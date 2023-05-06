@@ -29,3 +29,8 @@ server:
 logging:
   level:
     root: info
+
+jwt:
+  token:
+    secret: xN6yE#7sPz@Qf2k
+    expired: 3600000

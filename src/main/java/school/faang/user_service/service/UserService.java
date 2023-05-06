@@ -37,6 +37,12 @@ public class UserService extends AbstractUserService {
     }
 
     @Transactional(readOnly = true)
+    public User findUserByUsername(String login) {
+        return userRepository.findUserByLogin(login)
+                .orElseThrow(() -> new EntityNotFoundException("Couldn't find a user with login " + login));
+    }
+
+    @Transactional(readOnly = true)
     public boolean existsById(long id) {
         return userRepository.existsById(id);
     }

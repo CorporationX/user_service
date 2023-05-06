@@ -3,9 +3,7 @@ package school.faang.user_service.dto;
 import lombok.Data;
 
 @Data
-public class UserDto {
-    private long id;
+public class AuthRequestDto {
     private String username;
-    private String email;
     private String password;
 }

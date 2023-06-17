@@ -10,4 +10,9 @@ class UserServiceTest {
     void getUsers() {
         assertTrue(true);
     }
+
+    @Test
+    void getAllUsers() {
+        fail();
+    }
 }

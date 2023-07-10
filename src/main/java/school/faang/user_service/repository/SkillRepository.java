@@ -18,7 +18,7 @@ public interface SkillRepository extends CrudRepository<Skill, Long> {
     int countExisting(List<Long> ids);
 
     @Query(nativeQuery = true, value = """
-            SELECT s.* FROM skill s
+            SELECT .* FROM skill s
             JOIN user_skill us ON us.skill_id = s.id
             WHERE us.user_id = ?1
             """)

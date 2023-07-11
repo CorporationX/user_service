@@ -15,11 +15,15 @@ public class SubscriptionController {
         subscriptionService.followUser(followerId, followeeId);
     }
 
+    public void unfollowUser(long followerId, long followeeId){
+        validateFollower(followerId, followeeId);
+        subscriptionService.unfollowUser(followerId, followeeId);
+    }
+
     private boolean validateFollower(long followerId, long followeeId){
         if(followerId == followeeId){
             throw new DataValidationException("Пользователь пытается подписаться сам на себя");
         }
         return true;
     }
-
 }

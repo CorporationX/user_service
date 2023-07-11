@@ -25,6 +25,14 @@ class SubscriptionServiceTest {
         Mockito.verify(subscriptionRepository, Mockito.times(1))
                 .followUser(followerId, followeeId);
     }
+    @Test
+    void unfollowUserCallRepositoryMethod(){
+        int followerId = 11;
+        int followeeId = 15;
+        subscriptionService.unfollowUser(followerId, followeeId);
+        Mockito.verify(subscriptionRepository, Mockito.times(1))
+                .unfollowUser(followerId, followeeId);
+    }
 
     @Test
     void followUserThrowIllegalException(){
@@ -33,10 +41,25 @@ class SubscriptionServiceTest {
         Assert.assertThrows(IllegalArgumentException.class,
                 ()-> subscriptionService.followUser(followerId, followeeId));
     }
+
+    @Test
+    void unfollowUserThrowIllegalException(){
+        int followerId = -11;
+        int followeeId = -15;
+        Assert.assertThrows(IllegalArgumentException.class,
+                ()-> subscriptionService.unfollowUser(followerId, followeeId));
+    }
     @Test
     void followUserThrowDataValidException() {
         int idUser = 11;
         Assert.assertThrows(DataValidationException.class,
                 ()-> subscriptionService.followUser(idUser, idUser));
+    }
+
+    @Test
+    void unfollowUserThrowDataValidException() {
+        int idUser = 11;
+        Assert.assertThrows(DataValidationException.class,
+                ()-> subscriptionService.unfollowUser(idUser, idUser));
     }
 }

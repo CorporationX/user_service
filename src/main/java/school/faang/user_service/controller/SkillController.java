@@ -19,7 +19,7 @@ public class SkillController {
 
     @PostMapping("/{id}")
     @ResponseBody
-    public void create(@Valid @RequestBody SkillDto skill){
-        skillService.create(skill);
+    public SkillDto create(@Valid @RequestBody SkillDto skill){
+        return skillService.create(skill);
     }
 }

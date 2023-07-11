@@ -30,7 +30,7 @@ public class MentorshipService {
         }
     }
 
-    public void deleteMentee(Long menteeId, Long mentorId){
+    public void deleteMentee(Long menteeId, Long mentorId) {
         User mentee = userRepository.findById(menteeId).orElseThrow(() ->
                 new EntityNotFoundException("Invalid mentee ID"));
         User mentor = userRepository.findById(mentorId).orElseThrow(() ->
@@ -42,6 +42,20 @@ public class MentorshipService {
 
         mentor.getMentees().remove(mentee);
         userRepository.save(mentor);
+    }
+
+    public void deleteMentor(Long mentorId, Long menteeId) {
+        User mentee = userRepository.findById(menteeId).orElseThrow(() ->
+                new EntityNotFoundException("Invalid mentee ID"));
+        User mentor = userRepository.findById(mentorId).orElseThrow(() ->
+                new EntityNotFoundException("Invalid mentor ID"));
+
+        if (mentor.getId() == mentee.getId()) {
+            throw new IllegalArgumentException("Invalid deletion. You can't be mentor of yourself");
+        }
+
+        mentee.getMentees().remove(mentor);
+        userRepository.save(mentee);
     }
 }
 

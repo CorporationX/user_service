@@ -20,7 +20,11 @@ public class MentorshipController {
         return mentorshipService.getMentors(userId);
     }
 
-    public void deleteMentee(Long menteeId, Long mentorId){
+    public void deleteMentee(Long menteeId, Long mentorId) {
         mentorshipService.deleteMentee(menteeId, mentorId);
+    }
+
+    public void deleteMentor(Long mentorId, Long menteeId) {
+        mentorshipService.deleteMentor(mentorId, menteeId);
     }
 }

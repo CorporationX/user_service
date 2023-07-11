@@ -93,6 +93,14 @@ class SubscriptionServiceTest {
         Assertions.assertEquals(false, subscriptionService.filterUser(user, filter));
     }
 
+    @Test
+    void getFollowerCountPerformRepositoryMethod(){
+        int userID = 15;
+        subscriptionRepository.findFollowersAmountByFolloweeId(userID);
+        Mockito.verify(subscriptionRepository, Mockito.times(1))
+                .findFollowersAmountByFolloweeId(userID);
+    }
+
     private User createUser(){
         User user = new User();
         user.setUsername("Username");

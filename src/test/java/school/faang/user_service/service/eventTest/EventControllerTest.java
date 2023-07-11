@@ -1,11 +1,14 @@
 package school.faang.user_service.service.eventTest;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import school.faang.user_service.controller.event.EventController;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.exception.DataValidationException;
@@ -84,10 +87,9 @@ public class EventControllerTest {
 
     @Test
     void testNegativeEventIdIsInvalid() {
-        Assert.assertThrows(
-                DataValidationException.class,
-                () -> eventController.getEvent(-1L)
-        );
+        long eventId = -1;
+        ResponseEntity<?> responseEntity = eventController.getEvent(eventId);
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
     }
     @Test
     void testReceivingValidEvent() {

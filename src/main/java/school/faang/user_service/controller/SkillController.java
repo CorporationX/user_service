@@ -1,5 +1,6 @@
 package school.faang.user_service.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,14 +11,10 @@ import school.faang.user_service.service.SkillService;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/skill")
 public class SkillController {
     private final SkillService skillService;
-
-    @Autowired
-    public SkillController(SkillService skillService) {
-        this.skillService = skillService;
-    }
 
     public SkillDto create(SkillDto skillDTO) {
         skillDTO.validateSkill();
@@ -34,6 +31,5 @@ public class SkillController {
 
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
         return skillService.acquireSkillFromOffers(skillId, userId);
-
     }
 }

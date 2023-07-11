@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
@@ -21,19 +22,12 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class SkillService {
     private final SkillRepository skillRepository;
     private final SkillOfferRepository skillOfferRepository;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final UserRepository userRepository;
-
-    @Autowired
-    public SkillService(SkillRepository skillRepository, SkillOfferRepository skillOfferRepository, UserSkillGuaranteeRepository userSkillGuaranteeRepository, UserRepository userRepository) {
-        this.skillRepository = skillRepository;
-        this.skillOfferRepository = skillOfferRepository;
-        this.userSkillGuaranteeRepository = userSkillGuaranteeRepository;
-        this.userRepository = userRepository;
-    }
 
     public SkillDto create(SkillDto skillDTO) {
         if (!skillRepository.existsByTitle(skillDTO.getTitle())) {

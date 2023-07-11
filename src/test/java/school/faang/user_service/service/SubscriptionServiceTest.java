@@ -129,14 +129,14 @@ class SubscriptionServiceTest {
 
     private UserFilterDto createUserFilterDto(){
         UserFilterDto userFilterDto = new UserFilterDto();
-        userFilterDto.setNamePattern("Username");
-        userFilterDto.setAboutPattern("I'm interesting person");
-        userFilterDto.setEmailPattern("user@mail.com");
-        userFilterDto.setContactPattern("UserContact");
-        userFilterDto.setCountryPattern("UserCountry");
-        userFilterDto.setCityPattern("UserCity");
-        userFilterDto.setPhonePattern("89991324567");
-        userFilterDto.setSkillPattern("userSkill");
+        userFilterDto.setNamePattern("\\D+");
+        userFilterDto.setAboutPattern("\\D+");
+        userFilterDto.setEmailPattern("\\D+@\\D+");
+        userFilterDto.setContactPattern("\\D+");
+        userFilterDto.setCountryPattern("\\D+");
+        userFilterDto.setCityPattern("\\D+");
+        userFilterDto.setPhonePattern("\\d+");
+        userFilterDto.setSkillPattern("\\D+");
         userFilterDto.setExperienceMin(1);
         userFilterDto.setExperienceMax(7);
         return userFilterDto;

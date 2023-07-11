@@ -34,16 +34,16 @@ public class SubscriptionService {
     }
 
     public Boolean filterUser(User user, UserFilterDto filter){
-        return user.getUsername().equals(filter.getNamePattern()) &&
-                user.getEmail().equals(filter.getEmailPattern()) &&
-                user.getPhone().equals(filter.getPhonePattern()) &&
-                user.getAboutMe().equals(filter.getAboutPattern()) &&
-                user.getCountry().getTitle().equals(filter.getCountryPattern()) &&
-                user.getCity().equals(filter.getCityPattern()) &&
+        return user.getUsername().matches(filter.getNamePattern()) &&
+                user.getEmail().matches(filter.getEmailPattern()) &&
+                user.getPhone().matches(filter.getPhonePattern()) &&
+                user.getAboutMe().matches(filter.getAboutPattern()) &&
+                user.getCountry().getTitle().matches(filter.getCountryPattern()) &&
+                user.getCity().matches(filter.getCityPattern()) &&
                 user.getExperience() > filter.getExperienceMin() &&
                 user.getExperience() < filter.getExperienceMax() &&
-                user.getContacts().stream().allMatch(contact -> contact.getContact().equals(filter.getContactPattern())) &&
-                user.getSkills().stream().allMatch(skill -> skill.getTitle().equals(filter.getSkillPattern()));
+                user.getContacts().stream().allMatch(contact -> contact.getContact().matches(filter.getContactPattern())) &&
+                user.getSkills().stream().allMatch(skill -> skill.getTitle().matches(filter.getSkillPattern()));
     }
 
     private void validateFollower(long followerId, long followeeId){

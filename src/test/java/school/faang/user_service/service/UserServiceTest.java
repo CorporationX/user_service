@@ -10,7 +10,6 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -20,8 +19,6 @@ import static org.mockito.Mockito.when;
 class UserServiceTest {
     @Mock
     private SkillRepository skillRepository;
-    @Mock
-    private SkillMapper skillMapper;
     @InjectMocks
     private SkillService skillService;
 

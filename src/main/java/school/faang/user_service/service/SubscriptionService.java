@@ -11,9 +11,16 @@ public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
 
     public void followUser(long followerId, long followeeId){
-        if(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)){
+        validateFollower(followerId, followeeId);
+        subscriptionRepository.followUser(followerId, followeeId);
+    }
+    private boolean validateFollower(long followerId, long followeeId){
+        if(followerId == followeeId){
             throw new DataValidationException("Пользователь пытается подписаться сам на себя");
         }
-        subscriptionRepository.followUser(followerId, followeeId);
+        if(followerId <= 0 || followeeId <= 0){
+            throw new IllegalArgumentException("Пользователя с отрицательным Id не может быть");
+        }
+        return true;
     }
 }

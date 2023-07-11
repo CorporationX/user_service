@@ -28,6 +28,10 @@ public class SubscriptionController {
         return subscriptionService.getFollowers(followeeId, filter);
     }
 
+    public int getFollowersCount(long followerId){
+        return subscriptionService.getFollowersCount(followerId);
+    }
+
     private boolean validateFollower(long followerId, long followeeId){
         if(followerId == followeeId){
             throw new DataValidationException("Пользователь пытается подписаться сам на себя");

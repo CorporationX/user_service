@@ -19,10 +19,9 @@ public class MentorshipService {
         List<User> mentees = new ArrayList<>();
         if (userRepository.findById(userId).isEmpty()) {
             throw new NoSuchElementException("There is no user with such ID");
-        } else if (userRepository.findById(userId).get().getMentees().isEmpty()) {
-            return mentees;
+        } else {
+            return userRepository.findById(userId).get().getMentees();
         }
-        return userRepository.findById(userId).get().getMentees();
     }
 }
 

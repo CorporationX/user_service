@@ -14,9 +14,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class GoalServiceTest {
 
     @Mock
-    SkillRepository skilllRepository;
-
-    @Mock
     GoalRepository goalRepository;
 
     @ExtendWith(MockitoExtension.class)
@@ -33,6 +30,19 @@ class GoalServiceTest {
     @Test
     public void findGoalsByUserIdDataWasCollectedTest() {
         service.findGoalsByUserId(1L);
+        Mockito.verify(goalRepository).findGoalsByUserId(Mockito.anyLong());
+    }
+
+    @Test
+    public void getGoalsByUserLessThanOneTest() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            service.getGoalsByUser(0L, null);
+        });
+    }
+
+    @Test
+    public void getGoalsByUserNullFilter() {
+        service.getGoalsByUser(1L, null);
         Mockito.verify(goalRepository).findGoalsByUserId(Mockito.anyLong());
     }
 }

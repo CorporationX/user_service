@@ -42,4 +42,9 @@ public class EventService {
     public boolean validation(EventDto event) {
         return event.getTitle() != null && !event.getTitle().isEmpty() && event.getStartDate() != null && event.getOwnerId() != null;
     }
+
+    public EventDto getEvent(long eventId) {
+        return EventMapper.INSTANCE.toEventDto(eventRepository.findById(eventId)
+                .orElseThrow(() -> new DataValidationException("Ошибка")));
+    }
 }

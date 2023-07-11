@@ -33,7 +33,6 @@ class EventServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         eventService.create(event);
         verify(userRepository, times(1)).findById(1L);
-
     }
 
     @Test

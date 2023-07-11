@@ -17,7 +17,7 @@ public class SkillController {
 
     private final SkillService skillService;
 
-    @PostMapping("/{id}")
+    @PostMapping
     @ResponseBody
     public SkillDto create(@Valid @RequestBody SkillDto skill){
         return skillService.create(skill);

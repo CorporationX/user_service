@@ -10,11 +10,16 @@ import school.faang.user_service.service.SubscriptionService;
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
-    public  void followUser(long followerId, long followeeId){
+    public void followUser(long followerId, long followeeId){
+        validateFollower(followerId, followeeId);
+        subscriptionService.followUser(followerId, followeeId);
+    }
+
+    private boolean validateFollower(long followerId, long followeeId){
         if(followerId == followeeId){
             throw new DataValidationException("Пользователь пытается подписаться сам на себя");
         }
-        subscriptionService.followUser(followerId, followeeId);
+        return true;
     }
 
 }

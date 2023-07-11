@@ -1,28 +1,33 @@
 package school.faang.user_service.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.UserRepository;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 
-@Controller
+@Service
 @RequiredArgsConstructor
 public class MentorshipService {
     private final UserRepository userRepository;
 
     public List<User> getMentees(Long userId) {
-        List<User> mentees = new ArrayList<>();
         if (userRepository.findById(userId).isEmpty()) {
-            throw new NoSuchElementException("There is no user with such ID");
-        } else if (userRepository.findById(userId).get().getMentees().isEmpty()) {
-            return mentees;
+            throw new EntityNotFoundException("There is no user with such ID");
+        } else {
+            return userRepository.findById(userId).get().getMentees();
         }
-        return userRepository.findById(userId).get().getMentees();
+    }
+
+    public List<User> getMentors(Long userId) {
+        if (userRepository.findById(userId).isEmpty()) {
+            throw new EntityNotFoundException("There is no user with such ID");
+        } else {
+            return userRepository.findById(userId).get().getMentors();
+        }
     }
 }
 

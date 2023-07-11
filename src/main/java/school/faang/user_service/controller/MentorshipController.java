@@ -15,4 +15,8 @@ public class MentorshipController {
     public List<User> getMentees(Long userId) {
         return mentorshipService.getMentees(userId);
     }
+
+    public List<User> getMentors(Long userId) {
+        return mentorshipService.getMentors(userId);
+    }
 }

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.service.SubscriptionService;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,8 +20,7 @@ public class SubscriptionController {
                            @PathVariable("id") long followeeId) {
         if (followerId == followeeId) {
             throw new DataValidationException("You can't subscribe to yourself.");
-        } else {
-            subscriptionService.followUser(followerId, followeeId);
         }
+        subscriptionService.followUser(followerId, followeeId);
     }
 }

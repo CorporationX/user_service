@@ -11,4 +11,6 @@ public class MenteeDto {
     private String email;
     private String phone;
     private String aboutMe;
+    private String city;
+    private Integer experience;
 }

@@ -18,21 +18,25 @@ class MenteeMapperTest {
 
     @Test
     void userToMenteeDto_ShouldProperlyMapUserToMenteeDto() {
-        User testUserOne = new User();
-        testUserOne.setId(1L);
-        testUserOne.setUsername("one");
-        testUserOne.setEmail("one@email");
-        testUserOne.setPhone("123456789");
-        testUserOne.setAboutMe("about one");
+        User testUser = new User();
+        testUser.setId(1L);
+        testUser.setUsername("one");
+        testUser.setEmail("one@email");
+        testUser.setPhone("123456789");
+        testUser.setAboutMe("about one");
+        testUser.setCity("Moscow");
+        testUser.setExperience(10);
 
-        MenteeDto menteeDto = menteeMapper.UserToMenteeDto(testUserOne);
+        MenteeDto menteeDto = menteeMapper.UserToMenteeDto(testUser);
 
         assertAll(() -> {
             assertNotNull(menteeDto);
-            assertEquals(menteeDto.getUsername(), testUserOne.getUsername());
-            assertEquals(menteeDto.getEmail(), testUserOne.getEmail());
-            assertEquals(menteeDto.getPhone(), testUserOne.getPhone());
-            assertEquals(menteeDto.getAboutMe(), testUserOne.getAboutMe());
+            assertEquals(menteeDto.getUsername(), testUser.getUsername());
+            assertEquals(menteeDto.getEmail(), testUser.getEmail());
+            assertEquals(menteeDto.getPhone(), testUser.getPhone());
+            assertEquals(menteeDto.getAboutMe(), testUser.getAboutMe());
+            assertEquals(menteeDto.getCity(), testUser.getCity());
+            assertEquals(menteeDto.getExperience(), testUser.getExperience());
         });
     }
 }

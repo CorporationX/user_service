@@ -81,4 +81,18 @@ public class EventControllerTest {
                 () -> eventController.create(eventDto)
         );
     }
+
+    @Test
+    void testNegativeEventIdIsInvalid() {
+        Assert.assertThrows(
+                DataValidationException.class,
+                () -> eventController.getEvent(-1L)
+        );
+    }
+    @Test
+    void testReceivingValidEvent() {
+        int eventId = 10;
+        eventController.getEvent(eventId);
+        verify(eventService, times(1)).getEvent(eventId);
+    }
 }

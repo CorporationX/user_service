@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -20,6 +21,12 @@ public class EventService {
         validateEventSkills(event);
         var eventEntity = eventRepository.save(eventMapper.toEntity(event));
         return eventMapper.toDto(eventEntity);
+    }
+
+    public EventDto getEvent(long eventId) {
+        var event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException(String.format("Event with id: %d was not found", eventId)));
+        return eventMapper.toDto(event);
     }
 
     private void validateEventSkills(EventDto event) {

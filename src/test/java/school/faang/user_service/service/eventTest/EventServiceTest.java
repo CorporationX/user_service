@@ -10,7 +10,9 @@ import org.mockito.MockitoAnnotations;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -19,6 +21,7 @@ import school.faang.user_service.service.event.EventService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class EventServiceTest {
     @Mock
@@ -56,5 +59,26 @@ public class EventServiceTest {
                 DataValidationException.class,
                 () -> eventService.create(eventDto)
         );
+    }
+
+    @Test
+    void testEntityIsNull() {
+        Mockito.when(eventRepository.findById(Mockito.anyLong())).thenReturn(
+                Optional.empty()
+        );
+        Assert.assertThrows(
+                NotFoundException.class,
+                () -> eventService.getEvent(5)
+        );
+    }
+
+    @Test
+    void testEntityIsNotNull() {
+        var event = Event.builder().id(0).build();
+        Mockito.when(eventRepository.findById(Mockito.anyLong())).thenReturn(
+                Optional.of(event)
+        );
+        eventService.getEvent(Mockito.anyLong());
+        Mockito.verify(eventMapper, Mockito.times(1)).toDto(event);
     }
 }

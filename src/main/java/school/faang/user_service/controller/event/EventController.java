@@ -16,6 +16,13 @@ public class EventController {
         return eventService.create(eventDto);
     }
 
+    public EventDto getEvent(long eventId) {
+        if (eventId < 0) {
+            throw new DataValidationException("Event id cannot be less than 0");
+        }
+        return eventService.getEvent(eventId);
+    }
+
     private void validateEvent(EventDto event) {
         if (event.getTitle() == null || event.getTitle().isBlank()) {
             throw new DataValidationException("Event title cannot be empty");

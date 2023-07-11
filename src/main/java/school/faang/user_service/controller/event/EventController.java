@@ -1,14 +1,17 @@
 package school.faang.user_service.controller.event;
 
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.ErrorResponse;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.service.event.EventService;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -26,6 +29,17 @@ public class EventController {
         }
         try {
             return ResponseEntity.ok(eventService.getEvent(eventId));
+        } catch (NotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    public ResponseEntity<List<?>> getEventsByFilter(@RequestBody EventFilterDto filter) {
+        try {
+            List<EventDto> filteredEvents = eventService.getEventsByFilter(filter);
+            return ResponseEntity.ok(filteredEvents);
         } catch (NotFoundException e) {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {

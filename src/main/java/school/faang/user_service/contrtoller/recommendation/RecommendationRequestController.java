@@ -12,8 +12,9 @@ public class RecommendationRequestController {
 
     private final RecommendationRequestService service;
 
-    public RecommendationRequestDto requestRecommendation(RecommendationRequestDto recommendationRequest) {
+    public void requestRecommendation(RecommendationRequestDto recommendationRequest) { //В задаче был RecommendationRequestDto. Пока не понял, откуда возрващать по этому сделал void
         validate(recommendationRequest);
+        service.create(recommendationRequest);
     }
 
     private void validate(RecommendationRequestDto recommendationRequest) {

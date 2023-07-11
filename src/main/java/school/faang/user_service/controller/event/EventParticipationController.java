@@ -2,8 +2,9 @@ package school.faang.user_service.controller.event;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
-@Component
+@Controller
 public class EventParticipationController {
     EventParticipationService eventParticipationService;
 
@@ -13,6 +14,7 @@ public class EventParticipationController {
     }
 
     public void registerParticipant(){
-
+        //передавать id пользователя и эвента в метод registerParticipant
+        // класса EventPartcipationService.
     }
 }

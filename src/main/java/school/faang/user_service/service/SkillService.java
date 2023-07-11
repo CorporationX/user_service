@@ -12,7 +12,6 @@ import school.faang.user_service.repository.SkillRepository;
 @RequiredArgsConstructor
 public class SkillService {
     private final SkillRepository skillRepository;
-    private final SkillMapper skillMapper;
 
     public SkillDto create(SkillDto skill){
         if (!skillRepository.existsByTitle(skill.getTitle())){
@@ -22,7 +21,7 @@ public class SkillService {
                             .build();
             skillRepository.save(newSkill);
 
-            return skillMapper.skillToDto(newSkill);
+            return SkillMapper.INSTANCE.skillToDto(newSkill);
         }
 
         throw new DataValidationException("Skill " + skill.getTitle() + " already exists");

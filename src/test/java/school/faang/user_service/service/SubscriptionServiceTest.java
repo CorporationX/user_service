@@ -88,7 +88,7 @@ class SubscriptionServiceTest {
     @Test
     void filterUserReturnFalse(){
         User user = createUser();
-        user.setCity("notCity");
+        user.setCity("1city");
         UserFilterDto filter = createUserFilterDto();
         Assertions.assertEquals(false, subscriptionService.filterUser(user, filter));
     }

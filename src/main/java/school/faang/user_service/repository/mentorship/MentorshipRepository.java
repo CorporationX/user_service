@@ -15,4 +15,11 @@ public interface MentorshipRepository extends CrudRepository<User, Long> {
             WHERE m.mentor_id = ?
             """)
     List<User> findMenteesByMentorId(long mentorId);
+
+    @Query(nativeQuery = true, value = """
+            SELECT * FROM users u
+            JOIN mentorship m  ON u.id = m.mentor_id
+            WHERE m.mentee_id = ?
+            """)
+    List<User> findMentorsByUserId(long userId);
 }

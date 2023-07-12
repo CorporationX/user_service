@@ -6,5 +6,5 @@ import school.faang.user_service.entity.User;
 
 @Mapper(componentModel = "spring")
 public interface MenteeMapper {
-    MenteeDto UserToMenteeDto(User user);
+    MenteeDto userToMenteeDto(User user);
 }

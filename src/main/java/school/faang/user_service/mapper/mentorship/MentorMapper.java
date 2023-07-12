@@ -7,5 +7,5 @@ import school.faang.user_service.entity.User;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR, uses = MenteeMapper.class)
 public interface MentorMapper {
-    MentorDto userToMentorDto(User user);
+    MentorDto toDto(User user);
 }

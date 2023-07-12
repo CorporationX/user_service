@@ -10,15 +10,12 @@ import static org.junit.jupiter.api.Assertions.*;
 class MenteeMapperTest {
 
     private MenteeMapper menteeMapper;
+    private User testUser;
 
     @BeforeEach
     void setUp() {
         menteeMapper = new MenteeMapperImpl();
-    }
-
-    @Test
-    void userToMenteeDto_ShouldProperlyMapUserToMenteeDto() {
-        User testUser = new User();
+        testUser = new User();
         testUser.setId(1L);
         testUser.setUsername("one");
         testUser.setEmail("one@email");
@@ -26,7 +23,10 @@ class MenteeMapperTest {
         testUser.setAboutMe("about one");
         testUser.setCity("Moscow");
         testUser.setExperience(10);
+    }
 
+    @Test
+    void userToMenteeDto_ShouldProperlyMapUserToMenteeDto() {
         MenteeDto menteeDto = menteeMapper.toDto(testUser);
 
         assertAll(() -> {

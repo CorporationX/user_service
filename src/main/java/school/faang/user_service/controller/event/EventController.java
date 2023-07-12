@@ -24,10 +24,21 @@ public class EventController {
 
     @DeleteMapping("/event{id}")
     public void deleteEvent(@PathVariable Long id) {
+        idValidate(id);
         eventService.deleteEvent(id);
     }
 
+    @PostMapping("/event{id}")
+    public EventDto updateEvent(@PathVariable Long id, @RequestBody EventDto eventDto) {
+        idValidate(id);
+        validateEvent(eventDto);
+        return eventService.updateEvent(id, eventDto);
+    }
+
     public void validateEvent(EventDto eventDto) {
+        if(eventDto == null){
+            throw new DataValidationException("Event cannot be null");
+        }
         if (eventDto.getTitle() == null || eventDto.getTitle().isBlank()) {
             throw new DataValidationException("Event title cannot be empty");
         }
@@ -38,6 +49,11 @@ public class EventController {
 
         if (eventDto.getOwnerId() == null || eventDto.getOwnerId() < 0) {
             throw new DataValidationException("Event owner ID cannot be null");
+        }
+    }
+    private void idValidate(long id) {
+        if (id < 0) {
+            throw new DataValidationException("Id cannot be negative");
         }
     }
 }

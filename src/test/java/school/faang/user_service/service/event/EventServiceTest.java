@@ -19,10 +19,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 @ExtendWith(MockitoExtension.class)
 class EventServiceTest {
     EventDto eventDto;
+    EventDto eventDtoForUpdate;
     @Mock
     private EventRepository eventRepository;
     @Mock
@@ -34,9 +37,10 @@ class EventServiceTest {
 
     @BeforeEach
     public void init() {
-        eventDto = new EventDto(4L, "fdgdfg", LocalDateTime.now(), LocalDateTime.now(),
+        eventDto = new EventDto(1L, "Cool new Event", LocalDateTime.now(), LocalDateTime.now(),
                 0L, "hfgh", new ArrayList<>(), "location", 1);
-
+        eventDtoForUpdate = new EventDto(2L, "Event 1", LocalDateTime.now(), LocalDateTime.now(),
+                0L, "Description", new ArrayList<>(), "location", 1);
     }
 
     @Test
@@ -66,5 +70,14 @@ class EventServiceTest {
         Assertions.assertThrows(DataValidationException.class, () -> {
             eventService.deleteEvent(id);
         });
+    }
+
+    @Test
+    public void testUpdateEvent() {
+        var event = Event.builder().id(1L).title("New Event").build();
+        Mockito.when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
+        Mockito.when(eventMapper.toDto(event)).thenReturn(eventDtoForUpdate);
+        EventDto updatedEvent = eventService.updateEvent(1L, eventDto);
+        assertEquals("Cool new Event", updatedEvent.getTitle());
     }
 }

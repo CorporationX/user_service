@@ -24,14 +24,47 @@ public class EventService {
     }
 
     public void deleteEvent(Long id) {
-        idValidate(id);
         eventRepository.findById(id).orElseThrow(() -> new DataValidationException("Event not found"));
         eventRepository.deleteById(id);
     }
 
-    private void idValidate(long id) {
-        if (id < 0) {
-            throw new DataValidationException("Id cannot be negative");
+    public EventDto updateEvent(Long id, EventDto eventFormRequest) {
+        Event eventForUpdate = eventRepository.findById(id).orElseThrow(() -> new DataValidationException("Event not found"));
+        EventDto eventDtoForUpdate = eventMapper.toDto(eventForUpdate);
+        updateEventInDb(eventDtoForUpdate, eventFormRequest);
+
+        return eventDtoForUpdate;
+    }
+
+    private void updateEventInDb(EventDto eventForUpdate, EventDto eventFormRequest) {
+        {
+            eventValidator.checkIfUserHasSkillsRequired(eventFormRequest);
+            if (!(eventFormRequest.getTitle() == null)) {
+                eventForUpdate.setTitle(eventFormRequest.getTitle());
+            }
+            if (!(eventFormRequest.getStartDate() == null)) {
+                eventForUpdate.setStartDate(eventFormRequest.getStartDate());
+            }
+            if (!(eventFormRequest.getEndDate() == null)) {
+                eventForUpdate.setEndDate(eventFormRequest.getEndDate());
+            }
+            if (!(eventFormRequest.getDescription() == null)) {
+                eventForUpdate.setDescription(eventFormRequest.getDescription());
+            }
+
+            if (!(eventFormRequest.getLocation() == null)) {
+                eventForUpdate.setLocation(eventFormRequest.getLocation());
+            }
+
+            if (eventFormRequest.getMaxAttendees() >= 0) {
+                eventForUpdate.setMaxAttendees(eventFormRequest.getMaxAttendees());
+            }
+
+            if (!(eventFormRequest.getRelatedSkills() == null)) {
+                eventForUpdate.setRelatedSkills(eventFormRequest.getRelatedSkills());
+            }
+            eventRepository.save(eventMapper.toEntity(eventForUpdate));
         }
+
     }
 }

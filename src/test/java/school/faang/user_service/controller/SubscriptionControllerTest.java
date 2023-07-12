@@ -31,7 +31,6 @@ class SubscriptionControllerTest {
 
     @Test
     public void testAssertThrow() {
-
         // Verify that a DataValidationException is thrown
         Assert.assertThrows(DataValidationException.class, () -> subscriptionController.followUser(followerId, followeeId));
     }
@@ -59,6 +58,36 @@ class SubscriptionControllerTest {
         }
 
         // Verify that the followUser method in the subscriptionService is not called
+        Mockito.verifyNoInteractions(subscriptionService);
+    }
+
+    @Test
+    public void testUnfollowUser() {
+        followerId = 1;
+        followeeId = 2;
+
+        // Test case where followerId is not equal to followeeId
+        subscriptionController.unfollowUser(followerId, followeeId);
+
+        // Verify that the unfollowUser method in the subscriptionService is called with the correct arguments
+        Mockito.verify(subscriptionService, Mockito.times(1)).unfollowUser(followerId, followeeId);
+    }
+
+    @Test
+    public void testUnfollowUserThrow() {
+        // Verify that a DataValidationException is thrown
+        Assert.assertThrows(DataValidationException.class, () ->
+                subscriptionController.unfollowUser(followerId, followeeId));
+
+        // Test case where followerId is equal to followeeId
+        try {
+            subscriptionController.unfollowUser(followerId, followerId);
+        } catch (DataValidationException e) {
+            // Verify that a DataValidationException is thrown
+            assertEquals("You can't unsubscribe to yourself", e.getMessage());
+        }
+
+        // Verify that the unfollowUser method in the subscriptionService is not called
         Mockito.verifyNoInteractions(subscriptionService);
     }
 }

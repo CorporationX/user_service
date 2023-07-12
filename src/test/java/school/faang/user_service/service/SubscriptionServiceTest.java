@@ -75,4 +75,13 @@ class SubscriptionServiceTest {
         // Verify that the followUser method is not called again
         Mockito.verifyNoMoreInteractions(subscriptionRepository);
     }
+
+    @Test
+    public void testUnfollowUser() {
+        // Test case where followerId is not equal to followeeId
+        subscriptionService.unfollowUser(followerId, followeeId);
+
+        // Verify that the followUser method in the subscriptionService is called with the correct arguments
+        Mockito.verify(subscriptionRepository, Mockito.times(1)).unfollowUser(followerId, followeeId);
+    }
 }

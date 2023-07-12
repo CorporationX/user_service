@@ -16,13 +16,20 @@ public class SubscriptionServiceTest {
     @InjectMocks
     private SubscriptionService subscriptionService;
 
+    private final long followerId = 2;
+    private final long followeeId = 1;
+
     @Test
     public void shouldAddNewFollowerById() {
-        long followerId = 2;
-        long followeeId = 1;
-
         Mockito.doNothing().when(subscriptionRepository).followUser(followerId, followeeId);
         Assertions.assertDoesNotThrow(() -> subscriptionService.followUser(followerId, followeeId));
         Mockito.verify(subscriptionRepository, Mockito.times(1)).followUser(followerId, followeeId);
+    }
+
+    @Test
+    public void shouldDeleteFollowerById() {
+        Mockito.doNothing().when(subscriptionRepository).unfollowUser(followerId, followeeId);
+        Assertions.assertDoesNotThrow(() -> subscriptionService.unfollowUser(followerId, followeeId));
+        Mockito.verify(subscriptionRepository, Mockito.times(1)).unfollowUser(followerId, followeeId);
     }
 }

@@ -1,6 +1,8 @@
 package school.faang.user_service.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.service.SkillService;
@@ -24,7 +25,10 @@ public class SkillController {
     private final SkillService skillService;
 
     @PostMapping
-    public SkillDto create(@Valid @RequestBody SkillDto skill){
+    public SkillDto create(@RequestParam @NotEmpty(message = "Title can't be empty")
+                               @Size(max = 100, message = "Title should be at least 3 symbols short") String title) {
+        SkillDto skill = new SkillDto(0L, title);
+
         return skillService.create(skill);
     }
 

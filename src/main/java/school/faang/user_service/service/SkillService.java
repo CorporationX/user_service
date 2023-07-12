@@ -18,8 +18,6 @@ public class SkillService {
     public SkillDto create(SkillDto skill){
         if (!skillRepository.existsByTitle(skill.getTitle())){
             Skill newSkill = SkillMapper.INSTANCE.skillToEntity(skill);
-            newSkill.setId(0);
-
             skillRepository.save(newSkill);
 
             return SkillMapper.INSTANCE.skillToDto(newSkill);

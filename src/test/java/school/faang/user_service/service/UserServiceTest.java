@@ -30,7 +30,7 @@ class UserServiceTest {
 
     @Test
     void createReturnsSkillDto(){
-        SkillDto skillDto = new SkillDto(1L, "title");
+        SkillDto skillDto = new SkillDto(0L, "title");
         Skill skill = SkillMapper.INSTANCE.skillToEntity(skillDto);
 
         when(skillRepository.existsByTitle(skillDto.getTitle())).thenReturn(false);

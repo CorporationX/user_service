@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.service.RecommendationService;
+import school.faang.user_service.service.recommendation.RecommendationService;
 
 import java.util.List;
 
@@ -14,7 +14,8 @@ public class RecommendationController {
 
     private final RecommendationService recommendationService;
 
-    public List<User> giveRecommendation(RecommendationDto recommendation){
+    public RecommendationDto giveRecommendation(RecommendationDto recommendation){
+        recommendationService.create(recommendation);
        return null;
     }
 }

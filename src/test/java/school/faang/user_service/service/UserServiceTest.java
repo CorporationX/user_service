@@ -9,21 +9,28 @@ import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.withSettings;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -31,17 +38,14 @@ class UserServiceTest {
     private SkillOfferRepository skillOfferRepository;
     @Mock
     private SkillRepository skillRepository;
-    @Mock
-    private UserSkillGuaranteeRepository userSkillGuaranteeRepository;
-    @Mock
-    private UserRepository userRepository;
+    private final SkillMapper skillMapper = SkillMapper.INSTANCE;
     @InjectMocks
     private SkillService skillService;
 
     @Test
     void createTest_Should_Return_SkillDto() {
         SkillDto skillDto = new SkillDto(1L, "title");
-        Skill skill = SkillMapper.INSTANCE.toEntity(skillDto);
+        Skill skill = skillMapper.toEntity(skillDto);
 
         when(skillRepository.existsByTitle(skillDto.getTitle())).thenReturn(false);
         when(skillRepository.save(skill)).thenReturn(skill);
@@ -62,9 +66,10 @@ class UserServiceTest {
 
         when(skillRepository.existsByTitle(skillDto.getTitle())).thenReturn(true);
 
-        assertThrows(DataValidException.class, () -> {
+        DataValidException dataValidException = assertThrows(DataValidException.class, () -> {
             skillService.create(skillDto);
         });
+        assertEquals("Skill already exists", dataValidException.getMessage());
 
         verify(skillRepository).existsByTitle(skillDto.getTitle());
     }
@@ -111,25 +116,26 @@ class UserServiceTest {
                 mock(SkillOffer.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS)),
                 mock(SkillOffer.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS))
         );
-        User user = mock(User.class);
         Skill skill = mock(Skill.class);
+        User user = mock(User.class);
+        long skillId = 1L;
+        long userId = 2L;
 
-        when(skillRepository.findUserSkill(anyLong(), anyLong())).thenReturn(Optional.empty())
-                .thenReturn(Optional.of(Skill.builder().id(1L).build()));
-        when(skillOfferRepository.findAllOffersOfSkill(anyLong(), anyLong())).thenReturn(offers);
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
-        when(skillRepository.findById(anyLong())).thenReturn(Optional.of(skill));
+        when(skillOfferRepository.findAllOffersOfSkill(skillId, userId)).thenReturn(offers);
+        doReturn(skillId).when(skill).getId();
+        when(skillRepository.findById(skillId)).thenReturn(Optional.of(skill));
+        when(user.getId()).thenReturn(userId);
+        when(skill.getUsers()).thenReturn(Collections.singletonList(user));
 
-        SkillDto acquiredSkill = skillService.acquireSkillFromOffers(anyLong(), anyLong());
+        SkillDto acquiredSkill = skillService.acquireSkillFromOffers(skillId, userId);
 
         assertNotNull(acquiredSkill);
-        assertEquals(1L, acquiredSkill.getId());
+        assertEquals(skillId, acquiredSkill.getId());
 
-        verify(skillRepository, times(2)).findUserSkill(anyLong(), anyLong());
-        verify(skillOfferRepository).findAllOffersOfSkill(anyLong(), anyLong());
-        verify(userRepository).findById(anyLong());
-        verify(skillRepository).assignSkillToUser(anyLong(), anyLong());
-        verify(userSkillGuaranteeRepository, times(3)).save(any(UserSkillGuarantee.class));
+        verify(skillOfferRepository).findAllOffersOfSkill(skillId, userId);
+        verify(skillRepository).assignSkillToUser(skillId, userId);
+        verify(skillRepository).findById(skillId);
         verify(skillOfferRepository, times(3)).deleteById(anyLong());
+        verify(skillRepository, times(1)).save(skill);
     }
 }

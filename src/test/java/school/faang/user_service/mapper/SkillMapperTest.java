@@ -4,11 +4,11 @@ import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class SkillMapperTest {
+    private final SkillMapper skillMapper = SkillMapper.INSTANCE;
 
     @Test
     void toDTOTest() {
@@ -16,7 +16,7 @@ class SkillMapperTest {
         skill.setId(1);
         skill.setTitle("title");
 
-        SkillDto skillDTO = SkillMapper.INSTANCE.toSkillDTO(skill);
+        SkillDto skillDTO = skillMapper.toSkillDTO(skill);
 
         assertNotNull(skillDTO);
         assertEquals("title", skillDTO.getTitle());
@@ -29,7 +29,7 @@ class SkillMapperTest {
         skillDTO.setId(1L);
         skillDTO.setTitle("title");
 
-        Skill skill = SkillMapper.INSTANCE.toEntity(skillDTO);
+        Skill skill = skillMapper.toEntity(skillDTO);
 
         assertNotNull(skill);
         assertEquals("title", skill.getTitle());

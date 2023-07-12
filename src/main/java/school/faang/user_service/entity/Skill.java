@@ -11,6 +11,7 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -55,4 +56,11 @@ public class Skill {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    public void addGuarantee(UserSkillGuarantee userSkillGuarantee) {
+        if (guarantees == null) {
+            guarantees = new ArrayList<>();
+        }
+        guarantees.add(userSkillGuarantee);
+    }
 }

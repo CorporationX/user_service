@@ -21,8 +21,8 @@ public class SkillController {
         return skillService.create(skillDTO);
     }
 
-    public List<SkillDto> getUserSkills(long userId) {
-        return skillService.getUserSkills(userId);
+    public List<SkillDto> getUserSkills(long userId, int page, int size) {
+        return skillService.getUserSkills(userId, page, size);
     }
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {

@@ -8,6 +8,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.user.UserService;
 
 import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class EventValidator {

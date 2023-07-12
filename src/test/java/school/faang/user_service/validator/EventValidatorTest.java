@@ -16,15 +16,16 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 @ExtendWith(MockitoExtension.class)
 class EventValidatorTest {
+    EventDto eventDto;
+    List<Long> skillIds;
     @Mock
     private UserService userService;
     @InjectMocks
     private EventValidator eventValidator;
-    EventDto eventDto;
-    List<Long> skillIds;
 
     @BeforeEach
     public void init() {

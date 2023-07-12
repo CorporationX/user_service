@@ -2,7 +2,6 @@ package school.faang.user_service.service.event;
 
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.event.Event;
@@ -24,4 +23,15 @@ public class EventService {
         return eventMapper.toDto(event);
     }
 
+    public void deleteEvent(Long id) {
+        idValidate(id);
+        eventRepository.findById(id).orElseThrow(() -> new DataValidationException("Event not found"));
+        eventRepository.deleteById(id);
+    }
+
+    private void idValidate(long id) {
+        if (id < 0) {
+            throw new DataValidationException("Id cannot be negative");
+        }
+    }
 }

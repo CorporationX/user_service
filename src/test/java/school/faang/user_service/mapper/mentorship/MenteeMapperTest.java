@@ -13,7 +13,7 @@ class MenteeMapperTest {
 
     @BeforeEach
     void setUp() {
-    menteeMapper = new MenteeMapperImpl();
+        menteeMapper = new MenteeMapperImpl();
     }
 
     @Test
@@ -27,7 +27,7 @@ class MenteeMapperTest {
         testUser.setCity("Moscow");
         testUser.setExperience(10);
 
-        MenteeDto menteeDto = menteeMapper.UserToMenteeDto(testUser);
+        MenteeDto menteeDto = menteeMapper.toDto(testUser);
 
         assertAll(() -> {
             assertNotNull(menteeDto);

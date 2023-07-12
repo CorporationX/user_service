@@ -29,6 +29,8 @@ class MentorshipServiceTest {
 
     @BeforeEach
     void setUp() {
+        Mockito.when(mentorshipRepository.existsById(3L))
+                .thenReturn(true);
         Mockito.when(mentorshipRepository.findMenteesByMentorId(3L))
                 .thenReturn(List.of(new User(), new User()));
     }

@@ -7,6 +7,7 @@ import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.GoalMapper;
+import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.util.List;
@@ -15,7 +16,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GoalService {
     private final GoalRepository goalRepository;
+    private final SkillRepository skillRepository;
     private final GoalMapper goalMapper = GoalMapper.INSTANCE;
+    private final int MAX_GOALS_PER_USER = 3;
 
     public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filterDto) {
         List<Goal> goals = goalRepository.findGoalsByUserId(userId)
@@ -43,6 +46,32 @@ public class GoalService {
     }
 
     private boolean goalContainSkillId(GoalFilterDto filterDto, Goal goal) {
-        return goal.getSkillsToAchieve().stream().map(Skill::getId).toList().contains(filterDto.getSkillId());
+        return goal.getSkillsToAchieve().stream()
+                .map(Skill::getId)
+                .toList()
+                .contains(filterDto.getSkillId());
+    }
+
+    public Goal createGoal(Long userId, Goal goal) {
+        validateGoalToCreate(userId, goal);
+        return goalRepository.save(goal);
+    }
+
+    private void validateGoalToCreate(Long userId, Goal goal) {
+        if (goal == null) {
+            throw new IllegalArgumentException("Goal cannot be null");
+        }
+        if (goal.getTitle().isBlank()) {
+            throw new IllegalArgumentException("Title cannot be null");
+        }
+        if (goalRepository.countActiveGoalsPerUser(userId) >= MAX_GOALS_PER_USER) {
+            throw new IllegalArgumentException("Maximum number of goals for this user reached");
+        }
+        List<Skill> skillsToAchieve = goal.getSkillsToAchieve();
+        skillsToAchieve.forEach(skill -> {
+            if (!skillRepository.existsByTitle(skill.getTitle())) {
+                throw new IllegalArgumentException("Skill not found");
+            }
+        });
     }
 }

@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 public interface GoalRepository extends CrudRepository<Goal, Long> {
 
     @Query(nativeQuery = true, value = """
-          E  SELCT * FROM goal g
+            SELECT * FROM goal g
             JOIN user_goal ug ON g.id = ug.goal_id
             WHERE ug.user_id = ?1
             """)

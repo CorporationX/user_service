@@ -14,6 +14,8 @@ public class GoalController {
     private final GoalService service;
 
     public List<Goal> getGoalsByUser(Long userId, GoalFilterDto filter) {
+        if (userId == null) throw new NullPointerException("userId can not be Null");
+        if (userId < 1) throw new IllegalArgumentException("userId can not be less than 1");
         return service.getGoalsByUser(userId, filter);
     }
 }

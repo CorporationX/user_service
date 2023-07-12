@@ -38,6 +38,14 @@ public class SubscriptionService {
         return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
     }
 
+    public List<UserDto> getFollowing(long followeeId, UserFilterDto filter){
+        validateUserId(followeeId);
+        return subscriptionRepository.findByFolloweeId(followeeId)
+                .filter(user -> filterUser(user, filter))
+                .map(user -> new UserDto(user.getId(), user.getUsername(), user.getEmail()))
+                .toList();
+    }
+
     public Boolean filterUser(User user, UserFilterDto filter){
         return user.getUsername().matches(filter.getNamePattern()) &&
                 user.getEmail().matches(filter.getEmailPattern()) &&

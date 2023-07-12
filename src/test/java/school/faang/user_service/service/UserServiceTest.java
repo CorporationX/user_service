@@ -26,6 +26,7 @@ class UserServiceTest {
     private SkillRepository skillRepository;
     @InjectMocks
     private SkillService skillService;
+    List<Skill> skillList;
 
     @Test
     void createReturnsSkillDto(){
@@ -33,12 +34,12 @@ class UserServiceTest {
         Skill skill = SkillMapper.INSTANCE.skillToEntity(skillDto);
 
         when(skillRepository.existsByTitle(skillDto.getTitle())).thenReturn(false);
-        when(skillRepository.save(skill)).thenReturn(skill);
+        when(skillRepository.save(any(Skill.class))).thenReturn(skill);
 
         SkillDto result = skillService.create(skillDto);
 
         assertNotNull(result);
-        assertEquals(1L, result.getId());
+        assertEquals(0, result.getId());
         assertEquals("title", result.getTitle());
 
         verify(skillRepository).existsByTitle(skillDto.getTitle());
@@ -48,38 +49,17 @@ class UserServiceTest {
     @Test
     void getAllSkillsByIdTest(){
         Long userId = 1L;
-        List<Skill> skillList = new ArrayList<>();
-        Skill skill1 = Skill.builder()
-                .id(1L)
-                .title("title")
-                .users(List.of())
-                .guarantees(List.of())
-                .events(List.of())
-                .goals(List.of())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
+        skillList = new ArrayList<>();
 
-        Skill skill2 = Skill.builder()
-                .id(1L)
-                .title("title")
-                .users(List.of())
-                .guarantees(List.of())
-                .events(List.of())
-                .goals(List.of())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
-
-        skillList.add(skill1);
-        skillList.add(skill2);
+        skillList.add(createSkill(1L, "title"));
+        skillList.add(createSkill(2L, "title"));
 
         List<SkillDto> expectedSkillDtoList = List.of(new SkillDto(1L, "title"),
                 new SkillDto(1L, "title"));
 
         when(skillRepository.findAllByUserId(userId)).thenReturn(skillList);
 
-        List<SkillDto> result = skillService.getUserSkills(userId);
+        List<SkillDto> result = skillService.getUserSkills(userId, 1, 5);
 
         assertEquals(expectedSkillDtoList.size(), result.size());
         verify(skillRepository).findAllByUserId(userId);
@@ -98,5 +78,18 @@ class UserServiceTest {
         verify(skillRepository).existsByTitle(skillDto.getTitle());
     }
 
+    private Skill createSkill(Long id, String title){
+        Skill skill = Skill.builder()
+                .id(id)
+                .title(title)
+                .users(List.of())
+                .guarantees(List.of())
+                .events(List.of())
+                .goals(List.of())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
 
+        return skill;
+    }
 }

@@ -17,10 +17,9 @@ public class SkillService {
 
     public SkillDto create(SkillDto skill){
         if (!skillRepository.existsByTitle(skill.getTitle())){
-            Skill newSkill = Skill.builder()
-                            .id(skill.getId())
-                            .title(skill.getTitle())
-                            .build();
+            Skill newSkill = SkillMapper.INSTANCE.skillToEntity(skill);
+            newSkill.setId(0);
+
             skillRepository.save(newSkill);
 
             return SkillMapper.INSTANCE.skillToDto(newSkill);
@@ -29,9 +28,13 @@ public class SkillService {
         throw new DataValidationException("Skill " + skill.getTitle() + " already exists");
     }
 
-    public List<SkillDto> getUserSkills(Long userId){
+    public List<SkillDto> getUserSkills(Long userId, int pageNumber, int pageSize) {
+        int numToSkip = (pageNumber - 1) * pageSize;
+
         return skillRepository.findAllByUserId(userId)
                 .stream()
+                .skip(numToSkip)
+                .limit(pageSize)
                 .map(SkillMapper.INSTANCE::skillToDto)
                 .toList();
     }

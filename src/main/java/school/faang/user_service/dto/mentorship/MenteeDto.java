@@ -1,10 +1,8 @@
 package school.faang.user_service.dto.mentorship;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
-@AllArgsConstructor
+@Data
 public class MenteeDto {
     // Не разобрался какие поля необходимо добавить в дтошку, поэтому выбрал несколько произвольных
     private String username;

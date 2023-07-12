@@ -16,6 +16,7 @@ public class GoalService {
     private final SkillRepository skillRepository;
     private final int MAX_GOALS_PER_USER = 3;
 
+    @Transactional
     public Goal createGoal(Long userId, Goal goal) {
         validateGoalToCreate(userId, goal);
         return goalRepository.save(goal);

@@ -37,14 +37,13 @@ public class EventService {
     }
 
     public List<EventDto> getEventsByFilter(EventFilterDto filter) {
-        var allEvents = eventRepository.findAll();
         List<Event> events = new ArrayList<>();
-        allEvents.forEach(events::add);
+        eventRepository.findAll().forEach(events::add);
         var filteredEvents = events.stream()
                 .filter(event -> filterMatches(event, filter))
                 .map(eventMapper::toDto)
                 .toList();
-        if (filteredEvents.isEmpty()){
+        if (filteredEvents.isEmpty()) {
             throw new NotFoundException("No events with current filters");
         }
         return filteredEvents;
@@ -65,25 +64,25 @@ public class EventService {
     }
 
     public boolean filterMatches(Event event, EventFilterDto filter) {
-        if (filter.getTitle() == null || !filter.getTitle().isBlank() || !filter.getTitle().contains(event.getTitle())) {
+        if (filter.getTitle() != null && !event.getTitle().contains(filter.getTitle())) {
             return false;
         }
-        if (filter.getStartDate() == null || filter.getStartDate().isAfter(event.getEndDate())) {
+        if (filter.getStartDate() != null && filter.getStartDate().isAfter(event.getEndDate())) {
             return false;
         }
-        if (filter.getEndDate() == null || filter.getEndDate().isBefore(event.getEndDate())) {
+        if (filter.getEndDate() != null && filter.getEndDate().isBefore(event.getEndDate())) {
             return false;
         }
-        if (filter.getOwnerId() == null || !(event.getOwner().getId() == filter.getOwnerId())) {
+        if (filter.getOwnerId() != null && !(event.getOwner().getId() == filter.getOwnerId())) {
             return false;
         }
-        if (filter.getLocation() == null || !event.getLocation().equals(filter.getLocation())) {
+        if (filter.getLocation() != null && !event.getLocation().equals(filter.getLocation())) {
             return false;
         }
-        if (filter.getMaxAttendees() == null || event.getMaxAttendees() > filter.getMaxAttendees()) {
+        if (filter.getMaxAttendees() != null && filter.getMaxAttendees() > event.getMaxAttendees()) {
             return false;
         }
-        if (filter.getRelatedSkillIds() != null && !filter.getRelatedSkillIds().isEmpty()) {
+        if (filter.getRelatedSkillIds() != null && !filter.getRelatedSkillIds().isEmpty() && event.getRelatedSkills() != null) {
             var eventSkillsIds = event.getRelatedSkills()
                     .stream()
                     .map(Skill::getId)

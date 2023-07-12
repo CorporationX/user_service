@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SubscriptionService;
 
 @ExtendWith(MockitoExtension.class)
@@ -26,7 +27,7 @@ public class SubscriptionControllerTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenIdEquals() {
+    public void shouldThrowExceptionWhenIdEqualsAreWhenSubscribing() {
         followeeId = 2;
 
         Assertions.assertThrows(DataValidationException.class, () -> subscriptionController.followUser(followerId, followeeId));
@@ -38,5 +39,13 @@ public class SubscriptionControllerTest {
         Mockito.doNothing().when(subscriptionService).unfollowUser(followerId, followeeId);
         Assertions.assertDoesNotThrow(() -> subscriptionController.unfollowUser(followerId, followeeId));
         Mockito.verify(subscriptionService, Mockito.times(1)).unfollowUser(followerId, followeeId);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenIdEqualsAreWhenUnsubscribing() {
+        followeeId = 2;
+
+        Assertions.assertThrows(DataValidationException.class, () -> subscriptionController.unfollowUser(followerId, followeeId));
+        Mockito.verify(subscriptionService, Mockito.times(0)).unfollowUser(followerId, followeeId);
     }
 }

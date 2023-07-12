@@ -23,6 +23,7 @@ public class SubscriptionService {
     public void unfollowUser(long followerId, long followeeId) {
         if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             subscriptionRepository.unfollowUser(followerId, followeeId);
+            return;
         }
         throw new DataValidationException("You are not subscribed to this user to unsubscribe from this user");
     }

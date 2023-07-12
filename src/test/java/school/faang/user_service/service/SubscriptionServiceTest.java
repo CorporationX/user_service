@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,8 +35,14 @@ public class SubscriptionServiceTest {
 
     @Test
     public void shouldDeleteFollowerById() {
-        Mockito.doNothing().when(subscriptionRepository).unfollowUser(followerId, followeeId);
+        Mockito.when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
         Assertions.assertDoesNotThrow(() -> subscriptionService.unfollowUser(followerId, followeeId));
         Mockito.verify(subscriptionRepository, Mockito.times(1)).unfollowUser(followerId, followeeId);
+    }
+
+    @Test
+    public void shouldThrowExceptionIfSubscriptionDoesNotExist() {
+        Assertions.assertThrows(DataValidationException.class, () -> subscriptionService.unfollowUser(followerId, followeeId));
+        Mockito.verify(subscriptionRepository, Mockito.times(0)).unfollowUser(followerId, followeeId);
     }
 }

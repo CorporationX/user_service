@@ -121,4 +121,11 @@ public class EventService {
                 })
                 .toList();
     }
+    public void deleteEvent(long eventId) {
+        if (eventId <= 0) {
+            throw new DataValidationException("Ошибка");
+        }else {
+            eventRepository.deleteById(eventId);
+        }
+    }
 }

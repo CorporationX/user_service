@@ -26,4 +26,7 @@ public class EventController {
 
         eventService.getEventsByFilter(filter);
     }
+    public void deleteEvent(long id){
+        eventService.deleteEvent(id);
+    }
 }

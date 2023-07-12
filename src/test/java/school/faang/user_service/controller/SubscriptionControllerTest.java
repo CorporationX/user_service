@@ -17,13 +17,20 @@ public class SubscriptionControllerTest {
     private SubscriptionController subscriptionController;
 
     private final long followerId = 2;
-    private final long followeeId = 1;
+    private long followeeId = 1;
 
     @Test
     public void shouldAddNewFollowerById() {
-        Mockito.doNothing().when(subscriptionService).followUser(followerId, followeeId);
         Assertions.assertDoesNotThrow(() -> subscriptionController.followUser(followerId, followeeId));
         Mockito.verify(subscriptionService, Mockito.times(1)).followUser(followerId, followeeId);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenIdEquals() {
+        followeeId = 2;
+
+        Assertions.assertThrows(DataValidationException.class, () -> subscriptionController.followUser(followerId, followeeId));
+        Mockito.verify(subscriptionService, Mockito.times(0)).followUser(followerId, followeeId);
     }
 
     @Test

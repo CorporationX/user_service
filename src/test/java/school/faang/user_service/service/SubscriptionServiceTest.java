@@ -21,9 +21,15 @@ public class SubscriptionServiceTest {
 
     @Test
     public void shouldAddNewFollowerById() {
-        Mockito.doNothing().when(subscriptionRepository).followUser(followerId, followeeId);
         Assertions.assertDoesNotThrow(() -> subscriptionService.followUser(followerId, followeeId));
         Mockito.verify(subscriptionRepository, Mockito.times(1)).followUser(followerId, followeeId);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenFollowerNotExists() {
+        Mockito.when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
+        Assertions.assertThrows(DataValidationException.class, () -> subscriptionService.followUser(followerId, followeeId));
+        Mockito.verify(subscriptionRepository, Mockito.times(0)).followUser(followerId, followeeId);
     }
 
     @Test

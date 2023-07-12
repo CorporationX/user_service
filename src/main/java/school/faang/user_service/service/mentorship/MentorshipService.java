@@ -14,7 +14,7 @@ public class MentorshipService {
     private final MenteeMapper menteeMapper;
 
     public List<MenteeDto> getMentees(long mentorId) {
-        if (mentorId < 1) {
+        if (!mentorshipRepository.existsById(mentorId)) {
             throw new RuntimeException("Invalid mentor id");
         }
         return mentorshipRepository.findMenteesByMentorId(mentorId).stream()

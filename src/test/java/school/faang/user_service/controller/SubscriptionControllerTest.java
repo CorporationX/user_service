@@ -1,17 +1,19 @@
 package school.faang.user_service.controller;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SubscriptionService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
 class SubscriptionControllerTest {
@@ -32,7 +34,7 @@ class SubscriptionControllerTest {
     @Test
     public void testAssertThrow() {
         // Verify that a DataValidationException is thrown
-        Assert.assertThrows(DataValidationException.class, () -> subscriptionController.followUser(followerId, followeeId));
+        assertThrows(DataValidationException.class, () -> subscriptionController.followUser(followerId, followeeId));
     }
 
     @Test
@@ -44,7 +46,7 @@ class SubscriptionControllerTest {
         subscriptionController.followUser(followerId, followeeId);
 
         // Verify that the followUser method in the subscriptionService is called with the correct arguments
-        Mockito.verify(subscriptionService, Mockito.times(1)).followUser(followerId, followeeId);
+        verify(subscriptionService, times(1)).followUser(followerId, followeeId);
     }
 
     @Test
@@ -58,7 +60,7 @@ class SubscriptionControllerTest {
         }
 
         // Verify that the followUser method in the subscriptionService is not called
-        Mockito.verifyNoInteractions(subscriptionService);
+        verifyNoInteractions(subscriptionService);
     }
 
     @Test
@@ -70,13 +72,13 @@ class SubscriptionControllerTest {
         subscriptionController.unfollowUser(followerId, followeeId);
 
         // Verify that the unfollowUser method in the subscriptionService is called with the correct arguments
-        Mockito.verify(subscriptionService, Mockito.times(1)).unfollowUser(followerId, followeeId);
+        verify(subscriptionService, times(1)).unfollowUser(followerId, followeeId);
     }
 
     @Test
     public void testUnfollowUserThrow() {
         // Verify that a DataValidationException is thrown
-        Assert.assertThrows(DataValidationException.class, () ->
+        assertThrows(DataValidationException.class, () ->
                 subscriptionController.unfollowUser(followerId, followeeId));
 
         // Test case where followerId is equal to followeeId
@@ -88,6 +90,6 @@ class SubscriptionControllerTest {
         }
 
         // Verify that the unfollowUser method in the subscriptionService is not called
-        Mockito.verifyNoInteractions(subscriptionService);
+        verifyNoInteractions(subscriptionService);
     }
 }

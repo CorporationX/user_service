@@ -1,18 +1,18 @@
 package school.faang.user_service.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SubscriptionService;
 
+import java.util.List;
+
+@RequiredArgsConstructor
 @Controller
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
-
-    @Autowired
-    public SubscriptionController(SubscriptionService subscriptionService) {
-        this.subscriptionService = subscriptionService;
-    }
 
     public void followUser(long followerId, long followeeId) {
         if (followerId == followeeId) {
@@ -26,5 +26,9 @@ public class SubscriptionController {
             throw new DataValidationException("You can't unsubscribe to yourself");
         }
         subscriptionService.unfollowUser(followerId, followeeId);
+    }
+
+    public List<UserDto> getFollowers(long followeeId, UserFilterDto filter) {
+        return subscriptionService.getFollowers(followeeId, filter);
     }
 }

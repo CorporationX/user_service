@@ -1,8 +1,6 @@
 package school.faang.user_service.service;
 
 import org.junit.Assert;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,26 +18,19 @@ class SkillServiceTest {
     @Mock
     private SkillRepository skillRepository;
 
+    @Mock
+    private SkillMapper skillMapper;
+
     @InjectMocks
     private SkillService skillService;
 
-    private final SkillMapper skillMapper = SkillMapper.INSTANCE;
-
-    @BeforeEach
-    void setUp() {
-    }
-
-    @AfterEach
-    void tearDown() {
-    }
-
     @Test
     void testExistsByTitle() {
-        SkillDto skillDto = new SkillDto(1L, "crek");
-        skillService.create(skillDto);
+        Mockito.when(skillRepository.existsByTitle("crek")).thenReturn(true);
+
         Assert.assertThrows(
                 DataValidationException.class,
-                () -> skillService.create(new SkillDto(2L, "crek"))
+                () -> skillService.create(new SkillDto(1L, "crek"))
         );
     }
 

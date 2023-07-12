@@ -12,6 +12,4 @@ public interface SkillMapper {
     Skill toEntity(SkillDto skillDto);
 
     SkillDto toDto(Skill skill);
-
-
 }

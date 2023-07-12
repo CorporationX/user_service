@@ -41,4 +41,14 @@ class SkillServiceTest {
         Mockito.verify(skillRepository, Mockito.times(1))
                 .save(skillMapper.toEntity(skillDto));
     }
+
+    @Test
+    void testGetUserSkills() {
+        Mockito.when(skillRepository.findAllByUserId(1L)).thenReturn(Mockito.anyList());
+
+        skillService.getUserSkills(1L);
+
+        Mockito.verify(skillRepository, Mockito.times(1))
+                .findAllByUserId(1L);
+    }
 }

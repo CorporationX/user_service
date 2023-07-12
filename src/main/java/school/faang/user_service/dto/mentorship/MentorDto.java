@@ -1,11 +1,9 @@
 package school.faang.user_service.dto.mentorship;
 
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 
-@AllArgsConstructor
-@Getter
+@Data
 public class MentorDto {
     private String username;
     private String email;

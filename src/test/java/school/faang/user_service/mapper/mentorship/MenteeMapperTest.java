@@ -27,7 +27,7 @@ class MenteeMapperTest {
 
     @Test
     void userToMenteeDto_ShouldProperlyMapUserToMenteeDto() {
-        MenteeDto menteeDto = menteeMapper.userToMenteeDto(testUser);
+        MenteeDto menteeDto = menteeMapper.toDto(testUser);
 
         assertAll(() -> {
             assertNotNull(menteeDto);

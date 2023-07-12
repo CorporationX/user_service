@@ -21,7 +21,7 @@ public class MentorshipService {
             throw new RuntimeException("Invalid mentor id");
         }
         return mentorshipRepository.findMenteesByMentorId(mentorId).stream()
-                .map(menteeMapper::userToMenteeDto)
+                .map(menteeMapper::toDto)
                 .toList();
     }
 
@@ -30,7 +30,7 @@ public class MentorshipService {
             throw new RuntimeException("Invalid user id");
         }
         return mentorshipRepository.findMentorsByUserId(userId).stream()
-                .map(mentorMapper::userToMentorDto)
+                .map(mentorMapper::toDto)
                 .toList();
     }
 }

@@ -22,7 +22,7 @@ class MentorMapperTest {
 
     @Test
     void userToMentorDto_shouldProperlyMapMentorFields() {
-        MentorDto mentorDto = mentorMapper.userToMentorDto(testUser);
+        MentorDto mentorDto = mentorMapper.toDto(testUser);
 
         assertAll(() -> {
             assertNotNull(mentorDto);
@@ -37,7 +37,7 @@ class MentorMapperTest {
 
     @Test
     void userToMentorDto_shouldProperlyMapMenteeList() {
-        MentorDto mentorDto = mentorMapper.userToMentorDto(testUser);
+        MentorDto mentorDto = mentorMapper.toDto(testUser);
 
         assertAll(() -> {
             assertEquals(mentorDto.getMentees().size(), 3);

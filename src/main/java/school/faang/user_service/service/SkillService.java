@@ -34,7 +34,7 @@ public class SkillService {
         }
 
         Skill skill = skillRepository.save(skillMapper.toEntity(skillDTO));
-        return skillMapper.toSkillDTO(skill);
+        return skillMapper.toDTO(skill);
     }
 
     @Transactional(readOnly = true)
@@ -43,7 +43,7 @@ public class SkillService {
                 .stream()
                 .skip((long) (page - 1) * size)
                 .limit(size)
-                .map(skillMapper::toSkillDTO)
+                .map(skillMapper::toDTO)
                 .toList();
     }
 
@@ -56,7 +56,7 @@ public class SkillService {
         return groupedSkills.entrySet()
                 .stream()
                 .map(entry -> SkillCandidateDto.builder()
-                        .skill(skillMapper.toSkillDTO(entry.getKey().getSkill()))
+                        .skill(skillMapper.toDTO(entry.getKey().getSkill()))
                         .offersAmount(entry.getValue())
                         .build())
                 .toList();
@@ -71,20 +71,20 @@ public class SkillService {
         skillRepository.assignSkillToUser(skillId, userId);
 
         return skillRepository.findById(skillId).map(skill -> {
-            User user = skill.getUsers().stream()
-                    .filter(e -> e.getId() == userId)
-                    .findFirst()
-                    .orElseThrow(() -> new DataValidException("User not found"));
-
-            addGuarantees(skill, offers, user);
+            addGuarantees(skill, offers, userId);
             skillRepository.save(skill);
 
-            return skillMapper.toSkillDTO(skill);
+            return skillMapper.toDTO(skill);
         }).orElseThrow(() ->
                 new DataValidException("User skill not found"));
     }
 
-    private void addGuarantees(Skill skill, List<SkillOffer> offers, User user) {
+    private void addGuarantees(Skill skill, List<SkillOffer> offers, Long userId) {
+        User user = skill.getUsers().stream()
+                .filter(e -> e.getId() == userId)
+                .findFirst()
+                .orElseThrow(() -> new DataValidException("User not found"));
+
         List<UserSkillGuarantee> skillGuarantees = offers.stream().map(offer -> UserSkillGuarantee.builder()
                         .user(user)
                         .skill(skill)
@@ -92,7 +92,7 @@ public class SkillService {
                         .build())
                 .toList();
 
-        skillGuarantees.forEach(skill::addGuarantee);
+        skill.addGuarantees(skillGuarantees);
 
         offers.forEach(offer -> skillOfferRepository.deleteById(offer.getId()));
     }

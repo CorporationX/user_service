@@ -16,7 +16,7 @@ class SkillMapperTest {
         skill.setId(1);
         skill.setTitle("title");
 
-        SkillDto skillDTO = skillMapper.toSkillDTO(skill);
+        SkillDto skillDTO = skillMapper.toDTO(skill);
 
         assertNotNull(skillDTO);
         assertEquals("title", skillDTO.getTitle());

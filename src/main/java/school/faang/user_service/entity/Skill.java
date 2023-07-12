@@ -57,10 +57,10 @@ public class Skill {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public void addGuarantee(UserSkillGuarantee userSkillGuarantee) {
+    public void addGuarantees(List<UserSkillGuarantee> guaranteesToAdd) {
         if (guarantees == null) {
             guarantees = new ArrayList<>();
         }
-        guarantees.add(userSkillGuarantee);
+        guarantees.addAll(guaranteesToAdd);
     }
 }

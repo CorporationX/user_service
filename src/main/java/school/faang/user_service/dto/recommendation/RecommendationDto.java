@@ -7,6 +7,7 @@ import java.util.List;
 
 @Data
 public class RecommendationDto {
+
     private Long id;
     private Long authorId;
     private Long receiverId;

@@ -84,7 +84,7 @@ class UserServiceTest {
 
         when(skillRepository.findAllByUserId(userId)).thenReturn(skills);
 
-        List<SkillDto> userSkills = skillService.getUserSkills(userId);
+        List<SkillDto> userSkills = skillService.getUserSkills(userId, 1, 2);
 
         assertEquals(2, userSkills.size());
 

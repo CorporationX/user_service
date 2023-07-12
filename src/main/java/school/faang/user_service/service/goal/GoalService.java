@@ -17,6 +17,7 @@ public class GoalService {
     private final GoalRepository goalRepository;
     private final GoalMapper goalMapper = GoalMapper.INSTANCE;
 
+    @Transactional(readOnly = true)
     public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filterDto) {
         List<Goal> goals = goalRepository.findGoalsByUserId(userId)
                 .filter(goal -> {

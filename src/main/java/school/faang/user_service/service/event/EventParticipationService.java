@@ -50,4 +50,8 @@ public class EventParticipationService {
 
         return eventParticipationRepository.findAllParticipantsByEventId(eventId);
     }
+
+    public int getParticipantsCount(long eventId) {
+        return eventParticipationRepository.countParticipants(eventId);
+    }
 }

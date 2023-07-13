@@ -42,6 +42,11 @@ public class EventParticipationController {
         return eventParticipationService.getParticipants(eventId);
     }
 
+    public int getParticipantsCount(long eventId) {
+        validateEvent(getEvent(eventId));
+        return eventParticipationService.getParticipantsCount(eventId);
+    }
+
     private static void validateParams(User user, Event event) {
         validateUser(user);
         validateEvent(event);

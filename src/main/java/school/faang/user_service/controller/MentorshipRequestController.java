@@ -13,6 +13,7 @@ import school.faang.user_service.dto.RequestsResponse;
 import school.faang.user_service.service.MentorshipRequestService;
 import school.faang.user_service.util.exception.GetRequestsMentorshipsException;
 import school.faang.user_service.util.exception.NoRequestsException;
+import school.faang.user_service.util.exception.RequestIsAlreadyAcceptedException;
 import school.faang.user_service.util.response.ErrorResponse;
 import school.faang.user_service.util.exception.RequestMentorshipException;
 import school.faang.user_service.util.exception.SameMentorAndMenteeException;
@@ -67,6 +68,13 @@ public class MentorshipRequestController {
         }
 
         return new RequestsResponse(mentorshipRequestService.getRequests(requestFilterDto));
+    }
+
+    @PostMapping("/accept/{id}") // интересно, как тут лучше сделать через @PathVariable или @RequestBody?
+    public ResponseEntity<HttpStatus> acceptRequest(@PathVariable("id") long id) {
+        mentorshipRequestService.acceptRequest(id);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @ExceptionHandler(UserNotFoundException.class)
@@ -133,6 +141,16 @@ public class MentorshipRequestController {
     private ResponseEntity<ErrorResponse> handleExceptions(NoRequestsException e) {
         ErrorResponse errorResponse = new ErrorResponse(
                 "No requests were created",
+                System.currentTimeMillis()
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(RequestIsAlreadyAcceptedException.class)
+    private ResponseEntity<ErrorResponse> handleExceptions(RequestIsAlreadyAcceptedException e) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                "This request is already accepted",
                 System.currentTimeMillis()
         );
 

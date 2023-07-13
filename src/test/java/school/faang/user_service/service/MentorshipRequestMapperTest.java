@@ -5,9 +5,14 @@ import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import org.mockito.*;
 import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.util.validator.FilterRequestStatusValidator;
 
 public class MentorshipRequestMapperTest {
+
+    @Mock
+    FilterRequestStatusValidator filterRequestStatusValidator;
 
     @Mock
     MentorshipRequestService mentorshipRequestService;
@@ -29,6 +34,17 @@ public class MentorshipRequestMapperTest {
         mentorshipRequestMapper.toEntity(mentorshipRequestDto, mentorshipRequestService);
 
         Mockito.verify(mentorshipRequestService, Mockito.times(2))
+                .findUserById(Mockito.anyLong());
+    }
+
+    @Test
+    void testMappingRequestFilterDto_UsersIdsAreNull() {
+        RequestFilterDto requestFilterDto =
+                new RequestFilterDto("description", null, null, "PENDING");
+
+        mentorshipRequestMapper.toEntity(requestFilterDto, mentorshipRequestService, filterRequestStatusValidator);
+
+        Mockito.verify(mentorshipRequestService, Mockito.times(0))
                 .findUserById(Mockito.anyLong());
     }
 }

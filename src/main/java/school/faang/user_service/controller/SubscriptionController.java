@@ -15,12 +15,10 @@ public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
     public void followUser(long followerId, long followeeId){
-        validateFollower(followerId, followeeId);
         subscriptionService.followUser(followerId, followeeId);
     }
 
     public void unfollowUser(long followerId, long followeeId){
-        validateFollower(followerId, followeeId);
         subscriptionService.unfollowUser(followerId, followeeId);
     }
 
@@ -38,12 +36,5 @@ public class SubscriptionController {
 
     public int getFollowingCount(long followerId){
         return subscriptionService.getFollowingCount(followerId);
-    }
-
-    private boolean validateFollower(long followerId, long followeeId){
-        if(followerId == followeeId){
-            throw new DataValidationException("Пользователь пытается подписаться сам на себя");
-        }
-        return true;
     }
 }

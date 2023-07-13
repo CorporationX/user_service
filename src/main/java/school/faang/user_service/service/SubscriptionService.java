@@ -20,5 +20,4 @@ public class SubscriptionService {
             throw new DataValidationException("This subscription already exists");
         }
     }
-
 }

@@ -3,6 +3,10 @@ package school.faang.user_service.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.skill.SkillDto;
+import school.faang.user_service.service.SkillService;
+
+import java.util.List;
+
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SkillService;
 
@@ -15,6 +19,8 @@ public class SkillController {
         this.skillService = skillService;
     }
 
+    public List<SkillDto> getUserSkills(long userId) {
+        return skillService.getUserSkills(userId);
     public SkillDto create(SkillDto skill) {
         validateSkill(skill);
         return skillService.create(skill);

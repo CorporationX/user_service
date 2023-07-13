@@ -21,5 +21,14 @@ class SkillControllerTest {
         SkillDto skill = new SkillDto(1L, "Programming");
         controller.create(skill);
         Mockito.verify(skillService, Mockito.times(1)).create(skill);
+    private SkillController controller;
+    @Mock
+    private SkillService service;
+
+    @Test
+    void getUserSkills() {
+        long userId = 1;
+        controller.getUserSkills(userId);
+        Mockito.verify(service).getUserSkills(userId);
     }
 }

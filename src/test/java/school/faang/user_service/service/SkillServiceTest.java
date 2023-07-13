@@ -36,5 +36,32 @@ class SkillServiceTest {
         Mockito.when(repository.existsByTitle("Programming")).thenReturn(true);
         skill = new SkillDto(1L,"Programming");
         assertThrows(DataValidationException.class,()-> skillService.create(skill));
+import school.faang.user_service.entity.Skill;
+import school.faang.user_service.repository.SkillRepository;
+
+import java.util.List;
+
+@ExtendWith(MockitoExtension.class)
+class SkillServiceTest {
+    @InjectMocks
+    SkillService service;
+
+    @Mock
+    SkillRepository repository;
+
+    @Test
+    void testGetUserSkills() {
+        long userId = 1L;
+        Mockito.when(repository.findAllByUserId(userId)).thenReturn(List.of(new Skill()));
+        service.getUserSkills(userId);
+        Mockito.verify(repository).findAllByUserId(userId);
+    }
+
+    @Test
+    void testThrown() {
+        long userId = 1L;
+        Mockito.when(repository.findAllByUserId(userId)).thenReturn(List.of(new Skill()));
+        service.getUserSkills(userId);
+        Mockito.verify(repository).findAllByUserId(userId);
     }
 }

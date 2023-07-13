@@ -1,13 +1,14 @@
 package school.faang.user_service.filters;
 
-import school.faang.user_service.commonMessages.MessagesForExceptions;
+import school.faang.user_service.commonMessages.ErrorMessages;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
 
-public class userFilter {
+public class UserFilter {
+    ErrorMessages errorMessages = new ErrorMessages();
     public List<UserDto> applyFilter(List<User> users, UserFilterDto filter){
         isApplicable(users);
         return users.stream()
@@ -32,7 +33,7 @@ public class userFilter {
     private void isApplicable(List<User> users){
         for (User user : users) {
             if (user == null) {
-                throw new NullPointerException(MessagesForExceptions);
+                throw new NullPointerException(errorMessages.USERISNULL);
             }
         }
     }

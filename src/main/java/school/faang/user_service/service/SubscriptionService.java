@@ -1,19 +1,21 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import school.faang.user_service.commonMessages.ErrorMessages;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.exceptions.DataValidationException;
+import school.faang.user_service.filters.UserFilter;
 import school.faang.user_service.repository.SubscriptionRepository;
 
 import java.util.List;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
+    ErrorMessages errorMessages = new ErrorMessages();
 
     public void followUser(long followerId, long followeeId){
         validateFollower(followerId, followeeId);
@@ -27,10 +29,7 @@ public class SubscriptionService {
 
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filter){
         validateUserId(followeeId);
-        return subscriptionRepository.findByFolloweeId(followeeId)
-                .filter(user -> filterUser(user, filter))
-                .map(user -> new UserDto(user.getId(), user.getUsername(), user.getEmail()))
-                .toList();
+        return new UserFilter().applyFilter(subscriptionRepository.findByFolloweeId(followeeId).toList(), filter);
     }
 
     public int getFollowersCount(long followeeId){
@@ -40,41 +39,25 @@ public class SubscriptionService {
 
     public List<UserDto> getFollowing(long followeeId, UserFilterDto filter){
         validateUserId(followeeId);
-        return subscriptionRepository.findByFolloweeId(followeeId)
-                .filter(user -> filterUser(user, filter))
-                .map(user -> new UserDto(user.getId(), user.getUsername(), user.getEmail()))
-                .toList();
+        return new UserFilter().applyFilter(subscriptionRepository.findByFolloweeId(followeeId).toList(), filter);
     }
 
     public int getFollowingCount(long followerId){
         validateUserId(followerId);
-        return subscriptionRepository.findFollowersAmountByFolloweeId(followerId);
-    }
-
-    public Boolean filterUser(User user, UserFilterDto filter){
-        return user.getUsername().matches(filter.getNamePattern()) &&
-                user.getEmail().matches(filter.getEmailPattern()) &&
-                user.getPhone().matches(filter.getPhonePattern()) &&
-                user.getAboutMe().matches(filter.getAboutPattern()) &&
-                user.getCountry().getTitle().matches(filter.getCountryPattern()) &&
-                user.getCity().matches(filter.getCityPattern()) &&
-                user.getExperience() > filter.getExperienceMin() &&
-                user.getExperience() < filter.getExperienceMax() &&
-                user.getContacts().stream().allMatch(contact -> contact.getContact().matches(filter.getContactPattern())) &&
-                user.getSkills().stream().allMatch(skill -> skill.getTitle().matches(filter.getSkillPattern()));
+        return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
     }
 
     private void validateFollower(long followerId, long followeeId){
         validateUserId(followerId);
         validateUserId(followeeId);
         if(followerId == followeeId){
-            throw new DataValidationException("Пользователь пытается подписаться сам на себя");
+            throw new DataValidationException(errorMessages.SAMEID);
         }
     }
 
     private void validateUserId(long userId){
         if(userId <= 0){
-            throw new IllegalArgumentException("Пользователя с отрицательным Id не может быть");
+            throw new IllegalArgumentException(errorMessages.NEGATIVEID);
         }
     }
 }

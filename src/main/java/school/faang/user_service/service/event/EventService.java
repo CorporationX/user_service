@@ -2,6 +2,7 @@ package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
@@ -14,9 +15,10 @@ import school.faang.user_service.repository.event.EventRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
-@Component("eventService")
+@Service("eventService")
 @RequiredArgsConstructor
 public class EventService {
     private final UserRepository userRepository;
@@ -35,10 +37,10 @@ public class EventService {
     }
 
     private static boolean isUserContainsSkill(EventDto event, User user) {
-        return user.getSkills()
+        return new HashSet<>(user.getSkills()
                 .stream()
                 .map(Skill::getTitle)
-                .toList()
+                .toList())
                 .containsAll(event.getRelatedSkills()
                         .stream()
                         .map(SkillDto::getTitle).toList());
@@ -68,7 +70,7 @@ public class EventService {
                         event.setEndDate(LocalDateTime.MAX);
                     }
                     return event.getStartDate().isAfter(filter.getStartDate())
-                            && event.getStartDate().isBefore(filter.getEndDate());
+                            && event.getEndDate().isBefore(filter.getEndDate());
                 })
                 .filter(event -> {
                     if (event.getOwnerId() == null) {
@@ -81,7 +83,7 @@ public class EventService {
                     if (event.getRelatedSkills() == null) {
                         return false;
                     } else {
-                        return event.getRelatedSkills().containsAll(filter.getRelatedSkills());
+                        return new HashSet<>(event.getRelatedSkills()).containsAll(filter.getRelatedSkills());
                     }
                 })
                 .filter(event -> {

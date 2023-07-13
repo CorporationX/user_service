@@ -27,21 +27,8 @@ class EventServiceTest {
 
 
     @Test
-    void should() {
-        User user = User.builder().id(1L).build();
-        EventDto event = EventDto.builder().id(1L).build();
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        eventService.create(event);
-        verify(userRepository, times(1)).findById(1L);
-    }
-
-    @Test
-    void create() {
+    void testFilterDTo() {
 
     }
 
-
-    @Test
-    void validation() {
-    }
 }

@@ -23,7 +23,6 @@ public class EventController {
         return eventService.create(eventService.getEvent(id));
     }
     public void getEventsByFilter(EventFilterDto filter){
-
         eventService.getEventsByFilter(filter);
     }
 }

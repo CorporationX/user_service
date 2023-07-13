@@ -33,8 +33,14 @@ public class GoalInvitationService {
         Optional<Goal> goal = goalRepository.findById(invitation.getGoalId());
 
         if (goal.isPresent()) {
-            goalInvitationRepository.save(new GoalInvitation(invitation.getId(), goal.get(), inviter, invited,
-                    invitation.getStatus(), LocalDateTime.now(), LocalDateTime.now()));
+            goalInvitationRepository.save(new GoalInvitation(
+                    invitation.getId(),
+                    goal.get(),
+                    inviter,
+                    invited,
+                    invitation.getStatus(),
+                    LocalDateTime.now(),
+                    LocalDateTime.now()));
         } else {
             throw new EntityNotFoundException("Invalid request. Requester goal not found");
         }

@@ -13,8 +13,9 @@ public class UserService {
 
     public User findUserById(Long userId) {
         if (userId != null) {
-            return userRepository.findById(userId).orElseThrow(() ->
-                    new EntityNotFoundException("Invalid request. Requester user not found"));
+            return userRepository
+                    .findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("Invalid request. Requester user not found"));
         }
         throw new NullPointerException();
     }

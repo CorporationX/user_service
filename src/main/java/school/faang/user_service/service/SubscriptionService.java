@@ -20,10 +20,10 @@ public class SubscriptionService {
     }
 
     private void followUserValidation(long followerId, long followeeId) {
-        if (userRepository.existsById(followeeId)) {
+        if (!userRepository.existsById(followeeId)) {
             throw new DataValidationException("The user they are trying to subscribe to does not exist");
         }
-        if (userRepository.existsById(followerId)) {
+        if (!userRepository.existsById(followerId)) {
             throw new DataValidationException("The user who is trying to subscribe does not exist");
         }
         if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {

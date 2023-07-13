@@ -16,20 +16,20 @@ public class SkillService {
     private final SkillMapper skillMapper;
 
     @Transactional
-    public SkillDto create(SkillDto skill) {
-        validateSkill(skill);
+    public SkillDto create(SkillDto skillDto) {
+        validateSkill(skillDto);
 
-        Skill skillToSave = skillMapper.toEntity(skill);
+        Skill skillToSave = skillMapper.toEntity(skillDto);
         return skillMapper.toDto(skillRepository.save(skillToSave));
     }
 
-    public void validateSkill(SkillDto skill) {
-        if (skill.getTitle().isBlank()) {
+    public void validateSkill(SkillDto skillDto) {
+        if (skillDto.getTitle().isBlank()) {
             throw new DataValidationException("Enter skill title, please");
         }
 
-        if (skillRepository.existsByTitle(skill.getTitle())) {
-            throw new DataValidationException("Skill with title " + skill.getTitle() + " already exists");
+        if (skillRepository.existsByTitle(skillDto.getTitle())) {
+            throw new DataValidationException("Skill with title " + skillDto.getTitle() + " already exists");
         }
     }
 }

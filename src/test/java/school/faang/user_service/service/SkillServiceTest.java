@@ -12,9 +12,6 @@ import school.faang.user_service.repository.SkillRepository;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,23 +22,21 @@ class SkillServiceTest {
     private SkillRepository skillRepository;
     @Mock
     private SkillMapper skillMapper;
-    SkillDto skillDto = mock(SkillDto.class);
 
     @Test
     void validateSkill_With_Blank_Title() {
-        when(skillDto.getTitle()).thenReturn("");
+        SkillDto skillDto = new SkillDto(1L, "");
 
         DataValidationException validationException = assertThrows(DataValidationException.class,
                 () -> skillService.validateSkill(skillDto));
 
         assertEquals("Enter skill title, please", validationException.getMessage());
-
-        verify(skillDto, times(1)).getTitle();
     }
 
     @Test
     void validationSkill_Not_Found_Title() {
-        when(skillDto.getTitle()).thenReturn("Skill");
+        SkillDto skillDto = new SkillDto(1L, "Skill");
+
         when(skillRepository.existsByTitle(anyString())).thenReturn(true);
 
         DataValidationException validationException = assertThrows(DataValidationException.class,

@@ -14,17 +14,33 @@ public class EventParticipationService {
     private final EventParticipationRepository eventParticipationRepository;
 
     public void registerParticipant(long eventId, long userId) {
-        User alreadyUser = eventParticipationRepository.findAllParticipantsByEventId(eventId)
-                .stream().filter(user -> user.getId() == userId).findFirst().orElse(null);
+        User alreadyUser = findAlreadyRegisteredUser(eventId, userId);
 
-        validatePossibility(alreadyUser);
+        validateRegisterPossibility(alreadyUser);
 
         eventParticipationRepository.register(eventId, userId);
     }
 
-    private static void validatePossibility(User alreadyUser) {
+    public void unregisterParticipant(long eventId, long userId) {
+        validateUnregisterPossibility(eventId, userId);
+
+        eventParticipationRepository.unregister(eventId, userId);
+    }
+
+    private User findAlreadyRegisteredUser(long eventId, long userId) {
+        return eventParticipationRepository.findAllParticipantsByEventId(eventId)
+                .stream().filter(user -> user.getId() == userId).findFirst().orElse(null);
+    }
+
+    private static void validateRegisterPossibility(User alreadyUser) {
         if (alreadyUser != null) {
             throw new IllegalArgumentException("User already registered");
+        }
+    }
+
+    private void validateUnregisterPossibility(long eventId, long userId) {
+        if (findAlreadyRegisteredUser(eventId, userId) == null) {
+            throw new IllegalArgumentException("User not registered");
         }
     }
 }

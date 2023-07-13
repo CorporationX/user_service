@@ -18,12 +18,21 @@ public class EventParticipationController {
     private final EventRepository eventRepository;
 
     public void registerParticipant(long eventId, long userId) {
-        User user = userRepository.findById(userId).orElse(null);
-        Event event = eventRepository.findById(eventId).orElse(null);
+        User user = getUser(userId);
+        Event event = getEvent(eventId);
 
         validateParams(user, event);
 
         eventParticipationService.registerParticipant(event.getId(), user.getId());
+    }
+
+    public void unregisterParticipant(long eventId, long userId) {
+        User user = getUser(userId);
+        Event event = getEvent(eventId);
+
+        validateParams(user, event);
+
+        eventParticipationService.unregisterParticipant(event.getId(), user.getId());
     }
 
     private static void validateParams(User user, Event event) {
@@ -33,5 +42,13 @@ public class EventParticipationController {
         if (event == null) {
             throw new NullPointerException("Event not found");
         }
+    }
+
+    private Event getEvent(long eventId) {
+        return eventRepository.findById(eventId).orElse(null);
+    }
+
+    private User getUser(long userId) {
+        return userRepository.findById(userId).orElse(null);
     }
 }

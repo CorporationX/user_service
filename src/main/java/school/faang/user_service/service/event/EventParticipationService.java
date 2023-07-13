@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 @Service
@@ -42,5 +44,10 @@ public class EventParticipationService {
         if (findAlreadyRegisteredUser(eventId, userId) == null) {
             throw new IllegalArgumentException("User not registered");
         }
+    }
+
+    public List<User> getParticipants(long eventId) {
+
+        return eventParticipationRepository.findAllParticipantsByEventId(eventId);
     }
 }

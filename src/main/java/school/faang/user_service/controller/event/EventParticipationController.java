@@ -9,6 +9,8 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.EventParticipationService;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 @Controller
@@ -35,10 +37,23 @@ public class EventParticipationController {
         eventParticipationService.unregisterParticipant(event.getId(), user.getId());
     }
 
+    public List<User> getParticipants(long eventId) {
+        validateEvent(getEvent(eventId));
+        return eventParticipationService.getParticipants(eventId);
+    }
+
     private static void validateParams(User user, Event event) {
+        validateUser(user);
+        validateEvent(event);
+    }
+
+    private static void validateUser(User user) {
         if (user == null) {
             throw new NullPointerException("User not found");
         }
+    }
+
+    private static void validateEvent(Event event) {
         if (event == null) {
             throw new NullPointerException("Event not found");
         }

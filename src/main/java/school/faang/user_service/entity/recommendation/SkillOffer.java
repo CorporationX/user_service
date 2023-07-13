@@ -17,7 +17,7 @@ public class SkillOffer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private long S;
 
     @ManyToOne
     @JoinColumn(name = "skill_id", nullable = false)

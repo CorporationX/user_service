@@ -22,4 +22,10 @@ public interface MentorshipRepository extends CrudRepository<User, Long> {
             WHERE m.mentee_id = ?
             """)
     List<User> findMentorsByUserId(long userId);
+
+    @Query(nativeQuery = true, value = """
+            DELETE FROM mentorship m
+            WHERE m.mentor_id = ?1 AND m.mentee_id = ?2
+            """)
+    void deleteMentee(long mentorId, long menteeId);
 }

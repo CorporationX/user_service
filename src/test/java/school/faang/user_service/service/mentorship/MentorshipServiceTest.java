@@ -12,10 +12,12 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.mentorship.MenteeMapper;
+import school.faang.user_service.mapper.mentorship.MentorMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
+import school.faang.user_service.validator.UserValidator;
+import school.faang.user_service.validator.mentorship.MentorshipValidator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -24,33 +26,70 @@ class MentorshipServiceTest {
     private MentorshipRepository mentorshipRepository;
     @Mock
     private MenteeMapper menteeMapper;
+    @Mock
+    private MentorMapper mentorMapper;
+    @Mock
+    private UserValidator userValidator;
+    @Mock
+    private MentorshipValidator mentorshipValidator;
     @InjectMocks
     private MentorshipService mentorshipService;
+    private static final long MENTOR_ID = 1L;
+    private static final long MENTEE_ID = 3L;
 
     @BeforeEach
     void setUp() {
-        Mockito.when(mentorshipRepository.existsById(3L))
-                .thenReturn(true);
-        Mockito.when(mentorshipRepository.findMenteesByMentorId(3L))
+        Mockito.when(mentorshipRepository.findMenteesByMentorId(MENTOR_ID))
                 .thenReturn(List.of(new User(), new User()));
+        Mockito.when(mentorshipRepository.findMentorsByUserId(MENTEE_ID))
+                .thenReturn(List.of(new User(), new User(), new User()));
     }
 
     @Test
     void getMentees_shouldMatchMenteesSize() {
-        List<User> mentees = mentorshipRepository.findMenteesByMentorId(3L);
+        List<User> mentees = mentorshipRepository.findMenteesByMentorId(MENTOR_ID);
         assertEquals(2, mentees.size());
     }
 
     @Test
-    void getMentees_shouldInvokeFindMenteesByMentorIdMethod() {
-        mentorshipService.getMentees(3L);
-        Mockito.verify(mentorshipRepository).findMenteesByMentorId(3L);
+    void getMentees_shouldInvokeValidateUserMethod() {
+        mentorshipService.getMentees(MENTOR_ID);
+        Mockito.verify(userValidator).validateUser(MENTOR_ID);
     }
 
     @Test
-    void getMentees_shouldThrowException() {
-        assertThrows(RuntimeException.class,
-                () -> mentorshipService.getMentees(0L),
-                "Invalid mentor id");
+    void getMentees_shouldInvokeFindMenteesByMentorIdMethod() {
+        mentorshipService.getMentees(MENTOR_ID);
+        Mockito.verify(mentorshipRepository).findMenteesByMentorId(MENTOR_ID);
+    }
+
+    @Test
+    void getMentors_shouldMatchMentorsSize() {
+        List<User> mentors = mentorshipRepository.findMentorsByUserId(MENTEE_ID);
+        assertEquals(3, mentors.size());
+    }
+
+    @Test
+    void getMentors_shouldInvokeValidateUserMethod() {
+        mentorshipService.getMentors(MENTEE_ID);
+        Mockito.verify(userValidator).validateUser(MENTEE_ID);
+    }
+
+    @Test
+    void getMentors_shouldInvokeFindMentorsByUserIdMethod() {
+        mentorshipService.getMentors(MENTEE_ID);
+        Mockito.verify(mentorshipRepository).findMentorsByUserId(MENTEE_ID);
+    }
+
+    @Test
+    void deleteMentee_shouldInvokeValidateToDeleteMenteeMethod() {
+        mentorshipService.deleteMentee(MENTOR_ID, MENTEE_ID);
+        Mockito.verify(mentorshipValidator).validateToDeleteMentee(MENTOR_ID, MENTEE_ID);
+    }
+
+    @Test
+    void deleteMentee_shouldInvokeDeleteMenteeMethod() {
+        mentorshipService.deleteMentee(MENTOR_ID, MENTEE_ID);
+        Mockito.verify(mentorshipRepository).deleteMentee(MENTOR_ID, MENTEE_ID);
     }
 }

@@ -41,9 +41,22 @@ public class SkillController {
         return skillService.getOfferedSkills(userId);
     }
 
-    private static void validateUserId(Long userId) {
+    @GetMapping("/{skillId}/{userId}")
+    public SkillDto acquireSkillFromOffers(@PathVariable Long skillId, @PathVariable Long userId) {
+        validateUserId(userId);
+        validateSkillId(skillId);
+        return skillService.acquireSkillFromOffers(skillId, userId);
+    }
+
+    private void validateUserId(Long userId) {
         if (userId == null) {
             throw new DataValidationException("Некорректный id пользователя!!!");
+        }
+    }
+
+    private void validateSkillId(Long skillId) {
+        if (skillId == null) {
+            throw new DataValidationException("Некорректный id скилла!!!");
         }
     }
 

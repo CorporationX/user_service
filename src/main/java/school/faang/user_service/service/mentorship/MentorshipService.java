@@ -14,12 +14,16 @@ public class MentorshipService {
     private final MenteeMapper menteeMapper;
 
     public List<MenteeDto> getMentees(long mentorId) {
-        if (mentorId < 1) {
+        validateMentorId(mentorId);
+        return mentorshipRepository.findMenteesByMentorId(mentorId).stream()
+                .map(menteeMapper::toDto)
+                .toList();
+    }
+
+    private void validateMentorId(long mentorId) {
+        if (!mentorshipRepository.existsById(mentorId)) {
             throw new RuntimeException("Invalid mentor id");
         }
-        return mentorshipRepository.findMenteesByMentorId(mentorId).stream()
-                .map(menteeMapper::UserToMenteeDto)
-                .toList();
     }
 }
 

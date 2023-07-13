@@ -17,6 +17,8 @@ import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class MentorshipServiceTest {
@@ -29,6 +31,8 @@ class MentorshipServiceTest {
 
     @BeforeEach
     void setUp() {
+        when(mentorshipRepository.existsById(3L))
+                .thenReturn(true);
         Mockito.when(mentorshipRepository.findMenteesByMentorId(3L))
                 .thenReturn(List.of(new User(), new User()));
     }

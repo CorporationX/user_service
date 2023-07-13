@@ -11,6 +11,8 @@ import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
+import java.util.HashSet;
+
 @Component("eventService")
 @RequiredArgsConstructor
 public class EventService {
@@ -30,10 +32,10 @@ public class EventService {
     }
 
     private static boolean isUserContainsSkill(EventDto event, User user) {
-        return user.getSkills()
+        return new HashSet<>(user.getSkills()
                 .stream()
                 .map(Skill::getTitle)
-                .toList()
+                .toList())
                 .containsAll(event.getRelatedSkills()
                         .stream()
                         .map(SkillDto::getTitle).toList());

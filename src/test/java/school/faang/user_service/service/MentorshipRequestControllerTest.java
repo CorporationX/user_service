@@ -9,7 +9,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import school.faang.user_service.controller.MentorshipRequestController;
 import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.dto.RequestsResponse;
+import school.faang.user_service.util.exception.GetRequestsMentorshipsException;
 import school.faang.user_service.util.exception.RequestMentorshipException;
+
 
 public class MentorshipRequestControllerTest {
 
@@ -47,5 +51,29 @@ public class MentorshipRequestControllerTest {
 
         Assertions.assertThrows(RequestMentorshipException.class,
                 () -> this.mentorshipRequestController.requestMentorship(mentorshipRequestDto, bindingResult));
+    }
+
+    @Test
+    void testGetRequests_RequestIsValid_ShouldReturnValidResponseEntity() {
+        RequestFilterDto requestFilterDto =
+                new RequestFilterDto("description", null, null, "PENDING");
+        BindingResult bindingResult = Mockito.mock(BindingResult.class);
+        Mockito.when(bindingResult.hasErrors()).thenReturn(false);
+
+        RequestsResponse requestsResponse =
+                mentorshipRequestController.getRequests(requestFilterDto, bindingResult);
+
+        Assertions.assertNotNull(requestsResponse);
+    }
+
+    @Test
+    void testGetRequests_RequestIsInvalid_ShouldReturnException() {
+        RequestFilterDto requestFilterDto =
+                new RequestFilterDto("description", null, null, "pending");
+        BindingResult bindingResult = Mockito.mock(BindingResult.class);
+        Mockito.when(bindingResult.hasErrors()).thenReturn(true);
+
+        Assertions.assertThrows(GetRequestsMentorshipsException.class,
+                () -> this.mentorshipRequestController.getRequests(requestFilterDto, bindingResult));
     }
 }

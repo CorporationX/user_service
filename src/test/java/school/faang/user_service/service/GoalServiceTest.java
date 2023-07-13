@@ -29,6 +29,7 @@ public class GoalServiceTest {
 
     @Test
     void getGoalsByUserTest() {
+        // Find sub-goals is completely same
         Stream<Goal> goals = Stream.of(
                 mock(Goal.class),
                 mock(Goal.class)

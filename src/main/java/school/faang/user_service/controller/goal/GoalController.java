@@ -18,4 +18,8 @@ public class GoalController {
     public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filterDto) {
         return goalService.getGoalsByUser(userId, filterDto);
     }
+
+    public List<GoalDto> getSubGoalsByFilter(Long parentId, GoalFilterDto filterDto){
+        return goalService.getSubGoalsByFilter(parentId, filterDto);
+    }
 }

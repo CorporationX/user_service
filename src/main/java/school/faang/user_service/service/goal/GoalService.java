@@ -22,4 +22,10 @@ public class GoalService {
         GoalFilter goalFilter = new GoalFilter(filterDto, goalMapper);
         return goalFilter.filterGoals(goalRepository.findGoalsByUserId(userId));
     }
+
+    @Transactional(readOnly = true)
+    public List<GoalDto> getSubGoalsByFilter(Long parentId, GoalFilterDto filterDto) {
+        GoalFilter goalFilter = new GoalFilter(filterDto, goalMapper);
+        return goalFilter.filterGoals(goalRepository.findByParent(parentId));
+    }
 }

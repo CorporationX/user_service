@@ -2,6 +2,7 @@ package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
@@ -11,7 +12,9 @@ import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
-@Component("eventService")
+import java.util.HashSet;
+
+@Service("eventService")
 @RequiredArgsConstructor
 public class EventService {
     private final UserRepository userRepository;
@@ -30,16 +33,17 @@ public class EventService {
     }
 
     private static boolean isUserContainsSkill(EventDto event, User user) {
-        return user.getSkills()
+        return new HashSet<>(user.getSkills()
                 .stream()
                 .map(Skill::getTitle)
-                .toList()
+                .toList())
                 .containsAll(event.getRelatedSkills()
                         .stream()
                         .map(SkillDto::getTitle).toList());
     }
 
     public boolean validation(EventDto event) {
-        return event.getTitle() != null && !event.getTitle().isEmpty() && event.getStartDate() != null && event.getOwnerId() != null;
+        return event.getTitle() != null && !event.getTitle().isEmpty()
+                && event.getStartDate() != null && event.getOwnerId() != null;
     }
 }

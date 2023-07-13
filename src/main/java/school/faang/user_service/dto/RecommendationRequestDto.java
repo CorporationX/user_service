@@ -1,5 +1,6 @@
 package school.faang.user_service.dto;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import school.faang.user_service.entity.RequestStatus;
@@ -8,8 +9,7 @@ import school.faang.user_service.entity.recommendation.SkillRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 public class RecommendationRequestDto {
     private long id;
     private String message;

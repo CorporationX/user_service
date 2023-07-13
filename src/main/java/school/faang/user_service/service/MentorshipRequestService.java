@@ -2,13 +2,17 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+import school.faang.user_service.util.exception.NoRequestsException;
+import school.faang.user_service.util.exception.RequestIsAlreadyAcceptedException;
 import school.faang.user_service.util.exception.UserNotFoundException;
 import school.faang.user_service.util.validator.FilterRequestStatusValidator;
 import school.faang.user_service.util.validator.MentorshipRequestValidator;
@@ -20,6 +24,7 @@ import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class MentorshipRequestService {
 
     private final MentorshipRequestRepository mentorshipRequestRepository;
@@ -28,6 +33,7 @@ public class MentorshipRequestService {
     private final FilterRequestStatusValidator filterRequestStatusValidator;
     private final UserRepository userRepository;
 
+    @Transactional
     public void requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         MentorshipRequest mentorshipRequest = mentorshipRequestMapper.toEntity(mentorshipRequestDto, this);
 
@@ -72,5 +78,21 @@ public class MentorshipRequestService {
 
     public User findUserById(long id) {
         return userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+    }
+
+    @Transactional
+    public void acceptRequest(long id) {
+        MentorshipRequest foundRequest =
+                mentorshipRequestRepository.findById(id).orElseThrow(NoRequestsException::new);
+
+        boolean doesContain = foundRequest.getReceiver().getMentees().contains(foundRequest.getRequester());
+
+        if (foundRequest.getStatus().equals(RequestStatus.ACCEPTED) || doesContain) {
+            throw new RequestIsAlreadyAcceptedException();
+        }
+
+        foundRequest.setStatus(RequestStatus.ACCEPTED);
+
+        mentorshipRequestRepository.save(foundRequest);
     }
 }

@@ -17,7 +17,8 @@ public class EventParticipationServiceImplementation implements EventParticipati
         this.eventParticipationRepository = eventParticipationRepository;
     }
 
-    public void registerParticipant(long eventId, long userId) {
+    public void registerParticipant(Long eventId, Long userId) {
+        validateInputData(eventId, userId);
         List<User> users = eventParticipationRepository.findAllParticipantsByEventId(eventId);
         if (!isUserRegisteredForEvent(users, userId)) {
             eventParticipationRepository.register(eventId, userId);
@@ -29,5 +30,11 @@ public class EventParticipationServiceImplementation implements EventParticipati
     private boolean isUserRegisteredForEvent(List<User> users, long userId) {
         return users.stream()
                 .anyMatch(curUser -> curUser.getId() == userId);
+    }
+
+    private void validateInputData(Long eventId, Long userId) {
+        if (eventId == null || userId == null) {
+            throw new RegistrationUserForEventException("Input data is null");
+        }
     }
 }

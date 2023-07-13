@@ -16,6 +16,11 @@ public class EventParticipationController {
         validate(eventId, userId);
         eventParticipationService.registerParticipant(eventId, userId);
     }
+    @PostMapping("/{eventId}/unregister/{userId}")
+    public void unregisterParticipant(Long eventId, Long userId) {
+        validate(eventId, userId);
+        eventParticipationService.unregisterParticipant(eventId, userId);
+    }
 
     private void validate(Long eventId, Long userId) {
         if(eventId == null || userId == null) {

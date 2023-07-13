@@ -35,4 +35,20 @@ class EventParticipationServiceTest {
         eventParticipationService.registerParticipant(1L, 1L);
         Mockito.verify(eventParticipationRepository).register(1L, 1L);
     }
+
+    @Test
+    public void unregisterParticipantThrowsException() {
+        User user = User.builder().id(1L).username("test").build();
+        Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(List.of(user));
+        Assertions.assertThrows(DataValidationException.class, () -> {
+            eventParticipationService.unregisterParticipant(1L, 2L);
+        });
+    }
+
+    @Test
+    public void unregisterParticipant() {
+        Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(List.of());
+        eventParticipationService.unregisterParticipant(1L, 1L);
+        Mockito.verify(eventParticipationRepository).unregister(1L, 1L);
+    }
 }

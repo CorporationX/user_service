@@ -16,12 +16,9 @@ import java.util.List;
 
 @Component
 public class SkillService {
-    private SkillRepository skillRepository;
-    private SkillMapper mapper;
 
-    @Autowired
-    public SkillService(SkillRepository skillRepository, SkillMapper mapper) {
     private SkillOfferRepository skillOfferRepository;
+    private SkillRepository skillRepository;
     private SkillMapper mapper;
 
     @Autowired

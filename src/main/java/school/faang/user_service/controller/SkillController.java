@@ -29,11 +29,13 @@ public class SkillController {
         return skillService.create(skill);
     }
 
+    public List<SkillCandidateDto> getOfferedSkills(long userId) {
+        return skillService.getOfferedSkills(userId);
+    }
+
     private void validateSkill(SkillDto skill) {
         if (skill.getTitle() == null || skill.getTitle().isEmpty()) {
             throw new DataValidationException("Skill can't be created with empty name");
         }
-    public List<SkillCandidateDto> getOfferedSkills(long userId) {
-        return skillService.getOfferedSkills(userId);
     }
 }

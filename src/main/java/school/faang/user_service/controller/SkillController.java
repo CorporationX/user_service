@@ -18,7 +18,7 @@ public class SkillController {
     }
 
     private void validateSkill(SkillDto skill) {
-        if (skill == null) {
+        if (skill == null || skill.getTitle() == null) {
             throw new DataValidationException("skill cannot be empty");
         }
     }

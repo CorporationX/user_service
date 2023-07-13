@@ -36,8 +36,10 @@ class SkillServiceTest {
     void testCreateExistByTitle() {
         SkillDto skillDto = new SkillDto();
         skillDto.setTitle("privet");
-        Mockito.when(skillRepository.existsByTitle(skillDto.getTitle())).thenReturn(true);
+
+        Mockito.when(skillRepository.existsByTitle(skillDto.getTitle()))
+                .thenReturn(true);
+
         Assert.assertThrows(DataValidationException.class, () -> skillService.create(skillDto));
     }
-
 }

@@ -22,7 +22,7 @@ public class EventController {
         return eventService.createEvent(eventDto);
     }
 
-    @DeleteMapping("/event{id}")
+    @DeleteMapping("/event/{id}")
     public void deleteEvent(@PathVariable Long id) {
         eventService.deleteEvent(id);
     }

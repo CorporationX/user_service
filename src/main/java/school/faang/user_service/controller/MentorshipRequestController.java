@@ -6,13 +6,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.dto.RequestsResponse;
 import school.faang.user_service.service.MentorshipRequestService;
+import school.faang.user_service.util.exception.GetRequestsMentorshipsException;
+import school.faang.user_service.util.exception.NoRequestsException;
 import school.faang.user_service.util.response.ErrorResponse;
 import school.faang.user_service.util.exception.RequestMentorshipException;
 import school.faang.user_service.util.exception.SameMentorAndMenteeException;
@@ -29,7 +29,7 @@ public class MentorshipRequestController {
 
     private final MentorshipRequestService mentorshipRequestService;
 
-    @PostMapping("/request")
+    @PostMapping("/send_request")
     public ResponseEntity<HttpStatus> requestMentorship(@RequestBody @Valid MentorshipRequestDto mentorshipRequestDto,
                                                         BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -49,6 +49,24 @@ public class MentorshipRequestController {
         mentorshipRequestService.requestMentorship(mentorshipRequestDto);
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/requests")
+    public RequestsResponse getRequests(@RequestBody @Valid RequestFilterDto requestFilterDto,
+                                        BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            StringBuilder message = new StringBuilder();
+            bindingResult.getFieldErrors().forEach(fieldError -> {
+                message.append(fieldError.getField())
+                        .append(": ")
+                        .append(fieldError.getDefaultMessage())
+                        .append(";");
+            });
+
+            throw new GetRequestsMentorshipsException(message.toString());
+        }
+
+        return new RequestsResponse(mentorshipRequestService.getRequests(requestFilterDto));
     }
 
     @ExceptionHandler(UserNotFoundException.class)
@@ -95,6 +113,26 @@ public class MentorshipRequestController {
     private ResponseEntity<ErrorResponse> handleExceptions(NoSuchElementException e) {
         ErrorResponse errorResponse = new ErrorResponse(
                 "Some elements are not in a database",
+                System.currentTimeMillis()
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(GetRequestsMentorshipsException.class)
+    private ResponseEntity<ErrorResponse> handleExceptions(GetRequestsMentorshipsException e) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                e.getMessage(),
+                System.currentTimeMillis()
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(NoRequestsException.class)
+    private ResponseEntity<ErrorResponse> handleExceptions(NoRequestsException e) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                "No requests were created",
                 System.currentTimeMillis()
         );
 

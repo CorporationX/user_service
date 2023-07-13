@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.event.Event;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface EventMapper {
   EventDto toDTO(Event model);
   Event toModel(EventDto dto);

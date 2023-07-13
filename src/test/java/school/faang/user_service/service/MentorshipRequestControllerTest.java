@@ -76,4 +76,13 @@ public class MentorshipRequestControllerTest {
         Assertions.assertThrows(GetRequestsMentorshipsException.class,
                 () -> this.mentorshipRequestController.getRequests(requestFilterDto, bindingResult));
     }
+
+    @Test
+    void testAcceptRequest_ShouldReturnValidResponseEntity() {
+        long id = 3;
+
+        ResponseEntity<HttpStatus> response = mentorshipRequestController.acceptRequest(id);
+
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
 }

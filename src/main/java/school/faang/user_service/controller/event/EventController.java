@@ -23,10 +23,16 @@ public class EventController {
         return eventService.create(eventService.getEvent(id));
     }
     public void getEventsByFilter(EventFilterDto filter){
-
         eventService.getEventsByFilter(filter);
     }
     public void deleteEvent(long id){
         eventService.deleteEvent(id);
+    }
+    public void updateEvent(EventDto event){
+        if (eventService.validation(event)) {
+            eventService.updateEvent(event);
+        }else {
+            throw new DataValidationException("Ошибка");
+        }
     }
 }

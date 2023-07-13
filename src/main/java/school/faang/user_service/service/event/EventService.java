@@ -30,7 +30,7 @@ public class EventService {
             result = EventMapper.INSTANCE.toEventDto(eventRepository.save(EventMapper.INSTANCE.toEvent(event)));
             return result;
         } else {
-            throw new DataValidationException("Ошибка");
+            throw new DataValidationException("Пользователь не может провести событие с такими навыками");
         }
     }
 
@@ -120,6 +120,9 @@ public class EventService {
                     }
                 })
                 .toList();
+    }
+    public EventDto updateEvent(EventDto event) {
+      return create(event);
     }
     public void deleteEvent(long eventId) {
         if (eventId <= 0) {

@@ -1,7 +1,6 @@
 package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.skill.SkillDto;
@@ -28,7 +27,7 @@ public class EventService {
             result = EventMapper.INSTANCE.toEventDto(eventRepository.save(EventMapper.INSTANCE.toEvent(event)));
             return result;
         } else {
-            throw new DataValidationException("Ошибка");
+            throw new DataValidationException("пользователь не может провести такое событие с такими навыками");
         }
     }
 

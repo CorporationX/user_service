@@ -51,5 +51,4 @@ class EventServiceTest {
         eventService.create(event);
         verify(eventRepository).save(any());
     }
-
 }

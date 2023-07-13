@@ -1,10 +1,12 @@
 package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.params.shadow.com.univocity.parsers.common.DataValidationException;
+
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.RecommendationService;
 
 @Component
@@ -12,9 +14,10 @@ import school.faang.user_service.service.RecommendationService;
 public class RecommendationController {
     private final RecommendationService recommendationService;
 
-    public void giveRecommendation(RecommendationDto recommendationDto){
-        validateRecommendation(recommendationDto);
-        recommendationService.create(recommendationDto);
+    @PostMapping("/recommendation")
+    public void giveRecommendation(@RequestBody RecommendationDto recommendation){
+        validateRecommendation(recommendation);
+        recommendationService.create(recommendation);
     }
 
     private void validateRecommendation(RecommendationDto recommendationDto){

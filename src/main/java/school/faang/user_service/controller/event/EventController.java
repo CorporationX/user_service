@@ -13,4 +13,8 @@ public class EventController {
     public EventDto create(EventDto eventDto) {
         return eventService.create(eventDto);
     }
+
+    public EventDto get(Long eventId) {
+        return eventService.get(eventId);
+    }
 }

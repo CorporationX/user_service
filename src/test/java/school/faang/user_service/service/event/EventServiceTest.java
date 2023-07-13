@@ -21,6 +21,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -132,5 +133,23 @@ class EventServiceTest {
 
         verify(userRepository).findById(1L);
         verify(eventRepository).save(any(Event.class));
+    }
+
+    @Test
+    void get_invalidEventId() {
+        when(eventRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> eventService.get(99L));
+    }
+
+    @Test
+    void get_ShouldReturnEventDto() {
+        createEvent();
+        when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
+
+        EventDto foundEventDto = eventService.get(1L);
+
+        assertNotNull(foundEventDto);
+        assertEquals(event.getId(), foundEventDto.getId());
     }
 }

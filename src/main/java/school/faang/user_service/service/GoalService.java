@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.Skill;
@@ -17,6 +18,7 @@ public class GoalService {
     private final GoalRepository goalRepository;
     private final SkillRepository skillRepository;
 
+    @Transactional
     public void updateGoal(Goal goalFromUpdate) {
         List<Skill> skillsToAchieve = goalFromUpdate.getSkillsToAchieve();
         List<User> users = goalFromUpdate.getUsers();

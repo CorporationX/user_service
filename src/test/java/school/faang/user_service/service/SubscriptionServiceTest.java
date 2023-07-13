@@ -9,11 +9,14 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
+import school.faang.user_service.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class SubscriptionServiceTest {
     @Mock
     private SubscriptionRepository subscriptionRepository;
+    @Mock
+    private UserRepository userRepository;
     @InjectMocks
     private SubscriptionService subscriptionService;
 
@@ -22,13 +25,33 @@ public class SubscriptionServiceTest {
 
     @Test
     public void shouldAddNewFollowerById() {
+        Mockito.when(userRepository.existsById(followerId)).thenReturn(true);
+        Mockito.when(userRepository.existsById(followeeId)).thenReturn(true);
+
         Assertions.assertDoesNotThrow(() -> subscriptionService.followUser(followerId, followeeId));
         Mockito.verify(subscriptionRepository, Mockito.times(1)).followUser(followerId, followeeId);
     }
 
     @Test
-    public void shouldThrowExceptionWhenFollowerNotExists() {
+    public void shouldThrowExceptionIfUserSubscribed() {
+        Mockito.when(userRepository.existsById(followerId)).thenReturn(true);
+        Mockito.when(userRepository.existsById(followeeId)).thenReturn(true);
         Mockito.when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
+
+        Assertions.assertThrows(DataValidationException.class, () -> subscriptionService.followUser(followerId, followeeId));
+        Mockito.verify(subscriptionRepository, Mockito.times(0)).followUser(followerId, followeeId);
+    }
+
+    @Test
+    public void shouldThrowExceptionIfFollowerDoesNotExist() {
+        Mockito.when(userRepository.existsById(followeeId)).thenReturn(true);
+        Assertions.assertThrows(DataValidationException.class, () -> subscriptionService.followUser(followerId, followeeId));
+        Mockito.verify(subscriptionRepository, Mockito.times(0)).followUser(followerId, followeeId);
+    }
+
+    @Test
+    public void shouldThrowExceptionIfFolloweeDoesNotExist() {
+        Mockito.lenient().when(userRepository.existsById(followerId)).thenReturn(true);
         Assertions.assertThrows(DataValidationException.class, () -> subscriptionService.followUser(followerId, followeeId));
         Mockito.verify(subscriptionRepository, Mockito.times(0)).followUser(followerId, followeeId);
     }

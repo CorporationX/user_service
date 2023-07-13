@@ -4,6 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.service.SkillService;
 
 import java.util.List;
@@ -37,5 +40,10 @@ public class SkillController {
         if (skill.getTitle() == null || skill.getTitle().isEmpty()) {
             throw new DataValidationException("Skill can't be created with empty name");
         }
+    }
+}
+
+    public SkillDto acquireSkillFromOffers(long skillId, long userId){
+        return skillService.acquireSkillFromOffers(skillId,userId);
     }
 }

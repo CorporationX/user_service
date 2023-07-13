@@ -21,6 +21,8 @@ public class SkillController {
 
     public List<SkillDto> getUserSkills(long userId) {
         return skillService.getUserSkills(userId);
+    }
+
     public SkillDto create(SkillDto skill) {
         validateSkill(skill);
         return skillService.create(skill);

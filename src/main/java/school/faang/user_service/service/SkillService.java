@@ -37,6 +37,7 @@ public class SkillService {
         return skills.stream()
                 .map((skill -> mapper.toDto(skill)))
                 .toList();
+    }
     public SkillDto create(SkillDto skill) {
         if (skillRepository.existsByTitle(skill.getTitle())) {
             throw new DataValidationException("This skill already exist");

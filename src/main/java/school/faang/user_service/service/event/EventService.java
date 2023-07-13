@@ -1,7 +1,7 @@
 package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.SkillDto;
 import school.faang.user_service.entity.User;
@@ -12,11 +12,10 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
 import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.List;
 import java.util.zip.DataFormatException;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class EventService {
     private final EventRepository eventRepository;
@@ -24,7 +23,7 @@ public class EventService {
 
     public EventDto create(EventDto eventDto) {
         try {
-            validation(eventDto);
+            validateEventDto(eventDto);
             Event event = eventRepository.save(EventMapper.INSTANCE.toEntity(eventDto));
             return EventMapper.INSTANCE.toDto(event);
         } catch (DataFormatException e) {
@@ -32,7 +31,10 @@ public class EventService {
         }
     }
 
-    public void validation(EventDto eventDto) throws DataFormatException {
+    private void validateEventDto(EventDto eventDto) throws DataFormatException {
+        if (eventDto.getId() == null || eventDto.getId() < 1) {
+            throw new DataFormatException("Event Id must be greater than 0");
+        }
         if (eventDto.getTitle().isBlank()) {
             throw new DataFormatException("Event must have a title");
         }
@@ -42,17 +44,15 @@ public class EventService {
         if (eventDto.getOwnerId() == null) {
             throw new DataFormatException("Event must have a user");
         }
-        userContainsSkills(eventDto);
+        checkUserContainsSkills(eventDto);
     }
 
-    public void userContainsSkills(EventDto eventDto) throws DataFormatException {
-        User user = userRepository.findById(eventDto.getOwnerId()).orElseThrow();
-        Set<SkillDto> userSkills = user.getSkills().stream()
-                .map(SkillMapper.INSTANCE::toSkillDTO)
-                .collect(Collectors.toSet());
-        Set<SkillDto> relatedSkills = new HashSet<>(eventDto.getRelatedSkills());
+    private void checkUserContainsSkills(EventDto eventDto) throws DataFormatException {
+        User user = userRepository.findById(eventDto.getOwnerId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (!relatedSkills.containsAll(userSkills)) {
+        List<SkillDto> userSkills = SkillMapper.INSTANCE.toListSkillsDTO(user.getSkills());
+        if (!new HashSet<>(eventDto.getRelatedSkills()).containsAll(userSkills)) {
             throw new DataFormatException("User has no related skills");
         }
     }

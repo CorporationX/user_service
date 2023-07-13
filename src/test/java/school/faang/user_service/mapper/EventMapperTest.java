@@ -58,9 +58,6 @@ class EventMapperTest {
         assertEquals(eventDto.getTitle(), mappedEvent.getTitle());
         assertEquals(eventDto.getStartDate(), mappedEvent.getStartDate());
         assertEquals(event.getRelatedSkills(), mappedEvent.getRelatedSkills());
-
-        /*Здесь у меня сравниваются id потому что при маппинге у меня выходит другой юзер, отличие в том что у юзера из
-         * setUp() есть скиллы, а этого нет скиллов. Как решить эту проблему я не знаю.*/
         assertEquals(user.getId(), mappedEvent.getOwner().getId());
     }
 

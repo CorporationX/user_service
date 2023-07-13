@@ -7,7 +7,6 @@ import org.mapstruct.factory.Mappers;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.event.Event;
 
-
 @Mapper(uses = SkillMapper.class, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface EventMapper {
     EventMapper INSTANCE = Mappers.getMapper(EventMapper.class);
@@ -20,5 +19,3 @@ public interface EventMapper {
     @Mapping(source = "relatedSkills", target = "relatedSkills")
     Event toEntity(EventDto eventDto);
 }
-
-

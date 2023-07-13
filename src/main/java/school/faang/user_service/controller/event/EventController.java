@@ -26,13 +26,13 @@ public class EventController {
         return eventService.createEvent(eventDto);
     }
 
-    @DeleteMapping("/event{id}")
+    @DeleteMapping("/event/{id}")
     public void deleteEvent(@PathVariable Long id) {
         idValidate(id);
         eventService.deleteEvent(id);
     }
 
-    @PutMapping("/event{id}")
+    @PutMapping("/event/{id}")
     public EventDto updateEvent(@PathVariable Long id, @RequestBody EventDto eventDto) {
         idValidate(id);
         validateEvent(eventDto);
@@ -60,8 +60,8 @@ public class EventController {
             throw new DataValidationException("Event owner ID cannot be null");
         }
     }
-    private void idValidate(long id) {
-        if (id < 0) {
+    private void idValidate(Long id) {
+        if ( id == null || id < 0) {
             throw new DataValidationException("Id cannot be negative");
         }
     }

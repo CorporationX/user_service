@@ -14,6 +14,18 @@ public class EventDto {
   String location;
   int maxAttendees;
 
+  public EventDto(Long id, String title, LocalDateTime startDate, LocalDateTime endDate, Long ownerId, String description, List<SkillDto> relatedSkills, String location, int maxAttendees) {
+    this.id = id;
+    this.title = title;
+    this.startDate = startDate;
+    this.endDate = endDate;
+    this.ownerId = ownerId;
+    this.description = description;
+    this.relatedSkills = relatedSkills;
+    this.location = location;
+    this.maxAttendees = maxAttendees;
+  }
+
   public String getTitle() {
     return title;
   }

@@ -11,6 +11,7 @@ import school.faang.user_service.mapper.SubscriptionMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -42,69 +43,29 @@ public class SubscriptionService {
     }
 
     public List<User> filterUsers(Stream<User> userStream, UserFilterDto filter) {
-        return userStream.filter(user -> {
-                    if (filter.getNamePattern().isBlank()) {
-                        return true;
-                    }
-                    return user.getUsername().equals(filter.getNamePattern());
-                })
-                .filter(user -> {
-                    if (filter.getAboutPattern().isBlank()) {
-                        return true;
-                    }
-                    return user.getAboutMe().equals(filter.getAboutPattern());
-                })
-                .filter(user -> {
-                    if (filter.getEmailPattern().isBlank()) {
-                        return true;
-                    }
-                    return user.getEmail().equals(filter.getEmailPattern());
-                })
-                .filter(user -> {
-                    if (filter.getContactPattern().isBlank()) {
-                        return true;
-                    }
-                    return user.getContacts().stream()
-                            .anyMatch(contact -> contact.getContact().equals(filter.getContactPattern()));
-                })
-                .filter(user -> {
-                    if (filter.getCountryPattern().isBlank()) {
-                        return true;
-                    }
-                    return user.getCountry().getTitle().equals(filter.getCountryPattern());
-                })
-                .filter(user -> {
-                    if (filter.getCityPattern().isBlank()) {
-                        return true;
-                    }
-                    return user.getCity().equals(filter.getCityPattern());
-                })
-                .filter(user -> {
-                    if (filter.getPhonePattern().isBlank()) {
-                        return true;
-                    }
-                    return user.getPhone().equals(filter.getPhonePattern());
-                })
-                .filter(user -> {
-                    if (filter.getSkillPattern().isBlank()) {
-                        return true;
-                    }
-                    return user.getSkills().stream()
-                            .anyMatch(skill -> skill.getTitle().equals(filter.getSkillPattern()));
-                })
-                .filter(user -> {
-                    if (Integer.toString(filter.getExperienceMin()).isBlank()) {
-                        return true;
-                    }
-                    return user.getExperience() > filter.getExperienceMin();
-                })
-                .filter(user -> {
-                    if (Integer.toString(filter.getExperienceMax()).isBlank()) {
-                        return true;
-                    }
-                    return user.getExperience() < filter.getExperienceMax();
-                })
-                .collect(Collectors.toList());
+        Predicate<User> namePredicate = user -> filter.getNamePattern().isBlank() || user.getUsername().equals(filter.getNamePattern());
+        Predicate<User> aboutPredicate = user -> filter.getAboutPattern().isBlank() || user.getAboutMe().equals(filter.getAboutPattern());
+        Predicate<User> emailPredicate = user -> filter.getEmailPattern().isBlank() || user.getEmail().equals(filter.getEmailPattern());
+        Predicate<User> contactPredicate = user -> filter.getContactPattern().isBlank() || user.getContacts().stream()
+                .anyMatch(contact -> contact.getContact().equals(filter.getContactPattern()));
+        Predicate<User> countryPredicate = user -> filter.getCountryPattern().isBlank() || user.getCountry().getTitle().equals(filter.getCountryPattern());
+        Predicate<User> cityPredicate = user -> filter.getCityPattern().isBlank() || user.getCity().equals(filter.getCityPattern());
+        Predicate<User> phonePredicate = user -> filter.getPhonePattern().isBlank() || user.getPhone().equals(filter.getPhonePattern());
+        Predicate<User> skillPredicate = user -> filter.getSkillPattern().isBlank() || user.getSkills().stream()
+                .anyMatch(skill -> skill.getTitle().equals(filter.getSkillPattern()));
+        Predicate<User> experienceMinPredicate = user -> Integer.toString(filter.getExperienceMin()).isBlank() || user.getExperience() > filter.getExperienceMin();
+        Predicate<User> experienceMaxPredicate = user -> Integer.toString(filter.getExperienceMax()).isBlank() || user.getExperience() < filter.getExperienceMax();
 
+        return userStream.filter(namePredicate)
+                .filter(aboutPredicate)
+                .filter(emailPredicate)
+                .filter(contactPredicate)
+                .filter(countryPredicate)
+                .filter(cityPredicate)
+                .filter(phonePredicate)
+                .filter(skillPredicate)
+                .filter(experienceMinPredicate)
+                .filter(experienceMaxPredicate)
+                .collect(Collectors.toList());
     }
 }

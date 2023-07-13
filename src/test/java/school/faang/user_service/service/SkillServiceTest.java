@@ -1,6 +1,5 @@
 package school.faang.user_service.service;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -11,6 +10,8 @@ import school.faang.user_service.entity.dto.skill.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class SkillServiceTest {
@@ -28,7 +29,7 @@ class SkillServiceTest {
     void testExistsByTitle() {
         Mockito.when(skillRepository.existsByTitle("crek")).thenReturn(true);
 
-        Assert.assertThrows(
+        assertThrows(
                 DataValidationException.class,
                 () -> skillService.create(new SkillDto(1L, "crek"))
         );
@@ -47,6 +48,16 @@ class SkillServiceTest {
         Mockito.when(skillRepository.findAllByUserId(1L)).thenReturn(Mockito.anyList());
 
         skillService.getUserSkills(1L);
+
+        Mockito.verify(skillRepository, Mockito.times(1))
+                .findAllByUserId(1L);
+    }
+
+    @Test
+    void testGetOfferedSkills(){
+        Mockito.when(skillRepository.findAllByUserId(1L)).thenReturn(Mockito.anyList());
+
+        skillService.getOfferedSkills(1L);
 
         Mockito.verify(skillRepository, Mockito.times(1))
                 .findAllByUserId(1L);

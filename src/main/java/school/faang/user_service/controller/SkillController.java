@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.entity.dto.skill.SkillCandidateDto;
 import school.faang.user_service.entity.dto.skill.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SkillService;
@@ -29,10 +30,21 @@ public class SkillController {
 
     @GetMapping("/{userId}")
     public List<SkillDto> getUserSkills(@PathVariable Long userId) {
+        validateUserId(userId);
+        return skillService.getUserSkills(userId);
+    }
+
+
+    @GetMapping("/offered/{userId}")
+    public List<SkillCandidateDto> getOfferedSkills(@PathVariable Long userId) {
+        validateUserId(userId);
+        return skillService.getOfferedSkills(userId);
+    }
+
+    private static void validateUserId(Long userId) {
         if (userId == null) {
             throw new DataValidationException("Некорректный id пользователя!!!");
         }
-        return skillService.getUserSkills(userId);
     }
 
     private void validateSkill(SkillDto skill) {

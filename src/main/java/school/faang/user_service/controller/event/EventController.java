@@ -3,6 +3,7 @@ package school.faang.user_service.controller.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -26,13 +27,13 @@ public class EventController {
         return eventService.createEvent(eventDto);
     }
 
-    @DeleteMapping("/event{id}")
+    @DeleteMapping("/event/{id}")
     public void deleteEvent(@PathVariable Long id) {
         idValidate(id);
         eventService.deleteEvent(id);
     }
 
-    @PutMapping("/event{id}")
+    @PutMapping("/event/{id}")
     public EventDto updateEvent(@PathVariable Long id, @RequestBody EventDto eventDto) {
         idValidate(id);
         validateEvent(eventDto);
@@ -42,6 +43,11 @@ public class EventController {
     @PostMapping("/event/list")
     public List<EventDto> getEventsByFilter(@RequestBody EventFilterDto filter) {
         return eventService.getEventsByFilter(filter);
+    }
+    @GetMapping("/event/{userId}/owned")
+    public List<EventDto> getOwnedEvents(@PathVariable long userId) {
+        idValidate(userId);
+        return eventService.getOwnedEvents(userId);
     }
 
     public void validateEvent(EventDto eventDto) {

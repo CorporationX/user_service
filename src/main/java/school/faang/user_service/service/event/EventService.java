@@ -49,6 +49,10 @@ public class EventService {
         return filterEvents(eventStream, filter);
     }
 
+    public List<EventDto> getOwnedEvents(long userId) {
+        return eventRepository.findAllByUserId(userId).stream().map(eventMapper::toDto).toList();
+    }
+
     private void updateEventInDb(EventDto eventForUpdate, EventDto eventFormRequest) {
         {
             eventValidator.checkIfUserHasSkillsRequired(eventFormRequest);

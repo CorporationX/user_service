@@ -1,24 +1,25 @@
 package school.faang.user_service.controller.event;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventService;
 
-@Component("eventController")
+@Controller("eventController")
 @RequiredArgsConstructor
 public class EventController {
     private final EventService eventService;
 
-    public EventDto create(EventDto event){
+    public EventDto create(EventDto event) {
         if (eventService.validation(event)) {
             return eventService.create(event);
-        }else {
+        } else {
             throw new DataValidationException("Ошибка");
         }
     }
-    public EventDto getEvent(long id){
+
+    public EventDto getEvent(long id) {
         return eventService.create(eventService.getEvent(id));
     }
 }

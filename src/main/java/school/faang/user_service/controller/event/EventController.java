@@ -14,8 +14,8 @@ public class EventController {
     public EventDto create(EventDto event) {
         if (eventService.validation(event)) {
             return eventService.create(event);
-        } else {
-            throw new DataValidationException("Ошибка");
+        }else {
+            throw new DataValidationException("Object is not valid");
         }
     }
 

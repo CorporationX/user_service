@@ -5,11 +5,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventService;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,11 +32,16 @@ public class EventController {
         eventService.deleteEvent(id);
     }
 
-    @PostMapping("/event{id}")
+    @PutMapping("/event{id}")
     public EventDto updateEvent(@PathVariable Long id, @RequestBody EventDto eventDto) {
         idValidate(id);
         validateEvent(eventDto);
         return eventService.updateEvent(id, eventDto);
+    }
+
+    @PostMapping("/event/list")
+    public List<EventDto> getEventsByFilter(@RequestBody EventFilterDto filter) {
+        return eventService.getEventsByFilter(filter);
     }
 
     public void validateEvent(EventDto eventDto) {

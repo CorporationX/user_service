@@ -1,5 +1,7 @@
 package school.faang.user_service.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -27,7 +29,7 @@ public interface SubscriptionRepository extends CrudRepository<User, Long> {
             join subscription as subs on u.id = subs.follower_id
             where subs.followee_id = :followeeId
             """)
-    Stream<User> findByFolloweeId(long followeeId);
+    Page<User> findByFolloweeId(long followeeId, Pageable pageable);
 
     @Query(nativeQuery = true, value = "select count(id) from subscription where followee_id = :followeeId")
     int findFollowersAmountByFolloweeId(long followeeId);

@@ -1,7 +1,9 @@
 package school.faang.user_service.service;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
@@ -21,8 +23,8 @@ import school.faang.user_service.validator.RecommendationValidator;
 
 import java.util.List;
 
-@Component
-@AllArgsConstructor
+@Service
+@RequiredArgsConstructor
 public class RecommendationService {
     private final RecommendationRepository recommendationRepository;
     private final RecommendationValidator recommendationValidator;

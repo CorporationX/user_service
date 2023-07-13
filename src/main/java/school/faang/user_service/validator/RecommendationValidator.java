@@ -1,6 +1,7 @@
 package school.faang.user_service.validator;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class RecommendationValidator {
     private final RecommendationRepository recommendationRepository;
     private final SkillOfferRepository skillOffersRepository;

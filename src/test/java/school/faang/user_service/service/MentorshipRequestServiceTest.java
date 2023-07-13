@@ -15,6 +15,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+import school.faang.user_service.util.exception.RequestIsAlreadyAcceptedException;
 import school.faang.user_service.util.validator.FilterRequestStatusValidator;
 import school.faang.user_service.util.validator.MentorshipRequestValidator;
 
@@ -182,6 +183,51 @@ public class MentorshipRequestServiceTest {
                 mentorshipRequest1,
                 mentorshipRequest2
         );
+    }
+
+    @Test
+    void testAcceptRequest_InputsAreValid_ShouldComplete() {
+        long id = 2;
+        MentorshipRequest mentorshipRequest =
+                new MentorshipRequest();
+        User receiver = new User();
+        User requester = new User();
+
+        mentorshipRequest.setId(id);
+        receiver.setId(1);
+        requester.setId(2);
+        receiver.setMentees(List.of(new User()));
+        mentorshipRequest.setReceiver(receiver);
+        mentorshipRequest.setRequester(requester);
+        mentorshipRequest.setStatus(RequestStatus.PENDING);
+
+        Mockito.when(mentorshipRequestRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(mentorshipRequest));
+
+        mentorshipRequestService.acceptRequest(id);
+
+        Assertions.assertEquals(RequestStatus.ACCEPTED, mentorshipRequest.getStatus());
+    }
+
+    @Test
+    void testAcceptRequest_InputsAreInvalid_ShouldReturnException() {
+        long id = 2;
+        MentorshipRequest mentorshipRequest =
+                new MentorshipRequest();
+        User receiver = new User();
+        User requester = new User();
+
+        mentorshipRequest.setId(id);
+        receiver.setId(1);
+        requester.setId(2);
+        receiver.setMentees(List.of(requester));
+        mentorshipRequest.setReceiver(receiver);
+        mentorshipRequest.setRequester(requester);
+        mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
+
+        Mockito.when(mentorshipRequestRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(mentorshipRequest));
+
+        Assertions.assertThrows(RequestIsAlreadyAcceptedException.class,
+                () -> mentorshipRequestService.acceptRequest(id));
     }
 }
 

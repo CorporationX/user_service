@@ -21,8 +21,8 @@ public class EventParticipationService {
     private final EventRepository eventRepository;
 
     public void registerParticipant(long eventId, long userId) {
-        User user = userRepository.findById(userId).orElse(null);
-        Event event = eventRepository.findById(eventId).orElse(null);
+        User user = getUser(userId);
+        Event event = getEvent(eventId);
 
         validateParams(user, event);
 
@@ -38,35 +38,49 @@ public class EventParticipationService {
     }
 
     public List<User> getParticipants(long eventId) {
-
+        validateEvent(getEvent(eventId));
         return eventParticipationRepository.findAllParticipantsByEventId(eventId);
     }
 
+    private Event getEvent(long eventId) {
+        return eventRepository.findById(eventId).orElse(null);
+    }
+
+    private User getUser(long userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
+
     private void validatePossibility(long userId, long eventId) {
-        boolean exist = eventParticipationRepository.findAllParticipantsByEventId(eventId)
-                .stream().anyMatch(u -> u.getId() == userId);
-        if (exist) {
+        if (isUserExist(userId, eventId)) {
             throw new IllegalArgumentException("User already registered");
         }
     }
 
     private void validateUnregisterPossibility(long eventId, long userId) {
-        if (findAlreadyRegisteredUser(eventId, userId) == null) {
+        if (!isUserExist(userId, eventId)) {
             throw new IllegalArgumentException("User not registered");
         }
     }
 
-    private User findAlreadyRegisteredUser(long eventId, long userId) {
+    private boolean isUserExist(long userId, long eventId) {
         return eventParticipationRepository.findAllParticipantsByEventId(eventId)
-                .stream().filter(user -> user.getId() == userId).findFirst().orElse(null);
+                .stream().anyMatch(u -> u.getId() == userId);
     }
 
     private static void validateParams(User user, Event event) {
-        if (user == null) {
-            throw new NullPointerException("User not found");
-        }
+        validateUser(user);
+        validateEvent(event);
+    }
+
+    private static void validateEvent(Event event) {
         if (event == null) {
             throw new NullPointerException("Event not found");
+        }
+    }
+
+    private static void validateUser(User user) {
+        if (user == null) {
+            throw new NullPointerException("User not found");
         }
     }
 }

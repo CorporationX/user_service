@@ -3,9 +3,6 @@ package school.faang.user_service.controller.event;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.EventParticipationService;
 
 import java.util.List;
@@ -27,16 +24,24 @@ public class EventParticipationController {
     }
 
     public List<User> getParticipants(long eventId) {
-        validateEvent(getEvent(eventId));
+        validateEventId(eventId);
         return eventParticipationService.getParticipants(eventId);
     }
 
     private void validateParams(long eventId, long userId) {
-        if (eventId < 0) {
-            throw new IllegalArgumentException("Event not found");
-        }
+        validateEventId(eventId);
+        validateUserId(userId);
+    }
+
+    private static void validateUserId(long userId) {
         if (userId < 0) {
             throw new IllegalArgumentException("User not found");
+        }
+    }
+
+    private static void validateEventId(long eventId) {
+        if (eventId < 0) {
+            throw new IllegalArgumentException("Event not found");
         }
     }
 }

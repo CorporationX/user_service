@@ -106,10 +106,11 @@ class EventParticipationServiceTest {
     void test_get_participants_should_return_list(){
         long eventId = event.getId();
         long userId = user.getId();
-
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.ofNullable(user));
+        Mockito.when(eventRepository.findById(eventId)).thenReturn(Optional.ofNullable(event));
         eventParticipationService.registerParticipant(eventId, userId);
 
-        Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(event.getId())).thenReturn(List.of(user));
+        Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(eventId)).thenReturn(List.of(user));
         List<User> participants = eventParticipationService.getParticipants(eventId);
 
         Assertions.assertNotNull(participants);
@@ -119,6 +120,8 @@ class EventParticipationServiceTest {
     @Test
     @Description("получение пустого списка участников мероприятия, если нет участников на мероприятие")
     void test_get_participants_should_return_empty(){
+        Mockito.when(eventRepository.findById(event.getId())).thenReturn(Optional.ofNullable(event));
+        Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(event.getId())).thenReturn(List.of());
         Assertions.assertEquals(List.of(), eventParticipationService.getParticipants(event.getId()));
     }
 }

@@ -43,6 +43,7 @@ class GoalServiceTest {
         when(goal.getUsers()).thenReturn(List.of(user));
         when(goalRepository.findById(anyLong())).thenReturn(Optional.of(goal));
     }
+
     @Test
     void updateGoal_With_Blank_Title_Throw_Exception() {
         when(goal.getTitle()).thenReturn("");

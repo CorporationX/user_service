@@ -122,6 +122,13 @@ public class EventServiceTest {
                 () -> eventService.getEventsByFilter(filterDto));
     }
 
+    @Test
+    void deletingEventTest(){
+        eventService.deleteEvent(1);
+        Mockito.verify(eventRepository,Mockito.times(1)).deleteById(1L);
+    }
+
+
     private Event getEventExample() {
         return Event.builder()
                 .id(0)

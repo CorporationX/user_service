@@ -114,10 +114,21 @@ public class EventControllerTest {
 
     @Test
     void testReceivingFilteredEventWithException() {
-
         Mockito.when(eventService.getEventsByFilter(filterDto)).thenThrow(new NotFoundException("Not found"));
         var response = eventController.getEventsByFilter(filterDto);
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         verify(eventService, times(1)).getEventsByFilter(filterDto);
+    }
+
+    @Test
+    void deletingEventNegativeIdExceptionTest() {
+        var response = eventController.deleteEvent(-1);
+        Assertions.assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void correctDeletingEventTest() {
+        var response = eventController.deleteEvent(100);
+        Assertions.assertEquals(response.getStatusCode(), HttpStatus.OK);
     }
 }

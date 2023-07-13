@@ -49,6 +49,10 @@ public class EventService {
         return filteredEvents;
     }
 
+    public void deleteEvent(long id) {
+        eventRepository.deleteById(id);
+    }
+
     private void validateEventSkills(EventDto event) {
         long ownerId = event.getOwnerId();
         var relatedSkills = event.getRelatedSkills();

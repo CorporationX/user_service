@@ -47,6 +47,18 @@ public class EventController {
         }
     }
 
+    public ResponseEntity<?> deleteEvent(@RequestBody long id) {
+        try {
+            if (id < 0) {
+                return ResponseEntity.badRequest().body("id have to be > 0");
+            }
+            eventService.deleteEvent(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     private void validateEvent(EventDto event) {
         if (event.getTitle() == null || event.getTitle().isBlank()) {
             throw new DataValidationException("Event title cannot be empty");

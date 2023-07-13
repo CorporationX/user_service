@@ -1,5 +1,6 @@
 package school.faang.user_service.dto;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,8 +15,10 @@ public class MentorshipRequestDto {
     private String description;
 
     @NotNull
+    @Min(value = 0, message = "Id can't be lower than 0")
     private Long requesterId;
 
     @NotNull
+    @Min(value = 0, message = "Id can't be lower than 0")
     private Long receiverId;
 }

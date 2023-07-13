@@ -73,4 +73,19 @@ class EventParticipationServiceTest {
         Mockito.when(userMapper.toDto(user)).thenReturn(userDto);
         Assertions.assertEquals(userDto, eventParticipationService.getParticipants(1L).get(0));
     }
+
+    @Test
+    public void getParticipantsCountThrowsException() {
+        Mockito.when(eventParticipationRepository.existsById(1L)).thenReturn(false);
+        Assertions.assertThrows(DataValidationException.class, () -> {
+            eventParticipationService.getParticipantsCount(1L);
+        });
+    }
+
+    @Test
+    public void getParticipantsCount() {
+        Mockito.when(eventParticipationRepository.existsById(1L)).thenReturn(true);
+        Mockito.when(eventParticipationRepository.countParticipants(1L)).thenReturn(1);
+        Assertions.assertEquals(1, eventParticipationService.getParticipantsCount(1L));
+    }
 }

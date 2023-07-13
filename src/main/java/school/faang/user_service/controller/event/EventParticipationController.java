@@ -33,6 +33,12 @@ public class EventParticipationController {
         return eventParticipationService.getParticipants(eventId);
     }
 
+    @GetMapping("{eventId}/participants/count")
+    public int getParticipantsCount(Long eventId) {
+        validateEventId(eventId);
+        return eventParticipationService.getParticipantsCount(eventId);
+    }
+
     private void validate(Long eventId, Long userId) {
         if (eventId == null || userId == null) {
             throw new DataValidationException("Event id or user id cannot be null");

@@ -49,6 +49,11 @@ public class EventParticipationService {
         return userDto;
     }
 
+    public int getParticipantsCount(Long eventId) {
+        validateEventId(eventId);
+        return eventParticipationRepository.countParticipants(eventId);
+    }
+
     private void validateEventId(Long eventId) {
         if (!eventParticipationRepository.existsById(eventId)) {
             throw new DataValidationException("Event not found");

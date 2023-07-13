@@ -50,6 +50,12 @@ public class EventController {
         return eventService.getOwnedEvents(userId);
     }
 
+    @GetMapping("/event/{userId}/participated")
+    public List<EventDto> getParticipatedEvents(@PathVariable long userId) {
+        idValidate(userId);
+        return eventService.getParticipatedEvents(userId);
+    }
+
     public void validateEvent(EventDto eventDto) {
         if(eventDto == null){
             throw new DataValidationException("Event cannot be null");

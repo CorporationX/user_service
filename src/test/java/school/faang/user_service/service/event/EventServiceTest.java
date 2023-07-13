@@ -113,4 +113,17 @@ class EventServiceTest {
         List<EventDto> events = eventService.getOwnedEvents(1L);
         assertEquals(2, events.size());
     }
+
+    @Test
+    public void testGetParticipatedEvents() {
+        var event = Event.builder().id(1L).title("New Event").build();
+        var event1 = Event.builder().id(2L).title("Event 1").build();
+        var eventDto = new EventDto(1L, "New Event", LocalDateTime.now(), LocalDateTime.now(), 1L, "hfgh", new ArrayList<>(), "location", 1);
+        var eventDto1 = new EventDto(2L, "Event 1", LocalDateTime.now(), LocalDateTime.MAX, 1L, "hfdfgdgh", new ArrayList<>(), "location", 1);
+        Mockito.when(eventRepository.findParticipatedEventsByUserId(1L)).thenReturn(List.of(event, event1));
+        Mockito.when(eventMapper.toDto(event)).thenReturn(eventDto);
+        Mockito.when(eventMapper.toDto(event1)).thenReturn(eventDto1);
+        List<EventDto> events = eventService.getParticipatedEvents(1L);
+        assertEquals(2, events.size());
+    }
 }

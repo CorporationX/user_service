@@ -19,9 +19,11 @@ public class MentorshipRequestValidator {
 
         if (requester.isEmpty() || receiver.isEmpty()) {
             throw new UserNotFoundException();
-        } else if (requester.get().getId() == receiver.get().getId()) {
+        }
+        if (requester.get().getId() == receiver.get().getId()) {
             throw new SameMentorAndMenteeException();
-        } else if (LocalDateTime.now().getMonth().getValue() - lastTimeRequest.get().getCreatedAt().getMonth().getValue() < 3) {
+        }
+        if (LocalDateTime.now().getMonth().getValue() - lastTimeRequest.get().getCreatedAt().getMonth().getValue() < 3) {
             throw new TimeHasNotPassedException();
         }
     }

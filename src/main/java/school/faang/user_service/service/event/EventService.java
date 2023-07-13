@@ -2,6 +2,7 @@ package school.faang.user_service.service.event;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.event.Event;
@@ -17,6 +18,7 @@ public class EventService {
     private final EventValidator eventValidator;
     private final EventMapper eventMapper;
 
+    @Autowired
     public EventDto createEvent(EventDto eventDto) {
         eventValidator.checkIfUserHasSkillsRequired(eventDto);
         Event event = eventRepository.save(eventMapper.toEntity(eventDto));
@@ -39,20 +41,20 @@ public class EventService {
     private void updateEventInDb(EventDto eventForUpdate, EventDto eventFormRequest) {
         {
             eventValidator.checkIfUserHasSkillsRequired(eventFormRequest);
-            if (!(eventFormRequest.getTitle() == null)) {
+            if (eventFormRequest.getTitle() != null) {
                 eventForUpdate.setTitle(eventFormRequest.getTitle());
             }
-            if (!(eventFormRequest.getStartDate() == null)) {
+            if (eventFormRequest.getStartDate() != null) {
                 eventForUpdate.setStartDate(eventFormRequest.getStartDate());
             }
-            if (!(eventFormRequest.getEndDate() == null)) {
+            if (eventFormRequest.getEndDate() != null) {
                 eventForUpdate.setEndDate(eventFormRequest.getEndDate());
             }
-            if (!(eventFormRequest.getDescription() == null)) {
+            if (eventFormRequest.getDescription() != null) {
                 eventForUpdate.setDescription(eventFormRequest.getDescription());
             }
 
-            if (!(eventFormRequest.getLocation() == null)) {
+            if (eventFormRequest.getLocation() != null) {
                 eventForUpdate.setLocation(eventFormRequest.getLocation());
             }
 
@@ -60,7 +62,7 @@ public class EventService {
                 eventForUpdate.setMaxAttendees(eventFormRequest.getMaxAttendees());
             }
 
-            if (!(eventFormRequest.getRelatedSkills() == null)) {
+            if (eventFormRequest.getRelatedSkills() != null) {
                 eventForUpdate.setRelatedSkills(eventFormRequest.getRelatedSkills());
             }
             eventRepository.save(eventMapper.toEntity(eventForUpdate));

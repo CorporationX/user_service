@@ -22,13 +22,13 @@ public class EventController {
         return eventService.createEvent(eventDto);
     }
 
-    @DeleteMapping("/event{id}")
+    @DeleteMapping("/event/{id}")
     public void deleteEvent(@PathVariable Long id) {
         idValidate(id);
         eventService.deleteEvent(id);
     }
 
-    @PostMapping("/event{id}")
+    @PostMapping("/event/{id}")
     public EventDto updateEvent(@PathVariable Long id, @RequestBody EventDto eventDto) {
         idValidate(id);
         validateEvent(eventDto);

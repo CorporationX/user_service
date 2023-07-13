@@ -2,12 +2,16 @@ package school.faang.user_service.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 
+import school.faang.user_service.repository.recommendation.SkillOfferRepository;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -17,8 +21,25 @@ public class SkillService {
 
     @Autowired
     public SkillService(SkillRepository skillRepository, SkillMapper mapper) {
+    private SkillOfferRepository skillOfferRepository;
+    private SkillMapper mapper;
+
+    @Autowired
+    public SkillService(SkillOfferRepository skillOfferRepository, SkillMapper mapper, SkillRepository skillRepository) {
+        this.skillOfferRepository = skillOfferRepository;
         this.skillRepository = skillRepository;
         this.mapper = mapper;
+    }
+
+
+    public List<SkillCandidateDto> getOfferedSkills(long userId) {
+        List<SkillDto> userSkills = getUserSkills(userId);
+        List<SkillCandidateDto> offeredSkills = new ArrayList<>();
+        userSkills.stream()
+                .map((skillDto)-> offeredSkills
+                        .add(new SkillCandidateDto(skillDto,skillOfferRepository
+                                .countAllOffersOfSkill(skillDto.getId(),userId))));
+        return offeredSkills;
     }
 
     public List<SkillDto> getUserSkills(long userId) {

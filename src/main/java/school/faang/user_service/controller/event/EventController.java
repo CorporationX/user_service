@@ -7,6 +7,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventService;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Controller
 public class EventController {
@@ -49,5 +50,9 @@ public class EventController {
 
   public void deleteEvent(Long id) {
     eventService.delete(id);
+  }
+
+  public List<EventDto> getParticipationEvents(Long userId) {
+    return eventService.getParticipatedEvents(userId);
   }
 }

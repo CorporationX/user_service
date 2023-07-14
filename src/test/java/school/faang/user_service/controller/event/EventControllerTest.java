@@ -70,6 +70,13 @@ public class EventControllerTest {
   }
 
   @Test
+  public void testGetAllUserParticipatedEvents() {
+    Long anyUserId = 1L;
+    eventController.getParticipationEvents(anyUserId);
+    Mockito.verify(eventService, Mockito.times(1)).getParticipatedEvents(anyUserId);
+  }
+
+  @Test
   public void testEventDeleting() {
     Long anyTestId = 1L;
     eventController.deleteEvent(anyTestId);

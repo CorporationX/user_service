@@ -44,4 +44,9 @@ public class EventService {
   public void delete(Long id) {
     eventRepository.deleteById(id);
   }
+
+  public List<EventDto> getParticipatedEvents(Long userId) {
+    List<Event> events = eventRepository.findParticipatedEventsByUserId(userId);
+    return events.stream().map(event -> eventMapper.toDto(event)).toList();
+  }
 }

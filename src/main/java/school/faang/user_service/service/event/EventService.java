@@ -32,7 +32,8 @@ public class EventService {
     }
 
     public EventDto get(Long eventId) {
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new RuntimeException("Event not found"));
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new IllegalArgumentException("Event not found"));
         return EventMapper.INSTANCE.toDto(event);
     }
 

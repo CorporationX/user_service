@@ -139,7 +139,8 @@ class EventServiceTest {
     void get_invalidEventId() {
         when(eventRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> eventService.get(99L));
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> eventService.get(99L));
+        assertEquals("Event not found", exception.getMessage());
     }
 
     @Test

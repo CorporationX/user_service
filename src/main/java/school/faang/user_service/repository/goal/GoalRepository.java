@@ -26,13 +26,6 @@ public interface GoalRepository extends CrudRepository<Goal, Long> {
     Goal create(String title, String description, Long parent);
 
     @Query(nativeQuery = true, value = """
-            SELECT * FROM goal g
-            JOIN user_goal ug ON g.id = ug.goal_id
-            WHERE ug.user_id = ?1
-            """)
-    Goal addGoaalToUSer(long userId, long goalId);
-
-    @Query(nativeQuery = true, value = """
             SELECT COUNT(ug.goal_id) FROM user_goal ug
             JOIN goal g ON g.id = ug.goal_id
             WHERE ug.user_id = :userId AND g.status = 0

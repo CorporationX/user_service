@@ -1,21 +1,23 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.mentorshipRequest;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.dto.MentorshipRequestDto;
-import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.dto.mentorshipRequest.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorshipRequest.RejectionDto;
+import school.faang.user_service.dto.mentorshipRequest.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.mapper.mentorshipRequest.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-import school.faang.user_service.util.exception.NoRequestsException;
-import school.faang.user_service.util.exception.RequestIsAlreadyAcceptedException;
-import school.faang.user_service.util.exception.UserNotFoundException;
-import school.faang.user_service.util.validator.FilterRequestStatusValidator;
-import school.faang.user_service.util.validator.MentorshipRequestValidator;
+import school.faang.user_service.util.mentorshipRequest.exception.NoRequestsException;
+import school.faang.user_service.util.mentorshipRequest.exception.RequestIsAlreadyAcceptedException;
+import school.faang.user_service.util.mentorshipRequest.exception.RequestIsAlreadyRejectedException;
+import school.faang.user_service.util.mentorshipRequest.exception.UserNotFoundException;
+import school.faang.user_service.util.mentorshipRequest.validator.FilterRequestStatusValidator;
+import school.faang.user_service.util.mentorshipRequest.validator.MentorshipRequestValidator;
 
 import java.util.List;
 import java.util.Optional;
@@ -92,6 +94,21 @@ public class MentorshipRequestService {
         }
 
         foundRequest.setStatus(RequestStatus.ACCEPTED);
+
+        mentorshipRequestRepository.save(foundRequest);
+    }
+
+    @Transactional
+    public void rejectRequest(long id, RejectionDto rejectionDto) {
+        MentorshipRequest foundRequest = mentorshipRequestRepository.findById(id)
+                .orElseThrow(NoRequestsException::new);
+
+        if (foundRequest.getStatus().equals(RequestStatus.REJECTED)) {
+            throw new RequestIsAlreadyRejectedException();
+        }
+
+        foundRequest.setStatus(RequestStatus.REJECTED);
+        foundRequest.setRejectionReason(rejectionDto.getReason());
 
         mentorshipRequestRepository.save(foundRequest);
     }

@@ -1,13 +1,13 @@
-package school.faang.user_service.mapper;
+package school.faang.user_service.mapper.mentorshipRequest;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.MentorshipRequestDto;
-import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.dto.mentorshipRequest.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorshipRequest.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
-import school.faang.user_service.service.MentorshipRequestService;
-import school.faang.user_service.util.validator.FilterRequestStatusValidator;
+import school.faang.user_service.service.mentorshipRequest.MentorshipRequestService;
+import school.faang.user_service.util.mentorshipRequest.validator.FilterRequestStatusValidator;
 
 @Component
 @Mapper(unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE,

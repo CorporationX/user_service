@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.mentorshipRequest;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,17 +7,20 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import school.faang.user_service.dto.MentorshipRequestDto;
-import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.dto.mentorshipRequest.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorshipRequest.RejectionDto;
+import school.faang.user_service.dto.mentorshipRequest.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.mapper.mentorshipRequest.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-import school.faang.user_service.util.exception.RequestIsAlreadyAcceptedException;
-import school.faang.user_service.util.validator.FilterRequestStatusValidator;
-import school.faang.user_service.util.validator.MentorshipRequestValidator;
+import school.faang.user_service.util.mentorshipRequest.exception.NoRequestsException;
+import school.faang.user_service.util.mentorshipRequest.exception.RequestIsAlreadyAcceptedException;
+import school.faang.user_service.util.mentorshipRequest.exception.RequestIsAlreadyRejectedException;
+import school.faang.user_service.util.mentorshipRequest.validator.FilterRequestStatusValidator;
+import school.faang.user_service.util.mentorshipRequest.validator.MentorshipRequestValidator;
 
 import java.util.List;
 import java.util.Optional;
@@ -206,10 +209,11 @@ public class MentorshipRequestServiceTest {
         mentorshipRequestService.acceptRequest(id);
 
         Assertions.assertEquals(RequestStatus.ACCEPTED, mentorshipRequest.getStatus());
+        Mockito.verify(mentorshipRequestRepository, Mockito.times(1)).save(mentorshipRequest);
     }
 
     @Test
-    void testAcceptRequest_InputsAreInvalid_ShouldReturnException() {
+    void testAcceptRequest_InputsAreInvalid_ShouldThrowException() {
         long id = 2;
         MentorshipRequest mentorshipRequest =
                 new MentorshipRequest();
@@ -228,6 +232,39 @@ public class MentorshipRequestServiceTest {
 
         Assertions.assertThrows(RequestIsAlreadyAcceptedException.class,
                 () -> mentorshipRequestService.acceptRequest(id));
+    }
+
+    @Test
+    void testRejectRequest_InputsAreInvalid_ShouldThrowException() {
+        long id = 1;
+        Mockito.when(mentorshipRequestRepository.findById(id)).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(NoRequestsException.class,
+                () -> mentorshipRequestService.rejectRequest(id, new RejectionDto("reason")));
+    }
+
+    @Test
+    void testRejectRequest_InputsAreValid_ShouldComplete() {
+        long id = 1;
+        MentorshipRequest foundRequest = new MentorshipRequest();
+        foundRequest.setStatus(RequestStatus.PENDING);
+        Mockito.when(mentorshipRequestRepository.findById(id)).thenReturn(Optional.of(foundRequest));
+
+        mentorshipRequestService.rejectRequest(id, new RejectionDto("reason"));
+
+        Assertions.assertEquals(RequestStatus.REJECTED, foundRequest.getStatus());
+        Mockito.verify(mentorshipRequestRepository, Mockito.times(1)).save(foundRequest);
+    }
+
+    @Test
+    void testRejectRequest_RequestIsAlreadyRejected_ShouldThrowException() {
+        long id = 1;
+        MentorshipRequest foundRequest = new MentorshipRequest();
+        foundRequest.setStatus(RequestStatus.REJECTED);
+        Mockito.when(mentorshipRequestRepository.findById(id)).thenReturn(Optional.of(foundRequest));
+
+        Assertions.assertThrows(RequestIsAlreadyRejectedException.class,
+                () -> mentorshipRequestService.rejectRequest(id, new RejectionDto("reason")));
     }
 }
 

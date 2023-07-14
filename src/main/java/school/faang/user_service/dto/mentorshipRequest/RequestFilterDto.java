@@ -1,6 +1,5 @@
-package school.faang.user_service.dto;
+package school.faang.user_service.dto.mentorshipRequest;
 
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package school.faang.user_service.util.exception;
+package school.faang.user_service.util.mentorshipRequest.exception;
 
 public class GetRequestsMentorshipsException extends RuntimeException {
     public GetRequestsMentorshipsException(String message) {

@@ -1,4 +1,4 @@
-package school.faang.user_service.controller;
+package school.faang.user_service.controller.mentorshipRequest;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -7,18 +7,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import school.faang.user_service.dto.MentorshipRequestDto;
-import school.faang.user_service.dto.RequestFilterDto;
-import school.faang.user_service.dto.RequestsResponse;
-import school.faang.user_service.service.MentorshipRequestService;
-import school.faang.user_service.util.exception.GetRequestsMentorshipsException;
-import school.faang.user_service.util.exception.NoRequestsException;
-import school.faang.user_service.util.exception.RequestIsAlreadyAcceptedException;
-import school.faang.user_service.util.response.ErrorResponse;
-import school.faang.user_service.util.exception.RequestMentorshipException;
-import school.faang.user_service.util.exception.SameMentorAndMenteeException;
-import school.faang.user_service.util.exception.TimeHasNotPassedException;
-import school.faang.user_service.util.exception.UserNotFoundException;
+import school.faang.user_service.dto.mentorshipRequest.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorshipRequest.RejectionDto;
+import school.faang.user_service.dto.mentorshipRequest.RequestFilterDto;
+import school.faang.user_service.dto.mentorshipRequest.RequestsResponse;
+import school.faang.user_service.service.mentorshipRequest.MentorshipRequestService;
+import school.faang.user_service.util.mentorshipRequest.exception.GetRequestsMentorshipsException;
+import school.faang.user_service.util.mentorshipRequest.exception.NoRequestsException;
+import school.faang.user_service.util.mentorshipRequest.exception.RequestIsAlreadyAcceptedException;
+import school.faang.user_service.util.mentorshipRequest.exception.RequestIsAlreadyRejectedException;
+import school.faang.user_service.util.mentorshipRequest.response.ErrorResponse;
+import school.faang.user_service.util.mentorshipRequest.exception.RequestMentorshipException;
+import school.faang.user_service.util.mentorshipRequest.exception.SameMentorAndMenteeException;
+import school.faang.user_service.util.mentorshipRequest.exception.TimeHasNotPassedException;
+import school.faang.user_service.util.mentorshipRequest.exception.UserNotFoundException;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -73,6 +75,27 @@ public class MentorshipRequestController {
     @PostMapping("/accept/{id}") // интересно, как тут лучше сделать через @PathVariable или @RequestBody?
     public ResponseEntity<HttpStatus> acceptRequest(@PathVariable("id") long id) {
         mentorshipRequestService.acceptRequest(id);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/reject/{id}")
+    public ResponseEntity<HttpStatus> rejectRequest(@PathVariable("id") long id,
+                                                    @RequestBody @Valid RejectionDto rejectionDto,
+                                                    BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            StringBuilder message = new StringBuilder();
+            bindingResult.getFieldErrors().forEach(fieldError -> {
+                message.append(fieldError.getField())
+                        .append(": ")
+                        .append(fieldError.getDefaultMessage())
+                        .append(";");
+            });
+
+            throw new RequestMentorshipException(message.toString());
+        }
+
+        mentorshipRequestService.rejectRequest(id, rejectionDto);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -151,6 +174,16 @@ public class MentorshipRequestController {
     private ResponseEntity<ErrorResponse> handleExceptions(RequestIsAlreadyAcceptedException e) {
         ErrorResponse errorResponse = new ErrorResponse(
                 "This request is already accepted",
+                System.currentTimeMillis()
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(RequestIsAlreadyRejectedException.class)
+    private ResponseEntity<ErrorResponse> handleExceptions(RequestIsAlreadyRejectedException e) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                "This request is already rejected",
                 System.currentTimeMillis()
         );
 

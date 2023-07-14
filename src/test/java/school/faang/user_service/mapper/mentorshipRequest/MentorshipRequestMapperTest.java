@@ -1,13 +1,13 @@
-package school.faang.user_service.service;
+package school.faang.user_service.mapper.mentorshipRequest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import org.mockito.*;
-import school.faang.user_service.dto.MentorshipRequestDto;
-import school.faang.user_service.dto.RequestFilterDto;
-import school.faang.user_service.mapper.MentorshipRequestMapper;
-import school.faang.user_service.util.validator.FilterRequestStatusValidator;
+import school.faang.user_service.dto.mentorshipRequest.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorshipRequest.RequestFilterDto;
+import school.faang.user_service.service.mentorshipRequest.MentorshipRequestService;
+import school.faang.user_service.util.mentorshipRequest.validator.FilterRequestStatusValidator;
 
 public class MentorshipRequestMapperTest {
 

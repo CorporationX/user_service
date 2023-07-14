@@ -1,14 +1,13 @@
-package school.faang.user_service.service;
+package school.faang.user_service.util.mentorshipRequest.validator;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.util.exception.SameMentorAndMenteeException;
-import school.faang.user_service.util.exception.TimeHasNotPassedException;
-import school.faang.user_service.util.exception.UserNotFoundException;
-import school.faang.user_service.util.validator.MentorshipRequestValidator;
+import school.faang.user_service.util.mentorshipRequest.exception.SameMentorAndMenteeException;
+import school.faang.user_service.util.mentorshipRequest.exception.TimeHasNotPassedException;
+import school.faang.user_service.util.mentorshipRequest.exception.UserNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.Optional;

@@ -1,10 +1,10 @@
-package school.faang.user_service.util.validator;
+package school.faang.user_service.util.mentorshipRequest.validator;
 
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.dto.mentorshipRequest.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.service.MentorshipRequestService;
+import school.faang.user_service.service.mentorshipRequest.MentorshipRequestService;
 
 @Component
 public class FilterRequestStatusValidator {

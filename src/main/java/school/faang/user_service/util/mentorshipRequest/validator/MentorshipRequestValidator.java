@@ -1,11 +1,11 @@
-package school.faang.user_service.util.validator;
+package school.faang.user_service.util.mentorshipRequest.validator;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.util.exception.SameMentorAndMenteeException;
-import school.faang.user_service.util.exception.TimeHasNotPassedException;
-import school.faang.user_service.util.exception.UserNotFoundException;
+import school.faang.user_service.util.mentorshipRequest.exception.SameMentorAndMenteeException;
+import school.faang.user_service.util.mentorshipRequest.exception.TimeHasNotPassedException;
+import school.faang.user_service.util.mentorshipRequest.exception.UserNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.Optional;

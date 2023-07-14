@@ -1,4 +1,4 @@
-package school.faang.user_service.util.response;
+package school.faang.user_service.util.mentorshipRequest.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

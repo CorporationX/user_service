@@ -133,4 +133,35 @@ class EventServiceTest {
         verify(userRepository).findById(1L);
         verify(eventRepository).save(any(Event.class));
     }
+
+    @Test
+    void updateEvent_ValidEventDto() {
+        createEvent();
+        eventDto.setTitle("Event2");
+        eventDto.setStartDate(LocalDate.of(2020, 3, 1).atStartOfDay());
+        eventDto.setRelatedSkills(List.of(new SkillDto(1L, "A")));
+
+        when(eventRepository.findById(eventDto.getId())).thenReturn(Optional.of(event));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+        EventDto updatedEvent = eventService.updateEvent(eventDto);
+
+        assertEquals(eventDto.getTitle(), updatedEvent.getTitle());
+        assertEquals(eventDto.getStartDate(), updatedEvent.getStartDate());
+        assertEquals(eventDto.getEndDate(), updatedEvent.getEndDate());
+        assertEquals(eventDto.getDescription(), updatedEvent.getDescription());
+        assertEquals(eventDto.getLocation(), updatedEvent.getLocation());
+        assertEquals(eventDto.getMaxAttendees(), updatedEvent.getMaxAttendees());
+        assertEquals(eventDto.getRelatedSkills(), updatedEvent.getRelatedSkills());
+    }
+
+    @Test
+    void updateEvent_EventNotFound() {
+        createUser();
+        when(eventRepository.findById(eventDto.getId())).thenReturn(Optional.empty());
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+        Exception exception = assertThrows(RuntimeException.class, () -> eventService.updateEvent(eventDto));
+        assertEquals("Event not found", exception.getMessage());
+    }
 }

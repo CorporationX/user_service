@@ -65,7 +65,7 @@ public class GoalService {
                 .toList();
     }
 
-    public void createGoal(Long userId, Goal goal) {
+    public void createGoalValidation(Long userId, Goal goal) {
         int activeGoalsCount = goalRepository.countActiveGoalsPerUser(userId);
         if (activeGoalsCount >= MAX_ACTIVE_GOALS ) {
             throw new IllegalArgumentException("Goal cannot be saved because MAX_ACTIVE_GOALS = "
@@ -76,6 +76,10 @@ public class GoalService {
         if (skillRepository.countExisting(goalDto.getSkillIds()) != goalDto.getSkillIds().size()) {
             throw new IllegalArgumentException("Goal contains non-existent skill");
         }
+    }
+
+    public void createGoal(Long userId, Goal goal) {
+        createGoalValidation(userId, goal);
         goalRepository.create(goal.getTitle(), goal.getDescription(), goal.getParent().getId());
     }
 }

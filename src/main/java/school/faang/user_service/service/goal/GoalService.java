@@ -48,11 +48,11 @@ public class GoalService {
         }
 
         return goals.stream()
-                .filter(goalDto -> filter.getStatus() == null || filter.getStatus() == goalDto.getStatus())
-                .filter(goalDto -> filter.getTitle() == null || filter.getTitle().equals(goalDto.getTitle()))
-                .filter(goalDto -> filter.getSkillIds() == null || filter.getSkillIds().isEmpty()
+                .filter(goalDto -> (filter.getStatus() == null || filter.getStatus() == goalDto.getStatus())
+                        && (filter.getTitle() == null || filter.getTitle().equals(goalDto.getTitle()))
+                        && (filter.getSkillIds() == null || filter.getSkillIds().isEmpty()
                         || new HashSet<>(filter.getSkillIds()).containsAll(goalDto.getSkillIds()))
-                .filter(goalDto -> filter.getParentId() == null || Objects.equals(filter.getParentId(), goalDto.getParentId()))
+                        && (filter.getParentId() == null || Objects.equals(filter.getParentId(), goalDto.getParentId())))
                 .toList();
     }
 
@@ -62,25 +62,24 @@ public class GoalService {
             throw new IllegalArgumentException("Необходимо указать цель.");
         }
 
-        GoalDto dto = new GoalDto();
-
         if (goal.getId() == null) {
             throw new IllegalArgumentException("Идентификатор цели не может быть пустым.");
         }
-        dto.setId(goal.getId());
-
-        dto.setDescription(goal.getDescription());
-
-        dto.setParentId(goal.getParent().getId());
 
         if (goal.getTitle() == null || goal.getTitle().isEmpty()) {
             throw new IllegalArgumentException("Название цели не может быть пустым.");
         }
-        dto.setTitle(goal.getTitle());
 
         if (goal.getStatus() == null) {
             throw new IllegalArgumentException("Статус цели не может быть пустым.");
         }
+
+        GoalDto dto = new GoalDto();
+
+        dto.setId(goal.getId());
+        dto.setDescription(goal.getDescription());
+        dto.setParentId(goal.getParent().getId());
+        dto.setTitle(goal.getTitle());
         dto.setStatus(goal.getStatus());
 
         return dto;

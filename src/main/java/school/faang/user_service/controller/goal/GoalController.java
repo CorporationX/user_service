@@ -40,4 +40,8 @@ public class GoalController {
             throw new DataValidationException("Title can not be blank or null");
         service.updateGoal(goalId, goal);
     }
+
+    public void deleteGoal(Long goalId) throws DataValidationException {
+        service.deleteGoal(goalId);
+    }
 }

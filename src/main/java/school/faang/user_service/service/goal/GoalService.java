@@ -107,4 +107,8 @@ public class GoalService {
         goalMapper.toEntity(goal);
     }
 
+    public void deleteGoal(Long goalId) {
+        goalRepository.delete(goalId);
+    }
+
 }

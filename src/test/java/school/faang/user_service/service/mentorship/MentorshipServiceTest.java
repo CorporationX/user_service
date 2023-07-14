@@ -27,19 +27,17 @@ class MentorshipServiceTest {
     private static final long INCORRECT_MENTOR_ID = 0L;
     @Mock
     private MentorshipRepository mentorshipRepository;
-    @Mock
-    private UserRepository userRepository;
     @InjectMocks
     private MentorshipService mentorshipService;
 
     @BeforeEach
     void setUp() {
-        when(userRepository.findById(INCORRECT_MENTOR_ID))
+        when(mentorshipRepository.findUserById(INCORRECT_MENTOR_ID))
                 .thenReturn(null);
 
         User mentor = new User();
         mentor.setMentees(List.of(new User(), new User()));
-        when(userRepository.findById(MENTOR_ID))
+        when(mentorshipRepository.findUserById(MENTOR_ID))
                 .thenReturn(Optional.of(mentor));
     }
 
@@ -52,7 +50,7 @@ class MentorshipServiceTest {
     @Test
     void getMentees_shouldInvokeFindByIdMethod() {
         mentorshipService.getMentees(MENTOR_ID);
-        Mockito.verify(userRepository).findById(MENTOR_ID);
+        Mockito.verify(mentorshipRepository).findUserById(MENTOR_ID);
     }
 
     @Test

@@ -1,6 +1,5 @@
 package school.faang.user_service.controller.event;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,7 +26,6 @@ public class EventController {
     @ResponseBody
     public ResponseEntity<?> create(@RequestBody EventDto eventDto) {
         try {
-            System.out.println(eventDto);
             validateEvent(eventDto);
             return ResponseEntity.ok(eventService.create(eventDto));
         } catch (DataValidationException e) {
@@ -68,7 +66,6 @@ public class EventController {
         if (event.getStartDate() == null) {
             throw new DataValidationException("Event start date cannot be null");
         }
-
         if (event.getOwnerId() == null || event.getOwnerId() < 0) {
             throw new DataValidationException("Event owner ID cannot be null or negative");
         }

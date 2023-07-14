@@ -103,7 +103,6 @@ public class EventControllerTest {
 
     @Test
     void testReceivingFilteredEventWithException() {
-
         Mockito.when(eventService.getEventsByFilter(filterDto)).thenThrow(new NotFoundException("Not found"));
         var response = eventController.getEventsByFilter(filterDto);
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());

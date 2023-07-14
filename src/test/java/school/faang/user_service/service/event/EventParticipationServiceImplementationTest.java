@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.annotation.Description;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.RegistrationUserForEventException;
 import school.faang.user_service.repository.event.EventParticipationRepository;
@@ -50,10 +51,23 @@ class EventParticipationServiceImplementationTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenTheUserIsRegistered() {
-        userId = user.getId();
+    void testUnregisterParticipant() {
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(eventId))
                 .thenReturn(List.of(user));
+
+        eventParticipationService.unregisterParticipant(eventId, userId);
+
+        Mockito.verify(eventParticipationRepository, Mockito.times(1))
+                .unregister(eventId, userId);
+    }
+
+    @Test
+    @Description("Testing the Register Participation method, the method should throw an exception" +
+            " if the user is already participating in the event")
+    void shouldThrowExceptionMethodRegisterParticipantWhenTheUserIsRegistered() {
+        userId = user.getId();
+        Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(eventId))
+                .thenReturn(List.of(new User(userId)));
 
         Exception exc = assertThrows(RegistrationUserForEventException.class,
                 () -> eventParticipationService.registerParticipant(eventId, userId));

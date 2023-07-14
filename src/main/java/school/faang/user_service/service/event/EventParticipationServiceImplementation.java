@@ -9,7 +9,7 @@ import school.faang.user_service.repository.event.EventParticipationRepository;
 import java.util.List;
 
 @Service
-public class EventParticipationServiceImplementation implements EventParticipationService{
+public class EventParticipationServiceImplementation implements EventParticipationService {
     private final EventParticipationRepository eventParticipationRepository;
 
     @Autowired
@@ -24,6 +24,19 @@ public class EventParticipationServiceImplementation implements EventParticipati
             eventParticipationRepository.register(eventId, userId);
         } else {
             throw new RegistrationUserForEventException("The user has already been registered for the event");
+        }
+    }
+
+    @Override
+    public void unregisterParticipant(Long eventId, Long userId) {
+        validateInputData(eventId, userId);
+        List<User> users = eventParticipationRepository.findAllParticipantsByEventId(eventId);
+        if (isUserRegisteredForEvent(users, userId)) {
+            eventParticipationRepository.unregister(eventId, userId);
+        } else {
+            String errorMessage = String.format("the userId: [%s] is not registered for the eventId: [%s]",
+                    userId, eventId);
+            throw new RegistrationUserForEventException(errorMessage);
         }
     }
 

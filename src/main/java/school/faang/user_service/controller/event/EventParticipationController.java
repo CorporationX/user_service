@@ -19,4 +19,9 @@ public class EventParticipationController {
     public void registerParticipant(@PathVariable Long eventId, @PathVariable Long userId){
         eventParticipationService.registerParticipant(eventId, userId);
     }
+
+    @PostMapping("/{eventId}/unregister/{userId} ")
+    public void unregisterParticipant(@PathVariable Long eventId, @PathVariable Long userId){
+        eventParticipationService.unregisterParticipant(eventId, userId);
+    }
 }

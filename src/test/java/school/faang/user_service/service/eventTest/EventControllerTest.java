@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import school.faang.user_service.controller.event.EventController;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.service.event.EventService;
 
@@ -50,46 +49,36 @@ public class EventControllerTest {
     @Test
     void testNullTitleIsInvalid() {
         eventDto.setTitle(null);
-        Assert.assertThrows(
-                DataValidationException.class,
-                () -> eventController.create(eventDto)
-        );
+        var result = eventController.create(eventDto);
+        Assertions.assertEquals(result, ResponseEntity.badRequest().body("Event title cannot be empty"));
     }
 
     @Test
     void testBlankTitleIsInvalid() {
         eventDto.setTitle("  ");
-        Assert.assertThrows(
-                DataValidationException.class,
-                () -> eventController.create(eventDto)
-        );
+        var result = eventController.create(eventDto);
+        Assertions.assertEquals(result, ResponseEntity.badRequest().body("Event title cannot be empty"));
     }
 
     @Test
     void testNullStartDateIsInvalid() {
         eventDto.setStartDate(null);
-        Assert.assertThrows(
-                DataValidationException.class,
-                () -> eventController.create(eventDto)
-        );
+        var result = eventController.create(eventDto);
+        Assertions.assertEquals(result, ResponseEntity.badRequest().body("Event start date cannot be null"));
     }
 
     @Test
     void testNullOwnedIdIsInvalid() {
         eventDto.setOwnerId(null);
-        Assert.assertThrows(
-                DataValidationException.class,
-                () -> eventController.create(eventDto)
-        );
+        var result = eventController.create(eventDto);
+        Assertions.assertEquals(result, ResponseEntity.badRequest().body("Event owner ID cannot be null or negative"));
     }
 
     @Test
     void testNegativeOwnedIdIsInvalid() {
         eventDto.setOwnerId(-1L);
-        Assert.assertThrows(
-                DataValidationException.class,
-                () -> eventController.create(eventDto)
-        );
+        var result = eventController.create(eventDto);
+        Assertions.assertEquals(result, ResponseEntity.badRequest().body("Event owner ID cannot be null or negative"));
     }
 
     @Test

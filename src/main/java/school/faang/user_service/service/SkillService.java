@@ -72,8 +72,6 @@ public class SkillService {
 
         return skillRepository.findById(skillId).map(skill -> {
             addGuarantees(skill, offers, userId);
-            skillRepository.save(skill);
-
             return skillMapper.toDTO(skill);
         }).orElseThrow(() ->
                 new DataValidException("User skill not found"));

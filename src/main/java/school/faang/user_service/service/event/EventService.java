@@ -34,6 +34,7 @@ public class EventService {
 
     if (!hasUserPermission) throw new DataValidationException("User doesn't have access");;
   }
+
   public EventDto create(EventDto event) throws DataValidationException {
      validateUserAccess(event.getRelatedSkills(), event.getOwnerId());
      Event createdEvent = eventRepository.save(eventMapper.toEntity(event));

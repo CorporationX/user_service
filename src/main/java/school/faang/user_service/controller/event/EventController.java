@@ -24,6 +24,7 @@ public class EventController {
 
     @DeleteMapping("/event/{id}")
     public void deleteEvent(@PathVariable Long id) {
+        validateId(id);
         eventService.deleteEvent(id);
     }
 
@@ -38,6 +39,11 @@ public class EventController {
 
         if (eventDto.getOwnerId() == null || eventDto.getOwnerId() < 0) {
             throw new DataValidationException("Event owner ID cannot be null");
+        }
+    }
+    private void validateId(long id) {
+        if (id < 0) {
+            throw new DataValidationException("Id cannot be negative");
         }
     }
 }

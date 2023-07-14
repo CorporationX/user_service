@@ -59,12 +59,4 @@ class EventServiceTest {
         eventService.deleteEvent(id);
         Mockito.verify(eventRepository, Mockito.times(1)).deleteById(id);
     }
-
-    @Test
-    public void testDeleteEventThrowsException() {
-        long id = -1L;
-        Assertions.assertThrows(DataValidationException.class, () -> {
-            eventService.deleteEvent(id);
-        });
-    }
 }

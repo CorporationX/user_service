@@ -24,14 +24,6 @@ public class EventService {
     }
 
     public void deleteEvent(Long id) {
-        idValidate(id);
-        eventRepository.findById(id).orElseThrow(() -> new DataValidationException("Event not found"));
         eventRepository.deleteById(id);
-    }
-
-    private void idValidate(long id) {
-        if (id < 0) {
-            throw new DataValidationException("Id cannot be negative");
-        }
     }
 }

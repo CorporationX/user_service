@@ -2,7 +2,7 @@ name: CI
 
 on:
     pull_request:
-        branches: [ feature/pipline-BC-3806 ]
+        branches: [ werewolf-master ]
 
 jobs:
     build:

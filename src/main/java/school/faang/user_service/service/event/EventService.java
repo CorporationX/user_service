@@ -13,7 +13,6 @@ import school.faang.user_service.repository.event.EventRepository;
 import java.util.List;
 
 @Service
-
 public class EventService {
   private EventRepository eventRepository;
   private SkillRepository skillRepository;

@@ -8,6 +8,6 @@ class UserServiceTest {
 
     @Test
     void getUsers() {
-        assertTrue(true);
+        assertTrue(false);
     }
 }

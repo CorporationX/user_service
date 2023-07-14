@@ -45,14 +45,39 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldThrowExceptionIfFollowerDoesNotExist() {
         Mockito.when(userRepository.existsById(followeeId)).thenReturn(true);
+        Mockito.when(userRepository.existsById(followerId)).thenReturn(false);
+
         Assertions.assertThrows(DataValidationException.class, () -> subscriptionService.followUser(followerId, followeeId));
         Mockito.verify(subscriptionRepository, Mockito.times(0)).followUser(followerId, followeeId);
     }
 
     @Test
     public void shouldThrowExceptionIfFolloweeDoesNotExist() {
+        Mockito.when(userRepository.existsById(followeeId)).thenReturn(false);
         Mockito.lenient().when(userRepository.existsById(followerId)).thenReturn(true);
+
         Assertions.assertThrows(DataValidationException.class, () -> subscriptionService.followUser(followerId, followeeId));
         Mockito.verify(subscriptionRepository, Mockito.times(0)).followUser(followerId, followeeId);
+    }
+
+    @Test
+    public void shouldReturnFollowersCount() {
+        int desiredFollowersCount = 3;
+
+        Mockito.when(userRepository.existsById(followeeId)).thenReturn(true);
+        Mockito.when(subscriptionRepository.findFollowersAmountByFolloweeId(followeeId))
+                .thenReturn(desiredFollowersCount);
+        int followersCount = subscriptionService.getFollowersCount(followeeId);
+
+        Assertions.assertEquals(desiredFollowersCount, followersCount);
+        Mockito.verify(subscriptionRepository).findFollowersAmountByFolloweeId(followeeId);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenUserNotExists() {
+        Mockito.when(userRepository.existsById(followeeId)).thenReturn(false);
+        Assertions.assertThrows(DataValidationException.class, () -> subscriptionService.getFollowersCount(followeeId));
+        Mockito.verify(subscriptionRepository, Mockito.times(0))
+                .findFollowersAmountByFolloweeId(followeeId);
     }
 }

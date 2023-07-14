@@ -33,4 +33,16 @@ public class SubscriptionControllerTest {
         Assertions.assertThrows(DataValidationException.class, () -> subscriptionController.followUser(followerId, followeeId));
         Mockito.verify(subscriptionService, Mockito.times(0)).followUser(followerId, followeeId);
     }
+
+    @Test
+    public void shouldReturnFollowersCount() {
+        int desiredFollowersCount = 3;
+
+        Mockito.when(subscriptionService.getFollowersCount(followeeId))
+                .thenReturn(desiredFollowersCount);
+        int followersCount = subscriptionService.getFollowersCount(followeeId);
+
+        Assertions.assertEquals(desiredFollowersCount, followersCount);
+        Mockito.verify(subscriptionService).getFollowersCount(followeeId);
+    }
 }

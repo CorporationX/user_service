@@ -22,11 +22,8 @@ public class SubscriptionService {
 
     @Transactional
     public void unfollowUser(long followerId, long followeeId) {
-        if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
-            subscriptionRepository.unfollowUser(followerId, followeeId);
-            return;
-        }
-        throw new DataValidationException("You are not subscribed to this user to unsubscribe from this user");
+        subscriptionNotExistsValidation(followerId, followeeId);
+        subscriptionRepository.unfollowUser(followerId, followeeId);
     }
 
     @Transactional
@@ -38,6 +35,12 @@ public class SubscriptionService {
     private void subscriptionExistsValidation(long followerId, long followeeId) {
         if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             throw new DataValidationException("You are already subscribed to this user.");
+        }
+    }
+
+    private void subscriptionNotExistsValidation(long followerId, long followeeId) {
+        if (!subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
+            throw new DataValidationException("You are not subscribed to this user to unsubscribe from this user");
         }
     }
 

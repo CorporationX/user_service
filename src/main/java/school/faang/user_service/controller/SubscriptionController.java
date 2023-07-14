@@ -17,19 +17,20 @@ import school.faang.user_service.service.SubscriptionService;
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
+    private static final String UNSUBSCRIBE_YOURSELF_EXCEPTION = "You can't unsubscribe from yourself.";
+    private static final String SUBSCRIBE_YOURSELF_EXCEPTION = "You can't subscribe to yourself.";
+
     @PutMapping("/follow/{id}")
     public void followUser(@RequestParam("followerId") long followerId,
                            @PathVariable("id") long followeeId) {
-        sameUserValidation(followerId, followeeId);
+        sameUserValidation(followerId, followeeId, SUBSCRIBE_YOURSELF_EXCEPTION);
         subscriptionService.followUser(followerId, followeeId);
     }
 
     @DeleteMapping("/unfollow/{id}")
     public void unfollowUser(@RequestParam("followerId") long followerId,
                          @PathVariable("id") long followeeId) {
-        if (followerId == followeeId) {
-            throw new DataValidationException("You can't unsubscribe from yourself.");
-        }
+        sameUserValidation(followerId, followeeId, UNSUBSCRIBE_YOURSELF_EXCEPTION);
         subscriptionService.unfollowUser(followerId, followeeId);
     }
 
@@ -38,10 +39,9 @@ public class SubscriptionController {
         return subscriptionService.getFollowersCount(followeeId);
     }
 
-    private static void sameUserValidation(long followerId, long followeeId) {
+    private void sameUserValidation(long followerId, long followeeId, String message) {
         if (followerId == followeeId) {
-            throw new DataValidationException("You can't subscribe to yourself.");
+            throw new DataValidationException(message);
         }
-        subscriptionService.followUser(followerId, followeeId);
     }
 }

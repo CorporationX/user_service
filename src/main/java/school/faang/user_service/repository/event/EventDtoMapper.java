@@ -8,14 +8,10 @@ import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.event.Event;
 
 
-@Mapper
+@Mapper(componentModel = "spring")
 @Component
-public interface EventMapper {
-    EventMapper INSTANCE = Mappers.getMapper(EventMapper.class);
-
-    @Mapping(target = "id", ignore = true)
-    Event toEvent(EventDto eventDto);
-
-    EventDto toEventDto(Event event);
+public interface EventDtoMapper {
+    EventDto mapToDto(Event event);
+    Event mapToEntity(EventDto eventDto);
 
 }

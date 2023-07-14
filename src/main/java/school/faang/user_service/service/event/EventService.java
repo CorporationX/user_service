@@ -5,55 +5,50 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.repository.event.EventMapper;
+import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.event.EventDtoMapper;
 import school.faang.user_service.repository.event.EventRepository;
 
-
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class EventService {
     private final EventRepository eventRepository;
-
-    private final EventMapper eventMapper;
+    private final EventDtoMapper eventDtoMapper;
+    private final UserRepository userRepository;
 
     @Autowired
-    public EventService(EventRepository eventRepository, EventMapper eventMapper) {
+    public EventService(EventRepository eventRepository, EventDtoMapper eventDtoMapper, UserRepository userRepository) {
         this.eventRepository = eventRepository;
-        this.eventMapper = eventMapper;
+        this.eventDtoMapper = eventDtoMapper;
+        this.userRepository = userRepository;
     }
 
     public EventDto create(EventDto event) {
         validateUserSkills(event);
-        Event savedEvent = eventRepository.save(eventMapper.toEvent(event));
-        return eventMapper.toEventDto(savedEvent);
-    }
-    public List<SkillDto> getUserSkills(Long userId) {
-        List<Event> userEvents = eventRepository.findParticipatedEventsByUserId(userId);
-
-        List<Skill> userSkills = userEvents.stream()
-                .flatMap(event -> event.getRelatedSkills().stream())
-                .toList();
-
-        return userSkills.stream()
-                .map(skill -> new SkillDto(skill.getId(), skill.getTitle()))
-                .collect(Collectors.toList());
+        Event createdEvent = eventRepository.save(eventDtoMapper.mapToEntity(event));
+        return eventDtoMapper.mapToDto(createdEvent);
     }
 
+    void validateUserSkills(EventDto event) {
+        List<SkillDto> requiredSkills = event.getRelatedSkills();
+        Long ownerId = event.getOwnerId();
 
-    public void validateUserSkills(EventDto event) {
-        List<SkillDto> eventSkills = event.getRelatedSkills();
-        Long userId = event.getOwnerId();
-        List<SkillDto> userSkills = getUserSkills(userId);
+        User owner = userRepository.findById(ownerId)
+                .orElseThrow(() -> new DataValidationException("Invalid owner ID"));
 
-        for (SkillDto eventSkill : eventSkills) {
-            if (!userSkills.contains(eventSkill)) {
-                throw new DataValidationException("User does not have the required skill: " + eventSkill.getTitle());
+        List<Skill> ownerSkills = owner.getSkills();
+
+        for (SkillDto requiredSkill : requiredSkills) {
+            boolean hasSkill = ownerSkills.stream()
+                    .anyMatch(skill -> skill.getTitle().equals(requiredSkill.getTitle()));
+
+            if (!hasSkill) {
+                throw new DataValidationException("User does not have the required skills for the event");
             }
         }
     }
-
 }

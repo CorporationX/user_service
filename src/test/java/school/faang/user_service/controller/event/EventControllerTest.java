@@ -1,64 +1,68 @@
 package school.faang.user_service.controller.event;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventService;
 
 import java.time.LocalDateTime;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@WebMvcTest(EventController.class)
-@AutoConfigureMockMvc
 class EventControllerTest {
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @MockBean
+    @Mock
     private EventService eventService;
 
-    @Test
-    public void testCreateEvent_Success() throws Exception {
+    private EventController eventController;
 
-        EventDto eventDto = createSampleEventDto();
-
-        doNothing().when(eventService).create(any(EventDto.class));
-
-        mockMvc.perform(post("/events")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(eventDto)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(eventDto.getId()))
-                .andExpect(jsonPath("$.title").value(eventDto.getTitle()));
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        eventController = new EventController(eventService);
     }
 
-    private @NotNull EventDto createSampleEventDto() {
+    @Test
+    void create_ValidEvent_ReturnsOkResponse() {
         EventDto eventDto = new EventDto();
-        eventDto.setId(1L);
-        eventDto.setTitle("Sample Event");
+        eventDto.setTitle("Event 1");
         eventDto.setStartDate(LocalDateTime.now());
-        eventDto.setEndDate(LocalDateTime.now().plusHours(2));
         eventDto.setOwnerId(1L);
-        eventDto.setDescription("Sample event description");
-        eventDto.setLocation("Sample location");
-        eventDto.setMaxAttendees(100);
 
-        return eventDto;
+        when(eventService.create(any(EventDto.class))).thenReturn(eventDto);
+
+        ResponseEntity<EventDto> response = eventController.create(eventDto);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
+        assertEquals(eventDto, response.getBody());
+        verify(eventService).create(eventDto);
+    }
+
+    @Test
+    void create_InvalidEvent_ThrowsDataValidationException() {
+        EventDto eventDto = new EventDto();
+        eventDto.setTitle(null);
+        eventDto.setStartDate(null);
+        eventDto.setOwnerId(null);
+
+        DataValidationException exception = assertThrows(DataValidationException.class, () -> {
+            eventController.create(eventDto);
+        });
+
+        assertEquals("Event title must not be empty", exception.getMessage());
     }
 
 }

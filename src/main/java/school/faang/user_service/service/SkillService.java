@@ -8,17 +8,21 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 
 import java.util.List;
 
 @Service
 @Data
-@RequiredArgsConstructor
 
 public class SkillService {
     private final SkillRepository skillRepository;
+    private final UserRepository userRepository;
 
     public List<SkillDto> getUserSkills(long userId) {
+        if (userRepository.findById(userId).isEmpty()) {
+            throw new RuntimeException("user is not found");
+        }
         List<Skill> skillsOfUsers = skillRepository.findAllByUserId(userId);
         return skillsOfUsers.stream().map(SkillMapper.INSTANCE::toDTO).toList();
     }

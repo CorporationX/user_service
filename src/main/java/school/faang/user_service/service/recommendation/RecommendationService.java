@@ -12,7 +12,6 @@ import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.validator.RecommendationValidator;
-import school.faang.user_service.validator.SkillOfferValidator;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +26,6 @@ public class RecommendationService {
     private final RecommendationMapper recommendationMapper;
     private final SkillOfferRepository skillOfferRepository;
     private final SkillRepository skillRepository;
-    private final SkillOfferValidator skillOfferValidator;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
 
     public RecommendationDto create(RecommendationDto recommendationDto) {
@@ -45,7 +43,7 @@ public class RecommendationService {
         return recommendationMapper.toDto(recommendation);
     }
 
-    public void processSkillOffers(RecommendationDto recommendationDto) {
+    private void processSkillOffers(RecommendationDto recommendationDto) {
         long recommendationId = recommendationDto.getId();
         long authorId = recommendationDto.getAuthorId();
         long receiverId = recommendationDto.getReceiverId();
@@ -76,10 +74,7 @@ public class RecommendationService {
     }
 
     private void validate(RecommendationDto recommendation) {
-        List<SkillOfferDto> skills = recommendation.getSkillOffers();
-
         recommendationValidator.validateLastUpdate(recommendation);
-        skillOfferValidator.validateSkillsListNotEmptyOrNull(skills);
-        skillOfferValidator.validateSkillsAreInRepository(skills);
+        recommendationValidator.validateSkills(recommendation);
     }
 }

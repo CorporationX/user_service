@@ -29,10 +29,9 @@ public class EventController {
     }
 
     @PostMapping("/event/{id}")
-    public EventDto updateEvent(@PathVariable Long id, @RequestBody EventDto eventDto) {
-        idValidate(id);
+    public EventDto updateEvent(@RequestBody EventDto eventDto) {
         validateEvent(eventDto);
-        return eventService.updateEvent(id, eventDto);
+        return eventService.updateEvent(eventDto);
     }
 
     public void validateEvent(EventDto eventDto) {

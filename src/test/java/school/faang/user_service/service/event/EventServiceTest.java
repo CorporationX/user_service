@@ -77,7 +77,7 @@ class EventServiceTest {
         var event = Event.builder().id(1L).title("New Event").build();
         Mockito.when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
         Mockito.when(eventMapper.toDto(event)).thenReturn(eventDtoForUpdate);
-        EventDto updatedEvent = eventService.updateEvent(1L, eventDto);
+        EventDto updatedEvent = eventService.updateEvent(eventDto);
         assertEquals("Cool new Event", updatedEvent.getTitle());
     }
 }

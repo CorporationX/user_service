@@ -30,43 +30,9 @@ public class EventService {
         eventRepository.deleteById(id);
     }
 
-    public EventDto updateEvent(Long id, EventDto eventFormRequest) {
-        Event eventForUpdate = eventRepository.findById(id).orElseThrow(() -> new DataValidationException("Event not found"));
-        EventDto eventDtoForUpdate = eventMapper.toDto(eventForUpdate);
-        updateEventInDb(eventDtoForUpdate, eventFormRequest);
-
-        return eventDtoForUpdate;
-    }
-
-    private void updateEventInDb(EventDto eventForUpdate, EventDto eventFormRequest) {
-        {
-            eventValidator.checkIfUserHasSkillsRequired(eventFormRequest);
-            if (eventFormRequest.getTitle() != null) {
-                eventForUpdate.setTitle(eventFormRequest.getTitle());
-            }
-            if (eventFormRequest.getStartDate() != null) {
-                eventForUpdate.setStartDate(eventFormRequest.getStartDate());
-            }
-            if (eventFormRequest.getEndDate() != null) {
-                eventForUpdate.setEndDate(eventFormRequest.getEndDate());
-            }
-            if (eventFormRequest.getDescription() != null) {
-                eventForUpdate.setDescription(eventFormRequest.getDescription());
-            }
-
-            if (eventFormRequest.getLocation() != null) {
-                eventForUpdate.setLocation(eventFormRequest.getLocation());
-            }
-
-            if (eventFormRequest.getMaxAttendees() >= 0) {
-                eventForUpdate.setMaxAttendees(eventFormRequest.getMaxAttendees());
-            }
-
-            if (eventFormRequest.getRelatedSkills() != null) {
-                eventForUpdate.setRelatedSkills(eventFormRequest.getRelatedSkills());
-            }
-            eventRepository.save(eventMapper.toEntity(eventForUpdate));
-        }
-
+    public EventDto updateEvent(EventDto eventFormRequest) {
+        eventValidator.checkIfUserHasSkillsRequired(eventFormRequest);
+        eventRepository.save(eventMapper.toEntity(eventFormRequest));
+        return eventFormRequest;
     }
 }

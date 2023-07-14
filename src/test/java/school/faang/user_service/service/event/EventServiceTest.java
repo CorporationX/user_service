@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.event.EventRepository;
@@ -33,8 +34,11 @@ class EventServiceTest {
 
     @Test
     public void testGetEvent() {
-        Mockito.when(eventRepository.findById(1L)).thenReturn(Optional.ofNullable(Event.builder().id(1L).build()));
-        assertEquals(eventMapper.toDto(Event.builder().id(1L).build()), eventService.getEvent(1L));
+        EventDto eventDto = new EventDto(1L, null,null,null,null,null,null,null,1);
+        Event event = Event.builder().id(1L).maxAttendees(1).build();
+        Mockito.when(eventRepository.findById(1L)).thenReturn(Optional.ofNullable(event));
+        Mockito.when(eventMapper.toDto(event)).thenReturn(eventDto);
+        assertEquals(eventDto, eventService.getEvent(1L));
     }
 
 }

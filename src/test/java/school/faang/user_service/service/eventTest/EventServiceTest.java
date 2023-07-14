@@ -49,7 +49,6 @@ public class EventServiceTest {
                         Skill.builder().id(1).build(),
                         Skill.builder().id(2).build()
                 ));
-
     }
 
     @Test
@@ -123,11 +122,26 @@ public class EventServiceTest {
     }
 
     @Test
-    void deletingEventTest(){
+    void deletingEventTest() {
         eventService.deleteEvent(1);
-        Mockito.verify(eventRepository,Mockito.times(1)).deleteById(1L);
+        Mockito.verify(eventRepository, Mockito.times(1)).deleteById(1L);
     }
 
+    @Test
+    void testUpdatingEventIsInvalid() {
+        eventDto.setRelatedSkills(List.of(new SkillDto(3), new SkillDto(4)));
+        Assert.assertThrows(
+                DataValidationException.class,
+                () -> eventService.updateEvent(eventDto)
+        );
+    }
+
+    @Test
+    void testUpdatingEventIsValid() {
+        eventDto.setRelatedSkills(List.of(new SkillDto(1), new SkillDto(2)));
+        eventService.updateEvent(eventDto);
+        Mockito.verify(eventMapper, Mockito.times(1)).toEntity(eventDto);
+    }
 
     private Event getEventExample() {
         return Event.builder()

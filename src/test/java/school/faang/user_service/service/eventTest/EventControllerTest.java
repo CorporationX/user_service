@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import school.faang.user_service.controller.event.EventController;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.service.event.EventService;
 
@@ -21,7 +22,6 @@ import java.util.List;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-
 
 public class EventControllerTest {
     @Mock
@@ -48,36 +48,47 @@ public class EventControllerTest {
     @Test
     void testNullTitleIsInvalid() {
         eventDto.setTitle(null);
-        var result = eventController.create(eventDto);
-        Assertions.assertEquals(result, ResponseEntity.badRequest().body("Event title cannot be empty"));
+        Assertions.assertThrows(
+                DataValidationException.class,
+                () -> eventController.create(eventDto)
+        );
     }
 
     @Test
     void testBlankTitleIsInvalid() {
         eventDto.setTitle("  ");
-        var result = eventController.create(eventDto);
-        Assertions.assertEquals(result, ResponseEntity.badRequest().body("Event title cannot be empty"));
+        Assertions.assertThrows(
+                DataValidationException.class,
+                () -> eventController.create(eventDto)
+        );
     }
 
     @Test
     void testNullStartDateIsInvalid() {
         eventDto.setStartDate(null);
-        var result = eventController.create(eventDto);
-        Assertions.assertEquals(result, ResponseEntity.badRequest().body("Event start date cannot be null"));
+        Assertions.assertThrows(
+                DataValidationException.class,
+                () -> eventController.create(eventDto)
+        );
     }
 
     @Test
     void testNullOwnedIdIsInvalid() {
         eventDto.setOwnerId(null);
-        var result = eventController.create(eventDto);
-        Assertions.assertEquals(result, ResponseEntity.badRequest().body("Event owner ID cannot be null or negative"));
+        Assertions.assertThrows(
+                DataValidationException.class,
+                () -> eventController.create(eventDto)
+        );
     }
 
     @Test
     void testNegativeOwnedIdIsInvalid() {
         eventDto.setOwnerId(-1L);
-        var result = eventController.create(eventDto);
-        Assertions.assertEquals(result, ResponseEntity.badRequest().body("Event owner ID cannot be null or negative"));
+
+        Assertions.assertThrows(
+                DataValidationException.class,
+                () -> eventController.create(eventDto)
+        );
     }
 
     @Test
@@ -103,8 +114,10 @@ public class EventControllerTest {
     @Test
     void testReceivingFilteredEventWithException() {
         Mockito.when(eventService.getEventsByFilter(filterDto)).thenThrow(new NotFoundException("Not found"));
-        var response = eventController.getEventsByFilter(filterDto);
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        Assertions.assertThrows(
+                NotFoundException.class,
+                () -> eventController.getEventsByFilter(filterDto)
+        );
         verify(eventService, times(1)).getEventsByFilter(filterDto);
     }
 
@@ -118,5 +131,30 @@ public class EventControllerTest {
     void correctDeletingEventTest() {
         var response = eventController.deleteEvent(100);
         Assertions.assertEquals(response.getStatusCode(), HttpStatus.OK);
+    }
+
+    @Test
+    void testUpdatingWithNullTitleIsInvalid() {
+        eventDto.setTitle(null);
+        Assertions.assertThrows(
+                DataValidationException.class,
+                () -> eventController.updateEvent(eventDto)
+        );
+    }
+
+    @Test
+    void testUpdatingWithNullStartDateIsInvalid() {
+        eventDto.setStartDate(null);
+        Assertions.assertThrows(
+                DataValidationException.class,
+                () -> eventController.updateEvent(eventDto)
+        );
+    }
+
+    @Test
+    void testUpdatingValidDto() {
+        var result = eventController.updateEvent(eventDto);
+        Assertions.assertEquals(result.getStatusCode(),HttpStatus.OK);
+        verify(eventService, times(1)).updateEvent(eventDto);
     }
 }

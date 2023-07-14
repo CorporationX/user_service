@@ -53,6 +53,11 @@ public class EventService {
         eventRepository.deleteById(id);
     }
 
+    public void updateEvent(EventDto eventDto) {
+        validateEventSkills(eventDto);
+        eventRepository.save(eventMapper.toEntity(eventDto));
+    }
+
     private void validateEventSkills(EventDto event) {
         long ownerId = event.getOwnerId();
         var relatedSkills = event.getRelatedSkills();

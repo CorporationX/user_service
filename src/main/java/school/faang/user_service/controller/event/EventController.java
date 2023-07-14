@@ -20,50 +20,39 @@ public class EventController {
 
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody EventDto eventDto) {
-        try {
-            validateEvent(eventDto);
-            return ResponseEntity.ok(eventService.create(eventDto));
-        } catch (DataValidationException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        validateEvent(eventDto);
+        var res = eventService.create(eventDto);
+        return ResponseEntity.ok(res);
     }
+
     @GetMapping("/get/{eventId}")
     public ResponseEntity<?> getEvent(long eventId) {
         if (eventId < 0) {
             return ResponseEntity.badRequest().body("Event ID cannot be less than 0");
         }
-        try {
-            return ResponseEntity.ok(eventService.getEvent(eventId));
-        } catch (NotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        return ResponseEntity.ok(eventService.getEvent(eventId));
     }
+
     @GetMapping("/filter")
     public ResponseEntity<List<?>> getEventsByFilter(@RequestBody EventFilterDto filter) {
-        try {
-            List<EventDto> filteredEvents = eventService.getEventsByFilter(filter);
-            return ResponseEntity.ok(filteredEvents);
-        } catch (NotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        List<EventDto> filteredEvents = eventService.getEventsByFilter(filter);
+        return ResponseEntity.ok(filteredEvents);
     }
+
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteEvent(@RequestBody long id) {
-        try {
-            if (id < 0) {
-                return ResponseEntity.badRequest().body("id have to be > 0");
-            }
-            eventService.deleteEvent(id);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    public ResponseEntity<?> deleteEvent(@PathVariable long id) {
+        if (id < 0) {
+            return ResponseEntity.badRequest().body("id have to be > 0");
         }
+        eventService.deleteEvent(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<?> updateEvent(@RequestBody EventDto eventDto) {
+        validateEvent(eventDto);
+        eventService.updateEvent(eventDto);
+        return ResponseEntity.ok().build();
     }
 
     private void validateEvent(EventDto event) {

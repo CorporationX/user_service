@@ -52,7 +52,7 @@ public class EventService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         List<SkillDto> userSkills = SkillMapper.INSTANCE.toListSkillsDTO(user.getSkills());
-        if (!new HashSet<>(eventDto.getRelatedSkills()).containsAll(userSkills)) {
+        if (!new HashSet<>(userSkills).containsAll(eventDto.getRelatedSkills())) {
             throw new DataFormatException("User has no related skills");
         }
     }

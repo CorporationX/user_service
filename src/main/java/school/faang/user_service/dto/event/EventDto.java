@@ -41,4 +41,16 @@ public class EventDto {
   public Long getOwnerId() {
     return ownerId;
   }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
+  public void setStartDate(LocalDateTime startDate) {
+    this.startDate = startDate;
+  }
+
+  public void setOwnerId(Long ownerId) {
+    this.ownerId = ownerId;
+  }
 }

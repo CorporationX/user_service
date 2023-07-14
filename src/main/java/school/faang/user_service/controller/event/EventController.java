@@ -19,7 +19,7 @@ public class EventController {
   }
 
   private static void validateTitle(String name) throws DataValidationException {
-    if (name.length() == MIN_NAME_LENGTH) {
+    if (name == null || name.length() < MIN_NAME_LENGTH) {
       throw new DataValidationException("Name is required and should be at least 3 symbols");
     }
   }
@@ -43,12 +43,7 @@ public class EventController {
   }
 
   public EventDto create(EventDto event) {
-    try {
-      validateCreateDTO(event);
-      return eventService.create(event);
-    } catch (Exception e) {
-      System.out.println(e);
-      return null;
-    }
+    validateCreateDTO(event);
+    return eventService.create(event);
   }
 }

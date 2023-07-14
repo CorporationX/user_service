@@ -6,7 +6,7 @@ import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.event.Event;
 
-  @Mapper(componentModel = "spring")
+  @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface EventMapper {
   public EventDto toDto(Event event);
 

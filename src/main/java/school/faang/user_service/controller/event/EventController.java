@@ -55,4 +55,8 @@ public class EventController {
   public List<EventDto> getParticipationEvents(Long userId) {
     return eventService.getParticipatedEvents(userId);
   }
+
+  public List<EventDto> getOwnedEvents(Long ownerId) {
+    return eventService.getOwnedEvents(ownerId);
+  }
 }

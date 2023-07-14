@@ -87,13 +87,17 @@ public class MentorshipRequestService {
         MentorshipRequest foundRequest =
                 mentorshipRequestRepository.findById(id).orElseThrow(NoRequestsException::new);
 
-        boolean doesContain = foundRequest.getReceiver().getMentees().contains(foundRequest.getRequester());
+        User receiver = foundRequest.getReceiver();
+        User requester = foundRequest.getRequester();
+        boolean doesContain = receiver.getMentees().contains(requester);
 
         if (foundRequest.getStatus().equals(RequestStatus.ACCEPTED) || doesContain) {
             throw new RequestIsAlreadyAcceptedException();
         }
 
         foundRequest.setStatus(RequestStatus.ACCEPTED);
+        receiver.getMentees().add(requester);
+        requester.getMentors().add(receiver);
 
         mentorshipRequestRepository.save(foundRequest);
     }
@@ -103,11 +107,16 @@ public class MentorshipRequestService {
         MentorshipRequest foundRequest = mentorshipRequestRepository.findById(id)
                 .orElseThrow(NoRequestsException::new);
 
+        User receiver = foundRequest.getReceiver();
+        User requester = foundRequest.getRequester();
+
         if (foundRequest.getStatus().equals(RequestStatus.REJECTED)) {
             throw new RequestIsAlreadyRejectedException();
         }
 
         foundRequest.setStatus(RequestStatus.REJECTED);
+        receiver.getMentees().remove(requester);
+        requester.getMentors().remove(receiver);
         foundRequest.setRejectionReason(rejectionDto.getReason());
 
         mentorshipRequestRepository.save(foundRequest);

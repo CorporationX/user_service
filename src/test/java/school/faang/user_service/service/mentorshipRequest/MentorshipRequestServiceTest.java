@@ -22,6 +22,7 @@ import school.faang.user_service.util.mentorshipRequest.exception.RequestIsAlrea
 import school.faang.user_service.util.mentorshipRequest.validator.FilterRequestStatusValidator;
 import school.faang.user_service.util.mentorshipRequest.validator.MentorshipRequestValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -199,7 +200,8 @@ public class MentorshipRequestServiceTest {
         mentorshipRequest.setId(id);
         receiver.setId(1);
         requester.setId(2);
-        receiver.setMentees(List.of(new User()));
+        receiver.setMentees(new ArrayList<>());
+        requester.setMentors(new ArrayList<>());
         mentorshipRequest.setReceiver(receiver);
         mentorshipRequest.setRequester(requester);
         mentorshipRequest.setStatus(RequestStatus.PENDING);
@@ -208,6 +210,8 @@ public class MentorshipRequestServiceTest {
 
         mentorshipRequestService.acceptRequest(id);
 
+        Assertions.assertTrue(receiver.getMentees().contains(requester));
+        Assertions.assertTrue(requester.getMentors().contains(receiver));
         Assertions.assertEquals(RequestStatus.ACCEPTED, mentorshipRequest.getStatus());
         Mockito.verify(mentorshipRequestRepository, Mockito.times(1)).save(mentorshipRequest);
     }
@@ -223,8 +227,8 @@ public class MentorshipRequestServiceTest {
         mentorshipRequest.setId(id);
         receiver.setId(1);
         requester.setId(2);
-        receiver.setMentees(List.of(requester));
         mentorshipRequest.setReceiver(receiver);
+        receiver.setMentees(new ArrayList<>(List.of(requester)));
         mentorshipRequest.setRequester(requester);
         mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
 
@@ -244,14 +248,53 @@ public class MentorshipRequestServiceTest {
     }
 
     @Test
-    void testRejectRequest_InputsAreValid_ShouldComplete() {
+    void testRejectRequest_InputsAreValidAndRequestWasAccepted_ShouldComplete() {
         long id = 1;
         MentorshipRequest foundRequest = new MentorshipRequest();
-        foundRequest.setStatus(RequestStatus.PENDING);
+        User receiver = new User();
+        User requester = new User();
+
+        foundRequest.setId(id);
+        receiver.setId(1);
+        requester.setId(2);
+        receiver.setMentees(new ArrayList<>(List.of(requester)));
+        requester.setMentors(new ArrayList<>(List.of(receiver)));
+        foundRequest.setReceiver(receiver);
+        foundRequest.setRequester(requester);
+        foundRequest.setStatus(RequestStatus.ACCEPTED);
+
         Mockito.when(mentorshipRequestRepository.findById(id)).thenReturn(Optional.of(foundRequest));
 
         mentorshipRequestService.rejectRequest(id, new RejectionDto("reason"));
 
+        Assertions.assertFalse(receiver.getMentees().contains(requester));
+        Assertions.assertFalse(requester.getMentors().contains(receiver));
+        Assertions.assertEquals(RequestStatus.REJECTED, foundRequest.getStatus());
+        Mockito.verify(mentorshipRequestRepository, Mockito.times(1)).save(foundRequest);
+    }
+
+    @Test
+    void testRejectRequest_InputsAreValidAndRequestWasPending_ShouldComplete() {
+        long id = 1;
+        MentorshipRequest foundRequest = new MentorshipRequest();
+        User receiver = new User();
+        User requester = new User();
+
+        foundRequest.setId(id);
+        receiver.setId(1);
+        requester.setId(2);
+        receiver.setMentees(new ArrayList<>());
+        requester.setMentors(new ArrayList<>());
+        foundRequest.setReceiver(receiver);
+        foundRequest.setRequester(requester);
+        foundRequest.setStatus(RequestStatus.PENDING);
+
+        Mockito.when(mentorshipRequestRepository.findById(id)).thenReturn(Optional.of(foundRequest));
+
+        mentorshipRequestService.rejectRequest(id, new RejectionDto("reason"));
+
+        Assertions.assertFalse(receiver.getMentees().contains(requester));
+        Assertions.assertFalse(requester.getMentors().contains(receiver));
         Assertions.assertEquals(RequestStatus.REJECTED, foundRequest.getStatus());
         Mockito.verify(mentorshipRequestRepository, Mockito.times(1)).save(foundRequest);
     }

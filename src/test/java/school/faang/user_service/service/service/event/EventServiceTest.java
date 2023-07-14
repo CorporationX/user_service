@@ -90,4 +90,27 @@ class EventServiceTest {
       eventService.get(anyId);
     });
   }
+
+  @Test
+  public void testGetEventByIdSuccess() {
+    Long anyId = 1L;
+    Event mockEvent = new Event();
+    mockEvent.setTitle("Mock");
+
+    Mockito.lenient().when(eventRepository.findById(anyId)).thenReturn(Optional.of(mockEvent));
+    try {
+      eventService.get(anyId);
+      Mockito.verify(eventRepository, Mockito.times(1)).findById(anyId);
+    } catch (Exception e) {}
+
+  }
+  @Test
+  public void testGetEventByIdFail() {
+    Long anyId = 1L;
+    Mockito.lenient().when(skillRepository.findById(anyId)).thenReturn(null);
+
+    assertThrows(Exception.class, () -> {
+      eventService.get(anyId);
+    });
+  }
 }

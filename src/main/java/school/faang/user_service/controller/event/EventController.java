@@ -74,4 +74,14 @@ public class EventController {
 
     return event;
   }
+
+  public EventDto getEvent(Long id) throws Exception {
+    EventDto event = eventService.get(id);
+
+    if (event == null) {
+      throw new Exception("Event with id: " + id + " not found");
+    }
+
+    return event;
+  }
 }

@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -11,8 +12,6 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mappers.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
-
-import java.util.List;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -26,7 +25,6 @@ class SkillServiceTest {
 
     @Mock
     private SkillMapper skillMapper;
-
 
     @Test
     void testCreate() {
@@ -52,6 +50,16 @@ class SkillServiceTest {
         skillDto.setId(4L);
 
         skillService.getUserSkills(skillDto.getId());
+        Mockito.verify(skillRepository, Mockito.times(1))
+                .findAllByUserId(skillDto.getId());
+    }
+
+    @Test
+    void testGetOfferedSkills() {
+        SkillDto skillDto = new SkillDto();
+        skillDto.setId(4L);
+
+        skillService.getOfferedSkills(skillDto.getId());
         Mockito.verify(skillRepository, Mockito.times(1))
                 .findAllByUserId(skillDto.getId());
     }

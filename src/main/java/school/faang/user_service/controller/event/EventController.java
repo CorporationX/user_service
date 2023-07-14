@@ -13,4 +13,8 @@ public class EventController {
     public EventDto create(EventDto eventDto) {
         return eventService.create(eventDto);
     }
+
+    public boolean deleteEvent(Long eventId) {
+        return eventService.deleteEvent(eventId);
+    }
 }

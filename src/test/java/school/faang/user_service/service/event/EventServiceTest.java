@@ -1,5 +1,6 @@
 package school.faang.user_service.service.event;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.validator.EventValidator;
@@ -45,5 +47,15 @@ class EventServiceTest {
     public void testSkillsValidation() {
         eventValidator.checkIfUserHasSkillsRequired(eventDto);
         Mockito.verify(eventValidator, Mockito.times(1)).checkIfUserHasSkillsRequired(eventDto);
+    }
+
+    @Test
+    public void testCreateEventWithMapper() {
+        Event event = Event.builder().id(4L).maxAttendees(1).build();
+        EventDto eventDto1 = new EventDto(4L, null,null,null,null,null,null,null,1);
+        Mockito.when(eventMapper.toEntity(eventDto1)).thenReturn(event);
+        Mockito.when(eventRepository.save(event)).thenReturn(event);
+        Mockito.when(eventMapper.toDto(event)).thenReturn(eventDto1);
+        Assertions.assertEquals(eventDto1, eventService.createEvent(eventDto1));
     }
 }

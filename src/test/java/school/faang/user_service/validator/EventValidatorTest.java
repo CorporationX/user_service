@@ -16,7 +16,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 @ExtendWith(MockitoExtension.class)
 class EventValidatorTest {
     @Mock
@@ -43,5 +44,11 @@ class EventValidatorTest {
         assertThrows(DataValidationException.class, () -> {
             eventValidator.checkIfUserHasSkillsRequired(eventDto);
         });
+    }
+
+    @Test
+    public void testValidateEvent() {
+        Mockito.when(userService.areOwnedSkills(eventDto.getOwnerId(), skillIds)).thenReturn(true);
+        eventValidator.checkIfUserHasSkillsRequired(eventDto);
     }
 }

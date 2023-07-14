@@ -32,7 +32,11 @@ public class SubscriptionController {
         return subscriptionService.getFollowers(followeeId, filter);
     }
 
-    public int getFollowersCount(long followerId){
-        return subscriptionService.getFollowersCount(followerId);
+    public int getFollowersCount(long followeeId) {
+        return subscriptionService.getFollowersCount(followeeId);
+    }
+
+    public int getFollowingCount(long followerId) {
+        return subscriptionService.getFollowingCount(followerId);
     }
 }

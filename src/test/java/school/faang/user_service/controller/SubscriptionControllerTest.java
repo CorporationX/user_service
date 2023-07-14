@@ -96,4 +96,11 @@ class SubscriptionControllerTest {
 
         verify(subscriptionService, times(1)).getFollowersCount(followerId);
     }
+
+    @Test
+    public void testGetFollowingCount() {
+        subscriptionController.getFollowingCount(followerId);
+
+        verify(subscriptionService, times(1)).getFollowingCount(followerId);
+    }
 }

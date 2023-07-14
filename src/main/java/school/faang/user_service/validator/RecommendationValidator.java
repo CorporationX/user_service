@@ -22,7 +22,7 @@ public class RecommendationValidator {
     private final RecommendationRepository recommendationRepository;
     private final SkillRepository skillRepository;
 
-    public void ValidateRecommendationContent(RecommendationDto recommendation) {
+    public void validateRecommendationContent(RecommendationDto recommendation) {
         String content = recommendation.getContent();
 
         if (content == null || content.isBlank()) {
@@ -48,6 +48,7 @@ public class RecommendationValidator {
 
     public void validateSkills(RecommendationDto recommendation) {
         List<SkillOfferDto> skills = recommendation.getSkillOffers();
+
         List<Long> skillIds = getUniqueSkillIds(skills);
         int countedSkills = skillRepository.countExisting(skillIds);
 

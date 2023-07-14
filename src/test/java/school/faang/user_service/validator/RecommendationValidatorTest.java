@@ -1,16 +1,17 @@
 package school.faang.user_service.validator;
 
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
+import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 
-import static org.mockito.ArgumentMatchers.any;
+import java.util.List;
+
 import static org.mockito.Mockito.*;
 
 
@@ -26,9 +27,12 @@ public class RecommendationValidatorTest {
     private RecommendationValidator recommendationValidator;
 
     @Test
-    void testValidateSkills(){
-        when(skillRepository.countExisting(anyList())).thenReturn(0);
-        recommendationValidator.validateSkills(any(RecommendationDto.class));
-        verify(recommendationValidator,times(1)).validateSkills(any(RecommendationDto.class));
+    public void testValidateSkills() {
+        List<SkillOfferDto> skills = List.of(new SkillOfferDto(1L, 1L), new SkillOfferDto(2L, 2L));
+        RecommendationDto recommendationDto = new RecommendationDto(null,null,null,null,skills,null);
+
+        when(skillRepository.countExisting(anyList())).thenReturn(2);
+        recommendationValidator.validateSkills(recommendationDto);
+        verify(recommendationValidator, times(1)).validateSkills(recommendationDto);
     }
 }

@@ -20,6 +20,6 @@ public class RecommendationController {
     }
 
     private void validate(RecommendationDto recommendation){
-        recommendationValidator.ValidateRecommendationContent(recommendation);
+        recommendationValidator.validateRecommendationContent(recommendation);
     }
 }

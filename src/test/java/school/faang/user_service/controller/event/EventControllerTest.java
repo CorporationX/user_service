@@ -68,4 +68,11 @@ public class EventControllerTest {
     eventController.create(eventDto);
     Mockito.verify(eventService, Mockito.times(1)).create(eventDto);
   }
+
+  @Test
+  public void testEventDeleting() {
+    Long anyTestId = 1L;
+    eventController.deleteEvent(anyTestId);
+    Mockito.verify(eventService, Mockito.times(1)).delete(anyTestId);
+  }
 }

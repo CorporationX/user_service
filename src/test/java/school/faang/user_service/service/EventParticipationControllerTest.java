@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import school.faang.user_service.controller.event.EventParticipationController;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventParticipationService;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -17,7 +18,12 @@ public class EventParticipationControllerTest {
 
     @Test
     public void validateTest() {
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(DataValidationException.class,
                 () -> eventParticipationController.validate(null, null));
+        assertThrows(DataValidationException.class,
+                () -> eventParticipationController.validate(-1L, 1L));
+
     }
+
+
 }

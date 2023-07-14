@@ -2,7 +2,11 @@ package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.event.EventParticipationRepository;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -10,15 +14,23 @@ public class EventParticipationService { // A
 
     private EventParticipationRepository eventParticipationRepository; // B
 
-    public void unregisterParticipant(long eventId, long userId) {
-        try {
-            if (eventParticipationRepository.findAllParticipantsByEventId(userId) != null) {
-                eventParticipationRepository.unregister(eventId, userId);
-            } else {
-                System.out.println("You're registered already.");
+    public void registerParticipant(long eventId, long userId) throws DataValidationException {
+        List<User> users = eventParticipationRepository.findAllParticipantsByEventId(eventId);
+        for (User user : users) {
+            if (user.getId() == userId) {
+                throw new DataValidationException("You are registered already!");
             }
-        } catch (Exception e) {
-            System.out.println("Error!");
         }
+        eventParticipationRepository.register(eventId, userId);
+    }
+
+    public void unregisterParticipant(long eventId, long userId) throws DataValidationException {
+        List<User> users = eventParticipationRepository.findAllParticipantsByEventId(eventId);
+        for (User user : users) {
+            if (user.getId() != userId) {
+                throw new DataValidationException("You are not registered yet!");
+            }
+        }
+        eventParticipationRepository.unregister(eventId, userId);
     }
 }

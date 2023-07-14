@@ -17,6 +17,13 @@ public class EventParticipationServiceTest {
     private EventParticipationService eventParticipationService;
 
     @Test
+    public void registerParticipantTest() {
+        Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(List.of());
+        eventParticipationService.registerParticipant(1L, 10L);
+        Mockito.verify(eventParticipationRepository).register(1L, 10L);
+    }
+
+    @Test
     public void unregisterParticipantTest() {
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(List.of());
         eventParticipationService.unregisterParticipant(1L, 10L);

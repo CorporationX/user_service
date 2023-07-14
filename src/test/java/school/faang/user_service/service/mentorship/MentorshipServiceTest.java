@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
@@ -27,19 +28,17 @@ class MentorshipServiceTest {
     private static final long INCORRECT_MENTOR_ID = 0L;
     @Mock
     private MentorshipRepository mentorshipRepository;
-    @Mock
-    private UserRepository userRepository;
     @InjectMocks
     private MentorshipService mentorshipService;
 
     @BeforeEach
     void setUp() {
-        when(userRepository.findById(INCORRECT_MENTOR_ID))
-                .thenReturn(null);
+        when(mentorshipRepository.findUserById(INCORRECT_MENTOR_ID))
+                .thenReturn(Optional.empty());
 
         User mentor = new User();
         mentor.setMentees(List.of(new User(), new User()));
-        when(userRepository.findById(MENTOR_ID))
+        when(mentorshipRepository.findUserById(MENTOR_ID))
                 .thenReturn(Optional.of(mentor));
     }
 
@@ -52,12 +51,12 @@ class MentorshipServiceTest {
     @Test
     void getMentees_shouldInvokeFindByIdMethod() {
         mentorshipService.getMentees(MENTOR_ID);
-        Mockito.verify(userRepository).findById(MENTOR_ID);
+        Mockito.verify(mentorshipRepository).findUserById(MENTOR_ID);
     }
 
     @Test
     void getMentees_shouldThrowException() {
-        assertThrows(RuntimeException.class,
+        assertThrows(UserNotFoundException.class,
                 () -> mentorshipService.getMentees(INCORRECT_MENTOR_ID),
                 "Invalid mentor id");
     }

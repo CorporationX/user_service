@@ -20,6 +20,12 @@ public interface GoalRepository extends CrudRepository<Goal, Long> {
     Stream<Goal> findGoalsByUserId(long userId);
 
     @Query(nativeQuery = true, value = """
+            SELECT * FROM goal g
+            WHERE g.goal_id = ?1
+            """)
+    Goal findGoal(long goalId);
+
+    @Query(nativeQuery = true, value = """
             INSERT INTO goal (title, description, parent_goal_id, status, created_at, updated_at)
             VALUES (?1, ?2, ?3, 0, NOW(), NOW()) returning goal
             """)

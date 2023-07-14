@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -82,4 +83,28 @@ public class GoalService {
         createGoalValidation(userId, goal);
         goalRepository.create(goal.getTitle(), goal.getDescription(), goal.getParent().getId());
     }
+
+    public void updateGoalValidation(Long goalId, GoalDto goal) {
+        GoalDto old = goalMapper.toDto(goalRepository.findGoal(goalId));
+        if (goal.getStatus().equals(GoalStatus.COMPLETED) && old.getStatus().equals(GoalStatus.COMPLETED)) {
+            throw new IllegalArgumentException("Goal already completed");
+        }
+
+        if (skillRepository.countExisting(goal.getSkillIds()) != goal.getSkillIds().size()) {
+            throw new IllegalArgumentException("Goal contains non-existent skill");
+        }
+    }
+
+    public void updateGoal(Long goalId, GoalDto goal) {
+        updateGoalValidation(goalId, goal);
+        if (goal.getStatus().equals(GoalStatus.COMPLETED)) {
+            List<Long> skillIds = goal.getSkillIds();
+            goalRepository.findUsersByGoalId(goalId).forEach(user -> {
+                skillIds.forEach(id -> skillRepository.assignSkillToUser(id, user.getId()));
+            });
+        }
+
+        goalMapper.toEntity(goal);
+    }
+
 }

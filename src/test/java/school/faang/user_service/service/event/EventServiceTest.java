@@ -34,7 +34,7 @@ class EventServiceTest {
 
     @Test
     public void testGetEvent() {
-        EventDto eventDto = new EventDto(1L, null,null,null,null,null,null,null,1);
+        EventDto eventDto = new EventDto(1L, null, null, null, null, null, null, null, 1);
         Event event = Event.builder().id(1L).maxAttendees(1).build();
         Mockito.when(eventRepository.findById(1L)).thenReturn(Optional.ofNullable(event));
         Mockito.when(eventMapper.toDto(event)).thenReturn(eventDto);

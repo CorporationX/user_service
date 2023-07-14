@@ -23,7 +23,7 @@ public class SkillService {
         return skillMapper.toDto(skillRepository.save(skillToSave));
     }
 
-    public void validateSkill(SkillDto skillDto) {
+    private void validateSkill(SkillDto skillDto) {
         if (skillDto.getTitle().isBlank()) {
             throw new DataValidationException("Enter skill title, please");
         }

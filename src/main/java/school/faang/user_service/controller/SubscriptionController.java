@@ -17,7 +17,7 @@ import school.faang.user_service.service.SubscriptionService;
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
-    @GetMapping("/user/{id}/followers")
+    @GetMapping("/followers/{id}")
     public Page<UserDto> getFollowers(@PathVariable("id") long followeeId,
                                       @RequestParam("filter") UserFilterDto filter) {
         return subscriptionService.getFollowers(followeeId, filter);

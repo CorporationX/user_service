@@ -43,10 +43,11 @@ public class SubscriptionControllerTest {
 
         Mockito.when(subscriptionService.getFollowers(followeeId, filter))
                 .thenReturn(expectedUsers);
+
         Page<UserDto> users = subscriptionController.getFollowers(followeeId, filter);
         Assertions.assertTrue(true);
 
-        Assertions.assertEquals(expectedUsers.getSize(), users.getSize());
+        Assertions.assertEquals(expectedUsers, users);
         Mockito.verify(subscriptionService, Mockito.times(1)).getFollowers(followeeId, filter);
     }
 }

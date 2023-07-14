@@ -19,11 +19,11 @@ public class SubscriptionService {
     private final UserRepository userRepository;
 
     public Page<UserDto> getFollowers(long followeeId, UserFilterDto filter) {
-        if (userRepository.existsById(followeeId)) {
-            return subscriptionRepository.findByFolloweeId(followeeId,
-                            PageRequest.of(filter.getPage(), filter.getPageSize()))
-                    .map(userMapper::toDto);
+        if (!userRepository.existsById(followeeId)) {
+            throw new DataValidationException("This user does not exist");
         }
-        throw new DataValidationException("This user does not exist");
+        return subscriptionRepository.findByFolloweeId(followeeId,
+                        PageRequest.of(filter.getPage(), filter.getPageSize()))
+                .map(userMapper::toDto);
     }
 }

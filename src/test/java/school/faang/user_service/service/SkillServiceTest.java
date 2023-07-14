@@ -12,6 +12,8 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mappers.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 
+import java.util.List;
+
 
 @ExtendWith(MockitoExtension.class)
 class SkillServiceTest {
@@ -29,7 +31,8 @@ class SkillServiceTest {
     @Test
     void testCreate() {
         skillService.create(new SkillDto());
-        Mockito.verify(skillRepository, Mockito.times(1)).save(skillMapper.toEntity(new SkillDto()));
+        Mockito.verify(skillRepository, Mockito.times(1))
+                .save(skillMapper.toEntity(new SkillDto()));
     }
 
     @Test
@@ -41,5 +44,15 @@ class SkillServiceTest {
                 .thenReturn(true);
 
         Assert.assertThrows(DataValidationException.class, () -> skillService.create(skillDto));
+    }
+
+    @Test
+    void testGetUserSkills() {
+        SkillDto skillDto = new SkillDto();
+        skillDto.setId(4L);
+
+        skillService.getUserSkills(skillDto.getId());
+        Mockito.verify(skillRepository, Mockito.times(1))
+                .findAllByUserId(skillDto.getId());
     }
 }

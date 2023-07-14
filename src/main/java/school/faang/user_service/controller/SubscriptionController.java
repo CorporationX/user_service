@@ -1,6 +1,7 @@
 package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,5 +23,14 @@ public class SubscriptionController {
             throw new DataValidationException("You can't subscribe to yourself.");
         }
         subscriptionService.followUser(followerId, followeeId);
+    }
+
+    @DeleteMapping("/unfollow/{id}")
+    public void unfollowUser(@RequestParam("followerId") long followerId,
+                         @PathVariable("id") long followeeId) {
+        if (followerId == followeeId) {
+            throw new DataValidationException("You can't unsubscribe from yourself.");
+        }
+        subscriptionService.unfollowUser(followerId, followeeId);
     }
 }

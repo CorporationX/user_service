@@ -18,9 +18,13 @@ public class SubscriptionController {
     @PutMapping("/follow/{id}")
     public void followUser(@RequestParam("followerId") long followerId,
                            @PathVariable("id") long followeeId) {
+        sameUserValidation(followerId, followeeId);
+        subscriptionService.followUser(followerId, followeeId);
+    }
+
+    private static void sameUserValidation(long followerId, long followeeId) {
         if (followerId == followeeId) {
             throw new DataValidationException("You can't subscribe to yourself.");
         }
-        subscriptionService.followUser(followerId, followeeId);
     }
 }

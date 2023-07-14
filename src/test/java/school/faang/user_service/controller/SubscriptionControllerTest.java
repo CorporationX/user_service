@@ -89,4 +89,11 @@ class SubscriptionControllerTest {
 
         verify(subscriptionService, times(1)).getFollowers(followeeId, userFilterDto);
     }
+
+    @Test
+    public void testGetFollowersCount() {
+        subscriptionController.getFollowersCount(followerId);
+
+        verify(subscriptionService, times(1)).getFollowersCount(followerId);
+    }
 }

@@ -78,37 +78,10 @@ class SubscriptionServiceTest {
         verify(subscriptionRepository, times(1)).unfollowUser(followerId, followeeId);
     }
 
-//    @Test
-//    public void testFollowers() {
-//
-//
-//        List<User> userListFromRepository = List.of(
-//                new User(1L, "user1", "about1", "email1", Collections.emptyList(), new Country(1L, "country1", Collections.emptyList()), "city1", "phone1", Collections.emptyList(), 0),
-//                new User(2L, "user2", "about2", "email2", Collections.emptyList(), new Country("country2"), "city2", "phone2", Collections.emptyList(), 0)
-//        );
-//        List<UserDto> userDtoList = List.of(
-//                new UserDto(1L, "user1", "email1"),
-//                new UserDto(2L, "user2", "email2")
-//        );
-//
-//        // Mock the repository call
-//        when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(Stream.of(userListFromRepository.toArray(new User[0])));
-//
-//        // Mock the user filter
-//        when(userFilter.filterUsers(any(Stream.class), any(UserFilterDto.class))).thenReturn(userListFromRepository);
-//
-//        // Mock the mapper
-//        when(subscriptionMapper.toListUserDto(userListFromRepository)).thenReturn(userDtoList);
-//
-//        // Call the method under test
-//        List<UserDto> result = subscriptionService.getFollowers(followeeId, userFilterDto);
-//
-//        // Verify the results
-//        assertEquals(userDtoList, result);
-//
-//        // Verify the interactions with mocked objects
-//        verify(subscriptionRepository).findByFolloweeId(followeeId);
-//        verify(userFilter).filterUsers(any(Stream.class), eq(userFilterDto));
-//        verify(subscriptionMapper).toListUserDto(userListFromRepository);
-//    }
+    @Test
+    public void testGetFollowersCount() {
+        subscriptionService.getFollowersCount(followeeId);
+
+        verify(subscriptionRepository, times(1)).findFollowersAmountByFolloweeId(followeeId);
+    }
 }

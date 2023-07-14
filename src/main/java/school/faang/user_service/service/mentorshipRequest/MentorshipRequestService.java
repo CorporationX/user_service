@@ -100,6 +100,8 @@ public class MentorshipRequestService {
         requester.getMentors().add(receiver);
 
         mentorshipRequestRepository.save(foundRequest);
+        userRepository.save(receiver);
+        userRepository.save(requester);
     }
 
     @Transactional
@@ -120,5 +122,7 @@ public class MentorshipRequestService {
         foundRequest.setRejectionReason(rejectionDto.getReason());
 
         mentorshipRequestRepository.save(foundRequest);
+        userRepository.save(receiver);
+        userRepository.save(requester);
     }
 }

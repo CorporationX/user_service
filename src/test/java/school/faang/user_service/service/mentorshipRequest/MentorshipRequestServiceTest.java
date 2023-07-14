@@ -196,7 +196,6 @@ public class MentorshipRequestServiceTest {
                 new MentorshipRequest();
         User receiver = new User();
         User requester = new User();
-        User testUser = new User();
 
         mentorshipRequest.setId(id);
         receiver.setId(1);
@@ -215,6 +214,8 @@ public class MentorshipRequestServiceTest {
         Assertions.assertTrue(requester.getMentors().contains(receiver));
         Assertions.assertEquals(RequestStatus.ACCEPTED, mentorshipRequest.getStatus());
         Mockito.verify(mentorshipRequestRepository, Mockito.times(1)).save(mentorshipRequest);
+        Mockito.verify(userRepository, Mockito.times(1)).save(receiver);
+        Mockito.verify(userRepository, Mockito.times(1)).save(requester);
     }
 
     @Test
@@ -272,6 +273,8 @@ public class MentorshipRequestServiceTest {
         Assertions.assertFalse(requester.getMentors().contains(receiver));
         Assertions.assertEquals(RequestStatus.REJECTED, foundRequest.getStatus());
         Mockito.verify(mentorshipRequestRepository, Mockito.times(1)).save(foundRequest);
+        Mockito.verify(userRepository, Mockito.times(1)).save(receiver);
+        Mockito.verify(userRepository, Mockito.times(1)).save(requester);
     }
 
     @Test
@@ -298,6 +301,8 @@ public class MentorshipRequestServiceTest {
         Assertions.assertFalse(requester.getMentors().contains(receiver));
         Assertions.assertEquals(RequestStatus.REJECTED, foundRequest.getStatus());
         Mockito.verify(mentorshipRequestRepository, Mockito.times(1)).save(foundRequest);
+        Mockito.verify(userRepository, Mockito.times(1)).save(receiver);
+        Mockito.verify(userRepository, Mockito.times(1)).save(requester);
     }
 
     @Test

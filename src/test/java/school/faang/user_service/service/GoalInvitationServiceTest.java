@@ -39,20 +39,27 @@ class GoalInvitationServiceTest {
     @Nested
     @DisplayName("Негативные тесты")
     class NegativeTestGroup {
+        long goalInvitationId;
+
+        @BeforeEach
+        public void setUp() {
+            goalInvitationId = 1L;
+        }
+
         @Test
         public void testRejectGoalInvitationThrowEntityExcBecOfGoalInvitation() {
             EntityNotFoundException exc = assertThrows(EntityNotFoundException.class,
-                    () -> goalInvitationService.rejectGoalInvitation(1L));
+                    () -> goalInvitationService.rejectGoalInvitation(goalInvitationId));
             assertEquals("Invalid request. Requested goal invitation not found", exc.getMessage());
         }
 
         @Test
         public void testRejectGoalInvitationThrowEntityExcBecOfGoal() {
-            Mockito.when(goalInvitationRepository.findById(1L)).thenReturn(Optional.of(goalInvitation));
+            Mockito.when(goalInvitationRepository.findById(goalInvitationId)).thenReturn(Optional.of(goalInvitation));
             Mockito.when(goalInvitation.getGoal()).thenReturn(goal);
 
             EntityNotFoundException exc = assertThrows(EntityNotFoundException.class,
-                    () -> goalInvitationService.rejectGoalInvitation(1L));
+                    () -> goalInvitationService.rejectGoalInvitation(goalInvitationId));
             assertEquals("Invalid request. Requested goal not found", exc.getMessage());
         }
     }
@@ -60,18 +67,22 @@ class GoalInvitationServiceTest {
     @Nested
     @DisplayName("Позитивные тесты")
     class PositiveTestGroup {
+        long goalInvitationId;
+
         @BeforeEach
         public void setUp() {
-            Mockito.when(goalInvitationRepository.findById(1L)).thenReturn(Optional.of(goalInvitation));
+            goalInvitationId = 1L;
+
+            Mockito.when(goalInvitationRepository.findById(goalInvitationId)).thenReturn(Optional.of(goalInvitation));
             Mockito.when(goalInvitation.getGoal()).thenReturn(goal);
             Mockito.when(goalRepository.existsById(Mockito.anyLong())).thenReturn(true);
 
-            goalInvitationService.rejectGoalInvitation(1L);
+            goalInvitationService.rejectGoalInvitation(goalInvitationId);
         }
 
         @Test
         public void testRejectGoalInvitationCallFindById() {
-            Mockito.verify(goalInvitationRepository, Mockito.times(1)).findById(1L);
+            Mockito.verify(goalInvitationRepository, Mockito.times(1)).findById(goalInvitationId);
         }
 
         @Test

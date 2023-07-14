@@ -19,14 +19,12 @@ public class SubscriptionController {
         if (followerId == followeeId) {
             throw new DataValidationException("Follower and folowee can not be the same");
         }
-        if(subscriptionService.validate(followerId, followeeId)) {
-            throw new DataValidationException("This subscription already exists");
-        }
-
     }
 
     public void unfollowUser(long followerId, long followeeId) {
         validate(followerId, followeeId);
-        subscriptionService.unfollowUser(followerId, followeeId);
+        if (subscriptionService.validateIfSubscribed(followerId, followeeId)) {
+            subscriptionService.unfollowUser(followerId, followeeId);
+        }
     }
 }

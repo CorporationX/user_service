@@ -1,5 +1,6 @@
 package school.faang.user_service.filters;
 
+import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 
@@ -8,6 +9,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Component
 public class UserFilter {
     public List<User> filterUsers(Stream<User> userStream, UserFilterDto filter) {
         Predicate<User> namePredicate = user -> filter.getNamePattern().isBlank() || user.getUsername().equals(filter.getNamePattern());

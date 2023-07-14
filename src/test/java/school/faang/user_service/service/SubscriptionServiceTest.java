@@ -6,7 +6,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.filters.UserFilter;
+import school.faang.user_service.mapper.SubscriptionMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,6 +25,12 @@ class SubscriptionServiceTest {
     SubscriptionService subscriptionService;
     @Mock
     SubscriptionRepository subscriptionRepository;
+    @Mock
+    UserFilterDto userFilterDto;
+    @Mock
+    SubscriptionMapper subscriptionMapper;
+    @Mock
+    UserFilter userFilter;
 
     long followerId;
     long followeeId;
@@ -33,55 +42,73 @@ class SubscriptionServiceTest {
     }
 
     @Test
-    public void testAssertThrow() {
-        // Mock the behavior of the existsByFollowerIdAndFolloweeId method to return true
+    public void testAssertThrowsDataValidationExceptionForMethodFollowUser() {
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
 
-        // Verify that a DataValidationException is thrown
         assertThrows(DataValidationException.class, () -> subscriptionService.followUser(followerId, followeeId));
     }
 
     @Test
     public void testFollowUser() {
-        // Test case where followerId is not equal to followeeId
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(false);
+
         subscriptionService.followUser(followerId, followeeId);
 
-        // Verify that the followUser method in the subscriptionService is called with the correct arguments
+        verify(subscriptionRepository, times(1)).existsByFollowerIdAndFolloweeId(followerId, followeeId);
+
         verify(subscriptionRepository, times(1)).followUser(followerId, followeeId);
     }
 
     @Test
-    public void testThrow() {
-        // Mock the behavior of the existsByFollowerIdAndFolloweeId method
-        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(false).thenReturn(true);
+    public void testMessageThrowForMethodFollowUser() {
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
 
-        // Call the followUser method
-        subscriptionService.followUser(followerId, followeeId);
-
-        // Verify that the existsByFollowerIdAndFolloweeId method is called with the correct arguments
-        verify(subscriptionRepository, times(1)).existsByFollowerIdAndFolloweeId(followerId, followeeId);
-
-        // Verify that the followUser method is called with the correct arguments
-        verify(subscriptionRepository, times(1)).followUser(followerId, followeeId);
-
-        // Call the followUser method and expect a DataValidationException to be thrown
         try {
             subscriptionService.followUser(followerId, followeeId);
         } catch (DataValidationException e) {
-            // Verify that the right message DataValidationException is thrown
             assertEquals("This subscription already exists", e.getMessage());
         }
-
-        // Verify that the followUser method is not called again
         verifyNoMoreInteractions(subscriptionRepository);
     }
 
     @Test
     public void testUnfollowUser() {
-        // Test case where followerId is not equal to followeeId
         subscriptionService.unfollowUser(followerId, followeeId);
 
-        // Verify that the followUser method in the subscriptionService is called with the correct arguments
         verify(subscriptionRepository, times(1)).unfollowUser(followerId, followeeId);
     }
+
+//    @Test
+//    public void testFollowers() {
+//
+//
+//        List<User> userListFromRepository = List.of(
+//                new User(1L, "user1", "about1", "email1", Collections.emptyList(), new Country(1L, "country1", Collections.emptyList()), "city1", "phone1", Collections.emptyList(), 0),
+//                new User(2L, "user2", "about2", "email2", Collections.emptyList(), new Country("country2"), "city2", "phone2", Collections.emptyList(), 0)
+//        );
+//        List<UserDto> userDtoList = List.of(
+//                new UserDto(1L, "user1", "email1"),
+//                new UserDto(2L, "user2", "email2")
+//        );
+//
+//        // Mock the repository call
+//        when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(Stream.of(userListFromRepository.toArray(new User[0])));
+//
+//        // Mock the user filter
+//        when(userFilter.filterUsers(any(Stream.class), any(UserFilterDto.class))).thenReturn(userListFromRepository);
+//
+//        // Mock the mapper
+//        when(subscriptionMapper.toListUserDto(userListFromRepository)).thenReturn(userDtoList);
+//
+//        // Call the method under test
+//        List<UserDto> result = subscriptionService.getFollowers(followeeId, userFilterDto);
+//
+//        // Verify the results
+//        assertEquals(userDtoList, result);
+//
+//        // Verify the interactions with mocked objects
+//        verify(subscriptionRepository).findByFolloweeId(followeeId);
+//        verify(userFilter).filterUsers(any(Stream.class), eq(userFilterDto));
+//        verify(subscriptionMapper).toListUserDto(userListFromRepository);
+//    }
 }

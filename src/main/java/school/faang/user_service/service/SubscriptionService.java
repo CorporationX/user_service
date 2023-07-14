@@ -15,18 +15,30 @@ public class SubscriptionService {
 
     @Transactional
     public void followUser(long followerId, long followeeId) {
-        UsersExistsValidation(followerId, followeeId);
-        SubscriptionExistsValidation(followerId, followeeId);
+        usersExistsValidation(followerId, followeeId);
+        subscriptionExistsValidation(followerId, followeeId);
         subscriptionRepository.followUser(followerId, followeeId);
     }
 
-    private void SubscriptionExistsValidation(long followerId, long followeeId) {
+    @Transactional
+    public int getFollowersCount(long followeeId) {
+        userExistsValidation(followeeId);
+        return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
+    }
+
+    private void subscriptionExistsValidation(long followerId, long followeeId) {
         if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             throw new DataValidationException("You are already subscribed to this user.");
         }
     }
 
-    private void UsersExistsValidation(long followerId, long followeeId) {
+    private void userExistsValidation(long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new DataValidationException("The user does not exist");
+        }
+    }
+
+    private void usersExistsValidation(long followerId, long followeeId) {
         if (!userRepository.existsById(followeeId)) {
             throw new DataValidationException("The user they are trying to subscribe to does not exist");
         }

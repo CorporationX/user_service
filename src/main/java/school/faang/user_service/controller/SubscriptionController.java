@@ -1,6 +1,7 @@
 package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +21,11 @@ public class SubscriptionController {
                            @PathVariable("id") long followeeId) {
         sameUserValidation(followerId, followeeId);
         subscriptionService.followUser(followerId, followeeId);
+    }
+
+    @GetMapping("/followers/count/{id}")
+    public int getFollowersCount(@PathVariable("id") long followeeId) {
+        return subscriptionService.getFollowersCount(followeeId);
     }
 
     private static void sameUserValidation(long followerId, long followeeId) {

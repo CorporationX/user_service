@@ -7,10 +7,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.SkillDto;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
-
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -41,11 +41,16 @@ class SkillServiceTest {
     }
 
     @Test
-    void testGetUserSkillsUserIsNotExist(){
+    void testGetUserSkillsUserIsNotExist() {
         Mockito.when(userRepository.findById(1L)).thenReturn(Optional.empty());
         assertThrows(RuntimeException.class, () -> skillService.getUserSkills(1L));
     }
 
     @Test
-    void testCallMethod
+    void testCallMethodFindByIdAndFindAllByUserId() {
+        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(new User()));
+        skillService.getUserSkills(1L);
+        Mockito.verify(userRepository, Mockito.times(1)).findById(1L);
+        Mockito.verify(skillRepository, Mockito.times(1)).findAllByUserId(1L);
+    }
 }

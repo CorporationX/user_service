@@ -1,7 +1,6 @@
 package school.faang.user_service.service;
 
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.SkillDto;
 import school.faang.user_service.entity.Skill;
@@ -14,7 +13,6 @@ import java.util.List;
 
 @Service
 @Data
-
 public class SkillService {
     private final SkillRepository skillRepository;
     private final UserRepository userRepository;

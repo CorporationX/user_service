@@ -13,10 +13,10 @@ public class RecommendationController {
     private final RecommendationService recommendationService;
     private final RecommendationValidator recommendationValidator;
 
-    public void giveRecommendation(RecommendationDto recommendation){
+    public RecommendationDto giveRecommendation(RecommendationDto recommendation){
         validate(recommendation);
-        recommendationService.create(recommendation);
 
+        return recommendationService.create(recommendation);
     }
 
     private void validate(RecommendationDto recommendation){

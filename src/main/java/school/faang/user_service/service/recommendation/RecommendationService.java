@@ -32,16 +32,18 @@ public class RecommendationService {
         validate(recommendationDto);
 
         long recommendationId = recommendationRepository.create(
-                recommendationDto.getAuthorId(), recommendationDto.getReceiverId(), recommendationDto.getContent());
-        saveSkillOffers(recommendationDto);
+                recommendationDto.getAuthorId(),
+                recommendationDto.getReceiverId(),
+                recommendationDto.getContent());
+
+        processSkillOffers(recommendationDto);
         Recommendation recommendation = recommendationRepository.findById(recommendationId)
                 .orElseThrow();
 
         return recommendationMapper.toDto(recommendation);
     }
 
-
-    private void saveSkillOffers(RecommendationDto recommendationDto) {
+    private void processSkillOffers(RecommendationDto recommendationDto) {
         long recommendationId = recommendationDto.getId();
         long authorId = recommendationDto.getAuthorId();
         long receiverId = recommendationDto.getReceiverId();
@@ -51,16 +53,24 @@ public class RecommendationService {
             long skillId = skill.getSkillId();
             Optional<Skill> userSkill = skillRepository.findUserSkill(skillId, receiverId);
 
-            if (userSkill.isPresent() && !isGuaranteeExists(receiverId, skillId, authorId)) {
-                userSkillGuaranteeRepository.create(receiverId, skillId, authorId);
+            if (userSkill.isPresent() && guaranteeNotExists(receiverId, skillId, authorId)) {
+                saveSkillGuarantee(receiverId, skillId, authorId);
             } else {
-                skillOfferRepository.create(skillId, recommendationId);
+                saveSkillOffer(skillId, recommendationId);
             }
         }
     }
 
-    private boolean isGuaranteeExists(long receiverId, long skillId, long authorId) {
-        return userSkillGuaranteeRepository.isGuaranteeExists(receiverId, skillId, authorId);
+    private boolean guaranteeNotExists(long receiverId, long skillId, long authorId) {
+        return !userSkillGuaranteeRepository.isGuaranteeExists(receiverId, skillId, authorId);
+    }
+
+    private void saveSkillGuarantee(long receiverId, long skillId, long authorId) {
+        userSkillGuaranteeRepository.create(receiverId, skillId, authorId);
+    }
+
+    private void saveSkillOffer(long skillId, long recommendationId) {
+        skillOfferRepository.create(skillId, recommendationId);
     }
 
     private void validate(RecommendationDto recommendation) {

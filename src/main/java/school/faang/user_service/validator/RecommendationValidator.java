@@ -25,7 +25,7 @@ public class RecommendationValidator {
     public void ValidateRecommendationContent(RecommendationDto recommendation) {
         String content = recommendation.getContent();
 
-        if (content.isBlank()) {
+        if (content == null || content.isBlank()) {
             throw new DataValidationException("Content can't be empty");
         }
     }
@@ -33,7 +33,8 @@ public class RecommendationValidator {
     public void validateLastUpdate(RecommendationDto recommendation) {
         long authorId = recommendation.getAuthorId();
         long userId = recommendation.getReceiverId();
-        Optional<Recommendation> lastRecommendation = recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(authorId, userId);
+        Optional<Recommendation> lastRecommendation =
+                recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(authorId, userId);
 
         if (lastRecommendation.isPresent()) {
             LocalDateTime lastUpdate = lastRecommendation.get().getUpdatedAt();
@@ -47,15 +48,15 @@ public class RecommendationValidator {
 
     public void validateSkills(RecommendationDto recommendation) {
         List<SkillOfferDto> skills = recommendation.getSkillOffers();
-        List<Long> skillIds = getDistinctSkillIds(skills);
+        List<Long> skillIds = getUniqueSkillIds(skills);
         int countedSkills = skillRepository.countExisting(skillIds);
 
         if (skills.size() != countedSkills) {
-            throw new DataValidationException("Invalid skills offered within a recommendation");
+            throw new DataValidationException("Invalid skills offered within the recommendation");
         }
     }
 
-    private List<Long> getDistinctSkillIds(List<SkillOfferDto> skills) {
+    private List<Long> getUniqueSkillIds(List<SkillOfferDto> skills) {
         return skills.stream()
                 .map(SkillOfferDto::getSkillId)
                 .distinct()

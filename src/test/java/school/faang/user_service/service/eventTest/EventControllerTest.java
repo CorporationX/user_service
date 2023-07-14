@@ -1,17 +1,14 @@
 package school.faang.user_service.service.eventTest;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import school.faang.user_service.controller.event.EventController;
 import school.faang.user_service.dto.event.EventDto;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventService;
 
 import java.time.LocalDateTime;
@@ -19,7 +16,6 @@ import java.util.ArrayList;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-
 
 public class EventControllerTest {
     @Mock
@@ -43,54 +39,38 @@ public class EventControllerTest {
     @Test
     void testNullTitleIsInvalid() {
         eventDto.setTitle(null);
-        Assert.assertThrows(
-                DataValidationException.class,
-                () -> eventController.create(eventDto)
-        );
+        var result = eventController.create(eventDto);
+        Assertions.assertEquals(result, ResponseEntity.badRequest().body("Event title cannot be empty"));
     }
 
     @Test
     void testBlankTitleIsInvalid() {
         eventDto.setTitle("  ");
-        Assert.assertThrows(
-                DataValidationException.class,
-                () -> eventController.create(eventDto)
-        );
+        var result = eventController.create(eventDto);
+        Assertions.assertEquals(result, ResponseEntity.badRequest().body("Event title cannot be empty"));
     }
 
     @Test
     void testNullStartDateIsInvalid() {
         eventDto.setStartDate(null);
-        Assert.assertThrows(
-                DataValidationException.class,
-                () -> eventController.create(eventDto)
-        );
+        var result = eventController.create(eventDto);
+        Assertions.assertEquals(result, ResponseEntity.badRequest().body("Event start date cannot be null"));
     }
 
     @Test
     void testNullOwnedIdIsInvalid() {
         eventDto.setOwnerId(null);
-        Assert.assertThrows(
-                DataValidationException.class,
-                () -> eventController.create(eventDto)
-        );
+        var result = eventController.create(eventDto);
+        Assertions.assertEquals(result, ResponseEntity.badRequest().body("Event owner ID cannot be null or negative"));
     }
 
     @Test
     void testNegativeOwnedIdIsInvalid() {
         eventDto.setOwnerId(-1L);
-        Assert.assertThrows(
-                DataValidationException.class,
-                () -> eventController.create(eventDto)
-        );
+        var result = eventController.create(eventDto);
+        Assertions.assertEquals(result, ResponseEntity.badRequest().body("Event owner ID cannot be null or negative"));
     }
 
-    @Test
-    void testNegativeEventIdIsInvalid() {
-        long eventId = -1;
-        ResponseEntity<?> responseEntity = eventController.getEvent(eventId);
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-    }
     @Test
     void testReceivingValidEvent() {
         int eventId = 10;

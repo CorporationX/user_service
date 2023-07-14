@@ -25,7 +25,6 @@ class SubscriptionControllerTest {
     @Mock
     UserFilterDto userFilterDto;
 
-
     long followerId;
     long followeeId;
 
@@ -33,7 +32,6 @@ class SubscriptionControllerTest {
     public void setUp() {
         followerId = 2L;
         followeeId = 2L;
-
     }
 
     @Test

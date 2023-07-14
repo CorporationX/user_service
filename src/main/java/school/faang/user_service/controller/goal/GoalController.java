@@ -27,4 +27,10 @@ public class GoalController {
         }
         return service.getGoalsByUser(userId, filter);
     }
+
+    public void createGoal(Long userId, Goal goal) throws DataValidationException {
+        if (goal.getTitle() == null || goal.getTitle().isBlank())
+            throw new DataValidationException("Title can not be blank or null");
+        service.createGoal(userId, goal);
+    }
 }

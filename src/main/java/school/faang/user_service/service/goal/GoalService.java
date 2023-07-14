@@ -64,4 +64,18 @@ public class GoalService {
                 .map(goalMapper::toEntity)
                 .toList();
     }
+
+    public void createGoal(Long userId, Goal goal) {
+        int activeGoalsCount = goalRepository.countActiveGoalsPerUser(userId);
+        if (activeGoalsCount >= MAX_ACTIVE_GOALS ) {
+            throw new IllegalArgumentException("Goal cannot be saved because MAX_ACTIVE_GOALS = "
+                    + MAX_ACTIVE_GOALS + " and current active goals = "
+                    + activeGoalsCount);
+        }
+        GoalDto goalDto = goalMapper.toDto(goal);
+        if (skillRepository.countExisting(goalDto.getSkillIds()) != goalDto.getSkillIds().size()) {
+            throw new IllegalArgumentException("Goal contains non-existent skill");
+        }
+        goalRepository.create(goal.getTitle(), goal.getDescription(), goal.getParent().getId());
+    }
 }

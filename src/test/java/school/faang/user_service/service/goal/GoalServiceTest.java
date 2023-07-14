@@ -44,6 +44,4 @@ class GoalServiceTest {
         service.getGoalsByUser(1L, null);
         Mockito.verify(goalRepository).findGoalsByUserId(Mockito.anyLong());
     }
-
-
 }

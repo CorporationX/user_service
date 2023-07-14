@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
@@ -33,7 +34,7 @@ class MentorshipServiceTest {
     @BeforeEach
     void setUp() {
         when(mentorshipRepository.findUserById(INCORRECT_MENTOR_ID))
-                .thenReturn(null);
+                .thenReturn(Optional.empty());
 
         User mentor = new User();
         mentor.setMentees(List.of(new User(), new User()));
@@ -55,7 +56,7 @@ class MentorshipServiceTest {
 
     @Test
     void getMentees_shouldThrowException() {
-        assertThrows(RuntimeException.class,
+        assertThrows(UserNotFoundException.class,
                 () -> mentorshipService.getMentees(INCORRECT_MENTOR_ID),
                 "Invalid mentor id");
     }

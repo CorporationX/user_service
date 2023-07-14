@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 @Service
@@ -18,7 +19,7 @@ public class MentorshipService {
 
     private User validateUserId(long mentorId) {
         return mentorshipRepository.findUserById(mentorId)
-                .orElseThrow(() -> new RuntimeException("Invalid mentor id"));
+                .orElseThrow(() -> new UserNotFoundException("Invalid mentor id"));
     }
 }
 

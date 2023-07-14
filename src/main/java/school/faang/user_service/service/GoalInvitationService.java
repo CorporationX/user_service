@@ -3,6 +3,7 @@ package school.faang.user_service.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
@@ -18,14 +19,15 @@ public class GoalInvitationService {
     public void acceptGoalInvitation(long id) {
         GoalInvitation goalInvitation = goalInvitationRepository
                 .findById(id)
-                .orElseThrow(
-                        () -> new EntityNotFoundException("Invalid request. Requested goal invitation not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Invalid request. Requested goal invitation not found"));
 
         User invitedUser = goalInvitation.getInvited();
         Goal goal = goalInvitation.getGoal();
 
         validateGoalInvitation(invitedUser, goal);
 
+        goalInvitation.setStatus(RequestStatus.ACCEPTED);
+        goalInvitationRepository.save(goalInvitation);
         invitedUser.getGoals().add(goal);
     }
 

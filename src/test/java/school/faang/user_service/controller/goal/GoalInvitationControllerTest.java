@@ -10,7 +10,6 @@ import school.faang.user_service.service.GoalInvitationService;
 
 @ExtendWith(MockitoExtension.class)
 class GoalInvitationControllerTest {
-
     @Mock
     GoalInvitationService goalInvitationService;
 
@@ -19,8 +18,9 @@ class GoalInvitationControllerTest {
 
     @Test
     public void testAcceptGoalInvitation() {
-        goalInvitationController.acceptGoalInvitation(1L);
+        long id = 1L;
+        goalInvitationController.acceptGoalInvitation(id);
 
-        Mockito.verify(goalInvitationService, Mockito.times(1)).acceptGoalInvitation(1L);
+        Mockito.verify(goalInvitationService, Mockito.times(1)).acceptGoalInvitation(id);
     }
 }

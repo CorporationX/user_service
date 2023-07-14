@@ -26,6 +26,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class GoalInvitationServiceTest {
     User user;
     Goal goal;
+    long userId;
+    long goalId;
+    long goalInvitationId;
     GoalInvitation goalInvitation;
 
     @Mock
@@ -42,11 +45,18 @@ class GoalInvitationServiceTest {
     class NegativeTestGroup {
         @BeforeEach
         public void setUp() {
-            goalInvitation = new GoalInvitation();
-            user = new User();
-            goal = new Goal();
+            goalId = 1L;
+            userId = 1L;
+            goalInvitationId = 1L;
 
-            goal.setId(1L);
+            goal = Goal.builder()
+                    .id(goalId)
+                    .build();
+            user = User.builder()
+                    .id(userId)
+                    .build();
+            goalInvitation = new GoalInvitation();
+
             goalInvitation.setGoal(goal);
             goalInvitation.setInvited(user);
         }
@@ -54,18 +64,16 @@ class GoalInvitationServiceTest {
         @Test
         public void testAcceptGoalInvitationThrowEntityExcBecOfGoalInvitation() {
             EntityNotFoundException exc = assertThrows(EntityNotFoundException.class,
-                    () -> goalInvitationService.acceptGoalInvitation(1L));
-
+                    () -> goalInvitationService.acceptGoalInvitation(goalInvitationId));
             assertEquals("Invalid request. Requested goal invitation not found", exc.getMessage());
         }
 
         @Test
         public void testAcceptGoalInvitationThrowEntityExcBecOfGoal() {
-            Mockito.when(goalInvitationRepository.findById(1L)).thenReturn(Optional.of(goalInvitation));
+            Mockito.when(goalInvitationRepository.findById(goalInvitationId)).thenReturn(Optional.of(goalInvitation));
 
             EntityNotFoundException exc = assertThrows(EntityNotFoundException.class,
-                    () -> goalInvitationService.acceptGoalInvitation(1L));
-
+                    () -> goalInvitationService.acceptGoalInvitation(goalInvitationId));
             assertEquals("Invalid request. Requested goal not found", exc.getMessage());
         }
 
@@ -73,11 +81,11 @@ class GoalInvitationServiceTest {
         public void testAcceptGoalInvitationThrowIllegalArgsExcBecOfGoalsSize() {
             user.setGoals(List.of(new Goal(), new Goal(), new Goal()));
 
-            Mockito.when(goalInvitationRepository.findById(1L)).thenReturn(Optional.of(goalInvitation));
-            Mockito.when(goalRepository.existsById(1L)).thenReturn(true);
+            Mockito.when(goalInvitationRepository.findById(goalInvitationId)).thenReturn(Optional.of(goalInvitation));
+            Mockito.when(goalRepository.existsById(goalId)).thenReturn(true);
 
             IllegalArgumentException exc = assertThrows(IllegalArgumentException.class,
-                    () -> goalInvitationService.acceptGoalInvitation(1L));
+                    () -> goalInvitationService.acceptGoalInvitation(goalInvitationId));
             assertEquals("The user already has the maximum number of goals", exc.getMessage());
         }
 
@@ -86,9 +94,10 @@ class GoalInvitationServiceTest {
             user.setGoals(List.of(new Goal(), goal));
 
             Mockito.when(goalInvitationRepository.findById(1L)).thenReturn(Optional.of(goalInvitation));
-            Mockito.when(goalRepository.existsById(1L)).thenReturn(true);
+            Mockito.when(goalRepository.existsById(Mockito.any())).thenReturn(true);
 
-            IllegalArgumentException exc = assertThrows(IllegalArgumentException.class, () -> goalInvitationService.acceptGoalInvitation(1L));
+            IllegalArgumentException exc = assertThrows(IllegalArgumentException.class,
+                    () -> goalInvitationService.acceptGoalInvitation(goalInvitationId));
             assertEquals("The user is already working on this goal", exc.getMessage());
         }
     }
@@ -96,32 +105,35 @@ class GoalInvitationServiceTest {
     @Nested
     @DisplayName("Позитивные тесты")
     class PositiveTestGroup {
-
         @BeforeEach
         public void setUp() {
+            goalId = 1L;
+            goalInvitationId = 1L;
             goalInvitation = new GoalInvitation();
-            user = new User();
-            goal = new Goal();
+            goal = Goal.builder()
+                    .id(goalId)
+                    .build();
+            user = User.builder()
+                    .goals(new ArrayList<>(List.of(new Goal(), new Goal())))
+                    .build();
 
-            goal.setId(1L);
             goalInvitation.setGoal(goal);
             goalInvitation.setInvited(user);
-            user.setGoals(new ArrayList<>(List.of(new Goal(), new Goal())));
 
-            Mockito.when(goalInvitationRepository.findById(1L)).thenReturn(Optional.of(goalInvitation));
-            Mockito.when(goalRepository.existsById(1L)).thenReturn(true);
+            Mockito.when(goalInvitationRepository.findById(goalInvitationId)).thenReturn(Optional.of(goalInvitation));
+            Mockito.when(goalRepository.existsById(goalId)).thenReturn(true);
 
-            goalInvitationService.acceptGoalInvitation(1L);
+            goalInvitationService.acceptGoalInvitation(goalInvitationId);
         }
 
         @Test
         public void testAcceptGoalInvitationCallFindById() {
-            Mockito.verify(goalInvitationRepository, Mockito.times(1)).findById(1L);
+            Mockito.verify(goalInvitationRepository, Mockito.times(1)).findById(goalInvitationId);
         }
 
         @Test
         public void testAcceptGoalInvitationCallExistsById() {
-            Mockito.verify(goalRepository, Mockito.times(1)).existsById(1L);
+            Mockito.verify(goalRepository, Mockito.times(1)).existsById(goalId);
         }
     }
 }

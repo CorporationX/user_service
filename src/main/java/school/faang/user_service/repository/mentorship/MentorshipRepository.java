@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface MentorshipRepository extends CrudRepository<User, Long> {
      List<User> getAllByMentorId(long mentorId);
+     List<User> getAllByMenteeId(long mentorId);
 }

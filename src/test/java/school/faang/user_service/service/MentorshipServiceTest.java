@@ -6,8 +6,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentee.MenteeDto;
+import school.faang.user_service.dto.mentee.MentorDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.MenteeMapper;
+import school.faang.user_service.mapper.mentee.MenteeMapper;
+import school.faang.user_service.mapper.mentor.MentorMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 
@@ -24,6 +26,8 @@ class MentorshipServiceTest {
     private MentorshipRepository mentorshipRepository;
     @Mock
     private MenteeMapper menteeMapper;
+    @Mock
+    private MentorMapper mentorMapper;
     @InjectMocks
     private MentorshipService mentorshipService;
 
@@ -60,6 +64,42 @@ class MentorshipServiceTest {
 
         assertNotNull(dtoList);
         assertEquals(menteeDtoList.get(0).getUsername(), dtoList.get(0).getUsername());
+        assertEquals(2, dtoList.size());
+    }
+
+    @Test
+    public void getMentors_When() {
+        when(mentorshipRepository.existsById(anyLong())).thenReturn(false);
+
+        RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> mentorshipService.getMentors(anyLong()));
+
+        assertEquals("User with id not found", runtimeException.getMessage());
+    }
+
+    @Test
+    public void getMentors_CorrectAnswer() {
+        User user1 = new User();
+        user1.setId(1);
+        user1.setUsername("ser");
+        user1.setEmail("sssss@s.ru");
+        user1.setPhone("12345");
+        User user2 = new User();
+        user2.setId(2);
+        user2.setUsername("len");
+        user2.setEmail("llll@l.ru");
+        user2.setPhone("54321");
+
+        List<User> list = List.of(user1, user2);
+        List<MentorDto> mentorDtoList = MentorMapper.INSTANCE.toMentorDto(list); //mentee
+
+        when(mentorshipRepository.getAllByMenteeId(anyLong())).thenReturn(list);
+        when(mentorshipRepository.existsById(anyLong())).thenReturn(true);
+        when(mentorMapper.toMentorDto(anyList())).thenReturn(mentorDtoList);
+
+        List<MentorDto> dtoList = mentorshipService.getMentors(1);
+
+        assertNotNull(dtoList);
+        assertEquals(mentorDtoList.get(0).getUsername(), dtoList.get(0).getUsername());
         assertEquals(2, dtoList.size());
     }
 }

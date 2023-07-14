@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,7 +11,6 @@ import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 
 @Service
-@Data
 @RequiredArgsConstructor
 
 public class SkillService {

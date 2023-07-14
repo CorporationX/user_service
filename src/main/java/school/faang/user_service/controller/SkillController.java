@@ -8,7 +8,6 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SkillService;
 
 @Controller
-@Data
 @RequiredArgsConstructor
 public class SkillController {
     private final SkillService skillService;

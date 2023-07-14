@@ -3,6 +3,7 @@ package school.faang.user_service.service.event;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.event.SkillDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
@@ -13,6 +14,7 @@ import school.faang.user_service.repository.event.EventRepository;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.StreamSupport;
 import java.util.zip.DataFormatException;
 
 @Service
@@ -29,6 +31,13 @@ public class EventService {
         } catch (DataFormatException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public List<EventDto> getEventsByFilter(EventFilterDto filter) {
+        return StreamSupport.stream(eventRepository.findAll().spliterator(), false)
+                .map(EventMapper.INSTANCE::toDto)
+                .filter(filter)
+                .toList();
     }
 
     private void validateEventDto(EventDto eventDto) throws DataFormatException {

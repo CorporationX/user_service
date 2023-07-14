@@ -13,7 +13,7 @@ import java.util.List;
 @Controller
 public class EventController {
   private final EventService eventService;
-  private final int MIN_NAME_LENGTH = 3;
+  private static final int MIN_NAME_LENGTH = 3;
 
   @Autowired
   public EventController(EventService eventService) {
@@ -63,5 +63,15 @@ public class EventController {
 
   public List<EventDto> getEventsByFilter(EventFilterDto filter) {
     return eventService.getEventsByFilter(filter);
+  }
+
+  public EventDto getEvent(Long id) throws Exception {
+    EventDto event = eventService.get(id);
+
+    if (event == null) {
+      throw new Exception("Event with id: " + id + " not found");
+    }
+
+    return event;
   }
 }

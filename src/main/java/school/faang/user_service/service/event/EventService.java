@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -75,5 +76,14 @@ public class EventService {
         .flatMap(filter -> filter.apply(events, filters))
         .map(eventMapper::toDto)
         .toList();
+  }
+
+  public EventDto get(Long id) throws Exception {
+    Optional<Event> event = eventRepository.findById(id);
+    if (event.isEmpty()) {
+      throw new Exception();
+    }
+
+    return eventMapper.toDto(event.get());
   }
 }

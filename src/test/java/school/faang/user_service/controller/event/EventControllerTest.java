@@ -1,4 +1,4 @@
-package school.faang.user_service.controller.event;
+package school.faang.user_service.service.controller.event;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -88,5 +88,14 @@ public class EventControllerTest {
     Long anyUserId = 1L;
     eventController.getOwnedEvents(anyUserId);
     Mockito.verify(eventService, Mockito.times(1)).getOwnedEvents(anyUserId);
+  }
+
+  @Test
+  public void testGetEventById() {
+    try {
+      Long anyId = 1L;
+      eventController.getEvent(anyId);
+      Mockito.verify(eventService, Mockito.times(1)).get(anyId);
+    } catch (Exception e) {}
   }
 }

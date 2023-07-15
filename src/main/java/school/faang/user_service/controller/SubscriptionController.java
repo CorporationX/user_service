@@ -23,14 +23,14 @@ public class SubscriptionController {
     @PutMapping("/follow/{id}")
     public void followUser(@RequestParam("followerId") long followerId,
                            @PathVariable("id") long followeeId) {
-        sameUserValidation(followerId, followeeId, SUBSCRIBE_YOURSELF_EXCEPTION);
+        validationSameUser(followerId, followeeId, SUBSCRIBE_YOURSELF_EXCEPTION);
         subscriptionService.followUser(followerId, followeeId);
     }
 
     @DeleteMapping("/unfollow/{id}")
     public void unfollowUser(@RequestParam("followerId") long followerId,
                          @PathVariable("id") long followeeId) {
-        sameUserValidation(followerId, followeeId, UNSUBSCRIBE_YOURSELF_EXCEPTION);
+        validationSameUser(followerId, followeeId, UNSUBSCRIBE_YOURSELF_EXCEPTION);
         subscriptionService.unfollowUser(followerId, followeeId);
     }
 
@@ -39,7 +39,12 @@ public class SubscriptionController {
         return subscriptionService.getFollowersCount(followeeId);
     }
 
-    private void sameUserValidation(long followerId, long followeeId, String message) {
+    @GetMapping("/followees/count/{id}")
+    public int getFollowingCount(@PathVariable("id") long followerId) {
+        return subscriptionService.getFollowingCount(followerId);
+    }
+
+    private void validationSameUser(long followerId, long followeeId, String message) {
         if (followerId == followeeId) {
             throw new DataValidationException(message);
         }

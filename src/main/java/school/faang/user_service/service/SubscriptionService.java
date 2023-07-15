@@ -15,42 +15,48 @@ public class SubscriptionService {
 
     @Transactional
     public void followUser(long followerId, long followeeId) {
-        usersExistsValidation(followerId, followeeId);
-        subscriptionExistsValidation(followerId, followeeId);
+        validationUsersExists(followerId, followeeId);
+        validationSubscriptionExists(followerId, followeeId);
         subscriptionRepository.followUser(followerId, followeeId);
     }
 
     @Transactional
     public void unfollowUser(long followerId, long followeeId) {
-        subscriptionNotExistsValidation(followerId, followeeId);
+        validationSubscriptionNotExists(followerId, followeeId);
         subscriptionRepository.unfollowUser(followerId, followeeId);
     }
 
     @Transactional
     public int getFollowersCount(long followeeId) {
-        userExistsValidation(followeeId);
+        validationUserExists(followeeId);
         return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
     }
 
-    private void subscriptionExistsValidation(long followerId, long followeeId) {
+    @Transactional
+    public int getFollowingCount(long followerId) {
+        validationUserExists(followerId);
+        return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
+    }
+
+    private void validationSubscriptionExists(long followerId, long followeeId) {
         if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             throw new DataValidationException("You are already subscribed to this user.");
         }
     }
 
-    private void subscriptionNotExistsValidation(long followerId, long followeeId) {
+    private void validationSubscriptionNotExists(long followerId, long followeeId) {
         if (!subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             throw new DataValidationException("You are not subscribed to this user to unsubscribe from this user");
         }
     }
 
-    private void userExistsValidation(long userId) {
+    private void validationUserExists(long userId) {
         if (!userRepository.existsById(userId)) {
             throw new DataValidationException("The user does not exist");
         }
     }
 
-    private void usersExistsValidation(long followerId, long followeeId) {
+    private void validationUsersExists(long followerId, long followeeId) {
         if (!userRepository.existsById(followeeId)) {
             throw new DataValidationException("The user they are trying to subscribe to does not exist");
         }

@@ -1,5 +1,6 @@
 package school.faang.user_service.service.service.event;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.SkillDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -64,6 +66,15 @@ class EventServiceTest {
     assertThrows(DataValidationException.class, () -> {
       eventService.create(eventDto);
     });
+  }
+
+
+  @Test
+  public void testGetAllUserParticipationEvents() {
+    long anyUserId = 1L;
+    Mockito.lenient().when(eventRepository.findParticipatedEventsByUserId(anyUserId)).thenReturn(List.of(new Event(), new Event(), new Event()));
+    List<EventDto> events = eventService.getParticipatedEvents(anyUserId);
+    Assertions.assertEquals(3, events.size());
   }
 
   @Test

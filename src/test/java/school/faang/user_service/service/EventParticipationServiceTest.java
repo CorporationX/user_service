@@ -1,9 +1,11 @@
 package school.faang.user_service.service;
 
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.service.event.EventParticipationService;
 
@@ -19,7 +21,7 @@ public class EventParticipationServiceTest {
     @Test
     public void getParticipantTest() {
         Mockito.when(eventParticipationRepository.existsById(1L)).thenReturn(false);
-        assertThrows(IllegalArgumentException.class,
-                () -> eventParticipationService.getParticipant(1L));
+        Assertions.assertThrows(DataValidationException.class,
+                () -> eventParticipationService.getListOfParticipant(1L));
     }
 }

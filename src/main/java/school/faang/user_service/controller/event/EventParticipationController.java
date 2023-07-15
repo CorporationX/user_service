@@ -7,7 +7,7 @@ import school.faang.user_service.service.event.EventParticipationService;
 @Component
 @RequiredArgsConstructor
 public class EventParticipationController {
-    private EventParticipationService eventParticipationService;
+    private final EventParticipationService eventParticipationService;
 
     public void validate(Long eventId, Long userId) {
         if (eventId == null || userId == null) {

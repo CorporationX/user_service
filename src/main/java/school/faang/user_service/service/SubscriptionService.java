@@ -15,20 +15,15 @@ public class SubscriptionService {
         subscriptionRepository.followUser(followerId, followeeId);
     }
 
-    private void validate(long followerId, long followeeId) {
+    public void unfollowUser(long followerId, long followeeId) {
         if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
-            throw new DataValidationException("This subscription already exists");
+            subscriptionRepository.unfollowUser(followerId, followeeId);
         }
     }
 
-    public boolean validateIfSubscribed(long followerId, long followeeId) {
-        return subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
-    }
-
-
-    public void unfollowUser(long followerId, long followeeId) {
-        if (validateIfSubscribed(followerId, followeeId)) {
-            subscriptionRepository.unfollowUser(followerId, followeeId);
+    private void validate(long followerId, long followeeId) {
+        if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
+            throw new DataValidationException("This subscription already exists");
         }
     }
 }

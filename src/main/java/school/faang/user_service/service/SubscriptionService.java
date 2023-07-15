@@ -22,7 +22,7 @@ public class SubscriptionService {
 
     @Transactional
     public void followUser(long followerId, long followeeId) {
-        followUserValidation(followerId, followeeId);
+        validationFollowUser(followerId, followeeId);
         subscriptionRepository.followUser(followerId, followeeId);
     }
 
@@ -45,7 +45,7 @@ public class SubscriptionService {
                 .collect(Collectors.toList());
     }
 
-    private void followUserValidation(long followerId, long followeeId) {
+    private void validationFollowUser(long followerId, long followeeId) {
         if (!userRepository.existsById(followeeId)) {
             throw new DataValidationException("The user they are trying to subscribe to does not exist");
         }

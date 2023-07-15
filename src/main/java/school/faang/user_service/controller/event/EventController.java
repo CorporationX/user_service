@@ -27,4 +27,8 @@ public class EventController {
     public EventDto getEvent(long id){
         return eventMapper.toDTO(eventService.getEvent(id));
     }
+
+    public void deleteEvent(long id){
+        eventService.deleteEvent(id);
+    }
 }

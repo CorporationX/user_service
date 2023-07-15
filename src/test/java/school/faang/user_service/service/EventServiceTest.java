@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
@@ -24,7 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
+
 
 @ExtendWith(MockitoExtension.class)
 public class EventServiceTest {
@@ -107,5 +108,17 @@ public class EventServiceTest {
     public void testCorrectGetEvent() {
         when(eventRepository.findById(1L)).thenReturn(Optional.ofNullable(event));
         Assertions.assertEquals(event, eventService.getEvent(1L));
+    }
+
+    @Test
+    public void testDeleteEventWithWrongId() {
+        Mockito.doThrow(new IllegalArgumentException()).when(eventRepository).deleteById(0L);
+        Assertions.assertThrows(DataValidationException.class, () -> eventService.deleteEvent(0L));
+    }
+
+    @Test
+    public void testCorrectDeleteEvent() {
+        eventService.deleteEvent(1L);
+        Mockito.verify(eventRepository, Mockito.times(1)).deleteById(1L);
     }
 }

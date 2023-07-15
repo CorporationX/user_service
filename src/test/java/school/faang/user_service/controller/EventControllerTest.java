@@ -32,7 +32,7 @@ public class EventControllerTest {
     @InjectMocks
     private EventController eventController;
     private EventDto eventDto = EventDto.builder()
-            .title("Hello BoottyCamp")
+            .title("Hello BootyCamp")
             .startDate(LocalDateTime.MAX)
             .ownerId(1L)
             .build();
@@ -104,6 +104,12 @@ public class EventControllerTest {
     public void testGetEvent() {
         eventController.getEvent(1);
         Mockito.verify(eventService, Mockito.times(1)).getEvent(1);
+    }
+
+    @Test
+    public void testDeleteEvent() {
+        eventController.deleteEvent(1L);
+        Mockito.verify(eventService, Mockito.times(1)).deleteEvent(1L);
     }
 
 }

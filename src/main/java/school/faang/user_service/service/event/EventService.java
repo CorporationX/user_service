@@ -62,4 +62,12 @@ public class EventService {
 
         return event.get();
     }
+
+    public void deleteEvent(long id){
+        try {
+            eventRepository.deleteById(id);
+        }catch (IllegalArgumentException exception){
+            throw new DataValidationException("ID is incorrect");
+        }
+    }
 }

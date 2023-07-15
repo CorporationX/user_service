@@ -55,9 +55,21 @@ public class SubscriptionControllerTest {
 
         Mockito.when(subscriptionService.getFollowersCount(followeeId))
                 .thenReturn(desiredFollowersCount);
-        int followersCount = subscriptionService.getFollowersCount(followeeId);
+        int followersCount = subscriptionController.getFollowersCount(followeeId);
 
         Assertions.assertEquals(desiredFollowersCount, followersCount);
         Mockito.verify(subscriptionService).getFollowersCount(followeeId);
+    }
+
+    @Test
+    public void shouldReturnFolloweesCount() {
+        int desiredFolloweesCount = 3;
+
+        Mockito.when(subscriptionService.getFollowingCount(followerId))
+                .thenReturn(desiredFolloweesCount);
+        int followeesCount = subscriptionController.getFollowingCount(followerId);
+
+        Assertions.assertEquals(desiredFolloweesCount, followeesCount);
+        Mockito.verify(subscriptionService).getFollowingCount(followerId);
     }
 }

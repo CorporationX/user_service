@@ -55,6 +55,5 @@ public class SubscriptionController {
         if (followerId == followeeId) {
             throw new DataValidationException(message);
         }
-        subscriptionService.unfollowUser(followerId, followeeId);
     }
 }

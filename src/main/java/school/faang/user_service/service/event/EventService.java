@@ -13,6 +13,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -45,5 +46,20 @@ public class EventService {
                                 .map(SkillDto::getTitle)
                                 .collect(Collectors.toSet()));
 
+    }
+
+    public Event getEvent(long id){
+        Optional<Event> event;
+
+        try{
+            event = eventRepository.findById(id);
+        }catch (IllegalArgumentException exception){
+            throw new DataValidationException("ID is incorrect");
+        }
+        if(event.isEmpty()){
+            throw new DataValidationException("There is no event with this id");
+        }
+
+        return event.get();
     }
 }

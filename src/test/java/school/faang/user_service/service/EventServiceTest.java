@@ -1,14 +1,11 @@
 package school.faang.user_service.service;
 
 
-import lombok.Builder;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
@@ -17,7 +14,6 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.mapper.event.EventMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -93,5 +89,23 @@ public class EventServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user2));
         when(eventRepository.save(eventMapper.toEvent(eventDto))).thenReturn(event);
         Assertions.assertEquals(event, eventService.create(eventDto));
+    }
+
+    @Test
+    public void testGetEventWithWrongId() {
+        when(eventRepository.findById(0L)).thenThrow(new IllegalArgumentException());
+        Assertions.assertThrows(DataValidationException.class, () -> eventService.getEvent(0L));
+    }
+
+    @Test
+    public void testGetNonExistentEvent() {
+        when(eventRepository.findById(10L)).thenReturn(Optional.ofNullable(null));
+        Assertions.assertThrows(DataValidationException.class, () -> eventService.getEvent(10L));
+    }
+
+    @Test
+    public void testCorrectGetEvent() {
+        when(eventRepository.findById(1L)).thenReturn(Optional.ofNullable(event));
+        Assertions.assertEquals(event, eventService.getEvent(1L));
     }
 }

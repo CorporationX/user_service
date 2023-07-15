@@ -23,4 +23,8 @@ public class EventController {
             throw new DataValidationException("Event is invalid");
         }
     }
+
+    public EventDto getEvent(long id){
+        return eventMapper.toDTO(eventService.getEvent(id));
+    }
 }

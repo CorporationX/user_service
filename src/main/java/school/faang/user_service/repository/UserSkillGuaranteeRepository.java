@@ -15,10 +15,10 @@ public interface UserSkillGuaranteeRepository extends CrudRepository<UserSkillGu
     Long create(long userId, long skillId, long guarantorId);
 
     @Query(nativeQuery = true, value = """
-        SELECT EXISTS(
-            SELECT 1 FROM user_skill_guarantee
-            WHERE user_id = ?1 AND skill_id = ?2 AND guarantor_id = ?3
-        )
-        """)
+            SELECT EXISTS(
+                SELECT 1 FROM user_skill_guarantee
+                WHERE user_id = ?1 AND skill_id = ?2 AND guarantor_id = ?3
+            )
+            """)
     boolean isGuaranteeExists(long userId, long skillId, long guarantorId);
 }

@@ -28,8 +28,8 @@ class SubscriptionServiceTest {
 
     @BeforeEach
     public void setUp() {
-        followerId = 2;
-        followeeId = 1;
+        followerId = 2L;
+        followeeId = 1L;
     }
 
     @Test
@@ -61,5 +61,12 @@ class SubscriptionServiceTest {
             assertEquals("This subscription already exists", e.getMessage());
         }
         verifyNoMoreInteractions(subscriptionRepository);
+    }
+
+    @Test
+    public void testGetFollowingCount() {
+        subscriptionService.getFollowingCount(followerId);
+
+        verify(subscriptionRepository, times(1)).findFolloweesAmountByFollowerId(followerId);
     }
 }

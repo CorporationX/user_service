@@ -20,4 +20,7 @@ public class SubscriptionController {
             throw new DataValidationException("You can't subscribe to yourself");
         }
     }
+    public int getFollowingCount(long followerId) {
+        return subscriptionService.getFollowingCount(followerId);
+    }
 }

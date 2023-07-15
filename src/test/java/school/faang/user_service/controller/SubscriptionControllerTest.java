@@ -27,8 +27,9 @@ class SubscriptionControllerTest {
 
     @BeforeEach
     public void setUp() {
-        followerId = 2;
-        followeeId = 2;
+        followerId = 2L;
+        followeeId = 2L;
+
     }
 
     @Test
@@ -38,8 +39,8 @@ class SubscriptionControllerTest {
 
     @Test
     public void testFollowUser() {
-        followerId = 1;
-        followeeId = 2;
+        followerId = 1L;
+        followeeId = 2L;
 
         subscriptionController.followUser(followerId, followeeId);
 
@@ -54,5 +55,12 @@ class SubscriptionControllerTest {
             assertEquals("You can't subscribe to yourself", e.getMessage());
         }
         verifyNoInteractions(subscriptionService);
+    }
+
+    @Test
+    public void testGetFollowingCount() {
+        subscriptionController.getFollowingCount(followerId);
+
+        verify(subscriptionService, times(1)).getFollowingCount(followerId);
     }
 }

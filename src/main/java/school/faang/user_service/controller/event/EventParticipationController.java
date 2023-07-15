@@ -7,9 +7,9 @@ import school.faang.user_service.service.event.EventParticipationService;
 
 @Component
 @RequiredArgsConstructor
-public class EventParticipationController { // A
+public class EventParticipationController {
 
-    private EventParticipationService eventParticipationService; // B
+    private final EventParticipationService eventParticipationService;
 
 
     public void registerParticipantController(Long eventId, Long userId) {

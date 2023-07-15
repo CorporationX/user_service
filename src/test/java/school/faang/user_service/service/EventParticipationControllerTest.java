@@ -11,10 +11,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class EventParticipationControllerTest {
     @Mock
-    private EventParticipationService eventParticipationService; // A
+    private EventParticipationService eventParticipationService;
 
     @InjectMocks
-    private EventParticipationController eventParticipationController; // B
+    private EventParticipationController eventParticipationController;
 
     @Test
     public void validateTest() {

@@ -10,9 +10,9 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class EventParticipationService { // A
+public class EventParticipationService {
 
-    private EventParticipationRepository eventParticipationRepository; // B
+    private final EventParticipationRepository eventParticipationRepository;
 
     public void registerParticipant(long eventId, long userId) throws DataValidationException {
         List<User> users = eventParticipationRepository.findAllParticipantsByEventId(eventId);

@@ -43,13 +43,13 @@ class EventServiceTest {
   @BeforeEach
   public void init() {
     userSkill.setTitle("Coding");
-    Mockito.when(skillRepository.findSkillsByGoalId(1L)).thenReturn(List.of(userSkill));
     eventDto = new EventDto(1L, "Hiring", LocalDateTime.now(), LocalDateTime.now(),
         1L, "Hiring event", List.of(eventSkill), "USA", 5);
   }
 
   @Test
   public void testCreateEvent() {
+    Mockito.when(skillRepository.findSkillsByGoalId(1L)).thenReturn(List.of(userSkill));
     eventService.create(eventDto);
     Mockito.verify(eventRepository, Mockito.times(1)).save(eventMapper.toEntity(eventDto));
   }
@@ -64,5 +64,12 @@ class EventServiceTest {
     assertThrows(DataValidationException.class, () -> {
       eventService.create(eventDto);
     });
+  }
+
+  @Test
+  public void testEventDeleting() {
+    Long anyTestId = 1L;
+    eventService.delete(anyTestId);
+    Mockito.verify(eventRepository, Mockito.times(1)).deleteById(anyTestId);
   }
 }

@@ -46,4 +46,8 @@ public class EventController {
     validateCreateDTO(event);
     return eventService.create(event);
   }
+
+  public void deleteEvent(Long id) {
+    eventService.delete(id);
+  }
 }

@@ -40,4 +40,8 @@ public class EventService {
      Event createdEvent = eventRepository.save(eventMapper.toEntity(event));
      return eventMapper.toDto(createdEvent);
   }
+
+  public void delete(Long id) {
+    eventRepository.deleteById(id);
+  }
 }

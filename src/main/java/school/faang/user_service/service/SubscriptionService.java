@@ -40,4 +40,11 @@ public class SubscriptionService {
         List<User> userListFromRepository = userFilter.filterUsers(userStreamFromRepository, filter);
         return subscriptionMapper.toListUserDto(userListFromRepository);
     }
+
+    @Transactional(readOnly = true)
+    public List<UserDto> getFollowing(long followerId, UserFilterDto filter) {
+        Stream<User> userStreamFromRepository = subscriptionRepository.findByFollowerId(followerId);
+        List<User> userListFromRepository = userFilter.filterUsers(userStreamFromRepository, filter);
+        return subscriptionMapper.toListUserDto(userListFromRepository);
+    }
 }

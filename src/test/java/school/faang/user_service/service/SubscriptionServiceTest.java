@@ -5,11 +5,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filters.UserFilter;
+import school.faang.user_service.mapper.SubscriptionMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 
 import java.util.List;
@@ -29,6 +31,8 @@ class SubscriptionServiceTest {
     SubscriptionService subscriptionService;
     @Mock
     SubscriptionRepository subscriptionRepository;
+    @Spy
+    SubscriptionMapper INSTANCE;
     @Mock
     UserFilterDto userFilterDto;
     @Mock
@@ -92,6 +96,20 @@ class SubscriptionServiceTest {
         subscriptionService.getFollowers(followeeId, userFilterDto);
 
         verify(subscriptionRepository, times(1)).findByFolloweeId(followeeId);
+        verify(userFilter, times(1)).filterUsers(userStream, userFilterDto);
+    }
+
+    @Test
+    public void testFollowing() {
+        User user = mock(User.class);
+        Stream<User> userStream = Stream.of(user);
+
+        when(subscriptionRepository.findByFollowerId(followerId)).thenReturn(userStream);
+        when(userFilter.filterUsers(userStream, userFilterDto)).thenReturn(List.of(user));
+
+        subscriptionService.getFollowing(followerId, userFilterDto);
+
+        verify(subscriptionRepository, times(1)).findByFollowerId(followerId);
         verify(userFilter, times(1)).filterUsers(userStream, userFilterDto);
     }
 }

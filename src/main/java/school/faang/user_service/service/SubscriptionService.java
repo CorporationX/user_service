@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +19,7 @@ public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     public Page<UserDto> getFollowers(long followeeId, UserFilterDto filter) {
         if (!userRepository.existsById(followeeId)) {
             throw new DataValidationException("This user does not exist");

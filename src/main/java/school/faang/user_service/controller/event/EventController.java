@@ -1,13 +1,11 @@
 package school.faang.user_service.controller.event;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.service.event.EventService;
 
 import java.util.List;
@@ -27,9 +25,7 @@ public class EventController {
 
     @GetMapping("/get/{eventId}")
     public ResponseEntity<?> getEvent(long eventId) {
-        if (eventId < 0) {
-            return ResponseEntity.badRequest().body("Event ID cannot be less than 0");
-        }
+        checkId(eventId);
         return ResponseEntity.ok(eventService.getEvent(eventId));
     }
 
@@ -41,9 +37,7 @@ public class EventController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteEvent(@PathVariable long id) {
-        if (id < 0) {
-            return ResponseEntity.badRequest().body("id have to be > 0");
-        }
+        checkId(id);
         eventService.deleteEvent(id);
         return ResponseEntity.ok().build();
     }
@@ -55,6 +49,13 @@ public class EventController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/get-owned-events/{userId}")
+    public ResponseEntity<List<EventDto>> getOwnedEvents(@PathVariable long userId) {
+        checkId(userId);
+        List<EventDto> ownedEvents = eventService.getOwnedEvents(userId);
+        return ResponseEntity.ok(ownedEvents);
+    }
+
     private void validateEvent(EventDto event) {
         if (event.getTitle() == null || event.getTitle().isBlank()) {
             throw new DataValidationException("Event title cannot be empty");
@@ -64,6 +65,12 @@ public class EventController {
         }
         if (event.getOwnerId() == null || event.getOwnerId() < 0) {
             throw new DataValidationException("Event owner ID cannot be null or negative");
+        }
+    }
+
+    private void checkId(long id) {
+        if (id < 1) {
+            throw new DataValidationException("id have to be > 0");
         }
     }
 }

@@ -58,6 +58,10 @@ public class EventService {
         eventRepository.save(eventMapper.toEntity(eventDto));
     }
 
+    public List<EventDto> getOwnedEvents(long userId){
+        return eventRepository.findAllByUserId(userId).stream().map(eventMapper::toDto).toList();
+    }
+
     private void validateEventSkills(EventDto event) {
         long ownerId = event.getOwnerId();
         var relatedSkills = event.getRelatedSkills();

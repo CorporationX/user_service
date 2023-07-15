@@ -44,6 +44,7 @@ public class EventServiceTest {
         var now = LocalDateTime.now();
         eventDto = new EventDto(0L, "title", now, now.plusDays(3), 0L, "0", new ArrayList<>(), "location", -1);
         filterDto = new EventFilterDto("title", now.plusHours(1), now.plusDays(10), 0L, List.of(), "location", 10);
+
         Mockito.when(skillRepository.findAllByUserId(eventDto.getOwnerId()))
                 .thenReturn(List.of(
                         Skill.builder().id(1).build(),
@@ -55,12 +56,14 @@ public class EventServiceTest {
     void testSkillIsValid() {
         eventDto.setRelatedSkills(List.of(new SkillDto(1), new SkillDto(2)));
         eventService.create(eventDto);
+
         Mockito.verify(eventMapper, Mockito.times(1)).toDto(Mockito.any());
     }
 
     @Test
     void testSkillsAreInvalid() {
         eventDto.setRelatedSkills(List.of(new SkillDto(3), new SkillDto(4)));
+
         Assert.assertThrows(
                 DataValidationException.class,
                 () -> eventService.create(eventDto)
@@ -72,6 +75,7 @@ public class EventServiceTest {
         Mockito.when(eventRepository.findById(Mockito.anyLong())).thenReturn(
                 Optional.empty()
         );
+
         Assert.assertThrows(
                 NotFoundException.class,
                 () -> eventService.getEvent(5)
@@ -84,6 +88,7 @@ public class EventServiceTest {
         Mockito.when(eventRepository.findById(Mockito.anyLong())).thenReturn(
                 Optional.of(event)
         );
+
         eventService.getEvent(Mockito.anyLong());
         Mockito.verify(eventMapper, Mockito.times(1)).toDto(event);
     }
@@ -91,10 +96,10 @@ public class EventServiceTest {
     @Test
     void testReceivingFilteredEvents() {
         Event event = getEventExample();
-
         List<Event> events = List.of(event);
         Mockito.when(eventRepository.findAll()).thenReturn(events);
         Mockito.when(eventMapper.toDto(Mockito.any(Event.class))).thenReturn(eventDto);
+
         var result = eventService.getEventsByFilter(filterDto);
         Assertions.assertEquals("title", result.get(0).getTitle());
     }
@@ -106,6 +111,7 @@ public class EventServiceTest {
         List<Event> events = List.of(event);
         Mockito.when(eventRepository.findAll()).thenReturn(events);
         Mockito.when(eventMapper.toDto(Mockito.any(Event.class))).thenReturn(eventDto);
+
         Assertions.assertThrows(NotFoundException.class,
                 () -> eventService.getEventsByFilter(filterDto));
     }
@@ -117,6 +123,7 @@ public class EventServiceTest {
         List<Event> events = List.of(event);
         Mockito.when(eventRepository.findAll()).thenReturn(events);
         Mockito.when(eventMapper.toDto(Mockito.any(Event.class))).thenReturn(eventDto);
+
         Assertions.assertThrows(NotFoundException.class,
                 () -> eventService.getEventsByFilter(filterDto));
     }
@@ -130,6 +137,7 @@ public class EventServiceTest {
     @Test
     void testUpdatingEventIsInvalid() {
         eventDto.setRelatedSkills(List.of(new SkillDto(3), new SkillDto(4)));
+
         Assert.assertThrows(
                 DataValidationException.class,
                 () -> eventService.updateEvent(eventDto)
@@ -140,7 +148,16 @@ public class EventServiceTest {
     void testUpdatingEventIsValid() {
         eventDto.setRelatedSkills(List.of(new SkillDto(1), new SkillDto(2)));
         eventService.updateEvent(eventDto);
+
         Mockito.verify(eventMapper, Mockito.times(1)).toEntity(eventDto);
+    }
+
+    @Test
+    void testReceivingOwnedEvents() {
+        long eventId = 1;
+        eventService.getOwnedEvents(eventId);
+
+        Mockito.verify(eventRepository, Mockito.times(1)).findAllByUserId(eventId);
     }
 
     private Event getEventExample() {

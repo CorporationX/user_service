@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import school.faang.user_service.controller.event.EventController;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
@@ -94,8 +93,10 @@ public class EventControllerTest {
     @Test
     void testNegativeEventIdIsInvalid() {
         long eventId = -1;
-        ResponseEntity<?> responseEntity = eventController.getEvent(eventId);
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        Assertions.assertThrows(
+                DataValidationException.class,
+                () -> eventController.getEvent(eventId)
+        );
     }
 
     @Test
@@ -123,8 +124,11 @@ public class EventControllerTest {
 
     @Test
     void deletingEventNegativeIdExceptionTest() {
-        var response = eventController.deleteEvent(-1);
-        Assertions.assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+        long eventId = -1;
+        Assertions.assertThrows(
+                DataValidationException.class,
+                () -> eventController.deleteEvent(eventId)
+        );
     }
 
     @Test
@@ -154,7 +158,27 @@ public class EventControllerTest {
     @Test
     void testUpdatingValidDto() {
         var result = eventController.updateEvent(eventDto);
-        Assertions.assertEquals(result.getStatusCode(),HttpStatus.OK);
+        Assertions.assertEquals(result.getStatusCode(), HttpStatus.OK);
         verify(eventService, times(1)).updateEvent(eventDto);
+    }
+
+    @Test
+    void testCorrectReceivingOwnedEvent() {
+        long eventId = 31;
+
+        var result = eventController.getOwnedEvents(eventId);
+
+        Assertions.assertEquals(result.getStatusCode(), HttpStatus.OK);
+        verify(eventService, times(1)).getOwnedEvents(eventId);
+    }
+
+    @Test
+    void testReceivingOwnedEventWithInvalidId() {
+        long eventId = Integer.MIN_VALUE;
+
+        Assertions.assertThrows(
+                DataValidationException.class,
+                () -> eventController.getOwnedEvents(eventId)
+        );
     }
 }

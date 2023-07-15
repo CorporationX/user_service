@@ -1,10 +1,10 @@
 package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.exception.UserAlreadyRegisteredException;
+import school.faang.user_service.exception.UserNotRegisteredException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
@@ -35,7 +35,20 @@ public class EventParticipationService {
         return userMapper.toDtoList(eventParticipationRepository.findAllParticipantsByEventId(eventId));
     }
 
+    public void unregisterParticipant(long eventId, long userId) {
+        if (isNotParticipantRegistered(eventId, userId)) {
+            throw new UserNotRegisteredException(
+                String.format("User with ID=%d is not registered for the event with ID=%d", userId, eventId)
+            );
+        }
+        eventParticipationRepository.unregister(eventId, userId);
+    }
+
     private boolean isParticipantRegistered(long eventId, long userId) {
         return getAllParticipants(eventId).stream().anyMatch(p -> p.getId() == userId);
+    }
+
+    private boolean isNotParticipantRegistered(long eventId, long userId) {
+        return !isParticipantRegistered(eventId, userId);
     }
 }

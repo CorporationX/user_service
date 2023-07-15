@@ -11,6 +11,7 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.UserAlreadyRegisteredException;
+import school.faang.user_service.exception.UserNotRegisteredException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
@@ -107,6 +108,39 @@ class EventParticipationServiceTest {
 
             verify(eventParticipationRepository, times(1)).findAllParticipantsByEventId(EVENT_ID);
             assertEquals(userDtoList, List.of(new UserDto()));
+        }
+    }
+
+    @Nested
+    @DisplayName("unregisterParticipant")
+    class UnregisterParticipantTest {
+        @Test
+        @DisplayName("When current user is exists, then unregister")
+        void whenCurrentUserIsExistsThenUnregister() {
+            User user = User.builder().id(USER_ID).build();
+            UserDto userDto = UserDto.builder().id(USER_ID).build();
+
+            when(eventParticipationRepository.findAllParticipantsByEventId(EVENT_ID)).thenReturn(List.of(user));
+            when(userMapper.toDtoList(List.of(user))).thenReturn(List.of(userDto));
+
+            eventParticipationService.unregisterParticipant(EVENT_ID, USER_ID);
+
+            verify(userMapper, times(1)).toDtoList(List.of(user));
+            verify(eventParticipationRepository, times(1)).unregister(EVENT_ID, USER_ID);
+        }
+
+        @Test
+        @DisplayName("When current user isn't exists, then throw exception")
+        void whenCurrentUserIsNotExistsThenThrowException() {
+            long otherUserId = 1L;
+            User otherUser = User.builder().id(otherUserId).build();
+            UserDto otherUserDto = UserDto.builder().id(otherUserId).build();
+
+            when(eventParticipationRepository.findAllParticipantsByEventId(EVENT_ID)).thenReturn(List.of(otherUser));
+            when(userMapper.toDtoList(List.of(otherUser))).thenReturn(List.of(otherUserDto));
+
+            assertThrows(UserNotRegisteredException.class,
+                () -> eventParticipationService.unregisterParticipant(EVENT_ID, USER_ID));
         }
     }
 }

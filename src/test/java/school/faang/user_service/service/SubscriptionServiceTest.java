@@ -86,7 +86,7 @@ class SubscriptionServiceTest {
     }
 
     @Test
-    public void testFollowers() {
+    public void testGetFollowers() {
         User user = mock(User.class);
         Stream<User> userStream = Stream.of(user);
 
@@ -100,7 +100,7 @@ class SubscriptionServiceTest {
     }
 
     @Test
-    public void testFollowing() {
+    public void testGetFollowing() {
         User user = mock(User.class);
         Stream<User> userStream = Stream.of(user);
 

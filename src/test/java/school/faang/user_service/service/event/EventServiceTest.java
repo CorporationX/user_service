@@ -16,12 +16,15 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.any;
@@ -75,6 +78,22 @@ class EventServiceTest {
         skill2.setId(2L);
         skill2.setTitle("B");
         return List.of(skill1, skill2);
+    }
+
+    private List<Event> createEvents() {
+        List<Event> events = new ArrayList<>();
+        createUser();
+        for (int i = 1; i <= 5; i++) {
+            Event event = new Event();
+            event.setId(i);
+            event.setTitle("Test Event " + i);
+            event.setStartDate(LocalDate.of(2020, 1, i).atStartOfDay());
+            event.setOwner(user);
+            event.setRelatedSkills(createSkills());
+
+            events.add(event);
+        }
+        return events;
     }
 
     @Test
@@ -132,5 +151,26 @@ class EventServiceTest {
 
         verify(userRepository).findById(1L);
         verify(eventRepository).save(any(Event.class));
+    }
+
+    @Test
+    void getOwnedEvents_WithExistingUserId() {
+        long userId = 1L;
+        List<Event> events = createEvents();
+        when(eventRepository.findAllByUserId(userId)).thenReturn(events);
+
+        List<EventDto> eventDtos = eventService.getOwnedEvents(userId);
+
+        assertEquals(events.size(), eventDtos.size());
+    }
+
+    @Test
+    void getOwnedEvents_WithNonExistingUserId() {
+        long userId = 1L;
+        when(eventRepository.findAllByUserId(userId)).thenReturn(Collections.emptyList());
+
+        List<EventDto> eventDtos = eventService.getOwnedEvents(userId);
+
+        assertTrue(eventDtos.isEmpty());
     }
 }

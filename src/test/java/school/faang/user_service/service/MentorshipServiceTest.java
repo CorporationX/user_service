@@ -13,7 +13,9 @@ import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 @ExtendWith(MockitoExtension.class)
 class MentorshipServiceTest {
     @Mock
@@ -42,26 +44,26 @@ class MentorshipServiceTest {
     @Test
     void shouldThrowEntityNotFoundExceptionForMentor() {
         Mockito.when(mentorshipRepository.findById(user.getId())).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundException.class, ()->mentorshipService.getMentees(userId));
+        assertThrows(EntityNotFoundException.class, () -> mentorshipService.getMentees(userId));
         Mockito.verify(mentorshipRepository).findById(userId);
     }
 
     @Test
     void shouldThrowEntityNotFoundExceptionForMentee() {
         Mockito.when(mentorshipRepository.findById(user.getId())).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundException.class, ()->mentorshipService.getMentors(userId));
+        assertThrows(EntityNotFoundException.class, () -> mentorshipService.getMentors(userId));
         Mockito.verify(mentorshipRepository).findById(userId);
     }
 
     @Test
-    void shouldReturnMentees(){
+    void shouldReturnMentees() {
         Mockito.when(mentorshipRepository.findById(user.getId())).thenReturn(Optional.of(user));
         assertEquals(userList, mentorshipService.getMentees(userId));
         Mockito.verify(mentorshipRepository, Mockito.times(2)).findById(user.getId());
     }
 
     @Test
-    void shouldReturnMentors(){
+    void shouldReturnMentors() {
         Mockito.when(mentorshipRepository.findById(user4.getId())).thenReturn(Optional.of(user4));
         assertEquals(userList, mentorshipService.getMentors(userId));
         Mockito.verify(mentorshipRepository, Mockito.times(2)).findById(user4.getId());

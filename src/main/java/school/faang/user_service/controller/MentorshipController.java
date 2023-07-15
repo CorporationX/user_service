@@ -13,7 +13,6 @@ import java.util.List;
 public class MentorshipController {
     private final MentorshipService mentorshipService;
 
-
     public List<User> getMentees(@Validated Long userId) {
         return mentorshipService.getMentees(userId);
     }

@@ -14,18 +14,22 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MentorshipService {
     private final MentorshipRepository mentorshipRepository;
-    private final  UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public List<User> getMentees(Long userId) {
-        if (mentorshipRepository.findById(userId).isPresent()){
+        if (mentorshipRepository.findById(userId).isPresent()) {
             return mentorshipRepository.findById(userId).get().getMentees();
-        } else {throw new EntityNotFoundException("Invalid mentee ID");}
+        } else {
+            throw new EntityNotFoundException("Invalid mentee ID");
+        }
     }
 
     public List<User> getMentors(Long userId) {
         if (mentorshipRepository.findById(userId).isPresent()) {
             return mentorshipRepository.findById(userId).get().getMentors();
-        } else {throw new EntityNotFoundException("Invalid mentor ID");}
+        } else {
+            throw new EntityNotFoundException("Invalid mentor ID");
+        }
     }
 
     public void deleteMentee(Long menteeId, Long mentorId) {

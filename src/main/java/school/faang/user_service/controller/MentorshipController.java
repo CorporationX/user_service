@@ -2,6 +2,7 @@ package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.service.MentorshipService;
 
@@ -12,7 +13,8 @@ import java.util.List;
 public class MentorshipController {
     private final MentorshipService mentorshipService;
 
-    public List<User> getMentees(Long userId) {
+
+    public List<User> getMentees(@Validated Long userId) {
         return mentorshipService.getMentees(userId);
     }
 

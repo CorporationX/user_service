@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import java.util.List;
 
@@ -12,22 +13,19 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class MentorshipService {
-    private final UserRepository userRepository;
+    private final MentorshipRepository mentorshipRepository;
+    private final  UserRepository userRepository;
 
     public List<User> getMentees(Long userId) {
-        if (userRepository.findById(userId).isEmpty()) {
-            throw new EntityNotFoundException("There is no user with such ID");
-        } else {
-            return userRepository.findById(userId).get().getMentees();
-        }
+        if (mentorshipRepository.findById(userId).isPresent()){
+            return mentorshipRepository.findById(userId).get().getMentees();
+        } else {throw new EntityNotFoundException("Invalid mentee ID");}
     }
 
     public List<User> getMentors(Long userId) {
-        if (userRepository.findById(userId).isEmpty()) {
-            throw new EntityNotFoundException("There is no user with such ID");
-        } else {
-            return userRepository.findById(userId).get().getMentors();
-        }
+        if (mentorshipRepository.findById(userId).isPresent()) {
+            return mentorshipRepository.findById(userId).get().getMentors();
+        } else {throw new EntityNotFoundException("Invalid mentor ID");}
     }
 
     public void deleteMentee(Long menteeId, Long mentorId) {

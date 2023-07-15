@@ -34,12 +34,12 @@ public class SubscriptionController {
         subscriptionService.unfollowUser(followerId, followeeId);
     }
 
-    @GetMapping("/followers/count/{id}")
+    @GetMapping("/user/{id}/followers/count")
     public int getFollowersCount(@PathVariable("id") long followeeId) {
         return subscriptionService.getFollowersCount(followeeId);
     }
 
-    @GetMapping("/followees/count/{id}")
+    @GetMapping("/user/{id}/followees/count")
     public int getFollowingCount(@PathVariable("id") long followerId) {
         return subscriptionService.getFollowingCount(followerId);
     }

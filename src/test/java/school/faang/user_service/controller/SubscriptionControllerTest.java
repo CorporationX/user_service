@@ -8,8 +8,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.mapper.UserMapper;
@@ -35,19 +33,18 @@ public class SubscriptionControllerTest {
                 .pageSize(3)
                 .page(0)
                 .build();
-        Page<UserDto> expectedUsers = new PageImpl<>(List.of(
+        List<UserDto> expectedUsers = List.of(
                 new UserDto(),
                 new UserDto(),
                 new UserDto()
-        ));
+        );
 
         Mockito.when(subscriptionService.getFollowers(followeeId, filter))
                 .thenReturn(expectedUsers);
 
-        Page<UserDto> users = subscriptionController.getFollowers(followeeId, filter);
-        Assertions.assertTrue(true);
+        List<UserDto> users = subscriptionController.getFollowers(followeeId, filter);
 
         Assertions.assertEquals(expectedUsers, users);
-        Mockito.verify(subscriptionService, Mockito.times(1)).getFollowers(followeeId, filter);
+        Mockito.verify(subscriptionService).getFollowers(followeeId, filter);
     }
 }

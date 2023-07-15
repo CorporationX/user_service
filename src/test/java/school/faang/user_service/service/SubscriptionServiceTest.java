@@ -8,19 +8,16 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @ExtendWith(MockitoExtension.class)
 class SubscriptionServiceTest {
@@ -29,7 +26,7 @@ class SubscriptionServiceTest {
     @Mock
     private UserRepository userRepository;
     @Spy
-    private UserMapper userMapper;
+    private UserMapperImpl userMapper;
     @InjectMocks
     private SubscriptionService subscriptionService;
 
@@ -37,34 +34,44 @@ class SubscriptionServiceTest {
 
     @Test
     public void shouldReturnUserDtoPage() {
-        UserFilterDto filter = UserFilterDto.builder()
-                .pageSize(3)
-                .page(0)
-                .build();
-        Page<User> desiredUsers = new PageImpl<>(List.of(
-                new User(),
-                new User(),
-                new User()
-        ));
-        Pageable pageable = PageRequest.of(filter.getPage(), filter.getPageSize());
+        UserFilterDto filter = new UserFilterDto();
+        Stream<User> desiredUsers = Stream.of(
+                User.builder()
+                        .id(0)
+                        .build(),
+                User.builder()
+                        .id(1)
+                        .build(),
+                User.builder()
+                        .id(2)
+                        .build()
+        );
 
         Mockito.when(userRepository.existsById(followeeId)).thenReturn(true);
-        Mockito.when(subscriptionRepository.findByFolloweeId(followeeId, pageable))
+        Mockito.when(subscriptionRepository.findByFolloweeId(followeeId))
                 .thenReturn(desiredUsers);
 
-        Page<UserDto> receivedUsers = subscriptionService.getFollowers(followeeId, filter);
+        List<UserDto> desiredUsersDto = List.of(
+                UserDto.builder()
+                        .id(0L)
+                        .build(),
+                UserDto.builder()
+                        .id(1L)
+                        .build(),
+                UserDto.builder()
+                        .id(2L)
+                        .build()
+        );
 
-        Assertions.assertEquals(desiredUsers.map(userMapper::toDto), receivedUsers);
-        Mockito.verify(subscriptionRepository, Mockito.times(1))
-                .findByFolloweeId(followeeId, pageable);
+        List<UserDto> receivedUsers = subscriptionService.getFollowers(followeeId, filter);
+
+        Assertions.assertEquals(desiredUsersDto, receivedUsers);
+        Mockito.verify(subscriptionRepository).findByFolloweeId(followeeId);
     }
 
     @Test
     public void shouldThrowExceptionWhenUserNotExists() {
-        UserFilterDto filter = UserFilterDto.builder()
-                .pageSize(3)
-                .page(0)
-                .build();
+        UserFilterDto filter = new UserFilterDto();
 
         Mockito.when(userRepository.existsById(followeeId)).thenReturn(false);
         Assertions.assertThrows(DataValidationException.class,

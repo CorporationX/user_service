@@ -15,6 +15,7 @@ import school.faang.user_service.validation.EventParticipationRequestValidator;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -23,6 +24,7 @@ import static org.mockito.Mockito.when;
 class EventParticipationControllerTest {
 
     private static final Long EVENT_ID = 123L;
+    private static final Long USER_ID = 333L;
 
     @InjectMocks
     private EventParticipationController controller;
@@ -31,6 +33,16 @@ class EventParticipationControllerTest {
     @Mock
     private EventParticipationRequestValidator validator;
 
+
+    @Test
+    void registerParticipantSuccessfully() {
+        ResponseEntity<Void> response = controller.registerParticipant(EVENT_ID, USER_ID);
+
+        verify(validator).validate(EVENT_ID, USER_ID);
+        verify(service).registerParticipant(EVENT_ID, USER_ID);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNull(response.getBody());
+    }
 
     @Test
     void getParticipantsCountSuccessfully() {

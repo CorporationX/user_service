@@ -1,7 +1,6 @@
 package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
@@ -13,7 +12,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EventParticipationService {
     private final EventParticipationRepository eventParticipationRepository;
-
 
     public void registerParticipant(long eventId, long userId) {
         List<User> users = eventParticipationRepository.findAllParticipantsByEventId(eventId);

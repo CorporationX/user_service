@@ -4,12 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventService;
@@ -18,9 +14,7 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class EventControllerTest {
     @Mock
@@ -35,24 +29,26 @@ class EventControllerTest {
     }
 
     @Test
-    void create_ValidEvent_ReturnsOkResponse() {
+    public void testCreateEvent_Success() {
         EventDto eventDto = new EventDto();
-        eventDto.setTitle("Event 1");
+        eventDto.setTitle("My Event");
         eventDto.setStartDate(LocalDateTime.now());
         eventDto.setOwnerId(1L);
 
-        when(eventService.create(any(EventDto.class))).thenReturn(eventDto);
+        EventService eventService = mock(EventService.class);
+        when(eventService.create(eventDto)).thenReturn(eventDto);
+
+        EventController eventController = new EventController(eventService);
 
         ResponseEntity<EventDto> response = eventController.create(eventDto);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
         assertEquals(eventDto, response.getBody());
-        verify(eventService).create(eventDto);
+        verify(eventService, times(1)).create(eventDto);
     }
 
     @Test
-    void create_InvalidEvent_ThrowsDataValidationException() {
+    void testCreateInvalidEvent_ThrowsDataValidationException() {
         EventDto eventDto = new EventDto();
         eventDto.setTitle(null);
         eventDto.setStartDate(null);

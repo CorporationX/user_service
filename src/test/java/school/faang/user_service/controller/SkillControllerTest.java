@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.SkillDto;
+import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SkillService;
 
@@ -55,5 +55,12 @@ class SkillControllerTest {
         skillController.getUserSkills(1L);
         Mockito.verify(skillService, Mockito.times(1))
                 .getUserSkills(1L);
+    }
+
+    @Test
+    void testCallMethodGetOfferedSkillsFromSkillService(){
+        skillController.getOfferedSkills(1L);
+        Mockito.verify(skillService, Mockito.times(1))
+                .getOfferedSkills(1L);
     }
 }

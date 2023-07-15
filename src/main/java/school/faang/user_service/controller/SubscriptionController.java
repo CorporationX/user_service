@@ -4,12 +4,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import school.faang.user_service.exception.DataValidationException;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.service.SubscriptionService;
+import school.faang.user_service.exception.DataValidationException;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,9 +46,16 @@ public class SubscriptionController {
         return subscriptionService.getFollowersCount(followeeId);
     }
 
+    @PostMapping("/user/{id}/followers")
+    public List<UserDto> getFollowers(@PathVariable("id") long followeeId,
+                                      @RequestBody UserFilterDto filter) {
+        return subscriptionService.getFollowers(followeeId, filter);
+    }
+
     private void validationSameUser(long followerId, long followeeId, String message) {
         if (followerId == followeeId) {
             throw new DataValidationException(message);
         }
+        subscriptionService.unfollowUser(followerId, followeeId);
     }
 }

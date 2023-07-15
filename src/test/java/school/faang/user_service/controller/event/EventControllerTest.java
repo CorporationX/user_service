@@ -82,4 +82,11 @@ public class EventControllerTest {
     eventController.deleteEvent(anyTestId);
     Mockito.verify(eventService, Mockito.times(1)).delete(anyTestId);
   }
+
+  @Test
+  public void testGetAllUserEvents() {
+    Long anyUserId = 1L;
+    eventController.getOwnedEvents(anyUserId);
+    Mockito.verify(eventService, Mockito.times(1)).getOwnedEvents(anyUserId);
+  }
 }

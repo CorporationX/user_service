@@ -49,4 +49,9 @@ public class EventService {
     List<Event> events = eventRepository.findParticipatedEventsByUserId(userId);
     return events.stream().map(event -> eventMapper.toDto(event)).toList();
   }
+
+  public List<EventDto> getOwnedEvents(Long ownerId) {
+    List<Event> events = eventRepository.findAllByUserId(ownerId);
+    return events.stream().map(event -> eventMapper.toDto(event)).toList();
+  }
 }

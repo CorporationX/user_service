@@ -83,4 +83,12 @@ class EventServiceTest {
     eventService.delete(anyTestId);
     Mockito.verify(eventRepository, Mockito.times(1)).deleteById(anyTestId);
   }
+
+  @Test
+  public void testGetAllUserEvents() {
+    long anyUserId = 1L;
+    Mockito.lenient().when(eventRepository.findAllByUserId(anyUserId)).thenReturn(List.of(new Event(), new Event()));
+    List<EventDto> events = eventService.getOwnedEvents(anyUserId);
+    Assertions.assertEquals(2, events.size());
+  }
 }

@@ -122,7 +122,7 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenUserNotExists() {
+    public void shouldThrowExceptionWhenFolloweeUserNotExistsWithFilter() {
         UserFilterDto filter = new UserFilterDto();
 
         Mockito.when(userRepository.existsById(followeeId)).thenReturn(false);
@@ -144,7 +144,7 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenUserNotExists() {
+    public void shouldThrowExceptionWhenFolloweeUserNotExists() {
         Mockito.when(userRepository.existsById(followeeId)).thenReturn(false);
         Assertions.assertThrows(DataValidationException.class, () -> subscriptionService.getFollowersCount(followeeId));
         Mockito.verify(subscriptionRepository, Mockito.times(0))

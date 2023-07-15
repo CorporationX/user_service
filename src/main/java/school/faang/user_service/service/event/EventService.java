@@ -38,29 +38,30 @@ public class EventService {
     public EventDto updateEvent(EventDto eventDto) {
         try {
             validateEventDto(eventDto);
-            Event event = eventRepository.findById(eventDto.getId())
-                    .orElseThrow(() -> new IllegalArgumentException("Event not found"));
-
-            updateField(eventDto.getTitle(), event.getTitle(), event::setTitle);
-            updateField(eventDto.getStartDate(), event.getStartDate(), event::setStartDate);
-            updateField(eventDto.getEndDate(), event.getEndDate(), event::setEndDate);
-            updateField(eventDto.getDescription(), event.getDescription(), event::setDescription);
-            updateField(eventDto.getLocation(), event.getLocation(), event::setLocation);
-            updateField(eventDto.getMaxAttendees(), event.getMaxAttendees(), event::setMaxAttendees);
-
-            if (eventDto.getRelatedSkills() != null) {
-                Set<Skill> skills1 = new HashSet<>(event.getRelatedSkills());
-                Set<Skill> skills2 = new HashSet<>(SkillMapper.INSTANCE.toListSkillsEntity(eventDto.getRelatedSkills()));
-                if (!skills1.equals(skills2)) {
-                    event.setRelatedSkills(skills2.stream().toList());
-                }
-            }
-
-            eventRepository.save(event);
-            return EventMapper.INSTANCE.toDto(event);
         } catch (DataFormatException e) {
             throw new RuntimeException(e);
         }
+
+        Event event = eventRepository.findById(eventDto.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Event not found"));
+
+        updateField(eventDto.getTitle(), event.getTitle(), event::setTitle);
+        updateField(eventDto.getStartDate(), event.getStartDate(), event::setStartDate);
+        updateField(eventDto.getEndDate(), event.getEndDate(), event::setEndDate);
+        updateField(eventDto.getDescription(), event.getDescription(), event::setDescription);
+        updateField(eventDto.getLocation(), event.getLocation(), event::setLocation);
+        updateField(eventDto.getMaxAttendees(), event.getMaxAttendees(), event::setMaxAttendees);
+
+        if (eventDto.getRelatedSkills() != null) {
+            Set<Skill> skills1 = new HashSet<>(event.getRelatedSkills());
+            Set<Skill> skills2 = new HashSet<>(SkillMapper.INSTANCE.toListSkillsEntity(eventDto.getRelatedSkills()));
+            if (!skills1.equals(skills2)) {
+                event.setRelatedSkills(skills2.stream().toList());
+            }
+        }
+
+        eventRepository.save(event);
+        return EventMapper.INSTANCE.toDto(event);
     }
 
     private <T> void updateField(T newValue, T oldValue, Consumer<T> updateFunction) {

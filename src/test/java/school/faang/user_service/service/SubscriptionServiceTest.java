@@ -5,13 +5,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filters.UserFilter;
-import school.faang.user_service.mapper.SubscriptionMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 
 import java.util.List;
@@ -33,8 +31,6 @@ class SubscriptionServiceTest {
     SubscriptionRepository subscriptionRepository;
     @Mock
     UserFilterDto userFilterDto;
-    @Spy
-    SubscriptionMapper subscriptionMapper = SubscriptionMapper.INSTANCE;
     @Mock
     UserFilter userFilter;
 

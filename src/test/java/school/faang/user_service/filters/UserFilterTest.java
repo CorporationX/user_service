@@ -72,7 +72,7 @@ class UserFilterTest {
     void testFilterUsersWrongPhone() {
         User user = User.builder().phone("1234567").build();
         Stream<User> userStream = Stream.of(user);
-        UserFilterDto userFilterDto = UserFilterDto.builder().phonePattern("123").build();
+        UserFilterDto userFilterDto = UserFilterDto.builder().phonePattern("000").build();
         List<User> userList = userFilter.filterUsers(userStream, userFilterDto);
         assertEquals(0, userList.size());
     }
@@ -107,13 +107,13 @@ class UserFilterTest {
     @Test
     void testFilterUsersRightAllParameters() {
         User user = User.builder()
-                .username("John")
-                .aboutMe("I am a student")
+                .username("John Black")
+                .aboutMe("I am a student in the university Harvard")
                 .email("email@example")
                 .contacts(Collections.emptyList())
-                .country(new Country(1L, "Peace", Collections.emptyList()))
-                .city("Town")
-                .phone("1234567")
+                .country(new Country(1L, "All world", Collections.emptyList()))
+                .city("New York city")
+                .phone("123456789")
                 .skills(Collections.emptyList())
                 .experience(10)
                 .build();
@@ -121,12 +121,12 @@ class UserFilterTest {
         UserFilterDto userFilterDto = UserFilterDto.builder()
                 .namePattern("John")
                 .aboutPattern("I am a student")
-                .emailPattern("email@example")
-                .contactPattern("")
-                .countryPattern("Peace")
-                .cityPattern("Town")
-                .phonePattern("1234567")
-                .skillPattern("")
+                .emailPattern("@example")
+                .contactPattern(" ")
+                .countryPattern("world")
+                .cityPattern("New")
+                .phonePattern("12345")
+                .skillPattern(null)
                 .experienceMin(5)
                 .experienceMax(15)
                 .build();

@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @ExtendWith(MockitoExtension.class)
-class SubscriptionServiceTest {
+public class SubscriptionServiceTest {
     @Mock
     private SubscriptionRepository subscriptionRepository;
     @Mock
@@ -30,7 +30,54 @@ class SubscriptionServiceTest {
     @InjectMocks
     private SubscriptionService subscriptionService;
 
-    private final long followeeId = 0;
+    private final long followerId = 2;
+    private final long followeeId = 1;
+
+    @Test
+    public void shouldAddNewFollowerById() {
+        Mockito.when(userRepository.existsById(followerId)).thenReturn(true);
+        Mockito.when(userRepository.existsById(followeeId)).thenReturn(true);
+
+        Assertions.assertDoesNotThrow(() -> subscriptionService.followUser(followerId, followeeId));
+        Mockito.verify(subscriptionRepository, Mockito.times(1)).followUser(followerId, followeeId);
+    }
+
+    @Test
+    public void shouldThrowExceptionIfUserSubscribed() {
+        Mockito.when(userRepository.existsById(followerId)).thenReturn(true);
+        Mockito.when(userRepository.existsById(followeeId)).thenReturn(true);
+        Mockito.when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
+
+        Assertions.assertThrows(DataValidationException.class, () -> subscriptionService.followUser(followerId, followeeId));
+        Mockito.verify(subscriptionRepository, Mockito.times(0)).followUser(followerId, followeeId);
+    }
+
+    @Test
+    public void shouldThrowExceptionIfFollowerDoesNotExist() {
+        Mockito.when(userRepository.existsById(followeeId)).thenReturn(true);
+        Assertions.assertThrows(DataValidationException.class, () -> subscriptionService.followUser(followerId, followeeId));
+        Mockito.verify(subscriptionRepository, Mockito.times(0)).followUser(followerId, followeeId);
+    }
+
+    @Test
+    public void shouldThrowExceptionIfFolloweeDoesNotExist() {
+        Mockito.lenient().when(userRepository.existsById(followerId)).thenReturn(true);
+        Assertions.assertThrows(DataValidationException.class, () -> subscriptionService.followUser(followerId, followeeId));
+        Mockito.verify(subscriptionRepository, Mockito.times(0)).followUser(followerId, followeeId);
+    }
+
+    @Test
+    public void shouldDeleteFollowerById() {
+        Mockito.when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
+        Assertions.assertDoesNotThrow(() -> subscriptionService.unfollowUser(followerId, followeeId));
+        Mockito.verify(subscriptionRepository, Mockito.times(1)).unfollowUser(followerId, followeeId);
+    }
+
+    @Test
+    public void shouldThrowExceptionIfSubscriptionDoesNotExist() {
+        Assertions.assertThrows(DataValidationException.class, () -> subscriptionService.unfollowUser(followerId, followeeId));
+        Mockito.verify(subscriptionRepository, Mockito.times(0)).unfollowUser(followerId, followeeId);
+    }
 
     @Test
     public void shouldReturnUserDtoPage() {

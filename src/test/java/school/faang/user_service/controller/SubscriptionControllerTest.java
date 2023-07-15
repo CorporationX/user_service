@@ -12,9 +12,10 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.service.SubscriptionService;
+import school.faang.user_service.exception.DataValidationException;
+
 
 import java.util.List;
-
 
 @ExtendWith(MockitoExtension.class)
 public class SubscriptionControllerTest {
@@ -25,7 +26,37 @@ public class SubscriptionControllerTest {
     @InjectMocks
     private SubscriptionController subscriptionController;
 
-    private final long followeeId = 0;
+    private final long followerId = 2;
+    private long followeeId = 1;
+
+    @Test
+    public void shouldAddNewFollowerById() {
+        Assertions.assertDoesNotThrow(() -> subscriptionController.followUser(followerId, followeeId));
+        Mockito.verify(subscriptionService, Mockito.times(1)).followUser(followerId, followeeId);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenIdEqualsAreWhenSubscribing() {
+        followeeId = 2;
+
+        Assertions.assertThrows(DataValidationException.class, () -> subscriptionController.followUser(followerId, followeeId));
+        Mockito.verify(subscriptionService, Mockito.times(0)).followUser(followerId, followeeId);
+    }
+
+    @Test
+    public void shouldDeleteFollowerById() {
+        Mockito.doNothing().when(subscriptionService).unfollowUser(followerId, followeeId);
+        Assertions.assertDoesNotThrow(() -> subscriptionController.unfollowUser(followerId, followeeId));
+        Mockito.verify(subscriptionService, Mockito.times(1)).unfollowUser(followerId, followeeId);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenIdEqualsAreWhenUnsubscribing() {
+        followeeId = 2;
+
+        Assertions.assertThrows(DataValidationException.class, () -> subscriptionController.unfollowUser(followerId, followeeId));
+        Mockito.verify(subscriptionService, Mockito.times(0)).unfollowUser(followerId, followeeId);
+    }
 
     @Test
     public void shouldReturnUserDtoPage() {

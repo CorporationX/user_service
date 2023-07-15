@@ -16,11 +16,13 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -75,6 +77,33 @@ class EventServiceTest {
         skill2.setId(2L);
         skill2.setTitle("B");
         return List.of(skill1, skill2);
+    }
+
+    private List<User> createUsers() {
+        List<User> users = new ArrayList<>();
+        for (int i = 1; i <= 5; i++) {
+            User user = new User();
+            user.setId(i);
+            users.add(user);
+        }
+        return users;
+    }
+
+    private List<Event> createEvents() {
+        List<Event> events = new ArrayList<>();
+        createUser();
+        for (int i = 1; i <= 5; i++) {
+            Event event = new Event();
+            event.setId(i);
+            event.setTitle("Test Event " + i);
+            event.setStartDate(LocalDate.of(2020, 1, i).atStartOfDay());
+            event.setOwner(user);
+            event.setAttendees(createUsers());
+            event.setRelatedSkills(createSkills());
+
+            events.add(event);
+        }
+        return events;
     }
 
     @Test
@@ -132,5 +161,18 @@ class EventServiceTest {
 
         verify(userRepository).findById(1L);
         verify(eventRepository).save(any(Event.class));
+    }
+
+    @Test
+    void getParticipatedEvents_ShouldReturnEventDtos() {
+        long userId = 1L;
+        List<Event> participatedEvents = createEvents();
+
+        when(eventRepository.findParticipatedEventsByUserId(userId)).thenReturn(participatedEvents);
+
+        List<EventDto> eventDtos = eventService.getParticipatedEvents(userId);
+
+        assertNotNull(eventDtos);
+        assertEquals(participatedEvents.size(), eventDtos.size());
     }
 }

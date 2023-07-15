@@ -47,6 +47,10 @@ public class EventService {
         checkUserContainsSkills(eventDto);
     }
 
+    public List<EventDto> getParticipatedEvents(long userId) {
+        return EventMapper.INSTANCE.toListDto(eventRepository.findParticipatedEventsByUserId(userId));
+    }
+
     private void checkUserContainsSkills(EventDto eventDto) throws DataFormatException {
         User user = userRepository.findById(eventDto.getOwnerId())
                 .orElseThrow(() -> new RuntimeException("User not found"));

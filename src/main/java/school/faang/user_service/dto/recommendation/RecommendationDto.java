@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
 public class RecommendationDto {
 
     private Long id;

@@ -17,22 +17,31 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class RecommendationValidatorTest {
-
+    @InjectMocks
+    private RecommendationValidator recommendationValidator;
     @Mock
     private RecommendationRepository recommendationRepository;
     @Mock
     private SkillRepository skillRepository;
 
-    @InjectMocks
-    private RecommendationValidator recommendationValidator;
+
+//    @Test
+//    public void testCountExisting(){
+//        List<Long> skillIds = List.of(1L,2L);
+//        verify(skillRepository,times(1)).countExisting(skillIds);
+//    }
 
     @Test
     public void testValidateSkills() {
         List<SkillOfferDto> skills = List.of(new SkillOfferDto(1L, 1L), new SkillOfferDto(2L, 2L));
-        RecommendationDto recommendationDto = new RecommendationDto(null,null,null,null,skills,null);
+        RecommendationDto recommendationDto = new RecommendationDto();
+        recommendationDto.setSkillOffers(skills);
+        List<Long> skillIds = List.of(1L,2L);
 
-        when(skillRepository.countExisting(anyList())).thenReturn(2);
+
+
+//        when(skillRepository.countExisting(skillIds)).thenReturn(2);
         recommendationValidator.validateSkills(recommendationDto);
-        verify(recommendationValidator, times(1)).validateSkills(recommendationDto);
+        verify(skillRepository,times(1)).countExisting(skillIds);
     }
 }

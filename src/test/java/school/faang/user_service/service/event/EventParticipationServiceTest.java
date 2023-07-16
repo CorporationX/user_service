@@ -11,9 +11,12 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventParticipationRepository;
+import school.faang.user_service.repository.event.EventRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 class EventParticipationServiceTest {
@@ -23,6 +26,12 @@ class EventParticipationServiceTest {
 
     @Mock
     private EventParticipationRepository eventParticipationRepository;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private EventRepository eventRepository;
 
     @InjectMocks
     private EventParticipationService eventParticipationService;
@@ -36,29 +45,41 @@ class EventParticipationServiceTest {
     @Test
     @Description("успешная регистрация юзера на мероприятие")
     void test_register_participant_should_success_register () {
-        long eventId = 1L;
-        long userId = 111L;
+
+        long eventId = event.getId();
+        long userId = user.getId();
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.ofNullable(user));
+        Mockito.when(eventRepository.findById(eventId)).thenReturn(Optional.ofNullable(event));
         eventParticipationService.registerParticipant(eventId, userId);
         Mockito.verify(eventParticipationRepository, Mockito.times(1)).register(eventId, userId);
     }
 
+
     @Test
     @Description("успешная регистрация одного и того же юзера на два разных мероприятия")
     void test_register_participant_should_success_register_for_other_event() {
-        long userId = 111L;
-
-        long eventId = 1L;
+        long eventId = event.getId();
+        long userId = user.getId();
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.ofNullable(user));
+        Mockito.when(eventRepository.findById(eventId)).thenReturn(Optional.ofNullable(event));
         eventParticipationService.registerParticipant(eventId, userId);
 
-        long otherEventId = 2L;
+        Event otherEvent = new Event();
+        long otherEventId = otherEvent.getId();
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.ofNullable(user));
+        Mockito.when(eventRepository.findById(eventId)).thenReturn(Optional.ofNullable(event));
         eventParticipationService.registerParticipant(otherEventId, userId);
-        Mockito.verify(eventParticipationRepository, Mockito.times(1)).register(eventId, userId);
+        Mockito.verify(eventParticipationRepository, Mockito.times(2)).register(eventId, userId);
     }
 
     @Test
     @Description("исключение выброшено, если пользователь зарегистрирован ранее")
     void test_register_participant_should_throw_exception() {
-        eventParticipationService.registerParticipant(event.getId(), user.getId());
+        long eventId = event.getId();
+        long userId = user.getId();
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.ofNullable(user));
+        Mockito.when(eventRepository.findById(eventId)).thenReturn(Optional.ofNullable(event));
+        eventParticipationService.registerParticipant(eventId, userId);
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(event.getId())).thenReturn(List.of(user));
         Assertions.assertThrows(IllegalArgumentException.class, () -> eventParticipationService.registerParticipant(event.getId(), user.getId()));
     }

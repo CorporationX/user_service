@@ -1,4 +1,4 @@
-package school.faang.user_service.service.service.event;
+package school.faang.user_service.service.event;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -9,14 +9,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
-import school.faang.user_service.dto.event.SkillDto;
+import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.service.event.EventMapper;
-import school.faang.user_service.service.event.EventService;
+import school.faang.user_service.mapper.EventMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,7 +30,6 @@ class EventServiceTest {
   private EventRepository eventRepository;
   @Mock
   private EventMapper eventMapper;
-
   @Mock
   private SkillRepository skillRepository;
 
@@ -89,6 +87,27 @@ class EventServiceTest {
     long anyUserId = 1L;
     Mockito.lenient().when(eventRepository.findAllByUserId(anyUserId)).thenReturn(List.of(new Event(), new Event()));
     List<EventDto> events = eventService.getOwnedEvents(anyUserId);
+    Assertions.assertEquals(2, events.size());
+  }
+
+  @Test void testGetAllUserEventsByTitleFilter() {
+    Event javaEvent = new Event();
+    javaEvent.setTitle("Java");
+
+    Event pythonEvent = new Event();
+    pythonEvent.setTitle("Python");
+
+    Event jsEvent = new Event();
+    jsEvent.setTitle("JavaScript");
+
+    Mockito.lenient().when(eventRepository.findAll()).thenReturn(List.of(javaEvent, pythonEvent, jsEvent));
+
+    EventFilterDto eventFilterDto = new EventFilterDto();
+
+    eventFilterDto.setTitle("Jav");
+
+    List<EventDto> events = eventService.getEventsByFilter(eventFilterDto);
+
     Assertions.assertEquals(2, events.size());
   }
 }

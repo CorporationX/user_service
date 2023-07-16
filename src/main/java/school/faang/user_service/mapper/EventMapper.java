@@ -1,4 +1,4 @@
-package school.faang.user_service.service.event;
+package school.faang.user_service.mapper;
 
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;

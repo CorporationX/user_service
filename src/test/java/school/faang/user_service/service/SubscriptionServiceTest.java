@@ -45,4 +45,26 @@ public class SubscriptionServiceTest {
         subscriptionService.followUser(user1.getId(), user2.getId());
         Mockito.verify(subscriptionRepository, Mockito.times(1)).followUser(user1.getId(), user2.getId());
     }
+
+    @Test
+    public void unsubscribeWhen_SubscriptionDoesNotExists() {
+        long followerId = new Random().nextLong();
+        long followeeId = new Random().nextLong();
+        User user1 = User.builder().id(followerId + 1).build();
+        User user2 = User.builder().id(followeeId + 1).build();
+        Mockito.when(subscriptionRepository.existsByFollowerIdAndFolloweeId(user1.getId(), user2.getId())).thenReturn(false);
+        assertThrows(DataValidationException.class, () -> subscriptionService.unfollowUser(user1.getId(), user2.getId()));
+    }
+
+    @Test
+    public void userUnfollowedSuccess() {
+        long followerId = new Random().nextLong();
+        long followeeId = new Random().nextLong();
+        User user1 = User.builder().id(followerId + 1).build();
+        User user2 = User.builder().id(followeeId + 1).build();
+        Mockito.when(subscriptionRepository.existsByFollowerIdAndFolloweeId(user1.getId(), user2.getId())).thenReturn(true);
+        subscriptionService.unfollowUser(user1.getId(), user2.getId());
+        Mockito.verify(subscriptionRepository, Mockito.times(1)).unfollowUser(user1.getId(), user2.getId());
+    }
+
 }

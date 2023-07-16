@@ -17,6 +17,13 @@ public class SubscriptionService {
         subscriptionRepository.followUser(followerId, followeeId);
     }
 
+    public void unfollowUser(long followerId, long followeeId) {
+        if (!isNotValid(followerId, followeeId)) {
+            throw new DataValidationException(String.format("User with id %d doesn't follow user with id %d", followerId, followeeId));
+        }
+        subscriptionRepository.unfollowUser(followerId, followeeId);
+    }
+
     public boolean isNotValid(long followerId, long followeeId) {
         return subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
     }

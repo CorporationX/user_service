@@ -44,4 +44,20 @@ public class SubscriptionControllerTest {
         Mockito.verify(subscriptionService, Mockito.times(1)).followUser(user1.getId(), user2.getId());
     }
 
+    @Test
+    public void selfUnsubscribe(){
+        long followerId = new Random().nextLong();
+        User user1 = User.builder().id(followerId + 1).build();
+        assertThrows(DataValidationException.class, () -> subscriptionController.unfollowUser(user1.getId(), user1.getId()));
+    }
+
+    @Test
+    public void userUnfollowSuccess() {
+        long followerId = new Random().nextLong();
+        long followeeId = new Random().nextLong();
+        User user1 = User.builder().id(followerId + 1).build();
+        User user2 = User.builder().id(followeeId + 1).build();
+        subscriptionController.unfollowUser(user1.getId(), user2.getId());
+        Mockito.verify(subscriptionService, Mockito.times(1)).unfollowUser(user1.getId(), user2.getId());
+    }
 }

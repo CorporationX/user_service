@@ -15,10 +15,10 @@ public class MentorshipRequestDto {
     private String description;
 
     @NotNull
-    @Min(value = 0, message = "Id can't be lower than 0")
+    @Min(value = 1, message = "Id can't be lower than 1")
     private Long requesterId;
 
     @NotNull
-    @Min(value = 0, message = "Id can't be lower than 0")
+    @Min(value = 1, message = "Id can't be lower than 1")
     private Long receiverId;
 }

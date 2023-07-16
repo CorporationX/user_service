@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 public class RequestFilterDto {
     private String description;
 
-    @Min(value = 0, message = "Id can not be lower than 0")
+    @Min(value = 1, message = "Id can not be lower than 1")
     private Long requesterId;
 
-    @Min(value = 0, message = "Id can not be lower than 0")
+    @Min(value = 1, message = "Id can not be lower than 1")
     private Long receiverId;
 
     private String status;

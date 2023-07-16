@@ -1,14 +1,10 @@
 package school.faang.user_service.dto.goal;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 import school.faang.user_service.entity.goal.GoalStatus;
 
 import java.util.List;
-@Setter
-@Getter
-@RequiredArgsConstructor
+@Data
 public class GoalDto {
     private Long id;
     private String description;

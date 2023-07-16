@@ -1,87 +1,26 @@
 package school.faang.user_service.service.goal;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
 import school.faang.user_service.dto.goal.GoalDto;
-import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.exception.EmptyGoalsException;
+import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.entity.Skill;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
-@Component
+@RequiredArgsConstructor
 public class GoalService {
     private final GoalRepository goalRepository;
+    private final GoalMapper goalMapper;
 
-    @Autowired
-    public GoalService(GoalRepository goalRepository) {
-        this.goalRepository = goalRepository;
-    }
-
-    public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter) {
-        if (userId == null) {
-            throw new IllegalArgumentException("Необходимо указать идентификатор пользователя.");
-        }
-
-        if (filter == null) {
-            throw new IllegalArgumentException("Необходимо указать фильтр целей.");
-        }
-
-        List<GoalDto> goals = goalRepository.findGoalsByUserId(userId)
-                .map(goal -> {
-                    GoalDto goalDto = convertToDto(goal);
-
-                    goalDto.setSkillIds(goal.getSkillsToAchieve().stream()
-                            .map(Skill::getId)
-                            .collect(Collectors.toList()));
-                    return goalDto;
-                })
+    public List<GoalDto> getGoalsByUser(@NotNull Long userId, GoalFilters filters) {
+        List<Goal> goals = goalRepository.findGoalsByUserId(userId).toList();
+        List<GoalDto> goalDtos = goals.stream()
+                .map(goalMapper::toDto)
                 .toList();
 
-        if (goals.isEmpty()) {
-            throw new EmptyGoalsException("Список целей пользователя пуст.");
-        }
-
-        return goals.stream()
-                .filter(goalDto -> (filter.getStatus() == null || filter.getStatus() == goalDto.getStatus())
-                        && (filter.getTitle() == null || filter.getTitle().equals(goalDto.getTitle()))
-                        && (filter.getSkillIds() == null || filter.getSkillIds().isEmpty()
-                        || new HashSet<>(filter.getSkillIds()).containsAll(goalDto.getSkillIds()))
-                        && (filter.getParentId() == null || Objects.equals(filter.getParentId(), goalDto.getParentId())))
-                .toList();
-    }
-
-
-    GoalDto convertToDto(Goal goal) {
-        if (goal == null) {
-            throw new IllegalArgumentException("Необходимо указать цель.");
-        }
-
-        if (goal.getId() == null) {
-            throw new IllegalArgumentException("Идентификатор цели не может быть пустым.");
-        }
-
-        if (goal.getTitle() == null || goal.getTitle().isEmpty()) {
-            throw new IllegalArgumentException("Название цели не может быть пустым.");
-        }
-
-        if (goal.getStatus() == null) {
-            throw new IllegalArgumentException("Статус цели не может быть пустым.");
-        }
-
-        GoalDto dto = new GoalDto();
-
-        dto.setId(goal.getId());
-        dto.setDescription(goal.getDescription());
-        dto.setParentId(goal.getParent().getId());
-        dto.setTitle(goal.getTitle());
-        dto.setStatus(goal.getStatus());
-
-        return dto;
+        return filters.getFilters().stream()
+                .reduce(goalDtos, (goals1, goalFilter) -> goalFilter.applyFilter(goals1), (a, b) -> b);
     }
 }

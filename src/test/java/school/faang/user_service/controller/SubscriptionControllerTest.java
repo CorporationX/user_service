@@ -8,12 +8,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.service.SubscriptionService;
 import school.faang.user_service.exception.DataValidationException;
-
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ public class SubscriptionControllerTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenIdEqualsAreWhenSubscribing() {
+    public void shouldThrowExceptionWhenIdEquals() {
         followeeId = 2;
 
         Assertions.assertThrows(DataValidationException.class, () -> subscriptionController.followUser(followerId, followeeId));
@@ -77,5 +77,17 @@ public class SubscriptionControllerTest {
 
         Assertions.assertEquals(expectedUsers, users);
         Mockito.verify(subscriptionService).getFollowers(followeeId, filter);
+    }
+
+    @Test
+    public void shouldReturnFollowersCount() {
+        int desiredFollowersCount = 3;
+
+        Mockito.when(subscriptionService.getFollowersCount(followeeId))
+                .thenReturn(desiredFollowersCount);
+        int followersCount = subscriptionService.getFollowersCount(followeeId);
+
+        Assertions.assertEquals(desiredFollowersCount, followersCount);
+        Mockito.verify(subscriptionService).getFollowersCount(followeeId);
     }
 }

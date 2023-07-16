@@ -83,4 +83,21 @@ class EventParticipationServiceTest {
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(event.getId())).thenReturn(List.of(user));
         Assertions.assertThrows(IllegalArgumentException.class, () -> eventParticipationService.registerParticipant(event.getId(), user.getId()));
     }
+
+    @Test
+    @Description("успешная отмена регистрации юзера на мероприятие")
+    void test_unregister_participant_should_success() {
+        long eventId = event.getId();
+        long userId = user.getId();
+        Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(event.getId())).thenReturn(List.of(user));
+
+        eventParticipationService.unregisterParticipant(eventId, userId);
+        Mockito.verify(eventParticipationRepository, Mockito.times(1)).unregister(eventId, userId);
+    }
+
+    @Test
+    @Description("исключение выброшено, если пользователь не зарегистрирован")
+    void test_unregister_participant_should_throw_exception() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> eventParticipationService.unregisterParticipant(event.getId(), user.getId()));
+    }
 }

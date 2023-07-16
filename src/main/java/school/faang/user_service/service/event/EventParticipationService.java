@@ -43,15 +43,15 @@ public class EventParticipationService {
         }
     }
 
-    private User findAlreadyRegisteredUser(long eventId, long userId) {
-        return eventParticipationRepository.findAllParticipantsByEventId(eventId)
-                .stream().filter(user -> user.getId() == userId).findFirst().orElse(null);
-    }
-
     private void validateUnregisterPossibility(long eventId, long userId) {
         if (findAlreadyRegisteredUser(eventId, userId) == null) {
             throw new IllegalArgumentException("User not registered");
         }
+    }
+
+    private User findAlreadyRegisteredUser(long eventId, long userId) {
+        return eventParticipationRepository.findAllParticipantsByEventId(eventId)
+                .stream().filter(user -> user.getId() == userId).findFirst().orElse(null);
     }
 
     private static void validateParams(User user, Event event) {

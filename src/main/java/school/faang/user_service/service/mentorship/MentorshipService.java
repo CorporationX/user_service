@@ -34,6 +34,16 @@ public class MentorshipService {
         return user.getMentors().stream().map(userMapper::userToUserDto).toList();
     }
 
+    public void deleteMentee(long menteeId, long mentorId) {
+        User mentor = validateId(mentorId);
+        User mentee = validateId(menteeId);
+
+        if (mentor.getMentees().contains(mentee)) {
+            mentor.getMentees().remove(mentee);
+        }
+        mentorshipRepository.save(mentor);
+    }
+
     private User validateId(long userId) {
         if (userId < 1) {
             throw new IllegalArgumentException("Некоректный ввод данных id");

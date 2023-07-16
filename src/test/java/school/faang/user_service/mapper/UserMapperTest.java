@@ -54,7 +54,7 @@ class UserMapperTest {
 
     @Test
     void userToUserDto_shouldMatchAllFields() {
-        UserDto result = userMapper.userToUserDto(user);
+        UserDto result = userMapper.toDto(user);
         assertAll(() -> {
             assertEquals(1L, result.getId());
             assertEquals("username", result.getUsername());
@@ -77,7 +77,7 @@ class UserMapperTest {
 
     @Test
     void userDtoToUser_shouldMatchAllFields() {
-        User result = userMapper.userDtoToUser(userDto);
+        User result = userMapper.toUser(userDto);
         assertAll(() -> {
             assertEquals(1L, result.getId());
             assertEquals("username", result.getUsername());

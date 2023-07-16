@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.service.SubscriptionService;
@@ -49,6 +50,11 @@ public class SubscriptionController {
     public List<UserDto> getFollowers(@PathVariable("id") long followeeId,
                                       @RequestBody UserFilterDto filter) {
         return subscriptionService.getFollowers(followeeId, filter);
+    }
+
+    @GetMapping("/user/{id}/followees/count")
+    public int getFollowingCount(@PathVariable("id") long followerId) {
+        return subscriptionService.getFollowingCount(followerId);
     }
 
     private void validationSameUser(long followerId, long followeeId, String message) {

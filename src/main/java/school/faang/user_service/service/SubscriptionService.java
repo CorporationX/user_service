@@ -40,16 +40,10 @@ public class SubscriptionService {
         return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
     }
 
-    private void validationSubscriptionExists(long followerId, long followeeId) {
-        if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
-            throw new DataValidationException("You are already subscribed to this user.");
-        }
-    }
-
-    private void validationSubscriptionNotExists(long followerId, long followeeId) {
-        if (!subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
-            throw new DataValidationException("You are not subscribed to this user to unsubscribe from this user");
-        }
+    @Transactional
+    public int getFollowingCount(long followerId) {
+        validationUserExists(followerId);
+        return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
     }
 
     @Transactional
@@ -60,6 +54,18 @@ public class SubscriptionService {
         return subscriptionRepository.findByFolloweeId(followeeId)
                 .map(userMapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    private void validationSubscriptionExists(long followerId, long followeeId) {
+        if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
+            throw new DataValidationException("You are already subscribed to this user.");
+        }
+    }
+
+    private void validationSubscriptionNotExists(long followerId, long followeeId) {
+        if (!subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
+            throw new DataValidationException("You are not subscribed to this user to unsubscribe from this user");
+        }
     }
 
     private void validationUserExists(long userId) {

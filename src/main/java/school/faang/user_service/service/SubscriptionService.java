@@ -18,9 +18,6 @@ public class SubscriptionService {
     }
 
     public boolean isNotValid(long followerId, long followeeId) {
-        if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
-            return true;
-        }
-        return false;
+        return subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
     }
 }

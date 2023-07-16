@@ -18,9 +18,6 @@ public class SubscriptionController {
     }
 
     public boolean isValid(long followerId, long followeeId) {
-        if (followerId != followeeId) {
-            return true;
-        }
-        return false;
+        return followerId != followeeId;
     }
 }

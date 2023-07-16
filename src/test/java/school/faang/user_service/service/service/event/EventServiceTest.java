@@ -50,7 +50,8 @@ class EventServiceTest {
 
   @Test
   public void testCreateEvent() {
-    Mockito.when(skillRepository.findSkillsByGoalId(1L)).thenReturn(List.of(userSkill));
+    Mockito.when(eventMapper.toEntity(eventDto)).thenReturn(new Event());
+
     eventService.create(eventDto);
     Mockito.verify(eventRepository, Mockito.times(1)).save(eventMapper.toEntity(eventDto));
   }

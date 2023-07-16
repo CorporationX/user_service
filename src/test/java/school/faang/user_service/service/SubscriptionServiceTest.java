@@ -25,7 +25,7 @@ public class SubscriptionServiceTest{
     void testGetFollowingCount() {
         long followerId = 123;
         int expectedCount = 10;
-        when(subscriptionRepository.findFollowersAmountByFolloweeId(followerId)).thenReturn(expectedCount);
+        when(subscriptionRepository.findFolloweesAmountByFollowerId(followerId)).thenReturn(expectedCount);
 
         int result = subscriptionService.getFollowingCount(followerId);
 

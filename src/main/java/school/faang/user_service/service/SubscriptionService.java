@@ -10,6 +10,6 @@ public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
 
     public int getFollowingCount(long followerId) {
-        return subscriptionRepository.findFollowersAmountByFolloweeId(followerId);
+        return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
     }
 }

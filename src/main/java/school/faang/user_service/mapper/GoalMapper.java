@@ -13,10 +13,12 @@ import java.util.List;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface GoalMapper {
     @Mapping(source = "parent.id", target = "parentId")
+    @Mapping(source = "mentor.id", target = "mentorId")
     @Mapping(source = "skillsToAchieve", target = "skillIds", qualifiedByName = "mapSkillsToIdList")
     GoalDto toDto(Goal goal);
 
     @Mapping(target = "parent", ignore = true)
+    @Mapping(target = "mentor", ignore = true)
     @Mapping(target = "skillsToAchieve", ignore = true)
     Goal toEntity(GoalDto goalDto);
 

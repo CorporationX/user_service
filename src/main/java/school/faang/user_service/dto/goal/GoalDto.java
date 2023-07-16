@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import school.faang.user_service.entity.goal.GoalStatus;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -16,5 +17,7 @@ public class GoalDto {
     private Long parentId;
     private String title;
     private GoalStatus status;
+    private LocalDateTime deadline;
+    private Long mentorId;
     private List<Long> skillIds;
 }

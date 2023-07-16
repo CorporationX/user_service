@@ -2,6 +2,7 @@ package school.faang.user_service.service.event;
 
 
 import lombok.RequiredArgsConstructor;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
@@ -80,11 +81,10 @@ public class EventService {
   }
 
   public EventDto get(Long id) throws Exception {
-    Optional<Event> event = eventRepository.findById(id);
-    if (event.isEmpty()) {
-      throw new Exception();
-    }
+    Event event = eventRepository
+        .findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("Couldn't find event with id: " + id));
 
-    return eventMapper.toDto(event.get());
+    return eventMapper.toDto(event);
   }
 }

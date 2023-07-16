@@ -2,6 +2,7 @@ package school.faang.user_service.controller.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,5 +44,13 @@ public class EventParticipationController {
         validator.validate(eventId);
         List<UserDto> userDtoList = eventParticipationService.getAllParticipants(eventId);
         return ResponseEntity.ok(userDtoList);
+    }
+
+    @DeleteMapping("/{eventId}/unregister/{userId}")
+    public ResponseEntity<Void> unregisterParticipant(@PathVariable("eventId") long eventId,
+                                                      @PathVariable("userId") long userId) {
+        validator.validate(eventId, userId);
+        eventParticipationService.unregisterParticipant(eventId, userId);
+        return ResponseEntity.ok().build();
     }
 }

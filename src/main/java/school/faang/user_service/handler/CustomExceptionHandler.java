@@ -9,6 +9,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import school.faang.user_service.exception.ErrorResponse;
 import school.faang.user_service.exception.RequestValidationException;
 import school.faang.user_service.exception.UserAlreadyRegisteredException;
+import school.faang.user_service.exception.UserNotRegisteredException;
 
 import java.time.LocalDateTime;
 
@@ -24,6 +25,11 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(UserAlreadyRegisteredException.class)
     public ResponseEntity<Object> handleUserAlreadyRegisteredException(UserAlreadyRegisteredException e, HttpServletRequest rq) {
         return buildErrorResponse(e, rq, HttpStatus.CONFLICT, "Already exists");
+    }
+
+    @ExceptionHandler(UserNotRegisteredException.class)
+    public ResponseEntity<Object> handleUserNotRegisteredException(UserNotRegisteredException e, HttpServletRequest rq) {
+        return buildErrorResponse(e, rq, HttpStatus.NOT_FOUND, "Doesn't exist");
     }
 
     private ResponseEntity<Object> buildErrorResponse(Exception e, HttpServletRequest rq, HttpStatus status, String error) {

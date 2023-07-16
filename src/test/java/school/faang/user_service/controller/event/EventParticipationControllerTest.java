@@ -74,4 +74,13 @@ class EventParticipationControllerTest {
         verify(validator).validate(EVENT_ID);
         verify(service).getAllParticipants(EVENT_ID);
     }
+
+    @Test
+    void unregisterParticipantSuccessfully() {
+        ResponseEntity<Void> response = controller.unregisterParticipant(EVENT_ID, USER_ID);
+
+        verify(validator).validate(EVENT_ID, USER_ID);
+        verify(service).unregisterParticipant(EVENT_ID, USER_ID);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
 }

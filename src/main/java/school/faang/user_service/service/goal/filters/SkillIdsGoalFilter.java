@@ -1,27 +1,25 @@
 package school.faang.user_service.service.goal.filters;
 
-import school.faang.user_service.dto.goal.GoalDto;
+import org.springframework.stereotype.Component;
+import school.faang.user_service.dto.goal.GoalFilterDto;
+import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.service.goal.GoalFilter;
 
 import java.util.HashSet;
-import java.util.List;
+import java.util.stream.Stream;
 
+@Component
 public class SkillIdsGoalFilter implements GoalFilter {
-    private final List<Long> skillIds;
 
-    public SkillIdsGoalFilter(List<Long> skillIds) {
-        this.skillIds = skillIds;
+    @Override
+    public Stream<Goal> applyFilter(Stream<Goal> goals, GoalFilterDto filters) {
+        return goals.filter(goal -> new HashSet<>(filters.getSkillIds()).containsAll(goal.getSkillsToAchieve().stream()
+                .map(Skill::getId).toList()));
     }
 
     @Override
-    public List<GoalDto> applyFilter(List<GoalDto> goals) {
-        return goals.stream()
-                .filter(goal -> new HashSet<>(skillIds).containsAll(goal.getSkillIds()) && isApplicable(goal))
-                .toList();
-    }
-
-    @Override
-    public boolean isApplicable(GoalDto goalDto) {
-        return goalDto.getSkillIds() != null && !goalDto.getSkillIds().isEmpty();
+    public boolean isApplicable(GoalFilterDto filters) {
+        return filters.getSkillIds() != null && !filters.getSkillIds().isEmpty();
     }
 }

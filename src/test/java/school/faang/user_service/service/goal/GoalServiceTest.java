@@ -1,117 +1,142 @@
 package school.faang.user_service.service.goal;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import school.faang.user_service.dto.goal.GoalDto;
-import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.entity.goal.GoalStatus;
-import school.faang.user_service.mapper.GoalMapper;
-import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.goal.filters.StatusGoalFilter;
-import school.faang.user_service.service.goal.filters.TitleGoalFilter;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.dto.goal.GoalFilterDto;
+import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.mapper.GoalMapper;
+import school.faang.user_service.repository.goal.GoalRepository;
+
+@ExtendWith(MockitoExtension.class)
 public class GoalServiceTest {
     @Mock
     private GoalRepository goalRepository;
     @Mock
     private GoalMapper goalMapper;
-
+    private GoalFilter filter1;
+    private GoalFilter filter2;
     private GoalService goalService;
 
     @BeforeEach
-    public void setup() {
-        MockitoAnnotations.openMocks(this);
-        goalService = new GoalService(goalRepository, goalMapper);
+    public void setUp() {
+        filter1 = mock(GoalFilter.class);
+        filter2 = mock(GoalFilter.class);
+
+        List<GoalFilter> goalFilters = Arrays.asList(filter1, filter2);
+        goalService = new GoalService(goalRepository, goalMapper, goalFilters);
     }
 
     @Test
     public void testGetGoalsByUser_EmptyGoals() {
-        when(goalRepository.findGoalsByUserId(anyLong())).thenReturn(Stream.empty());
-        when(goalMapper.toDto(any())).thenReturn(new GoalDto());
+        Mockito.when(goalRepository.findAll()).thenReturn(Collections.emptyList());
 
-        List<GoalDto> result = goalService.getGoalsByUser(1L, new GoalFilters());
+        Long userId = 1L;
+        GoalFilterDto filters = new GoalFilterDto();
 
-        Assertions.assertEquals(0, result.size());
-        verify(goalRepository, times(1)).findGoalsByUserId(anyLong());
-        verify(goalMapper, times(0)).toDto(any());
+        List<GoalDto> result = goalService.getGoalsByUser(userId, filters);
+
+        assertTrue(result.isEmpty());
+
+        Mockito.verify(goalRepository, Mockito.times(1)).findAll();
+        Mockito.verifyNoInteractions(goalMapper);
     }
 
     @Test
     public void testGetGoalsByUser_NoFilters() {
-        List<Goal> goals = Arrays.asList(new Goal(), new Goal(), new Goal());
-        when(goalRepository.findGoalsByUserId(anyLong())).thenReturn(goals.stream());
-        when(goalMapper.toDto(any())).thenReturn(new GoalDto());
+        List<Goal> goals = new ArrayList<>();
+        goals.add(new Goal());
+        Mockito.when(goalRepository.findAll()).thenReturn(goals);
 
-        List<GoalDto> result = goalService.getGoalsByUser(1L, new GoalFilters());
+        List<GoalDto> goalDtos = new ArrayList<>();
+        goalDtos.add(new GoalDto());
+        Mockito.when(goalMapper.toDto(any(Goal.class))).thenReturn(goalDtos.get(0));
 
-        Assertions.assertEquals(goals.size(), result.size());
-        verify(goalRepository, times(1)).findGoalsByUserId(anyLong());
-        verify(goalMapper, times(goals.size())).toDto(any());
+        Long userId = 1L;
+        GoalFilterDto filters = null;
+
+        List<GoalDto> result = goalService.getGoalsByUser(userId, filters);
+
+        assertEquals(1, result.size());
+
+        Mockito.verify(goalRepository, Mockito.times(1)).findAll();
+        Mockito.verify(goalMapper, Mockito.times(1)).toDto(any(Goal.class));
     }
 
     @Test
     public void testGetGoalsByUser_WithFilters() {
-        Goal goal1 = new Goal();
-        goal1.setTitle("Goal 1");
-        Goal goal2 = new Goal();
-        goal2.setTitle("Goal 2");
-        List<Goal> goals = Arrays.asList(goal1, goal2);
-        when(goalRepository.findGoalsByUserId(anyLong())).thenReturn(goals.stream());
-        when(goalMapper.toDto(any())).thenAnswer(invocation -> {
-            Goal goal = invocation.getArgument(0);
-            GoalDto goalDto = new GoalDto();
-            goalDto.setTitle(goal.getTitle());
-            return goalDto;
-        });
+        List<Goal> goals = new ArrayList<>();
+        goals.add(new Goal());
+        Mockito.when(goalRepository.findAll()).thenReturn(goals);
 
-        GoalFilters filters = new GoalFilters();
-        filters.addGoalFilter(new TitleGoalFilter("Goal 1"));
+        List<GoalDto> goalDtos = new ArrayList<>();
+        goalDtos.add(new GoalDto());
+        Mockito.when(goalMapper.toDto(any(Goal.class))).thenReturn(goalDtos.get(0));
 
-        List<GoalDto> result = goalService.getGoalsByUser(1L, filters);
+        lenient().when(filter1.isApplicable(any(GoalFilterDto.class))).thenReturn(true);
+        lenient().when(filter2.isApplicable(any(GoalFilterDto.class))).thenReturn(false);
 
-        Assertions.assertEquals(1, result.size());
-        Assertions.assertEquals("Goal 1", result.get(0).getTitle());
-        verify(goalRepository, times(1)).findGoalsByUserId(anyLong());
-        verify(goalMapper, times(goals.size())).toDto(any());
+        GoalFilterDto filters = new GoalFilterDto();
+
+        Long userId = 1L;
+
+        List<GoalDto> result = goalService.getGoalsByUser(userId, filters);
+
+        assertEquals(1, result.size());
+
+        Mockito.verify(goalRepository, Mockito.times(1)).findAll();
+        Mockito.verify(goalMapper, Mockito.times(1)).toDto(any(Goal.class));
+
+        Mockito.verify(filter1, Mockito.times(1)).isApplicable(any(GoalFilterDto.class));
+        Mockito.verify(filter1, Mockito.times(1)).applyFilter(any(Stream.class), any(GoalFilterDto.class));
+        Mockito.verify(filter2, Mockito.times(1)).isApplicable(any(GoalFilterDto.class));
+        Mockito.verifyNoMoreInteractions(filter2);
     }
 
     @Test
     public void testGetGoalsByUser_MultipleFilters() {
-        Goal goal1 = new Goal();
-        goal1.setTitle("Goal 1");
-        goal1.setStatus(GoalStatus.COMPLETED);
-        Goal goal2 = new Goal();
-        goal2.setTitle("Goal 2");
-        goal2.setStatus(GoalStatus.ACTIVE);
-        List<Goal> goals = Arrays.asList(goal1, goal2);
-        when(goalRepository.findGoalsByUserId(anyLong())).thenReturn(goals.stream());
-        when(goalMapper.toDto(any())).thenAnswer(invocation -> {
-            Goal goal = invocation.getArgument(0);
-            GoalDto goalDto = new GoalDto();
-            goalDto.setTitle(goal.getTitle());
-            goalDto.setStatus(goal.getStatus());
-            return goalDto;
-        });
+        List<Goal> goals = new ArrayList<>();
+        goals.add(new Goal());
+        Mockito.when(goalRepository.findAll()).thenReturn(goals);
 
-        GoalFilters filters = new GoalFilters();
-        filters.addGoalFilter(new TitleGoalFilter("Goal 1"));
-        filters.addGoalFilter(new StatusGoalFilter(GoalStatus.COMPLETED));
+        List<GoalDto> goalDtos = new ArrayList<>();
+        goalDtos.add(new GoalDto());
+        Mockito.when(goalMapper.toDto(any(Goal.class))).thenReturn(goalDtos.get(0));
 
-        List<GoalDto> result = goalService.getGoalsByUser(1L, filters);
+        lenient().when(filter1.isApplicable(any(GoalFilterDto.class))).thenReturn(true);
+        lenient().when(filter2.isApplicable(any(GoalFilterDto.class))).thenReturn(true);
 
-        Assertions.assertEquals(1, result.size());
-        Assertions.assertEquals("Goal 1", result.get(0).getTitle());
-        Assertions.assertEquals(result.get(0).getStatus(), GoalStatus.COMPLETED);
-        verify(goalRepository, times(1)).findGoalsByUserId(anyLong());
-        verify(goalMapper, times(goals.size())).toDto(any());
+        GoalFilterDto filters = new GoalFilterDto();
+
+        Long userId = 1L;
+
+        List<GoalDto> result = goalService.getGoalsByUser(userId, filters);
+
+        assertEquals(1, result.size());
+
+        Mockito.verify(goalRepository, Mockito.times(1)).findAll();
+        Mockito.verify(goalMapper, Mockito.times(1)).toDto(any(Goal.class));
+
+        Mockito.verify(filter1, Mockito.times(1)).isApplicable(any(GoalFilterDto.class));
+        Mockito.verify(filter1, Mockito.times(1)).applyFilter(any(Stream.class), any(GoalFilterDto.class));
+        Mockito.verify(filter2, Mockito.times(1)).isApplicable(any(GoalFilterDto.class));
+        Mockito.verify(filter2, Mockito.times(1)).applyFilter(any(Stream.class), any(GoalFilterDto.class));
     }
 }

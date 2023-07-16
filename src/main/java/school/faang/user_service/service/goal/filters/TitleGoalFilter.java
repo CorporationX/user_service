@@ -1,26 +1,21 @@
 package school.faang.user_service.service.goal.filters;
 
-import school.faang.user_service.dto.goal.GoalDto;
+import org.springframework.stereotype.Component;
+import school.faang.user_service.dto.goal.GoalFilterDto;
+import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.service.goal.GoalFilter;
 
-import java.util.List;
+import java.util.stream.Stream;
 
+@Component
 public class TitleGoalFilter implements GoalFilter {
-    private final String title;
-
-    public TitleGoalFilter(String title) {
-        this.title = title;
+    @Override
+    public Stream<Goal> applyFilter(Stream<Goal> goals, GoalFilterDto filters) {
+        return goals.filter(goal -> goal.getTitle().contains(filters.getTitlePattern()));
     }
 
     @Override
-    public List<GoalDto> applyFilter(List<GoalDto> goals) {
-        return goals.stream()
-                .filter(goal -> title.equals(goal.getTitle())&& isApplicable(goal))
-                .toList();
-    }
-
-    @Override
-    public boolean isApplicable(GoalDto goalDto) {
-        return goalDto.getTitle() != null;
+    public boolean isApplicable(GoalFilterDto filters) {
+        return filters.getTitlePattern() != null;
     }
 }

@@ -44,6 +44,16 @@ public class MentorshipService {
         mentorshipRepository.save(mentor);
     }
 
+    public void deleteMentor(long menteeId, long mentorId) {
+        User mentor = validateId(mentorId);
+        User mentee = validateId(menteeId);
+
+        if (mentee.getMentors().contains(mentor)) {
+            mentee.getMentors().remove(mentor);
+        }
+        mentorshipRepository.save(mentee);
+    }
+
     private User validateId(long userId) {
         if (userId < 1) {
             throw new IllegalArgumentException("Некоректный ввод данных id");

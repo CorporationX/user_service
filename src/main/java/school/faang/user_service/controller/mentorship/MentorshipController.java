@@ -24,4 +24,8 @@ public class MentorshipController {
     public void deleteMentee(long menteeId, long mentorId) {
         mentorshipService.deleteMentee(menteeId, mentorId);
     }
+
+    public void deleteMentor(long menteeId, long mentorId) {
+        mentorshipService.deleteMentor(menteeId, mentorId);
+    }
 }

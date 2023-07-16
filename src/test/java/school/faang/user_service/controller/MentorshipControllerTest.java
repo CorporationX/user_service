@@ -37,4 +37,10 @@ public class MentorshipControllerTest {
         mentorshipController.deleteMentee(CORRECT_USER_ID, CORRECT_USER_ID);
         verify(mentorshipService, times(1)).deleteMentee(CORRECT_USER_ID, CORRECT_USER_ID);
     }
+
+    @Test
+    void testDeleteMentors() {
+        mentorshipController.deleteMentor(CORRECT_USER_ID, CORRECT_USER_ID);
+        verify(mentorshipService, times(1)).deleteMentor(CORRECT_USER_ID, CORRECT_USER_ID);
+    }
 }

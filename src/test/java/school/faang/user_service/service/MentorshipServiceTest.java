@@ -86,6 +86,11 @@ public class MentorshipServiceTest {
     }
 
     @Test
+    void testDeleteMentorInputIncorrectUserId() {
+        assertThrows(IllegalArgumentException.class, () -> mentorshipService.deleteMentor(INCORRECT_USER_ID, INCORRECT_USER_ID));
+    }
+
+    @Test
     void testGetMenteesNonExistentUserId() {
         when(mentorshipRepository.findById(NON_EXISTENT_USER_ID)).thenReturn(Optional.ofNullable(nonExistentUser));
 
@@ -133,11 +138,24 @@ public class MentorshipServiceTest {
         when(mentorshipRepository.findById(NON_EXISTENT_USER_ID)).thenReturn(Optional.ofNullable(nonExistentUser));
 
         mentorshipService.deleteMentee(NON_EXISTENT_USER_ID, CORRECT_USER_ID);
-        List<User> actualMentorsList = correctUser.getMentees();
-        List<User> expectedMentorsList = List.of(correctUser);
+        List<User> actualMentorList = correctUser.getMentees();
+        List<User> expectedMentorList = List.of(correctUser);
 
         verify(mentorshipRepository, times(1)).save(correctUser);
-        assertArrayEquals(expectedMentorsList.toArray(), actualMentorsList.toArray());
+        assertArrayEquals(expectedMentorList.toArray(), actualMentorList.toArray());
+    }
+
+    @Test
+    void testDeleteMentorCorrectUserId() {
+        when(mentorshipRepository.findById(CORRECT_USER_ID)).thenReturn(Optional.ofNullable(correctUser));
+        when(mentorshipRepository.findById(NON_EXISTENT_USER_ID)).thenReturn(Optional.ofNullable(nonExistentUser));
+
+        mentorshipService.deleteMentor(CORRECT_USER_ID, NON_EXISTENT_USER_ID);
+        List<User> actualMenteeList = correctUser.getMentors();
+        List<User> expectedMenteeList = List.of(correctUser);
+
+        verify(mentorshipRepository, times(1)).save(correctUser);
+        assertArrayEquals(expectedMenteeList.toArray(), actualMenteeList.toArray());
     }
 
     @Test

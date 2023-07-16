@@ -58,11 +58,8 @@ class EventParticipationServiceTest {
     @Test
     @Description("исключение выброшено, если пользователь зарегистрирован ранее")
     void test_register_participant_should_throw_exception() {
-        // регистрируем участника на мероприятие
         eventParticipationService.registerParticipant(event.getId(), user.getId());
-        // репозиторий возвращает список участников с заданным пользователем
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(event.getId())).thenReturn(List.of(user));
-        // вызываем метод еще раз, чтобы проверить, что исключение выброшено, если пользователь зарегистрирован ранее
         Assertions.assertThrows(IllegalArgumentException.class, () -> eventParticipationService.registerParticipant(event.getId(), user.getId()));
     }
 }

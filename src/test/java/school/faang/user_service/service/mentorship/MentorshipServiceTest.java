@@ -10,8 +10,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.UserNotFoundException;
+import school.faang.user_service.exception.EntityNotFoundException;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,6 +29,8 @@ class MentorshipServiceTest {
     private static final long INCORRECT_USER_ID = 0L;
     @Mock
     private MentorshipRepository mentorshipRepository;
+    @Mock
+    private UserMapper userMapper;
     @InjectMocks
     private MentorshipService mentorshipService;
 
@@ -46,7 +50,7 @@ class MentorshipServiceTest {
 
     @Test
     void getMentees_shouldMatchMenteesSize() {
-        List<User> mentees = mentorshipService.getMentees(MENTOR_ID);
+        List<UserDto> mentees = mentorshipService.getMentees(MENTOR_ID);
         assertEquals(2, mentees.size());
     }
 
@@ -58,14 +62,14 @@ class MentorshipServiceTest {
 
     @Test
     void getMentees_shouldThrowException() {
-        assertThrows(UserNotFoundException.class,
+        assertThrows(EntityNotFoundException.class,
                 () -> mentorshipService.getMentees(INCORRECT_USER_ID),
                 "Invalid user id");
     }
 
     @Test
     void getMentors_shouldMatchMenteesSize() {
-        List<User> mentees = mentorshipService.getMentors(MENTEE_ID);
+        List<UserDto> mentees = mentorshipService.getMentors(MENTEE_ID);
         assertEquals(1, mentees.size());
     }
 
@@ -77,7 +81,7 @@ class MentorshipServiceTest {
 
     @Test
     void getMentors_shouldThrowException() {
-        assertThrows(UserNotFoundException.class,
+        assertThrows(EntityNotFoundException.class,
                 () -> mentorshipService.getMentors(INCORRECT_USER_ID),
                 "Invalid user id");
     }

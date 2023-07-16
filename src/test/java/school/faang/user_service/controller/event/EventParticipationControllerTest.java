@@ -23,7 +23,18 @@ class EventParticipationControllerTest {
     }
 
     @Test
+    void test_unregister_participant_should_success_unregister() {
+        eventParticipationController.unregisterParticipant(1L, 1L);
+        Mockito.verify(service, Mockito.times(1)).unregisterParticipant(1L, 1L);
+    }
+
+    @Test
     void test_register_participant_with_invalid_params_should_throw_exception() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> eventParticipationController.registerParticipant(-1L, -1L));
+    }
+
+    @Test
+    void test_unregister_participant_should_throw_exception() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> eventParticipationController.unregisterParticipant(-1L, -1L));
     }
 }

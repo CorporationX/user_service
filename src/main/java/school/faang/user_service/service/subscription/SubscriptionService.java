@@ -1,18 +1,20 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.subscription;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.filter.UserFilterDto;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.service.user.filter.UserFilter;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +22,8 @@ public class SubscriptionService {
     private final UserMapper userMapper;
     private final SubscriptionRepository subscriptionRepository;
     private final UserRepository userRepository;
+
+    private final List<UserFilter> userFilters;
 
     @Transactional
     public void followUser(long followerId, long followeeId) {
@@ -47,19 +51,22 @@ public class SubscriptionService {
     }
 
     @Transactional
-    public List<UserDto> getFollowers(long followeeId, UserFilterDto filter) {
+    public List<UserDto> getFollowers(long followeeId, UserFilterDto filters) {
         validationUserExists(followeeId);
-        return subscriptionRepository.findByFolloweeId(followeeId)
-                .map(userMapper::toDto)
-                .collect(Collectors.toList());
+        return filterUsers(subscriptionRepository.findByFolloweeId(followeeId), filters);
     }
 
     @Transactional
-    public List<UserDto> getFollowing(long followerId, UserFilterDto filter) {
+    public List<UserDto> getFollowing(long followerId, UserFilterDto filters) {
         validationUserExists(followerId);
-        return subscriptionRepository.findByFollowerId(followerId)
-                .map(userMapper::toDto)
-                .collect(Collectors.toList());
+        return filterUsers(subscriptionRepository.findByFollowerId(followerId), filters);
+    }
+
+    private List<UserDto> filterUsers(Stream<User> users, UserFilterDto filters) {
+        userFilters.stream()
+                .filter(filter -> filter.isApplicable(filters))
+                .forEach(filter -> filter.apply(users, filters));
+        return userMapper.toDtoList(users.toList());
     }
 
     private void validationSubscriptionExists(long followerId, long followeeId) {

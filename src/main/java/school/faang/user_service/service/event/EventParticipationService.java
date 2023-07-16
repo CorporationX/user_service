@@ -2,6 +2,7 @@ package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
@@ -11,7 +12,7 @@ import school.faang.user_service.repository.event.EventParticipationRepository;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class EventParticipationService {
     private final EventParticipationRepository eventParticipationRepository;
@@ -19,7 +20,7 @@ public class EventParticipationService {
 
     private void validateEventId(Long eventId) {
         if (!eventParticipationRepository.existsById(eventId)) {
-            throw new IllegalArgumentException("There is not event with this ID!");
+            throw new DataValidationException("There is not event with this ID!");
         }
     }
 

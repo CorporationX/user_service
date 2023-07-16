@@ -2,7 +2,7 @@ package school.faang.user_service.validation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.service.UserService;
+import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 

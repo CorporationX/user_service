@@ -8,7 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import school.faang.user_service.entity.User;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.service.UserService;
+import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 

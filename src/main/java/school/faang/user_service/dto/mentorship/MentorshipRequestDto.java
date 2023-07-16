@@ -14,14 +14,13 @@ import school.faang.user_service.entity.RequestStatus;
 @AllArgsConstructor
 public class MentorshipRequestDto {
 
-    @NotBlank
-    private String description;
-
+    @NotNull
+    private Long receiverId;
     @NotNull
     private Long requesterId;
 
-    @NotNull
-    private Long receiverId;
+    @NotBlank
+    private String description;
 
     private String rejectionReason;
     private RequestStatus requestStatus;

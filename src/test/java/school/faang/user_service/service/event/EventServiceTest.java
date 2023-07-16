@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -38,13 +37,17 @@ class EventServiceTest {
   @Mock
   private List<EventFilter> eventFilters;
 
-  @InjectMocks
   private EventService eventService;
+
   private Skill userSkill = new Skill();
 
 
   @BeforeEach
   public void init() {
+    EventFilter eventTitleFilter = new EventTitleFilter();
+    List<EventFilter> eventFilterList = List.of(eventTitleFilter);
+    eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList);
+
     userSkill.setTitle("Coding");
     userSkill.setId(1L);
     eventDto = new EventDto(1L, "Hiring", LocalDateTime.now(), LocalDateTime.now(),
@@ -112,8 +115,6 @@ class EventServiceTest {
     eventFilterDto.setTitle("Jav");
 
     List<EventDto> events = eventService.getEventsByFilter(eventFilterDto);
-
-    eventFilters.add(new EventTitleFilter());
 
     Assertions.assertEquals(2, events.size());
   }

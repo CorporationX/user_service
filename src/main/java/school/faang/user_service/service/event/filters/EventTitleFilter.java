@@ -15,6 +15,6 @@ public class EventTitleFilter implements EventFilter {
 
   @Override
   public void apply(Stream<Event> events, EventFilterDto filters) {
-    events.filter(event -> event.getTitle().matches(filters.getTitle()));
+    events.filter(event -> event.getTitle().contains(filters.getTitle()));
   }
 }

@@ -13,6 +13,7 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.filters.EventFilter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -25,7 +26,7 @@ public class EventService {
   private final EventRepository eventRepository;
   private final SkillRepository skillRepository;
   private final EventMapper eventMapper;
-  private final List<EventFilter> eventFilters = new ArrayList<>();
+  private final List<EventFilter> eventFilters;
 
   private void validateUserAccess(List<Long> skills, Long ownerId) {
     List<Skill> userSkills = skillRepository.findSkillsByGoalId(ownerId);
@@ -68,6 +69,7 @@ public class EventService {
 
   public List<EventDto> getEventsByFilter(EventFilterDto filters) {
     Stream<Event> events = eventRepository.findAll().stream();
+
     eventFilters.stream()
         .filter(filter -> filter.isApplicable(filters))
         .forEach(filter -> filter.apply(events, filters));

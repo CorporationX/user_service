@@ -4,26 +4,33 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.UserNotFoundException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.mentorship.MenteeDoesNotExist;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 @Service
 @RequiredArgsConstructor
 public class MentorshipService {
     private final MentorshipRepository mentorshipRepository;
+    private final UserMapper userMapper;
 
     @Transactional(readOnly = true)
-    public List<User> getMentees(long mentorId) {
+    public List<UserDto> getMentees(long mentorId) {
         User user = validateUserId(mentorId);
-        return user.getMentees();
+        return user.getMentees().stream()
+                .map(userMapper::toDto)
+                .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<User> getMentors(long userId) {
+    public List<UserDto> getMentors(long userId) {
         User user = validateUserId(userId);
-        return user.getMentors();
+        return user.getMentors().stream()
+                .map(userMapper::toDto)
+                .toList();
     }
 
     @Transactional
@@ -34,7 +41,7 @@ public class MentorshipService {
 
     private User validateUserId(long userId) {
         return mentorshipRepository.findUserById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Invalid user id: " + userId));
+                .orElseThrow(() -> new EntityNotFoundException("Invalid user id: " + userId));
     }
 
     private void validateToDeleteMentee(long mentorId, long menteeId) {

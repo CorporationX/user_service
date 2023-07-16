@@ -59,24 +59,37 @@ public class SubscriptionControllerTest {
     }
 
     @Test
-    public void shouldReturnUserDtoPage() {
-        UserFilterDto filter = UserFilterDto.builder()
-                .pageSize(3)
-                .page(0)
-                .build();
-        List<UserDto> expectedUsers = List.of(
-                new UserDto(),
+    public void shouldReturnFollowersList() {
+        UserFilterDto filter = new UserFilterDto();
+        List<UserDto> desiredUsers = List.of(
                 new UserDto(),
                 new UserDto()
         );
 
         Mockito.when(subscriptionService.getFollowers(followeeId, filter))
-                .thenReturn(expectedUsers);
+                .thenReturn(desiredUsers);
 
         List<UserDto> users = subscriptionController.getFollowers(followeeId, filter);
 
-        Assertions.assertEquals(expectedUsers, users);
+        Assertions.assertEquals(desiredUsers, users);
         Mockito.verify(subscriptionService).getFollowers(followeeId, filter);
+    }
+
+    @Test
+    public void shouldReturnFolloweesList() {
+        UserFilterDto filter = new UserFilterDto();
+        List<UserDto> desiredUsers = List.of(
+                new UserDto(),
+                new UserDto()
+        );
+
+        Mockito.when(subscriptionService.getFollowing(followerId, filter))
+                .thenReturn(desiredUsers);
+
+        List<UserDto> receivedUsers = subscriptionController.getFollowing(followerId, filter);
+
+        Assertions.assertEquals(desiredUsers, receivedUsers);
+        Mockito.verify(subscriptionService).getFollowing(followerId, filter);
     }
 
     @Test

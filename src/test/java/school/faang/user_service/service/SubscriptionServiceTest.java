@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -33,6 +34,28 @@ public class SubscriptionServiceTest {
 
     private final long followerId = 2;
     private final long followeeId = 1;
+    private Stream<User> desiredUsersStream;
+    private List<UserDto> desiredUsersDto;
+
+    @BeforeEach
+    public void setUp() {
+        desiredUsersStream = Stream.of(
+                User.builder()
+                        .id(0)
+                        .build(),
+                User.builder()
+                        .id(1)
+                        .build()
+        );
+        desiredUsersDto = List.of(
+                UserDto.builder()
+                        .id(0L)
+                        .build(),
+                UserDto.builder()
+                        .id(1L)
+                        .build()
+        );
+    }
 
     @Test
     public void shouldAddNewFollowerById() {
@@ -85,35 +108,12 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void shouldReturnUserDtoPage() {
+    public void shouldReturnFollowersList() {
         UserFilterDto filter = new UserFilterDto();
-        Stream<User> desiredUsers = Stream.of(
-                User.builder()
-                        .id(0)
-                        .build(),
-                User.builder()
-                        .id(1)
-                        .build(),
-                User.builder()
-                        .id(2)
-                        .build()
-        );
 
         Mockito.when(userRepository.existsById(followeeId)).thenReturn(true);
         Mockito.when(subscriptionRepository.findByFolloweeId(followeeId))
-                .thenReturn(desiredUsers);
-
-        List<UserDto> desiredUsersDto = List.of(
-                UserDto.builder()
-                        .id(0L)
-                        .build(),
-                UserDto.builder()
-                        .id(1L)
-                        .build(),
-                UserDto.builder()
-                        .id(2L)
-                        .build()
-        );
+                .thenReturn(desiredUsersStream);
 
         List<UserDto> receivedUsers = subscriptionService.getFollowers(followeeId, filter);
 
@@ -122,12 +122,35 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenFolloweeUserNotExistsWithFilter() {
+    public void shouldThrowExceptionWhenFolloweeNotExistsWithFilter() {
         UserFilterDto filter = new UserFilterDto();
 
         Mockito.when(userRepository.existsById(followeeId)).thenReturn(false);
         Assertions.assertThrows(DataValidationException.class,
                 () -> subscriptionService.getFollowers(followeeId, filter));
+    }
+
+    @Test
+    public void shouldReturnFolloweesList() {
+        UserFilterDto filter = new UserFilterDto();
+
+        Mockito.when(userRepository.existsById(followerId)).thenReturn(true);
+        Mockito.when(subscriptionRepository.findByFollowerId(followerId))
+                .thenReturn(desiredUsersStream);
+
+        List<UserDto> receivedUsersDto = subscriptionService.getFollowing(followerId, filter);
+
+        Assertions.assertEquals(desiredUsersDto, receivedUsersDto);
+        Mockito.verify(subscriptionRepository).findByFollowerId(followerId);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenFollowerNotExistsWithFilter() {
+        UserFilterDto filter = new UserFilterDto();
+
+        Mockito.when(userRepository.existsById(followerId)).thenReturn(false);
+        Assertions.assertThrows(DataValidationException.class,
+                () -> subscriptionService.getFollowing(followerId, filter));
     }
 
     @Test

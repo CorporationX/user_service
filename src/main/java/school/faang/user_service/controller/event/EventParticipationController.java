@@ -1,7 +1,6 @@
 package school.faang.user_service.controller.event;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.exception.DataValidationException;

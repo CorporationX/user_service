@@ -17,16 +17,21 @@ public class MentorshipService {
     private final UserMapper userMapper;
 
     public List<UserDto> getMentees(long userId) {
+        User user = initId(userId);
+
+        if (user.getMentees().isEmpty()) {
+            return new ArrayList<>();
+        }
+        return user.getMentees().stream().map(userMapper::userToUserDto).toList();
+    }
+
+    private User initId(long userId) {
         if (userId < 1) {
             throw new IllegalArgumentException("Некоректный ввод данных id");
         }
         User user = mentorshipRepository.findById(userId).orElseGet(() -> {
             throw new IllegalArgumentException("Пользователя с таким id не существует");
         });
-
-        if (user.getMentees().isEmpty()) {
-            return new ArrayList<>();
-        }
-        return user.getMentees().stream().map(userMapper::userToUserDto).toList();
+        return user;
     }
 }

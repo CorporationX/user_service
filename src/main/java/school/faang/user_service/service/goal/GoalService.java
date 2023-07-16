@@ -50,6 +50,7 @@ public class GoalService {
         return goalStream.map(goalMapper::toDto).toList();
     }
 
+    @Transactional
     public GoalDto createGoal(Long userId, GoalDto goalDto) {
         validateId(userId);
         validateGoal(goalDto);
@@ -57,6 +58,8 @@ public class GoalService {
 
         Goal goal = goalMapper.toEntity(goalDto);
         convertDtoDependenciesToEntity(goalDto, goal);
+        goal.setUsers(new ArrayList<>());
+        goal.getUsers().add(userRepository.findById(userId).get());
 
         goalRepository.save(goal);
 

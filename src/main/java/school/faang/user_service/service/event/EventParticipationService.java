@@ -14,7 +14,7 @@ public class EventParticipationService {
 
     private final EventParticipationRepository eventParticipationRepository;
 
-    public void registerParticipant(long eventId, long userId) throws DataValidationException {
+    public void registerParticipant(long eventId, long userId) {
         List<User> users = eventParticipationRepository.findAllParticipantsByEventId(eventId);
         for (User user : users) {
             if (user.getId() == userId) {
@@ -24,7 +24,7 @@ public class EventParticipationService {
         eventParticipationRepository.register(eventId, userId);
     }
 
-    public void unregisterParticipant(long eventId, long userId) throws DataValidationException {
+    public void unregisterParticipant(long eventId, long userId) {
         List<User> users = eventParticipationRepository.findAllParticipantsByEventId(eventId);
         for (User user : users) {
             if (user.getId() != userId) {

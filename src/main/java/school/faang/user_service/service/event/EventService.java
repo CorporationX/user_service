@@ -86,4 +86,8 @@ public class EventService {
     public List<Event> getOwnedEvents(long userId) {
         return Optional.ofNullable(eventRepository.findAllByUserId(userId)).orElse(new ArrayList<>());
     }
+
+    public List<Event> getParticipatedEvents(long userId) {
+        return Optional.ofNullable(eventRepository.findParticipatedEventsByUserId(userId)).orElse(new ArrayList<>());
+    }
 }

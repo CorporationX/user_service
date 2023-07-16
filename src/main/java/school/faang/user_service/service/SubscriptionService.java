@@ -48,10 +48,16 @@ public class SubscriptionService {
 
     @Transactional
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filter) {
-        if (!userRepository.existsById(followeeId)) {
-            throw new DataValidationException("This user does not exist");
-        }
+        validationUserExists(followeeId);
         return subscriptionRepository.findByFolloweeId(followeeId)
+                .map(userMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public List<UserDto> getFollowing(long followerId, UserFilterDto filter) {
+        validationUserExists(followerId);
+        return subscriptionRepository.findByFollowerId(followerId)
                 .map(userMapper::toDto)
                 .collect(Collectors.toList());
     }

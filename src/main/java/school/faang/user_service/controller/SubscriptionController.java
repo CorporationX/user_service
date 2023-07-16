@@ -46,15 +46,21 @@ public class SubscriptionController {
         return subscriptionService.getFollowersCount(followeeId);
     }
 
+    @GetMapping("/user/{id}/followees/count")
+    public int getFollowingCount(@PathVariable("id") long followerId) {
+        return subscriptionService.getFollowingCount(followerId);
+    }
+
     @PostMapping("/user/{id}/followers")
     public List<UserDto> getFollowers(@PathVariable("id") long followeeId,
                                       @RequestBody UserFilterDto filter) {
         return subscriptionService.getFollowers(followeeId, filter);
     }
 
-    @GetMapping("/user/{id}/followees/count")
-    public int getFollowingCount(@PathVariable("id") long followerId) {
-        return subscriptionService.getFollowingCount(followerId);
+    @PostMapping("/user/{id}/followees")
+    public List<UserDto> getFollowing(@PathVariable("id") long followerId,
+                                      @RequestBody UserFilterDto filter) {
+        return subscriptionService.getFollowing(followerId, filter);
     }
 
     private void validationSameUser(long followerId, long followeeId, String message) {

@@ -4,7 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventParticipationRepository;
+import school.faang.user_service.repository.event.EventRepository;
 
 import java.util.List;
 
@@ -14,11 +17,16 @@ import java.util.List;
 public class EventParticipationService {
 
     private final EventParticipationRepository eventParticipationRepository;
+    private final UserRepository userRepository;
+    private final EventRepository eventRepository;
 
     public void registerParticipant(long eventId, long userId) {
-        User alreadyUser = findAlreadyRegisteredUser(eventId, userId);
+        User user = userRepository.findById(userId).orElse(null);
+        Event event = eventRepository.findById(eventId).orElse(null);
 
-        validateRegisterPossibility(alreadyUser);
+        validateParams(user, event);
+
+        validatePossibility(user.getId(), event.getId());
 
         eventParticipationRepository.register(eventId, userId);
     }
@@ -29,13 +37,15 @@ public class EventParticipationService {
         eventParticipationRepository.unregister(eventId, userId);
     }
 
-    private User findAlreadyRegisteredUser(long eventId, long userId) {
-        return eventParticipationRepository.findAllParticipantsByEventId(eventId)
-                .stream().filter(user -> user.getId() == userId).findFirst().orElse(null);
+    public List<User> getParticipants(long eventId) {
+
+        return eventParticipationRepository.findAllParticipantsByEventId(eventId);
     }
 
-    private static void validateRegisterPossibility(User alreadyUser) {
-        if (alreadyUser != null) {
+    private void validatePossibility(long userId, long eventId) {
+        boolean exist = eventParticipationRepository.findAllParticipantsByEventId(eventId)
+                .stream().anyMatch(u -> u.getId() == userId);
+        if (exist) {
             throw new IllegalArgumentException("User already registered");
         }
     }
@@ -46,8 +56,17 @@ public class EventParticipationService {
         }
     }
 
-    public List<User> getParticipants(long eventId) {
+    private User findAlreadyRegisteredUser(long eventId, long userId) {
+        return eventParticipationRepository.findAllParticipantsByEventId(eventId)
+                .stream().filter(user -> user.getId() == userId).findFirst().orElse(null);
+    }
 
-        return eventParticipationRepository.findAllParticipantsByEventId(eventId);
+    private static void validateParams(User user, Event event) {
+        if (user == null) {
+            throw new NullPointerException("User not found");
+        }
+        if (event == null) {
+            throw new NullPointerException("Event not found");
+        }
     }
 }

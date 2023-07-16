@@ -23,7 +23,7 @@ public class SubscriptionService {
     }
 
     @Transactional(readOnly = true)
-    public int getFollowingCount(long followerId) {
+    public long getFollowingCount(long followerId) {
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
     }
 

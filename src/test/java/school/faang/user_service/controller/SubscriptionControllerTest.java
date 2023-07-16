@@ -52,9 +52,16 @@ class SubscriptionControllerTest {
         try {
             subscriptionController.followUser(followerId, followerId);
         } catch (DataValidationException e) {
-            assertEquals("You can't subscribe to yourself", e.getMessage());
+            assertEquals("Follower and folowee can not be the same", e.getMessage());
         }
         verifyNoInteractions(subscriptionService);
+    }
+
+    @Test
+    public void testGetFollowersCount() {
+        subscriptionController.getFollowersCount(followeeId);
+
+        verify(subscriptionService, times(1)).getFollowersCount(followeeId);
     }
 
     @Test

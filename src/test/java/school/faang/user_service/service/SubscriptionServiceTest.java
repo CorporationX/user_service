@@ -64,6 +64,13 @@ class SubscriptionServiceTest {
     }
 
     @Test
+    public void testGetFollowersCount() {
+        subscriptionService.getFollowersCount(followeeId);
+
+        verify(subscriptionRepository, times(1)).findFollowersAmountByFolloweeId(followeeId);
+    }
+
+    @Test
     public void testGetFollowingCount() {
         subscriptionService.getFollowingCount(followerId);
 

@@ -15,11 +15,11 @@ public class SubscriptionController {
         subscriptionService.followUser(followerId, followeeId);
     }
 
-    public int getFollowersCount(long followeeId) {
-        return subscriptionService.getFollowersCount(followeId);
+    public long getFollowersCount(long followeeId) {
+        return subscriptionService.getFollowersCount(followeeId);
     }
 
-    public int getFollowingCount(long followerId) {
+    public long getFollowingCount(long followerId) {
         return subscriptionService.getFollowingCount(followerId);
     }
 

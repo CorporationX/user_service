@@ -84,4 +84,8 @@ public class EventService {
 
     return eventMapper.toDto(event);
   }
+
+  public EventDto updateEvent(EventDto event) {
+    return create(event);
+  }
 }

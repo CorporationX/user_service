@@ -2,45 +2,32 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.goal.GoalInvitation;
+import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class GoalInvitationService {
+    private final List<InvitationFilter> invitationFilters;
+    private final GoalInvitationMapper goalInvitationMapper;
     private final GoalInvitationRepository goalInvitationRepository;
 
-    public List<GoalInvitation> getInvitations(InvitationFilterDto filter) {
-        List<GoalInvitation> invitations = new ArrayList<>();
-        goalInvitationRepository.findAll().forEach(invitations::add);
+    public List<GoalInvitationDto> getInvitations(InvitationFilterDto filters) {
+        List<GoalInvitation> invitations = goalInvitationRepository.findAll();
 
         if (invitations.isEmpty()) {
             throw new IllegalArgumentException("Invalid request. Goal invitation not found.");
         }
 
-        return filterInvitation(filter, invitations);
-    }
+        invitationFilters.stream()
+                .filter(f -> f.isApplicable(filters))
+                .forEach(f -> f.apply(invitations.stream(), filters));
 
-    private List<GoalInvitation> filterInvitation(InvitationFilterDto filter, List<GoalInvitation> invitations) {
-        if (filter.getInviterNamePattern() != null) {
-            invitations.removeIf(in -> !in.getInviter().getUsername().contains(filter.getInviterNamePattern()));
-        }
-        if (filter.getInvitedNamePattern() != null) {
-            invitations.removeIf(in -> !in.getInvited().getUsername().contains(filter.getInvitedNamePattern()));
-        }
-        if (filter.getInviterId() != null) {
-            invitations.removeIf(in -> in.getInviter().getId() != filter.getInviterId());
-        }
-        if (filter.getInvitedId() != null) {
-            invitations.removeIf(in -> in.getInvited().getId() != filter.getInvitedId());
-        }
-        if (filter.getStatus() != null) {
-            invitations.removeIf(in -> !in.getStatus().equals(filter.getStatus()));
-        }
-        return invitations;
+        return invitations.stream().map(goalInvitationMapper::toDto).toList();
     }
 }

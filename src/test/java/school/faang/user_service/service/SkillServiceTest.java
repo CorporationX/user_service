@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -44,6 +45,11 @@ class SkillServiceTest {
     private Skill skill;
     @Mock
     private SkillMapper mapper;
+
+    @BeforeEach
+    void setUp() {
+
+    }
 
     @Test
     void testCreate() {

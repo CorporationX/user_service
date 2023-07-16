@@ -94,6 +94,10 @@ public class SkillService {
 
         listGuarantees.forEach((userSkillGuaranteeRepository::save));
 
-        skill.setGuarantees(listGuarantees);
+        if (skill.getGuarantees() == null) {
+            skill.setGuarantees(listGuarantees);
+        } else {
+            skill.getGuarantees().addAll(listGuarantees);
+        }
     }
 }

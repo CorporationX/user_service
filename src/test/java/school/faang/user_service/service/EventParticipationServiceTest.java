@@ -1,9 +1,13 @@
 package school.faang.user_service.service;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.service.event.EventParticipationService;
@@ -12,7 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
+@ExtendWith(MockitoExtension.class)
 public class EventParticipationServiceTest {
     @Mock
     private EventParticipationRepository eventParticipationRepository;
@@ -29,7 +33,9 @@ public class EventParticipationServiceTest {
 
     @Test
     public void registerParticipantThrowExceptionTest() {
+        User user = User.builder().id(10L).username("test").build();
+        Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(10L)).thenReturn(List.of(user));
         assertThrows(DataValidationException.class,
-                () -> eventParticipationService.registerParticipant(1L, 10L));
+                () -> eventParticipationService.registerParticipant(10L, 10L));
     }
 }

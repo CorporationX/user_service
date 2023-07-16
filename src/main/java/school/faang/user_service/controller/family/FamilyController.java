@@ -2,8 +2,11 @@ package school.faang.user_service.controller.family;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.service.event.EventMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,8 +16,10 @@ import java.util.List;
 public class FamilyController {
 
     private final UserMapper userMapper;
+    private final EventMapper eventMapper;
 
-    public List<User> create(User user) {
+    public List<UserDto> create(UserDto user) {
+        eventMapper.toEntity(new EventDto());
         return List.of(user);
     }
 

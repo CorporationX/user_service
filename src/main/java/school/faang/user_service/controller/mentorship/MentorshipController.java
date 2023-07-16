@@ -27,10 +27,10 @@ public class MentorshipController {
             log.debug("Successfully got mentees for mentor with id:{}", mentorId);
             return ResponseEntity.ok(mentees);
         } catch (RuntimeException e) {
-            log.warn("Failed to get mentees for mentor with id:{}\nException:{}", mentorId, e);
+            log.warn("Failed to get mentees for mentor with id:{}\nException:{}", mentorId, e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            log.error("Failed to get mentees for mentor with id:{}\nException:{}", mentorId, e);
+            log.error("Failed to get mentees for mentor with id:{}\nException:{}", mentorId, e.getMessage());
             return ResponseEntity.internalServerError().body("Server error");
         }
     }

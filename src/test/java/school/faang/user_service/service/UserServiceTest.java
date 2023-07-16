@@ -9,5 +9,6 @@ class UserServiceTest {
     @Test
     void getUsers() {
         assertTrue(true);
+        assertFalse(false);
     }
 }

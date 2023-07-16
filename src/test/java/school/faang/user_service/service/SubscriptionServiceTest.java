@@ -28,8 +28,8 @@ class SubscriptionServiceTest {
 
     @BeforeEach
     public void setUp() {
-        followerId = 2;
-        followeeId = 1;
+        followerId = 2L;
+        followeeId = 1L;
     }
 
     @Test

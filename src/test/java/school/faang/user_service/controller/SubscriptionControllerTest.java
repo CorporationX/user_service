@@ -15,7 +15,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class SubscriptionControllerTest {
@@ -29,8 +28,8 @@ class SubscriptionControllerTest {
 
     @BeforeEach
     public void setUp() {
-        followerId = 2;
-        followeeId = 2;
+        followerId = 2L;
+        followeeId = 2L;
     }
 
     @Test
@@ -40,8 +39,8 @@ class SubscriptionControllerTest {
 
     @Test
     public void testFollowUser() {
-        followerId = 1;
-        followeeId = 2;
+        followerId = 1L;
+        followeeId = 2L;
 
         subscriptionController.followUser(followerId, followeeId);
 
@@ -60,10 +59,8 @@ class SubscriptionControllerTest {
 
     @Test
     public void testUnfollowUser() {
-        followerId = 1;
-        followeeId = 2;
-
-        when(subscriptionService.validateIfSubscribed(followerId, followeeId)).thenReturn(true).thenReturn(false);
+        followerId = 1L;
+        followeeId = 2L;
 
         subscriptionController.unfollowUser(followerId, followeeId);
 

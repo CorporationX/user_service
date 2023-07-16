@@ -16,29 +16,28 @@ public class SkillController {
     private final SkillService skillService;
 
     public SkillDto create(SkillDto skill) {
-        validateData(skill);
+        validateData(skill == null, "skill cannot be null");
         return skillService.create(skill);
     }
 
-    public List<SkillDto> getUserSkills(long userId) {
-        validateData(userId);
+    public List<SkillDto> getUserSkills(Long userId) {
+        validateData(userId == null, "userId cannot be null");
         return skillService.getUserSkills(userId);
     }
 
-    public List<SkillCandidateDto> getOfferedSkills(long userId) {
-        validateData(userId);
+    public List<SkillCandidateDto> getOfferedSkills(Long userId) {
+        validateData(userId == null, "userId cannot be null");
         return skillService.getOfferedSkills(userId);
     }
 
-    private void validateData(long userId) {
-        if (userId < 0) {
-            throw new DataValidationException("userId cannot be negative");
-        }
+    public SkillDto acquireSkillFromOffers(Long skillId, Long userId) {
+        validateData(skillId == null || userId == null, "skillId or userId cannot be null");
+        return skillService.acquireSkillFromOffers(skillId, userId);
     }
 
-    private void validateData(SkillDto skill) {
-        if (skill == null || skill.getTitle() == null) {
-            throw new DataValidationException("skill cannot be empty");
+    private void validateData(boolean condition, String exception) {
+        if (condition) {
+            throw new DataValidationException(exception);
         }
     }
 }

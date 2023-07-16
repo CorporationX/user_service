@@ -16,6 +16,8 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.mapper.EventMapper;
+import school.faang.user_service.service.event.filters.EventFilter;
+import school.faang.user_service.service.event.filters.EventTitleFilter;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,6 +34,9 @@ class EventServiceTest {
   private EventMapper eventMapper;
   @Mock
   private SkillRepository skillRepository;
+
+  @Mock
+  private List<EventFilter> eventFilters;
 
   @InjectMocks
   private EventService eventService;
@@ -107,6 +112,8 @@ class EventServiceTest {
     eventFilterDto.setTitle("Jav");
 
     List<EventDto> events = eventService.getEventsByFilter(eventFilterDto);
+
+    eventFilters.add(new EventTitleFilter());
 
     Assertions.assertEquals(2, events.size());
   }

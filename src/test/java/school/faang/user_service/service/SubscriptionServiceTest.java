@@ -42,7 +42,7 @@ public class SubscriptionServiceTest {
     void getFollowersThrowIllegalException(){
         int idUser = -10;
         assertThrows(IllegalArgumentException.class,
-                () -> subscriptionService.getFollowers(idUser, new UserFilterDto()));
+                () -> subscriptionService.getFollowing(idUser, new UserFilterDto()));
     }
     @Test
     void filterUserReturnTrue(){
@@ -72,9 +72,9 @@ public class SubscriptionServiceTest {
         filter.setPage(1);
         filter.setPageSize(1);
 
-        when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(mockUsers.stream());
+        when(subscriptionRepository.findByFollowerId(followeeId)).thenReturn(mockUsers.stream());
 
-        assertEquals(resultList, subscriptionService.getFollowers(followeeId, filter));
+        assertEquals(resultList, subscriptionService.getFollowing(followeeId, filter));
     }
 
 

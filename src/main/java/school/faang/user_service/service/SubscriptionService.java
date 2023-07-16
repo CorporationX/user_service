@@ -20,10 +20,10 @@ import java.util.stream.Stream;
 public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
 
-    public List<UserDto> getFollowers(long followeeId, UserFilterDto filter) {
+    public List<UserDto> getFollowing(long followeeId, UserFilterDto filter) {
         validateUserId(followeeId);
 
-        Stream<User> allUsers = subscriptionRepository.findByFolloweeId(followeeId);
+        Stream<User> allUsers = subscriptionRepository.findByFollowerId(followeeId);
         Stream<User> usersOnPage = getPage(allUsers.collect(Collectors.toList()), filter.getPage(), filter.getPageSize()).stream();
 
         return usersOnPage

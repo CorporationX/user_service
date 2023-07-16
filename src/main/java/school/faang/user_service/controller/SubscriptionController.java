@@ -13,7 +13,7 @@ import java.util.List;
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
-    public List<UserDto> getFollowers(long followeeId, UserFilterDto filter) {
-        return subscriptionService.getFollowers(followeeId, filter);
+    public List<UserDto> getFollowing(long followeeId, UserFilterDto filter) {
+        return subscriptionService.getFollowing(followeeId, filter);
     }
 }

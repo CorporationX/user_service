@@ -70,4 +70,14 @@ public class EventService {
             throw new DataValidationException("ID is incorrect");
         }
     }
+
+    public int updateEvent(EventDto event){
+        validate(event);
+        int result = 0;
+        try{
+            result = eventRepository.save(eventMapper.toEvent(event)).getAttendees().size();
+        }catch (NullPointerException e){
+        }
+        return result;
+    }
 }

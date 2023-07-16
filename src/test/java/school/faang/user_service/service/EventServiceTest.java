@@ -21,6 +21,7 @@ import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.EventService;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -76,7 +77,19 @@ public class EventServiceTest {
             )
             .id(1L)
             .owner(user2)
+            .attendees(new ArrayList<>())
             .build();
+    private Event eventWithoutAttendees = Event.builder()
+            .relatedSkills(
+                    List.of(
+                            Skill.builder().id(1L).title("1").build(),
+                            Skill.builder().id(2L).title("2").build()
+                    )
+            )
+            .id(1L)
+            .owner(user2)
+            .build();
+
 
 
     @Test
@@ -120,5 +133,26 @@ public class EventServiceTest {
     public void testCorrectDeleteEvent() {
         eventService.deleteEvent(1L);
         Mockito.verify(eventRepository, Mockito.times(1)).deleteById(1L);
+    }
+
+    @Test
+    public void testUpdateEventOwnerHasNoSkills(){
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
+        Assertions.assertThrows(DataValidationException.class, () -> eventService.updateEvent(eventDto));
+    }
+
+    @Test
+    public void testUpdateEventOwnerHasSkills(){
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user2));
+        when(eventRepository.save(eventMapper.toEvent(eventDto))).thenReturn(event);
+        eventService.updateEvent(eventDto);
+        Mockito.verify(eventRepository, Mockito.times(1)).save(eventMapper.toEvent(eventDto));
+    }
+
+    @Test
+    public void testUpdateEventReturnsNull(){
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user2));
+        when(eventRepository.save(eventMapper.toEvent(eventDto))).thenReturn(eventWithoutAttendees);
+        Assertions.assertEquals(0, eventService.updateEvent(eventDto));
     }
 }

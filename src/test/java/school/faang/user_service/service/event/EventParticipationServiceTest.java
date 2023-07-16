@@ -43,7 +43,6 @@ class EventParticipationServiceTest {
     }
 
     @Test
-    @Description("успешная регистрация юзера на мероприятие")
     void test_register_participant_should_success_register () {
 
         long eventId = event.getId();
@@ -56,7 +55,6 @@ class EventParticipationServiceTest {
 
 
     @Test
-    @Description("успешная регистрация одного и того же юзера на два разных мероприятия")
     void test_register_participant_should_success_register_for_other_event() {
         long eventId = event.getId();
         long userId = user.getId();
@@ -73,7 +71,6 @@ class EventParticipationServiceTest {
     }
 
     @Test
-    @Description("исключение выброшено, если пользователь зарегистрирован ранее")
     void test_register_participant_should_throw_exception() {
         long eventId = event.getId();
         long userId = user.getId();
@@ -85,7 +82,6 @@ class EventParticipationServiceTest {
     }
 
     @Test
-    @Description("успешная отмена регистрации юзера на мероприятие")
     void test_unregister_participant_should_success() {
         long eventId = event.getId();
         long userId = user.getId();
@@ -96,13 +92,11 @@ class EventParticipationServiceTest {
     }
 
     @Test
-    @Description("исключение выброшено, если пользователь не зарегистрирован")
     void test_unregister_participant_should_throw_exception() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> eventParticipationService.unregisterParticipant(event.getId(), user.getId()));
     }
 
     @Test
-    @Description("успешное получение списка участников мероприятия, если пользователи зарегистрированы на мероприятие")
     void test_get_participants_should_return_list(){
         long eventId = event.getId();
         long userId = user.getId();
@@ -118,7 +112,6 @@ class EventParticipationServiceTest {
     }
 
     @Test
-    @Description("получение пустого списка участников мероприятия, если нет участников на мероприятие")
     void test_get_participants_should_return_empty(){
         Mockito.when(eventRepository.findById(event.getId())).thenReturn(Optional.ofNullable(event));
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(event.getId())).thenReturn(List.of());

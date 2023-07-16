@@ -7,6 +7,6 @@ import java.util.List;
 
 @AllArgsConstructor
 @Data
-public class RequestsResponse {
+public class RequestResponse {
     List<MentorshipRequestDto> mentorshipRequestDtos;
 }

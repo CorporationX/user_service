@@ -1,7 +1,6 @@
 package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
@@ -23,16 +22,17 @@ import java.util.List;
 public class EventService {
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
+    private final EventMapper eventMapper;
 
     public EventDto create(EventDto event) {
         EventDto result;
         User user = userRepository.findById(event.getOwnerId()).orElseThrow();
         boolean userContainsSkill = isUserContainsSkill(event, user);
         if (userContainsSkill) {
-            result = EventMapper.INSTANCE.toEventDto(eventRepository.save(EventMapper.INSTANCE.toEvent(event)));
+            result = eventMapper.toEventDto(eventRepository.save(eventMapper.toEvent(event)));
             return result;
         } else {
-            throw new DataValidationException("Ошибка");
+            throw new DataValidationException("пользователь не может провести такое событие с такими навыками.");
         }
     }
 
@@ -51,17 +51,30 @@ public class EventService {
     }
 
     public EventDto getEvent(long eventId) {
-        return EventMapper.INSTANCE.toEventDto(eventRepository.findById(eventId)
+        return eventMapper.toEventDto(eventRepository.findById(eventId)
                 .orElseThrow(() -> new DataValidationException("Ошибка")));
     }
 
     public List<EventDto> getEventsByFilter(EventFilterDto filter) {
         List<EventDto> events = new ArrayList<>();
         eventRepository.findAll().forEach(event -> {
-            events.add(EventMapper
-                    .INSTANCE.toEventDto(event));
+            events.add(eventMapper.toEventDto(event));
         });
         return events.stream()
+                .filter(event -> {
+                    if (event.getId() == null) {
+                        return false;
+                    } else {
+                        return event.getId().equals(filter.getId());
+                    }
+                })
+                .filter(event -> {
+                    if (event.getTitle() == null) {
+                        return false;
+                    } else {
+                        return event.getTitle().equals(filter.getTitle());
+                    }
+                })
                 .filter(event -> {
                     if (event.getStartDate() == null) {
                         event.setStartDate(LocalDateTime.MIN);
@@ -72,13 +85,13 @@ public class EventService {
                     return event.getStartDate().isAfter(filter.getStartDate())
                             && event.getEndDate().isBefore(filter.getEndDate());
                 })
-                .filter(event -> {
-                    if (event.getOwnerId() == null) {
-                        return false;
-                    } else {
-                        return event.getOwnerId().equals(filter.getOwnerId());
-                    }
-                })
+//                .filter(event -> {
+//                    if (event.getOwnerId() == null) {
+//                        return false;
+//                    } else {
+//                        return event.getOwnerId().equals(filter.getOwnerId());
+//                    }
+//                })
                 .filter(event -> {
                     if (event.getRelatedSkills() == null) {
                         return false;
@@ -94,13 +107,6 @@ public class EventService {
                     }
                 })
                 .filter(event -> {
-                    if (event.getTitle() == null) {
-                        return false;
-                    } else {
-                        return event.getTitle().equals(filter.getTitle());
-                    }
-                })
-                .filter(event -> {
                     if (event.getDescription() == null) {
                         return false;
                     } else {
@@ -112,13 +118,6 @@ public class EventService {
                         return false;
                     } else {
                         return event.getMaxAttendees() == (filter.getMaxAttendees());
-                    }
-                })
-                .filter(event -> {
-                    if (event.getId() == null) {
-                        return false;
-                    } else {
-                        return event.getId().equals(filter.getId());
                     }
                 })
                 .toList();

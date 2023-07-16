@@ -10,7 +10,7 @@ import org.springframework.validation.BindingResult;
 import school.faang.user_service.dto.mentorshipRequest.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorshipRequest.RejectionDto;
 import school.faang.user_service.dto.mentorshipRequest.RequestFilterDto;
-import school.faang.user_service.dto.mentorshipRequest.RequestsResponse;
+import school.faang.user_service.dto.mentorshipRequest.RequestResponse;
 import school.faang.user_service.service.mentorshipRequest.MentorshipRequestService;
 import school.faang.user_service.util.mentorshipRequest.exception.GetRequestsMentorshipsException;
 import school.faang.user_service.util.mentorshipRequest.exception.RequestMentorshipException;
@@ -36,7 +36,7 @@ public class MentorshipRequestControllerTest {
         BindingResult bindingResult = Mockito.mock(BindingResult.class);
         Mockito.when(bindingResult.hasErrors()).thenReturn(false);
 
-        ResponseEntity<HttpStatus> httpStatusResponseEntity =
+        ResponseEntity<?> httpStatusResponseEntity =
                 this.mentorshipRequestController.requestMentorship(mentorshipRequestDto, bindingResult);
 
         Assertions.assertEquals(HttpStatus.OK, httpStatusResponseEntity.getStatusCode());
@@ -60,7 +60,7 @@ public class MentorshipRequestControllerTest {
         BindingResult bindingResult = Mockito.mock(BindingResult.class);
         Mockito.when(bindingResult.hasErrors()).thenReturn(false);
 
-        RequestsResponse requestsResponse =
+        ResponseEntity<RequestResponse> requestsResponse =
                 mentorshipRequestController.getRequests(requestFilterDto, bindingResult);
 
         Assertions.assertNotNull(requestsResponse);
@@ -81,7 +81,7 @@ public class MentorshipRequestControllerTest {
     void testAcceptRequest_ShouldReturnValidResponseEntity() {
         long id = 3;
 
-        ResponseEntity<HttpStatus> response = mentorshipRequestController.acceptRequest(id);
+        ResponseEntity<?> response = mentorshipRequestController.acceptRequest(id);
 
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
     }

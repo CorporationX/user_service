@@ -53,55 +53,23 @@ public class MentorshipRequestServiceTest {
 
     @Test
     void testRequestMentorship_ShouldCreateMentorship() {
-        String description = "description";
-        long requesterId = 1;
-        long receiverId = 2;
+        MentorshipRequestDto requestDto = buildRequestDto();
+        MentorshipRequest request = buildRequest();
 
-        User requester = new User();
-        User receiver = new User();
-        MentorshipRequestDto mentorshipRequestDto =
-                new MentorshipRequestDto(description, requesterId, receiverId);
-        MentorshipRequest mentorshipRequest =
-                new MentorshipRequest();
-
-        requester.setId(requesterId);
-        receiver.setId(receiverId);
-
-        mentorshipRequest.setDescription(description);
-        mentorshipRequest.setRequester(requester);
-        mentorshipRequest.setReceiver(receiver);
-
-        Mockito.when(mentorshipRequestMapper.toEntity(mentorshipRequestDto, mentorshipRequestService))
-                .thenReturn(mentorshipRequest);
+        Mockito.when(mentorshipRequestMapper.toEntity(requestDto, mentorshipRequestService))
+                .thenReturn(request);
         Mockito.doNothing().when(mentorshipRequestValidator).validate(Mockito.any(), Mockito.any(), Mockito.any());
 
-        mentorshipRequestService.requestMentorship(mentorshipRequestDto);
+        mentorshipRequestService.requestMentorship(requestDto);
 
         Mockito.verify(mentorshipRequestRepository, Mockito.times(1))
-                .save(mentorshipRequest);
+                .save(request);
     }
 
     @Test
     void testGetRequests_AllFiltersAreUsed_ShouldReturnListOfRequestDtos() {
-        String description = "description";
-        long requesterId = 1;
-        long receiverId = 2;
-        String status = "PENDING";
-
-        User requester = new User();
-        User receiver = new User();
-        RequestFilterDto requestFilterDto =
-                new RequestFilterDto(description, requesterId, receiverId, status);
-        MentorshipRequest mentorshipRequest =
-                new MentorshipRequest();
-
-        requester.setId(1);
-        requester.setId(2);
-
-        mentorshipRequest.setDescription(description);
-        mentorshipRequest.setRequester(requester);
-        mentorshipRequest.setReceiver(receiver);
-        mentorshipRequest.setStatus(RequestStatus.PENDING);
+        RequestFilterDto requestFilterDto = buildRequestFilter();
+        MentorshipRequest mentorshipRequest = buildRequest().builder().build();
 
         Mockito
                 .when(mentorshipRequestMapper.toEntity(requestFilterDto, mentorshipRequestService, filterRequestStatusValidator))
@@ -109,23 +77,15 @@ public class MentorshipRequestServiceTest {
 
         Mockito
                 .when(mentorshipRequestRepository.findAll())
-                .thenReturn(getListOfRequests(description, requester, receiver));
+                .thenReturn(getListOfRequests(mentorshipRequest.getDescription(), mentorshipRequest.getRequester(), mentorshipRequest.getReceiver()));
 
         Assertions.assertEquals(1, mentorshipRequestService.getRequests(requestFilterDto).size());
     }
 
     @Test
     void testGetRequests_NotAllFiltersAreUsed_ShouldReturnListOfRequestDtos() {
-        String description = "description";
-
-        RequestFilterDto requestFilterDto =
-                new RequestFilterDto();
-        MentorshipRequest mentorshipRequest =
-                new MentorshipRequest();
-
-        requestFilterDto.setDescription(description);
-
-        mentorshipRequest.setDescription(description);
+        RequestFilterDto requestFilterDto = RequestFilterDto.builder().description("description").build();
+        MentorshipRequest mentorshipRequest = MentorshipRequest.builder().description("description").build();
 
         Mockito
                 .when(mentorshipRequestMapper.toEntity(requestFilterDto, mentorshipRequestService, filterRequestStatusValidator))
@@ -133,7 +93,7 @@ public class MentorshipRequestServiceTest {
 
         Mockito
                 .when(mentorshipRequestRepository.findAll())
-                .thenReturn(getListOfRequests(description));
+                .thenReturn(getListOfRequests(requestFilterDto.getDescription()));
 
         Assertions.assertEquals(1, mentorshipRequestService.getRequests(requestFilterDto).size());
     }
@@ -148,40 +108,8 @@ public class MentorshipRequestServiceTest {
     }
 
     private List<MentorshipRequest> getListOfRequests(String description) {
-        MentorshipRequest mentorshipRequest1 =
-                new MentorshipRequest();
-
-        mentorshipRequest1.setDescription(description);
-
-        MentorshipRequest mentorshipRequest2 =
-                new MentorshipRequest();
-
-        mentorshipRequest2.setDescription("descr");
-
-        return List.of(
-                mentorshipRequest1,
-                mentorshipRequest2
-        );
-    }
-
-    private List<MentorshipRequest> getListOfRequests(String description,
-                                                      User requester,
-                                                      User receiver) {
-        MentorshipRequest mentorshipRequest1 =
-                new MentorshipRequest();
-
-        mentorshipRequest1.setDescription(description);
-        mentorshipRequest1.setRequester(requester);
-        mentorshipRequest1.setReceiver(receiver);
-        mentorshipRequest1.setStatus(RequestStatus.PENDING);
-
-        MentorshipRequest mentorshipRequest2 =
-                new MentorshipRequest();
-
-        mentorshipRequest2.setDescription("descr");
-        mentorshipRequest2.setRequester(requester);
-        mentorshipRequest2.setReceiver(receiver);
-        mentorshipRequest2.setStatus(RequestStatus.PENDING);
+        MentorshipRequest mentorshipRequest1 = MentorshipRequest.builder().description(description).build();
+        MentorshipRequest mentorshipRequest2 = MentorshipRequest.builder().description("descr").build();
 
         return List.of(
                 mentorshipRequest1,
@@ -190,54 +118,54 @@ public class MentorshipRequestServiceTest {
     }
 
     @Test
-    void testAcceptRequest_InputsAreValid_ShouldComplete() {
-        long id = 2;
-        MentorshipRequest mentorshipRequest =
-                new MentorshipRequest();
-        User receiver = new User();
-        User requester = new User();
-
-        mentorshipRequest.setId(id);
-        receiver.setId(1);
-        requester.setId(2);
-        receiver.setMentees(new ArrayList<>());
-        requester.setMentors(new ArrayList<>());
-        mentorshipRequest.setReceiver(receiver);
-        mentorshipRequest.setRequester(requester);
-        mentorshipRequest.setStatus(RequestStatus.PENDING);
+    void testAcceptRequest_InputsAreValid_ShouldAddMentorAndMentee() {
+        MentorshipRequest mentorshipRequest = buildRequest();
 
         Mockito.when(mentorshipRequestRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(mentorshipRequest));
 
-        mentorshipRequestService.acceptRequest(id);
+        mentorshipRequestService.acceptRequest(mentorshipRequest.getId());
 
-        Assertions.assertTrue(receiver.getMentees().contains(requester));
-        Assertions.assertTrue(requester.getMentors().contains(receiver));
+        Assertions.assertTrue(mentorshipRequest.getReceiver().getMentees().contains(mentorshipRequest.getRequester()));
+        Assertions.assertTrue(mentorshipRequest.getRequester().getMentors().contains(mentorshipRequest.getReceiver()));
+    }
+
+    @Test
+    void testAcceptRequest_InputsAreValid_ShouldChangeStatusToAcceptedAndSaveRequest() {
+        MentorshipRequest mentorshipRequest = buildRequest();
+
+        Mockito.when(mentorshipRequestRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(mentorshipRequest));
+
+        mentorshipRequestService.acceptRequest(mentorshipRequest.getId());
+
         Assertions.assertEquals(RequestStatus.ACCEPTED, mentorshipRequest.getStatus());
         Mockito.verify(mentorshipRequestRepository, Mockito.times(1)).save(mentorshipRequest);
-        Mockito.verify(userRepository, Mockito.times(1)).save(receiver);
-        Mockito.verify(userRepository, Mockito.times(1)).save(requester);
+    }
+
+    @Test
+    void testAcceptRequest_InputsAreValid_ShouldSaveMentorAndMentee() {
+        MentorshipRequest mentorshipRequest = buildRequest();
+
+        Mockito.when(mentorshipRequestRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(mentorshipRequest));
+
+        mentorshipRequestService.acceptRequest(mentorshipRequest.getId());
+
+        Mockito.verify(userRepository, Mockito.times(1)).save(mentorshipRequest.getReceiver());
+        Mockito.verify(userRepository, Mockito.times(1)).save(mentorshipRequest.getRequester());
     }
 
     @Test
     void testAcceptRequest_InputsAreInvalid_ShouldThrowException() {
-        long id = 2;
-        MentorshipRequest mentorshipRequest =
-                new MentorshipRequest();
-        User receiver = new User();
-        User requester = new User();
+        MentorshipRequest request = buildRequest().builder()
+                .status(RequestStatus.ACCEPTED)
+                .receiver(User.builder()
+                        .mentees(new ArrayList<>(List.of(buildRequest().getRequester())))
+                        .build())
+                .build();
 
-        mentorshipRequest.setId(id);
-        receiver.setId(1);
-        requester.setId(2);
-        mentorshipRequest.setReceiver(receiver);
-        receiver.setMentees(new ArrayList<>(List.of(requester)));
-        mentorshipRequest.setRequester(requester);
-        mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
-
-        Mockito.when(mentorshipRequestRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(mentorshipRequest));
+        Mockito.when(mentorshipRequestRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(request));
 
         Assertions.assertThrows(RequestIsAlreadyAcceptedException.class,
-                () -> mentorshipRequestService.acceptRequest(id));
+                () -> mentorshipRequestService.acceptRequest(request.getId()));
     }
 
     @Test
@@ -250,70 +178,154 @@ public class MentorshipRequestServiceTest {
     }
 
     @Test
-    void testRejectRequest_InputsAreValidAndRequestWasAccepted_ShouldComplete() {
-        long id = 1;
-        MentorshipRequest foundRequest = new MentorshipRequest();
-        User receiver = new User();
-        User requester = new User();
+    void testRejectRequest_InputsAreValidAndRequestWasAccepted_ShouldDeleteMentorAndMenteeFromLists() {
+        MentorshipRequest request = buildRequestForRejectingRequest();
 
-        foundRequest.setId(id);
-        receiver.setId(1);
-        requester.setId(2);
-        receiver.setMentees(new ArrayList<>(List.of(requester)));
-        requester.setMentors(new ArrayList<>(List.of(receiver)));
-        foundRequest.setReceiver(receiver);
-        foundRequest.setRequester(requester);
-        foundRequest.setStatus(RequestStatus.ACCEPTED);
+        Mockito.when(mentorshipRequestRepository.findById(request.getId())).thenReturn(Optional.of(request));
 
-        Mockito.when(mentorshipRequestRepository.findById(id)).thenReturn(Optional.of(foundRequest));
+        mentorshipRequestService.rejectRequest(request.getId(), new RejectionDto("reason"));
 
-        mentorshipRequestService.rejectRequest(id, new RejectionDto("reason"));
-
-        Assertions.assertFalse(receiver.getMentees().contains(requester));
-        Assertions.assertFalse(requester.getMentors().contains(receiver));
-        Assertions.assertEquals(RequestStatus.REJECTED, foundRequest.getStatus());
-        Mockito.verify(mentorshipRequestRepository, Mockito.times(1)).save(foundRequest);
-        Mockito.verify(userRepository, Mockito.times(1)).save(receiver);
-        Mockito.verify(userRepository, Mockito.times(1)).save(requester);
+        Assertions.assertFalse(request.getReceiver().getMentees().contains(request.getRequester()));
+        Assertions.assertFalse(request.getRequester().getMentors().contains(request.getReceiver()));
     }
 
     @Test
-    void testRejectRequest_InputsAreValidAndRequestWasPending_ShouldComplete() {
-        long id = 1;
-        MentorshipRequest foundRequest = new MentorshipRequest();
-        User receiver = new User();
-        User requester = new User();
+    void testRejectRequest_InputsAreValidAndRequestWasAccepted_StatusShouldBeRejected() {
+        MentorshipRequest request = buildRequestForRejectingRequest();
 
-        foundRequest.setId(id);
-        receiver.setId(1);
-        requester.setId(2);
-        receiver.setMentees(new ArrayList<>());
-        requester.setMentors(new ArrayList<>());
-        foundRequest.setReceiver(receiver);
-        foundRequest.setRequester(requester);
-        foundRequest.setStatus(RequestStatus.PENDING);
+        Mockito.when(mentorshipRequestRepository.findById(request.getId())).thenReturn(Optional.of(request));
 
-        Mockito.when(mentorshipRequestRepository.findById(id)).thenReturn(Optional.of(foundRequest));
+        mentorshipRequestService.rejectRequest(request.getId(), new RejectionDto("reason"));
 
-        mentorshipRequestService.rejectRequest(id, new RejectionDto("reason"));
+        Assertions.assertEquals(RequestStatus.REJECTED, request.getStatus());
 
-        Assertions.assertFalse(receiver.getMentees().contains(requester));
-        Assertions.assertFalse(requester.getMentors().contains(receiver));
+    }
+
+    @Test
+    void testRejectRequest_InputsAreValidAndRequestWasAccepted_RequestAndUsersShouldBeSaved() {
+        MentorshipRequest request = buildRequestForRejectingRequest();
+
+        Mockito.when(mentorshipRequestRepository.findById(request.getId())).thenReturn(Optional.of(request));
+
+        mentorshipRequestService.rejectRequest(request.getId(), new RejectionDto("reason"));
+
+        Mockito.verify(mentorshipRequestRepository, Mockito.times(1)).save(request);
+        Mockito.verify(userRepository, Mockito.times(1)).save(request.getReceiver());
+        Mockito.verify(userRepository, Mockito.times(1)).save(request.getRequester());
+    }
+
+    @Test
+    void testRejectRequest_InputsAreValidAndRequestWasPending_ShouldAddMentorAndMenteeToLists() {
+        MentorshipRequest foundRequest = buildRequest();
+
+        Mockito.when(mentorshipRequestRepository.findById(foundRequest.getId())).thenReturn(Optional.of(foundRequest));
+
+        mentorshipRequestService.rejectRequest(foundRequest.getId(), new RejectionDto("reason"));
+
+        Assertions.assertFalse(foundRequest.getReceiver().getMentees().contains(foundRequest.getRequester()));
+        Assertions.assertFalse(foundRequest.getRequester().getMentors().contains(foundRequest.getReceiver()));
+    }
+
+    @Test
+    void testRejectRequest_InputsAreValidAndRequestWasPending_RequestShouldBeRejected() {
+        MentorshipRequest foundRequest = buildRequest();
+
+        Mockito.when(mentorshipRequestRepository.findById(foundRequest.getId())).thenReturn(Optional.of(foundRequest));
+
+        mentorshipRequestService.rejectRequest(foundRequest.getId(), new RejectionDto("reason"));
+
         Assertions.assertEquals(RequestStatus.REJECTED, foundRequest.getStatus());
+    }
+
+    @Test
+    void testRejectRequest_InputsAreValidAndRequestWasPending_RequestAndUsersShouldBeSaved() {
+        MentorshipRequest foundRequest = buildRequest();
+
+        Mockito.when(mentorshipRequestRepository.findById(foundRequest.getId())).thenReturn(Optional.of(foundRequest));
+
+        mentorshipRequestService.rejectRequest(foundRequest.getId(), new RejectionDto("reason"));
+
         Mockito.verify(mentorshipRequestRepository, Mockito.times(1)).save(foundRequest);
-        Mockito.verify(userRepository, Mockito.times(1)).save(receiver);
-        Mockito.verify(userRepository, Mockito.times(1)).save(requester);
+        Mockito.verify(userRepository, Mockito.times(1)).save(foundRequest.getReceiver());
+        Mockito.verify(userRepository, Mockito.times(1)).save(foundRequest.getRequester());
     }
 
     @Test
     void testRejectRequest_RequestIsAlreadyRejected_ShouldThrowException() {
-        long id = 1;
-        MentorshipRequest foundRequest = new MentorshipRequest();
-        foundRequest.setStatus(RequestStatus.REJECTED);
-        Mockito.when(mentorshipRequestRepository.findById(id)).thenReturn(Optional.of(foundRequest));
+        MentorshipRequest request = buildRequest().builder()
+                .status(RequestStatus.REJECTED)
+                .build();
+
+        Mockito.when(mentorshipRequestRepository.findById(request.getId())).thenReturn(Optional.of(request));
 
         Assertions.assertThrows(RequestIsAlreadyRejectedException.class,
-                () -> mentorshipRequestService.rejectRequest(id, new RejectionDto("reason")));
+                () -> mentorshipRequestService.rejectRequest(request.getId(), new RejectionDto("reason")));
+    }
+
+    private List<MentorshipRequest> getListOfRequests(String description,
+                                                      User requester,
+                                                      User receiver) {
+
+        MentorshipRequest mentorshipRequest1 = buildRequest().builder()
+                .description(description)
+                .requester(requester)
+                .receiver(receiver)
+                .status(RequestStatus.PENDING)
+                .build();
+
+        MentorshipRequest mentorshipRequest2 = buildRequest().builder()
+                .description("descr")
+                .requester(User.builder().id(4).build())
+                .receiver(receiver)
+                .status(RequestStatus.PENDING)
+                .build();
+
+        return List.of(
+                mentorshipRequest1,
+                mentorshipRequest2
+        );
+    }
+
+    private MentorshipRequest buildRequest() {
+        return MentorshipRequest.builder()
+                .id(2)
+                .description("description")
+                .receiver(User.builder()
+                        .id(1)
+                        .mentees(new ArrayList<>()).build())
+                .requester(User.builder()
+                        .id(2)
+                        .mentors(new ArrayList<>()).build())
+                .status(RequestStatus.PENDING)
+                .build();
+    }
+
+    private MentorshipRequest buildRequestForRejectingRequest() {
+        return buildRequest().builder()
+                .status(RequestStatus.ACCEPTED)
+                .requester(User.builder()
+                        .mentors(new ArrayList<>(List.of(buildRequest().getReceiver())))
+                        .build())
+                .receiver(User.builder()
+                        .mentees(new ArrayList<>(List.of(buildRequest().getRequester())))
+                        .build())
+                .build();
+    }
+
+    private RequestFilterDto buildRequestFilter() {
+        return RequestFilterDto.builder()
+                .description("description")
+                .requesterId(1L)
+                .receiverId(2L)
+                .status("PENDING")
+                .build();
+    }
+
+    private MentorshipRequestDto buildRequestDto() {
+        return MentorshipRequestDto.builder()
+                .description("description")
+                .requesterId(1L)
+                .receiverId(2L)
+                .build();
     }
 }
-

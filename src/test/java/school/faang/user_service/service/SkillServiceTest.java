@@ -12,8 +12,12 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -23,17 +27,18 @@ class SkillServiceTest {
     private SkillService skillService;
     @Mock
     private SkillRepository skillRepository;
+    @Mock
+    private UserRepository userRepository;
     @Spy
     private SkillMapper skillMapper = Mappers.getMapper(SkillMapper.class);
-    ;
 
     @Test
     void testCreateSkillToDb() {
-        SkillDto skillDto = new SkillDto(1L, "Skill");
+        SkillDto skillDto = new SkillDto(1L, "Skill", List.of(1L), null, null);
         Skill skill = skillMapper.toEntity(skillDto);
 
         when(skillRepository.existsByTitle(skillDto.getTitle())).thenReturn(false);
-        when(skillRepository.save(skill)).thenReturn(skill);
+        when(skillRepository.save(any(Skill.class))).thenReturn(skill);
 
         SkillDto createdSkill = skillService.create(skillDto);
 
@@ -43,7 +48,7 @@ class SkillServiceTest {
 
     @Test
     void testValidationSkillWithBlankTitle() {
-        SkillDto skillDto = new SkillDto(1L, "");
+        SkillDto skillDto = new SkillDto(1L, "", List.of(1L), null, null);
 
         DataValidationException validationException = assertThrows(DataValidationException.class,
                 () -> skillService.create(skillDto));
@@ -53,7 +58,7 @@ class SkillServiceTest {
 
     @Test
     void testValidationSkillNotFoundTitle() {
-        SkillDto skillDto = new SkillDto(1L, "Skill");
+        SkillDto skillDto = new SkillDto(1L, "Skill", List.of(1L), null, null);
 
         when(skillRepository.existsByTitle(anyString())).thenReturn(true);
 

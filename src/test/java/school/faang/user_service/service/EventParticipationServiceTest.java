@@ -1,9 +1,11 @@
 package school.faang.user_service.service;
 
 import org.junit.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.service.event.EventParticipationService;
@@ -11,7 +13,7 @@ import school.faang.user_service.service.event.EventParticipationService;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
+@ExtendWith(MockitoExtension.class)
 public class EventParticipationServiceTest {
     @Mock
     private EventParticipationRepository eventParticipationRepository;

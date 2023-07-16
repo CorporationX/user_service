@@ -91,7 +91,6 @@ public class EventServiceTest {
             .build();
 
 
-
     @Test
     public void testOwnerHasNoSkillsForEvent() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
@@ -136,13 +135,13 @@ public class EventServiceTest {
     }
 
     @Test
-    public void testUpdateEventOwnerHasNoSkills(){
+    public void testUpdateEventOwnerHasNoSkills() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
         Assertions.assertThrows(DataValidationException.class, () -> eventService.updateEvent(eventDto));
     }
 
     @Test
-    public void testUpdateEventOwnerHasSkills(){
+    public void testUpdateEventOwnerHasSkills() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user2));
         when(eventRepository.save(eventMapper.toEvent(eventDto))).thenReturn(event);
         eventService.updateEvent(eventDto);
@@ -150,9 +149,15 @@ public class EventServiceTest {
     }
 
     @Test
-    public void testUpdateEventReturnsNull(){
+    public void testUpdateEventReturnsNull() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user2));
         when(eventRepository.save(eventMapper.toEvent(eventDto))).thenReturn(eventWithoutAttendees);
         Assertions.assertEquals(0, eventService.updateEvent(eventDto));
+    }
+
+    @Test
+    public void testGetOwnedEventsIsNull() {
+        when(eventRepository.findAllByUserId(1L)).thenReturn(null);
+        Assertions.assertEquals(0, eventService.getOwnedEvents(1L).size());
     }
 }

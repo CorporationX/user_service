@@ -13,6 +13,8 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -48,36 +50,40 @@ public class EventService {
 
     }
 
-    public Event getEvent(long id){
+    public Event getEvent(long id) {
         Optional<Event> event;
 
-        try{
+        try {
             event = eventRepository.findById(id);
-        }catch (IllegalArgumentException exception){
+        } catch (IllegalArgumentException exception) {
             throw new DataValidationException("ID is incorrect");
         }
-        if(event.isEmpty()){
+        if (event.isEmpty()) {
             throw new DataValidationException("There is no event with this id");
         }
 
         return event.get();
     }
 
-    public void deleteEvent(long id){
+    public void deleteEvent(long id) {
         try {
             eventRepository.deleteById(id);
-        }catch (IllegalArgumentException exception){
+        } catch (IllegalArgumentException exception) {
             throw new DataValidationException("ID is incorrect");
         }
     }
 
-    public int updateEvent(EventDto event){
+    public int updateEvent(EventDto event) {
         validate(event);
         int result = 0;
-        try{
+        try {
             result = eventRepository.save(eventMapper.toEvent(event)).getAttendees().size();
-        }catch (NullPointerException e){
+        } catch (NullPointerException e) {
         }
         return result;
+    }
+
+    public List<Event> getOwnedEvents(long userId) {
+        return Optional.ofNullable(eventRepository.findAllByUserId(userId)).orElse(new ArrayList<>());
     }
 }

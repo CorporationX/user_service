@@ -10,7 +10,9 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class EventService {
@@ -24,20 +26,28 @@ public class EventService {
     this.eventMapper = eventMapper;
   }
 
-  private void validateUserAccess(List<SkillDto> skills, Long ownerId) throws DataValidationException {
+  private void validateUserAccess(List<Long> skills, Long ownerId) {
     List<Skill> userSkills = skillRepository.findSkillsByGoalId(ownerId);
-    boolean hasUserPermission = skills.stream()
-        .allMatch((skill ->  userSkills.stream()
-            .anyMatch(userSkill -> userSkill.getTitle().equals(skill.getTitle()))
-            )
-        );
 
-    if (!hasUserPermission) throw new DataValidationException("User doesn't have access");;
+    Set<Long> eventSkills = new HashSet<>(skills);
+    Set<Long> userSkillIds = new HashSet<>(userSkills.stream().map(Skill::getId).toList());
+
+    boolean hasUserPermission = eventSkills.containsAll(userSkillIds);
+
+
+    if (!hasUserPermission) {
+      throw new DataValidationException("User doesn't have access");
+    };
   }
 
-  public EventDto create(EventDto event) throws DataValidationException {
+  public EventDto create(EventDto event) {
      validateUserAccess(event.getRelatedSkills(), event.getOwnerId());
-     Event createdEvent = eventRepository.save(eventMapper.toEntity(event));
+     List<Skill> skills = skillRepository.findAllById(event.getRelatedSkills());
+
+     Event newEvent = eventMapper.toEntity(event);
+     newEvent.setRelatedSkills(skills);
+
+     Event createdEvent = eventRepository.save(newEvent);
      return eventMapper.toDto(createdEvent);
   }
 

@@ -37,16 +37,15 @@ class EventServiceTest {
 
   @InjectMocks
   private EventService eventService;
-
-  private SkillDto eventSkill = new SkillDto(1L, "Coding");
   private Skill userSkill = new Skill();
 
 
   @BeforeEach
   public void init() {
     userSkill.setTitle("Coding");
+    userSkill.setId(1L);
     eventDto = new EventDto(1L, "Hiring", LocalDateTime.now(), LocalDateTime.now(),
-        1L, "Hiring event", List.of(eventSkill), "USA", 5);
+        1L, "Hiring event", List.of(1L), "USA", 5);
   }
 
   @Test

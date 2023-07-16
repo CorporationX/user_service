@@ -12,20 +12,20 @@ import java.util.List;
 @Controller
 public class EventController {
   private final EventService eventService;
-  private static final int MIN_NAME_LENGTH = 3;
+  private final int MIN_NAME_LENGTH = 3;
 
   @Autowired
   public EventController(EventService eventService) {
     this.eventService = eventService;
   }
 
-  private static void validateTitle(String name) throws DataValidationException {
+  private void validateTitle(String name) throws DataValidationException {
     if (name == null || name.length() < MIN_NAME_LENGTH) {
       throw new DataValidationException("Name is required and should be at least 3 symbols");
     }
   }
 
-  private static void validateStartDate(LocalDateTime startDate) throws DataValidationException {
+  private void validateStartDate(LocalDateTime startDate) throws DataValidationException {
     if (startDate == null) {
       throw new DataValidationException("Start date is required");
     }
@@ -37,14 +37,14 @@ public class EventController {
     }
   }
 
-  private static void validateCreateDTO(EventDto event) throws DataValidationException {
+  private void validateEvent(EventDto event) throws DataValidationException {
     validateTitle(event.getTitle());
     validateStartDate(event.getStartDate());
     validateUserId(event.getOwnerId());
   }
 
   public EventDto create(EventDto event) {
-    validateCreateDTO(event);
+    validateEvent(event);
     return eventService.create(event);
   }
 

@@ -4,4 +4,7 @@ public class RequestMentorshipException extends RuntimeException{
     public RequestMentorshipException(String message) {
         super(message);
     }
+
+    public RequestMentorshipException() {
+    }
 }

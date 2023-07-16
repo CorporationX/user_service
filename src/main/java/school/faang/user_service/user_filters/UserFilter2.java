@@ -1,4 +1,4 @@
-package school.faang.user_service.filters;
+package school.faang.user_service.user_filters;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.UserFilterDto;
@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
-public class UserFilter {
+public class UserFilter2 {
     public List<User> filterUsers(Stream<User> userStream, UserFilterDto filter) {
         Predicate<User> namePredicate = user -> filter.getNamePattern() == null || filter.getNamePattern().isBlank() || user.getUsername().contains(filter.getNamePattern());
         Predicate<User> aboutPredicate = user -> filter.getAboutPattern() == null || filter.getAboutPattern().isBlank() || user.getAboutMe().contains(filter.getAboutPattern());
@@ -22,8 +22,8 @@ public class UserFilter {
         Predicate<User> phonePredicate = user -> filter.getPhonePattern() == null || filter.getPhonePattern().isBlank() || user.getPhone().contains(filter.getPhonePattern());
         Predicate<User> skillPredicate = user -> filter.getSkillPattern() == null || filter.getSkillPattern().isBlank() || user.getSkills().stream()
                 .anyMatch(skill -> skill.getTitle().contains(filter.getSkillPattern()));
-        Predicate<User> experienceMinPredicate = user -> Integer.toString(filter.getExperienceMin()).isBlank() || user.getExperience() > filter.getExperienceMin();
-        Predicate<User> experienceMaxPredicate = user -> Integer.toString(filter.getExperienceMax()).isBlank() || user.getExperience() < filter.getExperienceMax();
+        Predicate<User> experienceMinPredicate = user -> filter.getExperienceMin() == 0 || user.getExperience() > filter.getExperienceMin();
+        Predicate<User> experienceMaxPredicate = user -> filter.getExperienceMax() == 0 || user.getExperience() < filter.getExperienceMax();
 
         return userStream.filter(namePredicate)
                 .filter(aboutPredicate)

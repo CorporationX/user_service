@@ -41,8 +41,8 @@ class SubscriptionControllerTest {
 
     @Test
     public void testFollowUser() {
-        followerId = 1;
-        followeeId = 2;
+        followerId = 1L;
+        followeeId = 2L;
 
         subscriptionController.followUser(followerId, followeeId);
 
@@ -54,7 +54,7 @@ class SubscriptionControllerTest {
         try {
             subscriptionController.followUser(followerId, followerId);
         } catch (DataValidationException e) {
-            assertEquals("You can't subscribe to yourself", e.getMessage());
+            assertEquals("Follower and folowee can not be the same", e.getMessage());
         }
         verifyNoInteractions(subscriptionService);
     }
@@ -76,7 +76,7 @@ class SubscriptionControllerTest {
         try {
             subscriptionController.unfollowUser(followerId, followerId);
         } catch (DataValidationException e) {
-            assertEquals("You can't unsubscribe to yourself", e.getMessage());
+            assertEquals("Follower and folowee can not be the same", e.getMessage());
         }
         verifyNoInteractions(subscriptionService);
     }

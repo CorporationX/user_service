@@ -3,9 +3,8 @@ package school.faang.user_service.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-
-@Data
 @AllArgsConstructor
+@Data
 @Builder
 public class UserFilterDto {
     private String namePattern;

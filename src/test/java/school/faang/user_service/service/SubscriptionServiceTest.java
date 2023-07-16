@@ -5,11 +5,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.filters.UserFilter;
+import school.faang.user_service.user_filters.UserFilter2;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 
 import java.util.List;
@@ -29,10 +32,12 @@ class SubscriptionServiceTest {
     SubscriptionService subscriptionService;
     @Mock
     SubscriptionRepository subscriptionRepository;
+    @Spy
+    UserMapper userMapper;
     @Mock
     UserFilterDto userFilterDto;
     @Mock
-    UserFilter userFilter;
+    UserFilter2 userFilter2;
 
 
     long followerId;
@@ -76,6 +81,8 @@ class SubscriptionServiceTest {
 
     @Test
     public void testUnfollowUser() {
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true).thenReturn(false);
+
         subscriptionService.unfollowUser(followerId, followeeId);
 
         verify(subscriptionRepository, times(1)).unfollowUser(followerId, followeeId);
@@ -84,14 +91,17 @@ class SubscriptionServiceTest {
     @Test
     public void testFollowers() {
         User user = mock(User.class);
+        UserDto userDto = mock(UserDto.class);
         Stream<User> userStream = Stream.of(user);
 
         when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(userStream);
-        when(userFilter.filterUsers(userStream, userFilterDto)).thenReturn(List.of(user));
+        when(userFilter2.filterUsers(userStream, userFilterDto)).thenReturn(List.of(user));
+        when(userMapper.toDto(user)).thenReturn(userDto);
 
         subscriptionService.getFollowers(followeeId, userFilterDto);
 
         verify(subscriptionRepository, times(1)).findByFolloweeId(followeeId);
-        verify(userFilter, times(1)).filterUsers(userStream, userFilterDto);
+        verify(userFilter2, times(1)).filterUsers(userStream, userFilterDto);
+        verify(userMapper, times(1)).toDto(user);
     }
 }

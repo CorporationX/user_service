@@ -1,4 +1,4 @@
-package school.faang.user_service.filters;
+package school.faang.user_service.user_filters;
 
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.UserFilterDto;
@@ -11,15 +11,15 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class UserFilterTest {
-    UserFilter userFilter = new UserFilter();
+class UserFilter2Test {
+    UserFilter2 userFilter2 = new UserFilter2();
 
     @Test
     void testFilterUsersWrongName() {
         User user = User.builder().username("John").build();
         Stream<User> userStream = Stream.of(user);
         UserFilterDto userFilterDto = UserFilterDto.builder().namePattern("Name").build();
-        List<User> userList = userFilter.filterUsers(userStream, userFilterDto);
+        List<User> userList = userFilter2.filterUsers(userStream, userFilterDto);
         assertEquals(0, userList.size());
     }
 
@@ -28,7 +28,7 @@ class UserFilterTest {
         User user = User.builder().aboutMe("").build();
         Stream<User> userStream = Stream.of(user);
         UserFilterDto userFilterDto = UserFilterDto.builder().aboutPattern("I am a student").build();
-        List<User> userList = userFilter.filterUsers(userStream, userFilterDto);
+        List<User> userList = userFilter2.filterUsers(userStream, userFilterDto);
         assertEquals(0, userList.size());
     }
 
@@ -37,7 +37,7 @@ class UserFilterTest {
         User user = User.builder().email(" ").build();
         Stream<User> userStream = Stream.of(user);
         UserFilterDto userFilterDto = UserFilterDto.builder().emailPattern("email@example").build();
-        List<User> userList = userFilter.filterUsers(userStream, userFilterDto);
+        List<User> userList = userFilter2.filterUsers(userStream, userFilterDto);
         assertEquals(0, userList.size());
     }
 
@@ -46,7 +46,7 @@ class UserFilterTest {
         User user = User.builder().contacts(Collections.emptyList()).build();
         Stream<User> userStream = Stream.of(user);
         UserFilterDto userFilterDto = UserFilterDto.builder().contactPattern("123456789").build();
-        List<User> userList = userFilter.filterUsers(userStream, userFilterDto);
+        List<User> userList = userFilter2.filterUsers(userStream, userFilterDto);
         assertEquals(0, userList.size());
     }
 
@@ -55,7 +55,7 @@ class UserFilterTest {
         User user = User.builder().country(new Country(1L, " ", Collections.emptyList())).build();
         Stream<User> userStream = Stream.of(user);
         UserFilterDto userFilterDto = UserFilterDto.builder().countryPattern("Peace").build();
-        List<User> userList = userFilter.filterUsers(userStream, userFilterDto);
+        List<User> userList = userFilter2.filterUsers(userStream, userFilterDto);
         assertEquals(0, userList.size());
     }
 
@@ -64,7 +64,7 @@ class UserFilterTest {
         User user = User.builder().city("City").build();
         Stream<User> userStream = Stream.of(user);
         UserFilterDto userFilterDto = UserFilterDto.builder().cityPattern("Town").build();
-        List<User> userList = userFilter.filterUsers(userStream, userFilterDto);
+        List<User> userList = userFilter2.filterUsers(userStream, userFilterDto);
         assertEquals(0, userList.size());
     }
 
@@ -73,7 +73,7 @@ class UserFilterTest {
         User user = User.builder().phone("1234567").build();
         Stream<User> userStream = Stream.of(user);
         UserFilterDto userFilterDto = UserFilterDto.builder().phonePattern("000").build();
-        List<User> userList = userFilter.filterUsers(userStream, userFilterDto);
+        List<User> userList = userFilter2.filterUsers(userStream, userFilterDto);
         assertEquals(0, userList.size());
     }
 
@@ -82,7 +82,7 @@ class UserFilterTest {
         User user = User.builder().skills(Collections.emptyList()).build();
         Stream<User> userStream = Stream.of(user);
         UserFilterDto userFilterDto = UserFilterDto.builder().skillPattern("Faster").build();
-        List<User> userList = userFilter.filterUsers(userStream, userFilterDto);
+        List<User> userList = userFilter2.filterUsers(userStream, userFilterDto);
         assertEquals(0, userList.size());
     }
 
@@ -91,7 +91,7 @@ class UserFilterTest {
         User user = User.builder().experience(10).build();
         Stream<User> userStream = Stream.of(user);
         UserFilterDto userFilterDto = UserFilterDto.builder().experienceMin(11).build();
-        List<User> userList = userFilter.filterUsers(userStream, userFilterDto);
+        List<User> userList = userFilter2.filterUsers(userStream, userFilterDto);
         assertEquals(0, userList.size());
     }
 
@@ -100,7 +100,7 @@ class UserFilterTest {
         User user = User.builder().experience(10).build();
         Stream<User> userStream = Stream.of(user);
         UserFilterDto userFilterDto = UserFilterDto.builder().experienceMax(5).build();
-        List<User> userList = userFilter.filterUsers(userStream, userFilterDto);
+        List<User> userList = userFilter2.filterUsers(userStream, userFilterDto);
         assertEquals(0, userList.size());
     }
 
@@ -130,7 +130,7 @@ class UserFilterTest {
                 .experienceMin(5)
                 .experienceMax(15)
                 .build();
-        List<User> userList = userFilter.filterUsers(userStream, userFilterDto);
+        List<User> userList = userFilter2.filterUsers(userStream, userFilterDto);
         assertEquals(1, userList.size());
     }
 }

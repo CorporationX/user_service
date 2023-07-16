@@ -18,7 +18,7 @@ public class MentorshipService {
     public List<UserDto> getMentees(long mentorId) {
         User user = validateUserId(mentorId);
         return user.getMentees().stream()
-                .map(userMapper::userToUserDto)
+                .map(userMapper::toDto)
                 .toList();
     }
 

@@ -32,7 +32,7 @@ public interface UserMapper {
                     target = "recommendationReceivedIds",
                     qualifiedByName = "mapRecommendationIds")
     })
-    UserDto userToUserDto(User user);
+    UserDto toDto(User user);
 
     @Mappings({
             @Mapping(target = "country", ignore = true),
@@ -45,7 +45,7 @@ public interface UserMapper {
             @Mapping(target = "recommendationsGiven", ignore = true),
             @Mapping(target = "recommendationsReceived", ignore = true)
     })
-    User userDtoToUser(UserDto userDto);
+    User toUser(UserDto userDto);
 
     @Named("mapUserIds")
     default List<Long> mapUserIds(List<User> users) {

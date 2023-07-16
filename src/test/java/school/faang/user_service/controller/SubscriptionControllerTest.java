@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SubscriptionService;
 
@@ -22,9 +21,6 @@ class SubscriptionControllerTest {
     SubscriptionController subscriptionController;
     @Mock
     SubscriptionService subscriptionService;
-    @Mock
-    UserFilterDto userFilterDto;
-
 
     long followerId;
     long followeeId;
@@ -43,8 +39,8 @@ class SubscriptionControllerTest {
 
     @Test
     public void testFollowUser() {
-        followerId = 1;
-        followeeId = 2;
+        followerId = 1L;
+        followeeId = 2L;
 
         subscriptionController.followUser(followerId, followeeId);
 
@@ -62,38 +58,9 @@ class SubscriptionControllerTest {
     }
 
     @Test
-    public void testUnfollowUser() {
-        followerId = 1L;
-        followeeId = 2L;
+    public void testGetFollowingCount() {
+        subscriptionController.getFollowingCount(followerId);
 
-        subscriptionController.unfollowUser(followerId, followeeId);
-
-        verify(subscriptionService, times(1)).unfollowUser(followerId, followeeId);
-    }
-
-    @Test
-    public void testMessageThrowForMethodUnfollowUser() {
-        assertThrows(DataValidationException.class, () -> subscriptionController.unfollowUser(followerId, followeeId));
-
-        try {
-            subscriptionController.unfollowUser(followerId, followerId);
-        } catch (DataValidationException e) {
-            assertEquals("You can't unsubscribe to yourself", e.getMessage());
-        }
-        verifyNoInteractions(subscriptionService);
-    }
-
-    @Test
-    public void testGetFollowers() {
-        subscriptionController.getFollowers(followeeId, userFilterDto);
-
-        verify(subscriptionService, times(1)).getFollowers(followeeId, userFilterDto);
-    }
-
-    @Test
-    public void testGetFollowersCount() {
-        subscriptionController.getFollowersCount(followerId);
-
-        verify(subscriptionService, times(1)).getFollowersCount(followerId);
+        verify(subscriptionService, times(1)).getFollowingCount(followerId);
     }
 }

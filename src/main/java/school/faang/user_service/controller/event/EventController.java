@@ -19,25 +19,25 @@ public class EventController {
     this.eventService = eventService;
   }
 
-  private void validateTitle(String name) throws DataValidationException {
+  private void validateTitle(String name) {
     if (name == null || name.length() < MIN_NAME_LENGTH) {
       throw new DataValidationException("Name is required and should be at least 3 symbols");
     }
   }
 
-  private void validateStartDate(LocalDateTime startDate) throws DataValidationException {
+  private void validateStartDate(LocalDateTime startDate) {
     if (startDate == null) {
       throw new DataValidationException("Start date is required");
     }
   }
 
-  private static void validateUserId(Long ownerId) throws DataValidationException {
+  private static void validateUserId(Long ownerId) {
     if (ownerId == null) {
       throw new DataValidationException("User id is required");
     }
   }
 
-  private void validateEvent(EventDto event) throws DataValidationException {
+  private void validateEvent(EventDto event) {
     validateTitle(event.getTitle());
     validateStartDate(event.getStartDate());
     validateUserId(event.getOwnerId());

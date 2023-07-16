@@ -21,9 +21,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class EventParticipationServiceImplementationTest {
-    private User user;
-    private Long eventId;
-    private Long userId;
+    private static final long EXISTING_USER_ID = 1L;
+
+    private long eventId;
+    private long someUserId;
+    private List<User> users;
+
+
     @Mock
     private EventParticipationRepository eventParticipationRepository;
 
@@ -33,32 +37,43 @@ class EventParticipationServiceImplementationTest {
     void setUp() {
         eventParticipationService =
                 new EventParticipationServiceImplementation(eventParticipationRepository);
-        user = new User();
+
         eventId = 1L;
-        userId = 1L;
+        someUserId = 10L;
+
+        users = getUsers();
     }
 
     @Test
-    void testRegisterParticipant() {
+    void testRegisterParticipant_WhenUserNotRegisteredAtEvent() {
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(eventId))
-                .thenReturn(new ArrayList<>(0));
+                .thenReturn(users);
 
-        eventParticipationService.registerParticipant(eventId, userId);
+        eventParticipationService.registerParticipant(eventId, someUserId);
 
         Mockito.verify(eventParticipationRepository, Mockito.times(1))
-                .register(eventId, userId);
+                .register(eventId, someUserId);
     }
 
     @Test
-    void shouldThrowExceptionWhenTheUserIsRegistered() {
-        userId = user.getId();
+    void testRegisterParticipant_WhenUserRegisteredAtEvent_ShouldThrowException() {
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(eventId))
-                .thenReturn(List.of(user));
+                .thenReturn(users);
 
+        Exception exc = assertThrows(RegistrationUserForEventException.class,
+                () -> eventParticipationService.registerParticipant(eventId, EXISTING_USER_ID));
+
+        assertEquals("The user has already been registered for the event",
+                exc.getMessage());
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideNullInputData")
+    void testRegisterParticipant_WhenInputDataIsNull_ShouldThrowException(Long eventId, Long userId) {
         Exception exc = assertThrows(RegistrationUserForEventException.class,
                 () -> eventParticipationService.registerParticipant(eventId, userId));
 
-        assertEquals("The user has already been registered for the event",
+        assertEquals("Input data is null",
                 exc.getMessage());
     }
 
@@ -77,6 +92,14 @@ class EventParticipationServiceImplementationTest {
                 Arguments.of(null, 1L),
                 Arguments.of(1L, null),
                 Arguments.of(null, null)
+        );
+    }
+
+    private List<User> getUsers() {
+        return List.of(
+                User.builder().id(EXISTING_USER_ID).build(),
+                User.builder().id(2L).build(),
+                User.builder().id(3L).build()
         );
     }
 }

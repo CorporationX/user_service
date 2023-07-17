@@ -20,6 +20,7 @@ import school.faang.user_service.mapper.GoalMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.validator.GoalValidator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -42,26 +43,26 @@ class GoalServiceTest {
     private final List<GoalFilter> goalFilters = List.of(new GoalStatusFilter(), new GoalTitleFilter());
 
     private GoalService goalService;
-    private Goal goal1;
-    private Goal goal2;
-    private GoalDto goalDto1;
-    private GoalDto goalDto2;
+    private Goal goalActive;
+    private Goal goalCompleted;
+    private GoalDto goalDtoActive;
+    private GoalDto goalDtoCompleted;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         goalService = new GoalService(goalRepository, skillRepository, userRepository, goalMapper, goalFilters);
 
-        goal1 = Goal.builder().id(1L).title("title1").status(GoalStatus.ACTIVE).deadline(LocalDateTime.now().plusDays(3L))
+        goalActive = Goal.builder().id(1L).title("title1").status(GoalStatus.ACTIVE).deadline(LocalDateTime.now().plusDays(3L))
                 .description("description1").build();
 
-        goal2 = Goal.builder().id(2L).title("title2").status(GoalStatus.COMPLETED).deadline(LocalDateTime.now().plusDays(3L))
+        goalCompleted = Goal.builder().id(2L).title("title2").status(GoalStatus.COMPLETED).deadline(LocalDateTime.now().plusDays(3L))
                 .description("description2").build();
 
-        goalDto1 = new GoalDto(1L, "description1", null, "title1", GoalStatus.ACTIVE, goal1.getDeadline(), null, null);
-        goalDto2 = new GoalDto(2L, "description2", null, "title2", GoalStatus.COMPLETED, goal2.getDeadline(), null, null);
+        goalDtoActive = new GoalDto(1L, "description1", null, "title1", GoalStatus.ACTIVE, goalActive.getDeadline(), null, null);
+        goalDtoCompleted = new GoalDto(2L, "description2", null, "title2", GoalStatus.COMPLETED, goalCompleted.getDeadline(), null, null);
 
-        Stream<Goal> goalStream = Stream.<Goal>builder().add(goal1).add(goal2).build();
+        Stream<Goal> goalStream = Stream.<Goal>builder().add(goalActive).add(goalCompleted).build();
 
         Mockito.when(goalRepository.findGoalsByUserId(Mockito.anyLong()))
                 .thenReturn(goalStream);
@@ -70,24 +71,28 @@ class GoalServiceTest {
                 .thenReturn(Optional.of(new Goal()));
         Mockito.when(skillRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.of(new Skill()));
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.of(new User()));
     }
 
     @Test
     public void testGetGoalsByUserIdInvalidLessThanOne() {
-        assertThrows(DataValidationException.class,
-                () -> goalService.getGoalsByUser(0L, new GoalFilterDto()), "User id cannot be less than 1!");
+        DataValidationException exception = assertThrows(DataValidationException.class,
+                () -> goalService.getGoalsByUser(0L, new GoalFilterDto()));
+        assertEquals("User id cannot be less than 1!", exception.getMessage());
     }
 
     @Test
     public void testGetGoalsByUserIdInvalidNull() {
-        assertThrows(DataValidationException.class,
-                () -> goalService.getGoalsByUser(null, new GoalFilterDto()), "User id cannot be null!");
+        DataValidationException exception = assertThrows(DataValidationException.class,
+                () -> goalService.getGoalsByUser(null, new GoalFilterDto()));
+        assertEquals("User id cannot be null!", exception.getMessage());
     }
 
     @Test
     public void testGetGoalsByUserIdValidNoneFilter() {
         List<GoalDto> goalDtoList = goalService.getGoalsByUser(1L, null);
-        List<GoalDto> expected = List.of(goalDto1, goalDto2);
+        List<GoalDto> expected = List.of(goalDtoActive, goalDtoCompleted);
 
         assertIterableEquals(expected, goalDtoList);
     }
@@ -96,7 +101,7 @@ class GoalServiceTest {
     public void testGetGoalsByUserIdValidStatusFilter() {
         List<GoalDto> goalDtoList = goalService.getGoalsByUser(1L, new GoalFilterDto(null, GoalStatus.ACTIVE));
         List<GoalDto> expected = List.of(
-                goalDto1
+                goalDtoActive
         );
 
         assertIterableEquals(expected, goalDtoList);
@@ -106,7 +111,7 @@ class GoalServiceTest {
     public void testGetGoalsByUserIdValidTitleFilter() {
         List<GoalDto> goalDtoList = goalService.getGoalsByUser(1L, new GoalFilterDto("1", null));
         List<GoalDto> expected = List.of(
-               goalDto1
+                goalDtoActive
         );
 
         assertIterableEquals(expected, goalDtoList);
@@ -165,7 +170,7 @@ class GoalServiceTest {
     @Test
     public void testCreateGoalInvalidUserHasMoreActiveGoalsThanExpected() {
         List<Goal> activeGoals = new ArrayList<>();
-        for (int i = 0; i < GoalService.MAX_ACTIVE_GOALS; i++) {
+        for (int i = 0; i < GoalValidator.MAX_ACTIVE_GOALS; i++) {
             activeGoals.add(Goal.builder().status(GoalStatus.ACTIVE).build());
         }
         Mockito.when(userRepository.findById(Mockito.anyLong()))
@@ -175,7 +180,7 @@ class GoalServiceTest {
         DataValidationException exception = assertThrows(DataValidationException.class,
                 () -> goalService.createGoal(1L, goalDto));
         assertEquals("User cannot have more than " +
-                GoalService.MAX_ACTIVE_GOALS + " active goals at the same time!", exception.getMessage());
+                GoalValidator.MAX_ACTIVE_GOALS + " active goals at the same time!", exception.getMessage());
     }
 
     @Test
@@ -235,12 +240,98 @@ class GoalServiceTest {
         Mockito.when(skillRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.of(new Skill()));
 
-        goalDto1.setSkillIds(List.of(1L, 2L));
-        goalDto1.setMentorId(mentorId);
-        goalDto1.setParentId(parentId);
-        goalService.createGoal(userId, goalDto1);
+        goalDtoActive.setSkillIds(List.of(1L, 2L));
+        goalDtoActive.setMentorId(mentorId);
+        goalDtoActive.setParentId(parentId);
+        goalService.createGoal(userId, goalDtoActive);
 
         Mockito.verify(goalRepository, Mockito.times(1)).save(Mockito.any());
         Mockito.verify(goalMapper, Mockito.times(1)).toDto(Mockito.any());
+    }
+
+    @Test
+    public void testUpdateGoalInvalidIdLessThanOne() {
+        DataValidationException exception = assertThrows(DataValidationException.class,
+                () -> goalService.updateGoal(0L, new GoalDto()));
+        assertEquals("Goal id cannot be less than 1!", exception.getMessage());
+    }
+
+    @Test
+    public void testUpdateGoalInvalidIdNull() {
+        DataValidationException exception = assertThrows(DataValidationException.class,
+                () -> goalService.updateGoal(null, new GoalDto()));
+        assertEquals("Goal id cannot be null!", exception.getMessage());
+    }
+
+    @Test
+    public void testUpdateGoalInvalidGoalDtoNull() {
+        DataValidationException exception = assertThrows(DataValidationException.class,
+                () -> goalService.updateGoal(1L, null));
+        assertEquals("Goal cannot be null!", exception.getMessage());
+    }
+
+    @Test
+    public void testUpdateGoalInvalidGoalDtoTitleNull() {
+        DataValidationException exception = assertThrows(DataValidationException.class,
+                () -> goalService.updateGoal(1L, new GoalDto()));
+        assertEquals("Title of goal cannot be empty!", exception.getMessage());
+    }
+
+    @Test
+    public void testUpdateGoalInvalidGoalDtoTitleEmpty() {
+        GoalDto goalDto = new GoalDto();
+        goalDto.setTitle("    ");
+        DataValidationException exception = assertThrows(DataValidationException.class,
+                () -> goalService.updateGoal(1L, goalDto));
+        assertEquals("Title of goal cannot be empty!", exception.getMessage());
+    }
+
+    @Test
+    public void testUpdateGoalInvalidStatusCompleted() {
+        Mockito.when(goalRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.of(Goal.builder().status(GoalStatus.COMPLETED).build()));
+
+        DataValidationException exception = assertThrows(DataValidationException.class,
+                () -> goalService.updateGoal(1L, goalDtoActive));
+        assertEquals("You cannot update a completed goal!", exception.getMessage());
+    }
+
+    @Test
+    public void testUpdateGoalValidWithoutUpdatingSkills() {
+        long goalId = 1L;
+
+        Mockito.when(goalRepository.findById(goalId))
+                .thenReturn(Optional.of(goalActive));
+
+        goalService.updateGoal(goalId, goalDtoCompleted);
+
+        Mockito.verify(goalMapper, Mockito.times(1)).toDto(Mockito.any());
+        Mockito.verify(goalMapper, Mockito.times(1)).toEntity(Mockito.any());
+
+        Mockito.verify(goalRepository, Mockito.times(0)).findUsersByGoalId(goalId);
+        Mockito.verify(goalRepository, Mockito.times(1)).save(Mockito.any());
+    }
+
+    @Test
+    public void testUpdateGoalValid() {
+        long goalId = 1L;
+        List<Skill> skills = List.of(Skill.builder().id(1L).build(), Skill.builder().id(2L).build());
+        List<User> users = List.of(User.builder().id(1L).build(), User.builder().id(3L).build());
+        Mockito.when(goalRepository.findById(goalId))
+                .thenReturn(Optional.of(goalActive));
+        Mockito.when(goalRepository.findUsersByGoalId(Mockito.anyLong()))
+                .thenReturn(users);
+
+        goalDtoCompleted.setSkillIds(skills.stream().map(Skill::getId).toList());
+
+        goalService.updateGoal(goalId, goalDtoCompleted);
+
+        Mockito.verify(goalMapper, Mockito.times(1)).toDto(Mockito.any());
+        Mockito.verify(goalMapper, Mockito.times(1)).toEntity(Mockito.any());
+
+        Mockito.verify(goalRepository, Mockito.times(1)).findUsersByGoalId(goalId);
+        Mockito.verify(goalRepository, Mockito.times(1)).save(Mockito.any());
+        Mockito.verify(skillRepository, Mockito.times(skills.size() * users.size()))
+                .assignSkillToUser(Mockito.anyLong(), Mockito.anyLong());
     }
 }

@@ -48,6 +48,7 @@ public class EventService {
         return filterEvents(eventStream, filter);
     }
 
+
     public List<EventDto> getOwnedEvents(long userId) {
         return eventRepository.findAllByUserId(userId).stream().map(eventMapper::toDto).toList();
     }
@@ -58,7 +59,6 @@ public class EventService {
         return eventMapper.toDto(entity);
 
     private void updateEventInDb(EventDto eventForUpdate, EventDto eventFormRequest) {
-        {
             eventValidator.checkIfUserHasSkillsRequired(eventFormRequest);
             if (!(eventFormRequest.getTitle() == null)) {
                 eventForUpdate.setTitle(eventFormRequest.getTitle());
@@ -86,8 +86,7 @@ public class EventService {
             }
             eventRepository.save(eventMapper.toEntity(eventForUpdate));
         }
-    }
-      
+   
     private List<EventDto> filterEvents(Stream<Event> events, EventFilterDto filter) {
         filters.stream()
                 .filter(eventFilter -> eventFilter.isApplicable(filter))

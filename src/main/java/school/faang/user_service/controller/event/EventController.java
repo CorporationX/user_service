@@ -43,6 +43,7 @@ public class EventController {
     public List<EventDto> getEventsByFilter(@RequestBody EventFilterDto filter) {
         return eventService.getEventsByFilter(filter);
     }
+  
     @GetMapping("/event/{userId}/owned")
     public List<EventDto> getOwnedEvents(@PathVariable long userId) {
         idValidate(userId);
@@ -71,8 +72,9 @@ public class EventController {
             throw new DataValidationException("Event owner ID cannot be null");
         }
     }
-    private void idValidate(long id) {
-        if (id < 0) {
+ 
+    private void idValidate(Long id) {
+        if ( id == null || id < 0) {
             throw new DataValidationException("Id cannot be negative");
         }
     }

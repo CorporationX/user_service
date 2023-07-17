@@ -1,7 +1,7 @@
 package school.faang.user_service.service;
 
-import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
+
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -33,8 +33,10 @@ public class EventParticipationServiceTest {
 
     @Test
     public void registerParticipantThrowExceptionTest() {
+        User user = User.builder().id(1L).username("test").build();
+        Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(List.of(user));
         assertThrows(DataValidationException.class,
-                () -> eventParticipationService.registerParticipant(1L, 10L));
+                () -> eventParticipationService.registerParticipant(1L, 1L));
     }
 
     @Test
@@ -49,6 +51,6 @@ public class EventParticipationServiceTest {
         User user = User.builder().id(1L).username("test").build();
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(List.of(user));
         assertThrows(DataValidationException.class,
-                () -> eventParticipationService.unregisterParticipant(1L, 1L));
+                () -> eventParticipationService.unregisterParticipant(1L, 10L));
     }
 }

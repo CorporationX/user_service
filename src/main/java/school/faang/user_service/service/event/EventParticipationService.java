@@ -24,8 +24,6 @@ public class EventParticipationService {
         User user = getUser(userId);
         Event event = getEvent(eventId);
 
-        validateParams(user, event);
-
         validatePossibility(user.getId(), event.getId());
 
         eventParticipationRepository.register(eventId, userId);
@@ -38,16 +36,15 @@ public class EventParticipationService {
     }
 
     public List<User> getParticipants(long eventId) {
-        validateEvent(getEvent(eventId));
         return eventParticipationRepository.findAllParticipantsByEventId(eventId);
     }
 
     private Event getEvent(long eventId) {
-        return eventRepository.findById(eventId).orElse(null);
+        return eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found"));
     }
 
     private User getUser(long userId) {
-        return userRepository.findById(userId).orElse(null);
+        return userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 
     private void validatePossibility(long userId, long eventId) {
@@ -65,22 +62,5 @@ public class EventParticipationService {
     private boolean isUserExist(long userId, long eventId) {
         return eventParticipationRepository.findAllParticipantsByEventId(eventId)
                 .stream().anyMatch(u -> u.getId() == userId);
-    }
-
-    private static void validateParams(User user, Event event) {
-        validateUser(user);
-        validateEvent(event);
-    }
-
-    private static void validateEvent(Event event) {
-        if (event == null) {
-            throw new NullPointerException("Event not found");
-        }
-    }
-
-    private static void validateUser(User user) {
-        if (user == null) {
-            throw new NullPointerException("User not found");
-        }
     }
 }

@@ -17,15 +17,17 @@ public class EventParticipationServiceImplementation implements EventParticipati
         this.eventParticipationRepository = eventParticipationRepository;
     }
 
+    @Override
     public void registerParticipant(Long eventId, Long userId) {
         validateInputData(eventId, userId);
         List<User> users = getParticipantsByEventId(eventId);
 
-        if (!isUserRegisteredForEvent(users, userId)) {
-            eventParticipationRepository.register(eventId, userId);
-        } else {
+        if (isUserRegisteredForEvent(users, userId)) {
             throw new RegistrationUserForEventException("The user has already been registered for the event");
         }
+
+        eventParticipationRepository.register(eventId, userId);
+
     }
 
     @Override
@@ -33,13 +35,13 @@ public class EventParticipationServiceImplementation implements EventParticipati
         validateInputData(eventId, userId);
         List<User> users = getParticipantsByEventId(eventId);
 
-        if (isUserRegisteredForEvent(users, userId)) {
-            eventParticipationRepository.unregister(eventId, userId);
-        } else {
+        if (!isUserRegisteredForEvent(users, userId)) {
             String errorMessage = String.format("the userId: [%s] is not registered for the eventId: [%s]",
                     userId, eventId);
             throw new RegistrationUserForEventException(errorMessage);
         }
+
+        eventParticipationRepository.unregister(eventId, userId);
     }
 
     @Override

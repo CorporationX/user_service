@@ -11,10 +11,11 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.SkillDto;
+import school.faang.user_service.entity.Skill;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.UserRepository;
+
 
 
 @ExtendWith(MockitoExtension.class)
@@ -26,7 +27,7 @@ class SkillServiceTest {
     @Mock
     private SkillRepository skillRepository;
     @Mock
-    private UserRepository userRepository;
+    private UserService userService;
     SkillDto skillDto;
 
     @BeforeEach
@@ -48,5 +49,20 @@ class SkillServiceTest {
     void testCreateSkill() {
         skillService.create(skillDto);
         verify(skillRepository, times(1)).save(any());
+    }
+
+    @Test
+    void testCallMethodFindByIdAndFindAllByUserId() {
+        skillService.getUserSkills(1L);
+        verify(userService, times(1)).checkUserById(1L);
+        verify(skillRepository, times(1)).findAllByUserId(1L);
+    }
+
+    @Test
+    void testMapperFromDTOtoEntity(){
+        assertInstanceOf(Skill.class, skillMapper.toEntity(skillDto));
+        Skill skillResult = skillMapper.toEntity(skillDto);
+        assertEquals(skillResult.getTitle(), skillDto.getTitle());
+        assertEquals(skillResult.getId(), skillDto.getId());
     }
 }

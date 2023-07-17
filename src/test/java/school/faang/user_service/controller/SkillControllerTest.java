@@ -53,7 +53,7 @@ class SkillControllerTest {
     @Test
     void testCallMethodGetUserSkillsFromSkillService(){
         skillController.getUserSkills(1L);
-        Mockito.verify(skillService, Mockito.times(1))
+        verify(skillService, times(1))
                 .getUserSkills(1L);
     }
 }

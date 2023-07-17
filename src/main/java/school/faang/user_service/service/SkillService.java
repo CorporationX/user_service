@@ -7,8 +7,6 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.UserRepository;
-
 
 import java.util.List;
 
@@ -18,12 +16,10 @@ import java.util.List;
 public class SkillService {
     private final SkillRepository skillRepository;
     private final SkillMapper skillMapper;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     public List<SkillDto> getUserSkills(long userId) {
-        if (userRepository.findById(userId).isEmpty()) {
-            throw new RuntimeException("user is not found");
-        }
+        userService.checkUserById(userId);
         List<Skill> skillsOfUsers = skillRepository.findAllByUserId(userId);
         return skillsOfUsers.stream().map(skillMapper::toDTO).toList();
     }
@@ -33,7 +29,6 @@ public class SkillService {
         if (skillRepository.existsByTitle(skill.getTitle())) {
             throw new DataValidationException("The skill already exists");
         }
-        SkillDto skillDtoResult = skillMapper.toDTO(skillRepository.save(skill));
-        return skillDtoResult;
+        return skillMapper.toDTO(skillRepository.save(skill));
     }
 }

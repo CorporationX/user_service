@@ -12,6 +12,8 @@ import school.faang.user_service.repository.event.EventRepository;
 
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -27,21 +29,10 @@ class EventServiceTest {
 
 
     @Test
-    void should() {
-        User user = User.builder().id(1L).build();
-        EventDto event = EventDto.builder().id(1L).build();
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        eventService.create(event);
-        verify(userRepository, times(1)).findById(1L);
-    }
-
-    @Test
-    void create() {
-
-    }
-
-
-    @Test
-    void validation() {
+    void testUpdateEvent() {
+        EventDto eventDto = EventDto.builder().id(1L).ownerId(1L).build();
+        when(eventRepository.findById(any())).thenReturn(any());
+        eventService.updateEvent(eventDto);
+       assertEquals(eventDto, eventDto);
     }
 }

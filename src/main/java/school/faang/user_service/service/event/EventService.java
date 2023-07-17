@@ -31,6 +31,12 @@ public class EventService {
         }
     }
 
+    public EventDto get(Long eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new IllegalArgumentException("Event not found"));
+        return EventMapper.INSTANCE.toDto(event);
+    }
+
     private void validateEventDto(EventDto eventDto) throws DataFormatException {
         if (eventDto.getId() == null || eventDto.getId() < 1) {
             throw new DataFormatException("Event Id must be greater than 0");
@@ -49,7 +55,7 @@ public class EventService {
 
     private void checkUserContainsSkills(EventDto eventDto) throws DataFormatException {
         User user = userRepository.findById(eventDto.getOwnerId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         List<SkillDto> userSkills = SkillMapper.INSTANCE.toListSkillsDTO(user.getSkills());
         if (!new HashSet<>(userSkills).containsAll(eventDto.getRelatedSkills())) {

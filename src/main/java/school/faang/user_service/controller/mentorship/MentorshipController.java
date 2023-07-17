@@ -36,4 +36,20 @@ public class MentorshipController {
             return ResponseEntity.internalServerError().body("Server error");
         }
     }
+
+    @GetMapping("/{menteeId}/mentors")
+    public ResponseEntity<?> getMentors(@PathVariable @Min(1L) long menteeId) {
+        log.debug("Received new request to get mentors for user with id:{}", menteeId);
+        try {
+            List<UserDto> mentors = mentorshipService.getMentors(menteeId);
+            log.debug("Successfully got mentors for mentee with id:{}", menteeId);
+            return ResponseEntity.ok(mentors);
+        } catch (RuntimeException e) {
+            log.warn("Failed to get mentors for mentee with id:{}\nException:{}", menteeId, e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            log.error("Failed to get mentors for mentee with id:{}\nException:{}", menteeId, e.getMessage());
+            return ResponseEntity.internalServerError().body("Server error");
+        }
+    }
 }

@@ -1,14 +1,17 @@
 package school.faang.user_service.service;
 
 import org.junit.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.controller.event.EventParticipationController;
 import school.faang.user_service.service.event.EventParticipationService;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class EventParticipationControllerTest {
+@ExtendWith(MockitoExtension.class)
+public final class EventParticipationControllerTest {
     @Mock
     private EventParticipationService eventParticipationService;
 

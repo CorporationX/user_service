@@ -17,7 +17,7 @@ public class EventParticipationService {
     private final EventParticipationRepository eventParticipationRepository;
     private final UserMapper userMapper;
 
-    private void validateEventId(Long eventId) {
+    public void validateEventId(Long eventId) {
         if (!eventParticipationRepository.existsById(eventId)) {
             throw new DataValidationException("There is not event with this ID!");
         }

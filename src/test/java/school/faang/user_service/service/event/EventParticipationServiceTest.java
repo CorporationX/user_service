@@ -112,7 +112,6 @@ class EventParticipationServiceTest {
 
     @Test
     void test_get_participants_should_return_empty(){
-        Mockito.when(eventRepository.findById(event.getId())).thenReturn(Optional.ofNullable(event));
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(event.getId())).thenReturn(List.of());
         Assertions.assertEquals(List.of(), eventParticipationService.getParticipants(event.getId()));
     }

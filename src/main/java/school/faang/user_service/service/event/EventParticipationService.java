@@ -1,14 +1,14 @@
 package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
 import java.util.List;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class EventParticipationService {
 

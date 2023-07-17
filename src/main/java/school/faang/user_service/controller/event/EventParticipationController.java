@@ -1,16 +1,15 @@
 package school.faang.user_service.controller.event;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventParticipationService;
 
-@Component
+@Controller
 @RequiredArgsConstructor
 public class EventParticipationController {
 
     private final EventParticipationService eventParticipationService;
-
 
     public void registerParticipantController(Long eventId, Long userId) {
         validate(eventId, userId);

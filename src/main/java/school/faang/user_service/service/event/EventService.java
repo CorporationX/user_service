@@ -1,6 +1,5 @@
 package school.faang.user_service.service.event;
 
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
@@ -52,6 +51,11 @@ public class EventService {
     public List<EventDto> getOwnedEvents(long userId) {
         return eventRepository.findAllByUserId(userId).stream().map(eventMapper::toDto).toList();
     }
+  
+    public EventDto getEvent(long id) {
+        Event entity = eventRepository.findById(id)
+                .orElseThrow(() -> new DataValidationException("Event not found"));
+        return eventMapper.toDto(entity);
 
     private void updateEventInDb(EventDto eventForUpdate, EventDto eventFormRequest) {
         {
@@ -82,8 +86,8 @@ public class EventService {
             }
             eventRepository.save(eventMapper.toEntity(eventForUpdate));
         }
-
     }
+      
     private List<EventDto> filterEvents(Stream<Event> events, EventFilterDto filter) {
         filters.stream()
                 .filter(eventFilter -> eventFilter.isApplicable(filter))

@@ -14,11 +14,11 @@ public class MentorshipController {
     private final MentorshipService mentorshipService;
 
     public List<User> getMentees(@Validated Long userId) {
-        return mentorshipService.getMentees(userId);
+        return mentorshipService.getMenteesOfUser(userId);
     }
 
     public List<User> getMentors(Long userId) {
-        return mentorshipService.getMentors(userId);
+        return mentorshipService.getMentorsOfUser(userId);
     }
 
     public void deleteMentee(Long menteeId, Long mentorId) {

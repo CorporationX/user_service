@@ -66,7 +66,8 @@ class GoalServiceTest {
 
         Mockito.when(goalRepository.findGoalsByUserId(Mockito.anyLong()))
                 .thenReturn(goalStream);
-
+        Mockito.when(goalRepository.findByParent(Mockito.anyLong()))
+                .thenReturn(goalStream);
         Mockito.when(goalRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.of(new Goal()));
         Mockito.when(skillRepository.findById(Mockito.anyLong()))
@@ -365,5 +366,47 @@ class GoalServiceTest {
         goalService.deleteGoal(goalId);
         Mockito.verify(goalRepository, Mockito.times(1)).existsById(goalId);
         Mockito.verify(goalRepository, Mockito.times(1)).deleteById(goalId);
+    }
+
+    @Test
+    public void testFindSubtasksOfGoalByUserIdInvalidLessThanOne() {
+        DataValidationException exception = assertThrows(DataValidationException.class,
+                () -> goalService.findSubtasksByGoalId(0L, new GoalFilterDto()));
+        assertEquals("Goal id cannot be less than 1!", exception.getMessage());
+    }
+
+    @Test
+    public void testFindSubtasksOfGoalByUserIdInvalidNull() {
+        DataValidationException exception = assertThrows(DataValidationException.class,
+                () -> goalService.findSubtasksByGoalId(null, new GoalFilterDto()));
+        assertEquals("Goal id cannot be null!", exception.getMessage());
+    }
+
+    @Test
+    public void testFindSubtasksOfGoalByUserIdValidNoneFilter() {
+        List<GoalDto> goalDtoList = goalService.findSubtasksByGoalId(1L, null);
+        List<GoalDto> expected = List.of(goalDtoActive, goalDtoCompleted);
+
+        assertIterableEquals(expected, goalDtoList);
+    }
+
+    @Test
+    public void testFindSubtasksOfGoalByUserIdValidStatusFilter() {
+        List<GoalDto> goalDtoList = goalService.findSubtasksByGoalId(1L, new GoalFilterDto(null, GoalStatus.ACTIVE));
+        List<GoalDto> expected = List.of(
+                goalDtoActive
+        );
+
+        assertIterableEquals(expected, goalDtoList);
+    }
+
+    @Test
+    public void testFindSubtasksOfGoalByUserIdValidTitleFilter() {
+        List<GoalDto> goalDtoList = goalService.findSubtasksByGoalId(1L, new GoalFilterDto("1", null));
+        List<GoalDto> expected = List.of(
+                goalDtoActive
+        );
+
+        assertIterableEquals(expected, goalDtoList);
     }
 }

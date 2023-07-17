@@ -85,13 +85,13 @@ public class EventService {
                     return event.getStartDate().isAfter(filter.getStartDate())
                             && event.getEndDate().isBefore(filter.getEndDate());
                 })
-//                .filter(event -> {
-//                    if (event.getOwnerId() == null) {
-//                        return false;
-//                    } else {
-//                        return event.getOwnerId().equals(filter.getOwnerId());
-//                    }
-//                })
+                .filter(event -> {
+                    if (event.getOwnerId() == null) {
+                        return false;
+                    } else {
+                        return event.getOwnerId().equals(filter.getOwnerId());
+                    }
+                })
                 .filter(event -> {
                     if (event.getRelatedSkills() == null) {
                         return false;

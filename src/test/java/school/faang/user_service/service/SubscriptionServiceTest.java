@@ -9,23 +9,25 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.commonMessages.ErrorMessages;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.contact.Contact;
 import school.faang.user_service.exceptions.DataValidationException;
+import school.faang.user_service.filters.UserFilter;
 import school.faang.user_service.repository.SubscriptionRepository;
 
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.mockito.Mockito.doNothing;
-
 @ExtendWith(MockitoExtension.class)
 class SubscriptionServiceTest {
     @Mock
     private SubscriptionRepository subscriptionRepository;
+    @Mock
+    private UserFilter userFilter;
     @InjectMocks
     private SubscriptionService subscriptionService;
 
@@ -96,8 +98,9 @@ class SubscriptionServiceTest {
     void followUserThrowIllegalException(){
         int followerId = -11;
         int followeeId = -15;
-        Assert.assertThrows(IllegalArgumentException.class,
+        IllegalArgumentException e = Assert.assertThrows(IllegalArgumentException.class,
                 ()-> subscriptionService.followUser(followerId, followeeId));
+        Assertions.assertEquals(ErrorMessages.NEGATIVE_ID, e.getMessage());
     }
     @Test
     void followUserThrowDataValidException() {
@@ -112,8 +115,6 @@ class SubscriptionServiceTest {
         Assert.assertThrows(IllegalArgumentException.class,
                 () -> subscriptionService.getFollowers(idUser, new UserFilterDto()));
     }
-
-
 
     private UserFilterDto createUserFilterDto(){
         UserFilterDto userFilterDto = new UserFilterDto();

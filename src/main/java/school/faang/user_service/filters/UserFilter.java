@@ -1,16 +1,16 @@
 package school.faang.user_service.filters;
 
+import org.springframework.stereotype.Component;
 import school.faang.user_service.commonMessages.ErrorMessages;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
-
+@Component
 public class UserFilter {
-    ErrorMessages errorMessages = new ErrorMessages();
     public List<UserDto> applyFilter(List<User> users, UserFilterDto filter){
-        isApplicable(users);
+        validateUsers(users);
         return users.stream()
                 .filter(user -> filterUser(user, filter))
                 .map(UserMapper.INSTANCE::userToDto)
@@ -30,10 +30,10 @@ public class UserFilter {
                 user.getSkills().stream().allMatch(skill -> skill.getTitle().matches(filter.getSkillPattern()));
     }
 
-    private void isApplicable(List<User> users){
+    private void validateUsers(List<User> users){
         for (User user : users) {
             if (user == null) {
-                throw new NullPointerException(errorMessages.USERISNULL);
+                throw new NullPointerException(ErrorMessages.USER_IS_NULL);
             }
         }
     }

@@ -7,8 +7,8 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.FIELD, unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public abstract class UserMapper {
-    public abstract User toEntity(UserDto userDto);
+public interface UserMapper {
+    User toEntity(UserDto userDto);
 
-    public abstract UserDto toDto(User user);
+    UserDto toDto(User user);
 }

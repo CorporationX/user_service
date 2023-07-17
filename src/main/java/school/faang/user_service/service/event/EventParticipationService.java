@@ -17,13 +17,7 @@ public class EventParticipationService {
     private final EventParticipationRepository eventParticipationRepository;
     private final UserMapper userMapper;
 
-    public void validateEventId(Long eventId) {
-        if (!eventParticipationRepository.existsById(eventId)) {
-            throw new DataValidationException("There is not event with this ID!");
-        }
-    }
-
-    public void registerParticipant(long eventId, long userId) {
+    public void registerParticipant(Long eventId, Long userId) {
         validateEventId(eventId);
         List<User> users = eventParticipationRepository.findAllParticipantsByEventId(eventId);
         for (User user : users) {
@@ -34,7 +28,7 @@ public class EventParticipationService {
         eventParticipationRepository.register(eventId, userId);
     }
 
-    public void unregisterParticipant(long eventId, long userId) {
+    public void unregisterParticipant(Long eventId, Long userId) {
         validateEventId(eventId);
         List<User> users = eventParticipationRepository.findAllParticipantsByEventId(eventId);
         for (User user : users) {
@@ -53,5 +47,11 @@ public class EventParticipationService {
             userDto.add(userMapper.toDto(user));
         }
         return userDto;
-    } 
+    }
+
+    public void validateEventId(Long eventId) {
+        if (!eventParticipationRepository.existsById(eventId)) {
+            throw new DataValidationException("There is not event with this ID!");
+        }
+    }
 }

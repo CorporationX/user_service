@@ -79,6 +79,14 @@ public class GoalService {
         return goalMapper.toDto(goal);
     }
 
+    @Transactional
+    public void deleteGoal(Long goalId) {
+        GoalValidator.validateId(goalId, "Goal");
+        if (!goalRepository.existsById(goalId))
+            throw new DataValidationException("Goal with given id was not found!");
+        goalRepository.deleteById(goalId);
+    }
+
     private void checkGoalCompletionAndAssignmentSkills(Goal goalToUpdate, Goal goal) {
         if (goalToUpdate.getStatus() == GoalStatus.ACTIVE && goal.getStatus() != null && goal.getStatus() == GoalStatus.COMPLETED) {
             List<Skill> skills = goalToUpdate.getSkillsToAchieve();

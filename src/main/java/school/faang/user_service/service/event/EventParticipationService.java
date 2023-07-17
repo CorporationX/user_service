@@ -9,6 +9,8 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 @Service
@@ -19,10 +21,8 @@ public class EventParticipationService {
     private final EventRepository eventRepository;
 
     public void registerParticipant(long eventId, long userId) {
-        User user = userRepository.findById(userId).orElse(null);
-        Event event = eventRepository.findById(eventId).orElse(null);
-
-        validateParams(user, event);
+        User user = getUser(userId);
+        Event event = getEvent(eventId);
 
         validatePossibility(user.getId(), event.getId());
 
@@ -35,31 +35,32 @@ public class EventParticipationService {
         eventParticipationRepository.unregister(eventId, userId);
     }
 
+    public List<User> getParticipants(long eventId) {
+        return eventParticipationRepository.findAllParticipantsByEventId(eventId);
+    }
+
+    private Event getEvent(long eventId) {
+        return eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found"));
+    }
+
+    private User getUser(long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
+
     private void validatePossibility(long userId, long eventId) {
-        boolean exist = eventParticipationRepository.findAllParticipantsByEventId(eventId)
-                .stream().anyMatch(u -> u.getId() == userId);
-        if (exist) {
+        if (isUserExist(userId, eventId)) {
             throw new IllegalArgumentException("User already registered");
         }
     }
 
     private void validateUnregisterPossibility(long eventId, long userId) {
-        if (findAlreadyRegisteredUser(eventId, userId) == null) {
+        if (!isUserExist(userId, eventId)) {
             throw new IllegalArgumentException("User not registered");
         }
     }
 
-    private User findAlreadyRegisteredUser(long eventId, long userId) {
+    private boolean isUserExist(long userId, long eventId) {
         return eventParticipationRepository.findAllParticipantsByEventId(eventId)
-                .stream().filter(user -> user.getId() == userId).findFirst().orElse(null);
-    }
-
-    private static void validateParams(User user, Event event) {
-        if (user == null) {
-            throw new NullPointerException("User not found");
-        }
-        if (event == null) {
-            throw new NullPointerException("Event not found");
-        }
+                .stream().anyMatch(u -> u.getId() == userId);
     }
 }

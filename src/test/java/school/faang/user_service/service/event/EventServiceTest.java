@@ -15,10 +15,13 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.mapper.EventMapper;
+import school.faang.user_service.service.event.filters.EventEndDateFilter;
 import school.faang.user_service.service.event.filters.EventFilter;
+import school.faang.user_service.service.event.filters.EventStartDateFilter;
 import school.faang.user_service.service.event.filters.EventTitleFilter;
 
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.List;
 
 import static org.junit.Assert.assertThrows;
@@ -117,5 +120,65 @@ class EventServiceTest {
     List<EventDto> events = eventService.getEventsByFilter(eventFilterDto);
 
     Assertions.assertEquals(2, events.size());
+  }
+
+  @Test void testGetAllUserEventsByStartDateFilter() {
+    List<EventFilter> eventFilterList = List.of(new EventStartDateFilter());
+    eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList);
+
+    Event javaEvent = new Event();
+    javaEvent.setTitle("Java");
+    javaEvent.setStartDate(LocalDateTime.of(2015,
+        Month.JULY, 29, 19, 0, 0));
+
+    Event pythonEvent = new Event();
+    pythonEvent.setTitle("Python");
+    pythonEvent.setStartDate(LocalDateTime.of(2018,
+        Month.JULY, 29, 19, 0, 0));
+
+    Event jsEvent = new Event();
+    jsEvent.setTitle("JavaScript");
+    jsEvent.setStartDate(LocalDateTime.of(2020,
+        Month.JULY, 29, 19, 0, 0));
+
+    Mockito.lenient().when(eventRepository.findAll()).thenReturn(List.of(javaEvent, pythonEvent, jsEvent));
+
+    EventFilterDto eventFilterDto = new EventFilterDto();
+
+    eventFilterDto.setStartDate(LocalDateTime.of(2018, Month.JANUARY, 8, 0, 0));
+
+    List<EventDto> events = eventService.getEventsByFilter(eventFilterDto);
+
+    Assertions.assertEquals(2, events.size());
+  }
+
+  @Test void testGetAllUserEventsByEndDateFilter() {
+    List<EventFilter> eventFilterList = List.of(new EventEndDateFilter());
+    eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList);
+
+    Event javaEvent = new Event();
+    javaEvent.setTitle("Java");
+    javaEvent.setEndDate(LocalDateTime.of(2015,
+        Month.JULY, 29, 19, 0, 0));
+
+    Event pythonEvent = new Event();
+    pythonEvent.setTitle("Python");
+    pythonEvent.setEndDate(LocalDateTime.of(2018,
+        Month.JULY, 29, 19, 0, 0));
+
+    Event jsEvent = new Event();
+    jsEvent.setTitle("JavaScript");
+    jsEvent.setEndDate(LocalDateTime.of(2020,
+        Month.JULY, 29, 19, 0, 0));
+
+    Mockito.lenient().when(eventRepository.findAll()).thenReturn(List.of(javaEvent, pythonEvent, jsEvent));
+
+    EventFilterDto eventFilterDto = new EventFilterDto();
+
+    eventFilterDto.setEndDate(LocalDateTime.of(2019, Month.JANUARY, 8, 0, 0));
+
+    List<EventDto> events = eventService.getEventsByFilter(eventFilterDto);
+
+    Assertions.assertEquals(1, events.size());
   }
 }

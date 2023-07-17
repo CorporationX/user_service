@@ -7,9 +7,9 @@ import org.mapstruct.factory.Mappers;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.event.Event;
 
-@Mapper(uses = SkillMapper.class, unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", uses = SkillMapper.class, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface EventMapper {
-    EventMapper INSTANCE = Mappers.getMapper(EventMapper.class);
+    EventMapper eventMapper = Mappers.getMapper(EventMapper.class);
 
     @Mapping(source = "owner.id", target = "ownerId")
     @Mapping(source = "relatedSkills", target = "relatedSkills")

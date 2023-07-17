@@ -22,12 +22,14 @@ import java.util.zip.DataFormatException;
 public class EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
+    private final EventMapper eventMapper;
+    private final SkillMapper skillMapper;
 
     public EventDto create(EventDto eventDto) {
         try {
             validateEventDto(eventDto);
-            Event event = eventRepository.save(EventMapper.INSTANCE.toEntity(eventDto));
-            return EventMapper.INSTANCE.toDto(event);
+            Event event = eventRepository.save(eventMapper.toEntity(eventDto));
+            return eventMapper.toDto(event);
         } catch (DataFormatException e) {
             throw new RuntimeException(e);
         }
@@ -35,7 +37,7 @@ public class EventService {
 
     public List<EventDto> getEventsByFilter(EventFilterDto filter) {
         return StreamSupport.stream(eventRepository.findAll().spliterator(), false)
-                .map(EventMapper.INSTANCE::toDto)
+                .map(eventMapper::toDto)
                 .filter(filter)
                 .toList();
     }
@@ -60,7 +62,7 @@ public class EventService {
         User user = userRepository.findById(eventDto.getOwnerId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        List<SkillDto> userSkills = SkillMapper.INSTANCE.toListSkillsDTO(user.getSkills());
+        List<SkillDto> userSkills = skillMapper.toListSkillsDTO(user.getSkills());
         if (!new HashSet<>(eventDto.getRelatedSkills()).containsAll(userSkills)) {
             throw new DataFormatException("User has no related skills");
         }

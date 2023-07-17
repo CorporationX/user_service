@@ -52,7 +52,7 @@ class EventMapperTest {
     @Test
     @DisplayName("Test mapping EventDto to Event")
     void toEntityTest() {
-        Event mappedEvent = EventMapper.INSTANCE.toEntity(eventDto);
+        Event mappedEvent = EventMapper.eventMapper.toEntity(eventDto);
 
         assertNotNull(mappedEvent);
         assertEquals(eventDto.getId(), mappedEvent.getId());
@@ -65,7 +65,7 @@ class EventMapperTest {
     @Test
     @DisplayName("Test mapping Event to EventDto")
     void toEventDtoTest() {
-        EventDto mapppedEventDto = EventMapper.INSTANCE.toDto(event);
+        EventDto mapppedEventDto = EventMapper.eventMapper.toDto(event);
 
         assertNotNull(mapppedEventDto);
         assertEquals(event.getId(), mapppedEventDto.getId());

@@ -16,33 +16,38 @@ import school.faang.user_service.repository.mentorship.MentorshipRepository;
 public class MentorshipService {
     private final MentorshipRepository mentorshipRepository;
     private final UserMapper userMapper;
-    private final UserRepository userRepository;
 
-//    @Transactional(readOnly = true)
-//    public List<UserDto> getMentees(long mentorId) {
-//        User user = validateUserId(mentorId);
-//        return user.getMentees().stream()
-//                .map(userMapper::toDto)
-//                .toList();
-//    }
-//
-//    @Transactional(readOnly = true)
-//    public List<UserDto> getMentors(long userId) {
-//        User user = validateUserId(userId);
-//        return user.getMentors().stream()
-//                .map(userMapper::toDto)
-//                .toList();
-//    }
+    @Transactional(readOnly = true)
+    public List<UserDto> getMentees(long mentorId) {
+        User user = getUserById(mentorId);
+        return user.getMentees().stream()
+                .map(userMapper::toDto)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserDto> getMentors(long userId) {
+        User user = getUserById(userId);
+        return user.getMentors().stream()
+                .map(userMapper::toDto)
+                .toList();
+    }
 
     @Transactional
     public void deleteMentee(long mentorId, long menteeId) {
-        mentorshipRepository.findById(mentorId)
-                .ifPresent(mentor -> mentor.getMentees()
-                        .removeIf(mentee -> mentee.getId() == menteeId));
+        User mentor = getUserById(mentorId);
+        mentor.getMentees().removeIf(mentee -> mentee.getId() == menteeId);
     }
 
-    private void validateUserId(long userId, long menteeId) {
+    @Transactional
+    public void deleteMentor(long menteeId, long mentorId) {
+        User mentee = getUserById(menteeId);
+        mentee.getMentors().removeIf(mentor -> mentor.getId() == mentorId);
+    }
 
+    private User getUserById(long userId) {
+        return mentorshipRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
     }
 }
 

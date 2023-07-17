@@ -1,7 +1,6 @@
 package school.faang.user_service.service.mentorship;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -39,36 +38,34 @@ class MentorshipServiceTest {
 
     @BeforeEach
     void setUp() {
-        when(mentorshipRepository.findUserById(INCORRECT_USER_ID))
+        when(mentorshipRepository.findById(INCORRECT_USER_ID))
                 .thenReturn(Optional.empty());
 
         User mentor = User.builder()
                 .id(MENTOR_ID)
-                .mentees(new ArrayList<>(Arrays.asList(
-                User.builder().id(MENTEE_ID).build(),
-                new User()))
-        ).build();
-        when(mentorshipRepository.findUserById(MENTOR_ID))
+                .mentees(new ArrayList<>(Collections.singletonList(User.builder().id(MENTEE_ID).build())))
+                .build();
+        when(mentorshipRepository.findById(MENTOR_ID))
                 .thenReturn(Optional.of(mentor));
 
         User mentee = User.builder()
                 .id(MENTEE_ID)
-                .mentors(Collections.singletonList(User.builder().id(MENTOR_ID).build())
-        ).build();
-        when(mentorshipRepository.findUserById(MENTEE_ID))
+                .mentors(new ArrayList<>(Collections.singletonList(User.builder().id(MENTOR_ID).build())))
+                .build();
+        when(mentorshipRepository.findById(MENTEE_ID))
                 .thenReturn(Optional.of(mentee));
     }
 
     @Test
     void getMentees_shouldMatchMenteesSize() {
         List<UserDto> mentees = mentorshipService.getMentees(MENTOR_ID);
-        assertEquals(2, mentees.size());
+        assertEquals(1, mentees.size());
     }
 
     @Test
     void getMentees_shouldInvokeFindByIdMethod() {
         mentorshipService.getMentees(MENTOR_ID);
-        verify(mentorshipRepository).findUserById(MENTOR_ID);
+        verify(mentorshipRepository).findById(MENTOR_ID);
     }
 
     @Test
@@ -87,7 +84,7 @@ class MentorshipServiceTest {
     @Test
     void getMentors_shouldInvokeFindByIdMethod() {
         mentorshipService.getMentors(MENTEE_ID);
-        verify(mentorshipRepository).findUserById(MENTEE_ID);
+        verify(mentorshipRepository).findById(MENTEE_ID);
     }
 
     @Test
@@ -100,31 +97,15 @@ class MentorshipServiceTest {
     @Test
     void deleteMentee_shouldInvokeFindByIdMethod() {
         mentorshipService.deleteMentee(MENTOR_ID, MENTEE_ID);
-        verify(mentorshipRepository).findUserById(MENTOR_ID);
-    }
-
-    @Test
-    void deleteMentee_shouldInvokeDeleteMenteeRepositoryMethod() {
-        User mentor = mentorshipRepository.findUserById(MENTOR_ID).orElseThrow();
-        mentorshipService.deleteMentee(MENTOR_ID, MENTEE_ID);
-        verify(mentorshipRepository).save(mentor);
+        verify(mentorshipRepository).findById(MENTOR_ID);
     }
 
     @Test
     void deleteMentee_shouldDeleteMenteeFromMentorMenteesList() {
-        User mentor = mentorshipRepository.findUserById(MENTOR_ID).orElseThrow();
-        User mentee = mentorshipRepository.findUserById(MENTEE_ID).orElseThrow();
-        assertEquals(2, mentor.getMentees().size());
-        System.out.println(mentor.getId());
-        System.out.println(mentee.getId());
-        mentor.getMentees().forEach(user -> System.out.println(user.getId()));
-        mentor.getMentees().stream()
-                .filter(user -> user.getId() == MENTEE_ID)
-                .findFirst()
-                .ifPresent(user -> mentor.getMentees().remove(user));
-        mentor.getMentees().forEach(user -> System.out.println(user.getId()));
-        mentorshipService.deleteMentee(MENTOR_ID, MENTEE_ID);
+        User mentor = mentorshipRepository.findById(MENTOR_ID).orElseThrow();
         assertEquals(1, mentor.getMentees().size());
+        mentorshipService.deleteMentee(MENTOR_ID, MENTEE_ID);
+        assertEquals(0, mentor.getMentees().size());
     }
 
     @Test

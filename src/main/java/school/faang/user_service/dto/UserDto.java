@@ -19,12 +19,4 @@ public class UserDto {
     private String country;
     private String city;
     private Integer experience;
-    private List<Long> followerIds;
-    private List<Long> followeeIds;
-    private List<Long> menteeIds;
-    private List<Long> mentorIds;
-    private List<Long> goalIds;
-    private List<Long> skillIds;
-    private List<Long> recommendationGivenIds;
-    private List<Long> recommendationReceivedIds;
 }

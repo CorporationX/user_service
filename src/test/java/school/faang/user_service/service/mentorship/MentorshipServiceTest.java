@@ -93,6 +93,18 @@ class MentorshipServiceTest {
     void getMentors_shouldThrowEntityNotFoundException() {
         assertThrows(EntityNotFoundException.class,
                 () -> mentorshipService.getMentors(INCORRECT_USER_ID),
+    }
+
+    @Test
+    void getMentees_shouldInvokeFindByIdMethod() {
+        mentorshipService.getMentees(MENTOR_ID);
+        Mockito.verify(mentorshipRepository).findById(MENTOR_ID);
+    }
+
+    @Test
+    void getMentees_shouldThrowException() {
+        assertThrows(EntityNotFoundException.class,
+                () -> mentorshipService.getMentees(INCORRECT_MENTOR_ID),
                 "Invalid user id");
     }
 }

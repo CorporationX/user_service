@@ -10,5 +10,6 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 public interface RecommendationMapper {
 
     RecommendationDto toDto(Recommendation recommendation);
+
     Recommendation toEntity(RecommendationDto recommendationDto);
 }

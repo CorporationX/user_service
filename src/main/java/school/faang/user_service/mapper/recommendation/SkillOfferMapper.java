@@ -11,5 +11,6 @@ public interface SkillOfferMapper {
 
 
     SkillOfferDto toDto(SkillOffer skillOffer);
+
     SkillOffer toEntity(SkillOfferDto skillOfferDto);
 }

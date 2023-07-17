@@ -17,7 +17,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 class SkillOfferValidatorTest {
@@ -53,26 +52,21 @@ class SkillOfferValidatorTest {
         String message = "You should choose some skills";
 
         assertThrows(DataValidationException.class,
-                () -> skillOfferValidator.validateSkillsListNotEmptyOrNull(emptySkills),message);
+                () -> skillOfferValidator.validateSkillsListNotEmptyOrNull(emptySkills), message);
     }
 
     @Test
-    public void testValidateSkillsAreInRepository_PassTheValidation() {
-        List<Long> skillIds = List.of(1L, 2L);
+    public void testValidateSkillsAreInRepository_ValidSkills() {
+        when(skillRepository.existsById(anyLong())).thenReturn(true);
 
-        when(skillRepository.countExisting(skillIds)).thenReturn(skillIds.size());
         assertDoesNotThrow(() -> skillOfferValidator.validateSkillsAreInRepository(skills));
-        verify(skillRepository, times(1)).countExisting(skillIds);
     }
 
     @Test
-    public void testValidateSkillsAreInRepository_InvalidSkill() {
-        List<Long> skillIds = List.of(1L, 2L);
+    public void testValidateSkillsAreInRepository_InvalidSkills() {
         String message = "Invalid skills";
+        when(skillRepository.existsById(anyLong())).thenReturn(false);
 
-        when(skillRepository.countExisting(skillIds)).thenReturn(1);
-        assertThrows(DataValidationException.class,
-                () -> skillOfferValidator.validateSkillsAreInRepository(skills), message);
-        verify(skillRepository, times(1)).countExisting(skillIds);
+        assertThrows(DataValidationException.class, () -> skillOfferValidator.validateSkillsAreInRepository(skills), message);
     }
 }

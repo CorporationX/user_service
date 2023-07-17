@@ -59,14 +59,12 @@ public class RecommendationService {
             long skillId = skillOffer.getSkill().getId();
 
             if (userSkills.contains(skillOffer.getSkill()) && guaranteeNotExists(userId, skillId, authorId)) {
-                UserSkillGuaranteeDto guaranteeDto = createGuaranteeDto(userId, skillId, authorId);
-                saveUserSkillGuarantee(guaranteeDto);
+                saveUserSkillGuarantee(userId, skillId, authorId);
             } else {
                 skillOfferRepository.save(skillOffer);
             }
         }
     }
-
 
     private List<Skill> getUserSkills(long userId) {
         Optional<User> user = userRepository.findById(userId);
@@ -75,16 +73,8 @@ public class RecommendationService {
                 .orElse(Collections.emptyList());
     }
 
-    private UserSkillGuaranteeDto createGuaranteeDto(long userId, long skillId, long guarantorId) {
-        UserSkillGuaranteeDto userSkillGuaranteeDto = new UserSkillGuaranteeDto();
-        userSkillGuaranteeDto.setUserId(userId);
-        userSkillGuaranteeDto.setGuarantorId(skillId);
-        userSkillGuaranteeDto.setGuarantorId(guarantorId);
-
-        return userSkillGuaranteeDto;
-    }
-
-    private void saveUserSkillGuarantee(UserSkillGuaranteeDto guaranteeDto) {
+    private void saveUserSkillGuarantee(long userId, long skillId, long guarantorId) {
+        UserSkillGuaranteeDto guaranteeDto = userSkillGuaranteeMapper.toDto(userId, skillId, guarantorId);
         UserSkillGuarantee guarantee = userSkillGuaranteeMapper.toEntity(guaranteeDto);
         userSkillGuaranteeRepository.save(guarantee);
     }

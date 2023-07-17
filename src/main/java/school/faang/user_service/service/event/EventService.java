@@ -34,7 +34,7 @@ public class EventService {
     public boolean deleteEvent(Long eventId) {
         if (eventRepository.existsById(eventId)) {
             eventRepository.deleteById(eventId);
-            return !eventRepository.existsById(eventId);
+            return true;
         }
         return false;
     }

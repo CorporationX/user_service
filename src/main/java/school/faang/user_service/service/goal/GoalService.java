@@ -15,6 +15,7 @@ import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.validator.GoalValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,6 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class GoalService {
-    public static final int MAX_ACTIVE_GOALS = 3;
     private final GoalRepository goalRepository;
     private final SkillRepository skillRepository;
     private final UserRepository userRepository;
@@ -33,7 +33,7 @@ public class GoalService {
     private final List<GoalFilter> goalFilters;
 
     public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter) {
-        validateId(userId);
+        GoalValidator.validateUserId(userId);
 
         Stream<Goal> goalStream = goalRepository.findGoalsByUserId(userId);
 
@@ -52,54 +52,52 @@ public class GoalService {
 
     @Transactional
     public GoalDto createGoal(Long userId, GoalDto goalDto) {
-        validateId(userId);
-        validateGoal(goalDto);
-        validateAdditionGoalToUser(userId, goalDto);
+        GoalValidator.validateUserId(userId);
+        GoalValidator.validateGoal(goalDto);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new DataValidationException("User with given id was not found!"));
+        GoalValidator.validateAdditionGoalToUser(user, goalDto);
 
         Goal goal = goalMapper.toEntity(goalDto);
         convertDtoDependenciesToEntity(goalDto, goal);
         goal.setUsers(new ArrayList<>());
-        goal.getUsers().add(userRepository.findById(userId).get());
+        goal.getUsers().add(user);
 
         goalRepository.save(goal);
 
         return goalMapper.toDto(goal);
     }
 
-    private void validateId(Long userId) {
-        if (userId == null) {
-            throw new DataValidationException("User id cannot be null!");
-        }
-        if (userId <= 0) {
-            throw new DataValidationException("User id cannot be less than 1!");
-        }
+    @Transactional
+    public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
+        GoalValidator.validateGoalId(goalId);
+        GoalValidator.validateGoal(goalDto);
+        Goal goalToUpdate = goalRepository.findById(goalId)
+                .orElseThrow(() -> new DataValidationException("Goal with given id was not found!"));
+        GoalValidator.validateUpdatingGoal(goalToUpdate);
+
+        Goal goal = goalMapper.toEntity(goalDto);
+        goal.setId(goalId);
+        convertDtoDependenciesToEntity(goalDto, goal);
+
+        checkGoalCompletionAndAssignmentSkills(goalToUpdate, goal);
+
+        goalRepository.save(goal);
+
+        return goalMapper.toDto(goal);
     }
 
-    private void validateGoal(GoalDto goalDto) {
-        if (goalDto == null) {
-            throw new DataValidationException("Goal cannot be null!");
-        }
-        if (goalDto.getTitle() == null || goalDto.getTitle().isBlank()) {
-            throw new DataValidationException("Title of goal cannot be empty!");
-        }
-    }
+    private void checkGoalCompletionAndAssignmentSkills(Goal goalToUpdate, Goal goal) {
+        if (goalToUpdate.getStatus() == GoalStatus.ACTIVE && goal.getStatus() == GoalStatus.COMPLETED) {
+            List<Skill> skills = goal.getSkillsToAchieve();
+            if (skills == null) {
+                return;
+            }
+            List<User> usersCompletedGoal = goalRepository.findUsersByGoalId(goalToUpdate.getId());
 
-    private void validateAdditionGoalToUser(Long userId, GoalDto goalDto) {
-        Optional<User> optionalUser = userRepository.findById(userId);
-        if (optionalUser.isEmpty()) {
-            throw new DataValidationException("User with given id was not found!");
-        }
-
-        if (optionalUser.get().getGoals() == null ||goalDto.getStatus() == GoalStatus.COMPLETED) {
-            return;
-        }
-
-        List<Goal> activeGoals = optionalUser.get().getGoals().stream()
-                .filter(goal -> goal.getStatus() == GoalStatus.ACTIVE)
-                .toList();
-
-        if (activeGoals.size() >= MAX_ACTIVE_GOALS) {
-            throw new DataValidationException("User cannot have more than " + MAX_ACTIVE_GOALS + " active goals at the same time!");
+            usersCompletedGoal.forEach(user -> {
+                skills.forEach(skill -> skillRepository.assignSkillToUser(skill.getId(), user.getId()));
+            });
         }
     }
 

@@ -1,9 +1,11 @@
 package school.faang.user_service.mentorship;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mentorship.dto.MentorshipRequestDto;
@@ -21,6 +23,11 @@ class MentorshipRequestServiceTest {
     private MentorshipRequestRepository mentorshipRequestRepository;
     @InjectMocks
     private MentorshipRequestService mentorshipRequestService;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
 
     @Test
     void testRequestMentorshipOneUser() {
@@ -45,7 +52,6 @@ class MentorshipRequestServiceTest {
                 () -> mentorshipRequestService.requestMentorship(new MentorshipRequestDto(0, "anyString", userRequest, userReceiver)));
     }
 
-    //не запускаются Mockito тесты, пишет что mentorshipRequestService=null
     @Test
     void testRequestMentorshipMore3RequestTrue() throws Exception {
         User userRequest = new User();
@@ -61,7 +67,7 @@ class MentorshipRequestServiceTest {
         MentorshipRequestDto dto = new MentorshipRequestDto(0, "any text", userRequest, userReceiver);
 
         mentorshipRequestService.requestMentorship(dto);
-        Mockito.verify(mentorshipRequestService, Mockito.times(1)).requestMentorship(dto);
+        Mockito.verify(mentorshipRequestRepository, Mockito.times(1)).create(dto.getRequester().getId(), dto.getReceiver().getId(), dto.getDescription());
 
     }
 
@@ -70,8 +76,9 @@ class MentorshipRequestServiceTest {
         User userRequest = new User();
         User userReceiver = new User();
         MentorshipRequestDto dto = new MentorshipRequestDto(0, "any text", userRequest, userReceiver);
+
         mentorshipRequestService.requestMentorship(dto);
-        Mockito.verify(mentorshipRequestService, Mockito.times(1)).requestMentorship(dto);
+        Mockito.verify(mentorshipRequestRepository, Mockito.times(1)).create(dto.getRequester().getId(), dto.getReceiver().getId(), dto.getDescription());
     }
 
     @Test

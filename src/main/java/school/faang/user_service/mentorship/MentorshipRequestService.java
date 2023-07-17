@@ -21,18 +21,20 @@ import java.util.Optional;
 public class MentorshipRequestService {
     @Autowired
     private MentorshipRequestRepository mentorshipRequestRepository;
+
     @Transactional
     public void requestMentorship(MentorshipRequestDto dto) throws Exception {
         if (dto.getRequester() == dto.getReceiver()) {
             throw new Exception("request was not create, your mentor is you");
         }
-
-        int sizeRequest = dto.getRequester().getSentMentorshipRequests().size();
-        if (sizeRequest >= 3) {
-            if (!dto.getRequester().getSentMentorshipRequests().
-                    get(sizeRequest - 3).getCreatedAt().
-                    isBefore(LocalDateTime.now().minusMonths(1))) {
-                throw new Exception("request was not create, so many requests in this month");
+        if (dto.getRequester().getSentMentorshipRequests() != null) {
+            int sizeRequest = dto.getRequester().getSentMentorshipRequests().size();
+            if (sizeRequest >= 3) {
+                if (!dto.getRequester().getSentMentorshipRequests().
+                        get(sizeRequest - 3).getCreatedAt().
+                        isBefore(LocalDateTime.now().minusMonths(1))) {
+                    throw new Exception("request was not create, so many requests in this month");
+                }
             }
         }
         mentorshipRequestRepository.create(dto.getRequester().getId(), dto.getReceiver().getId(), dto.getDescription());

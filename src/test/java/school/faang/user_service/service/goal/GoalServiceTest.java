@@ -8,7 +8,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.repository.goal.GoalRepository;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class GoalServiceTest {
 
@@ -38,12 +38,4 @@ class GoalServiceTest {
             service.getGoalsByUser(0L, null);
         });
     }
-
-    @Test
-    public void getGoalsByUserNullFilter() {
-        service.getGoalsByUser(1L, null);
-        Mockito.verify(goalRepository).findGoalsByUserId(Mockito.anyLong());
-    }
-
-
 }

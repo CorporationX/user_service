@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -17,6 +18,7 @@ public class GoalService {
     private final GoalRepository goalRepository;
     private final SkillRepository skillRepository;
     private final GoalMapper goalMapper;
+    private final List<GoalFilter> filterList;
     private final int MAX_ACTIVE_GOALS = 3;
 
     public List<Goal> findGoalsByUserId(Long id) {
@@ -26,42 +28,32 @@ public class GoalService {
                 .peek(goal -> goal.setSkillsToAchieve(skillRepository.findSkillsByGoalId(goal.getId()))).toList();
     }
 
-    public List<Goal> getGoalsByUser(Long userId, GoalFilterDto filter) {
+    public List<Goal> findSubGoalsByParentId(Long id) {
+        if (id == null) throw new IllegalArgumentException("parentId can not be Null");
+        if (id < 1) throw new IllegalArgumentException("parentId can not be less than 1");
+        return goalRepository.findByParent(id)
+                .peek(goal -> goal.setSkillsToAchieve(skillRepository.findSkillsByGoalId(goal.getId()))).toList();
+    }
+
+    public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter) {
+        List<GoalDto> dtoList = goalMapper.goalListToDto(findGoalsByUserId(userId));
         if (filter == null) {
-            return findGoalsByUserId(userId);
+            return dtoList;
         }
-        return findGoalsByUserId(userId).stream()
-                .map(goalMapper::toDto)
-                .filter(goalDto -> {
-                    if (filter.getDescription() != null && !filter.getDescription().isBlank()) {
-                        return filter.getDescription().equals(goalDto.getDescription());
-                    }
-                    return true;})
-                .filter(goalDto -> {
-                    if (filter.getParentId() != null) {
-                        return filter.getParentId().equals(goalDto.getParentId());
-                    }
-                    return true;})
-                .filter(goalDto -> {
-                    if (filter.getTitle() != null && !filter.getTitle().isBlank()) {
-                        return filter.getTitle().equals(goalDto.getTitle());
-                    }
-                    return true;})
-                .filter(goalDto -> {
-                    if (filter.getStatus() != null) {
-                        return filter.getStatus().equals(goalDto.getStatus());
-                    }
-                    return true;})
-                .filter(goalDto -> {
-                    if (filter.getSkillIds() != null) {
-                        for (int i = 0; i < filter.getSkillIds().size(); ++i) {
-                            if (goalDto.getSkillIds().contains(filter.getSkillIds().get(i))) {
-                                return true;
-                            }
-                        }
-                    }
-                    return true;})
-                .map(goalMapper::toEntity)
-                .toList();
+
+        filterList.stream().filter((fil) -> fil.isApplicable(filter)).forEach((fil) -> fil.apply(dtoList, filter));
+
+        return dtoList;
+    }
+
+    public List<GoalDto> getSubGoalsByUser(Long parentId, GoalFilterDto filter) {
+        List<GoalDto> dtoList = goalMapper.goalListToDto(findSubGoalsByParentId(parentId));
+        if (filter == null) {
+            return dtoList;
+        }
+
+        filterList.stream().filter((fil) -> fil.isApplicable(filter)).forEach((fil) -> fil.apply(dtoList, filter));
+
+        return dtoList;
     }
 }

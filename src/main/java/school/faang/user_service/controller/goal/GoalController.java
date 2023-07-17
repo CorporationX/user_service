@@ -3,6 +3,7 @@ package school.faang.user_service.controller.goal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.Exeptions.DataValidationException;
+import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.service.goal.GoalService;
@@ -19,7 +20,7 @@ public class GoalController {
         if (userId < 1) throw new DataValidationException("userId can not be less than 1");
     }
 
-    public List<Goal> getGoalsByUser(Long userId, GoalFilterDto filter) {
+    public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter) {
         try {
             validate(userId, filter);
         } catch (DataValidationException e) {

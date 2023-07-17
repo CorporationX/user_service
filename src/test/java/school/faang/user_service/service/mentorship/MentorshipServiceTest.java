@@ -1,5 +1,7 @@
 package school.faang.user_service.service.mentorship;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,32 +38,40 @@ class MentorshipServiceTest {
 
     @BeforeEach
     void setUp() {
-        when(mentorshipRepository.findUserById(INCORRECT_USER_ID))
+        when(mentorshipRepository.findById(INCORRECT_USER_ID))
                 .thenReturn(Optional.empty());
 
-        User mentor = User.builder().mentees(List.of(new User(), new User())).build();
-        when(mentorshipRepository.findUserById(MENTOR_ID))
+        User mentor = User.builder()
+                .id(MENTOR_ID)
+                .mentees(new ArrayList<>(Collections.singletonList(
+                        User.builder().id(MENTEE_ID).build())))
+                .build();
+        when(mentorshipRepository.findById(MENTOR_ID))
                 .thenReturn(Optional.of(mentor));
 
-        User mentee = User.builder().mentors(List.of(new User())).build();
-        when(mentorshipRepository.findUserById(MENTEE_ID))
+        User mentee = User.builder()
+                .id(MENTEE_ID)
+                .mentors(new ArrayList<>(Collections.singletonList(
+                        User.builder().id(MENTOR_ID).build())))
+                .build();
+        when(mentorshipRepository.findById(MENTEE_ID))
                 .thenReturn(Optional.of(mentee));
     }
 
     @Test
     void getMentees_shouldMatchMenteesSize() {
         List<UserDto> mentees = mentorshipService.getMentees(MENTOR_ID);
-        assertEquals(2, mentees.size());
+        assertEquals(1, mentees.size());
     }
 
     @Test
     void getMentees_shouldInvokeFindByIdMethod() {
         mentorshipService.getMentees(MENTOR_ID);
-        verify(mentorshipRepository).findUserById(MENTOR_ID);
+        verify(mentorshipRepository).findById(MENTOR_ID);
     }
 
     @Test
-    void getMentees_shouldThrowException() {
+    void getMentees_shouldThrowEntityNotFoundException() {
         assertThrows(EntityNotFoundException.class,
                 () -> mentorshipService.getMentees(INCORRECT_USER_ID),
                 "Invalid user id");
@@ -76,11 +86,11 @@ class MentorshipServiceTest {
     @Test
     void getMentors_shouldInvokeFindByIdMethod() {
         mentorshipService.getMentors(MENTEE_ID);
-        verify(mentorshipRepository).findUserById(MENTEE_ID);
+        verify(mentorshipRepository).findById(MENTEE_ID);
     }
 
     @Test
-    void getMentors_shouldThrowException() {
+    void getMentors_shouldThrowEntityNotFoundException() {
         assertThrows(EntityNotFoundException.class,
                 () -> mentorshipService.getMentors(INCORRECT_USER_ID),
                 "Invalid user id");

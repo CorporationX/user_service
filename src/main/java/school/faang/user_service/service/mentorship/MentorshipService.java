@@ -18,7 +18,7 @@ public class MentorshipService {
 
     @Transactional(readOnly = true)
     public List<UserDto> getMentees(long mentorId) {
-        User user = validateUserId(mentorId);
+        User user = getUserById(mentorId);
         return user.getMentees().stream()
                 .map(userMapper::toDto)
                 .toList();
@@ -26,14 +26,14 @@ public class MentorshipService {
 
     @Transactional(readOnly = true)
     public List<UserDto> getMentors(long userId) {
-        User user = validateUserId(userId);
+        User user = getUserById(userId);
         return user.getMentors().stream()
                 .map(userMapper::toDto)
                 .toList();
     }
 
-    private User validateUserId(long mentorId) {
-        return mentorshipRepository.findUserById(mentorId)
+    private User getUserById(long mentorId) {
+        return mentorshipRepository.findById(mentorId)
                 .orElseThrow(() -> new EntityNotFoundException("Invalid user id"));
     }
 }

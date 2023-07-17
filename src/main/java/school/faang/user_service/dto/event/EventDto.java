@@ -21,5 +21,7 @@ public class EventDto {
     private String description;
     private List<SkillDto> relatedSkills;
     private String location;
+    private String type;
+    private String status;
     private int maxAttendees;
 }

@@ -34,7 +34,7 @@ public class EventControllerTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         var now = LocalDateTime.now();
-        eventDto = new EventDto(0L, "0", now, now.plusDays(3), 0L, "0", new ArrayList<>(), "location", -1);
+        eventDto = new EventDto(0L, "0", now, now.plusDays(3), 0L, "0", new ArrayList<>(), "location","Webinar","status", -1);
         filterDto = new EventFilterDto("title", now, now.plusDays(10), 0L, List.of(), "location", 10);
     }
 
@@ -180,5 +180,24 @@ public class EventControllerTest {
                 DataValidationException.class,
                 () -> eventController.getOwnedEvents(eventId)
         );
+    }
+
+    @Test
+    void testGetParticipatedEventsWithNegativeId() {
+        long eventId = Integer.MIN_VALUE;
+
+        Assertions.assertThrows(
+                DataValidationException.class,
+                () -> eventController.getParticipatedEvents(eventId)
+        );
+    }
+
+    @Test
+    void testGetParticipatedEvents() {
+        long eventId = 12;
+
+        var result = eventController.getParticipatedEvents(eventId);
+
+        Assertions.assertEquals(result.getStatusCode(), HttpStatus.OK);
     }
 }

@@ -25,7 +25,9 @@ public class EventService {
     private final EventMapper eventMapper;
 
     public EventDto create(EventDto event) {
+        System.out.println(event);
         validateEventSkills(event);
+        System.out.println(eventMapper.toEntity(event));
         var eventEntity = eventRepository.save(eventMapper.toEntity(event));
         return eventMapper.toDto(eventEntity);
     }
@@ -60,6 +62,10 @@ public class EventService {
 
     public List<EventDto> getOwnedEvents(long userId){
         return eventRepository.findAllByUserId(userId).stream().map(eventMapper::toDto).toList();
+    }
+
+    public List<EventDto> getParticipatedEvents(long userId) {
+        return eventRepository.findParticipatedEventsByUserId(userId).stream().map(eventMapper::toDto).toList();
     }
 
     private void validateEventSkills(EventDto event) {

@@ -18,14 +18,15 @@ public class EventController {
 
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody EventDto eventDto) {
+        System.out.println(eventDto);
         validateEvent(eventDto);
         var res = eventService.create(eventDto);
         return ResponseEntity.ok(res);
     }
 
     @GetMapping("/get/{eventId}")
-    public ResponseEntity<?> getEvent(long eventId) {
-        checkId(eventId);
+    public ResponseEntity<?> getEvent(@PathVariable long eventId) {
+        validateId(eventId);
         return ResponseEntity.ok(eventService.getEvent(eventId));
     }
 
@@ -37,7 +38,7 @@ public class EventController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteEvent(@PathVariable long id) {
-        checkId(id);
+        validateId(id);
         eventService.deleteEvent(id);
         return ResponseEntity.ok().build();
     }
@@ -51,9 +52,16 @@ public class EventController {
 
     @GetMapping("/get-owned-events/{userId}")
     public ResponseEntity<List<EventDto>> getOwnedEvents(@PathVariable long userId) {
-        checkId(userId);
+        validateId(userId);
         List<EventDto> ownedEvents = eventService.getOwnedEvents(userId);
         return ResponseEntity.ok(ownedEvents);
+    }
+
+    @GetMapping("/participated-events/{userId}")
+    public ResponseEntity<List<EventDto>> getParticipatedEvents(@PathVariable long userId) {
+        validateId(userId);
+        List<EventDto> participatedEvents = eventService.getParticipatedEvents(userId);
+        return ResponseEntity.ok(participatedEvents);
     }
 
     private void validateEvent(EventDto event) {
@@ -68,7 +76,7 @@ public class EventController {
         }
     }
 
-    private void checkId(long id) {
+    private void validateId(long id) {
         if (id < 1) {
             throw new DataValidationException("id have to be > 0");
         }

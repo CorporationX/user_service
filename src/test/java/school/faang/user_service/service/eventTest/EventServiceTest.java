@@ -42,7 +42,7 @@ public class EventServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         var now = LocalDateTime.now();
-        eventDto = new EventDto(0L, "title", now, now.plusDays(3), 0L, "0", new ArrayList<>(), "location", -1);
+        eventDto = new EventDto(0L, "title", now, now.plusDays(3), 0L, "0", new ArrayList<>(), "location","Webinar","Planned", -1);
         filterDto = new EventFilterDto("title", now.plusHours(1), now.plusDays(10), 0L, List.of(), "location", 10);
 
         Mockito.when(skillRepository.findAllByUserId(eventDto.getOwnerId()))
@@ -158,6 +158,14 @@ public class EventServiceTest {
         eventService.getOwnedEvents(eventId);
 
         Mockito.verify(eventRepository, Mockito.times(1)).findAllByUserId(eventId);
+    }
+
+    @Test
+    void testGettingParticipatedEvents() {
+        long eventId = 1;
+        eventService.getParticipatedEvents(eventId);
+
+        Mockito.verify(eventRepository, Mockito.times(1)).findParticipatedEventsByUserId(eventId);
     }
 
     private Event getEventExample() {

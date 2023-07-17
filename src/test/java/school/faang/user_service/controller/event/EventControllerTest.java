@@ -14,30 +14,53 @@ import school.faang.user_service.service.event.EventService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 public class EventControllerTest {
+    EventDto eventDto;
     @Mock
     private EventService eventService;
     @InjectMocks
     private EventController eventController;
-    EventDto eventDto;
+
     @BeforeEach
     public void init() {
         eventDto = new EventDto(4L, "fdgdfg", LocalDateTime.now(), LocalDateTime.now(),
                 0L, "hfgh", new ArrayList<>(), "location", 1);
     }
+
     @Test
     public void testThrowDataValidationException() {
-       eventDto.setTitle(null);
-       assertThrows(DataValidationException.class, () -> {
-           eventController.createEvent(eventDto);
-       });
+        eventDto.setTitle(null);
+        assertThrows(DataValidationException.class, () -> {
+            eventController.createEvent(eventDto);
+        });
     }
+
     @Test
     public void testCreateEvent() {
         eventController.createEvent(eventDto);
         Mockito.verify(eventService, Mockito.times(1)).createEvent(eventDto);
+    }
+
+    @Test
+    public void testUpdateEvent() {
+        eventController.updateEvent(4L, eventDto);
+        Mockito.verify(eventService, Mockito.times(1)).updateEvent(4L, eventDto);
+    }
+
+    @Test
+    public void testUpdateEventThrowsDataValidationException() {
+        assertThrows(DataValidationException.class, () -> {
+            eventController.updateEvent(4L, null);
+        });
+        eventDto.setTitle(null);
+        assertThrows(DataValidationException.class, () -> {
+            eventController.updateEvent(4L, eventDto);
+        });
+        assertThrows(DataValidationException.class, () -> {
+            eventController.updateEvent(-1L, null);
+        });
     }
 }

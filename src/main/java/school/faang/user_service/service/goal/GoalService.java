@@ -52,11 +52,7 @@ public class GoalService {
 
     @Transactional
     public GoalDto createGoal(Long userId, GoalDto goalDto) {
-        GoalValidator.validateUserId(userId);
-        GoalValidator.validateGoal(goalDto);
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new DataValidationException("User with given id was not found!"));
-        GoalValidator.validateAdditionGoalToUser(user, goalDto);
+        User user = validateAndGetUser(userId, goalDto);
 
         Goal goal = goalMapper.toEntity(goalDto);
         convertDtoDependenciesToEntity(goalDto, goal);
@@ -70,14 +66,11 @@ public class GoalService {
 
     @Transactional
     public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
-        GoalValidator.validateGoalId(goalId);
-        GoalValidator.validateGoal(goalDto);
-        Goal goalToUpdate = goalRepository.findById(goalId)
-                .orElseThrow(() -> new DataValidationException("Goal with given id was not found!"));
-        GoalValidator.validateUpdatingGoal(goalToUpdate);
+        Goal goalToUpdate = validateAndGetGoal(goalId, goalDto);
 
         Goal goal = goalMapper.toEntity(goalDto);
         goal.setId(goalId);
+        goal.setCreatedAt(goalToUpdate.getCreatedAt());
         convertDtoDependenciesToEntity(goalDto, goal);
 
         checkGoalCompletionAndAssignmentSkills(goalToUpdate, goal);
@@ -88,17 +81,35 @@ public class GoalService {
     }
 
     private void checkGoalCompletionAndAssignmentSkills(Goal goalToUpdate, Goal goal) {
-        if (goalToUpdate.getStatus() == GoalStatus.ACTIVE && goal.getStatus() == GoalStatus.COMPLETED) {
-            List<Skill> skills = goal.getSkillsToAchieve();
+        if (goalToUpdate.getStatus() == GoalStatus.ACTIVE && goal.getStatus() != null && goal.getStatus() == GoalStatus.COMPLETED) {
+            List<Skill> skills = goalToUpdate.getSkillsToAchieve();
             if (skills == null) {
                 return;
             }
-            List<User> usersCompletedGoal = goalRepository.findUsersByGoalId(goalToUpdate.getId());
+            List<User> usersCompletedGoal = goalToUpdate.getUsers();
 
             usersCompletedGoal.forEach(user -> {
                 skills.forEach(skill -> skillRepository.assignSkillToUser(skill.getId(), user.getId()));
             });
         }
+    }
+
+    private Goal validateAndGetGoal(Long goalId, GoalDto goalDto) {
+        GoalValidator.validateGoalId(goalId);
+        GoalValidator.validateGoal(goalDto);
+        Goal goalToUpdate = goalRepository.findById(goalId)
+                .orElseThrow(() -> new DataValidationException("Goal with given id was not found!"));
+        GoalValidator.validateUpdatingGoal(goalToUpdate);
+        return goalToUpdate;
+    }
+
+    private User validateAndGetUser(Long userId, GoalDto goalDto) {
+        GoalValidator.validateUserId(userId);
+        GoalValidator.validateGoal(goalDto);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new DataValidationException("User with given id was not found!"));
+        GoalValidator.validateAdditionGoalToUser(user, goalDto);
+        return user;
     }
 
     private void convertDtoDependenciesToEntity(GoalDto goalDto, Goal goal) {

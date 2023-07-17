@@ -1,10 +1,6 @@
 package school.faang.user_service.filters;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.Skill;
@@ -12,11 +8,9 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.contact.Contact;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
 class UserFilterTest {
     UserFilter userFilter = new UserFilter();
 
@@ -48,8 +42,6 @@ class UserFilterTest {
         UserFilterDto filter = createUserFilterDto();
         assertTrue(userFilter.applyFilter(List.of(user), filter).isEmpty());
     }
-
-
 
     private User createUser(){
         User user = new User();

@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
-    ErrorMessages errorMessages = new ErrorMessages();
+    private final UserFilter userfilter;
 
     public void followUser(long followerId, long followeeId){
         validateFollower(followerId, followeeId);
@@ -29,7 +29,7 @@ public class SubscriptionService {
 
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filter){
         validateUserId(followeeId);
-        return new UserFilter().applyFilter(subscriptionRepository.findByFolloweeId(followeeId).toList(), filter);
+        return userfilter.applyFilter(subscriptionRepository.findByFolloweeId(followeeId).toList(), filter);
     }
 
     public int getFollowersCount(long followeeId){
@@ -39,7 +39,7 @@ public class SubscriptionService {
 
     public List<UserDto> getFollowing(long followeeId, UserFilterDto filter){
         validateUserId(followeeId);
-        return new UserFilter().applyFilter(subscriptionRepository.findByFolloweeId(followeeId).toList(), filter);
+        return userfilter.applyFilter(subscriptionRepository.findByFolloweeId(followeeId).toList(), filter);
     }
 
     public int getFollowingCount(long followerId){
@@ -51,13 +51,13 @@ public class SubscriptionService {
         validateUserId(followerId);
         validateUserId(followeeId);
         if(followerId == followeeId){
-            throw new DataValidationException(errorMessages.SAMEID);
+            throw new DataValidationException(ErrorMessages.SAME_ID);
         }
     }
 
     private void validateUserId(long userId){
         if(userId <= 0){
-            throw new IllegalArgumentException(errorMessages.NEGATIVEID);
+            throw new IllegalArgumentException(ErrorMessages.NEGATIVE_ID);
         }
     }
 }

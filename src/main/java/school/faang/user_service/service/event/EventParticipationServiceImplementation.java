@@ -50,6 +50,12 @@ public class EventParticipationServiceImplementation implements EventParticipati
         return getParticipantsByEventId(eventId);
     }
 
+    @Override
+    public long getParticipantsCount(Long eventId) {
+        validateEventId(eventId);
+        return eventParticipationRepository.countParticipants(eventId);
+    }
+
     private List<User> getParticipantsByEventId(Long eventId) {
         return eventParticipationRepository.findAllParticipantsByEventId(eventId);
     }

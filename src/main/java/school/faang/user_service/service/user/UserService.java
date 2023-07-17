@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.List;
+
 @Service
 public class UserService {
     private final UserRepository userRepository;

@@ -10,4 +10,6 @@ public interface EventParticipationService {
     void unregisterParticipant(Long eventId, Long userId);
 
     List<User> getParticipant(Long eventId);
+
+    long getParticipantsCount(Long eventId);
 }

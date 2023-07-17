@@ -3,15 +3,21 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.filter.requestfilter.RequestFilter;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
 @Service
 @RequiredArgsConstructor
 public class RecommendationRequestService {
@@ -24,6 +30,8 @@ public class RecommendationRequestService {
 
     private final RecommendationRequestMapper recommendationRequestMapper;
 
+    private final List<RequestFilter> requestFilters;
+
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
         validationExistById(recommendationRequestDto.getRequesterId());
         validationExistById(recommendationRequestDto.getReceiverId());
@@ -31,6 +39,14 @@ public class RecommendationRequestService {
         validationExistSkill(recommendationRequestDto);
         RecommendationRequest entity = recommendationRequestMapper.toEntity(recommendationRequestDto);
         return recommendationRequestMapper.toDto(recommendationRequestRepository.save(entity));
+    }
+
+    public List<RecommendationRequestDto> getRequests(RequestFilterDto filters) {
+        Stream<RecommendationRequest> requestStream = StreamSupport.stream(recommendationRequestRepository.findAll().spliterator(), false);
+        requestFilters.stream()
+                .filter(filter -> filter.isApplicable(filters))
+                .forEach(filter -> filter.apply(requestStream, filters));
+        return recommendationRequestMapper.toDto(requestStream.toList());
     }
 
     private void validationExistSkill(RecommendationRequestDto recommendationRequestDto) {
@@ -55,5 +71,4 @@ public class RecommendationRequestService {
             throw new DataValidationException("User with id " + id + " does not exist");
         }
     }
-
 }

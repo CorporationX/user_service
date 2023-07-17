@@ -5,9 +5,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
@@ -41,11 +43,13 @@ class RecommendationRequestServiceTest {
     @Spy
     private RecommendationRequestMapper recommendationRequestMapper;
 
-    RecommendationRequestDto requestDto;
+    private RecommendationRequestDto requestDto1;
+
+    private RecommendationRequestDto requestDto2;
 
     @BeforeEach
     void setUp() {
-        requestDto = RecommendationRequestDto.builder()
+        requestDto1 = RecommendationRequestDto.builder()
                 .id(1L)
                 .message("message")
                 .status(RequestStatus.ACCEPTED)
@@ -54,25 +58,44 @@ class RecommendationRequestServiceTest {
                 .receiverId(1L)
                 .createdAt(LocalDateTime.now().minusMonths(7))
                 .build();
+        requestDto2 = RecommendationRequestDto.builder()
+                .id(1L)
+                .build();
     }
 
     @Test
     void testValidationExistById() {
-        assertThrows(DataValidationException.class, () -> recommendationRequestService.create(requestDto));
+        assertThrows(DataValidationException.class, () -> recommendationRequestService.create(requestDto1));
     }
 
     @Test
     void testValidationRequestDate() {
-        requestDto.setCreatedAt(LocalDateTime.now().minusMonths(7));
-        assertThrows(DataValidationException.class, () -> recommendationRequestService.create(requestDto));
+        requestDto1.setCreatedAt(LocalDateTime.now().minusMonths(7));
+        assertThrows(DataValidationException.class, () -> recommendationRequestService.create(requestDto1));
     }
 
     @Test
     void testValidationExistSkill() {
-        requestDto.setCreatedAt(LocalDateTime.now());
-        assertThrows(DataValidationException.class, () -> recommendationRequestService.create(requestDto));
+        requestDto1.setCreatedAt(LocalDateTime.now());
+        assertThrows(DataValidationException.class, () -> recommendationRequestService.create(requestDto1));
         System.out.println(skillRepository.existsById(1L));
     }
 
+    @Test
+    void testGetRequests() {
+        RecommendationRequest entity1 = recommendationRequestMapper.toEntity(requestDto1);
+        RecommendationRequest entity2 = recommendationRequestMapper.toEntity(requestDto2);
+        Mockito.when(recommendationRequestRepository.findAll())
+                .thenReturn(List.of(entity1, entity2));
 
+        RequestFilterDto requestFilterDto = RequestFilterDto.builder()
+                .id(1)
+                .build();
+
+        List<RecommendationRequestDto> expected = List.of(requestDto1, requestDto2);
+
+        List<RecommendationRequestDto> actual = recommendationRequestService.getRequests(requestFilterDto);
+
+        assertEquals(expected, actual);
+    }
 }

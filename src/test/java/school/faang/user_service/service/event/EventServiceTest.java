@@ -1,5 +1,6 @@
 package school.faang.user_service.service.event;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,6 @@ import school.faang.user_service.validator.EventValidator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import school.faang.user_service.mapper.EventMapper;
 
 import java.util.Optional;
 

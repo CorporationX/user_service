@@ -22,11 +22,16 @@ public class SkillOfferValidator {
 
     public void validateSkillsAreInRepository(List<SkillOfferDto> skills) {
         List<Long> skillIds = getUniqueSkillIds(skills);
-        int countedSkills = skillRepository.countExisting(skillIds);
 
-        if (skills.size() != countedSkills) {
-            throw new DataValidationException("Invalid skills");
+        for (Long skillId : skillIds) {
+            if (skillNotExists(skillId)) {
+                throw new DataValidationException("Invalid skills");
+            }
         }
+    }
+
+    private boolean skillNotExists(long skillId) {
+        return !skillRepository.existsById(skillId);
     }
 
     private List<Long> getUniqueSkillIds(List<SkillOfferDto> skills) {

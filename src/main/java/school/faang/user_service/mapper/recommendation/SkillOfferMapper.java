@@ -9,6 +9,7 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.FIELD, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface SkillOfferMapper {
 
+
     SkillOfferDto toDto(SkillOffer skillOffer);
     SkillOffer toEntity(SkillOfferDto skillOfferDto);
 }

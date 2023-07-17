@@ -122,11 +122,6 @@ public class EventService {
     }
 
     public EventDto updateEvent(EventDto event) {
-        if (eventRepository.existsById(event.getId())) {
-            EventDto eventDto = event;
-            eventRepository.deleteById(event.getId());
-            return create(eventDto);
-        }
         return create(event);
     }
 
@@ -137,6 +132,9 @@ public class EventService {
             eventRepository.deleteById(eventId);
         }
     }
+
+    // эпик создание события BC-3688
+    // 1 таска BC-3689
 //    Создайте в классе EventService метод create(EventDto event)
 //    с возвращаемым значением EventDto который будет вызываться из метода create()
 //    класса EventController для непосредственного выполнения
@@ -147,7 +145,7 @@ public class EventService {
 //    нужно вывести ошибку о том, что пользователь не может провести такое событие с
 //    такими навыками. Если все в порядке, то нужно вызвать метода save класса EventRepository,
 //    который сохранит новое событие в базу данных
-
+    // 5 таска BC-3693
 //    Создайте в классе EventService метод updateEvent(EventDto event) для обновления события.
 
 //    Здесь нужно проверить, что пользователь, который создает событие, имеет навыки,

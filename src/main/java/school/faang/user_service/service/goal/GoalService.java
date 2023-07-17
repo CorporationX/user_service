@@ -37,17 +37,15 @@ public class GoalService {
 
         Stream<Goal> goalStream = goalRepository.findGoalsByUserId(userId);
 
-        if (filter == null) {
-            return goalStream.map(goalMapper::toDto).toList();
-        }
+        return checkExistFilterAndApplyFilters(goalStream, filter);
+    }
 
-        for (GoalFilter goalFilter : goalFilters) {
-            if (goalFilter.isApplicable(filter)) {
-                goalStream = goalFilter.apply(goalStream, filter);
-            }
-        }
+    public List<GoalDto> findSubtasksByGoalId(Long goalId, GoalFilterDto filter) {
+        GoalValidator.validateId(goalId, "Goal");
 
-        return goalStream.map(goalMapper::toDto).toList();
+        Stream<Goal> goalStream = goalRepository.findByParent(goalId);
+
+        return checkExistFilterAndApplyFilters(goalStream, filter);
     }
 
     @Transactional
@@ -85,6 +83,20 @@ public class GoalService {
         if (!goalRepository.existsById(goalId))
             throw new DataValidationException("Goal with given id was not found!");
         goalRepository.deleteById(goalId);
+    }
+
+    private List<GoalDto> checkExistFilterAndApplyFilters(Stream<Goal> goalStream, GoalFilterDto filter) {
+        if (filter == null) {
+            return goalStream.map(goalMapper::toDto).toList();
+        }
+
+        for (GoalFilter goalFilter : goalFilters) {
+            if (goalFilter.isApplicable(filter)) {
+                goalStream = goalFilter.apply(goalStream, filter);
+            }
+        }
+
+        return goalStream.map(goalMapper::toDto).toList();
     }
 
     private void checkGoalCompletionAndAssignmentSkills(Goal goalToUpdate, Goal goal) {

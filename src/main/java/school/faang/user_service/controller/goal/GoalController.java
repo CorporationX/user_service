@@ -23,6 +23,32 @@ import school.faang.user_service.service.goal.GoalService;
 public class GoalController {
     private final GoalService goalService;
 
+    @GetMapping("/get/{userId}")
+    public ResponseEntity<?> getGoalsByUser(@PathVariable("userId") Long userId,
+                                            @RequestBody(required = false) GoalFilterDto filter) {
+        try {
+            return ResponseEntity.ok(goalService.getGoalsByUser(userId, filter));
+        } catch (DataValidationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (NotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/get/subtasks/{goalId}")
+    public ResponseEntity<?> findSubtasksByGoalId(@PathVariable("goalId") Long goalId,
+                                                  @RequestBody(required = false) GoalFilterDto filter) {
+        try {
+            return ResponseEntity.ok(goalService.findSubtasksByGoalId(goalId, filter));
+        } catch (DataValidationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @PostMapping("/{userId}/create-goal")
     public ResponseEntity<?> createGoal(@PathVariable("userId") Long userId,
                                         @RequestBody GoalDto goalDto) {
@@ -54,20 +80,6 @@ public class GoalController {
             return ResponseEntity.ok().build();
         } catch (DataValidationException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @GetMapping("/get/{userId}")
-    public ResponseEntity<?> getGoalsByUser(@PathVariable Long userId,
-                                            @RequestBody(required = false) GoalFilterDto filter) {
-        try {
-            return ResponseEntity.ok(goalService.getGoalsByUser(userId, filter));
-        } catch (DataValidationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (NotFoundException e) {
-            return ResponseEntity.notFound().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

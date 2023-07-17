@@ -15,6 +15,11 @@ public class SubscriptionController {
         subscriptionService.followUser(followerId, followeeId);
     }
 
+    public void unfollowUser(long followerId, long followeeId) {
+        validate(followerId, followeeId);
+        subscriptionService.unfollowUser(followerId, followeeId);
+    }
+
     public long getFollowersCount(long followeeId) {
         return subscriptionService.getFollowersCount(followeeId);
     }

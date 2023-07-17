@@ -17,6 +17,13 @@ public class SubscriptionService {
         subscriptionRepository.followUser(followerId, followeeId);
     }
 
+    @Transactional
+    public void unfollowUser(long followerId, long followeeId) {
+        if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
+            subscriptionRepository.unfollowUser(followerId, followeeId);
+        }
+    }
+
     @Transactional(readOnly = true)
     public long getFollowersCount(long followeeId) {
         return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);

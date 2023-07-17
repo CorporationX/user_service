@@ -9,8 +9,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
 
+import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -60,6 +60,17 @@ class SubscriptionServiceTest {
 
             assertEquals("This subscription already exists", e.getMessage());
         }
+        verifyNoMoreInteractions(subscriptionRepository);
+    }
+
+    @Test
+    public void testUnfollowUser() {
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true).thenReturn(false);
+
+        subscriptionService.unfollowUser(followerId, followeeId);
+
+        verify(subscriptionRepository, times(1)).unfollowUser(followerId, followeeId);
+
         verifyNoMoreInteractions(subscriptionRepository);
     }
 

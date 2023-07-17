@@ -6,9 +6,9 @@ import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.validator.EventValidator;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ public class EventService {
         Event event = eventRepository.save(eventMapper.toEntity(eventDto));
         return eventMapper.toDto(event);
     }
-  
+
     public void deleteEvent(Long id) {
         eventRepository.findById(id).orElseThrow(() -> new DataValidationException("Event not found"));
         eventRepository.deleteById(id);
@@ -61,41 +61,42 @@ public class EventService {
                 .map(eventMapper::toDto)
                 .toList();
     }
-  
+
     public EventDto getEvent(long id) {
         Event entity = eventRepository.findById(id)
                 .orElseThrow(() -> new DataValidationException("Event not found"));
         return eventMapper.toDto(entity);
+    }
 
     private void updateEventInDb(EventDto eventForUpdate, EventDto eventFormRequest) {
-            eventValidator.checkIfUserHasSkillsRequired(eventFormRequest);
-            if (!(eventFormRequest.getTitle() == null)) {
-                eventForUpdate.setTitle(eventFormRequest.getTitle());
-            }
-            if (!(eventFormRequest.getStartDate() == null)) {
-                eventForUpdate.setStartDate(eventFormRequest.getStartDate());
-            }
-            if (!(eventFormRequest.getEndDate() == null)) {
-                eventForUpdate.setEndDate(eventFormRequest.getEndDate());
-            }
-            if (!(eventFormRequest.getDescription() == null)) {
-                eventForUpdate.setDescription(eventFormRequest.getDescription());
-            }
-
-            if (!(eventFormRequest.getLocation() == null)) {
-                eventForUpdate.setLocation(eventFormRequest.getLocation());
-            }
-
-            if (eventFormRequest.getMaxAttendees() >= 0) {
-                eventForUpdate.setMaxAttendees(eventFormRequest.getMaxAttendees());
-            }
-
-            if (!(eventFormRequest.getRelatedSkills() == null)) {
-                eventForUpdate.setRelatedSkills(eventFormRequest.getRelatedSkills());
-            }
-            eventRepository.save(eventMapper.toEntity(eventForUpdate));
+        eventValidator.checkIfUserHasSkillsRequired(eventFormRequest);
+        if (!(eventFormRequest.getTitle() == null)) {
+            eventForUpdate.setTitle(eventFormRequest.getTitle());
         }
-   
+        if (!(eventFormRequest.getStartDate() == null)) {
+            eventForUpdate.setStartDate(eventFormRequest.getStartDate());
+        }
+        if (!(eventFormRequest.getEndDate() == null)) {
+            eventForUpdate.setEndDate(eventFormRequest.getEndDate());
+        }
+        if (!(eventFormRequest.getDescription() == null)) {
+            eventForUpdate.setDescription(eventFormRequest.getDescription());
+        }
+
+        if (!(eventFormRequest.getLocation() == null)) {
+            eventForUpdate.setLocation(eventFormRequest.getLocation());
+        }
+
+        if (eventFormRequest.getMaxAttendees() >= 0) {
+            eventForUpdate.setMaxAttendees(eventFormRequest.getMaxAttendees());
+        }
+
+        if (!(eventFormRequest.getRelatedSkills() == null)) {
+            eventForUpdate.setRelatedSkills(eventFormRequest.getRelatedSkills());
+        }
+        eventRepository.save(eventMapper.toEntity(eventForUpdate));
+    }
+
     private List<EventDto> filterEvents(Stream<Event> events, EventFilterDto filter) {
         filters.stream()
                 .filter(eventFilter -> eventFilter.isApplicable(filter))

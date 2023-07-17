@@ -3,68 +3,71 @@ package school.faang.user_service.filter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
-import school.faang.user_service.mapper.GoalMapper;
+import school.faang.user_service.filter.goal.GoalFilter;
+import school.faang.user_service.filter.goal.GoalSkillFilter;
+import school.faang.user_service.filter.goal.GoalStatusFilter;
+import school.faang.user_service.filter.goal.GoalTitleFilter;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class GoalFilterTest {
-    private final GoalMapper goalMapper = GoalMapper.INSTANCE;
-    GoalFilterDto goalFilterDto = new GoalFilterDto();
-    Goal goal = mock(Goal.class);
-    Stream<Goal> goals = Stream.of(goal);
 
     @Test
     void filterGoals_Successful() {
-        GoalFilter goalFilter = new GoalFilter(goalFilterDto, goalMapper);
+        GoalFilterDto goalFilterDto = new GoalFilterDto();
+        List<Goal> goals = new ArrayList<>(List.of(new Goal()));
+        List<GoalFilter> goalFilters = List.of(new GoalTitleFilter(),
+                new GoalSkillFilter(), new GoalStatusFilter());
 
-        List<GoalDto> result = goalFilter.filterGoals(goals);
+        goalFilters.stream()
+                .filter(goalFilter -> goalFilter.isApplicable(goalFilterDto))
+                .forEach(goalFilter -> goalFilter.apply(goals, goalFilterDto));
 
-        assertEquals(1, result.size());
+        assertEquals(1, goals.size());
     }
 
     @Test
     void filterGoals_Status_Doesnt_Match() {
-        goalFilterDto.setGoalStatus(GoalStatus.ACTIVE);
-        GoalFilter goalFilter = new GoalFilter(goalFilterDto, goalMapper);
-        when(goal.getStatus()).thenReturn(GoalStatus.COMPLETED);
+        GoalFilterDto goalFilterDto = GoalFilterDto.builder().goalStatus(GoalStatus.ACTIVE).build();
+        Goal goal = Goal.builder().status(GoalStatus.COMPLETED).build();
+        List<Goal> goals = new ArrayList<>(List.of(goal));
+        GoalStatusFilter goalTitleFilter = new GoalStatusFilter();
 
-        List<GoalDto> result = goalFilter.filterGoals(goals);
+        goalTitleFilter.apply(goals, goalFilterDto);
 
-        assertEquals(0, result.size());
+        assertEquals(0, goals.size());
     }
 
     @Test
     void filterGoals_Goal_Doesnt_Match() {
-        goalFilterDto.setSkillId(1L);
-        GoalFilter goalFilter = new GoalFilter(goalFilterDto, goalMapper);
+        GoalFilterDto goalFilterDto = GoalFilterDto.builder().skillId(1L).build();
+        Skill skill = Skill.builder().id(2L).build();
+        Goal goal = Goal.builder().skillsToAchieve(List.of(skill)).build();
+        List<Goal> goals = new ArrayList<>(List.of(goal));
+        GoalSkillFilter goalTitleFilter = new GoalSkillFilter();
 
-        when(goal.getSkillsToAchieve()).thenReturn(List.of(Skill.builder().id(2L).build()));
+        goalTitleFilter.apply(goals, goalFilterDto);
 
-        List<GoalDto> result = goalFilter.filterGoals(goals);
-
-        assertEquals(0, result.size());
+        assertEquals(0, goals.size());
     }
 
     @Test
-    void filterGoals_Title_Doesnt_Match(){
-        goalFilterDto.setTitle("title");
-        GoalFilter goalFilter = new GoalFilter(goalFilterDto, goalMapper);
+    void filterGoals_Title_Doesnt_Match() {
+        GoalFilterDto goalFilterDto = GoalFilterDto.builder().title("tttitle").build();
+        Goal goal = Goal.builder().title("Title").build();
+        List<Goal> goals = new ArrayList<>(List.of(goal));
+        GoalTitleFilter goalTitleFilter = new GoalTitleFilter();
 
-        when(goal.getTitle()).thenReturn("title1");
+        goalTitleFilter.apply(goals, goalFilterDto);
 
-        List<GoalDto> result = goalFilter.filterGoals(goals);
-
-        assertEquals(0, result.size());
+        assertEquals(0, goals.size());
     }
 }

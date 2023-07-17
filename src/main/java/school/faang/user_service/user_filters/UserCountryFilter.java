@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 
-import java.util.stream.Stream;
+import java.util.List;
 
 @Component
 public class UserCountryFilter implements UserFilter {
@@ -14,7 +14,7 @@ public class UserCountryFilter implements UserFilter {
     }
 
     @Override
-    public Stream<User> apply(Stream<User> users, UserFilterDto filters) {
-        return users.filter(user -> user.getCountry().getTitle().contains(filters.getCountryPattern()));
+    public void apply(List<User> users, UserFilterDto filters) {
+        users.removeIf(user -> !user.getCountry().getTitle().contains(filters.getCountryPattern()));
     }
 }

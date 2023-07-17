@@ -5,9 +5,9 @@ import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -28,111 +28,111 @@ class UserFilterTest {
     @Test
     void testFilterUsersWrongName() {
         User user = User.builder().username("John").build();
-        Stream<User> userStream = Stream.of(user);
+        List<User> userList = new ArrayList<>(List.of(user));
         UserFilterDto userFilterDto = UserFilterDto.builder().namePattern("Name").build();
-        List<User> users = userFilters.stream()
+        userFilters.stream()
                 .filter(userFilter -> userFilter.isApplicable(userFilterDto))
-                .flatMap(userFilter -> userFilter.apply(userStream, userFilterDto)).toList();
-        assertEquals(0, users.size());
+                .forEach(userFilter -> userFilter.apply(userList, userFilterDto));
+        assertEquals(0, userList.size());
     }
 
     @Test
     void testFilterUsersWrongAbout() {
         User user = User.builder().aboutMe("").build();
-        Stream<User> userStream = Stream.of(user);
+        List<User> userList = new ArrayList<>(List.of(user));
         UserFilterDto userFilterDto = UserFilterDto.builder().aboutPattern("I am a student").build();
-        List<User> users = userFilters.stream()
+        userFilters.stream()
                 .filter(userFilter -> userFilter.isApplicable(userFilterDto))
-                .flatMap(userFilter -> userFilter.apply(userStream, userFilterDto)).toList();
-        assertEquals(0, users.size());
+                .forEach(userFilter -> userFilter.apply(userList, userFilterDto));
+        assertEquals(0, userList.size());
     }
 
     @Test
     void testFilterUsersWrongEmail() {
         User user = User.builder().email("@gmail.com").build();
-        Stream<User> userStream = Stream.of(user);
+        List<User> userList = new ArrayList<>(List.of(user));
         UserFilterDto userFilterDto = UserFilterDto.builder().emailPattern("email@example.com").build();
-        List<User> users = userFilters.stream()
+        userFilters.stream()
                 .filter(userFilter -> userFilter.isApplicable(userFilterDto))
-                .flatMap(userFilter -> userFilter.apply(userStream, userFilterDto)).toList();
-        assertEquals(0, users.size());
+                .forEach(userFilter -> userFilter.apply(userList, userFilterDto));
+        assertEquals(0, userList.size());
     }
 
     @Test
     void testFilterUsersWrongContact() {
         User user = User.builder().contacts(Collections.emptyList()).build();
-        Stream<User> userStream = Stream.of(user);
+        List<User> userList = new ArrayList<>(List.of(user));
         UserFilterDto userFilterDto = UserFilterDto.builder().contactPattern("123456789").build();
-        List<User> users = userFilters.stream()
+        userFilters.stream()
                 .filter(userFilter -> userFilter.isApplicable(userFilterDto))
-                .flatMap(userFilter -> userFilter.apply(userStream, userFilterDto)).toList();
-        assertEquals(0, users.size());
+                .forEach(userFilter -> userFilter.apply(userList, userFilterDto));
+        assertEquals(0, userList.size());
     }
 
     @Test
     void testFilterUsersWrongCountry() {
         User user = User.builder().country(new Country(1L, "World", Collections.emptyList())).build();
-        Stream<User> userStream = Stream.of(user);
+        List<User> userList = new ArrayList<>(List.of(user));
         UserFilterDto userFilterDto = UserFilterDto.builder().countryPattern("Ru").build();
-        List<User> users = userFilters.stream()
+        userFilters.stream()
                 .filter(userFilter -> userFilter.isApplicable(userFilterDto))
-                .flatMap(userFilter -> userFilter.apply(userStream, userFilterDto)).toList();
-        assertEquals(0, users.size());
+                .forEach(userFilter -> userFilter.apply(userList, userFilterDto));
+        assertEquals(0, userList.size());
     }
 
     @Test
     void testFilterUsersWrongCity() {
         User user = User.builder().city("City").build();
-        Stream<User> userStream = Stream.of(user);
+        List<User> userList = new ArrayList<>(List.of(user));
         UserFilterDto userFilterDto = UserFilterDto.builder().cityPattern("Town").build();
-        List<User> users = userFilters.stream()
+        userFilters.stream()
                 .filter(userFilter -> userFilter.isApplicable(userFilterDto))
-                .flatMap(userFilter -> userFilter.apply(userStream, userFilterDto)).toList();
-        assertEquals(0, users.size());
+                .forEach(userFilter -> userFilter.apply(userList, userFilterDto));
+        assertEquals(0, userList.size());
     }
 
     @Test
     void testFilterUsersWrongPhone() {
         User user = User.builder().phone("1234567").build();
-        Stream<User> userStream = Stream.of(user);
+        List<User> userList = new ArrayList<>(List.of(user));
         UserFilterDto userFilterDto = UserFilterDto.builder().phonePattern("000").build();
-        List<User> users = userFilters.stream()
+        userFilters.stream()
                 .filter(userFilter -> userFilter.isApplicable(userFilterDto))
-                .flatMap(userFilter -> userFilter.apply(userStream, userFilterDto)).toList();
-        assertEquals(0, users.size());
+                .forEach(userFilter -> userFilter.apply(userList, userFilterDto));
+        assertEquals(0, userList.size());
     }
 
     @Test
     void testFilterUsersWrongSkill() {
         User user = User.builder().skills(Collections.emptyList()).build();
-        Stream<User> userStream = Stream.of(user);
+        List<User> userList = new ArrayList<>(List.of(user));
         UserFilterDto userFilterDto = UserFilterDto.builder().skillPattern("Faster").build();
-        List<User> users = userFilters.stream()
+        userFilters.stream()
                 .filter(userFilter -> userFilter.isApplicable(userFilterDto))
-                .flatMap(userFilter -> userFilter.apply(userStream, userFilterDto)).toList();
-        assertEquals(0, users.size());
+                .forEach(userFilter -> userFilter.apply(userList, userFilterDto));
+        assertEquals(0, userList.size());
     }
 
     @Test
     void testFilterUsersWrongExperienceMin() {
         User user = User.builder().experience(10).build();
-        Stream<User> userStream = Stream.of(user);
+        List<User> userList = new ArrayList<>(List.of(user));
         UserFilterDto userFilterDto = UserFilterDto.builder().experienceMin(11).build();
-        List<User> users = userFilters.stream()
+        userFilters.stream()
                 .filter(userFilter -> userFilter.isApplicable(userFilterDto))
-                .flatMap(userFilter -> userFilter.apply(userStream, userFilterDto)).toList();
-        assertEquals(0, users.size());
+                .forEach(userFilter -> userFilter.apply(userList, userFilterDto));
+        assertEquals(0, userList.size());
     }
 
     @Test
     void testFilterUsersWrongExperienceMax() {
         User user = User.builder().experience(10).build();
-        Stream<User> userStream = Stream.of(user);
+        List<User> userList = new ArrayList<>(List.of(user));
         UserFilterDto userFilterDto = UserFilterDto.builder().experienceMax(5).build();
-        List<User> users = userFilters.stream()
+        userFilters.stream()
                 .filter(userFilter -> userFilter.isApplicable(userFilterDto))
-                .flatMap(userFilter -> userFilter.apply(userStream, userFilterDto)).toList();
-        assertEquals(0, users.size());
+                .forEach(userFilter -> userFilter.apply(userList, userFilterDto));
+        assertEquals(0, userList.size());
     }
 
     @Test
@@ -148,7 +148,7 @@ class UserFilterTest {
                 .skills(Collections.emptyList())
                 .experience(10)
                 .build();
-        Stream<User> userStream = Stream.of(user);
+        List<User> userList = new ArrayList<>(List.of(user));
         UserFilterDto userFilterDto = UserFilterDto.builder()
                 .namePattern("John")
                 .aboutPattern("I am a student")
@@ -161,9 +161,9 @@ class UserFilterTest {
                 .experienceMin(5)
                 .experienceMax(15)
                 .build();
-        List<User> users = userFilters.stream()
+        userFilters.stream()
                 .filter(userFilter -> userFilter.isApplicable(userFilterDto))
-                .flatMap(userFilter -> userFilter.apply(userStream, userFilterDto)).toList();
-        assertEquals(1, users.size());
+                .forEach(userFilter -> userFilter.apply(userList, userFilterDto));
+        assertEquals(1, userList.size());
     }
 }

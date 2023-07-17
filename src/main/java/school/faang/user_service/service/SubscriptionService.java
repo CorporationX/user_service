@@ -7,13 +7,12 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.user_filters.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
+import school.faang.user_service.user_filters.UserFilter;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -37,10 +36,10 @@ public class SubscriptionService {
 
     @Transactional(readOnly = true)
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filters) {
-        Stream<User> followers = subscriptionRepository.findByFolloweeId(followeeId);
+        List<User> followers = subscriptionRepository.findByFolloweeId(followeeId).collect(Collectors.toList());
         userFilters.stream().filter(filter -> filter.isApplicable(filters))
                 .forEach(filter -> filter.apply(followers, filters));
-        return followers.map(userMapper::toDto).collect(Collectors.toList());
+        return followers.stream().map(userMapper::toDto).collect(Collectors.toList());
     }
 
     private void validate(long followerId, long followeeId) {

@@ -11,9 +11,9 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.user_filters.UserFilter2;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
+import school.faang.user_service.user_filters.UserFilter;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -37,16 +37,15 @@ class SubscriptionServiceTest {
     @Mock
     UserFilterDto userFilterDto;
     @Mock
-    UserFilter2 userFilter2;
-
+    List<UserFilter> userFilters;
 
     long followerId;
     long followeeId;
 
     @BeforeEach
     public void setUp() {
-        followerId = 2;
-        followeeId = 1;
+        followerId = 2L;
+        followeeId = 1L;
     }
 
     @Test
@@ -95,13 +94,11 @@ class SubscriptionServiceTest {
         Stream<User> userStream = Stream.of(user);
 
         when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(userStream);
-        when(userFilter2.filterUsers(userStream, userFilterDto)).thenReturn(List.of(user));
         when(userMapper.toDto(user)).thenReturn(userDto);
 
         subscriptionService.getFollowers(followeeId, userFilterDto);
 
         verify(subscriptionRepository, times(1)).findByFolloweeId(followeeId);
-        verify(userFilter2, times(1)).filterUsers(userStream, userFilterDto);
         verify(userMapper, times(1)).toDto(user);
     }
 }

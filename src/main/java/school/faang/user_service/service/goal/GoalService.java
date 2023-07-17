@@ -33,7 +33,7 @@ public class GoalService {
     private final List<GoalFilter> goalFilters;
 
     public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter) {
-        GoalValidator.validateUserId(userId);
+        GoalValidator.validateId(userId, "User");
 
         Stream<Goal> goalStream = goalRepository.findGoalsByUserId(userId);
 
@@ -72,7 +72,6 @@ public class GoalService {
         goal.setId(goalId);
         goal.setCreatedAt(goalToUpdate.getCreatedAt());
         convertDtoDependenciesToEntity(goalDto, goal);
-
         checkGoalCompletionAndAssignmentSkills(goalToUpdate, goal);
 
         goalRepository.save(goal);
@@ -95,7 +94,7 @@ public class GoalService {
     }
 
     private Goal validateAndGetGoal(Long goalId, GoalDto goalDto) {
-        GoalValidator.validateGoalId(goalId);
+        GoalValidator.validateId(goalId, "Goal");
         GoalValidator.validateGoal(goalDto);
         Goal goalToUpdate = goalRepository.findById(goalId)
                 .orElseThrow(() -> new DataValidationException("Goal with given id was not found!"));
@@ -104,7 +103,7 @@ public class GoalService {
     }
 
     private User validateAndGetUser(Long userId, GoalDto goalDto) {
-        GoalValidator.validateUserId(userId);
+        GoalValidator.validateId(userId, "User");
         GoalValidator.validateGoal(goalDto);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new DataValidationException("User with given id was not found!"));
@@ -114,28 +113,23 @@ public class GoalService {
 
     private void convertDtoDependenciesToEntity(GoalDto goalDto, Goal goal) {
         if (goalDto.getMentorId() != null) {
-            Optional<User> mentorOptional = userRepository.findById(goalDto.getMentorId());
-            if (mentorOptional.isEmpty()) {
-                throw new DataValidationException("Mentor with given id was not found!");
-            }
-            goal.setMentor(mentorOptional.get());
+            User mentor = userRepository.findById(goalDto.getMentorId())
+                    .orElseThrow(() -> new DataValidationException("Mentor with given id was not found!"));
+            goal.setMentor(mentor);
         }
 
         if (goalDto.getParentId() != null) {
-            Optional<Goal> goalOptional = goalRepository.findById(goalDto.getParentId());
-            if (goalOptional.isEmpty()) {
-                throw new DataValidationException("Goal-parent with given id was not found!");
-            }
-            goal.setParent(goalOptional.get());
+            Goal goalParent = goalRepository.findById(goalDto.getParentId())
+                    .orElseThrow(() -> new DataValidationException("Goal-parent with given id was not found!"));
+            goal.setParent(goalParent);
         }
 
         if (goalDto.getSkillIds() != null) {
             List<Skill> skills = new ArrayList<>();
             goalDto.getSkillIds().forEach(skillId -> {
-                Optional<Skill> optionalSkill = skillRepository.findById(skillId);
-                if (optionalSkill.isEmpty())
-                    throw new DataValidationException("There is no way to add a goal with a non-existent skill!");
-                skills.add(optionalSkill.get());
+                Skill skill = skillRepository.findById(skillId)
+                        .orElseThrow(() -> new DataValidationException("There is no way to add a goal with a non-existent skill!"));
+                skills.add(skill);
             });
             goal.setSkillsToAchieve(skills);
         }

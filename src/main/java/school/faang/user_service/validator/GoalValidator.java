@@ -11,21 +11,13 @@ import java.util.List;
 public class GoalValidator {
     public static final int MAX_ACTIVE_GOALS = 3;
 
-    private static void validateId(Long id, String entityName) {
+    public static void validateId(Long id, String entityName) {
         if (id == null) {
             throw new DataValidationException(entityName + " id cannot be null!");
         }
         if (id <= 0) {
             throw new DataValidationException(entityName + " id cannot be less than 1!");
         }
-    }
-
-    public static void validateUserId(Long userId) {
-        validateId(userId, "User");
-    }
-
-    public static void validateGoalId(Long goalId) {
-        validateId(goalId, "Goal");
     }
 
     public static void validateGoal(GoalDto goalDto) {

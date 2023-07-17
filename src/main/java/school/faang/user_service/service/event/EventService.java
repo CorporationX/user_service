@@ -30,9 +30,7 @@ public class EventService {
         return eventMapper.toDto(event);
     }
 
-
     public void deleteEvent(Long id) {
-        eventRepository.findById(id).orElseThrow(() -> new DataValidationException("Event not found"));
         eventRepository.deleteById(id);
     }
 
@@ -48,6 +46,7 @@ public class EventService {
         Stream<Event> eventStream = StreamSupport.stream(eventRepository.findAll().spliterator(), false);
         return filterEvents(eventStream, filter);
     }
+
   
     public EventDto getEvent(long id) {
         Event entity = eventRepository.findById(id)

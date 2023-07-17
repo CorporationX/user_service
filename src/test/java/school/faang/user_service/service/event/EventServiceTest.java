@@ -1,6 +1,8 @@
 package school.faang.user_service.service.event;
 
+
 import jakarta.persistence.EntityNotFoundException;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,8 +30,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class EventServiceTest {
+  
     EventDto eventDto;
     EventDto eventDtoForUpdate;
+ 
     @Mock
     private EventRepository eventRepository;
     @Mock
@@ -126,5 +130,4 @@ class EventServiceTest {
         Mockito.when(eventMapper.toDto(event)).thenReturn(eventDto);
         assertEquals(eventDto, eventService.getEvent(1L));
     }
-
 }

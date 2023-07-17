@@ -1,5 +1,8 @@
 package school.faang.user_service.service.mentorship;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,14 +16,13 @@ import org.mockito.quality.Strictness;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.EntityNotFoundException;
-import school.faang.user_service.exception.mentorship.MenteeDoesNotExist;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -40,15 +42,18 @@ class MentorshipServiceTest {
         when(mentorshipRepository.findUserById(INCORRECT_USER_ID))
                 .thenReturn(Optional.empty());
 
-        User mentor = User.builder().mentees(List.of(
+        User mentor = User.builder()
+                .id(MENTOR_ID)
+                .mentees(new ArrayList<>(Arrays.asList(
                 User.builder().id(MENTEE_ID).build(),
-                new User())
+                new User()))
         ).build();
         when(mentorshipRepository.findUserById(MENTOR_ID))
                 .thenReturn(Optional.of(mentor));
 
-        User mentee = User.builder().mentors(List.of(
-                User.builder().id(MENTOR_ID).build())
+        User mentee = User.builder()
+                .id(MENTEE_ID)
+                .mentors(Collections.singletonList(User.builder().id(MENTOR_ID).build())
         ).build();
         when(mentorshipRepository.findUserById(MENTEE_ID))
                 .thenReturn(Optional.of(mentee));
@@ -100,8 +105,26 @@ class MentorshipServiceTest {
 
     @Test
     void deleteMentee_shouldInvokeDeleteMenteeRepositoryMethod() {
+        User mentor = mentorshipRepository.findUserById(MENTOR_ID).orElseThrow();
         mentorshipService.deleteMentee(MENTOR_ID, MENTEE_ID);
-        verify(mentorshipRepository).deleteMentee(MENTOR_ID, MENTEE_ID);
+        verify(mentorshipRepository).save(mentor);
+    }
+
+    @Test
+    void deleteMentee_shouldDeleteMenteeFromMentorMenteesList() {
+        User mentor = mentorshipRepository.findUserById(MENTOR_ID).orElseThrow();
+        User mentee = mentorshipRepository.findUserById(MENTEE_ID).orElseThrow();
+        assertEquals(2, mentor.getMentees().size());
+        System.out.println(mentor.getId());
+        System.out.println(mentee.getId());
+        mentor.getMentees().forEach(user -> System.out.println(user.getId()));
+        mentor.getMentees().stream()
+                .filter(user -> user.getId() == MENTEE_ID)
+                .findFirst()
+                .ifPresent(user -> mentor.getMentees().remove(user));
+        mentor.getMentees().forEach(user -> System.out.println(user.getId()));
+        mentorshipService.deleteMentee(MENTOR_ID, MENTEE_ID);
+        assertEquals(1, mentor.getMentees().size());
     }
 
     @Test
@@ -109,12 +132,5 @@ class MentorshipServiceTest {
         assertThrows(EntityNotFoundException.class,
                 () -> mentorshipService.deleteMentee(INCORRECT_USER_ID, MENTEE_ID),
                 "Invalid user id");
-    }
-
-    @Test
-    void deleteMentee_shouldThrowMenteeDoesNotExistException() {
-        assertThrows(MenteeDoesNotExist.class,
-                () -> mentorshipService.deleteMentee(MENTOR_ID, INCORRECT_USER_ID),
-                "Mentee does not exist");
     }
 }

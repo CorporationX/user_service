@@ -22,45 +22,45 @@ import school.faang.user_service.service.mentorship.MentorshipService;
 public class MentorshipController {
     private final MentorshipService mentorshipService;
 
-    @GetMapping("/{mentorId}/mentees")
-    public ResponseEntity<?> getMentees(@PathVariable @Min(1L) long mentorId) {
-        log.debug("Got new request to get mentees for mentor with id:{}", mentorId);
-        try {
-            List<UserDto> mentees = mentorshipService.getMentees(mentorId);
-            log.debug("Successfully got mentees for mentor with id:{}", mentorId);
-            return ResponseEntity.ok(mentees);
-        } catch (RuntimeException e) {
-            log.warn("Failed to get mentees for mentor with id:{}\nException:{}", mentorId, e.getMessage());
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (Exception e) {
-            log.error("Failed to get mentees for mentor with id:{}\nException:{}", mentorId, e.getMessage());
-            return ResponseEntity.internalServerError().body("Server error");
-        }
-    }
+//    @GetMapping("/{mentorId}/mentees")
+//    public ResponseEntity<?> getMentees(@PathVariable @Min(1L) long mentorId) {
+//        log.debug("Got new request to get mentees for mentor with id:{}", mentorId);
+//        try {
+//            List<UserDto> mentees = mentorshipService.getMentees(mentorId);
+//            log.debug("Successfully got mentees for mentor with id:{}", mentorId);
+//            return ResponseEntity.ok(mentees);
+//        } catch (RuntimeException e) {
+//            log.warn("Failed to get mentees for mentor with id:{}\nException:{}", mentorId, e.getMessage());
+//            return ResponseEntity.badRequest().body(e.getMessage());
+//        } catch (Exception e) {
+//            log.error("Failed to get mentees for mentor with id:{}\nException:{}", mentorId, e.getMessage());
+//            return ResponseEntity.internalServerError().body("Server error");
+//        }
+//    }
+//
+//    @GetMapping("/{menteeId}/mentors")
+//    public ResponseEntity<?> getMentors(@PathVariable @Min(1L) long menteeId) {
+//        log.debug("Got new request to get mentors for user with id:{}", menteeId);
+//        try {
+//            List<UserDto> mentors = mentorshipService.getMentors(menteeId);
+//            log.debug("Successfully got mentors for user with id:{}", menteeId);
+//            return ResponseEntity.ok(mentors);
+//        } catch (RuntimeException e) {
+//            log.warn("Failed to get mentors for user with id:{}\nException:{}", menteeId, e.getMessage());
+//            return ResponseEntity.badRequest().body(e.getMessage());
+//        } catch (Exception e) {
+//            log.error("Failed to get mentors for user with id:{}\nException:{}", menteeId, e.getMessage());
+//            return ResponseEntity.internalServerError().body("Server error");
+//        }
+//    }
 
-    @GetMapping("/{menteeId}/mentors")
-    public ResponseEntity<?> getMentors(@PathVariable @Min(1L) long menteeId) {
-        log.debug("Got new request to get mentors for user with id:{}", menteeId);
-        try {
-            List<UserDto> mentors = mentorshipService.getMentors(menteeId);
-            log.debug("Successfully got mentors for user with id:{}", menteeId);
-            return ResponseEntity.ok(mentors);
-        } catch (RuntimeException e) {
-            log.warn("Failed to get mentors for user with id:{}\nException:{}", menteeId, e.getMessage());
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (Exception e) {
-            log.error("Failed to get mentors for user with id:{}\nException:{}", menteeId, e.getMessage());
-            return ResponseEntity.internalServerError().body("Server error");
-        }
-    }
-
-    @DeleteMapping("/{mentorId}/mentors/{menteeId}/delete")
+    @DeleteMapping("/{mentorId}/mentees/{menteeId}/delete")
     public ResponseEntity<?> deleteMentee(@PathVariable @Min(1L) long mentorId, @PathVariable @Min(1L) long menteeId) {
         log.debug("Got new request to delete mentee from mentor with id:{}", mentorId);
         try {
             mentorshipService.deleteMentee(mentorId, menteeId);
             log.debug("Successfully deleted mentee with id:{} from mentor with id:{}", menteeId, mentorId);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok().body("Mentee was successfully deleted");
         } catch (RuntimeException e) {
             log.warn("Failed to delete mentee with id:{} from mentor with id:{}\nException:{}",
                     menteeId, mentorId, e.getMessage());

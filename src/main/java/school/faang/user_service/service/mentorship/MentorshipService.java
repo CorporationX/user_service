@@ -7,8 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.EntityNotFoundException;
-import school.faang.user_service.exception.mentorship.MenteeDoesNotExist;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 @Service
@@ -16,41 +16,33 @@ import school.faang.user_service.repository.mentorship.MentorshipRepository;
 public class MentorshipService {
     private final MentorshipRepository mentorshipRepository;
     private final UserMapper userMapper;
+    private final UserRepository userRepository;
 
-    @Transactional(readOnly = true)
-    public List<UserDto> getMentees(long mentorId) {
-        User user = validateUserId(mentorId);
-        return user.getMentees().stream()
-                .map(userMapper::toDto)
-                .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public List<UserDto> getMentors(long userId) {
-        User user = validateUserId(userId);
-        return user.getMentors().stream()
-                .map(userMapper::toDto)
-                .toList();
-    }
+//    @Transactional(readOnly = true)
+//    public List<UserDto> getMentees(long mentorId) {
+//        User user = validateUserId(mentorId);
+//        return user.getMentees().stream()
+//                .map(userMapper::toDto)
+//                .toList();
+//    }
+//
+//    @Transactional(readOnly = true)
+//    public List<UserDto> getMentors(long userId) {
+//        User user = validateUserId(userId);
+//        return user.getMentors().stream()
+//                .map(userMapper::toDto)
+//                .toList();
+//    }
 
     @Transactional
     public void deleteMentee(long mentorId, long menteeId) {
-        validateToDeleteMentee(mentorId, menteeId);
-        mentorshipRepository.deleteMentee(mentorId, menteeId);
+        mentorshipRepository.findById(mentorId)
+                .ifPresent(mentor -> mentor.getMentees()
+                        .removeIf(mentee -> mentee.getId() == menteeId));
     }
 
-    private User validateUserId(long userId) {
-        return mentorshipRepository.findUserById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("Invalid user id: " + userId));
-    }
+    private void validateUserId(long userId, long menteeId) {
 
-    private void validateToDeleteMentee(long mentorId, long menteeId) {
-        User mentor = validateUserId(mentorId);
-
-        mentor.getMentees().stream()
-                .filter(mentee -> mentee.getId() == menteeId)
-                .findFirst()
-                .orElseThrow(() -> new MenteeDoesNotExist("Mentee does not exist"));
     }
 }
 

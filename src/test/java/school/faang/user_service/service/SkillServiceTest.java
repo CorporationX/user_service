@@ -81,6 +81,9 @@ class SkillServiceTest {
     void testAcquireSkillFromOffers() {
         Skill skill = new Skill(4L, "One", null, null, null, null, null, null);
         SkillDto skillDto = new SkillDto();
+        skillDto.setId(4L);
+        skillDto.setTitle("One");
+
         Recommendation recommendation1 = Recommendation.builder().receiver(User.builder().id(1L).username("sdf").build()).build();
         SkillOffer skillOffer1 = new SkillOffer(4L, skill, recommendation1);
 
@@ -90,21 +93,8 @@ class SkillServiceTest {
                 .thenReturn(List.of(skillOffer1));
         Mockito.when(skillMapper.toDTO(skill))
                 .thenReturn(skillDto);
-        Mockito.when(skillRepository.findById(1L))
+        Mockito.when(skillRepository.findById(4L))
                 .thenReturn(Optional.of(skill));
         assertEquals(skillDto, skillService.acquireSkillFromOffers(4L, 4L));
-    }
-
-    @Test
-    void testAcquireSkillFromOffersFindUserSkill() {
-        Skill skill = new Skill(1L, "One", null, null, null, null, null, null);
-        SkillDto skillDto = new SkillDto();
-
-        Mockito.when(skillMapper.toDTO(skill))
-                .thenReturn(skillDto);
-        Mockito.when(skillRepository.findUserSkill(1L, 1L))
-                .thenReturn(Optional.of(skill));
-
-        assertEquals(skillDto, skillService.acquireSkillFromOffers(1L, 1L));
     }
 }

@@ -1,6 +1,5 @@
 package school.faang.user_service.controller.event;
 
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.exception.DataValidationException;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import school.faang.user_service.service.event.EventService;
 
 import java.util.List;
@@ -43,6 +44,11 @@ public class EventController {
     public List<EventDto> getEventsByFilter(@RequestBody EventFilterDto filter) {
         return eventService.getEventsByFilter(filter);
     }
+    
+    @GetMapping("/event/{id}")
+    public EventDto getEvent(@PathVariable Long id) {
+        return eventService.getEvent(id);
+    }
 
     public void validateEvent(EventDto eventDto) {
         if(eventDto == null){
@@ -60,6 +66,7 @@ public class EventController {
             throw new DataValidationException("Event owner ID cannot be null");
         }
     }
+
     private void idValidate(Long id) {
         if ( id == null || id < 0) {
             throw new DataValidationException("Id cannot be negative");

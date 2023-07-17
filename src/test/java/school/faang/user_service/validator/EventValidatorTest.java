@@ -45,4 +45,10 @@ class EventValidatorTest {
             eventValidator.checkIfUserHasSkillsRequired(eventDto);
         });
     }
+
+    @Test
+    public void testValidateEvent() {
+        Mockito.when(userService.areOwnedSkills(eventDto.getOwnerId(), skillIds)).thenReturn(true);
+        eventValidator.checkIfUserHasSkillsRequired(eventDto);
+    }
 }

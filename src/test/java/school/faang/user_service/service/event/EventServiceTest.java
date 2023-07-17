@@ -1,6 +1,5 @@
 package school.faang.user_service.service.event;
 
-import org.assertj.core.api.Assumptions;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,7 +14,6 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.mapper.EventMapper;
-import school.faang.user_service.mapper.EventMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
@@ -36,7 +34,7 @@ class EventServiceTest {
     @InjectMocks
     private EventService eventService;
     @Spy
-    private EventMapperImpl eventMapper;
+    private EventMapper eventMapper;
 
     @Test
     void testFilterDTo() {
@@ -52,7 +50,7 @@ class EventServiceTest {
                 .startDate(LocalDateTime.MIN.plusMinutes(1))
                 .endDate(LocalDateTime.MAX.minusMinutes(1))
                 .owner(user1)
-                .description("description")
+//                .description("description")
                 .relatedSkills(relatedSkills2)
                 .location("location")
                 .maxAttendees(1)

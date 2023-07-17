@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventParticipationService;
 
 @ExtendWith(MockitoExtension.class)
@@ -24,6 +25,6 @@ class EventParticipationControllerTest {
 
     @Test
     void test_register_participant_with_invalid_params_should_throw_exception() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> eventParticipationController.registerParticipant(-1L, -1L));
+        Assertions.assertThrows(DataValidationException.class, () -> eventParticipationController.registerParticipant(-1L, -1L));
     }
 }

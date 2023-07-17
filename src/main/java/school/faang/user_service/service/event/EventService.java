@@ -14,7 +14,6 @@ import school.faang.user_service.repository.event.EventRepository;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.StreamSupport;
 import java.util.zip.DataFormatException;
 
 @Service
@@ -36,7 +35,8 @@ public class EventService {
     }
 
     public List<EventDto> getEventsByFilter(EventFilterDto filter) {
-        return StreamSupport.stream(eventRepository.findAll().spliterator(), false)
+        return eventRepository.findAll()
+                .stream()
                 .map(eventMapper::toDto)
                 .filter(filter)
                 .toList();

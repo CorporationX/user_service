@@ -34,9 +34,9 @@ public class RecommendationRequestService {
     }
 
     private void validationExistSkill(RecommendationRequestDto recommendationRequestDto) {
-        for (SkillRequest skill : recommendationRequestDto.getSkills()) {
-            if (!skillRepository.existsById(skill.getSkill().getId())) {
-                throw new DataValidationException("Skill with id " + skill.getId() + " does not exist");
+        for (SkillRequest skillRequest : recommendationRequestDto.getSkills()) {
+            if (!skillRepository.existsById(skillRequest.getSkill().getId())) {
+                throw new DataValidationException("Skill with id " + skillRequest.getSkill().getId() + " does not exist");
             }
         }
     }

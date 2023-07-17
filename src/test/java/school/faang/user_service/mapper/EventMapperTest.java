@@ -16,8 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class EventMapperTest {
-
-    private final SkillMapper skillMapper = SkillMapper.INSTANCE;
     private final EventMapper eventMapper = EventMapper.INSTANCE;
 
     private EventDto eventDto;

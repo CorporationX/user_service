@@ -7,9 +7,7 @@ import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
-import java.util.function.Predicate;
 
 @Component
 @NoArgsConstructor

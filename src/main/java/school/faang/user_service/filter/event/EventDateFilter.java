@@ -5,7 +5,6 @@ import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 @Component
 public class EventDateFilter implements EventFilter {
@@ -19,7 +18,7 @@ public class EventDateFilter implements EventFilter {
     public void apply(List<EventDto> eventDtos, EventFilterDto filter) {
         eventDtos.removeIf(eventDto ->
                 eventDto.getStartDate() == null
-                        && eventDto.getEndDate() == null
+                        || eventDto.getEndDate() == null
                         || eventDto.getStartDate().isBefore(filter.getEarlierThanEndDate())
                         && eventDto.getEndDate().isAfter(filter.getEarlierThanEndDate()));
     }

@@ -15,7 +15,6 @@ import school.faang.user_service.repository.event.EventRepository;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Stream;
 import java.util.zip.DataFormatException;
 
 @Service

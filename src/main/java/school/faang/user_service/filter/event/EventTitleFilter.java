@@ -5,7 +5,6 @@ import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 @Component
 public class EventTitleFilter implements EventFilter {

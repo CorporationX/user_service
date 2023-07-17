@@ -6,7 +6,6 @@ import school.faang.user_service.dto.event.EventFilterDto;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Component
 public class EventRelatedSkillsFilter implements EventFilter {

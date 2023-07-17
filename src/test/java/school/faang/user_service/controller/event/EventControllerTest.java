@@ -46,18 +46,21 @@ public class EventControllerTest {
 
     @Test
     public void testUpdateEvent() {
-        eventController.updateEvent(eventDto);
-        Mockito.verify(eventService, Mockito.times(1)).updateEvent(eventDto);
+        eventController.updateEvent(4L, eventDto);
+        Mockito.verify(eventService, Mockito.times(1)).updateEvent(4L, eventDto);
     }
 
     @Test
     public void testUpdateEventThrowsDataValidationException() {
         assertThrows(DataValidationException.class, () -> {
-            eventController.updateEvent(null);
+            eventController.updateEvent(4L, null);
         });
         eventDto.setTitle(null);
         assertThrows(DataValidationException.class, () -> {
-            eventController.updateEvent(eventDto);
+            eventController.updateEvent(4L, eventDto);
+        });
+        assertThrows(DataValidationException.class, () -> {
+            eventController.updateEvent(-1L, null);
         });
     }
 }

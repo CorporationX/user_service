@@ -1,6 +1,8 @@
 package school.faang.user_service.service.event;
 
+
 import jakarta.persistence.EntityNotFoundException;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +13,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.event.EventMapper;
@@ -19,15 +22,17 @@ import school.faang.user_service.validator.EventValidator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
-class EventServiceTest {
+class EventServiceTest { 
     EventDto eventDto;
     EventDto eventDtoForUpdate;
+ 
     @Mock
     private EventRepository eventRepository;
     @Mock
@@ -69,7 +74,7 @@ class EventServiceTest {
     @Test
     public void testDeleteEventThrowsException() {
         long id = -1L;
-        Assertions.assertThrows(DataValidationException.class, () -> {
+        assertThrows(DataValidationException.class, () -> {
             eventService.deleteEvent(id);
         });
     }
@@ -79,10 +84,29 @@ class EventServiceTest {
         var event = Event.builder().id(1L).title("New Event").build();
         Mockito.when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
         Mockito.when(eventMapper.toDto(event)).thenReturn(eventDtoForUpdate);
-        EventDto updatedEvent = eventService.updateEvent(eventDto);
+        EventDto updatedEvent = eventService.updateEvent(1L, eventDto);
         assertEquals("Cool new Event", updatedEvent.getTitle());
     }
-  
+
+    @Test
+    public void testFilterEvent() {
+        var event = Event.builder().id(1L).title("New Event").build();
+        var event1 = Event.builder().id(2L).title("Event 1").build();
+        var eventDto = new EventDto(1L, "New Event", LocalDateTime.now(), LocalDateTime.now(),1L, "hfgh", new ArrayList<>(), "location", 1);
+        var eventDto1 = new EventDto(2L, "Event 1", LocalDateTime.now(), LocalDateTime.MAX,1L, "hfdfgdgh", new ArrayList<>(), "location", 1);
+
+
+        Mockito.when(eventRepository.findAll()).thenReturn(List.of(event,event1));
+        Mockito.when(eventMapper.toDto(event)).thenReturn(eventDto);
+        Mockito.when(eventMapper.toDto(event1)).thenReturn(eventDto1);
+        var filters = new EventFilterDto(null, null, null, null, null,
+                null, null,"location", 1);
+
+        List<EventDto> events = eventService.getEventsByFilter(filters);
+        assertEquals(2, events.size());
+
+    }
+
     public void testCreateEventWithMapper() {
         Event event = Event.builder().id(4L).maxAttendees(1).build();
         EventDto eventDto1 = new EventDto(4L, null,null,null,null,null,null,null,1);

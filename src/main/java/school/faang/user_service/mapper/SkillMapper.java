@@ -8,7 +8,7 @@ import school.faang.user_service.entity.Skill;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface SkillMapper {
     SkillMapper INSTANCE = Mappers.getMapper(SkillMapper.class);
 

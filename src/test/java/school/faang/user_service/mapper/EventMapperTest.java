@@ -17,6 +17,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class EventMapperTest {
 
+    private final SkillMapper skillMapper = SkillMapper.INSTANCE;
+    private final EventMapper eventMapper = EventMapper.INSTANCE;
+
     private EventDto eventDto;
     private User user;
     private Event event;
@@ -52,7 +55,7 @@ class EventMapperTest {
     @Test
     @DisplayName("Test mapping EventDto to Event")
     void toEntityTest() {
-        Event mappedEvent = EventMapper.eventMapper.toEntity(eventDto);
+        Event mappedEvent = eventMapper.toEntity(eventDto);
 
         assertNotNull(mappedEvent);
         assertEquals(eventDto.getId(), mappedEvent.getId());
@@ -65,7 +68,7 @@ class EventMapperTest {
     @Test
     @DisplayName("Test mapping Event to EventDto")
     void toEventDtoTest() {
-        EventDto mapppedEventDto = EventMapper.eventMapper.toDto(event);
+        EventDto mapppedEventDto = eventMapper.toDto(event);
 
         assertNotNull(mapppedEventDto);
         assertEquals(event.getId(), mapppedEventDto.getId());

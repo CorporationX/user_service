@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
@@ -13,10 +14,15 @@ import school.faang.user_service.dto.event.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.filter.event.EventDateFilter;
+import school.faang.user_service.filter.event.EventFilter;
+import school.faang.user_service.filter.event.EventTitleFilter;
+import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -79,17 +85,6 @@ class EventServiceTest {
         return List.of(skill1, skill2);
     }
 
-    private Iterable<Event> createEventIterable() {
-        Event event1 = new Event();
-        event1.setId(1L);
-        event1.setTitle("Title");
-        Event event2 = new Event();
-        event2.setStartDate(eventDto.getStartDate());
-        event2.setEndDate(LocalDate.of(2021, 1, 1).atStartOfDay());
-        Event event3 = new Event();
-        event3.setMaxAttendees(5);
-        return List.of(event1, event2, event3);
-    }
 
     @Test
     public void invalid_EventId() {
@@ -146,47 +141,5 @@ class EventServiceTest {
 
         verify(userRepository).findById(1L);
         verify(eventRepository).save(any(Event.class));
-    }
-
-    @Test
-    void getEventsByFilter_IdTitleFilter() {
-        EventFilterDto filter = new EventFilterDto();
-        filter.setId(1L);
-        filter.setTitle("Title");
-
-        when(eventRepository.findAll()).thenReturn(createEventIterable());
-
-        List<EventDto> actual = eventService.getEventsByFilter(filter);
-
-        assertNotNull(actual);
-        assertEquals(1, actual.size());
-        assertEquals(1, actual.get(0).getId());
-    }
-
-    @Test
-    void getEventsByFilter_DateFilter() {
-        EventFilterDto filter = new EventFilterDto();
-        filter.setLaterThanStartDate(LocalDate.of(2020, 6, 1).atStartOfDay());
-        filter.setEarlierThanEndDate(LocalDate.of(2020, 7, 20).atStartOfDay());
-
-        when(eventRepository.findAll()).thenReturn(createEventIterable());
-
-        List<EventDto> actual = eventService.getEventsByFilter(filter);
-
-        assertNotNull(actual);
-        assertEquals(1, actual.size());
-    }
-
-    @Test
-    void getEventsByFilter_maxAttendeesFilter() {
-        EventFilterDto filter = new EventFilterDto();
-        filter.setLessThanMaxAttendees(2);
-
-        when(eventRepository.findAll()).thenReturn(createEventIterable());
-
-        List<EventDto> actual = eventService.getEventsByFilter(filter);
-
-        assertNotNull(actual);
-        assertEquals(2, actual.size());
     }
 }

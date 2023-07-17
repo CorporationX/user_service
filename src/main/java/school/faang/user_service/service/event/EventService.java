@@ -7,6 +7,7 @@ import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.event.SkillDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.UserRepository;
@@ -14,6 +15,7 @@ import school.faang.user_service.repository.event.EventRepository;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Stream;
 import java.util.zip.DataFormatException;
 
 @Service
@@ -21,8 +23,9 @@ import java.util.zip.DataFormatException;
 public class EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
-    private final EventMapper eventMapper;
-    private final SkillMapper skillMapper;
+    private final EventMapper eventMapper = EventMapper.INSTANCE;
+    private final SkillMapper skillMapper = SkillMapper.INSTANCE;
+    private final List<EventFilter> filters;
 
     public EventDto create(EventDto eventDto) {
         try {
@@ -34,12 +37,11 @@ public class EventService {
         }
     }
 
-    public List<EventDto> getEventsByFilter(EventFilterDto filter) {
-        return eventRepository.findAll()
-                .stream()
-                .map(eventMapper::toDto)
-                .filter(filter)
-                .toList();
+    public List<EventDto> getEventsByFilter(EventFilterDto eventFilter) {
+        List<EventDto> eventDtos = eventRepository.findAll().stream().map(eventMapper::toDto).toList();
+        filters.stream().filter(filter -> filter.isApplicable(eventFilter))
+                .forEach(filter -> filter.apply(eventDtos, eventFilter));
+        return eventDtos;
     }
 
     private void validateEventDto(EventDto eventDto) throws DataFormatException {

@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
@@ -105,5 +106,35 @@ class SkillServiceTest {
                 () -> skillService.getUserSkills(1L));
 
         assertEquals("User has no skills", validationException.getMessage());
+    }
+
+    @Test
+    void testGetOfferedSkills() {
+        long userId = 1L;
+        User user = new User();
+        user.setId(userId);
+
+        List<Skill> skills = List.of(
+                new Skill(1L, "Hard Skill", List.of(user),
+                        null, null, null, null, null),
+                new Skill(2L, "Soft Skill", List.of(user),
+                        null, null, null, null, null),
+                new Skill(3L, "Hard Skill", List.of(user),
+                        null, null, null, null, null)
+        );
+
+        when(skillRepository.findAllByUserId(userId)).thenReturn(skills);
+
+        List<SkillCandidateDto> offeredSkillsDto = skillService.getOfferedSkills(userId);
+
+        String expectedTitle = "Hard Skill";
+        String actualTitle = offeredSkillsDto.get(0).getSkill().getTitle();
+
+        assertNotNull(offeredSkillsDto);
+        assertEquals(skills.size(), offeredSkillsDto.size());
+        assertEquals(2, offeredSkillsDto.get(0).getOffersAmount());
+        assertEquals(1, offeredSkillsDto.get(1).getOffersAmount());
+        assertEquals(2, offeredSkillsDto.get(2).getOffersAmount());
+        assertEquals(expectedTitle, actualTitle);
     }
 }

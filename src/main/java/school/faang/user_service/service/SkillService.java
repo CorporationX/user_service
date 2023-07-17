@@ -3,6 +3,7 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
@@ -12,6 +13,8 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -20,6 +23,7 @@ public class SkillService {
     private final SkillRepository skillRepository;
     private final SkillMapper skillMapper;
     private final UserRepository userRepository;
+    private final SkillCandidateDto skillCandidateDto;
 
     @Transactional
     public SkillDto create(SkillDto skillDto) {
@@ -56,5 +60,17 @@ public class SkillService {
         if (skills.isEmpty()) {
             throw new DataValidationException("User has no skills");
         }
+    }
+
+    public List<SkillCandidateDto> getOfferedSkills(long userId) {
+        List<Skill> skills = skillRepository.findAllByUserId(userId);
+        validateUserSkills(skills);
+
+        Map<String, Long> skillsAmount = skills.stream().
+                collect(Collectors.groupingBy(Skill::getTitle, Collectors.counting()));
+
+        return skills.stream()
+                .map(skill -> skillMapper.toCandidateDto(skill, skillsAmount.getOrDefault(skill.getTitle(), 0L)))
+                .toList();
     }
 }

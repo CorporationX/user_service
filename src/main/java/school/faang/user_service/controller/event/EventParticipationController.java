@@ -19,7 +19,6 @@ public class EventParticipationController {
 
     public void unregisterParticipant(long eventId, long userId) {
         validateParams(userId, eventId);
-
         eventParticipationService.unregisterParticipant(eventId, userId);
     }
 

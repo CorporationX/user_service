@@ -42,6 +42,11 @@ public class EventParticipationService {
         return eventParticipationRepository.findAllParticipantsByEventId(eventId);
     }
 
+    public int getParticipantsCount(long eventId) {
+        validateEvent(getEvent(eventId));
+        return eventParticipationRepository.countParticipants(eventId);
+    }
+
     private Event getEvent(long eventId) {
         return eventRepository.findById(eventId).orElse(null);
     }
@@ -82,9 +87,5 @@ public class EventParticipationService {
         if (user == null) {
             throw new NullPointerException("User not found");
         }
-    }
-
-    public int getParticipantsCount(long eventId) {
-        return eventParticipationRepository.countParticipants(eventId);
     }
 }

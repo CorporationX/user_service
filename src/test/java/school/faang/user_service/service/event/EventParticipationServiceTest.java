@@ -51,7 +51,6 @@ class EventParticipationServiceTest {
 
     @Test
     void test_register_participant_should_success_register () {
-
         long eventId = event.getId();
         long userId = user.getId();
         Mockito.when(userRepository.findById(userId)).thenReturn(Optional.ofNullable(user));
@@ -126,14 +125,14 @@ class EventParticipationServiceTest {
     }
 
     @Test
-    @Description("получение количества участников события, равного 1")
     void test_get_participants_count_should_return_one(){
         long eventId = event.getId();
         long userId = user.getId();
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.ofNullable(user));
+        Mockito.when(eventRepository.findById(eventId)).thenReturn(Optional.ofNullable(event));
 
         eventParticipationService.registerParticipant(eventId, userId);
-
-        Mockito.when(eventParticipationRepository.countParticipants(event.getId())).thenReturn(1);
+        Mockito.when(eventParticipationRepository.countParticipants(eventId)).thenReturn(1);
         int participantCount = eventParticipationService.getParticipantsCount(eventId);
 
         Assertions.assertNotEquals(0, participantCount);
@@ -141,13 +140,13 @@ class EventParticipationServiceTest {
     }
 
     @Test
-    @Description("получение количества участников события, равного 4")
     void test_get_participants_count_should_return_number_greater_than_one(){
         long eventId = event.getId();
-        for (User participant : participants) {
+        Mockito.when(eventRepository.findById(eventId)).thenReturn(Optional.ofNullable(event));
+        participants.forEach(participant -> {
+            Mockito.when(userRepository.findById(participant.getId())).thenReturn(Optional.ofNullable(user));
             eventParticipationService.registerParticipant(eventId, participant.getId());
-        }
-
+        });
 
         Mockito.when(eventParticipationRepository.countParticipants(event.getId())).thenReturn(4);
         int participantCount = eventParticipationService.getParticipantsCount(eventId);
@@ -157,8 +156,9 @@ class EventParticipationServiceTest {
     }
 
     @Test
-    @Description("получение количества участников события, равного 0")
     void test_get_participants_count_should_return_zero(){
-        Assertions.assertEquals(0, eventParticipationService.getParticipantsCount(event.getId()));
+        long eventId = event.getId();
+        Mockito.when(eventRepository.findById(eventId)).thenReturn(Optional.ofNullable(event));
+        Assertions.assertEquals(0, eventParticipationService.getParticipantsCount(eventId));
     }
 }

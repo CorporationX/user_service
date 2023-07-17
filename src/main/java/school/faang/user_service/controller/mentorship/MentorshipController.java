@@ -18,7 +18,7 @@ import java.util.List;
 public class MentorshipController {
     private final MentorshipService mentorshipService;
 
-    @GetMapping("mentor/{id}")
+    @GetMapping("mentees/{id}")
     public List<UserDTO> getMentees(@PathVariable("id") long mentorId) {
         if (mentorId <= 0) {
             throw new InvalidRequestMentorId("Invalid request: bad user id");

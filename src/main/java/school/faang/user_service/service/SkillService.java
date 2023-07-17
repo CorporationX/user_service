@@ -45,8 +45,16 @@ public class SkillService {
 
     public List<SkillDto> getUserSkills(long userId) {
         List<Skill> skills = skillRepository.findAllByUserId(userId);
+        validateUserSkills(skills);
+
         return skills.stream()
                 .map(skillMapper::toDto)
                 .toList();
+    }
+
+    private void validateUserSkills(List<Skill> skills) {
+        if (skills.isEmpty()) {
+            throw new DataValidationException("User has no skills");
+        }
     }
 }

@@ -29,7 +29,7 @@ public class SkillService {
         List<User> users = StreamSupport.stream
                 (userRepository.findAllById(skillDto.getUserIds()).spliterator(), false).toList();
         skillToSave.setUsers(users);
-        
+
         return skillMapper.toDto(skillRepository.save(skillToSave));
     }
 
@@ -40,6 +40,21 @@ public class SkillService {
 
         if (skillRepository.existsByTitle(skillDto.getTitle())) {
             throw new DataValidationException("Skill with title " + skillDto.getTitle() + " already exists");
+        }
+    }
+
+    public List<SkillDto> getUserSkills(long userId) {
+        List<Skill> skills = skillRepository.findAllByUserId(userId);
+        validateUserSkills(skills);
+
+        return skills.stream()
+                .map(skillMapper::toDto)
+                .toList();
+    }
+
+    private void validateUserSkills(List<Skill> skills) {
+        if (skills.isEmpty()) {
+            throw new DataValidationException("User has no skills");
         }
     }
 }

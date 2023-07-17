@@ -114,6 +114,24 @@ class EventParticipationServiceImplementationTest {
                 exc.getMessage());
     }
 
+    @Test
+    void testGetParticipant() {
+        Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(eventId))
+                .thenReturn(users);
+        List<User> expectedUsers = getUsers();
+
+        assertEquals(expectedUsers, eventParticipationService.getParticipant(eventId));
+    }
+
+    @Test
+    void testGetParticipant_WhenEventIdIsNull_shouldThrowException() {
+        Exception exc = assertThrows(RegistrationUserForEventException.class,
+                () -> eventParticipationService.getParticipant(null));
+
+        assertEquals("Input data is null",
+                exc.getMessage());
+    }
+
 
     private static Stream<Arguments> provideNullInputData() {
         return Stream.of(

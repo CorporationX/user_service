@@ -17,27 +17,41 @@ public class EventParticipationServiceImplementation implements EventParticipati
         this.eventParticipationRepository = eventParticipationRepository;
     }
 
+    @Override
     public void registerParticipant(Long eventId, Long userId) {
         validateInputData(eventId, userId);
-        List<User> users = eventParticipationRepository.findAllParticipantsByEventId(eventId);
-        if (!isUserRegisteredForEvent(users, userId)) {
-            eventParticipationRepository.register(eventId, userId);
-        } else {
+        List<User> users = getParticipantsByEventId(eventId);
+
+        if (isUserRegisteredForEvent(users, userId)) {
             throw new RegistrationUserForEventException("The user has already been registered for the event");
         }
+
+        eventParticipationRepository.register(eventId, userId);
+
     }
 
     @Override
     public void unregisterParticipant(Long eventId, Long userId) {
         validateInputData(eventId, userId);
-        List<User> users = eventParticipationRepository.findAllParticipantsByEventId(eventId);
-        if (isUserRegisteredForEvent(users, userId)) {
-            eventParticipationRepository.unregister(eventId, userId);
-        } else {
+        List<User> users = getParticipantsByEventId(eventId);
+
+        if (!isUserRegisteredForEvent(users, userId)) {
             String errorMessage = String.format("the userId: [%s] is not registered for the eventId: [%s]",
                     userId, eventId);
             throw new RegistrationUserForEventException(errorMessage);
         }
+
+        eventParticipationRepository.unregister(eventId, userId);
+    }
+
+    @Override
+    public List<User> getParticipant(Long eventId) {
+        validateEventId(eventId);
+        return getParticipantsByEventId(eventId);
+    }
+
+    private List<User> getParticipantsByEventId(Long eventId) {
+        return eventParticipationRepository.findAllParticipantsByEventId(eventId);
     }
 
     private boolean isUserRegisteredForEvent(List<User> users, long userId) {
@@ -47,6 +61,12 @@ public class EventParticipationServiceImplementation implements EventParticipati
 
     private void validateInputData(Long eventId, Long userId) {
         if (eventId == null || userId == null) {
+            throw new RegistrationUserForEventException("Input data is null");
+        }
+    }
+
+    private void validateEventId(Long eventId) {
+        if (eventId == null) {
             throw new RegistrationUserForEventException("Input data is null");
         }
     }

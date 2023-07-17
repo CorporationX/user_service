@@ -88,7 +88,7 @@ class SubscriptionServiceTest {
     }
 
     @Test
-    public void testFollowers() {
+    public void testGetFollowers() {
         User user = mock(User.class);
         UserDto userDto = mock(UserDto.class);
         Stream<User> userStream = Stream.of(user);

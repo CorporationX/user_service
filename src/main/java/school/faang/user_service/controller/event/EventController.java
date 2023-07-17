@@ -49,6 +49,12 @@ public class EventController {
         idValidate(userId);
         return eventService.getOwnedEvents(userId);
     }
+
+    @GetMapping("/event/{userId}/participated")
+    public List<EventDto> getParticipatedEvents(@PathVariable long userId) {
+        idValidate(userId);
+        return eventService.getParticipatedEvents(userId);
+    }
   
     @GetMapping("/event/{id}")
     public EventDto getEvent(@PathVariable Long id) {
@@ -72,7 +78,7 @@ public class EventController {
             throw new DataValidationException("Event owner ID cannot be null");
         }
     }
- 
+
     private void idValidate(Long id) {
         if ( id == null || id < 0) {
             throw new DataValidationException("Id cannot be negative");

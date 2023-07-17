@@ -29,7 +29,7 @@ public class EventService {
         Event event = eventRepository.save(eventMapper.toEntity(eventDto));
         return eventMapper.toDto(event);
     }
-
+  
     public void deleteEvent(Long id) {
         eventRepository.findById(id).orElseThrow(() -> new DataValidationException("Event not found"));
         eventRepository.deleteById(id);
@@ -48,9 +48,18 @@ public class EventService {
         return filterEvents(eventStream, filter);
     }
 
-
     public List<EventDto> getOwnedEvents(long userId) {
-        return eventRepository.findAllByUserId(userId).stream().map(eventMapper::toDto).toList();
+        return eventRepository.findAllByUserId(userId)
+                .stream()
+                .map(eventMapper::toDto)
+                .toList();
+    }
+
+    public List<EventDto> getParticipatedEvents(long userId) {
+        return eventRepository.findParticipatedEventsByUserId(userId)
+                .stream()
+                .map(eventMapper::toDto)
+                .toList();
     }
   
     public EventDto getEvent(long id) {

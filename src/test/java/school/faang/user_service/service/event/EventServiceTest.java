@@ -79,6 +79,38 @@ class EventServiceTest {
         Mockito.verify(eventRepository, Mockito.times(1)).deleteById(id);
     }
 
+
+    @Test
+    public void testFilterEvent() {
+        Mockito.when(eventRepository.findAll()).thenReturn(List.of(event, event1));
+        Mockito.when(eventMapper.toDto(event)).thenReturn(eventDto);
+        Mockito.when(eventMapper.toDto(event1)).thenReturn(eventDto1);
+        var filters = new EventFilterDto(null, null, null, null, null,
+                null, null, "location", 1);
+
+        List<EventDto> events = eventService.getEventsByFilter(filters);
+        assertEquals(2, events.size());
+
+    }
+
+    @Test
+    public void testGetOwnedEvents() {
+        Mockito.when(eventRepository.findAllByUserId(1L)).thenReturn(List.of(event, event1));
+        Mockito.when(eventMapper.toDto(event)).thenReturn(eventDto);
+        Mockito.when(eventMapper.toDto(event1)).thenReturn(eventDto1);
+        List<EventDto> events = eventService.getOwnedEvents(1L);
+        assertEquals(2, events.size());
+    }
+
+    @Test
+    public void testGetParticipatedEvents() {
+        Mockito.when(eventRepository.findParticipatedEventsByUserId(1L)).thenReturn(List.of(event, event1));
+        Mockito.when(eventMapper.toDto(event)).thenReturn(eventDto);
+        Mockito.when(eventMapper.toDto(event1)).thenReturn(eventDto1);
+        List<EventDto> events = eventService.getParticipatedEvents(1L);
+        assertEquals(2, events.size());
+    }
+
     @Test
     public void testDeleteEventThrowsException() {
         long id = -1L;

@@ -1,7 +1,6 @@
 package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
@@ -11,7 +10,6 @@ import school.faang.user_service.repository.event.EventRepository;
 
 import java.util.List;
 
-@Component
 @RequiredArgsConstructor
 @Service
 public class EventParticipationService {

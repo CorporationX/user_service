@@ -24,7 +24,6 @@ public class EventService {
     private final EventMapper eventMapper;
     private final List<EventFilter> filters = new ArrayList<>();
 
-    @Autowired
     public EventDto createEvent(EventDto eventDto) {
         eventValidator.checkIfUserHasSkillsRequired(eventDto);
         Event event = eventRepository.save(eventMapper.toEntity(eventDto));
@@ -49,13 +48,17 @@ public class EventService {
         return filterEvents(eventStream, filter);
     }
 
+
+    public List<EventDto> getOwnedEvents(long userId) {
+        return eventRepository.findAllByUserId(userId).stream().map(eventMapper::toDto).toList();
+    }
+  
     public EventDto getEvent(long id) {
         Event entity = eventRepository.findById(id)
                 .orElseThrow(() -> new DataValidationException("Event not found"));
         return eventMapper.toDto(entity);
 
     private void updateEventInDb(EventDto eventForUpdate, EventDto eventFormRequest) {
-        {
             eventValidator.checkIfUserHasSkillsRequired(eventFormRequest);
             if (!(eventFormRequest.getTitle() == null)) {
                 eventForUpdate.setTitle(eventFormRequest.getTitle());
@@ -83,8 +86,7 @@ public class EventService {
             }
             eventRepository.save(eventMapper.toEntity(eventForUpdate));
         }
-
-    }
+   
     private List<EventDto> filterEvents(Stream<Event> events, EventFilterDto filter) {
         filters.stream()
                 .filter(eventFilter -> eventFilter.isApplicable(filter))

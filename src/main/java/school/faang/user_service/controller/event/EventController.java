@@ -31,12 +31,6 @@ public class EventController {
         idValidate(id);
         eventService.deleteEvent(id);
     }
-  
-    @GetMapping("/event/{id}")
-    public EventDto getEvent(@PathVariable Long id) {
-        idValidate(id);
-        eventService.deleteEvent(id);
-    }
 
     @PutMapping("/event/{id}")
     public EventDto updateEvent(@PathVariable Long id, @RequestBody EventDto eventDto) {
@@ -48,7 +42,18 @@ public class EventController {
     @PostMapping("/event/list")
     public List<EventDto> getEventsByFilter(@RequestBody EventFilterDto filter) {
         return eventService.getEventsByFilter(filter);
-
+    }
+  
+    @GetMapping("/event/{userId}/owned")
+    public List<EventDto> getOwnedEvents(@PathVariable long userId) {
+        idValidate(userId);
+        return eventService.getOwnedEvents(userId);
+    }
+  
+    @GetMapping("/event/{id}")
+    public EventDto getEvent(@PathVariable Long id) {
+        idValidate(id);
+        return eventService.getEvent(id);
     }
 
     public void validateEvent(EventDto eventDto) {
@@ -67,7 +72,7 @@ public class EventController {
             throw new DataValidationException("Event owner ID cannot be null");
         }
     }
-      
+ 
     private void idValidate(Long id) {
         if ( id == null || id < 0) {
             throw new DataValidationException("Id cannot be negative");

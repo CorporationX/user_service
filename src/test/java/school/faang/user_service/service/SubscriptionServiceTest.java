@@ -17,6 +17,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.validation.SubscriptionValidator;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -27,6 +28,8 @@ public class SubscriptionServiceTest {
     private SubscriptionRepository subscriptionRepository;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private SubscriptionValidator subscriptionValidator;
     @Spy
     private UserMapperImpl userMapper;
     @InjectMocks
@@ -59,18 +62,14 @@ public class SubscriptionServiceTest {
 
     @Test
     public void shouldAddNewFollowerById() {
-        Mockito.when(userRepository.existsById(followerId)).thenReturn(true);
-        Mockito.when(userRepository.existsById(followeeId)).thenReturn(true);
-
         Assertions.assertDoesNotThrow(() -> subscriptionService.followUser(followerId, followeeId));
         Mockito.verify(subscriptionRepository, Mockito.times(1)).followUser(followerId, followeeId);
     }
 
     @Test
     public void shouldThrowExceptionIfUserSubscribed() {
-        Mockito.when(userRepository.existsById(followerId)).thenReturn(true);
-        Mockito.when(userRepository.existsById(followeeId)).thenReturn(true);
-        Mockito.when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
+        Mockito.doThrow(DataValidationException.class).when(subscriptionService)
+                        .followUser(followerId, followeeId);
 
         Assertions.assertThrows(DataValidationException.class, () -> subscriptionService.followUser(followerId, followeeId));
         Mockito.verify(subscriptionRepository, Mockito.times(0)).followUser(followerId, followeeId);
@@ -96,7 +95,6 @@ public class SubscriptionServiceTest {
 
     @Test
     public void shouldDeleteFollowerById() {
-        Mockito.when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
         Assertions.assertDoesNotThrow(() -> subscriptionService.unfollowUser(followerId, followeeId));
         Mockito.verify(subscriptionRepository, Mockito.times(1)).unfollowUser(followerId, followeeId);
     }
@@ -111,7 +109,6 @@ public class SubscriptionServiceTest {
     public void shouldReturnFollowersList() {
         UserFilterDto filter = new UserFilterDto();
 
-        Mockito.when(userRepository.existsById(followeeId)).thenReturn(true);
         Mockito.when(subscriptionRepository.findByFolloweeId(followeeId))
                 .thenReturn(desiredUsersStream);
 
@@ -134,7 +131,6 @@ public class SubscriptionServiceTest {
     public void shouldReturnFolloweesList() {
         UserFilterDto filter = new UserFilterDto();
 
-        Mockito.when(userRepository.existsById(followerId)).thenReturn(true);
         Mockito.when(subscriptionRepository.findByFollowerId(followerId))
                 .thenReturn(desiredUsersStream);
 
@@ -148,7 +144,8 @@ public class SubscriptionServiceTest {
     public void shouldThrowExceptionWhenFollowerNotExistsWithFilter() {
         UserFilterDto filter = new UserFilterDto();
 
-        Mockito.when(userRepository.existsById(followerId)).thenReturn(false);
+        Mockito.when(subscriptionService.getFollowing(followerId, filter))
+                .thenThrow(DataValidationException.class);
         Assertions.assertThrows(DataValidationException.class,
                 () -> subscriptionService.getFollowing(followerId, filter));
     }

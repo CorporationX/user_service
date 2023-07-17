@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.service.SubscriptionService;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.validation.SubscriptionValidator;
 
 import java.util.List;
 
@@ -23,6 +23,7 @@ import java.util.List;
 @RequestMapping("/subscription")
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
+    private final SubscriptionValidator subscriptionValidator;
 
     private static final String UNSUBSCRIBE_YOURSELF_EXCEPTION = "You can't unsubscribe from yourself.";
     private static final String SUBSCRIBE_YOURSELF_EXCEPTION = "You can't subscribe to yourself.";
@@ -30,14 +31,14 @@ public class SubscriptionController {
     @PutMapping("/follow/{id}")
     public void followUser(@RequestParam("followerId") long followerId,
                            @PathVariable("id") long followeeId) {
-        validationSameUser(followerId, followeeId, SUBSCRIBE_YOURSELF_EXCEPTION);
+        subscriptionValidator.validationSameUser(followerId, followeeId, SUBSCRIBE_YOURSELF_EXCEPTION);
         subscriptionService.followUser(followerId, followeeId);
     }
 
     @DeleteMapping("/unfollow/{id}")
     public void unfollowUser(@RequestParam("followerId") long followerId,
                          @PathVariable("id") long followeeId) {
-        validationSameUser(followerId, followeeId, UNSUBSCRIBE_YOURSELF_EXCEPTION);
+        subscriptionValidator.validationSameUser(followerId, followeeId, UNSUBSCRIBE_YOURSELF_EXCEPTION);
         subscriptionService.unfollowUser(followerId, followeeId);
     }
 
@@ -61,11 +62,5 @@ public class SubscriptionController {
     public List<UserDto> getFollowing(@PathVariable("id") long followerId,
                                       @RequestBody UserFilterDto filter) {
         return subscriptionService.getFollowing(followerId, filter);
-    }
-
-    private void validationSameUser(long followerId, long followeeId, String message) {
-        if (followerId == followeeId) {
-            throw new DataValidationException(message);
-        }
     }
 }

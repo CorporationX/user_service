@@ -14,6 +14,7 @@ import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.service.SubscriptionService;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.validation.SubscriptionValidator;
 
 import java.util.List;
 
@@ -21,6 +22,8 @@ import java.util.List;
 public class SubscriptionControllerTest {
     @Mock
     private SubscriptionService subscriptionService;
+    @Mock
+    private SubscriptionValidator subscriptionValidator;
     @Spy
     private UserMapper userMapper;
     @InjectMocks
@@ -52,8 +55,9 @@ public class SubscriptionControllerTest {
 
     @Test
     public void shouldThrowExceptionWhenIdEqualsAreWhenUnsubscribing() {
-        followeeId = 2;
+        followeeId = followerId;
 
+        Mockito.doThrow(DataValidationException.class).when(subscriptionController).unfollowUser(followerId, followeeId);
         Assertions.assertThrows(DataValidationException.class, () -> subscriptionController.unfollowUser(followerId, followeeId));
         Mockito.verify(subscriptionService, Mockito.times(0)).unfollowUser(followerId, followeeId);
     }

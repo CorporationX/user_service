@@ -1,74 +1,52 @@
 package school.faang.user_service.controller.event;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.EventParticipationService;
 
 import java.util.List;
 
-@Component
 @RequiredArgsConstructor
 @Controller
 public class EventParticipationController {
     private final EventParticipationService eventParticipationService;
-    private final UserRepository userRepository;
-    private final EventRepository eventRepository;
 
     public void registerParticipant(long eventId, long userId) {
-        User user = getUser(userId);
-        Event event = getEvent(eventId);
-
-        validateParams(user, event);
-
-        eventParticipationService.registerParticipant(event.getId(), user.getId());
+        validateParams(eventId, userId);
+        eventParticipationService.registerParticipant(eventId, userId);
     }
 
     public void unregisterParticipant(long eventId, long userId) {
-        User user = getUser(userId);
-        Event event = getEvent(eventId);
+        validateParams(userId, eventId);
 
-        validateParams(user, event);
-
-        eventParticipationService.unregisterParticipant(event.getId(), user.getId());
+        eventParticipationService.unregisterParticipant(eventId, userId);
     }
 
     public List<User> getParticipants(long eventId) {
-        validateEvent(getEvent(eventId));
+        validateEventId(eventId);
         return eventParticipationService.getParticipants(eventId);
     }
 
     public int getParticipantsCount(long eventId) {
-        validateEvent(getEvent(eventId));
+        validateEventId(eventId);
         return eventParticipationService.getParticipantsCount(eventId);
     }
 
-    private static void validateParams(User user, Event event) {
-        validateUser(user);
-        validateEvent(event);
+    private void validateParams(long eventId, long userId) {
+        validateEventId(eventId);
+        validateUserId(userId);
     }
 
-    private static void validateUser(User user) {
-        if (user == null) {
-            throw new NullPointerException("User not found");
+    private static void validateUserId(long userId) {
+        if (userId < 0) {
+            throw new IllegalArgumentException("User not found");
         }
     }
 
-    private static void validateEvent(Event event) {
-        if (event == null) {
-            throw new NullPointerException("Event not found");
+    private static void validateEventId(long eventId) {
+        if (eventId < 0) {
+            throw new IllegalArgumentException("Event not found");
         }
-    }
-
-    private Event getEvent(long eventId) {
-        return eventRepository.findById(eventId).orElse(null);
-    }
-
-    private User getUser(long userId) {
-        return userRepository.findById(userId).orElse(null);
     }
 }

@@ -1,5 +1,7 @@
 package school.faang.user_service.service.mentorship;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +27,7 @@ import static org.mockito.Mockito.when;
 @MockitoSettings(strictness = Strictness.LENIENT)
 class MentorshipServiceTest {
     private static final long MENTOR_ID = 1L;
+    private static final long MENTEE_ID = 2L;
     private static final long INCORRECT_MENTOR_ID = 0L;
     @Mock
     private MentorshipRepository mentorshipRepository;
@@ -35,25 +38,28 @@ class MentorshipServiceTest {
 
     @BeforeEach
     void setUp() {
-        when(mentorshipRepository.findUserById(INCORRECT_MENTOR_ID))
+        when(mentorshipRepository.findById(INCORRECT_MENTOR_ID))
                 .thenReturn(Optional.empty());
 
-        User mentor = new User();
-        mentor.setMentees(List.of(new User(), new User()));
-        when(mentorshipRepository.findUserById(MENTOR_ID))
+        User mentor = User.builder()
+                .id(MENTOR_ID)
+                .mentees(new ArrayList<>(Collections.singletonList(
+                        User.builder().id(MENTEE_ID).build())))
+                .build();
+        when(mentorshipRepository.findById(MENTOR_ID))
                 .thenReturn(Optional.of(mentor));
     }
 
     @Test
     void getMentees_shouldMatchMenteesSize() {
         List<UserDto> mentees = mentorshipService.getMentees(MENTOR_ID);
-        assertEquals(2, mentees.size());
+        assertEquals(1, mentees.size());
     }
 
     @Test
     void getMentees_shouldInvokeFindByIdMethod() {
         mentorshipService.getMentees(MENTOR_ID);
-        Mockito.verify(mentorshipRepository).findUserById(MENTOR_ID);
+        Mockito.verify(mentorshipRepository).findById(MENTOR_ID);
     }
 
     @Test

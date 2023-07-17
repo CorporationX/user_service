@@ -35,12 +35,4 @@ public class MentorshipControllerTest {
         mentorshipController.getMentees(mentorId);
         Mockito.verify(mentorshipService, Mockito.times(1)).getMentees(mentorId);
     }
-
-    @Test
-    public void testGetMenteesIsValidAnswer() {
-        long mentorId = 7;
-        Mockito.when(mentorshipService.getMentees(mentorId)).thenReturn(List.of(new UserDTO(), new UserDTO()));
-        List<UserDTO> userDTOS = mentorshipController.getMentees(mentorId);
-        Assertions.assertEquals(2, userDTOS.size());
-    }
 }

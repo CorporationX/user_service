@@ -8,23 +8,18 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SubscriptionService;
 
 import java.util.List;
-
-@RequiredArgsConstructor
 @Controller
+@RequiredArgsConstructor
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
     public void followUser(long followerId, long followeeId) {
-        if (followerId == followeeId) {
-            throw new DataValidationException("You can't subscribe to yourself");
-        }
+        validate(followerId, followeeId);
         subscriptionService.followUser(followerId, followeeId);
     }
 
     public void unfollowUser(long followerId, long followeeId) {
-        if (followerId == followeeId) {
-            throw new DataValidationException("You can't unsubscribe to yourself");
-        }
+        validate(followerId, followeeId);
         subscriptionService.unfollowUser(followerId, followeeId);
     }
 
@@ -32,7 +27,13 @@ public class SubscriptionController {
         return subscriptionService.getFollowers(followeeId, filter);
     }
 
-    public List<UserDto> getFollowing(long followerId, UserFilterDto filter){
+    public List<UserDto> getFollowing(long followerId, UserFilterDto filter) {
         return subscriptionService.getFollowing(followerId, filter);
+    }
+
+    private void validate(long followerId, long followeeId) {
+        if (followerId == followeeId) {
+            throw new DataValidationException("Follower and folowee can not be the same");
+        }
     }
 }

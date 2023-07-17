@@ -53,4 +53,24 @@ public class MentorshipServiceTest {
 
         Assertions.assertThrows(UserNotFound.class, () -> mentorshipService.getMentees(Mockito.anyLong()));
     }
+
+    @Test
+    public void testGetMentors_CorrectInputs_ShouldReturnEmptyList() {
+        User user = User.builder()
+                .mentors(Collections.emptyList())
+                .build();
+
+        Mockito.when(mentorshipRepository.findUserById(Mockito.anyLong())).thenReturn(Optional.of(user));
+
+        List<UserDTO> userDTOS = mentorshipService.getMentors(Mockito.anyLong());
+
+        Assertions.assertEquals(0, userDTOS.size());
+    }
+
+    @Test
+    public void testGetMentors_NotFoundUser_ShouldThrowException() {
+        Mockito.when(mentorshipRepository.findUserById(Mockito.anyLong())).thenReturn(Optional.ofNullable(null));
+
+        Assertions.assertThrows(UserNotFound.class, () -> mentorshipService.getMentors(Mockito.anyLong()));
+    }
 }

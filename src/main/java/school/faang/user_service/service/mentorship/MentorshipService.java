@@ -23,4 +23,11 @@ public class MentorshipService {
 
         return user.getMentees().stream().map(userMapper::toDto).toList();
     }
+
+    public List<UserDTO> getMentors(long menteeId) {
+        User user = mentorshipRepository.findUserById(menteeId)
+                .orElseThrow(() -> new UserNotFound("user not found in database"));
+
+        return user.getMentors().stream().map(userMapper::toDto).toList();
+    }
 }

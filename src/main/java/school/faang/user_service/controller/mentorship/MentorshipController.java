@@ -1,6 +1,7 @@
 package school.faang.user_service.controller.mentorship;
 
 import lombok.RequiredArgsConstructor;
+import org.mapstruct.control.MappingControl;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,5 +24,10 @@ public class MentorshipController {
     public List<UserDTO> getMentees(@PathVariable("id") long mentorId) {
         RequestValidation.checkValidityId(mentorId);
         return mentorshipService.getMentees(mentorId);
+    }
+    @GetMapping("mentors/{id}")
+    public List<UserDTO> getMentors(@PathVariable("id") long menteeId) {
+        RequestValidation.checkValidityId(menteeId);
+        return mentorshipService.getMentors(menteeId);
     }
 }

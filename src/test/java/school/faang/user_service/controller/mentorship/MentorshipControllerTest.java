@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDTO;
+import school.faang.user_service.exception.mentorship.InvalidRequestMentorId;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
 import java.util.List;
@@ -34,5 +35,17 @@ public class MentorshipControllerTest {
         long mentorId = 5;
         mentorshipController.getMentees(mentorId);
         Mockito.verify(mentorshipService, Mockito.times(1)).getMentees(mentorId);
+    }
+
+    @Test
+    public void testGetMentors_ShouldThrowException() {
+        Assert.assertThrows(InvalidRequestMentorId.class, () -> mentorshipController.getMentors(-5));
+    }
+
+    @Test
+    public void testGetMentors_IsInvokingGetMentors() {
+        long menteeId = 5;
+        mentorshipController.getMentors(menteeId);
+        Mockito.verify(mentorshipService, Mockito.times(1)).getMentors(menteeId);
     }
 }

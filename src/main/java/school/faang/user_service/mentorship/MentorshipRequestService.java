@@ -1,8 +1,9 @@
 package school.faang.user_service.mentorship;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.RequestStatus;
@@ -15,17 +16,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-@RestController
+@Service
+@RequiredArgsConstructor
 public class MentorshipRequestService {
     @Autowired
     private MentorshipRequestRepository mentorshipRequestRepository;
-    private RequestStatus requestStatus;
-
     @Transactional
-    public boolean requestMentorship(MentorshipRequestDto dto) {
+    public void requestMentorship(MentorshipRequestDto dto) throws Exception {
         if (dto.getRequester() == dto.getReceiver()) {
-            System.out.println("request was not create, your mentor is you");
-            return false;
+            throw new Exception("request was not create, your mentor is you");
         }
 
         int sizeRequest = dto.getRequester().getSentMentorshipRequests().size();
@@ -33,12 +32,10 @@ public class MentorshipRequestService {
             if (!dto.getRequester().getSentMentorshipRequests().
                     get(sizeRequest - 3).getCreatedAt().
                     isBefore(LocalDateTime.now().minusMonths(1))) {
-                System.out.println("request was not create, so many requests in this month");
-                return false;
+                throw new Exception("request was not create, so many requests in this month");
             }
         }
         mentorshipRequestRepository.create(dto.getRequester().getId(), dto.getReceiver().getId(), dto.getDescription());
-        return true;
     }
 
     @Transactional
@@ -59,11 +56,11 @@ public class MentorshipRequestService {
         MentorshipRequest request = mentorshipRequestRepository.findById(id)
                 .orElseThrow(Exception::new);
 
-        if (request.getStatus().equals(requestStatus.ACCEPTED)) {
+        if (request.getStatus().equals(RequestStatus.ACCEPTED)) {
             throw new Exception();
         }
 
-        request.setStatus(requestStatus.ACCEPTED);
+        request.setStatus(RequestStatus.ACCEPTED);
 
         List<User> newMentees = request.getReceiver().getMentees();
         newMentees.add(request.getRequester());
@@ -79,11 +76,11 @@ public class MentorshipRequestService {
         MentorshipRequest request = mentorshipRequestRepository.findById(id)
                 .orElseThrow(Exception::new);
 
-        if (request.getStatus().equals(requestStatus.REJECTED)) {
+        if (request.getStatus().equals(RequestStatus.REJECTED)) {
             throw new Exception();
         }
 
-        request.setStatus(requestStatus.REJECTED);
+        request.setStatus(RequestStatus.REJECTED);
         request.setRejectionReason(rejection.getReason());
     }
 }

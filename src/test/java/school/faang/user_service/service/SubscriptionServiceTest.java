@@ -73,4 +73,18 @@ class SubscriptionServiceTest {
 
         verifyNoMoreInteractions(subscriptionRepository);
     }
+
+    @Test
+    public void testGetFollowersCount() {
+        subscriptionService.getFollowersCount(followeeId);
+
+        verify(subscriptionRepository, times(1)).findFollowersAmountByFolloweeId(followeeId);
+    }
+
+    @Test
+    public void testGetFollowingCount() {
+        subscriptionService.getFollowingCount(followerId);
+
+        verify(subscriptionRepository, times(1)).findFolloweesAmountByFollowerId(followerId);
+    }
 }

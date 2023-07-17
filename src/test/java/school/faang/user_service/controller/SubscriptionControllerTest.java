@@ -71,7 +71,7 @@ class SubscriptionControllerTest {
 
     @Test
     public void testUnfollowUserThrow() {
-        assertThrows(DataValidationException.class, () -> subscriptionController.unfollowUser(followerId, followeeId));
+        Assert.assertThrows(DataValidationException.class, () -> subscriptionController.unfollowUser(followerId, followeeId));
 
         try {
             subscriptionController.unfollowUser(followerId, followerId);
@@ -79,5 +79,19 @@ class SubscriptionControllerTest {
             assertEquals("Follower and folowee can not be the same", e.getMessage());
         }
         verifyNoInteractions(subscriptionService);
+    }
+
+    @Test
+    public void testGetFollowersCount() {
+        subscriptionController.getFollowersCount(followeeId);
+
+        verify(subscriptionService, times(1)).getFollowersCount(followeeId);
+    }
+
+    @Test
+    public void testGetFollowingCount() {
+        subscriptionController.getFollowingCount(followerId);
+
+        verify(subscriptionService, times(1)).getFollowingCount(followerId);
     }
 }

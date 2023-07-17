@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import org.junit.Before;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,12 @@ import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.subscription.SubscriptionService;
+import school.faang.user_service.service.user.filter.UserAboutFilter;
+import school.faang.user_service.service.user.filter.UserFilter;
+import school.faang.user_service.service.user.filter.UserNameFilter;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -28,6 +34,8 @@ public class SubscriptionServiceTest {
     private SubscriptionRepository subscriptionRepository;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private List<UserFilter> userFilters;
     @Spy
     private UserMapperImpl userMapper;
     @InjectMocks
@@ -39,21 +47,21 @@ public class SubscriptionServiceTest {
     private List<UserDto> desiredUsersDto;
 
     @BeforeEach
-    public void setUp() {
+    public void setUpUsersLists() {
         desiredUsersStream = Stream.of(
                 User.builder()
                         .id(0)
+                        .username("1")
                         .build(),
                 User.builder()
                         .id(1)
+                        .username("2")
                         .build()
         );
         desiredUsersDto = List.of(
                 UserDto.builder()
                         .id(0L)
-                        .build(),
-                UserDto.builder()
-                        .id(1L)
+                        .username("1")
                         .build()
         );
     }
@@ -111,6 +119,7 @@ public class SubscriptionServiceTest {
     @Test
     public void shouldReturnFollowersList() {
         UserFilterDto filter = new UserFilterDto();
+        List<UserFilter> userFilters = new ArrayList<>();
 
         Mockito.when(userRepository.existsById(followeeId)).thenReturn(true);
         Mockito.when(subscriptionRepository.findByFolloweeId(followeeId))
@@ -133,13 +142,16 @@ public class SubscriptionServiceTest {
 
     @Test
     public void shouldReturnFolloweesList() {
-        UserFilterDto filter = new UserFilterDto();
+        UserFilterDto filters = UserFilterDto.builder()
+                .namePatter("1")
+                .build();
+        userFilters.add(Mockito.mock(UserNameFilter.class));
 
         Mockito.when(userRepository.existsById(followerId)).thenReturn(true);
         Mockito.when(subscriptionRepository.findByFollowerId(followerId))
                 .thenReturn(desiredUsersStream);
 
-        List<UserDto> receivedUsersDto = subscriptionService.getFollowing(followerId, filter);
+        List<UserDto> receivedUsersDto = subscriptionService.getFollowing(followerId, filters);
 
         Assertions.assertEquals(desiredUsersDto, receivedUsersDto);
         Mockito.verify(subscriptionRepository).findByFollowerId(followerId);

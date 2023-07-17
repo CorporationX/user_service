@@ -59,7 +59,8 @@ public class SubscriptionService {
     @Transactional
     public List<UserDto> getFollowing(long followerId, UserFilterDto filters) {
         validationUserExists(followerId);
-        return filterUsers(subscriptionRepository.findByFollowerId(followerId), filters);
+        List<UserDto> res = filterUsers(subscriptionRepository.findByFollowerId(followerId), filters);
+        return res;
     }
 
     private List<UserDto> filterUsers(Stream<User> users, UserFilterDto filters) {

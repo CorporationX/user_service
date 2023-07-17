@@ -44,6 +44,8 @@ public class RecommendationRequestController {
     }
 
     public void validationFilter(RequestFilterDto filter) {
-        throw new DataValidationException("Request filter is null!");
+        if (filter == null) {
+            throw new DataValidationException("Request filter is null!");
+        }
     }
 }

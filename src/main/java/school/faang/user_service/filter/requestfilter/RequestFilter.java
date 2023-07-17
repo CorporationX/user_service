@@ -9,5 +9,5 @@ public interface RequestFilter {
 
     boolean isApplicable(RequestFilterDto filter);
 
-    void apply(Stream<RecommendationRequest> recommendationRequestStream, RequestFilterDto filter);
+    Stream<RecommendationRequest> apply(Stream<RecommendationRequest> recommendationRequestStream, RequestFilterDto filters);
 }

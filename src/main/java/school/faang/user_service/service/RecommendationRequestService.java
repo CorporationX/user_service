@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RequestFilterDto;
@@ -30,7 +31,7 @@ public class RecommendationRequestService {
 
     private final RecommendationRequestMapper recommendationRequestMapper;
 
-    private final List<RequestFilter> requestFilters;
+    private List<RequestFilter> requestFilters;
 
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
         validationExistById(recommendationRequestDto.getRequesterId());
@@ -42,17 +43,25 @@ public class RecommendationRequestService {
     }
 
     public List<RecommendationRequestDto> getRequests(RequestFilterDto filters) {
-        Stream<RecommendationRequest> requestStream = StreamSupport.stream(recommendationRequestRepository.findAll().spliterator(), false);
-        requestFilters.stream()
+        Stream<RecommendationRequest> requestStream = StreamSupport.stream(recommendationRequestRepository
+                .findAll().spliterator(), false);
+
+        List<RequestFilter> requestFilterStream = requestFilters.stream()
                 .filter(filter -> filter.isApplicable(filters))
-                .forEach(filter -> filter.apply(requestStream, filters));
-        return recommendationRequestMapper.toDto(requestStream.toList());
+                .toList();
+
+        for (RequestFilter filter : requestFilterStream) {
+            requestStream = filter.apply(requestStream, filters);
+        }
+        return requestStream
+                .map(recommendationRequestMapper::toDto)
+                .toList();
     }
 
     private void validationExistSkill(RecommendationRequestDto recommendationRequestDto) {
-        for (SkillRequest skill : recommendationRequestDto.getSkills()) {
-            if (!skillRepository.existsById(skill.getSkill().getId())) {
-                throw new DataValidationException("Skill with id " + skill.getId() + " does not exist");
+        for (SkillRequest skillRequest : recommendationRequestDto.getSkills()) {
+            if (!skillRepository.existsById(skillRequest.getSkill().getId())) {
+                throw new DataValidationException("Skill with id " + skillRequest.getSkill().getId() + " does not exist");
             }
         }
     }
@@ -70,5 +79,10 @@ public class RecommendationRequestService {
         if (!userRepository.existsById(id)) {
             throw new DataValidationException("User with id " + id + " does not exist");
         }
+    }
+
+    @Autowired
+    public void setRequestFilters(List<RequestFilter> requestFilters) {
+        this.requestFilters = requestFilters;
     }
 }

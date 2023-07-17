@@ -55,7 +55,7 @@ public class EventService {
 
     private void checkUserContainsSkills(EventDto eventDto) throws DataFormatException {
         User user = userRepository.findById(eventDto.getOwnerId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         List<SkillDto> userSkills = SkillMapper.INSTANCE.toListSkillsDTO(user.getSkills());
         if (!new HashSet<>(eventDto.getRelatedSkills()).containsAll(userSkills)) {

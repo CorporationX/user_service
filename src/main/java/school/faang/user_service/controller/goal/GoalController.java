@@ -33,6 +33,18 @@ public class GoalController {
         }
     }
 
+    @PostMapping("/update/{goalId}")
+    public ResponseEntity<?> updateGoal(@PathVariable("goalId") Long goalId,
+                                        @RequestBody GoalDto goalDto) {
+        try {
+            return ResponseEntity.ok(goalService.updateGoal(goalId, goalDto));
+        } catch (DataValidationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
     @GetMapping("/get/{userId}")
     public ResponseEntity<?> getGoalsByUser(@PathVariable Long userId,
                                             @RequestBody(required = false) GoalFilterDto filter) {

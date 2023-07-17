@@ -12,7 +12,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class EventValidator {
-    private UserService userService;
+    private final UserService userService;
 
     public void checkIfUserHasSkillsRequired(EventDto event) {
         List<Long> skillIds = event.getRelatedSkills().stream()

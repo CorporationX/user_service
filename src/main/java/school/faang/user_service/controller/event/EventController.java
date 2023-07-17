@@ -48,6 +48,7 @@ public class EventController {
     @PostMapping("/event/list")
     public List<EventDto> getEventsByFilter(@RequestBody EventFilterDto filter) {
         return eventService.getEventsByFilter(filter);
+
     }
 
     public void validateEvent(EventDto eventDto) {
@@ -66,7 +67,7 @@ public class EventController {
             throw new DataValidationException("Event owner ID cannot be null");
         }
     }
-
+      
     private void idValidate(Long id) {
         if ( id == null || id < 0) {
             throw new DataValidationException("Id cannot be negative");

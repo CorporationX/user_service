@@ -24,6 +24,7 @@ public class EventService {
     private final EventMapper eventMapper;
     private final List<EventFilter> filters = new ArrayList<>();
 
+    @Autowired
     public EventDto createEvent(EventDto eventDto) {
         eventValidator.checkIfUserHasSkillsRequired(eventDto);
         Event event = eventRepository.save(eventMapper.toEntity(eventDto));
@@ -31,6 +32,7 @@ public class EventService {
     }
 
     public void deleteEvent(Long id) {
+        eventRepository.findById(id).orElseThrow(() -> new DataValidationException("Event not found"));
         eventRepository.deleteById(id);
     }
 
@@ -47,7 +49,6 @@ public class EventService {
         return filterEvents(eventStream, filter);
     }
 
-  
     public EventDto getEvent(long id) {
         Event entity = eventRepository.findById(id)
                 .orElseThrow(() -> new DataValidationException("Event not found"));

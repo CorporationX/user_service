@@ -21,7 +21,9 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.any;
@@ -160,5 +162,25 @@ class EventServiceTest {
 
         assertNotNull(foundEventDto);
         assertEquals(event.getId(), foundEventDto.getId());
+    }
+
+    @Test
+    public void deleteEvent_EventExists() {
+        Long eventId = 1L;
+        when(eventRepository.existsById(eventId)).thenReturn(true);
+
+        verify(eventRepository, times(1)).deleteById(eventId);
+        verify(eventRepository, times(1)).deleteById(eventId);
+        verify(eventRepository, times(2)).existsById(eventId);
+    }
+
+    @Test
+    public void deleteEvent_EventNotExist() {
+        Long eventId = 1L;
+        when(eventRepository.existsById(eventId)).thenReturn(false);
+
+        boolean result = eventService.deleteEvent(eventId);
+
+        assertFalse(result);
     }
 }

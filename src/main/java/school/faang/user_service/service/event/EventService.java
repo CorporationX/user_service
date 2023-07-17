@@ -37,6 +37,14 @@ public class EventService {
         return EventMapper.INSTANCE.toDto(event);
     }
 
+    public boolean deleteEvent(Long eventId) {
+        if (eventRepository.existsById(eventId)) {
+            eventRepository.deleteById(eventId);
+            return true;
+        }
+        return false;
+    }
+
     private void validateEventDto(EventDto eventDto) throws DataFormatException {
         if (eventDto.getId() == null || eventDto.getId() < 1) {
             throw new DataFormatException("Event Id must be greater than 0");

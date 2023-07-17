@@ -317,19 +317,18 @@ class GoalServiceTest {
         long goalId = 1L;
         List<Skill> skills = List.of(Skill.builder().id(1L).build(), Skill.builder().id(2L).build());
         List<User> users = List.of(User.builder().id(1L).build(), User.builder().id(3L).build());
+        goalActive.setSkillsToAchieve(skills);
+        goalActive.setUsers(users);
+        goalActive.setId(goalId);
+        goalDtoCompleted.setSkillIds(skills.stream().map(Skill::getId).toList());
         Mockito.when(goalRepository.findById(goalId))
                 .thenReturn(Optional.of(goalActive));
-        Mockito.when(goalRepository.findUsersByGoalId(Mockito.anyLong()))
-                .thenReturn(users);
-
-        goalDtoCompleted.setSkillIds(skills.stream().map(Skill::getId).toList());
 
         goalService.updateGoal(goalId, goalDtoCompleted);
 
         Mockito.verify(goalMapper, Mockito.times(1)).toDto(Mockito.any());
         Mockito.verify(goalMapper, Mockito.times(1)).toEntity(Mockito.any());
 
-        Mockito.verify(goalRepository, Mockito.times(1)).findUsersByGoalId(goalId);
         Mockito.verify(goalRepository, Mockito.times(1)).save(Mockito.any());
         Mockito.verify(skillRepository, Mockito.times(skills.size() * users.size()))
                 .assignSkillToUser(Mockito.anyLong(), Mockito.anyLong());

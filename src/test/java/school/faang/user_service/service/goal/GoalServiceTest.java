@@ -333,4 +333,37 @@ class GoalServiceTest {
         Mockito.verify(skillRepository, Mockito.times(skills.size() * users.size()))
                 .assignSkillToUser(Mockito.anyLong(), Mockito.anyLong());
     }
+
+    @Test
+    public void testDeleteGoalInvalidIdLessThanOne() {
+        DataValidationException exception = assertThrows(DataValidationException.class,
+                () -> goalService.deleteGoal(0L));
+        assertEquals("Goal id cannot be less than 1!", exception.getMessage());
+    }
+
+    @Test
+    public void testDeleteGoalInvalidIdNull() {
+        DataValidationException exception = assertThrows(DataValidationException.class,
+                () -> goalService.deleteGoal(null));
+        assertEquals("Goal id cannot be null!", exception.getMessage());
+    }
+
+    @Test
+    public void testDeleteGoalInvalidNotExist() {
+        Mockito.when(goalRepository.existsById(Mockito.anyLong()))
+                .thenReturn(false);
+        DataValidationException exception = assertThrows(DataValidationException.class,
+                () -> goalService.deleteGoal(1L));
+        assertEquals("Goal with given id was not found!", exception.getMessage());
+    }
+
+    @Test
+    public void testDeleteGoalValid() {
+        long goalId = 1L;
+        Mockito.when(goalRepository.existsById(goalId))
+                .thenReturn(true);
+        goalService.deleteGoal(goalId);
+        Mockito.verify(goalRepository, Mockito.times(1)).existsById(goalId);
+        Mockito.verify(goalRepository, Mockito.times(1)).deleteById(goalId);
+    }
 }

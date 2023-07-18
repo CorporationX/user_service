@@ -2,9 +2,11 @@ package school.faang.user_service.filters;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
@@ -26,41 +28,47 @@ import school.faang.user_service.filters.filtersForUserFilterDto.UserSkillFilter
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-
+@ExtendWith(MockitoExtension.class)
 class UserFilterTest {
 
-    @Mock
     private UserMapper userMapper = new UserMapperImpl();
-//    @Mock
-//    private DtoUserFilter dtoUserFilter ;
-//    @Mock
-//    private UserAboutFilter userAboutFilter;
-//    @Mock
-//    private UserCityFilter userCityFilter;
-//    @Mock
-//    private UserContactFilter userContactFilter;
-//    @Mock
-//    private UserCountryFilter userCountryFilter;
-//    @Mock
-//    private UserEmailFilter userEmailFilter;
-//    @Mock
-//    private UserExperienceMaxFilter userExperienceMaxFilter;
-//    @Mock
-//    private UserExperienceMinFilter userExperienceMinFilter;
-//    @Mock
-//    private UserNameFilter userNameFilter;
-//    @Mock
-//    private UserPageFilter userPageFilter;
-//    @Mock
-//    private UserPageSizeFilter userPageSizeFilter;
-//    @Mock
-//    private UserPhoneFilter userPhoneFilter;
-//    @Mock
-//    private UserSkillFilter userSkillFilter;
-    @Spy
+    @Mock
+    private DtoUserFilter dtoUserFilter ;
+    @Mock
+    private UserAboutFilter userAboutFilter;
+    @Mock
+    private UserCityFilter userCityFilter;
+    @Mock
+    private UserContactFilter userContactFilter;
+    @Mock
+    private UserCountryFilter userCountryFilter;
+    @Mock
+    private UserEmailFilter userEmailFilter;
+    @Mock
+    private UserExperienceMaxFilter userExperienceMaxFilter;
+    @Mock
+    private UserExperienceMinFilter userExperienceMinFilter;
+    @Mock
+    private UserNameFilter userNameFilter;
+    @Mock
+    private UserPageFilter userPageFilter;
+    @Mock
+    private UserPageSizeFilter userPageSizeFilter;
+    @Mock
+    private UserPhoneFilter userPhoneFilter;
+    @Mock
+    private UserSkillFilter userSkillFilter;
+
     private List<DtoUserFilter> allFilters;
-    @InjectMocks
     private UserFilter userFilter;
+
+    @BeforeEach
+    void setUp(){
+        allFilters = List.of(userAboutFilter, userCityFilter, userContactFilter, userCountryFilter,
+                userEmailFilter, userExperienceMaxFilter, userExperienceMinFilter, userNameFilter,
+                userPageFilter, userPageSizeFilter, userPhoneFilter, userSkillFilter);
+        userFilter = new UserFilter(allFilters, userMapper);
+    }
 
 
     @Test
@@ -71,23 +79,16 @@ class UserFilterTest {
     }
 
     @Test
-    void applyFilterWorks(){
-        User user = createUser();
-        UserFilterDto filterDto = createUserFilterDto();
-        assertFalse(userFilter.applyFilter(List.of(user), filterDto).isEmpty());
-    }
-
-    @Test
     void filterUserReturnValidUserDto(){
         User user = createUser();
         UserFilterDto filter = createUserFilterDto();
-        assertFalse(userFilter.applyFilter(List.of(user), filter).isEmpty());
+        assertEquals(1, (userFilter.applyFilter(List.of(user), filter)).size());
     }
 
     @Test
     void filterUserDontReturnInvalidUserDto(){
         User user = createUser();
-        user.setCity("1city");
+        user.setEmail("dsfs");
         UserFilterDto filter = createUserFilterDto();
         assertTrue(userFilter.applyFilter(List.of(user), filter).isEmpty());
     }
@@ -134,7 +135,7 @@ class UserFilterTest {
         userFilterDto.setContactPattern("\\D+");
         userFilterDto.setCountryPattern("\\D+");
         userFilterDto.setCityPattern("\\D+");
-        userFilterDto.setPhonePattern("\\d+");
+        userFilterDto.setPhonePattern("\\D+");
         userFilterDto.setSkillPattern("\\D+");
         userFilterDto.setExperienceMin(1);
         userFilterDto.setExperienceMax(7);

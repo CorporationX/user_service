@@ -18,10 +18,11 @@ public class UserFilter {
 
     public List<UserDto> applyFilter(List<User> users, UserFilterDto DtoFilters){
         validateUsers(users);
-        userFilters.stream()
+        return userFilters.stream()
                 .filter(filter -> filter.isApplicable(DtoFilters))
-                .forEach(filter -> filter.apply(users.stream(), DtoFilters));
-        return userMapper.toUserDtoList(users);
+                .flatMap(filter -> filter.apply(users.stream(), DtoFilters))
+                .map(userMapper::userToDto)
+                .toList();
     }
 
     private void validateUsers(List<User> users){

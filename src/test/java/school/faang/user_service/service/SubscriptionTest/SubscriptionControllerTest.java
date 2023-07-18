@@ -10,6 +10,7 @@ import org.mockito.Spy;
 import org.springframework.http.HttpStatus;
 import school.faang.user_service.controller.SubscriptionController;
 import school.faang.user_service.dto.SubscriptionDto;
+import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SubscriptionService;
 import school.faang.user_service.validator.SubscriptionValidator;
@@ -22,11 +23,13 @@ public class SubscriptionControllerTest {
     @InjectMocks
     private SubscriptionController controller;
     private SubscriptionDto dto;
+    private UserFilterDto filterDto;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         dto = new SubscriptionDto(1, 2);
+        filterDto = new UserFilterDto();
     }
 
     @Test
@@ -53,5 +56,17 @@ public class SubscriptionControllerTest {
         dto.setFolloweeId(1);
         Assertions.assertThrows(DataValidationException.class,
                 () -> controller.unfollowUser(dto));
+    }
+
+    @Test
+    void GetByFolloweeTest() {
+        var res = controller.getFollowers(1,filterDto);
+        Assertions.assertEquals(res.getStatusCode(), HttpStatus.OK);
+    }
+
+    @Test
+    void GetByFolloweeInvalidIdExceptionTest() {
+        Assertions.assertThrows(DataValidationException.class,
+                () -> controller.getFollowers(0,filterDto));
     }
 }

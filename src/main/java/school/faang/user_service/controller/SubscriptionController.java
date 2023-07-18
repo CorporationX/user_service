@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.SubscriptionDto;
+import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.service.SubscriptionService;
 import school.faang.user_service.validator.SubscriptionValidator;
 
@@ -26,5 +27,11 @@ public class SubscriptionController {
         validator.validateId(dto.getFollowerId(), dto.getFolloweeId());
         service.unfollowUser(dto.getFollowerId(), dto.getFolloweeId());
         return ResponseEntity.ok().body("Unfollowed");
+    }
+
+    @GetMapping("/followers/{followeeId}")
+    public ResponseEntity<?> getFollowers(@PathVariable long followeeId, @RequestBody UserFilterDto filter) {
+        validator.validateId(followeeId);
+        return ResponseEntity.ok(service.getFollowers(followeeId, filter));
     }
 }

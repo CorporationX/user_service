@@ -1,13 +1,16 @@
 package school.faang.user_service.service.SubscriptionTest;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 
+import org.springframework.http.HttpStatus;
+import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.filter.SubscriberFilter;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.SubscriptionService;
 
@@ -17,12 +20,19 @@ import static org.mockito.Mockito.when;
 public class SubscriptionServiceTest {
     @Mock
     private SubscriptionRepository repository;
+    @Spy
+    private SubscriberFilter filter;
+    @Spy
+    private UserMapper mapper;
     @InjectMocks
     private SubscriptionService service;
+    private UserFilterDto filterDto;
+
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        filterDto = new UserFilterDto();
     }
 
     @Test
@@ -50,7 +60,13 @@ public class SubscriptionServiceTest {
         long followerId = 1;
         long followeeId = 2;
 
-        repository.unfollowUser(followerId,followeeId);
+        repository.unfollowUser(followerId, followeeId);
         verify(repository).unfollowUser(followerId, followeeId);
+    }
+
+    @Test
+    void GetByFolloweeTest() {
+        var res = service.getFollowers(1, filterDto);
+        verify(repository).findByFolloweeId(Mockito.anyLong());
     }
 }

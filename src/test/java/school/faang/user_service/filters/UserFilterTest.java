@@ -2,22 +2,66 @@ package school.faang.user_service.filters;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.contact.Contact;
+import school.faang.user_service.filters.filtersForUserFilterDto.DtoUserFilter;
+import school.faang.user_service.filters.filtersForUserFilterDto.UserAboutFilter;
+import school.faang.user_service.filters.filtersForUserFilterDto.UserCityFilter;
+import school.faang.user_service.filters.filtersForUserFilterDto.UserContactFilter;
+import school.faang.user_service.filters.filtersForUserFilterDto.UserCountryFilter;
+import school.faang.user_service.filters.filtersForUserFilterDto.UserEmailFilter;
+import school.faang.user_service.filters.filtersForUserFilterDto.UserExperienceMaxFilter;
+import school.faang.user_service.filters.filtersForUserFilterDto.UserExperienceMinFilter;
+import school.faang.user_service.filters.filtersForUserFilterDto.UserNameFilter;
+import school.faang.user_service.filters.filtersForUserFilterDto.UserPageFilter;
+import school.faang.user_service.filters.filtersForUserFilterDto.UserPageSizeFilter;
+import school.faang.user_service.filters.filtersForUserFilterDto.UserPhoneFilter;
+import school.faang.user_service.filters.filtersForUserFilterDto.UserSkillFilter;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserFilterTest {
-    private UserFilter userFilter;
+
+    @Mock
     private UserMapper userMapper = new UserMapperImpl();
-    @BeforeEach
-    void beforeStart() {
-        userFilter = new UserFilter();
-    }
+//    @Mock
+//    private DtoUserFilter dtoUserFilter ;
+//    @Mock
+//    private UserAboutFilter userAboutFilter;
+//    @Mock
+//    private UserCityFilter userCityFilter;
+//    @Mock
+//    private UserContactFilter userContactFilter;
+//    @Mock
+//    private UserCountryFilter userCountryFilter;
+//    @Mock
+//    private UserEmailFilter userEmailFilter;
+//    @Mock
+//    private UserExperienceMaxFilter userExperienceMaxFilter;
+//    @Mock
+//    private UserExperienceMinFilter userExperienceMinFilter;
+//    @Mock
+//    private UserNameFilter userNameFilter;
+//    @Mock
+//    private UserPageFilter userPageFilter;
+//    @Mock
+//    private UserPageSizeFilter userPageSizeFilter;
+//    @Mock
+//    private UserPhoneFilter userPhoneFilter;
+//    @Mock
+//    private UserSkillFilter userSkillFilter;
+    @Spy
+    private List<DtoUserFilter> allFilters;
+    @InjectMocks
+    private UserFilter userFilter;
+
 
     @Test
     void applyFilterThrowNullPointer(){

@@ -100,4 +100,32 @@ public class RecommendationValidatorTest {
         verify(recommendationRepository, times(1))
                 .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(1L, 2L);
     }
+
+    @Test
+    public void testValidateRecommendationExist_ValidRecommendation() {
+        long recommendationId = 1L;
+        RecommendationDto recommendationDto = new RecommendationDto();
+        recommendationDto.setId(recommendationId);
+
+
+        Recommendation recommendation = new Recommendation();
+        recommendation.setId(recommendationId);
+
+        when(recommendationRepository.findById(recommendationId)).thenReturn(Optional.of(recommendation));
+        assertDoesNotThrow(() -> recommendationValidator.validateRecommendationExist(recommendationDto));
+        verify(recommendationRepository, times(1)).findById(recommendationId);
+    }
+
+    @Test
+    public void testValidateRecommendationExist_InvalidRecommendation() {
+        long recommendationId = 1L;
+        RecommendationDto recommendationDto = new RecommendationDto();
+        recommendationDto.setId(recommendationId);
+        String message = "Invalid recommendation to update";
+
+        when(recommendationRepository.findById(recommendationId)).thenReturn(Optional.empty());
+        assertThrows(DataValidationException.class,
+                () -> recommendationValidator.validateRecommendationExist(recommendationDto), message);
+        verify(recommendationRepository, times(1)).findById(recommendationId);
+    }
 }

@@ -9,6 +9,9 @@ import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.service.recommendation.RecommendationService;
 import school.faang.user_service.validator.RecommendationValidator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
@@ -55,5 +58,34 @@ public class RecommendationControllerTest {
 
         recommendationController.deleteRecommendation(recommendationId);
         verify(recommendationService).delete(recommendationId);
+    }
+
+    @Test
+    public void testGetAllUserRecommendations() {
+        long userId = 1L;
+
+        List<RecommendationDto> recommendationList = new ArrayList<>();
+        RecommendationDto recommendation1 = new RecommendationDto();
+        recommendation1.setId(1L);
+        recommendation1.setAuthorId(2L);
+        recommendation1.setReceiverId(userId);
+        recommendation1.setContent("Content 1");
+
+        RecommendationDto recommendation2 = new RecommendationDto();
+        recommendation2.setId(2L);
+        recommendation2.setAuthorId(3L);
+        recommendation2.setReceiverId(userId);
+        recommendation2.setContent("Content 2");
+
+        recommendationList.add(recommendation1);
+        recommendationList.add(recommendation2);
+
+        when(recommendationService.getAllUserRecommendations(userId)).thenReturn(recommendationList);
+
+        List<RecommendationDto> result = recommendationController.getAllUserRecommendations(userId);
+
+        assertEquals(2, result.size());
+        assertEquals(recommendation1.getId(), result.get(0).getId());
+        assertEquals(recommendation2.getId(), result.get(1).getId());
     }
 }

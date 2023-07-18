@@ -8,6 +8,7 @@ import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -21,7 +22,7 @@ public class GoalInvitationService {
         List<GoalInvitation> invitations = goalInvitationRepository.findAll();
 
         if (invitations.isEmpty()) {
-            throw new IllegalArgumentException("Invalid request. Goal invitation not found.");
+            return new ArrayList<>();
         }
 
         invitationFilters.stream()

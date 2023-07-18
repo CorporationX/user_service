@@ -1,6 +1,9 @@
 package school.faang.user_service.mapper;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import school.faang.user_service.dto.skill.SkillDto;
@@ -8,10 +11,9 @@ import school.faang.user_service.entity.Skill;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
 class SkillMapperTest {
-    @Autowired
-    private SkillMapper mapper;
+
+    private SkillMapper mapper = new SkillMapperImpl();
 
     @Test
     void toEntity() {

@@ -80,7 +80,7 @@ public class EventService {
         .toList();
   }
 
-  public EventDto get(Long id) throws Exception {
+  public EventDto get(Long id)  {
     Event event = eventRepository
         .findById(id)
         .orElseThrow(() -> new EntityNotFoundException("Couldn't find event with id: " + id));

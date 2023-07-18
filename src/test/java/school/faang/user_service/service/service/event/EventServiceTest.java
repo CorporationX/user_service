@@ -1,5 +1,6 @@
 package school.faang.user_service.service.service.event;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,9 +13,9 @@ import school.faang.user_service.dto.event.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.service.event.EventMapper;
 import school.faang.user_service.service.event.EventService;
 
 import java.time.LocalDateTime;
@@ -46,7 +47,7 @@ class EventServiceTest {
   public void init() {
     userSkill.setTitle("Coding");
     eventDto = new EventDto(1L, "Hiring", LocalDateTime.now(), LocalDateTime.now(),
-        1L, "Hiring event", List.of(eventSkill), "USA", 5);
+        1L, "Hiring event", List.of(1L), "USA", 5);
   }
 
   @Test
@@ -86,30 +87,7 @@ class EventServiceTest {
     Long anyId = 1L;
     Mockito.lenient().when(skillRepository.findById(anyId)).thenReturn(null);
 
-    assertThrows(Exception.class, () -> {
-      eventService.get(anyId);
-    });
-  }
-
-  @Test
-  public void testGetEventByIdSuccess() {
-    Long anyId = 1L;
-    Event mockEvent = new Event();
-    mockEvent.setTitle("Mock");
-
-    Mockito.lenient().when(eventRepository.findById(anyId)).thenReturn(Optional.of(mockEvent));
-    try {
-      eventService.get(anyId);
-      Mockito.verify(eventRepository, Mockito.times(1)).findById(anyId);
-    } catch (Exception e) {}
-
-  }
-  @Test
-  public void testGetEventByIdFail() {
-    Long anyId = 1L;
-    Mockito.lenient().when(skillRepository.findById(anyId)).thenReturn(null);
-
-    assertThrows(Exception.class, () -> {
+    assertThrows(EntityNotFoundException.class, () -> {
       eventService.get(anyId);
     });
   }

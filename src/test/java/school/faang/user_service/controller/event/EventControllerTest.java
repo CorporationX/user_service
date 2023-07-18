@@ -92,10 +92,8 @@ public class EventControllerTest {
 
   @Test
   public void testGetEventById() {
-    try {
-      Long anyId = 1L;
-      eventController.getEvent(anyId);
-      Mockito.verify(eventService, Mockito.times(1)).get(anyId);
-    } catch (Exception e) {}
+    Long anyId = 1L;
+    eventController.getEvent(anyId);
+    Mockito.verify(eventService, Mockito.times(1)).get(anyId);
   }
 }

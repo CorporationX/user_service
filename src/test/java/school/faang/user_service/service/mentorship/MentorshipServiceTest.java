@@ -74,7 +74,7 @@ class MentorshipServiceTest {
     void getMentees_shouldThrowException() {
         assertThrows(EntityNotFoundException.class,
                 () -> mentorshipService.getMentees(INCORRECT_USER_ID),
-                "Invalid user id");
+                "User not found");
     }
 
     @Test
@@ -93,7 +93,7 @@ class MentorshipServiceTest {
     void getMentors_shouldThrowException() {
         assertThrows(EntityNotFoundException.class,
                 () -> mentorshipService.getMentors(INCORRECT_USER_ID),
-                "Invalid user id");
+                "User not found");
     }
 
     @Test
@@ -114,6 +114,6 @@ class MentorshipServiceTest {
     void deleteMentee_shouldThrowUserNotFoundException() {
         assertThrows(EntityNotFoundException.class,
                 () -> mentorshipService.deleteMentee(INCORRECT_USER_ID, MENTEE_ID),
-                "Invalid user id");
+                "User not found");
     }
 }

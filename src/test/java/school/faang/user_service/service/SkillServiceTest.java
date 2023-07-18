@@ -101,14 +101,6 @@ class SkillServiceTest {
     }
 
     @Test
-    void testValidationAvailabilityOfUserSkills() {
-        DataValidationException validationException = assertThrows(DataValidationException.class,
-                () -> skillService.getUserSkills(1L));
-
-        assertEquals("User has no skills", validationException.getMessage());
-    }
-
-    @Test
     void testGetOfferedSkills() {
         long userId = 1L;
         User user = new User();

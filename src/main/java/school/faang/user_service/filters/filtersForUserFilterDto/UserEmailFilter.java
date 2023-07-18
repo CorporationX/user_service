@@ -10,11 +10,11 @@ import java.util.stream.Stream;
 public class UserEmailFilter implements DtoUserFilter {
     @Override
     public boolean isApplicable(UserFilterDto filters) {
-        return filters.getNamePattern() != null;
+        return filters.getEmailPattern() != null;
     }
 
     @Override
     public Stream<User> apply(Stream<User> users, UserFilterDto filterDto) {
-        return users.filter(user -> user.getEmail().matches(filterDto.getEmailPattern()));
+        return users.filter(user -> user.getEmail().contains(filterDto.getEmailPattern()));
     }
 }

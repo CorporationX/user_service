@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 public class UserExperienceMaxFilter implements DtoUserFilter {
     @Override
     public boolean isApplicable(UserFilterDto filters) {
-        return filters.getNamePattern() != null;
+        return filters.getExperienceMax() > 0;
     }
 
     @Override

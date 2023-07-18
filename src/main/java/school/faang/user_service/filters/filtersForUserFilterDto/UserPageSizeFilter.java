@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 public class UserPageSizeFilter implements DtoUserFilter{
     @Override
     public boolean isApplicable(UserFilterDto filters) {
-        return filters.getNamePattern() != null;
+        return filters.getPageSize() != 0;
     }
 
     @Override

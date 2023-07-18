@@ -17,7 +17,6 @@ import school.faang.user_service.mapper.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 
 
-
 @ExtendWith(MockitoExtension.class)
 class SkillServiceTest {
     @InjectMocks
@@ -28,6 +27,7 @@ class SkillServiceTest {
     private SkillRepository skillRepository;
     @Mock
     private UserService userService;
+
     SkillDto skillDto;
 
     @BeforeEach
@@ -49,6 +49,7 @@ class SkillServiceTest {
     void testCreateSkill() {
         skillService.create(skillDto);
         verify(skillRepository, times(1)).save(any());
+
     }
 
     @Test

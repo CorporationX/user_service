@@ -21,9 +21,6 @@ class SkillControllerTest {
     SkillDto skillDto = new SkillDto(1L, "flexibility");
 
     @Test
-    void create() {
-    }
-    @Test
     void testBlankTitleIsInvalid() {
         assertThrows(DataValidationException.class,
                 () -> skillController.validateSkill(new SkillDto(1L, "   ")));

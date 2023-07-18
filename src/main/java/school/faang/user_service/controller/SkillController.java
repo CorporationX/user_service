@@ -10,7 +10,6 @@ import school.faang.user_service.service.SkillService;
 import java.util.List;
 
 @Controller
-@Data
 @RequiredArgsConstructor
 public class SkillController {
     private final SkillService skillService;

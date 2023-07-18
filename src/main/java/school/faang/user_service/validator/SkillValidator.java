@@ -20,7 +20,7 @@ public class SkillValidator {
             return;
         }
         List<Long> recommendationSkills = recommendationDto.getSkillOffers().stream().
-                map(skillOfferDto -> skillOfferDto.getSkill().getId())
+                map(skillOfferDto -> skillOfferDto.getSkill())
                 .distinct()
                 .toList();
 

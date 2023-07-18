@@ -13,10 +13,10 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class RecommendationValidator {
 
-    private  final RecommendationRepository recommendationRepository;
+    private final RecommendationRepository recommendationRepository;
     private static final int MONTHS_LAST_RECOMMENDATION = 6;
 
-    public void validateRecommendation(RecommendationDto recommendationDto) {
+    public void validateRecommendationContent(RecommendationDto recommendationDto) {
         if (recommendationDto.getContent() == null || recommendationDto.getContent().isEmpty()) {
             throw new DataValidationException("Content are empty or null ");
         }

@@ -29,7 +29,7 @@ class RecommendationValidatorTest {
         RecommendationDto recommendationDto = new RecommendationDto();
         recommendationDto.setContent("Valid content");
 
-        assertDoesNotThrow(() -> recommendationValidator.validateRecommendation(recommendationDto));
+        assertDoesNotThrow(() -> recommendationValidator.validateRecommendationContent(recommendationDto));
     }
 
     @Test
@@ -38,7 +38,7 @@ class RecommendationValidatorTest {
         recommendationDto.setContent(null);
 
         assertThrows(DataValidationException.class,
-                () -> recommendationValidator.validateRecommendation(recommendationDto));
+                () -> recommendationValidator.validateRecommendationContent(recommendationDto));
     }
 
     @Test
@@ -47,7 +47,7 @@ class RecommendationValidatorTest {
         recommendationDto.setContent("");
 
         assertThrows(DataValidationException.class,
-                () -> recommendationValidator.validateRecommendation(recommendationDto));
+                () -> recommendationValidator.validateRecommendationContent(recommendationDto));
     }
 
     @Test

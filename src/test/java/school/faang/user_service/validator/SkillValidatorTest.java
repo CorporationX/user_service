@@ -38,8 +38,8 @@ class SkillValidatorTest {
     void validateSkillOffersDto_ValidSkills_NoExceptionThrown() {
         RecommendationDto recommendationDto = new RecommendationDto();
         List<SkillOfferDto> skillOffers = new ArrayList<>();
-        skillOffers.add(SkillOfferDto.builder().id(1L).skill(Skill.builder().id(1L).build()).build());
-        skillOffers.add(SkillOfferDto.builder().id(2L).skill(Skill.builder().id(2L).build()).build());
+        skillOffers.add(SkillOfferDto.builder().id(1L).skill(1L).build());
+        skillOffers.add(SkillOfferDto.builder().id(2L).skill(2L).build());
         recommendationDto.setSkillOffers(skillOffers);
 
         List<Skill> skills = new ArrayList<>();
@@ -58,8 +58,8 @@ class SkillValidatorTest {
     void validateSkillOffersDto_InvalidSkills_ExceptionThrown() {
         RecommendationDto recommendationDto = new RecommendationDto();
         List<SkillOfferDto> skillOffers = new ArrayList<>();
-        skillOffers.add(SkillOfferDto.builder().id(1L).skill(Skill.builder().id(1L).build()).build());
-        skillOffers.add(SkillOfferDto.builder().id(2L).skill(Skill.builder().id(2L).build()).build());
+        skillOffers.add(SkillOfferDto.builder().id(1L).skill(1L).build());
+        skillOffers.add(SkillOfferDto.builder().id(2L).skill(2L).build());
         recommendationDto.setSkillOffers(skillOffers);
 
         List<Skill> skills = new ArrayList<>();

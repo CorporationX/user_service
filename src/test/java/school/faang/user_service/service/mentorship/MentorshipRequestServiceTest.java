@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.mentorship;
 
 import org.mockito.Mock;
 import org.mockito.InjectMocks;
@@ -6,15 +6,21 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import school.faang.user_service.entity.User;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
+import jakarta.persistence.EntityNotFoundException;
 import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.dto.event.RejectionDto;
+import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.dto.filter.RequestFilterDto;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.validation.MentorshipRequestValidator;
-import school.faang.user_service.service.mentorship.MentorshipRequestService;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+
+import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.Mockito.when;
 
@@ -31,10 +37,16 @@ public class MentorshipRequestServiceTest {
     @InjectMocks
     private MentorshipRequestService mentorshipRequestService;
 
-    private MentorshipRequestDto badRequest;
+    private Long requestId;
+    private Long badRequestId;
+
+    private RejectionDto rejectionDto;
+
     private MentorshipRequestDto mentorshipRequestDto;
+    private MentorshipRequestDto badMentorshipRequestDto;
 
     private RequestFilterDto requestFilterDto;
+
 
     @BeforeEach
     public void setUp() {
@@ -44,7 +56,7 @@ public class MentorshipRequestServiceTest {
                 .description("Wanna code like you bruh")
                 .build();
 
-        badRequest = MentorshipRequestDto.builder() // Because requesterId == receiverId
+        badMentorshipRequestDto = MentorshipRequestDto.builder() // Because requesterId == receiverId
                 .requesterId(1L)
                 .receiverId(1L)
                 .build();
@@ -55,32 +67,66 @@ public class MentorshipRequestServiceTest {
                 .description("Wanna be a good coder")
                 .requestStatus(RequestStatus.ACCEPTED)
                 .build();
+
+        requestId = 1L;
+        badRequestId = -1_234_567_890L;
+
+        rejectionDto = new RejectionDto("Rejection example");
     }
 
     @Test
-    @DisplayName("Test: Mentorship request - positive scenario")
-    public void testRequestMentorshipIsOk() {
+    @DisplayName("Mentorship request - positive scenario")
+    void testRequestMentorshipIsOk() {
         Assertions.assertDoesNotThrow(() -> mentorshipRequestService.requestMentorship(mentorshipRequestDto));
     }
 
     @Test
-    @DisplayName("Test: Mentorship request with requester & receiver being same person")
-    public void testRequestMentorshipBadRequest() {
-        when(mentorshipRequestService.requestMentorship(badRequest)).thenThrow(IllegalArgumentException.class);
+    @DisplayName("Mentorship request with requester & receiver being same person")
+    void testRequestMentorshipBadRequest() {
+        when(mentorshipRequestService.requestMentorship(badMentorshipRequestDto)).thenThrow(IllegalArgumentException.class);
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> mentorshipRequestService.requestMentorship(badRequest));
+                () -> mentorshipRequestService.requestMentorship(badMentorshipRequestDto));
     }
 
     @Test
-    @DisplayName("Test: Get requests - positive scenario")
-    public void testGetRequestsIsOk() {
+    @DisplayName("Get requests - positive scenario")
+    void testGetRequestsIsOk() {
         Assertions.assertDoesNotThrow(() -> mentorshipRequestService.getRequests(requestFilterDto));
     }
 
     @Test
-    @DisplayName("Test: Get requests - filter request is null")
-    public void testGetRequestsBadRequest() {
+    @DisplayName("Get requests - filter request is null")
+    void testGetRequestsBadRequest() {
         when(mentorshipRequestService.getRequests(null)).thenThrow(NullPointerException.class);
         Assertions.assertThrows(NullPointerException.class, () -> mentorshipRequestService.getRequests(null));
+    }
+
+    @Test
+    @DisplayName("Reject request - positive scenario")
+    void testRejectRequestPositiveIsOk() {
+        User receiver = User.builder()
+                .id(1L)
+                .build();
+
+        User requester = User.builder()
+                .id(2L)
+                .mentors(List.of())
+                .build();
+
+        MentorshipRequest mentorshipRequest = MentorshipRequest.builder()
+                .id(1L)
+                .receiver(receiver)
+                .requester(requester)
+                .build();
+
+        when(mentorshipRequestRepository.findById(requestId)).thenReturn(Optional.of(mentorshipRequest));
+        Assertions.assertDoesNotThrow(() -> mentorshipRequestService.rejectRequest(requestId, rejectionDto));
+    }
+
+    @Test
+    @DisplayName("Reject request - mentorship request not found")
+    void testRejectRequestThrowsRequestNotFoundException() {
+        Assertions.assertThrows(EntityNotFoundException.class,
+                () -> mentorshipRequestService.rejectRequest(badRequestId, rejectionDto));
     }
 }

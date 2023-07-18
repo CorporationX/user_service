@@ -1,4 +1,4 @@
-package school.faang.user_service.controller;
+package school.faang.user_service.controller.mentorship;
 
 import org.mockito.Mock;
 import org.mockito.InjectMocks;
@@ -14,6 +14,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.dto.filter.RequestFilterDto;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
+import school.faang.user_service.controller.MentorshipRequestController;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -27,6 +28,8 @@ public class MentorshipRequestControllerTest {
 
     @InjectMocks
     private MentorshipRequestController mentorshipRequestController;
+
+    private Long requestId;
 
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
@@ -66,11 +69,13 @@ public class MentorshipRequestControllerTest {
                 .requesterId(1L)
                 .description("")
                 .build();
+
+        requestId = 1L;
     }
 
     @Test
     @DisplayName("Request Mentorship: Valid request, should return 201")
-    public void testRequestMentorship200isAccepted() throws Exception {
+    void testRequestMentorship200isAccepted() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/mentorship/request")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(mentorshipRequestDto)))
@@ -80,7 +85,7 @@ public class MentorshipRequestControllerTest {
 
     @Test
     @DisplayName("Request Mentorship: Bad request, should return 400")
-    public void testRequestMentorship400badRequest() throws Exception {
+    void testRequestMentorship400badRequest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/mentorship/request")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(badMentorshipRequestDto)))
@@ -90,7 +95,7 @@ public class MentorshipRequestControllerTest {
 
     @Test
     @DisplayName("Get requests: Valid request, should return 200")
-    public void testGetRequests200IsOk() throws Exception {
+    void testGetRequests200IsOk() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/mentorship/request")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestFilterDto)))
@@ -99,10 +104,26 @@ public class MentorshipRequestControllerTest {
 
     @Test
     @DisplayName("Get requests: Bad request, should return 400")
-    public void testGetRequests400BadRequest() throws Exception {
+    void testGetRequests400BadRequest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/mentorship/request")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(badRequestFilterDto)))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Reject request: Positive scenario")
+    void testRejectRequest200IsOk() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/mentorship/request/" + requestId + "/reject")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    @DisplayName("Reject request: Bad request, should return 400")
+    void testRejectRequest400BadRequest() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/mentorship/request/" + null + "/reject")
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 }

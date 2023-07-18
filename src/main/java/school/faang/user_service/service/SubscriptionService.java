@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.commonMessages.ErrorMessages;
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.filters.UserFilterDto;
 import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.filters.UserFilter;
 import school.faang.user_service.repository.SubscriptionRepository;

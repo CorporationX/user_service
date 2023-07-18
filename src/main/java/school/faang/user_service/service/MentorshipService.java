@@ -15,13 +15,10 @@ public class MentorshipService {
     private final MentorshipRepository mentorshipRepository;
     private final UserMapper userMapper;
 
-    public List<UserDto> getMentees(long userId) {
-        if (!mentorshipRepository.existsById(userId)) {
-            throw new RuntimeException("User with id not found");
-        }
-        User mentor = new User();
-        mentor.setId(userId);
-        mentorshipRepository.findUserById(userId);
-        return userMapper.toUserListDto(mentor.getMentees());
+    public List<UserDto> getMentees(Long userId) {
+        User user = mentorshipRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User with id " + userId + " not found"));
+
+        return userMapper.toUserListDto(user.getMentees());
     }
 }

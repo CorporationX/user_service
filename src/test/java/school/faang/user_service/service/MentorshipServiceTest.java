@@ -6,11 +6,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentee.UserDto;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -29,16 +31,17 @@ class MentorshipServiceTest {
 
     @Test
     public void getMentees_When() {
-        when(mentorshipRepository.existsById(anyLong())).thenReturn(false);
-        RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> mentorshipService.getMentees(anyLong()));
-        assertEquals("User with id not found", runtimeException.getMessage());
+        RuntimeException runtimeException = assertThrows(IllegalArgumentException.class, () -> mentorshipService.getMentees(null));
+        assertEquals("User with id " + null + " not found", runtimeException.getMessage());
     }
 
     @Test
     public void getMentees_CorrectAnswer() {
         long mentorId = 2;
-
-        when(mentorshipRepository.existsById(anyLong())).thenReturn(true);
+        User user = new User();
+        user.setId(mentorId);
+        Optional<User> userOptional = Optional.of(user);
+        when(mentorshipRepository.findById(anyLong())).thenReturn(userOptional);
         when(mentorshipService.getMentees(mentorId)).thenReturn(List.of(new UserDto(), new UserDto()));
 
         List<UserDto> userDto = mentorshipService.getMentees(mentorId);

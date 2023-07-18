@@ -7,5 +7,4 @@ import school.faang.user_service.entity.User;
 
 @Repository
 public interface MentorshipRepository extends CrudRepository<User, Long> {
-    User findUserById(long mentorId);
 }

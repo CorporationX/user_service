@@ -10,6 +10,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.service.user.UserService;
 
@@ -74,7 +75,7 @@ class EventParticipationServiceTest {
         Mockito.when(eventService.existsById(eventId)).thenReturn(true);
         eventParticipationService.registerParticipant(eventId, userId);
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(event.getId())).thenReturn(List.of(user));
-        Assertions.assertThrows(IllegalArgumentException.class, () -> eventParticipationService.registerParticipant(event.getId(), user.getId()));
+        Assertions.assertThrows(DataValidationException.class, () -> eventParticipationService.registerParticipant(event.getId(), user.getId()));
     }
 
     @Test

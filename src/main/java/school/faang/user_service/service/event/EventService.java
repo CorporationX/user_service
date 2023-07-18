@@ -2,6 +2,7 @@ package school.faang.user_service.service.event;
 
 
 import lombok.RequiredArgsConstructor;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
@@ -13,10 +14,9 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.filters.EventFilter;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -75,5 +75,13 @@ public class EventService {
         .flatMap(filter -> filter.apply(events, filters))
         .map(eventMapper::toDto)
         .toList();
+  }
+
+  public EventDto get(Long id)  {
+    Event event = eventRepository
+        .findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("Couldn't find event with id: " + id));
+
+    return eventMapper.toDto(event);
   }
 }

@@ -1,8 +1,7 @@
 package school.faang.user_service.controller;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,9 +10,9 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.RecommendationService;
 
 @Controller
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class RecommendationController {
-    private final RecommendationService recommendationService;
+    private RecommendationService recommendationService;
 
     @PostMapping("/recommendation")
     public void giveRecommendation(@RequestBody RecommendationDto recommendation){

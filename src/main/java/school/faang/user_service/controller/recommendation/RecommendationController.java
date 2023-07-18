@@ -25,6 +25,10 @@ public class RecommendationController {
         return recommendationService.update(recommendation);
     }
 
+    public void deleteRecommendation(long id) {
+        recommendationService.delete(id);
+    }
+
     private void validate(RecommendationDto recommendation) {
         recommendationValidator.validateRecommendationContent(recommendation);
     }

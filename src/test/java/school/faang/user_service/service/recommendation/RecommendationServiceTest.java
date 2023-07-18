@@ -110,4 +110,13 @@ public class RecommendationServiceTest {
 
         assertEquals(updatedRecommendationDto, recommendationDto);
     }
+
+    @Test
+    public void testDelete() {
+        long recommendationId = 1L;
+
+        doNothing().when(recommendationRepository).deleteById(anyLong());
+        recommendationService.delete(recommendationId);
+        verify(recommendationRepository).deleteById(recommendationId);
+    }
 }

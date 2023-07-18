@@ -48,4 +48,12 @@ public class RecommendationControllerTest {
         verify(recommendationService, times(1)).update(recommendationDto);
         assertEquals(recommendationDto, result);
     }
+
+    @Test
+    public void testDeleteRecommendation() {
+        long recommendationId = 1L;
+
+        recommendationController.deleteRecommendation(recommendationId);
+        verify(recommendationService).delete(recommendationId);
+    }
 }

@@ -36,6 +36,6 @@ class EventParticipationControllerTest {
 
     @Test
     void test_unregister_participant_should_throw_exception() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> eventParticipationController.unregisterParticipant(-1L, -1L));
+        Assertions.assertThrows(DataValidationException.class, () -> eventParticipationController.unregisterParticipant(-1L, -1L));
     }
 }

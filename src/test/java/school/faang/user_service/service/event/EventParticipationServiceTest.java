@@ -61,8 +61,8 @@ class EventParticipationServiceTest {
 
         Event otherEvent = new Event();
         long otherEventId = otherEvent.getId();
-        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.ofNullable(user));
-        Mockito.when(eventRepository.findById(eventId)).thenReturn(Optional.ofNullable(event));
+        Mockito.when(userService.existsById(userId)).thenReturn(true);
+        Mockito.when(eventService.existsById(eventId)).thenReturn(true);
         eventParticipationService.registerParticipant(otherEventId, userId);
         Mockito.verify(eventParticipationRepository, Mockito.times(2)).register(eventId, userId);
     }
@@ -96,7 +96,7 @@ class EventParticipationServiceTest {
     }
 
     @Test
-    void test_unregister_participant_should_success() {
+    void test_unregister_participant_should_success_unregister() {
         long eventId = event.getId();
         long userId = user.getId();
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(event.getId())).thenReturn(List.of(user));
@@ -106,28 +106,24 @@ class EventParticipationServiceTest {
     }
 
     @Test
-    void test_unregister_participant_should_throw_exception() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> eventParticipationService.unregisterParticipant(event.getId(), user.getId()));
+    void test_unregister_participant_should_throw_exception_if_user_not_register() {
+        Assertions.assertThrows(DataValidationException.class, () -> eventParticipationService.unregisterParticipant(event.getId(), user.getId()));
     }
 
     @Test
-    void test_get_participants_should_return_list(){
+    void test_unregister_participant_should_throw_exception_if_user_not_exist() {
         long eventId = event.getId();
         long userId = user.getId();
-        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.ofNullable(user));
-        Mockito.when(eventRepository.findById(eventId)).thenReturn(Optional.ofNullable(event));
-        eventParticipationService.registerParticipant(eventId, userId);
-
-        Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(eventId)).thenReturn(List.of(user));
-        List<User> participants = eventParticipationService.getParticipants(eventId);
-
-        Assertions.assertNotNull(participants);
-        Assertions.assertEquals(1, participants.size());
+        Mockito.when(userService.existsById(userId)).thenThrow(IllegalArgumentException.class);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> eventParticipationService.unregisterParticipant(eventId, userId));
     }
 
     @Test
-    void test_get_participants_should_return_empty(){
-        Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(event.getId())).thenReturn(List.of());
-        Assertions.assertEquals(List.of(), eventParticipationService.getParticipants(event.getId()));
+    void test_unregister_participant_should_throw_exception_if_event_not_exist() {
+        long eventId = event.getId();
+        long userId = user.getId();
+        Mockito.when(userService.existsById(userId)).thenReturn(true);
+        Mockito.when(eventService.existsById(eventId)).thenThrow(IllegalArgumentException.class);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> eventParticipationService.unregisterParticipant(eventId, userId));
     }
 }

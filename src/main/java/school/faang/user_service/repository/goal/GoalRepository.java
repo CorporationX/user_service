@@ -34,7 +34,7 @@ public interface GoalRepository extends CrudRepository<Goal, Long> {
     @Query(nativeQuery = true, value = """
             DELETE FROM goal g WHERE g.goal_id = ?1
             """)
-    Goal delete(long goalId);
+    void delete(long goalId);
 
     @Query(nativeQuery = true, value = """
             SELECT COUNT(ug.goal_id) FROM user_goal ug

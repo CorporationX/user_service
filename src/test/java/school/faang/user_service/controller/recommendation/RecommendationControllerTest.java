@@ -88,4 +88,34 @@ public class RecommendationControllerTest {
         assertEquals(recommendation1.getId(), result.get(0).getId());
         assertEquals(recommendation2.getId(), result.get(1).getId());
     }
+
+    @Test
+    public void testGetAllGivenRecommendations() {
+        long userId = 1L;
+
+        List<RecommendationDto> recommendationList = new ArrayList<>();
+        RecommendationDto recommendation1 = new RecommendationDto();
+        recommendation1.setId(1L);
+        recommendation1.setAuthorId(userId);
+        recommendation1.setReceiverId(2L);
+        recommendation1.setContent("Content 1");
+
+        RecommendationDto recommendation2 = new RecommendationDto();
+        recommendation2.setId(2L);
+        recommendation2.setAuthorId(userId);
+        recommendation2.setReceiverId(3L);
+        recommendation2.setContent("Content 2");
+
+        recommendationList.add(recommendation1);
+        recommendationList.add(recommendation2);
+
+        when(recommendationService.getAllGivenRecommendations(userId)).thenReturn(recommendationList);
+
+        List<RecommendationDto> result = recommendationController.getAllGivenRecommendations(userId);
+
+        verify(recommendationService, times(1)).getAllGivenRecommendations(userId);
+        assertEquals(2, result.size());
+        assertEquals(recommendation1.getId(), result.get(0).getId());
+        assertEquals(recommendation2.getId(), result.get(1).getId());
+    }
 }

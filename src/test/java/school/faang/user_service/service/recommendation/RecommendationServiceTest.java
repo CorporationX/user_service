@@ -150,4 +150,38 @@ public class RecommendationServiceTest {
         assertEquals(recommendationDtos.size(), result.size());
         assertEquals(recommendationDtos, result);
     }
+
+
+    @Test
+    public void testGetAllGivenRecommendations() {
+        long receiverId = 3L;
+
+        List<Recommendation> receiverRecommendations = new ArrayList<>();
+        Recommendation recommendation1 = new Recommendation();
+        recommendation1.setId(1L);
+        Recommendation recommendation2 = new Recommendation();
+        recommendation2.setId(2L);
+        receiverRecommendations.add(recommendation1);
+        receiverRecommendations.add(recommendation2);
+
+        List<RecommendationDto> recommendationDtos = new ArrayList<>();
+        RecommendationDto recommendationDto1 = new RecommendationDto();
+        recommendationDto1.setId(1L);
+        RecommendationDto recommendationDto2 = new RecommendationDto();
+        recommendationDto2.setId(2L);
+        recommendationDtos.add(recommendationDto1);
+        recommendationDtos.add(recommendationDto2);
+
+        when(recommendationRepository.findAllByReceiverId(receiverId)).thenReturn(receiverRecommendations);
+        when(recommendationMapper.toDto(recommendation1)).thenReturn(recommendationDto1);
+        when(recommendationMapper.toDto(recommendation2)).thenReturn(recommendationDto2);
+
+        List<RecommendationDto> result = recommendationService.getAllUserRecommendations(receiverId);
+
+        verify(recommendationRepository, times(1)).findAllByReceiverId(receiverId);
+        verify(recommendationMapper, times(1)).toDto(recommendation1);
+        verify(recommendationMapper, times(1)).toDto(recommendation2);
+        assertEquals(recommendationDtos.size(), result.size());
+        assertEquals(recommendationDtos, result);
+    }
 }

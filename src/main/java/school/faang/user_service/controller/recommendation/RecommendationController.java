@@ -31,8 +31,12 @@ public class RecommendationController {
         recommendationService.delete(id);
     }
 
-    public List<RecommendationDto> getAllUserRecommendations(long userId){
+    public List<RecommendationDto> getAllUserRecommendations(long userId) {
         return recommendationService.getAllUserRecommendations(userId);
+    }
+
+    public List<RecommendationDto> getAllGivenRecommendations(long userId) {
+        return recommendationService.getAllGivenRecommendations(userId);
     }
 
     private void validate(RecommendationDto recommendation) {

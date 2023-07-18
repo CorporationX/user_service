@@ -69,13 +69,21 @@ public class RecommendationService {
 
     @Transactional
     public List<RecommendationDto> getAllUserRecommendations(long receiverId) {
-        List<Recommendation> receiverRecommendations = recommendationRepository.findAllByReceiverId(receiverId);
+        List<Recommendation> recommendations = recommendationRepository.findAllByReceiverId(receiverId);
 
-        return receiverRecommendations.stream()
+        return recommendations.stream()
                 .map(recommendationMapper::toDto)
                 .toList();
     }
 
+    @Transactional
+    public List<RecommendationDto>  getAllGivenRecommendations(long authorId){
+        List<Recommendation> recommendations = recommendationRepository.findAllByAuthorId(authorId);
+
+        return recommendations.stream()
+                .map(recommendationMapper::toDto)
+                .toList();
+    }
 
     private void processSkillOffers(Recommendation recommendation) {
         long userId = recommendation.getReceiver().getId();

@@ -33,5 +33,7 @@ public interface RecommendationRepository extends CrudRepository<Recommendation,
 
     Page<Recommendation> findAllByAuthorId(long authorId, Pageable pageable);
 
+    List<Recommendation> findAllByAuthorId(long authorId);
+
     Optional<Recommendation> findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(long authorId, long receiverId);
 }

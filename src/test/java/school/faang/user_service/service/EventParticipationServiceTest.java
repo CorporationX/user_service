@@ -29,8 +29,8 @@ public class EventParticipationServiceTest {
     @Test
     public void registerParticipantTest() {
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(Collections.emptyList());
-        eventParticipationService.registerParticipant(1L, 1L);
-        Mockito.verify(eventParticipationRepository).register(1L, 1L);
+        eventParticipationService.registerParticipant(1L, 2L);
+        Mockito.verify(eventParticipationRepository).register(1L, 2L);
     }
 
     @Test

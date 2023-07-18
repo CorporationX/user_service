@@ -43,14 +43,16 @@ class MentorshipServiceTest {
 
         User mentor = User.builder()
                 .id(MENTOR_ID)
-                .mentees(new ArrayList<>(Collections.singletonList(User.builder().id(MENTEE_ID).build())))
+                .mentees(new ArrayList<>(Collections.singletonList(
+                        User.builder().id(MENTEE_ID).build())))
                 .build();
         when(mentorshipRepository.findById(MENTOR_ID))
                 .thenReturn(Optional.of(mentor));
 
         User mentee = User.builder()
                 .id(MENTEE_ID)
-                .mentors(new ArrayList<>(Collections.singletonList(User.builder().id(MENTOR_ID).build())))
+                .mentors(new ArrayList<>(Collections.singletonList(
+                        User.builder().id(MENTOR_ID).build())))
                 .build();
         when(mentorshipRepository.findById(MENTEE_ID))
                 .thenReturn(Optional.of(mentee));

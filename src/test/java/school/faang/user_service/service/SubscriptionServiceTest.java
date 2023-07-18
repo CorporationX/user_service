@@ -118,7 +118,6 @@ class SubscriptionServiceTest {
         verify(subscriptionRepository, times(1)).findByFollowerId(followerId);
         verify(userMapper, times(1)).toDto(user);
     }
-}
 
     @Test
     public void testGetFollowersCount() {

@@ -12,7 +12,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class UserFilterTest {
-
     private final List<UserFilter> userFilters = List.of(
             new UserNameFilter(),
             new UserAboutFilter(),
@@ -161,15 +160,15 @@ class UserFilterTest {
                 .experience(15)
                 .build();
         User user3 = User.builder()
-                .username("Dan Green")
-                .aboutMe("I am a professor in the Harvard university")
+                .username("Joe Green")
+                .aboutMe("I am a student in the Harvard university")
                 .email("green@example.com")
                 .contacts(Collections.emptyList())
                 .country(new Country(1L, "Mexico", Collections.emptyList()))
                 .city("Los Angeles city")
                 .phone("88004562378")
                 .skills(Collections.emptyList())
-                .experience(20)
+                .experience(12)
                 .build();
         List<User> userList = new ArrayList<>(List.of(user1, user2, user3));
         UserFilterDto userFilterDto = UserFilterDto.builder()
@@ -187,6 +186,6 @@ class UserFilterTest {
         userFilters.stream()
                 .filter(userFilter -> userFilter.isApplicable(userFilterDto))
                 .forEach(userFilter -> userFilter.apply(userList, userFilterDto));
-        assertEquals(2, userList.size());
+        assertEquals(3, userList.size());
     }
 }

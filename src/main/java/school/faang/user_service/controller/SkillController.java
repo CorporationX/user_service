@@ -14,8 +14,6 @@ import java.util.List;
 public class SkillController {
     private final SkillService skillService;
 
-
-
     public SkillDto create(SkillDto skill) {
         validateSkill(skill);
         return skillService.create(skill);
@@ -26,11 +24,16 @@ public class SkillController {
             throw new DataValidationException("The title is not valid");
         }
     }
+
     public List<SkillDto> getUserSkills(long userId) {
         return skillService.getUserSkills(userId);
     }
 
-    public List<SkillCandidateDto> getOfferedSkills(long userId){
+    public List<SkillCandidateDto> getOfferedSkills(long userId) {
         return skillService.getOfferedSkills(userId);
+    }
+
+    public SkillDto acquireSkillFromOffers(long skillId, long userId) {
+        return skillService.acquireSkillFromOffers(skillId, userId);
     }
 }

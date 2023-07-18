@@ -17,14 +17,18 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.recommendation.Recommendation;
+import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillCandidateMapperImpl;
 import school.faang.user_service.mapper.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -39,11 +43,19 @@ class SkillServiceTest {
     private SkillRepository skillRepository;
     @Mock
     private UserService userService;
+    @Mock
+    private SkillOfferRepository skillOfferRepository;
     SkillDto skillDto;
     Skill skill1;
     Skill skill2;
     List<Skill> list1;
     List<Skill> list2;
+    SkillOffer skillOffer;
+    Recommendation recommendation = new Recommendation();
+    User author = new User();
+    User receiver = new User();
+
+
 
     @BeforeEach
     public void setUp() {
@@ -54,6 +66,10 @@ class SkillServiceTest {
                 new ArrayList<Goal>(), LocalDateTime.now().minusDays(1), LocalDateTime.now());
         list1 = new ArrayList<>(List.of(skill1));
         list2 = new ArrayList<>(List.of(skill1, skill2));
+        recommendation.setAuthor(author);
+        recommendation.setReceiver(receiver);
+        skillOffer = new SkillOffer(1L,skill1,recommendation);
+
     }
 
     @Test
@@ -111,6 +127,29 @@ class SkillServiceTest {
         when(skillRepository.findSkillsOfferedToUser(1L)).thenReturn(list2);
         List<SkillCandidateDto> result = skillService.getOfferedSkills(1L);
         assertEquals(2, result.size());
+    }
+
+    @Test
+    void testAcquireSkillFromOffersThrowsException() {
+        when(skillRepository.findUserSkill(anyLong(), anyLong()))
+                .thenReturn(Optional.of(skill1));
+        assertThrows(DataValidationException.class,
+                () -> skillService.acquireSkillFromOffers(1L, 1L));
+    }
+
+    @Test
+    void testAcquireSkillFromOffers() {
+        when(skillRepository.findUserSkill(1L, 1L))
+                .thenReturn(Optional.empty());
+        when(skillOfferRepository.findAllOffersOfSkill(1L,1L))
+                .thenReturn(List.of(skillOffer,skillOffer,skillOffer,skillOffer));
+        when(skillRepository.findAllByUserId(1L)).thenReturn(List.of(skill1));
+        skillService.acquireSkillFromOffers(1L, 1L);
+        verify(skillRepository,times(1)).assignSkillToUser(1L,1L);
+        assertEquals(skillMapper.toDTO(skill1), skillService.acquireSkillFromOffers(1L,1L));
+
+
+
     }
 
 }

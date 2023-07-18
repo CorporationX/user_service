@@ -27,16 +27,18 @@ public class MentorshipRequestService {
         if (dto.getRequester() == dto.getReceiver()) {
             throw new Exception("request was not create, your mentor is you");
         }
-        if (dto.getRequester().getSentMentorshipRequests() != null) {
-            int sizeRequest = dto.getRequester().getSentMentorshipRequests().size();
-            if (sizeRequest >= 3) {
-                if (!dto.getRequester().getSentMentorshipRequests().
-                        get(sizeRequest - 3).getCreatedAt().
-                        isBefore(LocalDateTime.now().minusMonths(1))) {
-                    throw new Exception("request was not create, so many requests in this month");
-                }
+
+        List<MentorshipRequest> sentRequests = dto.getRequester().getSentMentorshipRequests();
+        if (sentRequests != null && sentRequests.size() >= 3) {
+
+            MentorshipRequest thirdLatestRequest = sentRequests.get(sentRequests.size() - 3);
+            LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
+
+            if (!thirdLatestRequest.getCreatedAt().isBefore(oneMonthAgo)) {
+                throw new Exception("request was not created, too many requests in this month");
             }
         }
+
         mentorshipRequestRepository.create(dto.getRequester().getId(), dto.getReceiver().getId(), dto.getDescription());
     }
 

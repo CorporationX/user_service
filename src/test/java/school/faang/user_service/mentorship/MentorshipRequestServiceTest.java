@@ -82,10 +82,6 @@ class MentorshipRequestServiceTest {
     }
 
     @Test
-    void getRequests() {
-    }
-
-    @Test
     void acceptRequest() {
     }
 

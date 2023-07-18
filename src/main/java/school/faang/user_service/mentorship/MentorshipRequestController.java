@@ -2,9 +2,7 @@ package school.faang.user_service.mentorship;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.mentorship.dto.MentorshipRequestDto;
 import school.faang.user_service.mentorship.dto.RejectionDto;
@@ -21,7 +19,9 @@ public class MentorshipRequestController {
     private final MentorshipRequestService mentorshipRequestService;
 
     @PostMapping("/mentorship/request")
-    public void requestMentorship(MentorshipRequestDto dto) {
+    //не понял, как и где использовать маппер т.к. не понимаю что и как мы получаем
+    // из RequestBody
+    public void requestMentorship(@RequestBody MentorshipRequestDto dto) {
         try {
             mentorshipRequestService.requestMentorship(dto);
         } catch (Exception e) {
@@ -30,7 +30,9 @@ public class MentorshipRequestController {
     }
 
     @PostMapping("/mentorship/request/list")
-    public Optional<MentorshipRequest> getRequests(RequestFilterDto filter) {
+    public Optional<MentorshipRequest> getRequests(@RequestBody RequestFilterDto filter) {
+        //не совсем понимаю как это правильно реализовать,
+        // из-за того, как сделать запрос в бд по фильтрам
         try {
             return mentorshipRequestService.getRequests(filter);
         } catch (Exception e) {
@@ -39,7 +41,7 @@ public class MentorshipRequestController {
     }
 
     @PostMapping("mentorship/request/{id}/accept")
-    public void acceptRequest(long id){
+    public void acceptRequest(@PathVariable long id){
         try {
             mentorshipRequestService.acceptRequest(id);
         } catch (Exception e) {
@@ -48,7 +50,7 @@ public class MentorshipRequestController {
     }
 
     @PostMapping("/mentorship/request/{id}/reject")
-    public void rejectRequest(long id, RejectionDto rejection){
+    public void rejectRequest(@PathVariable long id, RejectionDto rejection){
         try {
             mentorshipRequestService.rejectRequest(id, rejection);
         } catch (Exception e) {

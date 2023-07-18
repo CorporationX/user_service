@@ -34,4 +34,11 @@ public class GoalInvitationController {
 
         return ResponseEntity.ok(goalInvitationService.acceptGoalInvitation(id));
     }
+
+    @PutMapping("/reject/{id}")
+    public ResponseEntity<?> rejectGoalInvitation(@PathVariable Long id) {
+        goalInvitationValidator.validateInvitation(id);
+
+        return ResponseEntity.ok(goalInvitationService.rejectGoalInvitation(id));
+    }
 }

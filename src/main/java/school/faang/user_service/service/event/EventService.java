@@ -13,25 +13,27 @@ import school.faang.user_service.repository.event.EventRepository;
 
 import java.util.HashSet;
 
-@Service("eventService")
+@Service("restService")
 @RequiredArgsConstructor
 public class EventService {
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
+    private final EventMapper eventMapper;
 
     public EventDto create(EventDto event) {
-        EventDto result;
         User user = userRepository.findById(event.getOwnerId()).orElseThrow();
-        boolean userContainsSkill = isUserContainsSkill(event, user);
-        if (userContainsSkill) {
-            result = EventMapper.INSTANCE.toEventDto(eventRepository.save(EventMapper.INSTANCE.toEvent(event)));
-            return result;
-        } else {
-            throw new DataValidationException("пользователь не может провести такое событие с такими навыками");
+        if (!(isUserContainsSkill(event, user))) {
+            throw new DataValidationException("The user cannot hold such an event with such skills");
         }
+        return eventMapper.toEventDto(eventRepository.save(eventMapper.toEvent(event)));
     }
 
-    private static boolean isUserContainsSkill(EventDto event, User user) {
+    public EventDto getEvent(long eventId) {
+        return eventMapper.toEventDto(eventRepository.findById(eventId)
+                .orElseThrow(() -> new DataValidationException("User with this id was not found")));
+    }
+
+    private boolean isUserContainsSkill(EventDto event, User user) {
         return new HashSet<>(user.getSkills()
                 .stream()
                 .map(Skill::getTitle)
@@ -39,14 +41,5 @@ public class EventService {
                 .containsAll(event.getRelatedSkills()
                         .stream()
                         .map(SkillDto::getTitle).toList());
-    }
-
-    public boolean validation(EventDto event) {
-        return event.getTitle() != null && !event.getTitle().isEmpty() && event.getStartDate() != null && event.getOwnerId() != null;
-    }
-
-    public EventDto getEvent(long eventId) {
-        return EventMapper.INSTANCE.toEventDto(eventRepository.findById(eventId)
-                .orElseThrow(() -> new DataValidationException("Ошибка")));
     }
 }

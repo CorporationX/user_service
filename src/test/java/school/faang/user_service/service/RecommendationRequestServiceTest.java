@@ -30,6 +30,7 @@ import school.faang.user_service.repository.recommendation.RecommendationRequest
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -53,6 +54,8 @@ class RecommendationRequestServiceTest {
     @Spy
     private RecommendationRequestMapperImpl recommendationRequestMapper;
 
+    private RecommendationRequest requestEntity;
+
     private RecommendationRequestDto requestDto1;
 
     private RecommendationRequestDto requestDto2;
@@ -61,7 +64,6 @@ class RecommendationRequestServiceTest {
 
     @BeforeEach
     void setUp() {
-
         LocalDateTime createdAt = LocalDateTime.now().minusMonths(7);
         requestDto1 = RecommendationRequestDto.builder()
                 .id(1L)
@@ -84,6 +86,8 @@ class RecommendationRequestServiceTest {
                 .receiverId(1L)
                 .createdAt(createdAt)
                 .build();
+
+        requestEntity = recommendationRequestMapper.toEntity(requestDto1);
     }
 
     @Test
@@ -148,5 +152,21 @@ class RecommendationRequestServiceTest {
         List<RecommendationRequestDto> actual = recommendationRequestService.getRequests(requestFilterDto);
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void testGetRequestsIdNegative() {
+        Mockito.when(recommendationRequestRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(DataValidationException.class, () -> recommendationRequestService.getRequestsId(1L));
+    }
+
+    @Test
+    void testGetRequestsId() {
+        Mockito.when(recommendationRequestRepository.findById(1L)).thenReturn(Optional.ofNullable(requestEntity));
+
+        RecommendationRequestDto actual = recommendationRequestService.getRequestsId(1L);
+
+        assertEquals(requestDto1, actual);
     }
 }

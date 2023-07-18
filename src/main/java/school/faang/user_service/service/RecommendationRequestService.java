@@ -58,6 +58,12 @@ public class RecommendationRequestService {
                 .toList();
     }
 
+    public RecommendationRequestDto getRequestsId(Long id) {
+        RecommendationRequest recommendationRequest = recommendationRequestRepository.findById(id)
+                .orElseThrow(() -> new DataValidationException("RecommendationRequest with id " + id + " does not exist"));
+        return recommendationRequestMapper.toDto(recommendationRequest);
+    }
+
     private void validationExistSkill(RecommendationRequestDto recommendationRequestDto) {
         for (SkillRequest skillRequest : recommendationRequestDto.getSkills()) {
             if (!skillRepository.existsById(skillRequest.getSkill().getId())) {

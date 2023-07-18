@@ -30,7 +30,7 @@ class GoalInvitationControllerTest {
     }
 
     @Test
-    void testCreateInvitation_InputsAreCorrect_ShouldSaveGoalInvitation() {
+    void testCreateInvitation_InputsAreCorrect_ShouldCreateGoalInvitation() {
         goalController.createInvitation(buildGoalInvitationDto());
 
         Mockito.verify(goalService, Mockito.times(1)).createInvitation(buildGoalInvitationDto());
@@ -42,6 +42,20 @@ class GoalInvitationControllerTest {
         Mockito.doThrow(RuntimeException.class).when(controllerValidator).validateInvitation(dto, new RuntimeException());
 
         Assertions.assertNotEquals(HttpStatus.OK, goalController.createInvitation(dto));
+    }
+
+    @Test
+    void testAcceptInvitation_InputsAreCorrect_ShouldAcceptGoalInvitation() {
+        goalController.acceptGoalInvitation(1L);
+
+        Mockito.verify(goalService, Mockito.times(1)).acceptGoalInvitation(1L);
+    }
+
+    @Test
+    void testAcceptInvitation_InputsAreIncorrect_StatusShouldNotBeOk() {
+        Mockito.doThrow(RuntimeException.class).when(controllerValidator).validateInvitation(-1L);
+
+        Assertions.assertThrows(RuntimeException.class, () -> goalController.acceptGoalInvitation(-1L));
     }
 
     private GoalInvitationDto buildGoalInvitationDto() {

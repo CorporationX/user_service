@@ -2,6 +2,9 @@ package school.faang.user_service.mapper;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
@@ -9,15 +12,15 @@ import school.faang.user_service.entity.User;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@ExtendWith(MockitoExtension.class)
 class UserMapperTest {
-    private UserMapper userMapper;
+    @Spy
+    private UserMapperImpl userMapper;
     private User user;
     private UserDto userDto;
 
     @BeforeEach
     void setUp() {
-        userMapper = new UserMapperImpl();
-
         user = User.builder()
                 .id(1L)
                 .username("username")
@@ -42,30 +45,30 @@ class UserMapperTest {
 
     @Test
     void userToUserDto_shouldMatchAllFields() {
-        UserDto result = userMapper.toDto(user);
+        UserDto actual = userMapper.toDto(user);
         assertAll(() -> {
-            assertEquals(1L, result.getId());
-            assertEquals("username", result.getUsername());
-            assertEquals("user@email", result.getEmail());
-            assertEquals("12345678", result.getPhone());
-            assertEquals("aboutUser", result.getAboutMe());
-            assertEquals("country", result.getCountry());
-            assertEquals("city", result.getCity());
-            assertEquals(10, result.getExperience());
+            assertEquals(1L, actual.getId());
+            assertEquals("username", actual.getUsername());
+            assertEquals("user@email", actual.getEmail());
+            assertEquals("12345678", actual.getPhone());
+            assertEquals("aboutUser", actual.getAboutMe());
+            assertEquals("country", actual.getCountry());
+            assertEquals("city", actual.getCity());
+            assertEquals(10, actual.getExperience());
         });
     }
 
     @Test
     void userDtoToUser_shouldMatchAllFields() {
-        User result = userMapper.toUser(userDto);
+        User actual = userMapper.toUser(userDto);
         assertAll(() -> {
-            assertEquals(1L, result.getId());
-            assertEquals("username", result.getUsername());
-            assertEquals("user@email", result.getEmail());
-            assertEquals("12345678", result.getPhone());
-            assertEquals("aboutUser", result.getAboutMe());
-            assertEquals("city", result.getCity());
-            assertEquals(10, result.getExperience());
+            assertEquals(1L, actual.getId());
+            assertEquals("username", actual.getUsername());
+            assertEquals("user@email", actual.getEmail());
+            assertEquals("12345678", actual.getPhone());
+            assertEquals("aboutUser", actual.getAboutMe());
+            assertEquals("city", actual.getCity());
+            assertEquals(10, actual.getExperience());
         });
     }
 }

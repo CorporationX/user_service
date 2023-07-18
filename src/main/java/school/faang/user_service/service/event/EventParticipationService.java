@@ -17,16 +17,26 @@ public class EventParticipationService {
         userService.existsById(userId);
         eventService.existsById(eventId);
 
-        validatePossibility(userId, eventId);
+        if (isExist(userId, eventId)) {
+            throw new DataValidationException("User already registered");
+        }
 
         eventParticipationRepository.register(eventId, userId);
     }
 
-    private void validatePossibility(long userId, long eventId) {
-        boolean exist = eventParticipationRepository.findAllParticipantsByEventId(eventId)
-                .stream().anyMatch(u -> u.getId() == userId);
-        if (exist) {
-            throw new DataValidationException("User already registered");
+    public void unregisterParticipant(long eventId, long userId) {
+        userService.existsById(userId);
+        eventService.existsById(eventId);
+
+        if (!isExist(userId, eventId)) {
+            throw new DataValidationException("User was not registered");
         }
+
+        eventParticipationRepository.unregister(eventId, userId);
+    }
+
+    private boolean isExist(long userId, long eventId) {
+        return eventParticipationRepository.findAllParticipantsByEventId(eventId)
+                .stream().anyMatch(u -> u.getId() == userId);
     }
 }

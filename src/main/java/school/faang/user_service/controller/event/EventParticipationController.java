@@ -15,6 +15,12 @@ public class EventParticipationController {
         eventParticipationService.registerParticipant(eventId, userId);
     }
 
+    public void unregisterParticipant(long eventId, long userId) {
+        validateParams(userId, eventId);
+
+        eventParticipationService.unregisterParticipant(eventId, userId);
+    }
+
     private void validateParams(long eventId, long userId) {
         if (eventId < 0 || userId < 0) {
             throw new DataValidationException("Id must be more than zero");

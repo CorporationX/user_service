@@ -21,10 +21,11 @@ public class GoalService {
 
     public List<GoalDto> getGoalsByUser(@NotNull Long userId, GoalFilterDto filters) {
         Stream<Goal> goals = goalRepository.findAll().stream();
-        goalFilters.stream()
-                .filter(goalFilter -> goalFilter.isApplicable(filters))
-                .forEach(goalFilter -> goalFilter.applyFilter(goals,filters));
 
-        return goals.map(goalMapper::toDto).toList();
+        return goalFilters.stream()
+                .filter(goalFilter -> goalFilter.isApplicable(filters))
+                .flatMap(goalFilter -> goalFilter.applyFilter(goals,filters))
+                .map(goalMapper::toDto)
+                .toList();
     }
 }

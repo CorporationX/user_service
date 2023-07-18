@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-@Service("eventService")
+@Service("restService")
 @RequiredArgsConstructor
 public class EventService {
     private final UserRepository userRepository;
@@ -25,36 +25,17 @@ public class EventService {
     private final EventMapper eventMapper;
 
     public EventDto create(EventDto event) {
-        EventDto result;
         User user = userRepository.findById(event.getOwnerId()).orElseThrow();
-        boolean userContainsSkill = isUserContainsSkill(event, user);
-        if (userContainsSkill) {
-            result = eventMapper.toEventDto(eventRepository.save(eventMapper.toEvent(event)));
-            return result;
-        } else {
-            throw new DataValidationException("пользователь не может провести такое событие с такими навыками.");
+        if (!(isUserContainsSkill(event, user))) {
+            throw new DataValidationException("The user cannot hold such an event with such skills");
         }
-    }
-
-    private static boolean isUserContainsSkill(EventDto event, User user) {
-        return new HashSet<>(user.getSkills()
-                .stream()
-                .map(Skill::getTitle)
-                .toList())
-                .containsAll(event.getRelatedSkills()
-                        .stream()
-                        .map(SkillDto::getTitle).toList());
-    }
-
-    public boolean validation(EventDto event) {
-        return event.getTitle() != null && !event.getTitle().isEmpty() && event.getStartDate() != null && event.getOwnerId() != null;
+        return eventMapper.toEventDto(eventRepository.save(eventMapper.toEvent(event)));
     }
 
     public EventDto getEvent(long eventId) {
         return eventMapper.toEventDto(eventRepository.findById(eventId)
-                .orElseThrow(() -> new DataValidationException("Ошибка")));
+                .orElseThrow(() -> new DataValidationException("User with this id was not found")));
     }
-
     public List<EventDto> getEventsByFilter(EventFilterDto filter) {
         List<EventDto> events = new ArrayList<>();
         eventRepository.findAll().forEach(event -> {
@@ -121,5 +102,14 @@ public class EventService {
                     }
                 })
                 .toList();
+    }
+    private boolean isUserContainsSkill(EventDto event, User user) {
+        return new HashSet<>(user.getSkills()
+                .stream()
+                .map(Skill::getTitle)
+                .toList())
+                .containsAll(event.getRelatedSkills()
+                        .stream()
+                        .map(SkillDto::getTitle).toList());
     }
 }

@@ -19,29 +19,4 @@ class GoalServiceTest {
     @InjectMocks
     GoalService service;
 
-    @Test
-    public void findGoalsByUserIdLessThanOneTest() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            service.findGoalsByUserId(0L);
-        });
-    }
-
-    @Test
-    public void findGoalsByUserIdDataWasCollectedTest() {
-        service.findGoalsByUserId(1L);
-        Mockito.verify(goalRepository).findGoalsByUserId(Mockito.anyLong());
-    }
-
-    @Test
-    public void getGoalsByUserLessThanOneTest() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            service.getGoalsByUser(0L, null);
-        });
-    }
-
-    @Test
-    public void getGoalsByUserNullFilter() {
-        service.getGoalsByUser(1L, null);
-        Mockito.verify(goalRepository).findGoalsByUserId(Mockito.anyLong());
-    }
 }

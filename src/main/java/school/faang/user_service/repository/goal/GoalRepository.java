@@ -1,10 +1,13 @@
 package school.faang.user_service.repository.goal;
 
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.service.goal.GoalService;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -30,6 +33,14 @@ public interface GoalRepository extends CrudRepository<Goal, Long> {
             VALUES (?1, ?2, ?3, 0, NOW(), NOW()) returning goal
             """)
     Goal create(String title, String description, Long parent);
+
+    @Modifying
+    @Query("UPDATE goal g SET g.title = ?1, g.description = ?2, g.status = ?2 WHERE g.id = ?3")
+    void update(String title, String description, GoalStatus status, Long id);
+
+    @Modifying
+    @Query("UPDATE goal_skill gs SET gs.skill_id = ?1 WHERE gs.goal_id = ?2")
+    void updateGoalSkill(Long sid, Long gid);
 
     @Query(nativeQuery = true, value = """
             SELECT COUNT(ug.goal_id) FROM user_goal ug

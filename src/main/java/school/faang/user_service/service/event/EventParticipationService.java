@@ -2,6 +2,7 @@ package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.service.user.UserService;
 
@@ -25,7 +26,7 @@ public class EventParticipationService {
         boolean exist = eventParticipationRepository.findAllParticipantsByEventId(eventId)
                 .stream().anyMatch(u -> u.getId() == userId);
         if (exist) {
-            throw new IllegalArgumentException("User already registered");
+            throw new DataValidationException("User already registered");
         }
     }
 }

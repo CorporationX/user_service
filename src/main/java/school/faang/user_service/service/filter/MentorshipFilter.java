@@ -1,8 +1,9 @@
 package school.faang.user_service.service.filter;
 
+import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.filter.RequestFilterDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
-
+@Component
 public class MentorshipFilter {
 
     public boolean filter(RequestFilterDto requestFilterDto, MentorshipRequestDto mentorshipRequestDto) {

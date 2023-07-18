@@ -30,7 +30,7 @@ public class SkillController {
         return skillService.getUserSkills(userId);
     }
 
-    List<SkillCandidateDto> getOfferedSkills(long userId){
+    public List<SkillCandidateDto> getOfferedSkills(long userId){
         return skillService.getOfferedSkills(userId);
     }
 }

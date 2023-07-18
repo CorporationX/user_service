@@ -10,8 +10,6 @@ import school.faang.user_service.entity.Skill;
 public interface SkillCandidate {
     Skill toEntity(SkillCandidateDto skillCandidateDto);
 
-    SkillCandidateDto toDTO(Skill skill);
-
     @Mapping(source = "skill", target = "skill")
     @Mapping(source = "count", target = "offersAmount")
     SkillCandidateDto mapToDTO(Skill skill, Long count);

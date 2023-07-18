@@ -39,4 +39,10 @@ public class MentorshipController {
         RequestValidation.checkValidityId(mentorId);
         return mentorshipService.deleteMentee(menteeId, mentorId);
     }
+    @DeleteMapping("delete/mentor/{mentorId}/mentee/{menteeId}")
+    public ResponseEntity<?> deleteMentor(@PathVariable long menteeId, @PathVariable long mentorId) {
+        RequestValidation.checkValidityId(menteeId);
+        RequestValidation.checkValidityId(mentorId);
+        return mentorshipService.deleteMentor(menteeId, mentorId);
+    }
 }

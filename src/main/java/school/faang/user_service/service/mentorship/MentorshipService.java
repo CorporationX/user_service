@@ -46,6 +46,20 @@ public class MentorshipService {
                 : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
     }
 
+    public ResponseEntity<?> deleteMentor(long menteeId, long mentorId) {
+        if (menteeId == mentorId) {
+            throw new MenteeMentorOneUser("a mentor cannot be a mentee of himself");
+        }
+        User mentor = findValidUser(mentorId);
+        User mentee = findValidUser(menteeId);
+        final boolean isDeleted = mentee.getMentors().remove(mentor);
+        mentorshipRepository.save(mentee);
+
+        return isDeleted
+                ? new ResponseEntity<>(HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+    }
+
     public User findValidUser(long id) {
         return mentorshipRepository.findUserById(id)
                 .orElseThrow(() -> new UserNotFound("user not found in database"));

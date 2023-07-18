@@ -32,17 +32,18 @@ public class MentorshipServiceTest {
 
     @Test
     public void testGetMentees_IncorrectInputs_ShouldThrowException() {
-        Mockito.when(mentorshipRepository.findById(Mockito.anyLong())).thenReturn(null);
+        Mockito.when(mentorshipRepository.findUserById(Mockito.anyLong())).thenReturn(null);
         Assert.assertThrows(RuntimeException.class, () -> mentorshipService.getMentees(Mockito.anyLong()));
     }
 
     @Test
     public void testGetMentees_CorrectInputs_ShouldReturnEmptyList() {
         User user = User.builder()
+                .mentors(Collections.emptyList())
                 .mentees(Collections.emptyList())
                 .build();
 
-        Mockito.when(mentorshipRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(user));
+        Mockito.when(mentorshipRepository.findUserById(Mockito.anyLong())).thenReturn(Optional.of(user));
 
         List<UserDTO> userDTOS = mentorshipService.getMentees(Mockito.anyLong());
 
@@ -51,7 +52,7 @@ public class MentorshipServiceTest {
 
     @Test
     public void testGetMentees_NotFoundUser_ShouldThrowException() {
-        Mockito.when(mentorshipRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(null));
+        Mockito.when(mentorshipRepository.findUserById(Mockito.anyLong())).thenReturn(Optional.ofNullable(null));
 
         Assertions.assertThrows(UserNotFound.class, () -> mentorshipService.getMentees(Mockito.anyLong()));
     }
@@ -101,5 +102,32 @@ public class MentorshipServiceTest {
 
         Mockito.verify(mentorshipRepository, Mockito.times(1)).save(user2);
         Assertions.assertArrayEquals(expectedMenteeList.toArray(), actualMenteeList.toArray());
+    }
+
+    @Test
+    public void testDeleteMentor_ShouldThrowException() {
+        Assertions.assertThrows(MenteeMentorOneUser.class, () -> mentorshipService.deleteMentor(5, 5));
+    }
+
+    @Test
+    public void testDeleteMentor_ShouldDeleteMentor() {
+        User mentor = User.builder()
+                .mentees(new ArrayList<>())
+                .mentors(new ArrayList<>())
+                .build();
+        User mentee = User.builder()
+                .mentors(new ArrayList<>(List.of(mentor)))
+                .build();
+
+        Mockito.when(mentorshipRepository.findUserById(1)).thenReturn(Optional.of(mentee));
+        Mockito.when(mentorshipRepository.findUserById(2)).thenReturn(Optional.of(mentor));
+
+        mentorshipService.deleteMentor(1, 2);
+
+        List<User> actualMentorsList = mentee.getMentors();
+        List<User> expectMentorsList = Collections.emptyList();
+
+        Mockito.verify(mentorshipRepository, Mockito.times(1)).save(mentee);
+        Assertions.assertArrayEquals(expectMentorsList.toArray(), actualMentorsList.toArray());
     }
 }

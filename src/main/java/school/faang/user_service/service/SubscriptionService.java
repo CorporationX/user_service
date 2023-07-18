@@ -12,7 +12,6 @@ import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.user_filters.UserFilter;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,10 +35,10 @@ public class SubscriptionService {
 
     @Transactional(readOnly = true)
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filters) {
-        List<User> followers = subscriptionRepository.findByFolloweeId(followeeId).collect(Collectors.toList());
+        List<User> followers = subscriptionRepository.findByFolloweeId(followeeId).toList();
         userFilters.stream().filter(filter -> filter.isApplicable(filters))
                 .forEach(filter -> filter.apply(followers, filters));
-        return followers.stream().map(userMapper::toDto).collect(Collectors.toList());
+        return followers.stream().map(userMapper::toDto).toList();
     }
 
     private void validate(long followerId, long followeeId) {

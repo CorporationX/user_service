@@ -137,26 +137,48 @@ class UserFilterTest {
 
     @Test
     void testFilterUsersRightAllParameters() {
-        User user = User.builder()
+        User user1 = User.builder()
                 .username("John Black")
                 .aboutMe("I am a student in the Harvard university")
-                .email("email@example.com")
+                .email("black@example.com")
                 .contacts(Collections.emptyList())
-                .country(new Country(1L, "All world", Collections.emptyList()))
+                .country(new Country(1L, "America", Collections.emptyList()))
                 .city("New York city")
-                .phone("123456789")
+                .phone("88001234567")
                 .skills(Collections.emptyList())
                 .experience(10)
                 .build();
-        List<User> userList = new ArrayList<>(List.of(user));
+        User user2 = User.builder()
+                .username("Jonathan White")
+                .aboutMe("I am a student in the Oxford university")
+                .email("white@example.com")
+                .contacts(Collections.emptyList())
+                .country(new Country(1L, "England", Collections.emptyList()))
+                .city("London city")
+                .phone("88007894561")
+                .skills(Collections.emptyList())
+                .experience(15)
+                .build();
+        User user3 = User.builder()
+                .username("Dan Green")
+                .aboutMe("I am a professor in the Harvard university")
+                .email("green@example.com")
+                .contacts(Collections.emptyList())
+                .country(new Country(1L, "Mexico", Collections.emptyList()))
+                .city("Los Angeles city")
+                .phone("88004562378")
+                .skills(Collections.emptyList())
+                .experience(20)
+                .build();
+        List<User> userList = new ArrayList<>(List.of(user1, user2, user3));
         UserFilterDto userFilterDto = UserFilterDto.builder()
-                .namePattern("John")
+                .namePattern("Jo")
                 .aboutPattern("I am a student")
                 .emailPattern("@example.com")
                 .contactPattern(" ")
-                .countryPattern("world")
-                .cityPattern("New")
-                .phonePattern("12345")
+                .countryPattern("")
+                .cityPattern("city")
+                .phonePattern("8800")
                 .skillPattern(null)
                 .experienceMin(5)
                 .experienceMax(15)
@@ -164,6 +186,6 @@ class UserFilterTest {
         userFilters.stream()
                 .filter(userFilter -> userFilter.isApplicable(userFilterDto))
                 .forEach(userFilter -> userFilter.apply(userList, userFilterDto));
-        assertEquals(1, userList.size());
+        assertEquals(2, userList.size());
     }
 }

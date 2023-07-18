@@ -11,6 +11,7 @@ import school.faang.user_service.mapper.goal.GoalInvitationMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.util.goal.exception.GoalInvitationNotFoundException;
 import school.faang.user_service.util.goal.exception.GoalNotFoundException;
 import school.faang.user_service.util.goal.exception.UserNotFoundException;
 import school.faang.user_service.util.goal.validator.GoalInvitationEntityValidator;
@@ -30,10 +31,27 @@ public class GoalInvitationService {
     public GoalInvitationDto createInvitation(GoalInvitationDto goalInvitationDto) {
         GoalInvitation goalInvitation = goalInvitationMapper.toEntity(goalInvitationDto, this);
         goalInvitationDtoValidator.validate(goalInvitation);
+        User inviter = goalInvitation.getInviter();
+        User invited = goalInvitation.getInvited();
 
+        inviter.getSentGoalInvitations().add(goalInvitation);
+        invited.getReceivedGoalInvitations().add(goalInvitation);
         goalInvitation = goalInvitationRepository.save(goalInvitation);
+        userRepository.save(inviter);
+        userRepository.save(invited);
 
         return goalInvitationMapper.toDto(goalInvitation);
+    }
+
+    @Transactional
+    public GoalInvitationDto acceptGoalInvitation(Long id) {
+        GoalInvitation goalInvitation = goalInvitationRepository.findById(id).orElseThrow(
+                () -> new GoalInvitationNotFoundException("Goal invitation with id = " + id + " not found")
+        );
+
+//        if (goalInvitation.getInvited())
+
+        return null;
     }
 
     public User findUserById(Long id) {

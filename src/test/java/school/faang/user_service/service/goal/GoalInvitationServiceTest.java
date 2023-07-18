@@ -21,6 +21,7 @@ import school.faang.user_service.util.goal.exception.GoalNotFoundException;
 import school.faang.user_service.util.goal.exception.UserNotFoundException;
 import school.faang.user_service.util.goal.validator.GoalInvitationEntityValidator;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 public class GoalInvitationServiceTest {
@@ -55,10 +56,37 @@ public class GoalInvitationServiceTest {
         Mockito.doNothing().when(goalInvitationDtoValidator).validate(buildGoalInvitationEntity());
         Mockito.when(goalInvitationMapper.toDto(buildGoalInvitationEntity())).thenReturn(buildGoalInvitationDto());
 
-        goalInvitationService.createInvitation(GoalInvitationDto.builder().build());
+        goalInvitationService.createInvitation(buildGoalInvitationDto());
 
         Mockito.verify(goalInvitationRepository, Mockito.times(1)).save(Mockito.any());
         Mockito.verify(goalInvitationMapper, Mockito.times(1)).toDto(Mockito.any());
+    }
+
+    @Test
+    void testCreateInvitation_InputsAreCorrect_ShouldAddGoalInvitationsToList() {
+        GoalInvitation goalInvitation = buildGoalInvitationEntity();
+        Mockito.when(goalInvitationMapper.toEntity(buildGoalInvitationDto(), goalInvitationService))
+                .thenReturn(goalInvitation);
+        Mockito.doNothing().when(goalInvitationDtoValidator).validate(buildGoalInvitationEntity());
+        Mockito.when(goalInvitationMapper.toDto(goalInvitation)).thenReturn(buildGoalInvitationDto());
+
+        goalInvitationService.createInvitation(buildGoalInvitationDto());
+
+        Assertions.assertEquals(1, goalInvitation.getInviter().getSentGoalInvitations().size());
+        Assertions.assertEquals(1, goalInvitation.getInvited().getReceivedGoalInvitations().size());
+    }
+
+    @Test
+    void testCreateInvitation_InputsAreCorrect_ShouldSaveUsers() {
+        GoalInvitation goalInvitation = buildGoalInvitationEntity();
+        Mockito.when(goalInvitationMapper.toEntity(buildGoalInvitationDto(), goalInvitationService))
+                .thenReturn(goalInvitation);
+        Mockito.doNothing().when(goalInvitationDtoValidator).validate(buildGoalInvitationEntity());
+        Mockito.when(goalInvitationMapper.toDto(goalInvitation)).thenReturn(buildGoalInvitationDto());
+
+        goalInvitationService.createInvitation(buildGoalInvitationDto());
+
+        Mockito.verify(userRepository, Mockito.times(2)).save(Mockito.any());
     }
 
     @Test
@@ -98,10 +126,12 @@ public class GoalInvitationServiceTest {
     private GoalInvitation buildGoalInvitationEntity() {
         return GoalInvitation.builder()
                 .id(1L)
-                .invited(User.builder().
-                        id(1L)
+                .invited(User.builder()
+                        .id(1L)
+                        .receivedGoalInvitations(new ArrayList<>())
                         .build())
                 .inviter(User.builder()
+                        .sentGoalInvitations(new ArrayList<>())
                         .id(1L)
                         .build())
                 .goal(Goal.builder()

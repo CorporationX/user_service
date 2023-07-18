@@ -21,7 +21,7 @@ public class GoalService {
     private final int MAX_ACTIVE_GOALS = 3;
 
     public void deleteGoal(Long goalId) {
-        goalRepository.delete(goalId);
+        goalRepository.deleteById(goalId);
     }
 
 }

@@ -13,10 +13,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.UserSkillGuarantee;
+import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.mapper.SkillCandidateMapperImpl;
 import school.faang.user_service.mapper.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +33,8 @@ class SkillServiceTest {
     private SkillService skillService;
     @Spy
     private SkillMapperImpl skillMapper;
+    @Spy
+    private SkillCandidateMapperImpl skillCandidateMapper;
     @Mock
     private SkillRepository skillRepository;
     @Mock
@@ -35,15 +43,17 @@ class SkillServiceTest {
     Skill skill1;
     Skill skill2;
     List<Skill> list1;
+    List<Skill> list2;
 
     @BeforeEach
     public void setUp() {
         skillDto = new SkillDto(1L, "flexibility");
-        skill1 = skillMapper.toEntity(skillDto);
-        //skill2 = new Skill(1L, "test1", null, null, null, null, null, null);
+        skill1 = new Skill(1L, "test", new ArrayList<User>(), new ArrayList<UserSkillGuarantee>(), new ArrayList<Event>(),
+                new ArrayList<Goal>(), LocalDateTime.now().minusDays(1), LocalDateTime.now());
+        skill2 = new Skill(1L, "test", new ArrayList<User>(), new ArrayList<UserSkillGuarantee>(), new ArrayList<Event>(),
+                new ArrayList<Goal>(), LocalDateTime.now().minusDays(1), LocalDateTime.now());
         list1 = new ArrayList<>(List.of(skill1));
-
-
+        list2 = new ArrayList<>(List.of(skill1, skill2));
     }
 
     @Test
@@ -93,14 +103,14 @@ class SkillServiceTest {
     void testMapperFromOneElementSkillList() {
         when(skillRepository.findSkillsOfferedToUser(1L)).thenReturn(list1);
         List<SkillCandidateDto> result = skillService.getOfferedSkills(1L);
-
-        //assertEquals(1, result.size());
+        assertEquals(1, result.size());
     }
 
-//    @Test
-//    void testMapperFromManyElementsSkillList() {
-//        when(skillRepository.findSkillsOfferedToUser(anyLong())).thenReturn(new ArrayList<>(List.of(skillMapper.toEntity(skillDto))));
-//        skillService.getOfferedSkills(1L);
-//    }
+    @Test
+    void testMapperFromManyElementsSkillList() {
+        when(skillRepository.findSkillsOfferedToUser(1L)).thenReturn(list2);
+        List<SkillCandidateDto> result = skillService.getOfferedSkills(1L);
+        assertEquals(2, result.size());
+    }
 
 }

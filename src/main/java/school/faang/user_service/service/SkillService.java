@@ -42,8 +42,9 @@ public class SkillService {
         Map<Skill, Long> offeredSkillsAndCount = offeredSkills.stream()
                 .collect(Collectors.toMap(Function.identity(), value -> 1L, Long::sum));
         return offeredSkillsAndCount.entrySet().stream()
-                .map(offeredSkill ->
-                        skillCandidateMapper.toDTO(offeredSkill.getKey(), offeredSkill.getValue()))
-                .toList();
+                .map(offeredSkill -> {
+                    SkillDto skillDto = skillMapper.toDTO(offeredSkill.getKey());
+                    return skillCandidateMapper.toDTO(skillDto, offeredSkill.getValue());
+                }).toList();
     }
 }

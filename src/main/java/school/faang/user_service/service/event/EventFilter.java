@@ -9,5 +9,5 @@ public interface EventFilter {
 
     boolean isApplicable(EventFilterDto eventDto);
 
-    void apply(Stream<Event> events, EventFilterDto eventDto);
+    Stream<Event> apply(Stream<Event> events, EventFilterDto eventDto);
 }

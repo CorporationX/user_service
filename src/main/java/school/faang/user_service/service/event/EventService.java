@@ -44,6 +44,7 @@ public class EventService {
 //        eventRepository.findAll().forEach(event -> {
 //            events.add(eventMapper.toEventDto(event));
 //        });
+
         Stream<Event> event = eventRepository.findAll().stream();
         eventFilters.stream()
                 .filter(filter -> filter.isApplicable(filters))

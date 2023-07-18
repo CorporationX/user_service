@@ -19,11 +19,11 @@ import static org.mockito.Mockito.verifyNoInteractions;
 @ExtendWith(MockitoExtension.class)
 class SubscriptionControllerTest {
     @InjectMocks
-    SubscriptionController subscriptionController;
+    private SubscriptionController subscriptionController;
     @Mock
-    SubscriptionService subscriptionService;
+    private SubscriptionService subscriptionService;
     @Mock
-    UserFilterDto userFilterDto;
+    private UserFilterDto userFilterDto;
 
     long followerId;
     long followeeId;

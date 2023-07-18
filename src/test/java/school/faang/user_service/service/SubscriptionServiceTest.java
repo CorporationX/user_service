@@ -29,15 +29,15 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class SubscriptionServiceTest {
     @InjectMocks
-    SubscriptionService subscriptionService;
+    private SubscriptionService subscriptionService;
     @Mock
-    SubscriptionRepository subscriptionRepository;
+    private SubscriptionRepository subscriptionRepository;
     @Spy
-    UserMapper userMapper;
+    private UserMapper userMapper;
     @Mock
-    UserFilterDto userFilterDto;
+    private UserFilterDto userFilterDto;
     @Mock
-    List<UserFilter> userFilters;
+    private List<UserFilter> userFilters;
 
     long followerId;
     long followeeId;
@@ -108,12 +108,12 @@ class SubscriptionServiceTest {
         UserDto userDto = mock(UserDto.class);
         Stream<User> userStream = Stream.of(user);
 
-        when(subscriptionRepository.findByFolloweeId(followerId)).thenReturn(userStream);
+        when(subscriptionRepository.findByFollowerId(followerId)).thenReturn(userStream);
         when(userMapper.toDto(user)).thenReturn(userDto);
 
-        subscriptionService.getFollowers(followerId, userFilterDto);
+        subscriptionService.getFollowing(followerId, userFilterDto);
 
-        verify(subscriptionRepository, times(1)).findByFolloweeId(followerId);
+        verify(subscriptionRepository, times(1)).findByFollowerId(followerId);
         verify(userMapper, times(1)).toDto(user);
     }
 }

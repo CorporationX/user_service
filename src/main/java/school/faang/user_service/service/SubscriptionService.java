@@ -7,12 +7,11 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.user_filters.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
+import school.faang.user_service.user_filters.UserFilter;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,23 +35,25 @@ public class SubscriptionService {
 
     @Transactional(readOnly = true)
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filters) {
-        List<User> followers = subscriptionRepository.findByFolloweeId(followeeId).collect(Collectors.toList());
-        userFilters.stream().filter(filter -> filter.isApplicable(filters))
-                .forEach(filter -> filter.apply(followers, filters));
-        return followers.stream().map(userMapper::toDto).collect(Collectors.toList());
+        List<User> followers = subscriptionRepository.findByFolloweeId(followeeId).toList();
+        return getUsersDtoAfterFiltration(followers, filters);
     }
 
     @Transactional(readOnly = true)
     public List<UserDto> getFollowing(long followerId, UserFilterDto filters) {
-        List<User> followers = subscriptionRepository.findByFolloweeId(followerId).collect(Collectors.toList());
-        userFilters.stream().filter(filter -> filter.isApplicable(filters))
-                .forEach(filter -> filter.apply(followers, filters));
-        return followers.stream().map(userMapper::toDto).collect(Collectors.toList());
+        List<User> followees = subscriptionRepository.findByFollowerId(followerId).toList();
+        return getUsersDtoAfterFiltration(followees, filters);
     }
 
     private void validate(long followerId, long followeeId) {
         if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             throw new DataValidationException("This subscription already exists");
         }
+    }
+
+    private List<UserDto> getUsersDtoAfterFiltration(List<User> users, UserFilterDto filters) {
+        userFilters.stream().filter(filter -> filter.isApplicable(filters))
+                .forEach(filter -> filter.apply(users, filters));
+        return users.stream().map(userMapper::toDto).toList();
     }
 }

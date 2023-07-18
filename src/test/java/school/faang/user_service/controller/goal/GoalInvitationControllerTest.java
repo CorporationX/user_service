@@ -58,6 +58,20 @@ class GoalInvitationControllerTest {
         Assertions.assertThrows(RuntimeException.class, () -> goalController.acceptGoalInvitation(-1L));
     }
 
+    @Test
+    void testRejectInvitation_InputsAreCorrect_ShouldRejectGoalInvitation() {
+        goalController.rejectGoalInvitation(1L);
+
+        Mockito.verify(goalService, Mockito.times(1)).rejectGoalInvitation(1L);
+    }
+
+    @Test
+    void testRejectInvitation_InputsAreIncorrect_StatusShouldNotBeOk() {
+        Mockito.doThrow(RuntimeException.class).when(controllerValidator).validateInvitation(-1L);
+
+        Assertions.assertThrows(RuntimeException.class, () -> goalController.rejectGoalInvitation(-1L));
+    }
+
     private GoalInvitationDto buildGoalInvitationDto() {
         return GoalInvitationDto.builder()
                 .invitedUserId(1L)

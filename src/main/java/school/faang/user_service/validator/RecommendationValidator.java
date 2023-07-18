@@ -18,17 +18,26 @@ public class RecommendationValidator {
 
     private final RecommendationRepository recommendationRepository;
 
-    public void validateRecommendationContent(RecommendationDto recommendation) {
-        String content = recommendation.getContent();
+    public void validateRecommendationExist(RecommendationDto recommendationDto) {
+        Recommendation recommendation = recommendationRepository.findById(recommendationDto.getId())
+                .orElse(null);
+
+        if (recommendation == null) {
+            throw new DataValidationException("Invalid recommendation to update");
+        }
+    }
+
+    public void validateRecommendationContent(RecommendationDto recommendationDto) {
+        String content = recommendationDto.getContent();
 
         if (content == null || content.isBlank()) {
             throw new DataValidationException("Content can't be empty");
         }
     }
 
-    public void validateLastUpdate(RecommendationDto recommendation) {
-        long authorId = recommendation.getAuthorId();
-        long userId = recommendation.getReceiverId();
+    public void validateLastUpdate(RecommendationDto recommendationDto) {
+        long authorId = recommendationDto.getAuthorId();
+        long userId = recommendationDto.getReceiverId();
         Optional<Recommendation> lastRecommendation =
                 recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(authorId, userId);
 

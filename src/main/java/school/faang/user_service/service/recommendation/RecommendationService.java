@@ -49,6 +49,24 @@ public class RecommendationService {
         return recommendationMapper.toDto(recommendation);
     }
 
+    @Transactional
+    public RecommendationDto update(RecommendationDto recommendationDto) {
+        recommendationValidator.validateRecommendationExist(recommendationDto);
+        validate(recommendationDto);
+
+        delete(recommendationDto.getId());
+        Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
+        recommendationRepository.save(recommendation);
+        processSkillOffers(recommendation);
+
+        return recommendationMapper.toDto(recommendation);
+    }
+
+    private void delete(long recommendationId) {
+        recommendationRepository.deleteById(recommendationId);
+    }
+
+
     private void processSkillOffers(Recommendation recommendation) {
         long userId = recommendation.getReceiver().getId();
         long authorId = recommendation.getAuthor().getId();

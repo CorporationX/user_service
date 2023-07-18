@@ -19,9 +19,7 @@ import school.faang.user_service.validator.SkillOfferValidator;
 
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -47,7 +45,7 @@ public class RecommendationServiceTest {
 
 
     @Test
-    public void testCreateRecommendation() {
+    public void testCreate() {
         RecommendationDto recommendationDto = new RecommendationDto();
         recommendationDto.setId(1L);
         recommendationDto.setAuthorId(2L);
@@ -69,15 +67,47 @@ public class RecommendationServiceTest {
         when(recommendationMapper.toEntity(any(RecommendationDto.class))).thenReturn(recommendationEntity);
         when(recommendationMapper.toDto(any(Recommendation.class))).thenReturn(recommendationDto);
 
-        RecommendationDto result = recommendationService.create(recommendationDto);
+        RecommendationDto updatedRecommendationDto = recommendationService.create(recommendationDto);
 
+        verify(recommendationValidator).validateLastUpdate(recommendationDto);
+        verify(skillOfferValidator).validateSkillsListNotEmptyOrNull(recommendationDto.getSkillOffers());
+        verify(skillOfferValidator).validateSkillsAreInRepository(recommendationDto.getSkillOffers());
         verify(recommendationRepository, times(1)).save(any(Recommendation.class));
 
-        assertDoesNotThrow(() -> recommendationService.create(recommendationDto));
-        assertEquals(recommendationDto.getId(), result.getId());
-        assertEquals(recommendationDto.getAuthorId(), result.getAuthorId());
-        assertEquals(recommendationDto.getReceiverId(), result.getReceiverId());
-        assertEquals(recommendationDto.getContent(), result.getContent());
-        assertEquals(recommendationDto.getSkillOffers(), result.getSkillOffers());
+        assertEquals(updatedRecommendationDto, recommendationDto);
+    }
+
+    @Test
+    public void testsUpdate() {
+        RecommendationDto recommendationDto = new RecommendationDto();
+        recommendationDto.setId(1L);
+        recommendationDto.setAuthorId(2L);
+        recommendationDto.setReceiverId(3L);
+        recommendationDto.setContent("content");
+        recommendationDto.setSkillOffers(new ArrayList<>());
+
+        Recommendation recommendationEntity = new Recommendation();
+        recommendationEntity.setId(1L);
+        User author = new User();
+        author.setId(2L);
+        recommendationEntity.setAuthor(author);
+        User receiver = new User();
+        receiver.setId(3L);
+        recommendationEntity.setReceiver(receiver);
+        recommendationEntity.setContent("content");
+        recommendationEntity.setSkillOffers(new ArrayList<>());
+
+        when(recommendationMapper.toEntity(any(RecommendationDto.class))).thenReturn(recommendationEntity);
+        when(recommendationMapper.toDto(any(Recommendation.class))).thenReturn(recommendationDto);
+
+        RecommendationDto updatedRecommendationDto = recommendationService.update(recommendationDto);
+
+        verify(recommendationValidator).validateLastUpdate(recommendationDto);
+        verify(skillOfferValidator).validateSkillsListNotEmptyOrNull(recommendationDto.getSkillOffers());
+        verify(skillOfferValidator).validateSkillsAreInRepository(recommendationDto.getSkillOffers());
+        verify(recommendationRepository).deleteById(1L);
+        verify(recommendationRepository).save(recommendationEntity);
+
+        assertEquals(updatedRecommendationDto, recommendationDto);
     }
 }

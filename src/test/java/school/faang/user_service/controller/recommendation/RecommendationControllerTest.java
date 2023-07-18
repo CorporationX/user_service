@@ -32,7 +32,20 @@ public class RecommendationControllerTest {
 
         verify(recommendationValidator, times(1)).validateRecommendationContent(recommendationDto);
         verify(recommendationService, times(1)).create(recommendationDto);
+        assertEquals(recommendationDto, result);
+    }
 
+    @Test
+    public void testUpdateRecommendation() {
+        RecommendationDto recommendationDto = new RecommendationDto();
+        recommendationDto.setContent("Sample content");
+
+        when(recommendationService.update(recommendationDto)).thenReturn(recommendationDto);
+
+        RecommendationDto result = recommendationController.updateRecommendation(recommendationDto);
+
+        verify(recommendationValidator, times(1)).validateRecommendationContent(recommendationDto);
+        verify(recommendationService, times(1)).update(recommendationDto);
         assertEquals(recommendationDto, result);
     }
 }

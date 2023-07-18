@@ -13,6 +13,7 @@ import school.faang.user_service.service.SkillService;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -46,7 +47,7 @@ class SkillControllerTest {
     void createNewSkill() {
         when(skillService.create(skillDto)).thenReturn(skillDto);
         SkillDto skillDto1 = skillController.create(skillDto);
-        verify(skillService, Mockito.times(1))
+        verify(skillService, times(1))
                 .create(skillDto);
         assertEquals(skillDto, skillDto1);
     }
@@ -54,14 +55,14 @@ class SkillControllerTest {
     @Test
     void testCallMethodGetUserSkillsFromSkillService(){
         skillController.getUserSkills(1L);
-        verify(skillService, Mockito.times(1))
+        verify(skillService, times(1))
                 .getUserSkills(1L);
     }
 
     @Test
     void testCallMethodGetOfferedSkillsFromSkillService(){
         skillController.getOfferedSkills(1L);
-        verify(skillService, Mockito.times(1))
+        verify(skillService, times(1))
                 .getOfferedSkills(1L);
     }
 }

@@ -7,11 +7,11 @@ import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.entity.Skill;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface SkillCandidate {
+public interface SkillCandidateMapper {
     Skill toEntity(SkillCandidateDto skillCandidateDto);
 
     @Mapping(source = "skill", target = "skill")
     @Mapping(source = "count", target = "offersAmount")
-    SkillCandidateDto mapToDTO(Skill skill, Long count);
+    SkillCandidateDto toDTO(Skill skill, Long count);
 
 }

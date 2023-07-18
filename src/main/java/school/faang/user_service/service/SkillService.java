@@ -6,7 +6,7 @@ import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.SkillCandidate;
+import school.faang.user_service.mapper.SkillCandidateMapper;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class SkillService {
     private final SkillRepository skillRepository;
     private final SkillMapper skillMapper;
-    private final SkillCandidate skillCandidate;
+    private final SkillCandidateMapper skillCandidateMapper;
     private final UserService userService;
 
     public List<SkillDto> getUserSkills(long userId) {
@@ -42,8 +42,8 @@ public class SkillService {
         Map<Skill, Long> offeredSkillsAndCount = offeredSkills.stream()
                 .collect(Collectors.toMap(Function.identity(), value -> 1L, Long::sum));
         return offeredSkillsAndCount.entrySet().stream()
-                .map(skillIntegerEntry ->
-                        skillCandidate.mapToDTO(skillIntegerEntry.getKey(), skillIntegerEntry.getValue()))
+                .map(offeredSkill ->
+                        skillCandidateMapper.toDTO(offeredSkill.getKey(), offeredSkill.getValue()))
                 .toList();
     }
 }

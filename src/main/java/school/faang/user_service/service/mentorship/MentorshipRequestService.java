@@ -1,7 +1,10 @@
 package school.faang.user_service.service.mentorship;
 
 import lombok.RequiredArgsConstructor;
+import school.faang.user_service.entity.User;
 import org.springframework.stereotype.Service;
+import jakarta.persistence.EntityNotFoundException;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.dto.filter.RequestFilterDto;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,5 +42,21 @@ public class MentorshipRequestService {
                 .map(mentorshipRequestMapper::toDto)
                 .filter(requestDto -> mentorshipFilter.filter(requestFilterDto, requestDto))
                 .toList();
+    }
+
+    @Transactional
+    public MentorshipRequestDto acceptRequest(Long id) {
+        MentorshipRequest request = mentorshipRequestRepository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("Invalid request. Mentorship request not found"));
+
+        User requester = request.getRequester();
+        User receiver = request.getReceiver();
+
+        if (!requester.getMentors().contains(receiver)) {
+            requester.getMentors().add(receiver);
+            request.setStatus(RequestStatus.ACCEPTED);
+            return mentorshipRequestMapper.toDto(request);
+        }
+        throw new IllegalArgumentException("Invalid request. Mentorship request is already accepted");
     }
 }

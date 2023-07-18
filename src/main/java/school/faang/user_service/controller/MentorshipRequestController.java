@@ -4,8 +4,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
 import school.faang.user_service.dto.filter.RequestFilterDto;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,9 +28,15 @@ public class MentorshipRequestController {
         return mentorshipRequestService.requestMentorship(mentorshipRequestDto);
     }
 
-    @GetMapping("mentorship/request")
+    @GetMapping("/mentorship/request")
     @ResponseStatus(HttpStatus.OK)
     public List<MentorshipRequestDto> getRequests(@Valid @RequestBody RequestFilterDto requestFilterDto) {
         return mentorshipRequestService.getRequests(requestFilterDto);
+    }
+
+    @PutMapping("/mentorship/request/{id}/accept")
+    @ResponseStatus(HttpStatus.OK)
+    public MentorshipRequestDto acceptRequest(@PathVariable Long id) {
+        return mentorshipRequestService.acceptRequest(id);
     }
 }

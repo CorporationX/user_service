@@ -11,10 +11,12 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDTO;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.mentorship.MenteeMentorOneUser;
 import school.faang.user_service.exception.mentorship.UserNotFound;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -72,5 +74,32 @@ public class MentorshipServiceTest {
         Mockito.when(mentorshipRepository.findUserById(Mockito.anyLong())).thenReturn(Optional.ofNullable(null));
 
         Assertions.assertThrows(UserNotFound.class, () -> mentorshipService.getMentors(Mockito.anyLong()));
+    }
+
+    @Test
+    public void testDeleteMentee_ShouldThrowException() {
+        Assertions.assertThrows(MenteeMentorOneUser.class, () -> mentorshipService.deleteMentee(5, 5));
+    }
+
+    @Test
+    public void testDeleteMentee_ShouldDeleteMentee() {
+        User user1 = User.builder()
+                .mentees(new ArrayList<>())
+                .mentors(new ArrayList<>())
+                .build();
+        User user2 = User.builder()
+                .mentees(new ArrayList<>(List.of(user1)))
+                .mentors(new ArrayList<>(List.of(user1)))
+                .build();
+
+        Mockito.when(mentorshipRepository.findUserById(1)).thenReturn(Optional.of(user1));
+        Mockito.when(mentorshipRepository.findUserById(2)).thenReturn(Optional.of(user2));
+
+        mentorshipService.deleteMentee(1, 2);
+        List<User> actualMenteeList = user2.getMentees();
+        List<User> expectedMenteeList = Collections.emptyList();
+
+        Mockito.verify(mentorshipRepository, Mockito.times(1)).save(user2);
+        Assertions.assertArrayEquals(expectedMenteeList.toArray(), actualMenteeList.toArray());
     }
 }

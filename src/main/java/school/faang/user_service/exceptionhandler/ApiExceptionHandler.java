@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import school.faang.user_service.exception.mentorship.InvalidRequestMentorId;
+import school.faang.user_service.exception.mentorship.MenteeMentorOneUser;
 import school.faang.user_service.exception.mentorship.UserNotFound;
 
 import java.time.ZoneId;
@@ -31,5 +32,15 @@ public class ApiExceptionHandler {
                 ZonedDateTime.now(ZoneId.of("Z"))
         );
         return new ResponseEntity<>(payloadException, HttpStatus.NOT_FOUND);
+    }
+    
+    @ExceptionHandler(MenteeMentorOneUser.class) 
+    public ResponseEntity<Object> handleMenteeMentorOneUser(MenteeMentorOneUser e) {
+        PayloadException payloadException = new PayloadException(
+                HttpStatus.BAD_REQUEST,
+                e.getMessage(),
+                ZonedDateTime.now(ZoneId.of("Z"))
+        );
+        return new ResponseEntity<>(payloadException, HttpStatus.BAD_REQUEST);
     }
 }

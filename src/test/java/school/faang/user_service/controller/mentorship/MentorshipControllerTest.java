@@ -48,4 +48,15 @@ public class MentorshipControllerTest {
         mentorshipController.getMentors(menteeId);
         Mockito.verify(mentorshipService, Mockito.times(1)).getMentors(menteeId);
     }
+
+    @Test
+    public void testDeleteMentee_ShouldThrowException() {
+        Assert.assertThrows(InvalidRequestMentorId.class, () -> mentorshipController.deleteMentee(-2, 5));
+    }
+
+    @Test
+    public void testDeleteMentee_IsInvokingDeleteMentee() {
+        mentorshipController.deleteMentee(5, 2);
+        Mockito.verify(mentorshipService, Mockito.times(1)).deleteMentee(5, 2);
+    }
 }

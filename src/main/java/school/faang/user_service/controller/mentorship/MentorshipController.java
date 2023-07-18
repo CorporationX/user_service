@@ -1,7 +1,10 @@
 package school.faang.user_service.controller.mentorship;
 
 import lombok.RequiredArgsConstructor;
+import org.bouncycastle.cert.ocsp.Req;
 import org.mapstruct.control.MappingControl;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,5 +32,11 @@ public class MentorshipController {
     public List<UserDTO> getMentors(@PathVariable("id") long menteeId) {
         RequestValidation.checkValidityId(menteeId);
         return mentorshipService.getMentors(menteeId);
+    }
+    @DeleteMapping("delete/mentee/{menteeId}/mentor/{mentorId}")
+    public ResponseEntity<?> deleteMentee(@PathVariable long menteeId, @PathVariable long mentorId) {
+        RequestValidation.checkValidityId(menteeId);
+        RequestValidation.checkValidityId(mentorId);
+        return mentorshipService.deleteMentee(menteeId, mentorId);
     }
 }

@@ -45,8 +45,12 @@ class SkillControllerTest {
         verify(skillService, times(1))
                 .create(skillDto);
         assertEquals(skillDto, skillDto1);
-
-
     }
 
+    @Test
+    void testCallMethodGetUserSkillsFromSkillService(){
+        skillController.getUserSkills(1L);
+        verify(skillService, times(1))
+                .getUserSkills(1L);
+    }
 }

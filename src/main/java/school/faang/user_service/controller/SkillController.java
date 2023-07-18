@@ -7,10 +7,16 @@ import school.faang.user_service.dto.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SkillService;
 
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 public class SkillController {
     private final SkillService skillService;
+
+    public List<SkillDto> getUserSkills(long userId) {
+        return skillService.getUserSkills(userId);
+    }
 
     public SkillDto create(SkillDto skill) {
         validateSkill(skill);

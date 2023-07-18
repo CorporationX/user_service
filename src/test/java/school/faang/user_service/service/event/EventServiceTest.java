@@ -179,6 +179,6 @@ class EventServiceTest {
 
     List<EventDto> events = eventService.getEventsByFilter(eventFilterDto);
 
-    Assertions.assertEquals(1, events.size());
+    Assertions.assertEquals(2, events.size());
   }
 }

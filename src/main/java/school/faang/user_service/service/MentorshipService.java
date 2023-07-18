@@ -2,9 +2,9 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.mentee.MenteeDto;
-import school.faang.user_service.mapper.MenteeMapper;
+import school.faang.user_service.dto.mentee.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import java.util.List;
@@ -13,13 +13,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MentorshipService {
     private final MentorshipRepository mentorshipRepository;
-    private final MenteeMapper menteeMapper;
+    private final UserMapper userMapper;
 
-    public List<MenteeDto> getMentees(long userId) {
+    public List<UserDto> getMentees(long userId) {
         if (!mentorshipRepository.existsById(userId)) {
             throw new RuntimeException("User with id not found");
         }
-        List<User> userList = mentorshipRepository.getAllByMentorId(userId);
-        return menteeMapper.toUserDto(userList);
+        User mentor = new User();
+        mentor.setId(userId);
+        mentorshipRepository.findUserById(mentor.getId());
+        return userMapper.toUserListDto(mentor.getMentees());
     }
 }

@@ -47,6 +47,6 @@ class EventParticipationControllerTest {
 
     @Test
     void test_get_participants_with_invalid_params_should_throw_exception() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> eventParticipationController.getParticipants(-1L));
+        Assertions.assertThrows(DataValidationException.class, () -> eventParticipationController.getParticipants(-1L));
     }
 }

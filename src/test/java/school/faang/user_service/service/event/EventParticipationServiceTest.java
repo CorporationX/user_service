@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
@@ -15,7 +16,6 @@ import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.service.user.UserService;
 
 import java.util.List;
-import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 class EventParticipationServiceTest {
@@ -132,12 +132,13 @@ class EventParticipationServiceTest {
     void test_get_participants_should_return_list(){
         long eventId = event.getId();
         long userId = user.getId();
-        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.ofNullable(user));
-        Mockito.when(eventRepository.findById(eventId)).thenReturn(Optional.ofNullable(event));
+        Mockito.when(userService.existsById(userId)).thenReturn(true);
+        Mockito.when(eventService.existsById(eventId)).thenReturn(true);
         eventParticipationService.registerParticipant(eventId, userId);
 
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(eventId)).thenReturn(List.of(user));
-        List<User> participants = eventParticipationService.getParticipants(eventId);
+        Mockito.when(eventService.existsById(eventId)).thenReturn(true);
+        List<UserDto> participants = eventParticipationService.getParticipants(eventId);
 
         Assertions.assertNotNull(participants);
         Assertions.assertEquals(1, participants.size());
@@ -145,7 +146,9 @@ class EventParticipationServiceTest {
 
     @Test
     void test_get_participants_should_return_empty(){
-        Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(event.getId())).thenReturn(List.of());
-        Assertions.assertEquals(List.of(), eventParticipationService.getParticipants(event.getId()));
+        long eventId = event.getId();
+        Mockito.when(eventService.existsById(eventId)).thenReturn(true);
+        Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(eventId)).thenReturn(List.of());
+        Assertions.assertEquals(List.of(), eventParticipationService.getParticipants(eventId));
     }
 }

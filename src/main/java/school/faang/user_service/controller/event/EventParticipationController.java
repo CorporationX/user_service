@@ -2,12 +2,11 @@ package school.faang.user_service.controller.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventParticipationService;
 
-import java.util.List;
-
+import java.util.Arrays;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -16,24 +15,26 @@ public class EventParticipationController {
     private final EventParticipationService eventParticipationService;
 
     public void registerParticipant(long eventId, long userId) {
-        validateParams(eventId, userId);
+        validateIds(eventId, userId);
         eventParticipationService.registerParticipant(eventId, userId);
     }
 
     public void unregisterParticipant(long eventId, long userId) {
-        validateParams(userId, eventId);
+        validateIds(userId, eventId);
 
         eventParticipationService.unregisterParticipant(eventId, userId);
     }
 
-    public List<User> getParticipants(long eventId) {
-        validateEventId(eventId);
+    public List<UserDto> getParticipants(long eventId) {
+        validateIds(eventId);
         return eventParticipationService.getParticipants(eventId);
     }
 
-    private void validateParams(long eventId, long userId) {
-        if (eventId < 0 || userId < 0) {
-            throw new DataValidationException("Id must be more than zero");
-        }
+    private void validateIds(long... ids) {
+        Arrays.stream(ids).forEach(id -> {
+            if (id < 0) {
+                throw new DataValidationException("Id must be more than zero");
+            }
+        });
     }
 }

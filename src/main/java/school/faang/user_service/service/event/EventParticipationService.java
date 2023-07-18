@@ -2,22 +2,21 @@ package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.service.user.UserService;
 
 import java.util.List;
 
-import java.util.List;
-
-@Component
 @RequiredArgsConstructor
 @Service
 public class EventParticipationService {
     private final EventParticipationRepository eventParticipationRepository;
     private final UserService userService;
     private final EventService eventService;
+    private final UserMapper userMapper;
 
     public void registerParticipant(long eventId, long userId) {
         userService.existsById(userId);
@@ -41,8 +40,12 @@ public class EventParticipationService {
         eventParticipationRepository.unregister(eventId, userId);
     }
 
-    public List<User> getParticipants(long eventId) {
-        return eventParticipationRepository.findAllParticipantsByEventId(eventId);
+    public List<UserDto> getParticipants(long eventId) {
+        eventService.existsById(eventId);
+        return eventParticipationRepository.findAllParticipantsByEventId(eventId)
+                .stream()
+                .map(userMapper.INSTANCE::toUserDto)
+                .toList();
     }
 
     private boolean isExist(long userId, long eventId) {

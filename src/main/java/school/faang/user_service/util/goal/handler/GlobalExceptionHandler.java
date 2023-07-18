@@ -10,6 +10,7 @@ import school.faang.user_service.util.goal.exception.GoalInvitationNotFoundExcep
 import school.faang.user_service.util.goal.exception.GoalNotFoundException;
 import school.faang.user_service.util.goal.exception.IncorrectIdException;
 import school.faang.user_service.util.goal.exception.MappingGoalInvitationDtoException;
+import school.faang.user_service.util.goal.exception.RejectionGoalInvitationException;
 import school.faang.user_service.util.goal.exception.UserNotFoundException;
 
 @ControllerAdvice
@@ -47,6 +48,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AcceptingGoalInvitationException.class)
     public ResponseEntity<ErrorResponse> handle(AcceptingGoalInvitationException e) {
+        return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage(), System.currentTimeMillis()));
+    }
+
+    @ExceptionHandler(RejectionGoalInvitationException.class)
+    public ResponseEntity<ErrorResponse> handle(RejectionGoalInvitationException e) {
         return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage(), System.currentTimeMillis()));
     }
 }

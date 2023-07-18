@@ -80,8 +80,8 @@ class EventServiceTest {
       eventService.get(anyId);
       Mockito.verify(eventRepository, Mockito.times(1)).findById(anyId);
     } catch (Exception e) {}
-
   }
+
   @Test
   public void testGetEventByIdFail() {
     Long anyId = 1L;

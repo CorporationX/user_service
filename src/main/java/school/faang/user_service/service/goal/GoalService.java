@@ -31,7 +31,7 @@ public class GoalService {
 
     public void createGoal(Long userId, Goal goal) {
         createGoalValidation(userId, goal);
-        goalRepository.create(goal.getTitle(), goal.getDescription(), goal.getParent().getId());
+        goalRepository.save(goal);
         GoalDto dto = goalMapper.toDto(goal);
         Long gid = dto.getId();
         dto.getSkillIds().stream().forEach(sid -> goalRepository.connectGoalWithSkill(gid, sid));

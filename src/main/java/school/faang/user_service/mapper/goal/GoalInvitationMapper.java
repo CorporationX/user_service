@@ -22,5 +22,5 @@ public interface GoalInvitationMapper {
     @Mapping(target = "invited", expression = "java(service.findUserById(dto.invitedUserId()))")
     @Mapping(target = "goal", expression = "java(service.findGoalById(dto.goalId()))")
     @Mapping(target = "status", expression = "java(PENDING)") // по идее статус должен быть такой при создании запроса, я же не могу отправить запрос, который по умолчанию будет принят
-    GoalInvitation toEntity(GoalInvitationDto dto, GoalInvitationService service);
+    GoalInvitation toEntityForCreatingInvitation(GoalInvitationDto dto, GoalInvitationService service);
 }

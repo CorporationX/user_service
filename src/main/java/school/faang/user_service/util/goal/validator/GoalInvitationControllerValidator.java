@@ -6,6 +6,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.util.goal.exception.IncorrectIdException;
 
 import java.util.List;
 
@@ -29,6 +30,12 @@ public class GoalInvitationControllerValidator {
             });
 
             throw e.getClass().getConstructor(String.class).newInstance(message.toString());
+        }
+    }
+
+    public void validateInvitation(Long id) {
+        if (id == null || id < 1) {
+            throw new IncorrectIdException("Id can't be lower than 1");
         }
     }
 }

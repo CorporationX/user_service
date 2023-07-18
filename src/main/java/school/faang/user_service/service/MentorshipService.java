@@ -2,11 +2,9 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.mentee.MenteeDto;
-import school.faang.user_service.dto.mentor.MentorDto;
+import school.faang.user_service.dto.mentor.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.mentee.MenteeMapper;
-import school.faang.user_service.mapper.mentor.MentorMapper;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import java.util.List;
@@ -15,22 +13,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MentorshipService {
     private final MentorshipRepository mentorshipRepository;
-    private final MenteeMapper menteeMapper;
-    private final MentorMapper mentorMapper;
+    private final UserMapper userMapper;
 
-    public List<MenteeDto> getMentees(long userId) {
-        if (!mentorshipRepository.existsById(userId)) {
-            throw new RuntimeException("User with id not found");
-        }
-        List<User> userList = mentorshipRepository.getAllByMentorId(userId);
-        return menteeMapper.toUserDto(userList);
+    public List<UserDto> getMentees(Long userId) {
+        User user = mentorshipRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User with id " + userId + " not found"));
+
+        return userMapper.toUserListDto(user.getMentees());
     }
 
-    public List<MentorDto> getMentors(long userId) {
-        if (!mentorshipRepository.existsById(userId)) {
-            throw new RuntimeException("User with id not found");
-        }
-        List<User> userList = mentorshipRepository.getAllByMenteeId(userId);
-        return mentorMapper.toMentorDto(userList);
+    public List<UserDto> getMentors(Long userId) {
+        User user = mentorshipRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User with id " + userId + " not found"));
+
+        return userMapper.toUserListDto(user.getMentors());
     }
 }

@@ -51,8 +51,7 @@ class MentorshipServiceTest {
 
         User mentee = User.builder()
                 .id(MENTEE_ID)
-                .mentors(new ArrayList<>(Collections.singletonList(
-                        User.builder().id(MENTOR_ID).build())))
+                .mentors(new ArrayList<>(Collections.singletonList(mentor)))
                 .build();
         when(mentorshipRepository.findById(MENTEE_ID))
                 .thenReturn(Optional.of(mentee));
@@ -78,9 +77,9 @@ class MentorshipServiceTest {
     }
 
     @Test
-    void getMentors_shouldMatchMenteesSize() {
-        List<UserDto> mentees = mentorshipService.getMentors(MENTEE_ID);
-        assertEquals(1, mentees.size());
+    void getMentors_shouldMatchMentorsSize() {
+        List<UserDto> mentors = mentorshipService.getMentors(MENTEE_ID);
+        assertEquals(1, mentors.size());
     }
 
     @Test
@@ -114,6 +113,27 @@ class MentorshipServiceTest {
     void deleteMentee_shouldThrowUserNotFoundException() {
         assertThrows(EntityNotFoundException.class,
                 () -> mentorshipService.deleteMentee(INCORRECT_USER_ID, MENTEE_ID),
+                "User not found");
+    }
+
+    @Test
+    void deleteMentor_shouldInvokeFindByIdMethod() {
+        mentorshipService.deleteMentor(MENTEE_ID, MENTOR_ID);
+        verify(mentorshipRepository).findById(MENTEE_ID);
+    }
+
+    @Test
+    void deleteMentor_shouldDeleteMentorFromMenteeMentorsList() {
+        User mentee = mentorshipRepository.findById(MENTEE_ID).orElseThrow();
+        assertEquals(1, mentee.getMentors().size());
+        mentorshipService.deleteMentor(MENTEE_ID, MENTOR_ID);
+        assertEquals(0, mentee.getMentors().size());
+    }
+
+    @Test
+    void deleteMentor_shouldThrowUserNotFoundException() {
+        assertThrows(EntityNotFoundException.class,
+                () -> mentorshipService.deleteMentee(INCORRECT_USER_ID, MENTOR_ID),
                 "User not found");
     }
 }

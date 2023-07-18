@@ -30,23 +30,26 @@ class EventServiceTest {
     @InjectMocks
     private EventService eventService;
 
-
     @Test
-    void should() {
+    void testCreateException() {
         List<SkillDto> skillsDto = List.of(SkillDto.builder().title("test").id(1L).build());
         List<Skill> skills = List.of(Skill.builder().id(1L).build());
+
         User user = User.builder().id(1L).skills(skills).build();
         EventDto event = EventDto.builder().id(1L).ownerId(1L).relatedSkills(skillsDto).build();
+
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         assertThrows(DataValidationException.class, () -> eventService.create(event));
     }
 
     @Test
-    void shouldTwo() {
+    void testCallCreate() {
         List<SkillDto> skillsDto = List.of(SkillDto.builder().title("test").id(1L).build());
         List<Skill> skills = List.of(Skill.builder().id(1L).title("test").build());
+
         User user = User.builder().id(1L).skills(skills).build();
         EventDto event = EventDto.builder().id(1L).ownerId(1L).relatedSkills(skillsDto).build();
+
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         eventService.create(event);
         verify(eventRepository).save(any());

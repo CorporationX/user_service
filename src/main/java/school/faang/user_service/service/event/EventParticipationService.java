@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventParticipationRepository;
+import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.user.UserService;
 
 @RequiredArgsConstructor
@@ -12,6 +14,7 @@ import school.faang.user_service.service.user.UserService;
 public class EventParticipationService {
 
     private final EventParticipationRepository eventParticipationRepository;
+    private final EventRepository eventRepository;
     private final UserService userService;
     private final EventService eventService;
 
@@ -25,12 +28,12 @@ public class EventParticipationService {
     }
 
     public int getParticipantsCount(long eventId) {
-        validateEvent(eventService.findById(eventId));
+        validateEvent(getEvent(eventId));
         return eventParticipationRepository.countParticipants(eventId);
     }
 
     private Event getEvent(long eventId) {
-        return eventService.findById(eventId).orElse(null);
+        return eventRepository.findById(eventId).orElse(null);
     }
 
     private void validatePossibility(long userId, long eventId) {

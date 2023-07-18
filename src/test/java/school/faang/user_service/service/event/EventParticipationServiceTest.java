@@ -11,7 +11,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventParticipationRepository;
+import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.user.UserService;
 
 import java.util.List;
@@ -30,6 +32,12 @@ class EventParticipationServiceTest {
 
     @Mock
     private UserService userService;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private EventRepository eventRepository;
 
     @Mock
     private EventService eventService;
@@ -58,7 +66,6 @@ class EventParticipationServiceTest {
         eventParticipationService.registerParticipant(eventId, userId);
         Mockito.verify(eventParticipationRepository, Mockito.times(1)).register(eventId, userId);
     }
-
 
     @Test
     void test_register_participant_should_success_register_for_other_event() {
@@ -108,8 +115,8 @@ class EventParticipationServiceTest {
     void test_get_participants_count_should_return_one(){
         long eventId = event.getId();
         long userId = user.getId();
-        Mockito.when(userService.findById(userId)).thenReturn(Optional.ofNullable(user));
-        Mockito.when(userService.findById(eventId)).thenReturn(Optional.ofNullable(event));
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.ofNullable(user));
+        Mockito.when(eventRepository.findById(eventId)).thenReturn(Optional.ofNullable(event));
 
         eventParticipationService.registerParticipant(eventId, userId);
         Mockito.when(eventParticipationRepository.countParticipants(eventId)).thenReturn(1);
@@ -122,9 +129,9 @@ class EventParticipationServiceTest {
     @Test
     void test_get_participants_count_should_return_number_greater_than_one(){
         long eventId = event.getId();
-        Mockito.when(userService.findById(eventId)).thenReturn(Optional.ofNullable(event));
+        Mockito.when(eventRepository.findById(eventId)).thenReturn(Optional.ofNullable(event));
         participants.forEach(participant -> {
-            Mockito.when(userService.findById(participant.getId())).thenReturn(Optional.ofNullable(user));
+            Mockito.when(userRepository.findById(participant.getId())).thenReturn(Optional.ofNullable(user));
             eventParticipationService.registerParticipant(eventId, participant.getId());
         });
 
@@ -138,7 +145,7 @@ class EventParticipationServiceTest {
     @Test
     void test_get_participants_count_should_return_zero(){
         long eventId = event.getId();
-        Mockito.when(userService.findById(eventId)).thenReturn(Optional.ofNullable(event));
+        Mockito.when(eventRepository.findById(eventId)).thenReturn(Optional.ofNullable(event));
         Assertions.assertEquals(0, eventParticipationService.getParticipantsCount(eventId));
     }
 }

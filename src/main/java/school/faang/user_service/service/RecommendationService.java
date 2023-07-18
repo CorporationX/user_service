@@ -43,11 +43,9 @@ public class RecommendationService {
     public RecommendationDto create(RecommendationDto recommendation) {
         validate(recommendation);
 
-        long newRecommendationId = recommendationRepository.create(
-                recommendation.getAuthorId(),
-                recommendation.getReceiverId(),
-                recommendation.getContent()
-        );
+        long newRecommendationId = recommendationRepository.create(recommendation.getAuthorId(), recommendation.getReceiverId(),
+                recommendation.getContent());
+
         Recommendation recommendationEntity = recommendationRepository.findById(newRecommendationId)
                 .orElseThrow(() -> new DataValidationException("Recommendation not found"));
 
@@ -61,6 +59,7 @@ public class RecommendationService {
         skillValidator.validateSkillOffersDto(recommendation);
     }
 
+    @Transactional
     public void saveSkillOffers(Recommendation recommendationEntity, List<SkillOfferDto> skillOffers) {
         for (SkillOfferDto skillOfferDto : skillOffers) {
             long newSkillOfferId = skillOfferRepository.create(
@@ -71,6 +70,7 @@ public class RecommendationService {
 
             List<Skill> skillsInUser = skillRepository.findAllByUserId(recommendationEntity.getReceiver().getId());
             List<SkillDto> skillsInUserDtos = skillsInUser.stream().map(skillMapper::toDto).toList();
+
             UserSkillGuaranteeDto userSkillGuaranteeDto = UserSkillGuaranteeDto.builder()
                     .userId(recommendationEntity.getReceiver().getId())
                     .guarantorId(recommendationEntity.getAuthor().getId())

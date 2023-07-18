@@ -17,6 +17,7 @@ import school.faang.user_service.service.event.EventParticipationService;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,8 +34,8 @@ public class EventParticipationServiceTest {
     @Test
     public void registerParticipantTest() {
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(Collections.emptyList());
-        eventParticipationService.registerParticipant(1L, 1L);
-        Mockito.verify(eventParticipationRepository).register(1L, 1L);
+        eventParticipationService.registerParticipant(1L, 10L);
+        Mockito.verify(eventParticipationRepository).register(1L, 10L);
     }
 
     @Test
@@ -55,17 +56,21 @@ public class EventParticipationServiceTest {
 
     @Test
     public void unregisterParticipantThrowExceptionTest() {
+        User user = User.builder().id(1L).username("name").build();
+        Mockito.when(eventParticipationRepository.existsById(1L)).thenReturn(true);
+        Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(List.of(user));
         Assertions.assertThrows(DataValidationException.class,
                 () -> eventParticipationService.unregisterParticipant(1L, 2L));
     }
 
     @Test
     public void getParticipantTest() {
-        UserDto userDto = new UserDto(1L, "name", "email@gmail.com");
-        User user = userMapper.toEntity(userDto);
+        User user = User.builder().id(1L).username("test").build();
+        UserDto userDto = new UserDto(1L, "test", "test");
+        Mockito.when(eventParticipationRepository.existsById(1L)).thenReturn(true);
+        Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(List.of(user));
+        Mockito.when(userMapper.toDto(user)).thenReturn(userDto);
         Assertions.assertEquals(userDto, eventParticipationService.getListOfParticipant(1L).get(0));
-        Assertions.assertEquals(user.getId(), userDto.getId());
-        Assertions.assertEquals(user.getUsername(), userDto.getUsername());
     }
 
     @Test

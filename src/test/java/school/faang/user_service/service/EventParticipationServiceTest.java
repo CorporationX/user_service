@@ -39,7 +39,7 @@ public class EventParticipationServiceTest {
 
     @Test
     public void registerParticipantThrowExceptionTest() {
-        User user = User.builder().id(1L).username("test").build();
+        User user = User.builder().id(1L).username("name").build();
         Mockito.when(eventParticipationRepository.existsById(1L)).thenReturn(true);
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(List.of(user));
         assertThrows(DataValidationException.class,
@@ -61,18 +61,16 @@ public class EventParticipationServiceTest {
 
     @Test
     public void getParticipantTest() {
-        Mockito.when(eventParticipationRepository.existsById(1L)).thenReturn(false);
-        assertThrows(DataValidationException.class,
-                () -> eventParticipationService.getListOfParticipant(1L));
+        UserDto userDto = new UserDto(1L, "name", "email@gmail.com");
+        User user = userMapper.toEntity(userDto);
+        Assertions.assertEquals(userDto, eventParticipationService.getListOfParticipant(1L).get(0));
+        Assertions.assertEquals(user.getId(), userDto.getId());
+        Assertions.assertEquals(user.getUsername(), userDto.getUsername());
     }
 
     @Test
     public void getParticipantThrowExceptionTest() {
-        User user = User.builder().id(1L).username("name").build();
-        UserDto userDto = new UserDto(1L, "name", "email@gmail.com");
-        Mockito.when(eventParticipationRepository.existsById(1L)).thenReturn(true);
-        Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(List.of(user));
-        Mockito.when(userMapper.toDto(user)).thenReturn(userDto);
-        Assertions.assertEquals(userDto, eventParticipationService.getListOfParticipant(1L).get(0));
+        assertThrows(DataValidationException.class,
+                () -> eventParticipationService.getListOfParticipant(1L));
     }
 }

@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -130,7 +131,8 @@ class EventServiceTest {
     void create_ShouldReturnEventDto() {
         Event event = createEvent();
         User user = createUser();
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        Long userId = 1L;
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(eventRepository.save(ArgumentMatchers.any(Event.class))).thenReturn(event);
 
         EventDto eventDto = createEventDto();
@@ -141,7 +143,7 @@ class EventServiceTest {
         assertEquals(eventDto.getOwnerId(), createdEventDto.getOwnerId());
         assertThat(eventDto.getRelatedSkills()).containsExactlyInAnyOrderElementsOf(createdEventDto.getRelatedSkills());
 
-        verify(userRepository).findById(1L);
+        verify(userRepository).findById(userId);
         verify(eventRepository).save(any(Event.class));
     }
 
@@ -158,10 +160,13 @@ class EventServiceTest {
         Event event = createEvent();
         when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
 
-        EventDto foundEventDto = eventService.get(1L);
+        Long eventId = 1L;
+        EventDto foundEventDto = eventService.get(eventId);
 
         assertNotNull(foundEventDto);
         assertEquals(event.getId(), foundEventDto.getId());
+
+        verify(eventRepository, times(1)).findById(eventId);
     }
 
     @Test
@@ -169,9 +174,12 @@ class EventServiceTest {
         Long eventId = 1L;
         when(eventRepository.existsById(eventId)).thenReturn(true);
 
+        boolean result = eventService.deleteEvent(eventId);
+
+        assertTrue(result);
+
         verify(eventRepository, times(1)).deleteById(eventId);
-        verify(eventRepository, times(1)).deleteById(eventId);
-        verify(eventRepository, times(2)).existsById(eventId);
+        verify(eventRepository, times(1)).existsById(eventId);
     }
 
     @Test
@@ -182,5 +190,7 @@ class EventServiceTest {
         boolean result = eventService.deleteEvent(eventId);
 
         assertFalse(result);
+
+        verify(eventRepository, times(1)).existsById(eventId);
     }
 }

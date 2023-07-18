@@ -21,7 +21,7 @@ public class MentorshipService {
         }
         User mentor = new User();
         mentor.setId(userId);
-        mentorshipRepository.findUserById(mentor.getId());
+        mentorshipRepository.findUserById(userId);
         return userMapper.toUserListDto(mentor.getMentees());
     }
 }

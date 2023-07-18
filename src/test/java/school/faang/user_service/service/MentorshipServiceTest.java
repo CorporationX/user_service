@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentee.UserDto;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 
@@ -15,10 +16,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
+
 @ExtendWith(MockitoExtension.class)
 class MentorshipServiceTest {
     @Mock
     private MentorshipRepository mentorshipRepository;
+    @Mock
+    private UserMapper userMapper;
     @InjectMocks
     private MentorshipService mentorshipService;
 
@@ -26,9 +30,7 @@ class MentorshipServiceTest {
     @Test
     public void getMentees_When() {
         when(mentorshipRepository.existsById(anyLong())).thenReturn(false);
-
         RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> mentorshipService.getMentees(anyLong()));
-
         assertEquals("User with id not found", runtimeException.getMessage());
     }
 

@@ -13,7 +13,7 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.List;
-import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -23,7 +23,6 @@ public class SkillService {
     private final SkillRepository skillRepository;
     private final SkillMapper skillMapper;
     private final UserRepository userRepository;
-    private final SkillCandidateDto skillCandidateDto;
 
     @Transactional
     public SkillDto create(SkillDto skillDto) {
@@ -56,13 +55,12 @@ public class SkillService {
     }
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
-        List<Skill> skills = skillRepository.findAllByUserId(userId);
+        List<Skill> skillsOfferedToUser = skillRepository.findSkillsOfferedToUser(userId);
 
-        Map<String, Long> skillsAmount = skills.stream().
-                collect(Collectors.groupingBy(Skill::getTitle, Collectors.counting()));
-
-        return skills.stream()
-                .map(skill -> skillMapper.toCandidateDto(skill, skillsAmount.getOrDefault(skill.getTitle(), 0L)))
+        return skillsOfferedToUser.stream().
+                collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                .entrySet().stream()
+                .map(entry -> skillMapper.toCandidateDto(entry.getKey(), entry.getValue()))
                 .toList();
     }
 }

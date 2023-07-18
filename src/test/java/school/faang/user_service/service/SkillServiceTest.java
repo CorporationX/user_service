@@ -106,27 +106,26 @@ class SkillServiceTest {
         User user = new User();
         user.setId(userId);
 
-        List<Skill> skills = List.of(
+        List<Skill> skillsOfferedToUser = List.of(
                 new Skill(1L, "Hard Skill", List.of(user),
                         null, null, null, null, null),
                 new Skill(2L, "Soft Skill", List.of(user),
                         null, null, null, null, null),
-                new Skill(3L, "Hard Skill", List.of(user),
+                new Skill(1L, "Hard Skill", List.of(user),
                         null, null, null, null, null)
         );
 
-        when(skillRepository.findAllByUserId(userId)).thenReturn(skills);
+        when(skillRepository.findSkillsOfferedToUser(userId)).thenReturn(skillsOfferedToUser);
 
         List<SkillCandidateDto> offeredSkillsDto = skillService.getOfferedSkills(userId);
 
-        String expectedTitle = "Hard Skill";
+        String expectedTitle = "Soft Skill";
         String actualTitle = offeredSkillsDto.get(0).getSkill().getTitle();
 
         assertNotNull(offeredSkillsDto);
-        assertEquals(skills.size(), offeredSkillsDto.size());
-        assertEquals(2, offeredSkillsDto.get(0).getOffersAmount());
-        assertEquals(1, offeredSkillsDto.get(1).getOffersAmount());
-        assertEquals(2, offeredSkillsDto.get(2).getOffersAmount());
+        assertEquals(2, offeredSkillsDto.size());
+        assertEquals(1, offeredSkillsDto.get(0).getOffersAmount());
+        assertEquals(2, offeredSkillsDto.get(1).getOffersAmount());
         assertEquals(expectedTitle, actualTitle);
     }
 }

@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 class MentorshipServiceTest {
     private static final long MENTOR_ID = 1L;
     private static final long MENTEE_ID = 2L;
-    private static final long INCORRECT_USER_ID = 0L;
+    private static final long INCORRECT_USER_ID = 3L;
     @Mock
     private MentorshipRepository mentorshipRepository;
     @Mock
@@ -71,7 +71,7 @@ class MentorshipServiceTest {
     }
 
     @Test
-    void getMentees_shouldThrowEntityNotFoundException() {
+    void getMentees_shouldThrowException() {
         assertThrows(EntityNotFoundException.class,
                 () -> mentorshipService.getMentees(INCORRECT_USER_ID),
                 "Invalid user id");
@@ -90,21 +90,30 @@ class MentorshipServiceTest {
     }
 
     @Test
-    void getMentors_shouldThrowEntityNotFoundException() {
+    void getMentors_shouldThrowException() {
         assertThrows(EntityNotFoundException.class,
                 () -> mentorshipService.getMentors(INCORRECT_USER_ID),
+                "Invalid user id");
     }
 
     @Test
-    void getMentees_shouldInvokeFindByIdMethod() {
-        mentorshipService.getMentees(MENTOR_ID);
-        Mockito.verify(mentorshipRepository).findById(MENTOR_ID);
+    void deleteMentee_shouldInvokeFindByIdMethod() {
+        mentorshipService.deleteMentee(MENTOR_ID, MENTEE_ID);
+        verify(mentorshipRepository).findById(MENTOR_ID);
     }
 
     @Test
-    void getMentees_shouldThrowException() {
+    void deleteMentee_shouldDeleteMenteeFromMentorMenteesList() {
+        User mentor = mentorshipRepository.findById(MENTOR_ID).orElseThrow();
+        assertEquals(1, mentor.getMentees().size());
+        mentorshipService.deleteMentee(MENTOR_ID, MENTEE_ID);
+        assertEquals(0, mentor.getMentees().size());
+    }
+
+    @Test
+    void deleteMentee_shouldThrowUserNotFoundException() {
         assertThrows(EntityNotFoundException.class,
-                () -> mentorshipService.getMentees(INCORRECT_MENTOR_ID),
+                () -> mentorshipService.deleteMentee(INCORRECT_USER_ID, MENTEE_ID),
                 "Invalid user id");
     }
 }

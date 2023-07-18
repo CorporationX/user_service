@@ -32,9 +32,21 @@ public class MentorshipService {
                 .toList();
     }
 
-    private User getUserById(long mentorId) {
-        return mentorshipRepository.findById(mentorId)
-                .orElseThrow(() -> new EntityNotFoundException("Invalid user id"));
+    @Transactional
+    public void deleteMentee(long mentorId, long menteeId) {
+        User mentor = getUserById(mentorId);
+        mentor.getMentees().removeIf(mentee -> mentee.getId() == menteeId);
+    }
+
+    @Transactional
+    public void deleteMentor(long menteeId, long mentorId) {
+        User mentee = getUserById(menteeId);
+        mentee.getMentors().removeIf(mentor -> mentor.getId() == mentorId);
+    }
+
+    private User getUserById(long userId) {
+        return mentorshipRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
     }
 }
 

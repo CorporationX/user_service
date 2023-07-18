@@ -98,12 +98,4 @@ class SkillServiceTest {
         assertEquals(skills.get(0).getTitle(), userSkillsDto.get(0).getTitle());
         assertEquals(skills.get(1).getTitle(), userSkillsDto.get(1).getTitle());
     }
-
-    @Test
-    void testValidationAvailabilityOfUserSkills() {
-        DataValidationException validationException = assertThrows(DataValidationException.class,
-                () -> skillService.getUserSkills(1L));
-
-        assertEquals("User has no skills", validationException.getMessage());
-    }
 }

@@ -41,4 +41,17 @@ public class SubscriptionControllerTest {
         Assertions.assertThrows(DataValidationException.class,
                 () -> controller.followUser(dto));
     }
+
+    @Test
+    void unfollowUserOkResponseTest() {
+        var res = controller.unfollowUser(dto);
+        Assertions.assertEquals(res.getStatusCode(), HttpStatus.OK);
+    }
+
+    @Test
+    void unfollowUserSameIdExceptionTest() {
+        dto.setFolloweeId(1);
+        Assertions.assertThrows(DataValidationException.class,
+                () -> controller.unfollowUser(dto));
+    }
 }

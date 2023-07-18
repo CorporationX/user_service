@@ -44,4 +44,13 @@ public class SubscriptionServiceTest {
         Assert.assertThrows(DataValidationException.class,
                 () -> service.followUser(followerId, followeeId));
     }
+
+    @Test
+    void unfollowTest() {
+        long followerId = 1;
+        long followeeId = 2;
+
+        repository.unfollowUser(followerId,followeeId);
+        verify(repository).unfollowUser(followerId, followeeId);
+    }
 }

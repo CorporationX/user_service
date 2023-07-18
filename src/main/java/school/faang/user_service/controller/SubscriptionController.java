@@ -18,6 +18,13 @@ public class SubscriptionController {
     public ResponseEntity<?> followUser(@RequestBody SubscriptionDto dto) {
         validator.validateId(dto.getFollowerId(), dto.getFolloweeId());
         service.followUser(dto.getFollowerId(), dto.getFolloweeId());
-        return ResponseEntity.ok().body("12");
+        return ResponseEntity.ok().body("Followed");
+    }
+
+    @DeleteMapping("/unfollow")
+    public ResponseEntity<?> unfollowUser(@RequestBody SubscriptionDto dto) {
+        validator.validateId(dto.getFollowerId(), dto.getFolloweeId());
+        service.unfollowUser(dto.getFollowerId(), dto.getFolloweeId());
+        return ResponseEntity.ok().body("Unfollowed");
     }
 }

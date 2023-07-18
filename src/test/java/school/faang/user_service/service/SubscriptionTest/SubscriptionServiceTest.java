@@ -69,4 +69,10 @@ public class SubscriptionServiceTest {
         var res = service.getFollowers(1, filterDto);
         verify(repository).findByFolloweeId(Mockito.anyLong());
     }
+
+    @Test
+    void GetFollowersCountTest() {
+        var res = service.getFollowers(1, filterDto);
+        verify(repository).findByFolloweeId(Mockito.anyLong());
+    }
 }

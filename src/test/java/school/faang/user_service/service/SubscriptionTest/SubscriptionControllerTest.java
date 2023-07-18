@@ -69,4 +69,16 @@ public class SubscriptionControllerTest {
         Assertions.assertThrows(DataValidationException.class,
                 () -> controller.getFollowers(0,filterDto));
     }
+
+    @Test
+    void GetFollowersCountTest() {
+        var res = controller.getFollowersCount(1);
+        Assertions.assertEquals(res.getStatusCode(), HttpStatus.OK);
+    }
+
+    @Test
+    void GetFollowersCountInvalidIdExceptionTest() {
+        Assertions.assertThrows(DataValidationException.class,
+                () -> controller.getFollowers(0,filterDto));
+    }
 }

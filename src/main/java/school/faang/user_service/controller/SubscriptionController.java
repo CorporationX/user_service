@@ -34,4 +34,11 @@ public class SubscriptionController {
         validator.validateId(followeeId);
         return ResponseEntity.ok(service.getFollowers(followeeId, filter));
     }
+
+    @GetMapping("/followers/count/{followerId}")
+    public ResponseEntity<?> getFollowersCount(@PathVariable long followerId) {
+        validator.validateId(followerId);
+        long followersCount = service.getFollowersCount(followerId);
+        return ResponseEntity.ok(followersCount);
+    }
 }

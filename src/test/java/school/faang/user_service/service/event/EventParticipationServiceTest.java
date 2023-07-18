@@ -15,13 +15,14 @@ import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.service.user.UserService;
 
 import java.util.List;
-import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 class EventParticipationServiceTest {
     private User user;
 
     private Event event;
+
+    private List<User> participants;
 
     @Mock
     private EventParticipationRepository eventParticipationRepository;
@@ -39,6 +40,12 @@ class EventParticipationServiceTest {
     public void setUp() {
         this.user = new User();
         this.event = new Event();
+        this.participants = List.of(
+                new User(),
+                new User(),
+                new User(),
+                new User()
+        );
     }
 
     @Test
@@ -132,8 +139,8 @@ class EventParticipationServiceTest {
     void test_get_participants_count_should_return_one(){
         long eventId = event.getId();
         long userId = user.getId();
-        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.ofNullable(user));
-        Mockito.when(eventRepository.findById(eventId)).thenReturn(Optional.ofNullable(event));
+        Mockito.when(userService.existsById(userId)).thenReturn(true);
+        Mockito.when(eventService.existsById(eventId)).thenReturn(true);
 
         eventParticipationService.registerParticipant(eventId, userId);
         Mockito.when(eventParticipationRepository.countParticipants(eventId)).thenReturn(1);
@@ -146,9 +153,9 @@ class EventParticipationServiceTest {
     @Test
     void test_get_participants_count_should_return_number_greater_than_one(){
         long eventId = event.getId();
-        Mockito.when(eventRepository.findById(eventId)).thenReturn(Optional.ofNullable(event));
+        Mockito.when(eventService.existsById(eventId)).thenReturn(true);
         participants.forEach(participant -> {
-            Mockito.when(userRepository.findById(participant.getId())).thenReturn(Optional.ofNullable(user));
+            Mockito.when(userService.existsById(participant.getId())).thenReturn(true);
             eventParticipationService.registerParticipant(eventId, participant.getId());
         });
 
@@ -162,7 +169,7 @@ class EventParticipationServiceTest {
     @Test
     void test_get_participants_count_should_return_zero(){
         long eventId = event.getId();
-        Mockito.when(eventRepository.findById(eventId)).thenReturn(Optional.ofNullable(event));
+        Mockito.when(eventService.existsById(eventId)).thenReturn(true);
         Assertions.assertEquals(0, eventParticipationService.getParticipantsCount(eventId));
     }
 }

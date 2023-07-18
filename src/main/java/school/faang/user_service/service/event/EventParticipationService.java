@@ -36,7 +36,7 @@ public class EventParticipationService {
     }
 
     public int getParticipantsCount(long eventId) {
-        validateEvent(getEvent(eventId));
+        eventService.existsById(eventId);
         return eventParticipationRepository.countParticipants(eventId);
     }
 

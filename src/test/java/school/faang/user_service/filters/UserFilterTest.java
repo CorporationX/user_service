@@ -1,7 +1,7 @@
 package school.faang.user_service.filters;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
@@ -12,7 +12,12 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserFilterTest {
-    UserFilter userFilter = new UserFilter();
+    private UserFilter userFilter;
+    private UserMapper userMapper = new UserMapperImpl();
+    @BeforeEach
+    void beforeStart() {
+        userFilter = new UserFilter();
+    }
 
     @Test
     void applyFilterThrowNullPointer(){

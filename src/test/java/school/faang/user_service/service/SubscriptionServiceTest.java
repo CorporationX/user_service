@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.commonMessages.ErrorMessages;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.filters.UserFilterDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;

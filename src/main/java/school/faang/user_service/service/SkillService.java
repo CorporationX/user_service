@@ -14,13 +14,11 @@ import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class SkillService {
-
 
     private final SkillRepository skillRepository;
 
@@ -30,7 +28,7 @@ public class SkillService {
 
     private final SkillMapper skillMapper;
 
-    private final static long MIN_SKILL_OFFERS = 3;
+    private static final long MIN_SKILL_OFFERS = 3;
 
     public SkillDto create(SkillDto skillDto) {
         if (skillRepository.existsByTitle(skillDto.getTitle())) {
@@ -49,7 +47,7 @@ public class SkillService {
     }
 
     public List<SkillCandidateDto> getOfferedSkills(Long userId) {
-        return skillRepository.findAllByUserId(userId)
+        return skillRepository.findSkillsOfferedToUser(userId)
                 .stream()
                 .collect(Collectors.groupingBy(skill -> skill, Collectors.counting()))
                 .entrySet()
@@ -59,25 +57,24 @@ public class SkillService {
     }
 
     public SkillDto acquireSkillFromOffers(Long skillId, Long userId) {
-        Optional<Skill> userSkill = skillRepository.findUserSkill(skillId, userId);
-
-        if (userSkill.isEmpty()) {
+        Skill userSkill = skillRepository.findUserSkill(skillId, userId).orElse(null);
+        if (userSkill == null) {
             List<SkillOffer> allOffersOfSkill = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
             if (allOffersOfSkill.size() >= MIN_SKILL_OFFERS) {
+                userSkill = skillRepository.findById(skillId).orElseThrow(() -> new DataValidationException("Такого скилла не существует!!"));
                 skillRepository.assignSkillToUser(skillId, userId);
-                userSkill = skillRepository.findById(skillId);
-                addUserSkillGuaranteeRepository(skillRepository.findById(skillId), allOffersOfSkill);
-                return skillMapper.toDto(userSkill.orElseThrow(() -> new DataValidationException("Такой скилла не существует!!")));
+                addUserSkillGuarantee(userSkill, allOffersOfSkill);
+                return skillMapper.toDto(userSkill);
             }
         }
-        return skillMapper.toDto(userSkill.orElseThrow(() -> new DataValidationException("Такой скилла не существует!!")));
+        return skillMapper.toDto(userSkill);
     }
 
-    protected void addUserSkillGuaranteeRepository(Optional<Skill> userSkill, List<SkillOffer> allOffersOfSkill) {
+    protected void addUserSkillGuarantee(Skill userSkill, List<SkillOffer> allOffersOfSkill) {
         for (SkillOffer skillOffer : allOffersOfSkill) {
             userSkillGuaranteeRepository.save(UserSkillGuarantee.builder()
                     .user(skillOffer.getRecommendation().getReceiver())
-                    .skill(userSkill.get())
+                    .skill(userSkill)
                     .guarantor(skillOffer.getRecommendation().getAuthor())
                     .build());
         }

@@ -13,12 +13,6 @@ import java.util.List;
 public class EventParticipationService {
     private final EventParticipationRepository eventParticipationRepository;
 
-    public void validateEventId(Long eventId) {
-        if (!eventParticipationRepository.existsById(eventId)) {
-            throw new DataValidationException("There is not event with this ID!");
-        }
-    }
-
     public void registerParticipant(Long eventId, Long userId) {
         validateEventId(eventId);
         List<User> users = eventParticipationRepository.findAllParticipantsByEventId(eventId);
@@ -44,5 +38,11 @@ public class EventParticipationService {
     public int getCountRegisteredParticipant(Long eventId) {
         validateEventId(eventId);
         return eventParticipationRepository.countParticipants(eventId);
+    }
+
+    private void validateEventId(Long eventId) {
+        if (!eventParticipationRepository.existsById(eventId)) {
+            throw new DataValidationException("There is not event with this ID!");
+        }
     }
 }

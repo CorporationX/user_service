@@ -2,6 +2,7 @@ package school.faang.user_service.controller.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventParticipationService;
 
 @RequiredArgsConstructor
@@ -21,11 +22,8 @@ public class EventParticipationController {
     }
 
     private void validateParams(long eventId, long userId) {
-        if (eventId < 0) {
-            throw new IllegalArgumentException("Event not found");
-        }
-        if (userId < 0) {
-            throw new IllegalArgumentException("User not found");
+        if (eventId < 0 || userId < 0) {
+            throw new DataValidationException("Id must be more than zero");
         }
     }
 }

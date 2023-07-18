@@ -33,9 +33,10 @@ public class EventParticipationServiceTest {
 
     @Test
     public void registerParticipantTest() {
+        Mockito.when(eventParticipationRepository.existsById(1L)).thenReturn(true);
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(Collections.emptyList());
-        eventParticipationService.registerParticipant(1L, 10L);
-        Mockito.verify(eventParticipationRepository).register(1L, 10L);
+        eventParticipationService.registerParticipant(1L, 1L);
+        Mockito.verify(eventParticipationRepository).register(1L, 1L);
     }
 
     @Test
@@ -49,6 +50,7 @@ public class EventParticipationServiceTest {
 
     @Test
     public void unregisterParticipantTest() {
+        Mockito.when(eventParticipationRepository.existsById(1L)).thenReturn(true);
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(Collections.emptyList());
         eventParticipationService.unregisterParticipant(1L, 1L);
         Mockito.verify(eventParticipationRepository).unregister(1L, 1L);

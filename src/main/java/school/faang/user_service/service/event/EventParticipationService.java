@@ -49,7 +49,7 @@ public class EventParticipationService {
         return userDto;
     }
 
-    public void validateEventId(Long eventId) {
+    private void validateEventId(Long eventId) {
         if (!eventParticipationRepository.existsById(eventId)) {
             throw new DataValidationException("There is not event with this ID!");
         }

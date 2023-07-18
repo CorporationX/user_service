@@ -59,15 +59,15 @@ public class SubscriptionService {
     @Transactional
     public List<UserDto> getFollowing(long followerId, UserFilterDto filters) {
         validationUserExists(followerId);
-        List<UserDto> res = filterUsers(subscriptionRepository.findByFollowerId(followerId), filters);
-        return res;
+        return filterUsers(subscriptionRepository.findByFollowerId(followerId), filters);
     }
 
     private List<UserDto> filterUsers(Stream<User> users, UserFilterDto filters) {
-        userFilters.stream()
+        return userFilters.stream()
                 .filter(filter -> filter.isApplicable(filters))
-                .forEach(filter -> filter.apply(users, filters));
-        return userMapper.toDtoList(users.toList());
+                .reduce(users, (stream, filter) -> filter.apply(stream, filters), Stream::concat)
+                .map(userMapper::toDto)
+                .toList();
     }
 
     private void validationSubscriptionExists(long followerId, long followeeId) {

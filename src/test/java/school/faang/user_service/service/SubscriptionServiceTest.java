@@ -5,12 +5,22 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
+import school.faang.user_service.user_filters.UserFilter;
 
-import static org.junit.Assert.assertThrows;
+import java.util.List;
+import java.util.stream.Stream;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -19,9 +29,15 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class SubscriptionServiceTest {
     @InjectMocks
-    SubscriptionService subscriptionService;
+    private SubscriptionService subscriptionService;
     @Mock
-    SubscriptionRepository subscriptionRepository;
+    private SubscriptionRepository subscriptionRepository;
+    @Spy
+    private UserMapper userMapper;
+    @Mock
+    private UserFilterDto userFilterDto;
+    @Mock
+    private List<UserFilter> userFilters;
 
     long followerId;
     long followeeId;
@@ -57,7 +73,6 @@ class SubscriptionServiceTest {
         try {
             subscriptionService.followUser(followerId, followeeId);
         } catch (DataValidationException e) {
-
             assertEquals("This subscription already exists", e.getMessage());
         }
         verifyNoMoreInteractions(subscriptionRepository);
@@ -73,6 +88,37 @@ class SubscriptionServiceTest {
 
         verifyNoMoreInteractions(subscriptionRepository);
     }
+
+    @Test
+    public void testGetFollowers() {
+        User user = mock(User.class);
+        UserDto userDto = mock(UserDto.class);
+        Stream<User> userStream = Stream.of(user);
+
+        when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(userStream);
+        when(userMapper.toDto(user)).thenReturn(userDto);
+
+        subscriptionService.getFollowers(followeeId, userFilterDto);
+
+        verify(subscriptionRepository, times(1)).findByFolloweeId(followeeId);
+        verify(userMapper, times(1)).toDto(user);
+    }
+
+    @Test
+    public void testGetFollowing() {
+        User user = mock(User.class);
+        UserDto userDto = mock(UserDto.class);
+        Stream<User> userStream = Stream.of(user);
+
+        when(subscriptionRepository.findByFollowerId(followerId)).thenReturn(userStream);
+        when(userMapper.toDto(user)).thenReturn(userDto);
+
+        subscriptionService.getFollowing(followerId, userFilterDto);
+
+        verify(subscriptionRepository, times(1)).findByFollowerId(followerId);
+        verify(userMapper, times(1)).toDto(user);
+    }
+}
 
     @Test
     public void testGetFollowersCount() {

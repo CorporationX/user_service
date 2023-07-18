@@ -34,14 +34,10 @@ public class GoalInvitationService {
     public GoalInvitationDto createInvitation(GoalInvitationDto goalInvitationDto) {
         GoalInvitation goalInvitation = goalInvitationMapper.toEntityForCreatingInvitation(goalInvitationDto, this);
         goalInvitationDtoValidator.validate(goalInvitation);
-        User inviter = goalInvitation.getInviter();
-        User invited = goalInvitation.getInvited();
 
-        inviter.getSentGoalInvitations().add(goalInvitation);
-        invited.getReceivedGoalInvitations().add(goalInvitation);
+        goalInvitation.getInviter().getSentGoalInvitations().add(goalInvitation);
+        goalInvitation.getInvited().getReceivedGoalInvitations().add(goalInvitation);
         goalInvitation = goalInvitationRepository.save(goalInvitation);
-        userRepository.save(inviter);
-        userRepository.save(invited);
 
         return goalInvitationMapper.toDto(goalInvitation);
     }
@@ -49,7 +45,7 @@ public class GoalInvitationService {
     @Transactional
     public GoalInvitationDto acceptGoalInvitation(Long id) {
         GoalInvitation goalInvitation = goalInvitationAcceptValidator
-                .validateRequestToAccept(goalInvitationRepository.findById(id));
+                .validateRequest(goalInvitationRepository.findById(id));
         User invited = goalInvitation.getInvited();
         User inviter = goalInvitation.getInviter();
 
@@ -57,8 +53,7 @@ public class GoalInvitationService {
         invited.getReceivedGoalInvitations().remove(goalInvitation);
         inviter.getSentGoalInvitations().remove(goalInvitation);
         invited.getGoals().add(goalInvitation.getGoal());
-        userRepository.save(inviter);
-        userRepository.save(invited);
+        goalInvitation.getGoal().getUsers().add(invited);
         goalInvitationRepository.save(goalInvitation);
 
         return goalInvitationMapper.toDto(goalInvitation);

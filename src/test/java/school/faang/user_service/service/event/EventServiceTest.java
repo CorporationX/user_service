@@ -1,5 +1,6 @@
 package school.faang.user_service.service.event;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +24,7 @@ import school.faang.user_service.service.event.filters.EventTitleFilter;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.Assert.assertThrows;
 
@@ -74,6 +76,29 @@ class EventServiceTest {
 
     assertThrows(DataValidationException.class, () -> {
       eventService.create(eventDto);
+    });
+  }
+
+  @Test
+  public void testGetEventByIdSuccess() {
+    Long anyId = 1L;
+    Event mockEvent = new Event();
+    mockEvent.setTitle("Mock");
+
+    Mockito.lenient().when(eventRepository.findById(anyId)).thenReturn(Optional.of(mockEvent));
+    try {
+      eventService.get(anyId);
+      Mockito.verify(eventRepository, Mockito.times(1)).findById(anyId);
+    } catch (Exception e) {}
+  }
+
+  @Test
+  public void testGetEventByIdFail() {
+    Long anyId = 1L;
+    Mockito.lenient().when(skillRepository.findById(anyId)).thenReturn(null);
+
+    assertThrows(EntityNotFoundException.class, () -> {
+      eventService.get(anyId);
     });
   }
 

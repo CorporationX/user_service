@@ -1,4 +1,4 @@
-package school.faang.user_service.service.controller.event;
+package school.faang.user_service.controller.event;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;

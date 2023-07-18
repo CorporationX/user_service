@@ -31,6 +31,14 @@ public class SubscriptionController {
         return subscriptionService.getFollowing(followerId, filter);
     }
 
+    public long getFollowersCount(long followeeId) {
+        return subscriptionService.getFollowersCount(followeeId);
+    }
+
+    public long getFollowingCount(long followerId) {
+        return subscriptionService.getFollowingCount(followerId);
+    }
+
     private void validate(long followerId, long followeeId) {
         if (followerId == followeeId) {
             throw new DataValidationException("Follower and folowee can not be the same");

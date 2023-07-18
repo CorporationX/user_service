@@ -45,6 +45,16 @@ public class SubscriptionService {
         return getUsersDtoAfterFiltration(followees, filters);
     }
 
+    @Transactional(readOnly = true)
+    public long getFollowersCount(long followeeId) {
+        return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
+    }
+
+    @Transactional(readOnly = true)
+    public long getFollowingCount(long followerId) {
+        return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
+    }
+
     private void validate(long followerId, long followeeId) {
         if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             throw new DataValidationException("This subscription already exists");

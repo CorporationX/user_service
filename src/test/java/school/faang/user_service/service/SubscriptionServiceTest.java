@@ -85,6 +85,8 @@ class SubscriptionServiceTest {
         subscriptionService.unfollowUser(followerId, followeeId);
 
         verify(subscriptionRepository, times(1)).unfollowUser(followerId, followeeId);
+
+        verifyNoMoreInteractions(subscriptionRepository);
     }
 
     @Test
@@ -115,5 +117,20 @@ class SubscriptionServiceTest {
 
         verify(subscriptionRepository, times(1)).findByFollowerId(followerId);
         verify(userMapper, times(1)).toDto(user);
+    }
+}
+
+    @Test
+    public void testGetFollowersCount() {
+        subscriptionService.getFollowersCount(followeeId);
+
+        verify(subscriptionRepository, times(1)).findFollowersAmountByFolloweeId(followeeId);
+    }
+
+    @Test
+    public void testGetFollowingCount() {
+        subscriptionService.getFollowingCount(followerId);
+
+        verify(subscriptionRepository, times(1)).findFolloweesAmountByFollowerId(followerId);
     }
 }

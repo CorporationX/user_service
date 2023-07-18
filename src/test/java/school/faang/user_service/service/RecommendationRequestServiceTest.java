@@ -9,6 +9,7 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.Skill;
@@ -168,5 +169,22 @@ class RecommendationRequestServiceTest {
         RecommendationRequestDto actual = recommendationRequestService.getRequestsId(1L);
 
         assertEquals(requestDto1, actual);
+    }
+
+    @Test
+    void testRejectRequest() {
+        RejectionDto rejectionDto = RejectionDto.builder().reason("not enough skills").build();
+        Mockito.when(recommendationRequestRepository.findById(1L)).thenReturn(Optional.ofNullable(requestEntity));
+
+        requestEntity.setStatus(RequestStatus.PENDING);
+        requestEntity.setRejectionReason(rejectionDto.getReason());
+
+        recommendationRequestService.rejectRequest(1L, rejectionDto);
+        Mockito.verify(recommendationRequestRepository, Mockito.times(1)).save(requestEntity);
+    }
+
+    @Test
+    void testRejectRequestNegative() {
+        assertThrows(DataValidationException.class, () -> recommendationRequestService.rejectRequest(1L, RejectionDto.builder().build()));
     }
 }

@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.exception.DataValidationException;
@@ -64,6 +66,17 @@ public class RecommendationRequestService {
         return recommendationRequestMapper.toDto(recommendationRequest);
     }
 
+    public RejectionDto rejectRequest(Long id, RejectionDto rejection) {
+        RecommendationRequest recommendationRequest = recommendationRequestRepository.findById(id)
+                .orElseThrow(() -> new DataValidationException("RecommendationRequest with id " + id + " does not exist"));
+        if (recommendationRequest.getStatus().equals(RequestStatus.PENDING)) {
+            recommendationRequest.setStatus(RequestStatus.REJECTED);
+            recommendationRequest.setRejectionReason(rejection.getReason());
+            recommendationRequestRepository.save(recommendationRequest);
+        }
+        return rejection;
+    }
+
     private void validationExistSkill(RecommendationRequestDto recommendationRequestDto) {
         for (SkillRequest skillRequest : recommendationRequestDto.getSkills()) {
             if (!skillRepository.existsById(skillRequest.getSkill().getId())) {
@@ -91,4 +104,6 @@ public class RecommendationRequestService {
     public void setRequestFilters(List<RequestFilter> requestFilters) {
         this.requestFilters = requestFilters;
     }
+
+
 }

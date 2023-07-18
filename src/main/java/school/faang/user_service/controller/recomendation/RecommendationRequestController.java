@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.RecommendationRequestService;
@@ -37,6 +38,18 @@ public class RecommendationRequestController {
     public RecommendationRequestDto getRecommendationRequest(@PathVariable Long id) {
         validationId(id);
         return recommendationRequestService.getRequestsId(id);
+    }
+
+    public RejectionDto rejectRequest(Long id, RejectionDto rejection) {
+        validationId(id);
+        validationRejection(rejection);
+        return recommendationRequestService.rejectRequest(id, rejection);
+    }
+
+    private void validationRejection(RejectionDto rejection) {
+        if (rejection == null) {
+            throw new DataValidationException("Rejection is null");
+        }
     }
 
     private void validationRecommendationRequestDto(RecommendationRequestDto recommendationRequest) {

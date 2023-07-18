@@ -27,5 +27,5 @@ public interface SkillOfferRepository extends CrudRepository<SkillOffer, Long> {
             JOIN so.recommendation r
             WHERE so.skill.id = :skillId AND r.receiver.id = :userId
             """)
-    List<SkillOffer> findAllOffersOfSkill(long skillId, long userId, Long id);
+    List<SkillOffer> findAllOffersOfSkill(long skillId, long userId);
 }

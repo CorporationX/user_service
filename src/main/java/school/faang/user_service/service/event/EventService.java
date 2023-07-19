@@ -3,6 +3,7 @@ package school.faang.user_service.service.event;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 @RequiredArgsConstructor
@@ -24,6 +26,7 @@ public class EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final EventMapper eventMapper;
+    private final List<EventFilter> filters;
 
 
     public Event create(EventDto event) {
@@ -89,5 +92,14 @@ public class EventService {
 
     public List<Event> getParticipatedEvents(long userId) {
         return Optional.ofNullable(eventRepository.findParticipatedEventsByUserId(userId)).orElse(new ArrayList<>());
+    }
+
+    public List<EventDto> getEventsByFilter(EventFilterDto filter){
+        Stream<Event> events = eventRepository.findAll().stream();
+        return filters.stream()
+                .filter(eventFilter -> eventFilter.isApplicable(filter))
+                .flatMap(eventFilter -> eventFilter.apply(events, filter))
+                .map(eventMapper::toDTO)
+                .toList();
     }
 }

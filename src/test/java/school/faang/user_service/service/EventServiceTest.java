@@ -10,6 +10,7 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
@@ -18,6 +19,8 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.event.EventMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.service.event.EventFilter;
+import school.faang.user_service.service.event.EventIdFilter;
 import school.faang.user_service.service.event.EventService;
 
 
@@ -36,6 +39,8 @@ public class EventServiceTest {
     private UserRepository userRepository;
     @Spy
     private EventMapperImpl eventMapper;
+    @Mock
+    private List<EventFilter> filters;
     @InjectMocks
     private EventService eventService;
 
@@ -165,5 +170,19 @@ public class EventServiceTest {
     public void testGetParticipatedEventsIsNull() {
         when(eventRepository.findParticipatedEventsByUserId(1L)).thenReturn(null);
         Assertions.assertEquals(0, eventService.getParticipatedEvents(1L).size());
+    }
+
+    @Test
+    public void testGetEventsByIdFilter(){
+        EventFilterDto eventFilterDto = EventFilterDto.builder().eventId(1L).build();
+        List<Event> events = List.of(
+                Event.builder().id(1L).build(),
+                Event.builder().id(2L).build(),
+                Event.builder().id(3L).build()
+        );
+
+        when(eventRepository.findAll()).thenReturn(events);
+
+        Assertions.assertEquals(1, eventService.getEventsByFilter(eventFilterDto).size());
     }
 }

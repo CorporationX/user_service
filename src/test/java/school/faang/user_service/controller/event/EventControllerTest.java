@@ -7,14 +7,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.controller.event.EventController;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.service.event.EventMock;
 import school.faang.user_service.service.event.EventService;
 
-import java.util.ArrayList;
-
-import static java.time.LocalDateTime.*;
 import static org.junit.Assert.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,8 +24,7 @@ public class EventControllerTest {
 
   @BeforeEach
   public void init() {
-    eventDto = new EventDto(1L, "Hiring", now(), now(),
-        1L, "Hiring event", new ArrayList<>(), "USA", 5);
+    eventDto = EventMock.getEventDto();
   }
 
   @Test

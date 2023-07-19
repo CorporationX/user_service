@@ -1,13 +1,16 @@
 package school.faang.user_service.service.event;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.constraints.AssertTrue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.Skill;
@@ -27,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 class EventServiceTest {
@@ -55,8 +59,7 @@ class EventServiceTest {
 
     userSkill.setTitle("Coding");
     userSkill.setId(1L);
-    eventDto = new EventDto(1L, "Hiring", LocalDateTime.now(), LocalDateTime.now(),
-        1L, "Hiring event", List.of(1L), "USA", 5);
+    eventDto = EventMock.getEventDto();
   }
 
   @Test
@@ -65,6 +68,27 @@ class EventServiceTest {
 
     eventService.create(eventDto);
     Mockito.verify(eventRepository, Mockito.times(1)).save(eventMapper.toEntity(eventDto));
+  }
+
+  @Test
+  public void testUpdateEvent() {
+    Long anyId = 1L;
+
+    EventDto existingEventDto = EventMock.getEventDto();
+    Event existingEventEntity = EventMock.getEventEntity();
+
+    Mockito.when(eventRepository.findById(anyId)).thenReturn(Optional.of(existingEventEntity));
+    Mockito.when(eventMapper.toEntity(existingEventDto)).thenReturn(existingEventEntity);
+    Mockito.when(eventMapper.toDto(existingEventEntity)).thenReturn(existingEventDto);
+
+    EventDto eventToUpdateDto = EventMock.getEventDto();
+
+    eventToUpdateDto.setTitle("Updated Title");
+    eventToUpdateDto.setDescription("Updated description");
+
+    eventService.updateEvent(eventToUpdateDto);
+    Mockito.verify(eventMapper, Mockito.times(1)).update(existingEventDto, eventToUpdateDto);
+    Mockito.verify(eventRepository, Mockito.times(1)).save(existingEventEntity);
   }
 
   @Test

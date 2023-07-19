@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +42,7 @@ class EventParticipationServiceTest {
         User existingUser2 = User.builder()
                 .id(someUserId - 1)
                 .build();
-        var registeredUsers = List.of(existingUser1, existingUser2);
+        List<User> registeredUsers = List.of(existingUser1, existingUser2);
 
         Mockito.when(repository.findAllParticipantsByEventId(someEventId)).thenReturn(registeredUsers);
 

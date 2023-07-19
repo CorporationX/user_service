@@ -1,22 +1,21 @@
 package school.faang.user_service.service;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 
+import java.util.Collections;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class GoalInvitationServiceTest {
@@ -32,14 +31,20 @@ class GoalInvitationServiceTest {
     @Mock
     GoalInvitationRepository goalInvitationRepository;
 
-    @InjectMocks
     GoalInvitationService goalInvitationService;
 
+    @BeforeEach
+    public void setUp() {
+        goalInvitationService = new GoalInvitationService(
+                invitationFilters,
+                goalInvitationMapper,
+                goalInvitationRepository);
+    }
+
     @Test
-    public void testGetInvitationsThrowIllegalArgsExc() {
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-                () -> goalInvitationService.getInvitations(new InvitationFilterDto()));
-        assertEquals("Invalid request. Goal invitation not found.", e.getMessage());
+    public void testGetInvitationsReturnEmptyList() {
+        List<GoalInvitationDto> result = goalInvitationService.getInvitations(new InvitationFilterDto());
+        Assertions.assertEquals(Collections.emptyList(), result);
     }
 
     @Nested
@@ -67,7 +72,7 @@ class GoalInvitationServiceTest {
         }
 
         @Test
-        public void testGetInvitationsCallStream() {
+        public void testGetInvitationsCallStream2() {
             Mockito.verify(invitations, Mockito.times(1)).stream();
         }
     }

@@ -13,11 +13,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EventController {
     private final EventService eventService;
-    private final EventMapper eventMapper;
 
     public EventDto create(EventDto event) {
         validate(event);
-        return eventMapper.toDTO(eventService.create(event));
+        return eventService.create(event);
     }
 
     private void validate(EventDto event) {
@@ -27,7 +26,7 @@ public class EventController {
     }
 
     public EventDto getEvent(long id) {
-        return eventMapper.toDTO(eventService.getEvent(id));
+        return eventService.getEvent(id);
     }
 
     public void deleteEvent(long id) {

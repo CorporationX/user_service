@@ -26,9 +26,9 @@ public class EventService {
     private final EventMapper eventMapper;
 
 
-    public Event create(EventDto event) {
+    public EventDto create(EventDto event) {
         validate(event);
-        return eventRepository.save(eventMapper.toEvent(event));
+        return eventMapper.toDTO(eventRepository.save(eventMapper.toEvent(event)));
     }
 
     private void validate(EventDto event) {
@@ -50,7 +50,7 @@ public class EventService {
 
     }
 
-    public Event getEvent(long id) {
+    public EventDto getEvent(long id){
         Optional<Event> event;
 
         try {
@@ -62,7 +62,7 @@ public class EventService {
             throw new DataValidationException("There is no event with this id");
         }
 
-        return event.get();
+        return eventMapper.toDTO(event.get());
     }
 
     public void deleteEvent(long id) {

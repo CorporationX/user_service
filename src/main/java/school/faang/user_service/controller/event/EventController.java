@@ -25,6 +25,9 @@ public class EventController {
     public void getEventsByFilter(EventFilterDto filter) {
         eventService.getEventsByFilter(filter);
     }
+    public void deleteEvent(long id) {
+        eventService.deleteEvent(id);
+    }
     private boolean checkValidation(EventDto event) {
         return event.getTitle() != null && !event.getTitle().isEmpty()
                 && event.getStartDate() != null && event.getOwnerId() != null;

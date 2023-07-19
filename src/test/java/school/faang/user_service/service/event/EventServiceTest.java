@@ -138,4 +138,14 @@ class EventServiceTest {
 
         Assertions.assertEquals(expected, eventsByFilter);
     }
+    @Test
+    void shouldThrowExecutionOnDeleteEvent() {
+        assertThrows(DataValidationException.class, () -> eventService.deleteEvent(0L));
+    }
+
+    @Test
+    void testDeleteEvent() {
+        eventService.deleteEvent(1L);
+        verify(eventRepository, times(1)).deleteById(1L);
+    }
 }

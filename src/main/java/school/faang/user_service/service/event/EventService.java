@@ -48,6 +48,9 @@ public class EventService {
         }
         return event.map(eventMapper::toEventDto).toList();
     }
+    public void deleteEvent(long eventId) {
+        eventRepository.deleteById(eventId);
+    }
 
     private boolean isUserContainsSkill(EventDto event, User user) {
         return new HashSet<>(user.getSkills()

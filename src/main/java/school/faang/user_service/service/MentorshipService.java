@@ -39,4 +39,13 @@ public class MentorshipService {
         mentor.getMentees().remove(mentee);
         userRepository.save(mentor);
     }
+
+    public void deleteMentor(Long menteeId, Long mentorId) {
+        User mentor = userRepository.findById(mentorId)
+                .orElseThrow(() -> new IllegalArgumentException("Mentor with id " + mentorId + " not found"));
+        User mentee = userRepository.findById(menteeId)
+                .orElseThrow(() -> new IllegalArgumentException("Mentee with id " + menteeId + " not found"));
+        mentee.getMentors().remove(mentor);
+        userRepository.save(mentee);
+    }
 }

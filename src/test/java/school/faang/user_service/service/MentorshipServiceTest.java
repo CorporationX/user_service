@@ -94,4 +94,19 @@ class MentorshipServiceTest {
         List<User> userList = mentor.getMentees();
         assertEquals(1, userList.size());
     }
+
+    @Test
+    public void deleteMentor_CorrectAnswer() {
+        User mentor1 = new User();
+        User mentor2 = new User();
+        User mentee = new User();
+        List<User> mentors = new ArrayList<>();
+        mentors.add(mentor1);
+        mentors.add(mentor2);
+        mentee.setMentors(mentors);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(mentor1)).thenReturn(Optional.of(mentee));
+        mentorshipService.deleteMentor(mentee.getId(), mentor1.getId());
+        List<User> userList = mentee.getMentors();
+        assertEquals(1, userList.size());
+    }
 }

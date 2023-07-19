@@ -91,7 +91,11 @@ public class EventService {
                 .toList();
     }
 
-    public List<Event> getParticipatedEvents(long userId) {
-        return Optional.ofNullable(eventRepository.findParticipatedEventsByUserId(userId)).orElse(new ArrayList<>());
+    public List<EventDto> getParticipatedEvents(long userId) {
+        return Optional.ofNullable(eventRepository.findParticipatedEventsByUserId(userId))
+                .orElse(new ArrayList<>())
+                .stream()
+                .map(eventMapper::toDTO)
+                .toList();
     }
 }

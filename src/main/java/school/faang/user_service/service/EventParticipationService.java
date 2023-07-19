@@ -18,7 +18,7 @@ public class EventParticipationService {
                 .filter(person -> person.getId() == userId)
                 .findFirst();
         if (user.isPresent()) {
-            throw new RuntimeException("yep");
+            throw new RuntimeException("User already have been registered in this event");
         }
 
     }

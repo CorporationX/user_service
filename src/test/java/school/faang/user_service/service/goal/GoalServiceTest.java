@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.exeptions.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
@@ -35,7 +36,7 @@ public class GoalServiceTest {
     void MaxActiveGoalsTest() {
         when(goalRepository.countActiveGoalsPerUser(1L)).thenReturn(3);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        DataValidationException exception = assertThrows(DataValidationException.class,
                 () -> goalService.createGoal(1L, Goal.builder().title("title").build()));
 
         assertEquals("Out of MAX_ACTIVE_GOALS range", exception.getMessage());
@@ -49,7 +50,7 @@ public class GoalServiceTest {
                 .thenReturn(true)
                 .thenReturn(false);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        DataValidationException exception = assertThrows(DataValidationException.class,
                 () -> goalService.createGoal(1L, goal));
 
         assertEquals("Contains a non-existence skill", exception.getMessage());

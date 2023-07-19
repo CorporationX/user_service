@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.exeptions.DataValidationException;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -28,12 +29,12 @@ public class GoalService {
 
     private void creatingGoalValidation(Long userId, Goal goal) {
         if (goalRepository.countActiveGoalsPerUser(userId) >= MAX_ACTIVE_GOALS) {
-            throw new IllegalArgumentException("Out of MAX_ACTIVE_GOALS range");
+            throw new DataValidationException("Out of MAX_ACTIVE_GOALS range");
         }
         List<Skill> skillsToAchieve = goal.getSkillsToAchieve();
         skillsToAchieve.forEach(skill -> {
             if (!skillRepository.existsByTitle(skill.getTitle())) {
-                throw new IllegalArgumentException("Contains a non-existence skill");
+                throw new DataValidationException("Contains a non-existence skill");
             }
         });
     }

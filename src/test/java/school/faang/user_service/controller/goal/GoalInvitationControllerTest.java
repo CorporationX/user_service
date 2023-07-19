@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.goal;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,6 +16,14 @@ class GoalInvitationControllerTest {
 
     @InjectMocks
     GoalInvitationController goalInvitationController;
+
+    @Test
+    public void testAcceptGoalInvitationThrowIllegalExc() {
+        long id = -1L;
+        Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> goalInvitationController.acceptGoalInvitation(id));
+    }
 
     @Test
     public void testAcceptGoalInvitation() {

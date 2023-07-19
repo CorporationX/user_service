@@ -148,4 +148,15 @@ class EventServiceTest {
         eventService.deleteEvent(1L);
         verify(eventRepository, times(1)).deleteById(1L);
     }
+    @Test
+    void testUpdateEvent() {
+
+    }
+    @Test
+    void testUpdateEventException() {
+        EventDto eventDto = EventDto.builder().id(1L).ownerId(1L).build();
+        assertThrows(DataValidationException.class, () -> {
+            eventService.updateEvent(eventDto);
+        });
+    }
 }

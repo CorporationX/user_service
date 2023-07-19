@@ -32,10 +32,12 @@ public class EventService {
         }
         return eventMapper.toEventDto(eventRepository.save(eventMapper.toEvent(event)));
     }
+
     public EventDto getEvent(long eventId) {
         return eventMapper.toEventDto(eventRepository.findById(eventId)
                 .orElseThrow(() -> new DataValidationException("User with this id was not found")));
     }
+
     public List<EventDto> getEventsByFilter(EventFilterDto filters) {
         Stream<Event> event = eventRepository.findAll().stream();
 
@@ -48,6 +50,15 @@ public class EventService {
         }
         return event.map(eventMapper::toEventDto).toList();
     }
+
+    public EventDto updateEvent(EventDto event) {
+        Event event1 = eventRepository.findById(event.getId())
+                .orElseThrow(() -> new DataValidationException(
+                        "The event did not pass validation when updating the event"));
+        eventMapper.update(event1, event);
+        return create(eventMapper.toEventDto(event1));
+    }
+
     public void deleteEvent(long eventId) {
         if (eventId <= 0) {
             throw new DataValidationException("Event does not exist");

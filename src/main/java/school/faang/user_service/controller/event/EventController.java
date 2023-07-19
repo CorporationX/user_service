@@ -25,6 +25,12 @@ public class EventController {
     public void getEventsByFilter(EventFilterDto filter) {
         eventService.getEventsByFilter(filter);
     }
+    public void updateEvent(EventDto event){
+        if (!(checkValidation(event))) {
+            throw new DataValidationException("The event did not pass validation when updating the event");
+        }
+        eventService.updateEvent(event);
+    }
     public void deleteEvent(long id) {
         eventService.deleteEvent(id);
     }

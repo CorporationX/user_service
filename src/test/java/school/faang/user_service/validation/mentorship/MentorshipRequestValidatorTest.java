@@ -1,5 +1,7 @@
 package school.faang.user_service.validation.mentorship;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,10 +11,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
+import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.exception.EntityNotFoundException;
+import school.faang.user_service.exception.mentorship.MentorshipRequestValidationException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
@@ -44,8 +49,8 @@ class MentorshipRequestValidatorTest {
     }
 
     @Test
-    void validate_shouldNotThrowException() {
-        mentorshipRequestValidator.validate(requestDto);
+    void validate_shouldNotThrowAnyException() {
+        assertDoesNotThrow(() -> mentorshipRequestValidator.validate(requestDto));
     }
 
     @Test
@@ -54,5 +59,34 @@ class MentorshipRequestValidatorTest {
         assertThrows(EntityNotFoundException.class,
                 () -> mentorshipRequestValidator.validate(requestDto),
                 "Requester with id " + INCORRECT_ID + " not found.");
+
+        requestDto.setRequesterId(REQUESTER_ID);
+        requestDto.setReceiverId(INCORRECT_ID);
+
+        assertThrows(EntityNotFoundException.class,
+                () -> mentorshipRequestValidator.validate(requestDto),
+                "Receiver with id " + INCORRECT_ID + " not found.");
+    }
+
+    @Test
+    void validate_shouldThrowMentorshipRequestValidationException_whenRequesterAndReceiverAreTheSameUser() {
+        requestDto.setReceiverId(REQUESTER_ID);
+
+        assertThrows(MentorshipRequestValidationException.class,
+                () -> mentorshipRequestValidator.validate(requestDto),
+                "Requester and receiver cannot be the same user.");
+    }
+
+    @Test
+    void validate_shouldThrowMentorshipRequestValidationException_whenRequestIsBeforeThreeMonthsPassed() {
+        when(mentorshipRequestRepository.findLatestRequest(REQUESTER_ID, RECEIVER_ID))
+                .thenReturn(Optional.of(MentorshipRequest
+                        .builder()
+                        .createdAt(LocalDateTime.now().minusMonths(2))
+                        .build()));
+
+        assertThrows(MentorshipRequestValidationException.class,
+                () -> mentorshipRequestValidator.validate(requestDto),
+                "Request has already been sent for the last three months.");
     }
 }

@@ -10,6 +10,6 @@ public class MentorshipFilter {
         return requestFilterDto.getReceiverId().equals(mentorshipRequestDto.getReceiverId())
                 || requestFilterDto.getRequesterId().equals(mentorshipRequestDto.getRequesterId())
                 || requestFilterDto.getDescription().equals(mentorshipRequestDto.getDescription())
-                || requestFilterDto.getRequestStatus().equals(mentorshipRequestDto.getRequestStatus());
+                || requestFilterDto.getRequestStatus().equals(mentorshipRequestDto.getStatus());
     }
 }

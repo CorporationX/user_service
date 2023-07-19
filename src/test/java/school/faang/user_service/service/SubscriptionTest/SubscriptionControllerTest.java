@@ -86,4 +86,15 @@ public class SubscriptionControllerTest {
         var res = controller.getFollowing(1, filterDto);
         Assertions.assertEquals(res.getStatusCode(), HttpStatus.OK);
     }
+
+    @Test
+    void GetFolloweesCountTest() {
+        var res = controller.getFollowing(1, filterDto);
+        Assertions.assertEquals(res.getStatusCode(), HttpStatus.OK);
+    }
+    @Test
+    void GetFolloweesCountInvalidIdTest() {
+        Assertions.assertThrows(DataValidationException.class,
+                () -> controller.getFollowing(-1, filterDto));
+    }
 }

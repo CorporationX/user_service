@@ -51,4 +51,11 @@ public class SubscriptionController {
         List<UserDto> following = service.getFollowing(followeeId, filter);
         return ResponseEntity.ok().body(following);
     }
+
+    @GetMapping("/following/count/{followerId}")
+    public ResponseEntity<Integer> getFollowingCount(@PathVariable long followerId) {
+        validator.validateId(followerId);
+        int followingCount = service.getFollowingCount(followerId);
+        return ResponseEntity.ok().body(followingCount);
+    }
 }

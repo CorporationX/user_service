@@ -54,4 +54,8 @@ public class SubscriptionService {
                 .toList();
         return following;
     }
+
+    public int getFollowingCount(long followerId) {
+        return repository.findFolloweesAmountByFollowerId(followerId);
+    }
 }

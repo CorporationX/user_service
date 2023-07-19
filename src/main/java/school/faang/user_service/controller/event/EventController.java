@@ -3,6 +3,7 @@ package school.faang.user_service.controller.event;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventService;
 
@@ -21,6 +22,9 @@ public class EventController {
         return eventService.getEvent(id);
     }
 
+    public void getEventsByFilter(EventFilterDto filter) {
+        eventService.getEventsByFilter(filter);
+    }
     private boolean checkValidation(EventDto event) {
         return event.getTitle() != null && !event.getTitle().isEmpty()
                 && event.getStartDate() != null && event.getOwnerId() != null;

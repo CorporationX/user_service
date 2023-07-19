@@ -12,6 +12,7 @@ import school.faang.user_service.exception.DataValidationException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import school.faang.user_service.service.event.EventService;
+import school.faang.user_service.validator.EventValidator;
 
 import java.util.List;
 
@@ -19,23 +20,24 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EventController {
     private final EventService eventService;
+    private final EventValidator eventValidator;
 
     @PostMapping("/event")
     public EventDto createEvent(@RequestBody EventDto eventDto) {
-        validateEvent(eventDto);
+        eventValidator.validateEvent(eventDto);
         return eventService.createEvent(eventDto);
     }
 
     @DeleteMapping("/event/{id}")
     public void deleteEvent(@PathVariable Long id) {
-        idValidate(id);
+        eventValidator.idValidate(id);
         eventService.deleteEvent(id);
     }
 
     @PutMapping("/event/{id}")
     public EventDto updateEvent(@PathVariable Long id, @RequestBody EventDto eventDto) {
-        idValidate(id);
-        validateEvent(eventDto);
+        eventValidator.idValidate(id);
+        eventValidator.validateEvent(eventDto);
         return eventService.updateEvent(id, eventDto);
     }
 
@@ -45,43 +47,21 @@ public class EventController {
     }
   
     @GetMapping("/event/{userId}/owned")
-    public List<EventDto> getOwnedEvents(@PathVariable long userId) {
-        idValidate(userId);
+    public List<EventDto> getOwnedEvents(@PathVariable Long userId) {
+        eventValidator.idValidate(userId);
         return eventService.getOwnedEvents(userId);
     }
 
     @GetMapping("/event/{userId}/participated")
-    public List<EventDto> getParticipatedEvents(@PathVariable long userId) {
-        idValidate(userId);
+    public List<EventDto> getParticipatedEvents(@PathVariable Long userId) {
+        eventValidator.idValidate(userId);
         return eventService.getParticipatedEvents(userId);
     }
   
     @GetMapping("/event/{id}")
     public EventDto getEvent(@PathVariable Long id) {
-        idValidate(id);
+        eventValidator.idValidate(id);
         return eventService.getEvent(id);
     }
 
-    public void validateEvent(EventDto eventDto) {
-        if(eventDto == null){
-            throw new DataValidationException("Event cannot be null");
-        }
-        if (eventDto.getTitle() == null || eventDto.getTitle().isBlank()) {
-            throw new DataValidationException("Event title cannot be empty");
-        }
-
-        if (eventDto.getStartDate() == null) {
-            throw new DataValidationException("Event start date cannot be null");
-        }
-
-        if (eventDto.getOwnerId() == null || eventDto.getOwnerId() < 0) {
-            throw new DataValidationException("Event owner ID cannot be null");
-        }
-    }
-
-    private void idValidate(Long id) {
-        if ( id == null || id < 0) {
-            throw new DataValidationException("Id cannot be negative");
-        }
-    }
 }

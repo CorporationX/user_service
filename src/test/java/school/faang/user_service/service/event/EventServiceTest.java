@@ -9,16 +9,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.event.EventMapper;
+import school.faang.user_service.filter.event.EventEndDateFilter;
+import school.faang.user_service.filter.event.EventFilter;
+import school.faang.user_service.filter.event.EventStartDateFilter;
+import school.faang.user_service.filter.event.EventTitleFilter;
+import school.faang.user_service.mapper.event.EventMapperImpl;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.validator.EventValidator;
 
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -39,19 +44,27 @@ class EventServiceTest {
     private EventRepository eventRepository;
     @Mock
     private EventValidator eventValidator;
-    @Mock
-    private EventMapper eventMapper;
+    @Spy
+    private EventMapperImpl eventMapper;
     @InjectMocks
     private EventService eventService;
 
     @BeforeEach
     public void init() {
+        EventEndDateFilter eventEndDateFilter = new EventEndDateFilter();
+        EventStartDateFilter eventStartDateFilter = new EventStartDateFilter();
+        EventTitleFilter eventTitleFilter = new EventTitleFilter();
+        List<EventFilter> filters = List.of(eventTitleFilter, eventStartDateFilter, eventEndDateFilter);
+        eventService = new EventService(eventRepository, eventValidator, eventMapper, filters);
+
         eventDto2 = new EventDto(1L, "Cool new Event", LocalDateTime.now(), LocalDateTime.now(),
                 0L, "hfgh", new ArrayList<>(), "location", 1);
         eventDtoForUpdate = new EventDto(2L, "Event 1", LocalDateTime.now(), LocalDateTime.now(),
                 0L, "Description", new ArrayList<>(), "location", 1);
-        event = Event.builder().id(1L).title("New Event").build();
-        event1 = Event.builder().id(2L).title("Event 1").build();
+        event = Event.builder().id(1L).title("New Event").startDate(LocalDateTime.of(2022, Month.APRIL, 2, 0, 0))
+                .endDate(LocalDateTime.of(2022, Month.APRIL, 3, 0, 0)).build();
+        event1 = Event.builder().id(2L).title("Event 1").startDate(LocalDateTime.of(2022, Month.APRIL, 2, 0, 0))
+                .endDate(LocalDateTime.of(2022, Month.APRIL, 3, 0, 0)).build();
         eventDto = new EventDto(1L, "New Event", LocalDateTime.now(), LocalDateTime.now(), 1L, "hfgh", new ArrayList<>(), "location", 1);
         eventDto1 = new EventDto(2L, "Event 1", LocalDateTime.now(), LocalDateTime.MAX, 1L, "hfdfgdgh", new ArrayList<>(), "location", 1);
     }
@@ -70,11 +83,8 @@ class EventServiceTest {
 
     @Test
     public void testDeleteEvent() {
-        long id = 3L;
-        var event = Event.builder().id(id).build();
-        Mockito.when(eventRepository.findById(id)).thenReturn(Optional.of(event));
-        eventService.deleteEvent(id);
-        Mockito.verify(eventRepository, Mockito.times(1)).deleteById(id);
+        eventService.deleteEvent(1L);
+        Mockito.verify(eventRepository, Mockito.times(1)).deleteById(1L);
     }
 
     @Test
@@ -89,14 +99,28 @@ class EventServiceTest {
     @Test
     public void testFilterEvent() {
         Mockito.when(eventRepository.findAll()).thenReturn(List.of(event, event1));
-        Mockito.when(eventMapper.toDto(event)).thenReturn(eventDto);
-        Mockito.when(eventMapper.toDto(event1)).thenReturn(eventDto1);
-        var filters = new EventFilterDto(null, null, null, null, null,
-                null, null, "location", 1);
 
-        List<EventDto> events = eventService.getEventsByFilter(filters);
+        EventFilterDto eventFilterDto = EventFilterDto.builder().titlePattern("New Event").build();
+        List<EventDto> events = eventService.getEventsByFilter(eventFilterDto);
+        assertEquals(1, events.size());
+    }
+
+    @Test
+    public void testFilterStartDate() {
+        Mockito.when(eventRepository.findAll()).thenReturn(List.of(event, event1));
+
+        EventFilterDto eventFilterDto = EventFilterDto.builder().startDatePattern(LocalDateTime.of(2022, Month.APRIL, 1, 0, 0)).build();
+        List<EventDto> events = eventService.getEventsByFilter(eventFilterDto);
         assertEquals(2, events.size());
+    }
 
+    @Test
+    public void testFilterEndDate() {
+        Mockito.when(eventRepository.findAll()).thenReturn(List.of(event, event1));
+
+        EventFilterDto eventFilterDto = EventFilterDto.builder().endDatePattern(LocalDateTime.of(2022, Month.APRIL, 4, 0, 0)).build();
+        List<EventDto> events = eventService.getEventsByFilter(eventFilterDto);
+        assertEquals(2, events.size());
     }
 
     @Test
@@ -109,20 +133,10 @@ class EventServiceTest {
     }
 
     @Test
-    public void testDeleteEventThrowsException() {
-        long id = -1L;
-        assertThrows(DataValidationException.class, () -> {
-            eventService.deleteEvent(id);
-        });
-    }
-
-    @Test
     public void testUpdateEvent() {
-        var event = Event.builder().id(1L).title("New Event").build();
         Mockito.when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
-        Mockito.when(eventMapper.toDto(event)).thenReturn(eventDtoForUpdate);
-        EventDto updatedEvent = eventService.updateEvent(1L, eventDto2);
-        assertEquals("Cool new Event", updatedEvent.getTitle());
+        eventService.updateEvent(1L, eventDtoForUpdate);
+        Mockito.verify(eventRepository, Mockito.times(1)).save(eventMapper.toEntity(eventDtoForUpdate));
     }
 
     @Test

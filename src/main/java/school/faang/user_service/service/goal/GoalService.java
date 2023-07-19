@@ -21,6 +21,9 @@ public class GoalService {
     private final int MAX_ACTIVE_GOALS = 3;
 
     public void deleteGoal(Long goalId) {
+        if (!goalRepository.existsById(goalId)) {
+            throw new IllegalArgumentException("Goal does not exist");
+        }
         goalRepository.deleteById(goalId);
     }
 

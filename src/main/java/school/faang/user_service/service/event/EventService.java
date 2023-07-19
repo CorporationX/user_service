@@ -48,7 +48,7 @@ public class EventService {
 
     }
 
-    public Event getEvent(long id){
+    public EventDto getEvent(long id){
         Optional<Event> event;
 
         try{
@@ -60,6 +60,6 @@ public class EventService {
             throw new DataValidationException("There is no event with this id");
         }
 
-        return event.get();
+        return eventMapper.toDTO(event.get());
     }
 }

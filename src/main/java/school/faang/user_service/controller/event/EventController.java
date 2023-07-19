@@ -24,6 +24,6 @@ public class EventController {
     }
 
     public EventDto getEvent(long id){
-        return eventMapper.toDTO(eventService.getEvent(id));
+        return eventService.getEvent(id);
     }
 }

@@ -36,7 +36,7 @@ class MentorshipRequestMapperTest {
                 .requesterId(1L)
                 .receiverId(2L)
                 .rejectionReason("rejection reason")
-                .status("PENDING")
+                .status("pending")
                 .build();
     }
 

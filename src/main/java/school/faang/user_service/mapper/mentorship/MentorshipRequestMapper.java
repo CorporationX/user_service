@@ -29,7 +29,7 @@ public interface MentorshipRequestMapper {
 
     @Named("mapStringToRequestStatus")
     default RequestStatus mapToRequestStatus(String status) {
-        return RequestStatus.valueOf(status);
+        return RequestStatus.valueOf(status.toUpperCase());
     }
 
     @Named("mapRequestStatusToString")

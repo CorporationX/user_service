@@ -13,7 +13,7 @@ import school.faang.user_service.repository.event.EventRepository;
 
 import java.util.HashSet;
 
-@Service("restService")
+@Service
 @RequiredArgsConstructor
 public class EventService {
     private final UserRepository userRepository;

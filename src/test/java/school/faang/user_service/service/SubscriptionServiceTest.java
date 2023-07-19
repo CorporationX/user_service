@@ -20,14 +20,15 @@ public class SubscriptionServiceTest {
 
     @Test
     void testRepositoryFollowUser(){
-        subscriptionService.followUser(22L, 23L);
+        subscriptionService.followUser(22, 23);
         Mockito.verify(subscriptionRepository, Mockito.times(1)).followUser(Mockito.anyLong(),
                 Mockito.anyLong());
     }
 
     @Test
     void testRepositoryFollowUserByNull(){
+        subscriptionService.followUser(22, 23);
         Assertions.assertThrows(DataValidationException.class,
-                () -> subscriptionService.followUser(-22L, 1L));
+                () -> subscriptionRepository.followUser(22, 23));
     }
 }

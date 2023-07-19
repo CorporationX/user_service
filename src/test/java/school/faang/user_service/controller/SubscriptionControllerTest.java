@@ -21,7 +21,7 @@ public class SubscriptionControllerTest {
 
     @Test
     void testFollowUser(){
-        subscriptionController.followUser(22L, 23L);
+        subscriptionController.followUser(22, 23);
         Mockito.verify(subscriptionService, Mockito.times(1)).followUser(Mockito.anyLong(),
                 Mockito.anyLong());
     }
@@ -29,6 +29,12 @@ public class SubscriptionControllerTest {
     @Test
     void testControllerFollowUserByNull(){
         Assertions.assertThrows(DataValidationException.class,
-                () -> subscriptionController.followUser(-33L, 1L));
+                () -> subscriptionController.followUser(-33, 1));
+    }
+
+    @Test
+    void testControllerFollowUserToYourself(){
+        Assertions.assertThrows(DataValidationException.class,
+                () -> subscriptionController.followUser(1, 1));
     }
 }

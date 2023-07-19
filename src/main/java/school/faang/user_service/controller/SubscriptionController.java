@@ -10,16 +10,16 @@ import school.faang.user_service.service.SubscriptionService;
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
-    public void followUser(Long followerId, Long followeeId) {
+    public void followUser(long followerId, long followeeId) {
         validate(followerId, followeeId);
         subscriptionService.followUser(followerId, followeeId);
     }
 
-    public void validate(Long firstId, Long secondId) {
+    public void validate(long firstId, long secondId) {
         if (firstId <= 0 || secondId <= 0){
             throw new DataValidationException("Id cannot be less 0! ");
-        } else if (firstId == null || secondId == null){
-            throw new DataValidationException("Id cannot be null !");
+        } if (firstId == secondId){
+            throw new DataValidationException("Can`t subscribe to yourself");
         }
     }
 }

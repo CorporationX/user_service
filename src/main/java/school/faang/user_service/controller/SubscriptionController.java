@@ -15,6 +15,11 @@ public class SubscriptionController {
         subscriptionService.followUser(followerId, followeeId);
     }
 
+    public void unfollowUser(long followerId, long followeeId){
+        validate(followerId, followeeId);
+        subscriptionService.unfollowUser(followerId, followeeId);
+    }
+
     public void validate(Long firstId, Long secondId) {
         if (firstId <= 0 || secondId <= 0){
             throw new DataValidationException("Id cannot be less 0! ");

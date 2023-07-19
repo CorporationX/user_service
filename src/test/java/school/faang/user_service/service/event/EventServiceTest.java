@@ -19,7 +19,6 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.filter.event_filter.EventIdFilter;
 import school.faang.user_service.service.filter.event_filter.EventMaxAttendeesFilter;
-import school.faang.user_service.service.filter.event_filter.EventRelatedSkillsFilter;
 import school.faang.user_service.service.filter.event_filter.EventTitleFilter;
 
 import java.time.LocalDateTime;
@@ -134,7 +133,7 @@ class EventServiceTest {
                         "location",
                         1));
 
-        eventService = new EventService(userRepository,eventRepository, eventMapper, eventFilters);
+        eventService = new EventService(userRepository, eventRepository, eventMapper, eventFilters);
         List<EventDto> eventsByFilter = eventService.getEventsByFilter(eventFilterDto);
         verify(eventRepository, times(1)).findAll();
 

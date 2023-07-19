@@ -13,8 +13,6 @@ import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Stream;
@@ -39,83 +37,20 @@ public class EventService {
         return eventMapper.toEventDto(eventRepository.findById(eventId)
                 .orElseThrow(() -> new DataValidationException("User with this id was not found")));
     }
-    public List<EventDto> getEventsByFilter(EventFilterDto filters) {
-//        List<EventDto> events = new ArrayList<>();
-//        eventRepository.findAll().forEach(event -> {
-//            events.add(eventMapper.toEventDto(event));
-//        });
 
+    public List<EventDto> getEventsByFilter(EventFilterDto filters) {
         Stream<Event> event = eventRepository.findAll().stream();
+
         List<EventFilter> eventFilterList = eventFilters.stream()
                 .filter(filter -> filter.isApplicable(filters))
                 .toList();
-        for (EventFilter events: eventFilterList) {
+
+        for (EventFilter events : eventFilterList) {
             event = events.apply(event, filters);
         }
         return event.map(eventMapper::toEventDto).toList();
-
-//        return events.stream()
-//                .filter(event -> {
-//                    if (event.getId() == null) {
-//                        return false;
-//                    } else {
-//                        return event.getId().equals(filter.getId());
-//                    }
-//                })
-//                .filter(event -> {
-//                    if (event.getTitle() == null) {
-//                        return false;
-//                    } else {
-//                        return event.getTitle().equals(filter.getTitle());
-//                    }
-//                })
-//                .filter(event -> {
-//                    if (event.getStartDate() == null) {
-//                        event.setStartDate(LocalDateTime.MIN);
-//                    }
-//                    if (event.getEndDate() == null) {
-//                        event.setEndDate(LocalDateTime.MAX);
-//                    }
-//                    return event.getStartDate().isAfter(filter.getStartDate())
-//                            && event.getEndDate().isBefore(filter.getEndDate());
-//                })
-//                .filter(event -> {
-//                    if (event.getOwnerId() == null) {
-//                        return false;
-//                    } else {
-//                        return event.getOwnerId().equals(filter.getOwnerId());
-//                    }
-//                })
-//                .filter(event -> {
-//                    if (event.getRelatedSkills() == null) {
-//                        return false;
-//                    } else {
-//                        return new HashSet<>(event.getRelatedSkills()).containsAll(filter.getRelatedSkills());
-//                    }
-//                })
-//                .filter(event -> {
-//                    if (event.getLocation() == null) {
-//                        return false;
-//                    } else {
-//                        return event.getLocation().equals(filter.getLocation());
-//                    }
-//                })
-//                .filter(event -> {
-//                    if (event.getDescription() == null) {
-//                        return false;
-//                    } else {
-//                        return event.getDescription().equals(filter.getDescription());
-//                    }
-//                })
-//                .filter(event -> {
-//                    if (event.getMaxAttendees() == 0) {
-//                        return false;
-//                    } else {
-//                        return event.getMaxAttendees() == (filter.getMaxAttendees());
-//                    }
-//                })
-//                .toList();
     }
+
     private boolean isUserContainsSkill(EventDto event, User user) {
         return new HashSet<>(user.getSkills()
                 .stream()

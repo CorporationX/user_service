@@ -8,6 +8,7 @@ import school.faang.user_service.repository.event.EventParticipationRepository;
 @RequiredArgsConstructor
 public class EventParticipationService {
     public final EventParticipationRepository repository;
+
     public int getParticipantsCount(long eventId){
         return repository.countParticipants(eventId);
     }

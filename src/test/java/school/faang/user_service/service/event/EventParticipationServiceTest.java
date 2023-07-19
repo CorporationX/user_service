@@ -12,7 +12,7 @@ import school.faang.user_service.repository.event.EventParticipationRepository;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(value = {MockitoExtension.class})
 class EventParticipationServiceTest {

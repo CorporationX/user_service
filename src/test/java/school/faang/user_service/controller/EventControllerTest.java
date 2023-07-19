@@ -22,7 +22,6 @@ import school.faang.user_service.service.event.EventService;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 @ExtendWith(MockitoExtension.class)
 public class EventControllerTest {
     @Mock
@@ -59,13 +58,6 @@ public class EventControllerTest {
             .startDate(LocalDateTime.MAX)
             .owner(User.builder().build())
             .build();
-
-
-    @Test
-    public void allDataIsValid() {
-        Mockito.when(eventService.create(eventDto)).thenReturn(event);
-        Assertions.assertEquals(eventMapper.toDTO(event), eventController.create(eventDto));
-    }
 
     @Test
     public void testSuccessfulEventCreating() {

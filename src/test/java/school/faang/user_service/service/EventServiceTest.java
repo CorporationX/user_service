@@ -101,8 +101,8 @@ public class EventServiceTest {
     @Test
     public void testOwnerHasSkillsForEvent() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user2));
-        when(eventRepository.save(eventMapper.toEvent(eventDto))).thenReturn(event);
-        Assertions.assertEquals(event, eventService.create(eventDto));
+        eventService.create(eventDto);
+        Mockito.verify(eventRepository, Mockito.times(1)).save(eventMapper.toEvent(eventDto));
     }
 
     @Test
@@ -120,7 +120,7 @@ public class EventServiceTest {
     @Test
     public void testCorrectGetEvent() {
         when(eventRepository.findById(1L)).thenReturn(Optional.ofNullable(event));
-        Assertions.assertEquals(event, eventService.getEvent(1L));
+        Assertions.assertEquals(eventMapper.toDTO(event), eventService.getEvent(1L));
     }
 
     @Test

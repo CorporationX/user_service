@@ -39,7 +39,7 @@ class EventParticipationServiceTest {
                 .id(someUserId - 1)
                 .build();
 
-        var eventParticipants = List.of(existingUser1,existingUser2);
+        List<User> eventParticipants = List.of(existingUser1,existingUser2);
 
         Mockito.when(repository.findAllParticipantsByEventId(someEventId)).thenReturn(eventParticipants);
 

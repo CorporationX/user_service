@@ -1,14 +1,17 @@
 package school.faang.user_service.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
+import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
+import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
@@ -18,11 +21,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class RecommendationService {
     private final RecommendationRepository recommendationRepository;
     private final SkillOfferRepository skillOfferRepository;
+    private final RecommendationMapper recommendationMapper;
     private final SkillRepository skillRepository;
     private final UserRepository userRepository;
 
@@ -33,56 +37,80 @@ public class RecommendationService {
     }
 
     public void saveSkillOffer(RecommendationDto recommendationDto) {
-        if (recommendationDto.getSkillOffers() != null && !recommendationDto.getSkillOffers().isEmpty()) {
-            List<Skill> userSkills = skillRepository.findAllByUserId(recommendationDto.getReceiverId());
-            List<Skill> recommendationSkills = recommendationDto.getSkillOffers().stream()
-                    .map(skill -> skillRepository.findById(skill.getSkillId()).orElseThrow(() -> new DataValidationException("One of offered skill not exist in our database")))
-                    .toList();
-            checkAndAddSkillsGuarantor(recommendationDto, userSkills, recommendationSkills);
-            recommendationDto.getSkillOffers()
-                    .forEach(skill -> skillOfferRepository.create(skill.getSkillId(), skill.getRecommendationId()));
-        }
+        checkAndAddSkillsGuarantor(recommendationDto);
+        List<Long> skillOffersId = recommendationDto.getSkillOffers().stream().map(SkillOfferDto::getId).toList();
+        List<SkillOffer> skillOffersEntity = skillOfferRepository.findAllById(skillOffersId);
+        skillOfferRepository.saveAll(skillOffersEntity);
     }
 
-    private void validateRecommendation(RecommendationDto recommendationDto) {
-        Optional<Recommendation> recommendation = recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(recommendationDto.getAuthorId(), recommendationDto.getReceiverId());
-        if (recommendation.isPresent()) {
-            LocalDateTime recommendationCreateTime = recommendation.get().getCreatedAt();
-            boolean allSkillsExistInSystem = recommendationDto.getSkillOffers().stream()
-                    .allMatch(skill -> skillRepository.existsById(skill.getId()));
-            if (recommendationCreateTime.isAfter(LocalDateTime.now().minusMonths(6))) {
-                throw new DataValidationException("Recommendation must be given less then 6 months");
-            } else if (!allSkillsExistInSystem) {
-                throw new DataValidationException("Some of the skills do not exist in our system");
-            }
-        }
+    public RecommendationDto update(RecommendationDto recommendation) {
+        validateRecommendation(recommendation);
+        Recommendation updatedRecommendation = recommendationRepository.update(recommendation.getAuthorId(), recommendation.getReceiverId(), recommendation.getContent());
+        skillOfferRepository.deleteAllByRecommendationId(recommendation.getId());
+        saveSkillOffer(recommendation);
+        return recommendationMapper.toDto(updatedRecommendation);
     }
 
-    private void checkAndAddSkillsGuarantor(RecommendationDto recommendationDto, List<Skill> userSkills, List<Skill> offeredSkills) {
-        if (recommendationDto != null && userSkills != null && !userSkills.isEmpty()) {
-            for (Skill userSkill : userSkills) {
-                for (Skill recSkill : offeredSkills) {
-                    if (userSkill.getTitle().equals(recSkill.getTitle())) {
-                        Long authorId = recommendationDto.getAuthorId();
-                        boolean isAuthorGuarantor = userSkill.getGuarantees().stream()
-                                .map(UserSkillGuarantee::getGuarantor)
-                                .map(User::getId)
-                                .noneMatch(guaranteeId -> guaranteeId.equals(authorId));
-
-                        if (isAuthorGuarantor) {
-                            User currentUser = userRepository.findById(recommendationDto.getReceiverId()).orElseThrow(() -> new DataValidationException("Entity not found"));
-                            User guarantor = userRepository.findById(recommendationDto.getAuthorId()).orElseThrow(() -> new DataValidationException("Entity not found"));
-                            UserSkillGuarantee newUserSkillGuarantee = UserSkillGuarantee.builder().user(currentUser).skill(userSkill).guarantor(guarantor).build();
-                            userSkill.getGuarantees().add(newUserSkillGuarantee);
-                        } else {
-                            recommendationDto.getSkillOffers().remove(userSkill.getId());
-                        }
-                    }
+    public void validateRecommendation(RecommendationDto recommendationDto) {
+        if (recommendationDto.getAuthorId() == null) {
+            throw new DataValidationException("Author ID must be specified");
+        }
+        if (recommendationDto.getReceiverId() == null) {
+            throw new DataValidationException("Receiver ID must be specified");
+        }
+        if (recommendationDto.getSkillOffers() != null) {
+            Optional<Recommendation> recommendation = recommendationRepository.
+                    findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(recommendationDto.getAuthorId(), recommendationDto.getReceiverId());
+            if (recommendation.isPresent()) {
+                LocalDateTime recommendationCreateTime = recommendation.get().getCreatedAt();
+                boolean allSkillsExistInSystem = recommendationDto.getSkillOffers().stream()
+                        .allMatch(skill -> skillRepository.existsById(skill.getId()));
+                if (recommendationCreateTime.isAfter(LocalDateTime.now().minusMonths(6))) {
+                    throw new DataValidationException("Recommendation must be given less then 6 months");
+                } else if (!allSkillsExistInSystem) {
+                    throw new DataValidationException("Some of the skills do not exist in our system");
                 }
             }
-            User currentUser = userRepository.findById(recommendationDto.getReceiverId()).orElseThrow(() -> new EntityNotFoundException("Entity not found"));
-            currentUser.setSkills(userSkills);
-            userRepository.save(currentUser);
         }
+    }
+
+    public void checkAndAddSkillsGuarantor(RecommendationDto recommendationDto) {
+        List<Skill> userSkills = skillRepository.findAllByUserId(recommendationDto.getReceiverId());
+        List<Skill> offeredSkills = getOfferedSkillsFromDatabase(recommendationDto);
+        userSkills.stream()
+                .flatMap(userSkill -> offeredSkills.stream()
+                        .filter(offeredSkill -> userSkill.getTitle().equals(offeredSkill.getTitle())))
+                .forEach(sameSkill -> {
+                    if (isAuthorGuarantor(sameSkill, recommendationDto.getAuthorId())) {
+                        User currentUser = userRepository.findById(recommendationDto.getReceiverId()).orElseThrow(() -> new DataValidationException("Entity not found"));
+                        User guarantor = userRepository.findById(recommendationDto.getAuthorId()).orElseThrow(() -> new DataValidationException("Entity not found"));
+                        UserSkillGuarantee newUserSkillGuarantee = UserSkillGuarantee.builder().user(currentUser).skill(sameSkill).guarantor(guarantor).build();
+                        sameSkill.getGuarantees().add(newUserSkillGuarantee);
+                    }
+                    recommendationDto.getSkillOffers()
+                            .forEach(skillOfferDto -> {
+                                if (skillOfferDto.getSkillId() == sameSkill.getId()) {
+                                      recommendationDto.getSkillOffers().remove(skillOfferDto);
+                                }
+                            });
+//                    recommendationDto.getSkillOffers().remove(sameSkill.getId());
+                });
+        User currentUser = userRepository.findById(recommendationDto.getReceiverId()).orElseThrow(() -> new DataValidationException("Entity not found"));
+        currentUser.setSkills(userSkills);
+        userRepository.save(currentUser);
+    }
+
+    public List<Skill> getOfferedSkillsFromDatabase(RecommendationDto recommendation) {
+        List<Long> skillsId = recommendation.getSkillOffers().stream()
+                .map(SkillOfferDto::getSkillId)
+                .toList();
+        return skillRepository.findAllById(skillsId);
+    }
+
+    private boolean isAuthorGuarantor(Skill userSkill, long authorId) {
+        return userSkill.getGuarantees().stream()
+                .map(UserSkillGuarantee::getGuarantor)
+                .map(User::getId)
+                .noneMatch(guaranteeId -> guaranteeId.equals(authorId));
     }
 }

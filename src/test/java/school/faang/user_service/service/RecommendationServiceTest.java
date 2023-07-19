@@ -163,6 +163,13 @@ class RecommendationServiceTest {
         assertEquals(recommendationUpdate.getContent(), result.getContent());
         assertEquals(recommendationUpdate.getSkillOffers(), result.getSkillOffers());
     }
+
+
+    @Test
+    public void testDeleteInvokesDeleteById() {
+        recommendationService.delete(1);
+        verify(recommendationRepository).deleteById(1L);
+    }
 }
 
 

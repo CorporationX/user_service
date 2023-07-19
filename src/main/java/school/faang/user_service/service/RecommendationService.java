@@ -62,6 +62,11 @@ public class RecommendationService {
         return recommendationMapper.toDto(recommendationEntity);
     }
 
+    public void delete(long id) {
+        recommendationRepository.deleteById(id);
+    }
+
+
     private void validate(RecommendationDto recommendation) {
         recommendationValidator.validateRecommendationContent(recommendation);
         recommendationValidator.validateRecommendationTerm(recommendation);

@@ -11,6 +11,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EventParticipationService {
     private final EventParticipationRepository repository;
+    
     public List<User> getParticipant(long eventId){
         return repository.findAllParticipantsByEventId(eventId);
     }

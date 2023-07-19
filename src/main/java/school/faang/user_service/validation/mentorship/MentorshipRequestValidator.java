@@ -12,6 +12,7 @@ import school.faang.user_service.repository.mentorship.MentorshipRequestReposito
 @Component
 @RequiredArgsConstructor
 public class MentorshipRequestValidator {
+    private static final int REQUEST_TIME_LIMIT = 3;
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final UserRepository userRepository;
 
@@ -31,7 +32,7 @@ public class MentorshipRequestValidator {
 
         mentorshipRequestRepository.findLatestRequest(requesterId, receiverId).ifPresent(
                 request -> {
-                    if (request.getUpdatedAt().isAfter(LocalDateTime.now().minusMonths(3))) {
+                    if (request.getCreatedAt().isAfter(LocalDateTime.now().minusMonths(REQUEST_TIME_LIMIT))) {
                         throw new MentorshipRequestValidationException(
                                 "Request has already been sent for the last three months.");
                     }

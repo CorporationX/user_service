@@ -12,7 +12,6 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -25,29 +24,36 @@ public class GoalService {
 
     @Transactional(readOnly = true)
     public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filterDto) {
-        List<Goal> goals = goalRepository.findGoalsByUserId(userId)
-                .peek(goal -> goal.setSkillsToAchieve(skillRepository.findSkillsByGoalId(goal.getId())))
-                .collect(Collectors.toList());
-        if (goalFilters != null){
-            goalFilters.stream()
-                    .filter(filter -> filter.isApplicable(filterDto))
-                    .forEach(filter -> filter.apply(goals, filterDto));
+        Stream<Goal> goals = goalRepository.findGoalsByUserId(userId)
+                .peek(goal -> goal.setSkillsToAchieve(skillRepository.findSkillsByGoalId(goal.getId())));
+
+        if (goalFilters != null) {
+            return filterGoals(goals, filterDto);
         }
 
-        return goalMapper.toDtoList(goals);
+        return goalMapper.toDtoList(goals.toList());
     }
 
     @Transactional(readOnly = true)
     public List<GoalDto> getSubGoalsByFilter(Long parentId, GoalFilterDto filterDto) {
-        List<Goal> goals = goalRepository.findByParent(parentId)
-                .peek(goal -> goal.setSkillsToAchieve(skillRepository.findSkillsByGoalId(goal.getId())))
-                .collect(Collectors.toList());
-        if (goalFilters != null){
-            goalFilters.stream()
-                    .filter(filter -> filter.isApplicable(filterDto))
-                    .forEach(filter -> filter.apply(goals, filterDto));
+        Stream<Goal> goals = goalRepository.findByParent(parentId)
+                .peek(goal -> goal.setSkillsToAchieve(skillRepository.findSkillsByGoalId(goal.getId())));
+
+        if (goalFilters != null) {
+            return filterGoals(goals, filterDto);
         }
 
-        return goalMapper.toDtoList(goals);
+        return goalMapper.toDtoList(goals.toList());
+    }
+
+    private List<GoalDto> filterGoals(Stream<Goal> goals, GoalFilterDto filter) {
+        Stream<Goal> filteredGoals = goals;
+        for (GoalFilter goalFilter : goalFilters) {
+            if (goalFilter.isApplicable(filter)) {
+                filteredGoals = goalFilter.apply(filteredGoals, filter);
+            }
+        }
+
+        return goalMapper.toDtoList(filteredGoals.toList());
     }
 }

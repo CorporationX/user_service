@@ -3,10 +3,13 @@ package school.faang.user_service.service.goal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -16,24 +19,22 @@ public class GoalService {
     private final GoalMapper goalMapper;
     private final int MAX_ACTIVE_GOALS = 3;
 
-    public void createGoalValidation(Long userId, Goal goal) {
-        int activeGoalsCount = goalRepository.countActiveGoalsPerUser(userId);
-        if (activeGoalsCount >= MAX_ACTIVE_GOALS ) {
-            throw new IllegalArgumentException("Goal cannot be saved because MAX_ACTIVE_GOALS = "
-                    + MAX_ACTIVE_GOALS + " and current active goals = "
-                    + activeGoalsCount);
-        }
-        GoalDto goalDto = goalMapper.toDto(goal);
-        if (skillRepository.countExisting(goalDto.getSkillIds()) != goalDto.getSkillIds().size()) {
-            throw new IllegalArgumentException("Goal contains non-existent skill");
-        }
+    public Goal createGoal(Long userId, Goal goal) {
+        creatingGoalValidation(userId, goal);
+        GoalDto dto = goalMapper.toDto(goal);
+        //goalMapper.toDto(goal).getSkillIds().forEach(id -> goalRepository.addSkillToGoal(id, goal.getId())); По заданию этот метод должен быть и мне его делать не нужно
+        return goalRepository.save(goal);
     }
 
-    public void createGoal(Long userId, Goal goal) {
-        createGoalValidation(userId, goal);
-        goalRepository.save(goal);
-        GoalDto dto = goalMapper.toDto(goal);
-        Long gid = dto.getId();
-        dto.getSkillIds().stream().forEach(sid -> goalRepository.connectGoalWithSkill(gid, sid));
+    private void creatingGoalValidation(Long userId, Goal goal) {
+        if (goalRepository.countActiveGoalsPerUser(userId) >= MAX_ACTIVE_GOALS) {
+            throw new IllegalArgumentException("Out of MAX_ACTIVE_GOALS range");
+        }
+        List<Skill> skillsToAchieve = goal.getSkillsToAchieve();
+        skillsToAchieve.forEach(skill -> {
+            if (!skillRepository.existsByTitle(skill.getTitle())) {
+                throw new IllegalArgumentException("Contains a non-existence skill");
+            }
+        });
     }
 }

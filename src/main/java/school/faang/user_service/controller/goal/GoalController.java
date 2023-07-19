@@ -15,6 +15,9 @@ public class GoalController {
     private final GoalService service;
 
     public void createGoal(Long userId, Goal goal) throws DataValidationException {
+        if (goal == null) {
+            throw new DataValidationException("Goal cannot be null");
+        }
         if (goal.getTitle() == null || goal.getTitle().isBlank())
             throw new DataValidationException("Title can not be blank or null");
         service.createGoal(userId, goal);

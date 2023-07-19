@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.exeptions.DataValidationException;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -21,7 +22,7 @@ class GoalServiceTest {
 
     @Test
     public void findGoalsByUserIdLessThanOneTest() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(DataValidationException.class, () -> {
             service.findGoalsByUserId(0L);
         });
     }
@@ -34,7 +35,7 @@ class GoalServiceTest {
 
     @Test
     public void getGoalsByUserLessThanOneTest() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(DataValidationException.class, () -> {
             service.getGoalsByUser(0L, null);
         });
     }

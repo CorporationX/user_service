@@ -3,13 +3,18 @@ package school.faang.user_service.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.goal.UpdateGoalDto;
+import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -17,32 +22,37 @@ import java.util.List;
 public class GoalService {
     private final GoalRepository goalRepository;
     private final SkillRepository skillRepository;
+    private final UserRepository userRepository;
+    private final GoalMapper goalMapper;
 
     @Transactional
-    public void updateGoal(Goal goalFromUpdate) {
-        List<Skill> skillsToAchieve = goalFromUpdate.getSkillsToAchieve();
-        List<User> users = goalFromUpdate.getUsers();
-        Goal goalToUpdate = goalRepository.findById(goalFromUpdate.getId())
+    public UpdateGoalDto updateGoal(UpdateGoalDto updateGoalDto) {
+        List<SkillDto> skillDtos = updateGoalDto.getSkillDtos();
+        List<Long> userIds = updateGoalDto.getUserIds();
+        Goal goalToUpdate = goalRepository.findById(updateGoalDto.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Goal not found"));
 
-        validateUpdate(goalToUpdate, goalFromUpdate, skillsToAchieve);
+        validateUpdate(goalToUpdate, updateGoalDto, skillDtos);
 
-        if (goalFromUpdate.getStatus().equals(GoalStatus.COMPLETED)) {
-            skillsToAchieve.forEach(skill -> {
-                users.forEach(user -> {
-                    if (!user.getSkills().contains(skill)) {
-                        skillRepository.assignSkillToUser(skill.getId(), user.getId());
-                    }
-                });
+
+        skillDtos.forEach(skill -> {
+            userIds.forEach(userId -> {
+                User user = userRepository.findById(userId).orElseThrow(() ->
+                        new IllegalArgumentException("User not found"));
+                List<String> userSkills = user.getSkills().stream().map(Skill::getTitle).toList();
+                if (!userSkills.contains(skill.getTitle())) {
+                    skillRepository.assignSkillToUser(skill.getId(), user.getId());
+                }
             });
-            goalRepository.delete(goalToUpdate);
-        } else {
-            goalRepository.save(goalFromUpdate);
-        }
+        });
+
+        goalToUpdate.setStatus(GoalStatus.COMPLETED);
+        goalToUpdate.setUpdatedAt(LocalDateTime.now());
+        return goalMapper.goalToUpdateGoalDto(goalRepository.save(goalToUpdate));
     }
 
-    private void validateUpdate(Goal goalToUpdate, Goal goalFromUpdate, List<Skill> skillsToAchieve) {
-        if (goalFromUpdate.getTitle().isBlank()) {
+    private void validateUpdate(Goal goalToUpdate, UpdateGoalDto updateGoalDto, List<SkillDto> skillDtos) {
+        if (updateGoalDto.getTitle().isBlank()) {
             throw new IllegalArgumentException("Title cannot be blank");
         }
 
@@ -50,7 +60,7 @@ public class GoalService {
             throw new IllegalArgumentException("Goal already completed");
         }
 
-        skillsToAchieve.forEach(skillToAchieve -> {
+        skillDtos.forEach(skillToAchieve -> {
             if (!skillRepository.existsByTitle(skillToAchieve.getTitle())) {
                 throw new IllegalArgumentException("Skill " + skillToAchieve.getTitle() + " not found");
             }

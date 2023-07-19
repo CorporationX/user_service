@@ -1,4 +1,4 @@
-package school.faang.user_service.service.GoalService;
+package school.faang.user_service.service.goal;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ public class GoalService {
     @Transactional
     public void deleteGoal(long goalId) {
         if (!goalRepository.existsById(goalId)) {
-            throw new IllegalArgumentException("Goal not found");
+            throw new IllegalArgumentException("Goal is not found");
         }
 
         goalRepository.deleteById(goalId);

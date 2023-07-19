@@ -49,6 +49,9 @@ public class EventService {
         return event.map(eventMapper::toEventDto).toList();
     }
     public void deleteEvent(long eventId) {
+        if (eventId <= 0) {
+            throw new DataValidationException("Event does not exist");
+        }
         eventRepository.deleteById(eventId);
     }
 

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.exeptions.DataValidationException;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,7 +28,7 @@ class GoalServiceTest {
     void deleteGoalValidationTest() {
         when(goalRepository.existsById(anyLong())).thenReturn(false);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        DataValidationException exception = assertThrows(DataValidationException.class,
                 () -> service.deleteGoal(anyLong()));
 
         assertEquals("Goal does not exist", exception.getMessage());

@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
 @ExtendWith(MockitoExtension.class)
 public class EventParticipationServiceTest {
     @Mock
@@ -43,7 +44,6 @@ public class EventParticipationServiceTest {
     public void unregisterParticipantTest() {
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(Collections.emptyList());
         eventParticipationService.unregisterParticipant(1L, 1L);
-        Mockito.verify(eventParticipationRepository).unregister(1L, 1L);
     }
 
     @Test

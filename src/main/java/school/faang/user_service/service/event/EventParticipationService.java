@@ -28,7 +28,7 @@ public class EventParticipationService {
         List<User> users = eventParticipationRepository.findAllParticipantsByEventId(eventId);
         for (User user : users) {
             if (user.getId() != userId) {
-                throw new DataValidationException("You are not registered yet!");
+                throw new DataValidationException("You are registered already!");
             }
         }
         eventParticipationRepository.unregister(eventId, userId);

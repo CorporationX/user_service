@@ -11,12 +11,12 @@ public class EventParticipationController {
 
     private final EventParticipationService eventParticipationService;
 
-    public void registerParticipantController(Long eventId, Long userId) {
+    public void registerParticipant(Long eventId, Long userId) {
         validate(eventId, userId);
         eventParticipationService.registerParticipant(eventId, userId);
     }
 
-    public void unregisterParticipantController(Long eventId, Long userId) {
+    public void unregisterParticipant(Long eventId, Long userId) {
         validate(eventId, userId);
         eventParticipationService.unregisterParticipant(eventId, userId);
     }

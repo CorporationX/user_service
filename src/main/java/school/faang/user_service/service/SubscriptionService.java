@@ -19,6 +19,16 @@ public class SubscriptionService {
         }
     }
 
+    public void unfollowUser(long followerId, long followeeId){
+        validate(followerId, followeeId);
+        boolean isExist = subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
+        if (isExist){
+            throw new DataValidationException("Can`t unfollow of yourself");
+        } else {
+            subscriptionRepository.unfollowUser(followerId, followeeId);
+        }
+    }
+
     public void validate(Long firstId, Long secondId) {
         if (firstId <= 0 || secondId <= 0){
             throw new DataValidationException("Id cannot be less 0! ");

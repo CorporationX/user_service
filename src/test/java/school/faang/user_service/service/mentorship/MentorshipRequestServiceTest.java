@@ -16,8 +16,6 @@ import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.validation.mentorship.MentorshipRequestValidator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 

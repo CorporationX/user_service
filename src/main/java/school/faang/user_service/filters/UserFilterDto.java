@@ -14,8 +14,8 @@ public class UserFilterDto {
     private String cityPattern;
     private String phonePattern;
     private String skillPattern;
-    private int experienceMin;
-    private int experienceMax;
-    private int page;
-    private int pageSize;
+    private Integer experienceMin;
+    private Integer experienceMax;
+    private Integer page;
+    private Integer pageSize;
 }

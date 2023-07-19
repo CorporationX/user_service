@@ -8,13 +8,13 @@ import java.util.stream.Stream;
 
 @Component
 public class UserAboutFilter implements DtoUserFilter {
-        @Override
-        public boolean isApplicable(UserFilterDto filters) {
-            return filters.getAboutPattern() != null;
-        }
+    @Override
+    public boolean isApplicable(UserFilterDto filters) {
+        return filters.getAboutPattern() != null;
+    }
 
-        @Override
-        public Stream<User> apply(Stream<User> users, UserFilterDto filterDto) {
-            return users.filter(user -> user.getAboutMe().matches(filterDto.getAboutPattern()));
-        }
+    @Override
+    public Stream<User> apply(Stream<User> users, UserFilterDto filterDto) {
+        return users.filter(user -> user.getAboutMe().contains(filterDto.getAboutPattern()));
+    }
 }

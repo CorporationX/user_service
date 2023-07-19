@@ -15,6 +15,6 @@ public class UserCityFilter implements DtoUserFilter {
 
     @Override
     public Stream<User> apply(Stream<User> users, UserFilterDto filterDto) {
-        return users.filter(user -> user.getCity().matches(filterDto.getCityPattern()));
+        return users.filter(user -> user.getCity().contains(filterDto.getCityPattern()));
     }
 }

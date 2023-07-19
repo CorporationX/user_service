@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.mentor.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MentorshipService {
     private final MentorshipRepository mentorshipRepository;
+    private final  UserRepository userRepository;
     private final UserMapper userMapper;
 
     public List<UserDto> getMentees(Long userId) {
@@ -27,5 +29,14 @@ public class MentorshipService {
                 .orElseThrow(() -> new IllegalArgumentException("User with id " + userId + " not found"));
 
         return userMapper.toUserListDto(user.getMentors());
+    }
+
+    public void deleteMentee(Long menteeId, Long mentorId) {
+        User mentor = userRepository.findById(mentorId)
+                .orElseThrow(() -> new IllegalArgumentException("Mentor with id " + mentorId + " not found"));
+        User mentee = userRepository.findById(menteeId)
+                .orElseThrow(() -> new IllegalArgumentException("Mentee with id " + menteeId + " not found"));
+        mentor.getMentees().remove(mentee);
+        userRepository.save(mentor);
     }
 }

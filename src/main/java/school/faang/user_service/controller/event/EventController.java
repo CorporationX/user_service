@@ -17,6 +17,9 @@ public class EventController {
         }
         return eventService.create(event);
     }
+    public EventDto getEvent(long id) {
+        return eventService.getEvent(id);
+    }
 
     private boolean checkValidation(EventDto event) {
         return event.getTitle() != null && !event.getTitle().isEmpty()

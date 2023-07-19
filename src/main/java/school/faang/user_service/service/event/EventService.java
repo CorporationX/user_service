@@ -27,6 +27,10 @@ public class EventService {
         }
         return eventMapper.toEventDto(eventRepository.save(eventMapper.toEvent(event)));
     }
+    public EventDto getEvent(long eventId) {
+        return eventMapper.toEventDto(eventRepository.findById(eventId)
+                .orElseThrow(() -> new DataValidationException("User with this id was not found")));
+    }
 
     private boolean isUserContainsSkill(EventDto event, User user) {
         return new HashSet<>(user.getSkills()

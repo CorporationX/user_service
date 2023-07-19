@@ -83,7 +83,11 @@ public class EventService {
         return result;
     }
 
-    public List<Event> getOwnedEvents(long userId) {
-        return Optional.ofNullable(eventRepository.findAllByUserId(userId)).orElse(new ArrayList<>());
+    public List<EventDto> getOwnedEvents(long userId) {
+        return Optional.ofNullable(eventRepository.findAllByUserId(userId))
+                .orElse(new ArrayList<>())
+                .stream()
+                .map(eventMapper::toDTO)
+                .toList();
     }
 }

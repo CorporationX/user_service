@@ -39,6 +39,6 @@ public class EventController {
     }
 
     public List<EventDto> getOwnedEvents(long userId) {
-        return eventService.getOwnedEvents(userId).stream().map(event -> eventMapper.toDTO(event)).toList();
+        return eventService.getOwnedEvents(userId);
     }
 }

@@ -7,12 +7,17 @@ import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.UserSkillGuarantee;
+import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.UserSkillGuaranteeRepository;
+import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -20,9 +25,12 @@ import java.util.stream.StreamSupport;
 @Service
 @RequiredArgsConstructor
 public class SkillService {
+    private final int MIN_SKILL_OFFERS = 3;
     private final SkillRepository skillRepository;
     private final SkillMapper skillMapper;
     private final UserRepository userRepository;
+    private final SkillOfferRepository skillOfferRepository;
+    private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
 
     @Transactional
     public SkillDto create(SkillDto skillDto) {
@@ -62,5 +70,36 @@ public class SkillService {
                 .entrySet().stream()
                 .map(entry -> skillMapper.toCandidateDto(entry.getKey(), entry.getValue()))
                 .toList();
+    }
+
+    @Transactional
+    public SkillDto acquireSkillFromOffers(long skillId, long userId) {
+        Optional<Skill> offeredSkill = skillRepository.findUserSkill(skillId, userId);
+
+        if (offeredSkill.isPresent()) {
+            throw new DataValidationException("User already has this skill");
+        }
+
+        List<SkillOffer> offeredSkills = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
+        if (offeredSkills.size() >= MIN_SKILL_OFFERS) {
+            skillRepository.assignSkillToUser(skillId, userId);
+
+            addUserSkillGuarantee(offeredSkills);
+            return skillMapper.toDto(offeredSkills.get(0).getSkill());
+        }
+        System.out.println("Not enough offers to acquire this skill");
+        return skillMapper.toDto(offeredSkills.get(0).getSkill());
+    }
+
+    private void addUserSkillGuarantee(List<SkillOffer> offeredSkills) {
+        userSkillGuaranteeRepository.saveAll(offeredSkills.stream()
+                .map(offeredSkill -> UserSkillGuarantee.builder()
+                        .user(offeredSkill.getRecommendation().getReceiver())
+                        .skill(offeredSkill.getSkill())
+                        .guarantor(offeredSkill.getRecommendation().getAuthor())
+                        .build()
+                )
+                .distinct()
+                .toList());
     }
 }

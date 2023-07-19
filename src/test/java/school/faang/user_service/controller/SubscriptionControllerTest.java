@@ -27,6 +27,19 @@ public class SubscriptionControllerTest {
     }
 
     @Test
+    void testUnfollowUser(){
+        subscriptionController.unfollowUser(22L, 23L);
+        Mockito.verify(subscriptionService, Mockito.times(1)).unfollowUser(Mockito.anyLong(),
+                Mockito.anyLong());
+    }
+
+    @Test
+    void testControllerUnFollowUserByNull(){
+        Assertions.assertThrows(DataValidationException.class,
+                () -> subscriptionController.unfollowUser(-33L, 1L));
+    }
+
+    @Test
     void testControllerFollowUserByNull(){
         Assertions.assertThrows(DataValidationException.class,
                 () -> subscriptionController.followUser(-33L, 1L));

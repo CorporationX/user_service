@@ -53,6 +53,15 @@ public class RecommendationService {
         return recommendationMapper.toDto(recommendationEntity);
     }
 
+    public RecommendationDto update(RecommendationDto recommendationUpdate) {
+        validate(recommendationUpdate);
+        Recommendation recommendationEntity = recommendationRepository.update(recommendationUpdate.getAuthorId(), recommendationUpdate.getReceiverId(), recommendationUpdate.getContent());
+
+        skillOfferRepository.deleteAllByRecommendationId(recommendationEntity.getId());
+        saveSkillOffers(recommendationEntity, recommendationUpdate.getSkillOffers());
+        return recommendationMapper.toDto(recommendationEntity);
+    }
+
     private void validate(RecommendationDto recommendation) {
         recommendationValidator.validateRecommendationContent(recommendation);
         recommendationValidator.validateRecommendationTerm(recommendation);

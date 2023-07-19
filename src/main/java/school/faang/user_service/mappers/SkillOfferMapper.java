@@ -6,7 +6,7 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface SkillOfferMapper {
 
     @Mapping(target = "skill.id", source = "skill")

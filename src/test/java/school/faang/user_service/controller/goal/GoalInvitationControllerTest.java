@@ -10,6 +10,8 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.springframework.http.HttpStatus;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.dto.goal.InvitationFilterDto;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.service.goal.GoalInvitationService;
 import school.faang.user_service.util.goal.validator.GoalInvitationControllerValidator;
 
@@ -72,11 +74,37 @@ class GoalInvitationControllerTest {
         Assertions.assertThrows(RuntimeException.class, () -> goalController.rejectGoalInvitation(-1L));
     }
 
+    @Test
+    void testGetInvitations_InputsAreCorrect_ShouldCallMethodFromService() {
+        goalController.getInvitations(buildInvitationFilterDto());
+
+        Mockito.verify(goalService, Mockito.times(1)).getInvitations(buildInvitationFilterDto());
+    }
+
+    @Test
+    void testGetInvitations_InputsAreIncorrect_StatusShouldNotBeOk() {
+        InvitationFilterDto invitationFilterDto = buildInvitationFilterDto().builder().inviterId(-1L).build();
+        Mockito.doThrow(RuntimeException.class).when(controllerValidator)
+                .validateInvitation(invitationFilterDto, new RuntimeException());
+
+        Assertions.assertNotEquals(HttpStatus.OK, goalController.getInvitations(invitationFilterDto));
+    }
+
     private GoalInvitationDto buildGoalInvitationDto() {
         return GoalInvitationDto.builder()
                 .invitedUserId(1L)
                 .inviterId(2L)
                 .goalId(1L)
+                .build();
+    }
+
+    private InvitationFilterDto buildInvitationFilterDto() {
+        return InvitationFilterDto.builder()
+                .inviterNamePattern("test")
+                .invitedNamePattern("test")
+                .inviterId(1L)
+                .invitedId(2L)
+                .status(RequestStatus.PENDING)
                 .build();
     }
 }

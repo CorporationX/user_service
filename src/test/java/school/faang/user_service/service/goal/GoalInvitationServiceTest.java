@@ -3,16 +3,23 @@ package school.faang.user_service.service.goal;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
-import school.faang.user_service.mapper.goal.GoalInvitationMapper;
+import school.faang.user_service.filter.goalInvitation.GoalInvitationFilter;
+import school.faang.user_service.filter.goalInvitation.GoalInvitationInvitedIdFilter;
+import school.faang.user_service.filter.goalInvitation.GoalInvitationInvitedNameFilter;
+import school.faang.user_service.filter.goalInvitation.GoalInvitationInviterIdFilter;
+import school.faang.user_service.filter.goalInvitation.GoalInvitationInviterNameFilter;
+import school.faang.user_service.filter.goalInvitation.GoalInvitationStatusFilter;
+import school.faang.user_service.mapper.goal.GoalInvitationMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -23,44 +30,67 @@ import school.faang.user_service.util.goal.validator.GoalInvitationEntityValidat
 import school.faang.user_service.util.goal.validator.GoalInvitationRejectValidator;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
-public class GoalInvitationServiceTest {
-
-    @Mock
-    GoalInvitationRepository goalInvitationRepository;
+class GoalInvitationServiceTest {
 
     @Mock
-    UserRepository userRepository;
+    private GoalInvitationRepository goalInvitationRepository;
 
     @Mock
-    GoalRepository goalRepository;
+    private UserRepository userRepository;
 
     @Mock
-    GoalInvitationMapper goalInvitationMapper;
+    private GoalRepository goalRepository;
+
+    @Spy
+    private GoalInvitationMapperImpl goalInvitationMapper;
 
     @Mock
-    GoalInvitationEntityValidator goalInvitationDtoValidator;
+    private GoalInvitationEntityValidator goalInvitationEntityValidator;
 
     @Mock
-    GoalInvitationAcceptValidator goalInvitationAcceptValidator;
+    private GoalInvitationAcceptValidator goalInvitationAcceptValidator;
 
     @Mock
-    GoalInvitationRejectValidator goalInvitationRejectValidator;
+    private GoalInvitationRejectValidator goalInvitationRejectValidator;
 
-    @InjectMocks
-    GoalInvitationService goalInvitationService;
+    private List<GoalInvitationFilter> goalFilters = List.of(
+            new GoalInvitationInvitedIdFilter(),
+            new GoalInvitationInvitedNameFilter(),
+            new GoalInvitationInviterIdFilter(),
+            new GoalInvitationInviterNameFilter(),
+            new GoalInvitationStatusFilter()
+    );
+
+    private GoalInvitationService goalInvitationService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+
+        goalInvitationService = new GoalInvitationService(
+            goalInvitationRepository,
+            userRepository,
+            goalRepository,
+            goalInvitationMapper,
+            goalInvitationEntityValidator,
+            goalInvitationAcceptValidator,
+            goalInvitationRejectValidator,
+            goalFilters
+        );
     }
 
     @Test
     void testCreateInvitation_InputsAreCorrect_ShouldSaveGoalInvitation() {
+        Mockito.when(goalRepository.findById(Mockito.any())).thenReturn(Optional.of(buildGoalInvitationEntity().getGoal()));
+        Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(buildGoalInvitationEntity().getInvited()));
+        Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(buildGoalInvitationEntity().getInviter()));
         Mockito.when(goalInvitationMapper.toEntityForCreatingInvitation(buildGoalInvitationDto(), goalInvitationService))
                 .thenReturn(buildGoalInvitationEntity());
-        Mockito.doNothing().when(goalInvitationDtoValidator).validate(buildGoalInvitationEntity());
+        Mockito.doNothing().when(goalInvitationEntityValidator).validate(buildGoalInvitationEntity());
         Mockito.when(goalInvitationMapper.toDto(buildGoalInvitationEntity())).thenReturn(buildGoalInvitationDto());
 
         goalInvitationService.createInvitation(buildGoalInvitationDto());
@@ -72,9 +102,12 @@ public class GoalInvitationServiceTest {
     @Test
     void testCreateInvitation_InputsAreCorrect_ShouldAddGoalInvitationsToList() {
         GoalInvitation goalInvitation = buildGoalInvitationEntity();
+        Mockito.when(goalRepository.findById(Mockito.any())).thenReturn(Optional.of(goalInvitation.getGoal()));
+        Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(goalInvitation.getInvited()));
+        Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(goalInvitation.getInviter()));
         Mockito.when(goalInvitationMapper.toEntityForCreatingInvitation(buildGoalInvitationDto(), goalInvitationService))
                 .thenReturn(goalInvitation);
-        Mockito.doNothing().when(goalInvitationDtoValidator).validate(buildGoalInvitationEntity());
+        Mockito.doNothing().when(goalInvitationEntityValidator).validate(buildGoalInvitationEntity());
         Mockito.when(goalInvitationMapper.toDto(goalInvitation)).thenReturn(buildGoalInvitationDto());
 
         goalInvitationService.createInvitation(buildGoalInvitationDto());
@@ -243,17 +276,32 @@ public class GoalInvitationServiceTest {
         Mockito.verify(goalRepository, Mockito.times(1)).findById(1L);
     }
 
+    @Test
+    void testGetInvitations_InputsAreCorrect_ShouldFilter() {
+        Mockito.when(goalInvitationRepository.findAll())
+                .thenReturn(getStreamOfGoalInvitations().toList());
+        List<GoalInvitationDto> expected = List.of(
+                buildGoalInvitationDto()
+        );
+
+        List<GoalInvitationDto> invitations = goalInvitationService.getInvitations(buildInvitationFilterDto());
+
+        Assertions.assertIterableEquals(expected, invitations);
+    }
+
     private GoalInvitation buildGoalInvitationEntity() {
         return GoalInvitation.builder()
                 .id(1L)
                 .invited(User.builder()
                         .id(1L)
+                        .username("test")
                         .receivedGoalInvitations(new ArrayList<>())
                         .goals(new ArrayList<>())
                         .build())
                 .inviter(User.builder()
+                        .id(2L)
                         .sentGoalInvitations(new ArrayList<>())
-                        .id(1L)
+                        .username("test")
                         .build())
                 .goal(Goal.builder()
                         .id(1L)
@@ -267,8 +315,35 @@ public class GoalInvitationServiceTest {
         return GoalInvitationDto.builder()
                 .id(1L)
                 .invitedUserId(1L)
-                .inviterId(1L)
+                .inviterId(2L)
                 .goalId(1L)
+                .status(RequestStatus.PENDING)
+                .build();
+    }
+
+    private Stream<GoalInvitation> getStreamOfGoalInvitations() {
+        return Stream.<GoalInvitation>builder()
+                .add(buildGoalInvitationEntity())
+                .add(GoalInvitation.builder()
+                        .invited(User.builder()
+                                .id(1L)
+                                .username("test")
+                                .build())
+                        .inviter(User.builder()
+                                .id(2L)
+                                .username("test")
+                                .build())
+                        .status(RequestStatus.REJECTED)
+                        .build())
+                .build();
+    }
+
+    private InvitationFilterDto buildInvitationFilterDto() {
+        return InvitationFilterDto.builder()
+                .invitedNamePattern("test")
+                .inviterNamePattern("test")
+                .invitedId(1L)
+                .inviterId(2L)
                 .status(RequestStatus.PENDING)
                 .build();
     }

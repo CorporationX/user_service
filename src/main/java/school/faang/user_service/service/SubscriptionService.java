@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.SubscriberFilter;
 import school.faang.user_service.mapper.UserMapper;
@@ -19,6 +20,7 @@ public class SubscriptionService {
     private final UserMapper mapper;
     private final SubscriberFilter subFilter;
 
+    @Transactional
     public void followUser(long followerId, long followeeId) {
         if (repository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             throw new DataValidationException("User has already followed");
@@ -39,7 +41,17 @@ public class SubscriptionService {
         return users;
     }
 
+    @Transactional
     public long getFollowersCount(long followeeId) {
         return repository.findFollowersAmountByFolloweeId(followeeId);
+    }
+
+    @Transactional
+    public List<UserDto> getFollowing(long followeeId, UserFilterDto filter) {
+        var following = repository.findByFollowerId(followeeId)
+                .filter(user -> subFilter.matchesFilters(user, filter))
+                .map(mapper::toDto)
+                .toList();
+        return following;
     }
 }

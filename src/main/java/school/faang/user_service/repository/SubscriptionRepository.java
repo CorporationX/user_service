@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 public interface SubscriptionRepository extends CrudRepository<User, Long> {
 
     @Query(nativeQuery = true, value = "insert into subscription (follower_id, followee_id) values (:followerId, :followeeId)")
+    @Modifying
     void followUser(long followerId, long followeeId);
 
     @Query(nativeQuery = true, value = "delete from subscription where follower_id = :followerId and followee_id = :followeeId")

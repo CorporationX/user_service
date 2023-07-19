@@ -4,9 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.SubscriptionDto;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.service.SubscriptionService;
 import school.faang.user_service.validator.SubscriptionValidator;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,5 +43,12 @@ public class SubscriptionController {
         validator.validateId(followerId);
         long followersCount = service.getFollowersCount(followerId);
         return ResponseEntity.ok(followersCount);
+    }
+
+    @GetMapping("/following/{followeeId}")
+    public ResponseEntity<?> getFollowing(@PathVariable long followeeId, @RequestBody UserFilterDto filter) {
+        validator.validateId(followeeId);
+        List<UserDto> following = service.getFollowing(followeeId, filter);
+        return ResponseEntity.ok().body(following);
     }
 }

@@ -81,4 +81,9 @@ public class SubscriptionControllerTest {
         Assertions.assertThrows(DataValidationException.class,
                 () -> controller.getFollowers(0,filterDto));
     }
+    @Test
+    void GetFolloweesTest() {
+        var res = controller.getFollowing(1, filterDto);
+        Assertions.assertEquals(res.getStatusCode(), HttpStatus.OK);
+    }
 }

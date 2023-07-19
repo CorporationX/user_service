@@ -250,4 +250,10 @@ class RecommendationServiceTest {
 
         assertEquals(expected, result);
     }
+
+    @Test
+    void deleteInvokesDeleteByIdTest() {
+        recommendationService.delete(1);
+        Mockito.verify(recommendationRepository).deleteById(1L);
+    }
 }

@@ -50,6 +50,10 @@ public class RecommendationService {
         return recommendationMapper.toDto(updatedRecommendation);
     }
 
+    public void delete(long id) {
+        recommendationRepository.deleteById(id);
+    }
+
     public void validateRecommendation(RecommendationDto recommendationDto) {
         if (recommendationDto.getAuthorId() == null) {
             throw new DataValidationException("Author ID must be specified");
@@ -89,7 +93,7 @@ public class RecommendationService {
                     recommendationDto.getSkillOffers()
                             .forEach(skillOfferDto -> {
                                 if (skillOfferDto.getSkillId() == sameSkill.getId()) {
-                                      recommendationDto.getSkillOffers().remove(skillOfferDto);
+                                    recommendationDto.getSkillOffers().remove(skillOfferDto);
                                 }
                             });
                 });

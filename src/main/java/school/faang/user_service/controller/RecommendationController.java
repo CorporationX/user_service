@@ -21,6 +21,10 @@ public class RecommendationController {
         recommendationService.update(updated);
     }
 
+    public void deleteRecommendation(long id) {
+        recommendationService.delete(id);
+    }
+
     private void validateRecommendation(RecommendationDto recommendationDto) {
         if (recommendationDto == null) {
             throw new DataValidationException("Recommendation can't be empty");

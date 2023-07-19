@@ -20,4 +20,7 @@ public class SubscriptionService {
     public void update(RecommendationDto recommendation){
         //?
     }
+    public void delete(long id){
+        //?
+    }
 }

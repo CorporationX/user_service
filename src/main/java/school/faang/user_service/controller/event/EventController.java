@@ -11,11 +11,10 @@ import school.faang.user_service.service.event.EventService;
 @RequiredArgsConstructor
 public class EventController {
     private final EventService eventService;
-    private final EventMapper eventMapper;
 
     public EventDto create(EventDto event) {
         validate(event);
-        return eventMapper.toDTO(eventService.create(event));
+        return eventService.create(event);
     }
 
     private void validate(EventDto event) {

@@ -24,9 +24,9 @@ public class EventService {
     private final EventMapper eventMapper;
 
 
-    public Event create(EventDto event) {
+    public EventDto create(EventDto event) {
         validate(event);
-        return eventRepository.save(eventMapper.toEvent(event));
+        return eventMapper.toDTO(eventRepository.save(eventMapper.toEvent(event)));
     }
 
     private void validate(EventDto event) {

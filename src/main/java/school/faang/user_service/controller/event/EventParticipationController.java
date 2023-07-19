@@ -47,6 +47,7 @@ public class EventParticipationController {
             throw new DataValidationException("User id cannot be less than or equal to 0");
         }
     }
+
     private void validateEventId(Long eventId) {
         if (eventId == null || eventId <= 0) {
             throw new DataValidationException("Event id cannot be null and less than or equal to 0");

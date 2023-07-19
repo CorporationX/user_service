@@ -13,7 +13,7 @@ public class EventController {
     private final EventService eventService;
 
     public EventDto create(EventDto event){
-        if (eventService.validation(event)) {
+        if (validation(event)) {
             return eventService.create(event);
         }else {
             throw new DataValidationException("Ошибка");
@@ -29,10 +29,13 @@ public class EventController {
         eventService.deleteEvent(id);
     }
     public void updateEvent(EventDto event){
-        if (eventService.validation(event)) {
+        if (validation(event)) {
             eventService.updateEvent(event);
         }else {
             throw new DataValidationException("Ошибка");
         }
+    }
+    private boolean validation(EventDto event) {
+        return event.getTitle() != null && !event.getTitle().isEmpty() && event.getStartDate() != null && event.getOwnerId() != null;
     }
 }

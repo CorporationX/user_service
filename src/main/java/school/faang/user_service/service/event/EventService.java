@@ -7,6 +7,7 @@ import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.UserRepository;
@@ -29,28 +30,28 @@ public class EventService {
         boolean userContainsSkill = isUserContainsSkill(event, user);
         if (!userContainsSkill) {
             throw new DataValidationException("Пользователь не может провести событие с такими навыками");
-
         }
         return eventMapper.toEventDto(eventRepository.save(eventMapper.toEvent(event)));
-    }
-
-    private static boolean isUserContainsSkill(EventDto event, User user) {
-        return new HashSet<>(user.getSkills()
-                .stream()
-                .map(Skill::getTitle)
-                .toList())
-                .containsAll(event.getRelatedSkills()
-                        .stream()
-                        .map(SkillDto::getTitle).toList());
-    }
-
-    public boolean validation(EventDto event) {
-        return event.getTitle() != null && !event.getTitle().isEmpty() && event.getStartDate() != null && event.getOwnerId() != null;
     }
 
     public EventDto getEvent(long eventId) {
         return eventMapper.toEventDto(eventRepository.findById(eventId)
                 .orElseThrow(() -> new DataValidationException("Ошибка")));
+    }
+
+    public EventDto updateEvent(EventDto event) {
+        Event event1 = eventRepository.findById(event.getId())
+                .orElseThrow(() -> new DataValidationException("Ошибка в развитии"));
+        eventMapper.update(event1, event);
+        return create(eventMapper.toEventDto(event1));
+    }
+
+    public void deleteEvent(long eventId) {
+        if (eventId <= 0) {
+            throw new DataValidationException("Ошибка");
+        } else {
+            eventRepository.deleteById(eventId);
+        }
     }
 
     public List<EventDto> getEventsByFilter(EventFilterDto filter) {
@@ -121,40 +122,13 @@ public class EventService {
                 .toList();
     }
 
-    public EventDto updateEvent(EventDto event) {
-        if (eventRepository.existsById(event.getId())) {
-            eventRepository.findById(event.getId()).ifPresent(e -> {
-                eventMapper.update(e,event);
-            });
-        }
-        return create(event);
+    private boolean isUserContainsSkill(EventDto event, User user) {
+        return new HashSet<>(user.getSkills()
+                .stream()
+                .map(Skill::getTitle)
+                .toList())
+                .containsAll(event.getRelatedSkills()
+                        .stream()
+                        .map(SkillDto::getTitle).toList());
     }
-
-    public void deleteEvent(long eventId) {
-        if (eventId <= 0) {
-            throw new DataValidationException("Ошибка");
-        } else {
-            eventRepository.deleteById(eventId);
-        }
-    }
-
-    // эпик создание события BC-3688
-    // 1 таска BC-3689
-//    Создайте в классе EventService метод create(EventDto event)
-//    с возвращаемым значением EventDto который будет вызываться из метода create()
-//    класса EventController для непосредственного выполнения
-//    нужного действия, после того, как запрос пользователя отвалидирован.
-
-//    Здесь нужно проверить, что пользователь, который создает событие, имеет навыки,
-//    связанные с событием. Если у пользователя нет этих навыков,
-//    нужно вывести ошибку о том, что пользователь не может провести такое событие с
-//    такими навыками. Если все в порядке, то нужно вызвать метода save класса EventRepository,
-//    который сохранит новое событие в базу данных.
-    // 5 таска BC-3693
-//    Создайте в классе EventService метод updateEvent(EventDto event) для обновления события.
-
-//    Здесь нужно проверить, что пользователь, который создает событие, имеет навыки,
-//    связанные с событием. Если у пользователя нет этих навыков, нужно вывести ошибку о том,
-//    что пользователь не может провести такое событие с такими навыками. Если все в порядке,
-//    то нужно вызвать метода save класса EventRepository, который сохранит новое событие в базу данных.
 }

@@ -1,6 +1,5 @@
 package school.faang.user_service.service;
 
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,13 +19,11 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.EventService;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.when;
-
 
 @ExtendWith(MockitoExtension.class)
 public class EventServiceTest {
@@ -90,7 +87,6 @@ public class EventServiceTest {
             .owner(user2)
             .build();
 
-
     @Test
     public void testOwnerHasNoSkillsForEvent() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
@@ -100,8 +96,8 @@ public class EventServiceTest {
     @Test
     public void testOwnerHasSkillsForEvent() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user2));
-        when(eventRepository.save(eventMapper.toEvent(eventDto))).thenReturn(event);
-        Assertions.assertEquals(event, eventService.create(eventDto));
+        eventService.create(eventDto);
+        Mockito.verify(eventRepository, Mockito.times(1)).save(eventMapper.toEvent(eventDto));
     }
 
     @Test
@@ -119,7 +115,7 @@ public class EventServiceTest {
     @Test
     public void testCorrectGetEvent() {
         when(eventRepository.findById(1L)).thenReturn(Optional.ofNullable(event));
-        Assertions.assertEquals(event, eventService.getEvent(1L));
+        Assertions.assertEquals(eventMapper.toDTO(event), eventService.getEvent(1L));
     }
 
     @Test

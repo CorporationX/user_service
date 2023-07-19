@@ -52,13 +52,11 @@ public class SubscriptionService {
     }
 
     private List<UserDto> applyFilter(Stream<User> users, UserFilterDto DtoFilters){
-
-        List<UserDto> result = userFilters.stream()
+        return userFilters.stream()
                 .filter(filter -> filter.isApplicable(DtoFilters))
                 .flatMap(filter -> filter.apply(users, DtoFilters))
                 .map(userMapper::userToDto)
                 .toList();
-        return result;
     }
 
     private void validateFollower(long followerId, long followeeId){

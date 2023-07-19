@@ -1,6 +1,5 @@
 package school.faang.user_service.service;
 
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,13 +19,11 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.EventService;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.when;
-
 
 @ExtendWith(MockitoExtension.class)
 public class EventServiceTest {
@@ -90,8 +87,6 @@ public class EventServiceTest {
             .owner(user2)
             .build();
 
-
-
     @Test
     public void testOwnerHasNoSkillsForEvent() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
@@ -136,13 +131,13 @@ public class EventServiceTest {
     }
 
     @Test
-    public void testUpdateEventOwnerHasNoSkills(){
+    public void testUpdateEventOwnerHasNoSkills() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
         Assertions.assertThrows(DataValidationException.class, () -> eventService.updateEvent(eventDto));
     }
 
     @Test
-    public void testUpdateEventOwnerHasSkills(){
+    public void testUpdateEventOwnerHasSkills() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user2));
         when(eventRepository.save(eventMapper.toEvent(eventDto))).thenReturn(event);
         eventService.updateEvent(eventDto);
@@ -150,7 +145,7 @@ public class EventServiceTest {
     }
 
     @Test
-    public void testUpdateEventReturnsNull(){
+    public void testUpdateEventReturnsNull() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user2));
         when(eventRepository.save(eventMapper.toEvent(eventDto))).thenReturn(eventWithoutAttendees);
         Assertions.assertEquals(0, eventService.updateEvent(eventDto));

@@ -20,5 +20,5 @@ public class EventFilterDto {
     private String description;
     private List<SkillDto> relatedSkills;
     private String location;
-    private int maxAttendees;
+    private Integer maxAttendees;
 }

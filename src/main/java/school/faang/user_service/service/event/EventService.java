@@ -46,9 +46,12 @@ public class EventService {
 //        });
 
         Stream<Event> event = eventRepository.findAll().stream();
-        eventFilters.stream()
+        List<EventFilter> eventFilterList = eventFilters.stream()
                 .filter(filter -> filter.isApplicable(filters))
-                .forEach(filter -> filter.apply(event,filters));
+                .toList();
+        for (EventFilter events: eventFilterList) {
+            event = events.apply(event, filters);
+        }
         return event.map(eventMapper::toEventDto).toList();
 
 //        return events.stream()

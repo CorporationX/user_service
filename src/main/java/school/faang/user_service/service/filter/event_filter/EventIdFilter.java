@@ -17,6 +17,6 @@ public class EventIdFilter implements EventFilter {
 
     @Override
     public Stream<Event> apply(Stream<Event> events, EventFilterDto eventDto) {
-        return events.filter(event -> event.getId().equals(eventDto.getId()));
+        return events.filter(event -> event.getId() == (eventDto.getId()));
     }
 }

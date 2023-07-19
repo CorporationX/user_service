@@ -17,6 +17,10 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.EventMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.service.filter.event_filter.EventIdFilter;
+import school.faang.user_service.service.filter.event_filter.EventMaxAttendeesFilter;
+import school.faang.user_service.service.filter.event_filter.EventRelatedSkillsFilter;
+import school.faang.user_service.service.filter.event_filter.EventTitleFilter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -85,6 +89,10 @@ class EventServiceTest {
 
     @Test
     void testFilterDTo() {
+        List<EventFilter> eventFilters = new ArrayList<>();
+        eventFilters.add(new EventMaxAttendeesFilter());
+        eventFilters.add(new EventTitleFilter());
+        eventFilters.add(new EventIdFilter());
 
         List<SkillDto> relatedSkills = new ArrayList<>();
         List<Skill> relatedSkills2 = new ArrayList<>();
@@ -126,6 +134,7 @@ class EventServiceTest {
                         "location",
                         1));
 
+        eventService = new EventService(userRepository,eventRepository, eventMapper, eventFilters);
         List<EventDto> eventsByFilter = eventService.getEventsByFilter(eventFilterDto);
         verify(eventRepository, times(1)).findAll();
 

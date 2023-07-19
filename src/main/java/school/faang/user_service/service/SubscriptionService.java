@@ -8,8 +8,6 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class SubscriptionService {

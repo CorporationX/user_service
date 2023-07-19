@@ -1,7 +1,6 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
@@ -93,7 +92,6 @@ public class RecommendationService {
                                       recommendationDto.getSkillOffers().remove(skillOfferDto);
                                 }
                             });
-//                    recommendationDto.getSkillOffers().remove(sameSkill.getId());
                 });
         User currentUser = userRepository.findById(recommendationDto.getReceiverId()).orElseThrow(() -> new DataValidationException("Entity not found"));
         currentUser.setSkills(userSkills);

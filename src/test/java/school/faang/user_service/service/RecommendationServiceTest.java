@@ -43,19 +43,17 @@ class RecommendationServiceTest {
     @Mock
     private SkillOfferRepository skillOfferRepository;
     @Spy
-    private RecommendationMapper recommendationMapper = new RecommendationMapperImpl();
-    @Spy
     private SkillOfferMapper skillOfferMapper = new SkillOfferMapperImpl();
+    @Spy
+    private RecommendationMapper recommendationMapper = new RecommendationMapperImpl(skillOfferMapper);
     @InjectMocks
     private RecommendationService recommendationService;
-
     private RecommendationDto recommendationDto;
     private List<Skill> skills;
     private List<SkillOfferDto> skillOffers;
     private List<UserSkillGuarantee> userSkillGuarantees;
     private UserSkillGuarantee firstGuarantee;
     private UserSkillGuarantee secondGuarantee;
-    private Skill sameSkill;
     private Skill userSkill;
     private User firstUser;
     private User secondUser;
@@ -69,7 +67,6 @@ class RecommendationServiceTest {
         this.userSkillGuarantees = new ArrayList<>();
         userSkillGuarantees.add(firstGuarantee);
         userSkillGuarantees.add(secondGuarantee);
-        this.sameSkill = Skill.builder().title("Java").build();
         this.userSkill = Skill.builder().title("Java").guarantees(userSkillGuarantees).build();
         this.skills = List.of(userSkill);
         this.skillOffers = List.of(new SkillOfferDto(1L, 1L, 1L));
@@ -118,12 +115,12 @@ class RecommendationServiceTest {
 
     @Test
     void createInvokesCreateMethod() {
-        Mockito.when(skillRepository.findAllByUserId(Mockito.anyLong())).thenReturn(skills);
+        Mockito.when(skillRepository.findAllByUserId(recommendationDto.getReceiverId())).thenReturn(skills);
         Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(new User()));
 
         recommendationService.create(recommendationDto);
 
-        Mockito.verify(recommendationRepository).create(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyString());
+        Mockito.verify(recommendationRepository).create(recommendationDto.getAuthorId(), recommendationDto.getReceiverId(), recommendationDto.getContent());
     }
 
     @Test
@@ -156,9 +153,9 @@ class RecommendationServiceTest {
 
     @Test
     void saveSkillOfferInvokesCheckAndAddSkillsGuarantorInvokesSaveMethod() {
-        Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(User.builder().build()));
+        Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(firstUser));
         recommendationService.saveSkillOffer(recommendationDto);
-        Mockito.verify(userRepository).save(Mockito.any());
+        Mockito.verify(userRepository).save(firstUser);
     }
 
     @Test
@@ -219,7 +216,7 @@ class RecommendationServiceTest {
     }
 
     @Test
-    void toDtoShouldReturnCorrectRecommendationWhenUpdateMethodIsInvoked() {
+    void updateTest() {
         Skill skill = Skill.builder().id(1).build();
         SkillOffer skillOffer = SkillOffer.builder().id(1).skill(skill).recommendation(Recommendation.builder().id(1).build()).build();
         SkillOfferDto skillOfferDto = new SkillOfferDto(1L, 1L, 1L);
@@ -236,7 +233,7 @@ class RecommendationServiceTest {
         RecommendationDto expected = new RecommendationDto(1L, firstUser.getId(), secondUser.getId(), "Hello", skillOfferDtos, recommendation.getCreatedAt());
 
         assertEquals(expected, result);
-        Mockito.verify(recommendationMapper, Mockito.times(2)).toDto(recommendation);
+        Mockito.verify(recommendationMapper).toDto(recommendation);
     }
 
     @Test

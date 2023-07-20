@@ -16,7 +16,6 @@ import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.requestfilter.CreateAtFilter;
-import school.faang.user_service.filter.requestfilter.IdFilter;
 import school.faang.user_service.filter.requestfilter.MessageFilter;
 import school.faang.user_service.filter.requestfilter.ReceiverIdFilter;
 import school.faang.user_service.filter.requestfilter.RequestFilter;
@@ -76,7 +75,6 @@ class RecommendationRequestServiceTest {
                 .id(2L)
                 .build();
         requestFilterDto = RequestFilterDto.builder()
-                .id(1L)
                 .message("ssa")
                 .status(RequestStatus.ACCEPTED)
                 .skills(List.of(new SkillRequest(1L, new RecommendationRequest(), Skill.builder().id(1).build())))
@@ -129,7 +127,6 @@ class RecommendationRequestServiceTest {
         RecommendationRequest entity2 = recommendationRequestMapper.toEntity(requestDto2);
 
         List<RequestFilter> filters = List.of(
-                new IdFilter(),
                 new MessageFilter(),
                 new SkillRequestFilter(),
                 new ReceiverIdFilter(),

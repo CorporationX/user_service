@@ -11,7 +11,6 @@ import java.util.List;
 @Data
 @Builder
 public class RequestFilterDto {
-    private long id;
     private String message;
     private RequestStatus status;
     private List<SkillRequest> skills;

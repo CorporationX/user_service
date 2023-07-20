@@ -23,7 +23,7 @@ public class EventController {
         }
     }
 
-    public EventDto getEvent(long id){
+    public EventDto getEvent(long id) {
         return eventService.getEvent(id);
     }
 }

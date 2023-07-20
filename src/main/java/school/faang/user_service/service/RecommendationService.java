@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -14,13 +15,14 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.mapper.SkillMapper;
-import school.faang.user_service.mapper.UserSkillGuaranteeDtoMapper;
+import school.faang.user_service.mapper.UserSkillGuaranteeMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.validator.RecommendationValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -32,7 +34,7 @@ public class RecommendationService {
     private final SkillRepository skillRepository;
     private final SkillMapper skillMapper;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
-    private final UserSkillGuaranteeDtoMapper userSkillGuaranteeDtoMapper;
+    private final UserSkillGuaranteeMapper userSkillGuaranteeMapper;
     private final RecommendationMapper recommendationMapper;
 
     public RecommendationDto create(RecommendationDto recomendation) {
@@ -60,21 +62,23 @@ public class RecommendationService {
                     .filter(userSkill -> userSkill.getId().equals(skillOffer.getSkill().getId()))
                     .forEach(skill -> guaranteesHave(skill, recommendation.getAuthor().getId(), userSkillGuaranteeDto));
         }
-
     }
 
     public void guaranteesHave(SkillDto skill, Long userId, UserSkillGuaranteeDto userSkillGuaranteeDto) {
         if (skill.getGuaranteeDtoList()
                 .stream()
-                .noneMatch(guarantee -> guarantee.getGuarantorId() == userId)) ;
-        userSkillGuaranteeDto.setSkillId(skill.getId());
-        skill.getGuaranteeDtoList().add(userSkillGuaranteeDto);
-        userSkillGuaranteeRepository.save(userSkillGuaranteeDtoMapper.toEntity(userSkillGuaranteeDto));
+                .noneMatch(guarantee -> guarantee.getGuarantorId() == userId));
+        userSkillGuaranteeDto.setSkillId(skill.getId()) ;{
+            skill.getGuaranteeDtoList().add(userSkillGuaranteeDto);
+            userSkillGuaranteeRepository.save(userSkillGuaranteeMapper.toEntity(userSkillGuaranteeDto));
+        }
     }
 
     public List<SkillDto> findSkills(long userId) {
         List<Skill> skills = skillRepository.findAllByUserId(userId);
-        return skills.stream().map(skillMapper::toDto).toList();
+        List<SkillDto> skillDtos = new ArrayList<>();
+        skills.stream().map(skillMapper::toDto).forEach(skillDtos::add);
+        return skillDtos;
     }
 
     public UserSkillGuaranteeDto getUserSkillGuarantee(Recommendation entity) {

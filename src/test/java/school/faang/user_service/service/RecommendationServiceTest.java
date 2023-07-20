@@ -10,6 +10,7 @@ import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
+import school.faang.user_service.exeption.RecommendationNotFoundException;
 import school.faang.user_service.mappers.RecommendationMapper;
 import school.faang.user_service.mappers.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
@@ -172,7 +173,7 @@ class RecommendationServiceTest {
 
     @Test
     public void testGetAllUserRecommendations() {
-        // Test data
+
         long receiverId = 2L;
         User receiver = User.builder().id(2L).build();
         List<Recommendation> recommendationList = List.of(
@@ -184,15 +185,75 @@ class RecommendationServiceTest {
                 RecommendationDto.builder().id(2L).content("Recommendation 2").receiverId(receiverId).build()
         );
 
-        // Mock the repository method to return the test data
-        when(recommendationRepository.findAllByReceiverId(receiverId)).thenReturn(recommendationList);
+
+        when(recommendationRepository.findAllByReceiverId(receiverId)).thenReturn(Optional.of(recommendationList));
         when(recommendationMapper.toRecommendationDtos(anyList())).thenReturn(expectedRecommendationDtoList);
 
         List<RecommendationDto> result = recommendationService.getAllUserRecommendations(receiverId);
 
         verify(recommendationRepository).findAllByReceiverId(receiverId);
+        verify(recommendationMapper).toRecommendationDtos(recommendationList);
 
         assertEquals(expectedRecommendationDtoList, result);
+    }
+
+    @Test
+    public void testGetAllUserRecommendationsWithException() {
+        long receiverId = 1L;
+
+        when(recommendationRepository.findAllByReceiverId(receiverId)).thenReturn(Optional.empty());
+
+        RecommendationNotFoundException expectedException = new RecommendationNotFoundException("Recommendation not found");
+
+        assertThrows(RecommendationNotFoundException.class, () -> {
+            recommendationService.getAllUserRecommendations(receiverId);
+        });
+
+        verify(recommendationRepository).findAllByReceiverId(receiverId);
+
+        verifyNoInteractions(recommendationMapper);
+    }
+
+    @Test
+    public void testGetAllGivenRecommendations() {
+        long authorId = 2L;
+        User receiver = User.builder().id(2L).build();
+        List<Recommendation> recommendationList = List.of(
+                Recommendation.builder().id(1L).content("Recommendation 1").receiver(receiver).build(),
+                Recommendation.builder().id(2L).content("Recommendation 2").receiver(receiver).build()
+        );
+        List<RecommendationDto> expectedRecommendationDtoList = List.of(
+                RecommendationDto.builder().id(1L).content("Recommendation 1").receiverId(authorId).build(),
+                RecommendationDto.builder().id(2L).content("Recommendation 2").receiverId(authorId).build()
+        );
+
+
+        when(recommendationRepository.findAllByAuthorId(authorId)).thenReturn(Optional.of(recommendationList));
+        when(recommendationMapper.toRecommendationDtos(anyList())).thenReturn(expectedRecommendationDtoList);
+
+        List<RecommendationDto> result = recommendationService.getAllGivenRecommendations(authorId);
+
+        verify(recommendationRepository).findAllByAuthorId(authorId);
+        verify(recommendationMapper).toRecommendationDtos(recommendationList);
+
+        assertEquals(expectedRecommendationDtoList, result);
+    }
+
+    @Test
+    public void testGetAllGivenRecommendationsWithException() {
+        long authorId = 1L;
+
+        when(recommendationRepository.findAllByAuthorId(authorId)).thenReturn(Optional.empty());
+
+        RecommendationNotFoundException expectedException = new RecommendationNotFoundException("Recommendation not found");
+
+        assertThrows(RecommendationNotFoundException.class, () -> {
+            recommendationService.getAllGivenRecommendations(authorId);
+        });
+
+        verify(recommendationRepository).findAllByAuthorId(authorId);
+
+        verifyNoInteractions(recommendationMapper);
     }
 }
 

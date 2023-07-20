@@ -12,6 +12,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exeption.DataValidationException;
+import school.faang.user_service.exeption.RecommendationNotFoundException;
 import school.faang.user_service.mappers.RecommendationMapper;
 import school.faang.user_service.mappers.SkillMapper;
 import school.faang.user_service.mappers.UserSkillGuaranteeMapper;
@@ -70,7 +71,16 @@ public class RecommendationService {
 
     @Transactional(readOnly = true)
     public List<RecommendationDto> getAllUserRecommendations(long receiverId) {
-        List<Recommendation> recommendations = recommendationRepository.findAllByReceiverId(receiverId);
+        List<Recommendation> recommendations = recommendationRepository.findAllByReceiverId(receiverId)
+                .orElseThrow(() -> new RecommendationNotFoundException("Recommendation not found"));
+
+        return recommendationMapper.toRecommendationDtos(recommendations);
+    }
+
+    @Transactional(readOnly = true)
+    public List<RecommendationDto> getAllGivenRecommendations(long authorId) {
+        List<Recommendation> recommendations = recommendationRepository.findAllByAuthorId(authorId)
+                .orElseThrow(() -> new RecommendationNotFoundException("Recommendation not found"));
 
         return recommendationMapper.toRecommendationDtos(recommendations);
     }

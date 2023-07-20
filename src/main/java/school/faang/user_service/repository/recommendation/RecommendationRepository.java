@@ -29,9 +29,10 @@ public interface RecommendationRepository extends CrudRepository<Recommendation,
 
     Page<Recommendation> findAllByReceiverId(long receiverId, Pageable pageable);
 
-    List<Recommendation> findAllByReceiverId(long receiverId);
+    Optional <List<Recommendation>> findAllByReceiverId(long receiverId);
 
     Page<Recommendation> findAllByAuthorId(long authorId, Pageable pageable);
+    Optional <List<Recommendation>> findAllByAuthorId(long authorId);
 
     Optional<Recommendation> findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(long authorId, long receiverId);
 }

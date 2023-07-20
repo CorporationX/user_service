@@ -32,4 +32,8 @@ public class RecommendationController {
     public List<RecommendationDto> getAllUserRecommendations(long receiverId) {
         return recommendationService.getAllUserRecommendations(receiverId);
     }
+
+    public List<RecommendationDto> getAllGivenRecommendations(long authorId) {
+        return recommendationService.getAllGivenRecommendations(authorId);
+    }
 }

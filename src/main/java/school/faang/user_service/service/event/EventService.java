@@ -26,7 +26,7 @@ public class EventService {
     private final List<EventFilter> eventFilters;
 
     public EventDto create(EventDto event) {
-        User user = userRepository.findById(event.getOwnerId()).orElseThrow();
+        User user = userRepository.findById(event.getId()).orElseThrow();
         if (!(isUserContainsSkill(event, user))) {
             throw new DataValidationException("The user cannot hold such an event with such skills");
         }

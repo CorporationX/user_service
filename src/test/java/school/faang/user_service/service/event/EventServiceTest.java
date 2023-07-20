@@ -29,6 +29,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -150,7 +151,16 @@ class EventServiceTest {
     }
     @Test
     void testUpdateEvent() {
+        List<SkillDto> skillsDto = new ArrayList<>(List.of(SkillDto.builder().title("test").id(1L).build()));
+        List<Skill> skills = new ArrayList<>(List.of(Skill.builder().id(1L).title("test").build()));
 
+        User user = User.builder().id(1L).skills(skills).build();
+        EventDto eventDto = EventDto.builder().id(1L).ownerId(1L).relatedSkills(skillsDto).build();
+        Event event = Event.builder().id(1L).relatedSkills(skills).owner(user).build();
+
+        when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        eventService.updateEvent(eventDto);
     }
     @Test
     void testUpdateEventException() {

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
@@ -32,33 +33,41 @@ public class RecommendationRequestService {
         long receiverId = recommendationRequest.getReceiver().getId();
         String message = recommendationRequest.getMessage();
 
-        if (userRepository.existsById(requesterId) && userRepository.existsById(receiverId)) {
-            if (!hasPendingRequest(requesterId, receiverId)) {
-                recommendationRequest.setCreatedAt(LocalDateTime.now());
-                recommendationRequest.setUpdatedAt(LocalDateTime.now());
-                recommendationRequest.setStatus(RequestStatus.PENDING);
-
-                RecommendationRequest savedRequest = recommendationRequestRepository.create(requesterId,receiverId, message);
-
-                for (SkillRequest skillRequest : recommendationRequest.getSkills()) {
-                    skillRequest.setRequest(savedRequest);
-                    skillRequestRepository.create(requesterId,skillRequest.getId());
-                }
-            } else {
-                throw new IllegalArgumentException("A recommendation request between the same users can only be sent once every six months.");
-            }
-        } else {
-            throw new IllegalArgumentException("Requester or receiver does not exist.");
+        if (!isUserExists(requesterId)) {
+            throw new IllegalArgumentException("Requester does not exist.");
         }
+
+        if (!isUserExists(receiverId)) {
+            throw new IllegalArgumentException("Receiver does not exist.");
+        }
+
+        if (hasPendingRequest(requesterId, receiverId)) {
+            throw new IllegalArgumentException("A recommendation request between the same users can only be sent once every six months.");
+        }
+
+        recommendationRequest.setCreatedAt(LocalDateTime.now());
+        recommendationRequest.setUpdatedAt(LocalDateTime.now());
+        recommendationRequest.setStatus(RequestStatus.PENDING);
+
+        RecommendationRequest savedRequest = recommendationRequestRepository.create(requesterId,receiverId, message);
+
+        for (SkillRequest skillRequest : recommendationRequest.getSkills()) {
+            skillRequest.setRequest(savedRequest);
+            skillRequestRepository.create(requesterId,skillRequest.getId());
+//                    skillRequestRepository.create(savedRequest.getId(),skillRequest.getId());
+        }
+    }
+
+    private boolean isUserExists(Long userId) {
+        return userRepository.existsById(userId);
     }
 
     private void validateRecommendationRequest(RecommendationRequestDto recommendationRequestDto) {
         if (recommendationRequestDto.getMessage() == null || recommendationRequestDto.getMessage().isEmpty()) {
             throw new IllegalArgumentException("Recommendation request message cannot be empty.");
         }
-
-        List<SkillRequest> skills = recommendationRequestDto.getSkills();
-        if (skills == null || skills.isEmpty()) {
+        List<Long> skillsIds = recommendationRequestDto.getSkillsIds();
+        if (skillsIds == null || skillsIds.isEmpty()) {
             throw new IllegalArgumentException("Recommendation request must contain at least one skill.");
         }
     }

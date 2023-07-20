@@ -28,4 +28,8 @@ public class GoalService {
                 .map(goalMapper::toDto)
                 .toList();
     }
+
+    public void deleteGoal(long goalId) {
+        goalRepository.deleteById(goalId);
+    }
 }

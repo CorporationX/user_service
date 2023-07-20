@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.annotation.Description;
+import school.faang.user_service.commonMessages.ErrorMessagesForEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.RegistrationUserForEventException;
 import school.faang.user_service.repository.event.EventParticipationRepository;
@@ -39,7 +40,7 @@ class EventParticipationServiceImplementationTest {
         eventParticipationService =
                 new EventParticipationServiceImplementation(eventParticipationRepository);
 
-        eventId = 1L;
+        eventId = 2L;
         someUserId = 10L;
 
         users = getUsers();
@@ -58,25 +59,38 @@ class EventParticipationServiceImplementationTest {
 
     @Test
     void testRegisterParticipant_WhenUserRegisteredAtEvent_ShouldThrowException() {
+        Object[] argsForMessage = {eventId, EXISTING_USER_ID};
+        String expectedMessage = ErrorMessagesForEvent.USER_IS_ALREADY_REGISTERED.format(argsForMessage);
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(eventId))
                 .thenReturn(users);
 
         Exception exc = assertThrows(RegistrationUserForEventException.class,
                 () -> eventParticipationService.registerParticipant(eventId, EXISTING_USER_ID));
 
-        assertEquals("The user has already been registered for the event",
-                exc.getMessage());
+        assertEquals(expectedMessage, exc.getMessage());
     }
 
     @ParameterizedTest
     @MethodSource("provideNullInputData")
-    void testRegisterParticipant_WhenInputDataIsNull_ShouldThrowException(Long eventId, Long userId) {
+    void testRegisterParticipant_WhenInputDataIsNull_ShouldThrowException(
+            Long eventId, Long userId, String expectedMessage) {
+
         Exception exc = assertThrows(RegistrationUserForEventException.class,
                 () -> eventParticipationService.registerParticipant(eventId, userId));
 
-        assertEquals("Input data is null",
-                exc.getMessage());
+        assertEquals(expectedMessage, exc.getMessage());
     }
+
+    @ParameterizedTest
+    @MethodSource("provideNegativeInputData")
+    void testRegisterParticipant_WhenInputDataIsNegative_ShouldThrowException(
+            Long eventId, Long userId, String expectedMessage) {
+        Exception exc = assertThrows(RegistrationUserForEventException.class,
+                () -> eventParticipationService.registerParticipant(eventId, userId));
+
+        assertEquals(expectedMessage, exc.getMessage());
+    }
+
 
     @Test
     void testUnregisterParticipant_WhenUserRegisteredAtEvent() {
@@ -93,26 +107,35 @@ class EventParticipationServiceImplementationTest {
     void testUnregisterParticipant_WhenUserNotRegisteredAtEvent_ShouldThrowException() {
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(eventId))
                 .thenReturn(users);
-
-        String expectedErrorMessage = String.format("the userId: [%s] is not registered for the eventId: [%s]",
-                someUserId, eventId);
+        Object[] argsForMessage = {eventId, someUserId};
+        String expectedMessage = ErrorMessagesForEvent.USER_IS_NOT_REGISTERED.format(argsForMessage);
 
         Exception exc = assertThrows(RegistrationUserForEventException.class,
                 () -> eventParticipationService.unregisterParticipant(eventId, someUserId));
 
-        assertEquals(expectedErrorMessage,
-                exc.getMessage());
+        assertEquals(expectedMessage, exc.getMessage());
     }
 
     @ParameterizedTest
     @MethodSource("provideNullInputData")
-    void testUnregisterParticipant_WhenInputDataIsNull_ShouldThrowException(Long eventId, Long userId) {
+    void testUnregisterParticipant_WhenInputDataIsNull_ShouldThrowException(
+            Long eventId, Long userId, String expectedMessage) {
         Exception exc = assertThrows(RegistrationUserForEventException.class,
                 () -> eventParticipationService.unregisterParticipant(eventId, userId));
 
-        assertEquals("Input data is null",
-                exc.getMessage());
+        assertEquals(expectedMessage, exc.getMessage());
     }
+
+    @ParameterizedTest
+    @MethodSource("provideNegativeInputData")
+    void testUnregisterParticipant_WhenInputDataIsNegative_ShouldThrowException(
+            Long eventId, Long userId, String expectedMessage) {
+        Exception exc = assertThrows(RegistrationUserForEventException.class,
+                () -> eventParticipationService.unregisterParticipant(eventId, userId));
+
+        assertEquals(expectedMessage, exc.getMessage());
+    }
+
 
     @Test
     void testGetParticipant() {
@@ -127,10 +150,20 @@ class EventParticipationServiceImplementationTest {
     void testGetParticipant_WhenEventIdIsNull_shouldThrowException() {
         Exception exc = assertThrows(RegistrationUserForEventException.class,
                 () -> eventParticipationService.getParticipant(null));
+        String expectedMessage = ErrorMessagesForEvent.EVENT_ID_IS_NULL;
 
-        assertEquals("Input data is null",
-                exc.getMessage());
+        assertEquals(expectedMessage, exc.getMessage());
     }
+
+    @Test
+    void testGetParticipant_WhenEventIdIsNegative_shouldThrowException() {
+        Exception exc = assertThrows(RegistrationUserForEventException.class,
+                () -> eventParticipationService.getParticipant(-1L));
+        String expectedMessage = ErrorMessagesForEvent.NEGATIVE_EVENT_ID;
+
+        assertEquals(expectedMessage, exc.getMessage());
+    }
+
 
     @Test
     void testGetParticipantsCount() {
@@ -143,19 +176,38 @@ class EventParticipationServiceImplementationTest {
 
     @Test
     void testGetParticipantsCount_WhenEventIdIsNull_shouldThrowException() {
+        String expectedMessage = ErrorMessagesForEvent.EVENT_ID_IS_NULL;
+
         Exception exc = assertThrows(RegistrationUserForEventException.class,
                 () -> eventParticipationService.getParticipantsCount(null));
 
-        assertEquals("Input data is null",
-                exc.getMessage());
+        assertEquals(expectedMessage, exc.getMessage());
+    }
+
+    @Test
+    void testGetParticipantsCount_WhenEventIdIsNegative_shouldThrowException() {
+        String expectedMessage = ErrorMessagesForEvent.NEGATIVE_EVENT_ID;
+
+        Exception exc = assertThrows(RegistrationUserForEventException.class,
+                () -> eventParticipationService.getParticipantsCount(-1L));
+
+        assertEquals(expectedMessage, exc.getMessage());
     }
 
 
     private static Stream<Arguments> provideNullInputData() {
         return Stream.of(
-                Arguments.of(null, 1L),
-                Arguments.of(1L, null),
-                Arguments.of(null, null)
+                Arguments.of(null, 1L, ErrorMessagesForEvent.EVENT_ID_IS_NULL),
+                Arguments.of(1L, null, ErrorMessagesForEvent.USER_ID_IS_NULL),
+                Arguments.of(null, null, ErrorMessagesForEvent.EVENT_ID_IS_NULL)
+        );
+    }
+
+    private static Stream<Arguments> provideNegativeInputData() {
+        return Stream.of(
+                Arguments.of(-1L, 1L, ErrorMessagesForEvent.NEGATIVE_EVENT_ID),
+                Arguments.of(1L, -1L, ErrorMessagesForEvent.NEGATIVE_USER_ID),
+                Arguments.of(-1L, -1L, ErrorMessagesForEvent.NEGATIVE_EVENT_ID)
         );
     }
 

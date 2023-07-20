@@ -13,10 +13,8 @@ public class RecommendationRequestDto {
     private String message;
     private RequestStatus status;
     private List<SkillRequest> skills;
-
     private long requesterId;
     private long receiverId;
-
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

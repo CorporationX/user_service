@@ -23,11 +23,11 @@ public class EventController {
         }
     }
 
-    public EventDto getEvent(long id){
+    public EventDto getEvent(long id) {
         return eventService.getEvent(id);
     }
 
-    public void deleteEvent(long id){
+    public void deleteEvent(long id) {
         eventService.deleteEvent(id);
     }
 

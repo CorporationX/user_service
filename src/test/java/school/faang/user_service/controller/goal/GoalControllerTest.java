@@ -14,6 +14,9 @@ import school.faang.user_service.service.goal.GoalService;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -50,5 +53,42 @@ public class GoalControllerTest {
                 .andExpect(jsonPath("$[1].title").value("Goal 2"));
 
         verify(goalService, times(1)).getGoalsByUser(anyLong(), any());
+    }
+
+    @Test
+    public void testUpdateGoal_ValidGoal() {
+        GoalDto goalDto = new GoalDto();
+        goalDto.setTitle("Learn Java");
+        goalDto.setDescription("Master Java programming language");
+
+        when(goalService.updateGoal(anyLong(), any(GoalDto.class))).thenReturn(goalDto);
+
+        long goalId = 1L;
+        GoalDto result = goalController.updateGoal(goalId, goalDto);
+
+        assertNotNull(result);
+        assertEquals("Learn Java", result.getTitle());
+        assertEquals("Master Java programming language", result.getDescription());
+    }
+
+    @Test
+    public void testUpdateGoal_InvalidGoalTitle() {
+        long goalId = 2L;
+        GoalDto goalDto = new GoalDto();
+        assertThrows(IllegalArgumentException.class, () -> goalController.updateGoal(goalId, goalDto));
+    }
+
+    @Test
+    public void testUpdateGoal_CorrectServiceMethodInvocation() {
+        GoalDto goalDto = new GoalDto();
+        goalDto.setTitle("Learn Kotlin");
+        goalDto.setDescription("Explore Kotlin programming language");
+
+        when(goalService.updateGoal(anyLong(), any(GoalDto.class))).thenReturn(goalDto);
+
+        long goalId = 3L;
+        GoalDto result = goalController.updateGoal(goalId, goalDto);
+
+        verify(goalService, times(1)).updateGoal(goalId, goalDto);
     }
 }

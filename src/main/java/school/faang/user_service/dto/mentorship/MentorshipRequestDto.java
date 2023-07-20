@@ -23,5 +23,5 @@ public class MentorshipRequestDto {
     private String description;
 
     private String rejectionReason;
-    private RequestStatus requestStatus;
+    private RequestStatus status;
 }

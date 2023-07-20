@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityNotFoundException;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.dto.event.RejectionDto;
+import jakarta.persistence.EntityNotFoundException;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.dto.filter.RequestFilterDto;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,7 +49,8 @@ public class MentorshipRequestService {
 
     @Transactional
     public MentorshipRequestDto acceptRequest(Long id) {
-        MentorshipRequest request = findRequest(id);
+        MentorshipRequest request = mentorshipRequestRepository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("Invalid request. Mentorship request not found"));
 
         User requester = request.getRequester();
         User receiver = request.getReceiver();

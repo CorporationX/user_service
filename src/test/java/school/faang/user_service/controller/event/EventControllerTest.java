@@ -89,4 +89,11 @@ public class EventControllerTest {
     eventController.getOwnedEvents(anyUserId);
     Mockito.verify(eventService, Mockito.times(1)).getOwnedEvents(anyUserId);
   }
+
+  @Test
+  public void testGetEventById() {
+    Long anyId = 1L;
+    eventController.getEvent(anyId);
+    Mockito.verify(eventService, Mockito.times(1)).get(anyId);
+  }
 }

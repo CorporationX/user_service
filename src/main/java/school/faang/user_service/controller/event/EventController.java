@@ -3,6 +3,7 @@ package school.faang.user_service.controller.event;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventService;
 
@@ -12,7 +13,7 @@ import java.util.List;
 @Controller
 public class EventController {
   private final EventService eventService;
-  private final int MIN_NAME_LENGTH = 3;
+  private static final int MIN_NAME_LENGTH = 3;
 
   @Autowired
   public EventController(EventService eventService) {
@@ -58,5 +59,13 @@ public class EventController {
 
   public List<EventDto> getOwnedEvents(Long ownerId) {
     return eventService.getOwnedEvents(ownerId);
+  }
+
+  public List<EventDto> getEventsByFilter(EventFilterDto filter) {
+    return eventService.getEventsByFilter(filter);
+  }
+
+  public EventDto getEvent(Long id) {
+    return eventService.get(id);
   }
 }

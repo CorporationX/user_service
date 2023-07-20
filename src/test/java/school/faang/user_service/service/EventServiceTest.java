@@ -94,8 +94,8 @@ public class EventServiceTest {
 
     @Test
     public void testGetEventWithWrongId() {
-        when(eventRepository.findById(0L)).thenThrow(new IllegalArgumentException());
         Assertions.assertThrows(DataValidationException.class, () -> eventService.getEvent(0L));
+        Assertions.assertThrows(DataValidationException.class, () -> eventService.getEvent(-10L));
     }
 
     @Test

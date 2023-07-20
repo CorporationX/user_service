@@ -48,19 +48,17 @@ public class EventService {
 
     }
 
-    public EventDto getEvent(long id){
-        Optional<Event> event;
+    public EventDto getEvent(long id) {
 
-        try{
-            event = eventRepository.findById(id);
-        }catch (IllegalArgumentException exception){
+        if (id <= 0) {
             throw new DataValidationException("ID is incorrect");
         }
-        if(event.isEmpty()){
-            throw new DataValidationException("There is no event with this id");
-        }
 
-        return eventMapper.toDTO(event.get());
+        return eventMapper.toDTO(
+                eventRepository
+                        .findById(id)
+                        .orElseThrow(() -> new DataValidationException("There is no event with this id"))
+        );
     }
 
     public void deleteEvent(long id){

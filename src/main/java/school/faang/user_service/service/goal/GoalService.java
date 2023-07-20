@@ -42,7 +42,9 @@ public class GoalService {
     }
 
     public List<Goal> findGoalsByUserId(long id) {
-        if (id < 1) throw new DataValidationException("userId can not be less than 1");
+        if (id < 1) {
+            throw new DataValidationException("userId can not be less than 1");
+        }
         return goalRepository.findGoalsByUserId(id)
                 .peek(goal -> goal.setSkillsToAchieve(skillRepository.findSkillsByGoalId(goal.getId()))).toList();
     }

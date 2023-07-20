@@ -25,6 +25,8 @@ public class GoalController {
     }
 
     private void validate (long userId, GoalFilterDto filter) throws DataValidationException {
-        if (userId < 1) throw new DataValidationException("userId can not be less than 1");
+        if (userId < 1) {
+            throw new DataValidationException("userId can not be less than 1");
+        }
     }
 }

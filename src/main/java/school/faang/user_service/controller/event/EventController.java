@@ -47,7 +47,7 @@ public class EventController {
         return eventService.getParticipatedEvents(userId);
     }
 
-    public List<EventDto> getEventsByFilter(EventFilterDto filter){
+    public List<EventDto> getEventsByFilter(EventFilterDto filter) {
         return eventService.getEventsByFilter(filter);
     }
 }

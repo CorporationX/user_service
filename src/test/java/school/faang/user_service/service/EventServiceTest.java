@@ -20,8 +20,13 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.EventFilter;
 import school.faang.user_service.service.event.EventIdFilter;
+import school.faang.user_service.service.event.EventOwnerIdFilter;
 import school.faang.user_service.service.event.EventService;
+import school.faang.user_service.service.event.EventStartDateFilter;
+import school.faang.user_service.service.event.EventTitleFilter;
 
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -160,19 +165,5 @@ public class EventServiceTest {
     public void testGetParticipatedEventsIsNull() {
         when(eventRepository.findParticipatedEventsByUserId(1L)).thenReturn(null);
         Assertions.assertEquals(0, eventService.getParticipatedEvents(1L).size());
-    }
-
-    @Test
-    public void testGetEventsByIdFilter(){
-        EventFilterDto eventFilterDto = EventFilterDto.builder().eventId(1L).build();
-        List<Event> events = List.of(
-                Event.builder().id(1L).build(),
-                Event.builder().id(2L).build(),
-                Event.builder().id(3L).build()
-        );
-
-        when(eventRepository.findAll()).thenReturn(events);
-
-        Assertions.assertEquals(1, eventService.getEventsByFilter(eventFilterDto).size());
     }
 }

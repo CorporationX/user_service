@@ -98,7 +98,7 @@ public class EventService {
                 .toList();
     }
 
-    public List<EventDto> getEventsByFilter(EventFilterDto filter){
+    public List<EventDto> getEventsByFilter(EventFilterDto filter) {
         Stream<Event> events = eventRepository.findAll().stream();
         return filters.stream()
                 .filter(eventFilter -> eventFilter.isApplicable(filter))

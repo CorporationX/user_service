@@ -23,7 +23,8 @@ public class EventIdFilterTest {
         Stream<Event> eventStream = events.stream();
         List<Event> actualEvents = eventIdFilter.apply(eventStream, eventFilterDto).toList();
         Assertions.assertEquals(1, actualEvents.size());
-
+        actualEvents.stream()
+                .forEach(event -> Assertions.assertEquals(event.getId(), eventFilterDto.getEventId()));
     }
 
 }

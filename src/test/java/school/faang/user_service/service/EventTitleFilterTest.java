@@ -22,8 +22,9 @@ public class EventTitleFilterTest {
 
     @Test
     public void testApply() {
-
         List<Event> actualEvents = eventTitleFilter.apply(events, eventFilterDto).toList();
         Assertions.assertEquals(2, actualEvents.size());
+        actualEvents.stream()
+                .forEach(event -> Assertions.assertTrue(event.getTitle().contains(eventFilterDto.getTitlePattern())));
     }
 }

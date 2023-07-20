@@ -16,6 +16,6 @@ public class EventOwnerIdFilter implements EventFilter{
 
     @Override
     public Stream<Event> apply(Stream<Event> events, EventFilterDto filter) {
-        return events.filter(event -> event.getOwner().getId() == filter.getEventId());
+        return events.filter(event -> event.getOwner().getId() == filter.getOwnerId());
     }
 }

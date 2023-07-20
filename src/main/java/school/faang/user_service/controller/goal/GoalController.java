@@ -14,13 +14,17 @@ import java.util.List;
 public class GoalController {
     private final GoalService service;
 
-    public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter) {
+    public List<GoalDto> getGoalsByUser(long userId, GoalFilterDto filter) {
         validate(userId, filter);
         return service.getGoalsByUser(userId, filter);
     }
 
-    private void validate (Long userId, GoalFilterDto filter) throws DataValidationException {
-        if (userId == null) throw new DataValidationException("userId can not be Null");
+    public List<GoalDto> getSubGoalsByUser(long userId, GoalFilterDto filter) {
+        validate(userId, filter);
+        return service.getSubGoalsByUser(userId, filter);
+    }
+
+    private void validate (long userId, GoalFilterDto filter) throws DataValidationException {
         if (userId < 1) throw new DataValidationException("userId can not be less than 1");
     }
 }

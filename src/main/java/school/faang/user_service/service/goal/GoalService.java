@@ -20,9 +20,8 @@ public class GoalService {
     private final SkillRepository skillRepository;
     private final GoalMapper goalMapper;
     private final List<GoalFilter> filterList;
-    private final int MAX_ACTIVE_GOALS = 3;
 
-    public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter) {
+    public List<GoalDto> getGoalsByUser(long userId, GoalFilterDto filter) {
         List<GoalDto> dtoList = goalMapper.goalsToDtos(findGoalsByUserId(userId));
         if (filter != null) {
             filterList.stream()
@@ -32,7 +31,7 @@ public class GoalService {
         return dtoList;
     }
 
-    public List<GoalDto> getSubGoalsByUser(Long parentId, GoalFilterDto filter) {
+    public List<GoalDto> getSubGoalsByUser(long parentId, GoalFilterDto filter) {
         List<GoalDto> dtoList = goalMapper.goalsToDtos(findSubGoalsByParentId(parentId));
         if (filter != null) {
             filterList.stream()
@@ -43,14 +42,12 @@ public class GoalService {
     }
 
     public List<Goal> findGoalsByUserId(long id) {
-        //if (id == null) throw new DataValidationException("userId can not be Null");
         if (id < 1) throw new DataValidationException("userId can not be less than 1");
         return goalRepository.findGoalsByUserId(id)
                 .peek(goal -> goal.setSkillsToAchieve(skillRepository.findSkillsByGoalId(goal.getId()))).toList();
     }
 
     public List<Goal> findSubGoalsByParentId(long id) {
-        //if (id == null) throw new DataValidationException("parentId can not be Null");
         if (id < 1) {
             throw new DataValidationException("parentId can not be less than 1");
         }

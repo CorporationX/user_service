@@ -103,7 +103,7 @@ public class EventControllerTest {
     }
 
     @Test
-    public void testSuccessfulUpdateEvent(){
+    public void testSuccessfulUpdateEvent() {
         eventController.updateEvent(eventDto);
         Mockito.verify(eventService, Mockito.times(1)).updateEvent(eventDto);
     }

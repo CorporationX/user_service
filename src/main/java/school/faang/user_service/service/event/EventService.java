@@ -67,12 +67,12 @@ public class EventService {
         }
     }
 
-    public int updateEvent(EventDto event){
+    public int updateEvent(EventDto event) {
         validate(event);
         int result = 0;
-        try{
+        try {
             result = eventRepository.save(eventMapper.toEvent(event)).getAttendees().size();
-        }catch (NullPointerException e){
+        } catch (NullPointerException e) {
         }
         return result;
     }

@@ -11,15 +11,16 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserSkillGuaranteeMapper;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
+import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.validator.RecommendationValidator;
-import school.faang.user_service.validator.SkillOfferValidator;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -29,11 +30,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class RecommendationService {
 
+    private static final int RECOMMENDATION_INTERVAL_MONTHS = 6;
+
     private final RecommendationRepository recommendationRepository;
-    private final RecommendationValidator recommendationValidator;
     private final RecommendationMapper recommendationMapper;
     private final SkillOfferRepository skillOfferRepository;
-    private final SkillOfferValidator skillOfferValidator;
+    private final SkillRepository skillRepository;
     private final UserRepository userRepository;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final UserSkillGuaranteeMapper userSkillGuaranteeMapper;
@@ -83,11 +85,57 @@ public class RecommendationService {
         return !userSkillGuaranteeRepository.existsByUserIdAndSkillIdAndGuarantorId(userId, skillId, guarantorId);
     }
 
-    private void validate(RecommendationDto recommendation) {
-        List<SkillOfferDto> skills = recommendation.getSkillOffers();
+    private void validate(RecommendationDto recommendationDto) {
+        List<SkillOfferDto> skills = recommendationDto.getSkillOffers();
 
-        recommendationValidator.validateLastUpdate(recommendation);
-        skillOfferValidator.validateSkillsListNotEmptyOrNull(skills);
-        skillOfferValidator.validateSkillsAreInRepository(skills);
+        validateLastUpdate(recommendationDto);
+        validateSkillsListNotEmptyOrNull(skills);
+        validateSkillsAreInRepository(skills);
+    }
+
+    private void validateLastUpdate(RecommendationDto recommendationDto) {
+        long authorId = recommendationDto.getAuthorId();
+        long userId = recommendationDto.getReceiverId();
+
+        Optional<Recommendation> lastRecommendation =
+                recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(authorId, userId);
+
+        if (lastRecommendation.isPresent()) {
+            LocalDateTime lastUpdate = lastRecommendation.get().getUpdatedAt();
+            LocalDateTime currentDate = LocalDateTime.now();
+            String errorMessage = String.format(
+                    "You've already recommended this user in the last %d months", RECOMMENDATION_INTERVAL_MONTHS);
+
+            if (lastUpdate.plusMonths(RECOMMENDATION_INTERVAL_MONTHS).isAfter(currentDate)) {
+                throw new DataValidationException(errorMessage);
+            }
+        }
+    }
+
+    private void validateSkillsListNotEmptyOrNull(List<SkillOfferDto> skills) {
+        if (skills == null || skills.isEmpty()) {
+            throw new DataValidationException("You should choose some skills");
+        }
+    }
+
+    private void validateSkillsAreInRepository(List<SkillOfferDto> skills) {
+        List<Long> skillIds = getUniqueSkillIds(skills);
+
+        for (Long skillId : skillIds) {
+            if (skillNotExist(skillId)) {
+                throw new DataValidationException("Invalid skills");
+            }
+        }
+    }
+
+    private boolean skillNotExist(long skillId) {
+        return !skillRepository.existsById(skillId);
+    }
+
+    private List<Long> getUniqueSkillIds(List<SkillOfferDto> skills) {
+        return skills.stream()
+                .map(SkillOfferDto::getSkillId)
+                .distinct()
+                .toList();
     }
 }

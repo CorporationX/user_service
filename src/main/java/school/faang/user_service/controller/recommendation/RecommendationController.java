@@ -3,23 +3,28 @@ package school.faang.user_service.controller.recommendation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.recommendation.RecommendationService;
-import school.faang.user_service.validator.RecommendationValidator;
 
 @RestController
 @RequiredArgsConstructor
 public class RecommendationController {
 
     private final RecommendationService recommendationService;
-    private final RecommendationValidator recommendationValidator;
 
-    public RecommendationDto giveRecommendation(RecommendationDto recommendation){
-        validate(recommendation);
+    public RecommendationDto giveRecommendation(RecommendationDto recommendationDto) {
+        validateRecommendationContent(recommendationDto);
 
-        return recommendationService.create(recommendation);
+        return recommendationService.create(recommendationDto);
     }
 
-    private void validate(RecommendationDto recommendation){
-        recommendationValidator.validateRecommendationContent(recommendation);
+
+
+    public void validateRecommendationContent(RecommendationDto recommendationDto) {
+        String content = recommendationDto.getContent();
+
+        if (content == null || content.isBlank()) {
+            throw new DataValidationException("Content can't be empty");
+        }
     }
 }

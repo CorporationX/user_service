@@ -1,5 +1,6 @@
 package school.faang.user_service.service.mentorship;
 
+import org.mockito.Spy;
 import org.mockito.Mock;
 import org.mockito.InjectMocks;
 import org.junit.jupiter.api.Test;
@@ -14,7 +15,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.dto.event.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.dto.filter.RequestFilterDto;
-import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.mapper.MentorshipRequestMapperImpl;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.validation.MentorshipRequestValidator;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -22,13 +23,19 @@ import school.faang.user_service.repository.mentorship.MentorshipRequestReposito
 import java.util.List;
 import java.util.Optional;
 
+import java.util.ArrayList;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class MentorshipRequestServiceTest {
 
-    @Mock
-    private MentorshipRequestMapper mentorshipRequestMapper;
+    @Spy
+    private MentorshipRequestMapperImpl mentorshipRequestMapper;
     @Mock
     private MentorshipRequestValidator mentorshipRequestValidator;
     @Mock
@@ -47,9 +54,8 @@ public class MentorshipRequestServiceTest {
 
     private RequestFilterDto requestFilterDto;
 
-
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         mentorshipRequestDto = MentorshipRequestDto.builder()
                 .requesterId(1L)
                 .receiverId(2L)
@@ -83,7 +89,7 @@ public class MentorshipRequestServiceTest {
     @Test
     @DisplayName("Mentorship request with requester & receiver being same person")
     void testRequestMentorshipBadRequest() {
-        when(mentorshipRequestService.requestMentorship(badMentorshipRequestDto)).thenThrow(IllegalArgumentException.class);
+        doThrow(IllegalArgumentException.class).when(mentorshipRequestValidator).validate(any());
         Assertions.assertThrows(IllegalArgumentException.class,
                 () -> mentorshipRequestService.requestMentorship(badMentorshipRequestDto));
     }
@@ -99,6 +105,37 @@ public class MentorshipRequestServiceTest {
     void testGetRequestsBadRequest() {
         when(mentorshipRequestService.getRequests(null)).thenThrow(NullPointerException.class);
         Assertions.assertThrows(NullPointerException.class, () -> mentorshipRequestService.getRequests(null));
+    }
+
+    @Test
+    @DisplayName("Accept request - positive scenario")
+    void testAcceptRequestIsOk() {
+        User receiver = User.builder()
+                .id(1L)
+                .build();
+
+        User requester = User.builder()
+                .id(2L)
+                .mentors(new ArrayList<>())
+                .build();
+
+        MentorshipRequest mentorshipRequest = MentorshipRequest.builder()
+                .id(1L)
+                .receiver(receiver)
+                .requester(requester)
+                .build();
+
+        when(mentorshipRequestRepository.findById(requestId)).thenReturn(Optional.of(mentorshipRequest));
+        MentorshipRequestDto accepted = mentorshipRequestService.acceptRequest(requestId);
+        assertEquals(RequestStatus.ACCEPTED, accepted.getStatus());
+        assertEquals(1, requester.getMentors().size());
+        assertEquals(receiver, requester.getMentors().get(0));
+    }
+
+    @Test
+    @DisplayName("Accept request - mentorship request not found")
+    void testAcceptRequestThrowsRequestNotFoundException() {
+        Assertions.assertThrows(EntityNotFoundException.class, () -> mentorshipRequestService.acceptRequest(badRequestId));
     }
 
     @Test

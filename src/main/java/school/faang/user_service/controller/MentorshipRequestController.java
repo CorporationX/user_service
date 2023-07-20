@@ -43,7 +43,7 @@ public class MentorshipRequestController {
 
     @PutMapping("/mentorship/request/{id}/reject")
     @ResponseStatus(HttpStatus.OK)
-    public MentorshipRequestDto rejectRequest(@PathVariable Long id, RejectionDto rejection) {
+    public MentorshipRequestDto rejectRequest(@PathVariable Long id, @RequestBody RejectionDto rejection) {
         return mentorshipRequestService.rejectRequest(id, rejection);
     }
 }

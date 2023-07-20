@@ -69,14 +69,14 @@ class MentorshipServiceTest {
     }
 
     @Test
-    void testDeleteMenteeException() {
+    void testIfMenteeIdIsNotEqualsMentorId() {
         User mentee = User.builder().id(1L).build();
         assertThrows(EntityNotFoundException.class,
                 () -> mentorshipService.deleteMentee(mentee.getId(), 2L));
     }
 
     @Test
-    void testDeleteMenteeExceptionTwo() {
+    void testDeleteMenteeIllegalArgumentException() {
         User mentee = User.builder().id(1L).build();
         when(userRepository.findById(1L)).thenReturn(Optional.of(mentee));
         assertThrows(IllegalArgumentException.class,

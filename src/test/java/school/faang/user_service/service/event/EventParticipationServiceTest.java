@@ -6,38 +6,36 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.commonMessages.ErrorMessagesForEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.RegistrationUserForEventException;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-class EventParticipationServiceImplementationTest {
+class EventParticipationServiceTest {
     private static final long EXISTING_USER_ID = 1L;
 
     private long eventId;
     private long someUserId;
     private List<User> users;
 
-
     @Mock
     private EventParticipationRepository eventParticipationRepository;
 
+    @InjectMocks
     private EventParticipationService eventParticipationService;
 
     @BeforeEach
     void setUp() {
-        eventParticipationService =
-                new EventParticipationServiceImplementation(eventParticipationRepository);
-
         eventId = 1L;
         someUserId = 10L;
 
@@ -63,8 +61,9 @@ class EventParticipationServiceImplementationTest {
         Exception exc = assertThrows(RegistrationUserForEventException.class,
                 () -> eventParticipationService.registerParticipant(eventId, EXISTING_USER_ID));
 
-        assertEquals("The user has already been registered for the event",
-                exc.getMessage());
+        Object[] argsForMessage = {EXISTING_USER_ID, eventId};
+        String expectedMessage = ErrorMessagesForEvent.USER_IS_ALREADY_REGISTERED.format(argsForMessage);
+        assertEquals(expectedMessage, exc.getMessage());
     }
 
     @ParameterizedTest
@@ -73,18 +72,8 @@ class EventParticipationServiceImplementationTest {
         Exception exc = assertThrows(RegistrationUserForEventException.class,
                 () -> eventParticipationService.registerParticipant(eventId, userId));
 
-        assertEquals("Input data is null",
-                exc.getMessage());
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideNullInputData")
-    void shouldThrowExceptionWhenInputDataIsNull(Long eventId, Long userId) {
-        Exception exc = assertThrows(RegistrationUserForEventException.class,
-                () -> eventParticipationService.registerParticipant(eventId, userId));
-
-        assertEquals("Input data is null",
-                exc.getMessage());
+        String expectedMessage = ErrorMessagesForEvent.INPUT_DATA_IS_NULL;
+        assertEquals(expectedMessage, exc.getMessage());
     }
 
     private static Stream<Arguments> provideNullInputData() {

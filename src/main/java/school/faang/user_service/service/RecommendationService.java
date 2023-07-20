@@ -19,7 +19,6 @@ import school.faang.user_service.repository.recommendation.RecommendationReposit
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.time.LocalDateTime;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,11 +57,15 @@ public class RecommendationService {
     }
 
     public List<RecommendationDto> getAllUserRecommendations(long recieverId) {
-        Page<Recommendation> recommendations = recommendationRepository.findAllByReceiverId(recieverId, Pageable.unpaged());
-        if (recommendations.isEmpty()) {
-            throw new DataValidationException("No recommendations found for the user with ID: " + recieverId);
-        }
-        return recommendationMapper.toRecommendationDtos(recommendations.getContent());
+        Page<Recommendation> userRecommendations = recommendationRepository.findAllByReceiverId(recieverId, Pageable.unpaged());
+        validatePageNotEmpty(userRecommendations);
+        return recommendationMapper.toRecommendationDtos(userRecommendations.getContent());
+    }
+
+    public List<RecommendationDto> getAllGivenRecommendations(long authorId) {
+        Page<Recommendation> authorRecommendations = recommendationRepository.findAllByAuthorId(authorId, Pageable.unpaged());
+        validatePageNotEmpty(authorRecommendations);
+        return recommendationMapper.toRecommendationDtos(authorRecommendations.getContent());
     }
 
     public void validateRecommendation(RecommendationDto recommendationDto) {
@@ -120,5 +123,11 @@ public class RecommendationService {
                 .map(UserSkillGuarantee::getGuarantor)
                 .map(User::getId)
                 .noneMatch(guaranteeId -> guaranteeId.equals(authorId));
+    }
+
+    private void validatePageNotEmpty(Page<Recommendation> page) {
+        if (page.isEmpty()) {
+            throw new DataValidationException("No recommendations found for the user");
+        }
     }
 }

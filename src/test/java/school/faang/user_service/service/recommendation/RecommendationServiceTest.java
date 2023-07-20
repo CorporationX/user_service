@@ -48,7 +48,6 @@ public class RecommendationServiceTest {
     @Mock
     private UserSkillGuaranteeMapper userSkillGuaranteeMapper;
 
-
     @Test
     public void testCreate() {
         RecommendationDto recommendationDto = new RecommendationDto();

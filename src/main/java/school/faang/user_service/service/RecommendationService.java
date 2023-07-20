@@ -31,10 +31,11 @@ public class RecommendationService {
     private final SkillRepository skillRepository;
     private final UserRepository userRepository;
 
-    public void create(RecommendationDto recommendationDto) {
+    public RecommendationDto create(RecommendationDto recommendationDto) {
         validateRecommendation(recommendationDto);
         saveSkillOffer(recommendationDto);
         recommendationRepository.create(recommendationDto.getAuthorId(), recommendationDto.getReceiverId(), recommendationDto.getContent());
+        return recommendationDto;
     }
 
     public void saveSkillOffer(RecommendationDto recommendationDto) {

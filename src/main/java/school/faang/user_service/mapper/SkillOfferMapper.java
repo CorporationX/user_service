@@ -17,6 +17,7 @@ public interface SkillOfferMapper {
     @Mapping(source = "skill.id", target = "skillId")
     @Mapping(source = "recommendation.id", target = "recommendationId")
     SkillOfferDto toDto(SkillOffer skillOffer);
+
     @Named("toSkillOfferDtos")
     default List<SkillOfferDto> toSkillOfferDtos(List<SkillOffer> skills) {
         return skills.stream()

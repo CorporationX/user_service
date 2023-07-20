@@ -13,14 +13,14 @@ import java.util.List;
 public class RecommendationController {
     private final RecommendationService recommendationService;
 
-    public void giveRecommendation(RecommendationDto recommendation) {
+    public RecommendationDto giveRecommendation(RecommendationDto recommendation) {
         validateRecommendation(recommendation);
-        recommendationService.create(recommendation);
+        return recommendationService.create(recommendation);
     }
 
-    public void updateRecommendation(RecommendationDto updated) {
+    public RecommendationDto updateRecommendation(RecommendationDto updated) {
         validateRecommendation(updated);
-        recommendationService.update(updated);
+        return recommendationService.update(updated);
     }
 
     public void deleteRecommendation(long id) {

@@ -6,10 +6,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.recommendation.RecommendationService;
-import school.faang.user_service.validator.RecommendationValidator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -18,19 +19,16 @@ public class RecommendationControllerTest {
     private RecommendationController recommendationController;
     @Mock
     private RecommendationService recommendationService;
-    @Mock
-    private RecommendationValidator recommendationValidator;
 
     @Test
     public void testGiveRecommendation() {
         RecommendationDto recommendationDto = new RecommendationDto();
-        recommendationDto.setContent("Sample content");
+        recommendationDto.setContent("content");
 
         when(recommendationService.create(recommendationDto)).thenReturn(recommendationDto);
 
         RecommendationDto result = recommendationController.giveRecommendation(recommendationDto);
 
-        verify(recommendationValidator, times(1)).validateRecommendationContent(recommendationDto);
         verify(recommendationService, times(1)).create(recommendationDto);
         assertEquals(recommendationDto, result);
     }
@@ -44,8 +42,43 @@ public class RecommendationControllerTest {
 
         RecommendationDto result = recommendationController.updateRecommendation(recommendationDto);
 
-        verify(recommendationValidator, times(1)).validateRecommendationContent(recommendationDto);
         verify(recommendationService, times(1)).update(recommendationDto);
         assertEquals(recommendationDto, result);
+    }
+
+    @Test
+    public void testGiveRecommendation_blankContent_throwException() {
+        RecommendationDto recommendationDto = new RecommendationDto();
+        recommendationDto.setContent("   ");
+
+        assertThrows(DataValidationException.class,
+                () -> recommendationController.giveRecommendation(recommendationDto));
+    }
+
+    @Test
+    public void testGiveRecommendation_nullContent_throwException() {
+        RecommendationDto recommendationDto = new RecommendationDto();
+        recommendationDto.setContent(null);
+
+        assertThrows(DataValidationException.class,
+                () -> recommendationController.giveRecommendation(recommendationDto));
+    }
+
+    @Test
+    public void testUpdateRecommendation_blankContent_throwException() {
+        RecommendationDto recommendationDto = new RecommendationDto();
+        recommendationDto.setContent("   ");
+
+        assertThrows(DataValidationException.class,
+                () -> recommendationController.updateRecommendation(recommendationDto));
+    }
+
+    @Test
+    public void testUpdateRecommendation_nullContent_throwException() {
+        RecommendationDto recommendationDto = new RecommendationDto();
+        recommendationDto.setContent(null);
+
+        assertThrows(DataValidationException.class,
+                () -> recommendationController.updateRecommendation(recommendationDto));
     }
 }

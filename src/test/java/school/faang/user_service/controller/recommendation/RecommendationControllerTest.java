@@ -6,13 +6,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.recommendation.RecommendationService;
-import school.faang.user_service.validator.RecommendationValidator;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -21,19 +21,16 @@ public class RecommendationControllerTest {
     private RecommendationController recommendationController;
     @Mock
     private RecommendationService recommendationService;
-    @Mock
-    private RecommendationValidator recommendationValidator;
 
     @Test
     public void testGiveRecommendation() {
         RecommendationDto recommendationDto = new RecommendationDto();
-        recommendationDto.setContent("Sample content");
+        recommendationDto.setContent("content");
 
         when(recommendationService.create(recommendationDto)).thenReturn(recommendationDto);
 
         RecommendationDto result = recommendationController.giveRecommendation(recommendationDto);
 
-        verify(recommendationValidator, times(1)).validateRecommendationContent(recommendationDto);
         verify(recommendationService, times(1)).create(recommendationDto);
         assertEquals(recommendationDto, result);
     }
@@ -47,24 +44,50 @@ public class RecommendationControllerTest {
 
         RecommendationDto result = recommendationController.updateRecommendation(recommendationDto);
 
-        verify(recommendationValidator, times(1)).validateRecommendationContent(recommendationDto);
         verify(recommendationService, times(1)).update(recommendationDto);
         assertEquals(recommendationDto, result);
     }
 
     @Test
-    public void testDeleteRecommendation() {
-        long recommendationId = 1L;
+    public void testGiveRecommendation_blankContent_throwException() {
+        RecommendationDto recommendationDto = new RecommendationDto();
+        recommendationDto.setContent("   ");
 
-        recommendationController.deleteRecommendation(recommendationId);
-        verify(recommendationService).delete(recommendationId);
+        assertThrows(DataValidationException.class,
+                () -> recommendationController.giveRecommendation(recommendationDto));
+    }
+
+    @Test
+    public void testGiveRecommendation_nullContent_throwException() {
+        RecommendationDto recommendationDto = new RecommendationDto();
+        recommendationDto.setContent(null);
+
+        assertThrows(DataValidationException.class,
+                () -> recommendationController.giveRecommendation(recommendationDto));
+    }
+
+    @Test
+    public void testUpdateRecommendation_blankContent_throwException() {
+        RecommendationDto recommendationDto = new RecommendationDto();
+        recommendationDto.setContent("   ");
+
+        assertThrows(DataValidationException.class,
+                () -> recommendationController.updateRecommendation(recommendationDto));
+    }
+
+    @Test
+    public void testUpdateRecommendation_nullContent_throwException() {
+        RecommendationDto recommendationDto = new RecommendationDto();
+        recommendationDto.setContent(null);
+
+        assertThrows(DataValidationException.class,
+                () -> recommendationController.updateRecommendation(recommendationDto));
     }
 
     @Test
     public void testGetAllUserRecommendations() {
         long userId = 1L;
 
-        List<RecommendationDto> recommendationList = new ArrayList<>();
         RecommendationDto recommendation1 = new RecommendationDto();
         recommendation1.setId(1L);
         recommendation1.setAuthorId(2L);
@@ -77,6 +100,7 @@ public class RecommendationControllerTest {
         recommendation2.setReceiverId(userId);
         recommendation2.setContent("Content 2");
 
+        List<RecommendationDto> recommendationList = new ArrayList<>();
         recommendationList.add(recommendation1);
         recommendationList.add(recommendation2);
 
@@ -93,7 +117,6 @@ public class RecommendationControllerTest {
     public void testGetAllGivenRecommendations() {
         long userId = 1L;
 
-        List<RecommendationDto> recommendationList = new ArrayList<>();
         RecommendationDto recommendation1 = new RecommendationDto();
         recommendation1.setId(1L);
         recommendation1.setAuthorId(userId);
@@ -106,6 +129,7 @@ public class RecommendationControllerTest {
         recommendation2.setReceiverId(3L);
         recommendation2.setContent("Content 2");
 
+        List<RecommendationDto> recommendationList = new ArrayList<>();
         recommendationList.add(recommendation1);
         recommendationList.add(recommendation2);
 

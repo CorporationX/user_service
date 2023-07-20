@@ -3,8 +3,8 @@ package school.faang.user_service.controller.recommendation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.recommendation.RecommendationService;
-import school.faang.user_service.validator.RecommendationValidator;
 
 import java.util.List;
 
@@ -13,25 +13,24 @@ import java.util.List;
 public class RecommendationController {
 
     private final RecommendationService recommendationService;
-    private final RecommendationValidator recommendationValidator;
 
     public RecommendationDto giveRecommendation(RecommendationDto recommendation) {
-        validate(recommendation);
+        validateRecommendationContent(recommendation);
 
         return recommendationService.create(recommendation);
     }
 
     public RecommendationDto updateRecommendation(RecommendationDto recommendation) {
-        validate(recommendation);
+        validateRecommendationContent(recommendation);
 
         return recommendationService.update(recommendation);
     }
 
-    public void deleteRecommendation(long id) {
-        recommendationService.delete(id);
+    public void deleteRecommendation(long recommendationId) {
+        recommendationService.delete(recommendationId);
     }
 
-    public List<RecommendationDto> getAllUserRecommendations(long userId) {
+    public List<RecommendationDto> getAllUserRecommendations(long userId){
         return recommendationService.getAllUserRecommendations(userId);
     }
 
@@ -39,7 +38,11 @@ public class RecommendationController {
         return recommendationService.getAllGivenRecommendations(userId);
     }
 
-    private void validate(RecommendationDto recommendation) {
-        recommendationValidator.validateRecommendationContent(recommendation);
+    private void validateRecommendationContent(RecommendationDto recommendationDto) {
+        String content = recommendationDto.getContent();
+
+        if (content == null || content.isBlank()) {
+            throw new DataValidationException("Content can't be empty");
+        }
     }
 }

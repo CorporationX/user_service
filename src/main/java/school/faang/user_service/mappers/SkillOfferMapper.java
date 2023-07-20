@@ -13,11 +13,11 @@ public interface SkillOfferMapper {
     @Mapping(target = "recommendation.id", source = "recommendation")
     SkillOffer toEntity(SkillOfferDto dto);
 
-    @Mapping(source ="skill.id", target = "skill" )
-    @Mapping(source ="recommendation.id", target = "recommendation")
+    @Mapping(target = "skill", source ="skill.id" )
+    @Mapping(target = "recommendation", source ="recommendation.id")
     SkillOfferDto toDto(SkillOffer entity);
 
-    @Named("mapSkillOffersDtoToEntity")
+    @Named("toSkillOfferDtos")
     default List<SkillOfferDto> toSkillOfferDtos(List<SkillOffer> skills) {
         return skills.stream()
                 .map(this::toDto)

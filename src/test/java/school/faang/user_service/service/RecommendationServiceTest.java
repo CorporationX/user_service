@@ -164,7 +164,6 @@ class RecommendationServiceTest {
         assertEquals(recommendationUpdate.getSkillOffers(), result.getSkillOffers());
     }
 
-
     @Test
     public void testDeleteInvokesDeleteById() {
         recommendationService.delete(1);

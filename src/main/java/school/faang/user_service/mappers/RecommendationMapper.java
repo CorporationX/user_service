@@ -7,7 +7,7 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.FIELD, unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = SkillOfferMapper.class)
 public interface RecommendationMapper {
-    @Mapping(source = "skillOffers", target = "skillOffers", qualifiedByName = "mapSkillOffersDtoToEntity")
+    @Mapping(source = "skillOffers", target = "skillOffers", qualifiedByName = "toSkillOfferDtos")
     @Mapping(source = "author.id", target = "authorId")
     @Mapping(source = "receiver.id", target = "receiverId")
     RecommendationDto toDto(Recommendation entity);

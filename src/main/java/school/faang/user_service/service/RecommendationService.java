@@ -53,6 +53,7 @@ public class RecommendationService {
         return recommendationMapper.toDto(recommendationEntity);
     }
 
+    @Transactional
     public RecommendationDto update(RecommendationDto recommendationUpdate) {
         validate(recommendationUpdate);
         Recommendation recommendationEntity = recommendationRepository.update(recommendationUpdate.getAuthorId(), recommendationUpdate.getReceiverId(), recommendationUpdate.getContent());
@@ -62,8 +63,16 @@ public class RecommendationService {
         return recommendationMapper.toDto(recommendationEntity);
     }
 
+    @Transactional
     public void delete(long id) {
         recommendationRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<RecommendationDto> getAllUserRecommendations(long receiverId) {
+        List<Recommendation> recommendations = recommendationRepository.findAllByReceiverId(receiverId);
+
+        return recommendationMapper.toRecommendationDtos(recommendations);
     }
 
 

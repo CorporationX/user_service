@@ -6,6 +6,8 @@ import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.service.RecommendationService;
 import school.faang.user_service.validator.RecommendationValidator;
 
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 public class RecommendationController {
@@ -25,5 +27,9 @@ public class RecommendationController {
 
     public void deleteRecommendation(long id) {
         recommendationService.delete(id);
+    }
+
+    public List<RecommendationDto> getAllUserRecommendations(long receiverId) {
+        return recommendationService.getAllUserRecommendations(receiverId);
     }
 }

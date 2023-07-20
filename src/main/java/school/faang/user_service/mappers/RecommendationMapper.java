@@ -4,6 +4,8 @@ import org.mapstruct.*;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
 
+import java.util.List;
+
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.FIELD, unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = SkillOfferMapper.class)
 public interface RecommendationMapper {
@@ -11,4 +13,10 @@ public interface RecommendationMapper {
     @Mapping(source = "author.id", target = "authorId")
     @Mapping(source = "receiver.id", target = "receiverId")
     RecommendationDto toDto(Recommendation entity);
+
+    @Named("toRecommendationDtos")
+    default List<RecommendationDto> toRecommendationDtos(List<Recommendation> recommendations) {
+        return recommendations.stream()
+                .map(this::toDto).toList();
+    }
 }

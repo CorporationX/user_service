@@ -169,6 +169,31 @@ class RecommendationServiceTest {
         recommendationService.delete(1);
         verify(recommendationRepository).deleteById(1L);
     }
+
+    @Test
+    public void testGetAllUserRecommendations() {
+        // Test data
+        long receiverId = 2L;
+        User receiver = User.builder().id(2L).build();
+        List<Recommendation> recommendationList = List.of(
+                Recommendation.builder().id(1L).content("Recommendation 1").receiver(receiver).build(),
+                Recommendation.builder().id(2L).content("Recommendation 2").receiver(receiver).build()
+        );
+        List<RecommendationDto> expectedRecommendationDtoList = List.of(
+                RecommendationDto.builder().id(1L).content("Recommendation 1").receiverId(receiverId).build(),
+                RecommendationDto.builder().id(2L).content("Recommendation 2").receiverId(receiverId).build()
+        );
+
+        // Mock the repository method to return the test data
+        when(recommendationRepository.findAllByReceiverId(receiverId)).thenReturn(recommendationList);
+        when(recommendationMapper.toRecommendationDtos(anyList())).thenReturn(expectedRecommendationDtoList);
+
+        List<RecommendationDto> result = recommendationService.getAllUserRecommendations(receiverId);
+
+        verify(recommendationRepository).findAllByReceiverId(receiverId);
+
+        assertEquals(expectedRecommendationDtoList, result);
+    }
 }
 
 

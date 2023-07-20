@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.RecommendationRequestDto;
@@ -18,12 +19,15 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class RecommendationRequestService {
+    @Getter
     private final static String REQUESTER_OR_RECEIVER_NOT_FOUND = "Requester or receiver not found";
+    @Getter
     private final static String REQUEST_IS_PENDING = "Request is pending";
+    @Getter
     private final static String SKILL_NOT_FOUND = "Skill not found";
 
-    private final RecommendationRequestRepository recommendationRepository;
-    private final SkillRequestRepository skillRepository;
+    private final RecommendationRequestRepository recommendationRequestRepository;
+    private final SkillRequestRepository skillRequestRepository;
     private final UserRepository userRepository;
 
     public void create(RecommendationRequestDto recommendationRequest) {
@@ -31,13 +35,13 @@ public class RecommendationRequestService {
             long requesterId = recommendationRequest.getRequesterId();
             long receiverId = recommendationRequest.getReceiverId();
             String message = recommendationRequest.getMessage();
-            recommendationRepository.create(requesterId, receiverId, message);
+            recommendationRequestRepository.create(requesterId, receiverId, message);
             recommendationRequest.getSkills()
-                    .forEach(skill -> skillRepository.create(requesterId, skill.getId()));
+                    .forEach(skill -> skillRequestRepository.create(requesterId, skill.getId()));
         }
     }
 
-    private boolean isUserExist(long requesterId, long receiverId) {
+    private boolean isRequesterAndReceiverExist(long requesterId, long receiverId) {
         Optional<User> requester = userRepository.findById(requesterId);
         Optional<User> receiver = userRepository.findById(receiverId);
         return requester.isPresent() && receiver.isPresent();
@@ -48,15 +52,15 @@ public class RecommendationRequestService {
         long requesterId = recommendationRequest.getRequesterId();
         Optional<RecommendationRequest> lastRequest;
 
-        if (!isUserExist(requesterId, receiverId)) {
+        if (!isRequesterAndReceiverExist(requesterId, receiverId)) {
             throw new IllegalArgumentException(REQUESTER_OR_RECEIVER_NOT_FOUND);
         }
 
-        lastRequest = recommendationRepository.findLatestPendingRequest(requesterId, receiverId);
+        lastRequest = recommendationRequestRepository.findLatestPendingRequest(requesterId, receiverId);
         if (lastRequest.isPresent()) {
-            LocalDateTime last = lastRequest.get().getUpdatedAt();
-            LocalDateTime cur = recommendationRequest.getCreatedAt();
-            if (last.plus(6, ChronoUnit.MONTHS).isBefore(cur)) {
+            LocalDateTime prevRequestsDate = lastRequest.get().getUpdatedAt();
+            LocalDateTime curRequestDate = recommendationRequest.getCreatedAt();
+            if (prevRequestsDate.plus(6, ChronoUnit.MONTHS).isAfter(curRequestDate)) {
                 throw new DateTimeException(REQUEST_IS_PENDING);
             }
         }
@@ -71,7 +75,7 @@ public class RecommendationRequestService {
                 .mapToLong(Skill::getId)
                 .boxed()
                 .forEach(skillId -> {
-                    if (!skillRepository.existsById(skillId)) {
+                    if (!skillRequestRepository.existsById(skillId)) {
                         throw new IllegalArgumentException(SKILL_NOT_FOUND);
                     }
                 });

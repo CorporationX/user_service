@@ -169,4 +169,9 @@ class EventServiceTest {
             eventService.updateEvent(eventDto);
         });
     }
+    @Test
+    void TestGetOwnedEvents() {
+        eventService.getOwnedEvents(1L);
+        verify(eventRepository, times(1)).findAllByUserId(1L);
+    }
 }

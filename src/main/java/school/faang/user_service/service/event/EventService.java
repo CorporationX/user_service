@@ -59,6 +59,10 @@ public class EventService {
         return create(eventMapper.toEventDto(event1));
     }
 
+    public List<Event> getOwnedEvents(long userId) {
+        return eventRepository.findAllByUserId(userId);
+    }
+
     public void deleteEvent(long eventId) {
         if (eventId <= 0) {
             throw new DataValidationException("Event does not exist");

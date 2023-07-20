@@ -18,6 +18,7 @@ public class EventController {
         }
         return eventService.create(event);
     }
+
     public EventDto getEvent(long id) {
         return eventService.getEvent(id);
     }
@@ -25,15 +26,22 @@ public class EventController {
     public void getEventsByFilter(EventFilterDto filter) {
         eventService.getEventsByFilter(filter);
     }
-    public void updateEvent(EventDto event){
+
+    public void updateEvent(EventDto event) {
         if (!(checkValidation(event))) {
             throw new DataValidationException("The event did not pass validation when updating the event");
         }
         eventService.updateEvent(event);
     }
+
+    public void getOwnedEvents(long userId) {
+        eventService.getOwnedEvents(userId);
+    }
+
     public void deleteEvent(long id) {
         eventService.deleteEvent(id);
     }
+
     private boolean checkValidation(EventDto event) {
         return event.getTitle() != null && !event.getTitle().isEmpty()
                 && event.getStartDate() != null && event.getOwnerId() != null;

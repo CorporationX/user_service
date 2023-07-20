@@ -111,13 +111,7 @@ public class EventServiceTest {
     }
 
     @Test
-    public void testDeleteEventWithWrongId() {
-        Mockito.doThrow(new IllegalArgumentException()).when(eventRepository).deleteById(0L);
-        Assertions.assertThrows(DataValidationException.class, () -> eventService.deleteEvent(0L));
-    }
-
-    @Test
-    public void testCorrectDeleteEvent() {
+    public void testDeleteEvent() {
         eventService.deleteEvent(1L);
         Mockito.verify(eventRepository, Mockito.times(1)).deleteById(1L);
     }

@@ -63,6 +63,10 @@ public class EventService {
         return eventRepository.findAllByUserId(userId);
     }
 
+    public void getParticipatedEvents(long userId) {
+        eventRepository.findParticipatedEventsByUserId(userId);
+    }
+
     public void deleteEvent(long eventId) {
         if (eventId <= 0) {
             throw new DataValidationException("Event does not exist");

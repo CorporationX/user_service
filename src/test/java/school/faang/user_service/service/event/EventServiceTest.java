@@ -69,6 +69,7 @@ class EventServiceTest {
         eventService.create(event);
         verify(eventRepository).save(any());
     }
+
     @Test
     void testGetEventThrows() {
         when(eventRepository.findById(1L)).thenReturn(Optional.empty());
@@ -139,6 +140,7 @@ class EventServiceTest {
 
         Assertions.assertEquals(expected, eventsByFilter);
     }
+
     @Test
     void shouldThrowExecutionOnDeleteEvent() {
         assertThrows(DataValidationException.class, () -> eventService.deleteEvent(0L));
@@ -149,6 +151,7 @@ class EventServiceTest {
         eventService.deleteEvent(1L);
         verify(eventRepository, times(1)).deleteById(1L);
     }
+
     @Test
     void testUpdateEvent() {
         List<SkillDto> skillsDto = new ArrayList<>(List.of(SkillDto.builder().title("test").id(1L).build()));
@@ -162,6 +165,7 @@ class EventServiceTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         eventService.updateEvent(eventDto);
     }
+
     @Test
     void testUpdateEventException() {
         EventDto eventDto = EventDto.builder().id(1L).ownerId(1L).build();
@@ -169,9 +173,16 @@ class EventServiceTest {
             eventService.updateEvent(eventDto);
         });
     }
+
     @Test
     void TestGetOwnedEvents() {
         eventService.getOwnedEvents(1L);
         verify(eventRepository, times(1)).findAllByUserId(1L);
+    }
+
+    @Test
+    void getParticipatedEvents() {
+        eventService.getParticipatedEvents(1L);
+        verify(eventRepository, times(1)).findParticipatedEventsByUserId(1L);
     }
 }

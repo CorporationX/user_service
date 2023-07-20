@@ -38,6 +38,10 @@ public class EventController {
         eventService.getOwnedEvents(userId);
     }
 
+    public void getParticipatedEvents(long userId) {
+        eventService.getParticipatedEvents(userId);
+    }
+
     public void deleteEvent(long id) {
         eventService.deleteEvent(id);
     }

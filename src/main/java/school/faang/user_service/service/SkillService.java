@@ -28,7 +28,7 @@ public class SkillService {
 
     private final SkillMapper skillMapper;
 
-    private static final long MIN_SKILL_OFFERS = 3;
+    private static final int MIN_SKILL_OFFERS = 3;
 
     public SkillDto create(SkillDto skillDto) {
         if (skillRepository.existsByTitle(skillDto.getTitle())) {
@@ -61,7 +61,8 @@ public class SkillService {
         if (userSkill == null) {
             List<SkillOffer> allOffersOfSkill = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
             if (allOffersOfSkill.size() >= MIN_SKILL_OFFERS) {
-                userSkill = skillRepository.findById(skillId).orElseThrow(() -> new DataValidationException("Такого скилла не существует!!"));
+                userSkill = skillRepository.findById(skillId)
+                        .orElseThrow(() -> new DataValidationException("Такого скилла не существует!!"));
                 skillRepository.assignSkillToUser(skillId, userId);
                 addUserSkillGuarantee(userSkill, allOffersOfSkill);
                 return skillMapper.toDto(userSkill);

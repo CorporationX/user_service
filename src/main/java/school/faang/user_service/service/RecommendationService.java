@@ -1,6 +1,8 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
@@ -17,6 +19,7 @@ import school.faang.user_service.repository.recommendation.RecommendationReposit
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.time.LocalDateTime;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,6 +55,14 @@ public class RecommendationService {
 
     public void delete(long id) {
         recommendationRepository.deleteById(id);
+    }
+
+    public List<RecommendationDto> getAllUserRecommendations(long recieverId) {
+        Page<Recommendation> recommendations = recommendationRepository.findAllByReceiverId(recieverId, Pageable.unpaged());
+        if (recommendations.isEmpty()) {
+            throw new DataValidationException("No recommendations found for the user with ID: " + recieverId);
+        }
+        return recommendationMapper.toRecommendationDtos(recommendations.getContent());
     }
 
     public void validateRecommendation(RecommendationDto recommendationDto) {
@@ -90,12 +101,7 @@ public class RecommendationService {
                         UserSkillGuarantee newUserSkillGuarantee = UserSkillGuarantee.builder().user(currentUser).skill(sameSkill).guarantor(guarantor).build();
                         sameSkill.getGuarantees().add(newUserSkillGuarantee);
                     }
-                    recommendationDto.getSkillOffers()
-                            .forEach(skillOfferDto -> {
-                                if (skillOfferDto.getSkillId() == sameSkill.getId()) {
-                                    recommendationDto.getSkillOffers().remove(skillOfferDto);
-                                }
-                            });
+                    recommendationDto.getSkillOffers().removeIf(skillOfferDto -> skillOfferDto.getSkillId() == sameSkill.getId());
                 });
         User currentUser = userRepository.findById(recommendationDto.getReceiverId()).orElseThrow(() -> new DataValidationException("Entity not found"));
         currentUser.setSkills(userSkills);

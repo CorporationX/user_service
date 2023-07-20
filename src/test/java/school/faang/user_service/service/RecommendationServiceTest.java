@@ -8,6 +8,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.Skill;
@@ -27,6 +31,7 @@ import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,11 +54,15 @@ class RecommendationServiceTest {
     @InjectMocks
     private RecommendationService recommendationService;
     private RecommendationDto recommendationDto;
+    private Recommendation recommendation;
+    private Page<Recommendation> recommendationPage;
     private List<Skill> skills;
-    private List<SkillOfferDto> skillOffers;
+    private List<SkillOfferDto> skillOffersDto;
+    private List<SkillOffer> skillsOffers;
     private List<UserSkillGuarantee> userSkillGuarantees;
     private UserSkillGuarantee firstGuarantee;
     private UserSkillGuarantee secondGuarantee;
+    private SkillOffer skillOffer;
     private Skill userSkill;
     private User firstUser;
     private User secondUser;
@@ -67,10 +76,14 @@ class RecommendationServiceTest {
         this.userSkillGuarantees = new ArrayList<>();
         userSkillGuarantees.add(firstGuarantee);
         userSkillGuarantees.add(secondGuarantee);
-        this.userSkill = Skill.builder().title("Java").guarantees(userSkillGuarantees).build();
+        this.userSkill = Skill.builder().id(1).title("Java").guarantees(userSkillGuarantees).build();
         this.skills = List.of(userSkill);
-        this.skillOffers = List.of(new SkillOfferDto(1L, 1L, 1L));
-        this.recommendationDto = new RecommendationDto(1L, 2L, 3L, "Hello", skillOffers, LocalDateTime.now());
+        this.skillOffersDto = new ArrayList<>(List.of(new SkillOfferDto(1L, 1L, 1L)));
+        this.skillOffer = SkillOffer.builder().id(1).skill(userSkill).recommendation(Recommendation.builder().id(1).build()).build();
+        this.skillsOffers = new ArrayList<>(List.of(skillOffer));
+        this.recommendationDto = new RecommendationDto(1L, 2L, 3L, "Hello", skillOffersDto, LocalDateTime.now());
+        this.recommendation = new Recommendation(1, "Hello", firstUser, secondUser, skillsOffers, null, LocalDateTime.now().minusYears(1), null);
+        this.recommendationPage = new PageImpl<>(Arrays.asList(recommendation, recommendation), PageRequest.of(0, 2), 2);
     }
 
     @Test
@@ -217,12 +230,8 @@ class RecommendationServiceTest {
 
     @Test
     void updateTest() {
-        Skill skill = Skill.builder().id(1).build();
-        SkillOffer skillOffer = SkillOffer.builder().id(1).skill(skill).recommendation(Recommendation.builder().id(1).build()).build();
         SkillOfferDto skillOfferDto = new SkillOfferDto(1L, 1L, 1L);
-        List<SkillOffer> skillsOffer = new ArrayList<>(List.of(skillOffer));
         List<SkillOfferDto> skillOfferDtos = new ArrayList<>(List.of(skillOfferDto));
-        Recommendation recommendation = new Recommendation(1, "Hello", firstUser, secondUser, skillsOffer, null, LocalDateTime.now().minusYears(1), null);
 
         Mockito.when(recommendationRepository.update(recommendationDto.getAuthorId(), recommendationDto.getReceiverId(), recommendationDto.getContent()))
                 .thenReturn(recommendation);
@@ -255,5 +264,46 @@ class RecommendationServiceTest {
     void deleteInvokesDeleteByIdTest() {
         recommendationService.delete(1);
         Mockito.verify(recommendationRepository).deleteById(1L);
+    }
+
+    @Test
+    void getAllUserRecommendationsTest() {
+        RecommendationDto dto = new RecommendationDto(1L, 3L, 4L, "Hello", skillOffersDto, recommendation.getCreatedAt());
+
+        Mockito.when(recommendationRepository.findAllByReceiverId(1, Pageable.unpaged()))
+                .thenReturn(recommendationPage);
+
+        List<RecommendationDto> result = recommendationService.getAllUserRecommendations(1);
+
+        assertEquals(2, result.size());
+        assertEquals(List.of(dto, dto), result);
+    }
+
+    @Test
+    void getAllUserRecommendationsInvokesFindAllByReceiverId() {
+        Mockito.when(recommendationRepository.findAllByReceiverId(1, Pageable.unpaged()))
+                .thenReturn(recommendationPage);
+
+        recommendationService.getAllUserRecommendations(1);
+
+        Mockito.verify(recommendationRepository).findAllByReceiverId(1, Pageable.unpaged());
+    }
+
+    @Test
+    void getAllUserRecommendationsInvokesToRecommendationDtos() {
+        Mockito.when(recommendationRepository.findAllByReceiverId(1, Pageable.unpaged()))
+                .thenReturn(recommendationPage);
+
+        recommendationService.getAllUserRecommendations(1);
+
+        Mockito.verify(recommendationMapper).toRecommendationDtos(recommendationPage.getContent());
+    }
+
+    @Test
+    void getAllUserRecommendationsThrowDataValidationException() {
+        Mockito.when(recommendationRepository.findAllByReceiverId(1, Pageable.unpaged()))
+                .thenReturn(Page.empty());
+
+        assertThrows(DataValidationException.class, () -> recommendationService.getAllUserRecommendations(1));
     }
 }

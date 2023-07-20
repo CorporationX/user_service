@@ -6,6 +6,8 @@ import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.RecommendationService;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class RecommendationController {
@@ -23,6 +25,10 @@ public class RecommendationController {
 
     public void deleteRecommendation(long id) {
         recommendationService.delete(id);
+    }
+
+    public List<RecommendationDto> getAllUserRecommendations(long recieverId) {
+        return recommendationService.getAllUserRecommendations(recieverId);
     }
 
     private void validateRecommendation(RecommendationDto recommendationDto) {

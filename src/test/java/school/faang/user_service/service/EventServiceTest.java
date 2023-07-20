@@ -1,6 +1,5 @@
 package school.faang.user_service.service;
 
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,13 +22,11 @@ import school.faang.user_service.service.event.EventFilter;
 import school.faang.user_service.service.event.EventIdFilter;
 import school.faang.user_service.service.event.EventService;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.when;
-
 
 @ExtendWith(MockitoExtension.class)
 public class EventServiceTest {
@@ -95,7 +92,6 @@ public class EventServiceTest {
             .owner(user2)
             .build();
 
-
     @Test
     public void testOwnerHasNoSkillsForEvent() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
@@ -105,14 +101,14 @@ public class EventServiceTest {
     @Test
     public void testOwnerHasSkillsForEvent() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user2));
-        when(eventRepository.save(eventMapper.toEvent(eventDto))).thenReturn(event);
-        Assertions.assertEquals(event, eventService.create(eventDto));
+        eventService.create(eventDto);
+        Mockito.verify(eventRepository, Mockito.times(1)).save(eventMapper.toEvent(eventDto));
     }
 
     @Test
     public void testGetEventWithWrongId() {
-        when(eventRepository.findById(0L)).thenThrow(new IllegalArgumentException());
         Assertions.assertThrows(DataValidationException.class, () -> eventService.getEvent(0L));
+        Assertions.assertThrows(DataValidationException.class, () -> eventService.getEvent(-10L));
     }
 
     @Test
@@ -124,17 +120,11 @@ public class EventServiceTest {
     @Test
     public void testCorrectGetEvent() {
         when(eventRepository.findById(1L)).thenReturn(Optional.ofNullable(event));
-        Assertions.assertEquals(event, eventService.getEvent(1L));
+        Assertions.assertEquals(eventMapper.toDTO(event), eventService.getEvent(1L));
     }
 
     @Test
-    public void testDeleteEventWithWrongId() {
-        Mockito.doThrow(new IllegalArgumentException()).when(eventRepository).deleteById(0L);
-        Assertions.assertThrows(DataValidationException.class, () -> eventService.deleteEvent(0L));
-    }
-
-    @Test
-    public void testCorrectDeleteEvent() {
+    public void testDeleteEvent() {
         eventService.deleteEvent(1L);
         Mockito.verify(eventRepository, Mockito.times(1)).deleteById(1L);
     }

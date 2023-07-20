@@ -29,9 +29,9 @@ public class EventService {
     private final List<EventFilter> filters;
 
 
-    public Event create(EventDto event) {
+    public EventDto create(EventDto event) {
         validate(event);
-        return eventRepository.save(eventMapper.toEvent(event));
+        return eventMapper.toDTO(eventRepository.save(eventMapper.toEvent(event)));
     }
 
     private void validate(EventDto event) {
@@ -53,26 +53,22 @@ public class EventService {
 
     }
 
-    public Event getEvent(long id) {
-        Optional<Event> event;
+    public EventDto getEvent(long id) {
 
-        try {
-            event = eventRepository.findById(id);
-        } catch (IllegalArgumentException exception) {
+        if (id <= 0) {
             throw new DataValidationException("ID is incorrect");
         }
-        if (event.isEmpty()) {
-            throw new DataValidationException("There is no event with this id");
-        }
 
-        return event.get();
+        return eventMapper.toDTO(
+                eventRepository
+                        .findById(id)
+                        .orElseThrow(() -> new DataValidationException("There is no event with this id"))
+        );
     }
 
     public void deleteEvent(long id) {
-        try {
+        if (id > 0) {
             eventRepository.deleteById(id);
-        } catch (IllegalArgumentException exception) {
-            throw new DataValidationException("ID is incorrect");
         }
     }
 
@@ -86,12 +82,20 @@ public class EventService {
         return result;
     }
 
-    public List<Event> getOwnedEvents(long userId) {
-        return Optional.ofNullable(eventRepository.findAllByUserId(userId)).orElse(new ArrayList<>());
+    public List<EventDto> getOwnedEvents(long userId) {
+        return Optional.ofNullable(eventRepository.findAllByUserId(userId))
+                .orElse(new ArrayList<>())
+                .stream()
+                .map(eventMapper::toDTO)
+                .toList();
     }
 
-    public List<Event> getParticipatedEvents(long userId) {
-        return Optional.ofNullable(eventRepository.findParticipatedEventsByUserId(userId)).orElse(new ArrayList<>());
+    public List<EventDto> getParticipatedEvents(long userId) {
+        return Optional.ofNullable(eventRepository.findParticipatedEventsByUserId(userId))
+                .orElse(new ArrayList<>())
+                .stream()
+                .map(eventMapper::toDTO)
+                .toList();
     }
 
     public List<EventDto> getEventsByFilter(EventFilterDto filter){

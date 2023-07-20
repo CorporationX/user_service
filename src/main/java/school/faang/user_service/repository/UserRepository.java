@@ -25,4 +25,10 @@ public interface UserRepository extends CrudRepository<User, Long> {
             WHERE up.end_date > NOW()
             """)
     Stream<User> findPremiumUsers();
+
+    @Query(nativeQuery = true, value = """
+            SELECT EXISTS(SELECT 1 FROM users u
+            WHERE u.id = ?1)
+            """)
+    boolean isUserPresent(long userId);
 }

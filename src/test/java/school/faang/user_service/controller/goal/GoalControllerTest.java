@@ -9,6 +9,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.service.goal.GoalService;
 
 import java.util.Arrays;
@@ -50,5 +51,55 @@ public class GoalControllerTest {
                 .andExpect(jsonPath("$[1].title").value("Goal 2"));
 
         verify(goalService, times(1)).getGoalsByUser(anyLong(), any());
+    }
+
+    @Test
+    public void testFindSubtasksByGoalId_ValidInput() throws Exception {
+        GoalDto subtask1 = new GoalDto();
+        subtask1.setTitle("Subtask 1");
+        GoalDto subtask2 = new GoalDto();
+        subtask2.setTitle("Subtask 2");
+        List<GoalDto> subtasks = Arrays.asList(subtask1, subtask2);
+        when(goalService.findSubtasksByGoalId(anyLong(), any())).thenReturn(subtasks);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/goals/subtasks/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].title").value("Subtask 1"))
+                .andExpect(jsonPath("$[1].title").value("Subtask 2"));
+
+        verify(goalService, times(1)).findSubtasksByGoalId(anyLong(), any());
+    }
+
+    @Test
+    public void testFindSubtasksByGoalId_WithFilter_ValidInput() throws Exception {
+        GoalDto subtask1 = new GoalDto();
+        subtask1.setTitle("Subtask 1");
+        GoalDto subtask2 = new GoalDto();
+        subtask2.setTitle("Subtask 2");
+        List<GoalDto> subtasks = Arrays.asList(subtask1, subtask2);
+        when(goalService.findSubtasksByGoalId(anyLong(), any())).thenReturn(subtasks);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/goals/subtasks/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("skillIds", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].title").value("Subtask 1"))
+                .andExpect(jsonPath("$[1].title").value("Subtask 2"));
+
+        verify(goalService, times(1)).findSubtasksByGoalId(anyLong(), any());
+    }
+
+    @Test
+    public void testFindSubtasksByGoalId_InvalidGoalId() throws Exception {
+        long invalidGoalId = 999;
+        when(goalService.findSubtasksByGoalId(invalidGoalId, new GoalFilterDto())).thenReturn(List.of());
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/goals/subtasks/" + invalidGoalId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
+
+        verify(goalService, times(1)).findSubtasksByGoalId(invalidGoalId, new GoalFilterDto());
     }
 }

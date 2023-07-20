@@ -22,15 +22,19 @@ public class EventParticipationService {
             }
         }
         eventParticipationRepository.register(eventId, userId);
+
     }
 
     public void unregisterParticipant(long eventId, long userId) {
-        List<User> users = eventParticipationRepository.findAllParticipantsByEventId(eventId);
-        for (User user : users) {
-            if (user.getId() != userId) {
-                throw new DataValidationException("You are registered already!");
-            }
+        if (checkAnyUserInEvent(eventId, userId)) {
+            eventParticipationRepository.unregister(eventId, userId);
+        } else {
+            throw new DataValidationException("You are not registered");
         }
-        eventParticipationRepository.unregister(eventId, userId);
+    }
+
+    public boolean checkAnyUserInEvent(long eventId, long userId) {
+        return eventParticipationRepository.findAllParticipantsByEventId(eventId).stream()
+                .anyMatch(user -> user.getId() == userId);
     }
 }

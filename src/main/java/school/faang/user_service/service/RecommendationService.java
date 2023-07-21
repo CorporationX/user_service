@@ -37,6 +37,5 @@ public class RecommendationService {
 //                skillOffer.contains(recommendationMapper.toEntity(skillOfferDto);
 //            }
 //        }
-
     }
 }

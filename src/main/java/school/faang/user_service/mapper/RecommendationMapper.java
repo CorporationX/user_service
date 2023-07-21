@@ -14,7 +14,6 @@ public interface RecommendationMapper {
     @Mapping(target = "skillOffers", expression = "java(recommendationDto.getSkillOffers())")
     RecommendationDto toDto(Recommendation recommendation);
 
-
     @Mapping(target = "author", expression = "java(recommendationDto.getAuthorId())")
     @Mapping(target = "receiver", expression = "java(recommendationDto.getReceiverId())")
     @Mapping(target = "skillOffers", expression = "java(recommendationDto.getSkillOffers())")

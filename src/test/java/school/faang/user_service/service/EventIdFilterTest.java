@@ -27,4 +27,9 @@ public class EventIdFilterTest {
                 .forEach(event -> Assertions.assertEquals(event.getId(), eventFilterDto.getEventId()));
     }
 
+    @Test
+    public void testIsApplicable() {
+        Assertions.assertTrue(eventIdFilter.isApplicable(eventFilterDto));
+        Assertions.assertFalse(eventIdFilter.isApplicable(EventFilterDto.builder().build()));
+    }
 }

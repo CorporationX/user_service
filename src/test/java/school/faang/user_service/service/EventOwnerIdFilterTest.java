@@ -29,4 +29,10 @@ public class EventOwnerIdFilterTest {
         actualEvents.stream()
                 .forEach(event -> Assertions.assertEquals(event.getOwner().getId(), eventFilterDto.getOwnerId()));
     }
+
+    @Test
+    public void testIsApplicable() {
+        Assertions.assertTrue(eventOwnerIdFilter.isApplicable(eventFilterDto));
+        Assertions.assertFalse(eventOwnerIdFilter.isApplicable(EventFilterDto.builder().build()));
+    }
 }

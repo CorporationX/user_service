@@ -32,4 +32,10 @@ public class EventStartDateFilterTest {
         actualEvents.stream()
                 .forEach(event -> Assertions.assertTrue(event.getStartDate().isAfter(eventFilterDto.getStartDate())));
     }
+
+    @Test
+    public void testIsApplicable() {
+        Assertions.assertTrue(eventStartDateFilter.isApplicable(eventFilterDto));
+        Assertions.assertFalse(eventStartDateFilter.isApplicable(EventFilterDto.builder().build()));
+    }
 }

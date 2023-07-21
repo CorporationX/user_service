@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
-import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
@@ -26,7 +25,6 @@ public class RecommendationService {
                 .orElseThrow(()-> new DataValidationException("Recommendation is not found"));
 
         validatorService.validateTime(recommendation);
-
         skillOfferRepository.findAll()
 
 

@@ -13,6 +13,6 @@ import school.faang.user_service.entity.User;
 )
 public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
-    UserDto toUserDto(User user);
-    User toUser(UserDto userDto);
+    UserDto toDto(User user);
+    User toEntity(UserDto userDto);
 }

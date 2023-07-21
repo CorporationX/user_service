@@ -44,7 +44,7 @@ public class EventParticipationService {
         eventService.existsById(eventId);
         return eventParticipationRepository.findAllParticipantsByEventId(eventId)
                 .stream()
-                .map(userMapper.INSTANCE::toUserDto)
+                .map(userMapper::toDto)
                 .toList();
     }
 

@@ -6,23 +6,22 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.annotation.Description;
 import school.faang.user_service.commonMessages.ErrorMessagesForEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.RegistrationUserForEventException;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-class EventParticipationServiceImplementationTest {
+class EventParticipationServiceTest {
     private static final long EXISTING_USER_ID = 1L;
 
     private long eventId;
@@ -32,14 +31,11 @@ class EventParticipationServiceImplementationTest {
 
     @Mock
     private EventParticipationRepository eventParticipationRepository;
-
+    @InjectMocks
     private EventParticipationService eventParticipationService;
 
     @BeforeEach
     void setUp() {
-        eventParticipationService =
-                new EventParticipationServiceImplementation(eventParticipationRepository);
-
         eventId = 2L;
         someUserId = 10L;
 

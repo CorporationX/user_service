@@ -3,6 +3,7 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
@@ -12,6 +13,8 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -29,7 +32,7 @@ public class SkillService {
         List<User> users = StreamSupport.stream
                 (userRepository.findAllById(skillDto.getUserIds()).spliterator(), false).toList();
         skillToSave.setUsers(users);
-
+        
         return skillMapper.toDto(skillRepository.save(skillToSave));
     }
 
@@ -48,6 +51,16 @@ public class SkillService {
 
         return skills.stream()
                 .map(skillMapper::toDto)
+                .toList();
+    }
+
+    public List<SkillCandidateDto> getOfferedSkills(long userId) {
+        List<Skill> skillsOfferedToUser = skillRepository.findSkillsOfferedToUser(userId);
+
+        return skillsOfferedToUser.stream().
+                collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                .entrySet().stream()
+                .map(entry -> skillMapper.toCandidateDto(entry.getKey(), entry.getValue()))
                 .toList();
     }
 }

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 
 public class SkillOfferDto {
-    private int id;
-    private int skillId;
-    private int recommendationId;
+    private Long id;
+    private Long skillId;
+    private Long recommendationId;
 }

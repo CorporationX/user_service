@@ -10,11 +10,18 @@ import java.util.stream.Stream;
 public class MessageFilter implements RequestFilter {
     @Override
     public boolean isApplicable(RequestFilterDto filter) {
-        return filter.getMessage().isBlank();
+        return filter.getMessagePattern() != null;
     }
 
     @Override
     public Stream<RecommendationRequest> apply(Stream<RecommendationRequest> recommendationRequestStream, RequestFilterDto filters) {
-        return recommendationRequestStream.filter(recommendationRequest -> recommendationRequest.getMessage().contains(filters.getMessage()));
+        return recommendationRequestStream
+                .filter(recommendationRequest -> {
+                    if (recommendationRequest.getMessage() == null) {
+                        return false;
+                    } else {
+                        return recommendationRequest.getMessage().contains(filters.getMessagePattern());
+                    }
+                });
     }
 }

@@ -10,17 +10,12 @@ import java.util.stream.Stream;
 public class UpdateAtFilter implements RequestFilter {
     @Override
     public boolean isApplicable(RequestFilterDto filter) {
-        return filter.getUpdatedAt() != null;
+        return filter.getUpdatedAtPattern() != null;
     }
 
     @Override
     public Stream<RecommendationRequest> apply(Stream<RecommendationRequest> recommendationRequestStream, RequestFilterDto filters) {
-        return recommendationRequestStream.filter(recommendationRequest -> {
-            if (recommendationRequest.getUpdatedAt() == null) {
-                return false;
-            } else {
-                return recommendationRequest.getUpdatedAt().isEqual(filters.getUpdatedAt());
-            }
-        });
+        return recommendationRequestStream
+                .filter(recommendationRequest -> recommendationRequest.getUpdatedAt().isEqual(filters.getUpdatedAtPattern()));
     }
 }

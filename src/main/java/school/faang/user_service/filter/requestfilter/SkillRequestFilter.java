@@ -3,6 +3,7 @@ package school.faang.user_service.filter.requestfilter;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.entity.recommendation.SkillRequest;
 
 import java.util.stream.Stream;
 
@@ -10,7 +11,7 @@ import java.util.stream.Stream;
 public class SkillRequestFilter implements RequestFilter {
     @Override
     public boolean isApplicable(RequestFilterDto filter) {
-        return filter.getSkills() != null;
+        return filter.getSkillsPattern() != null;
     }
 
     @Override
@@ -20,7 +21,10 @@ public class SkillRequestFilter implements RequestFilter {
                     if (recommendationRequest.getSkills() == null) {
                         return false;
                     } else {
-                        return recommendationRequest.getSkills().containsAll(filters.getSkills());
+                        return recommendationRequest.getSkills().stream()
+                                .map(SkillRequest::getId)
+                                .toList()
+                                .containsAll(filters.getSkillsPattern());
                     }
                 });
     }

@@ -1,8 +1,10 @@
 package school.faang.user_service.service;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.RecomendationDto;
+import school.faang.user_service.dto.RecommendationDto;
 import school.faang.user_service.dto.SkillOfferDto;
 import school.faang.user_service.dto.UserSkillGuaranteeDto;
 import school.faang.user_service.dto.skill.SkillDto;
@@ -33,11 +35,11 @@ public class RecommendationService {
     private final UserSkillGuaranteeDtoMapper userSkillGuaranteeDtoMapper;
     private final RecommendationMapper recommendationMapper;
 
-    public RecomendationDto giveRecommendation(RecomendationDto recomendationDto) {
-        recommendatorValidator.validateData(recomendationDto);
-        Long entityId = recommendationRepository.create(recomendationDto.getAuthorId(), recomendationDto.getReceiverId(), recomendationDto.getContent());
+    public RecommendationDto giveRecommendation(RecommendationDto recommendationDto) {
+        recommendatorValidator.validateData(recommendationDto);
+        Long entityId = recommendationRepository.create(recommendationDto.getAuthorId(), recommendationDto.getReceiverId(), recommendationDto.getContent());
         Recommendation entity = recommendationRepository.findById(entityId).orElseThrow(() -> new DataValidationException("Recommendation not found"));
-        skillSave(entity, recomendationDto.getSkillOffers());
+        skillSave(entity, recommendationDto.getSkillOffers());
         return recommendationMapper.toDto(entity);
     }
 
@@ -79,5 +81,29 @@ public class RecommendationService {
         userSkillGuaranteeDto.setUserId(entity.getReceiver().getId());
         userSkillGuaranteeDto.setGuarantorId(entity.getAuthor().getId());
         return userSkillGuaranteeDto;
+    }
+
+    public RecommendationDto updateRecommendation(RecommendationDto updated, Long id) {
+        Recommendation entity = recommendationRepository.findById(id).orElseThrow(() -> new DataValidationException("Recommendation not found"));
+        recommendatorValidator.validateData(updated);
+        recommendatorValidator.validateSkill(updated);
+        Recommendation updatedEntity = recommendationRepository.update(updated.getAuthorId(), updated.getReceiverId(), updated.getContent());
+        skillOffersRepository.deleteAllByRecommendationId(id);
+        skillSave(entity, updated.getSkillOffers());
+        return recommendationMapper.toDto(updatedEntity);
+    }
+
+    public void deleteRecommendation(Long id) {
+        recommendationRepository.deleteById(id);
+    }
+
+    public List<RecommendationDto> getAllUserRecommendations(Long receiverId) {
+        Page<Recommendation> page = recommendationRepository.findAllByReceiverId(receiverId, Pageable.unpaged());
+        return page.stream().map(recommendationMapper::toDto).toList();
+    }
+
+    public List<RecommendationDto> getAllUserGivenRecommendations(Long authorId) {
+        Page<Recommendation> page = recommendationRepository.findAllByAuthorId(authorId, Pageable.unpaged());
+        return page.stream().map(recommendationMapper::toDto).toList();
     }
 }

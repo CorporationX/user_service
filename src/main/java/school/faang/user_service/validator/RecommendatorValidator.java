@@ -2,7 +2,7 @@ package school.faang.user_service.validator;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.RecomendationDto;
+import school.faang.user_service.dto.RecommendationDto;
 import school.faang.user_service.dto.SkillOfferDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
@@ -19,7 +19,7 @@ public class RecommendatorValidator {
     private final SkillOfferRepository skillOffersRepository;
 
 
-    public void validateData(RecomendationDto recommendationDto) {
+    public void validateData(RecommendationDto recommendationDto) {
         if (recommendationDto.getId() == null) {
             recommendationRepository
                     .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(recommendationDto.getAuthorId(), recommendationDto.getReceiverId())
@@ -29,7 +29,7 @@ public class RecommendatorValidator {
         }
     }
 
-    public void validateSkill(RecomendationDto recommendation) {
+    public void validateSkill(RecommendationDto recommendation) {
         List<SkillOfferDto> skillOffers = recommendation.getSkillOffers();
         for (SkillOfferDto skillOffer : skillOffers) {
             if (!skillOffersRepository.existsById(skillOffer.getId())) {

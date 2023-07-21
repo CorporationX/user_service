@@ -64,6 +64,12 @@ public class RecommendationRequestService {
                 .toList();
     }
 
+    public RecommendationRequestDto getRequestsId(Long id) {
+        RecommendationRequest recommendationRequest = recommendationRequestRepository.findById(id)
+                .orElseThrow(() -> new DataValidationException("RecommendationRequest with id " + id + " does not exist"));
+        return recommendationRequestMapper.toDto(recommendationRequest);
+    }
+
     @Autowired
     public void setRequestFilters(List<RequestFilter> requestFilters) {
         this.requestFilters = requestFilters;

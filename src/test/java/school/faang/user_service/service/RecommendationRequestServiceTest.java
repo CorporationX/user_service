@@ -14,6 +14,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.requestfilter.CreateAtFilter;
 import school.faang.user_service.filter.requestfilter.MessageFilter;
 import school.faang.user_service.filter.requestfilter.ReceiverIdFilter;
@@ -29,8 +30,10 @@ import school.faang.user_service.validator.SkillValidator;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class RecommendationRequestServiceTest {
@@ -49,6 +52,8 @@ class RecommendationRequestServiceTest {
 
     @Mock
     private SkillValidator skillValidator;
+
+    private RecommendationRequest requestEntity;
 
     private RecommendationRequestDto requestDto1;
 
@@ -106,6 +111,7 @@ class RecommendationRequestServiceTest {
                 new CreateAtFilter(),
                 new UpdateAtFilter()
         );
+        requestEntity = recommendationRequestMapper.toEntity(requestDto1);
         recommendationRequestService.setRequestFilters(filters);
     }
 
@@ -246,5 +252,21 @@ class RecommendationRequestServiceTest {
         List<RecommendationRequestDto> actual = recommendationRequestService.getRequests(requestFilterDto);
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void testGetRequestsIdNegative() {
+        Mockito.when(recommendationRequestRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(DataValidationException.class, () -> recommendationRequestService.getRequestsId(1L));
+    }
+
+    @Test
+    void testGetRequestsId() {
+        Mockito.when(recommendationRequestRepository.findById(1L)).thenReturn(Optional.ofNullable(requestEntity));
+
+        RecommendationRequestDto actual = recommendationRequestService.getRequestsId(1L);
+
+        assertEquals(requestDto1, actual);
     }
 }

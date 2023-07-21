@@ -21,13 +21,17 @@ public class EventParticipationController {
 
     public void unregisterParticipant(long eventId, long userId) {
         validateIds(userId, eventId);
-
         eventParticipationService.unregisterParticipant(eventId, userId);
     }
 
     public List<UserDto> getParticipants(long eventId) {
         validateIds(eventId);
         return eventParticipationService.getParticipants(eventId);
+    }
+
+    public int getParticipantsCount(long eventId) {
+        validateIds(eventId);
+        return eventParticipationService.getParticipantsCount(eventId);
     }
 
     private void validateIds(long... ids) {

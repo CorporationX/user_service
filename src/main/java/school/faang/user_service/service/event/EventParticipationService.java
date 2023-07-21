@@ -3,10 +3,13 @@ package school.faang.user_service.service.event;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.service.user.UserService;
+
+import java.util.List;
 
 import java.util.List;
 
@@ -46,6 +49,11 @@ public class EventParticipationService {
                 .stream()
                 .map(userMapper::toDto)
                 .toList();
+    }
+
+    public int getParticipantsCount(long eventId) {
+        eventService.existsById(eventId);
+        return eventParticipationRepository.countParticipants(eventId);
     }
 
     private boolean isExist(long userId, long eventId) {

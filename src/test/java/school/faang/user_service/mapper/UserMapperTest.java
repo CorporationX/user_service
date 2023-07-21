@@ -3,7 +3,6 @@ package school.faang.user_service.mapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 
@@ -16,7 +15,7 @@ class UserMapperTest {
 
     @BeforeEach
     void setUp() {
-        userMapper = Mappers.getMapper(UserMapper.class);
+        userMapper = new UserMapperImpl();
         user = User.builder().id(1L).username("user").email("email@email").build();
         userDto = UserDto.builder().id(1L).username("user").email("email@email").build();
     }

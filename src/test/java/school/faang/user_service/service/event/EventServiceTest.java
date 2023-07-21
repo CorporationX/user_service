@@ -1,16 +1,13 @@
 package school.faang.user_service.service.event;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.constraints.AssertTrue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.Skill;
@@ -30,7 +27,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 class EventServiceTest {
@@ -92,7 +88,7 @@ class EventServiceTest {
   }
 
   @Test
-  public void testSkillsValidation() {
+  public void testCreateSkillsValidation() {
     Skill mockedSkill = new Skill();
     mockedSkill.setTitle("Running");
 
@@ -100,6 +96,18 @@ class EventServiceTest {
 
     assertThrows(DataValidationException.class, () -> {
       eventService.create(eventDto);
+    });
+  }
+
+  @Test
+  public void testEditSkillsValidation() {
+    Skill mockedSkill = new Skill();
+    mockedSkill.setTitle("Running");
+
+    Mockito.when(skillRepository.findSkillsByGoalId(1L)).thenReturn(List.of(mockedSkill));
+
+    assertThrows(DataValidationException.class, () -> {
+      eventService.updateEvent(eventDto);
     });
   }
 

@@ -40,6 +40,11 @@ class EventParticipationControllerTest {
     }
 
     @Test
+    void test_get_participants_with_invalid_params_should_throw_exception() {
+        Assertions.assertThrows(DataValidationException.class, () -> eventParticipationController.getParticipants(-1L));
+    }
+
+    @Test
     void test_get_participants_count_should_success() {
         eventParticipationController.getParticipantsCount(1L);
         Mockito.verify(participationService, Mockito.times(1)).getParticipantsCount(1L);

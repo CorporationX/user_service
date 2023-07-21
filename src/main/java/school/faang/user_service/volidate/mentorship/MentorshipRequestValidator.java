@@ -1,30 +1,60 @@
 package school.faang.user_service.volidate.mentorship;
 
-import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
+import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.MentorshipRequest;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exeption.DataValidationException;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
+@Component
 public class MentorshipRequestValidator {
-    public void validate(User requester, User receiver) throws Exception {
-        if (requester == receiver) {
-            throw new Exception("request was not create, your mentor is you");
+    public void requestValidate(User requester, User receiver){
+        if (requester.getId()==receiver.getId()) {
+            throw new DataValidationException("request was not create, your mentor is you");
         }
 
-        int n = requester.getPremium().getEndDate().isAfter(LocalDateTime.now()) ? 5 : 3;
+        int n =0;
+        try {
+            n = requester.getPremium().getEndDate().isAfter(LocalDateTime.now()) ? 5 : 3;
+        } catch (NullPointerException e){
+            n=3;
+        }
+
 
         List<MentorshipRequest> sentRequests = requester.getSentMentorshipRequests();
-        if (sentRequests != null && sentRequests.size() >= n) {
+
+        if (sentRequests==null){
+            throw new DataValidationException("MentorshipRequests list is null");
+        }
+
+        if (sentRequests.size() >= n) {
 
             MentorshipRequest thirdLatestRequest = sentRequests.get(sentRequests.size() - n);
             LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
 
             if (!thirdLatestRequest.getCreatedAt().isBefore(oneMonthAgo)) {
-                throw new Exception("request was not created, too many requests in this month");
+                throw new DataValidationException("request was not created, too many requests in this month");
             }
+        }
+    }
+
+    public void acceptRequestValidator(MentorshipRequest request) {
+        User requester = request.getRequester();
+        User receiver = request.getReceiver();
+        if (request.getStatus().equals(RequestStatus.ACCEPTED)) {
+            throw new DataValidationException("Already ACCEPTED");
+        }
+        if (requester.getMentors().contains(receiver)) {
+            throw new DataValidationException("Already working");
+        }
+    }
+
+    public void rejectRequestValidator(MentorshipRequest request) {
+        if (request.getStatus().equals(RequestStatus.REJECTED)) {
+            throw new DataValidationException("Already REJECTED");
         }
     }
 }

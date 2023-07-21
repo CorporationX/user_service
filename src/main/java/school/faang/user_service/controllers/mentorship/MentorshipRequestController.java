@@ -27,12 +27,12 @@ public class MentorshipRequestController {
     }
 
     @PostMapping("mentorship/request/{id}/accept")
-    public void acceptRequest(@PathVariable long id) throws Exception {
+    public void acceptRequest(@PathVariable long id) {
         mentorshipRequestService.acceptRequest(id);
     }
 
     @PostMapping("/mentorship/request/{id}/reject")
-    public void rejectRequest(@PathVariable long id, RejectionDto rejection) throws Exception {
+    public void rejectRequest(@PathVariable long id, RejectionDto rejection) {
         mentorshipRequestService.rejectRequest(id, rejection);
     }
 }

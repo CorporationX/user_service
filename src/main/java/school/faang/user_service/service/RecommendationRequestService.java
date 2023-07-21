@@ -6,49 +6,39 @@ import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
+import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
+import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class RecommendationRequestService {
-
     private final RecommendationRequestRepository recommendationRequestRepository;
     private final UserRepository userRepository;
     private final SkillRequestRepository skillRequestRepository;
-    RecommendationRequest recommendationRequest = recommendationRequestMapper.toEntity(dto);
+    private final SkillRepository skillRepository;
+    private final RecommendationRequestMapper recommendationRequestMapper;
 
-    Long requestId = recommendationRequest.getRequester().getId();
-    Long receiverId = recommendationRequest.getReceiver().getId();
-    String message = recommendationRequest.getMessage();
-
-    public RecommendationRequestDto create(RecommendationRequestDto recommendationRequest) {
-
-        RecommendationRequest recommendationRequest = recommendationRequestMapper.toEntity(dto);
-
-        Long requestId = recommendationRequest.getRequester().getId();
-        Long receiverId = recommendationRequest.getReceiver().getId();
-        String message = recommendationRequest.getMessage();
+    public void create (RecommendationRequestDto recommendationRequest) {
 
         validateUsersExist(recommendationRequest);
         validateSkillsExist(recommendationRequest);
         validateRequestPeriod(recommendationRequest);
 
-        recommendationRequest.setCreatedAt(LocalDateTime.now());
-        recommendationRequest.setUpdatedAt(LocalDateTime.now());
-        recommendationRequest.setStatus(RequestStatus.PENDING);
+        RecommendationRequest recommendationRequestEntity = recommendationRequestMapper.toEntity(recommendationRequest);
 
-        RecommendationRequest savedRequest = recommendationRequestRepository.
-                create(requestId, receiverId, message);
+        long requesterID = recommendationRequestEntity.getRequester().getId();
+        long receiverID = recommendationRequestEntity.getReceiver().getId();
+        String message = recommendationRequestEntity.getMessage();
 
-        for (SkillRequest skillRequest : recommendationRequest.getSkills()) {
-            skillRequest.setRequest(savedRequest);
-            skillRequestRepository.create(requestId,skillRequest.getId());
-        }
+        recommendationRequestRepository.create(requesterID, receiverID, message);
+        recommendationRequestEntity.getSkills().forEach(skill -> skillRequestRepository.create(requesterID, skill.getId()));
     }
 
     public void validateUsersExist(RecommendationRequestDto recommendationRequest) {
@@ -58,16 +48,23 @@ public class RecommendationRequestService {
     }
 
     public void validateSkillsExist(RecommendationRequestDto recommendationRequest) {
-        List<SkillRequest> skills = recommendationRequest.getSkills();
-        if (skills == null || skills.isEmpty()) {
-            throw new IllegalArgumentException("Recommendation request must contain at least one skill.");
+        List<Long> skillIds = recommendationRequest.getSkills().stream().map(SkillRequest::getId).toList();
+        for (Long skillId : skillIds) {
+            if (!skillRepository.existsById(skillId)) {
+                throw new IllegalArgumentException("Such skill does not exist");
+            }
         }
     }
 
     public void validateRequestPeriod (RecommendationRequestDto recommendationRequest) {
-        boolean canRequestRecommendation = recommendationRequestRepository.checkRequestAllowed(recommendationRequest.getRequesterId(), recommendationRequest.getRecieverId(), LocalDateTime.now().minusMonths(6));
-        if (!canRequestRecommendation) {
-            throw new IllegalArgumentException("Request not allowed");
+        long requesterId = recommendationRequest.getRequesterId();
+        long receiverId = recommendationRequest.getReceiverId();
+        Optional<RecommendationRequest> lastRequest = recommendationRequestRepository.findLatestPendingRequest(requesterId, receiverId);
+        LocalDateTime lastRequestsDate = lastRequest.get().getUpdatedAt();
+        LocalDateTime currentRequestDate = recommendationRequest.getCreatedAt();
+
+        if (lastRequest.isPresent() && currentRequestDate.minusMonths(6).isAfter(lastRequestsDate)) {
+            throw new IllegalArgumentException("A recommendation request from the same requester to the receiver has already been made in the last 6 months");
         }
     }
 }

@@ -9,12 +9,12 @@ import java.util.List;
 
 @Data
 public class RecommendationRequestDto {
-    private long id;
+    private Long id;
     private String message;
     private RequestStatus status;
     private List<SkillRequest> skills;
-    private long requesterId;
-    private long receiverId;
+    private Long requesterId;
+    private Long receiverId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

@@ -35,6 +35,11 @@ public class EventParticipationService {
         eventParticipationRepository.unregister(eventId, userId);
     }
 
+    public int getParticipantsCount(long eventId) {
+        eventService.existsById(eventId);
+        return eventParticipationRepository.countParticipants(eventId);
+    }
+
     private boolean isExist(long userId, long eventId) {
         return eventParticipationRepository.findAllParticipantsByEventId(eventId)
                 .stream().anyMatch(u -> u.getId() == userId);

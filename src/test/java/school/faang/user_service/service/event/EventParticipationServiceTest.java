@@ -22,6 +22,8 @@ class EventParticipationServiceTest {
 
     private Event event;
 
+    private List<User> participants;
+
     @Mock
     private EventParticipationRepository eventParticipationRepository;
 
@@ -38,6 +40,12 @@ class EventParticipationServiceTest {
     public void setUp() {
         this.user = new User();
         this.event = new Event();
+        this.participants = List.of(
+                new User(),
+                new User(),
+                new User(),
+                new User()
+        );
     }
 
     @Test
@@ -125,5 +133,43 @@ class EventParticipationServiceTest {
         Mockito.when(userService.existsById(userId)).thenReturn(true);
         Mockito.when(eventService.existsById(eventId)).thenThrow(IllegalArgumentException.class);
         Assertions.assertThrows(IllegalArgumentException.class, () -> eventParticipationService.unregisterParticipant(eventId, userId));
+    }
+
+    @Test
+    void test_get_participants_count_should_return_one(){
+        long eventId = event.getId();
+        long userId = user.getId();
+        Mockito.when(userService.existsById(userId)).thenReturn(true);
+        Mockito.when(eventService.existsById(eventId)).thenReturn(true);
+
+        eventParticipationService.registerParticipant(eventId, userId);
+        Mockito.when(eventParticipationRepository.countParticipants(eventId)).thenReturn(1);
+        int participantCount = eventParticipationService.getParticipantsCount(eventId);
+
+        Assertions.assertNotEquals(0, participantCount);
+        Assertions.assertEquals(1, participantCount);
+    }
+
+    @Test
+    void test_get_participants_count_should_return_number_greater_than_one(){
+        long eventId = event.getId();
+        Mockito.when(eventService.existsById(eventId)).thenReturn(true);
+        participants.forEach(participant -> {
+            Mockito.when(userService.existsById(participant.getId())).thenReturn(true);
+            eventParticipationService.registerParticipant(eventId, participant.getId());
+        });
+
+        Mockito.when(eventParticipationRepository.countParticipants(event.getId())).thenReturn(4);
+        int participantCount = eventParticipationService.getParticipantsCount(eventId);
+
+        Assertions.assertNotEquals(0, participantCount);
+        Assertions.assertEquals(4, participantCount);
+    }
+
+    @Test
+    void test_get_participants_count_should_return_zero(){
+        long eventId = event.getId();
+        Mockito.when(eventService.existsById(eventId)).thenReturn(true);
+        Assertions.assertEquals(0, eventParticipationService.getParticipantsCount(eventId));
     }
 }

@@ -1,7 +1,6 @@
 package school.faang.user_service.controller.recomendation;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,23 +11,23 @@ import school.faang.user_service.service.RecommendationRequestService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/skill/recommendation", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/skill/recommendation")
 public class RecommendationRequestController {
 
     private final RecommendationRequestService recommendationRequestService;
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping()
     public RecommendationRequestDto requestRecommendation(@RequestBody RecommendationRequestDto recommendationRequest) {
-        validationRecommendationRequestDto(recommendationRequest);
+        validationDto(recommendationRequest);
         return recommendationRequestService.create(recommendationRequest);
     }
 
-    private void validationRecommendationRequestDto(RecommendationRequestDto recommendationRequest) {
+    private void validationDto(RecommendationRequestDto recommendationRequest) {
         if (recommendationRequest == null) {
-            throw new DataValidationException("RecommendationRequestDto is null");
+            throw new DataValidationException("RecommendationRequestDto cannot be null");
         }
         if (recommendationRequest.getMessage().isBlank()) {
-            throw new DataValidationException("RecommendationRequestDto message is blank");
+            throw new DataValidationException("RecommendationRequestDto message cannot be blank");
         }
     }
 }

@@ -28,5 +28,6 @@ public class MentorshipRequestDto {
     private Long receiverId;
 
     private String rejectionReason;
-    private String status;
+
+    private RequestStatus status;
 }

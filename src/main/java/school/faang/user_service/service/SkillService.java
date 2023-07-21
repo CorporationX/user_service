@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
@@ -22,6 +23,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SkillService {
@@ -83,11 +85,11 @@ public class SkillService {
         List<SkillOffer> offeredSkills = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
         if (offeredSkills.size() >= MIN_SKILL_OFFERS) {
             skillRepository.assignSkillToUser(skillId, userId);
-
             addUserSkillGuarantee(offeredSkills);
-            return skillMapper.toDto(offeredSkills.get(0).getSkill());
+        } else {
+            log.debug("User ID {} doesn't have enough suggestions for skill ID {}. At least required {}, but received {}",
+                    userId, skillId, MIN_SKILL_OFFERS, offeredSkills.size());
         }
-        System.out.println("Not enough offers to acquire this skill");
         return skillMapper.toDto(offeredSkills.get(0).getSkill());
     }
 

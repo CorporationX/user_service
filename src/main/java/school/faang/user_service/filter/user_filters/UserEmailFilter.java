@@ -1,4 +1,4 @@
-package school.faang.user_service.user_filters;
+package school.faang.user_service.filter.user_filters;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.UserFilterDto;

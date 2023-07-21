@@ -9,7 +9,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.user_filters.UserFilter;
+import school.faang.user_service.filter.user_filters.UserFilter;
 
 import java.util.List;
 

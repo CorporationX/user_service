@@ -271,17 +271,24 @@ class RecommendationRequestServiceTest {
     @Test
     void testRejectRequest() {
         RejectionDto rejectionDto = RejectionDto.builder().reason("not enough skills").build();
-        Mockito.when(recommendationRequestRepository.findById(1L)).thenReturn(Optional.ofNullable(requestEntity));
+        Mockito.when(recommendationRequestRepository.findById(1L)).thenReturn(Optional.ofNullable(entity1));
 
-        requestEntity.setStatus(RequestStatus.PENDING);
-        requestEntity.setRejectionReason(rejectionDto.getReason());
+        entity1.setStatus(RequestStatus.PENDING);
+        entity1.setRejectionReason(rejectionDto.getReason());
+        requestDto1.setRejectionReason(rejectionDto.getReason());
+        requestDto1.setStatus(RequestStatus.REJECTED);
 
-        recommendationRequestService.rejectRequest(1L, rejectionDto);
-        Mockito.verify(recommendationRequestRepository, Mockito.times(1)).save(requestEntity);
+        RecommendationRequestDto actual = recommendationRequestService.rejectRequest(1L, rejectionDto);
+        Mockito.verify(recommendationRequestRepository, Mockito.times(1)).save(entity1);
+
+        assertEquals(requestDto1, actual);
     }
 
     @Test
-    void testRejectRequestNegative() {
-        assertThrows(DataValidationException.class, () -> recommendationRequestService.rejectRequest(1L, RejectionDto.builder().build()));
+    void testRejectRequestThrowsEntityNotFoundException() {
+        assertThrows(
+                EntityNotFoundException.class,
+                () -> recommendationRequestService.rejectRequest(1L, RejectionDto.builder().build())
+        );
     }
 }

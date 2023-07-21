@@ -8,7 +8,6 @@ import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filter.requestfilter.RequestFilter;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
@@ -60,20 +59,23 @@ public class RecommendationRequestService {
     }
 
     public RecommendationRequestDto getRecommendationRequest(Long id) {
-        RecommendationRequest recommendationRequest = recommendationRequestRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("RecommendationRequest with id " + id + " does not exist"));
+        RecommendationRequest recommendationRequest = getRecommendationRequestById(id);
         return recommendationRequestMapper.toDto(recommendationRequest);
     }
 
-    public RejectionDto rejectRequest(Long id, RejectionDto rejection) {
-        RecommendationRequest recommendationRequest = recommendationRequestRepository.findById(id)
-                .orElseThrow(() -> new DataValidationException("RecommendationRequest with id " + id + " does not exist"));
+    public RecommendationRequestDto rejectRequest(Long id, RejectionDto rejection) {
+        RecommendationRequest recommendationRequest = getRecommendationRequestById(id);
         if (recommendationRequest.getStatus().equals(RequestStatus.PENDING)) {
             recommendationRequest.setStatus(RequestStatus.REJECTED);
             recommendationRequest.setRejectionReason(rejection.getReason());
             recommendationRequestRepository.save(recommendationRequest);
         }
-        return rejection;
+        return recommendationRequestMapper.toDto(recommendationRequest);
+    }
+
+    private RecommendationRequest getRecommendationRequestById(Long id) {
+        return recommendationRequestRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("RecommendationRequest with id " + id + " does not exist"));
     }
 
     @Autowired

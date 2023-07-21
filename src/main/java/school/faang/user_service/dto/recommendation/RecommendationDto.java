@@ -10,7 +10,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-
 public class RecommendationDto {
     private Long id;
     private Long authorId;

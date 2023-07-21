@@ -1,13 +1,20 @@
 package school.faang.user_service.controller;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import school.faang.user_service.controller.recommendation.RecommendationRequestController;
 import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.service.RecommendationRequestService;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RecommendationRequestControllerTest {
     @Mock
@@ -16,7 +23,20 @@ public class RecommendationRequestControllerTest {
     @InjectMocks
     private RecommendationRequestController recommendationRequestController;
 
-    RecommendationRequestDto recommendationRequest = new RecommendationRequestDto();
+    private RecommendationRequestDto recommendationRequest;
+
+    @BeforeEach
+    void setUp() {
+        recommendationRequest = RecommendationRequestDto.builder()
+                .id(5L)
+                .message("message")
+                .status(RequestStatus.REJECTED)
+                .skills(null)
+                .requesterId(4L)
+                .receiverId(11L)
+                .createdAt(LocalDateTime.now().minusMonths(1))
+                .build();
+    }
 
     @Test
     public void testNullMessageIsInvalid() {

@@ -11,11 +11,12 @@ public class ReceiverIdFilter implements RequestFilter {
 
     @Override
     public boolean isApplicable(RequestFilterDto filter) {
-        return filter.getReceiverId() != null;
+        return filter.getReceiverIdPattern() != null;
     }
 
     @Override
     public Stream<RecommendationRequest> apply(Stream<RecommendationRequest> recommendationRequestStream, RequestFilterDto filters) {
-        return recommendationRequestStream.filter(recommendationRequest -> recommendationRequest.getReceiver().getId() == filters.getReceiverId());
+        return recommendationRequestStream
+                .filter(recommendationRequest -> recommendationRequest.getReceiver().getId() == filters.getReceiverIdPattern());
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RejectionDto;
+import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.RecommendationRequestService;
@@ -24,20 +25,29 @@ public class RecommendationRequestController {
 
     @PostMapping()
     public RecommendationRequestDto requestRecommendation(@RequestBody RecommendationRequestDto recommendationRequest) {
-        validationRecommendationRequestDto(recommendationRequest);
+        validationDto(recommendationRequest);
         return recommendationRequestService.create(recommendationRequest);
     }
 
-    @GetMapping("/{filter}")
-    public List<RecommendationRequestDto> getRecommendationRequests(@PathVariable RequestFilterDto filter) {
+    @GetMapping("/filter")
+    public List<RecommendationRequestDto> getRecommendationRequests(@RequestBody RequestFilterDto filter) {
         validationFilter(filter);
         return recommendationRequestService.getRequests(filter);
     }
 
     @GetMapping("/{id}")
-    public RecommendationRequestDto getRecommendationRequest(@PathVariable Long id) {
+    public RecommendationRequestDto getRecommendationRequest(@PathVariable long id) {
         validationId(id);
-        return recommendationRequestService.getRequestsId(id);
+        return recommendationRequestService.getRecommendationRequest(id);
+    }
+
+    private void validationDto(RecommendationRequestDto recommendationRequest) {
+        if (recommendationRequest == null) {
+            throw new DataValidationException("RecommendationRequestDto cannot be null");
+        }
+        if (recommendationRequest.getMessage().isBlank()) {
+            throw new DataValidationException("RecommendationRequestDto message cannot be blank");
+        }
     }
 
     public RejectionDto rejectRequest(Long id, RejectionDto rejection) {
@@ -52,25 +62,13 @@ public class RecommendationRequestController {
         }
     }
 
-    private void validationRecommendationRequestDto(RecommendationRequestDto recommendationRequest) {
-        if (recommendationRequest == null) {
-            throw new DataValidationException("RecommendationRequestDto is null");
-        }
-        if (recommendationRequest.getMessage().isBlank()) {
-            throw new DataValidationException("RecommendationRequestDto message is blank");
-        }
-    }
-
     public void validationFilter(RequestFilterDto filter) {
         if (filter == null) {
             throw new DataValidationException("Request filter is null!");
         }
     }
 
-    public void validationId(Long id) {
-        if (id == null) {
-            throw new DataValidationException("Id is null!");
-        }
+    public void validationId(long id) {
         if (id < 1) {
             throw new DataValidationException("Id cannot be less than 1");
         }

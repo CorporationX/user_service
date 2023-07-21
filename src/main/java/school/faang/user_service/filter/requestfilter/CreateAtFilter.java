@@ -10,17 +10,11 @@ import java.util.stream.Stream;
 public class CreateAtFilter implements RequestFilter {
     @Override
     public boolean isApplicable(RequestFilterDto filter) {
-        return filter.getCreatedAt() != null;
+        return filter.getCreatedAtPattern() != null;
     }
 
     @Override
     public Stream<RecommendationRequest> apply(Stream<RecommendationRequest> recommendationRequestStream, RequestFilterDto filters) {
-        return recommendationRequestStream.filter(recommendationRequest -> {
-            if (recommendationRequest.getCreatedAt() == null) {
-                return false;
-            } else {
-                return recommendationRequest.getCreatedAt().isEqual(filters.getCreatedAt());
-            }
-        });
+        return recommendationRequestStream.filter(recommendationRequest -> recommendationRequest.getCreatedAt().isEqual(filters.getCreatedAtPattern()));
     }
 }

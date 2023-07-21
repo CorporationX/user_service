@@ -10,11 +10,12 @@ import java.util.stream.Stream;
 public class RequesterIdFilter implements RequestFilter {
     @Override
     public boolean isApplicable(RequestFilterDto filter) {
-        return filter.getRequesterId() != null;
+        return filter.getRequesterIdPattern() != null;
     }
 
     @Override
     public Stream<RecommendationRequest> apply(Stream<RecommendationRequest> recommendationRequestStream, RequestFilterDto filters) {
-        return recommendationRequestStream.filter(recommendationRequest -> recommendationRequest.getRequester().getId() == filters.getRequesterId());
+        return recommendationRequestStream
+                .filter(recommendationRequest -> recommendationRequest.getRequester().getId() == filters.getRequesterIdPattern());
     }
 }

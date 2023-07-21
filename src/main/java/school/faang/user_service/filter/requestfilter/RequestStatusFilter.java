@@ -10,17 +10,18 @@ import java.util.stream.Stream;
 public class RequestStatusFilter implements RequestFilter {
     @Override
     public boolean isApplicable(RequestFilterDto filter) {
-        return filter.getStatus() != null;
+        return filter.getStatusPattern() != null;
     }
 
     @Override
     public Stream<RecommendationRequest> apply(Stream<RecommendationRequest> recommendationRequestStream, RequestFilterDto filters) {
-        return recommendationRequestStream.filter(recommendationRequest -> {
-            if (recommendationRequest.getSkills() == null) {
-                return false;
-            } else {
-                return recommendationRequest.getStatus().equals(filters.getStatus());
-            }
-        });
+        return recommendationRequestStream
+                .filter(recommendationRequest -> {
+                    if (recommendationRequest.getStatus() == null) {
+                        return false;
+                    } else {
+                        return recommendationRequest.getStatus().equals(filters.getStatusPattern());
+                    }
+                });
     }
 }

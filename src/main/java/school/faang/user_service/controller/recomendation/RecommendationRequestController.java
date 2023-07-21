@@ -1,7 +1,6 @@
 package school.faang.user_service.controller.recomendation;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,9 +34,9 @@ public class RecommendationRequestController {
     }
 
     @GetMapping("/{id}")
-    public RecommendationRequestDto getRecommendationRequest(@PathVariable Long id) {
+    public RecommendationRequestDto getRecommendationRequest(@PathVariable long id) {
         validationId(id);
-        return recommendationRequestService.getRequestsId(id);
+        return recommendationRequestService.getRecommendationRequest(id);
     }
 
     private void validationDto(RecommendationRequestDto recommendationRequest) {
@@ -55,10 +54,7 @@ public class RecommendationRequestController {
         }
     }
 
-    public void validationId(Long id) {
-        if (id == null) {
-            throw new DataValidationException("Id is null!");
-        }
+    public void validationId(long id) {
         if (id < 1) {
             throw new DataValidationException("Id cannot be less than 1");
         }

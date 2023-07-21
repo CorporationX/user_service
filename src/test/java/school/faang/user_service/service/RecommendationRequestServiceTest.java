@@ -14,7 +14,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filter.requestfilter.CreateAtFilter;
 import school.faang.user_service.filter.requestfilter.MessageFilter;
 import school.faang.user_service.filter.requestfilter.ReceiverIdFilter;
@@ -52,8 +52,6 @@ class RecommendationRequestServiceTest {
 
     @Mock
     private SkillValidator skillValidator;
-
-    private RecommendationRequest requestEntity;
 
     private RecommendationRequestDto requestDto1;
 
@@ -111,7 +109,6 @@ class RecommendationRequestServiceTest {
                 new CreateAtFilter(),
                 new UpdateAtFilter()
         );
-        requestEntity = recommendationRequestMapper.toEntity(requestDto1);
         recommendationRequestService.setRequestFilters(filters);
     }
 
@@ -255,17 +252,17 @@ class RecommendationRequestServiceTest {
     }
 
     @Test
-    void testGetRequestsIdNegative() {
+    void testGetRequestsIdThrowsEntityNotFoundException() {
         Mockito.when(recommendationRequestRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(DataValidationException.class, () -> recommendationRequestService.getRequestsId(1L));
+        assertThrows(EntityNotFoundException.class, () -> recommendationRequestService.getRecommendationRequest(1L));
     }
 
     @Test
-    void testGetRequestsId() {
-        Mockito.when(recommendationRequestRepository.findById(1L)).thenReturn(Optional.ofNullable(requestEntity));
+    void testGetRecommendationRequest() {
+        Mockito.when(recommendationRequestRepository.findById(1L)).thenReturn(Optional.ofNullable(entity1));
 
-        RecommendationRequestDto actual = recommendationRequestService.getRequestsId(1L);
+        RecommendationRequestDto actual = recommendationRequestService.getRecommendationRequest(1L);
 
         assertEquals(requestDto1, actual);
     }

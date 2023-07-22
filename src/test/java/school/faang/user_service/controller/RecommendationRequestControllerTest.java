@@ -9,20 +9,14 @@ import org.mockito.Mockito;
 import school.faang.user_service.controller.recommendation.RecommendationRequestController;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.service.RecommendationRequestService;
-
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 public class RecommendationRequestControllerTest {
     @Mock
     private RecommendationRequestService recommendationRequestService;
-
     @InjectMocks
     private RecommendationRequestController recommendationRequestController;
-
     private RecommendationRequestDto recommendationRequest;
 
     @BeforeEach

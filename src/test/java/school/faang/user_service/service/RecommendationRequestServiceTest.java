@@ -9,19 +9,18 @@ import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
-
+import school.faang.user_service.validator.RecommendationRequestValidator;
 import java.time.LocalDateTime;
 
 public class RecommendationRequestServiceTest {
     @Mock
     private UserRepository userRepository;
-
+    @Mock
+    private RecommendationRequestValidator recommendationRequestValidator;
     @Mock
     private RecommendationRequestRepository recommendationRequestRepository;
-
     @InjectMocks
     private RecommendationRequestService recommendationRequestService;
-
     private RecommendationRequestDto recommendationRequest;
 
     @BeforeEach
@@ -40,7 +39,7 @@ public class RecommendationRequestServiceTest {
     @Test
     public void testRequesterIdNotExist() {
         recommendationRequest.setRequesterId(125L);
-        recommendationRequestService.validateUsersExist(recommendationRequest);
+        recommendationRequestValidator.validateUsersExist(recommendationRequest);
         Mockito.verify(userRepository, Mockito.times(1)).existsById(recommendationRequest.getRequesterId());
     }
 

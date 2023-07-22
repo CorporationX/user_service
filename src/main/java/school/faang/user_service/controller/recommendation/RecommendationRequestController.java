@@ -1,7 +1,6 @@
 package school.faang.user_service.controller.recommendation;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.exception.DataValidationException;

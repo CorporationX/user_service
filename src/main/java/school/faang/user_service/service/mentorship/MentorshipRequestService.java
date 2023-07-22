@@ -8,6 +8,8 @@ import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.exception.EntityNotFoundException;
+import school.faang.user_service.exception.mentorship.MentorshipRequestValidationException;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -40,5 +42,20 @@ public class MentorshipRequestService {
         return requests.stream()
                 .map(mentorshipRequestMapper::toDto)
                 .toList();
+    }
+
+    @Transactional
+    public MentorshipRequestDto acceptRequest(long requestId) {
+        MentorshipRequest request = mentorshipRequestRepository.findById(requestId)
+                .orElseThrow(() -> new EntityNotFoundException("Request with id " + requestId + " not found."));
+
+        if (request.getRequester().getMentors().contains(request.getReceiver())) {
+            throw new MentorshipRequestValidationException("Receiver is already mentor of this requester.");
+        }
+
+        request.getRequester().getMentors().add(request.getReceiver());
+        request.setStatus(RequestStatus.ACCEPTED);
+
+        return mentorshipRequestMapper.toDto(request);
     }
 }

@@ -1,12 +1,15 @@
 package school.faang.user_service.controller.mentorship;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -50,6 +53,21 @@ public class MentorshipRequestController {
         } catch (Exception e) {
             log.error("Failed to get mentorship requests with filter: {}\nException: {}",
                     requestFilter, e.getMessage());
+            return ResponseEntity.internalServerError().body("Server error");
+        }
+    }
+
+    @PutMapping("/request/{id}/accept")
+    public ResponseEntity<?> acceptRequest(
+            @PathVariable @Min(message = "Request ID must be greater than zero", value = 1) long id) {
+        log.debug("Received request to accept mentorship request: {}", id);
+        try {
+            return ResponseEntity.ok(requestService.acceptRequest(id));
+        } catch (EntityNotFoundException | MentorshipRequestValidationException e) {
+            log.warn("Failed to accept mentorship request: {}\nException: {}", id, e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            log.error("Failed to accept mentorship request: {}\nException: {}", id, e.getMessage());
             return ResponseEntity.internalServerError().body("Server error");
         }
     }

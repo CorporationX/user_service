@@ -10,27 +10,36 @@ import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.RecommendationService;
 
+import java.util.List;
+
 @Controller
 @AllArgsConstructor
 public class RecommendationController {
     private RecommendationService recommendationService;
 
     @PostMapping("/recommendation")
-    public void giveRecommendation(@RequestBody RecommendationDto recommendation) {
+    public RecommendationDto giveRecommendation(@RequestBody RecommendationDto recommendation) {
         validateRecommendation(recommendation);
-        recommendationService.create(recommendation);
+        return recommendationService.create(recommendation);
     }
 
     @PostMapping("recommendation/{id}")
-    private void updateRecommendation(@RequestBody RecommendationDto updated, @PathVariable Long id) {
+    public RecommendationDto updateRecommendation(@RequestBody RecommendationDto updated, @PathVariable Long id) {
         validateId(id);
         validateData(updated);
+        return recommendationService.updateRecommendation(updated, id);
     }
 
     @PostMapping("recommendation/{id}")
-    private void deleteRecommendation(@PathVariable long id) {
+    public void deleteRecommendation(@PathVariable long id) {
         validateId(id);
         recommendationService.deleteRecommendation(id);
+    }
+
+    @PostMapping("/recommendation/receiver/{receiverId}")
+    public List<RecommendationDto> getAllUserRecommendations(long receiverId){
+        validateId(receiverId);
+        return recommendationService.getAllUserRecommendations(receiverId);
     }
 
     private void validateRecommendation(RecommendationDto recommendationDto) {

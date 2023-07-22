@@ -8,6 +8,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.Skill;
@@ -64,6 +67,7 @@ class RecommendationServiceTest {
     List<UserSkillGuarantee> guaranteesList;
     UserSkillGuarantee guarantees;
     User athorId;
+    Page<Recommendation> page;
 
     @BeforeEach
     void setUp() {
@@ -102,6 +106,8 @@ class RecommendationServiceTest {
                 .receiver(User.builder().id(1L).build())
                 .author(User.builder().id(1L).build())
                 .build();
+        this.page = new PageImpl<>(List.of(recommendation));
+
     }
 
     @Test
@@ -241,5 +247,14 @@ class RecommendationServiceTest {
     public void testDeleteRecommendation() {
         recommendationRepository.deleteById(1L);
         Mockito.verify(recommendationRepository, Mockito.times(1)).deleteById(1L);
+    }
+
+    @Test
+    public void testGetAllUserRecommendation() {
+        Mockito.when(recommendationRepository.findAllByReceiverId(1L, Pageable.unpaged()))
+                .thenReturn(page);
+
+        List<RecommendationDto> recommendationDtos = recommendationService.getAllUserRecommendations(1L);
+        assertEquals(1, recommendationDtos.size());
     }
 }

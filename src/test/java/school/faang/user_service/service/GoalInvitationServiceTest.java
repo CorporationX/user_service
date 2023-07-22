@@ -2,7 +2,6 @@ package school.faang.user_service.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +9,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
@@ -20,14 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import school.faang.user_service.dto.goal.GoalInvitationDto;
-import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.repository.goal.GoalInvitationRepository;
-import school.faang.user_service.repository.goal.GoalRepository;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class GoalInvitationServiceTest {
@@ -51,7 +46,6 @@ class GoalInvitationServiceTest {
     GoalInvitationService goalInvitationService;
 
     @Nested
-    @DisplayName("Негативные тесты")
     class NegativeTestGroup {
         @BeforeEach
         public void setUp() {
@@ -110,7 +104,6 @@ class GoalInvitationServiceTest {
                     () -> goalInvitationService.acceptGoalInvitation(goalInvitationId));
             assertEquals("The user is already working on this goal", exc.getMessage());
         }
-    }
 
         @Test
         public void testCreateInvitationThrowIllegalArgExc() {
@@ -130,7 +123,6 @@ class GoalInvitationServiceTest {
     }
 
     @Nested
-    @DisplayName("Позитивные тесты")
     class PositiveTestGroupA {
         @BeforeEach
         public void setUp() {
@@ -164,6 +156,7 @@ class GoalInvitationServiceTest {
         }
     }
 
+    @Nested
     class PositiveTestGroupB {
         @BeforeEach
         public void setUp() {

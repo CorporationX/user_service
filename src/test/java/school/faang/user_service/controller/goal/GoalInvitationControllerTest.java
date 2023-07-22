@@ -28,6 +28,7 @@ class GoalInvitationControllerTest {
                 .createInvitation(goalInvitationDto);
     }
 
+    @Test
     public void testAcceptGoalInvitationThrowIllegalExc() {
         long id = -1L;
         Assertions.assertThrows(

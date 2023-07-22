@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.exeptions.DataValidationException;
+import school.faang.user_service.exeptions.EntityNotFoundException;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,7 +29,7 @@ class GoalServiceTest {
     void deleteGoalValidationTest() {
         when(goalRepository.existsById(anyLong())).thenReturn(false);
 
-        DataValidationException exception = assertThrows(DataValidationException.class,
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
                 () -> service.deleteGoal(anyLong()));
 
         assertEquals("Goal does not exist", exception.getMessage());

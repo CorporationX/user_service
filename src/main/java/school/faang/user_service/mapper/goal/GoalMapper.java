@@ -17,6 +17,4 @@ public interface GoalMapper {
     @Mapping(target = "skillIds", source = "skillsToAchieve", qualifiedByName = "skillsToIds")
     @Mapping(target = "parentId", source = "parent.id")
     GoalDto toDto(Goal goal);
-
-    List<GoalDto> goalListToDto(List<Goal> list);
 }

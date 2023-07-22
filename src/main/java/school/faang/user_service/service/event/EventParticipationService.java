@@ -9,7 +9,6 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -41,6 +40,11 @@ public class EventParticipationService {
                 .toList();
     }
 
+    public int getParticipantsCount(Long eventId) {
+        validateEventId(eventId);
+        return eventParticipationRepository.countParticipants(eventId);
+    }
+
     private boolean isUserRegistered(Long eventId, Long userId) {
         List<User> users = eventParticipationRepository.findAllParticipantsByEventId(eventId);
         for (User user : users) {
@@ -49,11 +53,6 @@ public class EventParticipationService {
             }
         }
         return true;
-    }
-
-    public int getParticipantsCount(Long eventId) {
-        validateEventId(eventId);
-        return eventParticipationRepository.countParticipants(eventId);
     }
 
     private void validateEventId(Long eventId) {

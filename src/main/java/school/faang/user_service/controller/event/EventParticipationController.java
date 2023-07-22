@@ -35,13 +35,16 @@ public class EventParticipationController {
         return eventParticipationService.getParticipants(eventId);
     }
 
-    private void validateUserId(Long userId) {
-        if (userId == null || userId <= 0 ) {
-            throw new DataValidationException("User id cannot be null and less than or equal to 0");
     @GetMapping("{eventId}/participants/count")
     public int getParticipantsCount(Long eventId) {
         validateEventId(eventId);
         return eventParticipationService.getParticipantsCount(eventId);
+    }
+
+    private void validateUserId(Long userId) {
+        if (userId == null || userId <= 0) {
+            throw new DataValidationException("User id cannot be null and less than or equal to 0");
+        }
     }
 
     private void validateEventId(Long eventId) {

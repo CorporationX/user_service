@@ -17,28 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class InvitationFilterTest {
-
-    static Stream<InvitationFilter> argsProvider1() {
-        return Stream.of(
-                new InvitationInviterNameFilter(),
-                new InvitationInviterIdFilter(),
-                new InvitationInvitedNameFilter(),
-                new InvitationInvitedIdFilter(),
-                new InvitationStatusFilter()
-        );
-    }
-
-    static Stream<Arguments> argsProvider2() {
-        return Stream.of(
-                Arguments.of(new InvitationInviterNameFilter(), new InvitationFilterDto("a", null, null, null, null)),
-                Arguments.of(new InvitationInviterIdFilter(), new InvitationFilterDto(null, null, 1L, null, null)),
-                Arguments.of(new InvitationInvitedNameFilter(), new InvitationFilterDto(null, "a", null, null, null)),
-                Arguments.of(new InvitationInvitedIdFilter(), new InvitationFilterDto(null, null, null, 1L, null)),
-                Arguments.of(new InvitationStatusFilter(),
-                        new InvitationFilterDto(null, null, null, null, RequestStatus.ACCEPTED))
-        );
-    }
-
     @ParameterizedTest
     @MethodSource("argsProvider1")
     public void testIsApplicable(InvitationFilter invitationFilter) {
@@ -65,6 +43,27 @@ class InvitationFilterTest {
         assertAll(
                 () -> assertEquals(1, result.size()),
                 () -> assertEquals(invitation, result.get(0))
+        );
+    }
+
+    static Stream<InvitationFilter> argsProvider1() {
+        return Stream.of(
+                new InvitationInviterNameFilter(),
+                new InvitationInviterIdFilter(),
+                new InvitationInvitedNameFilter(),
+                new InvitationInvitedIdFilter(),
+                new InvitationStatusFilter()
+        );
+    }
+
+    static Stream<Arguments> argsProvider2() {
+        return Stream.of(
+                Arguments.of(new InvitationInviterNameFilter(), new InvitationFilterDto("a", null, null, null, null)),
+                Arguments.of(new InvitationInviterIdFilter(), new InvitationFilterDto(null, null, 1L, null, null)),
+                Arguments.of(new InvitationInvitedNameFilter(), new InvitationFilterDto(null, "a", null, null, null)),
+                Arguments.of(new InvitationInvitedIdFilter(), new InvitationFilterDto(null, null, null, 1L, null)),
+                Arguments.of(new InvitationStatusFilter(),
+                        new InvitationFilterDto(null, null, null, null, RequestStatus.ACCEPTED))
         );
     }
 }

@@ -10,14 +10,17 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
+import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,10 +43,19 @@ class GoalInvitationServiceTest {
     GoalInvitation mockGoalInvitation;
 
     @Mock
+    GoalInvitationMapper goalInvitationMapper;
+
+    @Mock
     UserService userService;
 
     @Mock
+    List<GoalInvitation> invitations;
+
+    @Mock
     GoalRepository goalRepository;
+
+    @Mock
+    List<InvitationFilter> invitationFilters;
 
     @Mock
     GoalInvitationRepository goalInvitationRepository;
@@ -144,6 +156,12 @@ class GoalInvitationServiceTest {
                     () -> goalInvitationService.rejectGoalInvitation(goalInvitationId));
             assertEquals("Invalid request. Requested goal not found", exc.getMessage());
         }
+
+        @Test
+        public void testGetInvitationsReturnEmptyList() {
+            List<GoalInvitationDto> result = goalInvitationService.getInvitations(new InvitationFilterDto());
+            assertEquals(Collections.emptyList(), result);
+        }
     }
 
     @Nested
@@ -235,6 +253,43 @@ class GoalInvitationServiceTest {
         @Test
         public void testRejectGoalInvitationCallSave() {
             Mockito.verify(goalInvitationRepository, Mockito.times(1)).save(mockGoalInvitation);
+        }
+    }
+
+    @Nested
+    class PositiveTestGroupD {
+        @BeforeEach
+        public void setUp() {
+            goalInvitationService = new GoalInvitationService(
+                    userService,
+                    goalRepository,
+                    invitationFilters,
+                    goalInvitationMapper,
+                    goalInvitationRepository);
+
+            Mockito.when(goalInvitationRepository.findAll()).thenReturn(invitations);
+
+            goalInvitationService.getInvitations(new InvitationFilterDto());
+        }
+
+        @Test
+        public void testGetInvitationsCallFindAll() {
+            Mockito.verify(goalInvitationRepository, Mockito.times(1)).findAll();
+        }
+
+        @Test
+        public void testGetInvitationsCallIsEmpty() {
+            Mockito.verify(invitations, Mockito.times(1)).isEmpty();
+        }
+
+        @Test
+        public void testGetInvitationsCallStream1() {
+            Mockito.verify(invitationFilters, Mockito.times(1)).stream();
+        }
+
+        @Test
+        public void testGetInvitationsCallStream2() {
+            Mockito.verify(invitations, Mockito.times(1)).stream();
         }
     }
 }

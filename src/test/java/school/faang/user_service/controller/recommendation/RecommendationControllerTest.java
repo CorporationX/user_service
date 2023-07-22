@@ -5,11 +5,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.recommendation.RecommendationService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -87,30 +89,22 @@ public class RecommendationControllerTest {
     @Test
     public void testGetAllUserRecommendations() {
         long userId = 1L;
+        int pageNumber = 0;
+        int pageSize = 10;
 
-        RecommendationDto recommendation1 = new RecommendationDto();
-        recommendation1.setId(1L);
-        recommendation1.setAuthorId(2L);
-        recommendation1.setReceiverId(userId);
-        recommendation1.setContent("Content 1");
+        RecommendationDto recommendationDto1 = new RecommendationDto();
+        recommendationDto1.setId(1L);
+        RecommendationDto recommendationDto2 = new RecommendationDto();
+        recommendationDto2.setId(2L);
+        List<RecommendationDto> recommendationDtosList = List.of(recommendationDto1, recommendationDto2);
 
-        RecommendationDto recommendation2 = new RecommendationDto();
-        recommendation2.setId(2L);
-        recommendation2.setAuthorId(3L);
-        recommendation2.setReceiverId(userId);
-        recommendation2.setContent("Content 2");
+        Page<RecommendationDto> page = new PageImpl<>(recommendationDtosList, PageRequest.of(pageNumber, pageSize), recommendationDtosList.size());
 
-        List<RecommendationDto> recommendationList = new ArrayList<>();
-        recommendationList.add(recommendation1);
-        recommendationList.add(recommendation2);
+        when(recommendationService.getAllUserRecommendations(userId, pageNumber, pageSize)).thenReturn(page);
 
-        when(recommendationService.getAllUserRecommendations(userId)).thenReturn(recommendationList);
+        Page<RecommendationDto> resultPage = recommendationController.getAllUserRecommendations(userId, pageNumber, pageSize);
 
-        List<RecommendationDto> result = recommendationController.getAllUserRecommendations(userId);
-
-        assertEquals(2, result.size());
-        assertEquals(recommendation1.getId(), result.get(0).getId());
-        assertEquals(recommendation2.getId(), result.get(1).getId());
+        assertEquals(recommendationDtosList, resultPage.getContent());
     }
 
     @Test

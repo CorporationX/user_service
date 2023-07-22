@@ -2,7 +2,9 @@ package school.faang.user_service.service.goal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -104,5 +106,25 @@ class GoalServiceTest {
         assertEquals(goalDto1, result.get(0));
         assertEquals(goalDto2, result.get(1));
         verify(goalMapper, times(2)).toDto(any(Goal.class));
+    }
+
+    @Test
+    public void testDeleteGoal_ExistingGoal() {
+        long goalId = 1L;
+
+        goalService.deleteGoal(goalId);
+
+        verify(goalRepository, times(1)).deleteById(goalId);
+    }
+
+    @Test
+    public void testDeleteGoal_NonExistentGoal() {
+        long nonExistentGoalId = 10L;
+
+        doNothing().when(goalRepository).deleteById(anyLong());
+
+        goalService.deleteGoal(nonExistentGoalId);
+
+        verify(goalRepository, times(1)).deleteById(nonExistentGoalId);
     }
 }

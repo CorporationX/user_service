@@ -1,6 +1,7 @@
 package school.faang.user_service.controller.goal;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,5 +27,10 @@ public class GoalController {
     public List<GoalDto> getGoalsByUser(@PathVariable Long userId, @RequestBody GoalFilterDto filters) {
 
         return goalService.getGoalsByUser(userId, filters);
+    }
+
+    @DeleteMapping("/goal/{goalId}")
+    public void deleteGoal(@PathVariable Long goalId) {
+        goalService.deleteGoal(goalId);
     }
 }

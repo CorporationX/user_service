@@ -18,7 +18,7 @@ public class GoalService {
     private final GoalRepository goalRepository;
     private final SkillRepository skillRepository;
     private final GoalMapper goalMapper;
-    private final int MAX_ACTIVE_GOALS = 3;
+    private static final int MAX_ACTIVE_GOALS = 3;
 
     public Goal createGoal(Long userId, Goal goal) {
         creatingGoalValidation(userId, goal);

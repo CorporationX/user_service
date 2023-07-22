@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorship.RequestFilterDto;
 import school.faang.user_service.dto.mentorship.UserDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
@@ -16,10 +17,14 @@ import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapperImpl;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+import school.faang.user_service.service.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -46,6 +51,9 @@ public class MentorshipRequestServiceTest {
     private UserDto incorrectUserDto;
     private UserDto receiverDto;
     private UserDto requesterDto;
+    private RequestFilterDto filterDto;
+    private User requester;
+    private User receiver;
 
     @BeforeEach
     void initData() {
@@ -69,6 +77,15 @@ public class MentorshipRequestServiceTest {
                 .updatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
                 .description("some description")
                 .build();
+
+        filterDto = RequestFilterDto.builder()
+                .requester(requesterDto)
+                .build();
+
+        requester = new User();
+        requester.setId(CORRECT_REQUESTER_ID);
+        receiver = new User();
+        receiver.setId(CORRECT_RECEIVER_ID);
     }
 
     @Test
@@ -120,11 +137,6 @@ public class MentorshipRequestServiceTest {
 
     @Test
     void testToDto() {
-        User requester = new User();
-        requester.setId(CORRECT_REQUESTER_ID);
-        User receiver = new User();
-        receiver.setId(CORRECT_RECEIVER_ID);
-
         latestRequest.setId(1L);
         latestRequest.setDescription("some description");
         latestRequest.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
@@ -133,6 +145,43 @@ public class MentorshipRequestServiceTest {
 
         MentorshipRequestDto actualDto = requestMapper.toDto(latestRequest);
         assertEquals(correctRequestDto, actualDto);
+    }
+
+    @Test
+    void testGetRequests() {
+        MentorshipRequestDto requestDto = MentorshipRequestDto.builder()
+                .requester(requesterDto)
+                .receiver(receiverDto)
+                .updatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
+                .description("some description")
+                .build();
+        latestRequest.setRequester(requester);
+        latestRequest.setReceiver(receiver);
+        latestRequest.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+        latestRequest.setDescription("some description");
+
+        when(requestRepository.findAll()).thenReturn(Collections.singleton(latestRequest));
+
+        List<MentorshipRequestDto> actualList = requestService.getRequests(filterDto);
+        List<MentorshipRequestDto> expectedList = List.of(requestDto);
+
+        assertEquals(expectedList, actualList);
+    }
+
+    @Test
+    void testGetRequestsWithEmptyList() {
+        filterDto.setRequester(receiverDto);
+        latestRequest.setRequester(requester);
+        latestRequest.setReceiver(receiver);
+        latestRequest.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+        latestRequest.setDescription("some description");
+
+        when(requestRepository.findAll()).thenReturn(Collections.singleton(latestRequest));
+
+        List<MentorshipRequestDto> actualList = requestService.getRequests(filterDto);
+        List<MentorshipRequestDto> expectedList = new ArrayList<>();
+
+        assertEquals(expectedList, actualList);
     }
 
     private void doForMentorshipRepository() {

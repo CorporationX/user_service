@@ -33,7 +33,7 @@ public class MentorshipRequestService {
     private void dataValidate(long requesterId, long receiverId, MentorshipRequestDto requestDto) {
         userValidate(requesterId, receiverId);
 
-        if ( mentorshipRequestRepository.findLatestRequest(requesterId, receiverId).isPresent()) {
+        if (mentorshipRequestRepository.findLatestRequest(requesterId, receiverId).isPresent()) {
             MentorshipRequest latestRequest = mentorshipRequestRepository.findLatestRequest(requesterId, receiverId).get();
             if (latestRequest.getUpdatedAt().plusMonths(3).isAfter(LocalDateTime.now())) {
                 throw new DataValidationException("Нельзя отправить запрос на менторство данному пользователю, т.к. должно " +

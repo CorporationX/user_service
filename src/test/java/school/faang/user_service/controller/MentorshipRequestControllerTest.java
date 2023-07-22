@@ -27,11 +27,14 @@ public class MentorshipRequestControllerTest {
 
     @BeforeEach
     void initData() {
-        correctRequestDto = new MentorshipRequestDto();
-        incorrectRequestDto = new MentorshipRequestDto();
-        correctRequestDto.setDescription("Some description for test");
-        incorrectRequestDto.setDescription("     ");
+        correctRequestDto = MentorshipRequestDto.builder()
+                .description("Some description for test")
+                .build();
+        incorrectRequestDto = MentorshipRequestDto.builder()
+                .description("     ")
+                .build();
     }
+
     @Test
     void testRequestMentorshipWithDescription() {
         requestController.requestMentorship(correctRequestDto);

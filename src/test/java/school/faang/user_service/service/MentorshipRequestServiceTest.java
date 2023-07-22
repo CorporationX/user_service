@@ -19,6 +19,7 @@ import school.faang.user_service.repository.mentorship.MentorshipRequestReposito
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -48,22 +49,26 @@ public class MentorshipRequestServiceTest {
 
     @BeforeEach
     void initData() {
-        incorrectUserDto = new UserDto();
-        receiverDto = new UserDto();
-        requesterDto = new UserDto();
-        incorrectUserDto.setId(NOT_FOUND_USER_ID);
-        receiverDto.setId(CORRECT_RECEIVER_ID);
-        requesterDto.setId(CORRECT_REQUESTER_ID);
+        incorrectUserDto = UserDto.builder()
+                .id(NOT_FOUND_USER_ID)
+                .build();
+        receiverDto = UserDto.builder()
+                .id(CORRECT_RECEIVER_ID)
+                .build();
+        requesterDto = UserDto.builder()
+                .id(CORRECT_REQUESTER_ID)
+                .build();
 
-        incorrectRequestDto = new MentorshipRequestDto();
+        incorrectRequestDto = MentorshipRequestDto.builder().build();
         latestRequest = new MentorshipRequest();
 
-        correctRequestDto = new MentorshipRequestDto();
-        correctRequestDto.setId(1L);
-        correctRequestDto.setReceiver(receiverDto);
-        correctRequestDto.setRequester(requesterDto);
-        correctRequestDto.setUpdatedAt(LocalDateTime.now());
-        correctRequestDto.setDescription("some description");
+        correctRequestDto = MentorshipRequestDto.builder()
+                .id(1L)
+                .receiver(receiverDto)
+                .requester(requesterDto)
+                .updatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
+                .description("some description")
+                .build();
     }
 
     @Test
@@ -122,7 +127,7 @@ public class MentorshipRequestServiceTest {
 
         latestRequest.setId(1L);
         latestRequest.setDescription("some description");
-        latestRequest.setUpdatedAt(LocalDateTime.now());
+        latestRequest.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
         latestRequest.setRequester(requester);
         latestRequest.setReceiver(receiver);
 

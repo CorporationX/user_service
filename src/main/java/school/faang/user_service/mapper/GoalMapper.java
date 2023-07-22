@@ -2,6 +2,7 @@ package school.faang.user_service.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.goal.GoalDto;
@@ -21,6 +22,8 @@ public interface GoalMapper {
     @Mapping(target = "mentor", ignore = true)
     @Mapping(target = "skillsToAchieve", ignore = true)
     Goal toEntity(GoalDto goalDto);
+
+    void update(GoalDto goalDto, @MappingTarget Goal goal);
 
     @Named("mapSkillsToIdList")
     default List<Long> mapSkillsToIdList(List<Skill> skillsToAchieve) {

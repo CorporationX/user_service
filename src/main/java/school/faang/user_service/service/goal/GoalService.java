@@ -66,15 +66,11 @@ public class GoalService {
     public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
         Goal goalToUpdate = validateAndGetGoal(goalId, goalDto);
 
-        Goal goal = goalMapper.toEntity(goalDto);
-        goal.setId(goalId);
-        goal.setCreatedAt(goalToUpdate.getCreatedAt());
-        convertDtoDependenciesToEntity(goalDto, goal);
-        checkGoalCompletionAndAssignmentSkills(goalToUpdate, goal);
+        goalMapper.update(goalDto, goalToUpdate);
+        convertDtoDependenciesToEntity(goalDto, goalToUpdate);
+        checkGoalCompletionAndAssignmentSkills(goalToUpdate, goalDto);
 
-        goalRepository.save(goal);
-
-        return goalMapper.toDto(goal);
+        return goalMapper.toDto(goalRepository.save(goalToUpdate));
     }
 
     @Transactional
@@ -99,8 +95,8 @@ public class GoalService {
         return goalStream.map(goalMapper::toDto).toList();
     }
 
-    private void checkGoalCompletionAndAssignmentSkills(Goal goalToUpdate, Goal goal) {
-        if (goalToUpdate.getStatus() == GoalStatus.ACTIVE && goal.getStatus() != null && goal.getStatus() == GoalStatus.COMPLETED) {
+    private void checkGoalCompletionAndAssignmentSkills(Goal goalToUpdate, GoalDto goalDto) {
+        if (goalToUpdate.getStatus() == GoalStatus.ACTIVE && goalDto.getStatus() != null && goalDto.getStatus() == GoalStatus.COMPLETED) {
             List<Skill> skills = goalToUpdate.getSkillsToAchieve();
             if (skills == null) {
                 return;

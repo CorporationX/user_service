@@ -17,13 +17,15 @@ public class EventParticipationController {
 
     @PostMapping("/{eventId}/register/{userId}")
     public void registerParticipant(Long eventId, Long userId) {
-        validate(eventId, userId);
+        validateUserId(userId);
+        validateEventId(eventId);
         eventParticipationService.registerParticipant(eventId, userId);
     }
 
     @PostMapping("/{eventId}/unregister/{userId}")
     public void unregisterParticipant(Long eventId, Long userId) {
-        validate(eventId, userId);
+        validateUserId(userId);
+        validateEventId(eventId);
         eventParticipationService.unregisterParticipant(eventId, userId);
     }
 
@@ -33,12 +35,9 @@ public class EventParticipationController {
         return eventParticipationService.getParticipants(eventId);
     }
 
-    private void validate(Long eventId, Long userId) {
-        if (eventId == null || userId == null) {
-            throw new DataValidationException("Event id or user id cannot be null");
-        }
-        if (userId <= 0 || eventId <= 0) {
-            throw new DataValidationException("User id cannot be less than or equal to 0");
+    private void validateUserId(Long userId) {
+        if (userId == null || userId <= 0 ) {
+            throw new DataValidationException("User id cannot be null and less than or equal to 0");
         }
     }
     private void validateEventId(Long eventId) {

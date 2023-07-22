@@ -7,6 +7,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
+import school.faang.user_service.repository.event.EventRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 public class EventParticipationService {
     private final EventParticipationRepository eventParticipationRepository;
+    private final EventRepository eventRepository;
     private final UserMapper userMapper;
 
     public void registerParticipant(Long eventId, Long userId) {
@@ -31,6 +33,14 @@ public class EventParticipationService {
         eventParticipationRepository.unregister(eventId, userId);
     }
 
+    public List<UserDto> getParticipants(Long eventId) {
+        validateEventId(eventId);
+        List<User> usersList = eventParticipationRepository.findAllParticipantsByEventId(eventId);
+        return usersList.stream()
+                .map(userMapper::toDto)
+                .toList();
+    }
+
     private boolean isUserRegistered(Long eventId, Long userId) {
         List<User> users = eventParticipationRepository.findAllParticipantsByEventId(eventId);
         for (User user : users) {
@@ -41,18 +51,8 @@ public class EventParticipationService {
         return true;
     }
 
-    public List<UserDto> getParticipants(Long eventId) {
-        validateEventId(eventId);
-        List<User> users = eventParticipationRepository.findAllParticipantsByEventId(eventId);
-        List<UserDto> userDto = new ArrayList<>();
-        for (User u : users) {
-            userDto.add(userMapper.toDto(u));
-        }
-        return userDto;
-    }
-
     private void validateEventId(Long eventId) {
-        if (!eventParticipationRepository.existsById(eventId)) {
+        if (!eventRepository.existsById(eventId)) {
             throw new DataValidationException("Event not found");
         }
     }

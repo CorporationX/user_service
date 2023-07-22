@@ -107,4 +107,8 @@ public class RecommendationService {
         return page.stream().map(recommendationMapper::toDto).toList();
     }
 
+    public List<RecommendationDto> getAllUserGivenRecommendations(Long authorId) {
+        Page<Recommendation> page = recommendationRepository.findAllByAuthorId(authorId, Pageable.unpaged());
+        return page.stream().map(recommendationMapper::toDto).toList();
+    }
 }

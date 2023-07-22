@@ -42,6 +42,12 @@ public class RecommendationController {
         return recommendationService.getAllUserRecommendations(receiverId);
     }
 
+    @PostMapping("/recommendation/given/{authorId}")
+    public List<RecommendationDto> getAllUserGivenRecommendations(@PathVariable Long authorId) {
+        validateId(authorId);
+        return recommendationService.getAllUserGivenRecommendations(authorId);
+    }
+
     private void validateRecommendation(RecommendationDto recommendationDto) {
         if (recommendationDto.getContent() == null || recommendationDto.getContent().isEmpty()) {
             throw new DataValidationException("Recommendation content cannot be empty");

@@ -257,4 +257,12 @@ class RecommendationServiceTest {
         List<RecommendationDto> recommendationDtos = recommendationService.getAllUserRecommendations(1L);
         assertEquals(1, recommendationDtos.size());
     }
+
+    @Test
+    public void testAllUserGivenRecommendations() {
+        Mockito.when(recommendationRepository.findAllByAuthorId(1L, Pageable.unpaged())).thenReturn(page);
+
+        List<RecommendationDto> recommendationDtos = recommendationService.getAllUserGivenRecommendations(1L);
+        assertEquals(1, recommendationDtos.size());
+    }
 }

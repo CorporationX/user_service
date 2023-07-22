@@ -214,6 +214,25 @@ class RecommendationServiceTest {
 
         recommendationService.guaranteesHaveSkill(recommendation);
 
-        assertEquals(1 , recommendation.getSkillOffers().get(0).getSkill().getGuarantees().size());
+        assertEquals(1, recommendation.getSkillOffers().get(0).getSkill().getGuarantees().size());
+    }
+
+    @Test
+    public void testUpdateRecommendation(){
+        ArrayList<SkillOffer> list = new ArrayList<>();
+        list.add(skillOffer);
+
+        Mockito.when(recommendationRepository.findById(1L))
+                .thenReturn(Optional.of(recommendation));
+        Mockito.when(recommendationRepository.update(recommendationDto.getAuthorId(), recommendationDto.getReceiverId(), recommendationDto.getContent()))
+                .thenReturn(recommendation);
+        Mockito.when(skillOffersRepository.create(skillOfferDto.getSkillId(), 1L))
+                .thenReturn(1L);
+        Mockito.when(skillOffersRepository.findById(1L))
+                .thenReturn(Optional.of(skillOffer));
+
+        RecommendationDto actual = recommendationService.updateRecommendation(recommendationDto, 1L);
+        RecommendationDto expected = recommendationMapper.toDto(recommendation);
+        assertEquals(expected, actual);
     }
 }

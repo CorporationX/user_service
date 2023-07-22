@@ -1,10 +1,8 @@
 package school.faang.user_service.service;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.controller.RecommendationController;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
@@ -36,6 +34,7 @@ public class RecommendationService {
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final UserSkillGuaranteeMapper userSkillGuaranteeMapper;
     private final RecommendationMapper recommendationMapper;
+    private final RecommendationController recommendationController;
 
     public RecommendationDto create(RecommendationDto recomendation) {
         recommendationValidator.validateData(recomendation);
@@ -67,8 +66,9 @@ public class RecommendationService {
     public void guaranteesHave(SkillDto skill, Long userId, UserSkillGuaranteeDto userSkillGuaranteeDto) {
         if (skill.getGuaranteeDtoList()
                 .stream()
-                .noneMatch(guarantee -> guarantee.getGuarantorId() == userId));
-        userSkillGuaranteeDto.setSkillId(skill.getId()) ;{
+                .noneMatch(guarantee -> guarantee.getGuarantorId() == userId)) ;
+        userSkillGuaranteeDto.setSkillId(skill.getId());
+        {
             skill.getGuaranteeDtoList().add(userSkillGuaranteeDto);
             userSkillGuaranteeRepository.save(userSkillGuaranteeMapper.toEntity(userSkillGuaranteeDto));
         }
@@ -86,5 +86,15 @@ public class RecommendationService {
         userSkillGuaranteeDto.setUserId(entity.getReceiver().getId());
         userSkillGuaranteeDto.setGuarantorId(entity.getAuthor().getId());
         return userSkillGuaranteeDto;
+    }
+
+    public RecommendationDto updateRecommendation(RecommendationDto updated, Long id) {
+        Recommendation entity = recommendationRepository.findById(id).orElseThrow(() -> new DataValidationException("Recommendation not found"));
+        recommendationValidator.validateData(updated);
+        recommendationValidator.validateSkill(updated);
+        Recommendation updatedEntity = recommendationRepository.update(updated.getAuthorId(), updated.getReceiverId(), updated.getContent());
+        skillOffersRepository.deleteAllByRecommendationId(id);
+        skillSave(entity, updated.getSkillOffers());
+        return recommendationMapper.toDto(updatedEntity);
     }
 }

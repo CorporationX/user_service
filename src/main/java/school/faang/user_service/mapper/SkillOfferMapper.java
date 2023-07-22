@@ -12,6 +12,7 @@ public interface SkillOfferMapper {
     @Mapping(source = "skill.id", target = "skillId")
     @Mapping(source = "recommendation.id", target = "recommendationId")
     SkillOfferDto toDto(SkillOffer skillOffer);
+
     SkillOffer toEntity(SkillOfferDto skillOfferDto);
 
     @Named("listSkillOffersDto")

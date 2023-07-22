@@ -43,7 +43,7 @@ public class EventService {
         }
 
         Event event = eventRepository.findById(eventDto.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Event not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Event not found. ID: " + eventDto.getId()));
 
         updateField(eventDto.getTitle(), event.getTitle(), event::setTitle);
         updateField(eventDto.getStartDate(), event.getStartDate(), event::setStartDate);

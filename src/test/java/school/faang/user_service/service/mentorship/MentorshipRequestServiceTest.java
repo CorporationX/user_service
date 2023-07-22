@@ -28,6 +28,7 @@ import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.validation.mentorship.MentorshipRequestValidator;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
@@ -72,7 +73,6 @@ class MentorshipRequestServiceTest {
         requestFilter = MentorshipRequestFilterDto.builder().build();
 
         when(mentorshipRequestMapper.toEntity(requestDto)).thenReturn(request);
-
         when(mentorshipRequestRepository.findById(request.getId())).thenReturn(Optional.of(request));
     }
 
@@ -106,7 +106,6 @@ class MentorshipRequestServiceTest {
 
         MentorshipRequest mentorshipRequest = mock(MentorshipRequest.class);
         when(mentorshipRequestRepository.findAll()).thenReturn(List.of(mentorshipRequest));
-
         when(filters.stream()).thenReturn(Stream.of(
                 new MentorshipRequestDescriptionFilter(),
                 new MentorshipRequestRequesterFilter(),
@@ -119,12 +118,10 @@ class MentorshipRequestServiceTest {
 
     @Test
     void getRequests_shouldInvokeMapperMethodToDto() {
-        MentorshipRequest mentorshipRequest = mock(MentorshipRequest.class);
-        when(mentorshipRequestRepository.findAll()).thenReturn(List.of(mentorshipRequest));
+        when(mentorshipRequestRepository.findAll()).thenReturn(List.of(request));
 
         mentorshipRequestService.getRequests(requestFilter);
-
-        verify(mentorshipRequestMapper).toDto(mentorshipRequest);
+        verify(mentorshipRequestMapper).toDto(request);
     }
 
     @Test
@@ -134,10 +131,13 @@ class MentorshipRequestServiceTest {
     }
 
     @Test
-    void acceptRequest_shouldShouldAddMentorToRequesterMentorsList() {
+    void acceptRequest_shouldAddMentorToRequesterMentorsList() {
         assertEquals(0, request.getRequester().getMentors().size());
         mentorshipRequestService.acceptRequest(request.getId());
-        assertEquals(1, request.getRequester().getMentors().size());
+        assertAll(() -> {
+            assertEquals(1, request.getRequester().getMentors().size());
+            assertEquals(request.getRequester().getMentors().get(0), request.getReceiver());
+        });
     }
 
     @Test

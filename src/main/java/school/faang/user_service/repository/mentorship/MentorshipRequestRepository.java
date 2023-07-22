@@ -4,7 +4,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.MentorshipRequest;
+import school.faang.user_service.entity.RequestStatus;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -26,8 +28,11 @@ public interface MentorshipRequestRepository extends CrudRepository<MentorshipRe
 
     @Query(nativeQuery = true, value = """
             SELECT * FROM mentorship_request
-            WHERE receiver_id = :receiverId
+            WHERE description = :description AND 
+            requester_id = :requesterId AND
+            receiver_id = :receiverId AND 
+            status = :status
             ORDER BY created_at DESC
             """)
-    Optional<MentorshipRequest> getRequests(long receiverId);
+    List<MentorshipRequest> getAllRequests(String description, long requesterId, long receiverId, RequestStatus status);
 }

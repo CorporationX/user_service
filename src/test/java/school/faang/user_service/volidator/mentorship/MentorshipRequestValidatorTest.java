@@ -1,6 +1,5 @@
-package school.faang.user_service.volidate.mentorship;
+package school.faang.user_service.volidator.mentorship;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.entity.MentorshipRequest;
@@ -12,14 +11,17 @@ import school.faang.user_service.exeption.DataValidationException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class MentorshipRequestValidatorTest {
     private MentorshipRequestValidator mentorshipRequestValidator = new MentorshipRequestValidator();
-    User requester = new User();
-    User receiver = new User();
+    Optional<User> requesterOptional = Optional.ofNullable(new User());
+    Optional<User> receiverOptional = Optional.ofNullable(new User());
+    User requester = requesterOptional.get();
+    User receiver = receiverOptional.get();
     @BeforeEach
     void setUp() {
         long requesterId = 1L;
@@ -34,13 +36,7 @@ class MentorshipRequestValidatorTest {
     @Test
     void requestValidateEquals() {
         assertThrows(DataValidationException.class,
-                ()->mentorshipRequestValidator.requestValidate(requester,requester));
-    }
-
-    @Test
-    void requestValidateListIsNull() {
-        assertThrows(DataValidationException.class,
-                ()->mentorshipRequestValidator.requestValidate(requester,receiver));
+                ()->mentorshipRequestValidator.requestValidate(requesterOptional,requesterOptional));
     }
 
     @Test
@@ -54,7 +50,7 @@ class MentorshipRequestValidatorTest {
 
         requester.setSentMentorshipRequests(mentorshipRequests);
         assertDoesNotThrow(() -> {
-            mentorshipRequestValidator.requestValidate(requester, receiver);
+            mentorshipRequestValidator.requestValidate(requesterOptional, receiverOptional);
         });
     }
 
@@ -69,7 +65,7 @@ class MentorshipRequestValidatorTest {
 
         requester.setSentMentorshipRequests(mentorshipRequests);
         assertThrows(DataValidationException.class,
-                ()->mentorshipRequestValidator.requestValidate(requester,receiver));
+                ()->mentorshipRequestValidator.requestValidate(requesterOptional, receiverOptional));
     }
 
     @Test
@@ -87,7 +83,7 @@ class MentorshipRequestValidatorTest {
 
         requester.setSentMentorshipRequests(mentorshipRequests);
         assertDoesNotThrow(() -> {
-            mentorshipRequestValidator.requestValidate(requester, receiver);
+            mentorshipRequestValidator.requestValidate(requesterOptional, receiverOptional);
         });
     }
 
@@ -106,7 +102,7 @@ class MentorshipRequestValidatorTest {
 
         requester.setSentMentorshipRequests(mentorshipRequests);
         assertThrows(DataValidationException.class,
-                ()->mentorshipRequestValidator.requestValidate(requester,receiver));
+                ()->mentorshipRequestValidator.requestValidate(requesterOptional, receiverOptional));
     }
 
     @Test
@@ -120,7 +116,7 @@ class MentorshipRequestValidatorTest {
 
         requester.setSentMentorshipRequests(mentorshipRequests);
         assertDoesNotThrow(() -> {
-            mentorshipRequestValidator.requestValidate(requester, receiver);
+            mentorshipRequestValidator.requestValidate(requesterOptional, receiverOptional);
         });
     }
 
@@ -132,7 +128,7 @@ class MentorshipRequestValidatorTest {
 
         mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
         assertThrows(DataValidationException.class,
-                ()->mentorshipRequestValidator.acceptRequestValidator(mentorshipRequest));
+                ()->mentorshipRequestValidator.acceptRequestValidator(Optional.of(mentorshipRequest)));
     }
 
     @Test
@@ -143,7 +139,7 @@ class MentorshipRequestValidatorTest {
 
         mentorshipRequest.setStatus(RequestStatus.PENDING);
         assertDoesNotThrow(() -> {
-            mentorshipRequestValidator.acceptRequestValidator(mentorshipRequest);
+            mentorshipRequestValidator.acceptRequestValidator(Optional.of(mentorshipRequest));
         });
     }
 
@@ -151,14 +147,14 @@ class MentorshipRequestValidatorTest {
     void acceptRequestValidatorAlreadyWorking(){
         MentorshipRequest mentorshipRequest = new MentorshipRequest();
 
-        requester.setMentors(List.of(receiver));
-        mentorshipRequest.setRequester(requester);
-        mentorshipRequest.setReceiver(receiver);
+        requesterOptional.get().setMentors(List.of(receiverOptional.get()));
+        mentorshipRequest.setRequester(requesterOptional.get());
+        mentorshipRequest.setReceiver(receiverOptional.get());
 
         mentorshipRequest.setStatus(RequestStatus.PENDING);
 
         assertThrows(DataValidationException.class,
-                ()->mentorshipRequestValidator.acceptRequestValidator(mentorshipRequest));
+                ()->mentorshipRequestValidator.acceptRequestValidator(Optional.of(mentorshipRequest)));
     }
 
     @Test
@@ -171,7 +167,7 @@ class MentorshipRequestValidatorTest {
         mentorshipRequest.setStatus(RequestStatus.PENDING);
 
         assertDoesNotThrow(() ->
-            mentorshipRequestValidator.acceptRequestValidator(mentorshipRequest)
+            mentorshipRequestValidator.acceptRequestValidator(Optional.of(mentorshipRequest))
         );
     }
 
@@ -183,7 +179,7 @@ class MentorshipRequestValidatorTest {
 
         mentorshipRequest.setStatus(RequestStatus.REJECTED);
         assertThrows(DataValidationException.class,
-                ()->mentorshipRequestValidator.rejectRequestValidator(mentorshipRequest));
+                ()->mentorshipRequestValidator.rejectRequestValidator(Optional.of(mentorshipRequest)));
     }
 
     @Test
@@ -194,7 +190,7 @@ class MentorshipRequestValidatorTest {
 
         mentorshipRequest.setStatus(RequestStatus.PENDING);
         assertDoesNotThrow(() -> {
-            mentorshipRequestValidator.rejectRequestValidator(mentorshipRequest);
+            mentorshipRequestValidator.rejectRequestValidator(Optional.of(mentorshipRequest));
         });
     }
 }

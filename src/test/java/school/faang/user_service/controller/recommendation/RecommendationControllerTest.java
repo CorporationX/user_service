@@ -51,6 +51,4 @@ public class RecommendationControllerTest {
         assertThrows(DataValidationException.class,
                 () -> recommendationController.giveRecommendation(recommendationDto));
     }
-
-
 }

@@ -18,8 +18,6 @@ public class RecommendationController {
         return recommendationService.create(recommendationDto);
     }
 
-
-
     public void validateRecommendationContent(RecommendationDto recommendationDto) {
         String content = recommendationDto.getContent();
 

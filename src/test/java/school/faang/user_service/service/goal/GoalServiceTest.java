@@ -15,6 +15,9 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import school.faang.user_service.repository.goal.GoalRepository;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class GoalServiceTest {
 
@@ -28,6 +31,11 @@ class GoalServiceTest {
     @Test
     void deleteGoalValidationTest() {
         when(goalRepository.existsById(anyLong())).thenReturn(false);
+    public void findGoalsByUserIdLessThanOneTest() {
+        assertThrows(DataValidationException.class, () -> {
+            service.findGoalsByUserId(0L);
+        });
+    }
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
                 () -> service.deleteGoal(anyLong()));
@@ -44,5 +52,11 @@ class GoalServiceTest {
         service.deleteGoal(1L);
 
         verify(goalRepository).deleteById(1L);
+    }
+    @Test
+    public void getGoalsByUserLessThanOneTest() {
+        assertThrows(DataValidationException.class, () -> {
+            service.getGoalsByUser(0L, null);
+        });
     }
 }

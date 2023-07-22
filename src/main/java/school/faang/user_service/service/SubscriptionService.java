@@ -27,6 +27,12 @@ public class SubscriptionService {
         return userFilters == null ? userMapper.toDtoList(allUsers.collect(Collectors.toList())) : filterUsers(allUsers, filter);
     }
 
+    public List<UserDto> getFollowing(long followeeId, UserFilterDto filter) {
+        validateUserId(followeeId);
+        Stream<User> allUsers = subscriptionRepository.findByFollowerId(followeeId);
+        return userFilters == null ? userMapper.toDtoList(allUsers.collect(Collectors.toList())) : filterUsers(allUsers, filter);
+    }
+
     private List<UserDto> filterUsers(Stream<User> users, UserFilterDto filter) {
         Stream<User> filteredUsers = users;
         for (UserFilter userFilter : userFilters) {

@@ -24,7 +24,6 @@ public class SubscriptionServiceTest {
     private SubscriptionRepository subscriptionRepository;
     @Mock
     private UserMapper userMapper;
-
     @InjectMocks
     private SubscriptionService subscriptionService;
 
@@ -44,6 +43,24 @@ public class SubscriptionServiceTest {
         subscriptionService.getFollowers(followeeId, filterDto);
 
         verify(subscriptionRepository, times(1)).findByFolloweeId(followeeId);
+    }
+
+    @Test
+    void getFollowingThrowIllegalException() {
+        int idUser = -10;
+        assertThrows(IllegalArgumentException.class,
+                () -> subscriptionService.getFollowing(idUser, new UserFilterDto()));
+    }
+
+    @Test
+    public void testGetFollowingInvokesFindByFolloweeId() {
+        long followeeId = 1L;
+        UserFilterDto filterDto = new UserFilterDto();
+        when(subscriptionRepository.findByFollowerId(followeeId)).thenReturn(Stream.empty());
+
+        subscriptionService.getFollowing(followeeId, filterDto);
+
+        verify(subscriptionRepository, times(1)).findByFollowerId(followeeId);
     }
 
 

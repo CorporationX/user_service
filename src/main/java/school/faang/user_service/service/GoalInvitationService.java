@@ -1,17 +1,23 @@
 package school.faang.user_service.service;
 
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 
-@AllArgsConstructor
 @Service
 public class GoalInvitationService {
     private GoalInvitationRepository goalInvitationRepository;
 
     private UserRepository userRepository;
+
+    @Autowired
+    public GoalInvitationService(GoalInvitationRepository goalInvitationRepository,
+                                 UserRepository userRepository) {
+        this.goalInvitationRepository = goalInvitationRepository;
+        this.userRepository = userRepository;
+    }
 
     public void createInvitation(GoalInvitationDto invitation) {
         if (invitation.getInviterId() == invitation.getInvitedUserId()) {

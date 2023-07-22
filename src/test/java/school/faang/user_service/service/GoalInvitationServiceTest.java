@@ -20,6 +20,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.repository.goal.GoalInvitationRepository;
+import school.faang.user_service.repository.goal.GoalRepository;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,6 +37,9 @@ class GoalInvitationServiceTest {
     long goalId;
     long goalInvitationId;
     GoalInvitation goalInvitation;
+
+    @Mock
+    UserService userService;
 
     @Mock
     GoalRepository goalRepository;
@@ -102,9 +112,26 @@ class GoalInvitationServiceTest {
         }
     }
 
+        @Test
+        public void testCreateInvitationThrowIllegalArgExc() {
+            Mockito.when(userService.findUserById(1L)).thenReturn(new User());
+            assertThrows(IllegalArgumentException.class, () -> goalInvitationService.createInvitation(
+                    new GoalInvitationDto(1L, 1L, 1L, 1L, RequestStatus.PENDING)));
+        }
+
+        @Test
+        public void testCreateInvitationThrowEntityExc() {
+            Mockito.when(userService.findUserById(1L)).thenReturn(new User());
+            Mockito.when(goalRepository.findById(1L)).thenReturn(Optional.empty());
+
+            assertThrows(EntityNotFoundException.class, () -> goalInvitationService.createInvitation(
+                    new GoalInvitationDto(1L, 1L, 2L, 1L, RequestStatus.PENDING)));
+        }
+    }
+
     @Nested
     @DisplayName("Позитивные тесты")
-    class PositiveTestGroup {
+    class PositiveTestGroupA {
         @BeforeEach
         public void setUp() {
             goalId = 1L;
@@ -134,6 +161,31 @@ class GoalInvitationServiceTest {
         @Test
         public void testAcceptGoalInvitationCallExistsById() {
             Mockito.verify(goalRepository, Mockito.times(1)).existsById(goalId);
+        }
+    }
+
+    class PositiveTestGroupB {
+        @BeforeEach
+        public void setUp() {
+            Mockito.when(userService.findUserById(1L)).thenReturn(new User());
+            Mockito.when(goalRepository.findById(1L)).thenReturn(Optional.of(new Goal()));
+
+            goalInvitationService.createInvitation(new GoalInvitationDto(1L, 1L, 2L, 1L, RequestStatus.PENDING));
+        }
+
+        @Test
+        public void testCreateInvitationCallFindUserById() {
+            Mockito.verify(userService, Mockito.times(2)).findUserById(Mockito.anyLong());
+        }
+
+        @Test
+        public void testCreateInvitationCallFindById() {
+            Mockito.verify(goalRepository, Mockito.times(1)).findById(1L);
+        }
+
+        @Test
+        public void testCreateInvitationCallSave() {
+            Mockito.verify(goalInvitationRepository, Mockito.times(1)).save(Mockito.any());
         }
     }
 }

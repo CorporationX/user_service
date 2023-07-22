@@ -10,89 +10,176 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class GoalInvitationServiceTest {
-    @Mock
+    User user;
     Goal goal;
-
-    @Mock
+    long userId;
+    long goalId;
+    long goalInvitationId;
     GoalInvitation goalInvitation;
 
     @Mock
-    GoalInvitationRepository goalInvitationRepository;
+    UserService userService;
 
     @Mock
     GoalRepository goalRepository;
+
+    @Mock
+    GoalInvitationRepository goalInvitationRepository;
 
     @InjectMocks
     GoalInvitationService goalInvitationService;
 
     @Nested
-    @DisplayName("Негативные тесты")
     class NegativeTestGroup {
-        long goalInvitationId;
-
         @BeforeEach
         public void setUp() {
+            goalId = 1L;
+            userId = 1L;
             goalInvitationId = 1L;
+
+            goal = Goal.builder()
+                    .id(goalId)
+                    .build();
+            user = User.builder()
+                    .id(userId)
+                    .build();
+            goalInvitation = new GoalInvitation();
+
+            goalInvitation.setGoal(goal);
+            goalInvitation.setInvited(user);
         }
 
         @Test
-        public void testRejectGoalInvitationThrowEntityExcBecOfGoalInvitation() {
+        public void testAcceptGoalInvitationThrowEntityExcBecOfGoalInvitation() {
             EntityNotFoundException exc = assertThrows(EntityNotFoundException.class,
-                    () -> goalInvitationService.rejectGoalInvitation(goalInvitationId));
+                    () -> goalInvitationService.acceptGoalInvitation(goalInvitationId));
             assertEquals("Invalid request. Requested goal invitation not found", exc.getMessage());
         }
 
         @Test
-        public void testRejectGoalInvitationThrowEntityExcBecOfGoal() {
+        public void testAcceptGoalInvitationThrowEntityExcBecOfGoal() {
             Mockito.when(goalInvitationRepository.findById(goalInvitationId)).thenReturn(Optional.of(goalInvitation));
-            Mockito.when(goalInvitation.getGoal()).thenReturn(goal);
 
             EntityNotFoundException exc = assertThrows(EntityNotFoundException.class,
-                    () -> goalInvitationService.rejectGoalInvitation(goalInvitationId));
+                    () -> goalInvitationService.acceptGoalInvitation(goalInvitationId));
             assertEquals("Invalid request. Requested goal not found", exc.getMessage());
+        }
+
+        @Test
+        public void testAcceptGoalInvitationThrowIllegalArgsExcBecOfGoalsSize() {
+            user.setGoals(List.of(new Goal(), new Goal(), new Goal()));
+
+            Mockito.when(goalInvitationRepository.findById(goalInvitationId)).thenReturn(Optional.of(goalInvitation));
+            Mockito.when(goalRepository.existsById(goalId)).thenReturn(true);
+
+            IllegalArgumentException exc = assertThrows(IllegalArgumentException.class,
+                    () -> goalInvitationService.acceptGoalInvitation(goalInvitationId));
+            assertEquals("The user already has the maximum number of goals", exc.getMessage());
+        }
+
+        @Test
+        public void testAcceptGoalInvitationThrowIllegalArgsExcBecOfGoal() {
+            user.setGoals(List.of(new Goal(), goal));
+
+            Mockito.when(goalInvitationRepository.findById(1L)).thenReturn(Optional.of(goalInvitation));
+            Mockito.when(goalRepository.existsById(Mockito.any())).thenReturn(true);
+
+            IllegalArgumentException exc = assertThrows(IllegalArgumentException.class,
+                    () -> goalInvitationService.acceptGoalInvitation(goalInvitationId));
+            assertEquals("The user is already working on this goal", exc.getMessage());
+        }
+
+        @Test
+        public void testCreateInvitationThrowIllegalArgExc() {
+            Mockito.when(userService.findUserById(1L)).thenReturn(new User());
+            assertThrows(IllegalArgumentException.class, () -> goalInvitationService.createInvitation(
+                    new GoalInvitationDto(1L, 1L, 1L, 1L, RequestStatus.PENDING)));
+        }
+
+        @Test
+        public void testCreateInvitationThrowEntityExc() {
+            Mockito.when(userService.findUserById(1L)).thenReturn(new User());
+            Mockito.when(goalRepository.findById(1L)).thenReturn(Optional.empty());
+
+            assertThrows(EntityNotFoundException.class, () -> goalInvitationService.createInvitation(
+                    new GoalInvitationDto(1L, 1L, 2L, 1L, RequestStatus.PENDING)));
         }
     }
 
     @Nested
-    @DisplayName("Позитивные тесты")
-    class PositiveTestGroup {
-        long goalInvitationId;
-
+    class PositiveTestGroupA {
         @BeforeEach
         public void setUp() {
+            goalId = 1L;
             goalInvitationId = 1L;
+            goalInvitation = new GoalInvitation();
+            goal = Goal.builder()
+                    .id(goalId)
+                    .build();
+            user = User.builder()
+                    .goals(new ArrayList<>(List.of(new Goal(), new Goal())))
+                    .build();
+
+            goalInvitation.setGoal(goal);
+            goalInvitation.setInvited(user);
 
             Mockito.when(goalInvitationRepository.findById(goalInvitationId)).thenReturn(Optional.of(goalInvitation));
-            Mockito.when(goalInvitation.getGoal()).thenReturn(goal);
-            Mockito.when(goalRepository.existsById(Mockito.anyLong())).thenReturn(true);
+            Mockito.when(goalRepository.existsById(goalId)).thenReturn(true);
 
-            goalInvitationService.rejectGoalInvitation(goalInvitationId);
+            goalInvitationService.acceptGoalInvitation(goalInvitationId);
         }
 
         @Test
-        public void testRejectGoalInvitationCallFindById() {
+        public void testAcceptGoalInvitationCallFindById() {
             Mockito.verify(goalInvitationRepository, Mockito.times(1)).findById(goalInvitationId);
         }
 
         @Test
-        public void testRejectGoalInvitationCallExistsById() {
-            Mockito.verify(goalRepository, Mockito.times(1)).existsById(Mockito.anyLong());
+        public void testAcceptGoalInvitationCallExistsById() {
+            Mockito.verify(goalRepository, Mockito.times(1)).existsById(goalId);
+        }
+    }
+
+    @Nested
+    class PositiveTestGroupB {
+        @BeforeEach
+        public void setUp() {
+            Mockito.when(userService.findUserById(1L)).thenReturn(new User());
+            Mockito.when(goalRepository.findById(1L)).thenReturn(Optional.of(new Goal()));
+
+            goalInvitationService.createInvitation(new GoalInvitationDto(1L, 1L, 2L, 1L, RequestStatus.PENDING));
         }
 
         @Test
-        public void testRejectGoalInvitationCallSave() {
-            Mockito.verify(goalInvitationRepository, Mockito.times(1)).save(goalInvitation);
+        public void testCreateInvitationCallFindUserById() {
+            Mockito.verify(userService, Mockito.times(2)).findUserById(Mockito.anyLong());
+        }
+
+        @Test
+        public void testCreateInvitationCallFindById() {
+            Mockito.verify(goalRepository, Mockito.times(1)).findById(1L);
+        }
+
+        @Test
+        public void testCreateInvitationCallSave() {
+            Mockito.verify(goalInvitationRepository, Mockito.times(1)).save(Mockito.any());
         }
     }
 }

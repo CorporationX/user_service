@@ -14,23 +14,22 @@ import java.util.List;
 public class SkillController {
     private final SkillService skillService;
 
-
-
     public SkillDto create(SkillDto skill) {
         validateSkill(skill);
         return skillService.create(skill);
     }
 
-    public void validateSkill(SkillDto skill) {
-        if (skill.getTitle() == null || skill.getTitle().isBlank()) {
-            throw new DataValidationException("The title is not valid");
-        }
-    }
     public List<SkillDto> getUserSkills(long userId) {
         return skillService.getUserSkills(userId);
     }
 
-    public List<SkillCandidateDto> getOfferedSkills(long userId){
+    public List<SkillCandidateDto> getOfferedSkills(long userId) {
         return skillService.getOfferedSkills(userId);
+    }
+
+    private void validateSkill(SkillDto skill) {
+        if (skill.getTitle() == null || skill.getTitle().isBlank()) {
+            throw new DataValidationException("The title is not valid");
+        }
     }
 }

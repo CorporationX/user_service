@@ -10,7 +10,6 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SkillService;
 
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
@@ -28,19 +27,19 @@ class SkillControllerTest {
     @Test
     void testBlankTitleIsInvalid() {
         assertThrows(DataValidationException.class,
-                () -> skillController.validateSkill(new SkillDto(1L, "   ")));
+                () -> skillController.create(new SkillDto(1L, "   ")));
     }
 
     @Test
     void testNullTitleIsInvalid() {
         assertThrows(DataValidationException.class,
-                () -> skillController.validateSkill(new SkillDto(1L, null)));
+                () -> skillController.create(new SkillDto(1L, null)));
     }
 
     @Test
     void testTitleIsValid() {
         assertDoesNotThrow(
-                () -> skillController.validateSkill(skillDto));
+                () -> skillController.create(skillDto));
     }
 
     @Test

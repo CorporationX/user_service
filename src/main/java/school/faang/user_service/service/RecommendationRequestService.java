@@ -40,6 +40,7 @@ public class RecommendationRequestService {
 
         recommendationRequestRepository.create(requesterID, receiverID, message);
         recommendationRequestEntity.getSkills().forEach(skill -> skillRequestRepository.create(requesterID, skill.getId()));
+        return null;
     }
 
     public void validateUsersExist(RecommendationRequestDto recommendationRequest) {

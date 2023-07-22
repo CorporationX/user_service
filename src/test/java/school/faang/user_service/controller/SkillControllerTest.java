@@ -28,19 +28,19 @@ class SkillControllerTest {
     @Test
     void testBlankTitleIsInvalid() {
         assertThrows(DataValidationException.class,
-                () -> skillController.validateSkill(new SkillDto(1L, "   ")));
+                () -> skillController.create(new SkillDto(1L, "   ")));
     }
 
     @Test
     void testNullTitleIsInvalid() {
         assertThrows(DataValidationException.class,
-                () -> skillController.validateSkill(new SkillDto(1L, null)));
+                () -> skillController.create(new SkillDto(1L, null)));
     }
 
     @Test
     void testTitleIsValid() {
         assertDoesNotThrow(
-                () -> skillController.validateSkill(skillDto));
+                () -> skillController.create(skillDto));
     }
 
     @Test

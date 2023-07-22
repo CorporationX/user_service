@@ -3,9 +3,11 @@ package school.faang.user_service.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
 
@@ -13,6 +15,7 @@ import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+@ExtendWith(value = {MockitoExtension.class})
 public class SubscriptionServiceTest {
 
     @Mock
@@ -20,11 +23,6 @@ public class SubscriptionServiceTest {
 
     @InjectMocks
     private SubscriptionService subscriptionService;
-
-    @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Test
     public void testUnfollowUser_ThrowsExceptionOnSelfUnfollow() {
@@ -38,7 +36,6 @@ public class SubscriptionServiceTest {
         long followeeId = 2;
 
         subscriptionService.unfollowUser(followerId, followeeId);
-
         verify(subscriptionRepository, times(1)).unfollowUser(followerId, followeeId);
     }
 }

@@ -1,11 +1,10 @@
 package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-import school.faang.user_service.exception.DataValidationException;
+import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.service.SubscriptionService;
 
-@Component
+@RestController
 @RequiredArgsConstructor
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
@@ -14,6 +13,4 @@ public class SubscriptionController {
 
         subscriptionService.unfollowUser(followerId, followeeId);
     }
-
-
 }

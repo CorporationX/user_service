@@ -5,22 +5,19 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.SkillCandidateMapper;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -64,7 +61,7 @@ public class SkillService {
         if (skillRepository.findUserSkill(skillId, userId).isPresent()) {
             throw new DataValidationException("user have this skill already");
         }
-        skillRepository.assignSkillToUser(1L,1L);
+        //skillRepository.assignSkillToUser(1L,1L);
         List<SkillOffer> skillOffers = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
         skillOffers.stream().filter(skillOffer ->
                         Collections.frequency(skillOffers, skillOffer.skill.getTitle()) >= MIN_SKILL_OFFERS)
@@ -88,7 +85,8 @@ public class SkillService {
 
     private Skill findGuaranteedSkill(long skillId, long userId) {
         return skillRepository.findAllByUserId(userId).stream()
-                .filter(currentSkill -> currentSkill.getId() == skillId).findAny().get();
+                .filter(currentSkill -> currentSkill.getId() == skillId).findAny().orElseThrow(
+                        ()-> new EntityNotFoundException("Skill wasn't found"));
     }
 
 }

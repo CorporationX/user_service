@@ -91,7 +91,7 @@ public class SkillService {
     private Skill findGuaranteedSkill(long skillId, long userId) {
         return skillRepository.findAllByUserId(userId).stream()
                 .filter(currentSkill -> currentSkill.getId() == skillId).findAny().orElseThrow(
-                        ()-> new EntityNotFoundException("Skill wasn't found"));
+                        () -> new EntityNotFoundException("Skill wasn't found"));
     }
 
 }

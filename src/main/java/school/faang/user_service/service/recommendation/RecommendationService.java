@@ -64,6 +64,7 @@ public class RecommendationService {
         return recommendationMapper.toDto(recommendation);
     }
 
+    @Transactional
     public void delete(long recommendationId) {
         recommendationRepository.deleteById(recommendationId);
     }

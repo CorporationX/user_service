@@ -2,20 +2,25 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.SkillDto;
+import school.faang.user_service.dto.skill.SkillCandidateDto;
+import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.mapper.SkillCandidateMapper;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-
 public class SkillService {
     private final SkillRepository skillRepository;
     private final SkillMapper skillMapper;
+    private final SkillCandidateMapper skillCandidateMapper;
     private final UserService userService;
 
     public List<SkillDto> getUserSkills(long userId) {
@@ -25,10 +30,21 @@ public class SkillService {
     }
 
     public SkillDto create(SkillDto skillDto) {
-        Skill skill = skillMapper.toEntity(skillDto);
-        if (skillRepository.existsByTitle(skill.getTitle())) {
+        Skill skillFromDto = skillMapper.toEntity(skillDto);
+        if (skillRepository.existsByTitle(skillFromDto.getTitle())) {
             throw new DataValidationException("The skill already exists");
         }
-        return skillMapper.toDTO(skillRepository.save(skill));
+        return skillMapper.toDTO(skillRepository.save(skillFromDto));
+    }
+
+    public List<SkillCandidateDto> getOfferedSkills(long userId) {
+        List<Skill> offeredSkills = skillRepository.findSkillsOfferedToUser(userId);
+        Map<Skill, Long> offeredSkillsAndCount = offeredSkills.stream()
+                .collect(Collectors.toMap(Function.identity(), value -> 1L, Long::sum));
+        return offeredSkillsAndCount.entrySet().stream()
+                .map(offeredSkill -> {
+                    SkillDto skillDto = skillMapper.toDTO(offeredSkill.getKey());
+                    return skillCandidateMapper.toDTO(skillDto, offeredSkill.getValue());
+                }).toList();
     }
 }

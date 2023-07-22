@@ -8,9 +8,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.SkillDto;
+import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SkillService;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class SkillControllerTest {
@@ -23,19 +28,19 @@ class SkillControllerTest {
     @Test
     void testBlankTitleIsInvalid() {
         assertThrows(DataValidationException.class,
-                () -> skillController.validateSkill(new SkillDto(1L, "   ")));
+                () -> skillController.create(new SkillDto(1L, "   ")));
     }
 
     @Test
     void testNullTitleIsInvalid() {
         assertThrows(DataValidationException.class,
-                () -> skillController.validateSkill(new SkillDto(1L, null)));
+                () -> skillController.create(new SkillDto(1L, null)));
     }
 
     @Test
     void testTitleIsValid() {
         assertDoesNotThrow(
-                () -> skillController.validateSkill(skillDto));
+                () -> skillController.create(skillDto));
     }
 
     @Test
@@ -52,5 +57,12 @@ class SkillControllerTest {
         skillController.getUserSkills(1L);
         verify(skillService, times(1))
                 .getUserSkills(1L);
+    }
+
+    @Test
+    void testCallMethodGetOfferedSkillsFromSkillService(){
+        skillController.getOfferedSkills(1L);
+        verify(skillService, times(1))
+                .getOfferedSkills(1L);
     }
 }

@@ -9,6 +9,7 @@ import school.faang.user_service.repository.UserRepository;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+
     public void checkUserById(long userId) {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User with this ID is not found"));
     }

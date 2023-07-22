@@ -35,6 +35,7 @@ class SkillServiceTest {
     private SkillMapperImpl skillMapper;
     @Spy
     private SkillCandidateMapperImpl skillCandidateMapper;
+
     @Mock
     private SkillRepository skillRepository;
     @Mock
@@ -44,6 +45,7 @@ class SkillServiceTest {
     Skill skill2;
     List<Skill> list1;
     List<Skill> list2;
+
 
     @BeforeEach
     public void setUp() {

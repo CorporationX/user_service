@@ -15,16 +15,16 @@ public class GoalController {
     private final GoalService service;
 
     public List<GoalDto> getGoalsByUser(long userId, GoalFilterDto filter) {
-        validate(userId, filter);
+        validate(userId);
         return service.getGoalsByUser(userId, filter);
     }
 
     public List<GoalDto> getSubGoalsByUser(long userId, GoalFilterDto filter) {
-        validate(userId, filter);
+        validate(userId);
         return service.getSubGoalsByUser(userId, filter);
     }
 
-    private void validate (long userId, GoalFilterDto filter) throws DataValidationException {
+    private void validate (long userId) {
         if (userId < 1) {
             throw new DataValidationException("userId can not be less than 1");
         }

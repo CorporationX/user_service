@@ -23,21 +23,13 @@ public class GoalService {
 
     public List<GoalDto> getGoalsByUser(long userId, GoalFilterDto filter) {
         List<GoalDto> dtoList = goalMapper.goalsToDtos(findGoalsByUserId(userId));
-        if (filter != null) {
-            filterList.stream()
-                    .filter((fil) -> fil.isApplicable(filter))
-                    .forEach((fil) -> fil.apply(dtoList, filter));
-        }
+        filter(filter, dtoList);
         return dtoList;
     }
 
     public List<GoalDto> getSubGoalsByUser(long parentId, GoalFilterDto filter) {
         List<GoalDto> dtoList = goalMapper.goalsToDtos(findSubGoalsByParentId(parentId));
-        if (filter != null) {
-            filterList.stream()
-                    .filter((fil) -> fil.isApplicable(filter))
-                    .forEach((fil) -> fil.apply(dtoList, filter));
-        }
+        filter(filter, dtoList);
         return dtoList;
     }
 
@@ -55,5 +47,13 @@ public class GoalService {
         }
         return goalRepository.findByParent(id)
                 .peek(goal -> goal.setSkillsToAchieve(skillRepository.findSkillsByGoalId(goal.getId()))).toList();
+    }
+
+    public void filter(GoalFilterDto filter, List<GoalDto> dtoList) {
+        if (filter != null) {
+            filterList.stream()
+                    .filter((fil) -> fil.isApplicable(filter))
+                    .forEach((fil) -> fil.apply(dtoList, filter));
+        }
     }
 }

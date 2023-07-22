@@ -121,7 +121,6 @@ public class RecommendationService {
             LocalDateTime lastUpdate = lastRecommendation.get().getUpdatedAt();
             LocalDateTime currentDate = LocalDateTime.now();
 
-
             if (lastUpdate.plusMonths(RECOMMENDATION_INTERVAL_MONTHS).isAfter(currentDate)) {
                 String errorMessage = String.format(
                         "You've already recommended the user %d in the last %d months",

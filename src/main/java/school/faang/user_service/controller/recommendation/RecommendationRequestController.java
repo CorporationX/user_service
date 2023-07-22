@@ -12,7 +12,7 @@ public class RecommendationRequestController {
     private final RecommendationRequestService recommendationRequestService;
 
     public RecommendationRequestDto requestRecommendation (RecommendationRequestDto recommendationRequest) {
-        if (recommendationRequest.getMessage() == null || recommendationRequest.getMessage().isEmpty()) {
+        if (recommendationRequest.getMessage() == null || recommendationRequest.getMessage().isBlank()) {
             throw new IllegalArgumentException("Recommendation request message should not be empty");
         } else {
             recommendationRequestService.create(recommendationRequest);

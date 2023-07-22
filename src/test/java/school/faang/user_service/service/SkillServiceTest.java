@@ -56,7 +56,6 @@ class SkillServiceTest {
     User receiver = new User();
 
 
-
     @BeforeEach
     public void setUp() {
         skillDto = new SkillDto(1L, "flexibility");
@@ -68,7 +67,7 @@ class SkillServiceTest {
         list2 = new ArrayList<>(List.of(skill1, skill2));
         recommendation.setAuthor(author);
         recommendation.setReceiver(receiver);
-        skillOffer = new SkillOffer(1L,skill1,recommendation);
+        skillOffer = new SkillOffer(1L, skill1, recommendation);
 
     }
 
@@ -141,15 +140,12 @@ class SkillServiceTest {
     void testAcquireSkillFromOffers() {
         when(skillRepository.findUserSkill(1L, 1L))
                 .thenReturn(Optional.empty());
-        when(skillOfferRepository.findAllOffersOfSkill(1L,1L))
-                .thenReturn(List.of(skillOffer,skillOffer,skillOffer,skillOffer));
+        when(skillOfferRepository.findAllOffersOfSkill(1L, 1L))
+                .thenReturn(List.of(skillOffer, skillOffer, skillOffer, skillOffer));
         when(skillRepository.findAllByUserId(1L)).thenReturn(List.of(skill1));
         skillService.acquireSkillFromOffers(1L, 1L);
-        verify(skillRepository,times(1)).assignSkillToUser(1L,1L);
-        assertEquals(skillMapper.toDTO(skill1), skillService.acquireSkillFromOffers(1L,1L));
-
-
-
+        verify(skillRepository, times(1)).assignSkillToUser(1L, 1L);
+        assertEquals(skillMapper.toDTO(skill1), skillService.acquireSkillFromOffers(1L, 1L));
     }
 
 }

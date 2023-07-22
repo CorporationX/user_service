@@ -2,25 +2,23 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.SkillCandidateMapper;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -36,12 +34,14 @@ public class SkillService {
 
     private final static int MIN_SKILL_OFFERS = 3;
 
+    @Transactional(readOnly = true)
     public List<SkillDto> getUserSkills(long userId) {
         userService.checkUserById(userId);
         List<Skill> skillsOfUsers = skillRepository.findAllByUserId(userId);
         return skillsOfUsers.stream().map(skillMapper::toDTO).toList();
     }
 
+    @Transactional
     public SkillDto create(SkillDto skillDto) {
         Skill skillFromDto = skillMapper.toEntity(skillDto);
         if (skillRepository.existsByTitle(skillFromDto.getTitle())) {
@@ -50,6 +50,7 @@ public class SkillService {
         return skillMapper.toDTO(skillRepository.save(skillFromDto));
     }
 
+    @Transactional(readOnly = true)
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
         List<Skill> offeredSkills = skillRepository.findSkillsOfferedToUser(userId);
         Map<Skill, Long> offeredSkillsAndCount = offeredSkills.stream()
@@ -60,11 +61,12 @@ public class SkillService {
         }).toList();
     }
 
+    @Transactional
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
         if (skillRepository.findUserSkill(skillId, userId).isPresent()) {
             throw new DataValidationException("user have this skill already");
         }
-        skillRepository.assignSkillToUser(1L,1L);
+        //skillRepository.assignSkillToUser(1L,1L);
         List<SkillOffer> skillOffers = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
         skillOffers.stream().filter(skillOffer ->
                         Collections.frequency(skillOffers, skillOffer.skill.getTitle()) >= MIN_SKILL_OFFERS)
@@ -88,7 +90,8 @@ public class SkillService {
 
     private Skill findGuaranteedSkill(long skillId, long userId) {
         return skillRepository.findAllByUserId(userId).stream()
-                .filter(currentSkill -> currentSkill.getId() == skillId).findAny().get();
+                .filter(currentSkill -> currentSkill.getId() == skillId).findAny().orElseThrow(
+                        ()-> new EntityNotFoundException("Skill wasn't found"));
     }
 
 }

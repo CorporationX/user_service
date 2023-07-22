@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -192,8 +193,8 @@ class RecommendationServiceTest {
                         .guarantees(userSkillGuarantees)
                         .build()));
 
-        assertThrows(DataValidationException.class, () -> recommendationService.saveSkillOffer(firstRecommendationDto));
-        assertThrows(DataValidationException.class, () -> recommendationService.saveSkillOffer(secondRecommendationDto));
+        assertThrows(EntityNotFoundException.class, () -> recommendationService.saveSkillOffer(firstRecommendationDto));
+        assertThrows(EntityNotFoundException.class, () -> recommendationService.saveSkillOffer(secondRecommendationDto));
     }
 
     @Test
@@ -214,7 +215,7 @@ class RecommendationServiceTest {
                         .guarantees(userSkillGuarantees)
                         .build()));
 
-        assertThrows(DataValidationException.class, () -> recommendationService.saveSkillOffer(firstRecommendationDto));
+        assertThrows(EntityNotFoundException.class, () -> recommendationService.saveSkillOffer(firstRecommendationDto));
     }
 
     @Test

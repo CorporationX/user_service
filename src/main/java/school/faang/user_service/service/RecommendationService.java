@@ -2,7 +2,6 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.controller.RecommendationController;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
@@ -34,7 +33,6 @@ public class RecommendationService {
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final UserSkillGuaranteeMapper userSkillGuaranteeMapper;
     private final RecommendationMapper recommendationMapper;
-    private final RecommendationController recommendationController;
 
     public RecommendationDto create(RecommendationDto recomendation) {
         recommendationValidator.validateData(recomendation);
@@ -96,5 +94,9 @@ public class RecommendationService {
         skillOffersRepository.deleteAllByRecommendationId(id);
         skillSave(entity, updated.getSkillOffers());
         return recommendationMapper.toDto(updatedEntity);
+    }
+
+    public void deleteRecommendation(long id) {
+        recommendationRepository.deleteById(id);
     }
 }

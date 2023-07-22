@@ -21,16 +21,22 @@ public class RecommendationController {
         recommendationService.create(recommendation);
     }
 
-    private void validateRecommendation(RecommendationDto recommendationDto) {
-        if (recommendationDto.getContent() == null || recommendationDto.getContent().isEmpty()) {
-            throw new DataValidationException("Recommendation content cannot be empty");
-        }
-    }
-
     @PostMapping("recommendation/{id}")
     private void updateRecommendation(@RequestBody RecommendationDto updated, @PathVariable Long id) {
         validateId(id);
         validateData(updated);
+    }
+
+    @PostMapping("recommendation/{id}")
+    private void deleteRecommendation(@PathVariable long id) {
+        validateId(id);
+        recommendationService.deleteRecommendation(id);
+    }
+
+    private void validateRecommendation(RecommendationDto recommendationDto) {
+        if (recommendationDto.getContent() == null || recommendationDto.getContent().isEmpty()) {
+            throw new DataValidationException("Recommendation content cannot be empty");
+        }
     }
 
     private void validateId(Long id) {

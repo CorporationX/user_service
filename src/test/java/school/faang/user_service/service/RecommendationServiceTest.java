@@ -64,6 +64,7 @@ class RecommendationServiceTest {
     List<UserSkillGuarantee> guaranteesList;
     UserSkillGuarantee guarantees;
     User athorId;
+
     @BeforeEach
     void setUp() {
         this.skillOfferDto = new SkillOfferDto(1L, 1L, 1L);
@@ -79,9 +80,9 @@ class RecommendationServiceTest {
                 .id(1)
                 .build();
         this.guarantees = UserSkillGuarantee
-                 .builder()
-                 .user(athorId)
-                 .build();
+                .builder()
+                .user(athorId)
+                .build();
         this.guaranteesList = new ArrayList<>(List.of(guarantees));
         this.skill = Skill
                 .builder()
@@ -210,7 +211,7 @@ class RecommendationServiceTest {
         skills.add(skill);
 
         Mockito.when(skillRepository.findAllByUserId(recommendation.getReceiver().getId()))
-                        .thenReturn(skills);
+                .thenReturn(skills);
 
         recommendationService.guaranteesHaveSkill(recommendation);
 
@@ -218,7 +219,7 @@ class RecommendationServiceTest {
     }
 
     @Test
-    public void testUpdateRecommendation(){
+    public void testUpdateRecommendation() {
         ArrayList<SkillOffer> list = new ArrayList<>();
         list.add(skillOffer);
 
@@ -234,5 +235,11 @@ class RecommendationServiceTest {
         RecommendationDto actual = recommendationService.updateRecommendation(recommendationDto, 1L);
         RecommendationDto expected = recommendationMapper.toDto(recommendation);
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testDeleteRecommendation() {
+        recommendationRepository.deleteById(1L);
+        Mockito.verify(recommendationRepository, Mockito.times(1)).deleteById(1L);
     }
 }

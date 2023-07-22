@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -100,14 +101,14 @@ public class RecommendationService {
                         .filter(offeredSkill -> userSkill.getTitle().equals(offeredSkill.getTitle())))
                 .forEach(sameSkill -> {
                     if (isAuthorGuarantor(sameSkill, recommendationDto.getAuthorId())) {
-                        User currentUser = userRepository.findById(recommendationDto.getReceiverId()).orElseThrow(() -> new DataValidationException("Entity not found"));
-                        User guarantor = userRepository.findById(recommendationDto.getAuthorId()).orElseThrow(() -> new DataValidationException("Entity not found"));
+                        User currentUser = userRepository.findById(recommendationDto.getReceiverId()).orElseThrow(() -> new EntityNotFoundException("Entity not found"));
+                        User guarantor = userRepository.findById(recommendationDto.getAuthorId()).orElseThrow(() -> new EntityNotFoundException("Entity not found"));
                         UserSkillGuarantee newUserSkillGuarantee = UserSkillGuarantee.builder().user(currentUser).skill(sameSkill).guarantor(guarantor).build();
                         sameSkill.getGuarantees().add(newUserSkillGuarantee);
                     }
                     recommendationDto.getSkillOffers().removeIf(skillOfferDto -> skillOfferDto.getSkillId() == sameSkill.getId());
                 });
-        User currentUser = userRepository.findById(recommendationDto.getReceiverId()).orElseThrow(() -> new DataValidationException("Entity not found"));
+        User currentUser = userRepository.findById(recommendationDto.getReceiverId()).orElseThrow(() -> new EntityNotFoundException("Entity not found"));
         currentUser.setSkills(userSkills);
         userRepository.save(currentUser);
     }

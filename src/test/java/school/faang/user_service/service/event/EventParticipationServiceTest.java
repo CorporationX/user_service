@@ -21,7 +21,7 @@ class EventParticipationServiceTest {
     private EventParticipationService eventParticipationService;
 
     @Test
-    public void registerParticipantThrowsException() {
+    public void registerParticipantAlreadyRegisteredThrowsException() {
         User user = User.builder().id(1L).username("test").build();
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(List.of(user));
         Assertions.assertThrows(DataValidationException.class, () -> {

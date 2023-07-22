@@ -80,4 +80,7 @@ public class RecommendationService {
 //        if(user1.getRecommendationsGiven().containsAll(user2.getRecommendationsReceived())){
 //        }
 //    }
+    public void delete(long id){
+        recommendationRepository.deleteById(id);
+    }
 }

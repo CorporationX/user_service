@@ -19,7 +19,9 @@ public class RecommendationController {
         validatorController.validateRecommendation(recommendation);
         return recommendationService.create(recommendation);
     }
-
+    public void deleteRecommendation(long id){
+        recommendationService.delete(id);
+    }
 
 //    public RecommendationDto updateRecommendation(RecommendationDto updated){
 //        validatorController.validateRecommendation(updated);

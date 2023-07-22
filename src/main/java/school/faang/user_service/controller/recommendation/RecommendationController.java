@@ -34,8 +34,8 @@ public class RecommendationController {
         return recommendationService.getAllUserRecommendations(userId, pageNumber, pageSize);
     }
 
-    public List<RecommendationDto> getAllGivenRecommendations(long userId) {
-        return recommendationService.getAllGivenRecommendations(userId);
+    public Page<RecommendationDto> getAllGivenRecommendations(long userId, int pageNumber, int pageSize) {
+        return recommendationService.getAllGivenRecommendations(userId,pageNumber,pageSize);
     }
 
     private void validateRecommendationContent(RecommendationDto recommendationDto) {

@@ -282,39 +282,33 @@ public class RecommendationServiceTest {
         assertEquals(recommendationDtosList, resultPage.getContent());
     }
 
-
     @Test
     public void testGetAllGivenRecommendations() {
-        long receiverId = 3L;
+        long receiverId = 1L;
+        int pageNumber = 0;
+        int pageSize = 10;
 
         Recommendation recommendation1 = new Recommendation();
         recommendation1.setId(1L);
         Recommendation recommendation2 = new Recommendation();
         recommendation2.setId(2L);
-
-        List<Recommendation> receiverRecommendations = new ArrayList<>();
-        receiverRecommendations.add(recommendation1);
-        receiverRecommendations.add(recommendation2);
+        List<Recommendation> recommendationsList = List.of(recommendation1, recommendation2);
 
         RecommendationDto recommendationDto1 = new RecommendationDto();
         recommendationDto1.setId(1L);
         RecommendationDto recommendationDto2 = new RecommendationDto();
         recommendationDto2.setId(2L);
+        List<RecommendationDto> recommendationDtosList = List.of(recommendationDto1, recommendationDto2);
 
-        List<RecommendationDto> recommendationDtos = new ArrayList<>();
-        recommendationDtos.add(recommendationDto1);
-        recommendationDtos.add(recommendationDto2);
+        Page<Recommendation> page = new PageImpl<>(recommendationsList, PageRequest.of(pageNumber, pageSize), recommendationsList.size());
 
-        when(recommendationRepository.findAllByReceiverId(receiverId)).thenReturn(receiverRecommendations);
+        when(recommendationRepository.findAllByAuthorId(anyLong(), any(Pageable.class))).thenReturn(page);
+
         when(recommendationMapper.toDto(recommendation1)).thenReturn(recommendationDto1);
         when(recommendationMapper.toDto(recommendation2)).thenReturn(recommendationDto2);
 
-        List<RecommendationDto> result = recommendationService.getAllUserRecommendations(receiverId);
+        Page<RecommendationDto> resultPage = recommendationService.getAllGivenRecommendations(receiverId, pageNumber, pageSize);
 
-        verify(recommendationRepository, times(1)).findAllByReceiverId(receiverId);
-        verify(recommendationMapper, times(1)).toDto(recommendation1);
-        verify(recommendationMapper, times(1)).toDto(recommendation2);
-        assertEquals(recommendationDtos.size(), result.size());
-        assertEquals(recommendationDtos, result);
+        assertEquals(recommendationDtosList, resultPage.getContent());
     }
 }

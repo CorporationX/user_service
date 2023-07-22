@@ -110,30 +110,21 @@ public class RecommendationControllerTest {
     @Test
     public void testGetAllGivenRecommendations() {
         long userId = 1L;
+        int pageNumber = 0;
+        int pageSize = 10;
 
-        RecommendationDto recommendation1 = new RecommendationDto();
-        recommendation1.setId(1L);
-        recommendation1.setAuthorId(userId);
-        recommendation1.setReceiverId(2L);
-        recommendation1.setContent("Content 1");
+        RecommendationDto recommendationDto1 = new RecommendationDto();
+        recommendationDto1.setId(1L);
+        RecommendationDto recommendationDto2 = new RecommendationDto();
+        recommendationDto2.setId(2L);
+        List<RecommendationDto> recommendationDtosList = List.of(recommendationDto1, recommendationDto2);
 
-        RecommendationDto recommendation2 = new RecommendationDto();
-        recommendation2.setId(2L);
-        recommendation2.setAuthorId(userId);
-        recommendation2.setReceiverId(3L);
-        recommendation2.setContent("Content 2");
+        Page<RecommendationDto> page = new PageImpl<>(recommendationDtosList, PageRequest.of(pageNumber, pageSize), recommendationDtosList.size());
 
-        List<RecommendationDto> recommendationList = new ArrayList<>();
-        recommendationList.add(recommendation1);
-        recommendationList.add(recommendation2);
+        when(recommendationService.getAllGivenRecommendations(userId, pageNumber, pageSize)).thenReturn(page);
 
-        when(recommendationService.getAllGivenRecommendations(userId)).thenReturn(recommendationList);
+        Page<RecommendationDto> resultPage = recommendationController.getAllGivenRecommendations(userId, pageNumber, pageSize);
 
-        List<RecommendationDto> result = recommendationController.getAllGivenRecommendations(userId);
-
-        verify(recommendationService, times(1)).getAllGivenRecommendations(userId);
-        assertEquals(2, result.size());
-        assertEquals(recommendation1.getId(), result.get(0).getId());
-        assertEquals(recommendation2.getId(), result.get(1).getId());
+        assertEquals(recommendationDtosList, resultPage.getContent());
     }
 }

@@ -11,7 +11,7 @@ import school.faang.user_service.service.RecommendationService;
 public interface RecommendationMapper {
 
     @Mapping(target = "authorId", source = "author.id")
-    @Mapping(target = "receiverId", expression = "receiver.id")
+    @Mapping(target = "receiverId", source = "receiver.id")
     RecommendationDto toDto(Recommendation recommendation);
 
     @Mapping(target = "author", expression = "java(recommendationService.getUser(recommendationDto.getAuthorId()))")

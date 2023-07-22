@@ -164,7 +164,6 @@ public class RecommendationServiceTest {
         assertEquals(updatedRecommendationDto, recommendationDto);
     }
 
-
     @Test
     public void testUpdate_InvalidSkillId_ThrowsDataValidationException() {
         RecommendationDto recommendationDto = new RecommendationDto();

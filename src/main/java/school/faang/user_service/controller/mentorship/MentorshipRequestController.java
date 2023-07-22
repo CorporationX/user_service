@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
+import school.faang.user_service.dto.mentorship.RejectionReasonDto;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.mentorship.MentorshipRequestValidationException;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
@@ -68,6 +69,22 @@ public class MentorshipRequestController {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             log.error("Failed to accept mentorship request: {}\nException: {}", id, e.getMessage());
+            return ResponseEntity.internalServerError().body("Server error");
+        }
+    }
+
+    @PutMapping("/request/{id}/reject")
+    public ResponseEntity<?> rejectRequest(
+            @PathVariable @Min(message = "Request ID must be greater than zero", value = 1) long id,
+            @RequestBody RejectionReasonDto rejectionReasonDto) {
+        log.debug("Received request to reject mentorship request: {}", id);
+        try {
+            return ResponseEntity.ok(requestService.rejectRequest(id, rejectionReasonDto));
+        } catch (EntityNotFoundException e) {
+            log.warn("Failed to reject mentorship request: {}\nException: {}", id, e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            log.error("Failed to reject mentorship request: {}\nException: {}", id, e.getMessage());
             return ResponseEntity.internalServerError().body("Server error");
         }
     }

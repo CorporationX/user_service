@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
+import school.faang.user_service.dto.mentorship.RejectionReasonDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.exception.EntityNotFoundException;
@@ -55,6 +56,17 @@ public class MentorshipRequestService {
 
         request.getRequester().getMentors().add(request.getReceiver());
         request.setStatus(RequestStatus.ACCEPTED);
+
+        return mentorshipRequestMapper.toDto(request);
+    }
+
+    @Transactional
+    public MentorshipRequestDto rejectRequest(long requestId, RejectionReasonDto rejectionReasonDto) {
+        MentorshipRequest request = mentorshipRequestRepository.findById(requestId)
+                .orElseThrow(() -> new EntityNotFoundException("Request with id " + requestId + " not found."));
+
+        request.setStatus(RequestStatus.REJECTED);
+        request.setRejectionReason(rejectionReasonDto.getReason());
 
         return mentorshipRequestMapper.toDto(request);
     }

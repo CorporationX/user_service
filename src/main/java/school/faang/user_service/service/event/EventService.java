@@ -15,6 +15,7 @@ import school.faang.user_service.repository.event.EventRepository;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Stream;
 import java.util.zip.DataFormatException;
 
 @Service
@@ -37,10 +38,14 @@ public class EventService {
     }
 
     public List<EventDto> getEventsByFilter(EventFilterDto eventFilter) {
-        List<EventDto> eventDtos = eventRepository.findAll().stream().map(eventMapper::toDto).toList();
-        filters.stream().filter(filter -> filter.isApplicable(eventFilter))
-                .forEach(filter -> filter.apply(eventDtos, eventFilter));
-        return eventDtos;
+        Stream<EventDto> eventDtoStream = eventRepository.findAll().stream().map(eventMapper::toDto);
+        for (EventFilter filter : filters) {
+            if (filter.isApplicable(eventFilter)) {
+                eventDtoStream = filter.apply(eventDtoStream, eventFilter);
+            }
+        }
+
+        return eventDtoStream.toList();
     }
 
     private void validateEventDto(EventDto eventDto) throws DataFormatException {

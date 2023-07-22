@@ -4,17 +4,17 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 
-import java.util.List;
+import java.util.stream.Stream;
 
 @Component
-public class EventMaxAttendeesFilter implements EventFilter{
+public class EventMaxAttendeesFilter implements EventFilter {
     @Override
     public boolean isApplicable(EventFilterDto filter) {
         return filter.getLessThanMaxAttendees() > 0;
     }
 
     @Override
-    public void apply(List<EventDto> eventDtos, EventFilterDto filter) {
-        eventDtos.removeIf(eventDto -> eventDto.getMaxAttendees() > filter.getLessThanMaxAttendees());
+    public Stream<EventDto> apply(Stream<EventDto> eventDtoStream, EventFilterDto filter) {
+        return eventDtoStream.filter(eventDto -> eventDto.getMaxAttendees() < filter.getLessThanMaxAttendees());
     }
 }

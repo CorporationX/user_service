@@ -4,17 +4,17 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 
-import java.util.List;
+import java.util.stream.Stream;
 
 @Component
 public class EventDescriptionFilter implements EventFilter {
     @Override
     public boolean isApplicable(EventFilterDto filter) {
-        return filter.getDescription() != null;
+        return filter.getDescriptionPattern() != null;
     }
 
     @Override
-    public void apply(List<EventDto> eventDtos, EventFilterDto filter) {
-        eventDtos.removeIf(eventDto -> !eventDto.getDescription().contains(filter.getDescription()));
+    public Stream<EventDto> apply(Stream<EventDto> eventDtoStream, EventFilterDto filter) {
+        return eventDtoStream.filter(eventDto -> eventDto.getDescription().matches(filter.getDescriptionPattern()));
     }
 }

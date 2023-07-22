@@ -15,12 +15,12 @@ import java.util.List;
 @Getter
 public class EventFilterDto {
     private Long id;
-    private String title;
+    private String titlePattern;
     private LocalDateTime laterThanStartDate;
     private LocalDateTime earlierThanEndDate;
     private Long ownerId;
-    private String description;
+    private String descriptionPattern;
     private List<SkillDto> relatedSkills;
-    private String location;
+    private String locationPattern;
     private int lessThanMaxAttendees;
 }

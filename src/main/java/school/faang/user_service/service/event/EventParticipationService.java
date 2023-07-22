@@ -15,8 +15,8 @@ public class EventParticipationService {
 
     public void registerParticipant(Long eventId, Long userId) {
         List<User> users = eventParticipationRepository.findAllParticipantsByEventId(eventId);
-        for(User u : users) {
-            if(u.getId() == userId) {
+        for (User user : users) {
+            if (user.getId() == userId) {
                 throw new DataValidationException("User already registered");
             }
         }

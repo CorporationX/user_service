@@ -18,10 +18,10 @@ public class EventParticipationController {
     }
 
     private void validate(Long eventId, Long userId) {
-        if(eventId == null || userId == null) {
+        if (eventId == null || userId == null) {
             throw new DataValidationException("Event id or user id cannot be null");
         }
-        if(userId <= 0 || eventId <= 0) {
+        if (userId <= 0 || eventId <= 0) {
             throw new DataValidationException("User id cannot be less than or equal to 0");
         }
     }

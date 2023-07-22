@@ -90,9 +90,4 @@ public class RecommendationService {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new DataValidationException("User not found"));
     }
-
-//    public void validateGuarantor(User user1, User user2){
-//        if(user1.getRecommendationsGiven().containsAll(user2.getRecommendationsReceived())){
-//        }
-//    }
 }

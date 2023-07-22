@@ -19,10 +19,4 @@ public class RecommendationController {
         validatorController.validateRecommendation(recommendation);
         return recommendationService.create(recommendation);
     }
-
-
-//    public RecommendationDto updateRecommendation(RecommendationDto updated){
-//        validatorController.validateRecommendation(updated);
-//        return recommendationService.update(updated);
-//    }
 }

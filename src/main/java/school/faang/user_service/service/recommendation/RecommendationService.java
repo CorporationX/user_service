@@ -121,10 +121,12 @@ public class RecommendationService {
         if (lastRecommendation.isPresent()) {
             LocalDateTime lastUpdate = lastRecommendation.get().getUpdatedAt();
             LocalDateTime currentDate = LocalDateTime.now();
-            String errorMessage = String.format(
-                    "You've already recommended this user in the last %d months", RECOMMENDATION_INTERVAL_MONTHS);
 
             if (lastUpdate.plusMonths(RECOMMENDATION_INTERVAL_MONTHS).isAfter(currentDate)) {
+                String errorMessage = String.format(
+                        "You've already recommended the user %d in the last %d months",
+                        userId, RECOMMENDATION_INTERVAL_MONTHS);
+
                 throw new DataValidationException(errorMessage);
             }
         }
@@ -140,14 +142,11 @@ public class RecommendationService {
         List<Long> skillIds = getUniqueSkillIds(skills);
 
         for (Long skillId : skillIds) {
-            if (skillNotExist(skillId)) {
+
+            if (!skillRepository.existsById(skillId)) {
                 throw new DataValidationException("Invalid skills");
             }
         }
-    }
-
-    private boolean skillNotExist(long skillId) {
-        return !skillRepository.existsById(skillId);
     }
 
     private List<Long> getUniqueSkillIds(List<SkillOfferDto> skills) {
@@ -158,11 +157,7 @@ public class RecommendationService {
     }
 
     private void validateRecommendationToUpdate(RecommendationDto recommendationDto) {
-        Recommendation recommendation = recommendationRepository.findById(recommendationDto.getId())
-                .orElse(null);
-
-        if (recommendation == null) {
-            throw new DataValidationException("Invalid recommendation to update");
-        }
+        recommendationRepository.findById(recommendationDto.getId())
+                .orElseThrow(() -> new DataValidationException("Invalid recommendation to update"));
     }
 }

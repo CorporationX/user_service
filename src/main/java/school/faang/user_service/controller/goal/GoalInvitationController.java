@@ -1,20 +1,20 @@
 package school.faang.user_service.controller.goal;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.service.GoalInvitationService;
+import school.faang.user_service.validator.GoalInvitationValidator;
 
 @Controller
+@RequiredArgsConstructor
 public class GoalInvitationController {
-    private GoalInvitationService goalInvitationService;
+    private final GoalInvitationService goalInvitationService;
 
-    @Autowired
-    private GoalInvitationController(GoalInvitationService goalInvitationService) {
-        this.goalInvitationService = goalInvitationService;
-    }
+    private final GoalInvitationValidator goalInvitationValidator;
 
     public void createInvitation(GoalInvitationDto invitation) {
+        goalInvitationValidator.validateControllerInputData(invitation);
         goalInvitationService.createInvitation(invitation);
     }
 }

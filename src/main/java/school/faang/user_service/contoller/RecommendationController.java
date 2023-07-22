@@ -15,9 +15,14 @@ public class RecommendationController {
     private final RecommendationService recommendationService;
     private final ValidatorController validatorController;
 
-    public void giveRecommendation(RecommendationDto recommendation) {
+    public RecommendationDto giveRecommendation(RecommendationDto recommendation) {
         validatorController.validateRecommendation(recommendation);
-        recommendationService.create(recommendation);
+        return recommendationService.create(recommendation);
     }
 
+
+//    public RecommendationDto updateRecommendation(RecommendationDto updated){
+//        validatorController.validateRecommendation(updated);
+//        return recommendationService.update(updated);
+//    }
 }

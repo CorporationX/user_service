@@ -10,7 +10,6 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
-import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.filter.MentorshipFilter;
 import school.faang.user_service.service.user.UserService;
@@ -27,7 +26,6 @@ public class MentorshipRequestService {
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final MentorshipRequestValidator mentorshipRequestValidator;
-    private final MentorshipRepository mentorshipRepository;
     private final UserService userService;
     private final MentorshipFilter mentorshipFilter;
 
@@ -41,7 +39,6 @@ public class MentorshipRequestService {
         mentorshipRequestRepository.save(mentorshipRequest);
     }
 
-    //переделать под фильтры
     @Transactional
     public List<MentorshipRequestDto> getRequests(RequestFilterDto filter) {
         List<MentorshipRequest> mentorshipRequests = mentorshipRequestRepository.getAllRequests(filter.getDescription(),

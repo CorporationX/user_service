@@ -22,4 +22,8 @@ public class RecommendationRequestController {
             return recommendationRequest;
         }
     }
+
+    public RecommendationRequestDto getRecommendationRequest(long id) {
+        return recommendationRequestService.getRequest(id);
+    }
 }

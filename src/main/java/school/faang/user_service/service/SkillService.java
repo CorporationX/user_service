@@ -15,7 +15,6 @@ import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +65,6 @@ public class SkillService {
         if (skillRepository.findUserSkill(skillId, userId).isPresent()) {
             throw new DataValidationException("user have this skill already");
         }
-        //skillRepository.assignSkillToUser(1L,1L);
         List<SkillOffer> skillOffers = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
         skillOffers.stream().filter(skillOffer ->
                         Collections.frequency(skillOffers, skillOffer.skill.getTitle()) >= MIN_SKILL_OFFERS)
@@ -91,7 +89,7 @@ public class SkillService {
     private Skill findGuaranteedSkill(long skillId, long userId) {
         return skillRepository.findAllByUserId(userId).stream()
                 .filter(currentSkill -> currentSkill.getId() == skillId).findAny().orElseThrow(
-                        () -> new EntityNotFoundException("Skill wasn't found"));
+                        ()-> new EntityNotFoundException("Skill wasn't found"));
     }
 
 }

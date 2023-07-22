@@ -11,13 +11,14 @@ import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RequestFilterDto;
 import school.faang.user_service.dto.mentorship.UserDto;
 import school.faang.user_service.entity.MentorshipRequest;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.MentorshipRequestNotFoundException;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapperImpl;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-import school.faang.user_service.service.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
 
 import java.time.LocalDateTime;
@@ -45,6 +46,7 @@ public class MentorshipRequestServiceTest {
     private final long NOT_FOUND_USER_ID = 55555L;
     private final long CORRECT_REQUESTER_ID = 1L;
     private final long CORRECT_RECEIVER_ID = 2L;
+    private final long CORRECT_REQUEST_ID = 1L;
     private MentorshipRequestDto incorrectRequestDto;
     private MentorshipRequestDto correctRequestDto;
     private MentorshipRequest latestRequest;
@@ -137,7 +139,7 @@ public class MentorshipRequestServiceTest {
 
     @Test
     void testToDto() {
-        latestRequest.setId(1L);
+        latestRequest.setId(CORRECT_REQUEST_ID);
         latestRequest.setDescription("some description");
         latestRequest.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
         latestRequest.setRequester(requester);
@@ -182,6 +184,37 @@ public class MentorshipRequestServiceTest {
         List<MentorshipRequestDto> expectedList = new ArrayList<>();
 
         assertEquals(expectedList, actualList);
+    }
+
+    @Test
+    void testAcceptRequestWithoutRequest() {
+        when(requestRepository.findById(CORRECT_REQUEST_ID)).thenReturn(Optional.empty());
+        assertThrows(MentorshipRequestNotFoundException.class, () -> requestService.acceptRequest(CORRECT_REQUEST_ID));
+    }
+
+    @Test
+    void testAcceptRequestWithExistingMentor() {
+        requester.setMentors(List.of(receiver));
+        latestRequest.setRequester(requester);
+        latestRequest.setReceiver(receiver);
+
+        when(requestRepository.findById(CORRECT_REQUEST_ID)).thenReturn(Optional.of(latestRequest));
+        assertThrows(IllegalArgumentException.class, () -> requestService.acceptRequest(CORRECT_REQUEST_ID));
+    }
+
+    @Test
+    void testAcceptRequest() {
+        latestRequest.setReceiver(receiver);
+        latestRequest.setRequester(requester);
+
+        when(requestRepository.findById(CORRECT_REQUEST_ID)).thenReturn(Optional.of(latestRequest));
+        requestService.acceptRequest(CORRECT_REQUEST_ID);
+
+        List<User> actualMentorList = requester.getMentors();
+        List<User> expectedUserList = List.of(receiver);
+
+        assertEquals(expectedUserList, actualMentorList);
+        assertEquals(RequestStatus.ACCEPTED, latestRequest.getStatus());
     }
 
     private void doForMentorshipRepository() {

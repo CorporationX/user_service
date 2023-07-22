@@ -22,6 +22,8 @@ public class MentorshipRequestControllerTest {
     @InjectMocks
     private MentorshipRequestController requestController;
 
+    private final long INCORRECT_ID = 0L;
+    private final long CORRECT_ID = 1L;
     private MentorshipRequestDto correctRequestDto;
     private MentorshipRequestDto incorrectRequestDto;
     private RequestFilterDto incorrectFilterDto;
@@ -58,5 +60,16 @@ public class MentorshipRequestControllerTest {
     void testGetRequest() {
         requestController.getRequests(correctFilterDto);
         verify(requestService, times(1)).getRequests(correctFilterDto);
+    }
+
+    @Test
+    void testAcceptRequestWithIncorrectId() {
+        assertThrows(DataValidationException.class, () -> requestController.acceptRequest(INCORRECT_ID));
+    }
+
+    @Test
+    void testAcceptRequest() {
+        requestController.acceptRequest(CORRECT_ID);
+        verify(requestService, times(1)).acceptRequest(CORRECT_ID);
     }
 }

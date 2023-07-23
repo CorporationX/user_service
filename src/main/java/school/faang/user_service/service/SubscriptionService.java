@@ -34,13 +34,11 @@ public class SubscriptionService {
     }
 
     private List<UserDto> filterUsers(Stream<User> users, UserFilterDto filter) {
-        Stream<User> filteredUsers = users;
-        for (UserFilter userFilter : userFilters) {
-            if (userFilter.isApplicable(filter)) {
-                filteredUsers = userFilter.apply(filteredUsers, filter);
-            }
-        }
-        return userMapper.toDtoList(filteredUsers.toList());
+        return userFilters.stream()
+                .filter(userFilter -> userFilter.isApplicable(filter))
+                .flatMap(userFilter -> userFilter.apply(users, filter))
+                .map(userMapper::toDto)
+                .toList();
     }
 
     private void validateUserId(long userId) {

@@ -6,8 +6,8 @@ import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 
-@Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.FIELD, unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface RecommendationRequestMapper {
-    RecommendationRequest toEntity(RecommendationRequestDto dto);
-    RecommendationRequestDto toDto(RecommendationRequest entity);
+    RecommendationRequestDto toDto(RecommendationRequest recommendationRequest);
+    RecommendationRequest toEntity(RecommendationRequestDto recommendationRequestDto);
 }

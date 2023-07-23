@@ -11,9 +11,9 @@ public class RecommendationRequestController {
     private final RecommendationRequestService recommendationRequestService;
 
     public RecommendationRequestDto requestRecommendation(RecommendationRequestDto recommendationRequest) {
-        if (!recommendationRequest.getMessage().isEmpty() && recommendationRequest.getMessage() != null) {
-            recommendationRequestService.create(recommendationRequest);
-            return recommendationRequest;
+        if (recommendationRequest.getMessage() != null && !recommendationRequest.getMessage().isEmpty()) {
+            return recommendationRequestService.create(recommendationRequest);
+            //return recommendationRequest;
         } else {
             throw new IllegalArgumentException("Empty recommendation request!");
         }

@@ -104,8 +104,18 @@ public class RecommendationService {
     }
 
     private void saveUserSkillGuarantee(long userId, long skillId, long guarantorId) {
-        UserSkillGuaranteeDto guaranteeDto = userSkillGuaranteeMapper.toDto(userId, skillId, guarantorId);
-        UserSkillGuarantee guarantee = userSkillGuaranteeMapper.toEntity(guaranteeDto);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new DataValidationException("User not found"));
+        Skill skill = skillRepository.findById(skillId)
+                .orElseThrow(() -> new DataValidationException("Skill not found"));
+        User guarantor = userRepository.findById(guarantorId)
+                .orElseThrow(() -> new DataValidationException("Guarantor not found"));
+
+        UserSkillGuarantee guarantee = new UserSkillGuarantee();
+        guarantee.setUser(user);
+        guarantee.setSkill(skill);
+        guarantee.setGuarantor(guarantor);
+
         userSkillGuaranteeRepository.save(guarantee);
     }
 

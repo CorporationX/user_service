@@ -10,7 +10,7 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.SkillOffer;
-import school.faang.user_service.exception.DataValidException;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
@@ -66,7 +66,7 @@ class UserServiceTest {
 
         when(skillRepository.existsByTitle(skillDto.getTitle())).thenReturn(true);
 
-        DataValidException dataValidException = assertThrows(DataValidException.class,
+        DataValidationException dataValidException = assertThrows(DataValidationException.class,
                 () -> skillService.create(skillDto));
         assertEquals("Skill already exists", dataValidException.getMessage());
 

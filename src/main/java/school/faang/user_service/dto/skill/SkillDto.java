@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import school.faang.user_service.exception.DataValidException;
+import school.faang.user_service.exception.DataValidationException;
 
 @Data
 @AllArgsConstructor
@@ -16,7 +16,7 @@ public class SkillDto {
 
     public void validateSkill() {
         if (this.title.isBlank()) {
-            throw new DataValidException("Title cannot be empty");
+            throw new DataValidationException("Title cannot be empty");
         }
     }
 }

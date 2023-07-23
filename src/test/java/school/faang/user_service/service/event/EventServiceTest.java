@@ -35,7 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.any;
@@ -244,6 +243,19 @@ class EventServiceTest {
         assertTrue(eventDtos.isEmpty());
     }
 
+    @Test
+    void getParticipatedEvents_ShouldReturnEventDtos() {
+        long userId = 1L;
+        List<Event> participatedEvents = createEvents();
+
+        when(eventRepository.findParticipatedEventsByUserId(userId)).thenReturn(participatedEvents);
+
+        List<EventDto> eventDtos = eventService.getParticipatedEvents(userId);
+
+        assertNotNull(eventDtos);
+        assertEquals(participatedEvents.size(), eventDtos.size());
+    }
+
     private EventDto createEventDto() {
         EventDto eventDto = new EventDto();
         eventDto.setId(1L);
@@ -309,18 +321,5 @@ class EventServiceTest {
             events.add(event);
         }
         return events;
-    }
-
-    @Test
-    void getParticipatedEvents_ShouldReturnEventDtos() {
-        long userId = 1L;
-        List<Event> participatedEvents = createEvents();
-
-        when(eventRepository.findParticipatedEventsByUserId(userId)).thenReturn(participatedEvents);
-
-        List<EventDto> eventDtos = eventService.getParticipatedEvents(userId);
-
-        assertNotNull(eventDtos);
-        assertEquals(participatedEvents.size(), eventDtos.size());
     }
 }

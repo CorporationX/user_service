@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.NotFoundException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -13,6 +14,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
 
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<String> handleNotFoundException(NotFoundException ex) {
+        System.out.println(ex.getClass() + " exception");
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleException(Exception ex) {
         System.out.println(ex.getClass() + " exception");

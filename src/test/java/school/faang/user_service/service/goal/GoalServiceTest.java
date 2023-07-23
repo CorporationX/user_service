@@ -24,6 +24,7 @@ import school.faang.user_service.validator.GoalValidator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -53,14 +54,18 @@ class GoalServiceTest {
         MockitoAnnotations.openMocks(this);
         goalService = new GoalService(goalRepository, skillRepository, userRepository, goalMapper, goalFilters);
 
-        goalActive = Goal.builder().id(1L).title("title1").status(GoalStatus.ACTIVE).deadline(LocalDateTime.now().plusDays(3L))
+        LocalDateTime deadline = LocalDateTime.now().plusDays(3L);
+
+        goalActive = Goal.builder().id(1L).title("title1").status(GoalStatus.ACTIVE).deadline(deadline)
                 .description("description1").build();
 
-        goalCompleted = Goal.builder().id(2L).title("title2").status(GoalStatus.COMPLETED).deadline(LocalDateTime.now().plusDays(3L))
+        goalCompleted = Goal.builder().id(2L).title("title2").status(GoalStatus.COMPLETED).deadline(deadline)
                 .description("description2").build();
 
-        goalDtoActive = new GoalDto(1L, "description1", null, "title1", GoalStatus.ACTIVE, goalActive.getDeadline(), null, null);
-        goalDtoCompleted = new GoalDto(2L, "description2", null, "title2", GoalStatus.COMPLETED, goalCompleted.getDeadline(), null, null);
+        goalDtoActive = GoalDto.builder().id(1L).description("description1").title("title1").status(GoalStatus.ACTIVE)
+                .deadline(deadline).skillIds(Collections.emptyList()).build();
+        goalDtoCompleted = GoalDto.builder().id(2L).description("description2").title("title2").status(GoalStatus.COMPLETED)
+                .deadline(deadline).skillIds(Collections.emptyList()).build();
 
         Stream<Goal> goalStream = Stream.<Goal>builder().add(goalActive).add(goalCompleted).build();
 
@@ -185,53 +190,6 @@ class GoalServiceTest {
     }
 
     @Test
-    public void testCreateGoalInvalidMentorNotFound() {
-        long userId = 1L;
-        long mentorId = 2L;
-        Mockito.when(userRepository.findById(userId))
-                .thenReturn(Optional.of(new User()));
-        Mockito.when(userRepository.findById(mentorId))
-                .thenReturn(Optional.empty());
-        GoalDto goalDto = new GoalDto();
-        goalDto.setTitle("Title");
-        goalDto.setMentorId(mentorId);
-        DataValidationException exception = assertThrows(DataValidationException.class,
-                () -> goalService.createGoal(userId, goalDto));
-        assertEquals("Mentor with given id was not found!", exception.getMessage());
-    }
-
-    @Test
-    public void testCreateGoalInvalidParentNotFound() {
-        long userId = 1L;
-        long parentId = 2L;
-        Mockito.when(userRepository.findById(userId))
-                .thenReturn(Optional.of(new User()));
-        Mockito.when(goalRepository.findById(parentId))
-                .thenReturn(Optional.empty());
-        GoalDto goalDto = new GoalDto();
-        goalDto.setTitle("Title");
-        goalDto.setParentId(parentId);
-        DataValidationException exception = assertThrows(DataValidationException.class,
-                () -> goalService.createGoal(userId, goalDto));
-        assertEquals("Goal-parent with given id was not found!", exception.getMessage());
-    }
-
-    @Test
-    public void testCreateGoalInvalidNotExistedSkill() {
-        long userId = 1L;
-        Mockito.when(userRepository.findById(userId))
-                .thenReturn(Optional.of(new User()));
-        Mockito.when(skillRepository.findById(Mockito.anyLong()))
-                .thenReturn(Optional.empty());
-        GoalDto goalDto = new GoalDto();
-        goalDto.setTitle("Title");
-        goalDto.setSkillIds(List.of(1L));
-        DataValidationException exception = assertThrows(DataValidationException.class,
-                () -> goalService.createGoal(userId, goalDto));
-        assertEquals("There is no way to add a goal with a non-existent skill!", exception.getMessage());
-    }
-
-    @Test
     public void testCreateGoalValid() {
         long userId = 1L;
         long mentorId = 2L;
@@ -240,6 +198,7 @@ class GoalServiceTest {
                 .thenReturn(Optional.of(new User()));
         Mockito.when(skillRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.of(new Skill()));
+        Mockito.doNothing().when(goalMapper).convertDtoDependenciesToEntity(Mockito.any(), Mockito.any());
 
         goalDtoActive.setSkillIds(List.of(1L, 2L));
         goalDtoActive.setMentorId(mentorId);
@@ -307,7 +266,7 @@ class GoalServiceTest {
         goalService.updateGoal(goalId, goalDtoCompleted);
 
         Mockito.verify(goalMapper, Mockito.times(1)).toDto(Mockito.any());
-        Mockito.verify(goalMapper, Mockito.times(1)).toEntity(Mockito.any());
+        Mockito.verify(goalMapper, Mockito.times(1)).convertDtoDependenciesToEntity(Mockito.any(), Mockito.any());
 
         Mockito.verify(goalRepository, Mockito.times(0)).findUsersByGoalId(goalId);
         Mockito.verify(goalRepository, Mockito.times(1)).save(Mockito.any());
@@ -324,15 +283,13 @@ class GoalServiceTest {
         goalDtoCompleted.setSkillIds(skills.stream().map(Skill::getId).toList());
         Mockito.when(goalRepository.findById(goalId))
                 .thenReturn(Optional.of(goalActive));
+        Mockito.doNothing().when(goalMapper).convertDtoDependenciesToEntity(Mockito.any(), Mockito.any());
 
         goalService.updateGoal(goalId, goalDtoCompleted);
 
         Mockito.verify(goalMapper, Mockito.times(1)).toDto(Mockito.any());
-        Mockito.verify(goalMapper, Mockito.times(1)).toEntity(Mockito.any());
-
+        Mockito.verify(goalMapper, Mockito.times(1)).convertDtoDependenciesToEntity(Mockito.any(), Mockito.any());
         Mockito.verify(goalRepository, Mockito.times(1)).save(Mockito.any());
-        Mockito.verify(skillRepository, Mockito.times(skills.size() * users.size()))
-                .assignSkillToUser(Mockito.anyLong(), Mockito.anyLong());
     }
 
     @Test

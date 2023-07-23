@@ -2,7 +2,6 @@ package school.faang.user_service.dto.event;
 
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.skill.SkillDto;
 
 import java.time.LocalDateTime;
@@ -10,7 +9,6 @@ import java.util.List;
 
 @Data
 @Builder
-@Component
 public class EventDto {
     private Long id;
     private String title;

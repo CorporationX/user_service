@@ -61,22 +61,6 @@ class EventServiceTest {
         eventService = new EventService(eventRepository, userRepository, eventFilters);
     }
 
-    private List<Event> createEvents() {
-        List<Event> events = new ArrayList<>();
-        createUser();
-        for (int i = 1; i <= 5; i++) {
-            Event event = new Event();
-            event.setId(i);
-            event.setTitle("Test Event " + i);
-            event.setStartDate(LocalDate.of(2020, 1, i).atStartOfDay());
-            event.setOwner(user);
-            event.setRelatedSkills(createSkills());
-
-            events.add(event);
-        }
-        return events;
-    }
-
     @Test
     public void invalid_EventId() {
         EventDto eventDto = createEventDto();
@@ -200,7 +184,7 @@ class EventServiceTest {
         filter.setId(1L);
         filter.setTitlePattern("^[a-zA-Z]+$");
 
-        when(eventRepository.findAll()).thenReturn(createEventDtoList());
+        when(eventRepository.findAll()).thenReturn(createEventList());
 
         List<EventDto> result = eventService.getEventsByFilter(filter);
 
@@ -215,7 +199,7 @@ class EventServiceTest {
         filter.setLaterThanStartDate(LocalDate.of(2019, 6, 1).atStartOfDay());
         filter.setEarlierThanEndDate(LocalDate.of(2022, 7, 20).atStartOfDay());
 
-        when(eventRepository.findAll()).thenReturn(createEventDtoList());
+        when(eventRepository.findAll()).thenReturn(createEventList());
 
         List<EventDto> result = eventService.getEventsByFilter(filter);
 
@@ -229,7 +213,7 @@ class EventServiceTest {
         EventFilterDto filter = new EventFilterDto();
         filter.setLessThanMaxAttendees(2);
 
-        when(eventRepository.findAll()).thenReturn(createEventDtoList());
+        when(eventRepository.findAll()).thenReturn(createEventList());
 
         List<EventDto> result = eventService.getEventsByFilter(filter);
 
@@ -237,6 +221,27 @@ class EventServiceTest {
         assertEquals(2, result.size());
         assertNotEquals(3L, result.get(0).getId());
         assertNotEquals(3L, result.get(1).getId());
+    }
+
+    @Test
+    void getOwnedEvents_WithExistingUserId() {
+        long userId = 1L;
+        List<Event> events = createEvents();
+        when(eventRepository.findAllByUserId(userId)).thenReturn(events);
+
+        List<EventDto> eventDtos = eventService.getOwnedEvents(userId);
+
+        assertEquals(events.size(), eventDtos.size());
+    }
+
+    @Test
+    void getOwnedEvents_WithNonExistingUserId() {
+        long userId = 1L;
+        when(eventRepository.findAllByUserId(userId)).thenReturn(Collections.emptyList());
+
+        List<EventDto> eventDtos = eventService.getOwnedEvents(userId);
+
+        assertTrue(eventDtos.isEmpty());
     }
 
     private EventDto createEventDto() {
@@ -276,7 +281,7 @@ class EventServiceTest {
         return List.of(skill1, skill2);
     }
 
-    private List<Event> createEventDtoList() {
+    private List<Event> createEventList() {
         Event event1 = new Event();
         event1.setId(1L);
         event1.setTitle("Title");
@@ -290,24 +295,19 @@ class EventServiceTest {
         return List.of(event1, event2, event3);
     }
 
-    @Test
-    void getOwnedEvents_WithExistingUserId() {
-        long userId = 1L;
-        List<Event> events = createEvents();
-        when(eventRepository.findAllByUserId(userId)).thenReturn(events);
+    private List<Event> createEvents() {
+        List<Event> events = new ArrayList<>();
+        User user = createUser();
+        for (int i = 1; i <= 5; i++) {
+            Event event = new Event();
+            event.setId(i);
+            event.setTitle("Test Event " + i);
+            event.setStartDate(LocalDate.of(2020, 1, i).atStartOfDay());
+            event.setOwner(user);
+            event.setRelatedSkills(createSkills());
 
-        List<EventDto> eventDtos = eventService.getOwnedEvents(userId);
-
-        assertEquals(events.size(), eventDtos.size());
-    }
-
-    @Test
-    void getOwnedEvents_WithNonExistingUserId() {
-        long userId = 1L;
-        when(eventRepository.findAllByUserId(userId)).thenReturn(Collections.emptyList());
-
-        List<EventDto> eventDtos = eventService.getOwnedEvents(userId);
-
-        assertTrue(eventDtos.isEmpty());
+            events.add(event);
+        }
+        return events;
     }
 }

@@ -8,12 +8,14 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import school.faang.user_service.controller.recommendation.RecommendationRequestController;
 import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.RecommendationRequestService;
 import java.time.LocalDateTime;
 
 public class RecommendationRequestControllerTest {
+    private RejectionDto rejection;
     private RecommendationRequestDto recommendationRequest;
     @Mock
     private RecommendationRequestService recommendationRequestService;
@@ -55,5 +57,13 @@ public class RecommendationRequestControllerTest {
     public void testRecommendationRequestCreated() {
         recommendationRequestController.requestRecommendation(recommendationRequest);
         Mockito.verify(recommendationRequestService, Mockito.times(1)).create(recommendationRequest);
+    }
+
+    @Test
+    public void testRecommendationRequestRejected() {
+        long id = 12;
+        rejection = RejectionDto.builder().reason("reason").build();
+        recommendationRequestController.requestRecommendation(recommendationRequest);
+        Mockito.verify(recommendationRequestService, Mockito.times(1)).rejectRequest(id, rejection);
     }
 }

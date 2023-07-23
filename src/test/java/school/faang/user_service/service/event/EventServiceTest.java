@@ -11,6 +11,7 @@ import school.faang.user_service.dto.event.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
@@ -35,6 +36,8 @@ class EventServiceTest {
 
     @InjectMocks
     private EventService eventService;
+
+    private EventMapper eventMapper = EventMapper.INSTANCE;
 
     private Event event;
     private EventDto eventDto;
@@ -141,6 +144,7 @@ class EventServiceTest {
         eventDto.setRelatedSkills(List.of(new SkillDto(1L, "A")));
 
         when(eventRepository.findById(eventDto.getId())).thenReturn(Optional.of(event));
+        when(eventRepository.save(any(Event.class))).thenReturn(eventMapper.toEntity(eventDto));
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
         EventDto updatedEvent = eventService.updateEvent(eventDto);

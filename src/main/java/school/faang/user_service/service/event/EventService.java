@@ -49,8 +49,8 @@ public class EventService {
             }
         }
 
-        eventRepository.save(eventMapper.toEntity(target));
-        return target;
+        Event result = eventRepository.save(eventMapper.toEntity(target));
+        return eventMapper.toDto(result);
     }
 
     private void validateEventDto(EventDto eventDto) {

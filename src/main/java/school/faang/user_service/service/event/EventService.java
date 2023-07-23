@@ -1,12 +1,13 @@
 package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.SkillDto;
-import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.exception.DataValidException;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.UserRepository;
@@ -14,85 +15,67 @@ import school.faang.user_service.repository.event.EventRepository;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Consumer;
-import java.util.zip.DataFormatException;
+
 
 @Service
 @RequiredArgsConstructor
 public class EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
+    private final EventMapper eventMapper = EventMapper.INSTANCE;
+    private final SkillMapper skillMapper = SkillMapper.INSTANCE;
 
     public EventDto create(EventDto eventDto) {
-        try {
-            validateEventDto(eventDto);
-            Event event = eventRepository.save(EventMapper.INSTANCE.toEntity(eventDto));
-            return EventMapper.INSTANCE.toDto(event);
-        } catch (DataFormatException e) {
-            throw new RuntimeException(e);
-        }
+        validateEventDto(eventDto);
+        Event event = eventRepository.save(eventMapper.toEntity(eventDto));
+        return eventMapper.toDto(event);
     }
 
-    public EventDto updateEvent(EventDto eventDto) {
-        try {
-            validateEventDto(eventDto);
-        } catch (DataFormatException e) {
-            throw new RuntimeException(e);
-        }
+    public EventDto updateEvent(EventDto source) {
+        validateEventDto(source);
 
-        Event event = eventRepository.findById(eventDto.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Event not found. ID: " + eventDto.getId()));
+        Event event = eventRepository.findById(source.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Event not found. ID: " + source.getId()));
+        EventDto target = eventMapper.toDto(event);
 
-        updateField(eventDto.getTitle(), event.getTitle(), event::setTitle);
-        updateField(eventDto.getStartDate(), event.getStartDate(), event::setStartDate);
-        updateField(eventDto.getEndDate(), event.getEndDate(), event::setEndDate);
-        updateField(eventDto.getDescription(), event.getDescription(), event::setDescription);
-        updateField(eventDto.getLocation(), event.getLocation(), event::setLocation);
-        updateField(eventDto.getMaxAttendees(), event.getMaxAttendees(), event::setMaxAttendees);
+        BeanUtils.copyProperties(source, target, "id", "relatedSkills");
 
-        if (eventDto.getRelatedSkills() != null) {
-            Set<Skill> skills1 = new HashSet<>(event.getRelatedSkills());
-            Set<Skill> skills2 = new HashSet<>(SkillMapper.INSTANCE.toListSkillsEntity(eventDto.getRelatedSkills()));
+        if (source.getRelatedSkills() != null) {
+            Set<SkillDto> skills1 = new HashSet<>(target.getRelatedSkills());
+            Set<SkillDto> skills2 = new HashSet<>(source.getRelatedSkills());
             if (!skills1.equals(skills2)) {
-                event.setRelatedSkills(skills2.stream().toList());
+                target.setRelatedSkills(skills2.stream().toList());
             }
         }
 
-        eventRepository.save(event);
-        return EventMapper.INSTANCE.toDto(event);
+        eventRepository.save(eventMapper.toEntity(target));
+        return target;
     }
 
-    private <T> void updateField(T newValue, T oldValue, Consumer<T> updateFunction) {
-        if (newValue != null && !Objects.equals(newValue, oldValue)) {
-            updateFunction.accept(newValue);
-        }
-    }
-
-    private void validateEventDto(EventDto eventDto) throws DataFormatException {
+    private void validateEventDto(EventDto eventDto) {
         if (eventDto.getId() == null || eventDto.getId() < 1) {
-            throw new DataFormatException("Event Id must be greater than 0");
+            throw new DataValidException("Event Id must be greater than 0");
         }
         if (eventDto.getTitle().isBlank()) {
-            throw new DataFormatException("Event must have a title");
+            throw new DataValidException("Event must have a title");
         }
         if (eventDto.getStartDate() == null) {
-            throw new DataFormatException("Event must have a start date");
+            throw new DataValidException("Event must have a start date");
         }
         if (eventDto.getOwnerId() == null) {
-            throw new DataFormatException("Event must have a user");
+            throw new DataValidException("Event must have a user");
         }
         checkUserContainsSkills(eventDto);
     }
 
-    private void checkUserContainsSkills(EventDto eventDto) throws DataFormatException {
+    private void checkUserContainsSkills(EventDto eventDto) {
         User user = userRepository.findById(eventDto.getOwnerId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found. ID: " + eventDto.getOwnerId()));
 
-        List<SkillDto> userSkills = SkillMapper.INSTANCE.toListSkillsDTO(user.getSkills());
+        List<SkillDto> userSkills = skillMapper.toListSkillsDTO(user.getSkills());
         if (!new HashSet<>(userSkills).containsAll(eventDto.getRelatedSkills())) {
-            throw new DataFormatException("User has no related skills");
+            throw new DataValidException("User has no related skills");
         }
     }
 }

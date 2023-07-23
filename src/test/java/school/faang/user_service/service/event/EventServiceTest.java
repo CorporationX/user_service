@@ -3,7 +3,6 @@ package school.faang.user_service.service.event;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -121,7 +120,7 @@ class EventServiceTest {
     void create_ShouldReturnEventDto() {
         createEvent();
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(eventRepository.save(ArgumentMatchers.any(Event.class))).thenReturn(event);
+        when(eventRepository.save(any(Event.class))).thenReturn(event);
 
         EventDto createdEventDto = eventService.create(eventDto);
 
@@ -162,6 +161,6 @@ class EventServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
         Exception exception = assertThrows(RuntimeException.class, () -> eventService.updateEvent(eventDto));
-        assertEquals("Event not found", exception.getMessage());
+        assertEquals("Event not found. ID: 1", exception.getMessage());
     }
 }

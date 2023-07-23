@@ -60,6 +60,11 @@ public class EventService {
     }
 
     private void validateEventDto(EventDto eventDto) {
+    public List<EventDto> getOwnedEvents(long userId) {
+        return EventMapper.INSTANCE.toListDto(eventRepository.findAllByUserId(userId));
+    }
+
+    private void validateEventDto(EventDto eventDto) throws DataFormatException {
         if (eventDto.getId() == null || eventDto.getId() < 1) {
             throw new DataValidException("Event Id must be greater than 0");
         }

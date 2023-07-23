@@ -22,6 +22,8 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.any;
@@ -56,6 +59,22 @@ class EventServiceTest {
                 new EventMaxAttendeesFilter()
         );
         eventService = new EventService(eventRepository, userRepository, eventFilters);
+    }
+
+    private List<Event> createEvents() {
+        List<Event> events = new ArrayList<>();
+        createUser();
+        for (int i = 1; i <= 5; i++) {
+            Event event = new Event();
+            event.setId(i);
+            event.setTitle("Test Event " + i);
+            event.setStartDate(LocalDate.of(2020, 1, i).atStartOfDay());
+            event.setOwner(user);
+            event.setRelatedSkills(createSkills());
+
+            events.add(event);
+        }
+        return events;
     }
 
     @Test
@@ -269,5 +288,26 @@ class EventServiceTest {
         event3.setId(3L);
         event3.setMaxAttendees(5);
         return List.of(event1, event2, event3);
+    }
+
+    @Test
+    void getOwnedEvents_WithExistingUserId() {
+        long userId = 1L;
+        List<Event> events = createEvents();
+        when(eventRepository.findAllByUserId(userId)).thenReturn(events);
+
+        List<EventDto> eventDtos = eventService.getOwnedEvents(userId);
+
+        assertEquals(events.size(), eventDtos.size());
+    }
+
+    @Test
+    void getOwnedEvents_WithNonExistingUserId() {
+        long userId = 1L;
+        when(eventRepository.findAllByUserId(userId)).thenReturn(Collections.emptyList());
+
+        List<EventDto> eventDtos = eventService.getOwnedEvents(userId);
+
+        assertTrue(eventDtos.isEmpty());
     }
 }

@@ -28,4 +28,8 @@ public class EventController {
     public List<EventDto> getEventsByFilter(EventFilterDto filter) {
         return eventService.getEventsByFilter(filter);
     }
+
+    public List<EventDto> getOwnedEvents(long userId) {
+        return eventService.getOwnedEvents(userId);
+    }
 }

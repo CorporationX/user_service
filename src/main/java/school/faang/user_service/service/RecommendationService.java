@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,7 +41,8 @@ public class RecommendationService {
         recommendationValidator.validateData(recomendation);
         recommendationValidator.validateSkill(recomendation);
         Long entityId = recommendationRepository.create(recomendation.getAuthorId(), recomendation.getReceiverId(), recomendation.getContent());
-        Recommendation entity = recommendationRepository.findById(entityId).orElseThrow(() -> new DataValidationException("Recommendation not found"));
+        Recommendation entity = recommendationRepository.findById(entityId)
+                .orElseThrow(() -> new EntityNotFoundException("Recommendation not found"));
         skillSave(entity, recomendation.getSkillOffers());
         return recommendationMapper.toDto(entity);
     }
@@ -48,7 +50,8 @@ public class RecommendationService {
     public void skillSave(Recommendation recommendation, List<SkillOfferDto> list) {
         list.forEach(offer -> {
             long offersIds = skillOffersRepository.create(offer.getSkillId(), recommendation.getId());
-            recommendation.addSkillOffer(skillOffersRepository.findById(offersIds).orElseThrow(() -> new DataValidationException("Skill offer not found")));
+            recommendation.addSkillOffer(skillOffersRepository.findById(offersIds)
+                    .orElseThrow(() -> new EntityNotFoundException("Skill offer not found")));
             guaranteesHaveSkill(recommendation);
         });
     }
@@ -89,7 +92,8 @@ public class RecommendationService {
     }
 
     public RecommendationDto updateRecommendation(RecommendationDto updated, Long id) {
-        Recommendation entity = recommendationRepository.findById(id).orElseThrow(() -> new DataValidationException("Recommendation not found"));
+        Recommendation entity = recommendationRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Recommendation not found"));
         recommendationValidator.validateData(updated);
         recommendationValidator.validateSkill(updated);
         Recommendation updatedEntity = recommendationRepository.update(updated.getAuthorId(), updated.getReceiverId(), updated.getContent());

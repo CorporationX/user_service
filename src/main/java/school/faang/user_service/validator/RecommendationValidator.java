@@ -1,5 +1,6 @@
 package school.faang.user_service.validator;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
@@ -31,7 +32,7 @@ public class RecommendationValidator {
         List<SkillOfferDto> skillOffers = recommendation.getSkillOffers();
         for (SkillOfferDto skillOffer : skillOffers) {
             if (!skillOffersRepository.existsById(skillOffer.getId())) {
-                throw new DataValidationException(skillOffer.getId() + "doesn't exists");
+                throw new EntityNotFoundException(skillOffer.getId() + "doesn't exists");
             }
         }
     }

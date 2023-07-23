@@ -2,17 +2,14 @@ package school.faang.user_service.controller;
 
 import lombok.AllArgsConstructor;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.RecommendationService;
 
 import java.util.List;
 
-@Controller
+@RestController
 @AllArgsConstructor
 public class RecommendationController {
     private RecommendationService recommendationService;
@@ -23,54 +20,57 @@ public class RecommendationController {
         return recommendationService.create(recommendation);
     }
 
-    @PostMapping("recommendation/{id}")
-    public RecommendationDto updateRecommendation(@RequestBody RecommendationDto updated, @PathVariable Long id) {
+    @PutMapping("/recommendation/{id}")
+    public RecommendationDto updateRecommendation(@RequestBody RecommendationDto updated, @PathVariable long id) {
         validateId(id);
         validateData(updated);
         return recommendationService.updateRecommendation(updated, id);
     }
 
-    @PostMapping("recommendation/{id}")
+    @DeleteMapping("/recommendation/{id}")
     public void deleteRecommendation(@PathVariable long id) {
         validateId(id);
         recommendationService.deleteRecommendation(id);
     }
 
-    @PostMapping("/recommendation/receiver/{receiverId}")
-    public List<RecommendationDto> getAllUserRecommendations(long receiverId){
+    @GetMapping("/recommendation/receiver/{receiverId}")
+    public List<RecommendationDto> getAllUserRecommendations(@PathVariable long receiverId){
         validateId(receiverId);
         return recommendationService.getAllUserRecommendations(receiverId);
     }
 
-    @PostMapping("/recommendation/given/{authorId}")
-    public List<RecommendationDto> getAllUserGivenRecommendations(@PathVariable Long authorId) {
+    @GetMapping("/recommendation/given/{authorId}")
+    public List<RecommendationDto> getAllUserGivenRecommendations(@PathVariable long authorId) {
         validateId(authorId);
         return recommendationService.getAllUserGivenRecommendations(authorId);
     }
 
     private void validateRecommendation(RecommendationDto recommendationDto) {
-        if (recommendationDto.getContent() == null || recommendationDto.getContent().isEmpty()) {
+        if (recommendationDto == null){
+            throw new DataValidationException("RecommendationDto cannot be null");
+        }
+        if (recommendationDto.getContent() == null || recommendationDto.getContent().isBlank()) {
             throw new DataValidationException("Recommendation content cannot be empty");
         }
     }
 
     private void validateId(Long id) {
-        if (id > 1)
-            throw new IllegalArgumentException("Id is null");
+        if (id < 1)
+            throw new DataValidationException("Id is null");
     }
 
     private void validateData(RecommendationDto recommendationDto) {
         if (recommendationDto == null) {
-            throw new IllegalArgumentException("RecommendationDto is nill");
+            throw new DataValidationException("RecommendationDto is null");
         }
         if (recommendationDto.getAuthorId() == null) {
-            throw new IllegalArgumentException("AuthorId is nill");
+            throw new DataValidationException("AuthorId is null");
         }
         if (recommendationDto.getReceiverId() == null) {
-            throw new IllegalArgumentException("ReceiverId is nill");
+            throw new DataValidationException("ReceiverId is null");
         }
         if (recommendationDto.getContent() == null) {
-            throw new IllegalArgumentException("Content is nill");
+            throw new DataValidationException("Content is null");
         }
     }
 }

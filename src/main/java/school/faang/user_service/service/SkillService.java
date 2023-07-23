@@ -8,6 +8,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
@@ -26,6 +27,7 @@ public class SkillService {
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final SkillRepository skillRepository;
     private final SkillMapper mapper;
+    private final UserRepository userRepository;
     private static final int MIN_SKILL_OFFERS = 3;
 
 
@@ -40,56 +42,60 @@ public class SkillService {
     }
 
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
-        if (skillRepository.findUserSkill(skillId, userId).isEmpty()) {
-            List<SkillOffer> allOffersOfSkill = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
-            if (allOffersOfSkill.size() >= MIN_SKILL_OFFERS) {
-                skillRepository.assignSkillToUser(skillId, userId);
-                Skill skill = skillRepository.findById(skillId).get();
-                addGuarantees(skill, allOffersOfSkill, userId);
-                return mapper.toDto(skill);
-            }
-            throw new DataValidationException("Not enough offers to add skill");
+        if (skillRepository.findUserSkill(skillId, userId).isPresent()) {
+            return null;
         }
-        return null;
+        List<SkillOffer> allOffersOfSkill = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
+        if (allOffersOfSkill.size() >= MIN_SKILL_OFFERS) {
+            skillRepository.assignSkillToUser(skillId, userId);
+            Skill skill = skillRepository.findById(skillId).get();
+            addGuarantees(skill, allOffersOfSkill, userId);
+            return mapper.toDto(skill);
+        }
+        throw new DataValidationException("Not enough offers to add skill");
     }
 
     public List<SkillDto> getUserSkills(long userId) {
+        verifyUserExist(userId);
         List<Skill> allByUserId = skillRepository.findAllByUserId(userId);
-        verifyUserExist(allByUserId);
-        return mapSkillToDto(allByUserId);
+        return mapSkillsToDtos(allByUserId);
     }
 
     public SkillDto create(SkillDto skill) {
-        if (skillRepository.existsByTitle(skill.getTitle())) {
+        SkillDto processedTitle = new SkillDto(skill.getId(), skill.getTitle().trim());
+        if (skillRepository.existsByTitle(processedTitle.getTitle())) {
             throw new DataValidationException("This skill already exist");
         }
-        Skill savedSkill = skillRepository.save(mapper.toEntity(skill));
+        Skill savedSkill = skillRepository.save(mapper.toEntity(processedTitle));
         return mapper.toDto(savedSkill);
     }
 
-    private void verifyUserExist(List<Skill> skills) {
-        if (skills == null || skills.isEmpty()) {
-            throw new DataValidationException("User with that id doesn't exist");
+    private void verifyUserExist(long userId) {
+        if (!(userRepository.existsById(userId))) {
+            throw new DataValidationException("User doesn't exist");
         }
     }
 
-    private List<SkillDto> mapSkillToDto(List<Skill> skills) {
+    private List<SkillDto> mapSkillsToDtos(List<Skill> skills) {
         return skills.stream()
                 .map(mapper::toDto)
                 .toList();
     }
 
     private void addGuarantees(Skill skill, List<SkillOffer> offers, long userId) {
-        User user = skill.getUsers()
-                .stream()
-                .filter(user1 -> user1.getId() == userId)
-                .findFirst().orElseThrow(() -> new DataValidationException("User not found"));
+        User user;
+        if (userRepository.findById(userId).isPresent()) {
+            user = userRepository.findById(userId).get();
+        } else {
+            throw new DataValidationException("User not found");
+        }
 
-        List<UserSkillGuarantee> listGuarantees = offers.stream().map(skillOffer -> UserSkillGuarantee.builder()
-                        .user(user)
-                        .skill(skill)
-                        .guarantor(skillOffer.getRecommendation().getAuthor())
-                        .build())
+        List<UserSkillGuarantee> listGuarantees = offers.stream().map(skillOffer ->
+                        UserSkillGuarantee.builder()
+                                .user(user)
+                                .skill(skill)
+                                .guarantor(skillOffer.getRecommendation().getAuthor())
+                                .build())
                 .toList();
 
         listGuarantees.forEach((userSkillGuaranteeRepository::save));

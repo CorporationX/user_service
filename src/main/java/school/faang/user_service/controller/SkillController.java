@@ -34,10 +34,11 @@ public class SkillController {
     }
 
     private void validateSkill(SkillDto skill) {
-        if (skill.getTitle() == null || skill.getTitle().isBlank()) {
+        String title = skill.getTitle();
+        if (title == null || title.isBlank()) {
             throw new DataValidationException("Skill can't be created with empty name");
         }
-        if (skill.getTitle().length() > 64){
+        if (title.length() > 64){
             throw new DataValidationException("Skill's title length can't be more than 64 symbols");
         }
     }

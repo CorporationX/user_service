@@ -310,4 +310,17 @@ class EventServiceTest {
         }
         return events;
     }
+
+    @Test
+    void getParticipatedEvents_ShouldReturnEventDtos() {
+        long userId = 1L;
+        List<Event> participatedEvents = createEvents();
+
+        when(eventRepository.findParticipatedEventsByUserId(userId)).thenReturn(participatedEvents);
+
+        List<EventDto> eventDtos = eventService.getParticipatedEvents(userId);
+
+        assertNotNull(eventDtos);
+        assertEquals(participatedEvents.size(), eventDtos.size());
+    }
 }

@@ -12,11 +12,12 @@ import school.faang.user_service.repository.recommendation.RecommendationRequest
 public class RecommendationRequestService {
     private final RecommendationRequestRepository recommendationRequestRepository;
     private final RecommendationRequestMapper recommendationRequestMapper;
+    private static final String MSG = "There is no person with such id";
 
     public RecommendationRequestDto getRequest(long id) {
         RecommendationRequest foundPerson = recommendationRequestRepository.findById(id)
                 .orElseThrow(() -> {
-                    throw new IllegalStateException("There is no person with such id");
+                    throw new IllegalStateException(MSG);
                 });
 
         return recommendationRequestMapper.toDto(foundPerson);

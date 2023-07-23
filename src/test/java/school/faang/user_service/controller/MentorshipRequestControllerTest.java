@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.dto.mentorship.RequestFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
@@ -28,6 +29,7 @@ public class MentorshipRequestControllerTest {
     private MentorshipRequestDto incorrectRequestDto;
     private RequestFilterDto incorrectFilterDto;
     private RequestFilterDto correctFilterDto;
+    private RejectionDto rejectionDto;
 
     @BeforeEach
     void initData() {
@@ -38,6 +40,9 @@ public class MentorshipRequestControllerTest {
                 .description("     ")
                 .build();
         correctFilterDto = RequestFilterDto.builder().build();
+        rejectionDto = RejectionDto.builder()
+                .reason("reason")
+                .build();
     }
 
     @Test
@@ -71,5 +76,16 @@ public class MentorshipRequestControllerTest {
     void testAcceptRequest() {
         requestController.acceptRequest(CORRECT_ID);
         verify(requestService, times(1)).acceptRequest(CORRECT_ID);
+    }
+
+    @Test
+    void testRejectRequestWithIncorrectId() {
+        assertThrows(DataValidationException.class, () -> requestController.rejectRequest(INCORRECT_ID, rejectionDto));
+    }
+
+    @Test
+    void testRejectRequest() {
+        requestController.rejectRequest(CORRECT_ID, rejectionDto);
+        verify(requestService, times(1)).rejectRequest(CORRECT_ID, rejectionDto);
     }
 }

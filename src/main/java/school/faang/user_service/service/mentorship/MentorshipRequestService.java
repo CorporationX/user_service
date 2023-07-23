@@ -4,12 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.dto.mentorship.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.MentorshipRequestNotFoundException;
+import school.faang.user_service.exception.RequestAlreadyAcceptedException;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
@@ -53,22 +55,53 @@ public class MentorshipRequestService {
     }
 
     public void acceptRequest(long id) {
-        MentorshipRequest mentorshipRequest = mentorshipRequestRepository.findById(id).orElseThrow(() -> {
-            throw new MentorshipRequestNotFoundException("Данного запроса на менторство не существует");
-        });
+        MentorshipRequest mentorshipRequest = findRequestInDB(id);
 
         User receiver = mentorshipRequest.getReceiver();
         User requester = mentorshipRequest.getRequester();
 
+        checkAcceptedRequest(mentorshipRequest, RequestStatus.ACCEPTED);
+
         if (requester.getMentors() == null) {
             requester.setMentors(List.of(receiver));
+            if (receiver.getMentees() == null) {
+                receiver.setMentees(List.of(requester));
+            } else {
+                receiver.getMentees().add(requester);
+            }
             mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
         } else if (!requester.getMentors().contains(receiver)) {
             requester.getMentors().add(receiver);
+            receiver.getMentees().add(requester);
             mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
         } else {
             throw new IllegalArgumentException("Данный пользователь уже является ментором отправителя");
         }
+    }
+
+    public void rejectRequest(long id, RejectionDto rejection) {
+        MentorshipRequest mentorshipRequest = findRequestInDB(id);
+
+        User requester = mentorshipRequest.getRequester();
+        User receiver = mentorshipRequest.getReceiver();
+
+        checkAcceptedRequest(mentorshipRequest, RequestStatus.REJECTED);
+
+        mentorshipRequest.setStatus(RequestStatus.REJECTED);
+        mentorshipRequest.setRejectionReason(rejection.getReason());
+        requester.getMentors().remove(receiver);
+        receiver.getMentees().remove(requester);
+    }
+
+    private void checkAcceptedRequest(MentorshipRequest request, RequestStatus status ) {
+        if (request.getStatus() == status) {
+            throw new RequestAlreadyAcceptedException("Данный запрос уже обработан");
+        }
+    }
+
+    private MentorshipRequest findRequestInDB(long id) {
+        return mentorshipRequestRepository.findById(id)
+                .orElseThrow(() -> new MentorshipRequestNotFoundException("Данного запроса на менторство не существует"));
     }
 
     private void dataValidate(long requesterId, long receiverId, MentorshipRequestDto requestDto) {

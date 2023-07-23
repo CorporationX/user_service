@@ -6,10 +6,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.exeptions.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
@@ -20,9 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class GoalServiceTest {
@@ -34,9 +34,12 @@ class GoalServiceTest {
     @InjectMocks
     private GoalService goalService;
 
-    Goal goal = mock(Goal.class);
+    GoalDto goalDto = mock(GoalDto.class);
     Skill skill = mock(Skill.class);
     User user = mock(User.class);
+
+    Goal goal = mock(Goal.class);
+    Goal goal1 = new Goal().builder().title("Java").status(GoalStatus.ACTIVE).build();
 
     @BeforeEach
     void setUp() {
@@ -50,8 +53,8 @@ class GoalServiceTest {
         when(goal.getTitle()).thenReturn("title");
         when(goal.getStatus()).thenReturn(GoalStatus.COMPLETED);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> goalService.updateGoal(0L, goal));
+        DataValidationException exception = assertThrows(DataValidationException.class,
+                () -> goalService.updateGoal(0L, goalDto));
 
         assertEquals("Goal already completed", exception.getMessage());
 
@@ -66,7 +69,7 @@ class GoalServiceTest {
         when(skill.getTitle()).thenReturn("Spring");
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> goalService.updateGoal(0L, goal));
+                () -> goalService.updateGoal(0L, goalDto));
 
         assertEquals("Goal contains non-existent skill", exception.getMessage());
     }
@@ -79,20 +82,22 @@ class GoalServiceTest {
         when(skill.getTitle()).thenReturn("Spring");
 
         goal.setStatus(GoalStatus.COMPLETED);
-        goalService.updateGoal(0L, goal);
+        goalService.updateGoal(0L, goalDto);
 
         verify(goalRepository).delete(goal);
     }
 
     @Test
     void updateGoalTest() {
-        when(goal.getTitle()).thenReturn("Java");
+        when(goalDto.getTitle()).thenReturn("Java");
+        when(goalRepository.findGoal(1L)).thenReturn(goal);
         when(goal.getStatus()).thenReturn(GoalStatus.ACTIVE);
         when(skillRepository.existsByTitle(anyString())).thenReturn(true);
-        when(skill.getTitle()).thenReturn("Spring");
 
-        goalService.updateGoal(0L, goal);
+        when().thenReturn(goal1);
 
-        verify(goalRepository).save(goal);
+        goalService.updateGoal(1L, goalDto);
+
+        verify(goalRepository).save(goal1);
     }
 }

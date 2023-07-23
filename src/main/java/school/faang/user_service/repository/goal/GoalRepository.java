@@ -34,14 +34,6 @@ public interface GoalRepository extends CrudRepository<Goal, Long> {
             """)
     Goal create(String title, String description, Long parent);
 
-    @Modifying
-    @Query("UPDATE goal g SET g.title = ?1, g.description = ?2, g.status = ?2 WHERE g.id = ?3")
-    void update(String title, String description, GoalStatus status, Long id);
-
-    @Modifying
-    @Query("UPDATE goal_skill gs SET gs.skill_id = ?1 WHERE gs.goal_id = ?2")
-    void updateGoalSkill(Long sid, Long gid);
-
     @Query(nativeQuery = true, value = """
             SELECT COUNT(ug.goal_id) FROM user_goal ug
             JOIN goal g ON g.id = ug.goal_id

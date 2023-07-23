@@ -117,12 +117,35 @@ public class GoalServiceTest {
     @Test
     public void testUpdateGoal_GoalNotFound() {
         Long goalId = 123L;
-
         GoalDto goalDto = new GoalDto(goalId, title);
 
         when(goalRepository.findById(goalId)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class,
                 () -> goalService.updateGoal(goalDto, userId, skills));
+    }
+
+    @Test
+    public void testDeleteGoal_Successful() {
+        Long goalId = 1L;
+        Goal goal = new Goal();
+        goal.setId(goalId);
+        GoalDto expectedDto = new GoalDto(goalId, title);
+
+        when(goalRepository.findById(goalId)).thenReturn(Optional.of(goal));
+        when(goalMapper.goalToDto(goal)).thenReturn(expectedDto);
+
+        GoalDto result = goalService.deleteGoal(goalId);
+
+        assertEquals(expectedDto, result);
+    }
+
+    @Test
+    public void testDeleteGoal_ThrowsException() {
+        Long nonExistingGoalId = 100L;
+
+        when(goalRepository.findById(nonExistingGoalId)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> goalService.deleteGoal(nonExistingGoalId));
     }
 }

@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalDto;
-import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -13,7 +12,6 @@ import school.faang.user_service.util.Message;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
@@ -52,7 +50,17 @@ public class GoalService {
                 .map(goalRepository::save)
                 .map(goalMapper::goalToDto)
                 .orElseThrow(() ->
-                        new IllegalArgumentException(MessageFormat.format("Goal{0} not found", goalDto.getId())));
+                        new IllegalArgumentException(MessageFormat.format("Goal {0} not found", goalDto.getId())));
+    }
 
+    @Transactional
+    public GoalDto deleteGoal(Long goalId){
+        return goalRepository.findById(goalId)
+                .map(goal -> {
+                    goalRepository.delete(goal);
+                    return goalMapper.goalToDto(goal);
+                })
+                .orElseThrow(() ->
+                        new IllegalArgumentException(MessageFormat.format("Goal {0} not found", goalId)));
     }
 }

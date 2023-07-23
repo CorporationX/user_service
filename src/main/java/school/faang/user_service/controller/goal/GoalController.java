@@ -2,6 +2,7 @@ package school.faang.user_service.controller.goal;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,5 +35,10 @@ public class GoalController {
         GoalDto goal = new GoalDto(0L, title);
 
         return goalService.updateGoal(goal, userId, skills);
+    }
+
+    @DeleteMapping
+    public GoalDto deleteGoal(Long goalId){
+        return goalService.deleteGoal(goalId);
     }
 }

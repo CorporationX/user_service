@@ -3,6 +3,7 @@ package school.faang.user_service.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.dto.mentorship.RequestFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
@@ -30,9 +31,18 @@ public class MentorshipRequestController {
     }
 
     public void acceptRequest(long id) {
+        validateRequestId(id);
+        mentorshipRequestService.acceptRequest(id);
+    }
+
+    public void rejectRequest(long id, RejectionDto rejection) {
+        validateRequestId(id);
+        mentorshipRequestService.rejectRequest(id, rejection);
+    }
+
+    private void validateRequestId(long id) {
         if (id < 1) {
             throw new DataValidationException("Некорректный ввод id");
         }
-        mentorshipRequestService.acceptRequest(id);
     }
 }

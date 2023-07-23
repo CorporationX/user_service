@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -64,6 +65,7 @@ class RecommendationServiceTest {
     List<UserSkillGuarantee> guaranteesList;
     UserSkillGuarantee guarantees;
     User athorId;
+
     @BeforeEach
     void setUp() {
         this.skillOfferDto = new SkillOfferDto(1L, 1L, 1L);
@@ -79,9 +81,9 @@ class RecommendationServiceTest {
                 .id(1)
                 .build();
         this.guarantees = UserSkillGuarantee
-                 .builder()
-                 .user(athorId)
-                 .build();
+                .builder()
+                .user(athorId)
+                .build();
         this.guaranteesList = new ArrayList<>(List.of(guarantees));
         this.skill = Skill
                 .builder()
@@ -105,8 +107,9 @@ class RecommendationServiceTest {
 
     @Test
     public void testCreateThrowException() {
-        Mockito.when(recommendationRepository.create(1L, 1L, "content")).thenReturn(1L);
-        assertThrows(DataValidationException.class, () -> {
+        Mockito.when(recommendationRepository.create(1L, 1L, "content"))
+                .thenReturn(1L);
+        assertThrows(EntityNotFoundException.class, () -> {
             recommendationService.create(recommendationDto);
         });
     }
@@ -168,7 +171,7 @@ class RecommendationServiceTest {
         Mockito.when(skillOffersRepository.create(1L, 1L))
                 .thenReturn(1L);
 
-        assertThrows(DataValidationException.class, () -> {
+        assertThrows(EntityNotFoundException.class, () -> {
             recommendationService.create(recommendationDto);
         });
     }
@@ -195,9 +198,14 @@ class RecommendationServiceTest {
                 .builder()
                 .id(2)
                 .build();
+        User userId = User
+                .builder()
+                .id(3)
+                .build();
         UserSkillGuarantee guarantees = UserSkillGuarantee
                 .builder()
                 .user(athorId)
+                .guarantor(userId)
                 .build();
         List<UserSkillGuarantee> guaranteesList = new ArrayList<>();
         guaranteesList.add(guarantees);
@@ -210,10 +218,10 @@ class RecommendationServiceTest {
         skills.add(skill);
 
         Mockito.when(skillRepository.findAllByUserId(recommendation.getReceiver().getId()))
-                        .thenReturn(skills);
+                .thenReturn(skills);
 
         recommendationService.guaranteesHaveSkill(recommendation);
 
-        assertEquals(1 , recommendation.getSkillOffers().get(0).getSkill().getGuarantees().size());
+        assertEquals(2, recommendation.getSkillOffers().get(0).getSkill().getGuarantees().size());
     }
 }

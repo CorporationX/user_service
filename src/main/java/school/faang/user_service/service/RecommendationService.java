@@ -1,9 +1,7 @@
 package school.faang.user_service.service;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillDto;
@@ -12,7 +10,6 @@ import school.faang.user_service.dto.recommendation.UserSkillGuaranteeDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.mapper.UserSkillGuaranteeMapper;
@@ -41,7 +38,7 @@ public class RecommendationService {
         recommendationValidator.validateData(recomendation);
         recommendationValidator.validateSkill(recomendation);
         Long entityId = recommendationRepository.create(recomendation.getAuthorId(), recomendation.getReceiverId(), recomendation.getContent());
-        Recommendation entity = recommendationRepository.findById(entityId).orElseThrow(() -> new DataValidationException("Recommendation not found"));
+        Recommendation entity = recommendationRepository.findById(entityId).orElseThrow(() -> new EntityNotFoundException("Recommendation not found"));
         skillSave(entity, recomendation.getSkillOffers());
         return recommendationMapper.toDto(entity);
     }
@@ -49,7 +46,7 @@ public class RecommendationService {
     public void skillSave(Recommendation recommendation, List<SkillOfferDto> list) {
         list.forEach(offer -> {
             long offersIds = skillOffersRepository.create(offer.getSkillId(), recommendation.getId());
-            recommendation.addSkillOffer(skillOffersRepository.findById(offersIds).orElseThrow(() -> new DataValidationException("Skill offer not found")));
+            recommendation.addSkillOffer(skillOffersRepository.findById(offersIds).orElseThrow(() -> new EntityNotFoundException("Skill offer not found")));
             guaranteesHaveSkill(recommendation);
         });
     }
@@ -60,16 +57,21 @@ public class RecommendationService {
         for (SkillOffer skillOffer : recommendation.getSkillOffers()) {
             usersSkills.stream()
                     .filter(userSkill -> userSkill.getId().equals(skillOffer.getSkill().getId()))
-                    .forEach(skill -> guaranteesHave(skill, recommendation.getAuthor().getId(), userSkillGuaranteeDto));
+                    .forEach(skill -> guaranteesHave(skill, recommendation, userSkillGuaranteeDto));
         }
     }
 
-    public void guaranteesHave(SkillDto skill, Long userId, UserSkillGuaranteeDto userSkillGuaranteeDto) {
+    public void guaranteesHave(SkillDto skill, Recommendation recommendation, UserSkillGuaranteeDto userSkillGuaranteeDto) {
         if (skill.getGuaranteeDtoList()
                 .stream()
-                .noneMatch(guarantee -> guarantee.getGuarantorId() == userId));
-        userSkillGuaranteeDto.setSkillId(skill.getId()) ;{
-            skill.getGuaranteeDtoList().add(userSkillGuaranteeDto);
+                .noneMatch(guarantee -> guarantee.getGuarantorId() == recommendation.getAuthor().getId())) {
+            userSkillGuaranteeDto.setSkillId(skill.getId());
+            recommendation.getSkillOffers().stream()
+                    .map(SkillOffer::getSkill)
+                    .filter(p -> p.getId() == skill.getId())
+                    .forEach((p) -> {
+                        p.getGuarantees().add(userSkillGuaranteeMapper.toEntity(userSkillGuaranteeDto));
+                    });
             userSkillGuaranteeRepository.save(userSkillGuaranteeMapper.toEntity(userSkillGuaranteeDto));
         }
     }

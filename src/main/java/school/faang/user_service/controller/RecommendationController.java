@@ -15,12 +15,15 @@ public class RecommendationController {
     private RecommendationService recommendationService;
 
     @PostMapping("/recommendation")
-    public void giveRecommendation(@RequestBody RecommendationDto recommendation){
+    public void giveRecommendation(@RequestBody RecommendationDto recommendation) {
         validateRecommendation(recommendation);
         recommendationService.create(recommendation);
     }
 
-    private void validateRecommendation(RecommendationDto recommendationDto){
+    private void validateRecommendation(RecommendationDto recommendationDto) {
+        if (recommendationDto == null) {
+            throw new DataValidationException("RecommendationDto cannot be null");
+        }
         if (recommendationDto.getContent() == null || recommendationDto.getContent().isEmpty()) {
             throw new DataValidationException("Recommendation content cannot be empty");
         }

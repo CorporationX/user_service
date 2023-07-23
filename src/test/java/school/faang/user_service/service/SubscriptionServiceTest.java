@@ -14,7 +14,7 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.UserMapperImpl;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.subscription.SubscriptionService;
@@ -33,7 +33,7 @@ public class SubscriptionServiceTest {
     @Mock
     private UserRepository userRepository;
     @Spy
-    private UserMapperImpl userMapper;
+    private UserMapper userMapper;
     @InjectMocks
     private SubscriptionService subscriptionService;
 

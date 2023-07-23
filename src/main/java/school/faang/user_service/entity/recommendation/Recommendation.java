@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "recommendation")
+@Table(name = "school/faang/user_service/controller/recommendation")
 public class Recommendation {
 
     @Id
@@ -35,10 +35,10 @@ public class Recommendation {
     @JoinColumn(name = "receiver_id", nullable = false)
     private User receiver;
 
-    @OneToMany(mappedBy = "recommendation", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "school/faang/user_service/controller/recommendation", cascade = CascadeType.ALL)
     private List<SkillOffer> skillOffers;
 
-    @OneToOne(mappedBy = "recommendation")
+    @OneToOne(mappedBy = "school/faang/user_service/controller/recommendation")
     private RecommendationRequest request;
 
     @CreationTimestamp

@@ -1,5 +1,6 @@
 package school.faang.user_service.goal;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -39,18 +40,25 @@ public class GoalServiceTest {
     @Spy
     private GoalMapper goalMapper = Mappers.getMapper(GoalMapper.class);
 
+    private GoalDto goalDto;
+    private Long userId;
+    private String title;
+
+    @BeforeEach
+    void setUp(){
+        userId = 1L;
+        title = "title";
+        goalDto = new GoalDto(userId, title);
+        goalDto.setSkills(Arrays.asList("skill1", "skill2", "skill3"));
+    }
+
     @Test
     public void testCreateGoal_Successful() {
-        Long userId = 1L;
-        String title = "title";
-        List<String> skills = Arrays.asList("skill1", "skill2", "skill3");
-
-        GoalDto goalDto = new GoalDto(userId, title);
 
         when(goalRepository.countActiveGoalsPerUser(userId)).thenReturn(2);
         when(skillRepository.findByTitle(anyString())).thenReturn(Optional.of(new Skill()));
 
-        GoalDto result = goalService.createGoal(goalDto, userId, skills);
+        GoalDto result = goalService.createGoal(goalDto, userId);
 
         assertEquals(result.getId(), userId);
         assertEquals(result.getTitle(), title);
@@ -58,30 +66,20 @@ public class GoalServiceTest {
 
     @Test
     public void testCreateGoal_UnexistingSkills() {
-        Long userId = 1L;
-        String title = "title";
-        List<String> skills = Arrays.asList("Skill1", "Skill2", "Skill3");
-
-        GoalDto goalDto = new GoalDto(userId, title);
 
         when(skillRepository.findByTitle(anyString())).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class,
-                () -> goalService.createGoal(goalDto, userId, skills));
+                () -> goalService.createGoal(goalDto, userId));
     }
 
     @Test
     public void testCreateGoal_TooManyGoals() {
-        Long userId = 1L;
-        String title = "title";
-        List<String> skills = Arrays.asList("Skill1", "Skill2", "Skill3");
-
-        GoalDto goalDto = new GoalDto(userId, title);
 
         when(skillRepository.findByTitle(anyString())).thenReturn(Optional.of(new Skill()));
         when(goalRepository.countActiveGoalsPerUser(userId)).thenReturn(5);
 
         assertThrows(IllegalArgumentException.class,
-                () -> goalService.createGoal(goalDto, userId, skills));
+                () -> goalService.createGoal(goalDto, userId));
     }
 }

@@ -12,9 +12,9 @@ import school.faang.user_service.repository.recommendation.RecommendationRequest
 public class RecommendationRequestService {
     private final RecommendationRequestRepository recommendationRequestRepository;
     private final  RecommendationRequestMapper recommendationRequestMapper;
-    public RecommendationRequestDto getRequest(long id) {
-        RecommendationRequest foundPerson = recommendationRequestRepository.findById(id).orElseThrow(() -> {
-            throw new IllegalStateException("There is no person in the row with this id");
+    public RecommendationRequestDto getRequest(long userId) {
+        RecommendationRequest foundPerson = recommendationRequestRepository.findById(userId).orElseThrow(() -> {
+            throw new IllegalStateException(String.format("There is no person in the row with id %d", userId));
         });
         return recommendationRequestMapper.toDto(foundPerson);
     }

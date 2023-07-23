@@ -8,11 +8,9 @@ import school.faang.user_service.service.RecommendationRequestService;
 @RestController
 @RequiredArgsConstructor
 public class RecommendationRequestController {
-    private final RecommendationRequestController recommendationRequestController;
-
     public RecommendationRequestService recommendationRequestService;
 
-    public RecommendationRequestDto getRecommendationRequest(long id) {
-        return recommendationRequestService.getRequest(id);
+    public RecommendationRequestDto getRecommendationRequest(long userId) {
+        return recommendationRequestService.getRequest(userId);
     }
 }

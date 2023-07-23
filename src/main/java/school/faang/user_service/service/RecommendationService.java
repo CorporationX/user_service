@@ -9,6 +9,7 @@ import school.faang.user_service.dto.recommendation.SkillDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.dto.recommendation.UserSkillGuaranteeDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exeption.EntityNotFoundException;
@@ -16,6 +17,7 @@ import school.faang.user_service.mappers.RecommendationMapper;
 import school.faang.user_service.mappers.SkillMapper;
 import school.faang.user_service.mappers.UserSkillGuaranteeMapper;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
@@ -23,6 +25,7 @@ import school.faang.user_service.validator.RecommendationValidator;
 import school.faang.user_service.validator.SkillValidator;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +37,7 @@ public class RecommendationService {
     private final RecommendationRepository recommendationRepository;
     private final SkillOfferRepository skillOfferRepository;
     private final SkillRepository skillRepository;
+    private final UserRepository userRepository;
     private final SkillValidator skillValidator;
     private final SkillMapper skillMapper;
     private final RecommendationMapper recommendationMapper;
@@ -62,8 +66,11 @@ public class RecommendationService {
     public RecommendationDto update(RecommendationDto recommendationUpdate) {
         validate(recommendationUpdate);
 
-        Recommendation recommendationEntity = recommendationRepository.update(recommendationUpdate.getAuthorId(),
-                recommendationUpdate.getReceiverId(), recommendationUpdate.getContent());
+        Recommendation recommendationEntity = recommendationRepository.update(
+                recommendationUpdate.getAuthorId(),
+                recommendationUpdate.getReceiverId(),
+                recommendationUpdate.getContent()
+        );
 
         skillOfferRepository.deleteAllByRecommendationId(recommendationEntity.getId());
         saveSkillOffers(recommendationEntity, recommendationUpdate.getSkillOffers());
@@ -77,16 +84,22 @@ public class RecommendationService {
 
     @Transactional(readOnly = true)
     public List<RecommendationDto> getAllUserRecommendations(long receiverId) {
+        User receiver = userRepository.findById(receiverId)
+                .orElseThrow(() -> new EntityNotFoundException("Receiver not found with ID: " + receiverId));
+
         List<Recommendation> recommendations = recommendationRepository.findAllByReceiverId(receiverId)
-                .orElseThrow(() -> new EntityNotFoundException("Recommendation not found"));
+                .orElseGet(Collections::emptyList);
 
         return recommendationMapper.toRecommendationDtos(recommendations);
     }
 
     @Transactional(readOnly = true)
     public List<RecommendationDto> getAllGivenRecommendations(long authorId) {
+        User author = userRepository.findById(authorId)
+                .orElseThrow(() -> new EntityNotFoundException("Author not found with ID: " + authorId));
+
         List<Recommendation> recommendations = recommendationRepository.findAllByAuthorId(authorId)
-                .orElseThrow(() -> new EntityNotFoundException("Recommendation not found"));
+                .orElseGet(Collections::emptyList);
 
         return recommendationMapper.toRecommendationDtos(recommendations);
     }

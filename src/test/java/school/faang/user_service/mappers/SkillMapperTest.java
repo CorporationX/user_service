@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class SkillMapperTest {
-    
+
     @InjectMocks
     private SkillMapper skillMapper = new SkillMapperImpl();
 
@@ -42,7 +42,6 @@ class SkillMapperTest {
         assertEquals(1, skillDto.getGuarantees().size());
         assertEquals(10L, skillDto.getGuarantees().get(0).getId());
     }
-
 
 
     @Test

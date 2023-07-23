@@ -9,9 +9,9 @@ import school.faang.user_service.entity.UserSkillGuarantee;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.FIELD, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserSkillGuaranteeMapper {
-    @Mapping(target = "user", source = "userId", qualifiedByName = "toUser")
-    @Mapping(target = "skill", source = "skillId", qualifiedByName = "toSkill")
-    @Mapping(target = "guarantor", source = "guarantorId", qualifiedByName = "toGuarantor")
+    @Mapping(source = "userId", target = "user", qualifiedByName = "toUser")
+    @Mapping(source = "skillId", target = "skill", qualifiedByName = "toSkill")
+    @Mapping(source = "guarantorId", target = "guarantor", qualifiedByName = "toGuarantor")
     UserSkillGuarantee toEntity(UserSkillGuaranteeDto dto);
 
     @Named("toUser")

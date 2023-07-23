@@ -23,7 +23,7 @@ class RecommendationMapperTest {
     private RecommendationMapper recommendationMapper = new RecommendationMapperImpl(skillOfferMapper);
 
     @Test
-    void toDto() {
+    public void testToDto() {
 
         Recommendation recommendation = new Recommendation();
         recommendation.setId(1L);
@@ -90,5 +90,4 @@ class RecommendationMapperTest {
         assertEquals(recommendations.get(1).getAuthor().getId(), dtos.get(1).getAuthorId());
         assertEquals(recommendations.get(1).getReceiver().getId(), dtos.get(1).getReceiverId());
     }
-
 }

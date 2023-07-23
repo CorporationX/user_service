@@ -10,12 +10,12 @@ import java.util.List;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, injectionStrategy = InjectionStrategy.FIELD)
 public interface SkillOfferMapper {
 
-    @Mapping(target = "skill.id", source = "skill")
-    @Mapping(target = "recommendation.id", source = "recommendation")
+    @Mapping(source = "skill", target = "skill.id")
+    @Mapping(source = "recommendation", target = "recommendation.id")
     SkillOffer toEntity(SkillOfferDto dto);
 
-    @Mapping(target = "skill", source ="skill.id" )
-    @Mapping(target = "recommendation", source ="recommendation.id")
+    @Mapping(source = "skill.id", target = "skill")
+    @Mapping(source = "recommendation.id", target = "recommendation")
     SkillOfferDto toDto(SkillOffer entity);
 
     @Named("toSkillOfferDtos")

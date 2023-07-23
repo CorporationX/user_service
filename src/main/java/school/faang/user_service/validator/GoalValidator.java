@@ -30,7 +30,7 @@ public class GoalValidator {
     }
 
     public static void validateAdditionGoalToUser(User user, GoalDto goalDto) {
-        if (user.getGoals() == null || goalDto.getStatus() == GoalStatus.COMPLETED) {
+        if (user.getGoals() == null || user.getGoals().isEmpty() || goalDto.getStatus() == GoalStatus.COMPLETED) {
             return;
         }
 

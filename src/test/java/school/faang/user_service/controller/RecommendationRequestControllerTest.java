@@ -9,15 +9,16 @@ import org.mockito.Mockito;
 import school.faang.user_service.controller.recommendation.RecommendationRequestController;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.RecommendationRequestService;
 import java.time.LocalDateTime;
 
 public class RecommendationRequestControllerTest {
+    private RecommendationRequestDto recommendationRequest;
     @Mock
     private RecommendationRequestService recommendationRequestService;
     @InjectMocks
     private RecommendationRequestController recommendationRequestController;
-    private RecommendationRequestDto recommendationRequest;
 
     @BeforeEach
     void setUp() {
@@ -36,7 +37,7 @@ public class RecommendationRequestControllerTest {
     public void testNullMessageIsInvalid() {
         recommendationRequest.setMessage(null);
         Assert.assertThrows(
-                IllegalArgumentException.class,
+                DataValidationException.class,
                 () -> recommendationRequestController.requestRecommendation(recommendationRequest)
         );
     }
@@ -45,7 +46,7 @@ public class RecommendationRequestControllerTest {
     public void testEmptyMessageIsInvalid() {
         recommendationRequest.setMessage("");
         Assert.assertThrows(
-                IllegalArgumentException.class,
+                DataValidationException.class,
                 () -> recommendationRequestController.requestRecommendation(recommendationRequest)
         );
     }

@@ -13,6 +13,7 @@ import school.faang.user_service.repository.recommendation.RecommendationRequest
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
 @Component
 @RequiredArgsConstructor
 public class RecommendationRequestValidator {

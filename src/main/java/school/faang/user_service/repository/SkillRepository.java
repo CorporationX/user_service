@@ -38,6 +38,8 @@ public interface SkillRepository extends CrudRepository<Skill, Long> {
             """)
     Optional<Skill> findUserSkill(long skillId, long userId);
 
+    Optional<Skill> findByTitle(String title);
+
     @Query(nativeQuery = true, value = "INSERT INTO user_skill (skill_id, user_id) VALUES (:skillId, :userId)")
     @Modifying
     void assignSkillToUser(long skillId, long userId);

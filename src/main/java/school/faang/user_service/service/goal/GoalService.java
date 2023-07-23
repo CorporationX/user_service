@@ -4,6 +4,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.dto.goal.GoalFilterDto;
+import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -62,5 +64,11 @@ public class GoalService {
                 })
                 .orElseThrow(() ->
                         new IllegalArgumentException(MessageFormat.format("Goal {0} not found", goalId)));
+    }
+
+    public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter){
+        List<Goal> goals = goalRepository.findGoalsByUserId(userId).toList();
+        filter.getStatus()
+
     }
 }

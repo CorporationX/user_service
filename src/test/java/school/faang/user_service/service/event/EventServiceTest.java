@@ -12,6 +12,7 @@ import school.faang.user_service.dto.event.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.exception.DataValidException;
 import school.faang.user_service.filter.event.EventDateFilter;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.filter.event.EventIdFilter;
@@ -27,7 +28,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -58,50 +58,13 @@ class EventServiceTest {
         eventService = new EventService(eventRepository, userRepository, eventFilters);
     }
 
-    private EventDto createEventDto() {
-        EventDto eventDto = new EventDto();
-        eventDto.setId(1L);
-        eventDto.setTitle("Test Event");
-        eventDto.setStartDate(LocalDate.of(2020, 1, 1).atStartOfDay());
-        eventDto.setOwnerId(1L);
-        eventDto.setRelatedSkills(List.of(new SkillDto(1L, "A"), new SkillDto(2L, "B")));
-        return eventDto;
-    }
-
-    private User createUser() {
-        User user = new User();
-        user.setId(1L);
-        user.setSkills(createSkills());
-        return user;
-    }
-
-    private Event createEvent() {
-        Event event = new Event();
-        event.setId(1L);
-        event.setTitle("Test Event");
-        event.setStartDate(LocalDate.of(2020, 1, 1).atStartOfDay());
-        event.setOwner(createUser());
-        event.setRelatedSkills(createSkills());
-        return event;
-    }
-
-    private List<Skill> createSkills() {
-        Skill skill1 = new Skill();
-        skill1.setId(1L);
-        skill1.setTitle("A");
-        Skill skill2 = new Skill();
-        skill2.setId(2L);
-        skill2.setTitle("B");
-        return List.of(skill1, skill2);
-    }
-
     @Test
     public void invalid_EventId() {
         EventDto eventDto = createEventDto();
         eventDto.setId(0L);
 
-        Exception exception = assertThrows(RuntimeException.class, () -> eventService.create(eventDto));
-        assertEquals("java.util.zip.DataFormatException: Event Id must be greater than 0",
+        Exception exception = assertThrows(DataValidException.class, () -> eventService.create(eventDto));
+        assertEquals("Event Id must be greater than 0",
                 exception.getMessage());
     }
 
@@ -110,8 +73,8 @@ class EventServiceTest {
         EventDto eventDto = createEventDto();
         eventDto.setTitle("");
 
-        Exception exception = assertThrows(RuntimeException.class, () -> eventService.create(eventDto));
-        assertEquals("java.util.zip.DataFormatException: Event must have a title", exception.getMessage());
+        Exception exception = assertThrows(DataValidException.class, () -> eventService.create(eventDto));
+        assertEquals("Event must have a title", exception.getMessage());
     }
 
     @Test
@@ -119,8 +82,8 @@ class EventServiceTest {
         EventDto eventDto = createEventDto();
         eventDto.setStartDate(null);
 
-        Exception exception = assertThrows(RuntimeException.class, () -> eventService.create(eventDto));
-        assertEquals("java.util.zip.DataFormatException: Event must have a start date", exception.getMessage());
+        Exception exception = assertThrows(DataValidException.class, () -> eventService.create(eventDto));
+        assertEquals("Event must have a start date", exception.getMessage());
     }
 
     @Test
@@ -128,8 +91,8 @@ class EventServiceTest {
         EventDto eventDto = createEventDto();
         eventDto.setOwnerId(null);
 
-        Exception exception = assertThrows(RuntimeException.class, () -> eventService.create(eventDto));
-        assertEquals("java.util.zip.DataFormatException: Event must have a user", exception.getMessage());
+        Exception exception = assertThrows(DataValidException.class, () -> eventService.create(eventDto));
+        assertEquals("Event must have a user", exception.getMessage());
     }
 
     @Test
@@ -139,8 +102,8 @@ class EventServiceTest {
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(createUser()));
 
-        Exception exception = assertThrows(RuntimeException.class, () -> eventService.create(eventDto));
-        assertEquals("java.util.zip.DataFormatException: User has no related skills", exception.getMessage());
+        Exception exception = assertThrows(DataValidException.class, () -> eventService.create(eventDto));
+        assertEquals("User has no related skills", exception.getMessage());
 
         verify(userRepository).findById(1L);
     }
@@ -255,6 +218,43 @@ class EventServiceTest {
         assertEquals(2, result.size());
         assertNotEquals(3L, result.get(0).getId());
         assertNotEquals(3L, result.get(1).getId());
+    }
+
+    private EventDto createEventDto() {
+        EventDto eventDto = new EventDto();
+        eventDto.setId(1L);
+        eventDto.setTitle("Test Event");
+        eventDto.setStartDate(LocalDate.of(2020, 1, 1).atStartOfDay());
+        eventDto.setOwnerId(1L);
+        eventDto.setRelatedSkills(List.of(new SkillDto(1L, "A"), new SkillDto(2L, "B")));
+        return eventDto;
+    }
+
+    private User createUser() {
+        User user = new User();
+        user.setId(1L);
+        user.setSkills(createSkills());
+        return user;
+    }
+
+    private Event createEvent() {
+        Event event = new Event();
+        event.setId(1L);
+        event.setTitle("Test Event");
+        event.setStartDate(LocalDate.of(2020, 1, 1).atStartOfDay());
+        event.setOwner(createUser());
+        event.setRelatedSkills(createSkills());
+        return event;
+    }
+
+    private List<Skill> createSkills() {
+        Skill skill1 = new Skill();
+        skill1.setId(1L);
+        skill1.setTitle("A");
+        Skill skill2 = new Skill();
+        skill2.setId(2L);
+        skill2.setTitle("B");
+        return List.of(skill1, skill2);
     }
 
     private List<Event> createEventDtoList() {

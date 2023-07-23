@@ -12,11 +12,12 @@ import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.exception.DataValidException;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Stream;
-import java.util.zip.DataFormatException;
+
 
 @Service
 @RequiredArgsConstructor
@@ -28,13 +29,9 @@ public class EventService {
     private final List<EventFilter> filters;
 
     public EventDto create(EventDto eventDto) {
-        try {
-            validateEventDto(eventDto);
-            Event event = eventRepository.save(eventMapper.toEntity(eventDto));
-            return eventMapper.toDto(event);
-        } catch (DataFormatException e) {
-            throw new RuntimeException(e);
-        }
+        validateEventDto(eventDto);
+        Event event = eventRepository.save(eventMapper.toEntity(eventDto));
+        return eventMapper.toDto(event);
     }
 
     public EventDto get(Long eventId) {
@@ -62,29 +59,29 @@ public class EventService {
         return eventDtoStream.toList();
     }
 
-    private void validateEventDto(EventDto eventDto) throws DataFormatException {
+    private void validateEventDto(EventDto eventDto) {
         if (eventDto.getId() == null || eventDto.getId() < 1) {
-            throw new DataFormatException("Event Id must be greater than 0");
+            throw new DataValidException("Event Id must be greater than 0");
         }
         if (eventDto.getTitle().isBlank()) {
-            throw new DataFormatException("Event must have a title");
+            throw new DataValidException("Event must have a title");
         }
         if (eventDto.getStartDate() == null) {
-            throw new DataFormatException("Event must have a start date");
+            throw new DataValidException("Event must have a start date");
         }
         if (eventDto.getOwnerId() == null) {
-            throw new DataFormatException("Event must have a user");
+            throw new DataValidException("Event must have a user");
         }
         checkUserContainsSkills(eventDto);
     }
 
-    private void checkUserContainsSkills(EventDto eventDto) throws DataFormatException {
+    private void checkUserContainsSkills(EventDto eventDto) {
         User user = userRepository.findById(eventDto.getOwnerId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         List<SkillDto> userSkills = skillMapper.toListSkillsDTO(user.getSkills());
         if (!new HashSet<>(userSkills).containsAll(eventDto.getRelatedSkills())) {
-            throw new DataFormatException("User has no related skills");
+            throw new DataValidException("User has no related skills");
         }
     }
 }

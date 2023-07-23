@@ -25,7 +25,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 public class EventServiceTest {
     @Mock
     private EventRepository eventRepository;
@@ -42,7 +41,7 @@ public class EventServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         var now = LocalDateTime.now();
-        eventDto = new EventDto(0L, "title", now, now.plusDays(3), 0L, "0", new ArrayList<>(), "location","Webinar","Planned", -1);
+        eventDto = new EventDto(0L, "title", now, now.plusDays(3), 0L, "0", new ArrayList<>(), "location", "Webinar", "Planned", -1);
         filterDto = new EventFilterDto("title", now.plusHours(1), now.plusDays(10), 0L, List.of(), "location", 10);
 
         Mockito.when(skillRepository.findAllByUserId(eventDto.getOwnerId()))
@@ -58,6 +57,7 @@ public class EventServiceTest {
         eventService.create(eventDto);
 
         Mockito.verify(eventMapper, Mockito.times(1)).toDto(Mockito.any());
+        Mockito.verify(eventRepository).save(Mockito.any());
     }
 
     @Test

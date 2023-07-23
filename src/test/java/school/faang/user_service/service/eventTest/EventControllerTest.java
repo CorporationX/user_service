@@ -3,10 +3,11 @@ package school.faang.user_service.service.eventTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import school.faang.user_service.controller.event.EventController;
 import school.faang.user_service.dto.event.EventDto;
@@ -21,7 +22,7 @@ import java.util.List;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-
+@ExtendWith(MockitoExtension.class)
 public class EventControllerTest {
     @Mock
     private EventService eventService;
@@ -32,7 +33,6 @@ public class EventControllerTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
         var now = LocalDateTime.now();
         eventDto = new EventDto(0L, "0", now, now.plusDays(3), 0L, "0", new ArrayList<>(), "location","Webinar","status", -1);
         filterDto = new EventFilterDto("title", now, now.plusDays(10), 0L, List.of(), "location", 10);

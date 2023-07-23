@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.event;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ public class EventController {
     private final EventService eventService;
 
     @PostMapping("/create")
+    @Operation(description = "zczc")
     public ResponseEntity<?> create(@RequestBody EventDto eventDto) {
         System.out.println(eventDto);
         validateEvent(eventDto);

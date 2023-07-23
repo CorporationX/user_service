@@ -1,16 +1,17 @@
 package school.faang.user_service.service;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 
+@ExtendWith(MockitoExtension.class)
 class RecommendationRequestServiceTest {
     @InjectMocks
     private RecommendationRequestService recommendationRequestService;
@@ -20,11 +21,6 @@ class RecommendationRequestServiceTest {
 
     @Mock
     private SkillRequestRepository skillRequestRepository;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
 
 
     @Test

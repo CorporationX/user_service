@@ -35,6 +35,7 @@ public class SubscriptionController {
     @GetMapping("/followers/{followeeId}")
     public ResponseEntity<?> getFollowers(@PathVariable long followeeId, @RequestBody UserFilterDto filter) {
         validator.validateId(followeeId);
+        validator.validateFilterDto(filter);
         return ResponseEntity.ok(service.getFollowers(followeeId, filter));
     }
 
@@ -48,6 +49,7 @@ public class SubscriptionController {
     @GetMapping("/following/{followeeId}")
     public ResponseEntity<?> getFollowing(@PathVariable long followeeId, @RequestBody UserFilterDto filter) {
         validator.validateId(followeeId);
+        validator.validateFilterDto(filter);
         List<UserDto> following = service.getFollowing(followeeId, filter);
         return ResponseEntity.ok().body(following);
     }

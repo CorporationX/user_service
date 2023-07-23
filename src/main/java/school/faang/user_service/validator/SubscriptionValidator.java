@@ -1,6 +1,7 @@
 package school.faang.user_service.validator;
 
 import org.springframework.stereotype.Component;
+import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 
 @Component
@@ -16,5 +17,10 @@ public class SubscriptionValidator {
         }
         validateId(firstId);
         validateId(secondId);
+    }
+    public void validateFilterDto(UserFilterDto dto){
+        if (dto.getPageSize() < 0 || dto.getPage() < 0 ){
+            throw new DataValidationException("Page and pageSize cannot be negative integers");
+        }
     }
 }

@@ -3,10 +3,11 @@ package school.faang.user_service.service.SubscriptionTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import school.faang.user_service.controller.SubscriptionController;
 import school.faang.user_service.dto.SubscriptionDto;
@@ -14,7 +15,7 @@ import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SubscriptionService;
 import school.faang.user_service.validator.SubscriptionValidator;
-
+@ExtendWith(MockitoExtension.class)
 public class SubscriptionControllerTest {
     @Mock
     private SubscriptionService service;
@@ -27,7 +28,6 @@ public class SubscriptionControllerTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
         dto = new SubscriptionDto(1, 2);
         filterDto = new UserFilterDto();
     }

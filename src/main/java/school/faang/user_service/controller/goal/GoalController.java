@@ -1,9 +1,6 @@
 package school.faang.user_service.controller.goal;
 
-import com.amazonaws.services.kms.model.NotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,8 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.goal.GoalService;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,64 +22,32 @@ public class GoalController {
     private final GoalService goalService;
 
     @GetMapping("/get/{userId}")
-    public ResponseEntity<?> getGoalsByUser(@PathVariable("userId") Long userId,
-                                            @RequestBody(required = false) GoalFilterDto filter) {
-        try {
-            return ResponseEntity.ok(goalService.getGoalsByUser(userId, filter));
-        } catch (DataValidationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (NotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    public List<GoalDto> getGoalsByUser(@PathVariable("userId") Long userId,
+                                        @RequestBody(required = false) GoalFilterDto filter) {
+        return goalService.getGoalsByUser(userId, filter);
     }
 
     @GetMapping("/get/subtasks/{goalId}")
-    public ResponseEntity<?> findSubtasksByGoalId(@PathVariable("goalId") Long goalId,
-                                                  @RequestBody(required = false) GoalFilterDto filter) {
-        try {
-            return ResponseEntity.ok(goalService.findSubtasksByGoalId(goalId, filter));
-        } catch (DataValidationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    public List<GoalDto> findSubtasksByGoalId(@PathVariable("goalId") Long goalId,
+                                              @RequestBody(required = false) GoalFilterDto filter) {
+        return goalService.findSubtasksByGoalId(goalId, filter);
     }
 
-    @PostMapping("/{userId}/create-goal")
-    public ResponseEntity<?> createGoal(@PathVariable("userId") Long userId,
-                                        @RequestBody GoalDto goalDto) {
-        try {
-            return ResponseEntity.ok(goalService.createGoal(userId, goalDto));
-        } catch (DataValidationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    @PostMapping("/user/{userId}/create-goal")
+    public GoalDto createGoal(@PathVariable("userId") Long userId,
+                              @RequestBody GoalDto goalDto) {
+        return goalService.createGoal(userId, goalDto);
     }
 
     @PutMapping("/update/{goalId}")
-    public ResponseEntity<?> updateGoal(@PathVariable("goalId") Long goalId,
-                                        @RequestBody GoalDto goalDto) {
-        try {
-            return ResponseEntity.ok(goalService.updateGoal(goalId, goalDto));
-        } catch (DataValidationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    public GoalDto updateGoal(@PathVariable("goalId") Long goalId,
+                              @RequestBody GoalDto goalDto) {
+        return goalService.updateGoal(goalId, goalDto);
     }
 
     @DeleteMapping("/delete/{goalId}")
-    public ResponseEntity<?> deleteGoal(@PathVariable("goalId") Long goalId) {
-        try {
-            goalService.deleteGoal(goalId);
-            return ResponseEntity.ok().build();
-        } catch (DataValidationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    public boolean deleteGoal(@PathVariable("goalId") Long goalId) {
+        goalService.deleteGoal(goalId);
+        return true;
     }
 }

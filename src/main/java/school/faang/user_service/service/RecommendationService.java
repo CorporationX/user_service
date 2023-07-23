@@ -1,10 +1,8 @@
 package school.faang.user_service.service;
 
-import jakarta.persistence.ManyToOne;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
-import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
@@ -18,12 +16,10 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.utils.validator.ValidatorService;
+import school.faang.user_service.utils.validator.ValidatorForService;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.StringJoiner;
-
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +27,7 @@ public class RecommendationService {
 
     private final RecommendationRepository recommendationRepository;
     private final SkillOfferRepository skillOfferRepository;
-    private final ValidatorService validatorService;
+    private final ValidatorForService validatorForService;
     private final RecommendationMapper recommendationMapper;
     private final SkillRepository skillRepository;
     private final UserRepository userRepository;
@@ -45,7 +41,7 @@ public class RecommendationService {
                         (recommendationDto.getAuthorId(), recommendationDto.getReceiverId())
                 .orElseThrow(() -> new DataValidationException("Recommendation is not found"));
 
-        validatorService.validateTime(recommendation);
+        validatorForService.validateTime(recommendation);
 
         List<SkillOffer> listSkillOffer = recommendationDto.getSkillOffers() //все рекомендации скиллов от одного пользователя
                 .stream()
@@ -77,6 +73,7 @@ public class RecommendationService {
                         userSkillGuaranteeRepository.save(userSkillGuarantee);
                     }
                 });
+
         recommendationRepository.save(recommendationGuarantee); //12 пункт
         return recommendationMapper.toDto(recommendationGuarantee);
     }
@@ -89,5 +86,9 @@ public class RecommendationService {
     public User getUser(long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new DataValidationException("User not found"));
+    }
+    public Recommendation getRecommendation(long recommendationId) {
+        return recommendationRepository.findById(recommendationId)
+                .orElseThrow(()-> new DataValidationException("Recommendation not found"));
     }
 }

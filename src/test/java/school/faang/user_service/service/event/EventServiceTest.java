@@ -44,7 +44,6 @@ class EventServiceTest {
     private EventService eventService;
 
     private Event event;
-    private EventDto eventDto;
     private User user;
 
     @BeforeEach
@@ -56,6 +55,16 @@ class EventServiceTest {
                 new EventMaxAttendeesFilter()
         );
         eventService = new EventService(eventRepository, userRepository, eventFilters);
+    }
+
+    private EventDto createEventDto() {
+        EventDto eventDto = new EventDto();
+        eventDto.setId(1L);
+        eventDto.setTitle("Test Event");
+        eventDto.setStartDate(LocalDate.of(2020, 1, 1).atStartOfDay());
+        eventDto.setOwnerId(1L);
+        eventDto.setRelatedSkills(List.of(new SkillDto(1L, "A"), new SkillDto(2L, "B")));
+        return eventDto;
     }
 
     private void createUser() {
@@ -87,6 +96,7 @@ class EventServiceTest {
 
     @Test
     public void invalid_EventId() {
+        EventDto eventDto = createEventDto();
         eventDto.setId(0L);
 
         assertThrows(RuntimeException.class, () -> eventService.create(eventDto));
@@ -94,6 +104,7 @@ class EventServiceTest {
 
     @Test
     public void invalid_TitleBlank() {
+        EventDto eventDto = createEventDto();
         eventDto.setTitle("");
 
         assertThrows(RuntimeException.class, () -> eventService.create(eventDto));
@@ -101,6 +112,7 @@ class EventServiceTest {
 
     @Test
     public void invalid_NullStartDate() {
+        EventDto eventDto = createEventDto();
         eventDto.setStartDate(null);
 
         assertThrows(RuntimeException.class, () -> eventService.create(eventDto));
@@ -108,6 +120,7 @@ class EventServiceTest {
 
     @Test
     public void invalid_NullOwnerId() {
+        EventDto eventDto = createEventDto();
         eventDto.setOwnerId(null);
 
         assertThrows(RuntimeException.class, () -> eventService.create(eventDto));
@@ -115,6 +128,7 @@ class EventServiceTest {
 
     @Test
     public void invalid_userNotContainsSkills() {
+        EventDto eventDto = createEventDto();
         createUser();
         eventDto.setRelatedSkills(List.of(new SkillDto(3L, "C"), new SkillDto(2L, "B")));
 
@@ -127,6 +141,7 @@ class EventServiceTest {
 
     @Test
     void create_ShouldReturnEventDto() {
+        EventDto eventDto = createEventDto();
         createEvent();
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(eventRepository.save(ArgumentMatchers.any(Event.class))).thenReturn(event);

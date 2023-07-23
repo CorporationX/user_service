@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
+import school.faang.user_service.dto.mentorship.RejectionReasonDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
@@ -51,6 +52,7 @@ class MentorshipRequestServiceTest {
     private MentorshipRequestDto requestDto;
     private MentorshipRequest request;
     private MentorshipRequestFilterDto requestFilter;
+    private RejectionReasonDto rejectionReason;
 
     @BeforeEach
     void setUp() {
@@ -71,6 +73,7 @@ class MentorshipRequestServiceTest {
                 .build();
 
         requestFilter = MentorshipRequestFilterDto.builder().build();
+        rejectionReason = RejectionReasonDto.builder().reason("reason").build();
 
         when(mentorshipRequestMapper.toEntity(requestDto)).thenReturn(request);
         when(mentorshipRequestRepository.findById(request.getId())).thenReturn(Optional.of(request));
@@ -159,7 +162,7 @@ class MentorshipRequestServiceTest {
 
         assertThrows(EntityNotFoundException.class,
                 () -> mentorshipRequestService.acceptRequest(request.getId()),
-                "EntityNotFoundException should be thrown");
+                "Request with id" + request.getId() + "not found.");
     }
 
     @Test
@@ -169,5 +172,38 @@ class MentorshipRequestServiceTest {
         assertThrows(MentorshipRequestValidationException.class,
                 () -> mentorshipRequestService.acceptRequest(request.getId()),
                 "Receiver is already mentor of this requester.");
+    }
+
+    @Test
+    void rejectRequest_shouldInvokeRepositoryMethodFindById() {
+        mentorshipRequestService.rejectRequest(request.getId(), rejectionReason);
+        verify(mentorshipRequestRepository).findById(request.getId());
+    }
+
+    @Test
+    void rejectRequest_shouldChangeRequestStatusToRejected() {
+        assertEquals(RequestStatus.PENDING, request.getStatus());
+        mentorshipRequestService.rejectRequest(request.getId(), rejectionReason);
+        assertEquals(RequestStatus.REJECTED, request.getStatus());
+    }
+
+    @Test
+    void rejectRequest_shouldSetRejectionReason() {
+        mentorshipRequestService.rejectRequest(request.getId(), rejectionReason);
+        assertEquals(rejectionReason.getReason(), request.getRejectionReason());
+    }
+
+    @Test
+    void rejectRequest_shouldInvokeMapperMethodToDto() {
+        mentorshipRequestService.rejectRequest(request.getId(), rejectionReason);
+        verify(mentorshipRequestMapper).toDto(request);
+    }
+
+    @Test
+    void rejectRequest_shouldThrowEntityNotFoundException() {
+        when(mentorshipRequestRepository.findById(request.getId())).thenReturn(Optional.empty());
+        assertThrows(EntityNotFoundException.class,
+                () -> mentorshipRequestService.rejectRequest(request.getId(), rejectionReason),
+                "Request with id" + request.getId() + "not found.");
     }
 }

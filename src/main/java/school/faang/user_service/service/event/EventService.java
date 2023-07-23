@@ -26,16 +26,17 @@ public class EventService {
     private final List<EventFilter> eventFilters;
 
     public EventDto create(EventDto event) {
-        User user = userRepository.findById(event.getId()).orElseThrow();
+        User user = userRepository.findById(event.getId()).orElseThrow(
+                () -> new DataValidationException("Event with this id was not found in the method create"));
         if (!(isUserContainsSkill(event, user))) {
-            throw new DataValidationException("The user cannot hold such an event with such skills");
+            throw new DataValidationException("The event cannot be held with such skills in the creation method");
         }
         return eventMapper.toEventDto(eventRepository.save(eventMapper.toEvent(event)));
     }
 
     public EventDto getEvent(long eventId) {
         return eventMapper.toEventDto(eventRepository.findById(eventId)
-                .orElseThrow(() -> new DataValidationException("User with this id was not found")));
+                .orElseThrow(() -> new DataValidationException("Event with this id was not found in the method getEvent")));
     }
 
     public List<EventDto> getEventsByFilter(EventFilterDto filters) {
@@ -54,17 +55,17 @@ public class EventService {
     public EventDto updateEvent(EventDto event) {
         Event event1 = eventRepository.findById(event.getId())
                 .orElseThrow(() -> new DataValidationException(
-                        "The event did not pass validation when updating the event"));
+                        "The event did not pass validation when updating the event in the method updateEvent"));
         eventMapper.update(event1, event);
-        return create(eventMapper.toEventDto(event1));
+        return eventMapper.toEventDto(eventRepository.save(event1));
     }
 
     public List<Event> getOwnedEvents(long userId) {
         return eventRepository.findAllByUserId(userId);
     }
 
-    public void getParticipatedEvents(long userId) {
-        eventRepository.findParticipatedEventsByUserId(userId);
+    public List<Event> getParticipatedEvents(long userId) {
+        return eventRepository.findParticipatedEventsByUserId(userId);
     }
 
     public void deleteEvent(long eventId) {

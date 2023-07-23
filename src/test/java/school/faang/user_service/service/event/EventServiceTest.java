@@ -67,6 +67,7 @@ class EventServiceTest {
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         eventService.create(event);
+        assertEquals(1L, event.getId());
         verify(eventRepository).save(any());
     }
 
@@ -162,8 +163,8 @@ class EventServiceTest {
         Event event = Event.builder().id(1L).relatedSkills(skills).owner(user).build();
 
         when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         eventService.updateEvent(eventDto);
+        assertEquals(event.getId(), eventDto.getId());
     }
 
     @Test
@@ -176,7 +177,9 @@ class EventServiceTest {
 
     @Test
     void TestGetOwnedEvents() {
-        eventService.getOwnedEvents(1L);
+        List<Event> events = List.of(Event.builder().id(1L).build());
+        when(eventRepository.findAllByUserId(1L)).thenReturn(events);
+        assertEquals(events,eventService.getOwnedEvents(1L));
         verify(eventRepository, times(1)).findAllByUserId(1L);
     }
 

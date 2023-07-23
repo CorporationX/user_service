@@ -15,12 +15,12 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.util.Message;
 
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static school.faang.user_service.util.Message.SKILL_NOT_FOUND;
 import static school.faang.user_service.util.Message.USER_NOT_FOUND;
 
 @Service
@@ -29,18 +29,19 @@ public class SkillService {
     private final SkillRepository skillRepository;
     private final SkillOfferRepository skillOfferRepository;
     private final UserRepository userRepository;
+    private final SkillMapper skillMapper;
     public static final int MIN_SKILL_OFFERS = 3;
 
     @Transactional
     public SkillDto create(SkillDto skill) {
-        if (!skillRepository.existsByTitle(skill.getTitle())) {
-            Skill newSkill = SkillMapper.INSTANCE.skillToEntity(skill);
-            skillRepository.save(newSkill);
-
-            return SkillMapper.INSTANCE.skillToDto(newSkill);
+        if (skillRepository.existsByTitle(skill.getTitle())){
+            throw new DataValidationException("Skill " + skill.getTitle() + " already exists");
         }
 
-        throw new DataValidationException("Skill " + skill.getTitle() + " already exists");
+        Skill newSkill = skillMapper.skillToEntity(skill);
+        skillRepository.save(newSkill);
+
+        return skillMapper.skillToDto(newSkill);
     }
 
     public List<SkillDto> getUserSkills(Long userId, int pageNumber, int pageSize) {
@@ -50,7 +51,7 @@ public class SkillService {
                 .stream()
                 .skip(numToSkip)
                 .limit(pageSize)
-                .map(SkillMapper.INSTANCE::skillToDto)
+                .map(skillMapper::skillToDto)
                 .toList();
     }
 
@@ -62,7 +63,7 @@ public class SkillService {
         return skillMap.entrySet()
                 .stream()
                 .map(skillEntry -> SkillCandidateDto.builder()
-                        .skill(SkillMapper.INSTANCE.skillToDto(skillEntry.getKey()))
+                        .skill(skillMapper.skillToDto(skillEntry.getKey()))
                         .offersAmount(skillEntry.getValue())
                         .build())
                 .toList();
@@ -72,7 +73,7 @@ public class SkillService {
     public SkillDto acquireSkillFromOffers(Long skillId, Long userId) {
         Optional<Skill> optionalSkill = skillRepository.findUserSkill(skillId, userId);
         if (optionalSkill.isPresent()) {
-            return SkillMapper.INSTANCE.skillToDto(optionalSkill.get());
+            return skillMapper.skillToDto(optionalSkill.get());
         }
 
         List<SkillOffer> skillOffers = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
@@ -84,17 +85,19 @@ public class SkillService {
         skillRepository.assignSkillToUser(skillId, userId);
 
         Skill assignedSkill = skillRepository.findUserSkill(skillId, userId)
-                .orElseThrow(() -> new RuntimeException(String.format(SKILL_NOT_FOUND, skillId, userId)));
+                .orElseThrow(() -> new RuntimeException(
+                        MessageFormat.format("Skill not found for skillId: {0}, userId: {1}", skillId, userId)));
 
         Skill updatedSkill = addSkillGuarantees(assignedSkill, skillOffers, userId);
 
-        return SkillMapper.INSTANCE.skillToDto(updatedSkill);
+        return skillMapper.skillToDto(updatedSkill);
     }
 
     private Skill addSkillGuarantees(Skill skill, List<SkillOffer> skillOffers, Long userId){
         List<UserSkillGuarantee> newGuarantees = skillOffers.stream().map(skillOffer -> UserSkillGuarantee.builder()
                     .user(userRepository.findById(userId)
-                            .orElseThrow(() -> new RuntimeException(String.format(USER_NOT_FOUND, userId))))
+                            .orElseThrow(() -> new RuntimeException(
+                                    MessageFormat.format(USER_NOT_FOUND, userId))))
                     .skill(skillOffer.getSkill())
                     .guarantor(skillOffer.getRecommendation().getAuthor())
                     .build())

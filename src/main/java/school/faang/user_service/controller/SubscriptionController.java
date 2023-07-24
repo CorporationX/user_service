@@ -15,24 +15,46 @@ public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
     public void followUser(Long followerId, Long followeeId) {
-        validate(followerId, followeeId);
+        validateFollow(followerId, followeeId);
         subscriptionService.followUser(followerId, followeeId);
     }
 
-    public void unfollowUser(long followerId, long followeeId){
-        validate(followerId, followeeId);
+    public void unfollowUser(long followerId, long followeeId) {
+        validateUnFollow(followerId, followeeId);
         subscriptionService.unfollowUser(followerId, followeeId);
     }
 
-    public List<UserDto> getFollowers(long followeeId, UserFilterDto filter){
+    public List<UserDto> getFollowers(long followeeId, UserFilterDto filter) {
         return subscriptionService.getFollowers(followeeId, filter);
     }
 
-    public void validate(Long firstId, Long secondId) {
-        if (firstId <= 0 || secondId <= 0){
+    public int getFollowersCount(long followerId) {
+        return subscriptionService.getFollowersCount(followerId);
+    }
+
+    public List<UserDto> getFollowing(long followeeId, UserFilterDto filter){
+        return subscriptionService.getFollowing(followeeId, filter);
+    }
+
+    public int getFollowingCount(long followerId){
+        return subscriptionService.getFollowersCount(followerId);
+    }
+
+    public void validateFollow(long firstId, long secondId) {
+        if (firstId <= 0 || secondId <= 0) {
             throw new DataValidationException("Id cannot be less 0! ");
-        } else if (firstId == null || secondId == null){
-            throw new DataValidationException("Id cannot be null !");
+        }
+        if (firstId == secondId) {
+            throw new DataValidationException("Can`t subscribe to yourself");
+        }
+    }
+
+    public void validateUnFollow(long firstId, long secondId) {
+        if (firstId <= 0 || secondId <= 0) {
+            throw new DataValidationException("Id cannot be less 0! ");
+        }
+        if (firstId == secondId) {
+            throw new DataValidationException("Can`t unfollow from yourself");
         }
     }
 }

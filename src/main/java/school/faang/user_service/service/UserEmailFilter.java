@@ -14,7 +14,7 @@ public class UserEmailFilter implements UserFilter{
     }
 
     @Override
-    public void apply(Stream<User> users, UserFilterDto filterDto) {
-        users.filter(user -> user.getEmail().contains(filterDto.getEmailPattern()));
+    public Stream<User> apply(Stream<User> users, UserFilterDto filterDto) {
+        return users.filter(user -> user.getEmail().contains(filterDto.getEmailPattern()));
     }
 }

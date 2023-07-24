@@ -19,22 +19,18 @@ public class SubscriptionService {
     private final List<UserFilter> userFilters;
 
     public void followUser(long followerId, long followeeId) {
-        validate(followerId, followeeId);
-        boolean isExist = subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
-        if (isExist){
-            throw new DataValidationException("Can`t subscribe to yourself");
-        } else {
+        if (!subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             subscriptionRepository.followUser(followerId, followeeId);
+        } else {
+            throw new DataValidationException("Can`t subscribe to yourself");
         }
     }
 
     public void unfollowUser(long followerId, long followeeId){
-        validate(followerId, followeeId);
-        boolean isExist = subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
-        if (isExist){
-            throw new DataValidationException("Can`t unfollow of yourself");
-        } else {
+        if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             subscriptionRepository.unfollowUser(followerId, followeeId);
+        } else {
+            throw new DataValidationException("You are not subscribed to unfollow");
         }
     }
 
@@ -46,11 +42,19 @@ public class SubscriptionService {
         return userMapper.toDto(users.toList());
     }
 
-    public void validate(Long firstId, Long secondId) {
-        if (firstId <= 0 || secondId <= 0){
-            throw new DataValidationException("Id cannot be less 0! ");
-        } else if (firstId == null || secondId == null){
-            throw new DataValidationException("Id cannot be null !");
+    public int getFollowersCount(long followeeId){
+        if (subscriptionRepository.existsById(followeeId)) {
+            return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
+        } else {
+            throw new DataValidationException("User with this Id does not exist");
         }
+    }
+
+    public List<UserDto> getFollowing(long followeeId, UserFilterDto filters){
+        Stream<User> users = subscriptionRepository.findByFolloweeId(followeeId);
+        userFilters.stream()
+                .filter(filter -> filter.isApplicable(filters))
+                .forEach(filter -> filter.apply(users, filters));
+        return userMapper.toDto(users.toList());
     }
 }

@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 public class GoalService {
     private final GoalRepository goalRepository;
     private final SkillRepository skillRepository;
+    private final UserRepository userRepository;
     private final GoalMapper goalMapper;
     private final CreateGoalMapper createGoalMapper;
     private final List<GoalFilter> goalFilters;
@@ -107,16 +108,28 @@ public class GoalService {
         });
     }
 
-    @jakarta.transaction.Transactional
+    @Transactional
     public UpdateGoalDto updateGoal(UpdateGoalDto updateGoalDto) {
         List<SkillDto> skillDtos = updateGoalDto.getSkillDtos();
         List<Long> userIds = updateGoalDto.getUserIds();
         Goal goalToUpdate = goalRepository.findById(updateGoalDto.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Goal not found"));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Goal with id " + updateGoalDto.getId() + " is not found"
+                ));
 
         validateUpdate(goalToUpdate, updateGoalDto, skillDtos);
 
+        if (updateGoalDto.getStatus() == GoalStatus.COMPLETED) {
+            assignSKillsToUsers(skillDtos, userIds);
+            goalToUpdate.setStatus(updateGoalDto.getStatus());
 
+        }
+
+        goalToUpdate.setUpdatedAt(LocalDateTime.now());
+        return goalMapper.goalToUpdateGoalDto(goalRepository.save(goalToUpdate));
+    }
+
+    private void assignSKillsToUsers(List<SkillDto> skillDtos, List<Long> userIds) {
         skillDtos.forEach(skill -> {
             userIds.forEach(userId -> {
                 User user = userRepository.findById(userId).orElseThrow(() ->
@@ -127,10 +140,6 @@ public class GoalService {
                 }
             });
         });
-
-        goalToUpdate.setStatus(GoalStatus.COMPLETED);
-        goalToUpdate.setUpdatedAt(LocalDateTime.now());
-        return goalMapper.goalToUpdateGoalDto(goalRepository.save(goalToUpdate));
     }
 
     private void validateUpdate(Goal goalToUpdate, UpdateGoalDto updateGoalDto, List<SkillDto> skillDtos) {

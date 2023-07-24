@@ -11,6 +11,7 @@ import school.faang.user_service.dto.goal.CreateGoalDto;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.dto.goal.ResponseGoalDto;
+import school.faang.user_service.dto.goal.UpdateGoalDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
@@ -20,21 +21,23 @@ import school.faang.user_service.filter.goal.GoalSkillFilter;
 import school.faang.user_service.filter.goal.GoalStatusFilter;
 import school.faang.user_service.filter.goal.GoalTitleFilter;
 import school.faang.user_service.mapper.goal.CreateGoalMapper;
-import school.faang.user_service.dto.goal.UpdateGoalDto;
-import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -44,13 +47,14 @@ public class GoalServiceTest {
     private GoalRepository goalRepository;
     @Mock
     private SkillRepository skillRepository;
+    @Mock
+    private UserRepository userRepository;
     @Spy
     private CreateGoalMapper createGoalMapper = CreateGoalMapper.INSTANCE;
     private GoalMapper goalMapper = GoalMapper.INSTANCE;
     @InjectMocks
     private GoalService goalService;
-    private final UpdateGoalDto updateGoalDto = new UpdateGoalDto();
-    private final Goal goal = new Goal();
+
 
 
     @BeforeEach
@@ -58,11 +62,8 @@ public class GoalServiceTest {
         List<GoalFilter> goalFilters = List.of(new GoalTitleFilter(),
                 new GoalSkillFilter(), new GoalStatusFilter());
 
-        goalService = new GoalService(goalRepository, skillRepository, goalMapper, createGoalMapper, goalFilters);
-
-        updateGoalDto.setId(1L);
-        updateGoalDto.setSkillDtos(List.of(SkillDto.builder().title("skillTitle").build()));
-        updateGoalDto.setUserIds(List.of(2L));
+        goalService = new GoalService(goalRepository, skillRepository, userRepository,
+                goalMapper, createGoalMapper, goalFilters);
     }
 
     @Test
@@ -192,7 +193,11 @@ public class GoalServiceTest {
 
     @Test
     void updateGoal_With_Blank_Title_Throw_Exception() {
+        UpdateGoalDto updateGoalDto = updateGoalDtoCreate();
         updateGoalDto.setTitle("");
+
+        Goal goal = new Goal();
+
         when(goalRepository.findById(anyLong())).thenReturn(Optional.of(goal));
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> goalService.updateGoal(updateGoalDto));
@@ -204,8 +209,12 @@ public class GoalServiceTest {
 
     @Test
     void updateGoal_Completed_Goal_Throw_Exception() {
+        UpdateGoalDto updateGoalDto = updateGoalDtoCreate();
         updateGoalDto.setTitle("Title");
+
+        Goal goal = new Goal();
         goal.setStatus(GoalStatus.COMPLETED);
+
         when(goalRepository.findById(anyLong())).thenReturn(Optional.of(goal));
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
@@ -218,8 +227,12 @@ public class GoalServiceTest {
 
     @Test
     void updateGoal_Skill_Not_Found_Throw_Exception() {
+        UpdateGoalDto updateGoalDto = updateGoalDtoCreate();
         updateGoalDto.setTitle("Title");
+
+        Goal goal = new Goal();
         goal.setStatus(GoalStatus.ACTIVE);
+
         when(goalRepository.findById(anyLong())).thenReturn(Optional.of(goal));
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
@@ -229,5 +242,13 @@ public class GoalServiceTest {
 
         verify(goalRepository).findById(anyLong());
         verify(skillRepository).existsByTitle(anyString());
+    }
+
+    private UpdateGoalDto updateGoalDtoCreate(){
+        UpdateGoalDto updateGoalDto = new UpdateGoalDto();
+        updateGoalDto.setId(1L);
+        updateGoalDto.setSkillDtos(List.of(SkillDto.builder().title("skillTitle").build()));
+        updateGoalDto.setUserIds(List.of(2L));
+        return updateGoalDto;
     }
 }

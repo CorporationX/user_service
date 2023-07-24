@@ -1,6 +1,9 @@
 package school.faang.user_service.service.recommendation;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
@@ -68,6 +71,13 @@ public class RecommendationService {
         recommendationRepository.deleteById(recommendationId);
     }
 
+    public Page<RecommendationDto> getAllUserRecommendations(long receiverId, int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Page<Recommendation> receiverRecommendations = recommendationRepository.findAllByReceiverId(receiverId, pageable);
+
+        return receiverRecommendations.map(recommendationMapper::toDto);
+    }
+
     private void processSkillOffers(Recommendation recommendation) {
         long userId = recommendation.getReceiver().getId();
         long authorId = recommendation.getAuthor().getId();
@@ -133,7 +143,7 @@ public class RecommendationService {
 
             if (lastUpdate.plusMonths(RECOMMENDATION_INTERVAL_MONTHS).isAfter(currentDate)) {
                 String errorMessage = String.format(
-                        "You've already recommended the user %d in the last %d months",
+                        "You've already recommended the %d user in the last %d months",
                         userId, RECOMMENDATION_INTERVAL_MONTHS);
 
                 throw new DataValidationException(errorMessage);

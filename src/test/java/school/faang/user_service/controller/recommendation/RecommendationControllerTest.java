@@ -5,9 +5,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.recommendation.RecommendationService;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -79,5 +84,26 @@ public class RecommendationControllerTest {
 
         assertThrows(DataValidationException.class,
                 () -> recommendationController.updateRecommendation(recommendationDto));
+    }
+
+    @Test
+    public void testGetAllUserRecommendations() {
+        long userId = 1L;
+        int pageNumber = 0;
+        int pageSize = 10;
+
+        RecommendationDto recommendationDto1 = new RecommendationDto();
+        recommendationDto1.setId(1L);
+        RecommendationDto recommendationDto2 = new RecommendationDto();
+        recommendationDto2.setId(2L);
+        List<RecommendationDto> recommendationDtosList = List.of(recommendationDto1, recommendationDto2);
+
+        Page<RecommendationDto> page = new PageImpl<>(recommendationDtosList, PageRequest.of(pageNumber, pageSize), recommendationDtosList.size());
+
+        when(recommendationService.getAllUserRecommendations(userId, pageNumber, pageSize)).thenReturn(page);
+
+        Page<RecommendationDto> resultPage = recommendationController.getAllUserRecommendations(userId, pageNumber, pageSize);
+
+        assertEquals(recommendationDtosList, resultPage.getContent());
     }
 }

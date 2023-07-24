@@ -268,8 +268,6 @@ class RecommendationServiceTest {
     void testUpdateInvokesUpdateMethod() {
         Mockito.when(userRepository.findById(recommendationDto.getReceiverId()))
                 .thenReturn(Optional.of(emptyUser));
-        Mockito.when(recommendationMapper.toDto(null))
-                .thenReturn(recommendationDto);
 
         recommendationService.update(recommendationDto);
 
@@ -280,26 +278,10 @@ class RecommendationServiceTest {
     void testUpdateInvokesDeleteAllByRecommendationIdMethod() {
         Mockito.when(userRepository.findById(recommendationDto.getReceiverId()))
                 .thenReturn(Optional.of(emptyUser));
-        Mockito.when(recommendationMapper.toDto(null))
-                .thenReturn(recommendationDto);
 
         recommendationService.update(recommendationDto);
 
         Mockito.verify(skillOfferRepository).deleteAllByRecommendationId(recommendationDto.getId());
-    }
-
-    @Test
-    void updateTest() {
-        Mockito.when(recommendationRepository.update(recommendationDto.getAuthorId(), recommendationDto.getReceiverId(), recommendationDto.getContent()))
-                .thenReturn(recommendation);
-        Mockito.when(userRepository.findById(recommendationDto.getReceiverId()))
-                .thenReturn(Optional.of(emptyUser));
-
-        RecommendationDto result = recommendationService.update(recommendationDto);
-        RecommendationDto expected = new RecommendationDto(1L, firstUser.getId(), secondUser.getId(), "Hello", skillOffersDto, recommendation.getCreatedAt());
-
-        assertEquals(expected, result);
-        Mockito.verify(recommendationMapper).toDto(recommendation);
     }
 
     @Test

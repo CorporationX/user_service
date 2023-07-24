@@ -46,20 +46,19 @@ public class RecommendationService {
         skillOfferRepository.saveAll(skillOffersEntity);
     }
 
-    public RecommendationDto update(RecommendationDto recommendation) {
+    public void update(RecommendationDto recommendation) {
         validateRecommendation(recommendation);
-        Recommendation updatedRecommendation = recommendationRepository.update(recommendation.getAuthorId(), recommendation.getReceiverId(), recommendation.getContent());
+        recommendationRepository.update(recommendation.getAuthorId(), recommendation.getReceiverId(), recommendation.getContent());
         skillOfferRepository.deleteAllByRecommendationId(recommendation.getId());
         saveSkillOffer(recommendation);
-        return recommendationMapper.toDto(updatedRecommendation);
     }
 
     public void delete(long id) {
         recommendationRepository.deleteById(id);
     }
 
-    public List<RecommendationDto> getAllUserRecommendations(long recieverId) {
-        Page<Recommendation> userRecommendations = recommendationRepository.findAllByReceiverId(recieverId, Pageable.unpaged());
+    public List<RecommendationDto> getAllUserRecommendations(long receiverId) {
+        Page<Recommendation> userRecommendations = recommendationRepository.findAllByReceiverId(receiverId, Pageable.unpaged());
         validatePageNotEmpty(userRecommendations);
         return recommendationMapper.toRecommendationDtos(userRecommendations.getContent());
     }

@@ -26,10 +26,9 @@ class SkillServiceTest {
     @Spy
     private SkillMapper skillMapper;
 
-
     @Test
     void testCreate() {
-        SkillDto skillDto= new SkillDto(1L, "privet");
+        SkillDto skillDto = new SkillDto(1L, "privet");
         skillService.create(skillDto);
         Mockito.verify(skillRepository, Mockito.times(1)).save(skillMapper.toEntity(skillDto));
     }
@@ -45,8 +44,7 @@ class SkillServiceTest {
 
     @Test
     void testGetUserSkills() {
-        SkillDto skillDto = new SkillDto();
-        skillDto.setId(4L);
+        SkillDto skillDto = new SkillDto(1L, "privet");
 
         skillService.getUserSkills(skillDto.getId());
         Mockito.verify(skillRepository, Mockito.times(1))
@@ -55,8 +53,7 @@ class SkillServiceTest {
 
     @Test
     void testGetOfferedSkills() {
-        SkillDto skillDto = new SkillDto();
-        skillDto.setId(4L);
+        SkillDto skillDto = new SkillDto(1L, "privet");
 
         skillService.getOfferedSkills(skillDto.getId());
         Mockito.verify(skillRepository, Mockito.times(1))

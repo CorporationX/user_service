@@ -5,18 +5,22 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mappers.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class SkillService {
     private final SkillRepository skillRepository;
     private final SkillMapper skillMapper;
+    private final SkillOfferRepository skillOfferRepository;
 
     public SkillDto create(SkillDto skill) {
         if (skillRepository.existsByTitle(skill.getTitle().toLowerCase().trim())) {
@@ -27,18 +31,14 @@ public class SkillService {
     }
 
     public List<SkillDto> getUserSkills(long userId) {
-        List<SkillDto> list = new ArrayList<>();
-        for (Skill skill : skillRepository.findAllByUserId(userId)) {
-            list.add(skillMapper.toDTO(skill));
-        }
-        return list;
+        return skillRepository.findAllByUserId(userId).stream()
+                .map(skill -> skillMapper.toDTO(skill))
+                .collect(Collectors.toList());
     }
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
-        List<SkillCandidateDto> list = new ArrayList<>();
-        for (Skill skill : skillRepository.findAllByUserId(userId)) {
-            list.add(skillMapper.candidateToDTO(skill));
-        }
-        return list;
+        return skillOfferRepository.findById(userId).stream()
+                .map(skillOffer -> skillMapper.candidateToDTO(skillOffer))
+                .collect(Collectors.toList());
     }
- }
+}

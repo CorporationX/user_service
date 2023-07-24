@@ -7,8 +7,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.goal.CreateGoalDto;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
+import school.faang.user_service.dto.goal.ResponseGoalDto;
+import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
@@ -16,7 +19,8 @@ import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.filter.goal.GoalSkillFilter;
 import school.faang.user_service.filter.goal.GoalStatusFilter;
 import school.faang.user_service.filter.goal.GoalTitleFilter;
-import school.faang.user_service.mapper.GoalMapper;
+import school.faang.user_service.mapper.goal.CreateGoalMapper;
+import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
@@ -26,7 +30,9 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -38,6 +44,7 @@ public class GoalServiceTest {
     @Mock
     private SkillRepository skillRepository;
     @Spy
+    private CreateGoalMapper createGoalMapper = CreateGoalMapper.INSTANCE;
     private GoalMapper goalMapper = GoalMapper.INSTANCE;
     @InjectMocks
     private GoalService goalService;
@@ -48,7 +55,7 @@ public class GoalServiceTest {
         List<GoalFilter> goalFilters = List.of(new GoalTitleFilter(),
                 new GoalSkillFilter(), new GoalStatusFilter());
 
-        goalService = new GoalService(goalRepository, skillRepository, goalMapper, goalFilters);
+        goalService = new GoalService(goalRepository, skillRepository, goalMapper, createGoalMapper, goalFilters);
     }
 
     @Test
@@ -70,6 +77,84 @@ public class GoalServiceTest {
         goalService.deleteGoal(1L);
 
         verify(goalRepository).deleteById(1L);
+    }
+
+    @Test
+    void createGoal_With_Null_Goal() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> goalService.createGoal(1L, null));
+
+        assertEquals("Goal cannot be null", exception.getMessage());
+    }
+
+    @Test
+    void createGoal_With_Blank_Title() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> goalService.createGoal(1L, CreateGoalDto.builder().title("").build()));
+
+        assertEquals("Title cannot be null", exception.getMessage());
+    }
+
+    @Test
+    void createGoal_When_Max_User_Reached() {
+        when(goalRepository.countActiveGoalsPerUser(1L)).thenReturn(3);
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> goalService.createGoal(1L, CreateGoalDto.builder().title("title").build()));
+
+        assertEquals("Maximum number of goals for this user reached", exception.getMessage());
+    }
+
+    @Test
+    void createGoal_When_Skill_Not_Exist() {
+        CreateGoalDto goalDto = CreateGoalDto.builder()
+                .title("title")
+                .skillsToAchieve(List.of(
+                        mock(SkillDto.class),
+                        mock(SkillDto.class),
+                        mock(SkillDto.class)
+                ))
+                .build();
+        Goal goal = createGoalMapper.toGoalFromCreateGoalDto(goalDto);
+
+        when(skillRepository.existsByTitle(any()))
+                .thenReturn(true)
+                .thenReturn(true)
+                .thenReturn(false);
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> goalService.createGoal(1L, goalDto));
+
+        assertEquals("Skill not found", exception.getMessage());
+    }
+
+    @Test
+    void createGoal_Successful() {
+        CreateGoalDto goalDto = CreateGoalDto.builder()
+                .title("title")
+                .skillsToAchieve(List.of(
+                        mock(SkillDto.class),
+                        mock(SkillDto.class),
+                        mock(SkillDto.class)
+                ))
+                .build();
+
+        Goal goal = createGoalMapper.toGoalFromCreateGoalDto(goalDto);
+
+        when(skillRepository.existsByTitle(any()))
+                .thenReturn(true)
+                .thenReturn(true)
+                .thenReturn(true);
+        when(goalRepository.save(any(Goal.class))).thenAnswer(i -> {
+            goal.setId(2L);
+            return goal;
+        });
+
+        ResponseGoalDto actual = goalService.createGoal(1L, goalDto);
+        ResponseGoalDto expected = createGoalMapper.toResponseGoalDtoFromGoal(goal);
+        expected.setId(2L);
+
+        assertEquals(expected, actual);
     }
 
     @Test

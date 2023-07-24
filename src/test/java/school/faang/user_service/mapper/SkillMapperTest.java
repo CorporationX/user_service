@@ -3,6 +3,7 @@ package school.faang.user_service.mapper;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.mapper.skill.SkillMapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

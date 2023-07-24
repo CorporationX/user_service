@@ -1,4 +1,4 @@
-package school.faang.user_service.mapper;
+package school.faang.user_service.mapper.goal;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

@@ -22,7 +22,7 @@ class SkillMapperTest {
     private SkillMapper skillMapper = new SkillMapperImpl();
 
     @Test
-    void toDto() {
+    void testToDto() {
 
         Skill skill = new Skill();
         skill.setId(1L);
@@ -45,7 +45,7 @@ class SkillMapperTest {
 
 
     @Test
-    void toDto_ShouldMapSkillWithGuaranteesToSkillDto() {
+    void testToDto_ShouldMapSkillWithGuaranteesToSkillDto() {
 
         Skill skill = new Skill();
         skill.setId(1L);

@@ -6,13 +6,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
+import school.faang.user_service.dto.recommendation.SkillDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
+import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
+import school.faang.user_service.exeption.DataValidationException;
 import school.faang.user_service.exeption.EntityNotFoundException;
 import school.faang.user_service.mappers.RecommendationMapper;
 import school.faang.user_service.mappers.SkillMapper;
+import school.faang.user_service.mappers.UserSkillGuaranteeMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
@@ -53,9 +57,11 @@ class RecommendationServiceTest {
     private RecommendationMapper recommendationMapper;
     @Mock
     private SkillMapper skillMapper;
+    @Mock
+    private UserSkillGuaranteeMapper userSkillGuaranteeMapper;
 
     @Test
-    public void testCreate() {
+    void testCreate() {
         SkillOfferDto skillOfferDto = SkillOfferDto.builder()
                 .id(1L)
                 .skill(1L)
@@ -104,7 +110,104 @@ class RecommendationServiceTest {
     }
 
     @Test
-    public void testUpdate() {
+    void testCreate_InvalidRecommendation_ThrowsDataValidationException() {
+
+        RecommendationDto recommendationDto = RecommendationDto.builder()
+                .authorId(1L)
+                .receiverId(2L)
+                .content("Invalid recommendation") // Content that fails validation
+                .skillOffers(Collections.emptyList())
+                .build();
+
+        RecommendationService recommendationServiceSpy = spy(recommendationService);
+
+        doThrow(DataValidationException.class)
+                .when(recommendationValidator)
+                .validateRecommendationContent(recommendationDto);
+
+        assertThrows(DataValidationException.class, () -> recommendationServiceSpy.create(recommendationDto));
+
+        verify(recommendationRepository, never()).create(anyLong(), anyLong(), anyString());
+        verify(recommendationRepository, never()).findById(anyLong());
+
+        verify(recommendationServiceSpy, never()).saveSkillOffers(any(Recommendation.class), anyList());
+
+        verify(recommendationMapper, never()).toDto(any(Recommendation.class));
+    }
+
+    @Test
+    void testCreate_RecommendationNotFound_ThrowsEntityNotFoundException() {
+
+        long authorId = 1L;
+        long receiverId = 2L;
+        String content = "Test recommendation";
+
+        RecommendationDto recommendationDto = RecommendationDto.builder()
+                .authorId(authorId)
+                .receiverId(receiverId)
+                .content(content)
+                .build();
+
+        when(recommendationRepository.create(authorId, receiverId, content)).thenReturn(1L);
+        when(recommendationRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> recommendationService.create(recommendationDto));
+    }
+
+    @Test
+    void testCreate_InvalidRecommendation_ThrowsValidationException() {
+        // Given
+        long authorId = 1L;
+        long receiverId = 2L;
+        String content = "Test recommendation";
+
+        RecommendationDto recommendationDto = new RecommendationDto();
+        recommendationDto.setAuthorId(authorId);
+        recommendationDto.setReceiverId(receiverId);
+        recommendationDto.setContent(content);
+
+        // Simulate validation failure
+        doThrow(DataValidationException.class).when(recommendationValidator)
+                .validateRecommendationContent(recommendationDto);
+
+        // When/Then
+        assertThrows(DataValidationException.class, () -> recommendationService.create(recommendationDto));
+    }
+
+    @Test
+    void testCreate_SkillNotFound_ThrowsEntityNotFoundException() {
+        long authorId = 1L;
+        long receiverId = 2L;
+        String content = "Test recommendation";
+
+        RecommendationDto recommendationDto = new RecommendationDto();
+        recommendationDto.setAuthorId(authorId);
+        recommendationDto.setReceiverId(receiverId);
+        recommendationDto.setContent(content);
+
+        SkillOfferDto skillOfferDto = new SkillOfferDto();
+        skillOfferDto.setId(1L);
+        skillOfferDto.setSkill(3L);
+        skillOfferDto.setRecommendation(1L);
+        List<SkillOfferDto> skillOffers = Collections.singletonList(skillOfferDto);
+        recommendationDto.setSkillOffers(skillOffers);
+        User author = User.builder().id(1L).build();
+        User receiver = User.builder().id(2L).build();
+
+        when(recommendationRepository.create(authorId, receiverId, content)).thenReturn(1L);
+
+        Recommendation recommendationEntity = new Recommendation();
+        recommendationEntity.setId(1L);
+        recommendationEntity.setAuthor(author);
+        recommendationEntity.setReceiver(receiver);
+        recommendationEntity.setContent(content);
+        when(recommendationRepository.findById(1L)).thenReturn(Optional.of(recommendationEntity));
+
+        assertThrows(EntityNotFoundException.class, () -> recommendationService.create(recommendationDto));
+    }
+
+    @Test
+    void testUpdate() {
         SkillOfferDto skillOfferDtoFirst = SkillOfferDto.builder()
                 .id(1L)
                 .skill(1L)
@@ -143,7 +246,10 @@ class RecommendationServiceTest {
                 .skillOffers(skillOfferList)
                 .build();
 
-        when(recommendationRepository.update(recommendationUpdate.getAuthorId(), recommendationUpdate.getReceiverId(), recommendationUpdate.getContent())).thenReturn(recommendationEntity);
+        when(recommendationRepository.update(recommendationUpdate.getAuthorId(),
+                recommendationUpdate.getReceiverId(),
+                recommendationUpdate.getContent())).
+                thenReturn(recommendationEntity);
         when(skillOfferRepository.create(anyLong(), anyLong())).thenReturn(1L);
         when(skillOfferRepository.findById(anyLong())).thenReturn(Optional.of(skillOffer));
         when(recommendationMapper.toDto(any(Recommendation.class))).thenReturn(recommendationUpdate);
@@ -154,7 +260,8 @@ class RecommendationServiceTest {
         verify(recommendationValidator).validateRecommendationTerm(recommendationUpdate);
         verify(skillValidator).validateSkillOffersDto(recommendationUpdate);
         verify(recommendationRepository, times(1)).update(anyLong(), anyLong(), anyString());
-        verify(skillOfferRepository, times(1)).deleteAllByRecommendationId(recommendationEntity.getId());
+        verify(skillOfferRepository, times(1))
+                .deleteAllByRecommendationId(recommendationEntity.getId());
         verify(skillOfferRepository, times(1)).create(1, 1);
 
         assertEquals(recommendationUpdate.getId(), result.getId());
@@ -165,13 +272,26 @@ class RecommendationServiceTest {
     }
 
     @Test
-    public void testDeleteInvokesDeleteById() {
+    void testValidate_CallsValidators() {
+        RecommendationDto recommendationDto = new RecommendationDto();
+
+        recommendationService.validate(recommendationDto);
+
+        verify(recommendationValidator, times(1)).validateRecommendationContent(recommendationDto);
+
+        verify(recommendationValidator, times(1)).validateRecommendationTerm(recommendationDto);
+
+        verify(skillValidator, times(1)).validateSkillOffersDto(recommendationDto);
+    }
+
+    @Test
+    void testDelete_InvokesDeleteById() {
         recommendationService.delete(1);
         verify(recommendationRepository).deleteById(1L);
     }
 
     @Test
-    public void getAllUserRecommendations_ReceiverExists_ReturnRecommendationDtos() {
+    void testGetAllUserRecommendations_ReceiverExists_ReturnRecommendationDtos() {
         long receiverId = 1L;
 
         User receiver = new User();
@@ -201,7 +321,8 @@ class RecommendationServiceTest {
 
         when(userRepository.findById(receiverId)).thenReturn(Optional.of(receiver));
         when(recommendationRepository.findAllByReceiverId(receiverId)).thenReturn(Optional.of(recommendations));
-        when(recommendationMapper.toRecommendationDtos(recommendations)).thenReturn(List.of(recommendationDto1, recommendationDto2));
+        when(recommendationMapper.toRecommendationDtos(recommendations))
+                .thenReturn(List.of(recommendationDto1, recommendationDto2));
 
         List<RecommendationDto> result = recommendationService.getAllUserRecommendations(receiverId);
 
@@ -216,7 +337,7 @@ class RecommendationServiceTest {
     }
 
     @Test
-    public void getAllUserRecommendations_ReceiverNotExists_ThrowEntityNotFoundException() {
+    void testGetAllUserRecommendations_ReceiverNotExists_ThrowEntityNotFoundException() {
         long receiverId = 1L;
 
         when(userRepository.findById(receiverId)).thenReturn(Optional.empty());
@@ -225,7 +346,7 @@ class RecommendationServiceTest {
     }
 
     @Test
-    public void getAllGivenRecommendations_AuthorExists_ReturnRecommendationDtos() {
+    void testGetAllGivenRecommendations_AuthorExists_ReturnRecommendationDtos() {
         long authorId = 1L;
 
         User author = new User();
@@ -270,7 +391,7 @@ class RecommendationServiceTest {
     }
 
     @Test
-    public void getAllGivenRecommendations_AuthorNotExists_ThrowEntityNotFoundException() {
+    void testGetAllGivenRecommendations_AuthorNotExists_ThrowEntityNotFoundException() {
         long authorId = 1L;
 
         when(userRepository.findById(authorId)).thenReturn(Optional.empty());
@@ -279,7 +400,7 @@ class RecommendationServiceTest {
     }
 
     @Test
-    public void getAllGivenRecommendations_NoRecommendations_ReturnEmptyList() {
+    void testGetAllGivenRecommendations_NoRecommendations_ReturnEmptyList() {
         long authorId = 1L;
 
         User author = new User();
@@ -297,7 +418,7 @@ class RecommendationServiceTest {
     }
 
     @Test
-    public void getAllGivenRecommendations_AuthorExistsButNoRecommendations_ReturnEmptyList() {
+    void testGetAllGivenRecommendations_AuthorExistsButNoRecommendations_ReturnEmptyList() {
         long authorId = 1L;
 
         User author = new User();
@@ -312,7 +433,7 @@ class RecommendationServiceTest {
     }
 
     @Test
-    public void getAllGivenRecommendations_NonExistingAuthor_ThrowsEntityNotFoundException() {
+    void testGetAllGivenRecommendations_NonExistingAuthor_ThrowsEntityNotFoundException() {
         long authorId = 1L;
 
         when(userRepository.findById(authorId)).thenReturn(Optional.empty());
@@ -322,6 +443,58 @@ class RecommendationServiceTest {
         verify(userRepository).findById(authorId);
 
         verify(recommendationRepository, never()).findAllByAuthorId(anyLong());
+    }
+
+    @Test
+    void testGetUserSkillsAndConvertToDtos_NoSkills_ReturnsEmptyList() {
+        long userId = 1L;
+
+        when(skillRepository.findAllByUserId(userId)).thenReturn(new ArrayList<>());
+
+        List<SkillDto> skillDtos = recommendationService.getUserSkillsAndConvertToDtos(userId);
+
+        assertEquals(0, skillDtos.size());
+        verify(skillRepository, times(1)).findAllByUserId(userId);
+        verify(skillMapper, never()).toDto(any(Skill.class));
+    }
+
+    @Test
+    void testGetUserSkillsAndConvertToDtos_SkillsExist_ReturnsSkillDtos() {
+        long userId = 1L;
+
+        List<Skill> skills = new ArrayList<>();
+        Skill skill1 = new Skill();
+        skill1.setId(101L);
+        skill1.setTitle("Skill 1");
+        skills.add(skill1);
+
+        Skill skill2 = new Skill();
+        skill2.setId(102L);
+        skill2.setTitle("Skill 2");
+        skills.add(skill2);
+
+        SkillDto skillDto1 = new SkillDto();
+        skillDto1.setId(101L);
+        skillDto1.setTitle("Skill 1");
+
+        SkillDto skillDto2 = new SkillDto();
+        skillDto2.setId(102L);
+        skillDto2.setTitle("Skill 2");
+
+        when(skillRepository.findAllByUserId(userId)).thenReturn(skills);
+
+        when(skillMapper.toDto(skill1)).thenReturn(skillDto1);
+        when(skillMapper.toDto(skill2)).thenReturn(skillDto2);
+
+        List<SkillDto> skillDtos = recommendationService.getUserSkillsAndConvertToDtos(userId);
+
+        assertEquals(2, skillDtos.size());
+        assertEquals(skillDto1, skillDtos.get(0));
+        assertEquals(skillDto2, skillDtos.get(1));
+
+        verify(skillRepository, times(1)).findAllByUserId(userId);
+        verify(skillMapper, times(1)).toDto(skill1);
+        verify(skillMapper, times(1)).toDto(skill2);
     }
 }
 

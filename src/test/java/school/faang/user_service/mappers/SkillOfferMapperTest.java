@@ -23,7 +23,7 @@ class SkillOfferMapperTest {
 
 
     @Test
-    public void testToEntity() {
+    void testToEntity() {
 
         SkillOfferDto dto = new SkillOfferDto();
         dto.setSkill(1L);
@@ -36,7 +36,7 @@ class SkillOfferMapperTest {
     }
 
     @Test
-    public void testToDto() {
+    void testToDto() {
 
         SkillOffer entity = new SkillOffer();
         Skill skill = new Skill();
@@ -53,7 +53,7 @@ class SkillOfferMapperTest {
     }
 
     @Test
-    public void testToSkillOfferDtos() {
+    void testToSkillOfferDtos() {
 
         List<SkillOffer> skillOffers = new ArrayList<>();
         SkillOffer offer1 = new SkillOffer();

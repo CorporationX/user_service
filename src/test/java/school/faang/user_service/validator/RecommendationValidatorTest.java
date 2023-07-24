@@ -25,7 +25,7 @@ class RecommendationValidatorTest {
 
 
     @Test
-    void validateRecommendation_ValidContent_NoExceptionThrown() {
+    void testValidateRecommendation_ValidContent_NoExceptionThrown() {
         RecommendationDto recommendationDto = new RecommendationDto();
         recommendationDto.setContent("Valid content");
 
@@ -33,7 +33,7 @@ class RecommendationValidatorTest {
     }
 
     @Test
-    void validateRecommendation_NullContent_ExceptionThrown() {
+    void testValidateRecommendation_NullContent_ExceptionThrown() {
         RecommendationDto recommendationDto = new RecommendationDto();
         recommendationDto.setContent(null);
 
@@ -42,7 +42,7 @@ class RecommendationValidatorTest {
     }
 
     @Test
-    void validateRecommendation_EmptyContent_ExceptionThrown() {
+    void testValidateRecommendation_EmptyContent_ExceptionThrown() {
         RecommendationDto recommendationDto = new RecommendationDto();
         recommendationDto.setContent("");
 
@@ -51,7 +51,7 @@ class RecommendationValidatorTest {
     }
 
     @Test
-    void validateRecommendationTerm_InvalidTerm_ExceptionThrown() {
+    void testValidateRecommendationTerm_InvalidTerm_ExceptionThrown() {
         long authorId = 1L;
         long receiverId = 2L;
 

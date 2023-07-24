@@ -6,6 +6,7 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, injectionStrategy = InjectionStrategy.FIELD)
 public interface SkillOfferMapper {
@@ -25,6 +26,6 @@ public interface SkillOfferMapper {
         }
         return skills.stream()
                 .map(this::toDto)
-                .toList();
+                .collect(Collectors.toList());
     }
 }

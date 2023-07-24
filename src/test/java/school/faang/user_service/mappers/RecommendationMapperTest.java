@@ -23,7 +23,7 @@ class RecommendationMapperTest {
     private RecommendationMapper recommendationMapper = new RecommendationMapperImpl(skillOfferMapper);
 
     @Test
-    public void testToDto() {
+    void testToDto() {
 
         Recommendation recommendation = new Recommendation();
         recommendation.setId(1L);
@@ -57,7 +57,7 @@ class RecommendationMapperTest {
     }
 
     @Test
-    public void testToRecommendationDtos() {
+    void testToRecommendationDtos() {
         List<Recommendation> recommendations = new ArrayList<>();
         Recommendation recommendation1 = new Recommendation();
         recommendation1.setId(1L);

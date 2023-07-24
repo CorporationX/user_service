@@ -16,18 +16,15 @@ class UserSkillGuaranteeMapperTest {
     private UserSkillGuaranteeMapper userSkillGuaranteeMapper = Mappers.getMapper(UserSkillGuaranteeMapper.class);
 
     @Test
-    void toEntity() {
-        // Given
+    void testToEntity() {
         UserSkillGuaranteeDto userSkillGuaranteeDto = new UserSkillGuaranteeDto();
         userSkillGuaranteeDto.setId(1L);
         userSkillGuaranteeDto.setUserId(10L);
         userSkillGuaranteeDto.setSkillId(20L);
         userSkillGuaranteeDto.setGuarantorId(30L);
 
-        // When
         UserSkillGuarantee userSkillGuarantee = userSkillGuaranteeMapper.toEntity(userSkillGuaranteeDto);
 
-        // Then
         assertEquals(1L, userSkillGuarantee.getId());
         assertEquals(10L, userSkillGuarantee.getUser().getId());
         assertEquals(20L, userSkillGuarantee.getSkill().getId());

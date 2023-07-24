@@ -26,7 +26,7 @@ class SkillValidatorTest {
     private SkillValidator skillValidator;
 
     @Test
-    void validateSkillOffersDto_NoSkillOffers_NoExceptionThrown() {
+    void testValidateSkillOffersDto_NoSkillOffers_NoExceptionThrown() {
         RecommendationDto recommendationDto = new RecommendationDto();
         recommendationDto.setSkillOffers(null);
 
@@ -35,7 +35,7 @@ class SkillValidatorTest {
     }
 
     @Test
-    void validateSkillOffersDto_ValidSkills_NoExceptionThrown() {
+    void testValidateSkillOffersDto_ValidSkills_NoExceptionThrown() {
         RecommendationDto recommendationDto = new RecommendationDto();
         List<SkillOfferDto> skillOffers = new ArrayList<>();
         skillOffers.add(SkillOfferDto.builder().id(1L).skill(1L).build());
@@ -55,7 +55,7 @@ class SkillValidatorTest {
     }
 
     @Test
-    void validateSkillOffersDto_InvalidSkills_ExceptionThrown() {
+    void testValidateSkillOffersDto_InvalidSkills_ExceptionThrown() {
         RecommendationDto recommendationDto = new RecommendationDto();
         List<SkillOfferDto> skillOffers = new ArrayList<>();
         skillOffers.add(SkillOfferDto.builder().id(1L).skill(1L).build());
@@ -70,5 +70,4 @@ class SkillValidatorTest {
 
         assertThrows(DataValidationException.class, () -> skillValidator.validateSkillOffersDto(recommendationDto));
     }
-
 }

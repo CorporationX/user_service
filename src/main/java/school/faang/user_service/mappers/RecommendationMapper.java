@@ -17,6 +17,7 @@ public interface RecommendationMapper {
 
     default List<RecommendationDto> toRecommendationDtos(List<Recommendation> recommendations) {
         return recommendations.stream()
-                .map(this::toDto).toList();
+                .map(this::toDto)
+                .toList();
     }
 }

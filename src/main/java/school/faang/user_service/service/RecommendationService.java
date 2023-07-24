@@ -105,7 +105,7 @@ public class RecommendationService {
     }
 
 
-    private void validate(RecommendationDto recommendation) {
+    public void validate(RecommendationDto recommendation) {
         recommendationValidator.validateRecommendationContent(recommendation);
         recommendationValidator.validateRecommendationTerm(recommendation);
         skillValidator.validateSkillOffersDto(recommendation);
@@ -118,17 +118,20 @@ public class RecommendationService {
                     skillOfferDto.getSkill(),
                     recommendationEntity.getId()
             );
-            recommendationEntity.addSkillOffer(skillOfferRepository.findById(newSkillOfferId).orElseThrow(() -> new EntityNotFoundException("Skill not found")));
+            recommendationEntity.addSkillOffer(skillOfferRepository.findById(newSkillOfferId)
+                    .orElseThrow(() -> new EntityNotFoundException("Skill not found")));
 
             List<SkillDto> skillsInUserDtos = getUserSkillsAndConvertToDtos(recommendationEntity.getAuthor().getId());
 
             UserSkillGuaranteeDto userSkillGuaranteeDto = createUserSkillGuaranteeDto(recommendationEntity);
 
-
             for (SkillOffer skillOffer : recommendationEntity.getSkillOffers()) {
                 skillsInUserDtos.stream()
                         .filter(userSkill -> userSkill.getId().equals(skillOffer.getSkill().getId()))
-                        .forEach(skill -> provideGuarantee(skill,recommendationEntity.getAuthor().getId(), userSkillGuaranteeDto));
+                        .forEach(skill -> provideGuarantee(
+                                skill,
+                                recommendationEntity.getAuthor().getId(),
+                                userSkillGuaranteeDto));
             }
         }
     }

@@ -14,7 +14,6 @@ import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.UserSkillGuaranteeMapper;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -40,7 +39,6 @@ public class RecommendationService {
     private final SkillRepository skillRepository;
     private final UserRepository userRepository;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
-    private final UserSkillGuaranteeMapper userSkillGuaranteeMapper;
 
     @Transactional
     public RecommendationDto create(RecommendationDto recommendationDto) {
@@ -76,6 +74,13 @@ public class RecommendationService {
         Page<Recommendation> receiverRecommendations = recommendationRepository.findAllByReceiverId(receiverId, pageable);
 
         return receiverRecommendations.map(recommendationMapper::toDto);
+    }
+
+    public Page<RecommendationDto>  getAllGivenRecommendations(long authorId, int pageNumber, int pageSize){
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Page<Recommendation> authorRecommendations = recommendationRepository.findAllByAuthorId(authorId, pageable);
+
+        return   authorRecommendations.map(recommendationMapper::toDto);
     }
 
     private void processSkillOffers(Recommendation recommendation) {

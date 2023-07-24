@@ -106,4 +106,25 @@ public class RecommendationControllerTest {
 
         assertEquals(recommendationDtosList, resultPage.getContent());
     }
+
+    @Test
+    public void testGetAllGivenRecommendations() {
+        long userId = 1L;
+        int pageNumber = 0;
+        int pageSize = 10;
+
+        RecommendationDto recommendationDto1 = new RecommendationDto();
+        recommendationDto1.setId(1L);
+        RecommendationDto recommendationDto2 = new RecommendationDto();
+        recommendationDto2.setId(2L);
+        List<RecommendationDto> recommendationDtosList = List.of(recommendationDto1, recommendationDto2);
+
+        Page<RecommendationDto> page = new PageImpl<>(recommendationDtosList, PageRequest.of(pageNumber, pageSize), recommendationDtosList.size());
+
+        when(recommendationService.getAllGivenRecommendations(userId, pageNumber, pageSize)).thenReturn(page);
+
+        Page<RecommendationDto> resultPage = recommendationController.getAllGivenRecommendations(userId, pageNumber, pageSize);
+
+        assertEquals(recommendationDtosList, resultPage.getContent());
+    }
 }

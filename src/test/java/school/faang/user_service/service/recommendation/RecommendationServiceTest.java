@@ -16,7 +16,6 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.UserSkillGuaranteeMapper;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -49,8 +48,6 @@ public class RecommendationServiceTest {
     private UserRepository userRepository;
     @Mock
     private UserSkillGuaranteeRepository userSkillGuaranteeRepository;
-    @Mock
-    private UserSkillGuaranteeMapper userSkillGuaranteeMapper;
 
     @Test
     public void testCreate() {
@@ -278,6 +275,36 @@ public class RecommendationServiceTest {
         when(recommendationMapper.toDto(recommendation2)).thenReturn(recommendationDto2);
 
         Page<RecommendationDto> resultPage = recommendationService.getAllUserRecommendations(receiverId, pageNumber, pageSize);
+
+        assertEquals(recommendationDtosList, resultPage.getContent());
+    }
+
+    @Test
+    public void testGetAllGivenRecommendations() {
+        long receiverId = 1L;
+        int pageNumber = 0;
+        int pageSize = 10;
+
+        Recommendation recommendation1 = new Recommendation();
+        recommendation1.setId(1L);
+        Recommendation recommendation2 = new Recommendation();
+        recommendation2.setId(2L);
+        List<Recommendation> recommendationsList = List.of(recommendation1, recommendation2);
+
+        RecommendationDto recommendationDto1 = new RecommendationDto();
+        recommendationDto1.setId(1L);
+        RecommendationDto recommendationDto2 = new RecommendationDto();
+        recommendationDto2.setId(2L);
+        List<RecommendationDto> recommendationDtosList = List.of(recommendationDto1, recommendationDto2);
+
+        Page<Recommendation> page = new PageImpl<>(recommendationsList, PageRequest.of(pageNumber, pageSize), recommendationsList.size());
+
+        when(recommendationRepository.findAllByAuthorId(anyLong(), any(Pageable.class))).thenReturn(page);
+
+        when(recommendationMapper.toDto(recommendation1)).thenReturn(recommendationDto1);
+        when(recommendationMapper.toDto(recommendation2)).thenReturn(recommendationDto2);
+
+        Page<RecommendationDto> resultPage = recommendationService.getAllGivenRecommendations(receiverId, pageNumber, pageSize);
 
         assertEquals(recommendationDtosList, resultPage.getContent());
     }

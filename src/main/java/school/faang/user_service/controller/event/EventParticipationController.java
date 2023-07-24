@@ -25,4 +25,8 @@ public class EventParticipationController {
     public List<User> getParticipant(long eventId){
         return service.getParticipant(eventId);
     }
+
+    public int getParticipantsCount(long eventId){
+        return service.getParticipantsCount(eventId);
+    }
 }

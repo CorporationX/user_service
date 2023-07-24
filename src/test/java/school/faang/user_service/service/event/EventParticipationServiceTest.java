@@ -81,4 +81,22 @@ class EventParticipationServiceTest {
 
         assertEquals(2, service.getParticipant(someEventId).size());
     }
+    @Test
+    public void getParticipant_ShouldReturnCorrectParticipantsCount() {
+        long someUserId = new Random().nextLong();
+        long someEventId = new Random().nextLong();
+
+        User existingUser1 = User.builder()
+                .id(someUserId + 1)
+                .build();
+        User existingUser2 = User.builder()
+                .id(someUserId - 1)
+                .build();
+
+        var eventParticipants = List.of(existingUser1, existingUser2);
+
+        Mockito.when(repository.countParticipants(someEventId)).thenReturn(eventParticipants.size());
+
+        assertEquals(2, service.getParticipantsCount(someEventId));
+    }
 }

@@ -6,7 +6,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
+import school.faang.user_service.dto.recommendation.RejectionDto;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
@@ -37,7 +39,7 @@ class RecommendationRequestServiceTest {
         IllegalStateException illegalStateException = assertThrows(IllegalStateException.class,
                 () -> recommendationRequestService.getRequest(anyLong()));
 
-        assertEquals("There is no person with such id", illegalStateException.getMessage());
+        assertEquals("There is no recommendation with such id", illegalStateException.getMessage());
     }
 
     @Test

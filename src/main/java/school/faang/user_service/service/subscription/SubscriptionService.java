@@ -65,7 +65,7 @@ public class SubscriptionService {
     private List<UserDto> filterUsers(Stream<User> users, UserFilterDto filters) {
         return userFilters.stream()
                 .filter(filter -> filter.isApplicable(filters))
-                .reduce(users, (stream, filter) -> filter.apply(stream, filters), Stream::concat)
+                .flatMap(filter -> filter.apply(users, filters))
                 .map(userMapper::toDto)
                 .toList();
     }

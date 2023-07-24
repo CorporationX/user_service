@@ -59,7 +59,7 @@ class RecommendationRequestServiceTest {
     }
 
     @Test
-    void tesCreate() {
+    void testCreate() {
         recommendationRequestService.create(recommendationRequestDto);
         Mockito.verify(recommendationRequestRepository).save(recommendationRequestMapper.toEntity(recommendationRequestDto));
     }

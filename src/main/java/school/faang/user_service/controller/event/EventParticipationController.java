@@ -14,4 +14,8 @@ public class EventParticipationController {
     public void registerParticipant(UserDto userDto, @PathVariable long eventId) {
         service.registerParticipant(userDto.getId(), eventId);
     }
+
+    public void unregisterParticipant(long eventId, long userId) {
+        service.unregisterParticipant(eventId, userId);
+    }
 }

@@ -57,6 +57,7 @@ public class EventController {
         return event.getTitle() == null && event.getTitle().isEmpty()
                 && event.getStartDate() == null && event.getOwnerId() == null;
     }
+
     private void validateId(Long id) {
         if (id == null){
             throw new DataValidationException("Id is null");

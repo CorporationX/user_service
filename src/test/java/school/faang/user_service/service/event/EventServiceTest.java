@@ -29,7 +29,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -179,7 +178,7 @@ class EventServiceTest {
     void TestGetOwnedEvents() {
         List<Event> events = List.of(Event.builder().id(1L).build());
         when(eventRepository.findAllByUserId(1L)).thenReturn(events);
-        assertEquals(events,eventService.getOwnedEvents(1L));
+        assertEquals(events, eventService.getOwnedEvents(1L));
         verify(eventRepository, times(1)).findAllByUserId(1L);
     }
 

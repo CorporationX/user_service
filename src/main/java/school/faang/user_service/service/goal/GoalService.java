@@ -27,7 +27,7 @@ public class GoalService {
         Stream<Goal> goals = goalRepository.findGoalsByUserId(userId)
                 .peek(goal -> goal.setSkillsToAchieve(skillRepository.findSkillsByGoalId(goal.getId())));
 
-        if (goalFilters != null) {
+        if (filterDto != null) {
             return filterGoals(goals, filterDto);
         }
 
@@ -39,7 +39,7 @@ public class GoalService {
         Stream<Goal> goals = goalRepository.findByParent(parentId)
                 .peek(goal -> goal.setSkillsToAchieve(skillRepository.findSkillsByGoalId(goal.getId())));
 
-        if (goalFilters != null) {
+        if (filterDto != null) {
             return filterGoals(goals, filterDto);
         }
 
@@ -48,6 +48,7 @@ public class GoalService {
 
     private List<GoalDto> filterGoals(Stream<Goal> goals, GoalFilterDto filter) {
         Stream<Goal> filteredGoals = goals;
+
         for (GoalFilter goalFilter : goalFilters) {
             if (goalFilter.isApplicable(filter)) {
                 filteredGoals = goalFilter.apply(filteredGoals, filter);

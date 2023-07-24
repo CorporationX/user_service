@@ -10,10 +10,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.test.web.servlet.MockMvc;
+import school.faang.user_service.dto.event.RejectionDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.dto.filter.RequestFilterDto;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
+import school.faang.user_service.controller.MentorshipRequestController;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -36,8 +38,10 @@ public class MentorshipRequestControllerTest {
     private MentorshipRequestDto mentorshipRequestDto;
     private MentorshipRequestDto badMentorshipRequestDto;
 
-    RequestFilterDto requestFilterDto;
-    RequestFilterDto badRequestFilterDto;
+    private RequestFilterDto requestFilterDto;
+    private RequestFilterDto badRequestFilterDto;
+
+    private RejectionDto rejectionDto;
 
 
     @BeforeEach
@@ -70,11 +74,13 @@ public class MentorshipRequestControllerTest {
                 .build();
 
         requestId = 1L;
+
+        rejectionDto = new RejectionDto("Some reason");
     }
 
     @Test
     @DisplayName("Request Mentorship: Valid request, should return 201")
-    public void testRequestMentorship200isOk() throws Exception {
+    void testRequestMentorship200isOk() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/mentorship/request")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(mentorshipRequestDto)))
@@ -84,7 +90,7 @@ public class MentorshipRequestControllerTest {
 
     @Test
     @DisplayName("Request Mentorship: Bad request, should return 400")
-    public void testRequestMentorship400badRequest() throws Exception {
+    void testRequestMentorship400badRequest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/mentorship/request")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(badMentorshipRequestDto)))
@@ -94,7 +100,7 @@ public class MentorshipRequestControllerTest {
 
     @Test
     @DisplayName("Get requests: Valid request, should return 200")
-    public void testGetRequests200IsOk() throws Exception {
+    void testGetRequests200IsOk() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/mentorship/request")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestFilterDto)))
@@ -103,7 +109,7 @@ public class MentorshipRequestControllerTest {
 
     @Test
     @DisplayName("Get requests: Bad request, should return 400")
-    public void testGetRequests400BadRequest() throws Exception {
+    void testGetRequests400BadRequest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/mentorship/request")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(badRequestFilterDto)))
@@ -114,7 +120,7 @@ public class MentorshipRequestControllerTest {
     @DisplayName("Accept request: Positive scenario")
     public void testAcceptRequest200IsOk() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/mentorship/request/" + requestId + "/accept")
-                .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print());
     }
@@ -124,6 +130,23 @@ public class MentorshipRequestControllerTest {
     public void testAcceptRequest400BadRequest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/mentorship/request/" + null + "/accept")
                         .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Reject request: Positive scenario")
+    void testRejectRequest200IsOk() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/mentorship/request/" + requestId + "/reject")
+                .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(rejectionDto)))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    @DisplayName("Reject request: Bad request, should return 400")
+    void testRejectRequest400BadRequest() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/mentorship/request/" + null + "/reject")
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 }

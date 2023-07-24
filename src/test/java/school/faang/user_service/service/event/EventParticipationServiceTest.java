@@ -15,10 +15,13 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.RegistrationUserForEventException;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static school.faang.user_service.commonMessages.ErrorMessagesForEvent.USER_IS_ALREADY_REGISTERED_FORMAT;
+import static school.faang.user_service.commonMessages.ErrorMessagesForEvent.USER_IS_NOT_REGISTERED_FORMAT;
 
 @ExtendWith(MockitoExtension.class)
 class EventParticipationServiceTest {
@@ -55,8 +58,7 @@ class EventParticipationServiceTest {
 
     @Test
     void testRegisterParticipant_WhenUserRegisteredAtEvent_ShouldThrowException() {
-        Object[] argsForMessage = {eventId, EXISTING_USER_ID};
-        String expectedMessage = ErrorMessagesForEvent.USER_IS_ALREADY_REGISTERED.format(argsForMessage);
+        String expectedMessage = MessageFormat.format(USER_IS_ALREADY_REGISTERED_FORMAT, eventId, EXISTING_USER_ID);
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(eventId))
                 .thenReturn(users);
 
@@ -103,8 +105,7 @@ class EventParticipationServiceTest {
     void testUnregisterParticipant_WhenUserNotRegisteredAtEvent_ShouldThrowException() {
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(eventId))
                 .thenReturn(users);
-        Object[] argsForMessage = {eventId, someUserId};
-        String expectedMessage = ErrorMessagesForEvent.USER_IS_NOT_REGISTERED.format(argsForMessage);
+        String expectedMessage = MessageFormat.format(USER_IS_NOT_REGISTERED_FORMAT, eventId, someUserId);
 
         Exception exc = assertThrows(RegistrationUserForEventException.class,
                 () -> eventParticipationService.unregisterParticipant(eventId, someUserId));

@@ -1,5 +1,6 @@
 package school.faang.user_service.service.event;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.commonMessages.ErrorMessagesForEvent;
@@ -7,20 +8,24 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.RegistrationUserForEventException;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
+import java.text.MessageFormat;
 import java.util.List;
+
+import static school.faang.user_service.commonMessages.ErrorMessagesForEvent.USER_IS_ALREADY_REGISTERED_FORMAT;
+import static school.faang.user_service.commonMessages.ErrorMessagesForEvent.USER_IS_NOT_REGISTERED_FORMAT;
 
 @Service
 @RequiredArgsConstructor
 public class EventParticipationService {
     private final EventParticipationRepository eventParticipationRepository;
 
+    @Transactional
     public void registerParticipant(Long eventId, Long userId) {
         validateInputData(eventId, userId);
         List<User> users = getParticipantsByEventId(eventId);
 
         if (isUserRegisteredForEvent(users, userId)) {
-            Object[] argsForMessage = {eventId, userId};
-            String errorMessage = ErrorMessagesForEvent.USER_IS_ALREADY_REGISTERED.format(argsForMessage);
+            String errorMessage = MessageFormat.format(USER_IS_ALREADY_REGISTERED_FORMAT, eventId, userId);
             throw new RegistrationUserForEventException(errorMessage);
         }
 
@@ -28,13 +33,13 @@ public class EventParticipationService {
 
     }
 
+    @Transactional
     public void unregisterParticipant(Long eventId, Long userId) {
         validateInputData(eventId, userId);
         List<User> users = getParticipantsByEventId(eventId);
 
         if (!isUserRegisteredForEvent(users, userId)) {
-            Object[] argsForMessage = {eventId, userId};
-            String errorMessage = ErrorMessagesForEvent.USER_IS_NOT_REGISTERED.format(argsForMessage);
+            String errorMessage = MessageFormat.format(USER_IS_NOT_REGISTERED_FORMAT, eventId, userId);
             throw new RegistrationUserForEventException(errorMessage);
         }
 

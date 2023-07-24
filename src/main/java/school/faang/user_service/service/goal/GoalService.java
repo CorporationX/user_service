@@ -18,6 +18,9 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class GoalService {
     private final GoalRepository goalRepository;
+    private final SkillRepository skillRepository;
+    private final GoalMapper goalMapper;
+    private final List<GoalFilter> goalFilters;
 
     @Transactional
     public void deleteGoal(long goalId) {
@@ -26,9 +29,7 @@ public class GoalService {
         }
 
         goalRepository.deleteById(goalId);
-    private final SkillRepository skillRepository;
-    private final GoalMapper goalMapper;
-    private final List<GoalFilter> goalFilters;
+    }
 
     @Transactional(readOnly = true)
     public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filterDto) {

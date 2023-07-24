@@ -69,4 +69,22 @@ class EventParticipationServiceTest {
 
         assertEquals("User with id 777 already registered at event with id 123", e.getMessage());
     }
+    @Test
+    public void getParticipant_ShouldReturnCorrectList() {
+        long someUserId = new Random().nextLong();
+        long someEventId = new Random().nextLong();
+
+        User existingUser1 = User.builder()
+                .id(someUserId + 1)
+                .build();
+        User existingUser2 = User.builder()
+                .id(someUserId - 1)
+                .build();
+
+        var eventParticipants = List.of(existingUser1, existingUser2);
+
+        Mockito.when(repository.findAllParticipantsByEventId(someEventId)).thenReturn(eventParticipants);
+
+        assertEquals(2, service.getParticipant(someEventId).size());
+    }
 }

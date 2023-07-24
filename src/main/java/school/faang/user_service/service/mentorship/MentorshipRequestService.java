@@ -50,7 +50,7 @@ public class MentorshipRequestService {
     @Transactional
     public MentorshipRequestDto acceptRequest(Long id) {
         MentorshipRequest request = mentorshipRequestRepository.findById(id).orElseThrow(() ->
-                new EntityNotFoundException("Invalid request. Mentorship request not found"));
+                new EntityNotFoundException("Invalid request. Mentorship request with ID " + id + " was not found"));
 
         User requester = request.getRequester();
         User receiver = request.getReceiver();
@@ -74,6 +74,6 @@ public class MentorshipRequestService {
 
     private MentorshipRequest findRequest(Long id) {
         return mentorshipRequestRepository.findById(id).orElseThrow(() ->
-                new EntityNotFoundException("Invalid request. Mentorship request not found"));
+                new EntityNotFoundException("Invalid request. Mentorship request with ID " + id + " was not found"));
     }
 }

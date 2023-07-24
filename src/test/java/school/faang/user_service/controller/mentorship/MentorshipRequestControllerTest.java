@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.test.web.servlet.MockMvc;
+import school.faang.user_service.dto.event.RejectionDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.dto.filter.RequestFilterDto;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -37,8 +38,10 @@ public class MentorshipRequestControllerTest {
     private MentorshipRequestDto mentorshipRequestDto;
     private MentorshipRequestDto badMentorshipRequestDto;
 
-    RequestFilterDto requestFilterDto;
-    RequestFilterDto badRequestFilterDto;
+    private RequestFilterDto requestFilterDto;
+    private RequestFilterDto badRequestFilterDto;
+
+    private RejectionDto rejectionDto;
 
 
     @BeforeEach
@@ -71,6 +74,8 @@ public class MentorshipRequestControllerTest {
                 .build();
 
         requestId = 1L;
+
+        rejectionDto = new RejectionDto("Some reason");
     }
 
     @Test
@@ -132,7 +137,8 @@ public class MentorshipRequestControllerTest {
     @DisplayName("Reject request: Positive scenario")
     void testRejectRequest200IsOk() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/mentorship/request/" + requestId + "/reject")
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(rejectionDto)))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 

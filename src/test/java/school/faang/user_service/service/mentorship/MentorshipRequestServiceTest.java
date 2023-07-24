@@ -158,6 +158,8 @@ public class MentorshipRequestServiceTest {
 
         when(mentorshipRequestRepository.findById(requestId)).thenReturn(Optional.of(mentorshipRequest));
         Assertions.assertDoesNotThrow(() -> mentorshipRequestService.rejectRequest(requestId, rejectionDto));
+        Assertions.assertEquals(mentorshipRequest.getStatus(), RequestStatus.REJECTED);
+        Assertions.assertFalse(mentorshipRequest.getRejectionReason().isBlank());
     }
 
     @Test

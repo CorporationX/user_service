@@ -16,7 +16,6 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.UserSkillGuaranteeMapper;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -49,8 +48,6 @@ public class RecommendationServiceTest {
     private UserRepository userRepository;
     @Mock
     private UserSkillGuaranteeRepository userSkillGuaranteeRepository;
-    @Mock
-    private UserSkillGuaranteeMapper userSkillGuaranteeMapper;
 
     @Test
     public void testCreate() {

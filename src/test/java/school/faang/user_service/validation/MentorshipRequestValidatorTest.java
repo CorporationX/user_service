@@ -54,8 +54,8 @@ public class MentorshipRequestValidatorTest {
         mentorshipRequest.setReceiver(receiver);
         mentorshipRequest.setRequester(requester);
 
-        when(userService.findUserById(receiver.getId())).thenReturn(true);
-        when(userService.findUserById(requester.getId())).thenReturn(true);
+        when(userService.isUserExist(receiver.getId())).thenReturn(true);
+        when(userService.isUserExist(requester.getId())).thenReturn(true);
         assertDoesNotThrow(() -> validator.validate(mentorshipRequest));
     }
 
@@ -83,9 +83,9 @@ public class MentorshipRequestValidatorTest {
         mentorshipRequest.setReceiver(receiver);
         mentorshipRequest.setRequester(requester);
 
-        when(userService.findUserById(receiver.getId())).thenReturn(false);
+        when(userService.isUserExist(receiver.getId())).thenReturn(false);
         assertThrows(IllegalArgumentException.class, () -> validator.validate(mentorshipRequest));
-        verify(userService).findUserById(receiver.getId());
+        verify(userService).isUserExist(receiver.getId());
     }
 
     @Test
@@ -99,8 +99,8 @@ public class MentorshipRequestValidatorTest {
         freshRequest.setRequester(requester);
         freshRequest.setCreatedAt(LocalDateTime.now());
 
-        when(userService.findUserById(receiver.getId())).thenReturn(true);
-        when(userService.findUserById(requester.getId())).thenReturn(true);
+        when(userService.isUserExist(receiver.getId())).thenReturn(true);
+        when(userService.isUserExist(requester.getId())).thenReturn(true);
         when(mentorshipRequestRepository.findLatestRequest(requester.getId(), receiver.getId()))
                 .thenReturn(Optional.of(mentorshipRequest));
 

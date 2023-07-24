@@ -23,10 +23,10 @@ public class MentorshipRequestValidator {
         if (requesterId.equals(receiverId)) {
             throw new IllegalArgumentException("You can not send request to yourself");
         }
-        if (!userService.findUserById(receiverId)) {
+        if (!userService.isUserExist(receiverId)) {
             throw new IllegalArgumentException("Invalid request. Mentor user not found");
         }
-        if (!userService.findUserById(requesterId)) {
+        if (!userService.isUserExist(requesterId)) {
             throw new IllegalArgumentException("Invalid request. Mentee user not found");
         }
 

@@ -2,9 +2,9 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
@@ -24,6 +24,7 @@ public class RecommendationRequestService {
     private final UserRepository userRepository;
     private final RecommendationRequestMapper recommendationRequestMapper;
 
+    @Transactional
     public void create(RecommendationRequestDto recommendationRequestDto) {
         validateRecommendationRequest(recommendationRequestDto);
 
@@ -33,12 +34,12 @@ public class RecommendationRequestService {
         long receiverId = recommendationRequest.getReceiver().getId();
         String message = recommendationRequest.getMessage();
 
-        if (!isUserExists(requesterId)) {
-            throw new IllegalArgumentException("Requester does not exist.");
+        if (isUserNotExists(requesterId)) {
+            throw new IllegalArgumentException("Requester with such id: " + requesterId + " does not exist.");
         }
 
-        if (!isUserExists(receiverId)) {
-            throw new IllegalArgumentException("Receiver does not exist.");
+        if (isUserNotExists(receiverId)) {
+            throw new IllegalArgumentException("Receiver with such id: " + receiverId + " does not exist.");
         }
 
         if (hasPendingRequest(requesterId, receiverId)) {
@@ -54,12 +55,11 @@ public class RecommendationRequestService {
         for (SkillRequest skillRequest : recommendationRequest.getSkills()) {
             skillRequest.setRequest(savedRequest);
             skillRequestRepository.create(requesterId,skillRequest.getId());
-//                    skillRequestRepository.create(savedRequest.getId(),skillRequest.getId());
         }
     }
 
-    private boolean isUserExists(Long userId) {
-        return userRepository.existsById(userId);
+    private boolean isUserNotExists(Long userId) {
+        return !userRepository.existsById(userId);
     }
 
     private void validateRecommendationRequest(RecommendationRequestDto recommendationRequestDto) {

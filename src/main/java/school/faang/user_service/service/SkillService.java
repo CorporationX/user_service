@@ -15,7 +15,7 @@ public class SkillService {
     private final SkillMapper skillMapper;
 
     public SkillDto create(SkillDto skill) {
-        if (skillRepository.existsByTitle(skill.getTitle())) {
+        if (skillRepository.existsByTitle(skill.getTitle().toLowerCase().trim())) {
             throw new DataValidationException("This skill already exist");
         }
         Skill savedSkill = skillRepository.save(skillMapper.toEntity(skill));

@@ -28,7 +28,7 @@ public class SkillService {
     private final long MIN_SKILL_OFFERS = 3;
 
     public SkillDto create(SkillDto skill) {
-        if (skillRepository.existsByTitle(skill.getTitle())) {
+        if (skillRepository.existsByTitle(skill.getTitle().toLowerCase().trim())) {
             throw new DataValidationException("This skill already exist");
         }
         Skill savedSkill = skillRepository.save(skillMapper.toEntity(skill));
@@ -36,19 +36,15 @@ public class SkillService {
     }
 
     public List<SkillDto> getUserSkills(long userId) {
-        List<SkillDto> list = new ArrayList<>();
-        for (Skill skill : skillRepository.findAllByUserId(userId)) {
-            list.add(skillMapper.toDTO(skill));
-        }
-        return list;
+        return skillRepository.findAllByUserId(userId).stream()
+                .map(skill -> skillMapper.toDTO(skill))
+                .collect(Collectors.toList());
     }
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
-        List<SkillCandidateDto> list = new ArrayList<>();
-        for (Skill skill : skillRepository.findAllByUserId(userId)) {
-            list.add(skillMapper.candidateToDTO(skill));
-        }
-        return list;
+        return skillOfferRepository.findById(userId).stream()
+                .map(skillOffer -> skillMapper.candidateToDTO(skillOffer))
+                .collect(Collectors.toList());
     }
 
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {

@@ -14,10 +14,12 @@ public interface GoalMapper {
     @Mapping(source = "id", target = "id")
     @Mapping(source = "title", target = "title")
     @Mapping(source = "users", target = "users")
+    @Mapping(source = "status", target = "status")
     GoalDto goalToDto(Goal goal);
 
     @Mapping(source = "id", target = "id")
     @Mapping(source = "title", target = "title")
     @Mapping(source = "users", target = "users")
+    @Mapping(source = "status", target = "status")
     Goal goalToEntity(GoalDto goalDto);
 }

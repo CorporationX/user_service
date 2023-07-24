@@ -67,8 +67,19 @@ public class GoalService {
     }
 
     public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter){
-        List<Goal> goals = goalRepository.findGoalsByUserId(userId).toList();
-        filter.getStatus()
+        List<Goal> goals = goalRepository.findGoalsByUserId(userId)
+                        .peek(goal -> goal.setSkillsToAchieve(skillRepository.findSkillsByGoalId(goal.getId())))
+                .toList();
 
+        return filterGoals(goals, filter);
+    }
+
+    private List<GoalDto> filterGoals(List<Goal> goals, GoalFilterDto filter){
+        List<GoalDto> filteredGoals = goals.stream()
+                .filter(goal -> goal.getTitle().equals(filter.getTitle()) && goal.getStatus().equals(filter.getStatus()))
+                .map(goalMapper::goalToDto)
+                .toList();
+
+        return filteredGoals;
     }
 }

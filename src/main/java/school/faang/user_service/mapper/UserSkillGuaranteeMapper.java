@@ -13,14 +13,4 @@ public interface UserSkillGuaranteeMapper {
     UserSkillGuarantee toEntity(UserSkillGuaranteeDto userSkillGuaranteeDto);
 
     UserSkillGuaranteeDto toDto(UserSkillGuarantee userSkillGuarantee);
-
-    @Named("toDtoWithIds")
-    default UserSkillGuaranteeDto toDto(long userId, long skillId, long guarantorId) {
-        UserSkillGuaranteeDto userSkillGuaranteeDto = new UserSkillGuaranteeDto();
-        userSkillGuaranteeDto.setUserId(userId);
-        userSkillGuaranteeDto.setGuarantorId(skillId);
-        userSkillGuaranteeDto.setGuarantorId(guarantorId);
-
-        return userSkillGuaranteeDto;
-    }
 }

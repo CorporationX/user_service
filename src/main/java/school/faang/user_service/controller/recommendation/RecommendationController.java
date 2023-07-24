@@ -12,13 +12,19 @@ public class RecommendationController {
 
     private final RecommendationService recommendationService;
 
-    public RecommendationDto giveRecommendation(RecommendationDto recommendationDto) {
-        validateRecommendationContent(recommendationDto);
+    public RecommendationDto giveRecommendation(RecommendationDto recommendation) {
+        validateRecommendationContent(recommendation);
 
-        return recommendationService.create(recommendationDto);
+        return recommendationService.create(recommendation);
     }
 
-    public void validateRecommendationContent(RecommendationDto recommendationDto) {
+    public RecommendationDto updateRecommendation(RecommendationDto recommendation) {
+        validateRecommendationContent(recommendation);
+
+        return recommendationService.update(recommendation);
+    }
+
+    private void validateRecommendationContent(RecommendationDto recommendationDto) {
         String content = recommendationDto.getContent();
 
         if (content == null || content.isBlank()) {

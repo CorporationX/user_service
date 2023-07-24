@@ -74,16 +74,11 @@ public class RecommendationServiceTest {
         when(recommendationMapper.toEntity(any(RecommendationDto.class))).thenReturn(recommendationEntity);
         when(recommendationMapper.toDto(any(Recommendation.class))).thenReturn(recommendationDto);
 
-        RecommendationDto result = recommendationService.create(recommendationDto);
+        RecommendationDto updatedRecommendationDto = recommendationService.create(recommendationDto);
 
         verify(recommendationRepository, times(1)).save(any(Recommendation.class));
 
-        assertDoesNotThrow(() -> recommendationService.create(recommendationDto));
-        assertEquals(recommendationDto.getId(), result.getId());
-        assertEquals(recommendationDto.getAuthorId(), result.getAuthorId());
-        assertEquals(recommendationDto.getReceiverId(), result.getReceiverId());
-        assertEquals(recommendationDto.getContent(), result.getContent());
-        assertEquals(recommendationDto.getSkillOffers(), result.getSkillOffers());
+        assertEquals(updatedRecommendationDto, recommendationDto);
     }
 
     @Test
@@ -132,5 +127,124 @@ public class RecommendationServiceTest {
         recommendationDto.setSkillOffers(new ArrayList<>());
 
         assertThrows(DataValidationException.class, () -> recommendationService.create(recommendationDto));
+    }
+
+    @Test
+    public void testsUpdate() {
+        RecommendationDto recommendationDto = new RecommendationDto();
+        recommendationDto.setId(1L);
+        recommendationDto.setAuthorId(2L);
+        recommendationDto.setReceiverId(3L);
+        recommendationDto.setContent("content");
+        recommendationDto.setSkillOffers(List.of(new SkillOfferDto(1L, 1L), new SkillOfferDto(2L, 2L)));
+
+        Recommendation recommendationEntity = new Recommendation();
+        recommendationEntity.setId(1L);
+        User author = new User();
+        author.setId(2L);
+        recommendationEntity.setAuthor(author);
+        User receiver = new User();
+        receiver.setId(3L);
+        recommendationEntity.setReceiver(receiver);
+        recommendationEntity.setContent("content");
+        recommendationEntity.setSkillOffers(List.of(
+                new SkillOffer(1L, new Skill(), recommendationEntity),
+                new SkillOffer(2L, new Skill(), recommendationEntity)));
+
+        when(recommendationRepository.findById(1L)).thenReturn(Optional.of(recommendationEntity));
+        when(skillRepository.existsById(anyLong())).thenReturn(true);
+        when(recommendationMapper.toEntity(any(RecommendationDto.class))).thenReturn(recommendationEntity);
+        when(recommendationMapper.toDto(any(Recommendation.class))).thenReturn(recommendationDto);
+
+        RecommendationDto updatedRecommendationDto = recommendationService.update(recommendationDto);
+
+        verify(recommendationRepository).deleteById(1L);
+        verify(recommendationRepository).save(recommendationEntity);
+
+        assertEquals(updatedRecommendationDto, recommendationDto);
+    }
+
+    @Test
+    public void testUpdate_InvalidSkillId_ThrowsDataValidationException() {
+        RecommendationDto recommendationDto = new RecommendationDto();
+        recommendationDto.setId(1L);
+        recommendationDto.setAuthorId(2L);
+        recommendationDto.setReceiverId(3L);
+        recommendationDto.setContent("content");
+        recommendationDto.setSkillOffers(List.of(new SkillOfferDto(1L, 1L), new SkillOfferDto(2L, 2L)));
+
+        Recommendation recommendationEntity = new Recommendation();
+        recommendationEntity.setId(1L);
+        User author = new User();
+        author.setId(2L);
+        recommendationEntity.setAuthor(author);
+        User receiver = new User();
+        receiver.setId(3L);
+        recommendationEntity.setReceiver(receiver);
+        recommendationEntity.setContent("content");
+        recommendationEntity.setSkillOffers(List.of(
+                new SkillOffer(1L, new Skill(), recommendationEntity),
+                new SkillOffer(2L, new Skill(), recommendationEntity)));
+
+        when(recommendationRepository.findById(1L)).thenReturn(Optional.of(recommendationEntity));
+        when(skillRepository.existsById(1L)).thenReturn(true);
+        when(skillRepository.existsById(2L)).thenReturn(false);
+
+        assertThrows(DataValidationException.class, () -> recommendationService.update(recommendationDto));
+    }
+
+    @Test
+    public void testUpdate_RecommendationIntervalNotExceeded_ThrowsDataValidationException() {
+        RecommendationDto recommendationDto = new RecommendationDto();
+        recommendationDto.setId(1L);
+        recommendationDto.setAuthorId(2L);
+        recommendationDto.setReceiverId(3L);
+        recommendationDto.setContent("content");
+        recommendationDto.setSkillOffers(List.of(new SkillOfferDto(1L, 1L)));
+
+        Recommendation recommendationEntity = new Recommendation();
+        recommendationEntity.setId(1L);
+        User author = new User();
+        author.setId(2L);
+        recommendationEntity.setAuthor(author);
+        User receiver = new User();
+        receiver.setId(3L);
+        recommendationEntity.setReceiver(receiver);
+        recommendationEntity.setContent("content");
+        recommendationEntity.setSkillOffers(List.of(
+                new SkillOffer(1L, new Skill(), recommendationEntity),
+                new SkillOffer(2L, new Skill(), recommendationEntity)));
+
+        Recommendation previousRecommendation = new Recommendation();
+        previousRecommendation.setUpdatedAt(LocalDateTime.now().minusMonths(6 - 1));
+
+        when(recommendationRepository.findById(1L)).thenReturn(Optional.of(recommendationEntity));
+        when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(2L, 3L))
+                .thenReturn(Optional.of(previousRecommendation));
+
+        assertThrows(DataValidationException.class, () -> recommendationService.update(recommendationDto));
+    }
+
+    @Test
+    public void testUpdate_RecommendationEmptySkillsList_ThrowsDataValidationException() {
+        RecommendationDto recommendationDto = new RecommendationDto();
+        recommendationDto.setId(1L);
+        recommendationDto.setAuthorId(2L);
+        recommendationDto.setReceiverId(3L);
+        recommendationDto.setContent("content");
+        recommendationDto.setSkillOffers(new ArrayList<>());
+
+        Recommendation recommendationEntity = new Recommendation();
+        recommendationEntity.setId(1L);
+        User author = new User();
+        author.setId(2L);
+        recommendationEntity.setAuthor(author);
+        User receiver = new User();
+        receiver.setId(3L);
+        recommendationEntity.setReceiver(receiver);
+        recommendationEntity.setContent("content");
+
+        when(recommendationRepository.findById(1L)).thenReturn(Optional.of(recommendationEntity));
+        assertThrows(DataValidationException.class, () -> recommendationService.update(recommendationDto));
     }
 }

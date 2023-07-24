@@ -3,7 +3,6 @@ package school.faang.user_service.service.recommendation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.dto.UserSkillGuaranteeDto;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.Skill;
@@ -51,6 +50,23 @@ public class RecommendationService {
         return recommendationMapper.toDto(recommendation);
     }
 
+    @Transactional
+    public RecommendationDto update(RecommendationDto recommendationDto) {
+        validateRecommendationToUpdate(recommendationDto);
+        validate(recommendationDto);
+
+        delete(recommendationDto.getId());
+        Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
+        recommendationRepository.save(recommendation);
+        processSkillOffers(recommendation);
+
+        return recommendationMapper.toDto(recommendation);
+    }
+
+    private void delete(long recommendationId) {
+        recommendationRepository.deleteById(recommendationId);
+    }
+
     private void processSkillOffers(Recommendation recommendation) {
         long userId = recommendation.getReceiver().getId();
         long authorId = recommendation.getAuthor().getId();
@@ -60,7 +76,7 @@ public class RecommendationService {
         for (SkillOffer skillOffer : skillOffers) {
             long skillId = skillOffer.getSkill().getId();
 
-            if (userSkills.contains(skillOffer.getSkill()) && guaranteeNotExists(userId, skillId, authorId)) {
+            if (userSkills.contains(skillOffer.getSkill()) && guaranteeNotExist(userId, skillId, authorId)) {
                 saveUserSkillGuarantee(userId, skillId, authorId);
             } else {
                 skillOfferRepository.save(skillOffer);
@@ -76,12 +92,22 @@ public class RecommendationService {
     }
 
     private void saveUserSkillGuarantee(long userId, long skillId, long guarantorId) {
-        UserSkillGuaranteeDto guaranteeDto = userSkillGuaranteeMapper.toDto(userId, skillId, guarantorId);
-        UserSkillGuarantee guarantee = userSkillGuaranteeMapper.toEntity(guaranteeDto);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new DataValidationException("User not found"));
+        Skill skill = skillRepository.findById(skillId)
+                .orElseThrow(() -> new DataValidationException("Skill not found"));
+        User guarantor = userRepository.findById(guarantorId)
+                .orElseThrow(() -> new DataValidationException("Guarantor not found"));
+
+        UserSkillGuarantee guarantee = new UserSkillGuarantee();
+        guarantee.setUser(user);
+        guarantee.setSkill(skill);
+        guarantee.setGuarantor(guarantor);
+
         userSkillGuaranteeRepository.save(guarantee);
     }
 
-    private boolean guaranteeNotExists(long userId, long skillId, long guarantorId) {
+    private boolean guaranteeNotExist(long userId, long skillId, long guarantorId) {
         return !userSkillGuaranteeRepository.existsByUserIdAndSkillIdAndGuarantorId(userId, skillId, guarantorId);
     }
 
@@ -136,5 +162,10 @@ public class RecommendationService {
                 .map(SkillOfferDto::getSkillId)
                 .distinct()
                 .toList();
+    }
+
+    private void validateRecommendationToUpdate(RecommendationDto recommendationDto) {
+        recommendationRepository.findById(recommendationDto.getId())
+                .orElseThrow(() -> new DataValidationException("Invalid recommendation to update"));
     }
 }

@@ -30,7 +30,19 @@ public class RecommendationControllerTest {
         RecommendationDto result = recommendationController.giveRecommendation(recommendationDto);
 
         verify(recommendationService, times(1)).create(recommendationDto);
+        assertEquals(recommendationDto, result);
+    }
 
+    @Test
+    public void testUpdateRecommendation() {
+        RecommendationDto recommendationDto = new RecommendationDto();
+        recommendationDto.setContent("Sample content");
+
+        when(recommendationService.update(recommendationDto)).thenReturn(recommendationDto);
+
+        RecommendationDto result = recommendationController.updateRecommendation(recommendationDto);
+
+        verify(recommendationService, times(1)).update(recommendationDto);
         assertEquals(recommendationDto, result);
     }
 
@@ -50,5 +62,23 @@ public class RecommendationControllerTest {
 
         assertThrows(DataValidationException.class,
                 () -> recommendationController.giveRecommendation(recommendationDto));
+    }
+
+    @Test
+    public void testUpdateRecommendation_blankContent_throwException() {
+        RecommendationDto recommendationDto = new RecommendationDto();
+        recommendationDto.setContent("   ");
+
+        assertThrows(DataValidationException.class,
+                () -> recommendationController.updateRecommendation(recommendationDto));
+    }
+
+    @Test
+    public void testUpdateRecommendation_nullContent_throwException() {
+        RecommendationDto recommendationDto = new RecommendationDto();
+        recommendationDto.setContent(null);
+
+        assertThrows(DataValidationException.class,
+                () -> recommendationController.updateRecommendation(recommendationDto));
     }
 }

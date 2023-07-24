@@ -14,7 +14,7 @@ import java.util.List;
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
-    public void followUser(Long followerId, Long followeeId) {
+    public void followUser(long followerId, long followeeId) {
         validateFollow(followerId, followeeId);
         subscriptionService.followUser(followerId, followeeId);
     }

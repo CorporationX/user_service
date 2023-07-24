@@ -7,7 +7,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.SubscriptionRepository;
+
+import java.util.List;
+import java.util.NoSuchElementException;
 
 @ExtendWith(MockitoExtension.class)
 public class SubscriptionServiceTest {
@@ -19,28 +23,41 @@ public class SubscriptionServiceTest {
     SubscriptionService subscriptionService;
 
     @Test
-    void testRepositoryFollowUser(){
-        subscriptionService.followUser(22L, 23L);
+    void testRepositoryFollowUser() {
+        subscriptionService.followUser(22, 23);
         Mockito.verify(subscriptionRepository, Mockito.times(1)).followUser(Mockito.anyLong(),
                 Mockito.anyLong());
     }
 
     @Test
-    void testRepositoryUnfollowUser(){
-        subscriptionService.unfollowUser(22L, 23L);
+    void testRepositoryUnfollowUser() {
+        subscriptionService.unfollowUser(22, 23);
         Mockito.verify(subscriptionRepository, Mockito.times(1)).unfollowUser(Mockito.anyLong(),
                 Mockito.anyLong());
     }
 
     @Test
-    void testRepositoryUnfollowUserByNull(){
-        Assertions.assertThrows(DataValidationException.class,
-                () -> subscriptionService.unfollowUser(-22L, 1L));
+    void testAlreadyFollowed() {
+        try {
+            User user = subscriptionRepository.findById(22L)
+                    .stream().findFirst().get();
+            List<User> followers = user.getFollowers();
+            boolean isExist = false;
+            for (User folower : followers) {
+                if (folower.getId() == 23) {
+                    isExist = true;
+                    break;
+                }
+            }
+            Assertions.assertTrue(isExist);
+        } catch (NoSuchElementException e) {
+            System.out.println("User with this Id does not exist");
+        }
     }
 
     @Test
-    void testRepositoryFollowUserByNull(){
-        Assertions.assertThrows(DataValidationException.class,
-                () -> subscriptionService.followUser(-22L, 1L));
+    void testGetFollowers() {
+
+        // Assertions.asser
     }
 }

@@ -13,7 +13,9 @@ import school.faang.user_service.repository.event.EventParticipationRepository;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(value = {MockitoExtension.class})
 class EventParticipationServiceTest {
@@ -60,5 +62,23 @@ class EventParticipationServiceTest {
                 UserNotRegisteredAtEvent.class,
                 () -> service.unregisterParticipant(userId, eventId)
         );
+    }
+    @Test
+    public void getParticipant_ShouldReturnCorrectList() {
+        long someUserId = new Random().nextLong();
+        long someEventId = new Random().nextLong();
+
+        User existingUser1 = User.builder()
+                .id(someUserId + 1)
+                .build();
+        User existingUser2 = User.builder()
+                .id(someUserId - 1)
+                .build();
+
+        var eventParticipants = List.of(existingUser1, existingUser2);
+
+        Mockito.when(repository.findAllParticipantsByEventId(someEventId)).thenReturn(eventParticipants);
+
+        assertEquals(2, service.getParticipant(someEventId).size());
     }
 }

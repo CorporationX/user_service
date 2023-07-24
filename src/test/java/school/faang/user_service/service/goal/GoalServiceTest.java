@@ -126,4 +126,11 @@ class GoalServiceTest {
 
         verify(goalRepository, times(1)).deleteById(nonExistentGoalId);
     }
+
+    @Test
+    public void getAllGoalsByUserTest() {
+        goalService.getGoalsByUser(1L);
+
+        verify(goalRepository, times(1)).findGoalsByUserId(1L);
+    }
 }

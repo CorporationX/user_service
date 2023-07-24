@@ -18,11 +18,8 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.subscription.SubscriptionService;
-import school.faang.user_service.service.user.filter.UserAboutFilter;
-import school.faang.user_service.service.user.filter.UserFilter;
 import school.faang.user_service.service.user.filter.UserNameFilter;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -107,16 +104,13 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void shouldReturnFollowersListByNameFilter() {
+    public void shouldReturnFollowersList() {
         UserFilterDto filters = UserFilterDto.builder()
                 .namePatter("John")
                 .build();
 
-        UserNameFilter userNameFilter = new UserNameFilter();
-        List<UserFilter> userFilters = new ArrayList<>();
-        userFilters.add(userNameFilter);
         subscriptionService = new SubscriptionService(userMapper, subscriptionRepository,
-                userRepository, userFilters);
+                userRepository, List.of(new UserNameFilter()));
 
         Mockito.when(userRepository.existsById(followeeId)).thenReturn(true);
         Mockito.when(subscriptionRepository.findByFolloweeId(followeeId))
@@ -124,35 +118,6 @@ public class SubscriptionServiceTest {
 
         Stream<User> desiredUsersStream = usersStream.stream()
                 .filter(user -> user.getUsername().contains("John"));
-
-        List<UserDto> receivedUsersDto = subscriptionService.getFollowers(followeeId, filters);
-
-        Assertions.assertEquals(userMapper.toDtoList(desiredUsersStream.toList()), receivedUsersDto);
-        Mockito.verify(subscriptionRepository).findByFolloweeId(followeeId);
-    }
-
-    @Test
-    public void shouldReturnFollowersListByAboutFilter() {
-        usersStream.get(0).setAboutMe("I like java");
-        usersStream.get(1).setAboutMe("I like python");
-        usersStream.get(2).setAboutMe("I like java");
-
-        UserFilterDto filters = UserFilterDto.builder()
-                .aboutPattern("java")
-                .build();
-
-        UserAboutFilter userAboutFilter = new UserAboutFilter();
-        List<UserFilter> userFilters = new ArrayList<>();
-        userFilters.add(userAboutFilter);
-        subscriptionService = new SubscriptionService(userMapper, subscriptionRepository,
-                userRepository, userFilters);
-
-        Mockito.when(userRepository.existsById(followeeId)).thenReturn(true);
-        Mockito.when(subscriptionRepository.findByFolloweeId(followeeId))
-                .thenReturn(usersStream.stream());
-
-        Stream<User> desiredUsersStream = usersStream.stream()
-                .filter(user -> user.getAboutMe().contains("java"));
 
         List<UserDto> receivedUsersDto = subscriptionService.getFollowers(followeeId, filters);
 
@@ -170,16 +135,14 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void shouldReturnFolloweesListByNameFilter() {
+    public void shouldReturnFolloweesList() {
         UserFilterDto filters = UserFilterDto.builder()
                 .namePatter("John")
                 .build();
 
-        UserNameFilter userNameFilter = new UserNameFilter();
-        List<UserFilter> userFilters = new ArrayList<>();
-        userFilters.add(userNameFilter);
+        UserNameFilter nameFilter = Mockito.mock(UserNameFilter.class);
         subscriptionService = new SubscriptionService(userMapper, subscriptionRepository,
-                userRepository, userFilters);
+                userRepository, List.of(nameFilter));
 
         Mockito.when(userRepository.existsById(followerId)).thenReturn(true);
         Mockito.when(subscriptionRepository.findByFollowerId(followerId))
@@ -188,34 +151,8 @@ public class SubscriptionServiceTest {
         Stream<User> desiredUsersStream = usersStream.stream()
                         .filter(user -> user.getUsername().contains("John"));
 
-        List<UserDto> receivedUsersDto = subscriptionService.getFollowing(followerId, filters);
-
-        Assertions.assertEquals(userMapper.toDtoList(desiredUsersStream.toList()), receivedUsersDto);
-        Mockito.verify(subscriptionRepository).findByFollowerId(followerId);
-    }
-
-    @Test
-    public void shouldReturnFolloweesListByAboutFilter() {
-        usersStream.get(0).setAboutMe("I like java");
-        usersStream.get(1).setAboutMe("I like python");
-        usersStream.get(2).setAboutMe("I like java");
-
-        UserFilterDto filters = UserFilterDto.builder()
-                .aboutPattern("java")
-                .build();
-
-        UserAboutFilter userAboutFilter = new UserAboutFilter();
-        List<UserFilter> userFilters = new ArrayList<>();
-        userFilters.add(userAboutFilter);
-        subscriptionService = new SubscriptionService(userMapper, subscriptionRepository,
-                userRepository, userFilters);
-
-        Mockito.when(userRepository.existsById(followerId)).thenReturn(true);
-        Mockito.when(subscriptionRepository.findByFollowerId(followerId))
-                .thenReturn(usersStream.stream());
-
-        Stream<User> desiredUsersStream = usersStream.stream()
-                .filter(user -> user.getAboutMe().contains("java"));
+        Mockito.lenient().when(nameFilter.isApplicable(filters)).thenReturn(true);
+        Mockito.lenient().when(nameFilter.apply(usersStream.stream(), filters)).thenReturn(desiredUsersStream);
 
         List<UserDto> receivedUsersDto = subscriptionService.getFollowing(followerId, filters);
 

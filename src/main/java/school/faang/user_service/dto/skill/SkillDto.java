@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 import school.faang.user_service.exception.DataValidException;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class SkillDto {
     private Long id;

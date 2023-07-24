@@ -7,6 +7,7 @@ import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.dto.goal.ResponseGoalDto;
 import school.faang.user_service.service.GoalService;
+import school.faang.user_service.dto.goal.UpdateGoalDto;
 
 import java.util.List;
 
@@ -29,5 +30,9 @@ public class GoalController {
 
     public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filterDto) {
         return goalService.getGoalsByUser(userId, filterDto);
+    }
+
+    public UpdateGoalDto updateGoal(UpdateGoalDto updateGoalDto){
+       return goalService.updateGoal(updateGoalDto);
     }
 }

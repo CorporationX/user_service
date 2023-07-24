@@ -7,14 +7,20 @@ import school.faang.user_service.dto.goal.CreateGoalDto;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.dto.goal.ResponseGoalDto;
+import school.faang.user_service.dto.goal.UpdateGoalDto;
 import school.faang.user_service.dto.skill.SkillDto;
+import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.goal.CreateGoalMapper;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -97,6 +103,48 @@ public class GoalService {
         skillsToAchieve.forEach(skill -> {
             if (!skillRepository.existsByTitle(skill.getTitle())) {
                 throw new IllegalArgumentException("Skill not found");
+            }
+        });
+    }
+
+    @jakarta.transaction.Transactional
+    public UpdateGoalDto updateGoal(UpdateGoalDto updateGoalDto) {
+        List<SkillDto> skillDtos = updateGoalDto.getSkillDtos();
+        List<Long> userIds = updateGoalDto.getUserIds();
+        Goal goalToUpdate = goalRepository.findById(updateGoalDto.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Goal not found"));
+
+        validateUpdate(goalToUpdate, updateGoalDto, skillDtos);
+
+
+        skillDtos.forEach(skill -> {
+            userIds.forEach(userId -> {
+                User user = userRepository.findById(userId).orElseThrow(() ->
+                        new IllegalArgumentException("User not found"));
+                List<String> userSkills = user.getSkills().stream().map(Skill::getTitle).toList();
+                if (!userSkills.contains(skill.getTitle())) {
+                    skillRepository.assignSkillToUser(skill.getId(), user.getId());
+                }
+            });
+        });
+
+        goalToUpdate.setStatus(GoalStatus.COMPLETED);
+        goalToUpdate.setUpdatedAt(LocalDateTime.now());
+        return goalMapper.goalToUpdateGoalDto(goalRepository.save(goalToUpdate));
+    }
+
+    private void validateUpdate(Goal goalToUpdate, UpdateGoalDto updateGoalDto, List<SkillDto> skillDtos) {
+        if (updateGoalDto.getTitle().isBlank()) {
+            throw new IllegalArgumentException("Title cannot be blank");
+        }
+
+        if (goalToUpdate.getStatus().equals(GoalStatus.COMPLETED)) {
+            throw new IllegalArgumentException("Goal already completed");
+        }
+
+        skillDtos.forEach(skillToAchieve -> {
+            if (!skillRepository.existsByTitle(skillToAchieve.getTitle())) {
+                throw new IllegalArgumentException("Skill " + skillToAchieve.getTitle() + " not found");
             }
         });
     }

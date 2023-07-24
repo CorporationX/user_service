@@ -62,7 +62,7 @@ public class SkillService {
     }
 
     public SkillDto create(SkillDto skill) {
-        SkillDto processedTitle = new SkillDto(skill.getId(), skill.getTitle().trim());
+        SkillDto processedTitle = new SkillDto(skill.getId(), processTitle(skill.getTitle()));
         if (skillRepository.existsByTitle(processedTitle.getTitle())) {
             throw new DataValidationException("This skill already exist");
         }
@@ -74,6 +74,12 @@ public class SkillService {
         if (!(userRepository.existsById(userId))) {
             throw new DataValidationException("User doesn't exist");
         }
+    }
+
+    private String processTitle(String title){
+        title = title.replaceAll("[^A-Za-zА-Яа-я0-9+-/#]", " ");
+        title = title.replaceAll("[\\s]+"," ");
+        return title.trim().toLowerCase();
     }
 
     private List<SkillDto> mapSkillsToDtos(List<Skill> skills) {

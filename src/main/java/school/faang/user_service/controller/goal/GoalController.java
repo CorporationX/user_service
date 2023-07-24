@@ -3,7 +3,6 @@ package school.faang.user_service.controller.goal;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,8 +18,11 @@ public class GoalController {
     private final GoalService goalService;
 
     @PostMapping
-    public GoalDto createGoal(@RequestBody GoalDto goalDto, Long userId){
+    public GoalDto createGoal(@RequestParam @NotEmpty(message = "Title can't be empty") String title, Long userId,
+                              List<String> skills){
 
-        return goalService.createGoal(goalDto, userId);
+        GoalDto goal = new GoalDto(0L, title);
+
+        return goalService.createGoal(goal, userId, skills);
     }
 }

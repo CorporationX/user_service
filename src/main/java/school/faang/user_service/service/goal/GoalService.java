@@ -21,9 +21,9 @@ public class GoalService {
     private final GoalMapper goalMapper;
 
     @Transactional
-    public GoalDto createGoal(GoalDto goal, Long userId){
+    public GoalDto createGoal(GoalDto goal, Long userId, List<String> skills){
         int currentUserGoalNum = goalRepository.countActiveGoalsPerUser(userId);
-        boolean allSkillsExist = goal.getSkills().stream()
+        boolean allSkillsExist = skills.stream()
                 .allMatch(skill -> skillRepository.findByTitle(skill.toLowerCase()).isPresent());
 
         if (!allSkillsExist){

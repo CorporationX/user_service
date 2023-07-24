@@ -17,6 +17,7 @@ import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -32,9 +33,12 @@ public class SkillService {
 
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
-        return skillRepository.findAllByUserId(userId)
-                .stream().map(mapper::toDto)
-                .collect(Collectors.groupingBy(skillDto -> skillDto, Collectors.counting()))
+        return skillOfferRepository.findAllByUserId(userId)
+                .stream()
+                .collect(Collectors.groupingBy(SkillOffer::getSkill, Collectors.counting()))
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(entry -> mapper.toDto(entry.getKey()), Map.Entry::getValue))
                 .entrySet()
                 .stream()
                 .map(entry -> new SkillCandidateDto(entry.getKey(), entry.getValue()))
@@ -76,9 +80,9 @@ public class SkillService {
         }
     }
 
-    private String processTitle(String title){
+    private String processTitle(String title) {
         title = title.replaceAll("[^A-Za-zА-Яа-я0-9+-/#]", " ");
-        title = title.replaceAll("[\\s]+"," ");
+        title = title.replaceAll("[\\s]+", " ");
         return title.trim().toLowerCase();
     }
 

@@ -6,5 +6,4 @@ import lombok.Data;
 public class SkillDto {
     private final Long id;
     private final String title;
-
 }

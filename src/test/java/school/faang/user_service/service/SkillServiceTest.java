@@ -99,26 +99,30 @@ class SkillServiceTest {
                 .title("One")
                 .build();
         Skill skill2 = Skill.builder()
-                .id(1L)
-                .title("One")
+                .id(2L)
+                .title("Two")
                 .build();
-        SkillDto skillDto1 = new SkillDto(1L, "One");
-        SkillDto skillDto2 = new SkillDto(1L, "One");
+        SkillOffer skillOffer = SkillOffer.builder()
+                .skill(skill1)
+                .build();
+        SkillOffer skillOffer1 = SkillOffer.builder()
+                .skill(skill2)
+                .build();
+        SkillOffer skillOffer2 = SkillOffer.builder()
+                .skill(skill1)
+                .build();
+        SkillDto skillDto1 = mapper.toDto(skill1);
         SkillCandidateDto skillCandidateDto1 = new SkillCandidateDto(skillDto1, 2L);
-        List<Skill> skills = new ArrayList<>();
-        skills.add(skill1);
-        skills.add(skill2);
+        List<SkillOffer> skillOffers = new ArrayList<>();
+        skillOffers.add(skillOffer);
+        skillOffers.add(skillOffer1);
+        skillOffers.add(skillOffer2);
 
-        Mockito.when(skillRepository.findAllByUserId(1L)).thenReturn(skills);
-        Mockito.when(mapper.toDto(skill1)).thenReturn(skillDto1);
-        Mockito.when(mapper.toDto(skill2)).thenReturn(skillDto2);
+        Mockito.when(skillOfferRepository.findAllByUserId(1L)).thenReturn(skillOffers);
 
-        skillService.getOfferedSkills(1L);
-
-        Mockito.verify(skillRepository, Mockito.times(1))
+        assertEquals(skillCandidateDto1, skillService.getOfferedSkills(1L).get(1));
+        Mockito.verify(skillOfferRepository, Mockito.times(1))
                 .findAllByUserId(1L);
-
-        assertEquals(skillCandidateDto1, skillService.getOfferedSkills(1L).get(0));
     }
 
     @Test

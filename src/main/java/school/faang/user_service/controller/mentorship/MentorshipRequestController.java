@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -58,7 +59,7 @@ public class MentorshipRequestController {
         }
     }
 
-    @PutMapping("/request/{id}/accept")
+    @PatchMapping("/request/{id}/accept")
     public ResponseEntity<?> acceptRequest(
             @PathVariable @Min(message = "Request ID must be greater than zero", value = 1) long id) {
         log.debug("Received request to accept mentorship request: {}", id);
@@ -73,7 +74,7 @@ public class MentorshipRequestController {
         }
     }
 
-    @PutMapping("/request/{id}/reject")
+    @PatchMapping("/request/{id}/reject")
     public ResponseEntity<?> rejectRequest(
             @PathVariable @Min(message = "Request ID must be greater than zero", value = 1) long id,
             @RequestBody RejectionReasonDto rejectionReasonDto) {

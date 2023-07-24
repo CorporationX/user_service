@@ -1,6 +1,5 @@
 package school.faang.user_service.service;
 
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.subscription.UserDto;
@@ -11,7 +10,6 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -24,21 +22,23 @@ public class SubscriptionService {
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filter) {
         validateUserId(followeeId);
         Stream<User> allUsers = subscriptionRepository.findByFolloweeId(followeeId);
-        return userFilters == null ? userMapper.toDtoList(allUsers.collect(Collectors.toList())) : filterUsers(allUsers, filter);
+        return filterUsers(allUsers, filter);
     }
 
-    public List<UserDto> getFollowing(long followeeId, UserFilterDto filter) {
-        validateUserId(followeeId);
-        Stream<User> allUsers = subscriptionRepository.findByFollowerId(followeeId);
-        return userFilters == null ? userMapper.toDtoList(allUsers.collect(Collectors.toList())) : filterUsers(allUsers, filter);
+    public List<UserDto> getFollowing(long followerId, UserFilterDto filter) {
+        validateUserId(followerId);
+        Stream<User> allUsers = subscriptionRepository.findByFollowerId(followerId);
+        return filterUsers(allUsers, filter);
     }
 
     private List<UserDto> filterUsers(Stream<User> users, UserFilterDto filter) {
-        return userFilters.stream()
-                .filter(userFilter -> userFilter.isApplicable(filter))
-                .flatMap(userFilter -> userFilter.apply(users, filter))
-                .map(userMapper::toDto)
-                .toList();
+        Stream<User> filteredUsers = users;
+        for (UserFilter userFilter : userFilters) {
+            if (userFilter.isApplicable(filter)) {
+                filteredUsers = userFilter.apply(filteredUsers, filter);
+            }
+        }
+        return userMapper.toDtoList(filteredUsers.toList());
     }
 
     private void validateUserId(long userId) {

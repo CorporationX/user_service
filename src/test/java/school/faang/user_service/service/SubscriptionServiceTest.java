@@ -1,25 +1,32 @@
 package school.faang.user_service.service;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.subscription.UserDto;
 import school.faang.user_service.dto.subscription.UserFilterDto;
-import school.faang.user_service.filter.user.UserFilter;
+import school.faang.user_service.entity.Country;
+import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.contact.Contact;
+import school.faang.user_service.filter.user.*;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.service.SubscriptionService;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class SubscriptionServiceTest {
@@ -62,6 +69,29 @@ public class SubscriptionServiceTest {
         );
     }
 
+    static List<User> users() {
+        return List.of(
+                User.builder().username("Silvester").build(),
+                User.builder().username("Ferdinant").build()
+        );
+    }
+
+    static List<UserDto> usersDto() {
+        return List.of(
+                UserDto.builder().username("Silvester").build(),
+                UserDto.builder().username("Ferdinant").build()
+        );
+    }
+
+    @BeforeEach
+    void setUp() {
+        List<UserFilter> userFilters = List.of(
+                new UserNameFilter(),
+                new UserAboutFilter()
+        );
+        subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, userFilters);
+    }
+
     @Test
     void getFollowersThrowIllegalException() {
         int idUser = -10;
@@ -70,13 +100,17 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void testGetFollowersInvokesFindByFolloweeId() {
+    public void testGetFollowersInvokes() {
         long followeeId = 1L;
         UserFilterDto filterDto = new UserFilterDto();
-        when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(Stream.empty());
+        filterDto.setNamePattern("F");
+        when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(users().stream());
+        when(userMapper.toDtoList(List.of(users().get(1)))).thenReturn(List.of(usersDto().get(1)));
 
-        subscriptionService.getFollowers(followeeId, filterDto);
+        List<UserDto> result = subscriptionService.getFollowers(followeeId, filterDto);
 
+        Assertions.assertEquals(1, result.size());
+        Assertions.assertEquals("Ferdinant", result.get(0).getUsername());
         verify(subscriptionRepository, times(1)).findByFolloweeId(followeeId);
     }
 
@@ -88,15 +122,20 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void testGetFollowingInvokesFindByFolloweeId() {
+    public void testGetFollowingInvokes() {
         long followeeId = 1L;
         UserFilterDto filterDto = new UserFilterDto();
-        when(subscriptionRepository.findByFollowerId(followeeId)).thenReturn(Stream.empty());
+        filterDto.setNamePattern("F");
+        when(subscriptionRepository.findByFollowerId(followeeId)).thenReturn(users().stream());
+        when(userMapper.toDtoList(List.of(users().get(1)))).thenReturn(List.of(usersDto().get(1)));
 
-        subscriptionService.getFollowing(followeeId, filterDto);
+        List<UserDto> result = subscriptionService.getFollowing(followeeId, filterDto);
 
+        Assertions.assertEquals(1, result.size());
+        Assertions.assertEquals("Ferdinant", result.get(0).getUsername());
         verify(subscriptionRepository, times(1)).findByFollowerId(followeeId);
     }
+
     @ParameterizedTest
     @MethodSource("argsProvider1")
     public void testIsApplicable(UserFilter userFilter) {
@@ -110,8 +149,6 @@ public class SubscriptionServiceTest {
         assertTrue(result1);
         assertFalse(result2);
     }
-
-}
 
     @ParameterizedTest
     @MethodSource("argsProvider2")

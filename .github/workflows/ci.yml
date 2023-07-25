@@ -4,8 +4,7 @@ run-name: by @${{ github.actor }}
 
 on:
   pull_request:
-    branches:
-      - dev
+    branches: [ dev ]
 
 jobs:
   build:

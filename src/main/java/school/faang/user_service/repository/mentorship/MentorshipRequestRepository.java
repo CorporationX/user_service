@@ -1,5 +1,6 @@
 package school.faang.user_service.repository.mentorship;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface MentorshipRequestRepository extends CrudRepository<MentorshipRequest, Long> {
+public interface MentorshipRequestRepository extends JpaRepository<MentorshipRequest, Long> {
 
     @Query(nativeQuery = true, value = """
             INSERT INTO mentorship_request (requester_id, receiver_id, description, status, created_at, updated_at)
@@ -28,11 +29,8 @@ public interface MentorshipRequestRepository extends CrudRepository<MentorshipRe
 
     @Query(nativeQuery = true, value = """
             SELECT * FROM mentorship_request
-            WHERE description = :description AND 
-            requester_id = :requesterId AND
-            receiver_id = :receiverId AND 
-            status = :status
+            WHERE requester_id = :requesterId
             ORDER BY created_at DESC
             """)
-    List<MentorshipRequest> getAllRequests(String description, long requesterId, long receiverId, RequestStatus status);
+    List<MentorshipRequest> getAllRequestsForRequester(long requesterId);
 }

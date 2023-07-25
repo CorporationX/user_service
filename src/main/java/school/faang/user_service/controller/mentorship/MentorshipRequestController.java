@@ -16,22 +16,22 @@ public class MentorshipRequestController {
 
     private final MentorshipRequestService mentorshipRequestService;
 
-    @PostMapping("/mentorship/request")
+    @PostMapping("/request")
     public void requestMentorship(@RequestBody MentorshipRequestDto dto) {
         mentorshipRequestService.requestMentorship(dto);
     }
 
-    @PostMapping("/mentorship/request/list")
+    @PostMapping("/request/list")
     public List<MentorshipRequestDto> getRequests(@RequestBody RequestFilterDto filterDto) {
         return mentorshipRequestService.getRequests(filterDto);
     }
 
-    @PostMapping("mentorship/request/{id}/accept")
+    @PostMapping("/request/{id}/accept")
     public void acceptRequest(@PathVariable long id) {
         mentorshipRequestService.acceptRequest(id);
     }
 
-    @PostMapping("/mentorship/request/{id}/reject")
+    @PostMapping("/request/{id}/reject")
     public void rejectRequest(@PathVariable long id, @RequestBody RejectionDto rejection) {
         mentorshipRequestService.rejectRequest(id, rejection);
     }

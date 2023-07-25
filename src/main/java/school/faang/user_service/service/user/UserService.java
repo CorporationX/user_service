@@ -29,7 +29,7 @@ public class UserService {
 
   private void stopUserGoals(Long userId) {
     List<Long> userGoalsForDeleting = new ArrayList<>();
-    List<Long> userGoalsForUpdating = new ArrayList<>(); // Will be handled in the next sub-task
+    List<Long> userGoalsForUpdating = new ArrayList<>();
 
     List<GoalDto> allGoals = goalService.getGoalsByUser(userId);
 

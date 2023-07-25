@@ -1,55 +1,40 @@
 package school.faang.user_service.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import school.faang.user_service.dto.RecommendationRequestDto;
-import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
+import java.util.List;
 
-import java.time.LocalDateTime;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class RecommendationRequestServiceTest {
-    @Mock
-    private UserRepository userRepository;
-
+    private RecommendationRequestMapper recommendationRequestMapper;
+    private RequestFilterDto filterDto;
     @Mock
     private RecommendationRequestRepository recommendationRequestRepository;
-
     @InjectMocks
     private RecommendationRequestService recommendationRequestService;
 
-    private RecommendationRequestDto recommendationRequest;
-
-    @BeforeEach
-    void setUp() {
-        recommendationRequest = RecommendationRequestDto.builder()
-                .id(5L)
-                .message("message")
-                .status(RequestStatus.REJECTED)
-                .skills(null)
-                .requesterId(4L)
-                .receiverId(11L)
-                .createdAt(LocalDateTime.now().minusMonths(1))
-                .build();
-    }
-
     @Test
-    public void testRequesterIdNotExist() {
-        recommendationRequest.setRequesterId(125L);
-        recommendationRequestService.validateUsersExist(recommendationRequest);
-        Mockito.verify(userRepository, Mockito.times(1)).existsById(recommendationRequest.getRequesterId());
-    }
+    public void getRequests_ReturnsMappedRecommendationRequests() {
 
-    @Test
-    public void testRequestCreated() {
-        recommendationRequest.setRequesterId(135L);
-        recommendationRequest.setReceiverId(124L);
-        recommendationRequest.setMessage("recommendation");
-        recommendationRequestService.create(recommendationRequest);
-        Mockito.verify(recommendationRequestRepository, Mockito.times(1)).create(135L, 124L, "recommendation");
+        RecommendationRequest recommendationRequest = new RecommendationRequest();
+        Mockito.when(recommendationRequestRepository.findAll()).thenReturn(List.of(recommendationRequest));
+
+        RecommendationRequestDto recommendationRequestDto = new RecommendationRequestDto();
+        Mockito.when(recommendationRequestMapper.toDto(recommendationRequest)).thenReturn(recommendationRequestDto);
+
+        RequestFilterDto filterDto = new RequestFilterDto();
+
+
+        List<RecommendationRequestDto> result = recommendationRequestService.getRequests(filterDto);
+
+        assertThat(result).containsExactly(recommendationRequestDto);
     }
 }

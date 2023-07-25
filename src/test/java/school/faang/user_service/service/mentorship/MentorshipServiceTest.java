@@ -6,7 +6,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import java.util.ArrayList;
@@ -21,6 +24,8 @@ class MentorshipServiceTest {
     private MentorshipService mentorshipService;
     @Mock
     private MentorshipRepository mentorshipRepository;
+    @Mock
+    private UserMapper userMapper;
 
     @BeforeEach
     void setUp() {
@@ -28,25 +33,36 @@ class MentorshipServiceTest {
     }
 
     @Test
-    void getMentees() {
+    void testGetMentees_True() {
         User mentor = new User();
         long mentorId = 1L;
 
         mentor.setMentees(new ArrayList<>());
         mentor.setId(mentorId);
 
+        mentor.setMentees(List.of(new User()));
+        List<UserDto> userDtoList = List.of(new UserDto(0, "any", "any"));
+
         Mockito.when(mentorshipRepository.findById(mentorId))
                 .thenReturn(Optional.of(mentor));
+        Mockito.when(userMapper.toDto(mentor.getMentees()))
+                .thenReturn(userDtoList);
 
-        List<User> mentees = mentorshipService.getMentees(mentorId);
+        List<UserDto> mentees = mentorshipService.getMentees(mentorId);
+
         Mockito.verify(mentorshipRepository, Mockito.times(1)).findById(mentorId);
+        assertEquals(1, mentees.size());
+    }
 
-        assertEquals(0, mentees.size());
+    @Test
+    void testGetMentees_WrongId() {
+        User mentor = new User();
+        long mentorId = 1L;
 
-        mentor.setMentees(List.of(new User(), new User()));
-        mentees = mentorshipService.getMentees(mentorId);
+        mentor.setId(mentorId);
 
-        assertEquals(2, mentees.size());
+        assertThrows(DataValidationException.class,
+                () -> mentorshipService.getMentees(2L));
     }
 
     @Test
@@ -56,19 +72,28 @@ class MentorshipServiceTest {
 
         mentee.setMentors(new ArrayList<>());
         mentee.setId(menteeId);
+        mentee.setMentors(List.of(new User(), new User()));
+        List<UserDto> userDtoList = List.of(new UserDto(0, "any", "any"));
 
         Mockito.when(mentorshipRepository.findById(menteeId))
                 .thenReturn(Optional.of(mentee));
+        Mockito.when(userMapper.toDto(mentee.getMentors()))
+                .thenReturn(userDtoList);
 
+        List<UserDto> mentees = mentorshipService.getMentors(menteeId);
 
-        List<User> mentees = mentorshipService.getMentors(menteeId);
         Mockito.verify(mentorshipRepository, Mockito.times(1)).findById(menteeId);
+        assertEquals(1, mentees.size());
+    }
 
-        assertEquals(0, mentees.size());
+    @Test
+    void testGetMentors_WrongId() {
+        User mentee = new User();
+        long menteeId = 1L;
 
-        mentee.setMentors(List.of(new User(), new User()));
-        mentees = mentorshipService.getMentors(menteeId);
+        mentee.setId(menteeId);
 
-        assertEquals(2, mentees.size());
+        assertThrows(DataValidationException.class,
+                () -> mentorshipService.getMentees(2L));
     }
 }

@@ -13,6 +13,7 @@ import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -40,7 +41,7 @@ public class EventService {
         BeanUtils.copyProperties(source, target, "id", "relatedSkills");
 
         if (source.getRelatedSkills() != null) {
-            List<SkillDto> sourceSkills = source.getRelatedSkills();
+            List<SkillDto> sourceSkills = new ArrayList<>(source.getRelatedSkills());
             sourceSkills.retainAll(target.getRelatedSkills());
             if (!sourceSkills.isEmpty()) {
                 target.setRelatedSkills(source.getRelatedSkills());

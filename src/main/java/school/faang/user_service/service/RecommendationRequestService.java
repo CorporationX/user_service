@@ -48,12 +48,6 @@ public class RecommendationRequestService {
         return recommendationRequestMapper.toDto(request);
     }
 
-    private static void validateRejectionDto(RejectionDto rejection) {
-        if (rejection == null || rejection.getReason().isBlank()) {
-            throw new IllegalArgumentException("Rejection and its reason must not be null or empty.");
-        }
-    }
-
 
     @Transactional
     public void create(RecommendationRequestDto recommendationRequestDto) {
@@ -90,6 +84,12 @@ public class RecommendationRequestService {
 
         if (hasPendingRequest(requesterId, receiverId)) {
             throw new IllegalArgumentException("A recommendation request between the same users can only be sent once every six months.");
+        }
+    }
+
+    private static void validateRejectionDto(RejectionDto rejection) {
+        if (rejection == null || rejection.getReason().isBlank()) {
+            throw new IllegalArgumentException("Rejection and its reason must not be null or empty.");
         }
     }
 

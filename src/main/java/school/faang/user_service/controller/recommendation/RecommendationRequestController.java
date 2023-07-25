@@ -19,4 +19,13 @@ public class RecommendationRequestController {
     public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
        return recommendationRequestService.rejectRequest(id, rejection);
     }
+
+    public RecommendationRequestDto requestRecommendation(RecommendationRequestDto recommendationRequest) {
+        if (!recommendationRequest.getMessage().isEmpty() && recommendationRequest.getMessage() != null) {
+            recommendationRequestService.create(recommendationRequest);
+            return recommendationRequest;
+        } else {
+            throw new IllegalArgumentException("Recommendation request message should not be empty");
+        }
+    }
 }

@@ -13,7 +13,7 @@ public class MentorshipService {
     private final MentorshipRepository mentorshipRepository;
     private final MentorshipValidator mentorshipValidator;
 
-    public boolean deleteMentee(long menteeId, long mentorId) {
+    public void deleteMentee(long menteeId, long mentorId) {
         mentorshipValidator.equalsIdValidator(menteeId, mentorId);
 
         User mentee = mentorshipRepository.findById(menteeId)
@@ -21,13 +21,11 @@ public class MentorshipService {
         User mentor = mentorshipRepository.findById(mentorId)
                 .orElseThrow(() -> new DataValidationException("Mentor was not found"));
 
-        boolean isDeleted = mentor.getMentees().remove(mentee);
+        mentor.getMentees().remove(mentee);
         mentorshipRepository.save(mentor);
-
-        return isDeleted;
     }
 
-    public boolean deleteMentor(long menteeId, long mentorId) {
+    public void deleteMentor(long menteeId, long mentorId) {
         mentorshipValidator.equalsIdValidator(menteeId, mentorId);
 
         User mentee = mentorshipRepository.findById(menteeId)
@@ -35,9 +33,7 @@ public class MentorshipService {
         User mentor = mentorshipRepository.findById(mentorId)
                 .orElseThrow(() -> new DataValidationException("Mentor was not found"));
 
-        boolean isDeleted = mentee.getMentors().remove(mentor);
-        mentorshipRepository.save(mentor);
-
-        return isDeleted;
+        mentee.getMentors().remove(mentor);
+        mentorshipRepository.save(mentee);
     }
 }

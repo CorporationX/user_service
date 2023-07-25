@@ -57,40 +57,32 @@ class MentorshipServiceTest {
 
     @Test
     void testDeleteMentee() {
-        boolean requestFirst = mentorshipService.deleteMentee(menteeId, mentorId);
+        mentorshipService.deleteMentee(menteeId, mentorId);
 
         Mockito.verify(mentorshipRepository, Mockito.times(1)).findById(menteeId);
         Mockito.verify(mentorshipRepository, Mockito.times(1)).findById(mentorId);
-
-        assertTrue(requestFirst);
-
-        boolean requestSecond = mentorshipService.deleteMentee(menteeId, mentorId);
-        assertFalse(requestSecond);
+        Mockito.verify(mentorshipRepository, Mockito.times(1)).save(mentor);
     }
 
     @Test
     void testDeleteMentor() {
-        boolean requestFirst = mentorshipService.deleteMentor(menteeId, mentorId);
+        mentorshipService.deleteMentor(menteeId, mentorId);
 
         Mockito.verify(mentorshipRepository, Mockito.times(1)).findById(menteeId);
         Mockito.verify(mentorshipRepository, Mockito.times(1)).findById(mentorId);
-
-        assertTrue(requestFirst);
-
-        boolean requestSecond = mentorshipService.deleteMentor(menteeId, mentorId);
-        assertFalse(requestSecond);
+        Mockito.verify(mentorshipRepository, Mockito.times(1)).save(mentee);
     }
 
     @Test
-    void testThrowExceptions_deleteMentee_DeleteMentor(){
+    void testThrowExceptions_deleteMentee_DeleteMentor() {
         assertThrows(DataValidationException.class,
-                ()->mentorshipService.deleteMentee(menteeId,3L));
+                () -> mentorshipService.deleteMentee(menteeId, 3L));
         assertThrows(DataValidationException.class,
-                ()->mentorshipService.deleteMentee(3L,mentorId));
+                () -> mentorshipService.deleteMentee(3L, mentorId));
 
         assertThrows(DataValidationException.class,
-                ()->mentorshipService.deleteMentor(menteeId,3L));
+                () -> mentorshipService.deleteMentor(menteeId, 3L));
         assertThrows(DataValidationException.class,
-                ()->mentorshipService.deleteMentor(3L,mentorId));
+                () -> mentorshipService.deleteMentor(3L, mentorId));
     }
 }

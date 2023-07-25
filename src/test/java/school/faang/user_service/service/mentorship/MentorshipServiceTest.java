@@ -55,7 +55,7 @@ class MentorshipServiceTest {
     }
 
     @Test
-    void testGetMentees_WrongId() {
+    void testGetMentorsThrowException() {
         User mentor = new User();
         long mentorId = 1L;
 
@@ -87,7 +87,7 @@ class MentorshipServiceTest {
     }
 
     @Test
-    void testGetMentors_WrongId() {
+    void testGetMenteesThrowException() {
         User mentee = new User();
         long menteeId = 1L;
 

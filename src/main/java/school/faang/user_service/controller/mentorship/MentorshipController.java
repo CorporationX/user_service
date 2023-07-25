@@ -15,13 +15,13 @@ public class MentorshipController {
     private final MentorshipService mentorshipService;
     private final MentorshipValidator mentorshipValidator;
 
-    @GetMapping("/{id}")
+    @GetMapping("mentee/{id}")
     public List<UserDto> getMentees(@PathVariable long id) {
         mentorshipValidator.idValidator(id);
         return mentorshipService.getMentees(id);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("mentor/{id}")
     public List<UserDto> getMentors(@PathVariable long id) {
         mentorshipValidator.idValidator(id);
         return mentorshipService.getMentors(id);

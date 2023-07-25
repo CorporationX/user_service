@@ -14,6 +14,7 @@ import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.List;
 
 
 @Service
@@ -25,9 +26,9 @@ public class GoalService {
     private final GoalMapper goalMapper;
 
     @Transactional
-    public GoalDto createGoal(GoalDto goal, Long userId, List<String> skills){
+    public GoalDto createGoal(GoalDto goal, Long userId){
         int currentUserGoalNum = goalRepository.countActiveGoalsPerUser(userId);
-        boolean allSkillsExist = skills.stream()
+        boolean allSkillsExist = goal.getSkills().stream()
                 .allMatch(skill -> skillRepository.findByTitle(skill.toLowerCase()).isPresent());
 
         if (!allSkillsExist){
@@ -56,3 +57,4 @@ public class GoalService {
 
     }
 }
+

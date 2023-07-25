@@ -2,8 +2,8 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.recommendation_request.RecommendationRequestDto;
 import school.faang.user_service.dto.filter.RecommendationRequestFilterDto;
+import school.faang.user_service.dto.recommendation_request.RecommendationRequestDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.filter.RecommendationRequestFilter;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
@@ -32,10 +32,20 @@ public class RecommendationRequestService {
     public List<RecommendationRequestDto> getRecommendationRequests(RecommendationRequestFilterDto filterDto) {
         Stream<RecommendationRequest> recommendationRequests = recommendationRequestRepository.findAll().stream();
 
-      return recommendationRequestFilters.stream()
-                .filter(requestFilter -> requestFilter.isApplicable(filterDto))
-                .flatMap(requestFilter -> requestFilter.apply(recommendationRequests, filterDto))
-                .map(recommendationRequestMapper::toDto)
-                .toList();
+        for (RecommendationRequestFilter filter : recommendationRequestFilters) {
+            if (filter.isApplicable(filterDto)) {
+                recommendationRequests = filter.apply(recommendationRequests, filterDto);
+            }
+        }
+        return recommendationRequestMapper.toDtoList(recommendationRequests.toList());
+
+// так вылетает ошибка, не понимаю почему
+        // stream has already been operated upon or closed
+        //java.lang.IllegalStateException: stream has already been operated upon or closed
+//        return recommendationRequestFilters.stream()
+//                .filter(requestFilter -> requestFilter.isApplicable(filterDto))
+//                .flatMap(requestFilter -> requestFilter.apply(recommendationRequests, filterDto))
+//                .map(recommendationRequestMapper::toDto)
+//                .toList();
     }
 }

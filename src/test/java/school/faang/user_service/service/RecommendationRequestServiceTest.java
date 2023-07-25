@@ -137,40 +137,40 @@ class RecommendationRequestServiceTest {
     }
 
 
-//    @Test
-//    void testRecommendationRequestMessageAndStatusFilter() {
-//        List<RecommendationRequestFilter> requestFilters = List.of(new RecommendationRequestMessageFilter(), new RecommendationRequestStatusFilter());
-//
-//        RecommendationRequest recommendationRequest1 = new RecommendationRequest();
-//        RecommendationRequest recommendationRequest2 = new RecommendationRequest();
-//        RecommendationRequest recommendationRequest3 = new RecommendationRequest();
-//
-//        recommendationRequest1.setMessage("Hello");
-//        recommendationRequest1.setStatus(RequestStatus.ACCEPTED);
-//
-//        recommendationRequest2.setMessage("Goodbye");
-//        recommendationRequest2.setStatus(RequestStatus.PENDING);
-//
-//        recommendationRequest3.setMessage("Hel");
-//        recommendationRequest3.setStatus(RequestStatus.ACCEPTED);
-//
-//        List<RecommendationRequest> requests = List.of(recommendationRequest1, recommendationRequest2, recommendationRequest3);
-//
-//        RecommendationRequestFilterDto recommendationRequestFilterDto =
-//                RecommendationRequestFilterDto.builder()
-//                        .messagePattern("Hel")
-//                        .status(RequestStatus.ACCEPTED)
-//                        .build();
-//
-//        when(recommendationRequestRepository.findAll()).thenReturn(requests);
-//
-//        recommendationRequestService = new RecommendationRequestService(recommendationRequestRepository, recommendationRequestMapper, requestFilters);
-//
-//        List<RecommendationRequestDto> eventsByFilter = recommendationRequestService.getRecommendationRequests(recommendationRequestFilterDto);
-//
-//        assertEquals(1, eventsByFilter.size());
-//        assertEquals("Hello", eventsByFilter.get(0).getMessage());
-//        assertEquals(RequestStatus.ACCEPTED, eventsByFilter.get(0).getStatus());
-//    }
+    @Test
+    void testRecommendationRequestMessageAndStatusFilter() {
+        List<RecommendationRequestFilter> requestFilters = List.of(new RecommendationRequestMessageFilter(), new RecommendationRequestStatusFilter());
+
+        RecommendationRequest recommendationRequest1 = new RecommendationRequest();
+        RecommendationRequest recommendationRequest2 = new RecommendationRequest();
+        RecommendationRequest recommendationRequest3 = new RecommendationRequest();
+
+        recommendationRequest1.setMessage("Hello");
+        recommendationRequest1.setStatus(RequestStatus.ACCEPTED);
+
+        recommendationRequest2.setMessage("Goodbye");
+        recommendationRequest2.setStatus(RequestStatus.PENDING);
+
+        recommendationRequest3.setMessage("Hel");
+        recommendationRequest3.setStatus(RequestStatus.ACCEPTED);
+
+        List<RecommendationRequest> requests = List.of(recommendationRequest1, recommendationRequest2, recommendationRequest3);
+
+        RecommendationRequestFilterDto recommendationRequestFilterDto =
+                RecommendationRequestFilterDto.builder()
+                        .messagePattern("Hel")
+                        .status(RequestStatus.ACCEPTED)
+                        .build();
+
+        when(recommendationRequestRepository.findAll()).thenReturn(requests);
+
+        recommendationRequestService = new RecommendationRequestService(recommendationRequestRepository, recommendationRequestMapper, requestFilters);
+
+        List<RecommendationRequestDto> eventsByFilter = recommendationRequestService.getRecommendationRequests(recommendationRequestFilterDto);
+
+        assertEquals(2, eventsByFilter.size());
+        assertEquals("Hello", eventsByFilter.get(0).getMessage());
+        assertEquals(RequestStatus.ACCEPTED, eventsByFilter.get(0).getStatus());
+    }
 
 }

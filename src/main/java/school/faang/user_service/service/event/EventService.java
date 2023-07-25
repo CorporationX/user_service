@@ -94,13 +94,13 @@ public class EventService {
             throw new DataValidException("Event Id must be greater than 0");
         }
         if (eventDto.getTitle().isBlank()) {
-            throw new DataValidException("Event must have a title");
+            throw new DataValidException("Event must have a title. Id: " + eventDto.getId());
         }
         if (eventDto.getStartDate() == null) {
-            throw new DataValidException("Event must have a start date");
+            throw new DataValidException("Event must have a start date. Id: " + eventDto.getId());
         }
         if (eventDto.getOwnerId() == null) {
-            throw new DataValidException("Event must have a user");
+            throw new DataValidException("Event must have a user. Id: " + eventDto.getId());
         }
         checkUserContainsSkills(eventDto);
     }

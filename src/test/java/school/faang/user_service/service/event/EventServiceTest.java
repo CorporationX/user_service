@@ -48,7 +48,7 @@ class EventServiceTest {
     @Mock
     private UserRepository userRepository;
 
-    private EventMapper eventMapper = EventMapper.INSTANCE;
+    private final EventMapper eventMapper = EventMapper.INSTANCE;
 
     private EventService eventService;
 
@@ -79,7 +79,7 @@ class EventServiceTest {
         eventDto.setTitle("");
 
         Exception exception = assertThrows(DataValidException.class, () -> eventService.create(eventDto));
-        assertEquals("Event must have a title", exception.getMessage());
+        assertEquals("Event must have a title. Id: 1", exception.getMessage());
     }
 
     @Test
@@ -88,7 +88,7 @@ class EventServiceTest {
         eventDto.setStartDate(null);
 
         Exception exception = assertThrows(DataValidException.class, () -> eventService.create(eventDto));
-        assertEquals("Event must have a start date", exception.getMessage());
+        assertEquals("Event must have a start date. Id: 1", exception.getMessage());
     }
 
     @Test
@@ -97,7 +97,7 @@ class EventServiceTest {
         eventDto.setOwnerId(null);
 
         Exception exception = assertThrows(DataValidException.class, () -> eventService.create(eventDto));
-        assertEquals("Event must have a user", exception.getMessage());
+        assertEquals("Event must have a user. Id: 1", exception.getMessage());
     }
 
     @Test

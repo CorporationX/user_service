@@ -33,7 +33,7 @@ public class EventController {
         eventService.deleteEvent(id);
     }
 
-    public int updateEvent(EventDto event) {
+    public EventDto updateEvent(EventDto event) {
         validate(event);
         return eventService.updateEvent(event);
     }

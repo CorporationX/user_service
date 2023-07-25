@@ -69,14 +69,10 @@ public class EventService {
         }
     }
 
-    public int updateEvent(EventDto event) {
-        validate(event);
-        int result = 0;
-        try {
-            result = eventRepository.save(eventMapper.toEvent(event)).getAttendees().size();
-        } catch (NullPointerException e) {
-        }
-        return result;
+    public EventDto updateEvent(EventDto eventDto) {
+        validate(eventDto);
+        Event event = eventRepository.findById(eventDto.getId()).orElseThrow(() -> new DataValidationException("Event not found"));
+        return eventMapper.toDTO(eventRepository.save(eventMapper.update(eventDto, event)));
     }
 
     public List<EventDto> getOwnedEvents(long userId) {

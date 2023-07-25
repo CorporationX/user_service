@@ -10,16 +10,16 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
-import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.filters.goal.dto.GoalFilterDto;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.goal.GoalService;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -102,7 +102,7 @@ public class GoalServiceTest {
         when(goalRepository.findById(existingGoalId)).thenReturn(Optional.of(existingGoal));
         when(goalRepository.save(Mockito.any(Goal.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        GoalDto result = goalService.updateGoal(newGoalDto, userId);
+        GoalDto result = goalService.updateGoal(newGoalDto);
 
         assertEquals(newGoalDto, result);
     }
@@ -115,7 +115,7 @@ public class GoalServiceTest {
         when(goalRepository.findById(goalId)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class,
-                () -> goalService.updateGoal(goalDto, userId));
+                () -> goalService.updateGoal(goalDto));
     }
 
     @Test
@@ -141,7 +141,11 @@ public class GoalServiceTest {
 
     @Test
     public void testGoalFilter_Successful(){
-        GoalFilterDto filter = new GoalFilterDto(GoalStatus.COMPLETED, "title");
+        GoalFilterDto filter = GoalFilterDto.builder()
+                .status(GoalStatus.COMPLETED)
+                .title("title")
+                .build();
+
         Goal goal1 = Goal.builder()
                 .id(1L)
                 .title("goal1")

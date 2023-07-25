@@ -2,6 +2,7 @@ package school.faang.user_service.controller.goal;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -10,8 +11,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.filters.goal.dto.GoalFilterDto;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.util.Message;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,9 +30,9 @@ public class GoalController {
     }
 
     @PutMapping
-    public GoalDto updateGoal(@RequestBody GoalDto goalDto, Long userId){
+    public GoalDto updateGoal(@RequestBody GoalDto goalDto){
 
-        return goalService.updateGoal(goalDto, userId);
+        return goalService.updateGoal(goalDto);
     }
 
     @DeleteMapping("/{goalId}")
@@ -41,7 +45,7 @@ public class GoalController {
     }
 
     @GetMapping
-    public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter){
-        return goalService.getGoalsByUser(userId, filter);
+    public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto goalFilterDto){
+        return goalService.getGoalsByUser(userId, goalFilterDto);
     }
 }

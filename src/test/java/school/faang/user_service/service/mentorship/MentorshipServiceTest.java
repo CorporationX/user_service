@@ -7,7 +7,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
+import school.faang.user_service.validator.mentorship.MentorshipValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +23,8 @@ class MentorshipServiceTest {
     private MentorshipService mentorshipService;
     @Mock
     private MentorshipRepository mentorshipRepository;
+    @Mock
+    private MentorshipValidator mentorshipValidator;
     private User mentor = new User();
     private User mentee = new User();
 
@@ -52,7 +56,7 @@ class MentorshipServiceTest {
     }
 
     @Test
-    void deleteMentee() {
+    void testDeleteMentee() {
         boolean requestFirst = mentorshipService.deleteMentee(menteeId, mentorId);
 
         Mockito.verify(mentorshipRepository, Mockito.times(1)).findById(menteeId);
@@ -65,7 +69,7 @@ class MentorshipServiceTest {
     }
 
     @Test
-    void deleteMentor() {
+    void testDeleteMentor() {
         boolean requestFirst = mentorshipService.deleteMentor(menteeId, mentorId);
 
         Mockito.verify(mentorshipRepository, Mockito.times(1)).findById(menteeId);
@@ -75,5 +79,18 @@ class MentorshipServiceTest {
 
         boolean requestSecond = mentorshipService.deleteMentor(menteeId, mentorId);
         assertFalse(requestSecond);
+    }
+
+    @Test
+    void testThrowExceptions_deleteMentee_DeleteMentor(){
+        assertThrows(DataValidationException.class,
+                ()->mentorshipService.deleteMentee(menteeId,3L));
+        assertThrows(DataValidationException.class,
+                ()->mentorshipService.deleteMentee(3L,mentorId));
+
+        assertThrows(DataValidationException.class,
+                ()->mentorshipService.deleteMentor(menteeId,3L));
+        assertThrows(DataValidationException.class,
+                ()->mentorshipService.deleteMentor(3L,mentorId));
     }
 }

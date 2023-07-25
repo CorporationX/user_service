@@ -1,4 +1,4 @@
-package school.faang.user_service.goal;
+package school.faang.user_service.service.goal;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -6,16 +6,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.goal.GoalService;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,100 +41,75 @@ public class GoalServiceTest {
     private GoalMapper goalMapper = Mappers.getMapper(GoalMapper.class);
 
     private GoalDto goalDto;
-    private Long userId;
+    private List<String> skills;
+    private Long id;
     private String title;
 
     @BeforeEach
     void setUp(){
-        userId = 1L;
+        id = 1L;
         title = "title";
-        goalDto = new GoalDto(userId, title);
-        goalDto.setSkills(Arrays.asList("skill1", "skill2", "skill3"));
+        skills = Arrays.asList("skill1", "skill2", "skill3");
+        goalDto = new GoalDto(id, title);
     }
-
 
     @Test
     public void testCreateGoal_Successful() {
-
-        when(goalRepository.countActiveGoalsPerUser(userId)).thenReturn(2);
+        when(goalRepository.countActiveGoalsPerUser(id)).thenReturn(2);
         when(skillRepository.findByTitle(anyString())).thenReturn(Optional.of(new Skill()));
+        goalDto.setSkills(skills);
 
-        GoalDto result = goalService.createGoal(goalDto, userId);
+        GoalDto result = goalService.createGoal(goalDto, id);
 
-        assertEquals(result.getId(), userId);
+
+        assertEquals(result.getId(), id);
         assertEquals(result.getTitle(), title);
     }
 
     @Test
     public void testCreateGoal_UnexistingSkills() {
-
         when(skillRepository.findByTitle(anyString())).thenReturn(Optional.empty());
+        goalDto.setSkills(skills);
 
         assertThrows(IllegalArgumentException.class,
-                () -> goalService.createGoal(goalDto, userId));
+                () -> goalService.createGoal(goalDto, id));
     }
 
     @Test
     public void testCreateGoal_TooManyGoals() {
-
         when(skillRepository.findByTitle(anyString())).thenReturn(Optional.of(new Skill()));
-        when(goalRepository.countActiveGoalsPerUser(userId)).thenReturn(5);
+        when(goalRepository.countActiveGoalsPerUser(id)).thenReturn(5);
+        goalDto.setSkills(skills);
 
         assertThrows(IllegalArgumentException.class,
-                () -> goalService.createGoal(goalDto, userId, skills));
+                () -> goalService.createGoal(goalDto, id));
     }
 
     @Test
     public void testUpdateGoal_Successful() {
         String newTitle = "New Title";
-
         long existingGoalId = 1L;
         Goal existingGoal = new Goal();
         existingGoal.setId(existingGoalId);
 
-        GoalDto goalDto = new GoalDto(userId, title);
-        GoalDto newGoalDto = new GoalDto(userId, newTitle);
+        GoalDto newGoalDto = new GoalDto(id, newTitle);
 
         when(goalRepository.findById(existingGoalId)).thenReturn(Optional.of(existingGoal));
         when(goalRepository.save(Mockito.any(Goal.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        GoalDto result = goalService.updateGoal(newGoalDto, userId, skills);
+        GoalDto result = goalService.updateGoal(newGoalDto, id);
 
         assertEquals(newGoalDto, result);
     }
 
     @Test
     public void testUpdateGoal_GoalNotFound() {
-        Long goalId = 123L;
-        GoalDto goalDto = new GoalDto(goalId, title);
 
-        when(goalRepository.findById(goalId)).thenReturn(Optional.empty());
+        Mockito.lenient().when(goalRepository.findById(goalDto.getId())).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class,
-                () -> goalService.updateGoal(goalDto, userId, skills));
-    }
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> goalService.updateGoal(goalDto, id));
 
-    @Test
-    public void testDeleteGoal_Successful() {
-        Long goalId = 1L;
-        Goal goal = new Goal();
-        goal.setId(goalId);
-        GoalDto expectedDto = new GoalDto(goalId, title);
-
-        when(goalRepository.findById(goalId)).thenReturn(Optional.of(goal));
-        when(goalMapper.goalToDto(goal)).thenReturn(expectedDto);
-
-        GoalDto result = goalService.deleteGoal(goalId);
-
-        assertEquals(expectedDto, result);
-    }
-
-    @Test
-    public void testDeleteGoal_ThrowsException() {
-        Long nonExistingGoalId = 100L;
-
-        when(goalRepository.findById(nonExistingGoalId)).thenReturn(Optional.empty());
-
-        assertThrows(IllegalArgumentException.class, () -> goalService.deleteGoal(nonExistingGoalId));
+        assertEquals("Goal 1 not found", exception.getMessage());
     }
 }

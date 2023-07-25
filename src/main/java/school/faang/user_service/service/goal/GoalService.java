@@ -10,11 +10,8 @@ import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.util.Message;
-
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
-import java.util.List;
-
 
 @Service
 @RequiredArgsConstructor
@@ -25,14 +22,15 @@ public class GoalService {
     private final GoalMapper goalMapper;
 
     @Transactional
-    public GoalDto createGoal(GoalDto goal, Long userId, List<String> skills){
+    public GoalDto createGoal(GoalDto goal, Long userId){
         int currentUserGoalNum = goalRepository.countActiveGoalsPerUser(userId);
-        boolean allSkillsExist = skills.stream()
+        boolean allSkillsExist = goal.getSkills().stream()
                 .allMatch(skill -> skillRepository.findByTitle(skill.toLowerCase()).isPresent());
 
         if (!allSkillsExist){
             throw new IllegalArgumentException(Message.UNEXISTING_SKILLS);
-        } else if (currentUserGoalNum > MAX_ACTIVE_GOALS){
+        }
+        if (currentUserGoalNum > MAX_ACTIVE_GOALS){
             throw new IllegalArgumentException(Message.TOO_MANY_GOALS);
         }
 
@@ -42,18 +40,18 @@ public class GoalService {
     }
 
     @Transactional
-    public GoalDto updateGoal(GoalDto goalDto, Long userId, List<String> skills) {
+    public GoalDto updateGoal(GoalDto goalDto, Long userId) {
         return goalRepository.findById(goalDto.getId())
-                .map(existingGoal -> {
+                .stream()
+                .peek(existingGoal -> {
                     existingGoal.setTitle(goalDto.getTitle());
                     existingGoal.setUpdatedAt(LocalDateTime.now());
-                    return existingGoal;
+                    goalRepository.save(existingGoal);
                 })
-                .map(goalRepository::save)
                 .map(goalMapper::goalToDto)
+                .findFirst()
                 .orElseThrow(() ->
                         new IllegalArgumentException(MessageFormat.format("Goal {0} not found", goalDto.getId())));
-    }
 
     @Transactional
     public GoalDto deleteGoal(Long goalId){

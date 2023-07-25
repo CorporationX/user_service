@@ -22,21 +22,17 @@ public class GoalController {
     private final GoalService goalService;
 
     @PostMapping
-    public GoalDto createGoal(@RequestParam @NotEmpty(message = "Title can't be empty") String title, Long userId,
-                              List<String> skills){
+    public GoalDto createGoal(@RequestBody GoalDto goalDto, Long userId){
 
-        GoalDto goal = new GoalDto(0L, title);
-
-        return goalService.createGoal(goal, userId, skills);
+        return goalService.createGoal(goalDto, userId);
     }
+}
+
 
     @PutMapping
-    public GoalDto updateGoal(@RequestParam @NotEmpty(message = "Title can't be empty") String title, Long userId,
-                              List<String> skills){
+    public GoalDto updateGoal(@RequestBody GoalDto goalDto, Long userId){
 
-        GoalDto goal = new GoalDto(0L, title);
-
-        return goalService.updateGoal(goal, userId, skills);
+        return goalService.updateGoal(goalDto, userId);
     }
 
     @DeleteMapping

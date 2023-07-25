@@ -2,9 +2,12 @@ package school.faang.user_service.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.exception.DataValidationException;
@@ -14,6 +17,7 @@ import school.faang.user_service.repository.SkillRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -26,20 +30,58 @@ class UserServiceTest {
     private SkillRepository skillRepository;
     @InjectMocks
     private SkillService skillService;
+    @Spy
+    private SkillMapper skillMapper = Mappers.getMapper(SkillMapper.class);
+
     List<Skill> skillList;
 
     @Test
+    void getOfferedSkillsTest() {
+        long userId = 1L;
+        List<Skill> skills = List.of(
+                createSkill(1L, "test"),
+                createSkill(1L, "test"),
+                createSkill(1L, "test")
+        );
+
+        when(skillRepository.findAllByUserId(userId)).thenReturn(skills);
+
+        List<SkillCandidateDto> candidates = skillService.getOfferedSkills(userId);
+
+        assertNotNull(candidates);
+        assertEquals(3, candidates.size());
+    }
+
+    @Test
+    void testAcquireSkillFromOffers() {
+        Long skillId = 1L;
+        Long userId = 2L;
+
+        when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.empty());
+
+        skillRepository.assignSkillToUser(skillId, userId);
+
+        Skill assignedSkill = createSkill(skillId, "test");
+        when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.of(assignedSkill));
+
+        SkillDto acquiredSkill = skillService.acquireSkillFromOffers(skillId, userId);
+
+        assertNotNull(acquiredSkill);
+        assertEquals(skillId, acquiredSkill.getId());
+    }
+
+    @Test
     void createReturnsSkillDto(){
-        SkillDto skillDto = new SkillDto(0L, "title");
-        Skill skill = SkillMapper.INSTANCE.skillToEntity(skillDto);
+        SkillDto skillDto = new SkillDto(1L, "title");
+        Skill skill = skillMapper.skillToEntity(skillDto);
 
         when(skillRepository.existsByTitle(skillDto.getTitle())).thenReturn(false);
-        when(skillRepository.save(any(Skill.class))).thenReturn(skill);
+        when(skillRepository.save(skill)).thenReturn(skill);
 
         SkillDto result = skillService.create(skillDto);
 
         assertNotNull(result);
-        assertEquals(0, result.getId());
+        assertEquals(1, result.getId());
         assertEquals("title", result.getTitle());
 
         verify(skillRepository).existsByTitle(skillDto.getTitle());

@@ -1,10 +1,6 @@
 package school.faang.user_service.mapper;
 
-import org.mapstruct.InjectionStrategy;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.event.Event;
@@ -19,6 +15,8 @@ public interface EventMapper {
 
   @Mapping(target = "relatedSkills", ignore = true)
   Event toEntity(EventDto eventDto);
+
+  EventDto update(@MappingTarget EventDto target, EventDto updatingSource);
 
   @Named("mapListToId")
   default List<Long> mapListToId(List<Skill> objects) {

@@ -68,4 +68,9 @@ public class EventController {
   public EventDto getEvent(Long id) {
     return eventService.get(id);
   }
+
+  public EventDto updateEvent(EventDto event) {
+    validateEvent(event);
+    return eventService.updateEvent(event);
+  }
 }

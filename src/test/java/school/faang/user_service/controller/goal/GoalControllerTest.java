@@ -51,4 +51,24 @@ public class GoalControllerTest {
 
         verify(goalService, times(1)).getGoalsByUser(anyLong(), any());
     }
+
+    @Test
+    public void testDeleteGoal_ExistingGoal() {
+        long goalId = 1L;
+
+        goalController.deleteGoal(goalId);
+
+        verify(goalService, times(1)).deleteGoal(goalId);
+    }
+
+    @Test
+    public void testDeleteGoal_NonExistentGoal_NoExceptionThrown() {
+        long nonExistentGoalId = 10L;
+
+        doNothing().when(goalService).deleteGoal(anyLong());
+
+        goalController.deleteGoal(nonExistentGoalId);
+
+        verify(goalService, times(1)).deleteGoal(nonExistentGoalId);
+    }
 }

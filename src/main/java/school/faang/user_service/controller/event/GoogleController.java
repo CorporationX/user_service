@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.BadRequestException;
 import school.faang.user_service.service.event.GoogleCalendarService;
 
 import java.io.IOException;
@@ -23,8 +23,8 @@ public class GoogleController {
     }
 
     private void idValidation(Long id) {
-        if (id <= 0) {
-            throw new DataValidationException("Id must be greater than 0");
+        if (id <= 0 || null == id) {
+            throw new BadRequestException("Id must be greater than 0");
         }
     }
 }

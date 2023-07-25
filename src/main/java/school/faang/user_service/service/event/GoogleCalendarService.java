@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.CalendarEventDto;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.mapper.event.CalendarMapper;
 import school.faang.user_service.repository.event.EventRepository;
 
@@ -27,7 +27,7 @@ public class GoogleCalendarService {
     private final CalendarMapper calendarMapper;
 
     public ResponseEntity<?> createEvent(Long id) throws IOException {
-        school.faang.user_service.entity.event.Event newEvent = eventRepository.findById(id).orElseThrow(() -> new DataValidationException("Event not found"));
+        school.faang.user_service.entity.event.Event newEvent = eventRepository.findById(id).orElseThrow(() -> new NotFoundException("Event not found"));
         CalendarEventDto eventDto = calendarMapper.toDto(newEvent);
 
         Event event = createEvent(eventDto);

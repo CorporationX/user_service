@@ -7,7 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.mapper.event.CalendarMapperImpl;
 import school.faang.user_service.repository.event.EventRepository;
 
@@ -26,7 +26,7 @@ public class GoogleCalendarServiceTest {
 
     @Test
     public void testCreateEventThrowException() {
-        assertThrows(DataValidationException.class, () -> {
+        assertThrows(NotFoundException.class, () -> {
             googleCalendarService.createEvent(1L);
         });
     }

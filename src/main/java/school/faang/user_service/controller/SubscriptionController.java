@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserFilterDto;
-import school.faang.user_service.service.SubscriptionService;
+import school.faang.user_service.dto.filter.UserFilterDto;
+import school.faang.user_service.service.subscription.SubscriptionService;
 import school.faang.user_service.exception.DataValidationException;
 
 import java.util.List;

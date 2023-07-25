@@ -11,13 +11,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -25,14 +25,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 @ExtendWith(MockitoExtension.class)
 class GoalServiceTest {
+    @InjectMocks
     private GoalService goalService;
-
     @Mock
     private GoalRepository goalRepository;
     private GoalFilter filter1;

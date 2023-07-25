@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static school.faang.user_service.util.Message.USER_NOT_FOUND;
+import static school.faang.user_service.util.Message.USER_NOT_FOUND_FORMAT;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +35,7 @@ public class SkillService {
     @Transactional
     public SkillDto create(SkillDto skill) {
         if (skillRepository.existsByTitle(skill.getTitle())){
-            throw new DataValidationException("Skill " + skill.getTitle() + " already exists");
+            throw new DataValidationException(Message.SKILL_EXISTS_FORMAT + skill.getTitle());
         }
 
         Skill newSkill = skillMapper.skillToEntity(skill);
@@ -79,7 +79,7 @@ public class SkillService {
         List<SkillOffer> skillOffers = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
 
         if (skillOffers.size() < MIN_SKILL_OFFERS) {
-            throw new RuntimeException(Message.NOT_ENOUGH_OFFERS);
+            throw new DataValidationException(Message.NOT_ENOUGH_OFFERS_FORMAT);
         }
 
         skillRepository.assignSkillToUser(skillId, userId);
@@ -97,7 +97,7 @@ public class SkillService {
         List<UserSkillGuarantee> newGuarantees = skillOffers.stream().map(skillOffer -> UserSkillGuarantee.builder()
                     .user(userRepository.findById(userId)
                             .orElseThrow(() -> new RuntimeException(
-                                    MessageFormat.format(USER_NOT_FOUND, userId))))
+                                    MessageFormat.format(USER_NOT_FOUND_FORMAT, userId))))
                     .skill(skillOffer.getSkill())
                     .guarantor(skillOffer.getRecommendation().getAuthor())
                     .build())

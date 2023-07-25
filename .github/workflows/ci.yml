@@ -1,9 +1,6 @@
 name: CI
 
-on:
-  push:
-    branches:
-      - pipeline-BC-3941
+on: [push]
 
 jobs:
   build:

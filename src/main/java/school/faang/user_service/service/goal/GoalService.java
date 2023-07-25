@@ -14,6 +14,7 @@ import school.faang.user_service.util.Message;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -66,29 +67,24 @@ public class GoalService {
         goalRepository.delete(goal);
     }
 
+    public List<GoalDto> findSubtasksByGoalId(Long parentGoalId, GoalFilterDto goalFilterDto){
+        return applyFilter(goalRepository.findByParent(parentGoalId), goalFilterDto);
+    }
+
     public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto goalFilterDto){
         List<Goal> goals = goalRepository.findGoalsByUserId(userId)
                         .peek(goal -> goal.setSkillsToAchieve(skillRepository.findSkillsByGoalId(goal.getId())))
                 .toList();
 
-        return applyFilter(goals, goalFilterDto);
+        return applyFilter(goals.stream(), goalFilterDto);
     }
 
-    private List<GoalDto> applyFilter(List<Goal> goals, GoalFilterDto goalFilterDto){
+    private List<GoalDto> applyFilter(Stream<Goal> goals, GoalFilterDto goalFilterDto){
         List<GoalDto> list = goalFilters.stream()
                 .filter(goalFilter -> goalFilter.isApplicable(goalFilterDto))
-                .flatMap(goalFilter -> goalFilter.apply(goals.stream(), goalFilterDto))
+                .flatMap(goalFilter -> goalFilter.apply(goals, goalFilterDto))
                 .map(goalMapper::goalToDto)
                 .toList();
         return list;
-    }
-
-    private List<GoalDto> filterGoals(List<Goal> goals, GoalFilterDto goalFilterDto){
-        List<GoalDto> filteredGoals = goals.stream()
-                .filter(goal -> goal.getTitle().equals(goalFilterDto.getTitle()) && goal.getStatus().equals(goalFilterDto.getStatus()))
-                .map(goalMapper::goalToDto)
-                .toList();
-
-        return filteredGoals;
     }
 }

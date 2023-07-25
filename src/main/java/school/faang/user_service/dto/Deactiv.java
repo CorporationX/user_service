@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class DtoDeactiv {
+public class Deactiv {
     private String text;
+    private long id;
 }

@@ -47,7 +47,7 @@ public class SubscriptionService {
     }
 
     public int getFollowingCount(long followerId) {
-        validateUserId(followerId);
+        validateUserId( followerId);
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
     }
 

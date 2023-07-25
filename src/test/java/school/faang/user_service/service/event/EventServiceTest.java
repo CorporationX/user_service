@@ -18,6 +18,7 @@ import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.filter.event.EventIdFilter;
 import school.faang.user_service.filter.event.EventMaxAttendeesFilter;
 import school.faang.user_service.filter.event.EventTitleFilter;
+import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
@@ -46,6 +47,8 @@ class EventServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    private EventMapper eventMapper = EventMapper.INSTANCE;
 
     private EventService eventService;
 
@@ -254,6 +257,39 @@ class EventServiceTest {
 
         assertNotNull(eventDtos);
         assertEquals(participatedEvents.size(), eventDtos.size());
+    }
+
+    @Test
+    void updateEvent_ValidEventDto() {
+        Event event = createEvent();
+        EventDto eventDto = createEventDto();
+        eventDto.setTitle("Event2");
+        eventDto.setStartDate(LocalDate.of(2020, 3, 1).atStartOfDay());
+        eventDto.setRelatedSkills(List.of(new SkillDto(1L, "A")));
+
+        when(eventRepository.findById(eventDto.getId())).thenReturn(Optional.of(event));
+        when(eventRepository.save(any(Event.class))).thenReturn(eventMapper.toEntity(eventDto));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(createUser()));
+
+        EventDto updatedEvent = eventService.updateEvent(eventDto);
+
+        assertEquals(eventDto.getTitle(), updatedEvent.getTitle());
+        assertEquals(eventDto.getStartDate(), updatedEvent.getStartDate());
+        assertEquals(eventDto.getEndDate(), updatedEvent.getEndDate());
+        assertEquals(eventDto.getDescription(), updatedEvent.getDescription());
+        assertEquals(eventDto.getLocation(), updatedEvent.getLocation());
+        assertEquals(eventDto.getMaxAttendees(), updatedEvent.getMaxAttendees());
+        assertEquals(eventDto.getRelatedSkills(), updatedEvent.getRelatedSkills());
+    }
+
+    @Test
+    void updateEvent_EventNotFound() {
+        EventDto eventDto = createEventDto();
+        when(eventRepository.findById(eventDto.getId())).thenReturn(Optional.empty());
+        when(userRepository.findById(1L)).thenReturn(Optional.of(createUser()));
+
+        Exception exception = assertThrows(RuntimeException.class, () -> eventService.updateEvent(eventDto));
+        assertEquals("Event not found. ID: 1", exception.getMessage());
     }
 
     private EventDto createEventDto() {

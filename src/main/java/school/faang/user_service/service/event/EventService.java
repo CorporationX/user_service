@@ -1,6 +1,7 @@
 package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
@@ -14,6 +15,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.exception.DataValidException;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Stream;
@@ -67,7 +69,28 @@ public class EventService {
         return EventMapper.INSTANCE.toListDto(eventRepository.findParticipatedEventsByUserId(userId));
     }
 
-    private void validateEventDto(EventDto eventDto) {
+    public EventDto updateEvent(EventDto source) {
+        validateEventDto(source);
+
+        Event event = eventRepository.findById(source.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Event not found. ID: " + source.getId()));
+        EventDto target = eventMapper.toDto(event);
+
+        BeanUtils.copyProperties(source, target, "id", "relatedSkills");
+
+        if (source.getRelatedSkills() != null) {
+            List<SkillDto> sourceSkills = new ArrayList<>(source.getRelatedSkills());
+            sourceSkills.retainAll(target.getRelatedSkills());
+            if (!sourceSkills.isEmpty()) {
+                target.setRelatedSkills(source.getRelatedSkills());
+            }
+        }
+
+        Event result = eventRepository.save(eventMapper.toEntity(target));
+        return eventMapper.toDto(result);
+    }
+
+    private void validateEventDto(EventDto eventDto) throws DataFormatException {
         if (eventDto.getId() == null || eventDto.getId() < 1) {
             throw new DataValidException("Event Id must be greater than 0");
         }
@@ -85,11 +108,12 @@ public class EventService {
 
     private void checkUserContainsSkills(EventDto eventDto) {
         User user = userRepository.findById(eventDto.getOwnerId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("User not found. ID: " + eventDto.getOwnerId()));
 
         List<SkillDto> userSkills = skillMapper.toListSkillsDTO(user.getSkills());
-        if (!new HashSet<>(userSkills).containsAll(eventDto.getRelatedSkills())) {
-            throw new DataValidException("User has no related skills");
+        boolean anySkillMissing = eventDto.getRelatedSkills().stream().anyMatch(skill -> !userSkills.contains(skill));
+        if (anySkillMissing) {
+            throw new DataValidException("User has no related skills. Id: " + eventDto.getOwnerId());
         }
     }
 }

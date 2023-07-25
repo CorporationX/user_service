@@ -2,14 +2,13 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +26,7 @@ public class RecommendationRequestService {
         return recommendationRequestMapper.toDto(foundPerson);
     }
 
+    @Transactional
     public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
         validateRejectionDto(rejection);
 

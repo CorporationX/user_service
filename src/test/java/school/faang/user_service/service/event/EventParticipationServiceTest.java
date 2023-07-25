@@ -6,13 +6,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.commonMessages.ErrorMessagesForEvent;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.RegistrationUserForEventException;
+import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
 import java.text.MessageFormat;
@@ -31,9 +35,10 @@ class EventParticipationServiceTest {
     private long someUserId;
     private List<User> users;
 
-
     @Mock
     private EventParticipationRepository eventParticipationRepository;
+    @Spy
+    private EventMapper mapper = Mappers.getMapper(EventMapper.class);
     @InjectMocks
     private EventParticipationService eventParticipationService;
 
@@ -138,7 +143,7 @@ class EventParticipationServiceTest {
     void testGetParticipant() {
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(eventId))
                 .thenReturn(users);
-        List<User> expectedUsers = getUsers();
+        List<UserDto> expectedUsers = getUsersDto();
 
         assertEquals(expectedUsers, eventParticipationService.getParticipant(eventId));
     }
@@ -213,6 +218,14 @@ class EventParticipationServiceTest {
                 User.builder().id(EXISTING_USER_ID).build(),
                 User.builder().id(2L).build(),
                 User.builder().id(3L).build()
+        );
+    }
+
+    private List<UserDto> getUsersDto() {
+        return List.of(
+                UserDto.builder().id(EXISTING_USER_ID).build(),
+                UserDto.builder().id(2L).build(),
+                UserDto.builder().id(3L).build()
         );
     }
 }

@@ -48,4 +48,5 @@ public interface SkillRepository extends CrudRepository<Skill, Long> {
             WHERE gs.goal_id = ?1)
             """)
     List<Skill> findSkillsByGoalId(long goalId);
+
 }

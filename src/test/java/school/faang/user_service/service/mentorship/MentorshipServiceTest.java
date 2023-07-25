@@ -8,7 +8,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
-import school.faang.user_service.validator.mentorship.MentorshipValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +21,6 @@ class MentorshipServiceTest {
     private MentorshipService mentorshipService;
     @Mock
     private MentorshipRepository mentorshipRepository;
-    @Mock
-    private MentorshipValidator mentorshipValidator;
     private User mentor = new User();
     private User mentee = new User();
 
@@ -52,10 +49,6 @@ class MentorshipServiceTest {
                 .thenReturn(Optional.of(mentee));
         Mockito.when(mentorshipRepository.findById(mentorId))
                 .thenReturn(Optional.of(mentor));
-        Mockito.when(mentorshipValidator.findUserByIdValidate(Optional.of(mentee)))
-                .thenReturn(mentee);
-        Mockito.when(mentorshipValidator.findUserByIdValidate(Optional.of(mentor)))
-                .thenReturn(mentor);
     }
 
     @Test
@@ -64,8 +57,6 @@ class MentorshipServiceTest {
 
         Mockito.verify(mentorshipRepository, Mockito.times(1)).findById(menteeId);
         Mockito.verify(mentorshipRepository, Mockito.times(1)).findById(mentorId);
-        Mockito.verify(mentorshipValidator, Mockito.times(1)).findUserByIdValidate(Optional.of(mentee));
-        Mockito.verify(mentorshipValidator, Mockito.times(1)).findUserByIdValidate(Optional.of(mentor));
 
         assertTrue(requestFirst);
 
@@ -79,8 +70,6 @@ class MentorshipServiceTest {
 
         Mockito.verify(mentorshipRepository, Mockito.times(1)).findById(menteeId);
         Mockito.verify(mentorshipRepository, Mockito.times(1)).findById(mentorId);
-        Mockito.verify(mentorshipValidator, Mockito.times(1)).findUserByIdValidate(Optional.of(mentee));
-        Mockito.verify(mentorshipValidator, Mockito.times(1)).findUserByIdValidate(Optional.of(mentor));
 
         assertTrue(requestFirst);
 

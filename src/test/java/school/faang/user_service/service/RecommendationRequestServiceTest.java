@@ -6,22 +6,39 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
+import school.faang.user_service.dto.recommendation.RejectionDto;
+import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.entity.recommendation.SkillRequest;
+import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+
+
 @ExtendWith(MockitoExtension.class)
 class RecommendationRequestServiceTest {
-    @InjectMocks
-    private RecommendationRequestService recommendationRequestService;
-
     @Mock
     private RecommendationRequestRepository recommendationRequestRepository;
-
     @Mock
     private SkillRequestRepository skillRequestRepository;
-
+    @Spy
+    private RecommendationRequestMapper recommendationRequestMapper = RecommendationRequestMapper.INSTANCE;
+    @InjectMocks
+    private RecommendationRequestService recommendationRequestService;
 
     @Test
     void create_EmptyMessage_ThrowsIllegalArgumentException() {
@@ -35,36 +52,6 @@ class RecommendationRequestServiceTest {
         Mockito.verify(recommendationRequestRepository, Mockito.never()).create(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyString());
         Mockito.verify(skillRequestRepository, Mockito.never()).create(Mockito.anyLong(), Mockito.anyLong());
     }
-}
-
-import org.mockito.Spy;
-import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
-import school.faang.user_service.dto.recommendation.RejectionDto;
-import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.entity.recommendation.SkillRequest;
-import school.faang.user_service.mapper.RecommendationRequestMapper;
-import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
-
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-@ExtendWith(MockitoExtension.class)
-class RecommendationRequestServiceTest {
-    @Mock
-    private RecommendationRequestRepository recommendationRequestRepository;
-    @Spy
-    private RecommendationRequestMapper recommendationRequestMapper = RecommendationRequestMapper.INSTANCE;
-    @InjectMocks
-    private RecommendationRequestService recommendationRequestService;
 
     @Test
     void getRequestThrowsException() {

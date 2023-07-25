@@ -7,11 +7,6 @@ import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.mapper.RecommendationRequestMapper;
-import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
-import school.faang.user_service.dto.RecommendationRequestDto;
-import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.repository.UserRepository;
@@ -27,6 +22,8 @@ import java.util.Optional;
 public class RecommendationRequestService {
     private final RecommendationRequestRepository recommendationRequestRepository;
     private final RecommendationRequestMapper recommendationRequestMapper;
+    private final UserRepository userRepository;
+    private final SkillRequestRepository skillRequestRepository;
     private static final String MSG = "There is no recommendation with such id";
 
     public RecommendationRequestDto getRequest(long id) {
@@ -56,9 +53,7 @@ public class RecommendationRequestService {
             throw new IllegalArgumentException("Rejection and its reason must not be null or empty.");
         }
     }
-    private final SkillRequestRepository skillRequestRepository;
-    private final UserRepository userRepository;
-    private final RecommendationRequestMapper recommendationRequestMapper;
+
 
     @Transactional
     public void create(RecommendationRequestDto recommendationRequestDto) {
@@ -76,11 +71,11 @@ public class RecommendationRequestService {
         recommendationRequest.setUpdatedAt(LocalDateTime.now());
         recommendationRequest.setStatus(RequestStatus.PENDING);
 
-        RecommendationRequest savedRequest = recommendationRequestRepository.create(requesterId,receiverId, message);
+        RecommendationRequest savedRequest = recommendationRequestRepository.create(requesterId, receiverId, message);
 
         for (SkillRequest skillRequest : recommendationRequest.getSkills()) {
             skillRequest.setRequest(savedRequest);
-            skillRequestRepository.create(requesterId,skillRequest.getId());
+            skillRequestRepository.create(requesterId, skillRequest.getId());
         }
     }
 
@@ -106,7 +101,7 @@ public class RecommendationRequestService {
         if (recommendationRequestDto.getMessage() == null || recommendationRequestDto.getMessage().isEmpty()) {
             throw new IllegalArgumentException("Recommendation request message cannot be empty.");
         }
-        List<Long> skillsIds = recommendationRequestDto.getSkillsIds();
+        List<Long> skillsIds = recommendationRequestDto.getSkillsId();
         if (skillsIds == null || skillsIds.isEmpty()) {
             throw new IllegalArgumentException("Recommendation request must contain at least one skill.");
         }

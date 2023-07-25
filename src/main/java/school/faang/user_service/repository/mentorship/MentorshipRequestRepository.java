@@ -9,7 +9,7 @@ import school.faang.user_service.entity.MentorshipRequest;
 import java.util.Optional;
 
 @Repository
-public interface MentorshipRequestRepository extends JpaRepository<MentorshipRequest, Long> {
+public interface MentorshipRequestRepository extends CrudRepository<MentorshipRequest, Long> {
 
     @Query(nativeQuery = true, value = """
             INSERT INTO mentorship_request (requester_id, receiver_id, description, status, created_at, updated_at)

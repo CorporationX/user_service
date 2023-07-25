@@ -34,17 +34,7 @@ public class RecommendationRequestService {
         long receiverId = recommendationRequest.getReceiver().getId();
         String message = recommendationRequest.getMessage();
 
-        if (isUserNotExists(requesterId)) {
-            throw new IllegalArgumentException("Requester with such id: " + requesterId + " does not exist.");
-        }
-
-        if (isUserNotExists(receiverId)) {
-            throw new IllegalArgumentException("Receiver with such id: " + receiverId + " does not exist.");
-        }
-
-        if (hasPendingRequest(requesterId, receiverId)) {
-            throw new IllegalArgumentException("A recommendation request between the same users can only be sent once every six months.");
-        }
+        validate(requesterId, receiverId);
 
         recommendationRequest.setCreatedAt(LocalDateTime.now());
         recommendationRequest.setUpdatedAt(LocalDateTime.now());
@@ -55,6 +45,20 @@ public class RecommendationRequestService {
         for (SkillRequest skillRequest : recommendationRequest.getSkills()) {
             skillRequest.setRequest(savedRequest);
             skillRequestRepository.create(requesterId,skillRequest.getId());
+        }
+    }
+
+    private void validate(long requesterId, long receiverId) {
+        if (isUserNotExists(requesterId)) {
+            throw new IllegalArgumentException("Requester with such id: " + requesterId + " does not exist.");
+        }
+
+        if (isUserNotExists(receiverId)) {
+            throw new IllegalArgumentException("Receiver with such id: " + receiverId + " does not exist.");
+        }
+
+        if (hasPendingRequest(requesterId, receiverId)) {
+            throw new IllegalArgumentException("A recommendation request between the same users can only be sent once every six months.");
         }
     }
 

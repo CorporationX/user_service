@@ -1,6 +1,7 @@
 package school.faang.user_service.service.goal;
 
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalDto;
@@ -44,7 +45,7 @@ public class GoalService {
     }
 
     @Transactional
-    public GoalDto updateGoal(GoalDto goalDto) {
+    public GoalDto updateGoal(@Valid GoalDto goalDto) {
         return goalRepository.findById(goalDto.getId())
                 .stream()
                 .peek(existingGoal -> {

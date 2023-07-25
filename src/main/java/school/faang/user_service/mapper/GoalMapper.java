@@ -4,14 +4,13 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.entity.Skill;
-
+import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.entity.goal.Goal;
 
 @Component
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface SkillMapper {
+public interface GoalMapper {
 
-    SkillDto skillToDto(Skill skill);
-    Skill skillToEntity(SkillDto skillDto);
+    GoalDto goalToDto(Goal goal);
+    Goal goalToEntity(GoalDto goalDto);
 }

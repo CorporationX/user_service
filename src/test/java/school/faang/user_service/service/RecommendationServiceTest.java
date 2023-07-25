@@ -33,6 +33,7 @@ import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -131,6 +132,17 @@ class RecommendationServiceTest {
                 .build();
 
         assertThrows(DataValidationException.class, () -> recommendationService.create(recommendationDtoWithAuthor));
+    }
+
+    @Test
+    void createThrowExceptionWhenAuthorIdEqualsReceiverId() {
+        RecommendationDto fakeRecommendation = RecommendationDto.builder()
+                .authorId(2L)
+                .receiverId(2L)
+                .content("Hello")
+                .build();
+
+        assertThrows(DataValidationException.class, () -> recommendationService.create(fakeRecommendation));
     }
 
     @Test
@@ -260,7 +272,9 @@ class RecommendationServiceTest {
 
     @Test
     void testValidateRecommendationInvokesFindFirstByAuthorIdAndReceiverIdOrderByCreatedAtDescMethod() {
-        recommendationService.validateRecommendation(recommendationDto);
+        Mockito.when(userRepository.findById(recommendationDto.getReceiverId()))
+                .thenReturn(Optional.of(firstUser));
+        recommendationService.create(recommendationDto);
         Mockito.verify(recommendationRepository).findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(2, 3);
     }
 
@@ -333,11 +347,13 @@ class RecommendationServiceTest {
     }
 
     @Test
-    void getAllUserRecommendationsThrowDataValidationException() {
+    void getAllUserRecommendationsReturnEmptyList() {
         Mockito.when(recommendationRepository.findAllByReceiverId(1, Pageable.unpaged()))
                 .thenReturn(Page.empty());
 
-        assertThrows(DataValidationException.class, () -> recommendationService.getAllUserRecommendations(1));
+        List<RecommendationDto> userRecommendations = recommendationService.getAllUserRecommendations(1);
+
+        assertEquals(Collections.emptyList(), userRecommendations);
     }
 
     @Test
@@ -374,10 +390,12 @@ class RecommendationServiceTest {
     }
 
     @Test
-    void getAllGivenRecommendationsThrowDataValidationException() {
+    void getAllGivenRecommendationsReturnEmptyList() {
         Mockito.when(recommendationRepository.findAllByAuthorId(1, Pageable.unpaged()))
                 .thenReturn(Page.empty());
 
-        assertThrows(DataValidationException.class, () -> recommendationService.getAllGivenRecommendations(1));
+        List<RecommendationDto> givenRecommendations = recommendationService.getAllGivenRecommendations(1);
+
+        assertEquals(Collections.emptyList(), givenRecommendations);
     }
 }

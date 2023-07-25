@@ -20,6 +20,7 @@ import school.faang.user_service.repository.recommendation.RecommendationReposit
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,33 +60,32 @@ public class RecommendationService {
 
     public List<RecommendationDto> getAllUserRecommendations(long receiverId) {
         Page<Recommendation> userRecommendations = recommendationRepository.findAllByReceiverId(receiverId, Pageable.unpaged());
-        validatePageNotEmpty(userRecommendations);
-        return recommendationMapper.toRecommendationDtos(userRecommendations.getContent());
+        return userRecommendations.isEmpty() ? Collections.emptyList() : recommendationMapper.toRecommendationDtos(userRecommendations.getContent());
     }
 
     public List<RecommendationDto> getAllGivenRecommendations(long authorId) {
         Page<Recommendation> authorRecommendations = recommendationRepository.findAllByAuthorId(authorId, Pageable.unpaged());
-        validatePageNotEmpty(authorRecommendations);
-        return recommendationMapper.toRecommendationDtos(authorRecommendations.getContent());
+        return authorRecommendations.isEmpty() ? Collections.emptyList() : recommendationMapper.toRecommendationDtos(authorRecommendations.getContent());
     }
 
-    public void validateRecommendation(RecommendationDto recommendationDto) {
+    private void validateRecommendation(RecommendationDto recommendationDto) {
         if (recommendationDto.getAuthorId() == null) {
             throw new DataValidationException("Author ID must be specified");
         }
         if (recommendationDto.getReceiverId() == null) {
             throw new DataValidationException("Receiver ID must be specified");
         }
+        if (recommendationDto.getAuthorId().equals(recommendationDto.getReceiverId())) {
+            throw new DataValidationException("Author cannot be the same as the receiver");
+        }
         if (recommendationDto.getSkillOffers() != null) {
             Optional<Recommendation> recommendation = recommendationRepository.
                     findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(recommendationDto.getAuthorId(), recommendationDto.getReceiverId());
             if (recommendation.isPresent()) {
                 LocalDateTime recommendationCreateTime = recommendation.get().getCreatedAt();
-                boolean allSkillsExistInSystem = recommendationDto.getSkillOffers().stream()
-                        .allMatch(skill -> skillRepository.existsById(skill.getId()));
                 if (recommendationCreateTime.isAfter(LocalDateTime.now().minusMonths(6))) {
                     throw new DataValidationException("Recommendation must be given less then 6 months");
-                } else if (!allSkillsExistInSystem) {
+                } else if (!allSkillsExistInSystem(recommendationDto.getSkillOffers())) {
                     throw new DataValidationException("Some of the skills do not exist in our system");
                 }
             }
@@ -97,7 +97,7 @@ public class RecommendationService {
         List<Skill> offeredSkills = getOfferedSkillsFromDatabase(recommendationDto);
         userSkills.stream()
                 .flatMap(userSkill -> offeredSkills.stream()
-                        .filter(offeredSkill -> userSkill.getTitle().equals(offeredSkill.getTitle())))
+                        .filter(offeredSkill -> userSkill.getId() == offeredSkill.getId()))
                 .forEach(sameSkill -> {
                     if (isAuthorGuarantor(sameSkill, recommendationDto.getAuthorId())) {
                         User currentUser = userRepository.findById(recommendationDto.getReceiverId()).orElseThrow(() -> new EntityNotFoundException("Entity not found"));
@@ -126,9 +126,8 @@ public class RecommendationService {
                 .noneMatch(guaranteeId -> guaranteeId.equals(authorId));
     }
 
-    private void validatePageNotEmpty(Page<Recommendation> page) {
-        if (page.isEmpty()) {
-            throw new DataValidationException("No recommendations found for the user");
-        }
+    private boolean allSkillsExistInSystem(List<SkillOfferDto> skillOffers) {
+        return skillOffers.stream()
+                .allMatch(skill -> skillRepository.existsById(skill.getId()));
     }
 }

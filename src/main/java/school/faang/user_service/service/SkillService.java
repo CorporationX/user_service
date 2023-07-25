@@ -35,8 +35,7 @@ public class SkillService {
     @Transactional
     public SkillDto create(SkillDto skill) {
         if (skillRepository.existsByTitle(skill.getTitle())){
-            throw new DataValidationException(Message.SKILL_EXISTS_FORMAT + skill.getTitle());
-        }
+            throw new DataValidationException(Message.SKILL_EXISTS_FORMAT + skill.getTitle());        }
 
         Skill newSkill = skillMapper.skillToEntity(skill);
         skillRepository.save(newSkill);

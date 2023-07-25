@@ -10,7 +10,7 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public boolean findUserById(Long userId) {
+    public boolean isUserExist(Long userId) {
         return userRepository.existsById(userId);
     }
 }

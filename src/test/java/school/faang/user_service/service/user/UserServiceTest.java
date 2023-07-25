@@ -23,15 +23,15 @@ public class UserServiceTest {
     @DisplayName("Test: User exists")
     public void testFindUserByIdPositive() {
         Long userId = 1L;
-        when(userService.findUserById(userId)).thenReturn(true);
-        assertTrue(userService.findUserById(userId));
+        when(userService.isUserExist(userId)).thenReturn(true);
+        assertTrue(userService.isUserExist(userId));
     }
 
     @Test
     @DisplayName("Test: User does not exists")
     public void testFindUserByIdNegative() {
         Long userId = 1L;
-        when(userService.findUserById(userId)).thenReturn(false);
-        assertFalse(userService.findUserById(userId));
+        when(userService.isUserExist(userId)).thenReturn(false);
+        assertFalse(userService.isUserExist(userId));
     }
 }

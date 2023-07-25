@@ -8,6 +8,7 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.mapper.event.EventMapper;
 
 import java.time.LocalDate;
 import java.util.List;

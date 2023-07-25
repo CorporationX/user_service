@@ -8,7 +8,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
-import school.faang.user_service.validator.mentorship.MentorshipValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +21,6 @@ class MentorshipServiceTest {
     private MentorshipService mentorshipService;
     @Mock
     private MentorshipRepository mentorshipRepository;
-    @Mock
-    private MentorshipValidator mentorshipValidator;
 
     @BeforeEach
     void setUp() {
@@ -40,12 +37,9 @@ class MentorshipServiceTest {
 
         Mockito.when(mentorshipRepository.findById(mentorId))
                 .thenReturn(Optional.of(mentor));
-        Mockito.when(mentorshipValidator.findUserByIdValidate(Optional.of(mentor)))
-                .thenReturn(mentor);
 
         List<User> mentees = mentorshipService.getMentees(mentorId);
         Mockito.verify(mentorshipRepository, Mockito.times(1)).findById(mentorId);
-        Mockito.verify(mentorshipValidator, Mockito.times(1)).findUserByIdValidate(Optional.of(mentor));
 
         assertEquals(0, mentees.size());
 
@@ -65,12 +59,10 @@ class MentorshipServiceTest {
 
         Mockito.when(mentorshipRepository.findById(menteeId))
                 .thenReturn(Optional.of(mentee));
-        Mockito.when(mentorshipValidator.findUserByIdValidate(Optional.of(mentee)))
-                .thenReturn(mentee);
+
 
         List<User> mentees = mentorshipService.getMentors(menteeId);
         Mockito.verify(mentorshipRepository, Mockito.times(1)).findById(menteeId);
-        Mockito.verify(mentorshipValidator, Mockito.times(1)).findUserByIdValidate(Optional.of(mentee));
 
         assertEquals(0, mentees.size());
 

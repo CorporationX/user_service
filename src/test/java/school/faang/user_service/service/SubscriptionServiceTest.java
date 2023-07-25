@@ -48,12 +48,6 @@ class SubscriptionServiceTest {
         userFilterDto.setAboutPattern("I");
     }
 
-    //failTest
-    @Test
-    void failTestForCI(){
-        Assertions.fail();
-    }
-
     //positive
     @Test
     void followUserCallRepositoryMethod() {

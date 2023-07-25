@@ -29,7 +29,7 @@ public class SkillController {
         return skillService.create(skillDto);
     }
 
-    @GetMapping("/{userId}")
+    @PostMapping("/{userId}")
     public List<SkillDto> getUserSkills(@PathVariable Long userId) {
         validateId(userId);
         return skillService.getUserSkills(userId);

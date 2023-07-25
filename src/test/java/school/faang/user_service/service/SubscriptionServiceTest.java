@@ -51,7 +51,7 @@ class SubscriptionServiceTest {
     //failTest
     @Test
     void failTestForCI(){
-         Assertions.fail();
+        Assertions.fail();
     }
 
     //positive

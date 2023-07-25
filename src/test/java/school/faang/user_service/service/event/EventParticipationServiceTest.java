@@ -63,7 +63,7 @@ class EventParticipationServiceTest {
 
     @Test
     void testRegisterParticipant_WhenUserRegisteredAtEvent_ShouldThrowException() {
-        String expectedMessage = MessageFormat.format(USER_IS_ALREADY_REGISTERED_FORMAT, eventId, EXISTING_USER_ID);
+        String expectedMessage = MessageFormat.format(USER_IS_ALREADY_REGISTERED_FORMAT, EXISTING_USER_ID, eventId);
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(eventId))
                 .thenReturn(users);
 
@@ -110,7 +110,7 @@ class EventParticipationServiceTest {
     void testUnregisterParticipant_WhenUserNotRegisteredAtEvent_ShouldThrowException() {
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(eventId))
                 .thenReturn(users);
-        String expectedMessage = MessageFormat.format(USER_IS_NOT_REGISTERED_FORMAT, eventId, someUserId);
+        String expectedMessage = MessageFormat.format(USER_IS_NOT_REGISTERED_FORMAT, someUserId, eventId);
 
         Exception exc = assertThrows(RegistrationUserForEventException.class,
                 () -> eventParticipationService.unregisterParticipant(eventId, someUserId));

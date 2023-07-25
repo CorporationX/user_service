@@ -28,12 +28,11 @@ public class EventParticipationService {
         List<User> users = getParticipantsByEventId(eventId);
 
         if (isUserRegisteredForEvent(users, userId)) {
-            String errorMessage = MessageFormat.format(USER_IS_ALREADY_REGISTERED_FORMAT, eventId, userId);
+            String errorMessage = MessageFormat.format(USER_IS_ALREADY_REGISTERED_FORMAT, userId, eventId);
             throw new RegistrationUserForEventException(errorMessage);
         }
 
         eventParticipationRepository.register(eventId, userId);
-
     }
 
     @Transactional
@@ -42,7 +41,7 @@ public class EventParticipationService {
         List<User> users = getParticipantsByEventId(eventId);
 
         if (!isUserRegisteredForEvent(users, userId)) {
-            String errorMessage = MessageFormat.format(USER_IS_NOT_REGISTERED_FORMAT, eventId, userId);
+            String errorMessage = MessageFormat.format(USER_IS_NOT_REGISTERED_FORMAT, userId, eventId);
             throw new RegistrationUserForEventException(errorMessage);
         }
 

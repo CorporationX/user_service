@@ -46,6 +46,7 @@ public class GoalController {
 
     @GetMapping
     public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto goalFilterDto){
+      
         return goalService.getGoalsByUser(userId, goalFilterDto);
     }
 }

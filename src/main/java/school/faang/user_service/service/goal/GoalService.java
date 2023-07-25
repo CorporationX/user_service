@@ -4,10 +4,10 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.event.EventDto;
+
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
-import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -63,5 +63,12 @@ public class GoalService {
         return existingGoal;
     }
 
+    public void removeUserFromGoals(List<Long> goalIds, Long userId) {
+        List<Goal> goals = goalRepository.findAllById(goalIds);
 
+        goals.forEach(goal -> {
+            List<User> currentUsers = goal.getUsers();
+            goal.setUsers(currentUsers.stream().filter(user -> user.getId() != userId).toList());
+        });
+    }
 }

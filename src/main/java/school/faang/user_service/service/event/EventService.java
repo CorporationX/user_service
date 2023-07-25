@@ -13,9 +13,7 @@ import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 @Service
@@ -42,10 +40,10 @@ public class EventService {
         BeanUtils.copyProperties(source, target, "id", "relatedSkills");
 
         if (source.getRelatedSkills() != null) {
-            Set<SkillDto> skills1 = new HashSet<>(target.getRelatedSkills());
-            Set<SkillDto> skills2 = new HashSet<>(source.getRelatedSkills());
-            if (!skills1.equals(skills2)) {
-                target.setRelatedSkills(skills2.stream().toList());
+            List<SkillDto> sourceSkills = source.getRelatedSkills();
+            sourceSkills.retainAll(target.getRelatedSkills());
+            if (!sourceSkills.isEmpty()) {
+                target.setRelatedSkills(source.getRelatedSkills());
             }
         }
 
@@ -71,11 +69,12 @@ public class EventService {
 
     private void checkUserContainsSkills(EventDto eventDto) {
         User user = userRepository.findById(eventDto.getOwnerId())
-                .orElseThrow(() -> new RuntimeException("User not found. ID: " + eventDto.getOwnerId()));
+                .orElseThrow(() -> new IllegalArgumentException("User not found. ID: " + eventDto.getOwnerId()));
 
         List<SkillDto> userSkills = skillMapper.toListSkillsDTO(user.getSkills());
-        if (!new HashSet<>(userSkills).containsAll(eventDto.getRelatedSkills())) {
-            throw new DataValidException("User has no related skills");
+        boolean anySkillMissing = eventDto.getRelatedSkills().stream().anyMatch(skill -> !userSkills.contains(skill));
+        if (anySkillMissing) {
+            throw new DataValidException("User has no related skills. Id: " + eventDto.getOwnerId());
         }
     }
 }

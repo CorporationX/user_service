@@ -24,10 +24,10 @@ public class MentorshipRequestValidator {
             throw new IllegalArgumentException("You can not send request to yourself");
         }
         if (!userService.isUserExist(receiverId)) {
-            throw new IllegalArgumentException("Invalid request. Mentor user not found");
+            throw new IllegalArgumentException("Invalid request. Mentor with id: " +  requesterId + " not found");
         }
         if (!userService.isUserExist(requesterId)) {
-            throw new IllegalArgumentException("Invalid request. Mentee user not found");
+            throw new IllegalArgumentException("Invalid request. Mentee with id: " + " not found");
         }
 
         LocalDateTime threeMonthsAgo = LocalDateTime.now().minusMonths(3);

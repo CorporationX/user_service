@@ -6,10 +6,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -21,6 +23,8 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -79,7 +83,7 @@ public class GoalServiceTest {
         when(goalRepository.countActiveGoalsPerUser(userId)).thenReturn(5);
 
         assertThrows(IllegalArgumentException.class,
-                () -> goalService.createGoal(goalDto, userId, skills));
+                () -> goalService.createGoal(goalDto, userId));
     }
 
     @Test
@@ -96,7 +100,7 @@ public class GoalServiceTest {
         when(goalRepository.findById(existingGoalId)).thenReturn(Optional.of(existingGoal));
         when(goalRepository.save(Mockito.any(Goal.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        GoalDto result = goalService.updateGoal(newGoalDto, userId, skills);
+        GoalDto result = goalService.updateGoal(newGoalDto, userId);
 
         assertEquals(newGoalDto, result);
     }
@@ -109,7 +113,7 @@ public class GoalServiceTest {
         when(goalRepository.findById(goalId)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class,
-                () -> goalService.updateGoal(goalDto, userId, skills));
+                () -> goalService.updateGoal(goalDto, userId));
     }
 
     @Test
@@ -117,14 +121,11 @@ public class GoalServiceTest {
         Long goalId = 1L;
         Goal goal = new Goal();
         goal.setId(goalId);
-        GoalDto expectedDto = new GoalDto(goalId, title);
 
         when(goalRepository.findById(goalId)).thenReturn(Optional.of(goal));
-        when(goalMapper.goalToDto(goal)).thenReturn(expectedDto);
+        goalService.deleteGoal(goalId);
 
-        GoalDto result = goalService.deleteGoal(goalId);
-
-        assertEquals(expectedDto, result);
+        verify(goalRepository, times(1)).delete(goal);
     }
 
     @Test

@@ -54,6 +54,7 @@ public class MentorshipRequestFilterTest {
                 .description("another description")
                 .requester(requesterDto)
                 .receiver(receiverDto)
+                .updatedAt(LocalDateTime.now().minusMonths(3).truncatedTo(ChronoUnit.SECONDS))
                 .status(RequestStatus.ACCEPTED)
                 .build();
         dto3 = MentorshipRequestDto.builder()
@@ -64,14 +65,14 @@ public class MentorshipRequestFilterTest {
                 .status(RequestStatus.PENDING)
                 .build();
         dto4 = MentorshipRequestDto.builder()
-                .description("description")
+                .description("some description for test")
                 .requester(requesterDto)
                 .receiver(receiverDto)
                 .updatedAt(LocalDateTime.now().minusMonths(2).truncatedTo(ChronoUnit.SECONDS))
                 .status(RequestStatus.ACCEPTED)
                 .build();
         dto5 = MentorshipRequestDto.builder()
-                .description("   ")
+                .description("anything else")
                 .requester(receiverDto)
                 .receiver(receiverDto)
                 .updatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
@@ -98,7 +99,7 @@ public class MentorshipRequestFilterTest {
         filter.setDescription("description");
 
         List<MentorshipRequestDto> actualList = requestFilter.requestFiltering();
-        List<MentorshipRequestDto> expectedList = List.of(dto1, dto3, dto4);
+        List<MentorshipRequestDto> expectedList = List.of(dto1, dto2, dto3, dto4);
 
         assertEquals(expectedList, actualList);
     }
@@ -150,7 +151,7 @@ public class MentorshipRequestFilterTest {
         filter.setRequester(requesterDto);
 
         List<MentorshipRequestDto> actualList = requestFilter.requestFiltering();
-        List<MentorshipRequestDto> expectedList = List.of(dto1, dto4);
+        List<MentorshipRequestDto> expectedList = List.of(dto1, dto2, dto4);
 
         assertEquals(expectedList, actualList);
     }

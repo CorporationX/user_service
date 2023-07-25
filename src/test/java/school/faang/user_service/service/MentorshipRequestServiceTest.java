@@ -17,7 +17,6 @@ import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapperImpl;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-import school.faang.user_service.service.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
 
 import java.time.LocalDateTime;

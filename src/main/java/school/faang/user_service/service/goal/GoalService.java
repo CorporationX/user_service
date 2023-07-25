@@ -4,18 +4,12 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalDto;
-import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.util.Message;
-
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.List;
-
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +27,8 @@ public class GoalService {
 
         if (!allSkillsExist){
             throw new IllegalArgumentException(Message.UNEXISTING_SKILLS);
-        } else if (currentUserGoalNum > MAX_ACTIVE_GOALS){
+        }
+        if (currentUserGoalNum > MAX_ACTIVE_GOALS){
             throw new IllegalArgumentException(Message.TOO_MANY_GOALS);
         }
 
@@ -43,18 +38,18 @@ public class GoalService {
     }
 
     @Transactional
-    public GoalDto updateGoal(GoalDto goalDto, Long userId, List<String> skills) {
+    public GoalDto updateGoal(GoalDto goalDto, Long userId) {
         return goalRepository.findById(goalDto.getId())
-                .map(existingGoal -> {
+                .stream()
+                .peek(existingGoal -> {
                     existingGoal.setTitle(goalDto.getTitle());
                     existingGoal.setUpdatedAt(LocalDateTime.now());
-                    return existingGoal;
+                    goalRepository.save(existingGoal);
                 })
-                .map(goalRepository::save)
                 .map(goalMapper::goalToDto)
+                .findFirst()
                 .orElseThrow(() ->
-                        new IllegalArgumentException(MessageFormat.format("Goal{0} not found", goalDto.getId())));
+                        new IllegalArgumentException(MessageFormat.format("Goal {0} not found", goalDto.getId())));
 
     }
 }
-

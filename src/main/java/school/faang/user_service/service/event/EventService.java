@@ -16,7 +16,6 @@ import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.exception.DataValidException;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -90,7 +89,7 @@ public class EventService {
         return eventMapper.toDto(result);
     }
 
-    private void validateEventDto(EventDto eventDto) throws DataFormatException {
+    private void validateEventDto(EventDto eventDto) {
         if (eventDto.getId() == null || eventDto.getId() < 1) {
             throw new DataValidException("Event Id must be greater than 0");
         }

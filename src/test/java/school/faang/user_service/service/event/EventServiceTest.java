@@ -108,7 +108,7 @@ class EventServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(createUser()));
 
         Exception exception = assertThrows(DataValidException.class, () -> eventService.create(eventDto));
-        assertEquals("User has no related skills", exception.getMessage());
+        assertEquals("User has no related skills. Id: 1", exception.getMessage());
 
         verify(userRepository).findById(1L);
     }

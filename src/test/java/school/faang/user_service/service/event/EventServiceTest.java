@@ -83,7 +83,7 @@ class EventServiceTest {
     }
 
     @Test
-    public void invalid_NullStartDate() {
+    void invalid_NullStartDate() {
         EventDto eventDto = createEventDto();
         eventDto.setStartDate(null);
 
@@ -92,7 +92,7 @@ class EventServiceTest {
     }
 
     @Test
-    public void invalid_NullOwnerId() {
+    void invalid_NullOwnerId() {
         EventDto eventDto = createEventDto();
         eventDto.setOwnerId(null);
 
@@ -101,7 +101,7 @@ class EventServiceTest {
     }
 
     @Test
-    public void invalid_userNotContainsSkills() {
+    void invalid_userNotContainsSkills() {
         EventDto eventDto = createEventDto();
         eventDto.setRelatedSkills(List.of(new SkillDto(3L, "C"), new SkillDto(2L, "B")));
 

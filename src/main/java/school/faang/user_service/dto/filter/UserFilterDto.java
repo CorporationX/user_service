@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserFilterDto {
-    private String namePatter;
+    private String namePattern;
     private String aboutPattern;
     private String emailPattern;
     private String contactPattern;

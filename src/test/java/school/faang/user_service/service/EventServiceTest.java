@@ -67,34 +67,24 @@ public class EventServiceTest {
 
     private EventDto eventDto = EventDto.builder()
             .relatedSkills(
-                    List.of(
+                    new ArrayList<>(List.of(
                             SkillDto.builder().id(1L).title("1").build(),
                             SkillDto.builder().id(2L).title("2").build()
-                    )
+                    ))
             )
             .ownerId(1L)
             .id(1L)
             .build();
     private Event event = Event.builder()
             .relatedSkills(
-                    List.of(
+                    new ArrayList<>(List.of(
                             Skill.builder().id(1L).title("1").build(),
                             Skill.builder().id(2L).title("2").build()
-                    )
+                    ))
             )
             .id(1L)
             .owner(user2)
             .attendees(new ArrayList<>())
-            .build();
-    private Event eventWithoutAttendees = Event.builder()
-            .relatedSkills(
-                    List.of(
-                            Skill.builder().id(1L).title("1").build(),
-                            Skill.builder().id(2L).title("2").build()
-                    )
-            )
-            .id(1L)
-            .owner(user2)
             .build();
 
     @Test
@@ -143,16 +133,17 @@ public class EventServiceTest {
     @Test
     public void testUpdateEventOwnerHasSkills() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user2));
-        when(eventRepository.save(eventMapper.toEvent(eventDto))).thenReturn(event);
+        when(eventRepository.findById(1L)).thenReturn(Optional.ofNullable(event));
+        when(eventRepository.save(eventMapper.update(eventDto, event))).thenReturn(event);
         eventService.updateEvent(eventDto);
-        Mockito.verify(eventRepository, Mockito.times(1)).save(eventMapper.toEvent(eventDto));
+        Mockito.verify(eventRepository, Mockito.times(1)).save(eventMapper.update(eventDto, event));
     }
 
     @Test
     public void testUpdateEventReturnsNull() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user2));
-        when(eventRepository.save(eventMapper.toEvent(eventDto))).thenReturn(eventWithoutAttendees);
-        Assertions.assertEquals(0, eventService.updateEvent(eventDto));
+        when(eventRepository.findById(1L)).thenReturn(Optional.ofNullable(null));
+        Assertions.assertThrows(DataValidationException.class, () -> eventService.updateEvent(eventDto));
     }
 
     @Test

@@ -4,8 +4,7 @@ run-name: by @${{ github.actor }}
 
 on:
   pull_request:
-    branches:
-      - feature/pipeline-BC-3941
+    branches: [ pipeline-BC-3941 ]
 
 jobs:
   build:

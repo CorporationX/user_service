@@ -4,8 +4,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalDto;
-import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -22,7 +22,7 @@ public class GoalService {
     private final GoalMapper goalMapper;
 
     @Transactional
-    public GoalDto createGoal(GoalDto goal, Long userId){
+    public GoalDto createGoal(GoalDto goal, Long userId) {
         int currentUserGoalNum = goalRepository.countActiveGoalsPerUser(userId);
         boolean allSkillsExist = goal.getSkills().stream()
                 .allMatch(skill -> skillRepository.findByTitle(skill.toLowerCase()).isPresent());
@@ -52,16 +52,15 @@ public class GoalService {
                 .findFirst()
                 .orElseThrow(() ->
                         new IllegalArgumentException(MessageFormat.format("Goal {0} not found", goalDto.getId())));
+    }
 
     @Transactional
-    public GoalDto deleteGoal(Long goalId){
-        return goalRepository.findById(goalId)
-                .map(goal -> {
-                    goalRepository.delete(goal);
-                    return goalMapper.goalToDto(goal);
-                })
+    public void deleteGoal(Long goalId){
+        Goal goal = goalRepository.findById(goalId)
                 .orElseThrow(() ->
                         new IllegalArgumentException(MessageFormat.format("Goal {0} not found", goalId)));
+
+        goalRepository.delete(goal);
     }
 
     public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter){

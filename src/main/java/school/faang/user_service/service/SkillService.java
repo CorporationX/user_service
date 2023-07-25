@@ -3,6 +3,7 @@ package school.faang.user_service.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
@@ -55,6 +56,20 @@ public class SkillService {
                 .toList();
     }
 
+    public List<SkillCandidateDto> getOfferedSkills(Long userId) {
+        Map<Skill, Long> skillMap = skillRepository.findAllByUserId(userId)
+                .stream()
+                .collect(Collectors.groupingBy(skill -> skill, Collectors.counting()));
+
+        return skillMap.entrySet()
+                .stream()
+                .map(skillEntry -> SkillCandidateDto.builder()
+                        .skill(skillMapper.skillToDto(skillEntry.getKey()))
+                        .offersAmount(skillEntry.getValue())
+                        .build())
+                .toList();
+    }
+
     @Transactional
     public SkillDto acquireSkillFromOffers(Long skillId, Long userId) {
         Optional<Skill> optionalSkill = skillRepository.findUserSkill(skillId, userId);
@@ -104,6 +119,6 @@ public class SkillService {
                         .skill(skillMapper.skillToDto(skillEntry.getKey()))
                         .offersAmount(skillEntry.getValue())
                         .build())
-                .toList();
+               .toList();
     }
 }

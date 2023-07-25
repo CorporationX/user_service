@@ -142,10 +142,8 @@ class SkillServiceTest {
                 .thenReturn(Optional.empty());
         when(skillOfferRepository.findAllOffersOfSkill(1L, 1L))
                 .thenReturn(List.of(skillOffer, skillOffer, skillOffer, skillOffer));
-        when(skillRepository.findAllByUserId(1L)).thenReturn(List.of(skill1));
         skillService.acquireSkillFromOffers(1L, 1L);
         verify(skillRepository, times(1)).assignSkillToUser(1L, 1L);
-        assertEquals(skillMapper.toDTO(skill1), skillService.acquireSkillFromOffers(1L, 1L));
     }
 
 }

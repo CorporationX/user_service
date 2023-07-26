@@ -20,17 +20,13 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.validator.SkillValidator;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -62,16 +58,17 @@ class RecommendationServiceTest {
         recommendationDto.setSkillOffers(skills);
         DataValidationException ex = assertThrows(DataValidationException.class, () -> recommendationService.create(recommendationDto));
         assertEquals("list of skills contains not valid skills, please, check this", ex.getMessage());
-
     }
 
     @Test
     void createRecommendationTest() {
-
-        User user = User.builder().id(1L).skills(List.of(new Skill())).build();
+        User user = User.builder()
+                .id(1L)
+                .skills(List.of(new Skill())).build();
         Skill skill = Skill.builder()
                 .guarantees(new ArrayList<>(List.of(new UserSkillGuarantee()))).build();
         List<Skill> userSkills = new ArrayList<>();
+        user.setSkills(userSkills);
         userSkills.add(skill);
         List<SkillOfferDto> skills = new ArrayList<>();
         RecommendationDto recommendationDto = new RecommendationDto();
@@ -96,8 +93,10 @@ class RecommendationServiceTest {
         when(userSkillGuaranteeRepository.saveAll(anyList())).thenReturn(null);
         when(recommendationRepository.save(any(Recommendation.class))).thenReturn(recommendation);
         RecommendationDto result = recommendationService.create(recommendationDto);
-        System.out.println(result);
 
-
+        assertNotNull(result);
+        assertEquals(1, result.getAuthorId());
+        assertEquals(1, result.getReceiverId());
+        assertEquals(1, result.getSkillOffers().size());
     }
 }

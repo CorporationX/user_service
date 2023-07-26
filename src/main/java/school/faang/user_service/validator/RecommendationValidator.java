@@ -1,19 +1,18 @@
 package school.faang.user_service.validator;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 
 import java.time.LocalDateTime;
-
+@RequiredArgsConstructor
 @Component
 public class RecommendationValidator {
     private static final int RECOMMENDATION_PERIOD_IN_MONTH = 6;
 
-    @Autowired
-    private RecommendationRepository recommendationRepository;
+    private final RecommendationRepository recommendationRepository;
 
     public void validate(RecommendationDto recommendation) {
         if (recommendation.getContent() == null || recommendation.getContent().isBlank()) {
@@ -23,7 +22,7 @@ public class RecommendationValidator {
         recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(
                 recommendation.getAuthorId(),
                 recommendation.getReceiverId()
-        ).map(rec -> rec.getCreatedAt()
+        ).filter(rec -> rec.getCreatedAt()
                 .plusMonths(RECOMMENDATION_PERIOD_IN_MONTH)
                 .isAfter(LocalDateTime.now()))
                 .ifPresent(r -> {

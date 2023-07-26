@@ -12,23 +12,23 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Component
 public class SkillValidator {
-
-    private final SkillRepository skillRepository;
-
-    public void validate(List<SkillOfferDto> skills) {
-        if (skills !=null && !skills.isEmpty()) {
-            List<Long> skillIds = skills.stream()
-                    .map(SkillOfferDto::getId)
-                    .distinct()
-                    .collect(Collectors.toList());
-            if (skills.size() != skillIds.size()) {
-                throw new DataValidationException("list of skills contains not unique skills, please, check this");
-            }
-            if (!skillIds.isEmpty()) {
-                if (skillIds.size() != skillRepository.countExisting(skillIds)) {
-                    throw new DataValidationException("list of skills contains not valid skills, please, check this");
-                }
-            }
-        }
-    }
+//
+//    private final SkillRepository skillRepository;
+//
+//    public void validate(List<SkillOfferDto> skills) {
+//        if (skills !=null && !skills.isEmpty()) {
+//            List<Long> skillIds = skills.stream()
+//                    .map(SkillOfferDto::getId)
+//                    .distinct()
+//                    .collect(Collectors.toList());
+//            if (skills.size() != skillIds.size()) {
+//                throw new DataValidationException("list of skills contains not unique skills, please, check this");
+//            }
+//            if (!skillIds.isEmpty()) {
+//                if (skillIds.size() != skillRepository.countExisting(skillIds)) {
+//                    throw new DataValidationException("list of skills contains not valid skills, please, check this");
+//                }
+//            }
+//        }
+//    }
 }

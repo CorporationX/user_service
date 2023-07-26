@@ -47,6 +47,7 @@ public class SubscriptionService {
             throw new IllegalArgumentException("User id cannot be negative");
         }
     }
+
     public void followUser(long followerId, long followeeId) {
         validate(followerId, followeeId);
         subscriptionRepository.followUser(followerId, followeeId);
@@ -69,6 +70,7 @@ public class SubscriptionService {
     public int getFollowersCount(long followeeId) {
         return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
     }
+
     public int getFollowingCount(long followerId) {
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
     }

@@ -235,4 +235,14 @@ public class SubscriptionServiceTest {
 
         assertEquals(followersCount, result);
     }
+    @Test
+    void testGetFollowingCount() {
+        long followerId = 123;
+        int expectedCount = 10;
+        when(subscriptionRepository.findFolloweesAmountByFollowerId(followerId)).thenReturn(expectedCount);
+
+        int result = subscriptionService.getFollowingCount(followerId);
+
+        assertEquals(expectedCount, result);
+    }
 }

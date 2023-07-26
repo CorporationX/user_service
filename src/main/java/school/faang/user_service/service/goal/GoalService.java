@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -39,17 +40,14 @@ public class GoalService {
 
     @Transactional
     public GoalDto updateGoal(GoalDto goalDto, Long userId) {
-        return goalRepository.findById(goalDto.getId())
-                .stream()
-                .peek(existingGoal -> {
-                    existingGoal.setTitle(goalDto.getTitle());
-                    existingGoal.setUpdatedAt(LocalDateTime.now());
-                    goalRepository.save(existingGoal);
-                })
-                .map(goalMapper::goalToDto)
-                .findFirst()
-                .orElseThrow(() ->
-                        new IllegalArgumentException(MessageFormat.format("Goal {0} not found", goalDto.getId())));
+        Goal goal = goalRepository.findById(goalDto.getId())
+                .orElseThrow(() -> new  IllegalArgumentException(
+                        MessageFormat.format("Goal {0} not found", goalDto.getId())));
 
+        goal.setTitle(goalDto.getTitle());
+        goal.setUpdatedAt(LocalDateTime.now());
+        goalRepository.save(goal);
+
+        return goalMapper.goalToDto(goal);
     }
 }

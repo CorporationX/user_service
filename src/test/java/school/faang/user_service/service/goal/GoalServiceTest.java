@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -19,11 +20,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -57,6 +60,13 @@ class GoalServiceTest {
         List<GoalDto> result = goalService.getGoalsByUser(userId, filters);
 
         assertEquals(0, result.size());
+    }
+
+    @Test
+    void testGetGoalsByUserWithoutFilters() {
+        goalService.getGoalsByUser(1L);
+
+        verify(goalRepository, times(1)).findGoalsByUserId(1L);
     }
 
     @Test
@@ -128,9 +138,83 @@ class GoalServiceTest {
     }
 
     @Test
-    public void getAllGoalsByUserTest() {
+    public void testGetAllGoalsByUser() {
         goalService.getGoalsByUser(1L);
 
         verify(goalRepository, times(1)).findGoalsByUserId(1L);
+    }
+
+    @Test
+    public void testGetById() {
+        Goal running = new Goal();
+        running.setId(1L);
+        running.setTitle("Running");
+        running.setDescription("Running description");
+
+        when(goalRepository.findById(1L)).thenReturn(Optional.of(running));
+        goalService.get(1L);
+        Mockito.verify(goalMapper, Mockito.times(1)).toDto(running);
+    }
+
+    @Test
+    public void testUpdateGoal() {
+        Goal running = new Goal();
+        running.setId(1L);
+        running.setTitle("Running");
+        running.setDescription("Running description");
+
+        when(goalRepository.findById(1L)).thenReturn(Optional.of(running));
+
+        GoalDto goalToUpdate = new GoalDto();
+        goalToUpdate.setId(1L);
+        goalToUpdate.setTitle("Update goal");
+        goalToUpdate.setDescription("Update goal");
+
+        goalService.update(goalToUpdate);
+        Mockito.verify(goalMapper, Mockito.times(1)).update(goalMapper.toDto(running), goalToUpdate);
+        Mockito.verify(goalRepository, Mockito.times(1)).save(goalMapper.toEntity(goalMapper.toDto(running)));
+    }
+
+    @Test
+    public void removeUserFromGoalsTest() {
+        Goal running = new Goal();
+        Goal swimming = new Goal();
+        Goal coding = new Goal();
+        Goal relaxing = new Goal();
+
+        User alex = new User();
+        alex.setId(1L);
+
+        User blake = new User();
+        blake.setId(2L);
+
+        running.setId(1L);
+        running.setUsers(List.of(alex, blake));
+
+        swimming.setId(2L);
+        swimming.setUsers(List.of(alex, blake));
+
+        coding.setId(3L);
+        coding.setUsers(List.of(alex, blake));
+
+        relaxing.setId(4L);
+        relaxing.setUsers(List.of(alex, blake));
+
+        when(goalRepository.findAllById(List.of(1L, 2L, 3L, 4L))).thenReturn(List.of(running, swimming,coding, relaxing));
+
+        int removedUsersFromGoalCount = goalService.removeUserFromGoals(List.of(1L, 2L, 3L, 4L), 1L);
+
+        assertEquals(4, removedUsersFromGoalCount);
+        assertEquals(1, running.getUsers().size());
+        assertEquals(1, swimming.getUsers().size());
+        assertEquals(1, coding.getUsers().size());
+        assertEquals(1, relaxing.getUsers().size());
+    }
+
+    @Test
+    void testDeleteAllByIds() {
+        goalService.deleteAllByIds(List.of(1L, 2L, 3L, 4L));
+
+        verify(goalRepository, times(1)).deleteAllById(List.of(1L, 2L, 3L, 4L));
     }
 }

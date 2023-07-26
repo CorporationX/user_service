@@ -23,8 +23,8 @@ public class UserService {
   }
 
   private boolean isOnlyWithOneCurrentUser(GoalDto goal, Long userId) {
-    List<Long> goalIds = goal.getUserIds();
-    return goalIds.size() == 1 && Objects.equals(goalIds.get(0), userId);
+    List<Long> userIds = goal.getUserIds();
+    return userIds.size() == 1 && Objects.equals(userIds.get(0), userId);
   }
 
   private void stopUserGoals(Long userId) {

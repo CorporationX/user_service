@@ -1,19 +1,17 @@
 package school.faang.user_service.controller.user;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import school.faang.user_service.exception.DataValidationException;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.service.user.UserService;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class UserController {
   private final UserService userService;
-  public void deactivateUser(Long id) {
-    if (id == null) {
-      throw new DataValidationException("User ID is required!");
-    }
-
+  @PostMapping("/users/deactivate/${id}")
+  public void deactivateUser(@PathVariable Long id) {
     userService.deactivateUser(id);
   }
 }

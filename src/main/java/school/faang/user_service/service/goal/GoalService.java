@@ -63,12 +63,14 @@ public class GoalService {
         return existingGoal;
     }
 
-    public void removeUserFromGoals(List<Long> goalIds, Long userId) {
+    public int removeUserFromGoals(List<Long> goalIds, Long userId) {
         List<Goal> goals = goalRepository.findAllById(goalIds);
 
         goals.forEach(goal -> {
             List<User> currentUsers = goal.getUsers();
             goal.setUsers(currentUsers.stream().filter(user -> user.getId() != userId).toList());
         });
+
+        return goals.size();
     }
 }

@@ -10,4 +10,5 @@ class UserServiceTest {
     void getUsers() {
         assertTrue(true);
     }
+
 }

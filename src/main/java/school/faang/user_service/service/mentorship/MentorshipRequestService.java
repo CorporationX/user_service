@@ -54,8 +54,7 @@ public class MentorshipRequestService {
 
     @Transactional
     public void acceptRequest(long id) {
-        MentorshipRequest request = mentorshipRequestRepository.findById(id).
-                orElseThrow(() -> new DataValidationException("Request is not exist"));
+        MentorshipRequest request =requestFindById(id);
         mentorshipRequestValidator.acceptRequestValidator(request);
 
         User requester = request.getRequester();
@@ -74,11 +73,15 @@ public class MentorshipRequestService {
 
     @Transactional
     public void rejectRequest(long id, RejectionDto rejection) {
-        MentorshipRequest request = mentorshipRequestRepository.findById(id)
-                .orElseThrow(() -> new DataValidationException("Request is not exist"));
+        MentorshipRequest request = requestFindById(id);
         mentorshipRequestValidator.rejectRequestValidator(request);
 
         request.setStatus(RequestStatus.REJECTED);
         request.setRejectionReason(rejection.getReason());
+    }
+
+    private MentorshipRequest requestFindById(long id){
+        return mentorshipRequestRepository.findById(id)
+                .orElseThrow(() -> new DataValidationException("Request is not exist"));
     }
 }

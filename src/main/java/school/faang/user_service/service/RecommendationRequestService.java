@@ -3,11 +3,13 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.recommendation.RecommendationRequestFilterDto;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
+import school.faang.user_service.filter.recommendation.RecommendationRequestFilter;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
@@ -16,31 +18,41 @@ import school.faang.user_service.repository.recommendation.SkillRequestRepositor
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
 public class RecommendationRequestService {
     private final RecommendationRequestRepository recommendationRequestRepository;
     private final RecommendationRequestMapper recommendationRequestMapper;
+    private final List<RecommendationRequestFilter> recommendationRequestFilters;
     private final UserRepository userRepository;
     private final SkillRequestRepository skillRequestRepository;
     private static final String MSG = "There is no recommendation with such id";
 
     public RecommendationRequestDto getRequest(long id) {
-        RecommendationRequest foundPerson = recommendationRequestRepository.findById(id)
-                .orElseThrow(() -> {
-                    throw new IllegalStateException(MSG);
-                });
-
+        RecommendationRequest foundPerson = recommendationRequestRepository.findById(id).orElseThrow(() -> {
+            throw new IllegalStateException(MSG);
+        });
         return recommendationRequestMapper.toDto(foundPerson);
+    }
+
+    public List<RecommendationRequestDto> getRecommendationRequests(RecommendationRequestFilterDto filterDto) {
+        Stream<RecommendationRequest> recommendationRequests = recommendationRequestRepository.findAll().stream();
+
+        for (RecommendationRequestFilter filter : recommendationRequestFilters) {
+            if (filter.isApplicable(filterDto)) {
+                recommendationRequests = filter.apply(recommendationRequests, filterDto);
+            }
+        }
+        return recommendationRequestMapper.toDtoList(recommendationRequests.toList());
     }
 
     @Transactional
     public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
         validateRejectionDto(rejection);
 
-        RecommendationRequest request = recommendationRequestRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Recommendation with id: " + id + " does not exist"));
+        RecommendationRequest request = recommendationRequestRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Recommendation with id: " + id + " does not exist"));
 
         request.setStatus(RequestStatus.REJECTED);
         request.setRejectionReason(rejection.getReason());

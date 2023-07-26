@@ -1,12 +1,11 @@
 package school.faang.user_service.controller;
 
-import org.junit.Assert;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import school.faang.user_service.controller.recommendation.RecommendationRequestController;
+import school.faang.user_service.service.RecommendationRequestService;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.entity.RequestStatus;
@@ -62,7 +61,14 @@ public class RecommendationRequestControllerTest {
         recommendationRequestController.requestRecommendation(recommendationRequest);
         Mockito.verify(recommendationRequestService, Mockito.times(1)).create(recommendationRequest);
     }
-
+  
+    @Test
+    public void testSuccessfulRequestGetting() {
+        long id = 4;
+        recommendationRequestController.getRecommendationRequest(id);
+        Mockito.verify(recommendationRequestService, Mockito.times(1)).getRequest(id);
+    }
+  
     @Test
     public void testNullRejectionReasonIsInvalid() {
         long id = 12;
@@ -91,3 +97,4 @@ public class RecommendationRequestControllerTest {
         Mockito.verify(recommendationRequestService, Mockito.times(1)).rejectRequest(id, rejection);
     }
 }
+

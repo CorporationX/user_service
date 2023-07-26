@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.RecommendationRequestDto;
@@ -31,8 +32,16 @@ public class RecommendationRequestService {
 
         return recommendationRequestMapper.toDto(createdRequest);
     }
-
-    public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
+   
+    public RecommendationRequestDto getRequest(long id) {
+        RecommendationRequest request = recommendationRequestRepository.findById(id)
+                .orElseThrow(() -> {
+                    throw new EntityNotFoundException("Recommendation does not exist");
+                });
+        return recommendationRequestMapper.toDto(request);
+    }
+  
+  public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
         RecommendationRequest recommendationRequest = recommendationRequestRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Recommendation Request does not exist"));
 
@@ -45,5 +54,5 @@ public class RecommendationRequestService {
         } else {
             throw new EntityNotFoundException("The request has already been accepted or rejected");
         }
-    }
+  }
 }

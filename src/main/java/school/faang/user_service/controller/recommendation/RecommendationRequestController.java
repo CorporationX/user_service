@@ -19,8 +19,12 @@ public class RecommendationRequestController {
             return recommendationRequestService.create(recommendationRequest);
         }
     }
-
-    public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
+    
+    public RecommendationRequestDto getRecommendationRequest(long id) {
+        return recommendationRequestService.getRequest(id);
+    }
+  
+  public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
         if (rejection.getReason() == null || rejection.getReason().isBlank()) {
             throw new DataValidationException("Recommendation request rejection reason should not be empty");
         } else {

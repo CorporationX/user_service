@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
+
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.entity.RequestStatus;
@@ -96,12 +98,19 @@ public class RecommendationRequestServiceTest {
     }
 
     @Test
-    public void testRequestCreated() {
-        recommendationRequest.setRequesterId(135L);
-        recommendationRequest.setReceiverId(124L);
-        recommendationRequest.setMessage("recommendation");
-        recommendationRequestService.create(recommendationRequest);
-        Mockito.verify(recommendationRequestRepository, Mockito.times(1)).create(135L, 124L, "recommendation");
+    public void testRequestNotFound() {
+        long invalidId = 1236;
+        Assert.assertThrows(
+                EntityNotFoundException.class,
+                () -> recommendationRequestService.getRequest(invalidId)
+        );
+    }
+
+    @Test
+    public void testRequestFound() {
+        long validId = 55;
+        recommendationRequestService.getRequest(validId);
+        Mockito.verify(recommendationRequestRepository, Mockito.times(1)).findById(validId);
     }
 
     @Test

@@ -21,12 +21,8 @@ public class RecommendationRequestService {
 
         List<RecommendationRequest> allRecommendationRequests = (List<RecommendationRequest>) recommendationRequestRepository.findAll();
         recommendationRequestFilters.stream().filter(requestFilter -> requestFilter.isApplicable(filter))
-                .forEach(requestFilter -> requestFilter.apply(allRecommendationRequests.stream(), filter);
+                .forEach(requestFilter -> requestFilter.apply(allRecommendationRequests.stream(), filter));
 
         return allRecommendationRequests.stream().map(recommendationRequestMapper::toDto).toList();
     }
 }
-
-
-
-

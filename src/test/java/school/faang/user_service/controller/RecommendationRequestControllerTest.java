@@ -11,9 +11,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.service.RecommendationRequestService;
 import java.time.LocalDateTime;
 
-
 public class RecommendationRequestControllerTest {
-
     private RequestFilterDto filterDto;
     @Mock
     private RecommendationRequestService recommendationRequestService;

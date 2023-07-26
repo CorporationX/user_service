@@ -1,7 +1,9 @@
 package school.faang.user_service.controller.event;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.exception.DataValidationException;
@@ -10,15 +12,12 @@ import school.faang.user_service.service.event.EventService;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Controller
+@RestController
+@RequestMapping("api/v1/events")
+@RequiredArgsConstructor
 public class EventController {
   private final EventService eventService;
   private static final int MIN_NAME_LENGTH = 3;
-
-  @Autowired
-  public EventController(EventService eventService) {
-    this.eventService = eventService;
-  }
 
   private void validateTitle(String name) {
     if (name == null || name.length() < MIN_NAME_LENGTH) {
@@ -44,32 +43,39 @@ public class EventController {
     validateUserId(event.getOwnerId());
   }
 
-  public EventDto create(EventDto event) {
+  @PostMapping("")
+  public EventDto create(@RequestBody EventDto event) {
     validateEvent(event);
     return eventService.create(event);
   }
 
-  public void deleteEvent(Long id) {
+  @DeleteMapping("/{id}")
+  public void deleteEvent(@PathVariable Long id) {
     eventService.delete(id);
   }
 
-  public List<EventDto> getParticipationEvents(Long userId) {
+  @GetMapping("/participants/${userId}")
+  public List<EventDto> getParticipationEvents(@PathVariable Long userId) {
     return eventService.getParticipatedEvents(userId);
   }
 
-  public List<EventDto> getOwnedEvents(Long ownerId) {
+  @GetMapping("/owner/${ownerId}")
+  public List<EventDto> getOwnedEvents(@PathVariable Long ownerId) {
     return eventService.getOwnedEvents(ownerId);
   }
 
-  public List<EventDto> getEventsByFilter(EventFilterDto filter) {
+  @PostMapping("/filter")
+  public List<EventDto> getEventsByFilter(@RequestBody EventFilterDto filter) {
     return eventService.getEventsByFilter(filter);
   }
 
-  public EventDto getEvent(Long id) {
+  @GetMapping("/{id}")
+  public EventDto getEvent(@PathVariable Long id) {
     return eventService.get(id);
   }
 
-  public EventDto updateEvent(EventDto event) {
+  @PutMapping("/")
+  public EventDto updateEvent(@RequestBody EventDto event) {
     validateEvent(event);
     return eventService.updateEvent(event);
   }

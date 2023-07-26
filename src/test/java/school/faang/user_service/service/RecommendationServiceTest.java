@@ -31,16 +31,6 @@ public class RecommendationServiceTest {
     private RecommendationService recommendationService;
 
     @Test
-    public void testCreateShouldReturnDataValidationException() {
-        Assert.assertThrows(DataValidationException.class, () -> recommendationService.create(new RecommendationDto(1L,
-                2L,
-                3L,
-                null,
-                null,
-                LocalDateTime.now())));
-    }
-
-    @Test
     public void testCreateShouldReturnCannotBeEmptyMsg() {
         DataValidationException dataValidationException = Assert.assertThrows(DataValidationException.class,
                 () -> recommendationService

@@ -16,16 +16,14 @@ public class MentorshipController {
 
     @DeleteMapping("/mentee/{id}/mentor/{id}")
     public void deleteMentee(long menteeId, long mentorId) {
-        mentorshipValidator.idValidator(menteeId);
-        mentorshipValidator.idValidator(mentorId);
+        mentorshipValidator.equalsIdValidator(mentorId, menteeId);
 
         mentorshipService.deleteMentee(menteeId, mentorId);
     }
 
     @DeleteMapping("/mentor/{id}/mentee/{id}")
     public void deleteMentor(long mentorId, long menteeId) {
-        mentorshipValidator.idValidator(menteeId);
-        mentorshipValidator.idValidator(mentorId);
+        mentorshipValidator.equalsIdValidator(mentorId, menteeId);
 
         mentorshipService.deleteMentor(menteeId, mentorId);
     }

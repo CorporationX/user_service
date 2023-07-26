@@ -38,14 +38,5 @@ public class RecommendationRequestService {
             }
         }
         return recommendationRequestMapper.toDtoList(recommendationRequests.toList());
-
-// так вылетает ошибка, не понимаю почему
-        // stream has already been operated upon or closed
-        //java.lang.IllegalStateException: stream has already been operated upon or closed
-//        return recommendationRequestFilters.stream()
-//                .filter(requestFilter -> requestFilter.isApplicable(filterDto))
-//                .flatMap(requestFilter -> requestFilter.apply(recommendationRequests, filterDto))
-//                .map(recommendationRequestMapper::toDto)
-//                .toList();
     }
 }

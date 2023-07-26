@@ -10,6 +10,8 @@ import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 
 import java.time.LocalDateTime;
@@ -27,6 +29,10 @@ public class RecommendationServiceTest {
 
     @Mock
     private RecommendationRepository recommendationRepository;
+    @Mock
+    private SkillRepository skillRepository;
+    @Mock
+    private UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     @InjectMocks
     private RecommendationService recommendationService;
 

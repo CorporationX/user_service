@@ -46,9 +46,7 @@ public class GoalInvitationService {
     }
 
     public void acceptGoalInvitation(long id) {
-        GoalInvitation goalInvitation = goalInvitationRepository
-                .findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Invalid request. Requested goal invitation not found"));
+        GoalInvitation goalInvitation = findGoalInvitation(id);
 
         User invitedUser = goalInvitation.getInvited();
         Goal goal = goalInvitation.getGoal();
@@ -60,6 +58,17 @@ public class GoalInvitationService {
         invitedUser.getGoals().add(goal);
     }
 
+    public void rejectGoalInvitation(long id) {
+        GoalInvitation goalInvitation = findGoalInvitation(id);
+
+        if (goalRepository.existsById(goalInvitation.getGoal().getId())) {
+            goalInvitation.setStatus(RequestStatus.REJECTED);
+            goalInvitationRepository.save(goalInvitation);
+        } else {
+            throw new EntityNotFoundException("Invalid request. Requested goal not found");
+        }
+    }
+
     private void validateGoalInvitation(User user, Goal goal) {
         if (!goalRepository.existsById(goal.getId())) {
             throw new EntityNotFoundException("Invalid request. Requested goal not found");
@@ -68,5 +77,11 @@ public class GoalInvitationService {
         } else if (user.getGoals().contains(goal)) {
             throw new IllegalArgumentException("The user is already working on this goal");
         }
+    }
+
+    private GoalInvitation findGoalInvitation(long id) {
+        return goalInvitationRepository
+                .findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Invalid request. Requested goal invitation not found"));
     }
 }

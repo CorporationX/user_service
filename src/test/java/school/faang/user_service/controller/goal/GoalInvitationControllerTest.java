@@ -43,4 +43,18 @@ class GoalInvitationControllerTest {
 
         Mockito.verify(goalInvitationService, Mockito.times(1)).acceptGoalInvitation(id);
     }
+
+    @Test
+    public void testRejectGoalInvitationThrowIllegalExc() {
+        Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> goalInvitationController.rejectGoalInvitation(-1L));
+    }
+
+    @Test
+    public void testRejectGoalInvitationCallRejectGoalInvitation() {
+        goalInvitationController.rejectGoalInvitation(1L);
+
+        Mockito.verify(goalInvitationService, Mockito.times(1)).rejectGoalInvitation(1L);
+    }
 }

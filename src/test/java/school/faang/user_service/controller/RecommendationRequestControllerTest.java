@@ -33,6 +33,10 @@ public class RecommendationRequestControllerTest {
                 .receiverId(11L)
                 .createdAt(LocalDateTime.now().minusMonths(1))
                 .build();
+
+        rejection = RejectionDto.builder()
+                .reason("reason")
+                .build();
     }
 
     @Test
@@ -57,6 +61,26 @@ public class RecommendationRequestControllerTest {
     public void testRecommendationRequestCreated() {
         recommendationRequestController.requestRecommendation(recommendationRequest);
         Mockito.verify(recommendationRequestService, Mockito.times(1)).create(recommendationRequest);
+    }
+
+    @Test
+    public void testNullRejectionReasonIsInvalid() {
+        long id = 12;
+        rejection.setReason(null);
+        Assert.assertThrows(
+                DataValidationException.class,
+                () -> recommendationRequestController.rejectRequest(id, rejection)
+        );
+    }
+
+    @Test
+    public void testEmptyRejectionReasonIsInvalid() {
+        long id = 12;
+        rejection.setReason("");
+        Assert.assertThrows(
+                DataValidationException.class,
+                () -> recommendationRequestController.rejectRequest(id, rejection)
+        );
     }
 
     @Test

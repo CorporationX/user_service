@@ -12,7 +12,7 @@ import school.faang.user_service.service.RecommendationRequestService;
 public class RecommendationRequestController {
     private final RecommendationRequestService recommendationRequestService;
 
-    public RecommendationRequestDto requestRecommendation (RecommendationRequestDto recommendationRequest) {
+    public RecommendationRequestDto requestRecommendation(RecommendationRequestDto recommendationRequest) {
         if (recommendationRequest.getMessage() == null || recommendationRequest.getMessage().isBlank()) {
             throw new DataValidationException("Recommendation request message should not be empty");
         } else {
@@ -20,7 +20,11 @@ public class RecommendationRequestController {
         }
     }
 
-    public RecommendationRequestDto rejectRequest (long id, RejectionDto rejection) {
-        return recommendationRequestService.rejectRequest(id, rejection);
+    public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
+        if (rejection.getReason() == null || rejection.getReason().isBlank()) {
+            throw new DataValidationException("Recommendation request rejection reason should not be empty");
+        } else {
+            return recommendationRequestService.rejectRequest(id, rejection);
+        }
     }
 }

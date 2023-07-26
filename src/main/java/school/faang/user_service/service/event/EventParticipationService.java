@@ -14,12 +14,26 @@ public class EventParticipationService {
     private final EventParticipationRepository eventParticipationRepository;
 
     public void registerParticipant(Long eventId, Long userId) {
+        if (!isUserRegistered(eventId, userId)) {
+            throw new DataValidationException("User already registered");
+        }
+        eventParticipationRepository.register(eventId, userId);
+    }
+
+    public void unregisterParticipant(Long eventId, Long userId) {
+        if (isUserRegistered(eventId, userId)) {
+            throw new DataValidationException("User not registered");
+        }
+        eventParticipationRepository.unregister(eventId, userId);
+    }
+
+    private boolean isUserRegistered(Long eventId, Long userId) {
         List<User> users = eventParticipationRepository.findAllParticipantsByEventId(eventId);
         for (User user : users) {
             if (user.getId() == userId) {
-                throw new DataValidationException("User already registered");
+                return false;
             }
         }
-        eventParticipationRepository.register(eventId, userId);
+        return true;
     }
 }

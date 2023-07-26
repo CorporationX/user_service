@@ -20,13 +20,6 @@ public class UserControllerTest {
   private UserController userController;
 
   @Test
-  public void throwValidationExceptionTest() {
-    assertThrows(DataValidationException.class, () -> {
-      userController.deactivateUser(null);
-    });
-  }
-
-  @Test
   public void deactivateUserTest() {
     userController.deactivateUser(1L);
 

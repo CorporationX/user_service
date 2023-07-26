@@ -120,6 +120,5 @@ public class SkillService {
                         .offersAmount(skillEntry.getValue())
                         .build())
                 .toList();
-
     }
 }

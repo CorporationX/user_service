@@ -1,19 +1,16 @@
 package school.faang.user_service.service;
 
 import org.junit.Assert;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
-import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,10 +19,10 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(value = {MockitoExtension.class})
 public class RecommendationServiceTest {
 
     @Mock
@@ -33,13 +30,8 @@ public class RecommendationServiceTest {
     @InjectMocks
     private RecommendationService recommendationService;
 
-    @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
-
     @Test
-    public void create_shouldReturnDataValidationException() {
+    public void testCreateShouldReturnDataValidationException() {
         Assert.assertThrows(DataValidationException.class, () -> recommendationService.create(new RecommendationDto(1L,
                 2L,
                 3L,
@@ -49,7 +41,7 @@ public class RecommendationServiceTest {
     }
 
     @Test
-    public void create_shouldReturnCannotBeEmptyMsg() {
+    public void testCreateShouldReturnCannotBeEmptyMsg() {
         DataValidationException dataValidationException = Assert.assertThrows(DataValidationException.class,
                 () -> recommendationService
                         .create(new RecommendationDto(1L,
@@ -64,7 +56,7 @@ public class RecommendationServiceTest {
     }
 
     @Test
-    public void create_shouldReturnEarlyThan6MonthsMsg() {
+    public void testCreateShouldReturnEarlyThan6MonthsMsg() {
         RecommendationDto recommendationDto = new RecommendationDto();
         recommendationDto.setAuthorId(1L);
         recommendationDto.setReceiverId(2L);
@@ -88,7 +80,7 @@ public class RecommendationServiceTest {
     }
 
     @Test
-    public void create_shouldReturnRecommendationId() {
+    public void testCreateShouldReturnRecommendationId() {
         RecommendationDto recommendationDto = new RecommendationDto();
         recommendationDto.setAuthorId(anyLong());
         recommendationDto.setReceiverId(anyLong());

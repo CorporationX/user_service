@@ -69,14 +69,14 @@ public class SubscriptionServiceTest {
         );
     }
 
-    static List<User> users() {
+    private List<User> users() {
         return List.of(
                 User.builder().username("Silvester").build(),
                 User.builder().username("Ferdinant").build()
         );
     }
 
-    static List<UserDto> usersDto() {
+    private List<UserDto> usersDto() {
         return List.of(
                 UserDto.builder().username("Silvester").build(),
                 UserDto.builder().username("Ferdinant").build()

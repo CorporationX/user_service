@@ -34,7 +34,6 @@ public class GoalService {
     private final CreateGoalMapper createGoalMapper;
     private final List<GoalFilter> goalFilters;
     private final int MAX_GOALS_PER_USER = 3;
-    private final UserRepository userRepository;
 
     @Transactional
     public void deleteGoal(long goalId) {

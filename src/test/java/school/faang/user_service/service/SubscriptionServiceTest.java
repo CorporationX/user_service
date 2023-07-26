@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.subscription.UserDto;
 import school.faang.user_service.dto.subscription.UserFilterDto;
@@ -16,6 +17,7 @@ import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.contact.Contact;
+import school.faang.user_service.exception.DataValidException;
 import school.faang.user_service.filter.user.*;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
@@ -173,5 +175,39 @@ public class SubscriptionServiceTest {
                 () -> assertEquals(1, result.size()),
                 () -> assertEquals(user1, result.get(0))
         );
+    }
+
+    @Test
+    public void testFollowUser_ThrowsExceptionOnExistingSubscription() {
+        long followerId = 1L;
+        long followeeId = 2L;
+
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
+
+        assertThrows(DataValidException.class, () -> subscriptionService.followUser(followerId, followeeId));
+
+        verify(subscriptionRepository, times(1)).existsByFollowerIdAndFolloweeId(anyLong(), anyLong());
+        verify(subscriptionRepository, never()).followUser(anyLong(), anyLong());
+    }
+
+    @Test
+    public void testFollowUser_ThrowsExceptionOnSelfSubscription() {
+        long followerId = 1L;
+
+        assertThrows(DataValidException.class, () -> subscriptionService.followUser(followerId, followerId));
+        verify(subscriptionRepository, never()).followUser(anyLong(), anyLong());
+    }
+
+    @Test
+    public void testFollowUser_CallsRepositoryOnValidSubscription() {
+        long followerId = 1L;
+        long followeeId = 2L;
+
+        Mockito.when(subscriptionRepository.existsByFollowerIdAndFolloweeId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(false);
+
+        subscriptionService.followUser(followerId, followeeId);
+
+        Mockito.verify(subscriptionRepository, Mockito.times(1)).existsByFollowerIdAndFolloweeId(followerId, followeeId);
+        Mockito.verify(subscriptionRepository, Mockito.times(1)).followUser(followerId, followeeId);
     }
 }

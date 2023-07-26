@@ -16,15 +16,25 @@ import java.util.stream.Collectors;
 public interface RecommendationRequestMapper {
     @Mapping(target = "requesterId", source = "requester.id")
     @Mapping(target = "receiverId", source = "receiver.id")
+    @Mapping(target = "recommendationId", source = "recommendation.id")
     @Mapping(target = "skillsId", source = "skills", qualifiedByName = "skillsToIds")
     RecommendationRequestDto toDto(RecommendationRequest recommendationRequest);
 
+    @Mapping(target = "requesterId", source = "requester.id")
+    @Mapping(target = "receiverId", source = "receiver.id")
+    @Mapping(target = "recommendationId", source = "recommendation.id")
+    @Mapping(target = "skillsId", source = "skills", qualifiedByName = "skillsToIds")
+    List<RecommendationRequestDto> toDtoList(List<RecommendationRequest> recommendationRequestDto);
+
     @Named("skillsToIds")
     default List<Long> skillsToIds(List<SkillRequest> skills) {
-        if (skills == null){
+        if (skills == null) {
             return null;
         }
 
-        return skills.stream().map(SkillRequest::getId).toList();
+        return skills.stream()
+                .map(SkillRequest::getId)
+                .collect(Collectors.toList());
     }
+
 }

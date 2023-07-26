@@ -7,12 +7,14 @@ import org.mockito.Mockito;
 import school.faang.user_service.controller.recommendation.RecommendationRequestController;
 import school.faang.user_service.service.RecommendationRequestService;
 import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.RecommendationRequestService;
 import java.time.LocalDateTime;
 
 public class RecommendationRequestControllerTest {
+    private RejectionDto rejection;
     private RecommendationRequestDto recommendationRequest;
     @Mock
     private RecommendationRequestService recommendationRequestService;
@@ -29,6 +31,10 @@ public class RecommendationRequestControllerTest {
                 .requesterId(4L)
                 .receiverId(11L)
                 .createdAt(LocalDateTime.now().minusMonths(1))
+                .build();
+
+        rejection = RejectionDto.builder()
+                .reason("reason")
                 .build();
     }
 
@@ -55,12 +61,40 @@ public class RecommendationRequestControllerTest {
         recommendationRequestController.requestRecommendation(recommendationRequest);
         Mockito.verify(recommendationRequestService, Mockito.times(1)).create(recommendationRequest);
     }
-
+  
     @Test
     public void testSuccessfulRequestGetting() {
         long id = 4;
         recommendationRequestController.getRecommendationRequest(id);
         Mockito.verify(recommendationRequestService, Mockito.times(1)).getRequest(id);
+    }
+  
+    @Test
+    public void testNullRejectionReasonIsInvalid() {
+        long id = 12;
+        rejection.setReason(null);
+        Assert.assertThrows(
+                DataValidationException.class,
+                () -> recommendationRequestController.rejectRequest(id, rejection)
+        );
+    }
+
+    @Test
+    public void testEmptyRejectionReasonIsInvalid() {
+        long id = 12;
+        rejection.setReason("");
+        Assert.assertThrows(
+                DataValidationException.class,
+                () -> recommendationRequestController.rejectRequest(id, rejection)
+        );
+    }
+
+    @Test
+    public void testRecommendationRequestRejected() {
+        long id = 12;
+        rejection = RejectionDto.builder().reason("reason").build();
+        recommendationRequestController.requestRecommendation(recommendationRequest);
+        Mockito.verify(recommendationRequestService, Mockito.times(1)).rejectRequest(id, rejection);
     }
 }
 

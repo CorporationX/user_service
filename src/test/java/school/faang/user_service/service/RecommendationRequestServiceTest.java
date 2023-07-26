@@ -9,7 +9,9 @@ import org.mockito.Mockito;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 
 import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.repository.SkillRepository;
@@ -21,6 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 public class RecommendationRequestServiceTest {
     private RecommendationRequestDto recommendationRequest;
+    private RecommendationRequest requestData;
+    private RejectionDto rejection;
     @Mock
     private UserRepository userRepository;
     @Mock
@@ -107,5 +111,23 @@ public class RecommendationRequestServiceTest {
         long validId = 55;
         recommendationRequestService.getRequest(validId);
         Mockito.verify(recommendationRequestRepository, Mockito.times(1)).findById(validId);
+    }
+
+    @Test
+    public void testRequestForRejectionNotFound() {
+        long id = 0;
+        rejection = RejectionDto.builder().reason("reason").build();
+        Assert.assertThrows(
+                EntityNotFoundException.class,
+                () -> recommendationRequestService.rejectRequest(id, rejection)
+        );
+    }
+
+    @Test
+    public void testRequestRejected() {
+        long id = 123;
+        rejection = RejectionDto.builder().reason("reason").build();
+        recommendationRequestService.rejectRequest(id, rejection);
+        Mockito.verify(recommendationRequestRepository, Mockito.times(1)).save(requestData);
     }
 }

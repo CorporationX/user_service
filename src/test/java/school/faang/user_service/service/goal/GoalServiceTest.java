@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -145,6 +146,7 @@ class GoalServiceTest {
     }
 
     @Test
+    @DisplayName("Should return goal by id")
     public void testGetById() {
         Goal running = new Goal();
         running.setId(1L);
@@ -157,6 +159,7 @@ class GoalServiceTest {
     }
 
     @Test
+    @DisplayName("Should update goal successfully")
     public void testUpdateGoal() {
         Goal running = new Goal();
         running.setId(1L);
@@ -176,6 +179,7 @@ class GoalServiceTest {
     }
 
     @Test
+    @DisplayName("Should remove specific user from goal.users list, if users > 2")
     public void removeUserFromGoalsTest() {
         Goal running = new Goal();
         Goal swimming = new Goal();
@@ -212,6 +216,7 @@ class GoalServiceTest {
     }
 
     @Test
+    @DisplayName("Should call goalRepository.deleteAllById")
     void testDeleteAllByIds() {
         goalService.deleteAllByIds(List.of(1L, 2L, 3L, 4L));
 

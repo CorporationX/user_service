@@ -210,4 +210,18 @@ public class SubscriptionServiceTest {
         Mockito.verify(subscriptionRepository, Mockito.times(1)).existsByFollowerIdAndFolloweeId(followerId, followeeId);
         Mockito.verify(subscriptionRepository, Mockito.times(1)).followUser(followerId, followeeId);
     }
+    @Test
+    public void testUnfollowUser_ThrowsExceptionOnSelfUnfollow() {
+        long userId = 1;
+        assertThrows(DataValidationException.class, () -> subscriptionService.unfollowUser(userId, userId));
+    }
+
+    @Test
+    public void testUnfollowUser_CallsRepositoryOnValidUnfollow() {
+        long followerId = 1;
+        long followeeId = 2;
+
+        subscriptionService.unfollowUser(followerId, followeeId);
+        verify(subscriptionRepository, times(1)).unfollowUser(followerId, followeeId);
+    }
 }

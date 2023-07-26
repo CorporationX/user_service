@@ -25,4 +25,8 @@ public class SubscriptionController {
     public void followUser(long followerId, long followeeId) {
         subscriptionService.followUser(followerId, followeeId);
     }
+    public void unfollowUser(long followerId, long followeeId) {
+
+        subscriptionService.unfollowUser(followerId, followeeId);
+    }
 }

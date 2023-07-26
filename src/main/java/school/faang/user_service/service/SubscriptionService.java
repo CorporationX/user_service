@@ -57,7 +57,12 @@ public class SubscriptionService {
             throw new DataValidException("Subscription already exists");
         }
         if (followerId == followeeId) {
-            throw new DataValidException("User can't subscribe on itself");
+            throw new DataValidException("User can't subscribe or unsubscribe on itself");
         }
+    }
+
+    public void unfollowUser(long followerId, long followeeId) {
+        validate(followerId, followeeId);
+        subscriptionRepository.unfollowUser(followerId, followeeId);
     }
 }

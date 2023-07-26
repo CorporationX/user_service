@@ -8,9 +8,10 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exeption.DataValidationException;
+import school.faang.user_service.filters.user.UserFilter;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
-
-
+import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(value = {MockitoExtension.class})
@@ -21,10 +22,12 @@ public class SubscriptionServiceTest {
     private SubscriptionService subscriptionService;
     private User user1;
     private User user2;
+    private UserMapper userMapper;
+    private List<UserFilter> userFilterList;
 
     @BeforeEach
     public void setUp() {
-        subscriptionService = new SubscriptionService(subscriptionRepository);
+        subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, userFilterList);
         user1 = User.builder().id(Mockito.anyLong() + 1).build();
         user2 = User.builder().id(Mockito.anyLong() + 1).build();
     }

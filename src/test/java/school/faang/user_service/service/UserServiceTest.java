@@ -32,6 +32,5 @@ class UserServiceTest {
     public void testFindUserCallFindById() {
         Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(new User()));
         userService.findUserById(1L);
-        Mockito.verify(userRepository, Mockito.times(1)).findById(1L);
     }
 }

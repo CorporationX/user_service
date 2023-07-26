@@ -16,18 +16,11 @@ public interface EventMapper {
     EventMapper INSTANCE = Mappers.getMapper(EventMapper.class);
 
     @Mapping(source = "owner.id", target = "ownerId")
-    @Mapping(source = "relatedSkills", target = "relatedSkills")
     EventDto toDto(Event event);
 
     @Mapping(source = "ownerId", target = "owner.id")
-    @Mapping(source = "relatedSkills", target = "relatedSkills")
     Event toEntity(EventDto eventDto);
 
     @Mapping(source = "owner.id", target = "ownerId")
-    @Mapping(source = "relatedSkills", target = "relatedSkills")
     List<EventDto> toListDto(List<Event> events);
-
-    @Mapping(source = "ownerId", target = "owner.id")
-    @Mapping(source = "relatedSkills", target = "relatedSkills")
-    List<Event> toListEntity(List<EventDto> eventDtoList);
 }

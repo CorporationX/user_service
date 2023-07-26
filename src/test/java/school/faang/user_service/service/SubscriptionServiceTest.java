@@ -224,4 +224,15 @@ public class SubscriptionServiceTest {
         subscriptionService.unfollowUser(followerId, followeeId);
         verify(subscriptionRepository, times(1)).unfollowUser(followerId, followeeId);
     }
+    @Test
+    void testGetFollowersCount() {
+        long followeeId = 123;
+        int followersCount = 42;
+
+        when(subscriptionRepository.findFollowersAmountByFolloweeId(followeeId)).thenReturn(followersCount);
+
+        int result = subscriptionService.getFollowersCount(followeeId);
+
+        assertEquals(followersCount, result);
+    }
 }

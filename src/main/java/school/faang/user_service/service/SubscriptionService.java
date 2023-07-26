@@ -65,4 +65,7 @@ public class SubscriptionService {
         validate(followerId, followeeId);
         subscriptionRepository.unfollowUser(followerId, followeeId);
     }
+    public int getFollowersCount(long followeeId) {
+        return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
+    }
 }

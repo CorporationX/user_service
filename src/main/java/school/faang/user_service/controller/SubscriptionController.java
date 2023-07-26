@@ -29,4 +29,7 @@ public class SubscriptionController {
 
         subscriptionService.unfollowUser(followerId, followeeId);
     }
+    public int getFollowersCount(long followerId) {
+        return subscriptionService.getFollowersCount(followerId);
+    }
 }

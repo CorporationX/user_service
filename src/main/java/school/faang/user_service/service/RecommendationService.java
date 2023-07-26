@@ -45,6 +45,10 @@ public class RecommendationService {
         return recommendationMapper.toDto(recommendationRepository.save(recommendation));
     }
 
+    public void delete(Long id) {
+        recommendationRepository.deleteById(id);
+    }
+
     private void addGuarantee(Recommendation recommendation, List<Skill> offeredSkills) {
         List<Skill> receiverSkills = recommendation.getReceiver().getSkills();
         List<UserSkillGuarantee> userSkillGuarantees = new ArrayList<>();

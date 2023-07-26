@@ -18,5 +18,10 @@ import school.faang.user_service.validator.RecommendationValidator;
             recommendationValidator.validate(recommendation);
             return ResponseEntity.ok(recommendationService.create(recommendation));
         }
+
+        public ResponseEntity deleteRecommendation(Long id) {
+            recommendationService.delete(id);
+            return ResponseEntity.ok().build();
+        }
     }
 

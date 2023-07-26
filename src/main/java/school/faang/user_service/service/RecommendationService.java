@@ -1,6 +1,8 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
@@ -43,6 +45,11 @@ public class RecommendationService {
         addGuarantee(recommendation, offeredSkills);
         recommendation.setSkillOffers(offeredSkills.stream().map(skill -> SkillOffer.builder().skill(skill).build()).collect(Collectors.toList()));
         return recommendationMapper.toDto(recommendationRepository.save(recommendation));
+    }
+
+    public Page<RecommendationDto> getAllUserRecommendations(Long receiverId, Pageable pageable) {
+        Page<Recommendation> page = recommendationRepository.findAllByReceiverId(receiverId, pageable);
+        return page.map(recommendationMapper::toDto);
     }
 
     private void addGuarantee(Recommendation recommendation, List<Skill> offeredSkills) {

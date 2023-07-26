@@ -62,12 +62,6 @@ class UserServiceTest {
 
         when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.empty());
 
-        List<SkillOffer> skillOffers = List.of(
-                mock(SkillOffer.class),
-                mock(SkillOffer.class),
-                mock(SkillOffer.class)
-        );
-
         skillRepository.assignSkillToUser(skillId, userId);
 
         Skill assignedSkill = createSkill(skillId, "test");

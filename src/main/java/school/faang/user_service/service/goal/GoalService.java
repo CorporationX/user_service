@@ -4,13 +4,13 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.util.Message;
-
-import java.util.List;
-
+import java.text.MessageFormat;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -28,12 +28,26 @@ public class GoalService {
 
         if (!allSkillsExist){
             throw new IllegalArgumentException(Message.UNEXISTING_SKILLS);
-        } else if (currentUserGoalNum > MAX_ACTIVE_GOALS){
+        }
+        if (currentUserGoalNum > MAX_ACTIVE_GOALS){
             throw new IllegalArgumentException(Message.TOO_MANY_GOALS);
         }
 
         goalRepository.save(goalMapper.goalToEntity(goal));
 
         return goal;
+    }
+
+    @Transactional
+    public GoalDto updateGoal(GoalDto goalDto, Long userId) {
+        Goal goal = goalRepository.findById(goalDto.getId())
+                .orElseThrow(() -> new  IllegalArgumentException(
+                        MessageFormat.format("Goal {0} not found", goalDto.getId())));
+
+        goal.setTitle(goalDto.getTitle());
+        goal.setUpdatedAt(LocalDateTime.now());
+        goalRepository.save(goal);
+
+        return goalMapper.goalToDto(goal);
     }
 }

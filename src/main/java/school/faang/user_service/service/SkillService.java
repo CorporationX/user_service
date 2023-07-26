@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +36,8 @@ public class SkillService {
     @Transactional
     public SkillDto create(SkillDto skill) {
         if (skillRepository.existsByTitle(skill.getTitle())){
-            throw new DataValidationException(Message.SKILL_EXISTS_FORMAT + skill.getTitle());        }
+            throw new DataValidationException(Message.SKILL_EXISTS_FORMAT + skill.getTitle());
+        }
 
         Skill newSkill = skillMapper.skillToEntity(skill);
         skillRepository.save(newSkill);
@@ -104,5 +106,19 @@ public class SkillService {
         skill.addGuarantees(newGuarantees);
 
         return skill;
+    }
+
+    public List<SkillCandidateDto> getOfferedSkills(Long userId) {
+        Map<Skill, Long> skillMap = skillRepository.findAllByUserId(userId)
+                .stream()
+                .collect(Collectors.groupingBy(skill -> skill, Collectors.counting()));
+
+        return skillMap.entrySet()
+                .stream()
+                .map(skillEntry -> SkillCandidateDto.builder()
+                        .skill(skillMapper.skillToDto(skillEntry.getKey()))
+                        .offersAmount(skillEntry.getValue())
+                        .build())
+                .toList();
     }
 }

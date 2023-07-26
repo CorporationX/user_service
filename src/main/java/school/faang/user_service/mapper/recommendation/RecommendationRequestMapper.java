@@ -1,0 +1,24 @@
+package school.faang.user_service.mapper.recommendation;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
+import school.faang.user_service.entity.recommendation.RecommendationRequest;
+
+import java.util.List;
+
+@Mapper(componentModel = "spring", unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
+public interface RecommendationRequestMapper {
+
+    @Mapping(target = "requesterId", source = "requester.id")
+    @Mapping(target = "receiverId", source = "receiver.id")
+    RecommendationRequestDto toDto(RecommendationRequest request);
+
+    @Mapping(target = "requester", ignore = true)
+    @Mapping(target = "receiver", ignore = true)
+    RecommendationRequest toEntity(RecommendationRequestDto request);
+
+    List<RecommendationRequest> toEntityList(List<RecommendationRequestDto> request);
+
+    List<RecommendationRequestDto> toDtoList(List<RecommendationRequest> request);
+}

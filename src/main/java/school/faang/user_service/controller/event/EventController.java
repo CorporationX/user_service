@@ -43,7 +43,7 @@ public class EventController {
     validateUserId(event.getOwnerId());
   }
 
-  @PostMapping("")
+  @PostMapping("/")
   public EventDto create(@RequestBody EventDto event) {
     validateEvent(event);
     return eventService.create(event);
@@ -54,12 +54,12 @@ public class EventController {
     eventService.delete(id);
   }
 
-  @GetMapping("/participants/${userId}")
+  @GetMapping("/participants/{userId}")
   public List<EventDto> getParticipationEvents(@PathVariable Long userId) {
     return eventService.getParticipatedEvents(userId);
   }
 
-  @GetMapping("/owner/${ownerId}")
+  @GetMapping("/owner/{ownerId}")
   public List<EventDto> getOwnedEvents(@PathVariable Long ownerId) {
     return eventService.getOwnedEvents(ownerId);
   }

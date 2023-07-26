@@ -18,5 +18,10 @@ import school.faang.user_service.validator.RecommendationValidator;
             recommendationValidator.validate(recommendation);
             return ResponseEntity.ok(recommendationService.create(recommendation));
         }
+
+        public ResponseEntity<RecommendationDto> updateRecommendation(RecommendationDto updated) {
+            recommendationValidator.validate(updated);
+            return ResponseEntity.ok(recommendationService.update(updated));
+        }
     }
 

@@ -15,6 +15,7 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
+import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,13 +26,18 @@ import java.util.stream.Collectors;
 public class RecommendationService {
     private final RecommendationRepository recommendationRepository;
     private final SkillRepository skillRepository;
+    private final SkillOfferRepository skillOfferRepository;
     private final UserRepository userRepository;
     private final RecommendationMapper recommendationMapper;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
 
     public RecommendationDto create(RecommendationDto recommendationDto) {
-        List<SkillOfferDto> skillOfferDtos = recommendationDto.getSkillOffers();
-        validate(skillOfferDtos);
+        Recommendation recommendation = saveNewRecommendation(recommendationDto);
+        saveNewSkillOffers(recommendationDto);
+        return recommendationMapper.toDto(recommendationRepository.save(recommendation));
+    }
+
+    private Recommendation saveNewRecommendation(RecommendationDto recommendationDto) {
         Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
         User author = userRepository.findById(recommendationDto.getAuthorId()).orElseThrow();
         User receiver = userRepository.findById(recommendationDto.getReceiverId()).orElseThrow();
@@ -39,9 +45,29 @@ public class RecommendationService {
         recommendation.setReceiver(receiver);
         recommendation.setContent(recommendationDto.getContent());
         recommendation.setCreatedAt(recommendationDto.getCreatedAt());
+        return recommendation;
+    }
+
+    private Recommendation saveNewSkillOffers(RecommendationDto recommendationDto) {
+        Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
+        List<SkillOfferDto> skillOfferDtos = recommendationDto.getSkillOffers();
+        validate(skillOfferDtos);
         List<Skill> offeredSkills = skillRepository.findAllById(skillOfferDtos.stream().map(SkillOfferDto::getSkillId).collect(Collectors.toList()));
         addGuarantee(recommendation, offeredSkills);
         recommendation.setSkillOffers(offeredSkills.stream().map(skill -> SkillOffer.builder().skill(skill).build()).collect(Collectors.toList()));
+        return recommendation;
+    }
+
+    public RecommendationDto update(RecommendationDto updated) {
+    Recommendation recommendation = recommendationRepository.findById(updated.getId()).orElseThrow();
+        recommendationRepository.update(
+                updated.getAuthorId(),
+                updated.getReceiverId(),
+                updated.getContent()
+        );
+
+        skillOfferRepository.deleteAllByRecommendationId(recommendation.getId());
+        saveNewSkillOffers(updated);
         return recommendationMapper.toDto(recommendationRepository.save(recommendation));
     }
 

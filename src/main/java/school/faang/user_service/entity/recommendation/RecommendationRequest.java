@@ -21,7 +21,7 @@ public class RecommendationRequest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "requester_id", nullable = false)

@@ -52,6 +52,12 @@ public class RecommendationService {
         return page.map(recommendationMapper::toDto);
     }
 
+
+    public Page<RecommendationDto> getAllGivenRecommendations(Long authorId, Pageable pageable) {
+        Page<Recommendation> page = recommendationRepository.findAllByAuthorId(authorId, pageable);
+        return page.map(recommendationMapper::toDto);
+    }
+
     private void addGuarantee(Recommendation recommendation, List<Skill> offeredSkills) {
         List<Skill> receiverSkills = recommendation.getReceiver().getSkills();
         List<UserSkillGuarantee> userSkillGuarantees = new ArrayList<>();

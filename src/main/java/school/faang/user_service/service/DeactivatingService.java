@@ -11,7 +11,6 @@ import school.faang.user_service.exception.DataValidException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,23 +20,11 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class DeactivatingService {
 
-//    findUserById
-//
-//    updateGoal
-//
-//    updateEvent
-//
-//    deleteGoalById
-//
-//    deleteEventById
-
     private final UserRepository userRepository;
 
     private final EventRepository eventRepository;
 
     private final GoalRepository goalRepository;
-
-    private final MentorshipRepository mentorshipRepository;
 
     @Transactional
     public Deactiv deactivatingTheUser(long userId) {

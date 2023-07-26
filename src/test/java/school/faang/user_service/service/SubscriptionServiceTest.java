@@ -1,5 +1,7 @@
 package school.faang.user_service.service;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -7,12 +9,15 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.subscription.UserDto;
 import school.faang.user_service.dto.subscription.UserFilterDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.contact.Contact;
+import school.faang.user_service.exception.DataValidException;
 import school.faang.user_service.filter.user.*;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
@@ -66,6 +71,29 @@ public class SubscriptionServiceTest {
         );
     }
 
+    private List<User> users() {
+        return List.of(
+                User.builder().username("Silvester").build(),
+                User.builder().username("Ferdinant").build()
+        );
+    }
+
+    private List<UserDto> usersDto() {
+        return List.of(
+                UserDto.builder().username("Silvester").build(),
+                UserDto.builder().username("Ferdinant").build()
+        );
+    }
+
+    @BeforeEach
+    void setUp() {
+        List<UserFilter> userFilters = List.of(
+                new UserNameFilter(),
+                new UserAboutFilter()
+        );
+        subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, userFilters);
+    }
+
     @Test
     void getFollowersThrowIllegalException() {
         int idUser = -10;
@@ -74,14 +102,40 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void testGetFollowersInvokesFindByFolloweeId() {
+    public void testGetFollowersInvokes() {
         long followeeId = 1L;
         UserFilterDto filterDto = new UserFilterDto();
-        when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(Stream.empty());
+        filterDto.setNamePattern("F");
+        when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(users().stream());
+        when(userMapper.toDtoList(List.of(users().get(1)))).thenReturn(List.of(usersDto().get(1)));
 
-        subscriptionService.getFollowers(followeeId, filterDto);
+        List<UserDto> result = subscriptionService.getFollowers(followeeId, filterDto);
 
+        Assertions.assertEquals(1, result.size());
+        Assertions.assertEquals("Ferdinant", result.get(0).getUsername());
         verify(subscriptionRepository, times(1)).findByFolloweeId(followeeId);
+    }
+
+    @Test
+    void getFollowingThrowIllegalException() {
+        int idUser = -10;
+        assertThrows(IllegalArgumentException.class,
+                () -> subscriptionService.getFollowing(idUser, new UserFilterDto()));
+    }
+
+    @Test
+    public void testGetFollowingInvokes() {
+        long followeeId = 1L;
+        UserFilterDto filterDto = new UserFilterDto();
+        filterDto.setNamePattern("F");
+        when(subscriptionRepository.findByFollowerId(followeeId)).thenReturn(users().stream());
+        when(userMapper.toDtoList(List.of(users().get(1)))).thenReturn(List.of(usersDto().get(1)));
+
+        List<UserDto> result = subscriptionService.getFollowing(followeeId, filterDto);
+
+        Assertions.assertEquals(1, result.size());
+        Assertions.assertEquals("Ferdinant", result.get(0).getUsername());
+        verify(subscriptionRepository, times(1)).findByFollowerId(followeeId);
     }
 
     @ParameterizedTest
@@ -121,5 +175,77 @@ public class SubscriptionServiceTest {
                 () -> assertEquals(1, result.size()),
                 () -> assertEquals(user1, result.get(0))
         );
+    }
+
+    @Test
+    public void testFollowUser_ThrowsExceptionOnExistingSubscription() {
+        long followerId = 1L;
+        long followeeId = 2L;
+
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
+
+        assertThrows(DataValidException.class, () -> subscriptionService.followUser(followerId, followeeId));
+
+        verify(subscriptionRepository, times(1)).existsByFollowerIdAndFolloweeId(anyLong(), anyLong());
+        verify(subscriptionRepository, never()).followUser(anyLong(), anyLong());
+    }
+
+    @Test
+    public void testFollowUser_ThrowsExceptionOnSelfSubscription() {
+        long followerId = 1L;
+
+        assertThrows(DataValidException.class, () -> subscriptionService.followUser(followerId, followerId));
+        verify(subscriptionRepository, never()).followUser(anyLong(), anyLong());
+    }
+
+    @Test
+    public void testFollowUser_CallsRepositoryOnValidSubscription() {
+        long followerId = 1L;
+        long followeeId = 2L;
+
+        Mockito.when(subscriptionRepository.existsByFollowerIdAndFolloweeId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(false);
+
+        subscriptionService.followUser(followerId, followeeId);
+
+        Mockito.verify(subscriptionRepository, Mockito.times(1)).existsByFollowerIdAndFolloweeId(followerId, followeeId);
+        Mockito.verify(subscriptionRepository, Mockito.times(1)).followUser(followerId, followeeId);
+    }
+
+    @Test
+    public void testUnfollowUser_ThrowsExceptionOnSelfUnfollow() {
+        long userId = 1;
+        assertThrows(DataValidException.class, () -> subscriptionService.unfollowUser(userId, userId));
+    }
+
+    @Test
+    public void testUnfollowUser_CallsRepositoryOnValidUnfollow() {
+        long followerId = 1;
+        long followeeId = 2;
+
+        subscriptionService.unfollowUser(followerId, followeeId);
+        verify(subscriptionRepository, times(1)).unfollowUser(followerId, followeeId);
+    }
+
+    @Test
+    void testGetFollowersCount() {
+        long followeeId = 123;
+        int followersCount = 42;
+
+        when(subscriptionRepository.findFollowersAmountByFolloweeId(followeeId)).thenReturn(followersCount);
+
+        int result = subscriptionService.getFollowersCount(followeeId);
+
+        assertEquals(followersCount, result);
+    }
+
+    @Test
+    void testGetFollowingCount() {
+        long followerId = 123;
+        int expectedCount = 10;
+        when(subscriptionRepository.findFolloweesAmountByFollowerId(followerId)).thenReturn(expectedCount);
+
+        int result = subscriptionService.getFollowingCount(followerId);
+
+        assertEquals(expectedCount, result);
     }
 }

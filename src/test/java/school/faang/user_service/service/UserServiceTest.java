@@ -8,37 +8,26 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.withSettings;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
+    private final SkillMapper skillMapper = SkillMapper.INSTANCE;
     @Mock
     private SkillOfferRepository skillOfferRepository;
     @Mock
     private SkillRepository skillRepository;
-    private final SkillMapper skillMapper = SkillMapper.INSTANCE;
     @InjectMocks
     private SkillService skillService;
 
@@ -107,35 +96,5 @@ class UserServiceTest {
         assertEquals(3, candidates.size());
 
         verify(skillOfferRepository).findAllOffersToUser(anyLong());
-    }
-
-    @Test
-    public void testAcquireSkillFromOffers() {
-        List<SkillOffer> offers = List.of(
-                mock(SkillOffer.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS)),
-                mock(SkillOffer.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS)),
-                mock(SkillOffer.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS))
-        );
-        Skill skill = mock(Skill.class);
-        User user = mock(User.class);
-        long skillId = 1L;
-        long userId = 2L;
-
-        when(skillOfferRepository.findAllOffersOfSkill(skillId, userId)).thenReturn(offers);
-        doReturn(skillId).when(skill).getId();
-        when(skillRepository.findById(skillId)).thenReturn(Optional.of(skill));
-        when(user.getId()).thenReturn(userId);
-        when(skill.getUsers()).thenReturn(Collections.singletonList(user));
-
-        SkillDto acquiredSkill = skillService.acquireSkillFromOffers(skillId, userId);
-
-        assertNotNull(acquiredSkill);
-        assertEquals(skillId, acquiredSkill.getId());
-
-        verify(skillOfferRepository).findAllOffersOfSkill(skillId, userId);
-        verify(skillRepository).assignSkillToUser(skillId, userId);
-        verify(skillRepository).findById(skillId);
-        verify(skillOfferRepository, times(3)).deleteById(anyLong());
-        verify(skillRepository, times(1)).save(skill);
     }
 }

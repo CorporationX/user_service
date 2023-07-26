@@ -17,8 +17,4 @@ public interface RecommendationRequestMapper {
     @Mapping(target = "requester", ignore = true)
     @Mapping(target = "receiver", ignore = true)
     RecommendationRequest toEntity(RecommendationRequestDto request);
-
-    List<RecommendationRequest> toEntityList(List<RecommendationRequestDto> request);
-
-    List<RecommendationRequestDto> toDtoList(List<RecommendationRequest> request);
 }

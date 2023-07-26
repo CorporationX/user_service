@@ -213,7 +213,7 @@ public class SubscriptionServiceTest {
     @Test
     public void testUnfollowUser_ThrowsExceptionOnSelfUnfollow() {
         long userId = 1;
-        assertThrows(DataValidationException.class, () -> subscriptionService.unfollowUser(userId, userId));
+        assertThrows(DataValidException.class, () -> subscriptionService.unfollowUser(userId, userId));
     }
 
     @Test

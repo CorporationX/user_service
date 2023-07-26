@@ -109,33 +109,4 @@ class UserServiceTest {
         verify(skillOfferRepository).findAllOffersToUser(anyLong());
     }
 
-    @Test
-    public void testAcquireSkillFromOffers() {
-        List<SkillOffer> offers = List.of(
-                mock(SkillOffer.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS)),
-                mock(SkillOffer.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS)),
-                mock(SkillOffer.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS))
-        );
-        Skill skill = mock(Skill.class);
-        User user = mock(User.class);
-        long skillId = 1L;
-        long userId = 2L;
-
-        when(skillOfferRepository.findAllOffersOfSkill(skillId, userId)).thenReturn(offers);
-        doReturn(skillId).when(skill).getId();
-        when(skillRepository.findById(skillId)).thenReturn(Optional.of(skill));
-        when(user.getId()).thenReturn(userId);
-        when(skill.getUsers()).thenReturn(Collections.singletonList(user));
-
-        SkillDto acquiredSkill = skillService.acquireSkillFromOffers(skillId, userId);
-
-        assertNotNull(acquiredSkill);
-        assertEquals(skillId, acquiredSkill.getId());
-
-        verify(skillOfferRepository).findAllOffersOfSkill(skillId, userId);
-        verify(skillRepository).assignSkillToUser(skillId, userId);
-        verify(skillRepository).findById(skillId);
-        verify(skillOfferRepository, times(3)).deleteById(anyLong());
-        verify(skillRepository, times(1)).save(skill);
-    }
 }

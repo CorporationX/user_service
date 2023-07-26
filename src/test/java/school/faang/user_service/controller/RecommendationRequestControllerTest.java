@@ -9,14 +9,16 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.controller.recommendation.RecommendationRequestController;
 import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.dto.rejection.RejectionDto;
 import school.faang.user_service.service.RecommendationRequestService;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(value = {MockitoExtension.class})
 public class RecommendationRequestControllerTest {
     private final Long userId = 1L;
-
+    private final Long requestId = 1L;
     @Mock
     private RecommendationRequestService recommendationRequestService;
 
@@ -33,5 +35,18 @@ public class RecommendationRequestControllerTest {
 
         Assert.assertEquals(expectedResult, actualResult);
         Mockito.verify(recommendationRequestService).getRequest(userId);
+    }
+
+    @Test
+    public void testRejectRequest() {
+        RejectionDto rejectionDto = new RejectionDto("");
+        RecommendationRequestDto expectedResponse = new RecommendationRequestDto();
+        Mockito.when(recommendationRequestService.rejectRequest(requestId, rejectionDto)).thenReturn(expectedResponse);
+
+        RecommendationRequestDto actualResponse = recommendationRequestController.rejectRequest(requestId, rejectionDto);
+
+        Mockito.verify(recommendationRequestService).rejectRequest(requestId, rejectionDto);
+
+        assertEquals(expectedResponse, actualResponse);
     }
 }

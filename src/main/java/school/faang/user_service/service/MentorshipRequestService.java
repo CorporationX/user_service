@@ -19,6 +19,12 @@ public class MentorshipRequestService {
    public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         MentorshipRequest mentorshipRequest = mapper.toEntity(mentorshipRequestDto);
         validator.validate(mentorshipRequest);
-        return mapper.toDto(repository.save(mentorshipRequest));
+
+        Long requesterId = mentorshipRequest.getRequester().getId();
+        Long receiverId = mentorshipRequest.getReceiver().getId();
+        String description = mentorshipRequest.getDescription();
+
+        MentorshipRequest newRequest = repository.create(requesterId, receiverId, description);
+        return mapper.toDto(newRequest);
     }
 }

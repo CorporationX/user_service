@@ -5,6 +5,7 @@ import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
+import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -12,6 +13,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MentorshipRequestValidator {
     private final UserRepository userRepository;
+    private final MentorshipRequestRepository mentorshipRequestRepository;
 
     public void validate(MentorshipRequest mentorshipRequest) {
         Long requesterId = mentorshipRequest.getRequester().getId();
@@ -30,13 +32,13 @@ public class MentorshipRequestValidator {
         if(requesterId == receiverId) {
             throw new IllegalArgumentException("A requester cannot be a receiver fo itself");
         }
-        if(mentorshipRequest.getUpdatedAt() == mentorshipRequest.getCreatedAt()) {
-            if(mentorshipRequest.getCreatedAt().isAfter(threeMonthBeforeNow)) {
-                throw new RuntimeException("The user can only make a request once every three months");
-            }
-        } else {
-            if(mentorshipRequest.getUpdatedAt().isAfter(threeMonthBeforeNow)) {
-                throw new RuntimeException("The user can only make a request once every three months");
+
+        Optional<MentorshipRequest> optionalLatestRequest = mentorshipRequestRepository.findLatestRequest(requesterId, receiverId);
+
+        if(optionalLatestRequest.isPresent()) {
+            MentorshipRequest latestRequest = optionalLatestRequest.get();
+            if(latestRequest.getUpdatedAt().isAfter(threeMonthBeforeNow)) {
+                throw new RuntimeException("Request can only be made once every 3 months");
             }
         }
     }

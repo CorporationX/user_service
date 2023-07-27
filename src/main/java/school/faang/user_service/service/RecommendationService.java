@@ -89,6 +89,63 @@ public class RecommendationService {
         return recommendationMapper.toDto(recommendation);
     }
 
+    public RecommendationDto update(RecommendationDto recommendationDto){
+        validatePreviousRecommendation(recommendationDto);
+
+        recommendationDto.getSkillOffers()
+                .forEach(skillOffer -> {
+                    if (!skillRepository.existsById(skillOffer.getSkillId())) {
+                        throw new DataValidationException(
+                                String.format("Skill with id=%d is missing in db!", skillOffer.getSkillId()));
+                    }
+                });
+
+        List<Long> skillIds = recommendationDto.getSkillOffers()
+                .stream()
+                .map(SkillOfferDto::getSkillId)
+                .toList();
+        var skills = skillRepository.findAllById(skillIds);
+        if (skillIds.size() != skills.size()) {
+            throw new DataValidationException("Some skills do not exist");
+        }
+
+        List<Long> recommendationIds = recommendationDto.getSkillOffers()
+                .stream()
+                .map(SkillOfferDto::getRecommendationId)
+                .toList();
+        var recommendations = recommendationRepository.findAllById(recommendationIds);
+        if (recommendationIds.size() != recommendations.size()) {
+            throw new DataValidationException("Some recommendations do not exist");
+        }
+
+        Recommendation updatedRecommendation = recommendationRepository
+                .update(recommendationDto.getAuthorId(), recommendationDto.getReceiverId(), recommendationDto.getContent());
+
+        recommendationDto.getSkillOffers()
+                .forEach(sod -> skillOfferRepository.deleteAllByRecommendationId(sod.getRecommendationId()));
+
+        recommendationDto.getSkillOffers()
+                .forEach(sod -> skillOfferRepository.create(sod.getSkillId(), sod.getRecommendationId()));
+
+        User receiver = getUser(recommendationDto.getReceiverId());
+        User author = getUser(recommendationDto.getAuthorId());
+
+        recommendationDto.getSkillOffers()
+                .forEach(skillOffer -> {
+                    Optional<Skill> optionalSkill = skillRepository.findUserSkill(skillOffer.getSkillId(), receiver.getId());
+                    if (optionalSkill.isPresent()) {
+                        UserSkillGuarantee userSkillGuarantee = UserSkillGuarantee.builder()
+                                .skill(optionalSkill.get())
+                                .user(receiver)
+                                .guarantor(author)
+                                .build();
+                        userSkillGuaranteeRepository.save(userSkillGuarantee);
+                    }
+                });
+
+        return recommendationMapper.toDto(updatedRecommendation);
+    }
+
     private void validatePreviousRecommendation(RecommendationDto recommendationDto) {
         var recommendation = recommendationRepository
                 .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc

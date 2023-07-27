@@ -48,7 +48,7 @@ public class GoogleCalendarService {
     private static final String CREDENTIALS_FILE_PATH = "/json/googleSecret.json";
 
     @Transactional
-    public String sendEventToCalendar(Long eventId) throws GeneralSecurityException, IOException {
+    public String createEvent(Long eventId) throws GeneralSecurityException, IOException {
         Event eventEntity = eventRepository.findById(eventId)
                 .orElseThrow(() -> new IllegalArgumentException("Событие не найдено"));
         GoogleToken googleToken = googleTokenRepository.findByUser(eventEntity.getOwner());
@@ -71,6 +71,42 @@ public class GoogleCalendarService {
         } else {
             return getAuthorizationUrl(eventEntity, flow).build();
         }
+    }
+
+    @Transactional
+    public void saveCredentialsFromCallback(String authorizationCode, Long eventId) throws IOException, GeneralSecurityException {
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event is not found"));
+
+        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+        InputStream in = GoogleCalendarService.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
+        if (in == null) {
+            throw new FileNotFoundException("Файл не найден: " + CREDENTIALS_FILE_PATH);
+        }
+        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
+
+        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
+                HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
+                .setDataStoreFactory(new JpaDataStoreFactory(googleTokenRepository))
+                .setAccessType("offline")
+                .build();
+
+        GoogleTokenResponse response = flow.newTokenRequest(authorizationCode)
+                .setRedirectUri("http://localhost:8080/api/v1/google/auth/callback?event=" + event.getId())
+                .execute();
+
+
+        Credential credential = flow.createAndStoreCredential(response, String.valueOf(event.getOwner().getId()));
+
+        GoogleToken googleToken = new GoogleToken();
+        googleToken.setUuid(UUID.randomUUID().toString());
+        googleToken.setUser(event.getOwner());
+        googleToken.setAccessToken(credential.getAccessToken());
+        googleToken.setRefreshToken(credential.getRefreshToken());
+        googleToken.setExpirationTimeMilliseconds(credential.getExpirationTimeMilliseconds());
+        googleToken.setUpdatedAt(LocalDateTime.now());
+        googleToken.setOauthClientSecret(clientSecrets.getDetails().getClientSecret());
+        googleToken.setOauthClientId(clientSecrets.getDetails().getClientId());
+        googleTokenRepository.save(googleToken);
     }
 
     private static GoogleAuthorizationCodeRequestUrl getAuthorizationUrl(Event eventEntity, GoogleAuthorizationCodeFlow flow) {
@@ -126,42 +162,6 @@ public class GoogleCalendarService {
         event.setEnd(end);
 
         return event;
-    }
-
-    @Transactional
-    public void saveCredentialsFromCallback(String authorizationCode, Long eventId) throws IOException, GeneralSecurityException {
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event is not found"));
-
-        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-        InputStream in = GoogleCalendarService.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
-        if (in == null) {
-            throw new FileNotFoundException("Файл не найден: " + CREDENTIALS_FILE_PATH);
-        }
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
-
-        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-                HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-                .setDataStoreFactory(new JpaDataStoreFactory(googleTokenRepository))
-                .setAccessType("offline")
-                .build();
-
-        GoogleTokenResponse response = flow.newTokenRequest(authorizationCode)
-                .setRedirectUri("http://localhost:8080/api/v1/google/auth/callback?event=" + event.getId())
-                .execute();
-
-
-        Credential credential = flow.createAndStoreCredential(response, String.valueOf(event.getOwner().getId()));
-
-        GoogleToken googleToken = new GoogleToken();
-        googleToken.setUuid(UUID.randomUUID().toString());
-        googleToken.setUser(event.getOwner());
-        googleToken.setAccessToken(credential.getAccessToken());
-        googleToken.setRefreshToken(credential.getRefreshToken());
-        googleToken.setExpirationTimeMilliseconds(credential.getExpirationTimeMilliseconds());
-        googleToken.setUpdatedAt(LocalDateTime.now());
-        googleToken.setOauthClientSecret(clientSecrets.getDetails().getClientSecret());
-        googleToken.setOauthClientId(clientSecrets.getDetails().getClientId());
-        googleTokenRepository.save(googleToken);
     }
 }
 

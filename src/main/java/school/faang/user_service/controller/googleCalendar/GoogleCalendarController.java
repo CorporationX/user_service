@@ -21,7 +21,7 @@ public class GoogleCalendarController {
 
     @PostMapping("/{eventId}")
     public String createEvent(@Valid @PathVariable Long eventId) throws GeneralSecurityException, IOException {
-        return googleCalendarService.sendEventToCalendar(eventId);
+        return googleCalendarService.createEvent(eventId);
     }
 
     @GetMapping("/auth/callback")

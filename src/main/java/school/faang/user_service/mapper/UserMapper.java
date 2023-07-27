@@ -15,5 +15,5 @@ public interface UserMapper {
     UserDto toDto(User user);
 
     @Mapping(target = "country", ignore = true)
-    User toUser(UserDto userDto);
+    User toEntity(UserDto userDto);
 }

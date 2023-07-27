@@ -1,5 +1,6 @@
 package school.faang.user_service.mapper;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -60,7 +61,7 @@ class UserMapperTest {
 
     @Test
     void userDtoToUser_shouldMatchAllFields() {
-        User actual = userMapper.toUser(userDto);
+        User actual = userMapper.toEntity(userDto);
         assertAll(() -> {
             assertEquals(1L, actual.getId());
             assertEquals("username", actual.getUsername());
@@ -70,5 +71,25 @@ class UserMapperTest {
             assertEquals("city", actual.getCity());
             assertEquals(10, actual.getExperience());
         });
+    }
+
+    @Test
+    void test_user_mapper_user_to_user_dto() {
+        UserDto result = userMapper.toDto(user);
+        Assertions.assertAll(
+                () -> assertEquals(result.getId(), userDto.getId()),
+                () -> assertEquals(result.getUsername(), userDto.getUsername()),
+                () -> assertEquals(result.getEmail(), userDto.getEmail())
+        );
+    }
+
+    @Test
+    void test_user_mapper_user_dto_to_user() {
+        User result = userMapper.toEntity(userDto);
+        Assertions.assertAll(
+                () -> assertEquals(result.getId(), user.getId()),
+                () -> assertEquals(result.getUsername(), user.getUsername()),
+                () -> assertEquals(result.getEmail(), user.getEmail())
+        );
     }
 }

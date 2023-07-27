@@ -61,5 +61,16 @@ public class MentorshipService {
         return userRepository.findById(userId)
                 .orElseThrow(()->new EntityNotFoundException("Invalid user Id"));
     }
+
+  public int cancelMentoring(Long userId) {
+      List<User> mentees = getMenteesOfUser(userId);
+
+      mentees.forEach(mentee -> {
+          List<User> mentors = mentee.getMentors();
+          mentee.setMentors(mentors.stream().filter(mentor -> mentor.getId() != userId).toList());
+      });
+
+      return mentees.size();
+  }
 }
 

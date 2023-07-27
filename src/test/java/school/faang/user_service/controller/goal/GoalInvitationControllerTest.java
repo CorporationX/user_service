@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.service.GoalInvitationService;
 
@@ -56,5 +57,12 @@ class GoalInvitationControllerTest {
         goalInvitationController.rejectGoalInvitation(1L);
 
         Mockito.verify(goalInvitationService, Mockito.times(1)).rejectGoalInvitation(1L);
+    }
+
+    @Test
+    public void testGetInvitationsCallGetInvitations() {
+        goalInvitationController.getInvitations(new InvitationFilterDto());
+
+        Mockito.verify(goalInvitationService, Mockito.times(1)).getInvitations(Mockito.any());
     }
 }

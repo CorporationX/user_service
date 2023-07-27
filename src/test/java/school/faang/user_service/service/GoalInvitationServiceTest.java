@@ -10,14 +10,18 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
+import school.faang.user_service.filter.InvitationFilter;
+import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,16 +38,22 @@ class GoalInvitationServiceTest {
     GoalInvitation goalInvitation;
 
     @Mock
-    Goal mockGoal;
+    GoalInvitation mockGoalInvitation;
 
     @Mock
-    GoalInvitation mockGoalInvitation;
+    GoalInvitationMapper goalInvitationMapper;
 
     @Mock
     UserService userService;
 
     @Mock
+    List<GoalInvitation> invitations;
+
+    @Mock
     GoalRepository goalRepository;
+
+    @Mock
+    List<InvitationFilter> invitationFilters;
 
     @Mock
     GoalInvitationRepository goalInvitationRepository;
@@ -135,14 +145,9 @@ class GoalInvitationServiceTest {
         }
 
         @Test
-        public void testRejectGoalInvitationThrowEntityExcBecOfGoal() {
-            Mockito.when(goalInvitationRepository.findById(goalInvitationId)).thenReturn(
-                    Optional.of(mockGoalInvitation));
-            Mockito.when(mockGoalInvitation.getGoal()).thenReturn(mockGoal);
-
-            EntityNotFoundException exc = assertThrows(EntityNotFoundException.class,
-                    () -> goalInvitationService.rejectGoalInvitation(goalInvitationId));
-            assertEquals("Invalid request. Requested goal not found", exc.getMessage());
+        public void testGetInvitationsReturnEmptyList() {
+            List<GoalInvitationDto> result = goalInvitationService.getInvitations(new InvitationFilterDto());
+            assertEquals(Collections.emptyList(), result);
         }
     }
 
@@ -171,12 +176,12 @@ class GoalInvitationServiceTest {
 
         @Test
         public void testAcceptGoalInvitationCallFindById() {
-            Mockito.verify(goalInvitationRepository, Mockito.times(1)).findById(goalInvitationId);
+            Mockito.verify(goalInvitationRepository).findById(goalInvitationId);
         }
 
         @Test
         public void testAcceptGoalInvitationCallExistsById() {
-            Mockito.verify(goalRepository, Mockito.times(1)).existsById(goalId);
+            Mockito.verify(goalRepository).existsById(goalId);
         }
     }
 
@@ -197,12 +202,12 @@ class GoalInvitationServiceTest {
 
         @Test
         public void testCreateInvitationCallFindById() {
-            Mockito.verify(goalRepository, Mockito.times(1)).findById(1L);
+            Mockito.verify(goalRepository).findById(1L);
         }
 
         @Test
         public void testCreateInvitationCallSave() {
-            Mockito.verify(goalInvitationRepository, Mockito.times(1)).save(Mockito.any());
+            Mockito.verify(goalInvitationRepository).save(Mockito.any());
         }
     }
 
@@ -213,28 +218,57 @@ class GoalInvitationServiceTest {
         @BeforeEach
         public void setUp() {
             goalInvitationId = 1L;
-
             Mockito.when(goalInvitationRepository.findById(goalInvitationId)).thenReturn(
                     Optional.of(mockGoalInvitation));
-            Mockito.when(mockGoalInvitation.getGoal()).thenReturn(mockGoal);
-            Mockito.when(goalRepository.existsById(Mockito.anyLong())).thenReturn(true);
 
             goalInvitationService.rejectGoalInvitation(goalInvitationId);
         }
 
         @Test
         public void testRejectGoalInvitationCallFindById() {
-            Mockito.verify(goalInvitationRepository, Mockito.times(1)).findById(goalInvitationId);
-        }
-
-        @Test
-        public void testRejectGoalInvitationCallExistsById() {
-            Mockito.verify(goalRepository, Mockito.times(1)).existsById(Mockito.anyLong());
+            Mockito.verify(goalInvitationRepository).findById(goalInvitationId);
         }
 
         @Test
         public void testRejectGoalInvitationCallSave() {
-            Mockito.verify(goalInvitationRepository, Mockito.times(1)).save(mockGoalInvitation);
+            Mockito.verify(goalInvitationRepository).save(mockGoalInvitation);
+        }
+    }
+
+    @Nested
+    class PositiveTestGroupD {
+        @BeforeEach
+        public void setUp() {
+            goalInvitationService = new GoalInvitationService(
+                    userService,
+                    goalRepository,
+                    invitationFilters,
+                    goalInvitationMapper,
+                    goalInvitationRepository);
+
+            Mockito.when(goalInvitationRepository.findAll()).thenReturn(invitations);
+
+            goalInvitationService.getInvitations(new InvitationFilterDto());
+        }
+
+        @Test
+        public void testGetInvitationsCallFindAll() {
+            Mockito.verify(goalInvitationRepository).findAll();
+        }
+
+        @Test
+        public void testGetInvitationsCallIsEmpty() {
+            Mockito.verify(invitations).isEmpty();
+        }
+
+        @Test
+        public void testGetInvitationsCallStream1() {
+            Mockito.verify(invitationFilters).stream();
+        }
+
+        @Test
+        public void testGetInvitationsCallStream2() {
+            Mockito.verify(invitations).stream();
         }
     }
 }

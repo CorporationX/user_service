@@ -2,9 +2,11 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.mentor.UserDto;
+import school.faang.user_service.dto.mentee.MenteeDto;
+import school.faang.user_service.dto.mentor.MentorDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.mentee.MenteeMapper;
+import school.faang.user_service.mapper.mentor.MentorMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
@@ -15,20 +17,21 @@ import java.util.List;
 public class MentorshipService {
     private final MentorshipRepository mentorshipRepository;
     private final  UserRepository userRepository;
-    private final UserMapper userMapper;
+    private final MentorMapper mentorMapper;
+    private final MenteeMapper menteeMapper;
 
-    public List<UserDto> getMentees(Long userId) {
+    public List<MenteeDto> getMentees(Long userId) {
         User user = mentorshipRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User with id " + userId + " not found"));
 
-        return userMapper.toUserListDto(user.getMentees());
+        return menteeMapper.toMenteeListDto(user.getMentees());
     }
 
-    public List<UserDto> getMentors(Long userId) {
+    public List<MentorDto> getMentors(Long userId) {
         User user = mentorshipRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User with id " + userId + " not found"));
 
-        return userMapper.toUserListDto(user.getMentors());
+        return mentorMapper.toMentorListDto(user.getMentors());
     }
 
     public void deleteMentee(Long menteeId, Long mentorId) {

@@ -34,256 +34,260 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class EventServiceTest {
-  EventDto eventDto;
-
-  @Mock
-  private EventRepository eventRepository;
-  @Mock
-  private EventMapper eventMapper;
-  @Mock
-  private SkillRepository skillRepository;
+    EventDto eventDto;
+
+    @Mock
+    private EventRepository eventRepository;
+    @Mock
+    private EventMapper eventMapper;
+    @Mock
+    private SkillRepository skillRepository;
 
-  @Mock
-  private List<EventFilter> eventFilters;
-
-  private EventService eventService;
-
-  private Skill userSkill = new Skill();
-
-
-  @BeforeEach
-  public void init() {
-    EventFilter eventTitleFilter = new EventTitleFilter();
-    List<EventFilter> eventFilterList = List.of(eventTitleFilter);
-    eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList);
-
-    userSkill.setTitle("Coding");
-    userSkill.setId(1L);
-    eventDto = EventMock.getEventDto();
-  }
-
-  @Test
-  public void testCreateEvent() {
-    Mockito.when(eventMapper.toEntity(eventDto)).thenReturn(new Event());
-
-    eventService.create(eventDto);
-    Mockito.verify(eventRepository, Mockito.times(1)).save(eventMapper.toEntity(eventDto));
-  }
-
-  @Test
-  public void testUpdateEvent() {
-    Long anyId = 1L;
-
-    EventDto existingEventDto = EventMock.getEventDto();
-    Event existingEventEntity = EventMock.getEventEntity();
-
-    Mockito.when(eventRepository.findById(anyId)).thenReturn(Optional.of(existingEventEntity));
-    Mockito.when(eventMapper.toEntity(existingEventDto)).thenReturn(existingEventEntity);
-    Mockito.when(eventMapper.toDto(existingEventEntity)).thenReturn(existingEventDto);
+    @Mock
+    private List<EventFilter> eventFilters;
+
+    private EventService eventService;
+
+    private Skill userSkill = new Skill();
+
+
+    @BeforeEach
+    public void init() {
+        EventFilter eventTitleFilter = new EventTitleFilter();
+        List<EventFilter> eventFilterList = List.of(eventTitleFilter);
+        eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList);
+
+        userSkill.setTitle("Coding");
+        userSkill.setId(1L);
+        eventDto = EventMock.getEventDto();
+    }
+
+    @Test
+    public void testCreateEvent() {
+        Mockito.when(eventMapper.toEntity(eventDto)).thenReturn(new Event());
+
+        eventService.create(eventDto);
+        Mockito.verify(eventRepository, Mockito.times(1)).save(eventMapper.toEntity(eventDto));
+    }
+
+    @Test
+    public void testUpdateEvent() {
+        Long anyId = 1L;
+
+        EventDto existingEventDto = EventMock.getEventDto();
+        Event existingEventEntity = EventMock.getEventEntity();
+
+        Mockito.when(eventRepository.findById(anyId)).thenReturn(Optional.of(existingEventEntity));
+        Mockito.when(eventMapper.toEntity(existingEventDto)).thenReturn(existingEventEntity);
+        Mockito.when(eventMapper.toDto(existingEventEntity)).thenReturn(existingEventDto);
+
+        EventDto eventToUpdateDto = EventMock.getEventDto();
 
-    EventDto eventToUpdateDto = EventMock.getEventDto();
+        eventToUpdateDto.setTitle("Updated Title");
+        eventToUpdateDto.setDescription("Updated description");
 
-    eventToUpdateDto.setTitle("Updated Title");
-    eventToUpdateDto.setDescription("Updated description");
+        eventService.updateEvent(eventToUpdateDto);
+        Mockito.verify(eventMapper, Mockito.times(1)).update(existingEventDto, eventToUpdateDto);
+        Mockito.verify(eventRepository, Mockito.times(1)).save(existingEventEntity);
+    }
 
-    eventService.updateEvent(eventToUpdateDto);
-    Mockito.verify(eventMapper, Mockito.times(1)).update(existingEventDto, eventToUpdateDto);
-    Mockito.verify(eventRepository, Mockito.times(1)).save(existingEventEntity);
-  }
+    @Test
+    public void testCreateSkillsValidation() {
+        Skill mockedSkill = new Skill();
+        mockedSkill.setTitle("Running");
+
+        Mockito.when(skillRepository.findSkillsByGoalId(1L)).thenReturn(List.of(mockedSkill));
+
+        assertThrows(DataValidationException.class, () -> {
+            eventService.create(eventDto);
+        });
+    }
+
+    @Test
+    public void testEditSkillsValidation() {
+        Skill mockedSkill = new Skill();
+        mockedSkill.setTitle("Running");
+
+        Mockito.when(skillRepository.findSkillsByGoalId(1L)).thenReturn(List.of(mockedSkill));
 
-  @Test
-  public void testCreateSkillsValidation() {
-    Skill mockedSkill = new Skill();
-    mockedSkill.setTitle("Running");
-
-    Mockito.when(skillRepository.findSkillsByGoalId(1L)).thenReturn(List.of(mockedSkill));
+        assertThrows(DataValidationException.class, () -> {
+            eventService.updateEvent(eventDto);
+        });
+    }
 
-    assertThrows(DataValidationException.class, () -> {
-      eventService.create(eventDto);
-    });
-  }
+    @Test
+    public void testGetEventByIdSuccess() {
+        Long anyId = 1L;
+        Event mockEvent = new Event();
+        mockEvent.setTitle("Mock");
 
-  @Test
-  public void testEditSkillsValidation() {
-    Skill mockedSkill = new Skill();
-    mockedSkill.setTitle("Running");
+        Mockito.lenient().when(eventRepository.findById(anyId)).thenReturn(Optional.of(mockEvent));
+        try {
+            eventService.get(anyId);
+            Mockito.verify(eventRepository, Mockito.times(1)).findById(anyId);
+        } catch (Exception e) {
+        }
+    }
 
-    Mockito.when(skillRepository.findSkillsByGoalId(1L)).thenReturn(List.of(mockedSkill));
+    @Test
+    public void testGetEventByIdFail() {
+        Long anyId = 1L;
+        Mockito.lenient().when(skillRepository.findById(anyId)).thenReturn(null);
 
-    assertThrows(DataValidationException.class, () -> {
-      eventService.updateEvent(eventDto);
-    });
-  }
+        assertThrows(EntityNotFoundException.class, () -> {
+            eventService.get(anyId);
+        });
+    }
 
-  @Test
-  public void testGetEventByIdSuccess() {
-    Long anyId = 1L;
-    Event mockEvent = new Event();
-    mockEvent.setTitle("Mock");
 
-    Mockito.lenient().when(eventRepository.findById(anyId)).thenReturn(Optional.of(mockEvent));
-    try {
-      eventService.get(anyId);
-      Mockito.verify(eventRepository, Mockito.times(1)).findById(anyId);
-    } catch (Exception e) {}
-  }
+    @Test
+    public void testGetAllUserParticipationEvents() {
+        long anyUserId = 1L;
+        Mockito.lenient().when(eventRepository.findParticipatedEventsByUserId(anyUserId)).thenReturn(List.of(new Event(), new Event(), new Event()));
+        List<EventDto> events = eventService.getParticipatedEvents(anyUserId);
+        Assertions.assertEquals(3, events.size());
+    }
 
-  @Test
-  public void testGetEventByIdFail() {
-    Long anyId = 1L;
-    Mockito.lenient().when(skillRepository.findById(anyId)).thenReturn(null);
+    @Test
+    public void testEventDeleting() {
+        Long anyTestId = 1L;
+        eventService.delete(anyTestId);
+        Mockito.verify(eventRepository, Mockito.times(1)).deleteById(anyTestId);
+    }
 
-    assertThrows(EntityNotFoundException.class, () -> {
-      eventService.get(anyId);
-    });
-  }
+    @Test
+    public void testGetAllUserEvents() {
+        long anyUserId = 1L;
+        Mockito.lenient().when(eventRepository.findAllByUserId(anyUserId)).thenReturn(List.of(new Event(), new Event()));
+        List<EventDto> events = eventService.getOwnedEvents(anyUserId);
+        Assertions.assertEquals(2, events.size());
+    }
 
+    @Test
+    void testGetAllUserEventsByTitleFilter() {
+        Event javaEvent = new Event();
+        javaEvent.setTitle("Java");
 
-  @Test
-  public void testGetAllUserParticipationEvents() {
-    long anyUserId = 1L;
-    Mockito.lenient().when(eventRepository.findParticipatedEventsByUserId(anyUserId)).thenReturn(List.of(new Event(), new Event(), new Event()));
-    List<EventDto> events = eventService.getParticipatedEvents(anyUserId);
-    Assertions.assertEquals(3, events.size());
-  }
+        Event pythonEvent = new Event();
+        pythonEvent.setTitle("Python");
 
-  @Test
-  public void testEventDeleting() {
-    Long anyTestId = 1L;
-    eventService.delete(anyTestId);
-    Mockito.verify(eventRepository, Mockito.times(1)).deleteById(anyTestId);
-  }
+        Event jsEvent = new Event();
+        jsEvent.setTitle("JavaScript");
 
-  @Test
-  public void testGetAllUserEvents() {
-    long anyUserId = 1L;
-    Mockito.lenient().when(eventRepository.findAllByUserId(anyUserId)).thenReturn(List.of(new Event(), new Event()));
-    List<EventDto> events = eventService.getOwnedEvents(anyUserId);
-    Assertions.assertEquals(2, events.size());
-  }
+        Mockito.lenient().when(eventRepository.findAll()).thenReturn(List.of(javaEvent, pythonEvent, jsEvent));
 
-  @Test void testGetAllUserEventsByTitleFilter() {
-    Event javaEvent = new Event();
-    javaEvent.setTitle("Java");
+        EventFilterDto eventFilterDto = new EventFilterDto();
 
-    Event pythonEvent = new Event();
-    pythonEvent.setTitle("Python");
+        eventFilterDto.setTitle("Jav");
 
-    Event jsEvent = new Event();
-    jsEvent.setTitle("JavaScript");
+        List<EventDto> events = eventService.getEventsByFilter(eventFilterDto);
 
-    Mockito.lenient().when(eventRepository.findAll()).thenReturn(List.of(javaEvent, pythonEvent, jsEvent));
+        Assertions.assertEquals(2, events.size());
+    }
 
-    EventFilterDto eventFilterDto = new EventFilterDto();
+    @Test
+    void testGetAllUserEventsByStartDateFilter() {
+        List<EventFilter> eventFilterList = List.of(new EventStartDateFilter());
+        eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList);
 
-    eventFilterDto.setTitle("Jav");
+        Event javaEvent = new Event();
+        javaEvent.setTitle("Java");
+        javaEvent.setStartDate(LocalDateTime.of(2015,
+            Month.JULY, 29, 19, 0, 0));
 
-    List<EventDto> events = eventService.getEventsByFilter(eventFilterDto);
+        Event pythonEvent = new Event();
+        pythonEvent.setTitle("Python");
+        pythonEvent.setStartDate(LocalDateTime.of(2018,
+            Month.JULY, 29, 19, 0, 0));
 
-    Assertions.assertEquals(2, events.size());
-  }
+        Event jsEvent = new Event();
+        jsEvent.setTitle("JavaScript");
+        jsEvent.setStartDate(LocalDateTime.of(2020,
+            Month.JULY, 29, 19, 0, 0));
 
-  @Test void testGetAllUserEventsByStartDateFilter() {
-    List<EventFilter> eventFilterList = List.of(new EventStartDateFilter());
-    eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList);
+        Mockito.lenient().when(eventRepository.findAll()).thenReturn(List.of(javaEvent, pythonEvent, jsEvent));
 
-    Event javaEvent = new Event();
-    javaEvent.setTitle("Java");
-    javaEvent.setStartDate(LocalDateTime.of(2015,
-        Month.JULY, 29, 19, 0, 0));
+        EventFilterDto eventFilterDto = new EventFilterDto();
 
-    Event pythonEvent = new Event();
-    pythonEvent.setTitle("Python");
-    pythonEvent.setStartDate(LocalDateTime.of(2018,
-        Month.JULY, 29, 19, 0, 0));
+        eventFilterDto.setStartDate(LocalDateTime.of(2018, Month.JANUARY, 8, 0, 0));
 
-    Event jsEvent = new Event();
-    jsEvent.setTitle("JavaScript");
-    jsEvent.setStartDate(LocalDateTime.of(2020,
-        Month.JULY, 29, 19, 0, 0));
+        List<EventDto> events = eventService.getEventsByFilter(eventFilterDto);
 
-    Mockito.lenient().when(eventRepository.findAll()).thenReturn(List.of(javaEvent, pythonEvent, jsEvent));
+        Assertions.assertEquals(2, events.size());
+    }
 
-    EventFilterDto eventFilterDto = new EventFilterDto();
+    @Test
+    void testGetAllUserEventsByEndDateFilter() {
+        List<EventFilter> eventFilterList = List.of(new EventEndDateFilter());
+        eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList);
 
-    eventFilterDto.setStartDate(LocalDateTime.of(2018, Month.JANUARY, 8, 0, 0));
+        Event javaEvent = new Event();
+        javaEvent.setTitle("Java");
+        javaEvent.setEndDate(LocalDateTime.of(2015,
+            Month.JULY, 29, 19, 0, 0));
 
-    List<EventDto> events = eventService.getEventsByFilter(eventFilterDto);
+        Event pythonEvent = new Event();
+        pythonEvent.setTitle("Python");
+        pythonEvent.setEndDate(LocalDateTime.of(2018,
+            Month.JULY, 29, 19, 0, 0));
 
-    Assertions.assertEquals(2, events.size());
-  }
+        Event jsEvent = new Event();
+        jsEvent.setTitle("JavaScript");
+        jsEvent.setEndDate(LocalDateTime.of(2020,
+            Month.JULY, 29, 19, 0, 0));
 
-  @Test void testGetAllUserEventsByEndDateFilter() {
-    List<EventFilter> eventFilterList = List.of(new EventEndDateFilter());
-    eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList);
+        Mockito.lenient().when(eventRepository.findAll()).thenReturn(List.of(javaEvent, pythonEvent, jsEvent));
 
-    Event javaEvent = new Event();
-    javaEvent.setTitle("Java");
-    javaEvent.setEndDate(LocalDateTime.of(2015,
-        Month.JULY, 29, 19, 0, 0));
+        EventFilterDto eventFilterDto = new EventFilterDto();
 
-    Event pythonEvent = new Event();
-    pythonEvent.setTitle("Python");
-    pythonEvent.setEndDate(LocalDateTime.of(2018,
-        Month.JULY, 29, 19, 0, 0));
+        eventFilterDto.setEndDate(LocalDateTime.of(2019, Month.JANUARY, 8, 0, 0));
 
-    Event jsEvent = new Event();
-    jsEvent.setTitle("JavaScript");
-    jsEvent.setEndDate(LocalDateTime.of(2020,
-        Month.JULY, 29, 19, 0, 0));
+        List<EventDto> events = eventService.getEventsByFilter(eventFilterDto);
 
-    Mockito.lenient().when(eventRepository.findAll()).thenReturn(List.of(javaEvent, pythonEvent, jsEvent));
+        Assertions.assertEquals(2, events.size());
+    }
 
-    EventFilterDto eventFilterDto = new EventFilterDto();
+    @Test
+    public void testDeleteAllByIds() {
+        eventService.deleteAllByIds(List.of(1L, 2L, 3L, 4L));
 
-    eventFilterDto.setEndDate(LocalDateTime.of(2019, Month.JANUARY, 8, 0, 0));
+        verify(eventRepository, times(1)).deleteAllById(List.of(1L, 2L, 3L, 4L));
+    }
 
-    List<EventDto> events = eventService.getEventsByFilter(eventFilterDto);
+    @Test
+    @DisplayName("Should remove specific user from event.attendee list, if users > 2")
+    public void testRemoveUserFromEvents() {
+        Event running = new Event();
+        Event swimming = new Event();
+        Event coding = new Event();
+        Event relaxing = new Event();
 
-    Assertions.assertEquals(2, events.size());
-  }
+        User alex = new User();
+        alex.setId(1L);
 
-  @Test
-  public void testDeleteAllByIds() {
-    eventService.deleteAllByIds(List.of(1L, 2L, 3L, 4L));
+        User blake = new User();
+        blake.setId(2L);
 
-    verify(eventRepository, times(1)).deleteAllById(List.of(1L, 2L, 3L, 4L));
-  }
+        running.setId(1L);
+        running.setAttendees(List.of(alex, blake));
 
-  @Test
-  @DisplayName("Should remove specific user from event.attendee list, if users > 2")
-  public void testRemoveUserFromEvents() {
-    Event running = new Event();
-    Event swimming = new Event();
-    Event coding = new Event();
-    Event relaxing = new Event();
+        swimming.setId(2L);
+        swimming.setAttendees(List.of(alex, blake));
 
-    User alex = new User();
-    alex.setId(1L);
+        coding.setId(3L);
+        coding.setAttendees(List.of(alex, blake));
 
-    User blake = new User();
-    blake.setId(2L);
+        relaxing.setId(4L);
+        relaxing.setAttendees(List.of(alex, blake));
 
-    running.setId(1L);
-    running.setAttendees(List.of(alex, blake));
+        when(eventRepository.findAllById(List.of(1L, 2L, 3L, 4L))).thenReturn(List.of(running, swimming, coding, relaxing));
 
-    swimming.setId(2L);
-    swimming.setAttendees(List.of(alex, blake));
+        int removedUsersFromEventCount = eventService.removeUserFromEvents(List.of(1L, 2L, 3L, 4L), 1L);
 
-    coding.setId(3L);
-    coding.setAttendees(List.of(alex, blake));
-
-    relaxing.setId(4L);
-    relaxing.setAttendees(List.of(alex, blake));
-
-    when(eventRepository.findAllById(List.of(1L, 2L, 3L, 4L))).thenReturn(List.of(running, swimming,coding, relaxing));
-
-    int removedUsersFromEventCount = eventService.removeUserFromEvents(List.of(1L, 2L, 3L, 4L), 1L);
-
-    assertEquals(4, removedUsersFromEventCount);
-    assertEquals(1, running.getAttendees().size());
-    assertEquals(1, swimming.getAttendees().size());
-    assertEquals(1, coding.getAttendees().size());
-    assertEquals(1, relaxing.getAttendees().size());
-  }
+        assertEquals(4, removedUsersFromEventCount);
+        assertEquals(1, running.getAttendees().size());
+        assertEquals(1, swimming.getAttendees().size());
+        assertEquals(1, coding.getAttendees().size());
+        assertEquals(1, relaxing.getAttendees().size());
+    }
 }

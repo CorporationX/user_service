@@ -13,16 +13,16 @@ import static org.junit.Assert.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 public class UserControllerTest {
-  @Mock
-  private UserService userService;
+    @Mock
+    private UserService userService;
 
-  @InjectMocks
-  private UserController userController;
+    @InjectMocks
+    private UserController userController;
 
-  @Test
-  public void deactivateUserTest() {
-    userController.deactivateUser(1L);
+    @Test
+    public void deactivateUserTest() {
+        userController.deactivateUser(1L);
 
-    Mockito.verify(userService, Mockito.times(1)).deactivateUser(1L);
-  }
+        Mockito.verify(userService, Mockito.times(1)).deactivateUser(1L);
+    }
 }

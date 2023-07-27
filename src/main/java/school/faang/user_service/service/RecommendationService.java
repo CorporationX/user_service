@@ -146,6 +146,10 @@ public class RecommendationService {
         return recommendationMapper.toDto(updatedRecommendation);
     }
 
+    public void delete(long id){
+        recommendationRepository.deleteById(id);
+    }
+
     private void validatePreviousRecommendation(RecommendationDto recommendationDto) {
         var recommendation = recommendationRepository
                 .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc

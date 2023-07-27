@@ -238,6 +238,12 @@ class RecommendationServiceTest {
                         .receiverId(2L).build()));
     }
 
+    @Test
+    public void testDelete_deleteRecommendation() {
+        long recommendationId = 1L;
+        recommendationService.delete(recommendationId);
+        Mockito.verify(recommendationRepository, Mockito.times(1)).deleteById(recommendationId);
+    }
 
     private Recommendation buildRecommendation(){
         return Recommendation

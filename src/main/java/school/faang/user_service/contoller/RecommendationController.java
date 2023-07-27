@@ -22,4 +22,7 @@ public class RecommendationController {
         recommendationDtoValidator.validateRecommendation(updated);
         return recommendationService.update(updated);
     }
+    public void deleteRecommendation(long id) {
+        recommendationService.delete(id);
+    }
 }

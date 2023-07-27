@@ -7,14 +7,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.controller.event.EventController;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.service.event.EventMock;
 import school.faang.user_service.service.event.EventService;
 
-import java.util.ArrayList;
-
-import static java.time.LocalDateTime.*;
 import static org.junit.Assert.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,8 +24,7 @@ public class EventControllerTest {
 
   @BeforeEach
   public void init() {
-    eventDto = new EventDto(1L, "Hiring", now(), now(),
-        1L, "Hiring event", new ArrayList<>(), "USA", 5);
+    eventDto = EventMock.getEventDto();
   }
 
   @Test
@@ -40,7 +36,7 @@ public class EventControllerTest {
   }
 
   @Test
-  public void testTitleLengthThrowDataValidationException() {
+  public void testCreateTitleLengthThrowDataValidationException() {
     eventDto.setTitle("Hi");
     assertThrows(DataValidationException.class, () -> {
       eventController.create(eventDto);
@@ -48,7 +44,7 @@ public class EventControllerTest {
   }
 
   @Test
-  public void testStartDateLengthThrowDataValidationException() {
+  public void testCreateStartDateLengthThrowDataValidationException() {
     eventDto.setStartDate(null);
     assertThrows(DataValidationException.class, () -> {
       eventController.create(eventDto);
@@ -56,7 +52,7 @@ public class EventControllerTest {
   }
 
   @Test
-  public void testOwnerIdThrowDataValidationException() {
+  public void testCreateOwnerIdThrowDataValidationException() {
     eventDto.setOwnerId(null);
     assertThrows(DataValidationException.class, () -> {
       eventController.create(eventDto);
@@ -67,6 +63,36 @@ public class EventControllerTest {
   public void testSuccessfulEventCreating() {
     eventController.create(eventDto);
     Mockito.verify(eventService, Mockito.times(1)).create(eventDto);
+  }
+
+  @Test
+  public void testEditTitleLengthThrowDataValidationException() {
+    eventDto.setTitle("Hi");
+    assertThrows(DataValidationException.class, () -> {
+      eventController.updateEvent(eventDto);
+    });
+  }
+
+  @Test
+  public void testEditStartDateLengthThrowDataValidationException() {
+    eventDto.setStartDate(null);
+    assertThrows(DataValidationException.class, () -> {
+      eventController.updateEvent(eventDto);
+    });
+  }
+
+  @Test
+  public void testEditOwnerIdThrowDataValidationException() {
+    eventDto.setOwnerId(null);
+    assertThrows(DataValidationException.class, () -> {
+      eventController.updateEvent(eventDto);
+    });
+  }
+
+  @Test
+  public void testSuccessfulEventUpdating() {
+    eventController.updateEvent(eventDto);
+    Mockito.verify(eventService, Mockito.times(1)).updateEvent(eventDto);
   }
 
   @Test

@@ -31,6 +31,7 @@ class MentorshipServiceTest {
 
     private long mentorId;
     private long menteeId;
+    private long wrongUserId=3L;
 
     @BeforeEach
     void setUp() {
@@ -76,7 +77,7 @@ class MentorshipServiceTest {
     @Test
     void testGetMentorsThrowException() {
         assertThrows(DataValidationException.class,
-                () -> mentorshipService.getMentees(3L));
+                () -> mentorshipService.getMentees(wrongUserId));
     }
 
     @Test
@@ -99,7 +100,7 @@ class MentorshipServiceTest {
     @Test
     void testGetMenteesThrowException() {
         assertThrows(DataValidationException.class,
-                () -> mentorshipService.getMentees(3L));
+                () -> mentorshipService.getMentees(wrongUserId));
     }
 
     @Test
@@ -123,13 +124,13 @@ class MentorshipServiceTest {
     @Test
     void testThrowExceptions_deleteMentee_DeleteMentor() {
         assertThrows(DataValidationException.class,
-                () -> mentorshipService.deleteMentee(menteeId, 3L));
+                () -> mentorshipService.deleteMentee(menteeId, wrongUserId));
         assertThrows(DataValidationException.class,
-                () -> mentorshipService.deleteMentee(3L, mentorId));
+                () -> mentorshipService.deleteMentee(wrongUserId, mentorId));
 
         assertThrows(DataValidationException.class,
-                () -> mentorshipService.deleteMentor(menteeId, 3L));
+                () -> mentorshipService.deleteMentor(menteeId, wrongUserId));
         assertThrows(DataValidationException.class,
-                () -> mentorshipService.deleteMentor(3L, mentorId));
+                () -> mentorshipService.deleteMentor(wrongUserId, mentorId));
     }
 }

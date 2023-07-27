@@ -1,4 +1,4 @@
-package school.faang.user_service.validation;
+package school.faang.user_service.validation.mentorship;
 
 import org.mockito.Mock;
 import org.mockito.InjectMocks;
@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+import school.faang.user_service.validation.MentorshipRequestValidator;
 
 import java.util.Optional;
 import java.time.LocalDateTime;

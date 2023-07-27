@@ -8,6 +8,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.Skill;
@@ -240,6 +242,16 @@ class RecommendationServiceTest {
         long recommendationId = 1L;
         recommendationService.delete(recommendationId);
         Mockito.verify(recommendationRepository, Mockito.times(1)).deleteById(recommendationId);
+    }
+
+    @Test
+    public void testGetAllUserRecommendations_checkNull(){
+        Page<Recommendation> recommendations = recommendationRepository
+                .findAllByReceiverId(recommendationDto.getReceiverId(), Pageable.unpaged());
+        Mockito.when(recommendationRepository
+                .findAllByReceiverId(recommendationDto.getReceiverId(), Pageable.unpaged()))
+                .thenReturn(null);
+        assertTrue(recommendationService.getAllUserRecommendations(recommendationDto.getReceiverId()).isEmpty());
     }
     private Recommendation buildRecommendation(){
         return Recommendation

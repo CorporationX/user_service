@@ -16,7 +16,6 @@ import school.faang.user_service.service.event.filters.EventFilter;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -35,7 +34,6 @@ public class EventService {
     Set<Long> userSkillIds = new HashSet<>(userSkills.stream().map(Skill::getId).toList());
 
     boolean hasUserPermission = eventSkills.containsAll(userSkillIds);
-
 
     if (!hasUserPermission) {
       throw new DataValidationException("User doesn't have access");
@@ -83,5 +81,15 @@ public class EventService {
         .orElseThrow(() -> new EntityNotFoundException("Couldn't find event with id: " + id));
 
     return eventMapper.toDto(event);
+  }
+
+  public EventDto updateEvent(EventDto event) {
+    validateUserAccess(event.getRelatedSkills(), event.getOwnerId());
+
+    EventDto existingEvent = get(event.getId());
+
+    eventMapper.update(existingEvent, event);
+
+    return create(existingEvent);
   }
 }

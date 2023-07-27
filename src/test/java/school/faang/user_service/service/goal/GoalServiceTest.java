@@ -2,20 +2,22 @@ package school.faang.user_service.service.goal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -23,14 +25,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 @ExtendWith(MockitoExtension.class)
 class GoalServiceTest {
+    @InjectMocks
     private GoalService goalService;
-
     @Mock
     private GoalRepository goalRepository;
     private GoalFilter filter1;
@@ -104,5 +105,25 @@ class GoalServiceTest {
         assertEquals(goalDto1, result.get(0));
         assertEquals(goalDto2, result.get(1));
         verify(goalMapper, times(2)).toDto(any(Goal.class));
+    }
+
+    @Test
+    public void testDeleteGoal_ExistingGoal() {
+        long goalId = 1L;
+
+        goalService.deleteGoal(goalId);
+
+        verify(goalRepository, times(1)).deleteById(goalId);
+    }
+
+    @Test
+    public void testDeleteGoal_NonExistentGoal() {
+        long nonExistentGoalId = 10L;
+
+        doNothing().when(goalRepository).deleteById(anyLong());
+
+        goalService.deleteGoal(nonExistentGoalId);
+
+        verify(goalRepository, times(1)).deleteById(nonExistentGoalId);
     }
 }

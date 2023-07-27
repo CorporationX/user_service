@@ -1,4 +1,4 @@
-package school.faang.user_service.controller;
+package school.faang.user_service.controller.mentorship;
 
 import org.mockito.Mock;
 import org.mockito.InjectMocks;

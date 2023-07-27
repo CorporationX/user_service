@@ -9,6 +9,7 @@ import school.faang.user_service.entity.Skill;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface SkillRepository extends JpaRepository<Skill, Long> {
@@ -50,5 +51,6 @@ public interface SkillRepository extends JpaRepository<Skill, Long> {
             """)
     List<Skill> findSkillsByGoalId(long goalId);
 
-    boolean existsAllById(List<Long> id);
+    boolean existsAllByIdIn(List<Long> id);
+    boolean existsById(Long id);
 }

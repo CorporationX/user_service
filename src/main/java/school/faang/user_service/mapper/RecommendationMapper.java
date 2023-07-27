@@ -1,15 +1,13 @@
 package school.faang.user_service.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +24,13 @@ public interface RecommendationMapper {
     @Mapping(target = "receiver", ignore = true)
     @Mapping(target = "skillOffers", source = "skillOffers", qualifiedByName = "toListOfEntity")
     Recommendation toEntity(RecommendationDto dto);
+
+    @Mapping(target = "updatedAt", source = "createdAt")
+    @Mapping(target = "createdAt", ignore = true)
+    void update(RecommendationDto dto, @MappingTarget Recommendation entity);
+
+//    @Mapping(target = "updatedAt", source = "createdAt")
+//    void update(LocalDateTime createdAt, @MappingTarget LocalDateTime updatedAt);
 
     @Named("toListOfDto")
     default List<SkillOfferDto> toListOfDto(List<SkillOffer> skillOffers) {

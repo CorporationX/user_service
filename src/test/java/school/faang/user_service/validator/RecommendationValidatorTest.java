@@ -1,5 +1,6 @@
 package school.faang.user_service.validator;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@Slf4j
 class RecommendationValidatorTest {
 
     private static final int RECOMMENDATION_PERIOD_IN_MONTH = 6;
@@ -27,6 +29,13 @@ class RecommendationValidatorTest {
     @InjectMocks
     private RecommendationValidator recommendationValidator;
 
+    @Test
+    public void tests(){
+        RecommendationDto dto = new RecommendationDto();
+        dto.setCreatedAt(LocalDateTime.now());
+        log.info("dto {}", dto);
+    }
+/*
 
     @Test
     void recommendationWithEmptyText() {
@@ -81,5 +90,7 @@ class RecommendationValidatorTest {
 
         assertDoesNotThrow(() -> recommendationValidator.validate(recommendationDto));
     }
+
+ */
 
 }

@@ -64,19 +64,15 @@ public class RecommendationServiceTest {
         recommendationDto.setAuthorId(1L);
         recommendationDto.setReceiverId(2L);
         recommendationDto.setContent("content");
-
         Recommendation lastRecommendation = new Recommendation();
         lastRecommendation.setCreatedAt(LocalDateTime.now());
-
         when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(
                 recommendationDto.getAuthorId(),
                 recommendationDto.getReceiverId()))
                 .thenReturn(Optional.of(lastRecommendation));
-
         DataValidationException dataValidationException = assertThrows(
                 DataValidationException.class,
                 () -> recommendationService.create(recommendationDto));
-
         String expectedMessage = "the recommendation can be given only after 6 months!";
         String actualMessage = dataValidationException.getMessage();
         assertEquals(expectedMessage, actualMessage);
@@ -89,14 +85,11 @@ public class RecommendationServiceTest {
         recommendationDto.setReceiverId(anyLong());
         recommendationDto.setContent("content");
         recommendationDto.setSkillOffers(List.of(new SkillOfferDto[]{}));
-
+        Long expectedId = 10L;
         when(recommendationRepository
                 .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(recommendationDto.getAuthorId(),
                         recommendationDto.getReceiverId()))
                 .thenReturn(Optional.empty());
-
-        Long expectedId = 10L;
-
         when(recommendationRepository.create(recommendationDto.getAuthorId(),
                 recommendationDto.getReceiverId(),
                 recommendationDto.getContent())).thenReturn(expectedId);
@@ -117,19 +110,15 @@ public class RecommendationServiceTest {
         recommendationDto.setReceiverId(2L);
         recommendationDto.setContent("new content");
         recommendationDto.setSkillOffers(List.of(new SkillOfferDto[]{}));
-
         Recommendation expectedRecommendation = recommendationMapper.toEntity(recommendationDto);
         when(recommendationRepository
                 .update(recommendationDto.getAuthorId(),
                         recommendationDto.getReceiverId(),
                         recommendationDto.getContent())).thenReturn(expectedRecommendation);
-
         Recommendation result = recommendationService.update(recommendationDto);
-
         verify(recommendationRepository).update(recommendationDto.getAuthorId(),
                 recommendationDto.getReceiverId(),
                 recommendationDto.getContent());
-
         assertEquals(expectedRecommendation, result);
     }
 

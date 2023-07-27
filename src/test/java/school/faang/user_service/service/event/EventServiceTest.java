@@ -2,6 +2,7 @@ package school.faang.user_service.service.event;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
@@ -27,6 +29,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class EventServiceTest {
@@ -237,5 +241,49 @@ class EventServiceTest {
     List<EventDto> events = eventService.getEventsByFilter(eventFilterDto);
 
     Assertions.assertEquals(2, events.size());
+  }
+
+  @Test
+  public void testDeleteAllByIds() {
+    eventService.deleteAllByIds(List.of(1L, 2L, 3L, 4L));
+
+    verify(eventRepository, times(1)).deleteAllById(List.of(1L, 2L, 3L, 4L));
+  }
+
+  @Test
+  @DisplayName("Should remove specific user from event.attendee list, if users > 2")
+  public void testRemoveUserFromEvents() {
+    Event running = new Event();
+    Event swimming = new Event();
+    Event coding = new Event();
+    Event relaxing = new Event();
+
+    User alex = new User();
+    alex.setId(1L);
+
+    User blake = new User();
+    blake.setId(2L);
+
+    running.setId(1L);
+    running.setAttendees(List.of(alex, blake));
+
+    swimming.setId(2L);
+    swimming.setAttendees(List.of(alex, blake));
+
+    coding.setId(3L);
+    coding.setAttendees(List.of(alex, blake));
+
+    relaxing.setId(4L);
+    relaxing.setAttendees(List.of(alex, blake));
+
+    when(eventRepository.findAllById(List.of(1L, 2L, 3L, 4L))).thenReturn(List.of(running, swimming,coding, relaxing));
+
+    int removedUsersFromEventCount = eventService.removeUserFromEvents(List.of(1L, 2L, 3L, 4L), 1L);
+
+    assertEquals(4, removedUsersFromEventCount);
+    assertEquals(1, running.getAttendees().size());
+    assertEquals(1, swimming.getAttendees().size());
+    assertEquals(1, coding.getAttendees().size());
+    assertEquals(1, relaxing.getAttendees().size());
   }
 }

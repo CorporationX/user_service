@@ -19,7 +19,8 @@ import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,41 +33,56 @@ public class RecommendationService {
     private final RecommendationMapper recommendationMapper;
 
     public Long create(RecommendationDto recommendationDto) {
-
-        emptyValidation(recommendationDto);
+        recommendationEmptyValidation(recommendationDto);
         timeValidation(recommendationDto);
+        skillEmptyValidation(recommendationDto);
 
-        List<SkillOfferDto> skillOfferDtoList = recommendationDto.getSkillOffers();
-        skillOfferDtoList.forEach(skillOfferDto -> {
-            skillRepository.findById(skillOfferDto.getSkillId())
-                    .ifPresent(skill -> skillOfferRepository.create(skillOfferDto.getSkillId(), skillOfferDto.getRecommendationId()));
-        });
-
-        List<Skill> skillsByReceiverId = skillRepository.findAllByUserId(recommendationDto.getReceiverId());
-        for (Skill skill : skillsByReceiverId) {
-            for (SkillOfferDto skillOfferDto : recommendationDto.getSkillOffers()) {
-                if (skillOfferDto.getSkillId() == skill.getId()) {
-                    addUserSkillGuarantee(recommendationDto.getAuthorId(),
-                            recommendationDto.getReceiverId(),
-                            skill.getId());
-                }
-            }
-
-        }
+        createSkillOffer(recommendationDto);
+        existsUserSkill(recommendationDto);
 
         return recommendationRepository.create(recommendationDto.getAuthorId(),
                 recommendationDto.getReceiverId(),
                 recommendationDto.getContent());
     }
 
+    private void createSkillOffer(RecommendationDto recommendationDto) {
+        recommendationDto.getSkillOffers()
+                .forEach(skillOfferDto -> skillOfferRepository.create(skillOfferDto.getSkillId(), recommendationDto.getId()));
+    }
+
+    public void existsUserSkill(RecommendationDto recommendationDto) {
+        Set<Long> skillsIdSet = skillRepository
+                .findAllByUserId(recommendationDto.getReceiverId())
+                .stream()
+                .map(Skill::getId)
+                .collect(Collectors.toSet());
+
+        Set<Long> skillOfferDtoSet = recommendationDto.
+                getSkillOffers()
+                .stream()
+                .map(SkillOfferDto::getSkillId)
+                .collect(Collectors.toSet());
+
+        skillsIdSet.retainAll(skillOfferDtoSet);
+        skillsIdSet.forEach(skillId -> addUserSkillGuarantee(recommendationDto.getAuthorId(),
+                recommendationDto.getReceiverId(),
+                skillId));
+    }
+
     public void addUserSkillGuarantee(Long authorId, Long receiverId, Long skillId) {
-        User author = userRepository.findById(authorId).orElseThrow(() -> new DataValidationException("Author not found"));
-        User receiver = userRepository.findById(receiverId).orElseThrow(() -> new DataValidationException("Receiver not found"));
-        Skill skill = skillRepository.findById(skillId).orElseThrow(() -> new DataValidationException("Skill not found"));
+        User author = findUserById(authorId);
+        User receiver = findUserById(receiverId);
+        Skill skill = skillRepository.findById(skillId)
+                .orElseThrow(() -> new DataValidationException("Skill not found"));
         userSkillGuaranteeRepository.save(new UserSkillGuarantee(null, receiver, skill, author));
     }
 
-    public void emptyValidation(RecommendationDto recommendationDto) {
+    private User findUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new DataValidationException("User by id - " + userId + " not found"));
+    }
+
+    public void recommendationEmptyValidation(RecommendationDto recommendationDto) {
         if (recommendationDto.getContent() == null || recommendationDto.getContent().isEmpty()) {
             throw new DataValidationException("recommendation cannot be empty");
         }
@@ -78,6 +94,14 @@ public class RecommendationService {
             if (lastRecommendation.getCreatedAt().isAfter(LocalDateTime.now().minusMonths(6))) {
                 throw new DataValidationException("the recommendation can be given only after 6 months!");
             }
+        });
+    }
+
+    public void skillEmptyValidation(RecommendationDto recommendationDto) {
+        List<SkillOfferDto> skillOfferDtoList = recommendationDto.getSkillOffers();
+        skillOfferDtoList.forEach(skillOfferDto -> {
+            skillRepository.findById(skillOfferDto.getSkillId())
+                    .orElseThrow(() -> new RuntimeException("skill by id - " + skillOfferDto.getSkillId() + " not found"));
         });
     }
 }

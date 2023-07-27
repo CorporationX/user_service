@@ -192,4 +192,10 @@ public class UserServiceTest {
 
         Mockito.verify(eventService, Mockito.times(1)).removeUserFromEvents(List.of(1L, 2L, 3L, 4L), 1L);
     }
+
+    @Test
+    public void testCancelMentoring() {
+        userService.deactivateUser(1L);
+        Mockito.verify(mentorshipService, Mockito.times(1)).cancelMentoring(1L);
+    }
 }

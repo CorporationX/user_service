@@ -50,7 +50,7 @@ public class RecommendationService {
                 .forEach(skillOfferDto -> skillOfferRepository.create(skillOfferDto.getSkillId(), recommendationDto.getId()));
     }
 
-    public void existsUserSkill(RecommendationDto recommendationDto) {
+    private void existsUserSkill(RecommendationDto recommendationDto) {
         Set<Long> skillsIdSet = skillRepository
                 .findAllByUserId(recommendationDto.getReceiverId())
                 .stream()
@@ -69,7 +69,7 @@ public class RecommendationService {
                 skillId));
     }
 
-    public void addUserSkillGuarantee(Long authorId, Long receiverId, Long skillId) {
+    private void addUserSkillGuarantee(Long authorId, Long receiverId, Long skillId) {
         User author = findUserById(authorId);
         User receiver = findUserById(receiverId);
         Skill skill = skillRepository.findById(skillId)
@@ -82,13 +82,13 @@ public class RecommendationService {
                 .orElseThrow(() -> new DataValidationException("User by id - " + userId + " not found"));
     }
 
-    public void recommendationEmptyValidation(RecommendationDto recommendationDto) {
+    private void recommendationEmptyValidation(RecommendationDto recommendationDto) {
         if (recommendationDto.getContent() == null || recommendationDto.getContent().isEmpty()) {
             throw new DataValidationException("recommendation cannot be empty");
         }
     }
 
-    public void timeValidation(RecommendationDto recommendationDto) {
+    private void timeValidation(RecommendationDto recommendationDto) {
         recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(recommendationDto.getAuthorId(),
                 recommendationDto.getReceiverId()).ifPresent(lastRecommendation -> {
             if (lastRecommendation.getCreatedAt().isAfter(LocalDateTime.now().minusMonths(6))) {
@@ -97,7 +97,7 @@ public class RecommendationService {
         });
     }
 
-    public void skillEmptyValidation(RecommendationDto recommendationDto) {
+    private void skillEmptyValidation(RecommendationDto recommendationDto) {
         List<SkillOfferDto> skillOfferDtoList = recommendationDto.getSkillOffers();
         skillOfferDtoList.forEach(skillOfferDto -> {
             skillRepository.findById(skillOfferDto.getSkillId())

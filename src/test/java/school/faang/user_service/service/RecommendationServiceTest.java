@@ -82,13 +82,13 @@ public class RecommendationServiceTest {
         recommendationDto.setReceiverId(anyLong());
         recommendationDto.setContent("content");
         recommendationDto.setSkillOffers(List.of(new SkillOfferDto[]{}));
+        Long expectedId = 10L;
 
         when(recommendationRepository
                 .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(recommendationDto.getAuthorId(),
                         recommendationDto.getReceiverId()))
                 .thenReturn(Optional.empty());
 
-        Long expectedId = 10L;
 
         when(recommendationRepository.create(recommendationDto.getAuthorId(),
                 recommendationDto.getReceiverId(),
@@ -100,6 +100,5 @@ public class RecommendationServiceTest {
                 recommendationDto.getReceiverId(),
                 recommendationDto.getContent());
         assertEquals(expectedId, resultId);
-
     }
 }

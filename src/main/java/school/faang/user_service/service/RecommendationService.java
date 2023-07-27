@@ -58,6 +58,10 @@ public class RecommendationService {
                 recommendationDto.getContent());
     }
 
+    public void delete(Long id) {
+        recommendationRepository.deleteById(id);
+    }
+
     private void createSkillOffer(RecommendationDto recommendationDto) {
         recommendationDto.getSkillOffers()
                 .forEach(skillOfferDto -> skillOfferRepository.create(skillOfferDto.getSkillId(), recommendationDto.getId()));

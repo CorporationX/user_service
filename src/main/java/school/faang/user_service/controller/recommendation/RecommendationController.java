@@ -1,8 +1,6 @@
 package school.faang.user_service.controller.recommendation;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
@@ -23,5 +21,10 @@ public class RecommendationController {
     @PutMapping()
     public Recommendation updateRecommendation(@RequestBody RecommendationDto recommendation) {
         return recommendationService.update(recommendation);
+    }
+
+    @DeleteMapping("/{recommendationId}")
+    public void deleteRecommendation(@PathVariable Long recommendationId) {
+        recommendationService.delete(recommendationId);
     }
 }

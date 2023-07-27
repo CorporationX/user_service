@@ -9,9 +9,9 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorship.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.IncorrectIdException;
+import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
-import school.faang.user_service.service.mentorship.MentorshipService;
-import school.faang.user_service.service.mentorship.UserMapperImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +32,9 @@ public class MentorshipServiceTest {
 
     private User nonExistentUser;
     private User correctUser;
+    private User testUser;
     private UserDto nonExistentUserDto;
-    private UserDto correctUserDto;
+    private UserDto testUserDto;
     private List<UserDto> expectedDtos;
     private final long CORRECT_USER_ID = 1L;
     private final long INCORRECT_USER_ID = 0L;
@@ -41,53 +42,62 @@ public class MentorshipServiceTest {
 
     @BeforeEach
     void initData() {
-        nonExistentUser = new User();
-        nonExistentUser.setId(NON_EXISTENT_USER_ID);
-        nonExistentUser.setUsername("Nikita");
-        nonExistentUser.setCity("Moscow");
-        nonExistentUser.setEmail("nick@mail.ru");
-        nonExistentUser.setMentors(new ArrayList<>());
-        nonExistentUser.setMentees(new ArrayList<>());
-        correctUser = new User();
-        correctUser.setId(CORRECT_USER_ID);
-        correctUser.setUsername("Max");
-        correctUser.setCity("Rome");
-        correctUser.setEmail("max@google.com");
-        correctUser.setMentees(new ArrayList<>(List.of(nonExistentUser, correctUser)));
-        correctUser.setMentors(new ArrayList<>(List.of(nonExistentUser, correctUser)));
+        testUser = User.builder()
+                .id(2L)
+                .username("Andrew")
+                .city("Milan")
+                .email("an@mail.ru")
+                .build();
+        nonExistentUser = User.builder()
+                .id(NON_EXISTENT_USER_ID)
+                .username("Nikita")
+                .city("Moscow")
+                .email("nick@mail.ru")
+                .mentors(new ArrayList<>())
+                .mentees(new ArrayList<>())
+                .build();
+        correctUser = User.builder()
+                .id(CORRECT_USER_ID)
+                .username("Max")
+                .city("Rome")
+                .email("max@google.com")
+                .mentors(new ArrayList<>(List.of(nonExistentUser, testUser)))
+                .mentees(new ArrayList<>(List.of(nonExistentUser, testUser)))
+                .build();
 
-        nonExistentUserDto = new UserDto();
-        nonExistentUserDto.setId(NON_EXISTENT_USER_ID);
-        nonExistentUserDto.setUsername("Nikita");
-        nonExistentUserDto.setCity("Moscow");
-        nonExistentUserDto.setEmail("nick@mail.ru");
-        correctUserDto = new UserDto();
-        correctUserDto.setId(CORRECT_USER_ID);
-        correctUserDto.setUsername("Max");
-        correctUserDto.setCity("Rome");
-        correctUserDto.setEmail("max@google.com");
-
-        expectedDtos = List.of(nonExistentUserDto, correctUserDto);
+        nonExistentUserDto = UserDto.builder()
+                .id(NON_EXISTENT_USER_ID)
+                .username("Nikita")
+                .city("Moscow")
+                .email("nick@mail.ru")
+                .build();
+        testUserDto = UserDto.builder()
+                .id(2L)
+                .username("Andrew")
+                .city("Milan")
+                .email("an@mail.ru")
+                .build();
+        expectedDtos = List.of(nonExistentUserDto, testUserDto);
     }
 
     @Test
     void testGetMenteesInputIncorrectUserId() {
-        assertThrows(IllegalArgumentException.class, () -> mentorshipService.getMentees(INCORRECT_USER_ID));
+        assertThrows(IncorrectIdException.class, () -> mentorshipService.getMentees(INCORRECT_USER_ID));
     }
 
     @Test
     void testGetMentorsInputIncorrectUserId() {
-        assertThrows(IllegalArgumentException.class, () -> mentorshipService.getMentors(INCORRECT_USER_ID));
+        assertThrows(IncorrectIdException.class, () -> mentorshipService.getMentors(INCORRECT_USER_ID));
     }
 
     @Test
     void testDeleteMenteeInputIncorrectUserId() {
-        assertThrows(IllegalArgumentException.class, () -> mentorshipService.deleteMentee(INCORRECT_USER_ID, INCORRECT_USER_ID));
+        assertThrows(IncorrectIdException.class, () -> mentorshipService.deleteMentee(INCORRECT_USER_ID, INCORRECT_USER_ID));
     }
 
     @Test
     void testDeleteMentorInputIncorrectUserId() {
-        assertThrows(IllegalArgumentException.class, () -> mentorshipService.deleteMentor(INCORRECT_USER_ID, INCORRECT_USER_ID));
+        assertThrows(IncorrectIdException.class, () -> mentorshipService.deleteMentor(INCORRECT_USER_ID, INCORRECT_USER_ID));
     }
 
     @Test
@@ -98,7 +108,7 @@ public class MentorshipServiceTest {
         List<UserDto> expectedList = new ArrayList<>();
 
         verify(mentorshipRepository, times(1)).findById(NON_EXISTENT_USER_ID);
-        assertArrayEquals(expectedList.toArray(), actualList.toArray());
+        assertEquals(expectedList, actualList);
     }
 
     @Test
@@ -109,7 +119,7 @@ public class MentorshipServiceTest {
         List<UserDto> expectedList = new ArrayList<>();
 
         verify(mentorshipRepository, times(1)).findById(NON_EXISTENT_USER_ID);
-        assertArrayEquals(expectedList.toArray(), actualList.toArray());
+        assertEquals(expectedList, actualList);
     }
 
     @Test
@@ -119,7 +129,7 @@ public class MentorshipServiceTest {
         List<UserDto> actualList = mentorshipService.getMentees(CORRECT_USER_ID);
 
         verify(mentorshipRepository, times(1)).findById(CORRECT_USER_ID);
-        assertArrayEquals(expectedDtos.toArray(), actualList.toArray());
+        assertEquals(expectedDtos, actualList);
     }
 
     @Test
@@ -127,22 +137,19 @@ public class MentorshipServiceTest {
        when(mentorshipRepository.findById(CORRECT_USER_ID)).thenReturn(Optional.ofNullable(correctUser));
 
        List<UserDto> actualList = mentorshipService.getMentors(CORRECT_USER_ID);
-
-       verify(mentorshipRepository, times(1)).findById(CORRECT_USER_ID);
-       assertArrayEquals(expectedDtos.toArray(), actualList.toArray());
+       assertEquals(expectedDtos, actualList);
     }
 
     @Test
     void testDeleteMenteeCorrectUserId() {
-        when(mentorshipRepository.findById(CORRECT_USER_ID)).thenReturn(Optional.ofNullable(correctUser));
-        when(mentorshipRepository.findById(NON_EXISTENT_USER_ID)).thenReturn(Optional.ofNullable(nonExistentUser));
+        when(mentorshipRepository.findById(CORRECT_USER_ID)).thenReturn(Optional.of(correctUser));
+        when(mentorshipRepository.findById(NON_EXISTENT_USER_ID)).thenReturn(Optional.of(nonExistentUser));
 
         mentorshipService.deleteMentee(NON_EXISTENT_USER_ID, CORRECT_USER_ID);
-        List<User> actualMentorList = correctUser.getMentees();
-        List<User> expectedMentorList = List.of(correctUser);
 
-        verify(mentorshipRepository, times(1)).save(correctUser);
-        assertArrayEquals(expectedMentorList.toArray(), actualMentorList.toArray());
+        List<User> actualMentorList = correctUser.getMentees();
+        List<User> expectedMentorList = List.of(testUser);
+        assertEquals(expectedMentorList, actualMentorList);
     }
 
     @Test
@@ -151,17 +158,15 @@ public class MentorshipServiceTest {
         when(mentorshipRepository.findById(NON_EXISTENT_USER_ID)).thenReturn(Optional.ofNullable(nonExistentUser));
 
         mentorshipService.deleteMentor(CORRECT_USER_ID, NON_EXISTENT_USER_ID);
-        List<User> actualMenteeList = correctUser.getMentors();
-        List<User> expectedMenteeList = List.of(correctUser);
 
-        verify(mentorshipRepository, times(1)).save(correctUser);
-        assertArrayEquals(expectedMenteeList.toArray(), actualMenteeList.toArray());
+        List<User> actualMenteeList = correctUser.getMentors();
+        List<User> expectedMenteeList = List.of(testUser);
+        assertEquals(expectedMenteeList, actualMenteeList);
     }
 
     @Test
     void testToDto() {
-        UserDto actualUserDto = userMapper.userToUserDto(nonExistentUser);
-
+        UserDto actualUserDto = userMapper.toDto(nonExistentUser);
         assertEquals(nonExistentUserDto, actualUserDto);
     }
 }

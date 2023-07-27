@@ -1,10 +1,13 @@
-package school.faang.user_service.service.mentorship;
+package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.mentorship.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.IncorrectIdException;
+import school.faang.user_service.exception.NoUserInDataBaseException;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import java.util.List;
@@ -43,10 +46,10 @@ public class MentorshipService {
 
     private User validateId(long userId) {
         if (userId < 1) {
-            throw new IllegalArgumentException("Некоректный ввод данных id");
+            throw new IncorrectIdException("Некоректный ввод данных id");
         }
         return mentorshipRepository.findById(userId).orElseThrow(() -> {
-            throw new IllegalArgumentException("Пользователя с таким id не существует");
+            throw new NoUserInDataBaseException("Пользователя с таким id не существует");
         });
     }
 

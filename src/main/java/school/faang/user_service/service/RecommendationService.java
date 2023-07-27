@@ -1,6 +1,8 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
@@ -17,6 +19,7 @@ import school.faang.user_service.repository.recommendation.RecommendationReposit
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -148,6 +151,18 @@ public class RecommendationService {
 
     public void delete(long id){
         recommendationRepository.deleteById(id);
+    }
+
+    public List<RecommendationDto> getAllUserRecommendations(long receiverId){
+        Page<Recommendation> recommendations = recommendationRepository
+                .findAllByReceiverId(receiverId, Pageable.unpaged());
+        if(recommendations==null) {
+            return new ArrayList<>();
+        }
+        return recommendations.getContent()
+                .stream()
+                .map(recommendationMapper::toDto)
+                .toList();
     }
 
     private void validatePreviousRecommendation(RecommendationDto recommendationDto) {

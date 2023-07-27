@@ -241,7 +241,6 @@ class RecommendationServiceTest {
         recommendationService.delete(recommendationId);
         Mockito.verify(recommendationRepository, Mockito.times(1)).deleteById(recommendationId);
     }
-
     private Recommendation buildRecommendation(){
         return Recommendation
                 .builder()

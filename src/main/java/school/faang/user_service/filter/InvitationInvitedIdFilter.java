@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.filter;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
@@ -8,17 +8,15 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @Component
-public class InvitationInviterNameFilter implements InvitationFilter {
+public class InvitationInvitedIdFilter implements InvitationFilter {
 
     @Override
     public boolean isApplicable(InvitationFilterDto filters) {
-        return filters.getInviterNamePattern() != null;
+        return filters.getInvitedId() != null;
     }
 
     @Override
     public List<GoalInvitation> apply(Stream<GoalInvitation> invitations, InvitationFilterDto filters) {
-        return invitations
-                .filter(in -> in.getInviter().getUsername().contains(filters.getInviterNamePattern()))
-                .toList();
+        return invitations.filter(in -> in.getInvited().getId() == filters.getInvitedId()).toList();
     }
 }

@@ -7,6 +7,12 @@ import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.GoalInvitation;
+import school.faang.user_service.filter.InvitationFilter;
+import school.faang.user_service.filter.InvitationInvitedIdFilter;
+import school.faang.user_service.filter.InvitationInvitedNameFilter;
+import school.faang.user_service.filter.InvitationInviterIdFilter;
+import school.faang.user_service.filter.InvitationInviterNameFilter;
+import school.faang.user_service.filter.InvitationStatusFilter;
 
 import java.util.List;
 import java.util.stream.Stream;

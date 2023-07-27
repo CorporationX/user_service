@@ -3,9 +3,11 @@ package school.faang.user_service.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exeption.UserAlreadyRegisteredAtEvent;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
 import java.util.List;
+
 
 @Component
 @AllArgsConstructor
@@ -18,7 +20,7 @@ public class EventParticipationService {
                 .filter(person -> person.getId() == userId)
                 .findFirst();
         if (user.isPresent()) {
-            throw new RuntimeException("User already have been registered in this event");
+            throw new UserAlreadyRegisteredAtEvent(eventId, userId);
         }
         eventParticipationRepository.register(eventId, userId);
     }
@@ -34,4 +36,9 @@ public class EventParticipationService {
             throw new RuntimeException(String.format("User with @d id, doesn't participate in event with @d id.", userId, eventId));
         }
     }
+
+    /*public List<User> getParticipant(long eventId){
+        var users = eventParticipationRepository.findAllParticipantsByEventId(eventId);
+        return users;
+    }*/
 }

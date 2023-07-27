@@ -17,13 +17,24 @@ import java.util.Objects;
 public class UserService {
   private final UserRepository userRepository;
   private final GoalService goalService;
+  private final EventService eventService;
 
   public boolean isUserExist(Long userId) {
     return userRepository.existsById(userId);
   }
 
-  private boolean isOnlyWithOneCurrentUser(GoalDto goal, Long userId) {
+  private boolean shouldGoalBeDeleted(GoalDto goal, Long userId) {
     List<Long> userIds = goal.getUserIds();
+    return userIds.size() == 1 && Objects.equals(userIds.get(0), userId);
+  }
+
+  private boolean shouldEventBeDeleted(EventDto event, Long userId) {
+    // If event owner is not a deactivated user
+    if (!Objects.equals(event.getOwnerId(), userId)) {
+      return false;
+    }
+
+    List<Long> userIds = event.getAttendeesIds();
     return userIds.size() == 1 && Objects.equals(userIds.get(0), userId);
   }
 
@@ -34,7 +45,7 @@ public class UserService {
     List<GoalDto> allGoals = goalService.getGoalsByUser(userId);
 
     for (GoalDto goal : allGoals) {
-      if (isOnlyWithOneCurrentUser(goal, userId)) {
+      if (shouldGoalBeDeleted(goal, userId)) {
         userGoalsForDeleting.add(goal.getId());
       } else {
         userGoalsForUpdating.add(goal.getId());
@@ -45,8 +56,27 @@ public class UserService {
     goalService.removeUserFromGoals(userGoalsForUpdating, userId);
   }
 
+  private void stopUserEvents(Long userId) {
+    List<Long> userEventsForDeleting = new ArrayList<>();
+    List<Long> userEventsForUpdating = new ArrayList<>();
+
+    List<EventDto> allevents = eventService.getParticipatedEvents(userId);
+
+    for (EventDto event : allevents) {
+      if (shouldEventBeDeleted(event, userId)) {
+        userEventsForDeleting.add(event.getId());
+      } else {
+        userEventsForUpdating.add(event.getId());
+      }
+    }
+
+    eventService.deleteAllByIds(userEventsForDeleting);
+    eventService.removeUserFromEvents(userEventsForUpdating, userId);
+  }
+
 
   public void deactivateUser(Long userId) {
     stopUserGoals(userId);
+    stopUserEvents(userId);
   }
 }

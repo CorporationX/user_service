@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.EventMapper;
@@ -91,5 +92,20 @@ public class EventService {
     eventMapper.update(existingEvent, event);
 
     return create(existingEvent);
+  }
+
+  public void deleteAllByIds(List<Long> ids) {
+    eventRepository.deleteAllById(ids);
+  }
+
+  public int removeUserFromEvents(List<Long> goalIds, Long userId) {
+    List<Event> events = eventRepository.findAllById(goalIds);
+
+    events.forEach(event -> {
+      List<User> currentUsers = event.getAttendees();
+      event.setAttendees(currentUsers.stream().filter(user -> user.getId() != userId).toList());
+    });
+
+    return events.size();
   }
 }

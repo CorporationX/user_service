@@ -16,67 +16,67 @@ import java.util.List;
 @RequestMapping("api/v1/events")
 @RequiredArgsConstructor
 public class EventController {
-  private final EventService eventService;
-  private static final int MIN_NAME_LENGTH = 3;
+    private final EventService eventService;
+    private static final int MIN_NAME_LENGTH = 3;
 
-  private void validateTitle(String name) {
-    if (name == null || name.length() < MIN_NAME_LENGTH) {
-      throw new DataValidationException("Name is required and should be at least 3 symbols");
+    private void validateTitle(String name) {
+        if (name == null || name.length() < MIN_NAME_LENGTH) {
+            throw new DataValidationException("Name is required and should be at least 3 symbols");
+        }
     }
-  }
 
-  private void validateStartDate(LocalDateTime startDate) {
-    if (startDate == null) {
-      throw new DataValidationException("Start date is required");
+    private void validateStartDate(LocalDateTime startDate) {
+        if (startDate == null) {
+            throw new DataValidationException("Start date is required");
+        }
     }
-  }
 
-  private static void validateUserId(Long ownerId) {
-    if (ownerId == null) {
-      throw new DataValidationException("User id is required");
+    private static void validateUserId(Long ownerId) {
+        if (ownerId == null) {
+            throw new DataValidationException("User id is required");
+        }
     }
-  }
 
-  private void validateEvent(EventDto event) {
-    validateTitle(event.getTitle());
-    validateStartDate(event.getStartDate());
-    validateUserId(event.getOwnerId());
-  }
+    private void validateEvent(EventDto event) {
+        validateTitle(event.getTitle());
+        validateStartDate(event.getStartDate());
+        validateUserId(event.getOwnerId());
+    }
 
-  @PostMapping("/")
-  public EventDto create(@RequestBody EventDto event) {
-    validateEvent(event);
-    return eventService.create(event);
-  }
+    @PostMapping("/")
+    public EventDto create(@RequestBody EventDto event) {
+        validateEvent(event);
+        return eventService.create(event);
+    }
 
-  @DeleteMapping("/{id}")
-  public void deleteEvent(@PathVariable Long id) {
-    eventService.delete(id);
-  }
+    @DeleteMapping("/{id}")
+    public void deleteEvent(@PathVariable Long id) {
+        eventService.delete(id);
+    }
 
-  @GetMapping("/participants/{userId}")
-  public List<EventDto> getParticipationEvents(@PathVariable Long userId) {
-    return eventService.getParticipatedEvents(userId);
-  }
+    @GetMapping("/participants/{userId}")
+    public List<EventDto> getParticipationEvents(@PathVariable Long userId) {
+        return eventService.getParticipatedEvents(userId);
+    }
 
-  @GetMapping("/owner/{ownerId}")
-  public List<EventDto> getOwnedEvents(@PathVariable Long ownerId) {
-    return eventService.getOwnedEvents(ownerId);
-  }
+    @GetMapping("/owner/{ownerId}")
+    public List<EventDto> getOwnedEvents(@PathVariable Long ownerId) {
+        return eventService.getOwnedEvents(ownerId);
+    }
 
-  @PostMapping("/filter")
-  public List<EventDto> getEventsByFilter(@RequestBody EventFilterDto filter) {
-    return eventService.getEventsByFilter(filter);
-  }
+    @PostMapping("/filter")
+    public List<EventDto> getEventsByFilter(@RequestBody EventFilterDto filter) {
+        return eventService.getEventsByFilter(filter);
+    }
 
-  @GetMapping("/{id}")
-  public EventDto getEvent(@PathVariable Long id) {
-    return eventService.get(id);
-  }
+    @GetMapping("/{id}")
+    public EventDto getEvent(@PathVariable Long id) {
+        return eventService.get(id);
+    }
 
-  @PutMapping("/")
-  public EventDto updateEvent(@RequestBody EventDto event) {
-    validateEvent(event);
-    return eventService.updateEvent(event);
-  }
+    @PutMapping("/")
+    public EventDto updateEvent(@RequestBody EventDto event) {
+        validateEvent(event);
+        return eventService.updateEvent(event);
+    }
 }

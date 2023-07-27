@@ -13,7 +13,6 @@ import school.faang.user_service.entity.RequestStatus;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MentorshipRequestDto {
-
     @NotNull
     private Long receiverId;
     @NotNull

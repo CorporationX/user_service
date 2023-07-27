@@ -18,7 +18,6 @@ import java.util.List;
 @RequestMapping("api/v1/events")
 @RequiredArgsConstructor
 public class EventParticipationController {
-
     private final EventParticipationService eventParticipationService;
     private final EventParticipationRequestValidator validator;
 

@@ -14,7 +14,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class EventParticipationService {
-
     private final EventParticipationRepository eventParticipationRepository;
     private final UserMapper userMapper;
 

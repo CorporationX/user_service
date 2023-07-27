@@ -5,9 +5,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.mentor.UserDto;
+import school.faang.user_service.dto.mentee.MenteeDto;
+import school.faang.user_service.dto.mentor.MentorDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.mentee.MenteeMapper;
+import school.faang.user_service.mapper.mentor.MentorMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
@@ -28,7 +30,9 @@ class MentorshipServiceTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    private UserMapper userMapper;
+    private MentorMapper mentorMapper;
+    @Mock
+    private MenteeMapper menteeMapper;
     @Mock
     private User user;
     @InjectMocks
@@ -48,9 +52,9 @@ class MentorshipServiceTest {
         user.setId(mentorId);
         Optional<User> userOptional = Optional.of(user);
         when(mentorshipRepository.findById(anyLong())).thenReturn(userOptional);
-        when(mentorshipService.getMentees(mentorId)).thenReturn(List.of(new UserDto(), new UserDto()));
+        when(mentorshipService.getMentees(mentorId)).thenReturn(List.of(new MenteeDto(), new MenteeDto()));
 
-        List<UserDto> userDto = mentorshipService.getMentees(mentorId);
+        List<MenteeDto> userDto = mentorshipService.getMentees(mentorId);
 
         assertEquals(2, userDto.size());
     }
@@ -67,9 +71,9 @@ class MentorshipServiceTest {
         User user = new User();
         Optional<User> userOptional = Optional.of(user);
         when(mentorshipRepository.findById(anyLong())).thenReturn(userOptional);
-        when(mentorshipService.getMentors(menteeId)).thenReturn(List.of(new UserDto(), new UserDto()));
+        when(mentorshipService.getMentors(menteeId)).thenReturn(List.of(new MentorDto(), new MentorDto()));
 
-        List<UserDto> userDto = mentorshipService.getMentors(menteeId);
+        List<MentorDto> userDto = mentorshipService.getMentors(menteeId);
 
         assertEquals(2, userDto.size());
     }

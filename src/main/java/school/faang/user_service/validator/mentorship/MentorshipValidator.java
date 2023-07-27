@@ -4,8 +4,8 @@ import school.faang.user_service.exception.DataValidationException;
 
 public class MentorshipValidator {
     public void idValidator(long id) {
-        if (id < 0) {
-            throw new DataValidationException("Id mast be bore 0");
+        if (id < 1) {
+            throw new DataValidationException("Id must be more 1, it's wrong id");
         }
     }
 

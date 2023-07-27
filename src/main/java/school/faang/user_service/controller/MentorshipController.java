@@ -1,4 +1,4 @@
-package school.faang.user_service.controller.mentorship;
+package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.mentorship.UserDto;
-import school.faang.user_service.service.mentorship.MentorshipService;
+import school.faang.user_service.service.MentorshipService;
 
 import java.util.List;
 

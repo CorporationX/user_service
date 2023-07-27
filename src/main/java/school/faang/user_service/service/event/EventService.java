@@ -41,16 +41,16 @@ public class EventService {
     }
 
     public List<EventDto> getEventsByFilter(EventFilterDto filters) {
-        Stream<Event> event = eventRepository.findAll().stream();
+        Stream<Event> events = eventRepository.findAll().stream();
 
         List<EventFilter> eventFilterList = eventFilters.stream()
                 .filter(filter -> filter.isApplicable(filters))
                 .toList();
 
-        for (EventFilter events : eventFilterList) {
-            event = events.apply(event, filters);
+        for (EventFilter filter : eventFilterList) {
+            events = filter.apply(events, filters);
         }
-        return event.map(eventMapper::toEventDto).toList();
+        return events.map(eventMapper::toEventDto).toList();
     }
 
     public EventDto updateEvent(EventDto event) {

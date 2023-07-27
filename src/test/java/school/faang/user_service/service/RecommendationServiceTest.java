@@ -73,9 +73,6 @@ class RecommendationServiceTest {
                 skillRepository,
                 userRepository,
                 userSkillGuaranteeRepository);
-
-        Mockito.when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(1L,2L))
-                .thenReturn(Optional.of(buildRecommendation()));
     }
 
     @Test

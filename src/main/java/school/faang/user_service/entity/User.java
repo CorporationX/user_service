@@ -96,7 +96,10 @@ public class User {
     @OneToMany(mappedBy = "owner")
     private List<Event> ownedEvents;
 
-    @ManyToMany(mappedBy = "mentors")
+    @ManyToMany
+    @JoinTable(name = "mentorship",
+            joinColumns = @JoinColumn(name = "mentor_id"),
+            inverseJoinColumns = @JoinColumn(name = "mentee_id"))
     private List<User> mentees;
 
     @ManyToMany

@@ -19,14 +19,12 @@ public class MentorshipService {
 
     public List<UserDto> getMentees(long id) {
         User user = findUserByIdMentorshipRep(id);
-
         List<User> mentees = user.getMentees();
         return isNullListUsers(mentees);
     }
 
     public List<UserDto> getMentors(long id) {
         User user = findUserByIdMentorshipRep(id);
-
         List<User> mentors = user.getMentors();
         return isNullListUsers(mentors);
     }
@@ -52,12 +50,12 @@ public class MentorshipService {
                 .orElseThrow(() -> new DataValidationException("User was not found"));
     }
 
-    private User findUserByIdMentorshipRep(long id){
+    private User findUserByIdMentorshipRep(long id) {
         return mentorshipRepository.findById(id)
                 .orElseThrow(() -> new DataValidationException("User was not found"));
     }
 
-    private List<UserDto> isNullListUsers(List<User> users){
+    private List<UserDto> isNullListUsers(List<User> users) {
         return users == null ?
                 new ArrayList<>() : userMapper.toDto(users);
     }

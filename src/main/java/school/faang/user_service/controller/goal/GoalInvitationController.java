@@ -13,18 +13,18 @@ import java.util.List;
 public class GoalInvitationController {
     private final GoalInvitationService goalInvitationService;
 
-    public void createInvitation(GoalInvitationDto invitation) {
-        goalInvitationService.createInvitation(invitation);
+    public GoalInvitationDto createInvitation(GoalInvitationDto invitation) {
+        return goalInvitationService.createInvitation(invitation);
     }
 
-    public void acceptGoalInvitation(long id) {
+    public GoalInvitationDto acceptGoalInvitation(long id) {
         validateId(id);
-        goalInvitationService.acceptGoalInvitation(id);
+        return goalInvitationService.acceptGoalInvitation(id);
     }
 
-    public void rejectGoalInvitation(long id) {
+    public GoalInvitationDto rejectGoalInvitation(long id) {
         validateId(id);
-        goalInvitationService.rejectGoalInvitation(id);
+        return goalInvitationService.rejectGoalInvitation(id);
     }
 
     public List<GoalInvitationDto> getInvitations(InvitationFilterDto filter) {

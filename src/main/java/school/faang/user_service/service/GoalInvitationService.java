@@ -27,7 +27,7 @@ public class GoalInvitationService {
     private final GoalInvitationMapper goalInvitationMapper;
     private final GoalInvitationRepository goalInvitationRepository;
 
-    public void createInvitation(GoalInvitationDto invitation) {
+    public GoalInvitationDto createInvitation(GoalInvitationDto invitation) {
         User inviter = userService.findUserById(invitation.getInviterId());
         User invited = userService.findUserById(invitation.getInvitedUserId());
 
@@ -38,7 +38,7 @@ public class GoalInvitationService {
         Optional<Goal> goal = goalRepository.findById(invitation.getGoalId());
 
         if (goal.isPresent()) {
-            goalInvitationRepository.save(new GoalInvitation(
+            GoalInvitation savedGoalInvitation = goalInvitationRepository.save(new GoalInvitation(
                     invitation.getId(),
                     goal.get(),
                     inviter,
@@ -46,12 +46,13 @@ public class GoalInvitationService {
                     invitation.getStatus(),
                     LocalDateTime.now(),
                     LocalDateTime.now()));
+            return goalInvitationMapper.toDto(savedGoalInvitation);
         } else {
             throw new EntityNotFoundException("Invalid request. Requester goal not found");
         }
     }
 
-    public void acceptGoalInvitation(long id) {
+    public GoalInvitationDto acceptGoalInvitation(long id) {
         GoalInvitation goalInvitation = findGoalInvitation(id);
 
         User invitedUser = goalInvitation.getInvited();
@@ -60,19 +61,17 @@ public class GoalInvitationService {
         validateGoalInvitation(invitedUser, goal);
 
         goalInvitation.setStatus(RequestStatus.ACCEPTED);
-        goalInvitationRepository.save(goalInvitation);
+        GoalInvitation savedGoalInvitation = goalInvitationRepository.save(goalInvitation);
         invitedUser.getGoals().add(goal);
+        return goalInvitationMapper.toDto(savedGoalInvitation);
     }
 
-    public void rejectGoalInvitation(long id) {
+    public GoalInvitationDto rejectGoalInvitation(long id) {
         GoalInvitation goalInvitation = findGoalInvitation(id);
 
-        if (goalRepository.existsById(goalInvitation.getGoal().getId())) {
-            goalInvitation.setStatus(RequestStatus.REJECTED);
-            goalInvitationRepository.save(goalInvitation);
-        } else {
-            throw new EntityNotFoundException("Invalid request. Requested goal not found");
-        }
+        goalInvitation.setStatus(RequestStatus.REJECTED);
+        GoalInvitation savedGoalInvitation = goalInvitationRepository.save(goalInvitation);
+        return goalInvitationMapper.toDto(savedGoalInvitation);
     }
 
     private void validateGoalInvitation(User user, Goal goal) {

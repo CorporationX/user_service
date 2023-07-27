@@ -37,9 +37,6 @@ class GoalInvitationServiceTest {
     GoalInvitation goalInvitation;
 
     @Mock
-    Goal mockGoal;
-
-    @Mock
     GoalInvitation mockGoalInvitation;
 
     @Mock
@@ -147,17 +144,6 @@ class GoalInvitationServiceTest {
         }
 
         @Test
-        public void testRejectGoalInvitationThrowEntityExcBecOfGoal() {
-            Mockito.when(goalInvitationRepository.findById(goalInvitationId)).thenReturn(
-                    Optional.of(mockGoalInvitation));
-            Mockito.when(mockGoalInvitation.getGoal()).thenReturn(mockGoal);
-
-            EntityNotFoundException exc = assertThrows(EntityNotFoundException.class,
-                    () -> goalInvitationService.rejectGoalInvitation(goalInvitationId));
-            assertEquals("Invalid request. Requested goal not found", exc.getMessage());
-        }
-
-        @Test
         public void testGetInvitationsReturnEmptyList() {
             List<GoalInvitationDto> result = goalInvitationService.getInvitations(new InvitationFilterDto());
             assertEquals(Collections.emptyList(), result);
@@ -189,12 +175,12 @@ class GoalInvitationServiceTest {
 
         @Test
         public void testAcceptGoalInvitationCallFindById() {
-            Mockito.verify(goalInvitationRepository, Mockito.times(1)).findById(goalInvitationId);
+            Mockito.verify(goalInvitationRepository).findById(goalInvitationId);
         }
 
         @Test
         public void testAcceptGoalInvitationCallExistsById() {
-            Mockito.verify(goalRepository, Mockito.times(1)).existsById(goalId);
+            Mockito.verify(goalRepository).existsById(goalId);
         }
     }
 
@@ -215,12 +201,12 @@ class GoalInvitationServiceTest {
 
         @Test
         public void testCreateInvitationCallFindById() {
-            Mockito.verify(goalRepository, Mockito.times(1)).findById(1L);
+            Mockito.verify(goalRepository).findById(1L);
         }
 
         @Test
         public void testCreateInvitationCallSave() {
-            Mockito.verify(goalInvitationRepository, Mockito.times(1)).save(Mockito.any());
+            Mockito.verify(goalInvitationRepository).save(Mockito.any());
         }
     }
 
@@ -231,28 +217,20 @@ class GoalInvitationServiceTest {
         @BeforeEach
         public void setUp() {
             goalInvitationId = 1L;
-
             Mockito.when(goalInvitationRepository.findById(goalInvitationId)).thenReturn(
                     Optional.of(mockGoalInvitation));
-            Mockito.when(mockGoalInvitation.getGoal()).thenReturn(mockGoal);
-            Mockito.when(goalRepository.existsById(Mockito.anyLong())).thenReturn(true);
 
             goalInvitationService.rejectGoalInvitation(goalInvitationId);
         }
 
         @Test
         public void testRejectGoalInvitationCallFindById() {
-            Mockito.verify(goalInvitationRepository, Mockito.times(1)).findById(goalInvitationId);
-        }
-
-        @Test
-        public void testRejectGoalInvitationCallExistsById() {
-            Mockito.verify(goalRepository, Mockito.times(1)).existsById(Mockito.anyLong());
+            Mockito.verify(goalInvitationRepository).findById(goalInvitationId);
         }
 
         @Test
         public void testRejectGoalInvitationCallSave() {
-            Mockito.verify(goalInvitationRepository, Mockito.times(1)).save(mockGoalInvitation);
+            Mockito.verify(goalInvitationRepository).save(mockGoalInvitation);
         }
     }
 
@@ -274,22 +252,22 @@ class GoalInvitationServiceTest {
 
         @Test
         public void testGetInvitationsCallFindAll() {
-            Mockito.verify(goalInvitationRepository, Mockito.times(1)).findAll();
+            Mockito.verify(goalInvitationRepository).findAll();
         }
 
         @Test
         public void testGetInvitationsCallIsEmpty() {
-            Mockito.verify(invitations, Mockito.times(1)).isEmpty();
+            Mockito.verify(invitations).isEmpty();
         }
 
         @Test
         public void testGetInvitationsCallStream1() {
-            Mockito.verify(invitationFilters, Mockito.times(1)).stream();
+            Mockito.verify(invitationFilters).stream();
         }
 
         @Test
         public void testGetInvitationsCallStream2() {
-            Mockito.verify(invitations, Mockito.times(1)).stream();
+            Mockito.verify(invitations).stream();
         }
     }
 }

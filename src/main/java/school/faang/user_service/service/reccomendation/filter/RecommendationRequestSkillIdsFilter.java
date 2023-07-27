@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 public class RecommendationRequestSkillIdsFilter implements RecommendationRequestFilter {
     @Override
     public boolean isApplicable(RequestFilterDto filters) {
-        return !filters.getSkillIds().isEmpty();
+        return filters.getSkillIds() != null && !filters.getSkillIds().isEmpty();
     }
 
     @Override

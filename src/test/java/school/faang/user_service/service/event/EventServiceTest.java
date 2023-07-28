@@ -1,102 +1,140 @@
 package school.faang.user_service.service.event;
 
-
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Spy;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.mapper.event.EventMapper;
+import school.faang.user_service.exception.event.DataValidationException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.service.event.EventService;
-import school.faang.user_service.validate.event.EventValidate;
-
-import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class EventServiceTest {
-    @Spy
-    private EventMapper eventMapper;
-
-    @Spy
-    private UserRepository userRepository;
-    @Spy
-    private EventRepository eventRepository;
-
-    private EventValidate eventValidate;
+    @InjectMocks
     private EventService eventService;
 
-    private Event event;
-    private EventDto eventDto;
+    @Mock
+    private EventRepository eventRepository;
+
+    @Mock
+    private UserRepository userRepository;
+
+
+    EventDto eventDto;
+    Event event;
 
     @BeforeEach
     void setUp() {
-        eventValidate = new EventValidate(userRepository);
-        eventService = new EventService(eventRepository, eventMapper, eventValidate);
+        eventService = new EventService(eventRepository, userRepository);
 
-        Skill skill1 = Skill.builder().id(1L).build();
-        Skill skill2 = Skill.builder().id(2L).build();
-        Skill skill3 = Skill.builder().id(3L).build();
+        User user = new User();
+        user.setId(1L);
 
-        User owner = new User();
-        owner.setId(1L);
+        Skill skill1 = new Skill();
+        skill1.setId(1L);
+        skill1.setTitle("Ability");
+        Skill skill2 = new Skill();
+        skill2.setId(2L);
+        skill2.setTitle("Expertise");
+        user.setSkills(List.of(skill1, skill2));
 
-        event = Event.builder()
-                .id(1L)
-                .title("Test Event")
-                .startDate(LocalDateTime.now())
-                .endDate(LocalDateTime.now().plusHours(2))
-                .owner(owner)
-                .description("This is a test event")
-                .relatedSkills(Arrays.asList(skill1, skill2, skill3))
-                .location("Test Location")
-                .maxAttendees(50)
-                .build();
+        eventDto = new EventDto();
+        eventDto.setId(1L);
+        eventDto.setTitle("My Event");
+        eventDto.setStartDate(LocalDate.of(2023, 7, 27).atStartOfDay());
+        eventDto.setOwnerId(1L);
+        eventDto.setRelatedSkills(List.of(new SkillDto(1L, "Ability"), new SkillDto(2L, "Expertise")));
 
-        eventDto = EventDto.builder()
-                .id(1L)
-                .title("Test Event")
-                .startDate(LocalDateTime.now())
-                .endDate(LocalDateTime.now().plusHours(2))
-                .ownerId(1L)
-                .description("This is a test event")
-                .skillIds(Arrays.asList(1L, 2L, 3L))
-                .location("Test Location")
-                .maxAttendees(50)
-                .build();
+        event = new Event();
+        event.setId(1L);
     }
 
     @Test
-    void create_ValidEventDto_ReturnsCreatedEventDto() {
-        // Arrange
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(new User()));
-        when(eventMapper.toEvent(eventDto)).thenReturn(event);
-        when(eventMapper.toDto(event)).thenReturn(eventDto);
+    void testCreate_EventExists() {
+        List<Event> existingEvents = new ArrayList<>();
+        existingEvents.add(event);
 
-        // Act
-        EventDto createdEventDto = eventService.create(eventDto);
+        assertThrows(DataValidationException.class, () -> eventService.create(eventDto));
+    }
 
-        // Assert
-        assertEquals(eventDto.getId(), createdEventDto.getId());
-        assertEquals(eventDto.getTitle(), createdEventDto.getTitle());
-        assertEquals(eventDto.getStartDate(), createdEventDto.getStartDate());
-        assertEquals(eventDto.getEndDate(), createdEventDto.getEndDate());
-        assertEquals(eventDto.getOwnerId(), createdEventDto.getOwnerId());
-        assertEquals(eventDto.getDescription(), createdEventDto.getDescription());
-        assertEquals(eventDto.getLocation(), createdEventDto.getLocation());
-        assertEquals(eventDto.getMaxAttendees(), createdEventDto.getMaxAttendees());
-        assertEquals(eventDto.getSkillIds(), createdEventDto.getSkillIds());
+    @Test
+    void testCreate_EventDoesNotExistReturnDto() {
+        User user = new User();
+        user.setId(1L);
+
+        Skill skill1 = new Skill();
+        skill1.setId(1L);
+        skill1.setTitle("Ability");
+        Skill skill2 = new Skill();
+        skill2.setId(2L);
+        skill2.setTitle("Expertise");
+        user.setSkills(List.of(skill1, skill2));
+
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        eventService = new EventService(eventRepository, userRepository);
+        when(eventRepository.findByEventId(event.getId())).thenReturn(new ArrayList<>());
+        when(eventRepository.save(any(Event.class))).thenReturn(event);
+        EventDto result = eventService.create(eventDto);
+
+        assertNotNull(result);
+        assertEquals(eventDto.getId(), result.getId());
+    }
+
+    @Test
+    void testCreate_ValidOwnerId() {
+        User user = new User();
+        user.setId(1L);
+
+        eventDto.setOwnerId(1L);
+
+        assertThrows(DataValidationException.class, () -> eventService.create(eventDto));
+    }
+
+    @Test
+    void testCreate_IfOwnerIdNull() {
+        eventDto.setOwnerId(null);
+
+        assertThrows(DataValidationException.class, () -> eventService.create(eventDto));
+    }
+
+    @Test
+    void testCreate_IfOwnerIdNegative() {
+        eventDto.setOwnerId(-1L);
+
+        assertThrows(DataValidationException.class, () -> eventService.create(eventDto));
+    }
+
+    @Test
+    void testCreate_ValidEventTitle() {
+        eventDto.setTitle("My Title");
+
+        assertThrows(DataValidationException.class, () -> eventService.create(eventDto));
+    }
+
+    @Test
+    void testCreate_NullEventTitle() {
+        eventDto.setTitle(null);
+
+        assertThrows(DataValidationException.class, () -> eventService.create(eventDto));
+    }
+
+    @Test
+    void testCreate_BlankEventTitle() {
+        eventDto.setTitle("     ");
+
+        assertThrows(DataValidationException.class, () -> eventService.create(eventDto));
     }
 }

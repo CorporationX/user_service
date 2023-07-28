@@ -1,15 +1,10 @@
 package school.faang.user_service.dto.skill;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
-@NoArgsConstructor
-
 public class SkillDto {
     private Long id;
     private String title;

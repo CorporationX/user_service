@@ -23,7 +23,6 @@ class EventMapperTest {
     private EventDto eventDto;
     private User user;
 
-
     @BeforeEach
     void setUp() {
         user = new User();

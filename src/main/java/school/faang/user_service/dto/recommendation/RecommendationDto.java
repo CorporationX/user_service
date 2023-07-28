@@ -19,8 +19,4 @@ public class RecommendationDto {
     private String content;
     private List<SkillOfferDto> skillOffers;
     private LocalDateTime createdAt;
-
-    public static void main(String[] args) {
-
-    }
 }

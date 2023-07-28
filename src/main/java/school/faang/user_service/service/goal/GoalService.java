@@ -82,6 +82,8 @@ public class GoalService {
         List<GoalDto> list = goalFilters.stream()
                 .filter(goalFilter -> goalFilter.isApplicable(goalFilterDto))
                 .flatMap(goalFilter -> goalFilter.apply(goals, goalFilterDto))
+                .map(goalMapper::goalToDto)
+                .toList();
 
         return applyFilter(goals, goalFilterDto);
     }

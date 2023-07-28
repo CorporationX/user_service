@@ -7,7 +7,6 @@ import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
@@ -20,10 +19,13 @@ import school.faang.user_service.filters.goal.dto.GoalFilterDto;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -50,7 +52,6 @@ public class GoalServiceTest {
     @Spy
     private GoalMapper goalMapper = Mappers.getMapper(GoalMapper.class);
 
-    private GoalDto goalDto;
     private List<String> skills;
     private Long id;
     private String title;
@@ -162,7 +163,7 @@ public class GoalServiceTest {
         Mockito.lenient().when(goalRepository.findById(goalDto.getId())).thenReturn(Optional.empty());
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> goalService.updateGoal(goalDto));
+                () -> goalService.updateGoal(goalDto, userId));
 
         assertEquals("Goal 1 not found", exception.getMessage());
     }
@@ -200,10 +201,12 @@ public class GoalServiceTest {
 
     @Test
     public void testFindGoalByParentIdFiltered(){
-        when(goalRepository.findByParent(goal3.getId())).thenReturn(goals.stream());
+        Stream<Goal> goalStream = goals.stream();
 
+        when(goalRepository.findByParent(goal3.getId())).thenReturn(goalStream);
         List<GoalDto> expected = List.of(goalDto2);
         List<GoalDto> result = goalService.findSubtasksByGoalId(goal3.getId(), filter);
+
         assertEquals(expected, result);
     }
 }

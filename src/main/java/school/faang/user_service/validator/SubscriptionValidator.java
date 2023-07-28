@@ -8,7 +8,7 @@ import school.faang.user_service.exception.DataValidationException;
 public class SubscriptionValidator {
     public void validateId(long id){
         if(id < 1){
-            throw new DataValidationException("id have to me greater than 0");
+            throw new DataValidationException("id have to be greater than 0");
         }
     }
     public void validateId(long firstId, long secondId){

@@ -23,7 +23,8 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static school.faang.user_service.commonMessages.ErrorMessagesForEvent.USER_IS_ALREADY_REGISTERED_FORMAT;
 import static school.faang.user_service.commonMessages.ErrorMessagesForEvent.USER_IS_NOT_REGISTERED_FORMAT;
 

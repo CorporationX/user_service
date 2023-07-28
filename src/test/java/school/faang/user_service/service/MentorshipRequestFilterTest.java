@@ -9,7 +9,7 @@ import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RequestFilterDto;
 import school.faang.user_service.dto.mentorship.UserDto;
 import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.service.mentorship.MentorshipRequestFilter;
+import school.faang.user_service.filter.MentorshipRequestFilter;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;

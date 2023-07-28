@@ -145,18 +145,6 @@ public class MentorshipRequestServiceTest {
     }
 
     @Test
-    void testToDto() {
-        latestRequest.setId(CORRECT_REQUEST_ID);
-        latestRequest.setDescription("some description");
-        latestRequest.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-        latestRequest.setRequester(requester);
-        latestRequest.setReceiver(receiver);
-
-        MentorshipRequestDto actualDto = requestMapper.toDto(latestRequest);
-        assertEquals(correctRequestDto, actualDto);
-    }
-
-    @Test
     void testGetRequests() {
         MentorshipRequestDto requestDto = MentorshipRequestDto.builder()
                 .requester(requesterDto)

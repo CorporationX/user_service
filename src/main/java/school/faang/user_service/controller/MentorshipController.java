@@ -3,29 +3,35 @@ package school.faang.user_service.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.service.MentorshipService;
 
 import java.util.List;
 
-@Controller
+@RestController
+@RequestMapping("api/v1/mentorship")
 @RequiredArgsConstructor
 public class MentorshipController {
     private final MentorshipService mentorshipService;
 
-    public List<User> getMentees(@Validated Long userId) {
+    @GetMapping("/mentees/{userId}")
+    public List<User> getMentees(@PathVariable @Validated Long userId) {
         return mentorshipService.getMenteesOfUser(userId);
     }
 
-    public List<User> getMentors(Long userId) {
+    @GetMapping("/mentors/{userId}")
+    public List<User> getMentors(@PathVariable Long userId) {
         return mentorshipService.getMentorsOfUser(userId);
     }
 
-    public void deleteMentee(Long menteeId, Long mentorId) {
+    @DeleteMapping("/mentees/{menteeId}/{mentorId}")
+    public void deleteMentee(@PathVariable Long menteeId, @PathVariable Long mentorId) {
         mentorshipService.deleteMentee(menteeId, mentorId);
     }
 
-    public void deleteMentor(Long mentorId, Long menteeId) {
+    @DeleteMapping("/mentors/{mentorId}/{menteeId}")
+    public void deleteMentor(@PathVariable Long mentorId, @PathVariable Long menteeId) {
         mentorshipService.deleteMentor(mentorId, menteeId);
     }
 }

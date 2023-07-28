@@ -8,13 +8,13 @@ import java.util.stream.Stream;
 
 @Component
 public class EventTitleFilter implements EventFilter {
-  @Override
-  public boolean isApplicable(EventFilterDto filters) {
-    return filters.getTitle() != null;
-  }
+    @Override
+    public boolean isApplicable(EventFilterDto filters) {
+        return filters.getTitle() != null;
+    }
 
-  @Override
-  public Stream<Event> apply(Stream<Event> events, EventFilterDto filters) {
-    return events.filter(event -> event.getTitle().contains(filters.getTitle()));
-  }
+    @Override
+    public Stream<Event> apply(Stream<Event> events, EventFilterDto filters) {
+        return events.filter(event -> event.getTitle().contains(filters.getTitle()));
+    }
 }

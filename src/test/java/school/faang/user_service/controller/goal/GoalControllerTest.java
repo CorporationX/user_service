@@ -76,5 +76,23 @@ public class GoalControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(2));
+
+    public void testDeleteGoal_ExistingGoal() {
+        long goalId = 1L;
+
+        goalController.deleteGoal(goalId);
+
+        verify(goalService, times(1)).deleteGoal(goalId);
+    }
+
+    @Test
+    public void testDeleteGoal_NonExistentGoal_NoExceptionThrown() {
+        long nonExistentGoalId = 10L;
+
+        doNothing().when(goalService).deleteGoal(anyLong());
+
+        goalController.deleteGoal(nonExistentGoalId);
+
+        verify(goalService, times(1)).deleteGoal(nonExistentGoalId);
     }
 }

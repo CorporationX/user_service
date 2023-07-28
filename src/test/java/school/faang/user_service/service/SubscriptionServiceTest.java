@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,12 +12,14 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.subscription.SubscriptionService;
+import school.faang.user_service.service.user.filter.UserNameFilter;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -34,25 +37,19 @@ public class SubscriptionServiceTest {
 
     private final long followerId = 2;
     private final long followeeId = 1;
-    private Stream<User> desiredUsersStream;
-    private List<UserDto> desiredUsersDto;
+    private List<User> usersStream;
 
     @BeforeEach
-    public void setUp() {
-        desiredUsersStream = Stream.of(
+    public void setUpUsersStream() {
+        usersStream = List.of(
                 User.builder()
-                        .id(0)
+                        .username("MichaelJohnson")
                         .build(),
                 User.builder()
-                        .id(1)
-                        .build()
-        );
-        desiredUsersDto = List.of(
-                UserDto.builder()
-                        .id(0L)
+                        .username("JohnDoe")
                         .build(),
-                UserDto.builder()
-                        .id(1L)
+                User.builder()
+                        .username("JaneSmith")
                         .build()
         );
     }
@@ -109,15 +106,27 @@ public class SubscriptionServiceTest {
 
     @Test
     public void shouldReturnFollowersList() {
-        UserFilterDto filter = new UserFilterDto();
+        UserFilterDto filters = UserFilterDto.builder()
+                .namePattern("John")
+                .build();
+        Stream<User> stream = usersStream.stream();
+        Stream<User> desiredUsersStream = getFiltredUsersStream();
+
+        UserNameFilter nameFilter = Mockito.mock(UserNameFilter.class);
+        subscriptionService = new SubscriptionService(userMapper, subscriptionRepository,
+                userRepository, List.of(nameFilter));
 
         Mockito.when(userRepository.existsById(followeeId)).thenReturn(true);
         Mockito.when(subscriptionRepository.findByFolloweeId(followeeId))
+                .thenReturn(stream);
+
+        Mockito.when(nameFilter.isApplicable(filters)).thenReturn(true);
+        Mockito.when(nameFilter.apply(stream, filters))
                 .thenReturn(desiredUsersStream);
 
-        List<UserDto> receivedUsers = subscriptionService.getFollowers(followeeId, filter);
+        List<UserDto> receivedUsersDto = subscriptionService.getFollowers(followeeId, filters);
 
-        Assertions.assertEquals(desiredUsersDto, receivedUsers);
+        Assertions.assertEquals(userMapper.toDtoList(getFiltredUsersStream().toList()), receivedUsersDto);
         Mockito.verify(subscriptionRepository).findByFolloweeId(followeeId);
     }
 
@@ -132,15 +141,27 @@ public class SubscriptionServiceTest {
 
     @Test
     public void shouldReturnFolloweesList() {
-        UserFilterDto filter = new UserFilterDto();
+        UserFilterDto filters = UserFilterDto.builder()
+                .namePattern("John")
+                .build();
+        Stream<User> stream = usersStream.stream();
+        Stream<User> desiredUsersStream = getFiltredUsersStream();
+
+        UserNameFilter nameFilter = Mockito.mock(UserNameFilter.class);
+        subscriptionService = new SubscriptionService(userMapper, subscriptionRepository,
+                userRepository, List.of(nameFilter));
 
         Mockito.when(userRepository.existsById(followerId)).thenReturn(true);
         Mockito.when(subscriptionRepository.findByFollowerId(followerId))
+                .thenReturn(stream);
+
+        Mockito.when(nameFilter.isApplicable(filters)).thenReturn(true);
+        Mockito.when(nameFilter.apply(stream, filters))
                 .thenReturn(desiredUsersStream);
 
-        List<UserDto> receivedUsersDto = subscriptionService.getFollowing(followerId, filter);
+        List<UserDto> receivedUsersDto = subscriptionService.getFollowing(followerId, filters);
 
-        Assertions.assertEquals(desiredUsersDto, receivedUsersDto);
+        Assertions.assertEquals(userMapper.toDtoList(getFiltredUsersStream().toList()), receivedUsersDto);
         Mockito.verify(subscriptionRepository).findByFollowerId(followerId);
     }
 
@@ -193,5 +214,11 @@ public class SubscriptionServiceTest {
         Assertions.assertThrows(DataValidationException.class, () -> subscriptionService.getFollowingCount(followerId));
         Mockito.verify(subscriptionRepository, Mockito.times(0))
                 .findFolloweesAmountByFollowerId(followerId);
+    }
+
+    @NotNull
+    private Stream<User> getFiltredUsersStream() {
+        return usersStream.stream()
+                .filter(user -> user.getUsername().contains("John"));
     }
 }

@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class SkillDto {
-  private long id;
-  private String title;
+    private long id;
+    private String title;
 }

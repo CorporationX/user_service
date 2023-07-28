@@ -3,7 +3,6 @@ package school.faang.user_service.service;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -21,7 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -43,8 +44,8 @@ class UserServiceTest {
         long userId = 1L;
         List<Skill> skills = List.of(
                 createSkill(1L, "test"),
-                createSkill(1L, "test"),
-                createSkill(1L, "test")
+                createSkill(2L, "test"),
+                createSkill(3L, "test")
         );
 
         when(skillRepository.findAllByUserId(userId)).thenReturn(skills);
@@ -73,7 +74,7 @@ class UserServiceTest {
     }
 
     @Test
-    void createReturnsSkillDto(){
+    void createReturnsSkillDto() {
         SkillDto skillDto = new SkillDto(1L, "title");
         Skill skill = skillMapper.skillToEntity(skillDto);
 
@@ -91,7 +92,7 @@ class UserServiceTest {
     }
 
     @Test
-    void getAllSkillsByIdTest(){
+    void getAllSkillsByIdTest() {
         Long userId = 1L;
         skillList = new ArrayList<>();
 
@@ -122,7 +123,7 @@ class UserServiceTest {
         verify(skillRepository).existsByTitle(skillDto.getTitle());
     }
 
-    private Skill createSkill(Long id, String title){
+    private Skill createSkill(Long id, String title) {
         Skill skill = Skill.builder()
                 .id(id)
                 .title(title)

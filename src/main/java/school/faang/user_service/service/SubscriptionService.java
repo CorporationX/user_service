@@ -21,42 +21,44 @@ public class SubscriptionService {
     private final List<DtoUserFilter> userFilters;
     private final UserMapper userMapper;
 
-    public void followUser(long followerId, long followeeId){
+    public void followUser(long followerId, long followeeId) {
         validateFollower(followerId, followeeId);
         subscriptionRepository.followUser(followerId, followeeId);
     }
 
-    public void unfollowUser(long followerId, long followeeId){
+    public void unfollowUser(long followerId, long followeeId) {
         validateFollower(followerId, followeeId);
         subscriptionRepository.unfollowUser(followerId, followeeId);
     }
 
-    public List<UserDto> getFollowers(long followeeId, UserFilterDto filter){
+    public List<UserDto> getFollowers(long followeeId, UserFilterDto filter) {
         validateUserId(followeeId);
         return applyFilter(subscriptionRepository.findByFolloweeId(followeeId), filter);
     }
 
-    public int getFollowersCount(long followeeId){
+    public int getFollowersCount(long followeeId) {
         validateUserId(followeeId);
         return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
     }
 
-    public List<UserDto> getFollowing(long followeeId, UserFilterDto filter){
+    public List<UserDto> getFollowing(long followeeId, UserFilterDto filter) {
         validateUserId(followeeId);
         return applyFilter(subscriptionRepository.findByFolloweeId(followeeId), filter);
     }
 
-    public int getFollowingCount(long followerId){
+    public int getFollowingCount(long followerId) {
         validateUserId(followerId);
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
     }
 
-    private List<UserDto> applyFilter(Stream<User> users, UserFilterDto DtoFilters){
-        return userFilters.stream()
-                .filter(filter -> filter.isApplicable(DtoFilters))
-                .flatMap(filter -> filter.apply(users, DtoFilters))
-                .map(userMapper::userToDto)
+    private List<UserDto> applyFilter(Stream<User> users, UserFilterDto dtoFilters){
+        List<DtoUserFilter> requiredFilters = userFilters.stream()
+                .filter(filter -> filter.isApplicable(dtoFilters))
                 .toList();
+        for(DtoUserFilter requiredFilter : requiredFilters){
+            users = requiredFilter.apply(users, dtoFilters);
+        }
+        return users.map(userMapper::userToDto).toList();
     }
 
     private void validateFollower(long followerId, long followeeId){

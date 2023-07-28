@@ -93,14 +93,14 @@ public class SkillService {
         return skillMapper.skillToDto(updatedSkill);
     }
 
-    private Skill addSkillGuarantees(Skill skill, List<SkillOffer> skillOffers, Long userId){
+    private Skill addSkillGuarantees(Skill skill, List<SkillOffer> skillOffers, Long userId) {
         List<UserSkillGuarantee> newGuarantees = skillOffers.stream().map(skillOffer -> UserSkillGuarantee.builder()
-                    .user(userRepository.findById(userId)
-                            .orElseThrow(() -> new RuntimeException(
-                                    MessageFormat.format(USER_NOT_FOUND_FORMAT, userId))))
-                    .skill(skillOffer.getSkill())
-                    .guarantor(skillOffer.getRecommendation().getAuthor())
-                    .build())
+                        .user(userRepository.findById(userId)
+                                .orElseThrow(() -> new RuntimeException(
+                                        MessageFormat.format(USER_NOT_FOUND_FORMAT, userId))))
+                        .skill(skillOffer.getSkill())
+                        .guarantor(skillOffer.getRecommendation().getAuthor())
+                        .build())
                 .toList();
         skill.addGuarantees(newGuarantees);
 

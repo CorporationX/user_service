@@ -51,12 +51,14 @@ public class SubscriptionService {
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
     }
 
-    private List<UserDto> applyFilter(Stream<User> users, UserFilterDto DtoFilters){
-        return userFilters.stream()
-                .filter(filter -> filter.isApplicable(DtoFilters))
-                .flatMap(filter -> filter.apply(users, DtoFilters))
-                .map(userMapper::userToDto)
+    private List<UserDto> applyFilter(Stream<User> users, UserFilterDto dtoFilters){
+        List<DtoUserFilter> requiredFilters = userFilters.stream()
+                .filter(filter -> filter.isApplicable(dtoFilters))
                 .toList();
+        for(DtoUserFilter requiredFilter : requiredFilters){
+            users = requiredFilter.apply(users, dtoFilters);
+        }
+        return users.map(userMapper::userToDto).toList();
     }
 
     private void validateFollower(long followerId, long followeeId){

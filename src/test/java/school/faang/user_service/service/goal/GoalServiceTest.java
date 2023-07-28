@@ -1,27 +1,24 @@
 package school.faang.user_service.service.goal;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
-import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
-import school.faang.user_service.exeptions.DataValidationException;
+import school.faang.user_service.exсeption.DataValidationException;
+import school.faang.user_service.exсeption.EntityNotFoundException;
+import school.faang.user_service.mapper.goal.GoalMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,74 +27,81 @@ class GoalServiceTest {
     private GoalRepository goalRepository;
     @Mock
     private SkillRepository skillRepository;
+    @Spy
+    private GoalMapperImpl goalMapper;
 
     @InjectMocks
     private GoalService goalService;
 
     GoalDto goalDto = mock(GoalDto.class);
-    Skill skill = mock(Skill.class);
-    User user = mock(User.class);
+    long id = 1;
 
-    Goal goal = mock(Goal.class);
-    Goal goal1 = new Goal().builder().title("Java").status(GoalStatus.ACTIVE).build();
-
-    @BeforeEach
-    void setUp() {
-        when(goal.getSkillsToAchieve()).thenReturn(List.of(skill));
-        when(goal.getUsers()).thenReturn(List.of(user));
-        when(goalRepository.findById(anyLong())).thenReturn(Optional.of(goal));
-    }
 
     @Test
     void updateCompletedGoalTest() {
-        when(goal.getTitle()).thenReturn("title");
-        when(goal.getStatus()).thenReturn(GoalStatus.COMPLETED);
+        Goal old = Goal.builder().status(GoalStatus.COMPLETED).build();
+        when(goalRepository.findGoal(id)).thenReturn(old);
 
         DataValidationException exception = assertThrows(DataValidationException.class,
-                () -> goalService.updateGoal(0L, goalDto));
+                () -> goalService.updateGoal(id, goalDto));
 
-        assertEquals("Goal already completed", exception.getMessage());
+        assertEquals("Goal already completed!", exception.getMessage());
 
-        verify(goalRepository).findGoal(anyLong());
+        verify(goalRepository).findGoal(id);
     }
 
     @Test
     void updateGoalSkillFoundTest() {
-        when(goal.getTitle()).thenReturn("Java");
-        when(goal.getStatus()).thenReturn(GoalStatus.ACTIVE);
-        when(skillRepository.existsByTitle(anyString())).thenReturn(false);
-        when(skill.getTitle()).thenReturn("Spring");
+        Goal old = Goal.builder().status(GoalStatus.ACTIVE).build();
+        List<Long> skillIds = List.of(1L, 2L);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> goalService.updateGoal(0L, goalDto));
+        when(goalRepository.findGoal(id)).thenReturn(old);
+        when(goalDto.getSkillIds()).thenReturn(skillIds);
+        when(skillRepository.countExisting(skillIds)).thenReturn(1);
 
-        assertEquals("Goal contains non-existent skill", exception.getMessage());
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+                () -> goalService.updateGoal(id, goalDto));
+
+        assertEquals("Goal contains non-existent skill!", exception.getMessage());
+
+        verify(goalRepository).findGoal(id);
+        verify(goalDto).getSkillIds();
+        verify(skillRepository).countExisting(skillIds);
     }
 
     @Test
     void updateGoalAndCompleteTest() {
-        when(goal.getTitle()).thenReturn("Java");
-        when(goal.getStatus()).thenReturn(GoalStatus.ACTIVE);
-        when(skillRepository.existsByTitle(anyString())).thenReturn(true);
-        when(skill.getTitle()).thenReturn("Spring");
+        Goal goal = Goal.builder().status(GoalStatus.COMPLETED).build();
+        Goal old = Goal.builder().status(GoalStatus.ACTIVE).build();
+        List<Long> skillIds = List.of(1L, 2L);
 
-        goal.setStatus(GoalStatus.COMPLETED);
-        goalService.updateGoal(0L, goalDto);
+        when(goalRepository.findGoal(id)).thenReturn(old);
+        when(goalDto.getSkillIds()).thenReturn(skillIds);
+        when(skillRepository.countExisting(skillIds)).thenReturn(2);
 
-        verify(goalRepository).delete(goal);
+        when(goalMapper.toEntity(goalDto)).thenReturn(goal);
+        when(goalDto.getSkillIds()).thenReturn(skillIds);
+        when(goalRepository.findUsersByGoalId(id)).thenReturn(List.of());
+
+        goalService.updateGoal(id, goalDto);
+
+        verify(goalRepository).deleteById(id);
     }
 
     @Test
     void updateGoalTest() {
-        when(goalDto.getTitle()).thenReturn("Java");
-        when(goalRepository.findGoal(1L)).thenReturn(goal);
-        when(goal.getStatus()).thenReturn(GoalStatus.ACTIVE);
-        when(skillRepository.existsByTitle(anyString())).thenReturn(true);
+        Goal goal = Goal.builder().status(GoalStatus.ACTIVE).build();
+        Goal old = Goal.builder().status(GoalStatus.ACTIVE).build();
+        List<Long> skillIds = List.of(1L, 2L);
 
-        when().thenReturn(goal1);
+        when(goalRepository.findGoal(id)).thenReturn(old);
+        when(goalDto.getSkillIds()).thenReturn(skillIds);
+        when(skillRepository.countExisting(skillIds)).thenReturn(2);
 
-        goalService.updateGoal(1L, goalDto);
+        when(goalMapper.toEntity(goalDto)).thenReturn(goal);
 
-        verify(goalRepository).save(goal1);
+        goalService.updateGoal(id, goalDto);
+
+        verify(goalRepository).save(goal);
     }
 }

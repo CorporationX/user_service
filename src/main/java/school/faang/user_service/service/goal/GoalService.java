@@ -1,13 +1,12 @@
 package school.faang.user_service.service.goal;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.exeptions.DataValidationException;
+import school.faang.user_service.exсeption.DataValidationException;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
-import school.faang.user_service.exeptions.EntityNotFoundException;
+import school.faang.user_service.exсeption.EntityNotFoundException;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -21,30 +20,33 @@ public class GoalService {
     private final SkillRepository skillRepository;
     private final GoalMapper goalMapper;
 
-    public void updateGoal(Long goalId, GoalDto goal) {
-        updateGoalValidation(goalId, goal);
+    public GoalDto updateGoal(long id, GoalDto goalDto) {
+        updateGoalValidation(id, goalDto);
 
-        Goal newGoal = goalMapper.toEntity(goal);
+        Goal goal = goalMapper.toEntity(goalDto);
 
-        if (newGoal.getStatus().equals(GoalStatus.COMPLETED)) {
-            List<Long> skillIds = goal.getSkillIds();
-            goalRepository.findUsersByGoalId(goalId).forEach(user -> {
-                skillIds.forEach(id -> skillRepository.assignSkillToUser(id, user.getId()));
+        if (goal.getStatus().equals(GoalStatus.COMPLETED)) {
+            List<Long> skillIds = goalDto.getSkillIds();
+            goalRepository.findUsersByGoalId(id).forEach(user -> {
+                skillIds.forEach(skillId -> skillRepository.assignSkillToUser(skillId, user.getId()));
             });
-            goalRepository.deleteById(goalId);
+            goalRepository.deleteById(id);
         } else {
-            goalRepository.save(newGoal);
+            return goalMapper.toDto(goalRepository.save(goal));
         }
+
+        return null;
     }
 
-    public void updateGoalValidation(Long goalId, GoalDto goal) {
-        Goal oldg = goalRepository.findGoal(goalId);
+    public void updateGoalValidation(long id, GoalDto goalDto) {
+        Goal oldg = goalRepository.findGoal(id);
         if (oldg.getStatus().equals(GoalStatus.COMPLETED)) {
-            throw new DataValidationException("Goal already completed");
+            throw new DataValidationException("Goal already completed!");
         }
 
-        if (skillRepository.countExisting(goal.getSkillIds()) != goal.getSkillIds().size()) {
-            throw new EntityNotFoundException("Goal contains non-existent skill");
+        List<Long> skillIds = goalDto.getSkillIds();
+        if (skillRepository.countExisting(skillIds) != skillIds.size()) {
+            throw new EntityNotFoundException("Goal contains non-existent skill!");
         }
     }
 

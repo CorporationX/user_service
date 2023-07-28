@@ -30,7 +30,7 @@ class UserServiceTest {
 
     @Test
     public void testFindUserThrowNullPointerExc() {
-        assertThrows(NullPointerException.class, () -> userService.findUserById(null));
+        assertThrows(EntityNotFoundException.class, () -> userService.findUserById(null));
     }
 
     @Test

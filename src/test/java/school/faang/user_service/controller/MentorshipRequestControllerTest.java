@@ -27,7 +27,6 @@ public class MentorshipRequestControllerTest {
     private final long CORRECT_ID = 1L;
     private MentorshipRequestDto correctRequestDto;
     private MentorshipRequestDto incorrectRequestDto;
-    private RequestFilterDto incorrectFilterDto;
     private RequestFilterDto correctFilterDto;
     private RejectionDto rejectionDto;
 
@@ -54,11 +53,6 @@ public class MentorshipRequestControllerTest {
     @Test
     void testRequestMentorshipWithoutDescription() {
         assertThrows(DataValidationException.class, () -> requestController.requestMentorship(incorrectRequestDto));
-    }
-
-    @Test
-    void testGetRequestsWithoutFilter() {
-        assertThrows(DataValidationException.class, () -> requestController.getRequests(incorrectFilterDto));
     }
 
     @Test

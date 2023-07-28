@@ -13,6 +13,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.MentorshipRequestNotFoundException;
 import school.faang.user_service.exception.RequestAlreadyAcceptedException;
 import school.faang.user_service.exception.UserNotFoundException;
+import school.faang.user_service.filter.MentorshipRequestFilter;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;

@@ -29,8 +29,15 @@ public class GoalInvitationService {
     public void rejectGoalInvitation(long id) {
         GoalInvitation invitation = goalInvitationRepository.findById(id)
                 .orElseThrow(() -> new DataValidException("Goal Invitation nou found. Id: " + id));
+        existsGoal(invitation);
         invitation.setStatus(RequestStatus.REJECTED);
         goalInvitationRepository.save(invitation);
+    }
+
+    private void existsGoal(GoalInvitation invitation) {
+        if (invitation.getInvited().getGoals().contains(invitation.getGoal())) {
+            throw new DataValidException("Unable to decline Invitation, invited already has goal. Id: " + invitation.getId());
+        }
     }
 
     private void validateInvitation(GoalInvitationDto invitation) {

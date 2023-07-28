@@ -50,7 +50,7 @@ public class GoalServiceTest {
     @Spy
     private GoalMapper goalMapper = Mappers.getMapper(GoalMapper.class);
 
-
+    private GoalDto goalDto;
     private List<String> skills;
     private Long id;
     private String title;
@@ -152,7 +152,7 @@ public class GoalServiceTest {
         when(goalRepository.findById(existingGoalId)).thenReturn(Optional.of(existingGoal));
         when(goalRepository.save(Mockito.any(Goal.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        GoalDto result = goalService.updateGoal(newGoalDto);
+        GoalDto result = goalService.updateGoal(newGoalDto, id);
 
         assertEquals(newGoalDto, result);
     }
@@ -204,7 +204,6 @@ public class GoalServiceTest {
 
         List<GoalDto> expected = List.of(goalDto2);
         List<GoalDto> result = goalService.findSubtasksByGoalId(goal3.getId(), filter);
-
         assertEquals(expected, result);
     }
 }

@@ -119,6 +119,6 @@ public class SkillService {
                         .skill(skillMapper.skillToDto(skillEntry.getKey()))
                         .offersAmount(skillEntry.getValue())
                         .build())
-               .toList();
+                .toList();
     }
 }

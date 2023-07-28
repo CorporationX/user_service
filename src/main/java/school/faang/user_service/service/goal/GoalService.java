@@ -27,12 +27,12 @@ public class GoalService {
     private final List<GoalFilter> goalFilters;
 
     @Transactional
-    public GoalDto createGoal(GoalDto goal, Long userId){
+    public GoalDto createGoal(GoalDto goal, Long userId) {
         int currentUserGoalNum = goalRepository.countActiveGoalsPerUser(userId);
         boolean allSkillsExist = goal.getSkills().stream()
                 .allMatch(skill -> skillRepository.findByTitle(skill.toLowerCase()).isPresent());
 
-        if (!allSkillsExist){
+        if (!allSkillsExist) {
             throw new IllegalArgumentException(Message.UNEXISTING_SKILLS);
         }
         if (currentUserGoalNum > MAX_ACTIVE_GOALS){
@@ -45,18 +45,16 @@ public class GoalService {
     }
 
     @Transactional
-    public GoalDto updateGoal(@Valid GoalDto goalDto) {
-        return goalRepository.findById(goalDto.getId())
-                .stream()
-                .peek(existingGoal -> {
-                    existingGoal.setTitle(goalDto.getTitle());
-                    existingGoal.setUpdatedAt(LocalDateTime.now());
-                    goalRepository.save(existingGoal);
-                })
-                .map(goalMapper::goalToDto)
-                .findFirst()
-                .orElseThrow(() ->
-                        new IllegalArgumentException(MessageFormat.format("Goal {0} not found", goalDto.getId())));
+    public GoalDto updateGoal(GoalDto goalDto, Long userId) {
+         Goal goal = goalRepository.findById(goalDto.getId())
+               .orElseThrow(() -> new  IllegalArgumentException(
+                     MessageFormat.format("Goal {0} not found", goalDto.getId())));
+
+        goal.setTitle(goalDto.getTitle());
+        goal.setUpdatedAt(LocalDateTime.now());
+        goalRepository.save(goal);
+
+        return goalMapper.goalToDto(goal);
     }
 
     @Transactional
@@ -84,8 +82,16 @@ public class GoalService {
         List<GoalDto> list = goalFilters.stream()
                 .filter(goalFilter -> goalFilter.isApplicable(goalFilterDto))
                 .flatMap(goalFilter -> goalFilter.apply(goals, goalFilterDto))
+
+        return applyFilter(goals, goalFilterDto);
+    }
+
+    private List<GoalDto> filterGoals(List<Goal> goals, GoalFilterDto goalFilterDto){
+        List<GoalDto> filteredGoals = goals.stream()
+                .filter(goal -> goal.getTitle().equals(goalFilterDto.getTitle()) && goal.getStatus().equals(goalFilterDto.getStatus()))
                 .map(goalMapper::goalToDto)
                 .toList();
-        return list;
+
+        return filteredGoals;
     }
 }

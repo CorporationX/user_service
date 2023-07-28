@@ -1,6 +1,5 @@
 package school.faang.user_service.dto.goal;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import jakarta.validation.constraints.NotNull;

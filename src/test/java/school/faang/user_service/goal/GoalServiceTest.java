@@ -19,7 +19,6 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.goal.GoalService;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -102,7 +101,7 @@ public class GoalServiceTest {
         when(goalRepository.findById(existingGoalId)).thenReturn(Optional.of(existingGoal));
         when(goalRepository.save(Mockito.any(Goal.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        GoalDto result = goalService.updateGoal(newGoalDto);
+        GoalDto result = goalService.updateGoal(newGoalDto, userId);
 
         assertEquals(newGoalDto, result);
     }
@@ -115,7 +114,7 @@ public class GoalServiceTest {
         when(goalRepository.findById(goalId)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class,
-                () -> goalService.updateGoal(goalDto));
+                () -> goalService.updateGoal(goalDto, userId));
     }
 
     @Test

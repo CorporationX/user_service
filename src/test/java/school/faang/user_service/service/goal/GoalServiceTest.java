@@ -112,7 +112,7 @@ public class GoalServiceTest {
         when(goalRepository.findById(existingGoalId)).thenReturn(Optional.of(existingGoal));
         when(goalRepository.save(Mockito.any(Goal.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        GoalDto result = goalService.updateGoal(newGoalDto);
+        GoalDto result = goalService.updateGoal(newGoalDto, id);
 
         assertEquals(newGoalDto, result);
     }

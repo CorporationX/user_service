@@ -25,15 +25,15 @@ public class GoalService {
     private final List<GoalFilter> goalFilters;
 
     @Transactional
-
-    public GoalDto createGoal(GoalDto goal, Long userId){
+    public GoalDto createGoal(GoalDto goal, Long userId) {
         int currentUserGoalNum = goalRepository.countActiveGoalsPerUser(userId);
         boolean allSkillsExist = goal.getSkills().stream()
                 .allMatch(skill -> skillRepository.findByTitle(skill.toLowerCase()).isPresent());
 
-        if (!allSkillsExist){
+        if (!allSkillsExist) {
             throw new IllegalArgumentException(Message.UNEXISTING_SKILLS);
         }
+      
         if (currentUserGoalNum > MAX_ACTIVE_GOALS){
             throw new IllegalArgumentException(Message.TOO_MANY_GOALS);
         }
@@ -44,18 +44,16 @@ public class GoalService {
     }
 
     @Transactional
-    public GoalDto updateGoal(GoalDto goalDto) {
-        return goalRepository.findById(goalDto.getId())
-                .stream()
-                .peek(existingGoal -> {
-                    existingGoal.setTitle(goalDto.getTitle());
-                    existingGoal.setUpdatedAt(LocalDateTime.now());
-                    goalRepository.save(existingGoal);
-                })
-                .map(goalMapper::goalToDto)
-                .findFirst()
-                .orElseThrow(() ->
-                        new IllegalArgumentException(MessageFormat.format("Goal {0} not found", goalDto.getId())));
+    public GoalDto updateGoal(GoalDto goalDto, Long userId) {
+         Goal goal = goalRepository.findById(goalDto.getId())
+               .orElseThrow(() -> new  IllegalArgumentException(
+                     MessageFormat.format("Goal {0} not found", goalDto.getId())));
+
+        goal.setTitle(goalDto.getTitle());
+        goal.setUpdatedAt(LocalDateTime.now());
+        goalRepository.save(goal);
+
+        return goalMapper.goalToDto(goal);
     }
 
     @Transactional

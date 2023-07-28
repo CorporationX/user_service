@@ -1,4 +1,4 @@
-package school.faang.user_service.filters.goal.dto;
+package school.faang.user_service.filter.goal.dto;
 
 import lombok.Builder;
 import lombok.Data;

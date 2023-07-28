@@ -5,10 +5,10 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.commonMessages.ErrorMessages;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.filters.UserFilterDto;
+import school.faang.user_service.filter.goal.UserFilterDto;
 import school.faang.user_service.exceptions.DataValidationException;
-import school.faang.user_service.filters.UserMapper;
-import school.faang.user_service.filters.filtersForUserFilterDto.DtoUserFilter;
+import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.filter.filtersForUserFilterDto.DtoUserFilter;
 import school.faang.user_service.repository.SubscriptionRepository;
 
 import java.util.List;

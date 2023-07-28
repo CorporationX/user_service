@@ -11,20 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.filters.goal.dto.GoalFilterDto;
+import school.faang.user_service.filter.goal.dto.GoalFilterDto;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.util.Message;
 import java.util.List;
-import org.springframework.web.bind.annotation.RequestParam;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import school.faang.user_service.dto.goal.GoalDto;
-import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.goal.GoalService;
-import school.faang.user_service.util.Message;
 
 @RestController
 @RequiredArgsConstructor

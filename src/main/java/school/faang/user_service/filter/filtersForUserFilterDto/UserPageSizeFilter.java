@@ -1,16 +1,16 @@
-package school.faang.user_service.filters.filtersForUserFilterDto;
+package school.faang.user_service.filter.filtersForUserFilterDto;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.filters.UserFilterDto;
+import school.faang.user_service.filter.goal.UserFilterDto;
 
 import java.util.stream.Stream;
 
 @Component
-public class UserPageFilter implements DtoUserFilter {
+public class UserPageSizeFilter implements DtoUserFilter{
     @Override
     public boolean isApplicable(UserFilterDto filters) {
-        return filters.getPage() != 0;
+        return filters.getPageSize() != 0;
     }
 
     @Override

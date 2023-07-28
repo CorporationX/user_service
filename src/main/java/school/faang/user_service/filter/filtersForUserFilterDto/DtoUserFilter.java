@@ -1,7 +1,7 @@
-package school.faang.user_service.filters.filtersForUserFilterDto;
+package school.faang.user_service.filter.filtersForUserFilterDto;
 
 import school.faang.user_service.entity.User;
-import school.faang.user_service.filters.UserFilterDto;
+import school.faang.user_service.filter.goal.UserFilterDto;
 
 import java.util.stream.Stream;
 

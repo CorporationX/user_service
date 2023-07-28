@@ -48,7 +48,6 @@ class SubscriptionServiceTest {
         userFilterDto.setAboutPattern("I");
     }
 
-
     //positive
     @Test
     void followUserCallRepositoryMethod() {

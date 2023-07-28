@@ -111,7 +111,7 @@ class GoalInvitationServiceTest {
     }
 
     @Test
-    public void testAcceptGoalInvitation_InvitedHasMaxGoals() {
+    void testAcceptGoalInvitation_InvitedHasMaxGoals() {
         long invitationId = 1L;
 
         GoalInvitation invitation = new GoalInvitation();

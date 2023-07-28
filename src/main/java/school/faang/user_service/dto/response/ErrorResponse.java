@@ -1,17 +1,14 @@
 package school.faang.user_service.dto.response;
 
-
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class ErrorResponse {
-    int status;
-    String message;
-    LocalDateTime time;
+    private final int status;
+    private final String message;
+    private LocalDateTime time = LocalDateTime.now();
 }

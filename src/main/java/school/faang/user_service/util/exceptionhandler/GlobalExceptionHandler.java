@@ -11,8 +11,6 @@ import school.faang.user_service.dto.response.ErrorResponse;
 import school.faang.user_service.util.exception.DataValidationException;
 import school.faang.user_service.util.exception.UserNotFoundException;
 
-import java.time.LocalDateTime;
-
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
@@ -22,7 +20,7 @@ public class GlobalExceptionHandler {
         log.error(e.getMessage());
 
         return new ResponseEntity<>(new ErrorResponse(HttpStatus.BAD_REQUEST.value(),
-                e.getMessage(), LocalDateTime.now()), HttpStatus.BAD_REQUEST);
+                e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -37,7 +35,7 @@ public class GlobalExceptionHandler {
         }
 
         return new ResponseEntity<>(new ErrorResponse(HttpStatus.BAD_REQUEST.value(),
-                message.toString(), LocalDateTime.now()), HttpStatus.BAD_REQUEST);
+                message.toString()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(UserNotFoundException.class)
@@ -45,6 +43,6 @@ public class GlobalExceptionHandler {
         log.error(e.getMessage());
 
         return new ResponseEntity<>(new ErrorResponse(HttpStatus.NOT_FOUND.value(),
-                e.getMessage(), LocalDateTime.now()), HttpStatus.NOT_FOUND);
+                e.getMessage()), HttpStatus.NOT_FOUND);
     }
 }

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.mydto.UserDto;
 import school.faang.user_service.dto.request.UserIdsRequest;
 import school.faang.user_service.service.UserService;
 import school.faang.user_service.util.validator.UserControllerValidator;

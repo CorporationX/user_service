@@ -61,7 +61,6 @@ class UserServiceTest {
         Long userId = 2L;
 
         when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.empty());
-
         skillRepository.assignSkillToUser(skillId, userId);
 
         Skill assignedSkill = createSkill(skillId, "test");

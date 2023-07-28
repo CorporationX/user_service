@@ -7,11 +7,16 @@ import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.filters.goal.GoalFilter;
+import school.faang.user_service.filters.goal.GoalStatusFilter;
+import school.faang.user_service.filters.goal.dto.GoalFilterDto;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -23,6 +28,8 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,6 +37,9 @@ public class GoalServiceTest {
 
     @InjectMocks
     private GoalService goalService;
+
+    @Mock
+    private List<GoalFilter> goalFilters;
 
     @Mock
     private GoalRepository goalRepository;
@@ -44,9 +54,14 @@ public class GoalServiceTest {
     private List<String> skills;
     private Long id;
     private String title;
+    private Long userId;
 
     @BeforeEach
     void setUp(){
+        GoalFilter goalFilter = new GoalStatusFilter();
+        List<GoalFilter> goalFilters = List.of(goalFilter);
+        goalService = new GoalService(goalRepository, skillRepository, goalMapper, goalFilters);
+        userId = 1L;
         id = 1L;
         title = "title";
         skills = Arrays.asList("skill1", "skill2", "skill3");
@@ -104,12 +119,65 @@ public class GoalServiceTest {
 
     @Test
     public void testUpdateGoal_GoalNotFound() {
-
         Mockito.lenient().when(goalRepository.findById(goalDto.getId())).thenReturn(Optional.empty());
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> goalService.updateGoal(goalDto, id));
+                () -> goalService.updateGoal(goalDto));
 
         assertEquals("Goal 1 not found", exception.getMessage());
+    }
+
+    @Test
+    public void testDeleteGoal_Successful() {
+        Long goalId = 1L;
+        Goal goal = new Goal();
+        goal.setId(goalId);
+
+        when(goalRepository.findById(goalId)).thenReturn(Optional.of(goal));
+        goalService.deleteGoal(goalId);
+
+        verify(goalRepository, times(1)).delete(goal);
+    }
+
+    @Test
+    public void testDeleteGoal_ThrowsException() {
+        Long nonExistingGoalId = 100L;
+
+        when(goalRepository.findById(nonExistingGoalId)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> goalService.deleteGoal(nonExistingGoalId));
+    }
+
+    @Test
+    public void testGoalFilter_Successful(){
+        GoalFilterDto filter = GoalFilterDto.builder()
+                .title("title")
+                .status(GoalStatus.COMPLETED)
+                .build();
+
+        Goal goal1 = Goal.builder()
+                .id(1L)
+                .title("goal1")
+                .status(GoalStatus.ACTIVE)
+                .build();
+        Goal goal2 = Goal.builder()
+                .id(2L)
+                .title("title")
+                .status(GoalStatus.COMPLETED)
+                .build();
+
+        List<Goal> goals = List.of(goal1, goal2);
+
+        when(goalRepository.findGoalsByUserId(userId)).thenReturn(goals.stream());
+
+        GoalDto goalDto2 = GoalDto.builder()
+                .id(2L)
+                .title("title")
+                .status(GoalStatus.COMPLETED)
+                .build();
+
+        List<GoalDto> expected = List.of(goalDto2);
+        List<GoalDto> result = goalService.getGoalsByUser(userId, filter);
+        assertEquals(expected, result);
     }
 }

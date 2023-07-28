@@ -12,11 +12,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.filters.goal.dto.GoalFilterDto;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.goal.GoalService;
-
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -135,6 +136,38 @@ public class GoalServiceTest {
         when(goalRepository.findById(nonExistingGoalId)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class, () -> goalService.deleteGoal(nonExistingGoalId));
+    }
 
+    @Test
+    public void testGoalFilter_Successful(){
+        GoalFilterDto filter = GoalFilterDto.builder()
+                .status(GoalStatus.COMPLETED)
+                .title("title")
+                .build();
+
+        Goal goal1 = Goal.builder()
+                .id(1L)
+                .title("goal1")
+                .status(GoalStatus.ACTIVE)
+                .build();
+        Goal goal2 = Goal.builder()
+                .id(2L)
+                .title("title")
+                .status(GoalStatus.COMPLETED)
+                .build();
+
+        List<Goal> goals = List.of(goal1, goal2);
+
+        when(goalRepository.findGoalsByUserId(userId)).thenReturn(goals.stream());
+
+        GoalDto goalDto2 = GoalDto.builder()
+                .id(2L)
+                .title("title")
+                .status(GoalStatus.COMPLETED)
+                .build();
+
+        List<GoalDto> expected = List.of(goalDto2);
+        List<GoalDto> result = goalService.getGoalsByUser(userId, filter);
+        assertEquals(expected, result);
     }
 }

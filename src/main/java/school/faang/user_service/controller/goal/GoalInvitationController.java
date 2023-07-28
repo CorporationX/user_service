@@ -17,4 +17,9 @@ public class GoalInvitationController {
     public GoalInvitationDto createInvitation(GoalInvitationDto invitationDto) {
         return goalInvitationService.createInvitation(invitationDto);
     }
+
+    @PostMapping
+    public void acceptGoalInvitation(long id) {
+        goalInvitationService.acceptGoalInvitation(id);
+    }
 }

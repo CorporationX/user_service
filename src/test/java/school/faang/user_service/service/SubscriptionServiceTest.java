@@ -43,7 +43,7 @@ class SubscriptionServiceTest {
 
 
     @Test
-    public void testUnfollowSuccessfully() {
+    void testUnfollowSuccessfully() {
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(123, 321)).thenReturn(true).thenReturn(false);
 
         subscriptionService.unfollowUser(123, 321);
@@ -71,7 +71,7 @@ class SubscriptionServiceTest {
     }
 
     @Test
-    public void testGetFollowers() {
+    void testGetFollowers() {
         User user = mock(User.class);
         UserDto userDto = mock(UserDto.class);
         Stream<User> userStream = Stream.of(user);
@@ -83,5 +83,19 @@ class SubscriptionServiceTest {
 
         verify(subscriptionRepository, times(1)).findByFolloweeId(111);
         verify(userMapper, times(1)).toDto(user);
+    }
+
+    @Test
+    void testGetFollowersCount(){
+        when(subscriptionRepository.existsById(1122L)).thenReturn(true);
+        subscriptionService.getFollowersCount(1122);
+        verify(subscriptionRepository, times(1)).findFollowersAmountByFolloweeId(Mockito.anyLong());
+    }
+
+    @Test
+    void testGetFolloweesCount(){
+        when(subscriptionRepository.existsById(2211L)).thenReturn(true);
+        subscriptionService.getFolloweesCount(2211);
+        verify(subscriptionRepository, times(1)).findFolloweesAmountByFollowerId(Mockito.anyLong());
     }
 }

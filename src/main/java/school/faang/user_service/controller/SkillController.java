@@ -21,7 +21,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/skill")
+@RequestMapping("/api/v1/skills")
 public class SkillController {
 
     private final SkillService skillService;
@@ -34,14 +34,14 @@ public class SkillController {
         return skillService.create(skill);
     }
 
-    @GetMapping("{userId}")
+    @GetMapping("/{userId}")
     public List<SkillDto> getUserSkills(@PathVariable Long userId,
                                         @RequestParam("page number") int pageNumber,
                                         @RequestParam("element number") int pageSize) {
         return skillService.getUserSkills(userId, pageNumber, pageSize);
     }
 
-    @GetMapping("{userId}")
+    @GetMapping("/{userId}/offered")
     public List<SkillCandidateDto> getOfferedSkills(@PathVariable Long userId){
         return skillService.getOfferedSkills(userId);
     }

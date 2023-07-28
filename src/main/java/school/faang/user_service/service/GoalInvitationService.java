@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.exception.DataValidException;
 import school.faang.user_service.mapper.goal.GoalInvitationMapper;
@@ -35,8 +34,8 @@ public class GoalInvitationService {
     }
 
     private void existsGoal(GoalInvitation invitation) {
-        if (invitation.getInvited().getGoals().contains(invitation.getGoal())) {
-            throw new DataValidException("Unable to decline Invitation, invited already has goal. Id: " + invitation.getId());
+        if (!goalRepository.existsById(invitation.getGoal().getId())) {
+            throw new DataValidException("Unable to decline Invitation, Goal not found. Id: " + invitation.getId());
         }
     }
 
@@ -47,11 +46,13 @@ public class GoalInvitationService {
         if (!goalRepository.existsById(invitation.getGoalId())) {
             throw new DataValidException("Goal does not exist. Invitation Id: " + invitation.getId());
         }
-        User inviter = userRepository.findById(invitation.getInviterId())
-                .orElseThrow(() -> new DataValidException("Inviter does not exist, Id: " + invitation.getInviterId()));
-        User invited = userRepository.findById(invitation.getInvitedUserId())
-                .orElseThrow(() -> new DataValidException("Invited does not exist, Id: " + invitation.getInvitedUserId()));
-        if (inviter.equals(invited)) {
+        if (!userRepository.existsById(invitation.getInviterId())) {
+            throw new DataValidException("Inviter does not exist, Id: " + invitation.getInviterId());
+        }
+        if (!userRepository.existsById(invitation.getInvitedUserId())) {
+            throw new DataValidException("Invited does not exist, Id: " + invitation.getInvitedUserId());
+        }
+        if (invitation.getInviterId().equals(invitation.getInvitedUserId())) {
             throw new DataValidException("Inviter and invited are equal. Invitation Id: " + invitation.getId());
         }
     }

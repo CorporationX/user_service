@@ -70,7 +70,7 @@ class GoalInvitationServiceTest {
         when(userRepository.existsById(anyLong())).thenReturn(true);
 
         Exception ex = assertThrows(DataValidException.class, () -> goalInvitationService.createInvitation(goalInvitationDto));
-        assertTrue(ex.getMessage().equals("Inviter and invited are equal"));
+        assertTrue(ex.getMessage().contains("Inviter and invited are equal"));
 
     }
 

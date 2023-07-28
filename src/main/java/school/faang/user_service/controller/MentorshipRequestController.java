@@ -35,13 +35,13 @@ public class MentorshipRequestController {
     }
 
     @PostMapping("/request/accept/{id}")
-    public void acceptRequest(@PathVariable("id") long id) {
+    public void acceptRequest(@PathVariable long id) {
         validateRequestId(id);
         mentorshipRequestService.acceptRequest(id);
     }
 
     @PostMapping("/request/reject/{id}")
-    public void rejectRequest(@PathVariable("id") long id, @RequestBody RejectionDto rejection) {
+    public void rejectRequest(@PathVariable long id, @RequestBody RejectionDto rejection) {
         validateRequestId(id);
         mentorshipRequestService.rejectRequest(id, rejection);
     }

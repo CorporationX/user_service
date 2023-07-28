@@ -41,13 +41,12 @@ class SubscriptionServiceTest {
     @BeforeEach
     void setUp() {
         DtoUserFilter userAboutFilter = new UserAboutFilter();
-        List<DtoUserFilter> DtoFilterList = List.of(userAboutFilter);
-        subscriptionService = new SubscriptionService(subscriptionRepository, DtoFilterList, userMapper);
+        userFilters = List.of(userAboutFilter);
+        subscriptionService = new SubscriptionService(subscriptionRepository, userFilters, userMapper);
         user.setAboutMe("I'm interesting person");
         userFilterDto = new UserFilterDto();
         userFilterDto.setAboutPattern("I");
     }
-
 
     //positive
     @Test

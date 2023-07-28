@@ -1,17 +1,16 @@
 package school.faang.user_service.dto.event;
 
-import java.util.List;
-
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import school.faang.user_service.dto.skill.SkillDto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
-@Getter
-@Setter
+@Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class EventDto {
@@ -24,5 +23,4 @@ public class EventDto {
     private List<SkillDto> relatedSkills;
     private String location;
     private int maxAttendees;
-
 }

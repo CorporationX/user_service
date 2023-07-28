@@ -20,6 +20,10 @@ import java.util.List;
 @Entity
 @Table(name = "skill")
 public class Skill {
+    public Skill(Long id, String title) {
+        this.id = id;
+        this.title = title;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

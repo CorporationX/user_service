@@ -12,15 +12,15 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.commonMessages.ErrorMessages;
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.filter.goal.UserFilterDto;
+import school.faang.user_service.filter.user.UserFilterDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.contact.Contact;
 import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.filter.filtersForUserFilterDto.DtoUserFilter;
-import school.faang.user_service.filter.filtersForUserFilterDto.UserAboutFilter;
+import school.faang.user_service.filter.user.UserFilter;
+import school.faang.user_service.filter.user.UserAboutFilter;
 import school.faang.user_service.repository.SubscriptionRepository;
 
 import java.util.List;
@@ -34,13 +34,13 @@ class SubscriptionServiceTest {
     @Mock
     private UserMapper userMapper;
     @Mock
-    List<DtoUserFilter> userFilters;
+    List<UserFilter> userFilters;
     private SubscriptionService subscriptionService;
     User user = new User();
 
     @BeforeEach
     void setUp() {
-        DtoUserFilter userAboutFilter = new UserAboutFilter();
+        UserFilter userAboutFilter = new UserAboutFilter();
         userFilters = List.of(userAboutFilter);
         subscriptionService = new SubscriptionService(subscriptionRepository, userFilters, userMapper);
         user.setAboutMe("I'm interesting person");

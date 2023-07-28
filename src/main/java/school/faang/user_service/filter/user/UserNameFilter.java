@@ -1,13 +1,12 @@
-package school.faang.user_service.filter.filtersForUserFilterDto;
+package school.faang.user_service.filter.user;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.filter.goal.UserFilterDto;
 
 import java.util.stream.Stream;
 
 @Component
-public class UserNameFilter implements DtoUserFilter {
+public class UserNameFilter implements UserFilter {
     @Override
     public boolean isApplicable(UserFilterDto filters) {
         return filters.getNamePattern() != null;

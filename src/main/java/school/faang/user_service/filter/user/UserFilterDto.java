@@ -1,4 +1,4 @@
-package school.faang.user_service.filter.goal;
+package school.faang.user_service.filter.user;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,4 +18,5 @@ public class UserFilterDto {
     private Integer experienceMax;
     private Integer page;
     private Integer pageSize;
+    private boolean isActive;
 }

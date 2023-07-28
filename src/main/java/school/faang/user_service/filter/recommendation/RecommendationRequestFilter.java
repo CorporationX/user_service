@@ -1,4 +1,4 @@
-package school.faang.user_service.filter;
+package school.faang.user_service.filter.recommendation;
 
 import school.faang.user_service.dto.filter.RecommendationRequestFilterDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;

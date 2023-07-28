@@ -14,9 +14,9 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -48,20 +48,21 @@ public class SkillService {
     }
 
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
+        Skill skill = skillRepository.findById(skillId).orElseThrow(() -> new DataValidationException("This skill doesn't exist"));
         Optional<Skill> userSkill = skillRepository.findUserSkill(skillId, userId);
 
         if (userSkill.isEmpty()) {
             List<SkillOffer> allOffersOfSkill = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
             if (allOffersOfSkill.size() >= MIN_SKILL_OFFERS) {
                 skillRepository.assignSkillToUser(skillId, userId);
-                addGuaranteeRepository(allOffersOfSkill);
-                return skillMapper.toDTO(skillRepository.findById(skillId).orElseThrow(() -> new DataValidationException("This skill doesn't exist")));
+                addGuarantees(allOffersOfSkill);
+                return skillMapper.toDTO(skill);
             }
         }
-        return skillMapper.toDTO(skillRepository.findById(skillId).orElseThrow(() -> new DataValidationException("This skill doesn't exist")));
+        return skillMapper.toDTO(skill);
     }
 
-    private void addGuaranteeRepository(List<SkillOffer> allOffersOfSkill) {
+    private void addGuarantees(List<SkillOffer> allOffersOfSkill) {
         for (SkillOffer skillOffer : allOffersOfSkill) {
             User receiver = skillOffer.getRecommendation().getReceiver();
             User author = skillOffer.getRecommendation().getAuthor();

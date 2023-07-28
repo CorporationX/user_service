@@ -55,7 +55,13 @@ public class GoalController {
 
     @GetMapping
     public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto goalFilterDto){
-      
+
         return goalService.getGoalsByUser(userId, goalFilterDto);
+    }
+
+    @GetMapping
+    public List<GoalDto> findSubtasksByGoalId(Long parentGoalId, GoalFilterDto goalFilterDto){
+      
+        return goalService.findSubtasksByGoalId(parentGoalId, goalFilterDto);
     }
 }

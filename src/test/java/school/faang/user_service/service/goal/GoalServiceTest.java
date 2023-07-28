@@ -55,6 +55,13 @@ public class GoalServiceTest {
     private Long id;
     private String title;
     private Long userId;
+    private GoalFilterDto filter;
+    private Goal goal3;
+    private Goal goal1;
+    private Goal goal2;
+    private List<Goal> goals;
+    private GoalDto goalDto;
+    private GoalDto goalDto2;
 
     @BeforeEach
     void setUp(){
@@ -66,6 +73,39 @@ public class GoalServiceTest {
         title = "title";
         skills = Arrays.asList("skill1", "skill2", "skill3");
         goalDto = new GoalDto(id, title);
+
+        filter = GoalFilterDto.builder()
+                .title("title")
+                .status(GoalStatus.COMPLETED)
+                .build();
+
+        goal3 = Goal.builder()
+                .id(3L)
+                .title("goal1")
+                .status(GoalStatus.ACTIVE)
+                .build();
+
+        goal1 = Goal.builder()
+                .id(1L)
+                .parent(goal3)
+                .title("goal1")
+                .status(GoalStatus.ACTIVE)
+                .build();
+
+        goal2 = Goal.builder()
+                .id(2L)
+                .parent(goal3)
+                .title("title")
+                .status(GoalStatus.COMPLETED)
+                .build();
+
+        goalDto2 = GoalDto.builder()
+                .id(2L)
+                .title("title")
+                .status(GoalStatus.COMPLETED)
+                .build();
+
+        goals = List.of(goal1, goal2);
     }
 
     @Test
@@ -150,34 +190,20 @@ public class GoalServiceTest {
 
     @Test
     public void testGoalFilter_Successful(){
-        GoalFilterDto filter = GoalFilterDto.builder()
-                .title("title")
-                .status(GoalStatus.COMPLETED)
-                .build();
-
-        Goal goal1 = Goal.builder()
-                .id(1L)
-                .title("goal1")
-                .status(GoalStatus.ACTIVE)
-                .build();
-        Goal goal2 = Goal.builder()
-                .id(2L)
-                .title("title")
-                .status(GoalStatus.COMPLETED)
-                .build();
-
-        List<Goal> goals = List.of(goal1, goal2);
-
         when(goalRepository.findGoalsByUserId(userId)).thenReturn(goals.stream());
-
-        GoalDto goalDto2 = GoalDto.builder()
-                .id(2L)
-                .title("title")
-                .status(GoalStatus.COMPLETED)
-                .build();
 
         List<GoalDto> expected = List.of(goalDto2);
         List<GoalDto> result = goalService.getGoalsByUser(userId, filter);
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void testFindGoalByParentIdFiltered(){
+        when(goalRepository.findByParent(goal3.getId())).thenReturn(goals.stream());
+
+        List<GoalDto> expected = List.of(goalDto2);
+        List<GoalDto> result = goalService.findSubtasksByGoalId(goal3.getId(), filter);
         assertEquals(expected, result);
     }
 }

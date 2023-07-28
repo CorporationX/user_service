@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.filter.goal.UserFilterDto;
+import school.faang.user_service.filter.user.UserFilterDto;
 import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.filter.filtersForUserFilterDto.DtoUserFilter;
+import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final List<DtoUserFilter> userFilters;
+    private final List<UserFilter> userFilters;
     private final UserMapper userMapper;
 
 
@@ -25,10 +25,12 @@ public class UserService {
     }
 
     private List<UserDto> applyFilter(Stream<User> userList, UserFilterDto userFilterDto){
-        return userFilters.stream()
+        List<UserDto> list =  userFilters.stream()
                 .filter(userFilter -> userFilter.isApplicable(userFilterDto))
                 .flatMap(userFilter -> userFilter.apply(userList, userFilterDto))
                 .map(userMapper::userToDto)
                 .toList();
+
+        return list;
     }
 }

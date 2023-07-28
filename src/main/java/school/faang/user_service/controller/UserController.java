@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.filter.goal.UserFilterDto;
+import school.faang.user_service.filter.user.UserFilterDto;
 import school.faang.user_service.service.UserService;
 
 import java.util.List;

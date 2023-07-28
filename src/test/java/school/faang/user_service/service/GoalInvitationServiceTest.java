@@ -18,6 +18,8 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -68,7 +70,7 @@ class GoalInvitationServiceTest {
         when(userRepository.existsById(anyLong())).thenReturn(true);
 
         Exception ex = assertThrows(DataValidException.class, () -> goalInvitationService.createInvitation(goalInvitationDto));
-        assertTrue(ex.getMessage().contains("Inviter and invited are equal"));
+        assertTrue(ex.getMessage().equals("Inviter and invited are equal"));
 
     }
 
@@ -108,10 +110,12 @@ class GoalInvitationServiceTest {
 
         User user1 = new User();
         user1.setId(1L);
+        user1.setGoals(new ArrayList<>(List.of(new Goal())));
         goalInvitation.setInviter(user1);
 
         User user2 = new User();
         user2.setId(2L);
+        user2.setGoals(new ArrayList<>(List.of(new Goal())));
         goalInvitation.setInvited(user2);
 
         Goal goal = new Goal();

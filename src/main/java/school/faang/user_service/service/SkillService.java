@@ -1,8 +1,8 @@
 package school.faang.user_service.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
@@ -34,8 +34,8 @@ public class SkillService {
 
     @Transactional
     public SkillDto create(SkillDto skill) {
-        if (skillRepository.existsByTitle(skill.getTitle())) {
-            throw new DataValidationException("Skill " + skill.getTitle() + " already exists");
+        if (skillRepository.existsByTitle(skill.getTitle())){
+            throw new DataValidationException(Message.SKILL_EXISTS_FORMAT + skill.getTitle());
         }
 
         Skill newSkill = skillMapper.skillToEntity(skill);

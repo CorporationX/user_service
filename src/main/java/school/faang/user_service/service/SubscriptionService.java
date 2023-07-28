@@ -5,10 +5,10 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.commonMessages.ErrorMessages;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.filters.UserFilterDto;
+import school.faang.user_service.filter.user.UserFilterDto;
 import school.faang.user_service.exceptions.DataValidationException;
-import school.faang.user_service.filters.UserMapper;
-import school.faang.user_service.filters.filtersForUserFilterDto.DtoUserFilter;
+import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.repository.SubscriptionRepository;
 
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
-    private final List<DtoUserFilter> userFilters;
+    private final List<UserFilter> userFilters;
     private final UserMapper userMapper;
 
     public void followUser(long followerId, long followeeId) {
@@ -52,10 +52,10 @@ public class SubscriptionService {
     }
 
     private List<UserDto> applyFilter(Stream<User> users, UserFilterDto dtoFilters){
-        List<DtoUserFilter> requiredFilters = userFilters.stream()
+        List<UserFilter> requiredFilters = userFilters.stream()
                 .filter(filter -> filter.isApplicable(dtoFilters))
                 .toList();
-        for(DtoUserFilter requiredFilter : requiredFilters){
+        for(UserFilter requiredFilter : requiredFilters){
             users = requiredFilter.apply(users, dtoFilters);
         }
         return users.map(userMapper::userToDto).toList();

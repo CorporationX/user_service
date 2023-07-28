@@ -28,19 +28,17 @@ import school.faang.user_service.util.Message;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/goal")
+@RequestMapping("/api/v1/goals")
 public class GoalController {
     private final GoalService goalService;
 
     @PostMapping
     public GoalDto createGoal(@RequestBody GoalDto goalDto, Long userId){
-
         return goalService.createGoal(goalDto, userId);
     }
 
     @PutMapping
     public GoalDto updateGoal(@RequestBody GoalDto goalDto, Long userId){
-
         return goalService.updateGoal(goalDto, userId);
     }
 
@@ -53,15 +51,13 @@ public class GoalController {
         goalService.deleteGoal(goalId);
     }
 
-    @GetMapping
+    @GetMapping("/{userId}")
     public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto goalFilterDto){
-
         return goalService.getGoalsByUser(userId, goalFilterDto);
     }
 
-    @GetMapping
+    @GetMapping("/{parentGoalId}/subtasks")
     public List<GoalDto> findSubtasksByGoalId(Long parentGoalId, GoalFilterDto goalFilterDto){
-      
         return goalService.findSubtasksByGoalId(parentGoalId, goalFilterDto);
     }
 }

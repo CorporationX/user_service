@@ -11,8 +11,8 @@ import java.util.List;
 
 @Component
 public class MentorshipRequestValidator {
-    private final int requestWithPremium = 5;
-    private final int requestWithoutPremium = 3;
+    private static final int REQUEST_WITH_PREMIUM = 5;
+    private static final int REQUEST_WITHOUT_PREMIUM = 3;
     private int numberOfRequestsInMonth;
 
     public void requestValidate(User requester, User receiver) {
@@ -20,13 +20,7 @@ public class MentorshipRequestValidator {
             throw new DataValidationException("request was not create, your mentor is you");
         }
 
-        if (requester.getPremium()!=null) {
-            numberOfRequestsInMonth = requester.getPremium()
-                    .getEndDate()
-                    .isAfter(LocalDateTime.now()) ? requestWithPremium : requestWithoutPremium;
-        } else {
-            numberOfRequestsInMonth = 3;
-        }
+        numberOfRequestsInMonth = getRequestsInMonth(requester);
 
         List<MentorshipRequest> sentRequests = requester.getSentMentorshipRequests();
         if (sentRequests.size() >= numberOfRequestsInMonth) {
@@ -55,6 +49,16 @@ public class MentorshipRequestValidator {
     public void rejectRequestValidator(MentorshipRequest request) {
         if (request.getStatus().equals(RequestStatus.REJECTED)) {
             throw new DataValidationException("Already REJECTED");
+        }
+    }
+
+    private int getRequestsInMonth(User requester) {
+        if (requester.getPremium() != null) {
+            return requester.getPremium()
+                    .getEndDate()
+                    .isAfter(LocalDateTime.now()) ? REQUEST_WITH_PREMIUM : REQUEST_WITHOUT_PREMIUM;
+        } else {
+            return REQUEST_WITHOUT_PREMIUM;
         }
     }
 }

@@ -16,6 +16,9 @@ public class RecommendationRequestCreatedAtFilter implements RecommendationReque
     @Override
     public Stream<RecommendationRequest> apply(Stream<RecommendationRequest> requests, RequestFilterDto filters) {
         return requests
-                .filter(request -> request.getCreatedAt().isEqual(filters.getCreatedAt()));
+                .filter(request -> request
+                        .getCreatedAt()
+                        .toLocalDate()
+                        .isEqual(filters.getCreatedAt().toLocalDate()));
     }
 }

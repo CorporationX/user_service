@@ -23,14 +23,9 @@ class UserServiceTest {
     @InjectMocks
     UserService userService;
 
- /*   @Test
-    public void testFindUserThrowEntityExc() {
-        assertThrows(EntityNotFoundException.class, () -> userService.findUserById(1L));
-    }*/
-
     @Test
-    public void testFindUserThrowNullPointerExc() {
-        assertThrows(NullPointerException.class, () -> userService.findUserById(null));
+    public void testFindUserThrowEntityNotFoundExc() {
+        assertThrows(EntityNotFoundException.class, () -> userService.findUserById(null));
     }
 
     @Test

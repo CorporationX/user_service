@@ -22,7 +22,7 @@ public class SubscriptionService {
 
     public void followUser(long followerId, long followeeId) {
         if (isNotValid(followerId, followeeId)) {
-            throw new DataValidationException(followerId, followeeId);
+            throw new DataValidationException(String.format("User with id %d already follow user with id %d", followerId, followeeId));
         }
         subscriptionRepository.followUser(followerId, followeeId);
     }

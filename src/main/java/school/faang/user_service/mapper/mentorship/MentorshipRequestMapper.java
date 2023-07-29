@@ -1,4 +1,4 @@
-package school.faang.user_service.mapper;
+package school.faang.user_service.mapper.mentorship;
 
 import org.mapstruct.*;
 import school.faang.user_service.entity.User;

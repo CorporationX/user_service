@@ -1,4 +1,4 @@
-package school.faang.user_service.mapper;
+package school.faang.user_service.mapper.goal;
 
 import org.mapstruct.*;
 import school.faang.user_service.dto.event.EventDto;

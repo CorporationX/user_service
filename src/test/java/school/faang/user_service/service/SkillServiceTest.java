@@ -39,6 +39,7 @@ class SkillServiceTest {
     private SkillMapperImpl skillMapper;
     @Spy
     private SkillCandidateMapperImpl skillCandidateMapper;
+
     @Mock
     private SkillRepository skillRepository;
     @Mock
@@ -54,6 +55,7 @@ class SkillServiceTest {
     Recommendation recommendation = new Recommendation();
     User author = new User();
     User receiver = new User();
+
 
 
     @BeforeEach

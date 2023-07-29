@@ -38,12 +38,6 @@ public class GoalController {
         GoalDto createdGoal = goalService.createGoal(userId, goal);
         return new ResponseEntity<>(createdGoal, HttpStatus.CREATED);
     }
-  
-    @PostMapping("/users/{userId}")
-    public List<GoalDto> getGoalsByUser(@PathVariable Long userId, @RequestBody GoalFilterDto filters) {
-        return goalService.getGoalsByUser(userId, filters);
-    }
-
 
     @PostMapping("/subtasks/{goalId}")
     public List<GoalDto> findSubtasksByGoalId(@PathVariable long goalId, @RequestBody GoalFilterDto filter) {

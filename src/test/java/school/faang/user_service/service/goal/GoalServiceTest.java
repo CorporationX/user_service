@@ -3,14 +3,12 @@ package school.faang.user_service.service.goal;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -40,19 +38,12 @@ import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validation.GoalValidator;
 
 import java.util.Collections;
-import java.util.List;
-import java.util.stream.Stream;
-
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class GoalServiceTest {
-
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class GoalServiceTest {
+public class GoalServiceTest {
     @InjectMocks
     private GoalService goalService;
 
@@ -61,20 +52,12 @@ class GoalServiceTest {
 
     @Mock
     private GoalMapper goalMapper;
-    private List<Goal> mockSubtasks;
-    private List<GoalDto> mockDtoList;
 
     @Mock
     private List<GoalFilter> goalFilters;
 
     @Mock
-    private SkillRepository skillRepository;
-
-    @Mock
     private GoalValidator goalValidator;
-
-    @InjectMocks
-    private GoalService goalService;
 
     @BeforeEach
     public void setUp() {
@@ -82,7 +65,6 @@ class GoalServiceTest {
     }
 
     @Test
-
     public void testGetGoalsByUser() {
         Long userId = 1L;
         GoalFilterDto filters = new GoalFilterDto();
@@ -128,76 +110,6 @@ class GoalServiceTest {
         assertEquals(mockGoalDto, result);
     }
 
-    @Test
-    public void testFindSubtasksByGoalId_ValidGoalIdNoFilters_ReturnsAllSubtasks() {
-        long goalId = 1;
-        GoalFilterDto filter = null;
-
-        when(goalRepository.findByParent(goalId)).thenReturn(mockSubtasks.stream());
-        when(filter1.isApplicable(filter)).thenReturn(false);
-        when(filter2.isApplicable(filter)).thenReturn(false);
-        when(goalMapper.toDto(any())).thenReturn(mockDtoList.get(0), mockDtoList.get(1));
-
-        List<GoalDto> result = goalService.findSubtasksByGoalId(goalId, filter);
-
-        assertEquals(mockDtoList, result);
-    }
-
-    @Test
-    public void testFindSubtasksByGoalId_ValidGoalIdWithFilters_ReturnsFilteredSubtasks() {
-        long goalId = 1;
-        GoalFilterDto filter = new GoalFilterDto();
-        filter.setSkillIds(List.of(1L));
-
-        when(goalRepository.findByParent(goalId)).thenReturn(mockSubtasks.stream());
-        when(filter1.isApplicable(filter)).thenReturn(true);
-        when(filter2.isApplicable(filter)).thenReturn(false);
-        when(filter1.applyFilter(any(), any())).thenReturn(mockSubtasks.stream());
-        when(goalMapper.toDto(any())).thenReturn(mockDtoList.get(0), mockDtoList.get(1));
-
-        List<GoalDto> result = goalService.findSubtasksByGoalId(goalId, filter);
-
-        assertEquals(mockDtoList, result);
-    }
-
-    @Test
-    public void testFindSubtasksByGoalId_InvalidGoalId() {
-        long invalidGoalId = 999;
-        GoalFilterDto filter = null;
-
-        when(goalRepository.findByParent(invalidGoalId)).thenReturn(Stream.empty());
-
-        List<GoalDto> result = goalService.findSubtasksByGoalId(invalidGoalId, filter);
-
-        assertEquals(0, result.size());
-    }
-
-    @Test
-    public void testFindSubtasksByGoalId_ValidGoalIdWithApplicableFilters_ReturnsFilteredSubtasks() {
-        long goalId = 1;
-        GoalFilterDto filter = new GoalFilterDto();
-        filter.setSkillIds(List.of(1L));
-
-        when(goalRepository.findByParent(goalId)).thenReturn(mockSubtasks.stream());
-        when(filter1.isApplicable(filter)).thenReturn(true);
-        when(filter2.isApplicable(filter)).thenReturn(true);
-        when(filter1.applyFilter(any(), any())).thenReturn(mockSubtasks.stream());
-        when(filter2.applyFilter(any(), any())).thenReturn(mockSubtasks.stream());
-        when(goalMapper.toDto(any())).thenReturn(mockDtoList.get(0), mockDtoList.get(1));
-
-        List<GoalDto> result = goalService.findSubtasksByGoalId(goalId, filter);
-
-        assertEquals(mockDtoList, result);
-    }
-
-    @Test
-    public void testFindSubtasksByGoalId_NullFilter_ReturnsAllSubtasks() {
-        long goalId = 1;
-        GoalFilterDto filter = null;
-
-        when(goalRepository.findByParent(goalId)).thenReturn(mockSubtasks.stream());
-        when(filter1.isApplicable(filter)).thenReturn(false);
-    }
     @Test
     public void testDeleteGoal_ExistingGoal() {
         long goalId = 1L;
@@ -284,7 +196,7 @@ class GoalServiceTest {
         relaxing.setId(4L);
         relaxing.setUsers(List.of(alex, blake));
 
-        when(goalRepository.findAllById(List.of(1L, 2L, 3L, 4L))).thenReturn(List.of(running, swimming,coding, relaxing));
+        when(goalRepository.findAllById(List.of(1L, 2L, 3L, 4L))).thenReturn(List.of(running, swimming, coding, relaxing));
 
         int removedUsersFromGoalCount = goalService.removeUserFromGoals(List.of(1L, 2L, 3L, 4L), 1L);
 

@@ -21,14 +21,14 @@ public class SubscriptionService {
     private final List<UserFilter> userFilters;
 
     public void followUser(long followerId, long followeeId) {
-        if (isNotValid(followerId, followeeId)) {
+        if (!isValid(followerId, followeeId)) {
             throw new DataValidationException(followerId, followeeId);
         }
         subscriptionRepository.followUser(followerId, followeeId);
     }
 
     public void unfollowUser(long followerId, long followeeId) {
-        if (!isNotValid(followerId, followeeId)) {
+        if (isValid(followerId, followeeId)) {
             throw new DataValidationException(String.format("User with id %d doesn't follow user with id %d", followerId, followeeId));
         }
         subscriptionRepository.unfollowUser(followerId, followeeId);
@@ -39,8 +39,12 @@ public class SubscriptionService {
         return filterUsers(users, filter);
     }
 
-    private boolean isNotValid(long followerId, long followeeId) {
-        return subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
+    public int getFollowersCount(long followeeId) {
+        return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
+    }
+
+    private boolean isValid(long followerId, long followeeId) {
+        return !subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
     }
 
     private List<UserDto> filterUsers(Stream<User> users, UserFilterDto filters) {

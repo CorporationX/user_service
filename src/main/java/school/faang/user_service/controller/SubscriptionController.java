@@ -32,6 +32,10 @@ public class SubscriptionController {
         return subscriptionService.getFollowers(followeeId, filter);
     }
 
+    public int getFollowersCount(long followeeId) {
+        return subscriptionService.getFollowersCount(followeeId);
+    }
+
     private boolean isValid(long followerId, long followeeId) {
         return followerId != followeeId;
     }

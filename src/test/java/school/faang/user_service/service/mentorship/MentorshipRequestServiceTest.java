@@ -15,16 +15,15 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.dto.event.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.dto.filter.RequestFilterDto;
-import school.faang.user_service.mapper.MentorshipRequestMapperImpl;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
-import school.faang.user_service.validation.MentorshipRequestValidator;
+import school.faang.user_service.mapper.mentorship.MentorshipRequestMapperImpl;
+import school.faang.user_service.validation.mentorship.MentorshipRequestValidator;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 import java.util.List;
 import java.util.Optional;
 
 import java.util.ArrayList;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;

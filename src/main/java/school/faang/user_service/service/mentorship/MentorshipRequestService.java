@@ -6,15 +6,13 @@ import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityNotFoundException;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.dto.event.RejectionDto;
-import jakarta.persistence.EntityNotFoundException;
-import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.dto.filter.RequestFilterDto;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.service.filter.MentorshipFilter;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
-import school.faang.user_service.validation.MentorshipRequestValidator;
+import school.faang.user_service.validation.mentorship.MentorshipRequestValidator;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 import java.util.List;

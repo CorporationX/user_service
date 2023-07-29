@@ -149,4 +149,22 @@ class EventParticipationServiceTest {
         );
         Assert.assertEquals(String.format("No one participates in the event with %d id.", tempEventId), e.getMessage());
     }
+
+    //Тесты для BC-3714 (Получить количество участников события)
+
+    @Test
+    void getParticipantCount(){
+        long tempUserId = new Random().nextLong();
+        long tempEventId = new Random().nextLong();
+
+        User existingUser1 = User.builder()
+                .id(tempUserId + 1)
+                .build();
+        User existingUser2 = User.builder()
+                .id(tempUserId - 1)
+                .build();
+        var registeredUsers = List.of(existingUser1, existingUser2);
+        Mockito.when(repository.countParticipants(tempEventId)).thenReturn(registeredUsers.size());
+        Assert.assertEquals(registeredUsers.size(), service.getParticipantsCount(tempEventId));
+    }
 }

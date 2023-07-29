@@ -48,4 +48,9 @@ public class EventParticipationService {
         }
     }
 
+    public int getParticipantsCount(long eventID){
+        var contOfParticipants = eventParticipationRepository.countParticipants(eventID);
+        return contOfParticipants;
+    }
+
 }

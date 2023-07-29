@@ -18,8 +18,12 @@ class EventParticipationController {
         service.unregisterParticipant(userDto.id(), eventId);
     }
 
-    void getParticipant(long eventId){
+    void getParticipant(long eventId) {
         service.getParticipant(eventId);
+    }
+
+    void getParticipantsCount(long eventId) {
+        service.getParticipantsCount(eventId);
     }
 
 }

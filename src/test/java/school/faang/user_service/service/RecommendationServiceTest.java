@@ -253,6 +253,16 @@ class RecommendationServiceTest {
                 .thenReturn(null);
         assertTrue(recommendationService.getAllUserRecommendations(recommendationDto.getReceiverId()).isEmpty());
     }
+
+    @Test
+    public void testGetAllGivenRecommendations_checkNull(){
+        Page<Recommendation> recommendations = recommendationRepository
+                .findAllByReceiverId(recommendationDto.getAuthorId(), Pageable.unpaged());
+        Mockito.when(recommendationRepository
+                .findAllByReceiverId(recommendationDto.getAuthorId(), Pageable.unpaged()))
+                .thenReturn(null);
+        assertTrue(recommendationService.getAllUserRecommendations(recommendationDto.getAuthorId()).isEmpty());
+    }
     private Recommendation buildRecommendation(){
         return Recommendation
                 .builder()

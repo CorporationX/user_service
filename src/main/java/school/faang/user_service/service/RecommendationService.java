@@ -165,6 +165,18 @@ public class RecommendationService {
                 .toList();
     }
 
+    public List<RecommendationDto> getAllGivenRecommendations(long authorId){
+        Page<Recommendation> recommendations = recommendationRepository
+                .findAllByReceiverId(authorId, Pageable.unpaged());
+        if(recommendations==null) {
+            return new ArrayList<>();
+        }
+        return recommendations.getContent()
+                .stream()
+                .map(recommendationMapper::toDto)
+                .toList();
+    }
+
     private void validatePreviousRecommendation(RecommendationDto recommendationDto) {
         var recommendation = recommendationRepository
                 .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc

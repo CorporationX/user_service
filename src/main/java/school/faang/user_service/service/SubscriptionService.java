@@ -6,7 +6,7 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exeption.DataValidationException;
-import school.faang.user_service.filters.user.UserFilter;
+import school.faang.user_service.service.filters.user.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 
@@ -41,6 +41,11 @@ public class SubscriptionService {
 
     public int getFollowersCount(long followeeId) {
         return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
+    }
+
+    public List<UserDto> getFollowing(long followerId, UserFilterDto filter){
+        Stream<User> users = subscriptionRepository.findByFollowerId(followerId);
+        return filterUsers(users, filter);
     }
 
     private boolean isValid(long followerId, long followeeId) {

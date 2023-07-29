@@ -69,4 +69,10 @@ public class SubscriptionControllerTest {
         subscriptionController.getFollowersCount(3L);
         Mockito.verify(subscriptionService).getFollowersCount(3L);
     }
+
+    @Test
+    public void getFollowingSuccess(){
+        subscriptionController.getFollowing(user1.getId(), filter);
+        Mockito.verify(subscriptionService).getFollowing(user1.getId(), filter);
+    }
 }

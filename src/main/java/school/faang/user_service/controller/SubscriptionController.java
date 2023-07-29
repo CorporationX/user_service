@@ -36,6 +36,10 @@ public class SubscriptionController {
         return subscriptionService.getFollowersCount(followeeId);
     }
 
+   public List<UserDto> getFollowing(long followerId, UserFilterDto filter){
+        return subscriptionService.getFollowing(followerId, filter);
+   }
+
     private boolean isValid(long followerId, long followeeId) {
         return followerId != followeeId;
     }

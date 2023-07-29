@@ -8,7 +8,6 @@ import school.faang.user_service.entity.RequestStatus;
 import java.time.LocalDateTime;
 
 @Data
-@Component
 @Builder
 public class MentorshipRequestDto {
     private String description;

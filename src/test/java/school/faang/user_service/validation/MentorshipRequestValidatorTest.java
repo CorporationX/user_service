@@ -32,7 +32,6 @@ class MentorshipRequestValidatorTest {
     private final String DESCRIPTION = "description";
     private MentorshipRequest request;
 
-
     @BeforeEach
     void setUp() {
         User requester = new User();

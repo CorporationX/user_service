@@ -14,27 +14,17 @@ public interface MentorshipRequestMapper {
     @Mapping(source = "receiver.id", target = "receiverId")
     MentorshipRequestDto toDto(MentorshipRequest mentorshipRequest);
 
-    @Mapping(source = "requesterId", target = "requester", qualifiedByName = "mapRequester")
-    @Mapping(source = "receiverId", target = "receiver", qualifiedByName = "mapReceiver")
+    @Mapping(source = "requesterId", target = "requester", qualifiedByName = "mapToUser")
+    @Mapping(source = "receiverId", target = "receiver", qualifiedByName = "mapToUser")
     MentorshipRequest toEntity(MentorshipRequestDto mentorshipRequestDto);
 
-    @Named("mapRequester")
-    default User mapRequester(Long requesterId) {
-        if(requesterId == null) {
+    @Named("mapToUser")
+    default User mapToUser(Long id) {
+        if(id == null) {
             return null;
         }
         User requester = new User();
-        requester.setId(requesterId);
+        requester.setId(id);
         return requester;
-    }
-
-    @Named("mapReceiver")
-    default User mapReceiver(Long receiverId) {
-        if(receiverId == null) {
-            return null;
-        }
-        User receiver = new User();
-        receiver.setId(receiverId);
-        return receiver;
     }
 }

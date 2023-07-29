@@ -3,6 +3,8 @@ package school.faang.user_service.service;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
@@ -10,7 +12,7 @@ import school.faang.user_service.repository.mentorship.MentorshipRequestReposito
 import school.faang.user_service.validation.MentorshipRequestValidator;
 
 @RequiredArgsConstructor
-@Component
+@Service
 public class MentorshipRequestService {
     private final MentorshipRequestRepository repository;
     private final MentorshipRequestMapper mapper;

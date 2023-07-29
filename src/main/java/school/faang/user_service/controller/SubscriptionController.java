@@ -24,7 +24,7 @@ public class SubscriptionController {
         subscriptionService.unfollowUser(followerId, followeeId);
     }
 
-    public boolean isValid(long followerId, long followeeId) {
+    private boolean isValid(long followerId, long followeeId) {
         return followerId != followeeId;
     }
 }

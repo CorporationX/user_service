@@ -36,8 +36,6 @@ public class SubscriptionServiceTest {
 
     private User user1;
     private User user2;
-    private UserDto userDto2;
-    private UserDto userDto1;
 
     private List<User> users;
     private List<UserDto> usersDto;
@@ -63,12 +61,12 @@ public class SubscriptionServiceTest {
         users.add(user1);
         users.add(user2);
 
-        userDto1 = UserDto.builder()
+        UserDto userDto1 = UserDto.builder()
                 .id(1L)
                 .username("46")
                 .email("46@gmail.com")
                 .build();
-        userDto2 = UserDto.builder()
+        UserDto userDto2 = UserDto.builder()
                 .id(2L)
                 .username("Angie")
                 .email("Angie@gmail.com")

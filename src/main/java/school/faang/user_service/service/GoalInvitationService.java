@@ -28,6 +28,9 @@ public class GoalInvitationService {
         if (invitation.getId() == null || invitation.getId() < 1) {
             throw new DataValidException("Invitation illegal id");
         }
+        if (goalInvitationRepository.existsById(invitation.getId())) {
+            throw new DataValidException("Invitation already exist. Id: " + invitation.getId());
+        }
         if (!goalRepository.existsById(invitation.getGoalId())) {
             throw new DataValidException("Goal does not exist. Invitation Id: " + invitation.getId());
         }

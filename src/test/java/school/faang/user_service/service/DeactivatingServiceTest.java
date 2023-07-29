@@ -60,6 +60,6 @@ class DeactivatingServiceTest {
 
         verify(goalRepository).findGoalsByUserId(23L);
         verify(goalRepository).delete(goal1);
-        
+
     }
 }

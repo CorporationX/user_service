@@ -1,4 +1,4 @@
-package school.faang.user_service.exeption;
+package school.faang.user_service.exeptions;
 
 public class UserAlreadyRegisteredAtEvent extends RuntimeException {
     public UserAlreadyRegisteredAtEvent(long eventId, long userId) {

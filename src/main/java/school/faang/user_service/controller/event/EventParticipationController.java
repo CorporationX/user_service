@@ -18,5 +18,8 @@ class EventParticipationController {
         service.unregisterParticipant(userDto.id(), eventId);
     }
 
+    void getParticipant(long eventId){
+        service.getParticipant(eventId);
+    }
 
 }

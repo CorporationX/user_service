@@ -1,4 +1,4 @@
-package school.faang.user_service.exeption;
+package school.faang.user_service.exeptions;
 
 public class UserAreNotRegisteredAtEvent extends RuntimeException{
     public UserAreNotRegisteredAtEvent(long eventId, long userId) {

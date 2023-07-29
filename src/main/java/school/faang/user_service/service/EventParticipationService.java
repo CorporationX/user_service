@@ -3,8 +3,9 @@ package school.faang.user_service.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exeption.UserAlreadyRegisteredAtEvent;
-import school.faang.user_service.exeption.UserAreNotRegisteredAtEvent;
+import school.faang.user_service.exeptions.NoOneParticipatesInTheEvent;
+import school.faang.user_service.exeptions.UserAlreadyRegisteredAtEvent;
+import school.faang.user_service.exeptions.UserAreNotRegisteredAtEvent;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
 import java.util.List;
@@ -34,7 +35,16 @@ public class EventParticipationService {
         if (user.isPresent()) {
             eventParticipationRepository.unregister(eventId, userId);
         } else {
-            throw new UserAreNotRegisteredAtEvent(eventId,userId);
+            throw new UserAreNotRegisteredAtEvent(eventId, userId);
+        }
+    }
+
+    public List<User> getParticipant(long eventId) {
+        var users = eventParticipationRepository.findAllParticipantsByEventId(eventId);
+        if (users.size() == 0) {
+            throw new NoOneParticipatesInTheEvent(eventId);
+        } else {
+            return users;
         }
     }
 

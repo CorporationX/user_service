@@ -7,7 +7,7 @@ import school.faang.user_service.commonMessages.ErrorMessagesForEvent;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.RegistrationUserForEventException;
-import school.faang.user_service.mapper.event.EventMapper;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
 import java.text.MessageFormat;
@@ -20,7 +20,7 @@ import static school.faang.user_service.commonMessages.ErrorMessagesForEvent.USE
 @RequiredArgsConstructor
 public class EventParticipationService {
     private final EventParticipationRepository eventParticipationRepository;
-    private final EventMapper mapper;
+    private final UserMapper mapper;
 
     @Transactional
     public void registerParticipant(Long eventId, Long userId) {
@@ -50,7 +50,7 @@ public class EventParticipationService {
 
     public List<UserDto> getParticipant(Long eventId) {
         validateEventId(eventId);
-        return getParticipantsByEventId(eventId).stream().map(mapper::toDto).toList();
+        return getParticipantsByEventId(eventId).stream().map(mapper::userToDto).toList();
     }
 
     public long getParticipantsCount(Long eventId) {

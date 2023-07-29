@@ -16,7 +16,7 @@ import school.faang.user_service.commonMessages.ErrorMessagesForEvent;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.RegistrationUserForEventException;
-import school.faang.user_service.mapper.event.EventMapper;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
 import java.text.MessageFormat;
@@ -39,7 +39,7 @@ class EventParticipationServiceTest {
     @Mock
     private EventParticipationRepository eventParticipationRepository;
     @Spy
-    private EventMapper mapper = Mappers.getMapper(EventMapper.class);
+    private UserMapper mapper = Mappers.getMapper(UserMapper.class);
     @InjectMocks
     private EventParticipationService eventParticipationService;
 

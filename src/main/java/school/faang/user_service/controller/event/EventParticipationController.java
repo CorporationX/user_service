@@ -12,7 +12,7 @@ import school.faang.user_service.service.event.EventParticipationService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/events")
+@RequestMapping("/api/v1/event")
 @RequiredArgsConstructor
 public class EventParticipationController {
 

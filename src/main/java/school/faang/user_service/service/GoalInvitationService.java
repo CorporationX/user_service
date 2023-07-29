@@ -2,6 +2,7 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.exception.DataValidException;
@@ -18,12 +19,14 @@ public class GoalInvitationService {
     private final GoalInvitationRepository goalInvitationRepository;
     private final GoalInvitationMapper goalInvitationMapper;
 
+    @Transactional
     public GoalInvitationDto createInvitation(GoalInvitationDto invitationDto) {
         validateInvitation(invitationDto);
         GoalInvitation invitation = goalInvitationRepository.save(goalInvitationMapper.toEntity(invitationDto));
         return goalInvitationMapper.toDto(invitation);
     }
 
+    @Transactional(readOnly = true)
     private void validateInvitation(GoalInvitationDto invitation) {
         if (invitation.getId() == null || invitation.getId() < 1) {
             throw new DataValidException("Invitation illegal id");

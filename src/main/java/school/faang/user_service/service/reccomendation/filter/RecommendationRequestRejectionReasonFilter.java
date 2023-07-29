@@ -10,12 +10,12 @@ import java.util.stream.Stream;
 public class RecommendationRequestRejectionReasonFilter implements RecommendationRequestFilter {
     @Override
     public boolean isApplicable(RequestFilterDto filters) {
-        return filters.getRejectionReason() != null;
+        return filters.getRejectionReason() != null && !filters.getRejectionReason().isBlank();
     }
 
     @Override
     public Stream<RecommendationRequest> apply(Stream<RecommendationRequest> requests, RequestFilterDto filters) {
         return requests
-                .filter(request -> request.getRejectionReason().contains(filters.getRejectionReason()));
+                .filter(request -> request.getRejectionReason().contains(filters.getRejectionReason().trim()));
     }
 }

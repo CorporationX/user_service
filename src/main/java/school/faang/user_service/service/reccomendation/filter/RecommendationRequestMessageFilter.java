@@ -10,12 +10,12 @@ import java.util.stream.Stream;
 public class RecommendationRequestMessageFilter implements RecommendationRequestFilter {
     @Override
     public boolean isApplicable(RequestFilterDto filters) {
-        return filters.getMessage() != null;
+        return filters.getMessage() != null && filters.getMessage().isBlank();
     }
 
     @Override
     public Stream<RecommendationRequest> apply(Stream<RecommendationRequest> requests, RequestFilterDto filters) {
         return requests
-                .filter(request -> request.getMessage().contains(filters.getMessage()));
+                .filter(request -> request.getMessage().contains(filters.getMessage().trim()));
     }
 }

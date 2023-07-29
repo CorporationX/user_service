@@ -65,4 +65,11 @@ class SkillControllerTest {
         verify(skillService, times(1))
                 .getOfferedSkills(1L);
     }
+
+    @Test
+    void testCallMethodAcquireSkillFromOffersFromSkillService(){
+        skillController.acquireSkillFromOffers(1L,1L);
+        verify(skillService, times(1))
+                .acquireSkillFromOffers(1L,1L);
+    }
 }

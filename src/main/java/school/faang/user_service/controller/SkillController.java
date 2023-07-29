@@ -27,6 +27,10 @@ public class SkillController {
         return skillService.getOfferedSkills(userId);
     }
 
+    public SkillDto acquireSkillFromOffers(long skillId, long userId) {
+        return skillService.acquireSkillFromOffers(skillId, userId);
+    }
+
     private void validateSkill(SkillDto skill) {
         if (skill.getTitle() == null || skill.getTitle().isBlank()) {
             throw new DataValidationException("The title is not valid");

@@ -7,10 +7,11 @@ import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.recommendation.SkillDto;
 import school.faang.user_service.entity.Skill;
 
-@Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR, unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = UserSkillGuaranteeMapper.class)
+@Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR,
+        unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = UserSkillGuaranteeMapper.class)
 public interface SkillMapper {
     @Mapping(source = "guarantees", target = "guaranteeDtoList", qualifiedByName = "listSkillGuaranteeDto")
-    public SkillDto toDto(Skill skill);
+    SkillDto toDto(Skill skill);
 
     Skill toEntity(SkillDto skillDto);
 }

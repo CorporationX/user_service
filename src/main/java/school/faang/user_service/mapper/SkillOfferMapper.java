@@ -14,7 +14,6 @@ public interface SkillOfferMapper {
     SkillOfferDto toDto(SkillOffer skillOffer);
 
     SkillOffer toEntity(SkillOfferDto skillOfferDto);
-
     @Named("listSkillOffersDto")
     default List<SkillOfferDto> listOffersDto(List<SkillOffer> skillOffers) {
         return skillOffers.stream()

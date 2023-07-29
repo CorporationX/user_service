@@ -21,19 +21,46 @@ public class RecommendationValidator {
     public void validateData(RecommendationDto recommendationDto) {
         if (recommendationDto.getId() == null) {
             recommendationRepository
-                    .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(recommendationDto.getAuthorId(), recommendationDto.getReceiverId())
-                    .map(param -> param.getCreatedAt().plusMonths(6).isBefore(LocalDateTime.now())).ifPresent(p -> {
-                        throw new DataValidationException("The author has recommended this user for 6 months");
+                    .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(recommendationDto.getAuthorId(),
+                            recommendationDto.getReceiverId())
+                    .ifPresent(p -> {
+                        if (p.getCreatedAt().plusMonths(6).isAfter(LocalDateTime.now()))
+                            throw new DataValidationException("The author has recommended this user for 6 months");
                     });
         }
+        validateSkill(recommendationDto);
     }
 
-    public void validateSkill(RecommendationDto recommendation) {
+    private void validateSkill(RecommendationDto recommendation) {
         List<SkillOfferDto> skillOffers = recommendation.getSkillOffers();
         for (SkillOfferDto skillOffer : skillOffers) {
             if (!skillOffersRepository.existsById(skillOffer.getId())) {
                 throw new EntityNotFoundException(skillOffer.getId() + "doesn't exists");
             }
+        }
+    }
+
+    public void validateRecommendation(RecommendationDto recommendationDto) {
+        if (recommendationDto == null) {
+            throw new DataValidationException("RecommendationDto cannot be null");
+        }
+        if (recommendationDto.getContent() == null || recommendationDto.getContent().isBlank()) {
+            throw new DataValidationException("Recommendation content cannot be empty");
+        }
+    }
+
+    public void validateRecommendationDto(RecommendationDto recommendationDto) {
+        if (recommendationDto == null) {
+            throw new DataValidationException("RecommendationDto is null");
+        }
+        if (recommendationDto.getAuthorId() == null) {
+            throw new DataValidationException("AuthorId is null");
+        }
+        if (recommendationDto.getReceiverId() == null) {
+            throw new DataValidationException("ReceiverId is null");
+        }
+        if (recommendationDto.getContent() == null) {
+            throw new DataValidationException("Content is null");
         }
     }
 }

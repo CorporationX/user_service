@@ -8,14 +8,12 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
-import school.faang.user_service.dto.recommendation.UserSkillGuaranteeDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.mapper.SkillMapper;
-import school.faang.user_service.mapper.UserSkillGuaranteeMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
@@ -34,46 +32,50 @@ public class RecommendationService {
     private final SkillRepository skillRepository;
     private final SkillMapper skillMapper;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
-    private final UserSkillGuaranteeMapper userSkillGuaranteeMapper;
     private final RecommendationMapper recommendationMapper;
 
-    public RecommendationDto create(RecommendationDto recomendation) {
-        recommendationValidator.validateData(recomendation);
-        recommendationValidator.validateSkill(recomendation);
-        Long entityId = recommendationRepository.create(recomendation.getAuthorId(), recomendation.getReceiverId(), recomendation.getContent());
-        Recommendation entity = recommendationRepository.findById(entityId)
-                .orElseThrow(() -> new EntityNotFoundException("Recommendation not found"));
-        skillSave(entity, recomendation.getSkillOffers());
+    public RecommendationDto create(RecommendationDto recommendation) {
+        recommendationValidator.validateData(recommendation);
+        Long entityId = recommendationRepository.create(recommendation.getAuthorId(), recommendation.getReceiverId(),
+                recommendation.getContent());
+        Recommendation entity = getRecommendation(entityId);
+        saveSkill(entity, recommendation.getSkillOffers());
         return recommendationMapper.toDto(entity);
     }
 
-    public void skillSave(Recommendation recommendation, List<SkillOfferDto> list) {
+    public void saveSkill(Recommendation recommendation, List<SkillOfferDto> list) {
         list.forEach(offer -> {
-            long offersIds = skillOffersRepository.create(offer.getSkillId(), recommendation.getId());
-            recommendation.addSkillOffer(skillOffersRepository.findById(offersIds)
-                    .orElseThrow(() -> new EntityNotFoundException("Skill offer not found")));
-            guaranteesHaveSkill(recommendation);
+            if (recommendation.getSkillOffers().stream()
+                    .noneMatch(skillOffer -> skillOffer.getId() != skillOffer.getId())) {
+                long offerId = skillOffersRepository.create(offer.getSkillId(), recommendation.getId());
+                recommendation.addSkillOffer(skillOffersRepository.findById(offerId)
+                        .orElseThrow(() -> new EntityNotFoundException("Skill offer not found")));
+                giveGuaranteesHaveSkill(recommendation);
+            }
         });
     }
 
-    public void guaranteesHaveSkill(Recommendation recommendation) {
+    public void giveGuaranteesHaveSkill(Recommendation recommendation) {
         List<SkillDto> usersSkills = findSkills(recommendation.getReceiver().getId());
-        UserSkillGuaranteeDto userSkillGuaranteeDto = getUserSkillGuarantee(recommendation);
+        UserSkillGuarantee userSkillGuarantee = getUserSkillGuarantee(recommendation);
         for (SkillOffer skillOffer : recommendation.getSkillOffers()) {
             usersSkills.stream()
                     .filter(userSkill -> userSkill.getId().equals(skillOffer.getSkill().getId()))
-                    .forEach(skill -> guaranteesHave(skill, recommendation.getAuthor().getId(), userSkillGuaranteeDto));
+                    .forEach(skill -> giveGuarantees(skill, recommendation, userSkillGuarantee));
         }
     }
 
-    public void guaranteesHave(SkillDto skill, Long userId, UserSkillGuaranteeDto userSkillGuaranteeDto) {
-        if (skill.getGuaranteeDtoList()
+    public void giveGuarantees(SkillDto skillDto, Recommendation recommendation, UserSkillGuarantee userSkillGuarantee) {
+        if (skillDto.getGuaranteeDtoList()
                 .stream()
-                .noneMatch(guarantee -> guarantee.getGuarantorId() == userId)) ;
-        userSkillGuaranteeDto.setSkillId(skill.getId());
-        {
-            skill.getGuaranteeDtoList().add(userSkillGuaranteeDto);
-            userSkillGuaranteeRepository.save(userSkillGuaranteeMapper.toEntity(userSkillGuaranteeDto));
+                .noneMatch(guarantee -> guarantee.getGuarantorId() == recommendation.getAuthor().getId())) {
+            userSkillGuarantee.setSkill(skillMapper.toEntity(skillDto));
+            recommendation.getSkillOffers().stream()
+                    .map(SkillOffer::getSkill)
+                    .filter(skill -> skill.getId() == skillDto.getId()).forEach((skill) -> {
+                        skill.getGuarantees().add(userSkillGuarantee);
+                    });
+            userSkillGuaranteeRepository.save(userSkillGuarantee);
         }
     }
 
@@ -84,29 +86,33 @@ public class RecommendationService {
         return skillDtos;
     }
 
-    public UserSkillGuaranteeDto getUserSkillGuarantee(Recommendation entity) {
-        UserSkillGuaranteeDto userSkillGuaranteeDto = new UserSkillGuaranteeDto();
-        userSkillGuaranteeDto.setUserId(entity.getReceiver().getId());
-        userSkillGuaranteeDto.setGuarantorId(entity.getAuthor().getId());
-        return userSkillGuaranteeDto;
+    public UserSkillGuarantee getUserSkillGuarantee(Recommendation entity) {
+        UserSkillGuarantee userSkillGuarantee = new UserSkillGuarantee();
+        userSkillGuarantee.setUser(entity.getReceiver());
+        userSkillGuarantee.setGuarantor(entity.getAuthor());
+        return userSkillGuarantee;
     }
 
     public RecommendationDto updateRecommendation(RecommendationDto updated, Long id) {
-        Recommendation entity = recommendationRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Recommendation not found"));
+        Recommendation entity = getRecommendation(id);
         recommendationValidator.validateData(updated);
-        recommendationValidator.validateSkill(updated);
-        Recommendation updatedEntity = recommendationRepository.update(updated.getAuthorId(), updated.getReceiverId(), updated.getContent());
+        Recommendation updatedEntity = recommendationRepository.update(updated.getAuthorId(), updated.getReceiverId(),
+                updated.getContent());
         skillOffersRepository.deleteAllByRecommendationId(id);
-        skillSave(entity, updated.getSkillOffers());
+        saveSkill(entity, updated.getSkillOffers());
         return recommendationMapper.toDto(updatedEntity);
+    }
+
+    private Recommendation getRecommendation(Long id) {
+        return recommendationRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Recommendation not found"));
     }
 
     public void deleteRecommendation(long id) {
         recommendationRepository.deleteById(id);
     }
 
-    public List<RecommendationDto> getAllUserRecommendations(long receiverId){
+    public List<RecommendationDto> getAllUserRecommendations(long receiverId) {
         Page<Recommendation> page = recommendationRepository.findAllByReceiverId(receiverId, Pageable.unpaged());
         return page.stream().map(recommendationMapper::toDto).toList();
     }

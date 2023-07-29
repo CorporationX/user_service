@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,7 +19,6 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.*;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
@@ -112,17 +112,23 @@ class RecommendationServiceTest {
 
     @Test
     public void testCreateThrowException() {
-        Mockito.when(recommendationRepository.create(1L, 1L, "content")).thenReturn(1L);
-        assertThrows(DataValidationException.class, () -> {
+        recommendationValidator = new RecommendationValidator(recommendationRepository, skillOffersRepository);
+
+        Mockito.when(recommendationRepository.create(1L, 1L, "content"))
+                .thenReturn(1L);
+        Mockito.when(recommendationRepository.findById(1L))
+                        .thenReturn(Optional.ofNullable(null));
+
+        assertThrows(EntityNotFoundException.class, () -> {
             recommendationService.create(recommendationDto);
         });
     }
 
     @Test
     public void testCreateCallValidateData() {
-        Mockito.when(skillOffersRepository.findById(1L))
+        Mockito.lenient().when(skillOffersRepository.findById(1L))
                 .thenReturn(Optional.of(new SkillOffer()));
-        Mockito.when(skillOffersRepository.create(1L, 1L))
+        Mockito.lenient().when(skillOffersRepository.create(1L, 1L))
                 .thenReturn(1L);
         Mockito.when(recommendationRepository.create(1L, 1L, "content"))
                 .thenReturn(1L);
@@ -136,9 +142,9 @@ class RecommendationServiceTest {
 
     @Test
     public void testCreateCallValidateSkill() {
-        Mockito.when(skillOffersRepository.findById(1L))
+        Mockito.lenient().when(skillOffersRepository.findById(1L))
                 .thenReturn(Optional.of(new SkillOffer()));
-        Mockito.when(skillOffersRepository.create(1L, 1L))
+        Mockito.lenient().when(skillOffersRepository.create(1L, 1L))
                 .thenReturn(1L);
         Mockito.when(recommendationRepository.create(1L, 1L, "content"))
                 .thenReturn(1L);
@@ -147,7 +153,7 @@ class RecommendationServiceTest {
 
         recommendationService.create(recommendationDto);
 
-        Mockito.verify(recommendationValidator).validateSkill(recommendationDto);
+        Mockito.verify(recommendationValidator).validateData(recommendationDto);
     }
 
     @Test
@@ -168,6 +174,17 @@ class RecommendationServiceTest {
 
     @Test
     public void testSkillSaveThrowException() {
+        Skill skill1 = Skill
+                .builder()
+                .id(2L)
+                .guarantees(guaranteesList)
+                .build();
+        recommendation.setSkillOffers(List.of( SkillOffer
+                .builder()
+                .id(2L)
+                .skill(skill1)
+                .build()));
+
         Mockito.when(recommendationRepository.create(1L, 1L, "content"))
                 .thenReturn(1L);
         Mockito.when(recommendationRepository.findById(1L))
@@ -175,7 +192,7 @@ class RecommendationServiceTest {
         Mockito.when(skillOffersRepository.create(1L, 1L))
                 .thenReturn(1L);
 
-        assertThrows(DataValidationException.class, () -> {
+        assertThrows(EntityNotFoundException.class, () -> {
             recommendationService.create(recommendationDto);
         });
     }
@@ -197,14 +214,55 @@ class RecommendationServiceTest {
     }
 
     @Test
+    public void testCreateWhereRecommendationHasEmptySkillOffer() {
+        recommendation.setSkillOffers(new ArrayList<>());
+
+        Mockito.when(skillOffersRepository.findById(1L))
+                .thenReturn(Optional.of(new SkillOffer()));
+        Mockito.when(skillOffersRepository.create(1L, 1L))
+                .thenReturn(1L);
+        Mockito.when(recommendationRepository.create(1L, 1L, "content"))
+                .thenReturn(1L);
+        Mockito.when(recommendationRepository.findById(1L))
+                .thenReturn(Optional.of(recommendation));
+
+        RecommendationDto result = recommendationService.create(recommendationDto);
+
+        assertEquals(1, result.getSkillOffers().size());
+    }
+
+    @Test
+    public void testCreateWhereRecommendationHasFewSkillsOffers() {
+        recommendation.setSkillOffers(new ArrayList<>(List.of(skillOffer, skillOffer)));
+
+        Mockito.when(skillOffersRepository.findById(1L))
+                .thenReturn(Optional.of(new SkillOffer()));
+        Mockito.when(skillOffersRepository.create(1L, 1L))
+                .thenReturn(1L);
+        Mockito.when(recommendationRepository.create(1L, 1L, "content"))
+                .thenReturn(1L);
+        Mockito.when(recommendationRepository.findById(1L))
+                .thenReturn(Optional.of(recommendation));
+
+        RecommendationDto result = recommendationService.create(recommendationDto);
+
+        assertEquals(3, result.getSkillOffers().size());
+    }
+
+    @Test
     public void testCallGuaranteesHaveSkill() {
         User athorId = User
                 .builder()
                 .id(2)
                 .build();
+        User userId = User
+                .builder()
+                .id(3)
+                .build();
         UserSkillGuarantee guarantees = UserSkillGuarantee
                 .builder()
                 .user(athorId)
+                .guarantor(userId)
                 .build();
         List<UserSkillGuarantee> guaranteesList = new ArrayList<>();
         guaranteesList.add(guarantees);
@@ -219,9 +277,9 @@ class RecommendationServiceTest {
         Mockito.when(skillRepository.findAllByUserId(recommendation.getReceiver().getId()))
                 .thenReturn(skills);
 
-        recommendationService.guaranteesHaveSkill(recommendation);
+        recommendationService.giveGuaranteesHaveSkill(recommendation);
 
-        assertEquals(1, recommendation.getSkillOffers().get(0).getSkill().getGuarantees().size());
+        assertEquals(2, recommendation.getSkillOffers().get(0).getSkill().getGuarantees().size());
     }
 
     @Test
@@ -231,11 +289,66 @@ class RecommendationServiceTest {
 
         Mockito.when(recommendationRepository.findById(1L))
                 .thenReturn(Optional.of(recommendation));
-        Mockito.when(recommendationRepository.update(recommendationDto.getAuthorId(), recommendationDto.getReceiverId(), recommendationDto.getContent()))
+        Mockito.when(recommendationRepository.update(recommendationDto.getAuthorId(), recommendationDto.getReceiverId(),
+                        recommendationDto.getContent()))
+                .thenReturn(recommendation);
+        Mockito.lenient().when(skillOffersRepository.create(skillOfferDto.getSkillId(), 1L))
+                .thenReturn(1L);
+        Mockito.lenient().when(skillOffersRepository.findById(1L))
+                .thenReturn(Optional.of(skillOffer));
+
+        RecommendationDto actual = recommendationService.updateRecommendation(recommendationDto, 1L);
+        RecommendationDto expected = recommendationMapper.toDto(recommendation);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testUpdateRecommendationSendNewSkillToTheOldSkill() {
+        recommendationDto.setSkillOffers(List.of(skillOfferDto,
+                new SkillOfferDto(2L, 2L, 1L)));
+        Skill skill1 = Skill
+                .builder()
+                .id(2L)
+                .guarantees(guaranteesList)
+                .build();
+        recommendation.setSkillOffers(new ArrayList<>(List.of(skillOffer, SkillOffer
+                .builder()
+                .id(2L)
+                .skill(skill1)
+                .build())));
+
+        Mockito.when(recommendationRepository.findById(1L))
+                .thenReturn(Optional.of(recommendation));
+        Mockito.when(recommendationRepository.update(recommendationDto.getAuthorId(), recommendationDto.getReceiverId(),
+                        recommendationDto.getContent()))
                 .thenReturn(recommendation);
         Mockito.when(skillOffersRepository.create(skillOfferDto.getSkillId(), 1L))
                 .thenReturn(1L);
         Mockito.when(skillOffersRepository.findById(1L))
+                .thenReturn(Optional.of(skillOffer));
+        Mockito.when(skillOffersRepository.create(2L, 1L))
+                .thenReturn(2L);
+        Mockito.when(skillOffersRepository.findById(2L))
+                .thenReturn(Optional.of(recommendation.getSkillOffers().get(1)));
+
+        RecommendationDto actual = recommendationService.updateRecommendation(recommendationDto, 1L);
+        RecommendationDto expected = recommendationMapper.toDto(recommendation);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testUpdateRecommendationEmptyList() {
+        recommendationDto.setSkillOffers(List.of());
+        recommendation.setSkillOffers(List.of());
+
+        Mockito.when(recommendationRepository.findById(1L))
+                .thenReturn(Optional.of(recommendation));
+        Mockito.when(recommendationRepository.update(recommendationDto.getAuthorId(), recommendationDto.getReceiverId(),
+                        recommendationDto.getContent()))
+                .thenReturn(recommendation);
+        Mockito.lenient().when(skillOffersRepository.create(skillOfferDto.getSkillId(), 1L))
+                .thenReturn(1L);
+        Mockito.lenient().when(skillOffersRepository.findById(1L))
                 .thenReturn(Optional.of(skillOffer));
 
         RecommendationDto actual = recommendationService.updateRecommendation(recommendationDto, 1L);

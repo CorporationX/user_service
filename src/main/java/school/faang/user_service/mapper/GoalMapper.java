@@ -1,6 +1,7 @@
 package school.faang.user_service.mapper;
 
 import org.mapstruct.*;
+import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
@@ -24,4 +25,6 @@ public interface GoalMapper {
                 .map(Skill::getId)
                 .collect(Collectors.toList());
     }
+
+    GoalDto update(@MappingTarget GoalDto target, GoalDto updatingSource);
 }

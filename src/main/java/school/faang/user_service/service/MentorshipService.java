@@ -34,7 +34,6 @@ public class MentorshipService {
     }
 
     public void deleteMentee(Long menteeId, Long mentorId) {
-
         User mentor = findUserById(mentorId);
         User mentee = findUserById(menteeId);
 

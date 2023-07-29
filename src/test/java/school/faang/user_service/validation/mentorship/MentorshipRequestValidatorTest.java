@@ -1,4 +1,4 @@
-package school.faang.user_service.validation;
+package school.faang.user_service.validation.mentorship;
 
 import org.mockito.Mock;
 import org.mockito.InjectMocks;
@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+import school.faang.user_service.validation.MentorshipRequestValidator;
 
 import java.util.Optional;
 import java.time.LocalDateTime;
@@ -54,8 +55,8 @@ public class MentorshipRequestValidatorTest {
         mentorshipRequest.setReceiver(receiver);
         mentorshipRequest.setRequester(requester);
 
-        when(userService.findUserById(receiver.getId())).thenReturn(true);
-        when(userService.findUserById(requester.getId())).thenReturn(true);
+        when(userService.isUserExist(receiver.getId())).thenReturn(true);
+        when(userService.isUserExist(requester.getId())).thenReturn(true);
         assertDoesNotThrow(() -> validator.validate(mentorshipRequest));
     }
 
@@ -83,9 +84,9 @@ public class MentorshipRequestValidatorTest {
         mentorshipRequest.setReceiver(receiver);
         mentorshipRequest.setRequester(requester);
 
-        when(userService.findUserById(receiver.getId())).thenReturn(false);
+        when(userService.isUserExist(receiver.getId())).thenReturn(false);
         assertThrows(IllegalArgumentException.class, () -> validator.validate(mentorshipRequest));
-        verify(userService).findUserById(receiver.getId());
+        verify(userService).isUserExist(receiver.getId());
     }
 
     @Test
@@ -99,8 +100,8 @@ public class MentorshipRequestValidatorTest {
         freshRequest.setRequester(requester);
         freshRequest.setCreatedAt(LocalDateTime.now());
 
-        when(userService.findUserById(receiver.getId())).thenReturn(true);
-        when(userService.findUserById(requester.getId())).thenReturn(true);
+        when(userService.isUserExist(receiver.getId())).thenReturn(true);
+        when(userService.isUserExist(requester.getId())).thenReturn(true);
         when(mentorshipRequestRepository.findLatestRequest(requester.getId(), receiver.getId()))
                 .thenReturn(Optional.of(mentorshipRequest));
 

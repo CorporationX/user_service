@@ -7,14 +7,12 @@ import school.faang.user_service.dto.DtoDeactiv;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.exception.DataValidException;
+import school.faang.user_service.exception.DeactivationException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -30,23 +28,21 @@ public class DeactivatingService {
 
     @Transactional
     public DtoDeactiv deactivatingTheUser(long userId) {
-        Optional<User> userOpt = userRepository.findById(userId);
-        if (userOpt.isEmpty()) {
-            throw new DataValidException("there is no user");
+        User user = userRepository.findById(userId).orElseThrow(() -> new DeactivationException("there is no user", userId));
+        if (!user.isActive()) {
+            throw new DeactivationException("The user has already been deactivated", userId);
         }
-        User user = userOpt.get();
-        long idUser = user.getId();
+        List<Goal> goals = goalRepository.findGoalsByUserId(userId).toList();
+        goals.stream().filter(goal -> goal.getUsers().size() == 1).forEach(goalRepository::delete);
 
-        Stream<Goal> goals = goalRepository.findGoalsByUserId(idUser);
-        goals.filter(goal -> goal.getUsers().size() == 1).forEach(goalRepository::delete);
-
-        List<Event> eventList = eventRepository.findAllByUserId(idUser);
-        eventRepository.deleteAll(eventList.stream().filter(event -> event.getOwner().getId() == idUser).toList());
+        List<Event> eventList = eventRepository.findAllByUserId(userId);
+        eventRepository.deleteAll(eventList.stream().filter(event -> event.getOwner().getId() == userId).toList());
 
         mentorshipService.cancelMentoring(user, goals);
 
         user.setActive(false);
-        return new DtoDeactiv("The user is deactivated", idUser);
+        userRepository.save(user);
+        return new DtoDeactiv("The user is deactivated", userId);
     }
 
 }

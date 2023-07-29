@@ -10,7 +10,6 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -19,9 +18,9 @@ public class MentorshipService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    protected void cancelMentoring(User user, Stream<Goal> goalStream) {
+    protected void cancelMentoring(User user, List<Goal> goals) {
         user.getMentees().stream().map(User::getMentors).forEach(list -> list.remove(user));
-        goalStream.filter(goal -> goal.getMentor().getId() == user.getId()).forEach(goal -> goal.setMentor(null));
+        goals.stream().filter(goal -> goal.getMentor().getId() == user.getId()).forEach(goal -> goal.setMentor(null));
     }
 
     public List<UserDto> getMentees(Long userId) {

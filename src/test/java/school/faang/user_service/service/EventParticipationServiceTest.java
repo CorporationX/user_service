@@ -113,5 +113,7 @@ class EventParticipationServiceTest {
         UserAreNotRegisteredAtEvent e = assertThrows(
                 UserAreNotRegisteredAtEvent.class,
                 () -> service.unregisterParticipant(tempEventId, tempUserId));
+
+        assertEquals(String.format("User with id %d aren't registered at event with id %d", tempUserId, tempEventId), e.getMessage());
     }
 }

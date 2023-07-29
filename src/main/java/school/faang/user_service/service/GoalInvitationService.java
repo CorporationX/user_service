@@ -36,6 +36,7 @@ public class GoalInvitationService {
         goalInvitationRepository.save(invitation);
     }
 
+    @Transactional(readOnly = true)
     private void checkGoalExists(GoalInvitation invitation) {
         if (!goalRepository.existsById(invitation.getGoal().getId())) {
             throw new DataValidException("Unable to decline Invitation, Goal not found. Id: " + invitation.getId());

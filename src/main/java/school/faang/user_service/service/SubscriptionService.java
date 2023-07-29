@@ -34,7 +34,6 @@ public class SubscriptionService {
         subscriptionRepository.unfollowUser(followerId, followeeId);
     }
 
-    //tut
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filter){
         Stream<User> users = subscriptionRepository.findByFolloweeId(followeeId);
         return filterUsers(users, filter);
@@ -44,14 +43,15 @@ public class SubscriptionService {
         return subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
     }
 
-    //tut
     private List<UserDto> filterUsers(Stream<User> users, UserFilterDto filters) {
-        if (filters != null) {
-            userFilters.stream()
-                    .filter(filter -> filter.isApplicable(filters))
-                    .forEach(filter -> filter.apply(users, filters));
+        if (filters == null) {
+            return users.map(userMapper::toDto).toList();
         }
-        return users.map(userMapper::toDto).toList();
+        return userFilters.stream()
+                    .filter(filter -> filter.isApplicable(filters))
+                    .flatMap(filter -> filter.apply(users, filters))
+                    .map(userMapper::toDto)
+                    .toList();
     }
 }
 

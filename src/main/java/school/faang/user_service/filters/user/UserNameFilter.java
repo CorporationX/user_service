@@ -5,9 +5,8 @@ import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 
 import java.util.stream.Stream;
-
 @Component
-public class UserUserNameFilter implements UserFilter {
+public class UserNameFilter implements UserFilter {
     @Override
     public boolean isApplicable(UserFilterDto filters) {
         return filters.getNamePattern() != null;
@@ -15,6 +14,6 @@ public class UserUserNameFilter implements UserFilter {
 
     @Override
     public Stream<User> apply(Stream<User> users, UserFilterDto filters) {
-        return users.filter(user -> user.getUsername().contains(filters.getNamePattern()));
+        return users.filter(user -> user.getUsername().equals(filters.getNamePattern()));
     }
 }

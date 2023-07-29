@@ -7,7 +7,6 @@ import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.exeption.DataValidationException;
 import school.faang.user_service.service.SubscriptionService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller

@@ -1,10 +1,10 @@
 package school.faang.user_service.dto;
 
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
+@Builder
 public class UserFilterDto {
     private String namePattern;
     private String aboutPattern;
@@ -18,4 +18,5 @@ public class UserFilterDto {
     private int experienceMax;
     private int page;
     private int pageSize;
+
 }

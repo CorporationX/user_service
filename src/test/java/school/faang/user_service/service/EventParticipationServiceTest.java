@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exeption.UserAlreadyRegisteredAtEvent;
+import school.faang.user_service.exeption.UserAreNotRegisteredAtEvent;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -32,10 +33,12 @@ class EventParticipationServiceTest {
         service = new EventParticipationService(repository);
     }
 
+    //Тесты для BC-3711 (регистрация на событие)
+
     @Test
     void registerParticipant_WhereUserNotRegisteredAtEvent() {
-        long someUserId = 777L;
-        long someEventId = 1234L;
+        long someUserId = new Random().nextLong();
+        long someEventId = new Random().nextLong();
 
         User existingUser1 = User.builder()
                 .id(someUserId + 1)
@@ -69,5 +72,46 @@ class EventParticipationServiceTest {
         );
 
         assertEquals("User with id 777 already registered at event with id 123", e.getMessage());
+    }
+
+    //Тесты для BC-3712 (Отменить регистрацию на событие)
+
+    @Test
+    void unregisterParticipant_WhereUserAlreadyRegisteredAtEvent() {
+        long tempUserId = new Random().nextLong();
+        long tempEventId = new Random().nextLong();
+
+        User existingUser1 = User.builder()
+                .id(tempUserId + 1)
+                .build();
+        User existingUser2 = User.builder()
+                .id(tempEventId - 1)
+                .build();
+        var registeredUsers = List.of(existingUser1, existingUser2);
+
+        Mockito.when(repository.findAllParticipantsByEventId(tempEventId)).thenReturn(registeredUsers);
+
+        assertDoesNotThrow(() -> service.unregisterParticipant(tempEventId, existingUser1.getId()));
+        Mockito.verify(repository).unregister(tempEventId, existingUser1.getId());
+    }
+
+    @Test
+    void unregisterParticipant_WhereUserAreNotRegisteredAtEvent() {
+        long tempUserId = new Random().nextLong();
+        long tempEventId = new Random().nextLong();
+
+        User existingUser1 = User.builder()
+                .id(tempUserId + 1)
+                .build();
+        User existingUser2 = User.builder()
+                .id(tempEventId - 1)
+                .build();
+        var registeredUsers = List.of(existingUser1, existingUser2);
+
+        Mockito.when(repository.findAllParticipantsByEventId(tempEventId)).thenReturn(registeredUsers);
+
+        UserAreNotRegisteredAtEvent e = assertThrows(
+                UserAreNotRegisteredAtEvent.class,
+                () -> service.unregisterParticipant(tempEventId, tempUserId));
     }
 }

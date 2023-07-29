@@ -48,6 +48,10 @@ public class SubscriptionService {
         return filterUsers(users, filter);
     }
 
+    public int getFollowingCount(long followerId) {
+        return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
+    }
+
     private boolean isValid(long followerId, long followeeId) {
         return !subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
     }

@@ -135,4 +135,10 @@ public class SubscriptionServiceTest {
         subscriptionService.getFollowersCount(3L);
         Mockito.verify(subscriptionRepository).findFollowersAmountByFolloweeId(3L);
     }
+
+    @Test
+    public void followingCount(){
+        subscriptionService.getFollowingCount(3L);
+        Mockito.verify(subscriptionRepository).findFolloweesAmountByFollowerId(3L);
+    }
 }

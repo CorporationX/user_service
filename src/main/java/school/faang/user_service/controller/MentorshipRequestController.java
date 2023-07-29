@@ -3,6 +3,7 @@ package school.faang.user_service.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,13 +16,13 @@ import school.faang.user_service.service.mentorship.MentorshipRequestService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/mentorship")
+@RequestMapping("/mentorship/requests")
 @RequiredArgsConstructor
 public class MentorshipRequestController {
 
     private final MentorshipRequestService mentorshipRequestService;
 
-    @PostMapping("/request")
+    @PostMapping("/new-request")
     public MentorshipRequestDto requestMentorship(@RequestBody MentorshipRequestDto mentorshipRequestDto) {
         if (mentorshipRequestDto.getDescription().isBlank() || mentorshipRequestDto.getDescription() == null) {
             throw new DataValidationException("Добавьте описание к запросу на менторство");
@@ -29,18 +30,18 @@ public class MentorshipRequestController {
         return mentorshipRequestService.requestMentorship(mentorshipRequestDto);
     }
 
-    @PostMapping("/request/filters")
+    @PostMapping("/filters")
     public List<MentorshipRequestDto> getRequests(@RequestBody RequestFilterDto filter) {
         return mentorshipRequestService.getRequests(filter);
     }
 
-    @PostMapping("/request/accept/{id}")
+    @PutMapping("/{id}/accept")
     public void acceptRequest(@PathVariable long id) {
         validateRequestId(id);
         mentorshipRequestService.acceptRequest(id);
     }
 
-    @PostMapping("/request/reject/{id}")
+    @PostMapping("/{id}/reject")
     public void rejectRequest(@PathVariable long id, @RequestBody RejectionDto rejection) {
         validateRequestId(id);
         mentorshipRequestService.rejectRequest(id, rejection);

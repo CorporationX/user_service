@@ -1,13 +1,11 @@
 package school.faang.user_service.dto.recommendation;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import school.faang.user_service.entity.RequestStatus;
 
 @AllArgsConstructor
-@Setter
-@Getter
+@Data
 public class RejectionDto {
     RequestStatus status;
     String reason;

@@ -29,7 +29,7 @@ public class GoalService {
 
         return goalFilters.stream()
                 .filter(goalFilter -> goalFilter.isApplicable(filters))
-                .flatMap(goalFilter -> goalFilter.applyFilter(goals,filters))
+                .flatMap(goalFilter -> goalFilter.applyFilter(goals, filters))
                 .map(goalMapper::toDto)
                 .toList();
     }
@@ -49,6 +49,7 @@ public class GoalService {
         return subtasks
                 .map(goalMapper::toDto)
                 .toList();
+    }
 
     public List<GoalDto> getGoalsByUser(@NotNull Long userId) {
         Stream<Goal> goals = goalRepository.findGoalsByUserId(userId);
@@ -56,23 +57,23 @@ public class GoalService {
         return goals.map(goalMapper::toDto).toList();
     }
 
-    public void deleteGoal(long goalId) {
+    public void deleteGoal ( long goalId){
         goalRepository.deleteById(goalId);
     }
 
-    public void deleteAllByIds(List<Long> ids) {
+    public void deleteAllByIds (List < Long > ids) {
         goalRepository.deleteAllById(ids);
     }
 
-    public GoalDto get(Long id)  {
+    public GoalDto get (Long id){
         Goal goal = goalRepository
-            .findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Couldn't find a goal with id: " + id));
+                .findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Couldn't find a goal with id: " + id));
 
         return goalMapper.toDto(goal);
     }
 
-    public GoalDto update(GoalDto goal) {
+    public GoalDto update (GoalDto goal){
         GoalDto existingGoal = get(goal.getId());
 
         goalMapper.update(existingGoal, goal);
@@ -81,7 +82,7 @@ public class GoalService {
         return existingGoal;
     }
 
-    public int removeUserFromGoals(List<Long> goalIds, Long userId) {
+    public int removeUserFromGoals (List < Long > goalIds, Long userId){
         List<Goal> goals = goalRepository.findAllById(goalIds);
 
         goals.forEach(goal -> {

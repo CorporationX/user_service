@@ -212,7 +212,8 @@ class GoalServiceTest {
 
         when(goalRepository.findByParent(goalId)).thenReturn(mockSubtasks.stream());
         when(filter1.isApplicable(filter)).thenReturn(false);
-
+    }
+    @Test
     public void testDeleteGoal_ExistingGoal() {
         long goalId = 1L;
 

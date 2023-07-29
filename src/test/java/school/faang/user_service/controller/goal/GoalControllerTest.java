@@ -77,6 +77,8 @@ public class GoalControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(2));
 
+    }
+    @Test
     public void testDeleteGoal_ExistingGoal() {
         long goalId = 1L;
 

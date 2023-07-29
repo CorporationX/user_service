@@ -28,6 +28,12 @@ public class GoalController {
         return goalService.getGoalsByUser(userId, filters);
     }
 
+
+    @PostMapping("/subtasks/{goalId}")
+    public List<GoalDto> findSubtasksByGoalId(@PathVariable long goalId, @RequestBody GoalFilterDto filter) {
+        return goalService.findSubtasksByGoalId(goalId, filter);
+    }
+
     @DeleteMapping("/goal/{goalId}")
     public void deleteGoal(@PathVariable Long goalId) {
         goalService.deleteGoal(goalId);

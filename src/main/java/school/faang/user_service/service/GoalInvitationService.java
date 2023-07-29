@@ -2,6 +2,7 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.goal.GoalInvitation;
@@ -25,15 +26,16 @@ public class GoalInvitationService {
         return goalInvitationMapper.toDto(invitation);
     }
 
+    @Transactional
     public void rejectGoalInvitation(long id) {
         GoalInvitation invitation = goalInvitationRepository.findById(id)
                 .orElseThrow(() -> new DataValidException("Goal Invitation nou found. Id: " + id));
-        existsGoal(invitation);
+        checkGoalExists(invitation);
         invitation.setStatus(RequestStatus.REJECTED);
         goalInvitationRepository.save(invitation);
     }
 
-    private void existsGoal(GoalInvitation invitation) {
+    private void checkGoalExists(GoalInvitation invitation) {
         if (!goalRepository.existsById(invitation.getGoal().getId())) {
             throw new DataValidException("Unable to decline Invitation, Goal not found. Id: " + invitation.getId());
         }

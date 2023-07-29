@@ -1,21 +1,31 @@
 package school.faang.user_service.service;
 
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.dto.goal.GoalInvitationFilterDto;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.exception.DataValidException;
+import school.faang.user_service.filter.goal.InvitationFilter;
+import school.faang.user_service.filter.goal.InvitationInvitedIdFilter;
+import school.faang.user_service.filter.goal.InvitationInvitedNameFilter;
+import school.faang.user_service.filter.goal.InvitationInviterIdFilter;
+import school.faang.user_service.filter.goal.InvitationInviterNameFilter;
+import school.faang.user_service.filter.goal.InvitationStatusFilter;
 import school.faang.user_service.mapper.goal.GoalInvitationMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -34,8 +44,21 @@ class GoalInvitationServiceTest {
     private GoalInvitationRepository goalInvitationRepository;
     @Spy
     private GoalInvitationMapper goalInvitationMapper = GoalInvitationMapper.INSTANCE;
-    @InjectMocks
     private GoalInvitationService goalInvitationService;
+
+    @BeforeEach
+    void setUp() {
+        List<InvitationFilter> filters = List.of(new InvitationInvitedNameFilter(),
+                new InvitationInviterNameFilter(),
+                new InvitationInvitedIdFilter(),
+                new InvitationInviterIdFilter(),
+                new InvitationStatusFilter());
+        goalInvitationService = new GoalInvitationService(userRepository,
+                goalRepository,
+                goalInvitationRepository,
+                goalInvitationMapper,
+                filters);
+    }
 
     @Test
     void createTestIllegalId() {
@@ -80,6 +103,41 @@ class GoalInvitationServiceTest {
         assertEquals(goalInvitationDto, result);
     }
 
+    @Test
+    void getInvitationsTest() {
+        GoalInvitationFilterDto invitationFilterDto = GoalInvitationFilterDto.builder()
+                .invitedId(4L)
+                .invitedNamePattern("Tom")
+                .status(RequestStatus.REJECTED).build();
+
+        List<GoalInvitation> goalInvitations = createGoalInvitationList();
+        when(goalInvitationRepository.findAll()).thenReturn(goalInvitations);
+
+        List<GoalInvitationDto> result = goalInvitationService.getInvitations(invitationFilterDto);
+
+        assertEquals(goalInvitations.get(1).getId(), result.get(0).getId());
+    }
+
+    private List<GoalInvitation> createGoalInvitationList() {
+        GoalInvitation invitation1 = createGoalInvitation();
+
+        GoalInvitation invitation2 = new GoalInvitation();
+        invitation2.setId(2L);
+        invitation2.setInviter(createUser(3L));
+        invitation2.setInvited(createUser(4L));
+        invitation2.setGoal(createGoal(2L));
+        invitation2.setStatus(RequestStatus.REJECTED);
+
+        GoalInvitation invitation3 = new GoalInvitation();
+        invitation3.setId(3L);
+        invitation3.setInviter(createUser(5L));
+        invitation3.setInvited(createUser(6L));
+        invitation3.setGoal(createGoal(3L));
+        invitation3.setStatus(RequestStatus.ACCEPTED);
+
+        return List.of(invitation1, invitation2, invitation3);
+    }
+
     private GoalInvitationDto createInvitationDto() {
         return GoalInvitationDto.builder().id(1L).inviterId(1L).invitedUserId(2L).goalId(1L).build();
     }
@@ -87,19 +145,24 @@ class GoalInvitationServiceTest {
     private GoalInvitation createGoalInvitation() {
         GoalInvitation goalInvitation = new GoalInvitation();
         goalInvitation.setId(1L);
-
-        User user1 = new User();
-        user1.setId(1L);
-        goalInvitation.setInviter(user1);
-
-        User user2 = new User();
-        user2.setId(2L);
-        goalInvitation.setInvited(user2);
-
-        Goal goal = new Goal();
-        goal.setId(1L);
-        goalInvitation.setGoal(goal);
+        goalInvitation.setInviter(createUser(1L));
+        goalInvitation.setInvited(createUser(2L));
+        goalInvitation.setGoal(createGoal(1L));
+        goalInvitation.setStatus(RequestStatus.PENDING);
 
         return goalInvitation;
+    }
+
+    private User createUser(long id) {
+        User user = new User();
+        user.setId(id);
+        user.setUsername("Tom");
+        return user;
+    }
+
+    private Goal createGoal(long id) {
+        Goal goal = new Goal();
+        goal.setId(id);
+        return goal;
     }
 }

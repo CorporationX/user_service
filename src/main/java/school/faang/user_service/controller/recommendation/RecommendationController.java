@@ -10,18 +10,17 @@ import school.faang.user_service.service.RecommendationService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/recommendation")
 public class RecommendationController {
 
     private final RecommendationService recommendationService;
 
-    @PostMapping()
+    @PostMapping("/recommendations")
     public Long giveRecommendation(@RequestBody RecommendationDto recommendation) {
         return recommendationService.create(recommendation);
     }
 
-    @PutMapping()
-    public Recommendation updateRecommendation(@RequestBody RecommendationDto recommendation) {
+    @PutMapping("/recommendations/{id}")
+    public Recommendation updateRecommendation(@PathVariable Long id, @RequestBody RecommendationDto recommendation) {
         return recommendationService.update(recommendation);
     }
 }

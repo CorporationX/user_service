@@ -11,7 +11,7 @@ import school.faang.user_service.entity.recommendation.SkillRequest;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", typeConversionPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.FIELD, typeConversionPolicy = ReportingPolicy.IGNORE)
 public interface RecommendationRequestMapper {
 
     @Mapping(source = "skills", target = "skillId", qualifiedByName = "mapToId")

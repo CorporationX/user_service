@@ -15,7 +15,6 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
-import school.faang.user_service.mapper.recommendation.RecommendationRequestMapperImpl;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 import school.faang.user_service.validator.RecommendationRequestValidator;
@@ -25,42 +24,33 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
+
 @ExtendWith(MockitoExtension.class)
-class RecommendationRequestServiceTest {
+public class RecommendationRequestServiceTest {
+    @Mock
+    private RecommendationRequestRepository recommendationRequestRepository;
+
+    @Mock
+    private SkillRequestRepository skillRequestRepository;
 
     @InjectMocks
     private RecommendationRequestService recommendationRequestService;
 
-    @Mock
-    private RecommendationRequestRepository recommendationRequestRepository;
-
-    @Spy
-    private RecommendationRequestMapper recommendationRequestMapper;
-
-    @Mock
-    private RecommendationRequestValidator recommendationRequestValidator;
-
-    @Mock
-    private SkillValidator skillValidator;
-
-    RecommendationRequestDto recommendationRequestDto;
-
-    @BeforeEach
-    void setUp() {
-        recommendationRequestDto = RecommendationRequestDto.builder()
-                .id(1L)
-                .message("message")
-                .status(RequestStatus.ACCEPTED)
-                .skillId(List.of(1L))
-                .requesterId(1L)
-                .receiverId(1L)
-                .createdAt(LocalDateTime.now().minusMonths(7))
-                .build();
-    }
-
     @Test
-    void testCreate() {
-        recommendationRequestService.create(recommendationRequestDto);
-        Mockito.verify(recommendationRequestRepository).save(recommendationRequestMapper.toEntity(recommendationRequestDto));
+    void createEmptyMessageThrowsIllegalArgumentException(){
+        RecommendationRequestDto recommendationRequestDto = new RecommendationRequestDto();
+        recommendationRequestDto.setMessage("");
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            recommendationRequestService.create(recommendationRequestDto);
+        });
+
+        Mockito.verify(recommendationRequestRepository, Mockito.never())
+                .create(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyString());
+        Mockito.verify(skillRequestRepository, Mockito.never())
+                .create(Mockito.anyLong(), Mockito.anyLong());
     }
 }

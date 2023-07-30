@@ -13,7 +13,6 @@ public class RecommendationRequestController {
     public RecommendationRequestDto requestRecommendation(RecommendationRequestDto recommendationRequest) {
         if (recommendationRequest.getMessage() != null && !recommendationRequest.getMessage().isEmpty()) {
             return recommendationRequestService.create(recommendationRequest);
-            //return recommendationRequest;
         } else {
             throw new IllegalArgumentException("Empty recommendation request!");
         }

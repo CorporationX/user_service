@@ -39,6 +39,7 @@ public class GoalInvitationService {
         goalInvitationRepository.save(invitation);
     }
 
+    @Transactional(readOnly = true)
     private void validateAccept(GoalInvitation invitation) {
         long id = invitation.getId();
         if (invitation.getInvited().getGoals().size() >= MAX_GOALS) {
@@ -52,6 +53,7 @@ public class GoalInvitationService {
         }
     }
 
+    @Transactional(readOnly = true)
     private void validateInvitation(GoalInvitationDto invitation) {
         if (invitation.getId() != null && goalInvitationRepository.existsById(invitation.getId())) {
             throw new DataValidException("Invitation already exist. Id: " + invitation.getId());

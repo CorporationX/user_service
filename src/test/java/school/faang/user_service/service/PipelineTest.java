@@ -7,6 +7,6 @@ public class PipelineTest {
 
     @Test
     void test() {
-        Assertions.assertEquals(1, 1);
+        Assertions.assertTrue(true);
     }
 }

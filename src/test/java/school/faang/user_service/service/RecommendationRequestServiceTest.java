@@ -73,6 +73,7 @@ class RecommendationRequestServiceTest {
                 .build();
         requestDto2 = RecommendationRequestDto.builder()
                 .id(2L)
+                .status(RequestStatus.REJECTED)
                 .requesterId(2L)
                 .receiverId(2L)
                 .skillsId(List.of(2L))
@@ -91,6 +92,7 @@ class RecommendationRequestServiceTest {
                 .build();
         entity2 = RecommendationRequest.builder()
                 .id(2L)
+                .status(RequestStatus.REJECTED)
                 .requester(User.builder().id(2L).build())
                 .receiver(User.builder().id(2L).build())
                 .skills(List.of(SkillRequest.builder().id(2L).build()))

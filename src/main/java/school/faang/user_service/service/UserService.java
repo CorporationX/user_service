@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.mentor.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
@@ -14,6 +15,7 @@ import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+@Setter
 public class UserService {
     private final UserRepository userRepository;
     private final List<UserFilter> userFilters;
@@ -22,11 +24,16 @@ public class UserService {
     public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
         Stream<User> premiumUsers = userRepository.findPremiumUsers();
 
+        premiumUsers = filter(userFilterDto, premiumUsers);
+        return userMapper.toUserListDto(premiumUsers.toList());
+    }
+
+    private Stream<User> filter(UserFilterDto userFilterDto, Stream<User> premiumUsers) {
         for (UserFilter filter : userFilters) {
             if (filter.isApplicable(userFilterDto)) {
                 premiumUsers = filter.apply(premiumUsers, userFilterDto);
             }
         }
-        return userMapper.toUserListDto(premiumUsers.toList());
+        return premiumUsers;
     }
 }

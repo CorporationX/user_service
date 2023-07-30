@@ -17,15 +17,9 @@ public class SkillRequestFilter implements RequestFilter {
     @Override
     public Stream<RecommendationRequest> apply(Stream<RecommendationRequest> recommendationRequestStream, RequestFilterDto filters) {
         return recommendationRequestStream
-                .filter(recommendationRequest -> {
-                    if (recommendationRequest.getSkills() == null) {
-                        return false;
-                    } else {
-                        return recommendationRequest.getSkills().stream()
-                                .map(SkillRequest::getId)
-                                .toList()
-                                .containsAll(filters.getSkillsPattern());
-                    }
-                });
+                .filter(recommendationRequest -> recommendationRequest.getSkills().stream()
+                        .map(SkillRequest::getId)
+                        .toList()
+                        .containsAll(filters.getSkillsPattern()));
     }
 }

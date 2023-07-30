@@ -30,7 +30,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class MentorshipRequestServiceTest {
-
     @Spy
     private MentorshipRequestMapperImpl mentorshipRequestMapper;
     @Mock

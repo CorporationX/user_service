@@ -10,6 +10,5 @@ public class SpringContextTest {
     @Test
     @DisplayName("Spring context test check")
     void shouldLoadSpringContext() {
-        System.out.println("Spring boot context is loaded");
     }
 }

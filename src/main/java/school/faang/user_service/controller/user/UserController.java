@@ -11,7 +11,7 @@ import school.faang.user_service.service.user.UserService;
 public class UserController {
     private final UserService userService;
 
-    @PostMapping("/users/deactivate/${id}")
+    @PostMapping("/users/deactivate/{id}")
     public void deactivateUser(@PathVariable Long id) {
         userService.deactivateUser(id);
     }

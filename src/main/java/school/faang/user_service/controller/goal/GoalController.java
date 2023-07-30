@@ -14,7 +14,7 @@ import school.faang.user_service.service.goal.GoalService;
 public class GoalController {
     private final GoalService service;
 
-    @PutMapping("goals/{id}")
+    @PutMapping("/goals/{goalId}")
     public GoalDto updateGoal(@PathVariable long id, @RequestBody GoalDto goalDto) {
         if (goalDto.getTitle() == null || goalDto.getTitle().isBlank())
             throw new DataValidationException("Title can not be blank or null");

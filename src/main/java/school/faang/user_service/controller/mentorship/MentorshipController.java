@@ -2,7 +2,7 @@ package school.faang.user_service.controller.mentorship;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.mentor.UserDto;
+import school.faang.user_service.dto.subscription.UserDto;
 import school.faang.user_service.service.MentorshipService;
 
 import java.util.List;

@@ -1,6 +1,8 @@
 package school.faang.user_service.controller.recommendation;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
@@ -25,5 +27,10 @@ public class RecommendationController {
     @DeleteMapping("/recommendations/{id}")
     public void deleteRecommendation(@PathVariable Long id) {
         recommendationService.delete(id);
+    }
+
+    @GetMapping("/recommendations/author/{authorId}")
+    public Page<RecommendationDto> getAllGivenRecommendations(@PathVariable Long authorId, Pageable pageable) {
+        return recommendationService.getAllGivenRecommendations(authorId, pageable);
     }
 }

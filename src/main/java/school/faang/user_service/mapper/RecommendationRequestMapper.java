@@ -9,7 +9,6 @@ import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
 
 import java.util.Collections;
-import java.util.Collections;
 import java.util.List;
 
 @Mapper(componentModel = "spring", typeConversionPolicy = ReportingPolicy.IGNORE)

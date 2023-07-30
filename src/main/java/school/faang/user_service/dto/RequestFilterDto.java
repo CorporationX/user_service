@@ -10,7 +10,6 @@ import java.util.List;
 @Data
 @Builder
 public class RequestFilterDto {
-    private String messagePattern;
     private RequestStatus statusPattern;
     private List<Long> skillsPattern;
     private Long requesterIdPattern;

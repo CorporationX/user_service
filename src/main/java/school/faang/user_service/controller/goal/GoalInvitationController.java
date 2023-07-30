@@ -19,7 +19,7 @@ public class GoalInvitationController {
         return goalInvitationService.createInvitation(invitationDto);
     }
 
-    @PostMapping("/rejectInvitation/{id}")
+    @PostMapping("/{id}/reject")
     public void rejectGoalInvitation(long id) {
         goalInvitationService.rejectGoalInvitation(id);
     }

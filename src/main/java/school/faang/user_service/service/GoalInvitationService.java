@@ -24,6 +24,7 @@ public class GoalInvitationService {
     @Transactional
     public GoalInvitationDto createInvitation(GoalInvitationDto invitationDto) {
         validateInvitation(invitationDto);
+
         GoalInvitation invitation = goalInvitationRepository.save(goalInvitationMapper.toEntity(invitationDto));
         return goalInvitationMapper.toDto(invitation);
     }
@@ -52,10 +53,7 @@ public class GoalInvitationService {
     }
 
     private void validateInvitation(GoalInvitationDto invitation) {
-        if (invitation.getId() == null || invitation.getId() < 1) {
-            throw new DataValidException("Invitation illegal id");
-        }
-        if (goalInvitationRepository.existsById(invitation.getId())) {
+        if (invitation.getId() != null && goalInvitationRepository.existsById(invitation.getId())) {
             throw new DataValidException("Invitation already exist. Id: " + invitation.getId());
         }
         if (!goalRepository.existsById(invitation.getGoalId())) {
@@ -70,5 +68,6 @@ public class GoalInvitationService {
         if (invitation.getInviterId().equals(invitation.getInvitedUserId())) {
             throw new DataValidException("Inviter and invited are equal. Invitation Id: " + invitation.getId());
         }
+        invitation.setId(null);
     }
 }

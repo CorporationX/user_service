@@ -9,7 +9,7 @@ import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.service.GoalInvitationService;
 
 @RestController
-@RequestMapping("/goals")
+@RequestMapping("/goal-invitations")
 @RequiredArgsConstructor
 public class GoalInvitationController {
     private final GoalInvitationService goalInvitationService;

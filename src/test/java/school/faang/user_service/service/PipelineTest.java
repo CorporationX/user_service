@@ -8,7 +8,6 @@ public class PipelineTest {
 
     @Test
     void test() {
-        int a = 0;
-        Assertions.assertEquals(1, a);
+        Assertions.fail();
     }
 }

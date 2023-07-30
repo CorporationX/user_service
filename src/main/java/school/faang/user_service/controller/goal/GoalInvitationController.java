@@ -23,7 +23,7 @@ public class GoalInvitationController {
         return goalInvitationService.createInvitation(invitationDto);
     }
 
-    @GetMapping("/filteredInvitations/")
+    @GetMapping
     public List<GoalInvitationDto> getInvitations(GoalInvitationFilterDto filter) {
         return goalInvitationService.getInvitations(filter);
     }

@@ -36,9 +36,6 @@ public class GoogleToken {
     @Column(name = "oauth_client_id")
     private String oauthClientId;
 
-    @Column(name = "oauth_client_secret")
-    private String oauthClientSecret;
-
     @Column(name = "access_token")
     private String accessToken;
 

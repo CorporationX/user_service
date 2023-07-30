@@ -19,4 +19,6 @@ public interface GoogleTokenRepository extends JpaRepository<GoogleToken, Long> 
     Optional<GoogleToken> findByOauthClientId(String clientId);
 
     Optional<GoogleToken> findByUser(User user);
+
+    Boolean existsByUser(User user);
 }

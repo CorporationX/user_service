@@ -1,10 +1,10 @@
 package school.faang.user_service.util.google;
 
 import com.google.api.client.auth.oauth2.StoredCredential;
+import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.util.store.AbstractDataStore;
 import com.google.api.client.util.store.DataStore;
 import com.google.api.client.util.store.DataStoreFactory;
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
@@ -15,13 +15,11 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.repository.GoogleTokenRepository;
 
-public class JpaDataStore<V extends Serializable> extends AbstractDataStore<StoredCredential> {
+public class JpaDataStore extends AbstractDataStore<StoredCredential> {
     private final GoogleTokenRepository repository;
-    /**
-     * @param dataStoreFactory data store factory
-     * @param id               data store ID
-     */
-    protected JpaDataStore(DataStoreFactory dataStoreFactory, String id, GoogleTokenRepository repository) {
+    protected JpaDataStore(DataStoreFactory dataStoreFactory,
+                           String id,
+                           GoogleTokenRepository repository) {
         super(dataStoreFactory, id);
         this.repository = repository;
     }

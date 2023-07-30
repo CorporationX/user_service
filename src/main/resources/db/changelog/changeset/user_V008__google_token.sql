@@ -5,7 +5,6 @@ CREATE TABLE google_token (
                               uuid VARCHAR(255),
                               user_id BIGINT,
                               oauth_client_id VARCHAR(255),
-                              oauth_client_secret VARCHAR(255),
                               access_token VARCHAR(255),
                               refresh_token VARCHAR(255),
                               expiration_time_milliseconds BIGINT,

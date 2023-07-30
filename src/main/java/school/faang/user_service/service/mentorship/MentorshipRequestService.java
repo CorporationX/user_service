@@ -13,7 +13,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.MentorshipRequestNotFoundException;
 import school.faang.user_service.exception.RequestAlreadyAcceptedException;
 import school.faang.user_service.exception.UserNotFoundException;
-import school.faang.user_service.filter.MentorshipRequestFilter;
+import school.faang.user_service.service.mentorship.filter.MentorshipRequestFilter;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -21,8 +21,7 @@ import school.faang.user_service.repository.mentorship.MentorshipRequestReposito
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -32,11 +31,11 @@ public class MentorshipRequestService {
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final MentorshipRepository mentorshipRepository;
     private final MentorshipRequestMapper requestMapper;
-    private MentorshipRequestFilter requestFilter;
+    private final List<MentorshipRequestFilter> filters;
 
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto requestDto) {
-        Long requesterId = requestDto.getRequester().getId();
-        Long receiverId = requestDto.getReceiver().getId();
+        long requesterId = requestDto.getRequester().getId();
+        long receiverId = requestDto.getReceiver().getId();
 
         dataValidate(requesterId, receiverId, requestDto);
 
@@ -44,17 +43,20 @@ public class MentorshipRequestService {
         return requestMapper.toDto(newRequest);
     }
 
-    public List<MentorshipRequestDto> getRequests(RequestFilterDto filter) {
-        List<MentorshipRequestDto> allRequestDto = new ArrayList<>();
-
+    public List<MentorshipRequestDto> getRequests(RequestFilterDto filterDto) {
+        List<MentorshipRequest> allRequests = new ArrayList<>();
         mentorshipRequestRepository.findAll()
-                .forEach(request -> allRequestDto.add(requestMapper.toDto(request)));
+                .forEach(request -> allRequests.add(request));
+        Stream<MentorshipRequest> requestStream = allRequests.stream();
 
-        requestFilter = MentorshipRequestFilter.builder()
-                .requestDtoList(allRequestDto)
-                .filter(filter)
-                .build();
-        return requestFilter.requestFiltering();
+        List<MentorshipRequestFilter> applicableFilters = filters.stream()
+                .filter(filter -> filter.isApplicable(filterDto))
+                .toList();
+        for (MentorshipRequestFilter filter : applicableFilters) {
+            requestStream = filter.apply(requestStream, filterDto);
+        }
+
+        return requestStream.map(requestMapper::toDto).toList();
     }
 
     public void acceptRequest(long id) {
@@ -110,10 +112,8 @@ public class MentorshipRequestService {
     private void dataValidate(long requesterId, long receiverId, MentorshipRequestDto requestDto) {
         userValidate(requesterId, receiverId);
 
-        Optional<MentorshipRequest> possibleRequest = mentorshipRequestRepository.findLatestRequest(requesterId, receiverId);
-
-        if (possibleRequest.isPresent()) {
-            MentorshipRequest latestRequest = possibleRequest.get();
+        if (mentorshipRequestRepository.findLatestRequest(requesterId, receiverId).isPresent()) {
+            MentorshipRequest latestRequest = mentorshipRequestRepository.findLatestRequest(requesterId, receiverId).get();
             if (latestRequest.getUpdatedAt().plusMonths(3).isAfter(LocalDateTime.now())) {
                 throw new DataValidationException("Нельзя отправить запрос на менторство данному пользователю, т.к. должно " +
                         "пройти не менее 3-ех месяцев с момента последнего запроса");

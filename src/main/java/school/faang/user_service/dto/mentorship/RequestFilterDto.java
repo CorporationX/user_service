@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 public class RequestFilterDto {
 
     private String description;
-    private UserDto requester;
-    private UserDto receiver;
+    private long requester;
+    private long receiver;
     private RequestStatus requestStatus;
     private LocalDateTime updatedAt;
 }

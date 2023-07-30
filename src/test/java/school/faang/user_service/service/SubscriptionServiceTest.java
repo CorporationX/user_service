@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
@@ -24,6 +23,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -78,29 +78,29 @@ public class SubscriptionServiceTest {
 
     @Test
     public void subscribeWhen_SubscriptionExists() {
-        Mockito.when(subscriptionRepository.existsByFollowerIdAndFolloweeId(user1.getId(), user2.getId())).thenReturn(true);
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(user1.getId(), user2.getId())).thenReturn(true);
         assertThrows(DataValidationException.class, () -> subscriptionService.followUser(user1.getId(), user2.getId()));
     }
 
     @Test
     public void userFollowedSuccess() {
         subscriptionService.followUser(user1.getId(), user2.getId());
-        Mockito.verify(subscriptionRepository).followUser(user1.getId(), user2.getId());
+        verify(subscriptionRepository).followUser(user1.getId(), user2.getId());
     }
 
     @Test
     public void unsubscribeWhen_SubscriptionDoesNotExists() {
-        Mockito.when(subscriptionRepository.existsByFollowerIdAndFolloweeId(user1.getId(), user2.getId()))
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(user1.getId(), user2.getId()))
                 .thenReturn(false);
         assertThrows(DataValidationException.class, () -> subscriptionService.unfollowUser(user1.getId(), user2.getId()));
     }
 
     @Test
     public void userUnfollowedSuccess() {
-        Mockito.when(subscriptionRepository.existsByFollowerIdAndFolloweeId(user1.getId(), user2.getId()))
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(user1.getId(), user2.getId()))
                 .thenReturn(true);
         subscriptionService.unfollowUser(user1.getId(), user2.getId());
-        Mockito.verify(subscriptionRepository).unfollowUser(user1.getId(), user2.getId());
+        verify(subscriptionRepository).unfollowUser(user1.getId(), user2.getId());
     }
 
 
@@ -113,7 +113,7 @@ public class SubscriptionServiceTest {
         Stream<User> userStream = users.stream();
         List<UserDto> expectedResult = usersDto.stream().filter(user -> user.getUsername().equals("46")).toList();
 
-        Mockito.when(subscriptionRepository.findByFolloweeId(userId)).thenReturn(userStream);
+        when(subscriptionRepository.findByFolloweeId(userId)).thenReturn(userStream);
         List<UserDto> result = subscriptionService.getFollowers(userId, filterDto);
 
         assertEquals(expectedResult, result);
@@ -124,7 +124,7 @@ public class SubscriptionServiceTest {
         List<UserDto> expectedResult = users.stream().map(userMapper::toDto).toList();
         UserFilterDto filterDto = null;
 
-        Mockito.when(subscriptionRepository.findByFolloweeId(3L)).thenReturn(users.stream());
+        when(subscriptionRepository.findByFolloweeId(3L)).thenReturn(users.stream());
         List<UserDto> result = subscriptionService.getFollowers(3L, filterDto);
 
         assertEquals(expectedResult, result);
@@ -133,12 +133,12 @@ public class SubscriptionServiceTest {
     @Test
     public void followersCount(){
         subscriptionService.getFollowersCount(3L);
-        Mockito.verify(subscriptionRepository).findFollowersAmountByFolloweeId(3L);
+        verify(subscriptionRepository).findFollowersAmountByFolloweeId(3L);
     }
 
     @Test
     public void followingCount(){
         subscriptionService.getFollowingCount(3L);
-        Mockito.verify(subscriptionRepository).findFolloweesAmountByFollowerId(3L);
+        verify(subscriptionRepository).findFolloweesAmountByFollowerId(3L);
     }
 }

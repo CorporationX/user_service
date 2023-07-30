@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 public class UserExperienceMaxFilter implements UserFilter {
     @Override
     public boolean isApplicable(UserFilterDto filters) {
-        return filters.getExperienceMax() >= 0;
+        return filters.getExperienceMax() > 0;
     }
 
     @Override

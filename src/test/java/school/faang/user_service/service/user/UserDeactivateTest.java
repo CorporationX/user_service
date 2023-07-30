@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.util.List;
@@ -22,6 +23,8 @@ public class UserDeactivateTest {
     private UserDto userDto;
     @Mock
     GoalRepository goalRepository;
+    @Mock
+    UserRepository userRepository;
     @InjectMocks
     UserService userService;
 
@@ -41,6 +44,7 @@ public class UserDeactivateTest {
         goal.setUsers(List.of(user1));
         List<Goal> goals = List.of(goal);
         user1.setGoals(goals);
+        Mockito.when(userRepository.existsById(userDto.getId())).thenReturn(true);
         Mockito.when(goalRepository.findGoalsByUserId(userDto.getId())).thenReturn(goals.stream());
         userService.deactivateUser(userDto);
         Mockito.verify((goalRepository), Mockito.times(1)).deleteById(userDto.getId());
@@ -52,6 +56,7 @@ public class UserDeactivateTest {
         List<Goal> goals = List.of(goal);
         user1.setGoals(goals);
         user2.setGoals(goals);
+        Mockito.when(userRepository.existsById(userDto.getId())).thenReturn(true);
         Mockito.when(goalRepository.findGoalsByUserId(userDto.getId())).thenReturn(goals.stream());
         userService.deactivateUser(userDto);
         Mockito.verify((goalRepository), Mockito.times(0)).deleteById(userDto.getId());

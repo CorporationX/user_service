@@ -16,7 +16,7 @@ public class MentorshipRequestController {
     private final MentorshipRequestService mentorshipRequestService;
 
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
-        if (mentorshipRequestDto.getDescription().isBlank() || mentorshipRequestDto.getDescription() == null) {
+        if (mentorshipRequestDto.getDescription() == null || mentorshipRequestDto.getDescription().isBlank()) {
             throw new DataValidationException("Добавьте описание к запросу на менторство");
         }
         return mentorshipRequestService.requestMentorship(mentorshipRequestDto);

@@ -4,7 +4,7 @@ on:
   [ push, pull_request ]
 
 jobs:
-  build_and_test:
+  compile:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -14,7 +14,18 @@ jobs:
           java-version: 17
           distribution: 'corretto'
           cache: gradle
-      - name: Build with Gradle
-        run: ./gradlew build
-      - name: Test with Gradle
+      - name: Compile with Gradle
+        run: ./gradlew compileJava
+  test:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'corretto'
+          cache: gradle
+      - name: Run tests
         run: ./gradlew test

@@ -62,6 +62,8 @@ class RecommendationRequestMapperTest {
     @Test
     void testToEntity() {
         RecommendationRequest actual = mapper.toEntity(requestDto);
+        request.setRequester(null);
+        request.setReceiver(null);
         assertEquals(request, actual);
     }
 }

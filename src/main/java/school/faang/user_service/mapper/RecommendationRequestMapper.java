@@ -8,6 +8,7 @@ import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
 
+import java.util.Collections;
 import java.util.List;
 
 @Mapper(componentModel = "spring", typeConversionPolicy = ReportingPolicy.IGNORE)
@@ -19,12 +20,15 @@ public interface RecommendationRequestMapper {
     RecommendationRequestDto toDto(RecommendationRequest recommendationRequest);
 
     @Mapping(source = "skillsId", target = "skills", qualifiedByName = "mapToSkillRequest")
-    @Mapping(source = "requesterId", target = "requester.id")
-    @Mapping(source = "receiverId", target = "receiver.id")
+    @Mapping(target = "requester", ignore = true)
+    @Mapping(target = "receiver", ignore = true)
     RecommendationRequest toEntity(RecommendationRequestDto recommendationRequestDto);
 
     @Named("mapToId")
     default List<Long> mapToId(List<SkillRequest> skills) {
+        if (skills == null) {
+            return Collections.emptyList();
+        }
         return skills.stream()
                 .map(SkillRequest::getId)
                 .toList();
@@ -32,6 +36,9 @@ public interface RecommendationRequestMapper {
 
     @Named("mapToSkillRequest")
     default List<SkillRequest> mapToSkillRequest(List<Long> skillsId) {
+        if (skillsId == null) {
+            return Collections.emptyList();
+        }
         return skillsId.stream()
                 .map(recommendationRequest -> {
                     SkillRequest skillRequest = new SkillRequest();

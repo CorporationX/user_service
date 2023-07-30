@@ -9,6 +9,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.filters.event.EventFilter;
 import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -96,10 +97,12 @@ public class EventService {
 
     public List<EventDto> getEventsByFilter(EventFilterDto filter) {
         Stream<Event> events = eventRepository.findAll().stream();
-        return filters.stream()
+        List<EventFilter> f = filters.stream()
                 .filter(eventFilter -> eventFilter.isApplicable(filter))
-                .flatMap(eventFilter -> eventFilter.apply(events, filter))
-                .map(eventMapper::toDTO)
                 .toList();
+        for (EventFilter eventFilter : f) {
+            events = eventFilter.apply(events, filter);
+        }
+        return events.map(eventMapper::toDTO).toList();
     }
 }

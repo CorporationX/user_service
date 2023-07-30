@@ -1,11 +1,11 @@
-package school.faang.user_service.service;
+package school.faang.user_service.filter;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.service.event.EventOwnerIdFilter;
+import school.faang.user_service.filters.event.EventOwnerIdFilter;
 
 import java.util.List;
 import java.util.stream.Stream;

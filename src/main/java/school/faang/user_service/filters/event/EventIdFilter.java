@@ -1,14 +1,14 @@
-package school.faang.user_service.service.event;
+package school.faang.user_service.filters.event;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.filters.event.EventFilter;
 
-import java.util.List;
 import java.util.stream.Stream;
 
 @Component
-public class EventIdFilter implements EventFilter{
+public class EventIdFilter implements EventFilter {
     @Override
     public boolean isApplicable(EventFilterDto filter) {
         return filter.getEventId() != null;

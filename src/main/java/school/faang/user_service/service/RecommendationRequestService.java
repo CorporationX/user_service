@@ -20,8 +20,6 @@ import java.util.stream.StreamSupport;
 public class RecommendationRequestService {
     private final RecommendationRequestRepository recommendationRequestRepository;
     private final  RecommendationRequestMapper recommendationRequestMapper;
-    private final UserRepository userRepository;
-    private final SkillRepository skillRepository;
     private final List<RecommendationRequestFilter> recommendationRequestFilters;
 
     public RecommendationRequestDto getRequest(long userId) {
@@ -33,7 +31,7 @@ public class RecommendationRequestService {
 
     public List<RecommendationRequestDto> getFilterRequest(RecommendationRequestFilterDto recommendationRequestFilterDto) {
         Stream<RecommendationRequest> recommendationRequests = StreamSupport.stream(recommendationRequestRepository.findAll().spliterator(), false);
-
+        //Stream<RecommendationRequest> recommendationRequests = recommendationRequestRepository.findAll().stream();
         for (RecommendationRequestFilter filter : recommendationRequestFilters) {
             if (filter.isApplicable(recommendationRequestFilterDto)) {
                 recommendationRequests = filter.apply(recommendationRequests, recommendationRequestFilterDto);

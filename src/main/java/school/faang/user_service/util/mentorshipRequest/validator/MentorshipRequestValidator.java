@@ -2,7 +2,6 @@ package school.faang.user_service.util.mentorshipRequest.validator;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestBody;
 import school.faang.user_service.dto.mentorshipRequest.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
@@ -31,16 +30,16 @@ public class MentorshipRequestValidator {
                 mentorshipRequestRepository.findLatestRequest(dto.getRequesterId(), dto.getReceiverId());
 
         if (requester.isEmpty() || receiver.isEmpty()) {
-            throw new UserNotFoundException();
+            throw new UserNotFoundException("User not found");
         }
         if (requester.get().getId() == receiver.get().getId()) {
-            throw new SameMentorAndMenteeException();
+            throw new SameMentorAndMenteeException("Same mentor and mentee");
         }
         if (lastRequest.isEmpty()) {
             throw new RequestMentorshipException("There is no requests");
         }
         if (lastRequest.get().getCreatedAt().isAfter(LocalDateTime.now().minusMonths(3))) {
-            throw new TimeHasNotPassedException();
+            throw new TimeHasNotPassedException("The request can be sent once every three months");
         }
     }
 }

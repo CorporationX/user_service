@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import school.faang.user_service.entity.RequestStatus;
 
 @Data
 @AllArgsConstructor
@@ -19,6 +20,6 @@ public class RequestFilterDto {
     @Min(value = 1, message = "Id can not be lower than 1")
     private Long receiverId;
 
-    private String status;
+    private RequestStatus status;
 }
 

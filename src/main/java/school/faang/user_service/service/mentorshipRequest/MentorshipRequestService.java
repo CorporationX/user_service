@@ -16,7 +16,6 @@ import school.faang.user_service.repository.mentorship.MentorshipRequestReposito
 import school.faang.user_service.util.mentorshipRequest.exception.NoRequestsException;
 import school.faang.user_service.util.mentorshipRequest.exception.RequestIsAlreadyAcceptedException;
 import school.faang.user_service.util.mentorshipRequest.exception.RequestIsAlreadyRejectedException;
-import school.faang.user_service.util.mentorshipRequest.exception.UserNotFoundException;
 import school.faang.user_service.util.mentorshipRequest.validator.MentorshipRequestValidator;
 
 import java.util.List;
@@ -54,9 +53,8 @@ public class MentorshipRequestService {
         return requests.map(mentorshipRequestMapper::toDto).toList();
     }
 
-
     @Transactional
-    public void acceptRequest(long id) {
+    public MentorshipRequestDto acceptRequest(long id) {
         MentorshipRequest foundRequest =
                 mentorshipRequestRepository.findById(id).orElseThrow(NoRequestsException::new);
 
@@ -75,10 +73,12 @@ public class MentorshipRequestService {
         mentorshipRequestRepository.save(foundRequest);
         userRepository.save(receiver);
         userRepository.save(requester);
+
+        return mentorshipRequestMapper.toDto(foundRequest);
     }
 
     @Transactional
-    public void rejectRequest(long id, RejectionDto rejectionDto) {
+    public MentorshipRequestDto rejectRequest(long id, RejectionDto rejectionDto) {
         MentorshipRequest foundRequest = mentorshipRequestRepository.findById(id)
                 .orElseThrow(NoRequestsException::new);
 
@@ -97,5 +97,7 @@ public class MentorshipRequestService {
         mentorshipRequestRepository.save(foundRequest);
         userRepository.save(receiver);
         userRepository.save(requester);
+
+        return mentorshipRequestMapper.toDto(foundRequest);
     }
 }

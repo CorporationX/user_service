@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 public class UserExperienceMinFilter implements UserFilter {
     @Override
     public boolean isApplicable(UserFilterDto filters) {
-        return filters.getExperienceMin() >= 0;
+        return filters.getExperienceMin() > 0;
     }
 
     @Override

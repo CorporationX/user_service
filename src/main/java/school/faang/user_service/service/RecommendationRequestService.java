@@ -11,6 +11,7 @@ import school.faang.user_service.repository.recommendation.RecommendationRequest
 
 import java.util.List;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +28,7 @@ public class RecommendationRequestService {
     }
 
     public List<RecommendationRequestDto> getFilterRequest(RecommendationRequestFilterDto recommendationRequestFilterDto) {
-        Stream<RecommendationRequest> recommendationRequests = recommendationRequestRepository.findAll().stream();
+        Stream<RecommendationRequest> recommendationRequests = StreamSupport.stream(recommendationRequestRepository.findAll().spliterator(), false);
 
         for (RecommendationRequestFilter filter : recommendationRequestFilters) {
             if (filter.isApplicable(recommendationRequestFilterDto)) {

@@ -36,5 +36,4 @@ public interface RecommendationRequestMapper {
                 .map(SkillRequest::getId)
                 .collect(Collectors.toList());
     }
-
 }

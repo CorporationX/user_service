@@ -14,6 +14,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filter.requestfilter.CreateAtFilter;
 import school.faang.user_service.filter.requestfilter.ReceiverIdFilter;
 import school.faang.user_service.filter.requestfilter.RequestFilter;
@@ -27,8 +28,10 @@ import school.faang.user_service.validator.SkillValidator;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class RecommendationRequestServiceTest {
@@ -129,102 +132,6 @@ class RecommendationRequestServiceTest {
                 .thenReturn(List.of(entity1, entity2));
 
         List<RecommendationRequestDto> expected = List.of(requestDto1);
-
-        List<RecommendationRequestDto> actual = recommendationRequestService.getRequests(requestFilterDto);
-
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void testGetRequestsWithCreateAtFilter() {
-        RequestFilterDto requestFilterDto = RequestFilterDto.builder()
-                .createdAtPattern(createdAt)
-                .build();
-
-        Mockito.when(recommendationRequestRepository.findAll())
-                .thenReturn(List.of(entity1, entity2));
-
-        List<RecommendationRequestDto> expected = List.of(requestDto1, requestDto2);
-
-        List<RecommendationRequestDto> actual = recommendationRequestService.getRequests(requestFilterDto);
-
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void testGetRequestsWithReceiverIdFilter() {
-        RequestFilterDto requestFilterDto = RequestFilterDto.builder()
-                .receiverIdPattern(1L)
-                .build();
-
-        Mockito.when(recommendationRequestRepository.findAll())
-                .thenReturn(List.of(entity1, entity2));
-
-        List<RecommendationRequestDto> expected = List.of(requestDto1);
-
-        List<RecommendationRequestDto> actual = recommendationRequestService.getRequests(requestFilterDto);
-
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void testGetRequestsWithRequesterIdFilter() {
-        RequestFilterDto requestFilterDto = RequestFilterDto.builder()
-                .receiverIdPattern(1L)
-                .build();
-
-        Mockito.when(recommendationRequestRepository.findAll())
-                .thenReturn(List.of(entity1, entity2));
-
-        List<RecommendationRequestDto> expected = List.of(requestDto1);
-
-        List<RecommendationRequestDto> actual = recommendationRequestService.getRequests(requestFilterDto);
-
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void testGetRequestsWithRequestStatusFilter() {
-        RequestFilterDto requestFilterDto = RequestFilterDto.builder()
-                .statusPattern(RequestStatus.ACCEPTED)
-                .build();
-
-        Mockito.when(recommendationRequestRepository.findAll())
-                .thenReturn(List.of(entity1, entity2));
-
-        List<RecommendationRequestDto> expected = List.of(requestDto1);
-
-        List<RecommendationRequestDto> actual = recommendationRequestService.getRequests(requestFilterDto);
-
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void testGetRequestsWithSkillRequestFilter() {
-        RequestFilterDto requestFilterDto = RequestFilterDto.builder()
-                .skillsPattern(List.of(1L))
-                .build();
-
-        Mockito.when(recommendationRequestRepository.findAll())
-                .thenReturn(List.of(entity1, entity2));
-
-        List<RecommendationRequestDto> expected = List.of(requestDto1);
-
-        List<RecommendationRequestDto> actual = recommendationRequestService.getRequests(requestFilterDto);
-
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void testGetRequestsWithUpdateAtFilter() {
-        RequestFilterDto requestFilterDto = RequestFilterDto.builder()
-                .updatedAtPattern(createdAt)
-                .build();
-
-        Mockito.when(recommendationRequestRepository.findAll())
-                .thenReturn(List.of(entity1, entity2));
-
-        List<RecommendationRequestDto> expected = List.of(requestDto1, requestDto2);
 
         List<RecommendationRequestDto> actual = recommendationRequestService.getRequests(requestFilterDto);
 

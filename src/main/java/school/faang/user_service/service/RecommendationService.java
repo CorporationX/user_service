@@ -16,6 +16,8 @@ import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -56,6 +58,11 @@ public class RecommendationService {
         return recommendationRepository.update(recommendationDto.getAuthorId(),
                 recommendationDto.getReceiverId(),
                 recommendationDto.getContent());
+    }
+
+    public Page<RecommendationDto> getAllUserRecommendations(Long receiverId, Pageable pageable) {
+        Page<Recommendation> recommendations = recommendationRepository.findAllByReceiverId(receiverId, pageable);
+        return recommendations.map(recommendationMapper::toDto);
     }
 
     private void createSkillOffer(RecommendationDto recommendationDto) {

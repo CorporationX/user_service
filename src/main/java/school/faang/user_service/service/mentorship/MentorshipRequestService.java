@@ -3,6 +3,7 @@ package school.faang.user_service.service.mentorship;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorship.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.UserNotFoundException;
@@ -11,7 +12,10 @@ import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +24,7 @@ public class MentorshipRequestService {
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final MentorshipRepository mentorshipRepository;
     private final MentorshipRequestMapper requestMapper;
+    private MentorshipRequestFilter requestFilter;
 
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto requestDto) {
         Long requesterId = requestDto.getRequester().getId();
@@ -29,6 +34,19 @@ public class MentorshipRequestService {
 
         MentorshipRequest newRequest = mentorshipRequestRepository.create(requesterId, receiverId, requestDto.getDescription());
         return requestMapper.toDto(newRequest);
+    }
+
+    public List<MentorshipRequestDto> getRequests(RequestFilterDto filter) {
+        List<MentorshipRequestDto> allRequestDto = new ArrayList<>();
+
+        mentorshipRequestRepository.findAll()
+                .forEach(request -> allRequestDto.add(requestMapper.toDto(request)));
+
+        requestFilter = MentorshipRequestFilter.builder()
+                .requestDtoList(allRequestDto)
+                .filter(filter)
+                .build();
+        return requestFilter.requestFiltering();
     }
 
     private void dataValidate(long requesterId, long receiverId, MentorshipRequestDto requestDto) {

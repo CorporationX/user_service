@@ -1,7 +1,6 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
@@ -41,6 +40,20 @@ public class RecommendationService {
         existsUserSkill(recommendationDto);
 
         return recommendationRepository.create(recommendationDto.getAuthorId(),
+                recommendationDto.getReceiverId(),
+                recommendationDto.getContent());
+    }
+
+    public Recommendation update(RecommendationDto recommendationDto) {
+        recommendationEmptyValidation(recommendationDto);
+        timeValidation(recommendationDto);
+        skillEmptyValidation(recommendationDto);
+
+        skillOfferRepository.deleteAllByRecommendationId(recommendationDto.getId());
+        createSkillOffer(recommendationDto);
+        existsUserSkill(recommendationDto);
+
+        return recommendationRepository.update(recommendationDto.getAuthorId(),
                 recommendationDto.getReceiverId(),
                 recommendationDto.getContent());
     }

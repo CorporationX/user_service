@@ -16,12 +16,6 @@ public class RequestStatusFilter implements RequestFilter {
     @Override
     public Stream<RecommendationRequest> apply(Stream<RecommendationRequest> recommendationRequestStream, RequestFilterDto filters) {
         return recommendationRequestStream
-                .filter(recommendationRequest -> {
-                    if (recommendationRequest.getStatus() == null) {
-                        return false;
-                    } else {
-                        return recommendationRequest.getStatus().equals(filters.getStatusPattern());
-                    }
-                });
+                .filter(recommendationRequest -> recommendationRequest.getStatus().equals(filters.getStatusPattern()));
     }
 }

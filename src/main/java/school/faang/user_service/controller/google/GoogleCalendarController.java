@@ -25,8 +25,9 @@ public class GoogleCalendarController {
         try {
             return googleCalendarService.createEvent(userId, eventId);
         } catch (Exception e) {
-            log.error("Failed to push event to Google Calendar for user with id:{}\nException:{}",
+            log.error("Failed to push event to Google Calendar for user with id:{}\nException: {}",
                     userId, e.getMessage());
+            e.printStackTrace();
             return GoogleEventResponseDto.builder().build();
         }
     }
@@ -38,7 +39,7 @@ public class GoogleCalendarController {
             String eventId = state.split("-")[1];
             return googleCalendarService.handleCallback(code, userId, eventId);
         } catch (Exception e) {
-            log.error("Failed to push event to Google Calendar\nException:{}", e.getMessage());
+            log.error("Failed to push event to Google Calendar\nException: {}", e.getMessage());
             return GoogleEventResponseDto.builder().build();
         }
     }

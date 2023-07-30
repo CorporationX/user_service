@@ -7,11 +7,8 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
-import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.EventDateTime;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -21,8 +18,6 @@ import java.security.GeneralSecurityException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.GoogleEventResponseDto;
@@ -37,15 +32,10 @@ import school.faang.user_service.util.google.JpaDataStoreFactory;
 @Service
 @RequiredArgsConstructor
 public class GoogleCalendarService {
-    private static final String APPLICATION_NAME = "Corporation-X";
-    private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-    private static final List<String> SCOPES = Collections.singletonList(CalendarScopes.CALENDAR);
-    private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
-    private static final String CALENDAR_ID = "primary";
-    private static final String REDIRECT_URI = "http://localhost:8080/api/v1/google/calendar/Callback";
     private final GoogleTokenRepository googleTokenRepository;
     private final EventService eventService;
     private final UserService userService;
+    private final GoogleCalendarProperties properties;
 
     public GoogleEventResponseDto createEvent(Long userId, Long eventId) throws GeneralSecurityException, IOException {
         Event event = eventService.getEvent(eventId);
@@ -72,30 +62,32 @@ public class GoogleCalendarService {
 
         // Inits and inserts event into Google Calendar
         com.google.api.services.calendar.model.Event googleEvent = mapToGoogleEvent(event, service);
-        googleEvent = service.events().insert(CALENDAR_ID, googleEvent).execute();
+        googleEvent = service.events().insert(properties.getCalendarId(), googleEvent).execute();
 
         return getResponse(googleEvent.getHtmlLink());
     }
 
-    private String getAuthorizationLink(NetHttpTransport HTTP_TRANSPORT, Long userId, Long eventId) throws IOException {
+    private String getAuthorizationLink(NetHttpTransport HTTP_TRANSPORT, Long userId, Long eventId)
+            throws IOException {
         GoogleClientSecrets clientSecrets = getClientSecrets();
         GoogleAuthorizationCodeFlow flow = getFlow(HTTP_TRANSPORT, clientSecrets);
 
         // Returns authorization url
         return flow.newAuthorizationUrl()
-                .setRedirectUri(REDIRECT_URI)
+                .setRedirectUri(properties.getRedirectUri())
                 .setState(userId + "-" + eventId)
                 .build();
     }
 
-    public GoogleEventResponseDto handleCallback(String code, String userId, String eventId) throws GeneralSecurityException, IOException {
+    public GoogleEventResponseDto handleCallback(String code, String userId, String eventId)
+            throws GeneralSecurityException, IOException {
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         GoogleClientSecrets clientSecrets = getClientSecrets();
         GoogleAuthorizationCodeFlow flow = getFlow(HTTP_TRANSPORT, clientSecrets);
 
         // Creates and saves new user's credential from callback response authorization code
         TokenResponse response = flow.newTokenRequest(code)
-                .setRedirectUri(REDIRECT_URI)
+                .setRedirectUri(properties.getRedirectUri())
                 .execute();
         Credential credential = flow.createAndStoreCredential(response, userId);
         Calendar service = getService(HTTP_TRANSPORT, credential);
@@ -104,7 +96,7 @@ public class GoogleCalendarService {
         // Но не уверен стоит ли делать это в коллбэк методе
         Event event = eventService.getEvent(Long.parseLong(eventId));
         com.google.api.services.calendar.model.Event googleEvent = mapToGoogleEvent(event, service);
-        googleEvent = service.events().insert(CALENDAR_ID, googleEvent).execute();
+        googleEvent = service.events().insert(properties.getCalendarId(), googleEvent).execute();
 
         return getResponse(googleEvent.getHtmlLink());
     }
@@ -118,7 +110,7 @@ public class GoogleCalendarService {
                 .setLocation(event.getLocation());
 
         // Gets actual timezone from user's Google calendar
-        String userTimeZone = service.calendars().get(CALENDAR_ID).execute().getTimeZone();
+        String userTimeZone = service.calendars().get(properties.getCalendarId()).execute().getTimeZone();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
         ZonedDateTime zonedStart = ZonedDateTime.of(event.getStartDate(), ZoneId.of(userTimeZone));
         ZonedDateTime zonedEnd = ZonedDateTime.of(event.getEndDate(), ZoneId.of(userTimeZone));
@@ -136,23 +128,23 @@ public class GoogleCalendarService {
     }
 
     private Calendar getService(HttpTransport HTTP_TRANSPORT, Credential credential) {
-        return new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
-                .setApplicationName(APPLICATION_NAME)
+        return new Calendar.Builder(HTTP_TRANSPORT, properties.getJsonFactory(), credential)
+                .setApplicationName(properties.getApplicationName())
                 .build();
     }
 
     private GoogleClientSecrets getClientSecrets() throws IOException {
-        InputStream in = GoogleCalendarService.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
+        InputStream in = GoogleCalendarService.class.getResourceAsStream(properties.getCredentialsFile());
         if (in == null) {
-            throw new FileNotFoundException("File not found: " + CREDENTIALS_FILE_PATH);
+            throw new FileNotFoundException("File not found: " + properties.getCredentialsFile());
         }
-        return GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
+        return GoogleClientSecrets.load(properties.getJsonFactory(), new InputStreamReader(in));
     }
 
     private GoogleAuthorizationCodeFlow getFlow(HttpTransport HTTP_TRANSPORT, GoogleClientSecrets clientSecrets)
             throws IOException {
-        return new GoogleAuthorizationCodeFlow.Builder(
-                HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
+        return new GoogleAuthorizationCodeFlow
+                .Builder(HTTP_TRANSPORT, properties.getJsonFactory(), clientSecrets, properties.getScopes())
                 .setDataStoreFactory(new JpaDataStoreFactory(googleTokenRepository))
                 .setAccessType("offline")
                 .build();

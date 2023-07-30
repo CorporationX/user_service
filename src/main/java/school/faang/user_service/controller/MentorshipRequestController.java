@@ -28,4 +28,11 @@ public class MentorshipRequestController {
         }
         return mentorshipRequestService.getRequests(filter);
     }
+
+    public void acceptRequest(long id) {
+        if (id < 1) {
+            throw new DataValidationException("Некорректный ввод id");
+        }
+        mentorshipRequestService.acceptRequest(id);
+    }
 }

@@ -2,10 +2,14 @@ package school.faang.user_service.service.mentorship;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
+import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.MentorshipRequestNotFoundException;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
@@ -19,6 +23,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class MentorshipRequestService {
 
     private final MentorshipRequestRepository mentorshipRequestRepository;
@@ -47,6 +52,25 @@ public class MentorshipRequestService {
                 .filter(filter)
                 .build();
         return requestFilter.requestFiltering();
+    }
+
+    public void acceptRequest(long id) {
+        MentorshipRequest mentorshipRequest = mentorshipRequestRepository.findById(id).orElseThrow(() -> {
+            throw new MentorshipRequestNotFoundException("Данного запроса на менторство не существует");
+        });
+
+        User receiver = mentorshipRequest.getReceiver();
+        User requester = mentorshipRequest.getRequester();
+
+        if (requester.getMentors() == null) {
+            requester.setMentors(List.of(receiver));
+            mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
+        } else if (!requester.getMentors().contains(receiver)) {
+            requester.getMentors().add(receiver);
+            mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
+        } else {
+            throw new IllegalArgumentException("Данный пользователь уже является ментором отправителя");
+        }
     }
 
     private void dataValidate(long requesterId, long receiverId, MentorshipRequestDto requestDto) {

@@ -19,10 +19,7 @@ import school.faang.user_service.util.mentorshipRequest.exception.UserNotFoundEx
 import school.faang.user_service.util.mentorshipRequest.validator.FilterRequestStatusValidator;
 import school.faang.user_service.util.mentorshipRequest.validator.MentorshipRequestValidator;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -36,49 +33,40 @@ public class MentorshipRequestService {
     private final UserRepository userRepository;
 
     @Transactional
-    public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
-        MentorshipRequest mentorshipRequest = mentorshipRequestMapper.toEntity(mentorshipRequestDto, this);
+    public MentorshipRequestDto requestMentorship(MentorshipRequestDto dto) {
+        mentorshipRequestValidator.validate(dto);
+        MentorshipRequest request = mentorshipRequestMapper.toEntity(dto);
+        mentorshipRequestRepository.save(request);
 
-        long requesterId = mentorshipRequest.getRequester().getId();
-        long receiverId = mentorshipRequest.getReceiver().getId();
-
-        Optional<User> requester = userRepository.findById(requesterId);
-        Optional<User> receiver = userRepository.findById(receiverId);
-        Optional<MentorshipRequest> latestRequest = mentorshipRequestRepository.findLatestRequest(requesterId, receiverId);
-
-        mentorshipRequestValidator.validate(requester, receiver, latestRequest);
-
-        mentorshipRequestRepository.save(mentorshipRequest);
-
-        return mentorshipRequestMapper.toDto(mentorshipRequest);
+        return mentorshipRequestMapper.toDto(request);
     }
 
-    public List<MentorshipRequestDto> getRequests(RequestFilterDto filter) {
-        MentorshipRequest entity = mentorshipRequestMapper.toEntity(filter, this,
-                filterRequestStatusValidator);
-
-        return StreamSupport.stream(mentorshipRequestRepository.findAll().spliterator(), false)
-                .filter(mentorshipRequest -> filterRequests(entity, mentorshipRequest))
-                .map(mentorshipRequestMapper::toDto)
-                .collect(Collectors.toList());
-    }
-
-    private boolean filterRequests(MentorshipRequest entity, MentorshipRequest requestFromDB) {
-        if (entity.getDescription() != null && !requestFromDB.getDescription().equals(entity.getDescription())) {
-            return false;
-        }
-        if (entity.getRequester() != null && !requestFromDB.getRequester().equals(entity.getRequester())) {
-            return false;
-        }
-        if (entity.getReceiver() != null && !requestFromDB.getReceiver().equals(entity.getReceiver())) {
-            return false;
-        }
-        if (entity.getStatus() != null && !requestFromDB.getStatus().equals(entity.getStatus())) {
-            return false;
-        }
-
-        return true;
-    }
+//    public List<MentorshipRequestDto> getRequests(RequestFilterDto filter) {
+//        MentorshipRequest entity = mentorshipRequestMapper.toEntity(filter, this,
+//                filterRequestStatusValidator);
+//
+//        return StreamSupport.stream(mentorshipRequestRepository.findAll().spliterator(), false)
+//                .filter(mentorshipRequest -> filterRequests(entity, mentorshipRequest))
+//                .map(mentorshipRequestMapper::toDto)
+//                .collect(Collectors.toList());
+//    }
+//
+//    private boolean filterRequests(MentorshipRequest entity, MentorshipRequest requestFromDB) {
+//        if (entity.getDescription() != null && !requestFromDB.getDescription().equals(entity.getDescription())) {
+//            return false;
+//        }
+//        if (entity.getRequester() != null && !requestFromDB.getRequester().equals(entity.getRequester())) {
+//            return false;
+//        }
+//        if (entity.getReceiver() != null && !requestFromDB.getReceiver().equals(entity.getReceiver())) {
+//            return false;
+//        }
+//        if (entity.getStatus() != null && !requestFromDB.getStatus().equals(entity.getStatus())) {
+//            return false;
+//        }
+//
+//        return true;
+//    }
 
     public User findUserById(long id) {
         return userRepository.findById(id).orElseThrow(UserNotFoundException::new);

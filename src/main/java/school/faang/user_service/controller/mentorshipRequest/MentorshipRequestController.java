@@ -29,31 +29,31 @@ public class MentorshipRequestController {
         return mentorshipRequestService.requestMentorship(dto);
     }
 
-    @GetMapping("/requests")
-    public ResponseEntity<RequestResponse> getRequests(@RequestBody @Valid RequestFilterDto requestFilterDto,
-                                       BindingResult bindingResult) {
-        controllerRequestValidator.validateRequest(bindingResult, new GetRequestsMentorshipsException());
-
-        return ResponseEntity.ok(new RequestResponse(mentorshipRequestService.getRequests(requestFilterDto)));
-    }
-
-    @PostMapping("/accept/{id}")
-    public ResponseEntity<?> acceptRequest(@PathVariable("id") long id) {
-        controllerRequestValidator.validateRequest(id);
-
-        mentorshipRequestService.acceptRequest(id);
-
-        return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("/reject/{id}")
-    public ResponseEntity<HttpStatus> rejectRequest(@PathVariable("id") long id,
-                                                    @RequestBody @Valid RejectionDto rejectionDto,
-                                                    BindingResult bindingResult) {
-        controllerRequestValidator.validateRequest(id, bindingResult, new UnknownRejectionReasonException());
-
-        mentorshipRequestService.rejectRequest(id, rejectionDto);
-
-        return ResponseEntity.ok().build();
-    }
+//    @GetMapping("/requests")
+//    public ResponseEntity<RequestResponse> getRequests(@RequestBody @Valid RequestFilterDto requestFilterDto,
+//                                       BindingResult bindingResult) {
+//        controllerRequestValidator.validateRequest(bindingResult, new GetRequestsMentorshipsException());
+//
+//        return ResponseEntity.ok(new RequestResponse(mentorshipRequestService.getRequests(requestFilterDto)));
+//    }
+//
+//    @PostMapping("/accept/{id}")
+//    public ResponseEntity<?> acceptRequest(@PathVariable("id") long id) {
+//        controllerRequestValidator.validateRequest(id);
+//
+//        mentorshipRequestService.acceptRequest(id);
+//
+//        return ResponseEntity.ok().build();
+//    }
+//
+//    @PostMapping("/reject/{id}")
+//    public ResponseEntity<HttpStatus> rejectRequest(@PathVariable("id") long id,
+//                                                    @RequestBody @Valid RejectionDto rejectionDto,
+//                                                    BindingResult bindingResult) {
+//        controllerRequestValidator.validateRequest(id, bindingResult, new UnknownRejectionReasonException());
+//
+//        mentorshipRequestService.rejectRequest(id, rejectionDto);
+//
+//        return ResponseEntity.ok().build();
+//    }
 }

@@ -24,7 +24,7 @@ public class MentorshipRequestController {
 
     @PostMapping("/new-request")
     public MentorshipRequestDto requestMentorship(@RequestBody MentorshipRequestDto mentorshipRequestDto) {
-        if (mentorshipRequestDto.getDescription().isBlank() || mentorshipRequestDto.getDescription() == null) {
+        if (mentorshipRequestDto.getDescription() == null || mentorshipRequestDto.getDescription().isBlank()) {
             throw new DataValidationException("Добавьте описание к запросу на менторство");
         }
         return mentorshipRequestService.requestMentorship(mentorshipRequestDto);

@@ -13,7 +13,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.MentorshipRequestNotFoundException;
 import school.faang.user_service.exception.RequestAlreadyAcceptedException;
 import school.faang.user_service.exception.UserNotFoundException;
-import school.faang.user_service.filter.MentorshipRequestFilter;
+import school.faang.user_service.service.mentorship.filter.MentorshipRequestFilter;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -21,6 +21,7 @@ import school.faang.user_service.repository.mentorship.MentorshipRequestReposito
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -30,11 +31,11 @@ public class MentorshipRequestService {
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final MentorshipRepository mentorshipRepository;
     private final MentorshipRequestMapper requestMapper;
-    private MentorshipRequestFilter requestFilter;
+    private final List<MentorshipRequestFilter> filters;
 
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto requestDto) {
-        long requesterId = requestDto.getRequester().getId();
-        long receiverId = requestDto.getReceiver().getId();
+        long requesterId = requestDto.getRequester();
+        long receiverId = requestDto.getReceiver();
 
         dataValidate(requesterId, receiverId, requestDto);
 
@@ -42,17 +43,20 @@ public class MentorshipRequestService {
         return requestMapper.toDto(newRequest);
     }
 
-    public List<MentorshipRequestDto> getRequests(RequestFilterDto filter) {
-        List<MentorshipRequestDto> allRequestDto = new ArrayList<>();
-
+    public List<MentorshipRequestDto> getRequests(RequestFilterDto filterDto) {
+        List<MentorshipRequest> allRequests = new ArrayList<>();
         mentorshipRequestRepository.findAll()
-                .forEach(request -> allRequestDto.add(requestMapper.toDto(request)));
+                .forEach(request -> allRequests.add(request));
+        Stream<MentorshipRequest> requestStream = allRequests.stream();
 
-        requestFilter = MentorshipRequestFilter.builder()
-                .requestDtoList(allRequestDto)
-                .filter(filter)
-                .build();
-        return requestFilter.requestFiltering();
+        List<MentorshipRequestFilter> applicableFilters = filters.stream()
+                .filter(filter -> filter.isApplicable(filterDto))
+                .toList();
+        for (MentorshipRequestFilter filter : applicableFilters) {
+            requestStream = filter.apply(requestStream, filterDto);
+        }
+
+        return requestStream.map(requestMapper::toDto).toList();
     }
 
     public void acceptRequest(long id) {

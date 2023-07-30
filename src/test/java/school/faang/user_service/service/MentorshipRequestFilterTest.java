@@ -5,16 +5,22 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RequestFilterDto;
-import school.faang.user_service.dto.mentorship.UserDto;
+import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.filter.MentorshipRequestFilter;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.service.mentorship.MentorshipRequestService;
+import school.faang.user_service.service.mentorship.filter.MentorshipRequestFilter;
+import school.faang.user_service.service.mentorship.filter.MentorshipRequestFilterByDescription;
+import school.faang.user_service.service.mentorship.filter.MentorshipRequestFilterByReceiver;
+import school.faang.user_service.service.mentorship.filter.MentorshipRequestFilterByRequestStatus;
+import school.faang.user_service.service.mentorship.filter.MentorshipRequestFilterByRequester;
+import school.faang.user_service.service.mentorship.filter.MentorshipRequestFilterByUpdatedTime;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,160 +28,177 @@ import static org.junit.jupiter.api.Assertions.*;
 public class MentorshipRequestFilterTest {
 
     @InjectMocks
-    private MentorshipRequestFilter requestFilter;
-    private List<MentorshipRequestDto> requestDtoList;
-    private RequestFilterDto filter;
-    private UserDto requesterDto;
-    private UserDto receiverDto;
-    private MentorshipRequestDto dto1;
-    private MentorshipRequestDto dto2;
-    private MentorshipRequestDto dto3;
-    private MentorshipRequestDto dto4;
-    private MentorshipRequestDto dto5;
+    private MentorshipRequestService requestService;
+    private List<MentorshipRequestFilter> filters = getFilters();
+    private Stream<MentorshipRequest> allRequests;
+    private RequestFilterDto filterDto;
+    private User requester;
+    private User receiver;
+    private MentorshipRequest request1;
+    private MentorshipRequest request2;
+    private MentorshipRequest request3;
+    private MentorshipRequest request4;
+    private MentorshipRequest request5;
+    private final long REQUESTER_ID = 1L;
+    private final long RECEIVER_ID = 2L;
+    private final LocalDateTime TEST_TIME = LocalDateTime.now();
 
     @BeforeEach
     void initData() {
-        filter = RequestFilterDto.builder().build();
-        requesterDto = UserDto.builder()
+        filterDto = RequestFilterDto.builder().build();
+        requester = User.builder()
                 .id(1L)
                 .build();
-        receiverDto = UserDto.builder()
+        receiver = User.builder()
                 .id(2L)
                 .build();
 
-        dto1 = MentorshipRequestDto.builder()
+        request1 = MentorshipRequest.builder()
                 .description("description")
-                .requester(requesterDto)
-                .receiver(receiverDto)
-                .updatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
+                .requester(requester)
+                .receiver(receiver)
+                .updatedAt(TEST_TIME)
                 .status(RequestStatus.REJECTED)
                 .build();
-        dto2 = MentorshipRequestDto.builder()
+        request2 = MentorshipRequest.builder()
                 .description("another description")
-                .requester(requesterDto)
-                .receiver(receiverDto)
+                .requester(requester)
+                .receiver(receiver)
+                .updatedAt(TEST_TIME.minusMonths(1))
                 .status(RequestStatus.ACCEPTED)
                 .build();
-        dto3 = MentorshipRequestDto.builder()
+        request3 = MentorshipRequest.builder()
                 .description("description")
-                .requester(requesterDto)
-                .receiver(requesterDto)
-                .updatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
+                .requester(requester)
+                .receiver(requester)
+                .updatedAt(TEST_TIME)
                 .status(RequestStatus.PENDING)
                 .build();
-        dto4 = MentorshipRequestDto.builder()
+        request4 = MentorshipRequest.builder()
                 .description("description")
-                .requester(requesterDto)
-                .receiver(receiverDto)
-                .updatedAt(LocalDateTime.now().minusMonths(2).truncatedTo(ChronoUnit.SECONDS))
+                .requester(requester)
+                .receiver(receiver)
+                .updatedAt(TEST_TIME.minusMonths(2))
                 .status(RequestStatus.ACCEPTED)
                 .build();
-        dto5 = MentorshipRequestDto.builder()
+        request5 = MentorshipRequest.builder()
                 .description("   ")
-                .requester(receiverDto)
-                .receiver(receiverDto)
-                .updatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
+                .requester(receiver)
+                .receiver(receiver)
+                .updatedAt(TEST_TIME)
                 .status(RequestStatus.ACCEPTED)
                 .build();
 
-        requestDtoList = List.of(dto1, dto2, dto3, dto4, dto5);
-        requestFilter = MentorshipRequestFilter.builder()
-                .filter(filter)
-                .requestDtoList(requestDtoList)
-                .build();
+        allRequests = List.of(request1, request2, request3, request4, request5).stream();
     }
 
     @Test
     void testRequestFilteringWithEmptyFilter() {
-        List<MentorshipRequestDto> actualList = requestFilter.requestFiltering();
-        List<MentorshipRequestDto> expectedList = requestDtoList;
+        List<MentorshipRequest> expectedList = List.of(request1, request2, request3, request4, request5);
+        List<MentorshipRequest> actualList = doFiltering(filterDto);
 
         assertEquals(expectedList, actualList);
     }
 
     @Test
     void testRequestFilteringByDescription() {
-        filter.setDescription("description");
+        filterDto.setDescription("description");
 
-        List<MentorshipRequestDto> actualList = requestFilter.requestFiltering();
-        List<MentorshipRequestDto> expectedList = List.of(dto1, dto3, dto4);
+        List<MentorshipRequest> actualList = doFiltering(filterDto);
+        List<MentorshipRequest> expectedList = List.of(request1, request2, request3, request4);
 
         assertEquals(expectedList, actualList);
     }
 
     @Test
     void testRequestFilteringByReceiver() {
-        filter.setReceiver(receiverDto);
+        filterDto.setReceiver(RECEIVER_ID);
 
-        List<MentorshipRequestDto> actualList = requestFilter.requestFiltering();
-        List<MentorshipRequestDto> expectedList = List.of(dto1, dto2, dto4, dto5);
+        List<MentorshipRequest> actualList = doFiltering(filterDto);
+        List<MentorshipRequest> expectedList = List.of(request1, request2, request4, request5);
 
         assertEquals(expectedList, actualList);
     }
 
     @Test
     void testRequestFilteringByRequester() {
-        filter.setRequester(requesterDto);
+        filterDto.setRequester(REQUESTER_ID);
 
-        List<MentorshipRequestDto> actualList = requestFilter.requestFiltering();
-        List<MentorshipRequestDto> expectedList = List.of(dto1, dto2, dto3, dto4);
+        List<MentorshipRequest> actualList =doFiltering(filterDto);
+        List<MentorshipRequest> expectedList = List.of(request1, request2, request3, request4);
 
         assertEquals(expectedList, actualList);
     }
 
     @Test
     void testRequestFilteringByUpdatedAt() {
-        filter.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+        filterDto.setUpdatedAt(TEST_TIME);
 
-        List<MentorshipRequestDto> actualList = requestFilter.requestFiltering();
-        List<MentorshipRequestDto> expectedList = List.of(dto1, dto3, dto5);
+        List<MentorshipRequest> actualList = doFiltering(filterDto);
+        List<MentorshipRequest> expectedList = List.of(request1, request3, request5);
 
         assertEquals(expectedList, actualList);
     }
 
     @Test
     void testRequestFilteringByStatus() {
-        filter.setRequestStatus(RequestStatus.ACCEPTED);
+        filterDto.setRequestStatus(RequestStatus.ACCEPTED);
 
-        List<MentorshipRequestDto> actualList = requestFilter.requestFiltering();
-        List<MentorshipRequestDto> expectedList = List.of(dto2, dto4, dto5);
+        List<MentorshipRequest> actualList = doFiltering(filterDto);
+        List<MentorshipRequest> expectedList = List.of(request2, request4, request5);
 
         assertEquals(expectedList, actualList);
     }
 
     @Test
     void testRequestFilteringWithMixFilters() {
-        filter.setDescription("description");
-        filter.setReceiver(receiverDto);
-        filter.setRequester(requesterDto);
+        filterDto.setDescription("description");
+        filterDto.setReceiver(RECEIVER_ID);
+        filterDto.setRequester(REQUESTER_ID);
 
-        List<MentorshipRequestDto> actualList = requestFilter.requestFiltering();
-        List<MentorshipRequestDto> expectedList = List.of(dto1, dto4);
+        List<MentorshipRequest> actualList = doFiltering(filterDto);
+        List<MentorshipRequest> expectedList = List.of(request1, request2, request4);
 
         assertEquals(expectedList, actualList);
     }
 
     @Test
     void testRequestFilteringWithAllFilters() {
-        filter.setDescription("description");
-        filter.setRequester(requesterDto);
-        filter.setReceiver(receiverDto);
-        filter.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-        filter.setRequestStatus(RequestStatus.REJECTED);
+        filterDto.setDescription("description");
+        filterDto.setRequester(REQUESTER_ID);
+        filterDto.setReceiver(RECEIVER_ID);
+        filterDto.setUpdatedAt(TEST_TIME);
+        filterDto.setRequestStatus(RequestStatus.REJECTED);
 
-        List<MentorshipRequestDto> actualList = requestFilter.requestFiltering();
-        List<MentorshipRequestDto> expectedList = List.of(dto1);
+        List<MentorshipRequest> actualList = doFiltering(filterDto);
+        List<MentorshipRequest> expectedList = List.of(request1);
 
         assertEquals(expectedList, actualList);
     }
 
     @Test
     void testRequestFilteringWithEmptyList() {
-        filter.setUpdatedAt(LocalDateTime.now().minusDays(10).truncatedTo(ChronoUnit.SECONDS));
+        filterDto.setUpdatedAt(TEST_TIME.minusDays(10));
 
-        List<MentorshipRequestDto> actualList = requestFilter.requestFiltering();
-        List<MentorshipRequestDto> expectedList = new ArrayList<>();
+        List<MentorshipRequest> actualList = doFiltering(filterDto);
+        List<MentorshipRequest> expectedList = new ArrayList<>();
 
         assertEquals(expectedList, actualList);
+    }
+
+    private List<MentorshipRequest> doFiltering(RequestFilterDto filterDto) {
+        List<MentorshipRequestFilter> applicableFilters = filters.stream()
+                .filter(filter -> filter.isApplicable(filterDto)).toList();
+
+        for (MentorshipRequestFilter filter : applicableFilters) {
+            allRequests = filter.apply(allRequests, filterDto);
+        }
+        return allRequests.toList();
+    }
+
+    private List<MentorshipRequestFilter> getFilters() {
+        return List.of(new MentorshipRequestFilterByDescription(), new MentorshipRequestFilterByReceiver(),
+                new MentorshipRequestFilterByRequester(), new MentorshipRequestFilterByRequestStatus(),
+                new MentorshipRequestFilterByUpdatedTime());
     }
 }

@@ -22,6 +22,12 @@ import school.faang.user_service.mapper.mentorship.MentorshipRequestMapperImpl;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
+import school.faang.user_service.service.mentorship.filter.MentorshipRequestFilter;
+import school.faang.user_service.service.mentorship.filter.MentorshipRequestFilterByDescription;
+import school.faang.user_service.service.mentorship.filter.MentorshipRequestFilterByReceiver;
+import school.faang.user_service.service.mentorship.filter.MentorshipRequestFilterByRequestStatus;
+import school.faang.user_service.service.mentorship.filter.MentorshipRequestFilterByRequester;
+import school.faang.user_service.service.mentorship.filter.MentorshipRequestFilterByUpdatedTime;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -77,14 +83,14 @@ public class MentorshipRequestServiceTest {
 
         correctRequestDto = MentorshipRequestDto.builder()
                 .id(CORRECT_REQUEST_ID)
-                .receiver(receiverDto)
-                .requester(requesterDto)
+                .receiver(CORRECT_RECEIVER_ID)
+                .requester(CORRECT_REQUESTER_ID)
                 .updatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
                 .description("some description")
                 .build();
 
         filterDto = RequestFilterDto.builder()
-                .requester(requesterDto)
+                .requester(CORRECT_REQUESTER_ID)
                 .build();
 
         requester = new User();
@@ -99,8 +105,8 @@ public class MentorshipRequestServiceTest {
 
     @Test
     void testUserValidateWithNotFoundRequester() {
-        incorrectRequestDto.setRequester(incorrectUserDto);
-        incorrectRequestDto.setReceiver(receiverDto);
+        incorrectRequestDto.setRequester(NOT_FOUND_USER_ID);
+        incorrectRequestDto.setReceiver(CORRECT_RECEIVER_ID);
 
         when(mentorshipRepository.existsById(NOT_FOUND_USER_ID)).thenReturn(false);
         assertThrows(UserNotFoundException.class, () -> requestService.requestMentorship(incorrectRequestDto));
@@ -108,8 +114,8 @@ public class MentorshipRequestServiceTest {
 
     @Test
     void testUserValidateWithNotFoundReceiver() {
-        incorrectRequestDto.setReceiver(incorrectUserDto);
-        incorrectRequestDto.setRequester(requesterDto);
+        incorrectRequestDto.setReceiver(NOT_FOUND_USER_ID);
+        incorrectRequestDto.setRequester(CORRECT_REQUESTER_ID);
 
         when(mentorshipRepository.existsById(NOT_FOUND_USER_ID)).thenReturn(false);
         when(mentorshipRepository.existsById(CORRECT_REQUESTER_ID)).thenReturn(true);
@@ -118,8 +124,8 @@ public class MentorshipRequestServiceTest {
 
     @Test
     void testUserValidateWithSameUser() {
-        incorrectRequestDto.setRequester(requesterDto);
-        incorrectRequestDto.setReceiver(requesterDto);
+        incorrectRequestDto.setRequester(CORRECT_REQUESTER_ID);
+        incorrectRequestDto.setReceiver(CORRECT_REQUESTER_ID);
 
         when(mentorshipRepository.existsById(CORRECT_REQUESTER_ID)).thenReturn(true);
         assertThrows(DataValidationException.class, () -> requestService.requestMentorship(incorrectRequestDto));
@@ -147,8 +153,8 @@ public class MentorshipRequestServiceTest {
     @Test
     void testGetRequests() {
         MentorshipRequestDto requestDto = MentorshipRequestDto.builder()
-                .requester(requesterDto)
-                .receiver(receiverDto)
+                .requester(CORRECT_REQUESTER_ID)
+                .receiver(CORRECT_RECEIVER_ID)
                 .updatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
                 .description("some description")
                 .build();
@@ -158,6 +164,8 @@ public class MentorshipRequestServiceTest {
         latestRequest.setDescription("some description");
 
         when(requestRepository.findAll()).thenReturn(Collections.singleton(latestRequest));
+        List<MentorshipRequestFilter> filters = getFilters();
+        requestService = new MentorshipRequestService(requestRepository,mentorshipRepository, requestMapper, filters);
 
         List<MentorshipRequestDto> actualList = requestService.getRequests(filterDto);
         List<MentorshipRequestDto> expectedList = List.of(requestDto);
@@ -167,13 +175,15 @@ public class MentorshipRequestServiceTest {
 
     @Test
     void testGetRequestsWithEmptyList() {
-        filterDto.setRequester(receiverDto);
+        filterDto.setRequester(CORRECT_RECEIVER_ID);
         latestRequest.setRequester(requester);
         latestRequest.setReceiver(receiver);
         latestRequest.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
         latestRequest.setDescription("some description");
 
         when(requestRepository.findAll()).thenReturn(Collections.singleton(latestRequest));
+        List<MentorshipRequestFilter> filters = getFilters();
+        requestService = new MentorshipRequestService(requestRepository,mentorshipRepository, requestMapper, filters);
 
         List<MentorshipRequestDto> actualList = requestService.getRequests(filterDto);
         List<MentorshipRequestDto> expectedList = new ArrayList<>();
@@ -259,5 +269,11 @@ public class MentorshipRequestServiceTest {
         when(mentorshipRepository.existsById(CORRECT_RECEIVER_ID)).thenReturn(true);
         when(requestRepository.findLatestRequest(CORRECT_REQUESTER_ID, CORRECT_RECEIVER_ID))
                 .thenReturn(Optional.of(latestRequest));
+    }
+
+    private List<MentorshipRequestFilter> getFilters() {
+        return List.of(new MentorshipRequestFilterByDescription(), new MentorshipRequestFilterByReceiver(),
+                new MentorshipRequestFilterByRequester(), new MentorshipRequestFilterByRequestStatus(),
+                new MentorshipRequestFilterByUpdatedTime());
     }
 }

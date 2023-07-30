@@ -14,12 +14,12 @@ import school.faang.user_service.service.GoalInvitationService;
 public class GoalInvitationController {
     private final GoalInvitationService goalInvitationService;
 
-    @PostMapping("/createInvitation/{id}")
+    @PostMapping
     public GoalInvitationDto createInvitation(@RequestBody GoalInvitationDto invitationDto) {
         return goalInvitationService.createInvitation(invitationDto);
     }
 
-    @PostMapping("/acceptInvitation/{id}")
+    @PostMapping("/{id}/accept")
     public void acceptGoalInvitation(long id) {
         goalInvitationService.acceptGoalInvitation(id);
     }

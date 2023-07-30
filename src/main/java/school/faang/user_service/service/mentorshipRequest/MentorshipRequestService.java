@@ -36,7 +36,7 @@ public class MentorshipRequestService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
+    public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         MentorshipRequest mentorshipRequest = mentorshipRequestMapper.toEntity(mentorshipRequestDto, this);
 
         long requesterId = mentorshipRequest.getRequester().getId();
@@ -49,6 +49,8 @@ public class MentorshipRequestService {
         mentorshipRequestValidator.validate(requester, receiver, latestRequest);
 
         mentorshipRequestRepository.save(mentorshipRequest);
+
+        return mentorshipRequestMapper.toDto(mentorshipRequest);
     }
 
     public List<MentorshipRequestDto> getRequests(RequestFilterDto filter) {

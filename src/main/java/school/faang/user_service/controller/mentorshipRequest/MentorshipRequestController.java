@@ -2,7 +2,6 @@ package school.faang.user_service.controller.mentorshipRequest;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -13,7 +12,6 @@ import school.faang.user_service.dto.mentorshipRequest.RequestFilterDto;
 import school.faang.user_service.dto.mentorshipRequest.RequestResponse;
 import school.faang.user_service.service.mentorshipRequest.MentorshipRequestService;
 import school.faang.user_service.util.mentorshipRequest.exception.GetRequestsMentorshipsException;
-import school.faang.user_service.util.mentorshipRequest.exception.RequestMentorshipException;
 import school.faang.user_service.util.mentorshipRequest.exception.UnknownRejectionReasonException;
 import school.faang.user_service.util.mentorshipRequest.validator.ControllerRequestValidator;
 
@@ -25,15 +23,10 @@ public class MentorshipRequestController {
     private final MentorshipRequestService mentorshipRequestService;
     private final ControllerRequestValidator controllerRequestValidator;
 
-    @SneakyThrows
     @PostMapping("/send_request")
-    public ResponseEntity<?> requestMentorship(@RequestBody @Valid MentorshipRequestDto mentorshipRequestDto,
-                                                                      BindingResult bindingResult) {
-        controllerRequestValidator.validateRequest(bindingResult, new RequestMentorshipException());
-
-        mentorshipRequestService.requestMentorship(mentorshipRequestDto);
-
-        return ResponseEntity.ok().build();
+    @ResponseStatus(HttpStatus.OK)
+    public MentorshipRequestDto requestMentorship(@Valid @RequestBody MentorshipRequestDto dto) {
+        return mentorshipRequestService.requestMentorship(dto);
     }
 
     @GetMapping("/requests")

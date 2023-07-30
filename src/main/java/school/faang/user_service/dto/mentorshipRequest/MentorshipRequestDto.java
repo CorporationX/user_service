@@ -6,21 +6,21 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Validated
 public class MentorshipRequestDto {
 
     @NotNull
     private String description;
 
     @NotNull
-    @Min(value = 1, message = "Id can't be lower than 1")
     private Long requesterId;
 
     @NotNull
-    @Min(value = 1, message = "Id can't be lower than 1")
     private Long receiverId;
 }

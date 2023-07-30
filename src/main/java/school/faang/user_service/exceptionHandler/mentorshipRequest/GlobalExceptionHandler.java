@@ -2,6 +2,8 @@ package school.faang.user_service.exceptionHandler.mentorshipRequest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import school.faang.user_service.util.mentorshipRequest.exception.GetRequestsMentorshipsException;
@@ -59,6 +61,21 @@ public class GlobalExceptionHandler {
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleException(MethodArgumentNotValidException e){
+        BindingResult bindingResult = e.getBindingResult();
+        StringBuilder message = new StringBuilder();
+
+        if (bindingResult.hasErrors()) {
+            bindingResult.getAllErrors().forEach(
+                    error -> message.append(error.getDefaultMessage())
+            );
+        }
+
+        return new ResponseEntity<>(new ErrorResponse(message.toString(),
+                HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(NoSuchElementException.class)

@@ -6,6 +6,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
@@ -19,6 +23,7 @@ import school.faang.user_service.repository.recommendation.RecommendationReposit
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -122,4 +127,50 @@ public class RecommendationServiceTest {
         assertEquals(expectedRecommendation, result);
     }
 
+    @Test
+    public void testGetAllUserRecommendations() {
+        Long receiverId = 2L;
+        Pageable pageable = PageRequest.of(0, 5);
+
+        User receiver = new User();
+        receiver.setId(receiverId);
+
+        Recommendation recommendation1 = new Recommendation();
+        recommendation1.setId(1L);
+        recommendation1.setContent("recommendation 1");
+        recommendation1.setReceiver(receiver);
+        recommendation1.setCreatedAt(LocalDateTime.now());
+        recommendation1.setUpdatedAt(LocalDateTime.now());
+
+        Recommendation recommendation2 = new Recommendation();
+        recommendation2.setId(2L);
+        recommendation2.setContent("recommendation 2");
+        recommendation2.setReceiver(receiver);
+        recommendation2.setCreatedAt(LocalDateTime.now());
+        recommendation2.setUpdatedAt(LocalDateTime.now());
+
+        List<Recommendation> recommendations = new ArrayList<>();
+        recommendations.add(recommendation1);
+        recommendations.add(recommendation2);
+
+        List<RecommendationDto> recommendationDtoList = new ArrayList<>();
+        RecommendationDto recommendationDto1 = new RecommendationDto(1L, 1L, 2L, "recommendation 1", List.of(new SkillOfferDto[]{}), LocalDateTime.now());
+        RecommendationDto recommendationDto2 = new RecommendationDto(2L, 4L, 2L, "recommendation 2", List.of(new SkillOfferDto[]{}), LocalDateTime.now());
+        recommendationDtoList.add(recommendationDto1);
+        recommendationDtoList.add(recommendationDto2);
+        Page<Recommendation> recommendationPage = new PageImpl<>(recommendations);
+        Page<RecommendationDto> recommendationDtoPage = new PageImpl<>(recommendationDtoList);
+
+        when(recommendationRepository.findAllByReceiverId(receiverId, pageable)).thenReturn(recommendationPage);
+        when(recommendationMapper.toDto(recommendation1)).thenReturn(recommendationDto1);
+        when(recommendationMapper.toDto(recommendation2)).thenReturn(recommendationDto2);
+
+        Page<RecommendationDto> result = recommendationService.getAllUserRecommendations(receiverId, pageable);
+
+        verify(recommendationRepository).findAllByReceiverId(receiverId, pageable);
+        verify(recommendationMapper).toDto(recommendation1);
+        verify(recommendationMapper).toDto(recommendation2);
+        assertEquals(2, recommendationDtoList.size());
+        assertEquals(recommendationDtoPage, result);
+    }
 }

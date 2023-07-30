@@ -122,4 +122,12 @@ public class RecommendationServiceTest {
         assertEquals(expectedRecommendation, result);
     }
 
+    @Test
+    public void testDelete() {
+        Long recommendationId = 1L;
+        doNothing().when(recommendationRepository).deleteById(recommendationId);
+        recommendationService.delete(recommendationId);
+        verify(recommendationRepository, times(1)).deleteById(recommendationId);
+    }
+
 }

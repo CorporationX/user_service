@@ -11,6 +11,3 @@ CREATE TABLE google_token (
                               updated_at TIMESTAMP,
                               CONSTRAINT fk_user_token_id FOREIGN KEY (user_id) REFERENCES users (id)
 );
-
-INSERT INTO event (title, description, start_date, end_date, location, max_attendees, user_id, type, status)
-VALUES ('Заголовок события', 'Описание события', '2023-07-26 10:00:00', '2023-07-26 15:00:00', 'Местоположение события', 100, 1, 1, 1);

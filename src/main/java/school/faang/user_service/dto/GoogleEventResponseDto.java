@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class GoogleEventLinkDto {
+public class GoogleEventResponseDto {
+    private String message;
     private String link;
 }

@@ -29,13 +29,11 @@ public class MentorshipRequestController {
         return mentorshipRequestService.requestMentorship(dto);
     }
 
-//    @GetMapping("/requests")
-//    public ResponseEntity<RequestResponse> getRequests(@RequestBody @Valid RequestFilterDto requestFilterDto,
-//                                       BindingResult bindingResult) {
-//        controllerRequestValidator.validateRequest(bindingResult, new GetRequestsMentorshipsException());
-//
-//        return ResponseEntity.ok(new RequestResponse(mentorshipRequestService.getRequests(requestFilterDto)));
-//    }
+    @GetMapping("/requests")
+    @ResponseStatus(HttpStatus.OK)
+    public RequestResponse getRequests(@Valid @RequestBody RequestFilterDto filter) {
+        return new RequestResponse(mentorshipRequestService.getRequests(filter));
+    }
 //
 //    @PostMapping("/accept/{id}")
 //    public ResponseEntity<?> acceptRequest(@PathVariable("id") long id) {

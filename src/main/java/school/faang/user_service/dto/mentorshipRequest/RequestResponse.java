@@ -8,5 +8,5 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 public class RequestResponse {
-    List<MentorshipRequestDto> mentorshipRequestDtos;
+    List<MentorshipRequestDto> dtos;
 }

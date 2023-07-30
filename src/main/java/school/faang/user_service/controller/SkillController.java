@@ -1,7 +1,6 @@
 package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,7 +33,6 @@ public class SkillController {
         validateId(userId);
         return skillService.getUserSkills(userId);
     }
-
 
     @PutMapping("/offered/{userId}")
     public List<SkillCandidateDto> getOfferedSkills(@PathVariable Long userId) {

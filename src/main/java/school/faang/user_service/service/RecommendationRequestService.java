@@ -7,6 +7,8 @@ import school.faang.user_service.dto.filter.RecommendationRequestFilterDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.filter.RecommendationRequestFilter;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
+import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 
 import java.util.List;
@@ -18,6 +20,8 @@ import java.util.stream.StreamSupport;
 public class RecommendationRequestService {
     private final RecommendationRequestRepository recommendationRequestRepository;
     private final  RecommendationRequestMapper recommendationRequestMapper;
+    private final UserRepository userRepository;
+    private final SkillRepository skillRepository;
     private final List<RecommendationRequestFilter> recommendationRequestFilters;
 
     public RecommendationRequestDto getRequest(long userId) {

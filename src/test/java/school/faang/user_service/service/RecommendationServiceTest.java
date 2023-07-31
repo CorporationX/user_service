@@ -165,7 +165,7 @@ public class RecommendationServiceTest {
         when(recommendationMapper.toDto(recommendation1)).thenReturn(recommendationDto1);
         when(recommendationMapper.toDto(recommendation2)).thenReturn(recommendationDto2);
 
-        Page<RecommendationDto> result = recommendationService.getAllUserRecommendations(receiverId, pageable);
+        Page<RecommendationDto> result = recommendationService.getAllUserRecommendations(receiverId, pageable.getPageNumber(), pageable.getPageSize());
 
         verify(recommendationRepository).findAllByReceiverId(receiverId, pageable);
         verify(recommendationMapper).toDto(recommendation1);

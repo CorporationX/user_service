@@ -27,8 +27,10 @@ public class RecommendationController {
         return recommendationService.update(recommendation);
     }
 
-    @GetMapping("{receiverId}")
-    public Page<RecommendationDto> getAllUserRecommendations(@PathVariable Long receiverId, Pageable pageable) {
-        return recommendationService.getAllUserRecommendations(receiverId, pageable);
+    @GetMapping("/{receiverId}")
+    public Page<RecommendationDto> getAllUserRecommendations(@PathVariable Long receiverId,
+                                                             @RequestParam(value = "page") int page,
+                                                             @RequestParam(value = "pageSize") int pageSize) {
+        return recommendationService.getAllUserRecommendations(receiverId, page, pageSize);
     }
 }

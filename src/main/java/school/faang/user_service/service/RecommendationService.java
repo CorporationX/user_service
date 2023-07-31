@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
@@ -60,7 +61,8 @@ public class RecommendationService {
                 recommendationDto.getContent());
     }
 
-    public Page<RecommendationDto> getAllUserRecommendations(Long receiverId, Pageable pageable) {
+    public Page<RecommendationDto> getAllUserRecommendations(Long receiverId, int page, int pageSize) {
+        Pageable pageable = PageRequest.of(page, pageSize);
         Page<Recommendation> recommendations = recommendationRepository.findAllByReceiverId(receiverId, pageable);
         return recommendations.map(recommendationMapper::toDto);
     }

@@ -23,10 +23,11 @@ import school.faang.user_service.mapper.goal.GoalInvitationMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.util.goal.exception.AcceptingGoalInvitationException;
+import school.faang.user_service.util.goal.exception.GoalInvitationNotFoundException;
 import school.faang.user_service.util.goal.exception.MappingGoalInvitationDtoException;
-import school.faang.user_service.util.goal.validator.GoalInvitationAcceptValidator;
+import school.faang.user_service.util.goal.exception.RejectionGoalInvitationException;
 import school.faang.user_service.util.goal.validator.GoalInvitationServiceValidator;
-import school.faang.user_service.util.goal.validator.GoalInvitationRejectValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,12 +51,6 @@ class GoalInvitationServiceTest {
     @Spy
     private GoalInvitationServiceValidator validator;
 
-    @Mock
-    private GoalInvitationAcceptValidator goalInvitationAcceptValidator;
-
-    @Mock
-    private GoalInvitationRejectValidator goalInvitationRejectValidator;
-
     private List<GoalInvitationFilter> goalFilters = List.of(
             new GoalInvitationInvitedIdFilter(),
             new GoalInvitationInvitedNameFilter(),
@@ -76,8 +71,6 @@ class GoalInvitationServiceTest {
             goalRepository,
             goalInvitationMapper,
             validator,
-            goalInvitationAcceptValidator,
-            goalInvitationRejectValidator,
             goalFilters
         );
     }
@@ -95,7 +88,7 @@ class GoalInvitationServiceTest {
         Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(buildGoalInvitationEntity().getInvited()));
         Mockito.when(userRepository.findById(2L)).thenReturn(Optional.of(buildGoalInvitationEntity().getInviter()));
 
-        MappingGoalInvitationDtoException e = Assertions.assertThrows(MappingGoalInvitationDtoException.class,
+        GoalInvitationNotFoundException e = Assertions.assertThrows(GoalInvitationNotFoundException.class,
                 () -> goalInvitationService.createInvitation(buildGoalInvitationDto()));
         Assertions.assertEquals("Goal not found", e.getMessage());
     }
@@ -123,7 +116,7 @@ class GoalInvitationServiceTest {
     }
 
     @Test
-    void testCreateInvitation_InputsAreCorrect_ShouldSaveGoalInvitation() {
+    void createInvitation_InputsAreCorrect_ShouldSaveGoalInvitation() {
         Mockito.when(goalRepository.findById(Mockito.any())).thenReturn(Optional.of(buildGoalInvitationEntity().getGoal()));
         Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(buildGoalInvitationEntity().getInvited()));
         Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(buildGoalInvitationEntity().getInviter()));
@@ -133,178 +126,148 @@ class GoalInvitationServiceTest {
         Mockito.verify(goalInvitationRepository, Mockito.times(1)).save(Mockito.any());
     }
 
-//    @Test
-//    void testAcceptGoalInvitation_InputsAreCorrect_RequestStatusShouldBeAccepted() {
-//        GoalInvitation goalInvitation = buildGoalInvitationEntity();
-//        Mockito.when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.of(goalInvitation));
-//        Mockito.when(goalInvitationAcceptValidator.validateRequest(Optional.of(goalInvitation)))
-//                        .thenReturn(goalInvitation);
-//
-//        goalInvitationService.acceptGoalInvitation(goalInvitation.getId());
-//
-//        Assertions.assertEquals(RequestStatus.ACCEPTED, goalInvitation.getStatus());
-//    }
+    @Test
+    void acceptInvitation_GoalNotFound_ShouldThrowException() {
+        Mockito.when(goalRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
-//    @Test
-//    void testAcceptGoalInvitation_InputsAreCorrect_GoalInvitationsShouldBeDeletedFromLists() {
-//        GoalInvitation goalInvitation = buildGoalInvitationEntity();
-//        Mockito.when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.of(goalInvitation));
-//        Mockito.when(goalInvitationAcceptValidator.validateRequest(Optional.of(goalInvitation)))
-//                .thenReturn(goalInvitation);
-//
-//        goalInvitationService.acceptGoalInvitation(goalInvitation.getId());
-//
-//        Assertions.assertFalse(goalInvitation.getInviter().getSentGoalInvitations().contains(goalInvitation.getGoal()));
-//        Assertions.assertFalse(goalInvitation.getInvited().getReceivedGoalInvitations().contains(goalInvitation.getGoal()));
-//    }
-//
-//    @Test
-//    void testAcceptGoalInvitation_InputsAreCorrect_GoalShouldBeAddedToList() {
-//        GoalInvitation goalInvitation = buildGoalInvitationEntity();
-//        Mockito.when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.of(goalInvitation));
-//        Mockito.when(goalInvitationAcceptValidator.validateRequest(Optional.of(goalInvitation)))
-//                .thenReturn(goalInvitation);
-//
-//        goalInvitationService.acceptGoalInvitation(goalInvitation.getId());
-//
-//        Assertions.assertTrue(goalInvitation.getGoal().getUsers().contains(goalInvitation.getInvited()));
-//    }
-//
-//    @Test
-//    void testAcceptGoalInvitation_InputsAreCorrect_GoalInvitationShouldBeSaved() {
-//        GoalInvitation goalInvitation = buildGoalInvitationEntity();
-//        Mockito.when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.of(goalInvitation));
-//        Mockito.when(goalInvitationAcceptValidator.validateRequest(Optional.of(goalInvitation)))
-//                .thenReturn(goalInvitation);
-//
-//        goalInvitationService.acceptGoalInvitation(goalInvitation.getId());
-//
-//        Mockito.verify(goalInvitationRepository, Mockito.times(1)).save(goalInvitation);
-//    }
-//
-//    @Test
-//    void testAcceptGoalInvitation_InputsAreIncorrect_ShouldThrowException() {
-//        GoalInvitation goalInvitation = buildGoalInvitationEntity();
-//        Mockito.when(goalInvitationRepository.findById(goalInvitation.getId()))
-//                .thenReturn(Optional.of(goalInvitation));
-//        Mockito.when(goalInvitationAcceptValidator.validateRequest(Optional.of(goalInvitation)))
-//                .thenThrow(RuntimeException.class);
-//
-//        Assertions.assertThrows(RuntimeException.class,
-//                () -> goalInvitationService.acceptGoalInvitation(goalInvitation.getId()));
-//    }
-//
-//    @Test
-//    void testRejectGoalInvitation_InputsAreCorrect_RequestStatusShouldBeRejected() {
-//        GoalInvitation goalInvitation = buildGoalInvitationEntity();
-//        Mockito.when(goalInvitationRepository.findById(goalInvitation.getId()))
-//                .thenReturn(Optional.of(goalInvitation));
-//        Mockito.when(goalInvitationRejectValidator.validateRequest(Optional.of(goalInvitation)))
-//                .thenReturn(goalInvitation);
-//
-//        goalInvitationService.rejectGoalInvitation(goalInvitation.getId());
-//
-//        Assertions.assertEquals(RequestStatus.REJECTED, goalInvitation.getStatus());
-//    }
-//
-//    @Test
-//    void testRejectGoalInvitation_InputsAreCorrect_GoalInvitationsShouldBeDeletedFromLists() {
-//        GoalInvitation goalInvitation = buildGoalInvitationEntity();
-//        Mockito.when(goalInvitationRepository.findById(goalInvitation.getId()))
-//                .thenReturn(Optional.of(goalInvitation));
-//        Mockito.when(goalInvitationRejectValidator.validateRequest(Optional.of(goalInvitation)))
-//                .thenReturn(goalInvitation);
-//
-//        goalInvitationService.rejectGoalInvitation(goalInvitation.getId());
-//
-//        Assertions.assertFalse(goalInvitation.getInviter().getSentGoalInvitations().contains(goalInvitation.getGoal()));
-//        Assertions.assertFalse(goalInvitation.getInvited().getReceivedGoalInvitations().contains(goalInvitation.getGoal()));
-//    }
-//
-//    @Test
-//    void testRejectGoalInvitation_InputsAreCorrect_GoalShouldBeDeletedFromList() {
-//        GoalInvitation goalInvitation = buildGoalInvitationEntity();
-//        Mockito.when(goalInvitationRepository.findById(goalInvitation.getId()))
-//                .thenReturn(Optional.of(goalInvitation));
-//        Mockito.when(goalInvitationRejectValidator.validateRequest(Optional.of(goalInvitation)))
-//                .thenReturn(goalInvitation);
-//
-//        goalInvitationService.rejectGoalInvitation(goalInvitation.getId());
-//
-//        Assertions.assertFalse(goalInvitation.getGoal().getUsers().contains(goalInvitation.getInvited()));
-//    }
-//
-//    @Test
-//    void testRejectGoalInvitation_InputsAreCorrect_GoalInvitationShouldBeSaved() {
-//        GoalInvitation goalInvitation = buildGoalInvitationEntity();
-//        Mockito.when(goalInvitationRepository.findById(goalInvitation.getId()))
-//                .thenReturn(Optional.of(goalInvitation));
-//        Mockito.when(goalInvitationRejectValidator.validateRequest(Optional.of(goalInvitation)))
-//                .thenReturn(goalInvitation);
-//
-//        goalInvitationService.rejectGoalInvitation(goalInvitation.getId());
-//
-//        Mockito.verify(goalInvitationRepository, Mockito.times(1)).save(goalInvitation);
-//    }
-//
-//    @Test
-//    void testRejectGoalInvitation_InputsAreIncorrect_ShouldThrowException() {
-//        GoalInvitation goalInvitation = buildGoalInvitationEntity();
-//        Mockito.when(goalInvitationRepository.findById(goalInvitation.getId()))
-//                .thenReturn(Optional.of(goalInvitation));
-//        Mockito.when(goalInvitationRejectValidator.validateRequest(Optional.of(goalInvitation)))
-//                .thenThrow(RuntimeException.class);
-//
-//        Assertions.assertThrows(RuntimeException.class,
-//                () -> goalInvitationService.rejectGoalInvitation(goalInvitation.getId()));
-//    }
-//
-//    @Test
-//    void testFindUserById_InputsAreIncorrect_ShouldThrowException() {
-//        Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
-//
-//        Assertions.assertThrows(UserNotFoundException.class,
-//                () -> goalInvitationService.findUserById(Mockito.anyLong()));
-//    }
-//
-//    @Test
-//    void testFindUserById_InputsAreCorrect_ShouldReturnUser() {
-//        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(new User()));
-//
-//        goalInvitationService.findUserById(1L);
-//
-//        Mockito.verify(userRepository, Mockito.times(1)).findById(1L);
-//    }
-//
-//    @Test
-//    void testFindGoalById_InputsAreIncorrect_ShouldThrowException() {
-//        Mockito.when(goalRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
-//
-//        Assertions.assertThrows(GoalNotFoundException.class,
-//                () -> goalInvitationService.findGoalById(Mockito.anyLong()));
-//    }
-//
-//    @Test
-//    void testFindGoalById_InputsAreCorrect_ShouldReturnGoal() {
-//        Mockito.when(goalRepository.findById(1L)).thenReturn(Optional.of(new Goal()));
-//
-//        goalInvitationService.findGoalById(1L);
-//
-//        Mockito.verify(goalRepository, Mockito.times(1)).findById(1L);
-//    }
-//
-//    @Test
-//    void testGetInvitations_InputsAreCorrect_ShouldFilter() {
-//        Mockito.when(goalInvitationRepository.findAll())
-//                .thenReturn(getStreamOfGoalInvitations().toList());
-//        List<GoalInvitationDto> expected = List.of(
-//                buildGoalInvitationDto()
-//        );
-//
-//        List<GoalInvitationDto> invitations = goalInvitationService.getInvitations(buildInvitationFilterDto());
-//
-//        Assertions.assertIterableEquals(expected, invitations);
-//    }
+        GoalInvitationNotFoundException e = Assertions.assertThrows(GoalInvitationNotFoundException.class,
+                () -> goalInvitationService.acceptInvitation(1L));
+        Assertions.assertEquals("Goal invitation with this id not found", e.getMessage());
+    }
+
+    @Test
+    void acceptInvitation_AlreadyAccepted_ShouldThrowException() {
+        Mockito.when(goalInvitationRepository.findById(Mockito.any())).thenReturn(Optional.of(
+                GoalInvitation.builder().id(1L).status(RequestStatus.ACCEPTED).build()
+        ));
+
+        AcceptingGoalInvitationException e = Assertions.assertThrows(AcceptingGoalInvitationException.class,
+                () -> goalInvitationService.acceptInvitation(1L));
+        Assertions.assertEquals("Goal invitation is already accepted", e.getMessage());
+    }
+
+    @Test
+    void acceptInvitation_InputsAreCorrect_GoalInvitationsShouldBeDeletedFromLists() {
+        GoalInvitation goalInvitation = buildGoalInvitationEntity();
+        Mockito.when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.of(goalInvitation));
+        Mockito.when(validator.validateToAccept(Optional.of(goalInvitation)))
+                .thenReturn(goalInvitation);
+
+        goalInvitationService.acceptInvitation(goalInvitation.getId());
+
+        Assertions.assertFalse(goalInvitation.getInviter().getSentGoalInvitations().contains(goalInvitation.getGoal()));
+        Assertions.assertFalse(goalInvitation.getInvited().getReceivedGoalInvitations().contains(goalInvitation.getGoal()));
+    }
+
+    @Test
+    void acceptInvitation_InputsAreCorrect_StatusShouldBeAccepted() {
+        GoalInvitation goalInvitation = buildGoalInvitationEntity();
+        Mockito.when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.of(goalInvitation));
+        Mockito.when(validator.validateToAccept(Optional.of(goalInvitation)))
+                .thenReturn(goalInvitation);
+
+        goalInvitationService.acceptInvitation(goalInvitation.getId());
+
+        Assertions.assertEquals(RequestStatus.ACCEPTED, goalInvitation.getStatus());
+    }
+
+    @Test
+    void acceptInvitation_InputsAreCorrect_GoalInvitationShouldBeSaved() {
+        GoalInvitation goalInvitation = buildGoalInvitationEntity();
+        Mockito.when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.of(goalInvitation));
+        Mockito.when(validator.validateToAccept(Optional.of(goalInvitation)))
+                .thenReturn(goalInvitation);
+
+        goalInvitationService.acceptInvitation(goalInvitation.getId());
+
+        Mockito.verify(goalInvitationRepository).save(goalInvitation);
+    }
+
+    @Test
+    void rejectInvitation_GoalNotFound_ShouldThrowException() {
+        Mockito.when(goalRepository.findById(Mockito.any())).thenReturn(Optional.empty());
+
+        RejectionGoalInvitationException e = Assertions.assertThrows(RejectionGoalInvitationException.class,
+                () -> goalInvitationService.rejectInvitation(1L));
+        Assertions.assertEquals("Goal invitation with this id not found", e.getMessage());
+    }
+
+    @Test
+    void rejectInvitation_AlreadyRejected_ShouldThrowException() {
+        Mockito.when(goalInvitationRepository.findById(Mockito.any())).thenReturn(Optional.of(
+                GoalInvitation.builder().id(1L).status(RequestStatus.REJECTED).build()
+        ));
+
+        RejectionGoalInvitationException  e = Assertions.assertThrows(RejectionGoalInvitationException.class,
+                () -> goalInvitationService.rejectInvitation(1L));
+        Assertions.assertEquals("Goal invitation is already rejected", e.getMessage());
+    }
+
+    @Test
+    void rejectInvitation_InputsAreCorrect_RequestStatusShouldBeRejected() {
+        GoalInvitation goalInvitation = buildGoalInvitationEntity();
+        Mockito.when(goalInvitationRepository.findById(goalInvitation.getId()))
+                .thenReturn(Optional.of(goalInvitation));
+        Mockito.when(validator.validateToReject(Optional.of(goalInvitation)))
+                .thenReturn(goalInvitation);
+
+        goalInvitationService.rejectInvitation(goalInvitation.getId());
+
+        Assertions.assertEquals(RequestStatus.REJECTED, goalInvitation.getStatus());
+    }
+
+    @Test
+    void rejectInvitation_InputsAreCorrect_GoalInvitationsShouldBeDeletedFromLists() {
+        GoalInvitation goalInvitation = buildGoalInvitationEntity();
+        Mockito.when(goalInvitationRepository.findById(goalInvitation.getId()))
+                .thenReturn(Optional.of(goalInvitation));
+        Mockito.when(validator.validateToReject(Optional.of(goalInvitation)))
+                .thenReturn(goalInvitation);
+
+        goalInvitationService.rejectInvitation(goalInvitation.getId());
+
+        Assertions.assertFalse(goalInvitation.getInviter().getSentGoalInvitations().contains(goalInvitation.getGoal()));
+        Assertions.assertFalse(goalInvitation.getInvited().getReceivedGoalInvitations().contains(goalInvitation.getGoal()));
+    }
+
+    @Test
+    void rejectInvitation_InputsAreCorrect_GoalShouldBeDeletedFromList() {
+        GoalInvitation goalInvitation = buildGoalInvitationEntity();
+        Mockito.when(goalInvitationRepository.findById(goalInvitation.getId()))
+                .thenReturn(Optional.of(goalInvitation));
+        Mockito.when(validator.validateToReject(Optional.of(goalInvitation)))
+                .thenReturn(goalInvitation);
+
+        goalInvitationService.rejectInvitation(goalInvitation.getId());
+
+        Assertions.assertFalse(goalInvitation.getGoal().getUsers().contains(goalInvitation.getInvited()));
+    }
+
+    @Test
+    void rejectInvitation_InputsAreCorrect_GoalInvitationShouldBeSaved() {
+        GoalInvitation goalInvitation = buildGoalInvitationEntity();
+        Mockito.when(goalInvitationRepository.findById(goalInvitation.getId()))
+                .thenReturn(Optional.of(goalInvitation));
+        Mockito.when(validator.validateToReject(Optional.of(goalInvitation)))
+                .thenReturn(goalInvitation);
+
+        goalInvitationService.rejectInvitation(goalInvitation.getId());
+
+        Mockito.verify(goalInvitationRepository, Mockito.times(1)).save(goalInvitation);
+    }
+
+    @Test
+    void testGetInvitations_InputsAreCorrect_ShouldFilter() {
+        Mockito.when(goalInvitationRepository.findAll())
+                .thenReturn(getStreamOfGoalInvitations().toList());
+        List<GoalInvitationDto> expected = List.of(
+                buildGoalInvitationDto()
+        );
+
+        List<GoalInvitationDto> invitations = goalInvitationService.getInvitations(buildInvitationFilterDto());
+
+        Assertions.assertIterableEquals(expected, invitations);
+    }
 
     private GoalInvitation buildGoalInvitationEntity() {
         return GoalInvitation.builder()

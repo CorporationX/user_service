@@ -3,7 +3,6 @@ package school.faang.user_service.controller.goal;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +15,6 @@ import school.faang.user_service.dto.goal.FilteredResponse;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.service.goal.GoalInvitationService;
-import school.faang.user_service.util.goal.exception.UseFiltersException;
 import school.faang.user_service.util.goal.validator.GoalInvitationControllerValidator;
 
 @RestController
@@ -35,24 +33,21 @@ public class GoalInvitationController {
         return goalInvitationService.createInvitation(goalInvitationDto);
     }
 
-//    @PutMapping("/accept/{id}")
-//    public ResponseEntity<?> acceptGoalInvitation(@PathVariable Long id) {
-//        goalInvitationValidator.validateInvitation(id);
-//
-//        return ResponseEntity.ok(goalInvitationService.acceptGoalInvitation(id));
-//    }
-//
-//    @PutMapping("/reject/{id}")
-//    public ResponseEntity<?> rejectGoalInvitation(@PathVariable Long id) {
-//        goalInvitationValidator.validateInvitation(id);
-//
-//        return ResponseEntity.ok(goalInvitationService.rejectGoalInvitation(id));
-//    }
-//
-//    @GetMapping("/get")
-//    public ResponseEntity<FilteredResponse> getInvitations(@RequestBody InvitationFilterDto invitationFilterDto) {
-//        goalInvitationValidator.validateInvitation(invitationFilterDto, new UseFiltersException());
-//
-//        return ResponseEntity.ok(new FilteredResponse(goalInvitationService.getInvitations(invitationFilterDto)));
-//    }
+    @PutMapping("/{id}/accept")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public GoalInvitationDto acceptInvitation(@PathVariable Long id) {
+        return goalInvitationService.acceptInvitation(id);
+    }
+
+    @PutMapping("/{id}/reject")
+    @ResponseStatus(HttpStatus.OK)
+    public GoalInvitationDto rejectInvitation(@PathVariable Long id) {
+        return goalInvitationService.rejectInvitation(id);
+    }
+
+    @GetMapping("/get")
+    @ResponseStatus(HttpStatus.OK)
+    public FilteredResponse getInvitations(@RequestBody InvitationFilterDto invitationFilterDto) {
+        return new FilteredResponse(goalInvitationService.getInvitations(invitationFilterDto));
+    }
 }

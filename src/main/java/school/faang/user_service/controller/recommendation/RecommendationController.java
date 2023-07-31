@@ -26,6 +26,11 @@ public class RecommendationController {
         return recommendationService.update(recommendation);
     }
 
+    @DeleteMapping("/recommendations/{id}")
+    public void deleteRecommendation(@PathVariable Long id) {
+        recommendationService.delete(id);
+    }
+
     @GetMapping("recommendations/receiver/{receiverId}")
     public Page<RecommendationDto> getAllUserRecommendations(@PathVariable Long receiverId,
                                                              @RequestParam(value = "page") int page,
@@ -33,13 +38,10 @@ public class RecommendationController {
         return recommendationService.getAllUserRecommendations(receiverId, page, pageSize);
     }
 
-    @DeleteMapping("/recommendations/{id}")
-    public void deleteRecommendation(@PathVariable Long id) {
-        recommendationService.delete(id);
-    }
-
     @GetMapping("/recommendations/author/{authorId}")
-    public Page<RecommendationDto> getAllGivenRecommendations(@PathVariable Long authorId, Pageable pageable) {
-        return recommendationService.getAllGivenRecommendations(authorId, pageable);
+    public Page<RecommendationDto> getAllGivenRecommendations(@PathVariable Long authorId,
+                                                              @RequestParam(value = "page") int page,
+                                                              @RequestParam(value = "pageSize") int pageSize) {
+        return recommendationService.getAllGivenRecommendations(authorId, page, pageSize);
     }
 }

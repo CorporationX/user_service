@@ -185,7 +185,7 @@ public class RecommendationServiceTest {
         assertEquals(recommendationDtoPage, result);
     }
     @Test
-    public void testGetAllUserRecommendations() {
+    public void testGetAllGivenRecommendations() {
         Long authorId = 2L;
         Pageable pageable = PageRequest.of(0, 5);
 
@@ -223,7 +223,7 @@ public class RecommendationServiceTest {
         when(recommendationMapper.toDto(recommendation1)).thenReturn(recommendationDto1);
         when(recommendationMapper.toDto(recommendation2)).thenReturn(recommendationDto2);
 
-        Page<RecommendationDto> result = recommendationService.getAllGivenRecommendations(authorId, pageable);
+        Page<RecommendationDto> result = recommendationService.getAllGivenRecommendations(authorId, pageable.getPageNumber(), pageable.getPageSize());
 
         verify(userRepository).findById(authorId);
         verify(recommendationRepository).findAllByAuthorId(authorId, pageable);

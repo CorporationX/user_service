@@ -21,13 +21,12 @@ public class GoogleCalendarController {
     private final GoogleCalendarService googleCalendarService;
 
     @PostMapping("/{userId}/event/{eventId}")
-    public GoogleEventResponseDto pushEvent(@PathVariable Long userId, @PathVariable Long eventId) {
+    public GoogleEventResponseDto addEventToGoogle(@PathVariable Long userId, @PathVariable Long eventId) {
         try {
             return googleCalendarService.createEvent(userId, eventId);
         } catch (Exception e) {
             log.error("Failed to push event to Google Calendar for user with id:{}\nException: {}",
                     userId, e.getMessage());
-            e.printStackTrace();
             return GoogleEventResponseDto.builder().build();
         }
     }

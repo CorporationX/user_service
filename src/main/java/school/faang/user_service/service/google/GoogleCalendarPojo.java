@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Data
 @Component
-public class GoogleCalendarProperties {
+public class GoogleCalendarPojo {
     @Value("${spring.google.calendar.application-name}")
     private String applicationName;
     @Value("${spring.google.calendar.credentials-file-path}")

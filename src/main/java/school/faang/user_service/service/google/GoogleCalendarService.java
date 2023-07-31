@@ -35,9 +35,10 @@ public class GoogleCalendarService {
     private final GoogleTokenRepository googleTokenRepository;
     private final EventService eventService;
     private final UserService userService;
-    private final GoogleCalendarProperties properties;
+    private final GoogleCalendarPojo calendarPojo;
 
-    public GoogleEventResponseDto createEvent(Long userId, Long eventId) throws GeneralSecurityException, IOException {
+    public GoogleEventResponseDto createEvent(Long userId, Long eventId)
+            throws GeneralSecurityException, IOException {
         Event event = eventService.getEvent(eventId);
         User user = userService.getUser(userId);
 
@@ -62,7 +63,7 @@ public class GoogleCalendarService {
 
         // Inits and inserts event into Google Calendar
         com.google.api.services.calendar.model.Event googleEvent = mapToGoogleEvent(event, service);
-        googleEvent = service.events().insert(properties.getCalendarId(), googleEvent).execute();
+        googleEvent = service.events().insert(calendarPojo.getCalendarId(), googleEvent).execute();
 
         return getResponse(googleEvent.getHtmlLink());
     }
@@ -74,7 +75,7 @@ public class GoogleCalendarService {
 
         // Returns authorization url
         return flow.newAuthorizationUrl()
-                .setRedirectUri(properties.getRedirectUri())
+                .setRedirectUri(calendarPojo.getRedirectUri())
                 .setState(userId + "-" + eventId)
                 .build();
     }
@@ -87,7 +88,7 @@ public class GoogleCalendarService {
 
         // Creates and saves new user's credential from callback response authorization code
         TokenResponse response = flow.newTokenRequest(code)
-                .setRedirectUri(properties.getRedirectUri())
+                .setRedirectUri(calendarPojo.getRedirectUri())
                 .execute();
         Credential credential = flow.createAndStoreCredential(response, userId);
         Calendar service = getService(HTTP_TRANSPORT, credential);
@@ -96,7 +97,7 @@ public class GoogleCalendarService {
         // Но не уверен стоит ли делать это в коллбэк методе
         Event event = eventService.getEvent(Long.parseLong(eventId));
         com.google.api.services.calendar.model.Event googleEvent = mapToGoogleEvent(event, service);
-        googleEvent = service.events().insert(properties.getCalendarId(), googleEvent).execute();
+        googleEvent = service.events().insert(calendarPojo.getCalendarId(), googleEvent).execute();
 
         return getResponse(googleEvent.getHtmlLink());
     }
@@ -110,7 +111,7 @@ public class GoogleCalendarService {
                 .setLocation(event.getLocation());
 
         // Gets actual timezone from user's Google calendar
-        String userTimeZone = service.calendars().get(properties.getCalendarId()).execute().getTimeZone();
+        String userTimeZone = service.calendars().get(calendarPojo.getCalendarId()).execute().getTimeZone();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
         ZonedDateTime zonedStart = ZonedDateTime.of(event.getStartDate(), ZoneId.of(userTimeZone));
         ZonedDateTime zonedEnd = ZonedDateTime.of(event.getEndDate(), ZoneId.of(userTimeZone));
@@ -128,23 +129,23 @@ public class GoogleCalendarService {
     }
 
     private Calendar getService(HttpTransport HTTP_TRANSPORT, Credential credential) {
-        return new Calendar.Builder(HTTP_TRANSPORT, properties.getJsonFactory(), credential)
-                .setApplicationName(properties.getApplicationName())
+        return new Calendar.Builder(HTTP_TRANSPORT, calendarPojo.getJsonFactory(), credential)
+                .setApplicationName(calendarPojo.getApplicationName())
                 .build();
     }
 
     private GoogleClientSecrets getClientSecrets() throws IOException {
-        InputStream in = GoogleCalendarService.class.getResourceAsStream(properties.getCredentialsFile());
+        InputStream in = GoogleCalendarService.class.getResourceAsStream(calendarPojo.getCredentialsFile());
         if (in == null) {
-            throw new FileNotFoundException("File not found: " + properties.getCredentialsFile());
+            throw new FileNotFoundException("File not found: " + calendarPojo.getCredentialsFile());
         }
-        return GoogleClientSecrets.load(properties.getJsonFactory(), new InputStreamReader(in));
+        return GoogleClientSecrets.load(calendarPojo.getJsonFactory(), new InputStreamReader(in));
     }
 
     private GoogleAuthorizationCodeFlow getFlow(HttpTransport HTTP_TRANSPORT, GoogleClientSecrets clientSecrets)
             throws IOException {
         return new GoogleAuthorizationCodeFlow
-                .Builder(HTTP_TRANSPORT, properties.getJsonFactory(), clientSecrets, properties.getScopes())
+                .Builder(HTTP_TRANSPORT, calendarPojo.getJsonFactory(), clientSecrets, calendarPojo.getScopes())
                 .setDataStoreFactory(new JpaDataStoreFactory(googleTokenRepository))
                 .setAccessType("offline")
                 .build();

@@ -9,27 +9,34 @@ import school.faang.user_service.service.SkillService;
 
 import java.util.List;
 
+
 @Controller
 @RequiredArgsConstructor
 public class SkillController {
     private final SkillService skillService;
 
     public SkillDto create(SkillDto skill) {
-        validateUserId(skill);
+        throwIfTrue(skill == null, "skill cannot be null");
         return skillService.create(skill);
     }
 
-    public List<SkillDto> getUserSkills(long userId) {
+    public List<SkillDto> getUserSkills(Long userId) {
         return skillService.getUserSkills(userId);
     }
 
-    public List<SkillCandidateDto> getOfferedSkills(long userId) {
+    public List<SkillCandidateDto> getOfferedSkills(Long userId) {
         return skillService.getOfferedSkills(userId);
     }
 
-    private void validateUserId(SkillDto skill) {
-        if (skill == null || skill.getTitle() == null) {
-            throw new DataValidationException("skill cannot be empty");
+    public SkillDto acquireSkillFromOffers(Long skillId, Long userId) {
+        throwIfTrue(skillId == null || userId == null, "skillId or userId cannot be null");
+        return skillService.acquireSkillFromOffers(skillId, userId);
+    }
+
+    private void throwIfTrue(boolean condition, String errorMessage) {
+        if (condition) {
+            throw new DataValidationException(errorMessage);
         }
     }
 }
+

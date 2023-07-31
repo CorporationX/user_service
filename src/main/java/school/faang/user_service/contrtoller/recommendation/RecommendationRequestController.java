@@ -1,9 +1,7 @@
 package school.faang.user_service.contrtoller.recommendation;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.service.RecommendationRequestService;
 
@@ -16,8 +14,8 @@ public class RecommendationRequestController {
     private final RecommendationRequestService service;
 
 
-    @GetMapping("/getRequestRecommendation")
-    public RecommendationRequestDto requestRecommendation(RecommendationRequestDto recommendationRequest) {
+    @PostMapping("/request")
+    public RecommendationRequestDto requestRecommendation(@RequestBody RecommendationRequestDto recommendationRequest) {
         validateRequest(recommendationRequest);
         return service.create(recommendationRequest);
     }

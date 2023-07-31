@@ -21,7 +21,7 @@ public class GoogleCalendarController {
     private final GoogleCalendarService googleCalendarService;
 
     @PostMapping("/{userId}/event/{eventId}")
-    public GoogleEventResponseDto addEventToGoogle(@PathVariable Long userId, @PathVariable Long eventId) {
+    public GoogleEventResponseDto createEvent(@PathVariable Long userId, @PathVariable Long eventId) {
         try {
             return googleCalendarService.createEvent(userId, eventId);
         } catch (Exception e) {

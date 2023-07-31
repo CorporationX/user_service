@@ -8,8 +8,10 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exeption.DataValidationException;
+import school.faang.user_service.service.filters.user.UserCountryFilter;
 import school.faang.user_service.service.filters.user.UserEmailFilter;
 import school.faang.user_service.service.filters.user.UserFilter;
 import school.faang.user_service.service.filters.user.UserNameFilter;
@@ -46,15 +48,18 @@ public class SubscriptionServiceTest {
         this.userFilters = new ArrayList<>();
         userFilters.add(new UserEmailFilter());
         userFilters.add(new UserNameFilter());
+        userFilters.add(new UserCountryFilter());
         subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, userFilters);
         user1 = User.builder()
                 .id(1L)
                 .username("46")
+                .country(new Country(1, "Russia", new ArrayList<>()))
                 .email("46@gmail.com")
                 .build();
         user2 = User.builder()
                 .id(2L)
                 .username("Angie")
+                .country(new Country(2, "New Zealand", new ArrayList<>()))
                 .email("Angie@gmail.com")
                 .build();
         users = new ArrayList<>();
@@ -134,5 +139,32 @@ public class SubscriptionServiceTest {
     public void followersCount(){
         subscriptionService.getFollowersCount(3L);
         verify(subscriptionRepository).findFollowersAmountByFolloweeId(3L);
+    }
+
+    @Test
+    public void getFollowings_NoFilter(){
+        List<UserDto> expectedResult = users.stream().map(userMapper::toDto).toList();
+        UserFilterDto filterDto = null;
+
+        when(subscriptionRepository.findByFollowerId(3L)).thenReturn(users.stream());
+        List<UserDto> result = subscriptionService.getFollowing(3l, filterDto);
+
+        assertEquals(expectedResult, result);
+    }
+
+    @Test
+    public void getFollowings_WithFilters(){
+        long userId = 3L;
+        UserFilterDto filterDto = UserFilterDto.builder()
+                .countryPattern("Russia")
+                .build();
+
+        Stream<User> userStream = users.stream();
+        List<UserDto> expectedResult = usersDto.stream().filter(user -> user.getUsername().equals("46")).toList();
+
+        when(subscriptionRepository.findByFolloweeId(userId)).thenReturn(userStream);
+        List<UserDto> result = subscriptionService.getFollowers(userId, filterDto);
+
+        assertEquals(expectedResult, result);
     }
 }

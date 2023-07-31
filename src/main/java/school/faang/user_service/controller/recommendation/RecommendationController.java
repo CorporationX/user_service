@@ -26,7 +26,7 @@ public class RecommendationController {
         return recommendationService.update(recommendation);
     }
 
-    @GetMapping("/{receiverId}")
+    @GetMapping("recommendations/receiver/{receiverId}")
     public Page<RecommendationDto> getAllUserRecommendations(@PathVariable Long receiverId,
                                                              @RequestParam(value = "page") int page,
                                                              @RequestParam(value = "pageSize") int pageSize) {

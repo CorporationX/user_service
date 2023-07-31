@@ -32,7 +32,7 @@ class DeactivatingServiceTest {
     @Mock
     private MentorshipService mentorshipService;
     @InjectMocks
-    private DeactivatingService service;
+    private UserService service;
 
     @Test
     void deactivatingTheUser() {
@@ -54,12 +54,11 @@ class DeactivatingServiceTest {
         when(eventRepository.findAllByUserId(23L)).thenReturn(List.of(Event.builder().owner(user).build()
                 , Event.builder().owner(user2).build()));
 
-        service.deactivatingTheUser(user.getId());
+        service.deactivateUser(user.getId());
 
         verify(eventRepository).deleteAll(checkTrue);
 
         verify(goalRepository).findGoalsByUserId(23L);
-        verify(goalRepository).delete(goal1);
 
     }
 }

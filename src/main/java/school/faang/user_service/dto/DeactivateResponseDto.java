@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class DtoDeactiv {
-    private String text;
-    private long id;
+public class DeactivateResponseDto {
+    private String message;
+    private long userId;
 }

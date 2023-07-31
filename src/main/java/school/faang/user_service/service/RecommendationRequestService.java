@@ -1,6 +1,5 @@
 package school.faang.user_service.service;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.RecommendationRequestDto;
@@ -18,11 +17,8 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class RecommendationRequestService {
-    @Getter
     private final static String REQUESTER_OR_RECEIVER_NOT_FOUND = "Requester or receiver not found";
-    @Getter
     private final static String REQUEST_IS_PENDING = "Request is pending";
-    @Getter
     private final static String SKILL_NOT_FOUND = "Skill not found";
 
     private final RecommendationRequestRepository recommendationRequestRepository;
@@ -45,13 +41,12 @@ public class RecommendationRequestService {
     private void checkRequestAvailability(RecommendationRequestDto recommendationRequest) {
         long receiverId = recommendationRequest.getReceiverId();
         long requesterId = recommendationRequest.getRequesterId();
-        Optional<RecommendationRequest> lastRequest;
 
         if (!isRequesterAndReceiverExist(requesterId, receiverId)) {
             throw new IllegalArgumentException(REQUESTER_OR_RECEIVER_NOT_FOUND);
         }
 
-        lastRequest = recommendationRequestRepository.findLatestPendingRequest(requesterId, receiverId);
+        Optional<RecommendationRequest> lastRequest = recommendationRequestRepository.findLatestPendingRequest(requesterId, receiverId);
         if (lastRequest.isPresent()) {
             LocalDateTime prevRequestsDate = lastRequest.get().getUpdatedAt();
             LocalDateTime curRequestDate = recommendationRequest.getCreatedAt();

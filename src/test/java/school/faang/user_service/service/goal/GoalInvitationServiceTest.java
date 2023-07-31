@@ -137,10 +137,16 @@ class GoalInvitationServiceTest {
 
     @Test
     void acceptInvitation_AlreadyAccepted_ShouldThrowException() {
-        Mockito.when(goalInvitationRepository.findById(Mockito.any())).thenReturn(Optional.of(
-                GoalInvitation.builder().id(1L).status(RequestStatus.ACCEPTED).build()
-        ));
+        User user = Mockito.spy(User.class);
+        GoalInvitation goalInvitation = Mockito.spy(GoalInvitation.class);
+        goalInvitation.setId(1L);
+        goalInvitation.setStatus(RequestStatus.ACCEPTED);
 
+        Mockito.when(goalInvitation.getInvited()).thenReturn(user);
+        Mockito.when(user.getGoals()).thenReturn(List.of(new Goal()));
+        Mockito.when(goalInvitationRepository.findById(Mockito.any())).thenReturn(Optional.of(
+                goalInvitation
+        ));
         AcceptingGoalInvitationException e = Assertions.assertThrows(AcceptingGoalInvitationException.class,
                 () -> goalInvitationService.acceptInvitation(1L));
         Assertions.assertEquals("Goal invitation is already accepted", e.getMessage());

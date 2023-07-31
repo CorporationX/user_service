@@ -1,65 +1,215 @@
 package school.faang.user_service.service;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import school.faang.user_service.dto.RecommendationRequestDto;
-import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.dto.SkillRequestDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.mapper.RecommendationRequestMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
+import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 
 import java.time.DateTimeException;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(org.mockito.junit.jupiter.MockitoExtension.class)
 class RecommendationRequestServiceTest {
     @Mock
-    private RecommendationRequestRepository recommendationRepository;
+    RecommendationRequestRepository recommendationRequestRepository;
     @Mock
-    private UserRepository userRepository;
+    SkillRequestRepository skillRequestRepository;
+    @Mock
+    UserRepository userRepository;
+    @Spy
+    RecommendationRequestMapperImpl recommendationRequestMapper;
     @InjectMocks
-    private RecommendationRequestService recommendationRequestService;
-    RecommendationRequestDto recommendationRequestDto;
+    RecommendationRequestService service;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-        recommendationRequestDto = new RecommendationRequestDto(1, "message", RequestStatus.ACCEPTED, new ArrayList<>(), 2, 5, LocalDateTime.now(), null);
-        Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(new User()));
+    @ParameterizedTest
+    @MethodSource("getId")
+    @DisplayName("Requester and receiver are the same")
+    void requesterAndReceiverAreTheSame(long id) {
+        RecommendationRequestDto dto = new RecommendationRequestDto();
+        dto.setRequesterId(id);
+        dto.setReceiverId(id);
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> service.create(dto));
+        assertEquals("Requester and receiver are the same", exception.getMessage());
     }
 
-    @Test
-    @DisplayName("Requester and receiver exist")
-    void requesterAndReceiverExist_test() {
-        Assertions.assertDoesNotThrow(() -> recommendationRequestService.create(recommendationRequestDto));
-        Mockito.verify(userRepository, Mockito.times(2)).findById(Mockito.anyLong());
+    @ParameterizedTest
+    @MethodSource("getIds")
+    @DisplayName("Receiver or requester not found")
+    void receiverOrRequesterNotFound(long receiverId, long requesterId) {
+        when(userRepository.findById(receiverId))
+                .thenReturn(Optional.empty());
+        when(userRepository.findById(requesterId))
+                .thenReturn(Optional.of(new User()));
+        RecommendationRequestDto dto = new RecommendationRequestDto();
+        dto.setReceiverId(receiverId);
+        dto.setRequesterId(requesterId);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> service.create(dto));
+        assertEquals("Requester or receiver not found", exception.getMessage());
     }
 
-    @Test
-    @DisplayName("Requester and receiver not exist")
-    void requesterAndReceiverNotExist_test() {
-        Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
-        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> recommendationRequestService.create(recommendationRequestDto));
-        Assertions.assertEquals(exception.getMessage(), RecommendationRequestService.getREQUESTER_OR_RECEIVER_NOT_FOUND());
+    @ParameterizedTest
+    @MethodSource("getIntFrom1To5")
+    @DisplayName("Request is pending")
+    void requestIsPending(int month) {
+        LocalDateTime now = LocalDateTime.now();
+
+        RecommendationRequest lastRequest = new RecommendationRequest();
+        lastRequest.setUpdatedAt(now.minusMonths(month));
+
+        RecommendationRequestDto curRequest = new RecommendationRequestDto();
+        curRequest.setRequesterId(1L);
+        curRequest.setReceiverId(2L);
+        curRequest.setCreatedAt(now);
+
+        when(recommendationRequestRepository.findLatestPendingRequest(anyLong(), anyLong())).
+                thenReturn(Optional.of(lastRequest));
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(new User()));
+        DateTimeException exception = assertThrows(DateTimeException.class,
+                () -> service.create(curRequest));
+        assertEquals("Request is pending", exception.getMessage());
     }
 
-    @Test
-    @DisplayName("Between requests less than 6 months. Must be error")
-    void betweenRequestsLessThan6Months_test() {
+    @ParameterizedTest
+    @MethodSource("getId")
+    @DisplayName("Skill not found")
+    void skillNotFound(long skillId) {
+        SkillRequestDto skillDto = new SkillRequestDto();
+        skillDto.setSkillId(skillId);
+
+        RecommendationRequestDto requestDto = new RecommendationRequestDto();
+        requestDto.setReceiverId(1L);
+        requestDto.setRequesterId(2L);
+        requestDto.setSkillRequests(List.of(skillDto));
+
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(new User()));
+        when(skillRequestRepository.existsById(skillId))
+                .thenReturn(false);
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> service.create(requestDto));
+        assertEquals("Skill not found", exception.getMessage());
+    }
+
+    @ParameterizedTest
+    @MethodSource("getIds")
+    @DisplayName("Verify skill request repository creating request")
+    void verifySkillRequestRepositoryCreatingRequest(long skillId, long skillRequestId) {
+        SkillRequestDto skillDto = new SkillRequestDto();
+        skillDto.setId(skillRequestId);
+        skillDto.setSkillId(skillId);
+
+        RecommendationRequestDto requestDto = new RecommendationRequestDto();
+        requestDto.setRequesterId(1L);
+        requestDto.setReceiverId(2L);
+        requestDto.setSkillRequests(List.of(skillDto));
+
+        when(skillRequestRepository.existsById(skillId))
+                .thenReturn(true);
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(new User()));
+
+        service.create(requestDto);
+
+        verify(skillRequestRepository)
+                .create(skillRequestId, skillId);
+    }
+
+    @ParameterizedTest
+    @MethodSource("getRequestData")
+    @DisplayName("Verify recommendation request repository creating request")
+    void verifyRecommendationRequestRepositoryCreatingRequest(long requesterId, long receiverId, String message) {
+        User receiver = new User();
+        User requester = new User();
+        receiver.setId(receiverId);
+        requester.setId(requesterId);
         RecommendationRequest request = new RecommendationRequest();
-        request.setUpdatedAt(recommendationRequestDto.getCreatedAt().minus(5, ChronoUnit.MONTHS));
-        Mockito.when(recommendationRepository.findLatestPendingRequest(2, 5)).thenReturn(Optional.of(request));
-        DateTimeException exception = Assertions.assertThrows(DateTimeException.class, () -> recommendationRequestService.create(recommendationRequestDto));
-        Assertions.assertEquals(exception.getMessage(), RecommendationRequestService.getREQUEST_IS_PENDING());
+        request.setRequester(requester);
+        request.setReceiver(receiver);
+        request.setMessage(message);
+
+        RecommendationRequestDto requestDto = new RecommendationRequestDto();
+        requestDto.setSkillRequests(new ArrayList<>());
+        requestDto.setRequesterId(requesterId);
+        requestDto.setReceiverId(receiverId);
+        requestDto.setMessage(message);
+
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(new User()));
+        when(recommendationRequestRepository.create(requesterId, receiverId, message))
+                .thenReturn(request);
+
+        RecommendationRequestDto created = service.create(requestDto);
+
+        assertAll(() -> {
+            assertEquals(requesterId, created.getRequesterId());
+            assertEquals(receiverId, created.getReceiverId());
+            assertEquals(message, created.getMessage());
+        });
     }
 
+    private static Stream<Arguments> getRequestData() {
+        return Stream.of(
+                Arguments.of(29L, 10L, "Java"),
+                Arguments.of(100L, 28746L, "Knife"),
+                Arguments.of(321312L, 1L, "Kotlin"),
+                Arguments.of(38L, 32L, "CI/CD")
+        );
+    }
+
+    private static Stream<Arguments> getId() {
+        return Stream.of(
+                Arguments.of(1L),
+                Arguments.of(3L),
+                Arguments.of(5L),
+                Arguments.of(100L),
+                Arguments.of(5213L)
+        );
+    }
+
+    private static Stream<Arguments> getIntFrom1To5() {
+        return Stream.of(
+                Arguments.of(0),
+                Arguments.of(1),
+                Arguments.of(2),
+                Arguments.of(3),
+                Arguments.of(4),
+                Arguments.of(5)
+        );
+    }
+
+    private static Stream<Arguments> getIds() {
+        return Stream.of(
+                Arguments.of(1L, 2L),
+                Arguments.of(2L, 1L),
+                Arguments.of(29L, 30L),
+                Arguments.of(1L, 100L),
+                Arguments.of(1321312, 432432),
+                Arguments.of(100L, 1L)
+        );
+    }
 }

@@ -17,9 +17,11 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class RecommendationRequestService {
-    private final static String REQUESTER_OR_RECEIVER_NOT_FOUND = "Requester or receiver not found";
-    private final static String REQUEST_IS_PENDING = "Request is pending";
-    private final static String SKILL_NOT_FOUND = "Skill not found";
+    private final String REQUESTER_OR_RECEIVER_NOT_FOUND = "Requester or receiver not found";
+    private final String REQUESTER_AND_RECEIVER_SAME = "Requester and receiver are the same";
+    private final String REQUEST_IS_PENDING = "Request is pending";
+    private final String SKILL_NOT_FOUND = "Skill not found";
+    private final int REQUEST_TIME_LIMIT = 6;
 
     private final RecommendationRequestRepository recommendationRequestRepository;
     private final SkillRequestRepository skillRequestRepository;
@@ -32,8 +34,8 @@ public class RecommendationRequestService {
         long requesterId = recommendationRequest.getRequesterId();
         long receiverId = recommendationRequest.getReceiverId();
         String message = recommendationRequest.getMessage();
-        recommendationRequest.getSkillRequestsIds()
-                .forEach(skillRequestId -> skillRequestRepository.create(requesterId, skillRequestId));
+        recommendationRequest.getSkillRequests()
+                .forEach(skillRequestDto -> skillRequestRepository.create(skillRequestDto.getId(), skillRequestDto.getSkillId()));
         return recommendationRequestMapper
                 .toDto(recommendationRequestRepository.create(requesterId, receiverId, message));
     }
@@ -41,7 +43,9 @@ public class RecommendationRequestService {
     private void checkRequestAvailability(RecommendationRequestDto recommendationRequest) {
         long receiverId = recommendationRequest.getReceiverId();
         long requesterId = recommendationRequest.getRequesterId();
-
+        if (requesterId == receiverId) {
+            throw new IllegalArgumentException(REQUESTER_AND_RECEIVER_SAME);
+        }
         if (!isRequesterAndReceiverExist(requesterId, receiverId)) {
             throw new IllegalArgumentException(REQUESTER_OR_RECEIVER_NOT_FOUND);
         }
@@ -50,12 +54,12 @@ public class RecommendationRequestService {
         if (lastRequest.isPresent()) {
             LocalDateTime prevRequestsDate = lastRequest.get().getUpdatedAt();
             LocalDateTime curRequestDate = recommendationRequest.getCreatedAt();
-            if (prevRequestsDate.plusMonths(6).isAfter(curRequestDate)) {
+            if (prevRequestsDate.plusMonths(REQUEST_TIME_LIMIT).isAfter(curRequestDate)) {
                 throw new DateTimeException(REQUEST_IS_PENDING);
             }
         }
 
-        checkSkills(recommendationRequest);
+        checkSkillsExist(recommendationRequest);
     }
 
     private boolean isRequesterAndReceiverExist(long requesterId, long receiverId) {
@@ -64,10 +68,10 @@ public class RecommendationRequestService {
         return requester.isPresent() && receiver.isPresent();
     }
 
-    private void checkSkills(RecommendationRequestDto recommendationRequest) {
-        recommendationRequest.getSkillRequestsIds()
-                .forEach(skillRequestId -> {
-                    if (!skillRequestRepository.existsById(skillRequestId)) {
+    private void checkSkillsExist(RecommendationRequestDto recommendationRequest) {
+        recommendationRequest.getSkillRequests()
+                .forEach(skillRequestDto -> {
+                    if (!skillRequestRepository.existsById(skillRequestDto.getSkillId())) {
                         throw new IllegalArgumentException(SKILL_NOT_FOUND);
                     }
                 });

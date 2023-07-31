@@ -1,11 +1,12 @@
 package school.faang.user_service.service;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
@@ -16,9 +17,10 @@ import school.faang.user_service.mapper.RecommendationRequestMapperImpl;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class RecommendationRequestServiceTest {
@@ -30,47 +32,68 @@ class RecommendationRequestServiceTest {
     @Spy
     private RecommendationRequestMapperImpl recommendationRequestMapper;
 
-    @Test
-    @DisplayName("Positive test with correct data for rejectRequest")
-    void rejectRequest_test_correctData() {
-        RecommendationRequest request;
-        request = new RecommendationRequest();
-        request.setId(1L);
-        request.setStatus(RequestStatus.PENDING);
+    @ParameterizedTest
+    @MethodSource("getIdAndRejectReason")
+    @DisplayName("Request not found")
+    void requestNotFound(long id) {
+        when(recommendationRequestRepository.findById(id))
+                .thenReturn(Optional.empty());
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> recommendationRequestService.rejectRequest(id, new RejectionDto()));
+        assertEquals("Recommendation request not found", exception.getMessage());
+    }
 
-        Mockito.when(recommendationRequestRepository
-                        .findById(1L))
+    @ParameterizedTest
+    @MethodSource("getStatus")
+    @DisplayName("Request already rejected")
+    void requestAlreadyRejected(RequestStatus status) {
+        RecommendationRequest request = new RecommendationRequest();
+        request.setStatus(status);
+
+        when(recommendationRequestRepository.findById(1L))
                 .thenReturn(Optional.of(request));
 
-        Mockito.when(recommendationRequestRepository
-                        .save(request))
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> recommendationRequestService.rejectRequest(1L, new RejectionDto()));
+        assertEquals("Recommendation request already rejected", exception.getMessage());
+    }
+
+    @ParameterizedTest
+    @MethodSource("getIdAndRejectReason")
+    @DisplayName("Request rejected")
+    void requestRejected(long id, String rejectionReason) {
+        RecommendationRequest request = new RecommendationRequest();
+        request.setStatus(RequestStatus.PENDING);
+        request.setId(id);
+
+        RejectionDto reject = new RejectionDto();
+        reject.setReason(rejectionReason);
+        when(recommendationRequestRepository.findById(id))
+                .thenReturn(Optional.of(request));
+        when(recommendationRequestRepository.save(request))
                 .thenReturn(request);
-        RejectionDto rejection = new RejectionDto(RequestStatus.REJECTED, "Because");
-        RecommendationRequestDto requestDto = recommendationRequestService.rejectRequest(1L, rejection);
-        assertEquals(1L, requestDto.getId().longValue());
-        assertEquals(RequestStatus.REJECTED, requestDto.getStatus());
-        assertEquals("Because", requestDto.getRejectionReason());
+
+        RecommendationRequestDto requestDto = recommendationRequestService.rejectRequest(id, reject);
+        assertAll(() -> {
+                    assertEquals(id, requestDto.getId());
+                    assertEquals(RequestStatus.REJECTED, requestDto.getStatus());
+                    assertEquals(rejectionReason, requestDto.getRejectionReason());
+                }
+        );
     }
 
-    @Test
-    @DisplayName("Negative test with invalid id")
-    void rejectRequest_test_invalidId() {
-        Mockito.when(recommendationRequestRepository
-                        .findById(23L))
-                .thenReturn(Optional.empty());
-        RejectionDto rejection = new RejectionDto(RequestStatus.REJECTED, "Because");
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> recommendationRequestService.rejectRequest(23L, rejection));
-        assertEquals(RecommendationRequestService.REQUEST_NOT_FOUND, exception.getMessage());
+    private static Stream<Arguments> getStatus() {
+        return Stream.of(
+                Arguments.of(RequestStatus.ACCEPTED),
+                Arguments.of(RequestStatus.REJECTED)
+        );
     }
 
-    @Test
-    @DisplayName("Negative test with invalid status")
-    void rejectRequest_test_invalidStatus() {
-        Mockito.when(recommendationRequestRepository
-                        .findById(1L))
-                .thenReturn(Optional.of(new RecommendationRequest()));
-        RejectionDto rejection = new RejectionDto(RequestStatus.REJECTED, "Because");
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> recommendationRequestService.rejectRequest(1L, rejection));
-        assertEquals(RecommendationRequestService.REQUEST_IS_NOT_PENDING, exception.getMessage());
+    private static Stream<Arguments> getIdAndRejectReason() {
+        return Stream.of(
+                Arguments.of(1L, "already exist"),
+                Arguments.of(2L, "because"),
+                Arguments.of(29L, "Dont need")
+        );
     }
 }

@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.mentorship.UserDto;
@@ -15,19 +16,26 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class MentorshipService {
 
     private final MentorshipRepository mentorshipRepository;
     private final UserMapper userMapper;
 
     public List<UserDto> getMentees(long userId) {
-        return validateId(userId).getMentees()
+        List<UserDto> result = validateId(userId).getMentees()
                 .stream().map(userMapper::toDto).toList();
+        log.info("Mentees for userId={} have taken successfully from DB", userId);
+
+        return result;
     }
 
     public List<UserDto> getMentors(long userId) {
-        return validateId(userId).getMentors()
+        List<UserDto> result = validateId(userId).getMentors()
                 .stream().map(userMapper::toDto).toList();
+        log.info("Mentors for userId={} have taken successfully from DB", userId);
+
+        return result;
     }
 
     public void deleteMentee(long menteeId, long mentorId) {
@@ -35,6 +43,7 @@ public class MentorshipService {
         User mentee = validateId(menteeId);
 
         removeUserFromList(mentor.getMentees(), mentee);
+        log.info("Mentee was deleted from mentor successfully, menteeId={}, mentorId={}", menteeId, mentorId);
     }
 
     public void deleteMentor(long menteeId, long mentorId) {
@@ -42,14 +51,15 @@ public class MentorshipService {
         User mentee = validateId(menteeId);
 
         removeUserFromList(mentee.getMentors(), mentor);
+        log.info("Mentor was deleted from mentee successfully, menteeId={}, mentorId={}", menteeId, mentorId);
     }
 
     private User validateId(long userId) {
         if (userId < 1) {
-            throw new IncorrectIdException("Некоректный ввод данных id");
+            throw new IncorrectIdException("Incorrect input id");
         }
         return mentorshipRepository.findById(userId).orElseThrow(() -> {
-            throw new NoUserInDataBaseException("Пользователя с таким id не существует");
+            throw new NoUserInDataBaseException("User with this id does not exist");
         });
     }
 

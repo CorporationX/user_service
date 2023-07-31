@@ -1,6 +1,9 @@
 package school.faang.user_service.util.goal.handler;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import school.faang.user_service.dto.goal.ErrorResponse;
@@ -31,6 +34,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorResponse> handle(UserNotFoundException e) {
         return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage(), System.currentTimeMillis()));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleException(MethodArgumentNotValidException e){
+        BindingResult bindingResult = e.getBindingResult();
+        StringBuilder message = new StringBuilder();
+
+        if (bindingResult.hasErrors()) {
+            bindingResult.getAllErrors().forEach(
+                    error -> message.append(error.getDefaultMessage())
+            );
+        }
+
+        return new ResponseEntity<>(new ErrorResponse(message.toString(),
+                HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(GoalNotFoundException.class)

@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
+import org.springframework.validation.annotation.Validated;
 import school.faang.user_service.entity.RequestStatus;
 
 @Builder
+@Validated
 public record GoalInvitationDto(
         @JsonProperty(access = JsonProperty.Access.READ_ONLY)
         Long id,                  // чтобы при сериализации игнорировать это поле, но выводить при десериализации

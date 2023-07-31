@@ -1,6 +1,5 @@
 package school.faang.user_service.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -8,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.MapperUserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.servise.MentorshipService;
@@ -19,9 +19,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipServiceTest {
@@ -37,7 +35,7 @@ class MentorshipServiceTest {
     @Test
     void testGetMenteesException() {
         when(mentorshipRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundException.class,
+        assertThrows(DataValidationException.class,
                 () -> mentorshipService.getMentees(1L));
     }
 
@@ -46,7 +44,7 @@ class MentorshipServiceTest {
         User mentee = User.builder().id(1L).build();
         when(mentorshipRepository.findById(1L)).thenReturn(Optional.of(mentee));
         mentorshipService.getMentees(1L);
-        verify(mentorshipRepository, times(2)).findById(1L);
+        verify(mentorshipRepository, times(1)).findById(1L);
         verify(mapperUserDto, times(1))
                 .toDto(mentorshipRepository.findById(1L).get().getMentees());
     }
@@ -54,7 +52,7 @@ class MentorshipServiceTest {
     @Test
     void testGetMentorsException() {
         when(mentorshipRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundException.class,
+        assertThrows(DataValidationException.class,
                 () -> mentorshipService.getMentors(1L));
     }
 
@@ -63,7 +61,7 @@ class MentorshipServiceTest {
         User mentor = User.builder().id(1L).build();
         when(mentorshipRepository.findById(1L)).thenReturn(Optional.of(mentor));
         mentorshipService.getMentors(1L);
-        verify(mentorshipRepository, times(2)).findById(1L);
+        verify(mentorshipRepository, times(1)).findById(1L);
         verify(mapperUserDto, times(1))
                 .toDto(mentorshipRepository.findById(1L).get().getMentees());
     }
@@ -71,7 +69,7 @@ class MentorshipServiceTest {
     @Test
     void testIfMenteeIdIsNotEqualsMentorId() {
         User mentee = User.builder().id(1L).build();
-        assertThrows(EntityNotFoundException.class,
+        assertThrows(DataValidationException.class,
                 () -> mentorshipService.deleteMentee(mentee.getId(), 2L));
     }
 
@@ -79,7 +77,7 @@ class MentorshipServiceTest {
     void testDeleteMenteeIllegalArgumentException() {
         User mentee = User.builder().id(1L).build();
         when(userRepository.findById(1L)).thenReturn(Optional.of(mentee));
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(DataValidationException.class,
                 () -> mentorshipService.deleteMentee(1L, 1L));
     }
 
@@ -100,7 +98,7 @@ class MentorshipServiceTest {
     @Test
     void testDeleteMentorException() {
         User mentor = User.builder().id(2L).build();
-        assertThrows(EntityNotFoundException.class,
+        assertThrows(DataValidationException.class,
                 () -> mentorshipService.deleteMentee(4L, mentor.getId()));
     }
 
@@ -108,7 +106,7 @@ class MentorshipServiceTest {
     void testDeleteMentorExceptionTwo() {
         User mentor = User.builder().id(1L).build();
         when(userRepository.findById(1L)).thenReturn(Optional.of(mentor));
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(DataValidationException.class,
                 () -> mentorshipService.deleteMentee(1L, 1L));
     }
 

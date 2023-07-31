@@ -1,16 +1,17 @@
 package school.faang.user_service.servise;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.MapperUserDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,17 +21,19 @@ public class MentorshipService {
     private final MapperUserDto mapperUserDto;
 
     public List<UserDto> getMentees(Long userId) {
-        if (!mentorshipRepository.findById(userId).isPresent()) {
-            throw new EntityNotFoundException("Invalid mentee ID");
+        Optional<User> mentorId = mentorshipRepository.findById(userId);
+        if (mentorId.isEmpty()) {
+            throw new DataValidationException("Invalid mentee ID" + userId);
         }
-        return mapperUserDto.toDto(mentorshipRepository.findById(userId).get().getMentees());
+        return mapperUserDto.toDto(mentorId.get().getMentees());
     }
 
     public List<UserDto> getMentors(Long userId) {
-        if (!mentorshipRepository.findById(userId).isPresent()) {
-            throw new EntityNotFoundException("Invalid mentor ID");
+        Optional<User> menteeId = mentorshipRepository.findById(userId);
+        if (menteeId.isEmpty()) {
+            throw new DataValidationException("Invalid mentor ID" + userId);
         }
-        return mapperUserDto.toDto(mentorshipRepository.findById(userId).get().getMentors());
+        return mapperUserDto.toDto(menteeId.get().getMentors());
     }
 
     @Transactional
@@ -39,7 +42,7 @@ public class MentorshipService {
         User mentor = findUserValidation(mentorId);
 
         if (mentor.getId() == mentee.getId()) {
-            throw new IllegalArgumentException("Invalid deletion. You can't be mentee of yourself");
+            throw new DataValidationException("Invalid deletion. You can't be mentee of yourself");
         }
 
         mentor.getMentees().remove(mentee);
@@ -52,7 +55,7 @@ public class MentorshipService {
         User mentor = findUserValidation(mentorId);
 
         if (mentor.getId() == mentee.getId()) {
-            throw new IllegalArgumentException("Invalid deletion. You can't be mentor of yourself");
+            throw new DataValidationException("Invalid deletion. You can't be mentor of yourself");
         }
 
         mentee.getMentors().remove(mentor);
@@ -61,10 +64,10 @@ public class MentorshipService {
 
     private User findUserValidation(Long id) {
         if (id == null) {
-            throw new EntityNotFoundException("Invalid ID");
+            throw new DataValidationException("Invalid ID");
         }
         return userRepository.findById(id).orElseThrow(() ->
-                new EntityNotFoundException("Invalid ID"));
+                new DataValidationException("Invalid ID"));
     }
 }
 

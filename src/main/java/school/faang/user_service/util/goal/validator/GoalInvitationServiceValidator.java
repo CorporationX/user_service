@@ -36,8 +36,9 @@ public class GoalInvitationServiceValidator {
                     "Goal invitation with this id not found"
             );
         }
-        int size = goalInvitation.get().getInvited().getGoals().size();
-        if (goalInvitation.get().getStatus().equals(RequestStatus.ACCEPTED)) {
+        GoalInvitation currentGoalInvitation = goalInvitation.get();
+        int size = currentGoalInvitation.getInvited().getGoals().size();
+        if (currentGoalInvitation.getStatus().equals(RequestStatus.ACCEPTED)) {
             throw new AcceptingGoalInvitationException(
                     "Goal invitation is already accepted"
             );
@@ -47,13 +48,13 @@ public class GoalInvitationServiceValidator {
                     "Goal invitation can't be accepted because invited has more than 3 received goal invitations"
             );
         }
-        if (goalInvitation.get().getInvited().getGoals().contains(goalInvitation.get().getGoal())) {
+        if (currentGoalInvitation.getInvited().getGoals().contains(goalInvitation.get().getGoal())) {
             throw new AcceptingGoalInvitationException(
                     "Goal invitation can't be accepted because invited has this goal already"
             );
         }
 
-        return goalInvitation.get();
+        return currentGoalInvitation;
     }
 
     public GoalInvitation validateToReject(Optional<GoalInvitation> goalInvitation) {

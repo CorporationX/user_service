@@ -9,20 +9,26 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.calendar.GoogleEventDto;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.mapper.GoogleCalendarMapper;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.mapper.EventMapper;
+import school.faang.user_service.service.google.calendar.GoogleCalendarService;
 import school.faang.user_service.service.event.filters.EventEndDateFilter;
 import school.faang.user_service.service.event.filters.EventFilter;
 import school.faang.user_service.service.event.filters.EventStartDateFilter;
 import school.faang.user_service.service.event.filters.EventTitleFilter;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.List;
@@ -46,6 +52,15 @@ class EventServiceTest {
     @Mock
     private List<EventFilter> eventFilters;
 
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private GoogleCalendarService googleCalendarService;
+
+    @Mock
+    private GoogleCalendarMapper googleCalendarMapper;
+
     private EventService eventService;
 
     private Skill userSkill = new Skill();
@@ -55,7 +70,7 @@ class EventServiceTest {
     public void init() {
         EventFilter eventTitleFilter = new EventTitleFilter();
         List<EventFilter> eventFilterList = List.of(eventTitleFilter);
-        eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList);
+        eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList, userRepository, googleCalendarService);
 
         userSkill.setTitle("Coding");
         userSkill.setId(1L);
@@ -64,7 +79,11 @@ class EventServiceTest {
 
     @Test
     public void testCreateEvent() {
+        User alex = new User();
+        alex.setId(1L);
+
         Mockito.when(eventMapper.toEntity(eventDto)).thenReturn(new Event());
+        Mockito.when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(alex));
 
         eventService.create(eventDto);
         Mockito.verify(eventRepository, Mockito.times(1)).save(eventMapper.toEntity(eventDto));
@@ -72,7 +91,12 @@ class EventServiceTest {
 
     @Test
     public void testUpdateEvent() {
+        User alex = new User();
+        alex.setId(1L);
         Long anyId = 1L;
+
+        Mockito.when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(alex));
+        Mockito.lenient().when(eventMapper.toEntity(eventDto)).thenReturn(new Event());
 
         EventDto existingEventDto = EventMock.getEventDto();
         Event existingEventEntity = EventMock.getEventEntity();
@@ -96,7 +120,7 @@ class EventServiceTest {
         Skill mockedSkill = new Skill();
         mockedSkill.setTitle("Running");
 
-        Mockito.when(skillRepository.findSkillsByGoalId(1L)).thenReturn(List.of(mockedSkill));
+        Mockito.when(skillRepository.findAllByUserId(1L)).thenReturn(List.of(mockedSkill));
 
         assertThrows(DataValidationException.class, () -> {
             eventService.create(eventDto);
@@ -108,7 +132,7 @@ class EventServiceTest {
         Skill mockedSkill = new Skill();
         mockedSkill.setTitle("Running");
 
-        Mockito.when(skillRepository.findSkillsByGoalId(1L)).thenReturn(List.of(mockedSkill));
+        Mockito.when(skillRepository.findAllByUserId(1L)).thenReturn(List.of(mockedSkill));
 
         assertThrows(DataValidationException.class, () -> {
             eventService.updateEvent(eventDto);
@@ -188,7 +212,7 @@ class EventServiceTest {
     @Test
     void testGetAllUserEventsByStartDateFilter() {
         List<EventFilter> eventFilterList = List.of(new EventStartDateFilter());
-        eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList);
+        eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList, userRepository, googleCalendarService);
 
         Event javaEvent = new Event();
         javaEvent.setTitle("Java");
@@ -219,7 +243,7 @@ class EventServiceTest {
     @Test
     void testGetAllUserEventsByEndDateFilter() {
         List<EventFilter> eventFilterList = List.of(new EventEndDateFilter());
-        eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList);
+        eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList, userRepository, googleCalendarService);
 
         Event javaEvent = new Event();
         javaEvent.setTitle("Java");
@@ -289,5 +313,12 @@ class EventServiceTest {
         assertEquals(1, swimming.getAttendees().size());
         assertEquals(1, coding.getAttendees().size());
         assertEquals(1, relaxing.getAttendees().size());
+    }
+
+    @Test
+    public void testCreateCalendarEvent() throws GeneralSecurityException, IOException {
+        GoogleEventDto googleEventDto = googleCalendarMapper.toGoogleEventDto(eventDto);
+        eventService.createCalendarEvent(googleEventDto);
+        verify(googleCalendarService, times(1)).createEvent(googleEventDto);
     }
 }

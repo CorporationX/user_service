@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.GoogleEventResponseDto;
 import school.faang.user_service.service.google.GoogleCalendarService;
 
@@ -19,9 +20,11 @@ import school.faang.user_service.service.google.GoogleCalendarService;
 @Validated
 public class GoogleCalendarController {
     private final GoogleCalendarService googleCalendarService;
+    private final UserContext userContext;
 
-    @PostMapping("/{userId}/event/{eventId}")
-    public GoogleEventResponseDto createEvent(@PathVariable Long userId, @PathVariable Long eventId) {
+    @PostMapping("/events/{eventId}")
+    public GoogleEventResponseDto createEvent(@PathVariable Long eventId) {
+        Long userId = userContext.getUserId();
         try {
             return googleCalendarService.createEvent(userId, eventId);
         } catch (Exception e) {
@@ -34,8 +37,8 @@ public class GoogleCalendarController {
     @GetMapping("/Callback")
     public GoogleEventResponseDto handleCallback(@RequestParam String code, @RequestParam String state) {
         try {
-            String userId = state.split("-")[0];
-            String eventId = state.split("-")[1];
+            Long userId = Long.parseLong(state.split("-")[0]);
+            Long eventId = Long.parseLong(state.split("-")[1]);
             return googleCalendarService.handleCallback(code, userId, eventId);
         } catch (Exception e) {
             log.error("Failed to push event to Google Calendar\nException: {}", e.getMessage());

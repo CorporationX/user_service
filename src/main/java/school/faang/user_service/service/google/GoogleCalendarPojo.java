@@ -20,5 +20,7 @@ public class GoogleCalendarPojo {
     private String redirectUri;
     @Value("${spring.google.calendar.scopes}")
     private List<String> scopes;
+    @Value("${spring.google.calendar.access-type}")
+    private String accessType;
     private JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
 }

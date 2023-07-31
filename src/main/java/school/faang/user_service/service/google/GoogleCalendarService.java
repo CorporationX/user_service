@@ -20,6 +20,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.GoogleEventResponseDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
@@ -37,6 +38,7 @@ public class GoogleCalendarService {
     private final UserService userService;
     private final GoogleCalendarPojo calendarPojo;
 
+    @Transactional
     public GoogleEventResponseDto createEvent(Long userId, Long eventId)
             throws GeneralSecurityException, IOException {
         Event event = eventService.getEvent(eventId);
@@ -76,11 +78,12 @@ public class GoogleCalendarService {
         // Returns authorization url
         return flow.newAuthorizationUrl()
                 .setRedirectUri(calendarPojo.getRedirectUri())
-                .setState(userId + "-" + eventId)
+                .setState(userId + "-" + eventId) // Не получилось придумать как еще передать параметры
                 .build();
     }
 
-    public GoogleEventResponseDto handleCallback(String code, String userId, String eventId)
+    @Transactional
+    public GoogleEventResponseDto handleCallback(String code, Long userId, Long eventId)
             throws GeneralSecurityException, IOException {
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         GoogleClientSecrets clientSecrets = getClientSecrets();
@@ -90,12 +93,12 @@ public class GoogleCalendarService {
         TokenResponse response = flow.newTokenRequest(code)
                 .setRedirectUri(calendarPojo.getRedirectUri())
                 .execute();
-        Credential credential = flow.createAndStoreCredential(response, userId);
+        Credential credential = flow.createAndStoreCredential(response, String.valueOf(userId));
         Calendar service = getService(HTTP_TRANSPORT, credential);
 
         // Здесь я создаю и добавляю новое событие в гугл календарь и возвращаю ссылку
         // Но не уверен стоит ли делать это в коллбэк методе
-        Event event = eventService.getEvent(Long.parseLong(eventId));
+        Event event = eventService.getEvent(eventId);
         com.google.api.services.calendar.model.Event googleEvent = mapToGoogleEvent(event, service);
         googleEvent = service.events().insert(calendarPojo.getCalendarId(), googleEvent).execute();
 
@@ -147,7 +150,7 @@ public class GoogleCalendarService {
         return new GoogleAuthorizationCodeFlow
                 .Builder(HTTP_TRANSPORT, calendarPojo.getJsonFactory(), clientSecrets, calendarPojo.getScopes())
                 .setDataStoreFactory(new JpaDataStoreFactory(googleTokenRepository))
-                .setAccessType("offline")
+                .setAccessType(calendarPojo.getAccessType())
                 .build();
     }
 

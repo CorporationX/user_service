@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.spy;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipServiceTest {
@@ -148,22 +149,14 @@ class MentorshipServiceTest {
         User samMentor = new User();
         samMentor.setId(1L);
 
+        User spiedSam = spy(samMentor);
+
         samMentor.setMentees(List.of(max, brayn, paul));
 
-        User fosterMentor = new User();
-        fosterMentor.setId(2L);
+        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(spiedSam));
 
-        max.setMentors(List.of(samMentor, fosterMentor));
-        brayn.setMentors(List.of(samMentor, fosterMentor));
-        paul.setMentors(List.of(samMentor, fosterMentor));
+        mentorshipService.cancelMentoring(1L);
 
-        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(samMentor));
-
-        int menteesCount = mentorshipService.cancelMentoring(1L);
-
-        assertEquals(3, menteesCount);
-        assertEquals(1, max.getMentors().size());
-        assertEquals(1, brayn.getMentors().size());
-        assertEquals(1, paul.getMentors().size());
+        Mockito.verify(spiedSam).setMentees(null);
     }
 }

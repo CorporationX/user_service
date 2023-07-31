@@ -18,6 +18,7 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.RecommendationMapper;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
@@ -43,6 +44,8 @@ public class RecommendationServiceTest {
     private UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     @Mock
     private SkillOfferRepository skillOfferRepository;
+    @Mock
+    private UserRepository userRepository;
     @Mock
     private RecommendationMapper recommendationMapper;
     @InjectMocks
@@ -181,4 +184,53 @@ public class RecommendationServiceTest {
         assertEquals(2, recommendationDtoList.size());
         assertEquals(recommendationDtoPage, result);
     }
+    @Test
+    public void testGetAllUserRecommendations() {
+        Long authorId = 2L;
+        Pageable pageable = PageRequest.of(0, 5);
+
+        User author = new User();
+        author.setId(authorId);
+
+        Recommendation recommendation1 = new Recommendation();
+        recommendation1.setId(1L);
+        recommendation1.setContent("recommendation 1");
+        recommendation1.setReceiver(author);
+        recommendation1.setCreatedAt(LocalDateTime.now());
+        recommendation1.setUpdatedAt(LocalDateTime.now());
+
+        Recommendation recommendation2 = new Recommendation();
+        recommendation2.setId(2L);
+        recommendation2.setContent("recommendation 2");
+        recommendation2.setReceiver(author);
+        recommendation2.setCreatedAt(LocalDateTime.now());
+        recommendation2.setUpdatedAt(LocalDateTime.now());
+
+        List<Recommendation> recommendations = new ArrayList<>();
+        recommendations.add(recommendation1);
+        recommendations.add(recommendation2);
+
+        List<RecommendationDto> recommendationDtoList = new ArrayList<>();
+        RecommendationDto recommendationDto1 = new RecommendationDto(1L, 1L, 2L, "recommendation 1", List.of(new SkillOfferDto[]{}), LocalDateTime.now());
+        RecommendationDto recommendationDto2 = new RecommendationDto(2L, 4L, 2L, "recommendation 2", List.of(new SkillOfferDto[]{}), LocalDateTime.now());
+        recommendationDtoList.add(recommendationDto1);
+        recommendationDtoList.add(recommendationDto2);
+        Page<Recommendation> recommendationPage = new PageImpl<>(recommendations);
+        Page<RecommendationDto> recommendationDtoPage = new PageImpl<>(recommendationDtoList);
+
+        when(userRepository.findById(authorId)).thenReturn(Optional.of(author));
+        when(recommendationRepository.findAllByAuthorId(authorId, pageable)).thenReturn(recommendationPage);
+        when(recommendationMapper.toDto(recommendation1)).thenReturn(recommendationDto1);
+        when(recommendationMapper.toDto(recommendation2)).thenReturn(recommendationDto2);
+
+        Page<RecommendationDto> result = recommendationService.getAllGivenRecommendations(authorId, pageable);
+
+        verify(userRepository).findById(authorId);
+        verify(recommendationRepository).findAllByAuthorId(authorId, pageable);
+        verify(recommendationMapper).toDto(recommendation1);
+        verify(recommendationMapper).toDto(recommendation2);
+        assertEquals(2, recommendationDtoList.size());
+        assertEquals(recommendationDtoPage, result);
+    }
+
 }

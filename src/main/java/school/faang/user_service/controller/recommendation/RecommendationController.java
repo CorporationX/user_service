@@ -37,4 +37,9 @@ public class RecommendationController {
     public void deleteRecommendation(@PathVariable Long id) {
         recommendationService.delete(id);
     }
+
+    @GetMapping("/recommendations/author/{authorId}")
+    public Page<RecommendationDto> getAllGivenRecommendations(@PathVariable Long authorId, Pageable pageable) {
+        return recommendationService.getAllGivenRecommendations(authorId, pageable);
+    }
 }

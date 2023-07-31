@@ -1,0 +1,20 @@
+name: Compile and Test
+
+on:
+  [ push, pull_request ]
+
+jobs:
+  compile_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'corretto'
+          cache: gradle
+      - name: Compile with Gradle
+        run: ./gradlew compileJava
+      - name: Run tests
+        run: ./gradlew test

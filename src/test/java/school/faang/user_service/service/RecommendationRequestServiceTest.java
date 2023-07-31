@@ -15,6 +15,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.filter.*;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
+import school.faang.user_service.mapper.RecommendationRequestMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
@@ -38,8 +39,10 @@ class RecommendationRequestServiceTest {
     private UserRepository userRepository;
     @Mock
     private SkillRepository skillRepository;
-    @Mock
-    private RecommendationRequestMapper recommendationRequestMapper;
+    @Spy
+    private RecommendationRequestMapperImpl recommendationRequestMapper;
+//    @Mock
+//    private RecommendationRequestMapper recommendationRequestMapper;
     @Mock
     private RecommendationRequestDto recommendationRequestDto;
 
@@ -61,7 +64,7 @@ class RecommendationRequestServiceTest {
                 RecommendationRequestFilterDto.builder().message("Hello").build();
 
         Mockito.when(recommendationRequestRepository.findAll()).thenReturn(requests);
-        Mockito.when(recommendationRequestMapper.toDtoList(any())).thenReturn(new ArrayList<>());
+        //Mockito.when(recommendationRequestMapper.toDtoList(any())).thenReturn(new ArrayList<>());
 
         recommendationRequestService = new RecommendationRequestService(recommendationRequestRepository, recommendationRequestMapper, recommendationRequestFilters);
 

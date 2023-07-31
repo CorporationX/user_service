@@ -28,6 +28,13 @@ spring:
           name: profile_view_channel
         analytic_channel:
           name: analytics_channel
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 1074499156848-ofs0dv33c8d2unbi825bqv92l2g8g1np.apps.googleusercontent.com
+            client-secret: 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
 
 server:
   port: 8080

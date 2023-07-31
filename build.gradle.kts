@@ -45,6 +45,16 @@ dependencies {
 	implementation("com.amazonaws:aws-java-sdk-s3:1.12.464")
 
 	/**
+	 * Google integration
+	 */
+	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+	implementation("com.google.api-client:google-api-client:2.2.0")
+	implementation("com.google.api-client:google-api-client-jackson2:2.2.0")
+	implementation("com.google.apis:google-api-services-calendar:v3-rev20230602-2.0.0")
+
+
+
+	/**
 	 * Utils & Logging
 	 */
 	implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")

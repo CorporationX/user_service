@@ -31,9 +31,6 @@ public class GoalController {
 
     @PutMapping("/goal/{goalId}")
     public GoalDto updateGoal(@PathVariable Long goalId, @RequestBody GoalDto goal) {
-        if (goal.getTitle() != null && !goal.getTitle().isBlank()) {
-            return goalService.updateGoal(goalId, goal);
-        }
-        throw new IllegalArgumentException("Invalid goal provided");
+        return goalService.updateGoal(goalId, goal);
     }
 }

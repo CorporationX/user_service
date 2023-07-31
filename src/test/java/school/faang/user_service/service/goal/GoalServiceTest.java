@@ -31,9 +31,11 @@ import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.exception.GoalValidationException;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.validation.GoalValidator;
 
 @ExtendWith(MockitoExtension.class)
 class GoalServiceTest {
@@ -49,12 +51,15 @@ class GoalServiceTest {
     @Mock
     private SkillRepository skillRepository;
 
+    @Mock
+    private GoalValidator goalValidator;
+
     @BeforeEach
     void setUp() {
         filter1 = mock(GoalFilter.class);
         filter2 = mock(GoalFilter.class);
         MockitoAnnotations.initMocks(this);
-        goalService = new GoalService(goalRepository, goalMapper, new ArrayList<>(),skillRepository);
+        goalService = new GoalService(goalRepository, goalMapper, new ArrayList<>(),skillRepository,goalValidator);
     }
 
     @Test
@@ -78,7 +83,7 @@ class GoalServiceTest {
         when(nonApplicableFilter.isApplicable(filters)).thenReturn(false);
 
         List<GoalFilter> goalFilters = List.of(nonApplicableFilter);
-        goalService = new GoalService(goalRepository, goalMapper, goalFilters,skillRepository);
+        goalService = new GoalService(goalRepository, goalMapper, goalFilters,skillRepository,goalValidator);
 
         List<Goal> goals = List.of(new Goal(), new Goal());
         when(goalRepository.findAll()).thenReturn(goals);
@@ -97,7 +102,7 @@ class GoalServiceTest {
         when(applicableFilter.isApplicable(filters)).thenReturn(true);
 
         List<GoalFilter> goalFilters = List.of(applicableFilter);
-        goalService = new GoalService(goalRepository, goalMapper, goalFilters,skillRepository);
+        goalService = new GoalService(goalRepository, goalMapper, goalFilters,skillRepository,goalValidator);
 
         List<Goal> goals = List.of(new Goal(), new Goal());
         when(goalRepository.findAll()).thenReturn(goals);
@@ -129,7 +134,7 @@ class GoalServiceTest {
         updatedGoal.setStatus(GoalStatus.ACTIVE);
 
         when(goalRepository.findById(any(Long.class))).thenReturn(Optional.of(existingGoal));
-        when(goalMapper.toEntity(goalDto)).thenReturn(updatedGoal);
+        when(goalMapper.updateFromDto(goalDto,existingGoal)).thenReturn(updatedGoal);
         when(goalRepository.save(any(Goal.class))).thenReturn(updatedGoal);
         when(goalMapper.toDto(updatedGoal)).thenReturn(goalDto);
 
@@ -148,17 +153,4 @@ class GoalServiceTest {
         assertThrows(IllegalArgumentException.class, () -> goalService.updateGoal(nonExistentGoalId, goalDto));
     }
 
-    @Test
-    public void testUpdateGoal_CompletedGoal() {
-        GoalDto goalDto = new GoalDto();
-        goalDto.setStatus(GoalStatus.COMPLETED);
-
-        Goal existingGoal = new Goal();
-        existingGoal.setStatus(GoalStatus.COMPLETED);
-
-        when(goalRepository.findById(any(Long.class))).thenReturn(Optional.of(existingGoal));
-
-        long goalId = 2L;
-        assertThrows(IllegalArgumentException.class, () -> goalService.updateGoal(goalId, goalDto));
-    }
 }

@@ -142,4 +142,22 @@ public class User {
 
     @OneToOne(mappedBy = "user")
     private Premium premium;
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", phone='" + phone + '\'' +
+                ", password='" + password + '\'' +
+                ", active=" + active +
+                ", aboutMe='" + aboutMe + '\'' +
+                ", city='" + city + '\'' +
+                ", experience=" + experience +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", country=" + (country != null ? country.getTitle() : null) +
+                '}';
+    }
 }

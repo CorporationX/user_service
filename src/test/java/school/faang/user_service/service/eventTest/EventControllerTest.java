@@ -34,7 +34,7 @@ public class EventControllerTest {
     @BeforeEach
     void setUp() {
         var now = LocalDateTime.now();
-        eventDto = new EventDto(0L, "0", now, now.plusDays(3), 0L, "0", new ArrayList<>(), "location","Webinar","status", -1);
+        eventDto = new EventDto(0L, "0", now, now.plusDays(3), 0L, "0", new ArrayList<>(),new ArrayList<>(), "location","Webinar","status", -1);
         filterDto = new EventFilterDto("title", now, now.plusDays(10), 0L, List.of(), "location", 10);
     }
 
@@ -74,16 +74,6 @@ public class EventControllerTest {
     @Test
     void testNullOwnedIdIsInvalid() {
         eventDto.setOwnerId(null);
-        Assertions.assertThrows(
-                DataValidationException.class,
-                () -> eventController.create(eventDto)
-        );
-    }
-
-    @Test
-    void testNegativeOwnedIdIsInvalid() {
-        eventDto.setOwnerId(-1L);
-
         Assertions.assertThrows(
                 DataValidationException.class,
                 () -> eventController.create(eventDto)

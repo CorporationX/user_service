@@ -1,10 +1,7 @@
 package school.faang.user_service.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -25,4 +22,13 @@ public class Country {
 
     @OneToMany(mappedBy = "country")
     private List<User> residents;
+
+    @Override
+    public String toString() {
+        return "Country{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", residentUserIds=" + (residents == null ? " " : residents.stream().map(User::getId).toList()) +
+                '}';
+    }
 }

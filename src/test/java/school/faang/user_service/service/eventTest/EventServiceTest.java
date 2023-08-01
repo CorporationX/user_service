@@ -4,10 +4,7 @@ import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
@@ -16,8 +13,12 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.NotFoundException;
+import school.faang.user_service.filter.event.Filter;
+import school.faang.user_service.filter.event.LocationFilter;
 import school.faang.user_service.mapper.EventMapper;
+import school.faang.user_service.mapper.EventMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.EventService;
 
@@ -25,30 +26,51 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
+
 public class EventServiceTest {
     @Mock
     private EventRepository eventRepository;
+
     @Mock
     private SkillRepository skillRepository;
+
     @Mock
     private EventMapper eventMapper;
+
+    List<Filter<Event, EventFilterDto>> filters;
+
+    @Mock
+    private UserRepository userRepository;
+
     @InjectMocks
     private EventService eventService;
-    EventDto eventDto;
-    EventFilterDto filterDto;
+
+    private EventDto eventDto;
+    private EventFilterDto filterDto;
+    private Event event;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         var now = LocalDateTime.now();
-        eventDto = new EventDto(0L, "title", now, now.plusDays(3), 0L, "0", new ArrayList<>(), "location", "Webinar", "Planned", -1);
+        eventDto = new EventDto(0L, "title", now, now.plusDays(3), 0L, "0", new ArrayList<>(), new ArrayList<>(), "location", "Webinar", "Planned", -1);
         filterDto = new EventFilterDto("title", now.plusHours(1), now.plusDays(10), 0L, List.of(), "location", 10);
+        event = Event.builder().id(1).build();
+
+        Filter<Event, EventFilterDto> filter = Mockito.mock(Filter.class);
+        filters = List.of(filter);
+        eventService = new EventService(eventRepository, skillRepository, userRepository, eventMapper, filters);
 
         Mockito.when(skillRepository.findAllByUserId(eventDto.getOwnerId()))
                 .thenReturn(List.of(
                         Skill.builder().id(1).build(),
                         Skill.builder().id(2).build()
                 ));
+        Mockito.when(eventMapper.toEntity(Mockito.any())).thenReturn(event);
+
+        Mockito.when(eventRepository.findAll()).thenReturn(List.of(event));
+        Mockito.when(eventMapper.toDto(Mockito.any(Event.class))).thenReturn(eventDto);
     }
 
     @Test
@@ -88,6 +110,7 @@ public class EventServiceTest {
         Mockito.when(eventRepository.findById(Mockito.anyLong())).thenReturn(
                 Optional.of(event)
         );
+        Mockito.when(eventMapper.toDto(Mockito.any())).thenReturn(eventDto);
 
         eventService.getEvent(Mockito.anyLong());
         Mockito.verify(eventMapper, Mockito.times(1)).toDto(event);
@@ -95,7 +118,7 @@ public class EventServiceTest {
 
     @Test
     void testReceivingFilteredEvents() {
-        Event event = getEventExample();
+        event = getEventExample();
         List<Event> events = List.of(event);
         Mockito.when(eventRepository.findAll()).thenReturn(events);
         Mockito.when(eventMapper.toDto(Mockito.any(Event.class))).thenReturn(eventDto);
@@ -106,26 +129,14 @@ public class EventServiceTest {
 
     @Test
     void testReceivingWrongLocationFilter() {
-        Event event = getEventExample();
+        event = getEventExample();
         event.setLocation("anotherLocation");
-        List<Event> events = List.of(event);
-        Mockito.when(eventRepository.findAll()).thenReturn(events);
-        Mockito.when(eventMapper.toDto(Mockito.any(Event.class))).thenReturn(eventDto);
 
-        Assertions.assertThrows(NotFoundException.class,
-                () -> eventService.getEventsByFilter(filterDto));
-    }
+        Mockito.when(filters.get(0).isApplicable(Mockito.any())).thenReturn(true);
+        Mockito.when(filters.get(0).applyFilter(Stream.of(event), filterDto)).thenReturn(Stream.empty());
+        var res = eventService.getEventsByFilter(filterDto).size();
+        Assertions.assertEquals(0, res);
 
-    @Test
-    void testReceivingWrongTitleFilter() {
-        Event event = getEventExample();
-        event.setTitle("ERROR!");
-        List<Event> events = List.of(event);
-        Mockito.when(eventRepository.findAll()).thenReturn(events);
-        Mockito.when(eventMapper.toDto(Mockito.any(Event.class))).thenReturn(eventDto);
-
-        Assertions.assertThrows(NotFoundException.class,
-                () -> eventService.getEventsByFilter(filterDto));
     }
 
     @Test

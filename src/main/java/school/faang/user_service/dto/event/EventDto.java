@@ -20,6 +20,7 @@ public class EventDto {
     private Long ownerId;
     private String description;
     private List<SkillDto> relatedSkills;
+    private List<Long> attendees;
     private String location;
     private String type;
     private String status;

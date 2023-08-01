@@ -1,6 +1,5 @@
 package school.faang.user_service.controller.event;
 
-import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,46 +12,44 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/event")
+@RequestMapping("/events")
 public class EventController {
     private final EventService eventService;
 
-    @PostMapping("/create")
-    @Operation(description = "zczc")
+    @PostMapping()
     public ResponseEntity<?> create(@RequestBody EventDto eventDto) {
-        System.out.println(eventDto);
         validateEvent(eventDto);
         var res = eventService.create(eventDto);
         return ResponseEntity.ok(res);
     }
 
-    @GetMapping("/get/{eventId}")
+    @GetMapping("/{eventId}")
     public ResponseEntity<?> getEvent(@PathVariable long eventId) {
         validateId(eventId);
         return ResponseEntity.ok(eventService.getEvent(eventId));
     }
 
-    @GetMapping("/filter")
+    @PostMapping("/filter")
     public ResponseEntity<List<?>> getEventsByFilter(@RequestBody EventFilterDto filter) {
         List<EventDto> filteredEvents = eventService.getEventsByFilter(filter);
         return ResponseEntity.ok(filteredEvents);
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteEvent(@PathVariable long id) {
-        validateId(id);
-        eventService.deleteEvent(id);
+    @DeleteMapping("/{eventId}")
+    public ResponseEntity<?> deleteEvent(@PathVariable long eventId) {
+        validateId(eventId);
+        eventService.deleteEvent(eventId);
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/update")
+    @PutMapping()
     public ResponseEntity<?> updateEvent(@RequestBody EventDto eventDto) {
         validateEvent(eventDto);
         eventService.updateEvent(eventDto);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/get-owned-events/{userId}")
+    @GetMapping("/owned-events/{userId}")
     public ResponseEntity<List<EventDto>> getOwnedEvents(@PathVariable long userId) {
         validateId(userId);
         List<EventDto> ownedEvents = eventService.getOwnedEvents(userId);
@@ -73,8 +70,8 @@ public class EventController {
         if (event.getStartDate() == null) {
             throw new DataValidationException("Event start date cannot be null");
         }
-        if (event.getOwnerId() == null || event.getOwnerId() < 0) {
-            throw new DataValidationException("Event owner ID cannot be null or negative");
+        if (event.getOwnerId() == null) {
+            throw new DataValidationException("Event owner ID cannot be null");
         }
     }
 

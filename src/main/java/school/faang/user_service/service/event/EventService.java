@@ -1,34 +1,45 @@
 package school.faang.user_service.service.event;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.NotFoundException;
+import school.faang.user_service.filter.event.Filter;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
 public class EventService {
     private final EventRepository eventRepository;
     private final SkillRepository skillRepository;
+    private final UserRepository userRepository;
     private final EventMapper eventMapper;
+    private final List<Filter<Event, EventFilterDto>> filters;
 
+    @Transactional
     public EventDto create(EventDto event) {
-        System.out.println(event);
         validateEventSkills(event);
-        System.out.println(eventMapper.toEntity(event));
-        var eventEntity = eventRepository.save(eventMapper.toEntity(event));
+
+        var attendees = userRepository.findAllById(event.getAttendees());
+        Event eventEntity = eventMapper.toEntity(event);
+        eventEntity.setAttendees(attendees);
+        eventEntity = eventRepository.save(eventEntity);
+
+        Event finalEventEntity = eventEntity;
+        attendees.forEach(user -> user.getParticipatedEvents().add(finalEventEntity));
+        userRepository.saveAll(attendees);
+
         return eventMapper.toDto(eventEntity);
     }
 
@@ -39,15 +50,12 @@ public class EventService {
     }
 
     public List<EventDto> getEventsByFilter(EventFilterDto filter) {
-        List<Event> events = new ArrayList<>();
-        eventRepository.findAll().forEach(events::add);
-        var filteredEvents = events.stream()
-                .filter(event -> filterMatches(event, filter))
+        List<Event> events = eventRepository.findAll();
+        var filteredEvents = filters.stream()
+                .filter(eventFilter -> eventFilter.isApplicable(filter))
+                .reduce(events.stream(), (stream, eventFilter) -> eventFilter.applyFilter(stream, filter), Stream::concat)
                 .map(eventMapper::toDto)
                 .toList();
-        if (filteredEvents.isEmpty()) {
-            throw new NotFoundException("No events with current filters");
-        }
         return filteredEvents;
     }
 
@@ -60,7 +68,7 @@ public class EventService {
         eventRepository.save(eventMapper.toEntity(eventDto));
     }
 
-    public List<EventDto> getOwnedEvents(long userId){
+    public List<EventDto> getOwnedEvents(long userId) {
         return eventRepository.findAllByUserId(userId).stream().map(eventMapper::toDto).toList();
     }
 
@@ -80,37 +88,5 @@ public class EventService {
                 throw new DataValidationException("User does not have the required skills for the event");
             }
         }
-    }
-
-    public boolean filterMatches(Event event, EventFilterDto filter) {
-        if (filter.getTitle() != null && !event.getTitle().contains(filter.getTitle())) {
-            return false;
-        }
-        if (filter.getStartDate() != null && filter.getStartDate().isAfter(event.getEndDate())) {
-            return false;
-        }
-        if (filter.getEndDate() != null && filter.getEndDate().isBefore(event.getEndDate())) {
-            return false;
-        }
-        if (filter.getOwnerId() != null && !(event.getOwner().getId() == filter.getOwnerId())) {
-            return false;
-        }
-        if (filter.getLocation() != null && !event.getLocation().equals(filter.getLocation())) {
-            return false;
-        }
-        if (filter.getMaxAttendees() != null && filter.getMaxAttendees() > event.getMaxAttendees()) {
-            return false;
-        }
-        if (filter.getRelatedSkillIds() != null && !filter.getRelatedSkillIds().isEmpty() && event.getRelatedSkills() != null) {
-            var eventSkillsIds = event.getRelatedSkills()
-                    .stream()
-                    .map(Skill::getId)
-                    .toList();
-            // приведение к hashset для повышения производительности
-            if (!(new HashSet<>(eventSkillsIds).containsAll(filter.getRelatedSkillIds()))) {
-                return false;
-            }
-        }
-        return true;
     }
 }

@@ -15,7 +15,8 @@ import java.util.List;
 public class SkillService {
     private final SkillRepository skillRepository;
 
-    public SkillDto create(SkillDto skill){
+    public SkillDto create(SkillDto skill)
+    {
         if (!skillRepository.existsByTitle(skill.getTitle())){
             Skill newSkill = SkillMapper.INSTANCE.skillToEntity(skill);
             skillRepository.save(newSkill);

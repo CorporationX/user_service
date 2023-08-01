@@ -1,7 +1,7 @@
 package school.faang.user_service.service;
 
 
-import lombok.Builder;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -93,5 +93,23 @@ public class EventServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user2));
         eventService.create(eventDto);
         verify(eventRepository, Mockito.times(1)).save(eventMapper.toEvent(eventDto));
+    }
+
+    @Test
+    public void testGetEventWithWrongId() {
+        Assertions.assertThrows(DataValidationException.class, () -> eventService.getEvent(0L));
+        Assertions.assertThrows(DataValidationException.class, () -> eventService.getEvent(-10L));
+    }
+
+    @Test
+    public void testGetNonExistentEvent() {
+        when(eventRepository.findById(10L)).thenReturn(Optional.ofNullable(null));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> eventService.getEvent(10L));
+    }
+
+    @Test
+    public void testCorrectGetEvent() {
+        when(eventRepository.findById(1L)).thenReturn(Optional.ofNullable(event));
+        Assertions.assertEquals(eventMapper.toDTO(event), eventService.getEvent(1L));
     }
 }

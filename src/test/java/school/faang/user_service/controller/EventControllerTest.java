@@ -90,4 +90,10 @@ public class EventControllerTest {
         Assertions.assertThrows(DataValidationException.class, () -> eventController.create(eventDto5));
     }
 
+    @Test
+    public void testGetEvent() {
+        eventController.getEvent(1);
+        Mockito.verify(eventService, Mockito.times(1)).getEvent(1);
+    }
+
 }

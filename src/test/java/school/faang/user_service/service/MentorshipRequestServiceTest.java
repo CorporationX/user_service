@@ -212,7 +212,7 @@ public class MentorshipRequestServiceTest {
         latestRequest.setReceiver(receiver);
 
         when(requestRepository.findById(CORRECT_REQUEST_ID)).thenReturn(Optional.of(latestRequest));
-        assertThrows(IllegalArgumentException.class, () -> requestService.acceptRequest(CORRECT_REQUEST_ID));
+        assertThrows(RequestAlreadyAcceptedException.class, () -> requestService.acceptRequest(CORRECT_REQUEST_ID));
     }
 
     @Test

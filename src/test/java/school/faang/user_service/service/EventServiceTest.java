@@ -152,4 +152,17 @@ public class EventServiceTest {
         when(eventRepository.findAllByUserId(1L)).thenReturn(events);
         Assertions.assertEquals(1, eventService.getOwnedEvents(1L).size());
     }
+
+    @Test
+    public void testGetParticipatedEventsIsNull() {
+        when(eventRepository.findParticipatedEventsByUserId(1L)).thenReturn(null);
+        Assertions.assertEquals(0, eventService.getParticipatedEvents(1L).size());
+    }
+
+    @Test
+    public void testGetParticipatedEvents() {
+        List<Event> events = List.of(Event.builder().build());
+        when(eventRepository.findParticipatedEventsByUserId(1L)).thenReturn(events);
+        Assertions.assertEquals(1, eventService.getParticipatedEvents(1L).size());
+    }
 }

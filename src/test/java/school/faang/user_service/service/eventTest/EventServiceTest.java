@@ -75,7 +75,7 @@ public class EventServiceTest {
 
     @Test
     void testSkillIsValid() {
-        eventDto.setRelatedSkills(List.of(new SkillDto(1), new SkillDto(2)));
+        eventDto.setRelatedSkills(List.of(new SkillDto(1L,"1"), new SkillDto(2L,"2")));
         eventService.create(eventDto);
 
         Mockito.verify(eventMapper, Mockito.times(1)).toDto(Mockito.any());
@@ -84,7 +84,7 @@ public class EventServiceTest {
 
     @Test
     void testSkillsAreInvalid() {
-        eventDto.setRelatedSkills(List.of(new SkillDto(3), new SkillDto(4)));
+        eventDto.setRelatedSkills(List.of(new SkillDto(3L,"3"), new SkillDto(4L,"4")));
 
         Assert.assertThrows(
                 DataValidationException.class,
@@ -147,7 +147,7 @@ public class EventServiceTest {
 
     @Test
     void testUpdatingEventIsInvalid() {
-        eventDto.setRelatedSkills(List.of(new SkillDto(3), new SkillDto(4)));
+        eventDto.setRelatedSkills(List.of(new SkillDto(3L,"3"), new SkillDto(4L,"4")));
 
         Assert.assertThrows(
                 DataValidationException.class,
@@ -157,7 +157,7 @@ public class EventServiceTest {
 
     @Test
     void testUpdatingEventIsValid() {
-        eventDto.setRelatedSkills(List.of(new SkillDto(1), new SkillDto(2)));
+        eventDto.setRelatedSkills(List.of(new SkillDto(1L,"1"), new SkillDto(2L,"2")));
         eventService.updateEvent(eventDto);
 
         Mockito.verify(eventMapper, Mockito.times(1)).toEntity(eventDto);

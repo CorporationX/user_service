@@ -1,4 +1,4 @@
-package school.faang.user_service.util;
+package school.faang.user_service.profilePicGenerator;
 
 public class ProfilePicGenerator {
 

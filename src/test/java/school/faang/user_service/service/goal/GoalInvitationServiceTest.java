@@ -19,10 +19,11 @@ import school.faang.user_service.filter.goalInvitation.GoalInvitationInvitedName
 import school.faang.user_service.filter.goalInvitation.GoalInvitationInviterIdFilter;
 import school.faang.user_service.filter.goalInvitation.GoalInvitationInviterNameFilter;
 import school.faang.user_service.filter.goalInvitation.GoalInvitationStatusFilter;
-import school.faang.user_service.mapper.goal.GoalInvitationMapperImpl;
+import school.faang.user_service.mapper.GoalInvitationMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.GoalInvitationService;
 import school.faang.user_service.util.goal.exception.AcceptingGoalInvitationException;
 import school.faang.user_service.util.goal.exception.GoalInvitationNotFoundException;
 import school.faang.user_service.util.goal.exception.MappingGoalInvitationDtoException;

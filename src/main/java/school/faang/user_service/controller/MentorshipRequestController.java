@@ -8,7 +8,7 @@ import school.faang.user_service.dto.mentorshipRequest.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorshipRequest.RejectionDto;
 import school.faang.user_service.dto.mentorshipRequest.RequestFilterDto;
 import school.faang.user_service.dto.mentorshipRequest.RequestResponse;
-import school.faang.user_service.service.mentorshipRequest.MentorshipRequestService;
+import school.faang.user_service.service.MentorshipRequestService;
 
 @RestController
 @RequiredArgsConstructor

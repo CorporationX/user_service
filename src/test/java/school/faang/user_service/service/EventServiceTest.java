@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
+
 
 @ExtendWith(MockitoExtension.class)
 public class EventServiceTest {
@@ -111,5 +111,11 @@ public class EventServiceTest {
     public void testCorrectGetEvent() {
         when(eventRepository.findById(1L)).thenReturn(Optional.ofNullable(event));
         Assertions.assertEquals(eventMapper.toDTO(event), eventService.getEvent(1L));
+    }
+
+    @Test
+    public void testDeleteEvent() {
+        eventService.deleteEvent(1L);
+        Mockito.verify(eventRepository, Mockito.times(1)).deleteById(1L);
     }
 }

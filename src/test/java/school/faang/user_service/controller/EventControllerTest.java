@@ -66,27 +66,27 @@ public class EventControllerTest {
     }
 
     @Test
-    public void titleIsNull() {
+    public void testEventCreateTitleIsNull() {
         Assertions.assertThrows(DataValidationException.class, () -> eventController.create(eventDto1));
     }
 
     @Test
-    public void titleIsBlank() {
+    public void testEventCreateTitleIsBlank() {
         Assertions.assertThrows(DataValidationException.class, () -> eventController.create(eventDto2));
     }
 
     @Test
-    public void startDateIsNull() {
+    public void testEventCreateStartDateIsNull() {
         Assertions.assertThrows(DataValidationException.class, () -> eventController.create(eventDto3));
     }
 
     @Test
-    public void ownerIDIsNull() {
+    public void testEventCreateOwnerIDIsNull() {
         Assertions.assertThrows(DataValidationException.class, () -> eventController.create(eventDto4));
     }
 
     @Test
-    public void eventIsNull() {
+    public void testEventCreateEventIsNull() {
         Assertions.assertThrows(DataValidationException.class, () -> eventController.create(eventDto5));
     }
 
@@ -102,4 +102,34 @@ public class EventControllerTest {
         Mockito.verify(eventService, Mockito.times(1)).deleteEvent(1L);
     }
 
+    @Test
+    public void testSuccessfulUpdateEvent() {
+        eventController.updateEvent(eventDto);
+        Mockito.verify(eventService, Mockito.times(1)).updateEvent(eventDto);
+    }
+
+    @Test
+    public void testUpdateEventTitleIsNull() {
+        Assertions.assertThrows(DataValidationException.class, () -> eventController.updateEvent(eventDto1));
+    }
+
+    @Test
+    public void testUpdateEventTitleIsBlank() {
+        Assertions.assertThrows(DataValidationException.class, () -> eventController.updateEvent(eventDto2));
+    }
+
+    @Test
+    public void testUpdateEventStartDateIsNull() {
+        Assertions.assertThrows(DataValidationException.class, () -> eventController.updateEvent(eventDto3));
+    }
+
+    @Test
+    public void testUpdateEventOwnerIDIsNull() {
+        Assertions.assertThrows(DataValidationException.class, () -> eventController.updateEvent(eventDto4));
+    }
+
+    @Test
+    public void testUpdateEventEventIsNull() {
+        Assertions.assertThrows(DataValidationException.class, () -> eventController.updateEvent(eventDto5));
+    }
 }

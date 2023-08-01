@@ -7,6 +7,8 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.service.event.EventService;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class EventController {
@@ -29,5 +31,14 @@ public class EventController {
 
     public void deleteEvent(long id) {
         eventService.deleteEvent(id);
+    }
+
+    public EventDto updateEvent(EventDto event) {
+        validate(event);
+        return eventService.updateEvent(event);
+    }
+
+    public List<EventDto> getOwnedEvents(long userId) {
+        return eventService.getOwnedEvents(userId);
     }
 }

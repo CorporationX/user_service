@@ -14,6 +14,8 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -66,5 +68,19 @@ public class EventService {
         if (id > 0) {
             eventRepository.deleteById(id);
         }
+    }
+
+    public EventDto updateEvent(EventDto eventDto) {
+        validate(eventDto);
+        Event event = eventRepository.findById(eventDto.getId()).orElseThrow(() -> new DataValidationException("Event not found"));
+        return eventMapper.toDTO(eventRepository.save(eventMapper.update(eventDto, event)));
+    }
+
+    public List<EventDto> getOwnedEvents(long userId) {
+        return Optional.ofNullable(eventRepository.findAllByUserId(userId))
+                .orElse(new ArrayList<>())
+                .stream()
+                .map(eventMapper::toDTO)
+                .toList();
     }
 }

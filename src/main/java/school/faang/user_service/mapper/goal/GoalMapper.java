@@ -1,7 +1,6 @@
 package school.faang.user_service.mapper.goal;
 
 import org.mapstruct.*;
-import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;

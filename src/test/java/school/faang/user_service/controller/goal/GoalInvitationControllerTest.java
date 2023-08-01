@@ -1,21 +1,21 @@
 package school.faang.user_service.controller.goal;
 
+import org.mockito.Mock;
+import org.mockito.InjectMocks;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
+import school.faang.user_service.entity.goal.Goal;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import school.faang.user_service.service.goal.GoalInvitationService;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 @ExtendWith(MockitoExtension.class)
 public class GoalInvitationControllerTest {
@@ -50,7 +50,7 @@ public class GoalInvitationControllerTest {
     @Test
     @DisplayName("Create invitation: Valid request, should return 201")
     void testCreateInvitationIsOk() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/goal/invite")
+        mockMvc.perform(MockMvcRequestBuilders.post("/goal/invitation")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(goalInvitationDto)))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
@@ -59,11 +59,27 @@ public class GoalInvitationControllerTest {
     @Test
     @DisplayName("Create invitation: Bad request, should return 400")
     void testCreateInvitationBadRequest() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/goal/invite")
+        mockMvc.perform(MockMvcRequestBuilders.post("/goal/invitation")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(badGoalInvitationDto)))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
+    @Test
+    @DisplayName("Accept invitation: Valid request, should return 202")
+    void testAcceptInvitationAccepted() throws Exception {
+        long invitationId = 1L;
+        mockMvc.perform(MockMvcRequestBuilders.put("/goal/invitation/" + invitationId + "/accept")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isAccepted());
+    }
 
+    @Test
+    @DisplayName("Accept invitation: Bad request, should return 400")
+    void testAcceptInvitationBadRequest() throws Exception {
+        Goal goal = new Goal();
+        mockMvc.perform(MockMvcRequestBuilders.put("/goal/invitation/" + goal + "/accept")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
 }

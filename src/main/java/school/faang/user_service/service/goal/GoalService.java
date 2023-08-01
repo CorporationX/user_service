@@ -12,7 +12,7 @@ import school.faang.user_service.entity.Skill;
 
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.mapper.GoalMapper;
+import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validation.GoalValidator;

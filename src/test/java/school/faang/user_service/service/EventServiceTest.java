@@ -141,4 +141,11 @@ public class EventServiceTest {
         when(eventRepository.findAllByUserId(1L)).thenReturn(null);
         Assertions.assertEquals(0, eventService.getOwnedEvents(1L).size());
     }
+
+    @Test
+    public void testGetOwnedEvents() {
+        List<Event> events = List.of(Event.builder().build());
+        when(eventRepository.findAllByUserId(1L)).thenReturn(events);
+        Assertions.assertEquals(1, eventService.getOwnedEvents(1L).size());
+    }
 }

@@ -1,7 +1,12 @@
 name: Compile and Test
 
 on:
-  [ push, pull_request ]
+  pull_request:
+    branches: 
+      - medusa-master
+  push:
+    branches: 
+      - medusa-master
 
 jobs:
   compile_and_test:

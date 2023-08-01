@@ -91,3 +91,20 @@ val test by tasks.getting(Test::class) { testLogging.showStandardStreams = true 
 tasks.bootJar {
 	archiveFileName.set("service.jar")
 }
+
+tasks.test {
+	finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+	dependsOn(tasks.test)
+	reports {
+		xml.required.set(false)
+		csv.required.set(true)
+		html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+	}
+}
+
+jacoco {
+	toolVersion = "0.8.9"
+}

@@ -1,26 +1,25 @@
-name: CI
+name: Compile and Test
 
 on:
   pull_request:
-    branches:
-      - master
+    branches: 
+      - medusa-master
+  push:
+    branches: 
+      - medusa-master
 
 jobs:
-  build:
+  compile_and_test:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Set up JDK
-        uses: actions/setup-java@v2
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
         with:
-          java-version: '17'
-          distribution: 'adopt'
-
-      - name: Build with Gradle
-        run: ./gradlew build --no-daemon
-
-      - name: Run tests with Gradle
-        run: ./gradlew test --no-daemon
+          java-version: 17
+          distribution: 'corretto'
+          cache: gradle
+      - name: Compile with Gradle
+        run: ./gradlew compileJava
+      - name: Run tests
+        run: ./gradlew test

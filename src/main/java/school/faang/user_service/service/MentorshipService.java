@@ -34,7 +34,6 @@ public class MentorshipService {
     }
 
     public void deleteMentee(Long menteeId, Long mentorId) {
-
         User mentor = findUserById(mentorId);
         User mentee = findUserById(menteeId);
 
@@ -62,5 +61,11 @@ public class MentorshipService {
         return userRepository.findById(userId)
                 .orElseThrow(()->new EntityNotFoundException("Invalid user Id"));
     }
+
+  public void cancelMentoring(Long userId) {
+      User mentor = findUserById(userId);
+
+      mentor.setMentees(null);
+  }
 }
 

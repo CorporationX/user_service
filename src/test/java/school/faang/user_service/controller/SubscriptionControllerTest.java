@@ -10,9 +10,9 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.service.SubscriptionService;
+import school.faang.user_service.service.subscription.SubscriptionService;
 import school.faang.user_service.exception.DataValidationException;
 
 import java.util.List;

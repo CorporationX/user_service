@@ -8,13 +8,13 @@ import java.util.stream.Stream;
 
 @Component
 public class EventEndDateFilter implements EventFilter {
-  @Override
-  public boolean isApplicable(EventFilterDto filters) {
-    return filters.getEndDate() != null;
-  }
+    @Override
+    public boolean isApplicable(EventFilterDto filters) {
+        return filters.getEndDate() != null;
+    }
 
-  @Override
-  public Stream<Event> apply(Stream<Event> events, EventFilterDto filters) {
-    return events.filter(event -> event.getEndDate().isBefore(filters.getEndDate()));
-  }
+    @Override
+    public Stream<Event> apply(Stream<Event> events, EventFilterDto filters) {
+        return events.filter(event -> event.getEndDate().isBefore(filters.getEndDate()));
+    }
 }

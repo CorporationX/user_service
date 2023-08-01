@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import school.faang.user_service.exception.ErrorResponse;
+import school.faang.user_service.exception.GoalValidationException;
 import school.faang.user_service.exception.RequestValidationException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -43,4 +44,21 @@ class CustomExceptionHandlerTest {
         assertEquals(exception.getMessage(), errorResponse.getMessage());
     }
 
+    @Test
+    void testHandleGoalValidationException_ReturnsErrorResponse() {
+        GoalValidationException exception = new GoalValidationException("Goal is not valid");
+        request = mock(HttpServletRequest.class);
+
+        ResponseEntity<Object> response = exceptionHandler.handleGoalValidationException(exception, request);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+
+        ErrorResponse errorResponse = (ErrorResponse) response.getBody();
+
+        assertNotNull(errorResponse);
+        assertEquals(request.getRequestURI(), errorResponse.getUrl());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatus());
+        assertEquals("Goal Validation Error", errorResponse.getError());
+        assertEquals(exception.getMessage(), errorResponse.getMessage());
+    }
 }

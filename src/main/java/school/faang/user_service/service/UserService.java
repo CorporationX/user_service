@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.mydto.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.mymappers.UserMapper;
+import school.faang.user_service.mapper.mymappers.User1Mapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.util.exception.UserNotFoundException;
 
@@ -17,7 +17,7 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository repository;
-    private final UserMapper mapper;
+    private final User1Mapper mapper;
 
     public UserDto getUser(long id) {
         User foundUser = repository.findById(id)

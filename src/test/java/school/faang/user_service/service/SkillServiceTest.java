@@ -14,11 +14,11 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mappers.SkillMapper;
+import school.faang.user_service.mapper.SkillMapper;
+import school.faang.user_service.mapper.mymappers.Skill1Mapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -69,11 +69,11 @@ class SkillServiceTest {
 
     @Test
     void testGetOfferedSkills() {
-        SkillDto skillDto = new SkillDto(1L, "privet");
+        long userId = 1L;
 
-        skillService.getOfferedSkills(skillDto.getId());
-        Mockito.verify(skillRepository, Mockito.times(1))
-                .findAllByUserId(skillDto.getId());
+        skillService.getOfferedSkills(userId);
+        Mockito.verify(skillOfferRepository, Mockito.times(1))
+                .findById(userId);
     }
 
     @Test
@@ -82,7 +82,7 @@ class SkillServiceTest {
         SkillDto skillDto = new SkillDto(4L, "One");
 
         Recommendation recommendation1 = Recommendation.builder().receiver(User.builder().id(1L).username("sdf").build()).build();
-        SkillOffer skillOffer1 = new SkillOffer(4L, skill, recommendation1);
+        SkillOffer skillOffer1 = new SkillOffer(skill, 4L, recommendation1);
 
         Mockito.when(skillRepository.findById(4L)).thenReturn(Optional.of(skill));
         Mockito.when(skillRepository.findUserSkill(4L, 4L)).thenReturn(Optional.empty());

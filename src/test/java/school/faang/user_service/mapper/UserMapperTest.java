@@ -10,10 +10,10 @@ import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.mapper.mymappers.CountryMapperImpl;
-import school.faang.user_service.mapper.mymappers.GoalMapperImpl;
-import school.faang.user_service.mapper.mymappers.SkillMapperImpl;
-import school.faang.user_service.mapper.mymappers.UserMapperImpl;
+import school.faang.user_service.mapper.mymappers.Country1MapperImpl;
+import school.faang.user_service.mapper.mymappers.Goal1MapperImpl;
+import school.faang.user_service.mapper.mymappers.Skill1MapperImpl;
+import school.faang.user_service.mapper.mymappers.User1MapperImpl;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,17 +23,17 @@ import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 class UserMapperTest {
 
-    private GoalMapperImpl goalMapper;
-    private SkillMapperImpl skillMapper;
-    private CountryMapperImpl countryMapper;
-    private UserMapperImpl userMapper;
+    private Goal1MapperImpl goalMapper;
+    private Skill1MapperImpl skillMapper;
+    private Country1MapperImpl countryMapper;
+    private User1MapperImpl userMapper;
 
     @BeforeEach
     void setUp() {
-        goalMapper = new GoalMapperImpl();
-        skillMapper = new SkillMapperImpl();
-        countryMapper = new CountryMapperImpl();
-        userMapper = new UserMapperImpl(goalMapper, skillMapper, countryMapper);
+        goalMapper = new Goal1MapperImpl();
+        skillMapper = new Skill1MapperImpl();
+        countryMapper = new Country1MapperImpl();
+        userMapper = new User1MapperImpl(goalMapper, skillMapper, countryMapper);
     }
 
     @Test

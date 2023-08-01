@@ -13,7 +13,7 @@ import school.faang.user_service.util.exception.UserNotFoundException;
 
 @ControllerAdvice
 @Slf4j
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler3 {
 
     @ExceptionHandler(DataValidationException.class)
     public ResponseEntity<ErrorResponse> handleException(DataValidationException e){

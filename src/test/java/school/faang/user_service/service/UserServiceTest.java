@@ -6,20 +6,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.mydto.CountryDto;
-import school.faang.user_service.dto.mydto.GoalDto;
-import school.faang.user_service.dto.mydto.SkillDto;
 import school.faang.user_service.dto.mydto.UserDto;
-import school.faang.user_service.entity.Country;
-import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.mapper.mymappers.CountryMapperImpl;
-import school.faang.user_service.mapper.mymappers.GoalMapperImpl;
-import school.faang.user_service.mapper.mymappers.SkillMapperImpl;
-import school.faang.user_service.mapper.mymappers.UserMapperImpl;
+import school.faang.user_service.mapper.mymappers.Country1MapperImpl;
+import school.faang.user_service.mapper.mymappers.Goal1MapperImpl;
+import school.faang.user_service.mapper.mymappers.Skill1MapperImpl;
+import school.faang.user_service.mapper.mymappers.User1MapperImpl;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.UserService;
 import school.faang.user_service.util.exception.UserNotFoundException;
 
 import java.util.Collections;
@@ -37,16 +29,16 @@ class UserServiceTest {
     private UserRepository repository;
 
 
-    private GoalMapperImpl goalMapper = new GoalMapperImpl();
+    private Goal1MapperImpl goalMapper = new Goal1MapperImpl();
 
 
-    private SkillMapperImpl skillMapper = new SkillMapperImpl();
+    private Skill1MapperImpl skillMapper = new Skill1MapperImpl();
 
 
-    private CountryMapperImpl countryMapper = new CountryMapperImpl();
+    private Country1MapperImpl countryMapper = new Country1MapperImpl();
 
     @Spy
-    private UserMapperImpl userMapper = new UserMapperImpl(goalMapper, skillMapper, countryMapper);
+    private User1MapperImpl userMapper = new User1MapperImpl(goalMapper, skillMapper, countryMapper);
 
     @InjectMocks
     private UserService service;

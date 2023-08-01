@@ -6,7 +6,7 @@ import school.faang.user_service.entity.Country;
 
 @Mapper(componentModel = "spring",
         unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
-public interface CountryMapper {
+public interface Country1Mapper {
 
     CountryDto toDto(Country country);
 

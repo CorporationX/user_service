@@ -21,7 +21,7 @@ import school.faang.user_service.util.exception.UserNotFoundException;
 import java.util.NoSuchElementException;
 
 @ControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler2 {
 
     @ExceptionHandler(UserNotFoundException.class)
     private ResponseEntity<ErrorResponse> handleExceptions(UserNotFoundException e) {

@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public abstract class GoalMapper {
+public abstract class Goal1Mapper {
 
     @Autowired
     protected SkillRepository skillRepository;

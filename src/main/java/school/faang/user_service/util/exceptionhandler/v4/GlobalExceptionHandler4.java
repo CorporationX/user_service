@@ -19,7 +19,7 @@ import school.faang.user_service.util.exception.RejectionGoalInvitationException
 import school.faang.user_service.util.exception.UseFiltersException;
 
 @ControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler4 {
 
     @ExceptionHandler(CreateInvitationException.class)
     public ResponseEntity<ErrorResponse> handle(CreateInvitationException e) {

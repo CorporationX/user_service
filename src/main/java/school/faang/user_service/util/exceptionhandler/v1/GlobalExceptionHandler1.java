@@ -8,7 +8,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.NotFoundException;
 
 @ControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler1 {
     @ExceptionHandler(DataValidationException.class)
     public ResponseEntity<String> handleDataValidationException(DataValidationException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());

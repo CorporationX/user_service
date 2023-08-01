@@ -8,9 +8,9 @@ import school.faang.user_service.entity.User;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {GoalMapper.class, SkillMapper.class, CountryMapper.class},
+@Mapper(componentModel = "spring", uses = {Goal1Mapper.class, Skill1Mapper.class, Country1Mapper.class},
         unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE, injectionStrategy = InjectionStrategy.CONSTRUCTOR)
-public interface UserMapper {
+public interface User1Mapper {
 
     @Mapping(target = "followers", expression = "java(entity.getFollowers().stream().map(fol -> fol.getId()).toList())")
     @Mapping(target = "followees", expression = "java(entity.getFollowees().stream().map(fol -> fol.getId()).toList())")

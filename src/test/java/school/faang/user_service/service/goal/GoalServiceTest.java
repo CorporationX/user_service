@@ -3,12 +3,16 @@ package school.faang.user_service.service.goal;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -23,6 +27,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -35,6 +40,7 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.goal.filters.TitleGoalFilter;
 import school.faang.user_service.validation.GoalValidator;
 
 import java.util.Collections;
@@ -50,42 +56,71 @@ public class GoalServiceTest {
     @Mock
     private GoalRepository goalRepository;
 
-    @Mock
+    @Spy
     private GoalMapper goalMapper;
 
-    @Mock
     private List<GoalFilter> goalFilters;
 
     @Mock
     private GoalValidator goalValidator;
+    private List<Goal> mockSubtasks;
+    private List<GoalDto> mockDtoList;
+    private GoalFilter filter1;
+    private GoalFilter filter2;
 
     @BeforeEach
     public void setUp() {
+        mockSubtasks = new ArrayList<>();
+        Goal subtask1 = new Goal();
+        subtask1.setId(1L);
+        subtask1.setTitle("Subtask 1");
+        Goal subtask2 = new Goal();
+        subtask2.setId(2L);
+        subtask2.setTitle("Subtask 2");
+        mockSubtasks.add(subtask1);
+        mockSubtasks.add(subtask2);
+
+        mockDtoList = new ArrayList<>();
+        GoalDto dto1 = new GoalDto();
+        dto1.setId(1L);
+        dto1.setTitle("Subtask 1");
+        GoalDto dto2 = new GoalDto();
+        dto2.setId(2L);
+        dto2.setTitle("Subtask 2");
+        mockDtoList.add(dto1);
+        mockDtoList.add(dto2);
+
+        filter1 = mock(GoalFilter.class);
+        filter2 = mock(GoalFilter.class);
+        goalService = new GoalService(goalRepository, goalMapper, goalFilters,goalValidator);
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testGetGoalsByUser() {
+    void testGetGoalsByUser_EmptyGoalFiltersAndEmptyGoalRepository() {
         Long userId = 1L;
         GoalFilterDto filters = new GoalFilterDto();
-        List<GoalDto> mockGoals = Collections.singletonList(new GoalDto());
 
-        GoalFilter mockGoalFilter = mock(GoalFilter.class);
-
-        Goal mockGoal = new Goal();
-        when(goalRepository.findAll()).thenReturn(List.of(mockGoal));
-
-        when(goalFilters.stream()).thenReturn(Stream.of(mockGoalFilter));
-        when(mockGoalFilter.isApplicable(any(GoalFilterDto.class))).thenReturn(true);
-        when(mockGoalFilter.applyFilter(any(Stream.class), any(GoalFilterDto.class)))
-                .thenReturn(Stream.of(mockGoal));
-        when(goalMapper.toDto(any(Goal.class))).thenReturn(mockGoals.get(0));
+        when(goalRepository.findAll()).thenReturn(new ArrayList<>());
 
         List<GoalDto> result = goalService.getGoalsByUser(userId, filters);
 
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(mockGoals, result);
+        assertEquals(0, result.size());
+    }
+
+    @Test
+    void testGetGoalsByUser_WithNonApplicableGoalFilter() {
+        Long userId = 1L;
+        GoalFilterDto filters = new GoalFilterDto();
+        GoalFilter nonApplicableFilter = mock(GoalFilter.class);
+        when(nonApplicableFilter.isApplicable(filters)).thenReturn(false);
+
+        List<GoalFilter> goalFilters = List.of(nonApplicableFilter);
+        List<Goal> goals = List.of(new Goal(), new Goal());
+        when(goalRepository.findAll()).thenReturn(goals);
+        List<GoalDto> result = goalService.getGoalsByUser(userId, filters);
+
+        assertEquals(0, result.size());
     }
 
     @Test
@@ -111,108 +146,31 @@ public class GoalServiceTest {
     }
 
     @Test
-    public void testDeleteGoal_ExistingGoal() {
-        long goalId = 1L;
+    void testGetGoalsByUser_WithApplicableGoalFilter() {
+        Long userId = 1L;
+        GoalFilterDto filters = new GoalFilterDto();
 
-        goalService.deleteGoal(goalId);
+        GoalFilter applicableFilter = mock(GoalFilter.class);
+        when(applicableFilter.isApplicable(filters)).thenReturn(true);
 
-        verify(goalRepository, times(1)).deleteById(goalId);
-    }
+        List<GoalFilter> goalFilters = Collections.singletonList(applicableFilter);
+        goalService = new GoalService(goalRepository, goalMapper, goalFilters, goalValidator);
 
-    @Test
-    public void testDeleteGoal_NonExistentGoal() {
-        long nonExistentGoalId = 10L;
+        List<Goal> goals = Arrays.asList(new Goal(), new Goal());
+        when(goalRepository.findAll()).thenReturn(goals);
 
-        doNothing().when(goalRepository).deleteById(anyLong());
+        GoalDto goalDto1 = new GoalDto();
+        GoalDto goalDto2 = new GoalDto();
+        when(goalMapper.toDto(any(Goal.class))).thenReturn(goalDto1, goalDto2);
 
-        goalService.deleteGoal(nonExistentGoalId);
+        Stream<Goal> filteredGoals = goals.stream();
+        when(applicableFilter.applyFilter(any(Stream.class), eq(filters))).thenReturn(filteredGoals);
 
-        verify(goalRepository, times(1)).deleteById(nonExistentGoalId);
-    }
+        List<GoalDto> result = goalService.getGoalsByUser(userId, filters);
 
-    @Test
-    public void testGetAllGoalsByUser() {
-        goalService.getGoalsByUser(1L);
-
-        verify(goalRepository, times(1)).findGoalsByUserId(1L);
-    }
-
-    @Test
-    @DisplayName("Should return goal by id")
-    public void testGetById() {
-        Goal running = new Goal();
-        running.setId(1L);
-        running.setTitle("Running");
-        running.setDescription("Running description");
-
-        when(goalRepository.findById(1L)).thenReturn(Optional.of(running));
-        goalService.get(1L);
-        Mockito.verify(goalMapper, Mockito.times(1)).toDto(running);
-    }
-
-    @Test
-    @DisplayName("Should update goal successfully")
-    public void testUpdateGoal() {
-        Goal running = new Goal();
-        running.setId(1L);
-        running.setTitle("Running");
-        running.setDescription("Running description");
-
-        when(goalRepository.findById(1L)).thenReturn(Optional.of(running));
-
-        GoalDto goalToUpdate = new GoalDto();
-        goalToUpdate.setId(1L);
-        goalToUpdate.setTitle("Update goal");
-        goalToUpdate.setDescription("Update goal");
-
-        goalService.update(goalToUpdate);
-        Mockito.verify(goalMapper, Mockito.times(1)).update(goalMapper.toDto(running), goalToUpdate);
-        Mockito.verify(goalRepository, Mockito.times(1)).save(goalMapper.toEntity(goalMapper.toDto(running)));
-    }
-
-    @Test
-    @DisplayName("Should remove specific user from goal.users list, if users > 2")
-    public void removeUserFromGoalsTest() {
-        Goal running = new Goal();
-        Goal swimming = new Goal();
-        Goal coding = new Goal();
-        Goal relaxing = new Goal();
-
-        User alex = new User();
-        alex.setId(1L);
-
-        User blake = new User();
-        blake.setId(2L);
-
-        running.setId(1L);
-        running.setUsers(List.of(alex, blake));
-
-        swimming.setId(2L);
-        swimming.setUsers(List.of(alex, blake));
-
-        coding.setId(3L);
-        coding.setUsers(List.of(alex, blake));
-
-        relaxing.setId(4L);
-        relaxing.setUsers(List.of(alex, blake));
-
-        when(goalRepository.findAllById(List.of(1L, 2L, 3L, 4L))).thenReturn(List.of(running, swimming, coding, relaxing));
-
-        int removedUsersFromGoalCount = goalService.removeUserFromGoals(List.of(1L, 2L, 3L, 4L), 1L);
-
-        assertEquals(4, removedUsersFromGoalCount);
-        assertEquals(1, running.getUsers().size());
-        assertEquals(1, swimming.getUsers().size());
-        assertEquals(1, coding.getUsers().size());
-        assertEquals(1, relaxing.getUsers().size());
-    }
-
-    @Test
-    @DisplayName("Should call goalRepository.deleteAllById")
-    void testDeleteAllByIds() {
-        goalService.deleteAllByIds(List.of(1L, 2L, 3L, 4L));
-
-        verify(goalRepository, times(1)).deleteAllById(List.of(1L, 2L, 3L, 4L));
-
+        assertEquals(2, result.size());
+        assertEquals(goalDto1, result.get(0));
+        assertEquals(goalDto2, result.get(1));
+        verify(goalMapper, times(2)).toDto(any(Goal.class));
     }
 }

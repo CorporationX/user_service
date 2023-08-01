@@ -24,17 +24,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GoalController {
     private final GoalService goalService;
-    private final GoalValidator goalValidator;
 
     @GetMapping("/users/{userId}/goals")
-    public ResponseEntity<List<GoalDto>> getGoalsByUser(@PathVariable Long userId, @RequestBody GoalFilterDto filters) {
+    public List<GoalDto> getGoalsByUser(@PathVariable Long userId, @RequestBody GoalFilterDto filters) {
         List<GoalDto> goals = goalService.getGoalsByUser(userId, filters);
-        return new ResponseEntity<>(goals, HttpStatus.OK);
+        return goals;
     }
 
     @PostMapping("/users/{userId}/goals")
     public ResponseEntity<GoalDto> createGoal(@PathVariable Long userId, @RequestBody GoalDto goal) {
-        goalValidator.validateGoal(userId, goal);
         GoalDto createdGoal = goalService.createGoal(userId, goal);
         return new ResponseEntity<>(createdGoal, HttpStatus.CREATED);
     }

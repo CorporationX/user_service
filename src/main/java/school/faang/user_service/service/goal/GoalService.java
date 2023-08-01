@@ -3,6 +3,7 @@ package school.faang.user_service.service.goal;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.goal.GoalDto;
@@ -17,17 +18,23 @@ import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validation.GoalValidator;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Service
-@RequiredArgsConstructor
 public class GoalService {
     private final GoalRepository goalRepository;
     private final GoalMapper goalMapper;
     private final List<GoalFilter> goalFilters;
-    private final SkillRepository skillRepository;
     private final GoalValidator goalValidator;
 
+    @Autowired
+    public GoalService(GoalRepository goalRepository, GoalMapper goalMapper, List<GoalFilter> goalFilters, GoalValidator goalValidator) {
+        this.goalRepository = goalRepository;
+        this.goalMapper = goalMapper;
+        this.goalFilters = Optional.ofNullable(goalFilters).orElse(List.of());
+        this.goalValidator = goalValidator;
+    }
 
     public List<GoalDto> getGoalsByUser(@NotNull Long userId, GoalFilterDto filters) {
         Stream<Goal> goals = goalRepository.findAll().stream();

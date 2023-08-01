@@ -42,9 +42,6 @@ public class GoalControllerTest {
     @Mock
     private GoalService goalService;
 
-    @Mock
-    private GoalValidator goalValidator;
-
     @InjectMocks
     private GoalController goalController;
 

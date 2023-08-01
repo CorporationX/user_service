@@ -38,11 +38,11 @@ public class EventService {
     private boolean ownerHasSkills(EventDto event, User user) {
 
         return user.getSkills().stream()
-                .map(Skill::getTitle)
+                .map(Skill::getId)
                 .collect(Collectors.toSet())
                 .containsAll(
                         event.getRelatedSkills().stream()
-                                .map(SkillDto::getTitle)
+                                .map(SkillDto::getId)
                                 .collect(Collectors.toSet()));
 
     }

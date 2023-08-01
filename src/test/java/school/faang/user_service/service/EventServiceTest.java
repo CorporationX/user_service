@@ -91,7 +91,7 @@ public class EventServiceTest {
     @Test
     public void testOwnerHasSkillsForEvent() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user2));
-        when(eventRepository.save(eventMapper.toEvent(eventDto))).thenReturn(event);
-        Assertions.assertEquals(event, eventService.create(eventDto));
+        eventService.create(eventDto);
+        verify(eventRepository, Mockito.times(1)).save(eventMapper.toEvent(eventDto));
     }
 }

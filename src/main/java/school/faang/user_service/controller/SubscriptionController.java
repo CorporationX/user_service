@@ -12,7 +12,7 @@ import school.faang.user_service.dto.SubscriptionDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.service.SubscriptionService;
-import school.faang.user_service.validator.SubscriptionValidator;
+import school.faang.user_service.util.validator.SubscriptionValidator;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;

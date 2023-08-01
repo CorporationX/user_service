@@ -6,17 +6,17 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import school.faang.user_service.util.mentorshipRequest.exception.GetRequestsMentorshipsException;
-import school.faang.user_service.util.mentorshipRequest.exception.IncorrectIdException;
-import school.faang.user_service.util.mentorshipRequest.exception.NoRequestsException;
-import school.faang.user_service.util.mentorshipRequest.exception.RequestIsAlreadyAcceptedException;
-import school.faang.user_service.util.mentorshipRequest.exception.RequestIsAlreadyRejectedException;
-import school.faang.user_service.util.mentorshipRequest.exception.RequestMentorshipException;
-import school.faang.user_service.util.mentorshipRequest.exception.SameMentorAndMenteeException;
-import school.faang.user_service.util.mentorshipRequest.exception.TimeHasNotPassedException;
-import school.faang.user_service.util.mentorshipRequest.exception.UnknownRejectionReasonException;
-import school.faang.user_service.util.mentorshipRequest.exception.UserNotFoundException;
-import school.faang.user_service.util.mentorshipRequest.response.ErrorResponse;
+import school.faang.user_service.dto.response.ErrorResponse;
+import school.faang.user_service.util.exception.GetRequestsMentorshipsException;
+import school.faang.user_service.util.exception.IncorrectIdException;
+import school.faang.user_service.util.exception.NoRequestsException;
+import school.faang.user_service.util.exception.RequestIsAlreadyAcceptedException;
+import school.faang.user_service.util.exception.RequestIsAlreadyRejectedException;
+import school.faang.user_service.util.exception.RequestMentorshipException;
+import school.faang.user_service.util.exception.SameMentorAndMenteeException;
+import school.faang.user_service.util.exception.TimeHasNotPassedException;
+import school.faang.user_service.util.exception.UnknownRejectionReasonException;
+import school.faang.user_service.util.exception.UserNotFoundException;
 
 import java.util.NoSuchElementException;
 
@@ -26,8 +26,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserNotFoundException.class)
     private ResponseEntity<ErrorResponse> handleExceptions(UserNotFoundException e) {
         ErrorResponse errorResponse = new ErrorResponse(
-                "Incorrect inputs about users",
-                System.currentTimeMillis()
+                HttpStatus.BAD_REQUEST.value(),
+                "Incorrect inputs about users"
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
@@ -36,8 +36,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SameMentorAndMenteeException.class)
     private ResponseEntity<ErrorResponse> handleExceptions(SameMentorAndMenteeException e) {
         ErrorResponse errorResponse = new ErrorResponse(
-                "The same mentor is specified",
-                System.currentTimeMillis()
+                HttpStatus.BAD_REQUEST.value(),
+                "The same mentor is specified"
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
@@ -46,8 +46,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RequestMentorshipException.class)
     private ResponseEntity<ErrorResponse> handleExceptions(RequestMentorshipException e) {
         ErrorResponse errorResponse = new ErrorResponse(
-                e.getMessage(),
-                System.currentTimeMillis()
+                HttpStatus.BAD_REQUEST.value(),
+                e.getMessage()
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
@@ -56,8 +56,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TimeHasNotPassedException.class)
     private ResponseEntity<ErrorResponse> handleExceptions(TimeHasNotPassedException e) {
         ErrorResponse errorResponse = new ErrorResponse(
-                "The request can be sent once every three months",
-                System.currentTimeMillis()
+                HttpStatus.BAD_REQUEST.value(),
+                "The request can be sent once every three months"
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
@@ -74,15 +74,15 @@ public class GlobalExceptionHandler {
             );
         }
 
-        return new ResponseEntity<>(new ErrorResponse(message.toString(),
-                HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ErrorResponse(HttpStatus.BAD_REQUEST.value(),
+                message.toString()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(NoSuchElementException.class)
     private ResponseEntity<ErrorResponse> handleExceptions(NoSuchElementException e) {
         ErrorResponse errorResponse = new ErrorResponse(
-                "Some elements are not in a database",
-                System.currentTimeMillis()
+                HttpStatus.BAD_REQUEST.value(),
+                "Some elements are not in a database"
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
@@ -91,8 +91,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(GetRequestsMentorshipsException.class)
     private ResponseEntity<ErrorResponse> handleExceptions(GetRequestsMentorshipsException e) {
         ErrorResponse errorResponse = new ErrorResponse(
-                e.getMessage(),
-                System.currentTimeMillis()
+                HttpStatus.BAD_REQUEST.value(),
+                e.getMessage()
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
@@ -101,8 +101,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoRequestsException.class)
     private ResponseEntity<ErrorResponse> handleExceptions(NoRequestsException e) {
         ErrorResponse errorResponse = new ErrorResponse(
-                "No requests were created",
-                System.currentTimeMillis()
+                HttpStatus.BAD_REQUEST.value(),
+                "No requests were created"
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
@@ -111,8 +111,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RequestIsAlreadyAcceptedException.class)
     private ResponseEntity<ErrorResponse> handleExceptions(RequestIsAlreadyAcceptedException e) {
         ErrorResponse errorResponse = new ErrorResponse(
-                "This request is already accepted",
-                System.currentTimeMillis()
+                HttpStatus.BAD_REQUEST.value(),
+                "This request is already accepted"
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
@@ -121,8 +121,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RequestIsAlreadyRejectedException.class)
     private ResponseEntity<ErrorResponse> handleExceptions(RequestIsAlreadyRejectedException e) {
         ErrorResponse errorResponse = new ErrorResponse(
-                "This request is already rejected",
-                System.currentTimeMillis()
+                HttpStatus.BAD_REQUEST.value(),
+                "This request is already rejected"
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
@@ -131,8 +131,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IncorrectIdException.class)
     private ResponseEntity<ErrorResponse> handleExceptions(IncorrectIdException e) {
         ErrorResponse errorResponse = new ErrorResponse(
-                "Id can't be lower than 1",
-                System.currentTimeMillis()
+                HttpStatus.BAD_REQUEST.value(),
+                "Id can't be lower than 1"
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
@@ -141,8 +141,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnknownRejectionReasonException.class)
     private ResponseEntity<ErrorResponse> handleExceptions(UnknownRejectionReasonException e) {
         ErrorResponse errorResponse = new ErrorResponse(
-                "Rejection's reason must be specified",
-                System.currentTimeMillis()
+                HttpStatus.BAD_REQUEST.value(),
+                "Rejection's reason must be specified"
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);

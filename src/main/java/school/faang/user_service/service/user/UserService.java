@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.MentorshipService;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.goal.GoalService;
 
@@ -18,6 +19,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final GoalService goalService;
     private final EventService eventService;
+    private final MentorshipService mentorshipService;
 
     public boolean isUserExist(Long userId) {
         return userRepository.existsById(userId);
@@ -74,8 +76,14 @@ public class UserService {
         eventService.removeUserFromEvents(userEventsForUpdating, userId);
     }
 
+    private void cancelMentoring(Long userId) {
+        mentorshipService.cancelMentoring(userId);
+    }
+
+
     public void deactivateUser(Long userId) {
         stopUserGoals(userId);
         stopUserEvents(userId);
+        cancelMentoring(userId);
     }
 }

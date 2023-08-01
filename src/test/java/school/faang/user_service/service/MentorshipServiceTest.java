@@ -2,10 +2,10 @@ package school.faang.user_service.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.spy;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipServiceTest {
@@ -136,5 +137,26 @@ class MentorshipServiceTest {
         mentorshipService.deleteMentee(user.getId(),user4.getId());
         assertNotEquals(1, user4.getMentees().size());
         Mockito.verify(userRepository).save(any());
+    }
+
+    @Test
+    @DisplayName("Should remove specific mentor from mentee.mentors list")
+    public void testRemoveMentorFromAllMentees() {
+        User max = new User();
+        User brayn = new User();
+        User paul = new User();
+
+        User samMentor = new User();
+        samMentor.setId(1L);
+
+        User spiedSam = spy(samMentor);
+
+        samMentor.setMentees(List.of(max, brayn, paul));
+
+        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(spiedSam));
+
+        mentorshipService.cancelMentoring(1L);
+
+        Mockito.verify(spiedSam).setMentees(null);
     }
 }

@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.MentorshipService;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.goal.GoalService;
 
@@ -26,6 +27,9 @@ public class UserServiceTest {
 
     @Mock
     EventService eventService;
+
+    @Mock
+    MentorshipService mentorshipService;
 
     @InjectMocks
     private UserService userService;
@@ -187,5 +191,11 @@ public class UserServiceTest {
         userService.deactivateUser(1L);
 
         Mockito.verify(eventService, Mockito.times(1)).removeUserFromEvents(List.of(1L, 2L, 3L, 4L), 1L);
+    }
+
+    @Test
+    public void testCancelMentoring() {
+        userService.deactivateUser(1L);
+        Mockito.verify(mentorshipService, Mockito.times(1)).cancelMentoring(1L);
     }
 }

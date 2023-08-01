@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exeption.DataValidationException;
+import school.faang.user_service.exception.DataValidationException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,14 +13,13 @@ import java.util.List;
 public class MentorshipRequestValidator {
     private static final int REQUEST_WITH_PREMIUM = 5;
     private static final int REQUEST_WITHOUT_PREMIUM = 3;
-    private int numberOfRequestsInMonth;
 
     public void requestValidate(User requester, User receiver) {
         if (requester.getId() == receiver.getId()) {
             throw new DataValidationException("request was not create, your mentor is you");
         }
 
-        numberOfRequestsInMonth = getRequestsInMonth(requester);
+        int numberOfRequestsInMonth = getRequestsInMonth(requester);
 
         List<MentorshipRequest> sentRequests = requester.getSentMentorshipRequests();
         if (sentRequests.size() >= numberOfRequestsInMonth) {

@@ -8,20 +8,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RecommendationDto {
+public class RecommendationUpdateDto {
     @NotNull
     private Long id;
-    private Long authorId;
-    private Long receiverId;
     @NotNull
     @NotBlank
     private String content;
-    private List<SkillOfferDto> skillOffers;
-    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

@@ -34,7 +34,7 @@ spring:
       calendar-id: primary
       redirect-uri: http://localhost:8080/api/v1/google/calendar/Callback
       scopes: https://www.googleapis.com/auth/calendar
-      access-type: online
+      access-type: offline
 
 server:
   port: 8080

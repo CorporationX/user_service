@@ -1,4 +1,4 @@
-package school.faang.user_service.controller.mentorshipRequest;
+package school.faang.user_service.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

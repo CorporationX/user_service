@@ -1,4 +1,4 @@
-package school.faang.user_service.util.exceptionhandler;
+package school.faang.user_service.util.exceptionhandler.v3;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

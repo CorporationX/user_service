@@ -1,4 +1,4 @@
-package school.faang.user_service.exceptionHandler.mentorshipRequest;
+package school.faang.user_service.util.exceptionhandler.v2;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

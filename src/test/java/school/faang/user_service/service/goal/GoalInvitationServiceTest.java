@@ -137,8 +137,15 @@ class GoalInvitationServiceTest {
 
     @Test
     void acceptInvitation_AlreadyAccepted_ShouldThrowException() {
+        User user = Mockito.spy(User.class);
+        GoalInvitation goalInvitation = Mockito.spy(GoalInvitation.class);
+        goalInvitation.setId(1L);
+        goalInvitation.setStatus(RequestStatus.ACCEPTED);
+
+        Mockito.when(goalInvitation.getInvited()).thenReturn(user);
+        Mockito.when(user.getGoals()).thenReturn(List.of(new Goal()));
         Mockito.when(goalInvitationRepository.findById(Mockito.any())).thenReturn(Optional.of(
-                GoalInvitation.builder().id(1L).status(RequestStatus.ACCEPTED).build()
+                goalInvitation
         ));
 
         AcceptingGoalInvitationException e = Assertions.assertThrows(AcceptingGoalInvitationException.class,
@@ -257,7 +264,7 @@ class GoalInvitationServiceTest {
     }
 
     @Test
-    void testGetInvitations_InputsAreCorrect_ShouldFilter() {
+    void getInvitations_InputsAreCorrect_ShouldFilter() {
         Mockito.when(goalInvitationRepository.findAll())
                 .thenReturn(getStreamOfGoalInvitations().toList());
         List<GoalInvitationDto> expected = List.of(

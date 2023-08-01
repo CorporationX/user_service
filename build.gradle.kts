@@ -100,12 +100,11 @@ tasks.jacocoTestReport {
 	dependsOn(tasks.test)
 	reports {
 		xml.required.set(false)
-		csv.required.set(false)
+		csv.required.set(true)
 		html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
 	}
 }
 
 jacoco {
 	toolVersion = "0.8.9"
-	reportsDirectory.set(layout.buildDirectory.dir("customJacocoReportDir"))
 }

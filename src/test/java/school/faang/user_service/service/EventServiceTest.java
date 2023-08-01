@@ -3,6 +3,7 @@ package school.faang.user_service.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,6 +17,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.mapper.event.EventMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -90,7 +92,7 @@ public class EventServiceTest {
     public void testOwnerHasSkillsForEvent() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user2));
         eventService.create(eventDto);
-        Mockito.verify(eventRepository, Mockito.times(1)).save(eventMapper.toEvent(eventDto));
+        verify(eventRepository, Mockito.times(1)).save(eventMapper.toEvent(eventDto));
     }
 
     @Test

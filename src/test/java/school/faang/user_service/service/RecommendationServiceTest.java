@@ -30,8 +30,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 
 @ExtendWith(MockitoExtension.class)
 class RecommendationServiceTest {
@@ -111,21 +112,19 @@ class RecommendationServiceTest {
     }
 
     @Test
-    public void testCreateThrowException() {
+    void testCreateThrowException() {
         recommendationValidator = new RecommendationValidator(recommendationRepository, skillOffersRepository);
 
         Mockito.when(recommendationRepository.create(1L, 1L, "content"))
                 .thenReturn(1L);
         Mockito.when(recommendationRepository.findById(1L))
-                        .thenReturn(Optional.ofNullable(null));
+                        .thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> {
-            recommendationService.create(recommendationDto);
-        });
+        assertThrows(EntityNotFoundException.class, () -> recommendationService.create(recommendationDto));
     }
 
     @Test
-    public void testCreateCallValidateData() {
+    void testCreateCallValidateData() {
         Mockito.lenient().when(skillOffersRepository.findById(1L))
                 .thenReturn(Optional.of(new SkillOffer()));
         Mockito.lenient().when(skillOffersRepository.create(1L, 1L))
@@ -141,7 +140,7 @@ class RecommendationServiceTest {
     }
 
     @Test
-    public void testCreateCallValidateSkill() {
+    void testCreateCallValidateSkill() {
         Mockito.lenient().when(skillOffersRepository.findById(1L))
                 .thenReturn(Optional.of(new SkillOffer()));
         Mockito.lenient().when(skillOffersRepository.create(1L, 1L))
@@ -157,11 +156,7 @@ class RecommendationServiceTest {
     }
 
     @Test
-    public void testCreateCallSkillSave() {
-        Mockito.when(skillOffersRepository.findById(1L))
-                .thenReturn(Optional.of(new SkillOffer()));
-        Mockito.when(skillOffersRepository.create(1L, 1L))
-                .thenReturn(1L);
+    void testCreateCallSkillSave() {
         Mockito.when(recommendationRepository.create(1L, 1L, "content"))
                 .thenReturn(1L);
         Mockito.when(recommendationRepository.findById(1L))
@@ -169,11 +164,11 @@ class RecommendationServiceTest {
 
         recommendationService.create(recommendationDto);
 
-        assertEquals(2, recommendation.getSkillOffers().size());
+        assertEquals(1, recommendation.getSkillOffers().size());
     }
 
     @Test
-    public void testSkillSaveThrowException() {
+    void testSkillSaveThrowException() {
         Skill skill1 = Skill
                 .builder()
                 .id(2L)
@@ -192,17 +187,11 @@ class RecommendationServiceTest {
         Mockito.when(skillOffersRepository.create(1L, 1L))
                 .thenReturn(1L);
 
-        assertThrows(EntityNotFoundException.class, () -> {
-            recommendationService.create(recommendationDto);
-        });
+        assertThrows(EntityNotFoundException.class, () -> recommendationService.create(recommendationDto));
     }
 
     @Test
-    public void testCreate() {
-        Mockito.when(skillOffersRepository.findById(1L))
-                .thenReturn(Optional.of(new SkillOffer()));
-        Mockito.when(skillOffersRepository.create(1L, 1L))
-                .thenReturn(1L);
+    void testCreate() {
         Mockito.when(recommendationRepository.create(1L, 1L, "content"))
                 .thenReturn(1L);
         Mockito.when(recommendationRepository.findById(1L))
@@ -210,11 +199,11 @@ class RecommendationServiceTest {
 
         RecommendationDto result = recommendationService.create(recommendationDto);
 
-        assertEquals(2, result.getSkillOffers().size());
+        assertEquals(1, result.getSkillOffers().size());
     }
 
     @Test
-    public void testCreateWhereRecommendationHasEmptySkillOffer() {
+    void testCreateWhereRecommendationHasEmptySkillOffer() {
         recommendation.setSkillOffers(new ArrayList<>());
 
         Mockito.when(skillOffersRepository.findById(1L))
@@ -232,13 +221,9 @@ class RecommendationServiceTest {
     }
 
     @Test
-    public void testCreateWhereRecommendationHasFewSkillsOffers() {
+    void testCreateWhereRecommendationHasFewSkillsOffers() {
         recommendation.setSkillOffers(new ArrayList<>(List.of(skillOffer, skillOffer)));
 
-        Mockito.when(skillOffersRepository.findById(1L))
-                .thenReturn(Optional.of(new SkillOffer()));
-        Mockito.when(skillOffersRepository.create(1L, 1L))
-                .thenReturn(1L);
         Mockito.when(recommendationRepository.create(1L, 1L, "content"))
                 .thenReturn(1L);
         Mockito.when(recommendationRepository.findById(1L))
@@ -246,11 +231,11 @@ class RecommendationServiceTest {
 
         RecommendationDto result = recommendationService.create(recommendationDto);
 
-        assertEquals(3, result.getSkillOffers().size());
+        assertEquals(2, result.getSkillOffers().size());
     }
 
     @Test
-    public void testCallGuaranteesHaveSkill() {
+    void testCallGuaranteesHaveSkill() {
         User athorId = User
                 .builder()
                 .id(2)
@@ -283,10 +268,7 @@ class RecommendationServiceTest {
     }
 
     @Test
-    public void testUpdateRecommendation() {
-        ArrayList<SkillOffer> list = new ArrayList<>();
-        list.add(skillOffer);
-
+    void testUpdateRecommendation() {
         Mockito.when(recommendationRepository.findById(1L))
                 .thenReturn(Optional.of(recommendation));
         Mockito.when(recommendationRepository.update(recommendationDto.getAuthorId(), recommendationDto.getReceiverId(),
@@ -303,7 +285,7 @@ class RecommendationServiceTest {
     }
 
     @Test
-    public void testUpdateRecommendationSendNewSkillToTheOldSkill() {
+    void testUpdateRecommendationSendNewSkillToTheOldSkill() {
         recommendationDto.setSkillOffers(List.of(skillOfferDto,
                 new SkillOfferDto(2L, 2L, 1L)));
         Skill skill1 = Skill
@@ -322,14 +304,6 @@ class RecommendationServiceTest {
         Mockito.when(recommendationRepository.update(recommendationDto.getAuthorId(), recommendationDto.getReceiverId(),
                         recommendationDto.getContent()))
                 .thenReturn(recommendation);
-        Mockito.when(skillOffersRepository.create(skillOfferDto.getSkillId(), 1L))
-                .thenReturn(1L);
-        Mockito.when(skillOffersRepository.findById(1L))
-                .thenReturn(Optional.of(skillOffer));
-        Mockito.when(skillOffersRepository.create(2L, 1L))
-                .thenReturn(2L);
-        Mockito.when(skillOffersRepository.findById(2L))
-                .thenReturn(Optional.of(recommendation.getSkillOffers().get(1)));
 
         RecommendationDto actual = recommendationService.updateRecommendation(recommendationDto, 1L);
         RecommendationDto expected = recommendationMapper.toDto(recommendation);
@@ -337,7 +311,7 @@ class RecommendationServiceTest {
     }
 
     @Test
-    public void testUpdateRecommendationEmptyList() {
+    void testUpdateRecommendationEmptyList() {
         recommendationDto.setSkillOffers(List.of());
         recommendation.setSkillOffers(List.of());
 
@@ -357,13 +331,13 @@ class RecommendationServiceTest {
     }
 
     @Test
-    public void testDeleteRecommendation() {
+    void testDeleteRecommendation() {
         recommendationRepository.deleteById(1L);
         Mockito.verify(recommendationRepository, Mockito.times(1)).deleteById(1L);
     }
 
     @Test
-    public void testGetAllUserRecommendation() {
+    void testGetAllUserRecommendation() {
         Mockito.when(recommendationRepository.findAllByReceiverId(1L, Pageable.unpaged()))
                 .thenReturn(page);
 
@@ -372,7 +346,7 @@ class RecommendationServiceTest {
     }
 
     @Test
-    public void testAllUserGivenRecommendations() {
+    void testAllUserGivenRecommendations() {
         Mockito.when(recommendationRepository.findAllByAuthorId(1L, Pageable.unpaged()))
                 .thenReturn(page);
 

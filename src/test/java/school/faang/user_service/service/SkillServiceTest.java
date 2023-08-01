@@ -8,11 +8,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
-import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
@@ -48,6 +48,8 @@ class SkillServiceTest {
     private SkillOffer skillOffer4;
     private Skill skill;
 
+    private SkillDto skillDto;
+
     @Mock
     private UserSkillGuaranteeRepository userSkillGuaranteeRepository;
 
@@ -62,6 +64,10 @@ class SkillServiceTest {
         skillOffer2 = new SkillOffer(1L, skill, recommendation2);
         skillOffer3 = new SkillOffer(1L, skill, recommendation3);
         skillOffer4 = new SkillOffer(1L, skill, recommendation4);
+        skillDto = SkillDto.builder()
+                .id(1L)
+                .title("crek")
+                .build();
     }
 
     @Test
@@ -70,13 +76,12 @@ class SkillServiceTest {
 
         assertThrows(
                 DataValidationException.class,
-                () -> skillService.create(new SkillDto(1L, "crek"))
-        );
+                () -> skillService.create(skillDto
+        ));
     }
 
     @Test
     void testCreate() {
-        SkillDto skillDto = new SkillDto(1L, "crek");
         skillService.create(skillDto);
         Mockito.verify(skillRepository, Mockito.times(1))
                 .save(skillMapper.toEntity(skillDto));
@@ -96,23 +101,24 @@ class SkillServiceTest {
     void testGetOfferedSkills() {
         Skill skill1 = Skill.builder()
                 .id(1L)
-                .title("One")
+                .title("crek")
                 .build();
         Skill skill2 = Skill.builder()
                 .id(1L)
-                .title("One")
+                .title("crek")
                 .build();
-        SkillDto skillDto1 = new SkillDto(1L, "One");
-        SkillDto skillDto2 = new SkillDto(1L, "One");
-        SkillCandidateDto skillCandidateDto = new SkillCandidateDto(skillDto1, 2L);
+        SkillDto skillDto2 = SkillDto.builder()
+                .id(1L)
+                .title("crek")
+                .build();
+        SkillCandidateDto skillCandidateDto = new SkillCandidateDto(skillDto, 2L);
         List<SkillCandidateDto> expected = List.of(skillCandidateDto);
-
         List<Skill> skills = new ArrayList<>();
         skills.add(skill1);
         skills.add(skill2);
 
         Mockito.when(skillRepository.findSkillsOfferedToUser(1L)).thenReturn(skills);
-        Mockito.when(skillMapper.toDto(skill1)).thenReturn(skillDto1);
+        Mockito.when(skillMapper.toDto(skill1)).thenReturn(skillDto);
         Mockito.when(skillMapper.toDto(skill2)).thenReturn(skillDto2);
 
         skillService.getOfferedSkills(1L);
@@ -127,8 +133,6 @@ class SkillServiceTest {
 
     @Test
     void testAcquireSkillFromOffers() {
-        SkillDto skillDto = new SkillDto(1L, "One");
-
         Mockito.when(skillRepository.findUserSkill(1L, 1L)).thenReturn(Optional.empty());
         Mockito.when(skillOfferRepository.findAllOffersOfSkill(1L, 1L))
                 .thenReturn(List.of(skillOffer1, skillOffer2, skillOffer3, skillOffer4));
@@ -139,9 +143,7 @@ class SkillServiceTest {
 
     @Test
     void testAcquireSkillFromOffersFindUserSkill() {
-        Skill skill = new Skill(1L, "One", null, null, null, null, null, null);
-        SkillDto skillDto = new SkillDto(1L, "One");
-
+        Skill skill = new Skill(1L, "crek", null, null, null, null, null, null);
         Mockito.when(skillMapper.toDto(skill)).thenReturn(skillDto);
         Mockito.when(skillRepository.findUserSkill(1L, 1L)).thenReturn(Optional.of(skill));
 

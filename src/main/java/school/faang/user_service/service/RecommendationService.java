@@ -6,8 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
-import school.faang.user_service.dto.recommendation.SkillDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
+import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
@@ -46,7 +46,7 @@ public class RecommendationService {
     public void saveSkill(Recommendation recommendation, List<SkillOfferDto> list) {
         list.forEach(offer -> {
             if (recommendation.getSkillOffers().stream()
-                    .noneMatch(skillOffer -> skillOffer.getId() != skillOffer.getId())) {
+                    .noneMatch(skillOffer -> skillOffer.getId() == offer.getId())) {
                 long offerId = skillOffersRepository.create(offer.getSkillId(), recommendation.getId());
                 recommendation.addSkillOffer(skillOffersRepository.findById(offerId)
                         .orElseThrow(() -> new EntityNotFoundException("Skill offer not found")));
@@ -72,9 +72,8 @@ public class RecommendationService {
             userSkillGuarantee.setSkill(skillMapper.toEntity(skillDto));
             recommendation.getSkillOffers().stream()
                     .map(SkillOffer::getSkill)
-                    .filter(skill -> skill.getId() == skillDto.getId()).forEach((skill) -> {
-                        skill.getGuarantees().add(userSkillGuarantee);
-                    });
+                    .filter(skill -> skill.getId() == skillDto.getId()).forEach(skill ->
+                            skill.getGuarantees().add(userSkillGuarantee));
             userSkillGuaranteeRepository.save(userSkillGuarantee);
         }
     }

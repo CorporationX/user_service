@@ -23,11 +23,11 @@ public class MentorshipRequestController {
     private final MentorshipRequestService mentorshipRequestService;
 
     @PostMapping("/new-request")
-    public MentorshipRequestDto requestMentorship(@RequestBody MentorshipRequestDto mentorshipRequestDto) {
+    public void requestMentorship(@RequestBody MentorshipRequestDto mentorshipRequestDto) {
         if (mentorshipRequestDto.getDescription() == null || mentorshipRequestDto.getDescription().isBlank()) {
-            throw new DataValidationException("Добавьте описание к запросу на менторство");
+            throw new DataValidationException("Add a description to your mentoring request");
         }
-        return mentorshipRequestService.requestMentorship(mentorshipRequestDto);
+        mentorshipRequestService.requestMentorship(mentorshipRequestDto);
     }
 
     @PostMapping("/filters")
@@ -37,19 +37,11 @@ public class MentorshipRequestController {
 
     @PutMapping("/{id}/accept")
     public void acceptRequest(@PathVariable long id) {
-        validateRequestId(id);
         mentorshipRequestService.acceptRequest(id);
     }
 
     @PostMapping("/{id}/reject")
     public void rejectRequest(@PathVariable long id, @RequestBody RejectionDto rejection) {
-        validateRequestId(id);
         mentorshipRequestService.rejectRequest(id, rejection);
-    }
-
-    private void validateRequestId(long id) {
-        if (id < 1) {
-            throw new DataValidationException("Некорректный ввод id");
-        }
     }
 }

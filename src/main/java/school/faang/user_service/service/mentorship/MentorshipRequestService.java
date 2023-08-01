@@ -1,6 +1,7 @@
 package school.faang.user_service.service.mentorship;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
@@ -26,6 +27,7 @@ import java.util.stream.Stream;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class MentorshipRequestService {
 
     private final MentorshipRequestRepository mentorshipRequestRepository;
@@ -33,14 +35,13 @@ public class MentorshipRequestService {
     private final MentorshipRequestMapper requestMapper;
     private final List<MentorshipRequestFilter> filters;
 
-    public MentorshipRequestDto requestMentorship(MentorshipRequestDto requestDto) {
+    public void requestMentorship(MentorshipRequestDto requestDto) {
         long requesterId = requestDto.getRequester();
         long receiverId = requestDto.getReceiver();
 
         dataValidate(requesterId, receiverId, requestDto);
-
-        MentorshipRequest newRequest = mentorshipRequestRepository.create(requesterId, receiverId, requestDto.getDescription());
-        return requestMapper.toDto(newRequest);
+        mentorshipRequestRepository.create(requesterId, receiverId, requestDto.getDescription());
+        log.info("Mentorship request from requesterId={} to receiverId={} has been saved in DB successfully", requesterId, receiverId);
     }
 
     public List<MentorshipRequestDto> getRequests(RequestFilterDto filterDto) {
@@ -56,6 +57,7 @@ public class MentorshipRequestService {
             requestStream = filter.apply(requestStream, filterDto);
         }
 
+        log.info("Requests have been taken from DB with filters successfully");
         return requestStream.map(requestMapper::toDto).toList();
     }
 
@@ -80,8 +82,9 @@ public class MentorshipRequestService {
             receiver.getMentees().add(requester);
             mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
         } else {
-            throw new IllegalArgumentException("Данный пользователь уже является ментором отправителя");
+            throw new RequestAlreadyAcceptedException("This user has already been mentor for requester");
         }
+        log.info("The request accepted successfully, requestId={}", id);
     }
 
     public void rejectRequest(long id, RejectionDto rejection) {
@@ -96,17 +99,18 @@ public class MentorshipRequestService {
         mentorshipRequest.setRejectionReason(rejection.getReason());
         requester.getMentors().remove(receiver);
         receiver.getMentees().remove(requester);
+        log.info("The request rejected successfully, requestId={}", id);
     }
 
     private void checkAcceptedRequest(MentorshipRequest request, RequestStatus status ) {
         if (request.getStatus() == status) {
-            throw new RequestAlreadyAcceptedException("Данный запрос уже обработан");
+            throw new RequestAlreadyAcceptedException("This request has already been accepted");
         }
     }
 
     private MentorshipRequest findRequestInDB(long id) {
         return mentorshipRequestRepository.findById(id)
-                .orElseThrow(() -> new MentorshipRequestNotFoundException("Данного запроса на менторство не существует"));
+                .orElseThrow(() -> new MentorshipRequestNotFoundException("This mentorship request does not exist"));
     }
 
     private void dataValidate(long requesterId, long receiverId, MentorshipRequestDto requestDto) {
@@ -115,21 +119,21 @@ public class MentorshipRequestService {
         if (mentorshipRequestRepository.findLatestRequest(requesterId, receiverId).isPresent()) {
             MentorshipRequest latestRequest = mentorshipRequestRepository.findLatestRequest(requesterId, receiverId).get();
             if (latestRequest.getUpdatedAt().plusMonths(3).isAfter(LocalDateTime.now())) {
-                throw new DataValidationException("Нельзя отправить запрос на менторство данному пользователю, т.к. должно " +
-                        "пройти не менее 3-ех месяцев с момента последнего запроса");
+                throw new DataValidationException("You cannot send a mentorship request to this user " +
+                        "because it must have been at least 3 months since the last request");
             }
         }
     }
 
     private void userValidate(long requesterId, long receiverId) {
         if (!mentorshipRepository.existsById(requesterId)) {
-            throw new UserNotFoundException("Пользователя, отправляющего запрос не существует");
+            throw new UserNotFoundException("This requester does not exist");
         }
         if (!mentorshipRepository.existsById(receiverId)) {
-            throw new UserNotFoundException("Пользователя, у которого запрашивают менторство не существует");
+            throw new UserNotFoundException("This receiver does not exist");
         }
         if (requesterId == receiverId) {
-            throw new DataValidationException("Пользователь не может отправлять себе запрос на менторство");
+            throw new DataValidationException("The user cannot send himself a mentorship request");
         }
     }
 }

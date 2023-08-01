@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -101,7 +102,7 @@ public class EventServiceTest {
     @Test
     public void testGetNonExistentEvent() {
         when(eventRepository.findById(10L)).thenReturn(Optional.ofNullable(null));
-        Assertions.assertThrows(DataValidationException.class, () -> eventService.getEvent(10L));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> eventService.getEvent(10L));
     }
 
     @Test

@@ -1,5 +1,6 @@
 package school.faang.user_service.service.event;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.EventDto;
@@ -57,7 +58,7 @@ public class EventService {
         return eventMapper.toDTO(
                 eventRepository
                         .findById(id)
-                        .orElseThrow(() -> new DataValidationException("There is no event with this id"))
+                        .orElseThrow(() -> new EntityNotFoundException("There is no event with this id"))
         );
     }
 }

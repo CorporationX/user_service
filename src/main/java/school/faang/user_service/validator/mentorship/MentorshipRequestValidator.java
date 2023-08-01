@@ -1,4 +1,4 @@
-package school.faang.user_service.volidator.mentorship;
+package school.faang.user_service.validator.mentorship;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.MentorshipRequest;

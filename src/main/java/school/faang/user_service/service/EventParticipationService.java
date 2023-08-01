@@ -3,9 +3,7 @@ package school.faang.user_service.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exeptions.NoOneParticipatesInTheEvent;
-import school.faang.user_service.exeptions.UserAlreadyRegisteredAtEvent;
-import school.faang.user_service.exeptions.UserAreNotRegisteredAtEvent;
+import school.faang.user_service.exeptions.*;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
 import java.util.List;
@@ -22,7 +20,7 @@ public class EventParticipationService {
                 .filter(person -> person.getId() == userId)
                 .findFirst();
         if (user.isPresent()) {
-            throw new UserAlreadyRegisteredAtEvent(eventId, userId);
+            throw new UserAlreadyRegisteredAtEventExeption(eventId, userId);
         }
         eventParticipationRepository.register(eventId, userId);
     }
@@ -35,22 +33,21 @@ public class EventParticipationService {
         if (user.isPresent()) {
             eventParticipationRepository.unregister(eventId, userId);
         } else {
-            throw new UserAreNotRegisteredAtEvent(eventId, userId);
+            throw new UserAreNotRegisteredAtEventExeption(eventId, userId);
         }
     }
 
     public List<User> getParticipant(long eventId) {
         var users = eventParticipationRepository.findAllParticipantsByEventId(eventId);
-        if (users.size() == 0) {
-            throw new NoOneParticipatesInTheEvent(eventId);
+        if (users.isEmpty()) {
+            throw new NoOneParticipatesInTheEventExeption(eventId);
         } else {
             return users;
         }
     }
 
     public int getParticipantsCount(long eventID){
-        var contOfParticipants = eventParticipationRepository.countParticipants(eventID);
-        return contOfParticipants;
+        return eventParticipationRepository.countParticipants(eventID);
     }
 
 }

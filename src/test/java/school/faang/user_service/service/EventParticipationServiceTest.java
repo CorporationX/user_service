@@ -13,9 +13,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exeptions.NoOneParticipatesInTheEvent;
-import school.faang.user_service.exeptions.UserAlreadyRegisteredAtEvent;
-import school.faang.user_service.exeptions.UserAreNotRegisteredAtEvent;
+import school.faang.user_service.exeptions.NoOneParticipatesInTheEventExeption;
+import school.faang.user_service.exeptions.UserAlreadyRegisteredAtEventExeption;
+import school.faang.user_service.exeptions.UserAreNotRegisteredAtEventExeption;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -68,8 +68,8 @@ class EventParticipationServiceTest {
 
         Mockito.when(repository.findAllParticipantsByEventId(eventId)).thenReturn(registeredUsers);
 
-        UserAlreadyRegisteredAtEvent e = assertThrows(
-                UserAlreadyRegisteredAtEvent.class,
+        UserAlreadyRegisteredAtEventExeption e = assertThrows(
+                UserAlreadyRegisteredAtEventExeption.class,
                 () -> service.registerParticipant(eventId, userId)
         );
 
@@ -112,8 +112,8 @@ class EventParticipationServiceTest {
 
         Mockito.when(repository.findAllParticipantsByEventId(tempEventId)).thenReturn(registeredUsers);
 
-        UserAreNotRegisteredAtEvent e = assertThrows(
-                UserAreNotRegisteredAtEvent.class,
+        UserAreNotRegisteredAtEventExeption e = assertThrows(
+                UserAreNotRegisteredAtEventExeption.class,
                 () -> service.unregisterParticipant(tempEventId, tempUserId));
 
         assertEquals(String.format("User with id %d aren't registered at event with id %d", tempUserId, tempEventId), e.getMessage());
@@ -143,8 +143,8 @@ class EventParticipationServiceTest {
         long tempEventId = new Random().nextLong();
 
         Mockito.when(repository.findAllParticipantsByEventId(tempEventId)).thenReturn(List.of());
-        NoOneParticipatesInTheEvent e = assertThrows(
-                NoOneParticipatesInTheEvent.class,
+        NoOneParticipatesInTheEventExeption e = assertThrows(
+                NoOneParticipatesInTheEventExeption.class,
                 () -> service.getParticipant(tempEventId)
         );
         Assert.assertEquals(String.format("No one participates in the event with %d id.", tempEventId), e.getMessage());

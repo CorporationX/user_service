@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import school.faang.user_service.exception.ErrorResponse;
+import school.faang.user_service.exception.GoalValidationException;
 import school.faang.user_service.exception.RequestValidationException;
 import school.faang.user_service.exception.UserAlreadyRegisteredException;
 
@@ -24,6 +25,11 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(UserAlreadyRegisteredException.class)
     public ResponseEntity<Object> handleUserAlreadyRegisteredException(UserAlreadyRegisteredException e, HttpServletRequest rq) {
         return buildErrorResponse(e, rq, HttpStatus.CONFLICT, "Already exists");
+    }
+
+    @ExceptionHandler(GoalValidationException.class)
+    public ResponseEntity<Object> handleGoalValidationException(GoalValidationException e, HttpServletRequest request) {
+        return buildErrorResponse(e, request, HttpStatus.BAD_REQUEST, "Goal Validation Error");
     }
 
     private ResponseEntity<Object> buildErrorResponse(Exception e, HttpServletRequest rq, HttpStatus status, String error) {

@@ -49,4 +49,10 @@ public class EventService {
             throw new DataValidationException("User has no related skills. Id " + eventDto.getOwnerId());
         }
     }
+
+    public EventDto getEvent(Long id) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new DataValidationException("Event not found"));
+        return eventMapper.toDto(event);
+    }
 }

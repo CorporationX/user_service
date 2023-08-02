@@ -164,4 +164,25 @@ class EventServiceTest {
 
         assertThrows(DataValidationException.class, () -> eventService.create(eventDto));
     }
+
+    @Test
+    void testGetEvent_ExistingEventId_ReturnEventDto() {
+        when(eventMapper.toDto(event)).thenReturn(eventDto);
+        when(eventMapper.toDto(any(Event.class))).thenReturn(eventDto);
+        when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
+
+        EventDto result = eventService.getEvent(1L);
+
+        assertNotNull(result);
+        assertEquals(eventDto.getId(), result.getId());
+    }
+
+    @Test
+    void testGetEvent_NonExistingEventId() {
+        when(eventMapper.toDto(event)).thenReturn(eventDto);
+        when(eventMapper.toDto(any(Event.class))).thenReturn(eventDto);
+        when(eventRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(DataValidationException.class, () -> eventService.getEvent(1L));
+    }
 }

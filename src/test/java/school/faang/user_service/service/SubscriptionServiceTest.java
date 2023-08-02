@@ -33,6 +33,7 @@ public class SubscriptionServiceTest {
     @Mock
     private SubscriptionRepository subscriptionRepository;
     private SubscriptionService subscriptionService;
+
     @Spy
     private UserMapper userMapper = new UserMapperImpl();
 
@@ -164,11 +165,10 @@ public class SubscriptionServiceTest {
         Stream<User> userStream = users.stream();
         List<UserDto> expectedResult = usersDto.stream().filter(user -> user.getUsername().equals("46")).toList();
 
-        when(subscriptionRepository.findByFolloweeId(userId)).thenReturn(userStream);
-        List<UserDto> result = subscriptionService.getFollowers(userId, filterDto);
+        when(subscriptionRepository.findByFollowerId(userId)).thenReturn(userStream);
+        List<UserDto> result = subscriptionService.getFollowing(userId, filterDto);
 
         assertEquals(expectedResult, result);
-        verify(subscriptionRepository).findFollowersAmountByFolloweeId(3L);
     }
 
     @Test

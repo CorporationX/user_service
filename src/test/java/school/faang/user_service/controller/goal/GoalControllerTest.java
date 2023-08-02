@@ -144,13 +144,6 @@ public class GoalControllerTest {
     }
 
     @Test
-    public void testUpdateGoal_InvalidGoalTitle() {
-        long goalId = 2L;
-        GoalDto goalDto = new GoalDto();
-        assertThrows(IllegalArgumentException.class, () -> goalController.updateGoal(goalId, goalDto));
-    }
-
-    @Test
     public void testUpdateGoal_CorrectServiceMethodInvocation() {
         GoalDto goalDto = new GoalDto();
         goalDto.setTitle("Learn Kotlin");

@@ -127,8 +127,7 @@ public class GoalService {
 
     public GoalDto update (GoalDto goal){
         GoalDto existingGoal = get(goal.getId());
-
-        goalMapper.update(existingGoal, goal);
+        goalMapper.updateFromDto(existingGoal, goalMapper.toEntity(goal));
         goalRepository.save(goalMapper.toEntity(existingGoal));
 
         return existingGoal;

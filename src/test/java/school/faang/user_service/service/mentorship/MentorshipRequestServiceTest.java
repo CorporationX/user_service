@@ -18,8 +18,8 @@ import school.faang.user_service.dto.mentorship.RejectionReasonDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
-import school.faang.user_service.exception.mentorship.MentorshipRequestValidationException;
 import school.faang.user_service.filter.mentorship.MentorshipRequestDescriptionFilter;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.filter.mentorship.MentorshipRequestReceiverFilter;
@@ -169,7 +169,7 @@ class MentorshipRequestServiceTest {
     void acceptRequest_shouldThrowMentorshipRequestValidationException() {
         request.getRequester().getMentors().add(request.getReceiver());
 
-        assertThrows(MentorshipRequestValidationException.class,
+        assertThrows(DataValidationException.class,
                 () -> mentorshipRequestService.acceptRequest(request.getId()),
                 "Receiver is already mentor of this requester.");
     }

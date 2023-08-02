@@ -1,6 +1,5 @@
 package school.faang.user_service.service;
 
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,7 +11,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
-import school.faang.user_service.exeption.EntityNotFoundException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mappers.RecommendationMapper;
 import school.faang.user_service.mappers.SkillMapper;
 import school.faang.user_service.mappers.UserSkillGuaranteeMapper;
@@ -21,8 +20,8 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.validator.RecommendationValidator;
-import school.faang.user_service.validator.SkillValidator;
+import school.faang.user_service.validation.RecommendationValidator;
+import school.faang.user_service.validation.SkillValidator;
 
 import java.util.ArrayList;
 import java.util.Collections;

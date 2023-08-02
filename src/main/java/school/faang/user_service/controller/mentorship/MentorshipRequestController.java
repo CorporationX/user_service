@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -17,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.dto.mentorship.RejectionReasonDto;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
-import school.faang.user_service.exception.mentorship.MentorshipRequestValidationException;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
 
 @RestController
@@ -34,7 +33,7 @@ public class MentorshipRequestController {
         log.debug("Received mentorship request: {}", requestDto);
         try {
             return ResponseEntity.ok(requestService.requestMentorship(requestDto));
-        } catch (EntityNotFoundException | MentorshipRequestValidationException e) {
+        } catch (EntityNotFoundException | DataValidationException e) {
             log.warn("Failed to save mentorship request: {}\nException: {}", requestDto, e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
@@ -59,13 +58,13 @@ public class MentorshipRequestController {
         }
     }
 
-    @PatchMapping("/request/{id}/accept")
+    @PutMapping("/request/{id}/accept")
     public ResponseEntity<?> acceptRequest(
             @PathVariable @Min(message = "Request ID must be greater than zero", value = 1) long id) {
         log.debug("Received request to accept mentorship request: {}", id);
         try {
             return ResponseEntity.ok(requestService.acceptRequest(id));
-        } catch (EntityNotFoundException | MentorshipRequestValidationException e) {
+        } catch (EntityNotFoundException | DataValidationException e) {
             log.warn("Failed to accept mentorship request: {}\nException: {}", id, e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
@@ -74,7 +73,7 @@ public class MentorshipRequestController {
         }
     }
 
-    @PatchMapping("/request/{id}/reject")
+    @PutMapping("/request/{id}/reject")
     public ResponseEntity<?> rejectRequest(
             @PathVariable @Min(message = "Request ID must be greater than zero", value = 1) long id,
             @RequestBody RejectionReasonDto rejectionReasonDto) {

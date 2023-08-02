@@ -53,7 +53,7 @@ public class EventParticipationServiceTest {
     }
 
     @Test
-    public void unregisterParticipantThrowExceptionTest() {
+    public void unregisterParticipantUserNotRegisteredThrowsUserNotRegisteredAtEventExceptionTest() {
         User user = User.builder().id(1L).username("test").build();
         Mockito.when(eventParticipationRepository.existsById(1L)).thenReturn(true);
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(List.of(user));

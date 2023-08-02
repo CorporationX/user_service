@@ -21,7 +21,7 @@ public class UserServiceApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(UserServiceApplication.class, args);
-        ProfilePicGenerator.generateProfilePic("G", "K", 1L);
+        ProfilePicGenerator.generateProfilePic("T", "O", 1L);
     }
 
     @Bean

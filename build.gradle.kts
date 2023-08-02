@@ -72,6 +72,8 @@ dependencies {
 	testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.2")
 	testImplementation("org.assertj:assertj-core:3.24.2")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+	implementation("io.minio:minio:8.5.4")
 }
 
 jsonSchema2Pojo {

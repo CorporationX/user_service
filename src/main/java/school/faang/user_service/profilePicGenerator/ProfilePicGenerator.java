@@ -11,25 +11,21 @@ import io.minio.errors.ServerException;
 import io.minio.errors.XmlParserException;
 import io.minio.http.Method;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import school.faang.user_service.client.MinIOClient;
-
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.concurrent.TimeUnit;
 
 public class ProfilePicGenerator {
 
     public static String generateProfilePic(String nameFirstLetter, String surnameFirstLetter, Long id){
         String bucketName = "corpbucket";
-        String seed = nameFirstLetter + surnameFirstLetter;
+        String seed = nameFirstLetter.toUpperCase() + surnameFirstLetter.toUpperCase();
         String profilePicName = seed + id;
         String generatedPicUrl = "https://api.dicebear.com/6.x/initials/svg?seed=" + seed
                 + "&radius=20&backgroundType=gradientLinear";
@@ -39,8 +35,7 @@ public class ProfilePicGenerator {
 
         uploadToMinioBucket(profilePicFile, bucketName);
 
-       String picUrl = getUrl(profilePicFile, bucketName);
-       System.out.println(picUrl);
+        String picUrl = getUrl(profilePicFile, bucketName);
 
         return generatedPicUrl;
     }
@@ -70,8 +65,6 @@ public class ProfilePicGenerator {
     private static void uploadToMinioBucket(MultipartFile file, String bucketName){
         MinioClient minioClient = MinIOClient.getClient();
         try {
-            //ByteBuffer byteBuffer = ByteBuffer.wrap(file.getBytes());
-
             minioClient.putObject(PutObjectArgs.builder()
                     .bucket(bucketName)
                     .object("profilePics/" + file.getName())

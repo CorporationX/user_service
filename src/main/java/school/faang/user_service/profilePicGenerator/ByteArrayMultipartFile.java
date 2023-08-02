@@ -59,6 +59,4 @@ public class ByteArrayMultipartFile implements MultipartFile {
     public void transferTo(File dest) throws IOException, IllegalStateException {
 
     }
-
 }
-

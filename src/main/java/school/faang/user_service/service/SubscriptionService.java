@@ -20,6 +20,8 @@ public class SubscriptionService {
     private final UserMapper userMapper;
     private final List<UserFilter> userFilters;
 
+
+
     public void followUser(long followerId, long followeeId) {
         if (subscriptionExists(followerId, followeeId)) {
             throw new DataValidationException(String.format("User with id %d already follow user with id %d", followerId, followeeId));

@@ -82,8 +82,48 @@ jsonSchema2Pojo {
 	setSourceType("jsonschema")
 }
 
+jacoco {
+	toolVersion = "0.8.9"
+	reportsDirectory.set(layout.buildDirectory.dir("customJacocoReportDir"))
+}
+
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+tasks.test {
+	finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+	dependsOn(tasks.test)
+	reports {
+		xml.required.set(false)
+		csv.required.set(false)
+		html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+	}
+}
+
+tasks.jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			limit {
+				minimum = "0.5".toBigDecimal()
+			}
+		}
+
+		rule {
+			isEnabled = false
+			element = "CLASS"
+			includes = listOf("org.gradle.*")
+
+			limit {
+				counter = "LINE"
+				value = "TOTALCOUNT"
+				maximum = "0.3".toBigDecimal()
+			}
+		}
+	}
 }
 
 val test by tasks.getting(Test::class) { testLogging.showStandardStreams = true }

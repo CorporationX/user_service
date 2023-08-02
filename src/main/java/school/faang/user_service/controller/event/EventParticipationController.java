@@ -8,14 +8,15 @@ import school.faang.user_service.service.event.EventParticipationService;
 @Controller
 @RequiredArgsConstructor
 public class EventParticipationController {
+
     private final EventParticipationService eventParticipationService;
 
-    public void registerParticipantController(Long eventId, Long userId) {
+    public void registerParticipant(Long eventId, Long userId) {
         validate(eventId, userId);
         eventParticipationService.registerParticipant(eventId, userId);
     }
 
-    public void unregisterParticipantController(Long eventId, Long userId) {
+    public void unregisterParticipant(Long eventId, Long userId) {
         validate(eventId, userId);
         eventParticipationService.unregisterParticipant(eventId, userId);
     }
@@ -29,11 +30,8 @@ public class EventParticipationController {
         if (eventId == null || userId == null) {
             throw new DataValidationException("Cannot use null for event or user ID!");
         }
-    }
 
     public void validateEventID(Long eventId) {
         if (eventId == null || eventId <= 0) {
             throw new DataValidationException("Cannot use 0 or negative number for event ID!");
         }
-    }
-}

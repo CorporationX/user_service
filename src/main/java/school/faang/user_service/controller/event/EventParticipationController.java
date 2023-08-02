@@ -25,8 +25,5 @@ public class EventParticipationController {
         if (eventId == null || userId == null) {
             throw new DataValidationException("Cannot use null for event of user ID!");
         }
-        if (eventId <= 0 || userId <= 0) {
-            throw new DataValidationException("Cannot use 0 or negative numbers for event or user ID!");
-        }
     }
 }

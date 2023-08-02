@@ -49,7 +49,7 @@ public class EventParticipationServiceTest {
     }
 
     @Test
-    public void unregisterParticipantThrowExceptionTest() {
+    public void unregisterParticipantUserNotRegisteredThrowsUserNotRegisteredAtEventExceptionTest() {
         assertThrows(DataValidationException.class,
                 () -> eventParticipationService.unregisterParticipant(1L, 2L));
     }

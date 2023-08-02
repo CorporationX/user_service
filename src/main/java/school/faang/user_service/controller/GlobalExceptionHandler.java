@@ -1,9 +1,13 @@
 package school.faang.user_service.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -20,8 +24,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException e) {
-        log.error("Method argument validation exception occurred\n", e);
+    public Map<String, String> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        log.error("Method argument validation exception occurred", e);
         return e.getBindingResult().getAllErrors().stream()
                 .collect(Collectors.toMap(
                         error -> ((FieldError) error).getField(),
@@ -29,24 +33,52 @@ public class GlobalExceptionHandler {
                 );
     }
 
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponseDto handleConstraintViolationException(
+            ConstraintViolationException e, HttpServletRequest request) {
+        log.error("Constraint validation exception occurred", e);
+        return ErrorResponseDto.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error(e.getMessage())
+                .path(request.getRequestURI())
+                .build();
+    }
+
     @ExceptionHandler(DataValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponseDto handleMentorshipRequestValidationException(DataValidationException e) {
-        log.error("Data validation exception occurred\n", e);
-        return new ErrorResponseDto(e.getMessage());
+    public ErrorResponseDto handleDataValidationException(DataValidationException e, HttpServletRequest request) {
+        log.error("Data validation exception occurred", e);
+        return ErrorResponseDto.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error(e.getMessage())
+                .path(request.getRequestURI())
+                .build();
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponseDto handleEntityNotFoundException(EntityNotFoundException e) {
-        log.error("Entity not found exception occurred\n", e);
-        return new ErrorResponseDto(e.getMessage());
+    public ErrorResponseDto handleEntityNotFoundException(EntityNotFoundException e, HttpServletRequest request) {
+        log.error("Entity not found exception occurred", e);
+        return ErrorResponseDto.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error(e.getMessage())
+                .path(request.getRequestURI())
+                .build();
     }
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponseDto handleRuntimeException(RuntimeException e) {
-        log.error("Runtime exception occurred\n", e);
-        return new ErrorResponseDto(e.getMessage());
+    public ErrorResponseDto handleRuntimeException(RuntimeException e, HttpServletRequest request) {
+        log.error("Runtime exception occurred", e);
+        return ErrorResponseDto.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error(e.getMessage())
+                .path(request.getRequestURI())
+                .build();
     }
 }

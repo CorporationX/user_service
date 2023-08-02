@@ -13,11 +13,6 @@ public class ErrorResponseDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime timestamp;
     private int status;
-    private String message;
-    private String url;
-
-    public ErrorResponseDto(String message) {
-        this.timestamp = LocalDateTime.now();
-        this.message = message;
-    }
+    private String error;
+    private String path;
 }

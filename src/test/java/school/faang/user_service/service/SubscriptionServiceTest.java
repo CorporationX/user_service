@@ -18,7 +18,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.contact.Contact;
 import school.faang.user_service.exceptions.DataValidationException;
-import school.faang.user_service.filters.UserMapper;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.filters.filtersForUserFilterDto.DtoUserFilter;
 import school.faang.user_service.filters.filtersForUserFilterDto.UserAboutFilter;
 import school.faang.user_service.repository.SubscriptionRepository;

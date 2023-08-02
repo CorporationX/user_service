@@ -11,13 +11,13 @@ import school.faang.user_service.entity.goal.GoalInvitation;
 
 public interface GoalInvitationMapper
 {
-    GoalInvitationMapper INSTANCE = Mappers.getMapper(GoalInvitationMapper.class);
+    //GoalInvitationMapper INSTANCE = Mappers.getMapper(GoalInvitationMapper.class);
 
     @Mapping(source="goalId",target = "goal.id")
     @Mapping(source="inviterId",target = "inviter.id")
     @Mapping(source="invitedUserId",target = "invited.id")
-
     GoalInvitation toEntity(GoalInvitationDto goalInvitationDto);
+
     @Mapping(source="goal.id",target = "goalId")
     @Mapping(source="inviter.id",target = "inviterId")
     @Mapping(source="invited.id",target = "invitedUserId")

@@ -1,6 +1,5 @@
 package school.faang.user_service.service;
 
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -11,7 +10,6 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventParticipationService;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
 @ExtendWith(MockitoExtension.class)
 public class EventParticipationControllerTest {
     @Mock
@@ -30,5 +28,23 @@ public class EventParticipationControllerTest {
     public void validateEventIdTest() {
         assertThrows(DataValidationException.class,
                 () -> eventParticipationController.registerParticipantController(null, 1L));
+    }
+      
+    @Test  
+    public void validateThrowExceptionTest() {
+        assertThrows(DataValidationException.class, 
+                     () -> eventParticipationController.validate(-1L, 1L);
+        );
+        assertThrows(DataValidationException.class,
+                     () -> eventParticipationController.validate(null, 1L);
+        );
+    }
+  
+    @Test
+    public void checkValidateThrowsExceptionTest() {
+        assertThrows(DataValidationException.class,
+                () -> eventParticipationController.registerParticipantController(null, null));
+        assertThrows(DataValidationException.class,
+                () -> eventParticipationController.registerParticipantController(-1L, 1L));
     }
 }

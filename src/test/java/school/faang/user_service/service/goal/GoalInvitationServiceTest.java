@@ -41,11 +41,17 @@ public class GoalInvitationServiceTest {
     @InjectMocks
     GoalInvitationService goalInvitationService;
 
-    private GoalInvitation goalInvitation;
     private GoalInvitation badRequest;
+    private GoalInvitation goalInvitation;
 
-    private GoalInvitationDto goalInvitationDto;
     private GoalInvitationDto badRequestDto;
+    private GoalInvitationDto goalInvitationDto;
+
+    private User inviter;
+    private User invitedUser;
+
+    private long invitationId;
+    private long badInvitationId;
 
     @BeforeEach
     void setUp() {
@@ -57,6 +63,24 @@ public class GoalInvitationServiceTest {
 
         badRequestDto = GoalInvitationDto.builder().inviterId(1L).invitedUserId(1L).build();
         badRequest = goalInvitationMapper.toEntity(badRequestDto);
+
+        inviter = User.builder()
+                .id(1L)
+                .build();
+        invitedUser = User.builder()
+                .id(2L)
+                .goals(new ArrayList<>())
+                .build();
+
+        goalInvitation = GoalInvitation.builder()
+                .id(1L)
+                .inviter(inviter)
+                .invited(invitedUser)
+                .goal(new Goal())
+                .build();
+
+        invitationId = 1L;
+        badInvitationId = -200L;
     }
 
     @Test
@@ -75,30 +99,30 @@ public class GoalInvitationServiceTest {
     @Test
     @DisplayName("Accept invitation: Positive scenario")
     void testAcceptInvitationIsOk() {
-        User inviter = User.builder()
-                .id(1L)
-                .build();
-        User invitedUser = User.builder()
-                .id(2L)
-                .goals(new ArrayList<>())
-                .build();
-        GoalInvitation invitation = GoalInvitation.builder()
-                .id(1L)
-                .inviter(inviter)
-                .invited(invitedUser)
-                .goal(new Goal())
-                .build();
-
-        when(goalInvitationRepository.findById(1L)).thenReturn(Optional.of(invitation));
-        GoalInvitationDto accepted = goalInvitationService.acceptGoalInvitation(1L);
+        when(goalInvitationRepository.findById(invitationId)).thenReturn(Optional.of(goalInvitation));
+        GoalInvitationDto accepted = goalInvitationService.acceptGoalInvitation(invitationId);
 
         Assertions.assertEquals(RequestStatus.ACCEPTED, accepted.getStatus());
         Assertions.assertEquals(1, invitedUser.getGoals().size());
     }
 
     @Test
-    @DisplayName("Accept invitation: invitation not found")
-    void shouldThrowEntityNotFoundException() {
-        Assertions.assertThrows(EntityNotFoundException.class, () -> goalInvitationService.acceptGoalInvitation(-200L));
+    @DisplayName("Accept invitation: Invitation not found")
+    void testAcceptInvitationThrowsEntityNotFoundException() {
+        Assertions.assertThrows(EntityNotFoundException.class, () -> goalInvitationService.acceptGoalInvitation(badInvitationId));
+    }
+
+    @Test
+    @DisplayName("Reject invitation: Positive scenario")
+    void testRejectInvitationIsOk() {
+        when(goalInvitationRepository.findById(invitationId)).thenReturn(Optional.of(goalInvitation));
+        GoalInvitationDto rejected = goalInvitationService.rejectGoalInvitation(invitationId);
+        Assertions.assertEquals(RequestStatus.REJECTED, rejected.getStatus());
+    }
+
+    @Test
+    @DisplayName("Reject invitation: Invitation not found")
+    void testRejectInvitationThrowsEntityNotFoundException() {
+        Assertions.assertThrows(EntityNotFoundException.class, () -> goalInvitationService.rejectGoalInvitation(badInvitationId));
     }
 }

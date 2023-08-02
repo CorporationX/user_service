@@ -76,16 +76,13 @@ public class GoalInvitationValidatorTest {
     @Test
     @DisplayName("Goal invitation validator: inviter does not exists")
     void testValidatorFailsInviterDoesNotExists() {
-        when(goalRepository.existsById(goalInvitation.getGoal().getId())).thenReturn(true);
         Assertions.assertThrows(DataValidationException.class, () -> goalInvitationValidator.validate(goalInvitation));
     }
 
     @Test
     @DisplayName("Goal invitation validator: invited user does not exists")
     void testValidatorFailsInvitedUserDoesNotExists() {
-        when(goalRepository.existsById(goalInvitation.getGoal().getId())).thenReturn(true);
         when(goalInvitationRepository.existsById(goalInvitation.getInviter().getId())).thenReturn(true);
-        when(goalInvitationRepository.existsById(goalInvitation.getInvited().getId())).thenReturn(false);
         Assertions.assertThrows(DataValidationException.class, () -> goalInvitationValidator.validate(goalInvitation));
     }
 

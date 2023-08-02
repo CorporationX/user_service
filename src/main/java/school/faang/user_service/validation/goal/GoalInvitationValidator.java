@@ -20,21 +20,24 @@ public class GoalInvitationValidator {
         Long inviterId = invitation.getInviter().getId();
         Long invitedId = invitation.getInvited().getId();
 
+        isUserPresent(inviterId);
+        isUserPresent(invitedId);
+
         if (inviterId.equals(invitedId)) {
             throw new DataValidationException("Invalid request. You can not invite yourself");
         }
+        if (!goalRepository.existsById(invitation.getGoal().getId())) {
+            throw new DataValidationException("Invalid request. Goal does not exists");
+        }
+    }
+
+    public void validateAcceptInvitation(GoalInvitation invitation) {
         if (invitation.getInvited().getGoals().size() == MAX_ACTIVE_GOALS) {
             throw new DataValidationException("Invalid request. Inviter user has reached maximum amount of active goals");
         }
         if (invitation.getGoal().getUsers().contains(invitation.getInvited())) {
             throw new DataValidationException("Invalid request. Invited user is already working on this goal");
         }
-        if (!goalRepository.existsById(invitation.getGoal().getId())) {
-            throw new DataValidationException("Invalid request. Goal does not exists");
-        }
-
-        isUserPresent(inviterId);
-        isUserPresent(invitedId);
     }
 
     private void isUserPresent(Long userId) {

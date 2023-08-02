@@ -30,8 +30,17 @@ public class GoalInvitationService {
     public GoalInvitationDto acceptGoalInvitation(Long id) {
         GoalInvitation goalInvitation = findInvitation(id);
         goalInvitationValidator.validate(goalInvitation);
+        goalInvitationValidator.validateAcceptInvitation(goalInvitation);
         goalInvitation.setStatus(RequestStatus.ACCEPTED);
         goalInvitation.getInvited().getGoals().add(goalInvitation.getGoal());
+        return goalInvitationMapper.toDto(goalInvitation);
+    }
+
+    @Transactional
+    public GoalInvitationDto rejectGoalInvitation(Long id) {
+        GoalInvitation goalInvitation = findInvitation(id);
+        goalInvitationValidator.validate(goalInvitation);
+        goalInvitation.setStatus(RequestStatus.REJECTED);
         return goalInvitationMapper.toDto(goalInvitation);
     }
 

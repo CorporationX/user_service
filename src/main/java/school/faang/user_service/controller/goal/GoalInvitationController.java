@@ -29,4 +29,10 @@ public class GoalInvitationController {
     public GoalInvitationDto acceptGoalInvitation(@PathVariable Long id) {
         return goalInvitationService.acceptGoalInvitation(id);
     }
+
+    @PutMapping("/goal/invitation/{id}/reject")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public GoalInvitationDto rejectGoalInvitation(@PathVariable Long id) {
+        return goalInvitationService.rejectGoalInvitation(id);
+    }
 }

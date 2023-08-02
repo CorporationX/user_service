@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.http.MediaType;
-import school.faang.user_service.entity.goal.Goal;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -32,6 +31,8 @@ public class GoalInvitationControllerTest {
     private GoalInvitationDto goalInvitationDto;
     private GoalInvitationDto badGoalInvitationDto;
 
+    private long invitationId;
+
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(goalInvitationController).build();
@@ -45,6 +46,8 @@ public class GoalInvitationControllerTest {
                 .build();
 
         badGoalInvitationDto = GoalInvitationDto.builder().build(); // no id, which is mandatory
+
+        invitationId = 1L;
     }
 
     @Test
@@ -68,7 +71,6 @@ public class GoalInvitationControllerTest {
     @Test
     @DisplayName("Accept invitation: Valid request, should return 202")
     void testAcceptInvitationAccepted() throws Exception {
-        long invitationId = 1L;
         mockMvc.perform(MockMvcRequestBuilders.put("/goal/invitation/" + invitationId + "/accept")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isAccepted());
@@ -77,9 +79,24 @@ public class GoalInvitationControllerTest {
     @Test
     @DisplayName("Accept invitation: Bad request, should return 400")
     void testAcceptInvitationBadRequest() throws Exception {
-        Goal goal = new Goal();
-        mockMvc.perform(MockMvcRequestBuilders.put("/goal/invitation/" + goal + "/accept")
+        mockMvc.perform(MockMvcRequestBuilders.put("/goal/invitation/" + goalInvitationDto + "/accept")
                 .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Reject invitation: Valid request, should return 202")
+    void testRejectInvitationRejected() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/goal/invitation/" + invitationId + "/reject")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isAccepted());
+    }
+
+    @Test
+    @DisplayName("Reject invitation: Bad request, should return 400")
+    void testRejectInvitationBadRequest() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/goal/invitation/" + goalInvitationDto + "/reject")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 }

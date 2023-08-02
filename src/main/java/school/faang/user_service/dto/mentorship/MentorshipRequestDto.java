@@ -1,10 +1,8 @@
-package school.faang.user_service.dto;
+package school.faang.user_service.dto.mentorship;
 
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.RequestStatus;
-
 import java.time.LocalDateTime;
 
 @Data

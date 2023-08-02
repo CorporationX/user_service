@@ -9,8 +9,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import school.faang.user_service.entity.User;
 
 import java.time.LocalDateTime;
@@ -18,6 +20,8 @@ import java.time.LocalDateTime;
 @Builder
 @Data
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "google_token")
 public class GoogleToken {
     @Id

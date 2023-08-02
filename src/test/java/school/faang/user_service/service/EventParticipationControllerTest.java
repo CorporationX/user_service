@@ -19,16 +19,28 @@ public class EventParticipationControllerTest {
     private EventParticipationController eventParticipationController;
 
     @Test
-    public void validateThrowExceptionTest() {
-        assertThrows(DataValidationException.class, () -> {
-            eventParticipationController.validate(-1L, 1L);
-        });
-        assertThrows(DataValidationException.class, () -> {
-            eventParticipationController.validate(null, 1L);
-        });
+    public void validateTest() {
+        assertThrows(DataValidationException.class,
+                () -> eventParticipationController.registerParticipantController(-1L, 1L));
     }
-}
 
+    @Test
+    public void validateEventIdTest() {
+        assertThrows(DataValidationException.class,
+                () -> eventParticipationController.registerParticipantController(null, 1L));
+    }
+      
+    @Test  
+    public void validateThrowExceptionTest() {
+        assertThrows(DataValidationException.class, 
+                     () -> eventParticipationController.validate(-1L, 1L);
+        );
+        assertThrows(DataValidationException.class,
+                     () -> eventParticipationController.validate(null, 1L);
+        );
+    }
+  
+    @Test
     public void checkValidateThrowsExceptionTest() {
         assertThrows(DataValidationException.class,
                 () -> eventParticipationController.registerParticipantController(null, null));

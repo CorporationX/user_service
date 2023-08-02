@@ -1,4 +1,4 @@
-package school.faang.user_service.servise;
+package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

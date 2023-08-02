@@ -168,5 +168,12 @@ public class SubscriptionServiceTest {
         List<UserDto> result = subscriptionService.getFollowers(userId, filterDto);
 
         assertEquals(expectedResult, result);
+        verify(subscriptionRepository).findFollowersAmountByFolloweeId(3L);
+    }
+
+    @Test
+    public void followingCount(){
+        subscriptionService.getFollowingCount(3L);
+        verify(subscriptionRepository).findFolloweesAmountByFollowerId(3L);
     }
 }

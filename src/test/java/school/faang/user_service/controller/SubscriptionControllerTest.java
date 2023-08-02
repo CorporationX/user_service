@@ -76,4 +76,10 @@ public class SubscriptionControllerTest {
         subscriptionController.getFollowing(user1.getId(), filter);
         verify(subscriptionService).getFollowing(user1.getId(), filter);
     }
+
+    @Test
+    public void followingCount(){
+        subscriptionController.getFollowingCount(3L);
+        verify(subscriptionService).getFollowingCount(3L);
+    }
 }

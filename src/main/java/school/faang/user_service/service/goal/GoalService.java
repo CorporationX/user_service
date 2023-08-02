@@ -12,7 +12,7 @@ import school.faang.user_service.entity.Skill;
 
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.mapper.GoalMapper;
+import school.faang.user_service.mapper.goal.GoalMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validation.GoalValidator;
@@ -24,12 +24,12 @@ import java.util.stream.Stream;
 @Service
 public class GoalService {
     private final GoalRepository goalRepository;
-    private final GoalMapper goalMapper;
+    private final GoalMapperImpl goalMapper;
     private final List<GoalFilter> goalFilters;
     private final GoalValidator goalValidator;
 
     @Autowired
-    public GoalService(GoalRepository goalRepository, GoalMapper goalMapper, List<GoalFilter> goalFilters, GoalValidator goalValidator) {
+    public GoalService(GoalRepository goalRepository, GoalMapperImpl goalMapper, List<GoalFilter> goalFilters, GoalValidator goalValidator) {
         this.goalRepository = goalRepository;
         this.goalMapper = goalMapper;
         this.goalFilters = Optional.ofNullable(goalFilters).orElse(List.of());

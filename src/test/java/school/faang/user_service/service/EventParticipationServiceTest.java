@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 import org.junit.jupiter.api.Assertions;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,8 +21,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 @ExtendWith(MockitoExtension.class)
 public class EventParticipationServiceTest {
     @Mock
@@ -37,8 +36,8 @@ public class EventParticipationServiceTest {
     public void registerParticipantTest() {
         Mockito.when(eventParticipationRepository.existsById(1L)).thenReturn(true);
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(Collections.emptyList());
-        eventParticipationService.registerParticipant(1L, 1L);
-        Mockito.verify(eventParticipationRepository).register(1L, 1L);
+        eventParticipationService.registerParticipant(1L, 10L);
+        Mockito.verify(eventParticipationRepository).register(1L, 10L);
     }
 
     @Test
@@ -55,16 +54,31 @@ public class EventParticipationServiceTest {
         Mockito.when(eventParticipationRepository.existsById(1L)).thenReturn(true);
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(Collections.emptyList());
         eventParticipationService.unregisterParticipant(1L, 1L);
+        Mockito.verify(eventParticipationRepository).findAllParticipantsByEventId(1L);
         Mockito.verify(eventParticipationRepository).unregister(1L, 1L);
     }
 
     @Test
-    public void unregisterParticipantThrowExceptionTest() {
-        User user = User.builder().id(1L).username("name").build();
+    public void unregisterParticipantUserNotRegisteredThrowsUserNotRegisteredAtEventExceptionTest() {
+        User user = User.builder().id(1L).username("test").build();
         Mockito.when(eventParticipationRepository.existsById(1L)).thenReturn(true);
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(List.of(user));
-        Assertions.assertThrows(DataValidationException.class,
-                () -> eventParticipationService.unregisterParticipant(1L, 2L));
+        assertThrows(DataValidationException.class,
+                () -> eventParticipationService.unregisterParticipant(1L, 10L));
+    }
+
+    @Test
+    public void getCountRegisteredParticipantTest() {
+        Mockito.when(eventParticipationRepository.existsById(1L)).thenReturn(true);
+        Mockito.when(eventParticipationRepository.countParticipants(1L)).thenReturn(1);
+        Assertions.assertEquals(1, eventParticipationService.getCountRegisteredParticipant(1L));
+        Mockito.verify(eventParticipationRepository).countParticipants(1L);
+    }
+
+    @Test
+    public void getParticipantsCountThrowsException() {
+        assertThrows(DataValidationException.class,
+                () -> eventParticipationService.getCountRegisteredParticipant(1L));
     }
 
     @Test

@@ -9,10 +9,6 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
 import java.util.ArrayList;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.repository.event.EventParticipationRepository;
-
 import java.util.List;
 
 @Service
@@ -21,7 +17,8 @@ public class EventParticipationService {
     private final EventParticipationRepository eventParticipationRepository;
     private final UserMapper userMapper;
 
-    public void registerParticipant(long eventId, long userId) {
+    public void registerParticipant(Long eventId, Long userId) {
+        validateEventId(eventId);
         List<User> users = eventParticipationRepository.findAllParticipantsByEventId(eventId);
         for (User user : users) {
             if (user.getId() == userId) {
@@ -51,6 +48,11 @@ public class EventParticipationService {
         }
         return userDto;
     }
+  
+  public int getCountRegisteredParticipant(Long eventId) {
+        validateEventId(eventId);
+        return eventParticipationRepository.countParticipants(eventId);
+  }
 
     private void validateEventId(Long eventId) {
         if (!eventParticipationRepository.existsById(eventId)) {

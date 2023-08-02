@@ -10,7 +10,6 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exeption.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
 
-
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(value = {MockitoExtension.class})

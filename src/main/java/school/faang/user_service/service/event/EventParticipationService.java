@@ -17,7 +17,7 @@ public class EventParticipationService {
     private final EventParticipationRepository eventParticipationRepository;
     private final UserMapper userMapper;
 
-    public void registerParticipant(Long eventId, Long userId) {
+    public void registerParticipant(Long eventId, Long userId) { //1
         validateEventId(eventId);
         List<User> users = eventParticipationRepository.findAllParticipantsByEventId(eventId);
         for (User user : users) {
@@ -28,18 +28,20 @@ public class EventParticipationService {
         eventParticipationRepository.register(eventId, userId);
     }
 
-    public void unregisterParticipant(Long eventId, Long userId) {
-        validateEventId(eventId);
-        List<User> users = eventParticipationRepository.findAllParticipantsByEventId(eventId);
-        for (User user : users) {
-            if (user.getId() != userId) {
-                throw new DataValidationException("You are not registered yet!");
-            }
+    public void unregisterParticipant(Long eventId, Long userId) { //2
+        if (checkThereIsUserInEvent(eventId, userId)) {
+            eventParticipationRepository.unregister(eventId, userId);
+        } else {
+            throw new DataValidationException("You are not registered");
         }
-        eventParticipationRepository.unregister(eventId, userId);
     }
 
-    public List<UserDto> getListOfParticipant(Long eventId) {
+    public boolean checkThereIsUserInEvent(long eventId, long userId) { //2.1
+        return eventParticipationRepository.findAllParticipantsByEventId(eventId).stream()
+                .anyMatch(user -> user.getId() == userId);
+    }
+
+    public List<UserDto> getListOfParticipant(Long eventId) { //3
         validateEventId(eventId);
         List<User> users = eventParticipationRepository.findAllParticipantsByEventId(eventId);
         List<UserDto> userDto = new ArrayList<>();
@@ -48,11 +50,11 @@ public class EventParticipationService {
         }
         return userDto;
     }
-  
-  public int getCountRegisteredParticipant(Long eventId) {
+
+    public int getCountRegisteredParticipant(Long eventId) { //4
         validateEventId(eventId);
         return eventParticipationRepository.countParticipants(eventId);
-  }
+    }
 
     private void validateEventId(Long eventId) {
         if (!eventParticipationRepository.existsById(eventId)) {

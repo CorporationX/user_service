@@ -1,7 +1,5 @@
 package school.faang.user_service.service;
 
-import org.junit.jupiter.api.Assertions;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -51,27 +49,39 @@ public class EventParticipationServiceTest {
 
     @Test
     public void unregisterParticipantTest() {
-        Mockito.when(eventParticipationRepository.existsById(1L)).thenReturn(true);
-        Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(Collections.emptyList());
+        User user = User.builder().id(1L).username("name").build();
+        Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(List.of(user));
         eventParticipationService.unregisterParticipant(1L, 1L);
-        Mockito.verify(eventParticipationRepository).findAllParticipantsByEventId(1L);
         Mockito.verify(eventParticipationRepository).unregister(1L, 1L);
     }
 
     @Test
     public void unregisterParticipantUserNotRegisteredThrowsUserNotRegisteredAtEventExceptionTest() {
-        User user = User.builder().id(1L).username("test").build();
+        assertThrows(DataValidationException.class,
+                () -> eventParticipationService.unregisterParticipant(1L, 2L));
+    }
+
+    @Test
+    public void getParticipantTest() {
+        User user = User.builder().id(1L).username("name").build();
+        UserDto userDto = new UserDto(1L, "name", "email");
         Mockito.when(eventParticipationRepository.existsById(1L)).thenReturn(true);
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(List.of(user));
+        Mockito.when(userMapper.toDto(user)).thenReturn(userDto);
+        assertEquals(userDto, eventParticipationService.getListOfParticipant(1L).get(0));
+    }
+
+    @Test
+    public void getParticipantThrowExceptionTest() {
         assertThrows(DataValidationException.class,
-                () -> eventParticipationService.unregisterParticipant(1L, 10L));
+                () -> eventParticipationService.getListOfParticipant(1L));
     }
 
     @Test
     public void getCountRegisteredParticipantTest() {
         Mockito.when(eventParticipationRepository.existsById(1L)).thenReturn(true);
         Mockito.when(eventParticipationRepository.countParticipants(1L)).thenReturn(1);
-        Assertions.assertEquals(1, eventParticipationService.getCountRegisteredParticipant(1L));
+        assertEquals(1, eventParticipationService.getCountRegisteredParticipant(1L));
         Mockito.verify(eventParticipationRepository).countParticipants(1L);
     }
 
@@ -79,21 +89,5 @@ public class EventParticipationServiceTest {
     public void getParticipantsCountThrowsException() {
         assertThrows(DataValidationException.class,
                 () -> eventParticipationService.getCountRegisteredParticipant(1L));
-    }
-
-    @Test
-    public void getParticipantTest() {
-        User user = User.builder().id(1L).username("test").build();
-        UserDto userDto = new UserDto(1L, "test", "test");
-        Mockito.when(eventParticipationRepository.existsById(1L)).thenReturn(true);
-        Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(List.of(user));
-        Mockito.when(userMapper.toDto(user)).thenReturn(userDto);
-        Assertions.assertEquals(userDto, eventParticipationService.getListOfParticipant(1L).get(0));
-    }
-
-    @Test
-    public void getParticipantThrowExceptionTest() {
-        assertThrows(DataValidationException.class,
-                () -> eventParticipationService.getListOfParticipant(1L));
     }
 }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.Skill;
@@ -46,13 +47,13 @@ public class RecommendationService {
         recommendation.setSkillOffers(offeredSkills.stream().map(skill -> SkillOffer.builder().skill(skill).build()).collect(Collectors.toList()));
         return recommendationMapper.toDto(recommendationRepository.save(recommendation));
     }
-
+    @Transactional(readOnly = true)
     public Page<RecommendationDto> getAllUserRecommendations(Long receiverId, Pageable pageable) {
         Page<Recommendation> page = recommendationRepository.findAllByReceiverId(receiverId, pageable);
         return page.map(recommendationMapper::toDto);
     }
 
-
+    @Transactional(readOnly = true)
     public Page<RecommendationDto> getAllGivenRecommendations(Long authorId, Pageable pageable) {
         Page<Recommendation> page = recommendationRepository.findAllByAuthorId(authorId, pageable);
         return page.map(recommendationMapper::toDto);

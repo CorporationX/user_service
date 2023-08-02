@@ -1,6 +1,7 @@
 package school.faang.user_service.controller.goal;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,19 +19,19 @@ import java.util.List;
 public class GoalInvitationController {
     private final GoalInvitationService goalInvitationService;
 
-    @PostMapping()
+    @PostMapping
     public GoalInvitationDto createInvitation(@RequestBody GoalInvitationDto invitation) {
         return goalInvitationService.createInvitation(invitation);
     }
 
     @PutMapping("accept/{id}")
-    public GoalInvitationDto acceptGoalInvitation(@RequestBody long id) {
+    public GoalInvitationDto acceptGoalInvitation(@PathVariable long id) {
         validateId(id);
         return goalInvitationService.acceptGoalInvitation(id);
     }
 
     @PutMapping("reject/{id}")
-    public GoalInvitationDto rejectGoalInvitation(@RequestBody long id) {
+    public GoalInvitationDto rejectGoalInvitation(@PathVariable long id) {
         validateId(id);
         return goalInvitationService.rejectGoalInvitation(id);
     }

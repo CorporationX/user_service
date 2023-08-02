@@ -17,7 +17,7 @@ public class SkillChecker {
     private final SkillRepository skillRepository;
 
     public void validate(List<SkillOfferDto> skills) {
-        if (skills != null && !skills.isEmpty()) {
+        if (skills == null || skills.isEmpty()) {
             return;
         }
 

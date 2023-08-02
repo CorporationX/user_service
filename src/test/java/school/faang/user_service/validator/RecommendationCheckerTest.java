@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.RecommendationPeriodIsNotCorrect;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.service.RecommendationService;
 
@@ -17,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class RecommendationValidatorTest {
+class RecommendationCheckerTest {
 
     private static final int RECOMMENDATION_PERIOD_IN_MONTH = 6;
     @Mock
@@ -25,7 +26,7 @@ class RecommendationValidatorTest {
     @Mock
     private RecommendationService recommendationService;
     @InjectMocks
-    private RecommendationValidator recommendationValidator;
+    private RecommendationChecker recommendationChecker;
 
 
     @Test
@@ -34,7 +35,7 @@ class RecommendationValidatorTest {
                 .content("").build();
 
         DataValidationException ex = assertThrows(DataValidationException.class,
-                () -> recommendationValidator.validate(recommendationDto));
+                () -> recommendationChecker.validate(recommendationDto));
 
         assertEquals("Recommendation content should not be empty", ex.getMessage());
     }
@@ -56,7 +57,7 @@ class RecommendationValidatorTest {
         )
                 .thenReturn(java.util.Optional.of(recommendation));
 
-        DataValidationException ex = assertThrows(DataValidationException.class, () -> recommendationValidator.validate(recommendationDto));
+        RecommendationPeriodIsNotCorrect ex = assertThrows(RecommendationPeriodIsNotCorrect.class, () -> recommendationChecker.validate(recommendationDto));
         assertEquals("Date of new recommendation should be after "
                 + RECOMMENDATION_PERIOD_IN_MONTH
                 + " months of the last recommendation", ex.getMessage());
@@ -79,7 +80,7 @@ class RecommendationValidatorTest {
         )
                 .thenReturn(java.util.Optional.of(recommendation));
 
-        assertDoesNotThrow(() -> recommendationValidator.validate(recommendationDto));
+        assertDoesNotThrow(() -> recommendationChecker.validate(recommendationDto));
     }
 
 }

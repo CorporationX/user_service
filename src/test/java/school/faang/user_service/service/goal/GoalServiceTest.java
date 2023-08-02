@@ -37,7 +37,8 @@ import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.mapper.GoalMapper;
+import school.faang.user_service.mapper.goal.GoalMapper;
+import school.faang.user_service.mapper.goal.GoalMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.goal.filters.TitleGoalFilter;
@@ -57,7 +58,7 @@ public class GoalServiceTest {
     private GoalRepository goalRepository;
 
     @Spy
-    private GoalMapper goalMapper;
+    private GoalMapperImpl goalMapper;
 
     private List<GoalFilter> goalFilters;
 

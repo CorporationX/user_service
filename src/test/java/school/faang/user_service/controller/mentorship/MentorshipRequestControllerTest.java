@@ -15,7 +15,6 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.dto.filter.RequestFilterDto;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
-import school.faang.user_service.controller.MentorshipRequestController;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;

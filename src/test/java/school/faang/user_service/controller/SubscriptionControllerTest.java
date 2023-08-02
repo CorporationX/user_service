@@ -3,6 +3,7 @@ package school.faang.user_service.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -21,6 +22,7 @@ public class SubscriptionControllerTest {
     @Mock
     private SubscriptionService subscriptionService;
 
+    @InjectMocks
     private SubscriptionController subscriptionController;
     private User user1;
     private User user2;
@@ -28,7 +30,6 @@ public class SubscriptionControllerTest {
 
     @BeforeEach
     public void setUp() {
-        subscriptionController = new SubscriptionController(subscriptionService);
         long followerId = new Random().nextLong();
         long followeeId = new Random().nextLong();
         user1 = User.builder().id(followerId + 1).build();

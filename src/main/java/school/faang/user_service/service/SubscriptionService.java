@@ -21,14 +21,14 @@ public class SubscriptionService {
     private final List<UserFilter> userFilters;
 
     public void followUser(long followerId, long followeeId) {
-        if (isNotValid(followerId, followeeId)) {
+        if (subscriptionExists(followerId, followeeId)) {
             throw new DataValidationException(String.format("User with id %d already follow user with id %d", followerId, followeeId));
         }
         subscriptionRepository.followUser(followerId, followeeId);
     }
 
     public void unfollowUser(long followerId, long followeeId) {
-        if (!isNotValid(followerId, followeeId)) {
+        if (!subscriptionExists(followerId, followeeId)) {
             throw new DataValidationException(String.format("User with id %d doesn't follow user with id %d", followerId, followeeId));
         }
         subscriptionRepository.unfollowUser(followerId, followeeId);
@@ -37,10 +37,6 @@ public class SubscriptionService {
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filter){
         Stream<User> users = subscriptionRepository.findByFolloweeId(followeeId);
         return filterUsers(users, filter);
-    }
-
-    private boolean isNotValid(long followerId, long followeeId) {
-        return subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
     }
 
     private List<UserDto> filterUsers(Stream<User> users, UserFilterDto filters) {
@@ -53,5 +49,8 @@ public class SubscriptionService {
                     .map(userMapper::toDto)
                     .toList();
     }
-}
 
+    private boolean subscriptionExists(long followerId, long followeeId) {
+        return subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
+    }
+}

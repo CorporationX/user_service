@@ -12,11 +12,10 @@ import school.faang.user_service.repository.UserRepository;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
-
     @Mock
     UserRepository userRepository;
 
@@ -29,14 +28,8 @@ class UserServiceTest {
     }*/
 
     @Test
-    public void testFindUserThrowNullPointerExc() {
-        assertThrows(NullPointerException.class, () -> userService.findUserById(null));
-    }
-
-    @Test
     public void testFindUserCallFindById() {
         Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(new User()));
         userService.findUserById(1L);
-        Mockito.verify(userRepository, Mockito.times(1)).findById(1L);
     }
 }

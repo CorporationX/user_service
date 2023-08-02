@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exeption.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(value = {MockitoExtension.class})
@@ -38,4 +39,18 @@ public class SubscriptionServiceTest {
         subscriptionService.followUser(user1.getId(), user2.getId());
         Mockito.verify(subscriptionRepository, Mockito.times(1)).followUser(user1.getId(), user2.getId());
     }
+
+    @Test
+    public void unsubscribeWhen_SubscriptionDoesNotExists() {
+        Mockito.when(subscriptionRepository.existsByFollowerIdAndFolloweeId(user1.getId(), user2.getId())).thenReturn(false);
+        assertThrows(DataValidationException.class, () -> subscriptionService.unfollowUser(user1.getId(), user2.getId()));
+    }
+
+    @Test
+    public void userUnfollowedSuccess() {
+        Mockito.when(subscriptionRepository.existsByFollowerIdAndFolloweeId(user1.getId(), user2.getId())).thenReturn(true);
+        subscriptionService.unfollowUser(user1.getId(), user2.getId());
+        Mockito.verify(subscriptionRepository, Mockito.times(1)).unfollowUser(user1.getId(), user2.getId());
+    }
+
 }

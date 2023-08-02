@@ -11,13 +11,20 @@ public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
 
     public void followUser(long followerId, long followeeId) {
-        if (isNotValid(followerId, followeeId)) {
-            throw new DataValidationException(followerId, followeeId);
+        if (subscriptionExists(followerId, followeeId)) {
+            throw new DataValidationException(String.format("User with id %d already follow user with id %d", followerId, followeeId));
         }
         subscriptionRepository.followUser(followerId, followeeId);
     }
 
-    public boolean isNotValid(long followerId, long followeeId) {
+    public void unfollowUser(long followerId, long followeeId) {
+        if (!subscriptionExists(followerId, followeeId)) {
+            throw new DataValidationException(String.format("User with id %d doesn't follow user with id %d", followerId, followeeId));
+        }
+        subscriptionRepository.unfollowUser(followerId, followeeId);
+    }
+
+    private boolean subscriptionExists(long followerId, long followeeId) {
         return subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
     }
 }

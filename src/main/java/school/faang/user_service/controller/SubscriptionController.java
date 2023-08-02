@@ -17,7 +17,14 @@ public class SubscriptionController {
         subscriptionService.followUser(followerId, followeeId);
     }
 
-    public boolean isValid(long followerId, long followeeId) {
+    public void unfollowUser(long followerId, long followeeId) {
+        if (!isValid(followerId, followeeId)) {
+            throw new DataValidationException("user can't unfollow itself");
+        }
+        subscriptionService.unfollowUser(followerId, followeeId);
+    }
+
+    private boolean isValid(long followerId, long followeeId) {
         return followerId != followeeId;
     }
 }

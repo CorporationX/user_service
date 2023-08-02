@@ -14,6 +14,6 @@ public class UserNameFilter implements UserFilter {
 
     @Override
     public Stream<User> apply(Stream<User> users, UserFilterDto filters) {
-        return users.filter(user -> user.getUsername().equals(filters.getNamePattern()));
+        return users.filter(user -> user.getUsername().contains(filters.getNamePattern()));
     }
 }

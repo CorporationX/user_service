@@ -1,17 +1,14 @@
 package school.faang.user_service.mapper.event;
 
 import org.mapstruct.*;
-import org.mapstruct.factory.Mappers;
+import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.mapper.skill.SkillMapper;
 import java.util.List;
 
-@Mapper(uses = SkillMapper.class, unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Component
+@Mapper(componentModel = "spring" , injectionStrategy = InjectionStrategy.FIELD, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface EventMapper {
-
-    EventMapper INSTANCE = Mappers.getMapper(EventMapper.class);
-
     @Mapping(source = "owner.id", target = "ownerId")
     EventDto toDto(Event event);
 

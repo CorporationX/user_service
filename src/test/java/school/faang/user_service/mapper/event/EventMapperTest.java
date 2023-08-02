@@ -1,10 +1,10 @@
 package school.faang.user_service.mapper.event;
 
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.skill.SkillDto;
@@ -17,64 +17,57 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 class EventMapperTest {
-    private final EventMapper eventMapper = EventMapper.INSTANCE;
-
+    @Spy
+    private EventMapperImpl eventMapper;
     private Event event;
     private EventDto eventDto;
-    private User user;
 
     @BeforeEach
     void setUp() {
-        user = new User();
-        user.setId(1L);
+        User user = User.builder().id(1L).build();
 
-        Skill skill1 = new Skill();
-        skill1.setId(1L);
-        skill1.setTitle("Ability");
-        Skill skill2 = new Skill();
-        skill2.setId(2L);
-        skill2.setTitle("Expertise");
-        user.setSkills(List.of(skill1, skill2));
-
-        eventDto = EventDto.builder()
-                .id(1L)
-                .title("Test Event")
-                .startDate(LocalDateTime.now())
-                .ownerId(1L)
-                .relatedSkills(List.of(new SkillDto(1L, "Ability"), new SkillDto(2L, "Expertise")))
-                .build();
+        Skill skill1 = Skill.builder().id(1L).title("Ability").build();
+        Skill skill2 = Skill.builder().id(2L).title("Expertise").build();
 
         event = Event.builder()
                 .id(1L)
-                .title("Test Event")
-                .startDate(LocalDateTime.now())
+                .title("My Event")
+                .startDate(LocalDateTime.of(2023, 7, 27, 0, 0))
+                .endDate(null)
+                .description("Event description")
+                .location("Event location")
+                .maxAttendees(100)
                 .owner(user)
                 .relatedSkills(List.of(skill1, skill2))
+                .build();
+
+        eventDto = EventDto.builder()
+                .id(1L)
+                .title("My Event")
+                .startDate(LocalDateTime.of(2023, 7, 27, 0, 0))
+                .endDate(null)
+                .description("Event description")
+                .location("Event location")
+                .maxAttendees(100)
+                .ownerId(1L)
+                .relatedSkills(List.of(
+                        SkillDto.builder().id(1L).title("Ability").build(),
+                        SkillDto.builder().id(2L).title("Expertise").build()
+                ))
                 .build();
     }
 
     @Test
-    @DisplayName("Dto transform to Entity. Put in database")
-    void testToEvent_ReturnsEventEntity() {
-        Event result = eventMapper.toEvent(eventDto);
-
-        assertNotNull(result);
-        assertEquals(eventDto.getId(), result.getId());
-        assertEquals(eventDto.getTitle(), result.getTitle());
-        assertEquals(eventDto.getStartDate(), result.getStartDate());
-        assertEquals(event.getRelatedSkills(), result.getRelatedSkills());
-        assertEquals(user.getId(), result.getOwner().getId());
+    @DisplayName("Test Event to EventDto Mapping")
+    void test_EventToEventDto() {
+        EventDto mappedEventDto = eventMapper.toDto(event);
+        assertEquals(eventDto, mappedEventDto);
     }
 
     @Test
-    void testToDto_ReturnsEventDto() {
-        EventDto result = eventMapper.toDto(event);
-
-        assertNotNull(result);
-        assertEquals(event.getId(), result.getId());
-        assertEquals(event.getTitle(), result.getTitle());
-        assertEquals(event.getStartDate(), result.getStartDate());
-        assertEquals(eventDto.getRelatedSkills(), result.getRelatedSkills());
-        assertEquals(user.getId(), result.getOwnerId());
+    @DisplayName("Test EventDto to Event Mapping")
+    void test_EventDtoToEvent() {
+        Event mappedEvent = eventMapper.toEvent(eventDto);
+        assertEquals(event, mappedEvent);
     }
 }

@@ -20,10 +20,6 @@ import java.util.List;
 @Entity
 @Table(name = "skill")
 public class Skill {
-    public Skill(Long id, String title) {
-        this.id = id;
-        this.title = title;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -59,7 +55,4 @@ public class Skill {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    public Skill(long l, String s) {
-    }
 }

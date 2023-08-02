@@ -18,19 +18,14 @@ import java.util.List;
 public class EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
-    private final EventMapper eventMapper = EventMapper.INSTANCE;
-    private final SkillMapper skillMapper = SkillMapper.INSTANCE;
+    private final EventMapper eventMapper;
+    private final SkillMapper skillMapper;
 
     public EventDto create(EventDto eventDto) {
         validateEvent(eventDto);
         Event event = eventMapper.toEvent(eventDto);
-        if (eventRepository.findByEventId(event.getId()).stream()
-                .findFirst()
-                .isPresent()) {
-            throw new DataValidationException("Event already exists");
-        }
-        EventDto eventDtoActual = eventMapper.toDto(eventRepository.save(event));
-        return eventDtoActual;
+
+        return eventMapper.toDto(eventRepository.save(event));
     }
 
     private void validateEvent(EventDto eventDto) {

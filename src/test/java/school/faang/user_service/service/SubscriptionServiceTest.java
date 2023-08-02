@@ -133,4 +133,10 @@ public class SubscriptionServiceTest {
 
         assertEquals(expectedResult, result);
     }
+
+    @Test
+    public void followersCount(){
+        subscriptionService.getFollowersCount(3L);
+        Mockito.verify(subscriptionRepository).findFollowersAmountByFolloweeId(3L);
+    }
 }

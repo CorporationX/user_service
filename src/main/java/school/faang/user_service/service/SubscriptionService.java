@@ -39,6 +39,10 @@ public class SubscriptionService {
         return filterUsers(users, filter);
     }
 
+    public int getFollowersCount(long followeeId) {
+        return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
+    }
+
     private List<UserDto> filterUsers(Stream<User> users, UserFilterDto filters) {
         if (filters == null) {
             return users.map(userMapper::toDto).toList();
@@ -54,3 +58,4 @@ public class SubscriptionService {
         return subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
     }
 }
+

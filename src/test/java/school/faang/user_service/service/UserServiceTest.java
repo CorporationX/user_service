@@ -12,24 +12,26 @@ import school.faang.user_service.repository.UserRepository;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
+
     @Mock
     UserRepository userRepository;
 
     @InjectMocks
     UserService userService;
 
- /*   @Test
-    public void testFindUserThrowEntityExc() {
-        assertThrows(EntityNotFoundException.class, () -> userService.findUserById(1L));
-    }*/
+    @Test
+    public void testFindUserThrowEntityNotFoundExc() {
+        assertThrows(EntityNotFoundException.class, () -> userService.findUserById(null));
+    }
 
     @Test
     public void testFindUserCallFindById() {
         Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(new User()));
         userService.findUserById(1L);
+        Mockito.verify(userRepository, Mockito.times(1)).findById(1L);
     }
 }

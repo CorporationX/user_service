@@ -18,5 +18,4 @@ public class UserFilterDto {
     private int experienceMax;
     private int page;
     private int pageSize;
-
 }

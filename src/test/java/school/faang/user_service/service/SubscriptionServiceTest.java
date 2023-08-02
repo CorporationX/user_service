@@ -116,7 +116,9 @@ public class SubscriptionServiceTest {
                 .namePattern("46")
                 .build();
         Stream<User> userStream = users.stream();
-        List<UserDto> expectedResult = usersDto.stream().filter(user -> user.getUsername().equals("46")).toList();
+        List<UserDto> expectedResult = usersDto.stream()
+                .filter(user -> user.getUsername().equals("46"))
+                .toList();
 
         when(subscriptionRepository.findByFolloweeId(userId)).thenReturn(userStream);
         List<UserDto> result = subscriptionService.getFollowers(userId, filterDto);

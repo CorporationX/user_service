@@ -22,4 +22,17 @@ public class EventParticipationService {
         }
         eventParticipationRepository.register(eventId, userId);
     }
+
+    public void unregisterParticipant(long eventId, long userId) {
+        if (checkThereIsUserInEvent(eventId, userId)) {
+            eventParticipationRepository.unregister(eventId, userId);
+        } else {
+            throw new DataValidationException("You are not registered");
+        }
+    }
+
+    public boolean checkThereIsUserInEvent(long eventId, long userId) {
+        return eventParticipationRepository.findAllParticipantsByEventId(eventId).stream()
+                .anyMatch(user -> user.getId() == userId);
+    }
 }

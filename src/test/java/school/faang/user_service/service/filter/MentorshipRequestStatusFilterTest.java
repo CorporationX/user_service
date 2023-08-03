@@ -2,11 +2,11 @@ package school.faang.user_service.service.filter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.filter.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
-import school.faang.user_service.service.mentorship.filter.MentorshipRequestDescriptionFilter;
+import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.service.mentorship.filter.MentorshipRequestStatusFilter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,16 +16,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
-
-@ExtendWith(MockitoExtension.class)
-public class MentorshipRequestDescriptionFilterTest {
-    private final MentorshipRequestDescriptionFilter descriptionFilter = new MentorshipRequestDescriptionFilter();
+public class MentorshipRequestStatusFilterTest {
+    private final MentorshipRequestStatusFilter descriptionFilter = new MentorshipRequestStatusFilter();
     private RequestFilterDto filter;
     private List<MentorshipRequest> requests;
     private MentorshipRequest request1;
     private MentorshipRequest request2;
     private MentorshipRequest request3;
+    private User user1;
+    private User user2;
+    private User user3;
 
 
     @BeforeEach
@@ -36,9 +36,9 @@ public class MentorshipRequestDescriptionFilterTest {
         request2 = new MentorshipRequest();
         request3 = new MentorshipRequest();
 
-        request1.setDescription("description1");
-        request2.setDescription("description2");
-        request3.setDescription("description3");
+        request1.setStatus(RequestStatus.PENDING);
+        request2.setStatus(RequestStatus.ACCEPTED);
+        request3.setStatus(RequestStatus.REJECTED);
 
         requests = new ArrayList<>();
 
@@ -48,8 +48,8 @@ public class MentorshipRequestDescriptionFilterTest {
     }
 
     @Test
-    void testIsApplicableWhenDescriptionPatternNotEmpty() {
-        filter.setDescriptionPattern("description");
+    void testIsApplicableWhenReceiverNamePatternNotEmpty() {
+        filter.setRequestStatusPattern(RequestStatus.PENDING);
         assertTrue(descriptionFilter.isApplicable(filter));
     }
 
@@ -60,10 +60,10 @@ public class MentorshipRequestDescriptionFilterTest {
 
     @Test
     void testFilterFilters() {
-        filter.setDescriptionPattern("1");
+        filter.setRequestStatusPattern(RequestStatus.ACCEPTED);
         Stream<MentorshipRequest> filteredRequestsStream = descriptionFilter.apply(requests.stream(), filter);
         MentorshipRequest filteredRequest = filteredRequestsStream.findFirst().get();
 
-        assertEquals(filteredRequest, request1);
+        assertEquals(filteredRequest, request2);
     }
 }

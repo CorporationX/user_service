@@ -27,7 +27,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class RecommendationServiceTest {
@@ -45,6 +45,16 @@ class RecommendationServiceTest {
     private UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     @InjectMocks
     private RecommendationService recommendationService;
+
+    @Test
+    public void testDelete() {
+        Long recommendationId = 1L;
+        doNothing().when(recommendationRepository).deleteById(recommendationId);
+        recommendationService.delete(recommendationId);
+        verify(recommendationRepository, times(1)).deleteById(recommendationId);
+    }
+
+
 
     @Test
     void validateSkillsNotExist() {

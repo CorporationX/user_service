@@ -5,7 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.service.RecommendationService;
 import school.faang.user_service.validator.RecommendationValidator;
 
@@ -16,11 +15,7 @@ import school.faang.user_service.validator.RecommendationValidator;
         @Autowired
         private RecommendationValidator recommendationValidator;
 
-        public ResponseEntity<RecommendationDto> giveRecommendation(RecommendationDto recommendation){
-            recommendationValidator.validate(recommendation);
-            return ResponseEntity.ok(recommendationService.create(recommendation));
-        }
-        @DeleteMapping("/{id}")
+        @DeleteMapping("/delete/{id}")
         public ResponseEntity deleteRecommendation(@PathVariable Long id) {
             recommendationService.delete(id);
             return ResponseEntity.ok().build();

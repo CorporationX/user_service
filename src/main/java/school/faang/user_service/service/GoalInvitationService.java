@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.GoalInvitation;
@@ -15,6 +16,9 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -92,9 +96,10 @@ public class GoalInvitationService {
 
         GoalInvitation goalInvitation = GoalInvitationMapper.INSTANCE.toEntity(invitationDto);
         return goalInvitationMapper.toDto(goalInvitationRepository.save(goalInvitation));
+    }
 
-        //throw new GoalInvitationException("target not found in database");
+    public List<GoalInvitationDto> getInvitations(InvitationFilterDto filter){
 
-
+        return new ArrayList<>();
     }
 }

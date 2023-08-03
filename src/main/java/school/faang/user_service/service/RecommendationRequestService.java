@@ -3,6 +3,7 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
+import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.dto.recommendation.filter.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
@@ -28,7 +29,7 @@ public class RecommendationRequestService {
     private final String REQUEST_IS_PENDING = "Request is pending";
     private final String SKILL_NOT_FOUND = "Skill not found";
     private final String REQUEST_NOT_FOUND = "Request not found";
-    public static final String REQUEST_IS_NOT_PENDING = "Recommendation request already %s";
+    public static final String REQUEST_ALREADY_IS = "Recommendation request already %s";
     private final int REQUEST_TIME_LIMIT = 6;
 
     private final RecommendationRequestRepository recommendationRequestRepository;
@@ -69,7 +70,7 @@ public class RecommendationRequestService {
         RecommendationRequest request = recommendationRequestRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(REQUEST_NOT_FOUND));
         if (request.getStatus() != RequestStatus.PENDING) {
-            throw new IllegalArgumentException(String.format(REQUEST_IS_NOT_PENDING, request.getStatus()));
+            throw new IllegalArgumentException(String.format(REQUEST_ALREADY_IS, request.getStatus()));
         }
         request.setStatus(RequestStatus.REJECTED);
         request.setRejectionReason(rejection.getReason());

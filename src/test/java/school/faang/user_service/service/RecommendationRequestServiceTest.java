@@ -1,9 +1,5 @@
 package school.faang.user_service.service;
 
-<<<<<<< HEAD
-
-=======
->>>>>>> medusa-feature-BC-3527
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -15,6 +11,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.SkillRequestDto;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
+import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
@@ -210,7 +207,7 @@ class RecommendationRequestServiceTest {
                 .thenReturn(Optional.empty());
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> recommendationRequestService.rejectRequest(id, new RejectionDto()));
-        assertEquals("Recommendation request not found", exception.getMessage());
+        assertEquals("Request not found", exception.getMessage());
     }
 
     @ParameterizedTest
@@ -225,7 +222,7 @@ class RecommendationRequestServiceTest {
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> recommendationRequestService.rejectRequest(1L, new RejectionDto()));
-        assertEquals("Recommendation request already rejected", exception.getMessage());
+        assertEquals(String.format("Recommendation request already %s", status), exception.getMessage());
     }
 
     @ParameterizedTest

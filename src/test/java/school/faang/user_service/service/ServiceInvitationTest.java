@@ -6,31 +6,36 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
-import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
+import school.faang.user_service.mapper.GoalMapper;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.data.redis.connection.RedisGeoCommands.GeoCommandArgs.GeoCommandFlag.any;
 
 @ExtendWith(MockitoExtension.class)
 
 public class ServiceInvitationTest {
     @Mock
-    private GoalInvitationRepository goalRepository;
+    private GoalRepository goalRepository;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    GoalInvitationRepository goalInvitationRepository;
+    @Mock
+    GoalMapper goalMapper;
     @InjectMocks
     private GoalInvitationService goalInvitationService;
-    List<Goal> goalList;
     @Test
     void createGoalInvitation(){
         GoalInvitationDto goalInvitationDto = new GoalInvitationDto();
@@ -46,24 +51,36 @@ public class ServiceInvitationTest {
     }
     @Test
     void acceptGoalInvitation(){
+        Long id = 3L;
+        Long goal_id = 2L;
+        Long user_id = 1l;
 
-        goalList = new ArrayList<>();
+        ArrayList<Goal> userArrayList = new ArrayList<>();
 
-        //goalList.add();
+        Goal goal = new Goal();
+        goal.setId(goal_id);
+        goal.setId(2l);
 
-        GoalInvitationDto goalInvitationDto = new GoalInvitationDto();
-        goalInvitationDto.setStatus(RequestStatus.valueOf("ACCEPTED"));
-
-        goalInvitationDto.setGoalId(1L);
-
-        goalInvitationDto.setInvitedUserId(2L);
-        goalInvitationDto.setInviterId(3L);
+        User user = new User();
+        user.setId(1L);
+        user.setGoals(userArrayList);
 
 
-        GoalInvitationDto result = goalInvitationService.createInvitation(goalInvitationDto);
-        GoalInvitationDto result2 = goalInvitationService.acceptGoalInvitation(1L);
-        assertNotNull(result);
-        assertEquals("ACCEPTED", result2.getStatus());
+        GoalInvitation goalInvitation = new GoalInvitation();
+        goalInvitation.setGoal(goal);
+        goalInvitation.setId(id);
+        goalInvitation.setInvited(user);
+
+        when(goalInvitationRepository.findById(id)).thenReturn(Optional.of(goalInvitation));
+        when(userRepository.findById(user_id)).thenReturn(Optional.of(user));
+        when(goalRepository.findById(goal_id)).thenReturn(Optional.of(goal));
+
+        goalInvitationService.acceptGoalInvitation(id);
+
+        verify(goalInvitationRepository,times(1)).findById(id);
+        verify(userRepository,times(1)).findById(user_id);
+        verify(goalRepository,times(1)).findById(goal_id);
+
     }
 
 }

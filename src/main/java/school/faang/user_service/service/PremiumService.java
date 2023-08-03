@@ -32,7 +32,7 @@ public class PremiumService {
     private final PremiumValidator premiumValidator;
     private final PremiumMapper premiumMapper;
 
-    private final Clock clock;
+    private final Clock clock = Clock.systemUTC();
 
     public PremiumDto buyPremium(long userId, PremiumPeriod premiumPeriod) {
         premiumValidator.validateExistPremiumFromUser(userId);

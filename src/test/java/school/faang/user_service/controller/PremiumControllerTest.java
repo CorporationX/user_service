@@ -43,7 +43,8 @@ class PremiumControllerTest {
     }
 
     @Test
-    void testByPremium() throws Exception {LocalDateTime now = LocalDateTime.now();
+    void testByPremium() throws Exception {
+        LocalDateTime now = LocalDateTime.now();
         PremiumDto premiumDto = PremiumDto.builder()
                 .id(1L)
                 .userId(1L)

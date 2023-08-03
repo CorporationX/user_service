@@ -12,6 +12,11 @@ import school.faang.user_service.repository.recommendation.SkillRequestRepositor
 
 import java.time.DateTimeException;
 import java.time.LocalDateTime;
+import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
+import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
+import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
+
 import java.util.Optional;
 
 @Service
@@ -76,4 +81,8 @@ public class RecommendationRequestService {
                     }
                 });
     }
+
+    public RecommendationRequestDto getRequest(long id) {
+        Optional<RecommendationRequest> request = repository.findById(id);
+        return mapper.toDto(request.orElseThrow(() -> new IllegalArgumentException(NOT_FOUND)));
 }

@@ -38,6 +38,27 @@ class RecommendationRequestServiceTest {
     UserRepository userRepository;
     @Spy
     RecommendationRequestMapperImpl recommendationRequestMapper;
+import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
+import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.mapper.recommendation.RecommendationRequestMapperImpl;
+import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
+
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class RecommendationRequestServiceTest {
+
+    @Mock
+    RecommendationRequestRepository repository;
+    @Spy
+    RecommendationRequestMapperImpl mapper;
     @InjectMocks
     RecommendationRequestService service;
 
@@ -91,6 +112,14 @@ class RecommendationRequestServiceTest {
         DateTimeException exception = assertThrows(DateTimeException.class,
                 () -> service.create(curRequest));
         assertEquals("Request is pending", exception.getMessage());
+    @DisplayName("Get recommendation request by id")
+    void getRecommendationRequestById(long id) {
+        RecommendationRequest request = new RecommendationRequest();
+        request.setId(id);
+        when(repository.findById(id))
+                .thenReturn(Optional.of(request));
+        RecommendationRequestDto requestDto = service.getRequest(id);
+        assertEquals(id, requestDto.getId());
     }
 
     @ParameterizedTest
@@ -179,6 +208,12 @@ class RecommendationRequestServiceTest {
                 Arguments.of(321312L, 1L, "Kotlin"),
                 Arguments.of(38L, 32L, "CI/CD")
         );
+    @DisplayName("Recommendation request not found")
+    void getRecommendationRequestByIdNotFound(long id) {
+        when(repository.findById(anyLong()))
+                .thenReturn(Optional.empty());
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> service.getRequest(id));
+        assertEquals("Recommendation request not found", exception.getMessage());
     }
 
     private static Stream<Arguments> getId() {

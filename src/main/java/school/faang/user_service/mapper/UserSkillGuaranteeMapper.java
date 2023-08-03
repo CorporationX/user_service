@@ -4,6 +4,7 @@ import org.mapstruct.*;
 import school.faang.user_service.dto.recommendation.UserSkillGuaranteeDto;
 import school.faang.user_service.entity.UserSkillGuarantee;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR, unmappedTargetPolicy = ReportingPolicy.IGNORE)
@@ -17,6 +18,9 @@ public interface UserSkillGuaranteeMapper {
 
     @Named("listSkillGuaranteeDto")
     default List<UserSkillGuaranteeDto> listGuaranteeDto(List<UserSkillGuarantee> userSkillGuarantees) {
+        if (userSkillGuarantees == null){
+            return new ArrayList<>();
+        }
         return userSkillGuarantees.stream()
                 .map(this::toDto)
                 .toList();

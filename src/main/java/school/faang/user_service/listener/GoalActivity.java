@@ -1,16 +1,15 @@
 package school.faang.user_service.listener;
 
 import org.springframework.stereotype.Component;
-import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.goal.Goal;
 
 @Component
-public class EventActivity implements Activity{
-
-    private final Long rating = 5L;
+public class GoalActivity implements Activity{
+    private final Long rating = 2L;
     @Override
     public Long getUserId(Object object) {
-        Event event = (Event) object;
-        return event.getOwner().getId();
+        Goal goal = (Goal) object;
+        return goal.getUsers().get(0).getId();
     }
 
     @Override
@@ -20,6 +19,6 @@ public class EventActivity implements Activity{
 
     @Override
     public Class getEntityClass() {
-        return Event.class;
+        return Goal.class;
     }
 }

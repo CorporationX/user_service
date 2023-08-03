@@ -6,5 +6,5 @@ public interface Activity {
 
     Long getRating(Object object);
 
-    <T extends Object> T getEntity();
+    Class getEntityClass();
 }

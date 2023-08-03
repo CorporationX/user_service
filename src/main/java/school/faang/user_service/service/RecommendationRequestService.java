@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.filter.RequestFilterDto;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
@@ -27,6 +28,7 @@ public class RecommendationRequestService {
     private final String REQUEST_IS_PENDING = "Request is pending";
     private final String SKILL_NOT_FOUND = "Skill not found";
     private final String REQUEST_NOT_FOUND = "Request not found";
+    public static final String REQUEST_IS_NOT_PENDING = "Recommendation request already %s";
     private final int REQUEST_TIME_LIMIT = 6;
 
     private final RecommendationRequestRepository recommendationRequestRepository;
@@ -61,6 +63,19 @@ public class RecommendationRequestService {
         return recommendationRequests
                 .map(recommendationRequestMapper::toDto)
                 .toList();
+    }
+
+    public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
+        RecommendationRequest request = recommendationRequestRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(REQUEST_NOT_FOUND));
+        if (request.getStatus() != RequestStatus.PENDING) {
+            throw new IllegalArgumentException(String.format(REQUEST_IS_NOT_PENDING, request.getStatus()));
+        }
+        request.setStatus(RequestStatus.REJECTED);
+        request.setRejectionReason(rejection.getReason());
+        return recommendationRequestMapper.toDto(
+                recommendationRequestRepository.save(request)
+        );
     }
 
     private void checkRequestAvailability(RecommendationRequestDto recommendationRequest) {

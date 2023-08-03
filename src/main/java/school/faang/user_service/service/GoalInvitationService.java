@@ -82,15 +82,20 @@ public class GoalInvitationService {
         {
             throw new GoalInvitationException("target not found in database");
         }
+        // тут ты получаешь сущность и перегоняешь ее в дто сразу
+        //
         GoalInvitationDto  invitationDto =  goalInvitationMapper.toDto
                 ((goalInvitationRepository.findById(id)
                         .stream()
                         .findAny()
                         .get()));
 
+        // тут ты в дтошке меняешь статус
         invitationDto.setStatus(RequestStatus.valueOf("REJECTED"));
 
+        // тут ты обратно перегоняешь в сущность
         GoalInvitation goalInvitation = GoalInvitationMapper.INSTANCE.toEntity(invitationDto);
+        // собственно сейвишь и ответ перегоняешь в ДТО
         return goalInvitationMapper.toDto(goalInvitationRepository.save(goalInvitation));
 
         //throw new GoalInvitationException("target not found in database");

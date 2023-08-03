@@ -9,6 +9,7 @@ import school.faang.user_service.dto.recommendation.UserSkillGuaranteeDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.mapper.skill.SkillMapper;
+import school.faang.user_service.mapper.skill.SkillMapperImpl;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class SkillMapperTest {
 
-    /*@InjectMocks
+    @InjectMocks
     private SkillMapper skillMapper = new SkillMapperImpl();
 
     @Test
@@ -82,5 +83,5 @@ class SkillMapperTest {
         UserSkillGuaranteeDto guaranteeDto2 = guaranteeDtos.get(1);
         assertEquals(101L, guaranteeDto2.getId());
 
-    }*/
+    }
 }

@@ -1,4 +1,3 @@
-/*
 package school.faang.user_service.service;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -133,4 +132,4 @@ class SubscriptionServiceTest {
 
         verify(subscriptionRepository, times(1)).findFolloweesAmountByFollowerId(followerId);
     }
-}*/
+}

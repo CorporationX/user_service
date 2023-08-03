@@ -1,4 +1,3 @@
-/*
 package school.faang.user_service.service;
 
 import org.junit.jupiter.api.Test;
@@ -506,4 +505,3 @@ class RecommendationServiceTest {
 
 
 
-*/

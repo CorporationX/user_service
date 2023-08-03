@@ -27,7 +27,7 @@ import school.faang.user_service.filter.mentorship.MentorshipRequestRequesterFil
 import school.faang.user_service.filter.mentorship.MentorshipRequestStatusFilter;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-import school.faang.user_service.validation.mentorship.MentorshipRequestValidator;
+import school.faang.user_service.validator.MentorshipRequestValidator;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;

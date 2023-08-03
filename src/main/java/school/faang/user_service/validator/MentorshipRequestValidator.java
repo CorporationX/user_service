@@ -1,4 +1,4 @@
-package school.faang.user_service.validation.mentorship;
+package school.faang.user_service.validator;
 
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -6,20 +6,20 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.exception.mentorship.MentorshipRequestValidationException;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-import school.faang.user_service.service.mentorship.UserService;
+import school.faang.user_service.service.user.UserService;
 
 @Component
 @RequiredArgsConstructor
 public class MentorshipRequestValidator {
     private static final int REQUEST_TIME_LIMIT = 3;
     private final MentorshipRequestRepository mentorshipRequestRepository;
-    private final UserService userService;
+    private final UserService userValidator;
 
     public void validate(MentorshipRequestDto mentorshipRequestDto) {
         long requesterId = mentorshipRequestDto.getRequesterId();
         long receiverId = mentorshipRequestDto.getReceiverId();
 
-        userService.validateUsers(requesterId, receiverId);
+        userValidator.validateUsers(requesterId, receiverId);
 
         if (requesterId == receiverId) {
             throw new MentorshipRequestValidationException("Requester and receiver cannot be the same user.");

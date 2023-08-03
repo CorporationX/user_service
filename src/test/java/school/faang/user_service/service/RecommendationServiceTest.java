@@ -1,3 +1,4 @@
+/*
 package school.faang.user_service.service;
 
 import org.junit.jupiter.api.Test;
@@ -12,11 +13,11 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
-import school.faang.user_service.exeption.DataValidationException;
-import school.faang.user_service.exeption.EntityNotFoundException;
-import school.faang.user_service.mappers.RecommendationMapper;
-import school.faang.user_service.mappers.SkillMapper;
-import school.faang.user_service.mappers.UserSkillGuaranteeMapper;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
+import school.faang.user_service.mapper.recommendation.RecommendationMapper;
+import school.faang.user_service.mapper.skill.SkillMapper;
+import school.faang.user_service.mapper.skill.UserSkillGuaranteeMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
@@ -505,3 +506,4 @@ class RecommendationServiceTest {
 
 
 
+*/

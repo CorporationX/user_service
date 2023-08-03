@@ -1,8 +1,9 @@
-package school.faang.user_service.mappers;
+package school.faang.user_service.mapper.recommendation;
 
 import org.mapstruct.*;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
+import school.faang.user_service.mapper.skill.SkillOfferMapper;
 
 import java.util.List;
 

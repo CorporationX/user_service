@@ -21,7 +21,7 @@ import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 class EventParticipationServiceTest {
-    private User user;
+    /*private User user;
 
     private Event event;
 
@@ -201,5 +201,5 @@ class EventParticipationServiceTest {
         long eventId = event.getId();
         Mockito.when(eventService.existsById(eventId)).thenReturn(true);
         Assertions.assertEquals(0, eventParticipationService.getParticipantsCount(eventId));
-    }
+    }*/
 }

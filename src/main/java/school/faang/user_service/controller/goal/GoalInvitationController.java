@@ -14,8 +14,8 @@ public class GoalInvitationController {
     {
         return goalInvitationService.createInvitation(invitation);
     }
-    public GoalInvitationDto acceptGoalInvitation(long id){
-        return goalInvitationService.acceptGoalInvitation(id);
+    public void acceptGoalInvitation(long id){
+        acceptGoalInvitation(id);
     }
 
 }

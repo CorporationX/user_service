@@ -9,11 +9,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import school.faang.user_service.dto.RecommendationRequestDto;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.SkillRequestDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.mapper.RecommendationRequestMapperImpl;
+import school.faang.user_service.mapper.recommendation.RecommendationRequestMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
@@ -28,39 +29,21 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(org.mockito.junit.jupiter.MockitoExtension.class)
-class RecommendationRequestServiceTest {
-    @Mock
-    RecommendationRequestRepository recommendationRequestRepository;
-    @Mock
-    SkillRequestRepository skillRequestRepository;
-    @Mock
-    UserRepository userRepository;
-    @Spy
-    RecommendationRequestMapperImpl recommendationRequestMapper;
-import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
-import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.mapper.recommendation.RecommendationRequestMapperImpl;
-import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
-
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class RecommendationRequestServiceTest {
 
     @Mock
-    RecommendationRequestRepository repository;
+    RecommendationRequestRepository recommendationRequestRepository;
+    @Mock
+    UserRepository userRepository;
+    @Mock
+    SkillRequestRepository skillRequestRepository;
     @Spy
     RecommendationRequestMapperImpl mapper;
     @InjectMocks
-    RecommendationRequestService service;
+    RecommendationRequestService recommendationRequestService;
+
 
     @ParameterizedTest
     @MethodSource("getId")
@@ -71,7 +54,7 @@ class RecommendationRequestServiceTest {
         dto.setReceiverId(id);
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> service.create(dto));
+                () -> recommendationRequestService.create(dto));
         assertEquals("Requester and receiver are the same", exception.getMessage());
     }
 
@@ -87,7 +70,7 @@ class RecommendationRequestServiceTest {
         dto.setReceiverId(receiverId);
         dto.setRequesterId(requesterId);
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> service.create(dto));
+                () -> recommendationRequestService.create(dto));
         assertEquals("Requester or receiver not found", exception.getMessage());
     }
 
@@ -110,15 +93,19 @@ class RecommendationRequestServiceTest {
         when(userRepository.findById(anyLong()))
                 .thenReturn(Optional.of(new User()));
         DateTimeException exception = assertThrows(DateTimeException.class,
-                () -> service.create(curRequest));
+                () -> recommendationRequestService.create(curRequest));
         assertEquals("Request is pending", exception.getMessage());
+    }
+
+    @ParameterizedTest
+    @MethodSource("getId")
     @DisplayName("Get recommendation request by id")
     void getRecommendationRequestById(long id) {
         RecommendationRequest request = new RecommendationRequest();
         request.setId(id);
-        when(repository.findById(id))
+        when(recommendationRequestRepository.findById(id))
                 .thenReturn(Optional.of(request));
-        RecommendationRequestDto requestDto = service.getRequest(id);
+        RecommendationRequestDto requestDto = recommendationRequestService.getRequest(id);
         assertEquals(id, requestDto.getId());
     }
 
@@ -140,7 +127,7 @@ class RecommendationRequestServiceTest {
                 .thenReturn(false);
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> service.create(requestDto));
+                () -> recommendationRequestService.create(requestDto));
         assertEquals("Skill not found", exception.getMessage());
     }
 
@@ -162,7 +149,7 @@ class RecommendationRequestServiceTest {
         when(userRepository.findById(anyLong()))
                 .thenReturn(Optional.of(new User()));
 
-        service.create(requestDto);
+        recommendationRequestService.create(requestDto);
 
         verify(skillRequestRepository)
                 .create(skillRequestId, skillId);
@@ -192,13 +179,23 @@ class RecommendationRequestServiceTest {
         when(recommendationRequestRepository.create(requesterId, receiverId, message))
                 .thenReturn(request);
 
-        RecommendationRequestDto created = service.create(requestDto);
+        RecommendationRequestDto created = recommendationRequestService.create(requestDto);
 
         assertAll(() -> {
             assertEquals(requesterId, created.getRequesterId());
             assertEquals(receiverId, created.getReceiverId());
             assertEquals(message, created.getMessage());
         });
+    }
+
+    @ParameterizedTest
+    @MethodSource("getId")
+    @DisplayName("Recommendation request not found")
+    void getRecommendationRequestByIdNotFound(long id) {
+        when(recommendationRequestRepository.findById(anyLong()))
+                .thenReturn(Optional.empty());
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> recommendationRequestService.getRequest(id));
+        assertEquals("Request not found", exception.getMessage());
     }
 
     private static Stream<Arguments> getRequestData() {
@@ -208,12 +205,6 @@ class RecommendationRequestServiceTest {
                 Arguments.of(321312L, 1L, "Kotlin"),
                 Arguments.of(38L, 32L, "CI/CD")
         );
-    @DisplayName("Recommendation request not found")
-    void getRecommendationRequestByIdNotFound(long id) {
-        when(repository.findById(anyLong()))
-                .thenReturn(Optional.empty());
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> service.getRequest(id));
-        assertEquals("Recommendation request not found", exception.getMessage());
     }
 
     private static Stream<Arguments> getId() {

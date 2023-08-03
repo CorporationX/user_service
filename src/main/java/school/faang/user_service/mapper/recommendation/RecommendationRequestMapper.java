@@ -10,9 +10,11 @@ public interface RecommendationRequestMapper {
 
     @Mapping(target = "requesterId", source = "requester.id")
     @Mapping(target = "receiverId", source = "receiver.id")
-    RecommendationRequestDto toDto(RecommendationRequest recommendationRequest);
+    @Mapping(target = "recommendationId", source = "recommendation.id")
+    RecommendationRequestDto toDto(RecommendationRequest request);
 
     @Mapping(target = "requester", ignore = true)
     @Mapping(target = "receiver", ignore = true)
-    RecommendationRequest toEntity(RecommendationRequestDto recommendationRequestDto);
+    @Mapping(target = "recommendation", ignore = true)
+    RecommendationRequest toEntity(RecommendationRequestDto request);
 }

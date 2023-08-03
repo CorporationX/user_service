@@ -2,22 +2,22 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
+import school.faang.user_service.dto.recommendation.filter.RequestFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.mapper.RecommendationRequestMapper;
+import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
+import school.faang.user_service.service.reccomendation.filter.RecommendationRequestFilter;
 
 import java.time.DateTimeException;
 import java.time.LocalDateTime;
-import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
-import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
-import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -26,12 +26,15 @@ public class RecommendationRequestService {
     private final String REQUESTER_AND_RECEIVER_SAME = "Requester and receiver are the same";
     private final String REQUEST_IS_PENDING = "Request is pending";
     private final String SKILL_NOT_FOUND = "Skill not found";
+    private final String REQUEST_NOT_FOUND = "Request not found";
     private final int REQUEST_TIME_LIMIT = 6;
 
     private final RecommendationRequestRepository recommendationRequestRepository;
     private final SkillRequestRepository skillRequestRepository;
     private final UserRepository userRepository;
     private final RecommendationRequestMapper recommendationRequestMapper;
+
+    private final List<RecommendationRequestFilter> recommendationRequestFilters;
 
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequest) {
         checkRequestAvailability(recommendationRequest);
@@ -43,6 +46,21 @@ public class RecommendationRequestService {
                 .forEach(skillRequestDto -> skillRequestRepository.create(skillRequestDto.getId(), skillRequestDto.getSkillId()));
         return recommendationRequestMapper
                 .toDto(recommendationRequestRepository.create(requesterId, receiverId, message));
+    }
+
+    public RecommendationRequestDto getRequest(long id) {
+        Optional<RecommendationRequest> request = recommendationRequestRepository.findById(id);
+        return recommendationRequestMapper.toDto(request.orElseThrow(() -> new IllegalArgumentException(REQUEST_NOT_FOUND)));
+    }
+
+    public List<RecommendationRequestDto> getRequest(RequestFilterDto filters) {
+        Stream<RecommendationRequest> recommendationRequests = recommendationRequestRepository.findAll().stream();
+        recommendationRequestFilters.stream()
+                .filter(filter -> filter.isApplicable(filters))
+                .forEach(filter -> filter.apply(recommendationRequests, filters));
+        return recommendationRequests
+                .map(recommendationRequestMapper::toDto)
+                .toList();
     }
 
     private void checkRequestAvailability(RecommendationRequestDto recommendationRequest) {
@@ -81,8 +99,4 @@ public class RecommendationRequestService {
                     }
                 });
     }
-
-    public RecommendationRequestDto getRequest(long id) {
-        Optional<RecommendationRequest> request = repository.findById(id);
-        return mapper.toDto(request.orElseThrow(() -> new IllegalArgumentException(NOT_FOUND)));
 }

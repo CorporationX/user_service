@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -64,7 +63,7 @@ public class GlobalExceptionHandler {
         log.error("Entity not found exception occurred", e);
         return ErrorResponseDto.builder()
                 .timestamp(LocalDateTime.now())
-                .status(HttpStatus.BAD_REQUEST.value())
+                .status(HttpStatus.NOT_FOUND.value())
                 .error(e.getMessage())
                 .path(request.getRequestURI())
                 .build();
@@ -76,8 +75,20 @@ public class GlobalExceptionHandler {
         log.error("Runtime exception occurred", e);
         return ErrorResponseDto.builder()
                 .timestamp(LocalDateTime.now())
-                .status(HttpStatus.BAD_REQUEST.value())
-                .error(e.getMessage())
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .error("Internal server error")
+                .path(request.getRequestURI())
+                .build();
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponseDto handleException(Exception e, HttpServletRequest request) {
+        log.error("Exception occurred", e);
+        return ErrorResponseDto.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .error("Internal server error")
                 .path(request.getRequestURI())
                 .build();
     }

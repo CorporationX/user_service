@@ -1,4 +1,4 @@
-package school.faang.user_service.entity.dto.skill;
+package school.faang.user_service.dto.skill;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

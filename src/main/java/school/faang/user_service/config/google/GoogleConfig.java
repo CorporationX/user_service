@@ -40,6 +40,12 @@ public class GoogleConfig {
     @Value("${google.calendar.redirect-uri}")
     private String redirectUri;
 
+    @Value("${google.calendar.access-type}")
+    private String accessType;
+
+    @Value("${google.calendar.calendar-id}")
+    private String calendarId;
+
     private final GoogleTokenRepository googleTokenRepository;
 
     public GoogleAuthorizationCodeFlow getFlow()
@@ -49,7 +55,7 @@ public class GoogleConfig {
         return new GoogleAuthorizationCodeFlow
                 .Builder(HTTP_TRANSPORT, jsonFactory, getClientSecrets(), Collections.singleton(CalendarScopes.CALENDAR))
                 .setDataStoreFactory(new JpaDataStoreFactory(googleTokenRepository))
-                .setAccessType("online")
+                .setAccessType(accessType)
                 .build();
     }
     public Calendar getService(Credential credential) throws GeneralSecurityException, IOException {

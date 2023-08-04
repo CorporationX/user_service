@@ -15,6 +15,7 @@ import school.faang.user_service.dto.event.GoogleEventDto;
 import school.faang.user_service.dto.event.GoogleEventResponseDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.EventNotFoundException;
+import school.faang.user_service.exception.NotPartOfEventException;
 import school.faang.user_service.mapper.event.GoogleEventDtoMapper;
 import school.faang.user_service.mapper.event.GoogleEventMapper;
 import school.faang.user_service.repository.GoogleTokenRepository;
@@ -37,9 +38,9 @@ public class GoogleCalendarService {
                 .orElseThrow(() -> new EventNotFoundException("Event not found"));
         User user = userService.findUserById(userId);
 
-//        if (!user.getParticipatedEvents().contains(event)) {
-//            throw new DataValidationException("User with id " + userId + " is not part of event with id " + eventId);
-//        }
+        if (!user.getParticipatedEvents().contains(event)) {
+            throw new NotPartOfEventException("User with id " + userId + " is not part of event with id " + eventId);
+        }
 
         if (!googleTokenRepository.existsByUser(user)) {
             return GoogleEventResponseDto.builder()
@@ -54,7 +55,7 @@ public class GoogleCalendarService {
 
         GoogleEventDto googleEventDto = googleEventDtoMapper.toGoogleEventDto(event);
         com.google.api.services.calendar.model.Event googleEvent = googleEventMapper.toGoogleEvent(googleEventDto);
-        googleEvent = service.events().insert("primary", googleEvent).execute();
+        googleEvent = service.events().insert(googleConfig.getCalendarId(), googleEvent).execute();
 
         return getResponse(googleEvent.getHtmlLink());
     }
@@ -62,6 +63,9 @@ public class GoogleCalendarService {
     @Transactional
     public GoogleEventResponseDto handleCallback(String code, Long userId, Long eventId)
             throws GeneralSecurityException, IOException {
+        school.faang.user_service.entity.event.Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EventNotFoundException("Event not found"));
+
         GoogleAuthorizationCodeFlow flow = googleConfig.getFlow();
 
         TokenResponse response = flow.newTokenRequest(code)
@@ -70,11 +74,9 @@ public class GoogleCalendarService {
         Credential credential = flow.createAndStoreCredential(response, String.valueOf(userId));
         Calendar service = googleConfig.getService(credential);
 
-        school.faang.user_service.entity.event.Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new EventNotFoundException("Event not found"));
         GoogleEventDto googleEventDto = googleEventDtoMapper.toGoogleEventDto(event);
         com.google.api.services.calendar.model.Event googleEvent = googleEventMapper.toGoogleEvent(googleEventDto);
-        googleEvent = service.events().insert("primary", googleEvent).execute();
+        googleEvent = service.events().insert(googleConfig.getCalendarId(), googleEvent).execute();
 
         return getResponse(googleEvent.getHtmlLink());
     }

@@ -35,8 +35,7 @@ public class GoogleCalendarController {
     }
 
     @GetMapping("/Callback")
-    public GoogleEventResponseDto handleCallback(@RequestParam String code, @RequestParam String state,
-                                                 @RequestParam String clientId) {
+    public GoogleEventResponseDto handleCallback(@RequestParam String code, @RequestParam String state) {
         try {
             Long userId = Long.parseLong(state.split("-")[0]);
             Long eventId = Long.parseLong(state.split("-")[1]);

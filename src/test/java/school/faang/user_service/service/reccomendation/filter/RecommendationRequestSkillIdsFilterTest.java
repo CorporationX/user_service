@@ -6,6 +6,7 @@ import school.faang.user_service.dto.recommendation.filter.RequestFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
+import school.faang.user_service.util.filter.recommendationRequest.RecommendationRequestSkillIdsFilter;
 
 import java.util.ArrayList;
 import java.util.List;

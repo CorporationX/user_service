@@ -1,4 +1,4 @@
-package school.faang.user_service.service.reccomendation.filter;
+package school.faang.user_service.util.filter.recommendationRequest;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.recommendation.filter.RequestFilterDto;
@@ -7,15 +7,18 @@ import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import java.util.stream.Stream;
 
 @Component
-public class RecommendationRequestIdFilter implements RecommendationRequestFilter {
+public class RecommendationRequestCreatedAtFilter implements RecommendationRequestFilter {
     @Override
     public boolean isApplicable(RequestFilterDto filters) {
-        return filters.getId() != null;
+        return filters.getCreatedAt() != null;
     }
 
     @Override
     public Stream<RecommendationRequest> apply(Stream<RecommendationRequest> requests, RequestFilterDto filters) {
         return requests
-                .filter(request -> request.getId() == filters.getRequesterId());
+                .filter(request -> request
+                        .getCreatedAt()
+                        .toLocalDate()
+                        .isEqual(filters.getCreatedAt().toLocalDate()));
     }
 }

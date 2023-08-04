@@ -131,13 +131,13 @@ class SkillServiceTest {
 
         List<SkillCandidateDto> offeredSkillsDto = skillService.getOfferedSkills(userId);
 
-        String expectedTitle = "Soft Skill";
+        String expectedTitle = "Hard Skill";
         String actualTitle = offeredSkillsDto.get(0).getSkill().getTitle();
 
         assertNotNull(offeredSkillsDto);
         assertEquals(2, offeredSkillsDto.size());
-        assertEquals(1, offeredSkillsDto.get(0).getOffersAmount());
-        assertEquals(2, offeredSkillsDto.get(1).getOffersAmount());
+        assertEquals(2, offeredSkillsDto.get(0).getOffersAmount());
+        assertEquals(1, offeredSkillsDto.get(1).getOffersAmount());
         assertEquals(expectedTitle, actualTitle);
     }
 

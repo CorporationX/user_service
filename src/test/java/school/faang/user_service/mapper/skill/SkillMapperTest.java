@@ -18,6 +18,7 @@ class SkillMapperTest {
 
     private Skill skill;
     private SkillDto skillDto;
+    private SkillDto updatedSkillDto;
 
     @BeforeEach
     void setUp() {
@@ -28,6 +29,10 @@ class SkillMapperTest {
         skillDto = new SkillDto();
         skillDto.setId(1L);
         skillDto.setTitle("Programming");
+
+        updatedSkillDto = new SkillDto();
+        updatedSkillDto.setId(1L);
+        updatedSkillDto.setTitle("Updated Programming");
     }
 
     @Test
@@ -58,5 +63,13 @@ class SkillMapperTest {
         List<SkillDto> skillDtos = List.of(skillDto);
         List<Skill> mappedSkills = skillMapper.toListSkillsEntity(skillDtos);
         assertEquals(List.of(skill), mappedSkills);
+    }
+
+    @Test
+    @DisplayName("Test updating SkillDto from Skill")
+    void testUpdateSkill() {
+        skillMapper.updateSkill(updatedSkillDto, skill);
+        assertEquals(updatedSkillDto.getId(), skill.getId());
+        assertEquals(updatedSkillDto.getTitle(), skill.getTitle());
     }
 }

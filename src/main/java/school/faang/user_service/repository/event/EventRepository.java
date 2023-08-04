@@ -9,7 +9,7 @@ import school.faang.user_service.entity.event.Event;
 import java.util.List;
 
 @Repository
-public interface EventRepository extends CrudRepository<Event, Long> {
+public interface EventRepository extends JpaRepository<Event, Long> {
 
     @Query(nativeQuery = true, value = """
             SELECT e.* FROM event e
@@ -24,5 +24,7 @@ public interface EventRepository extends CrudRepository<Event, Long> {
             """)
     List<Event> findParticipatedEventsByUserId(long userId);
 
-    List<Event> findByEventId(long id);
+    List<Event> findByEventId(Long id);
+
+    List<Event> findAll();
 }

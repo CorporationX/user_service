@@ -11,6 +11,7 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.mapper.skill.SkillMapperImpl;
 import java.time.LocalDateTime;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,13 +22,21 @@ class EventMapperTest {
     private EventMapperImpl eventMapper;
     private Event event;
     private EventDto eventDto;
+    private EventDto updatedDto;
 
     @BeforeEach
     void setUp() {
-        User user = User.builder().id(1L).build();
+        User user = User.builder()
+                .id(1L)
+                .build();
 
-        Skill skill1 = Skill.builder().id(1L).title("Ability").build();
-        Skill skill2 = Skill.builder().id(2L).title("Expertise").build();
+        Skill skill1 = Skill.builder()
+                .id(1L)
+                .title("Ability")
+                .build();
+        Skill skill2 = Skill.builder()
+                .id(2L)
+                .title("Expertise").build();
 
         event = Event.builder()
                 .id(1L)
@@ -55,6 +64,13 @@ class EventMapperTest {
                         SkillDto.builder().id(2L).title("Expertise").build()
                 ))
                 .build();
+
+        updatedDto = EventDto.builder()
+                .id(1L)
+                .title("My SuperEvent")
+                .maxAttendees(50)
+                .ownerId(1L)
+                .build();
     }
 
     @Test
@@ -69,5 +85,16 @@ class EventMapperTest {
     void test_EventDtoToEvent() {
         Event mappedEvent = eventMapper.toEvent(eventDto);
         assertEquals(event, mappedEvent);
+    }
+
+    @Test
+    @DisplayName("Test Event Update")
+    void testUpdateDto() {
+        eventMapper.updateDto(updatedDto, event);
+
+        assertEquals(updatedDto.getId(), event.getId());
+        assertEquals(updatedDto.getTitle(), event.getTitle());
+        assertEquals(updatedDto.getMaxAttendees(), event.getMaxAttendees());
+        assertEquals(updatedDto.getOwnerId(), event.getOwner().getId());
     }
 }

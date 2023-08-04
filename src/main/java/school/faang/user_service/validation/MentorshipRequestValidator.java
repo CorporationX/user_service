@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 import java.time.LocalDateTime;
@@ -15,7 +14,7 @@ public class MentorshipRequestValidator {
     private final UserRepository userRepository;
     private final MentorshipRequestRepository mentorshipRequestRepository;
 
-    public void validate(MentorshipRequest mentorshipRequest) {
+    public void validateRequest(MentorshipRequest mentorshipRequest) {
         Long requesterId = mentorshipRequest.getRequester().getId();
         Long receiverId = mentorshipRequest.getReceiver().getId();
         LocalDateTime threeMonthBeforeNow = LocalDateTime.now().minusMonths(3);
@@ -41,5 +40,22 @@ public class MentorshipRequestValidator {
                 throw new RuntimeException("Request can only be made once every 3 months");
             }
         }
+    }
+
+    public void validateAcceptRequest(Long requestId) {
+        Optional<MentorshipRequest> requestOpt = mentorshipRequestRepository.findById(requestId);
+        if(!requestOpt.isPresent()) {
+            throw new NullPointerException("Request must exist");
+        } else {
+            MentorshipRequest request = requestOpt.get();
+            User requester = request.getRequester();
+            User receiver = request.getReceiver();
+
+            if(requester.getMentors().contains(receiver)) {
+                throw new IllegalArgumentException(receiver.getUsername() + "is already the requester mentor");
+            }
+        }
+
+
     }
 }

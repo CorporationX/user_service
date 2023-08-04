@@ -1,15 +1,17 @@
 package school.faang.user_service.service;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.validation.MentorshipRequestValidator;
+
+import java.util.List;
+
+import static school.faang.user_service.entity.RequestStatus.ACCEPTED;
 
 @RequiredArgsConstructor
 @Service
@@ -20,7 +22,7 @@ public class MentorshipRequestService {
 
    public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         MentorshipRequest mentorshipRequest = mapper.toEntity(mentorshipRequestDto);
-        validator.validate(mentorshipRequest);
+        validator.validateRequest(mentorshipRequest);
 
         Long requesterId = mentorshipRequest.getRequester().getId();
         Long receiverId = mentorshipRequest.getReceiver().getId();
@@ -29,4 +31,18 @@ public class MentorshipRequestService {
         MentorshipRequest newRequest = repository.create(requesterId, receiverId, description);
         return mapper.toDto(newRequest);
     }
+
+   public void acceptRequest(long requestId) {
+        validator.validateAcceptRequest(requestId);
+        MentorshipRequest request = repository.findById(requestId).get();
+        User requester = request.getRequester();
+        User receiver = request.getReceiver();
+
+        if(requester.getMentors() == null) {
+            requester.setMentors(List.of(receiver));
+        } else {
+            requester.getMentors().add(receiver);
+        }
+        request.setStatus(ACCEPTED);
+   }
 }

@@ -12,6 +12,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,18 +29,22 @@ class MentorshipRequestValidatorTest {
 
     private final long REQUESTER_ID = 1L;
     private final long RECEIVER_ID = 2L;
+    private final long REQUEST_ID = 0L;
     private final LocalDateTime THREE_MONTH_AGO = LocalDateTime.now().minusMonths(3);
     private final String DESCRIPTION = "description";
     private MentorshipRequest request;
+    private User requester;
+    private User receiver;
 
     @BeforeEach
     void setUp() {
-        User requester = new User();
+        requester = new User();
         requester.setId(REQUESTER_ID);
-        User receiver = new User();
+        receiver = new User();
         receiver.setId(RECEIVER_ID);
 
         request = new MentorshipRequest();
+        request.setId(REQUEST_ID);
         request.setRequester(requester);
         request.setReceiver(receiver);
         request.setDescription(DESCRIPTION);
@@ -49,25 +54,25 @@ class MentorshipRequestValidatorTest {
     void testCorrectRequest() {
         when(userRepository.existsById(REQUESTER_ID)).thenReturn(true);
         when(userRepository.existsById(RECEIVER_ID)).thenReturn(true);
-        assertDoesNotThrow(() -> validator.validate(request));
+        assertDoesNotThrow(() -> validator.validateRequest(request));
     }
 
     @Test
     void testRequestWithoutDescription() {
         request.setDescription("");
-        assertThrows(IllegalArgumentException.class, () -> validator.validate(request));
+        assertThrows(IllegalArgumentException.class, () -> validator.validateRequest(request));
     }
 
     @Test
     void testRequesterDoesNotExists() {
         when(userRepository.existsById(REQUESTER_ID)).thenReturn(false);
-        assertThrows(IndexOutOfBoundsException.class, () -> validator.validate(request));
+        assertThrows(IndexOutOfBoundsException.class, () -> validator.validateRequest(request));
     }
     @Test
     void testReceiverDoesNotExists() {
         when(userRepository.existsById(REQUESTER_ID)).thenReturn(true);
         when(userRepository.existsById(RECEIVER_ID)).thenReturn(false);
-        assertThrows(IndexOutOfBoundsException.class, () -> validator.validate(request));
+        assertThrows(IndexOutOfBoundsException.class, () -> validator.validateRequest(request));
     }
 
     @Test
@@ -78,7 +83,7 @@ class MentorshipRequestValidatorTest {
 
         when(userRepository.existsById(REQUESTER_ID)).thenReturn(true);
         when(userRepository.existsById(request.getReceiver().getId())).thenReturn(true);
-        assertThrows(IllegalArgumentException.class, () -> validator.validate(request));
+        assertThrows(IllegalArgumentException.class, () -> validator.validateRequest(request));
     }
 
     @Test
@@ -89,6 +94,19 @@ class MentorshipRequestValidatorTest {
         when(userRepository.existsById(RECEIVER_ID)).thenReturn(true);
         when(mentorshipRequestRepository.findLatestRequest(REQUESTER_ID, RECEIVER_ID))
                 .thenReturn(Optional.of(request));
-        assertThrows(RuntimeException.class, () -> validator.validate(request));
+        assertThrows(RuntimeException.class, () -> validator.validateRequest(request));
+    }
+
+    @Test
+    void requestExist() {
+        when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(null);
+        assertThrows(NullPointerException.class, () -> validator.validateAcceptRequest(REQUEST_ID));
+    }
+
+    @Test
+    void receiverNotMentor() {
+        requester.setMentors(List.of(receiver));
+        when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(Optional.of(request));
+        assertThrows(IllegalArgumentException.class, () -> validator.validateAcceptRequest(REQUEST_ID));
     }
 }

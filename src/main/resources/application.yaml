@@ -27,6 +27,10 @@ spring:
         profile_view_channel:
             name: profile_view_channel
 
+  servlet:
+    multipart:
+      max-file-size: 5MB
+
 server:
   port: 8080
 
@@ -43,11 +47,13 @@ payment-service:
   port: 9080
 
 aws:
-  accessKey: access_key
-  secretKey: secret_key
-  region: bucket_region
+  accessKey: "8hzEe6m0CHClRlZudZ6l"
+  secretKey: "qXXnIDz2CUW0eXReb6Ghb77guwmnXL3OLzEGe5KQ"
+  region: "http://localhost:9000/"
 
 services:
   s3:
-    bucket-name: user_backet
+    bucket-name: user-bucket
     isMocked: true
+
+

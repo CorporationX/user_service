@@ -1,4 +1,4 @@
-package school.faang.user_service.mappers;
+package school.faang.user_service.mapper;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,6 +12,7 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 
 import java.util.ArrayList;
 import java.util.List;
+import school.faang.user_service.mapper.SkillOfferMapper;
 
 import static org.junit.jupiter.api.Assertions.*;
 

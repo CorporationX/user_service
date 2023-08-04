@@ -86,7 +86,7 @@ class RecommendationServiceTest {
                 .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(1L,2L))
                 .thenReturn(Optional.empty());
 
-        assertThrows(DataValidationException.class,
+        assertThrows(SkillNotFoundException.class,
                 ()-> recommendationService.create(RecommendationDto
                         .builder().authorId(1L)
                         .receiverId(2L)
@@ -119,7 +119,7 @@ class RecommendationServiceTest {
         recommendationDto.getSkillOffers()
                 .forEach(skillOffer -> skillRepository.existsById(skillOffer.getSkillId()));
 
-        assertThrows(DataValidationException.class,
+        assertThrows(SkillNotFoundException.class,
                 () -> recommendationService.create(RecommendationDto
                         .builder().authorId(1L)
                         .skillOffers(List.of(new SkillOfferDto()))
@@ -136,7 +136,7 @@ class RecommendationServiceTest {
 
         assertEquals(skillIds.size(), skills.size());
 
-        assertThrows(DataValidationException.class,
+        assertThrows(SkillNotFoundException.class,
                 () -> recommendationService.create(RecommendationDto
                         .builder().authorId(1L)
                         .skillOffers(List.of(new SkillOfferDto()))
@@ -153,7 +153,7 @@ class RecommendationServiceTest {
 
         assertEquals(recommendationIds.size(), recommendations.size());
 
-        assertThrows(DataValidationException.class,
+        assertThrows(SkillNotFoundException.class,
                 () -> recommendationService.create(RecommendationDto
                         .builder().authorId(1L)
                         .skillOffers(List.of(new SkillOfferDto()))

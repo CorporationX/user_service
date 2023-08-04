@@ -10,6 +10,7 @@ import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.invalidFieldException.DataValidationException;
 import school.faang.user_service.exception.EntityAlreadyExistException;
+import school.faang.user_service.exception.notFoundExceptions.SkillNotFoundException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
@@ -49,7 +50,7 @@ public class SkillService {
     }
 
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
-        Skill skill = skillRepository.findById(skillId).orElseThrow(() -> new DataValidationException("This skill doesn't exist"));
+        Skill skill = skillRepository.findById(skillId).orElseThrow(() -> new SkillNotFoundException("This skill doesn't exist"));
         Optional<Skill> userSkill = skillRepository.findUserSkill(skillId, userId);
 
         if (userSkill.isEmpty()) {

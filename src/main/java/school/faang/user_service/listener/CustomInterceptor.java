@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserActivity;
-import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserActivityJpaRepository;
 
 import java.util.Arrays;
@@ -55,8 +54,10 @@ public class CustomInterceptor implements Interceptor {
                 .rating(rating)
                 .build());
 
-//        userActivityJpaRepository.updateRating(rating, userId);
+        userActivityJpaRepository.updateRating(rating, userId);
 
         return Interceptor.super.onSave(entity, id, state, propertyNames, types);
     }
+
+
 }

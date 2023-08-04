@@ -2,7 +2,7 @@ package school.faang.user_service.util.validator;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
-import school.faang.user_service.exception.tasksEntity.SameEntityException;
+import school.faang.user_service.exception.SameEntityException;
 
 @Component
 public class GoalInvitationControllerValidator {

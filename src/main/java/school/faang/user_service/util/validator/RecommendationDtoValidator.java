@@ -2,7 +2,7 @@ package school.faang.user_service.util.validator;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
-import school.faang.user_service.exception.tasksEntity.invalidFieldException.EntityIsNullOrEmptyException;
+import school.faang.user_service.exception.invalidFieldException.EntityIsNullOrEmptyException;
 
 @Component
 public class RecommendationDtoValidator {

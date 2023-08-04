@@ -11,10 +11,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorshipRequest.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.tasksEntity.SameEntityException;
-import school.faang.user_service.exception.tasksEntity.TimingException;
-import school.faang.user_service.exception.tasksEntity.notFoundExceptions.MentorshipRequestNotFoundException;
-import school.faang.user_service.exception.tasksEntity.notFoundExceptions.contact.UserNotFoundException;
+import school.faang.user_service.exception.SameEntityException;
+import school.faang.user_service.exception.TimingException;
+import school.faang.user_service.exception.notFoundExceptions.MentorshipRequestNotFoundException;
+import school.faang.user_service.exception.notFoundExceptions.contact.UserNotFoundException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 

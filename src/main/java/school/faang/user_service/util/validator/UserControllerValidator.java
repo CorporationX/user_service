@@ -1,7 +1,7 @@
 package school.faang.user_service.util.validator;
 
 import org.springframework.stereotype.Component;
-import school.faang.user_service.exception.tasksEntity.invalidFieldException.InvalidIdException;
+import school.faang.user_service.exception.invalidFieldException.InvalidIdException;
 
 @Component
 public class UserControllerValidator {

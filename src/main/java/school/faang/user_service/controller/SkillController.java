@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.exception.tasksEntity.invalidFieldException.DataValidationException;
+import school.faang.user_service.exception.invalidFieldException.DataValidationException;
 import school.faang.user_service.service.SkillService;
 
 import java.util.List;

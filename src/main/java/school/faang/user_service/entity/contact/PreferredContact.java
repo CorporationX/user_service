@@ -1,6 +1,6 @@
 package school.faang.user_service.entity.contact;
 
-import school.faang.user_service.exception.tasksEntity.invalidFieldException.InvalidEnumValueException;
+import school.faang.user_service.exception.invalidFieldException.InvalidEnumValueException;
 
 public enum PreferredContact {
     EMAIL, PHONE, TELEGRAM;

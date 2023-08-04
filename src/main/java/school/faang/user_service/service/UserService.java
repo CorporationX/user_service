@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.mydto.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.tasksEntity.notFoundExceptions.contact.UserNotFoundException;
+import school.faang.user_service.exception.notFoundExceptions.contact.UserNotFoundException;
 import school.faang.user_service.mapper.mymappers.User1Mapper;
 import school.faang.user_service.repository.UserRepository;
 

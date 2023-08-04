@@ -15,13 +15,18 @@ import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.exception.tasksEntity.EntityStateException;
+import school.faang.user_service.exception.tasksEntity.SameEntityException;
+import school.faang.user_service.exception.tasksEntity.TimingException;
+import school.faang.user_service.exception.tasksEntity.notFoundExceptions.SkillNotFoundException;
+import school.faang.user_service.exception.tasksEntity.notFoundExceptions.contact.UserNotFoundException;
+import school.faang.user_service.exception.tasksEntity.notFoundExceptions.recommendation.RecommendationRequestNotFoundException;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 import school.faang.user_service.service.recommendation.RecommendationRequestService;
 
-import java.time.DateTimeException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +60,7 @@ class RecommendationRequestServiceTest {
         dto.setRequesterId(id);
         dto.setReceiverId(id);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        SameEntityException exception = assertThrows(SameEntityException.class,
                 () -> recommendationRequestService.create(dto));
         assertEquals("Requester and receiver are the same", exception.getMessage());
     }
@@ -71,7 +76,7 @@ class RecommendationRequestServiceTest {
         RecommendationRequestDto dto = new RecommendationRequestDto();
         dto.setReceiverId(receiverId);
         dto.setRequesterId(requesterId);
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class,
                 () -> recommendationRequestService.create(dto));
         assertEquals("Requester or receiver not found", exception.getMessage());
     }
@@ -94,7 +99,7 @@ class RecommendationRequestServiceTest {
                 thenReturn(Optional.of(lastRequest));
         when(userRepository.findById(anyLong()))
                 .thenReturn(Optional.of(new User()));
-        DateTimeException exception = assertThrows(DateTimeException.class,
+        TimingException exception = assertThrows(TimingException.class,
                 () -> recommendationRequestService.create(curRequest));
         assertEquals("Request is pending", exception.getMessage());
     }
@@ -128,7 +133,7 @@ class RecommendationRequestServiceTest {
         when(skillRequestRepository.existsById(skillId))
                 .thenReturn(false);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        SkillNotFoundException exception = assertThrows(SkillNotFoundException.class,
                 () -> recommendationRequestService.create(requestDto));
         assertEquals("Skill not found", exception.getMessage());
     }
@@ -196,7 +201,7 @@ class RecommendationRequestServiceTest {
     void getRecommendationRequestByIdNotFound(long id) {
         when(recommendationRequestRepository.findById(anyLong()))
                 .thenReturn(Optional.empty());
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> recommendationRequestService.getRequest(id));
+        RecommendationRequestNotFoundException exception = assertThrows(RecommendationRequestNotFoundException.class, () -> recommendationRequestService.getRequest(id));
         assertEquals("Request not found", exception.getMessage());
     }
 
@@ -206,7 +211,7 @@ class RecommendationRequestServiceTest {
     void requestNotFound(long id) {
         when(recommendationRequestRepository.findById(id))
                 .thenReturn(Optional.empty());
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        RecommendationRequestNotFoundException exception = assertThrows(RecommendationRequestNotFoundException.class,
                 () -> recommendationRequestService.rejectRequest(id, new RejectionDto()));
         assertEquals("Request not found", exception.getMessage());
     }
@@ -221,7 +226,7 @@ class RecommendationRequestServiceTest {
         when(recommendationRequestRepository.findById(1L))
                 .thenReturn(Optional.of(request));
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        EntityStateException exception = assertThrows(EntityStateException.class,
                 () -> recommendationRequestService.rejectRequest(1L, new RejectionDto()));
         assertEquals(String.format("Recommendation request already %s", status), exception.getMessage());
     }

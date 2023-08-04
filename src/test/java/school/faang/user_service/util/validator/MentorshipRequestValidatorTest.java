@@ -11,12 +11,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorshipRequest.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.tasksEntity.SameEntityException;
+import school.faang.user_service.exception.tasksEntity.TimingException;
+import school.faang.user_service.exception.tasksEntity.notFoundExceptions.MentorshipRequestNotFoundException;
+import school.faang.user_service.exception.tasksEntity.notFoundExceptions.contact.UserNotFoundException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-import school.faang.user_service.exception.RequestMentorshipException;
-import school.faang.user_service.exception.SameMentorAndMenteeException;
-import school.faang.user_service.exception.TimeHasNotPassedException;
-import school.faang.user_service.exception.UserNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -56,7 +56,7 @@ class MentorshipRequestValidatorTest {
         Mockito.when(userRepository.findById(1L))
                 .thenReturn(Optional.of(User.builder().id(2L).build()));
 
-        SameMentorAndMenteeException e = Assertions.assertThrows(SameMentorAndMenteeException.class,
+        SameEntityException e = Assertions.assertThrows(SameEntityException.class,
                 () -> validator.validate(buildDto()));
         Assertions.assertEquals("Same mentor and mentee", e.getMessage());
     }
@@ -68,9 +68,9 @@ class MentorshipRequestValidatorTest {
         Mockito.when(mentorshipRequestRepository.findLatestRequest(1L, 2L))
                 .thenReturn(Optional.empty());
 
-        RequestMentorshipException e = Assertions.assertThrows(RequestMentorshipException.class,
+        MentorshipRequestNotFoundException e = Assertions.assertThrows(MentorshipRequestNotFoundException.class,
                 () -> validator.validate(buildDto()));
-        Assertions.assertEquals("There is no requests", e.getMessage());
+        Assertions.assertEquals("Mentorship request not found", e.getMessage());
     }
 
     @Test
@@ -78,7 +78,7 @@ class MentorshipRequestValidatorTest {
         Mockito.when(userRepository.findById(1L))
                 .thenReturn(Optional.of(User.builder().id(1L).build()));
 
-        TimeHasNotPassedException e = Assertions.assertThrows(TimeHasNotPassedException.class,
+        TimingException e = Assertions.assertThrows(TimingException.class,
                 () -> validator.validate(buildDto()));
         Assertions.assertEquals("The request can be sent once every three months", e.getMessage());
     }

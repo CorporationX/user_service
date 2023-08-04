@@ -13,8 +13,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.exception.NotFoundException;
+import school.faang.user_service.exception.tasksEntity.EntityStateException;
+import school.faang.user_service.exception.tasksEntity.notFoundExceptions.contact.UserNotFoundException;
 import school.faang.user_service.filter.subfilter.SubscriberFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
@@ -59,7 +59,7 @@ public class SubscriptionServiceTest {
         long followeeId = 2;
         when(repository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
 
-        Assert.assertThrows(DataValidationException.class,
+        Assert.assertThrows(EntityStateException.class,
                 () -> service.followUser(followerId, followeeId));
     }
 
@@ -93,7 +93,7 @@ public class SubscriptionServiceTest {
         when(repository.findByFollowerId(followeeId)).thenReturn(Stream.empty());
 
         Assert.assertThrows(
-                NotFoundException.class,
+                UserNotFoundException.class,
                 () -> service.getFollowers(followeeId, filterDto)
         );
     }
@@ -119,7 +119,7 @@ public class SubscriptionServiceTest {
         when(repository.findByFolloweeId(followeeId)).thenReturn(Stream.empty());
 
         Assert.assertThrows(
-                NotFoundException.class,
+                UserNotFoundException.class,
                 () -> service.getFollowing(followeeId, filterDto)
         );
     }

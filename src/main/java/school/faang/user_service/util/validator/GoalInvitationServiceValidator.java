@@ -61,7 +61,7 @@ public class GoalInvitationServiceValidator {
 
     public GoalInvitation validateToReject(Optional<GoalInvitation> goalInvitation) {
         if (goalInvitation.isEmpty()) {
-            throw new GoalNotFoundException("Goal invitation with this id not found");
+            throw new GoalInvitationNotFoundException("Goal invitation with this id not found");
         }
         if (goalInvitation.get().getStatus() == RequestStatus.REJECTED) {
             throw new EntityStateException("Goal invitation is already rejected");

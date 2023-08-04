@@ -13,15 +13,15 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
+import school.faang.user_service.exception.tasksEntity.EntityStateException;
+import school.faang.user_service.exception.tasksEntity.notFoundExceptions.contact.UserNotFoundException;
+import school.faang.user_service.exception.tasksEntity.notFoundExceptions.goal.GoalInvitationNotFoundException;
+import school.faang.user_service.exception.tasksEntity.notFoundExceptions.goal.GoalNotFoundException;
 import school.faang.user_service.filter.goalinvitation.*;
 import school.faang.user_service.mapper.GoalInvitationMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.exception.AcceptingGoalInvitationException;
-import school.faang.user_service.exception.GoalInvitationNotFoundException;
-import school.faang.user_service.exception.MappingGoalInvitationDtoException;
-import school.faang.user_service.exception.RejectionGoalInvitationException;
 import school.faang.user_service.util.validator.GoalInvitationServiceValidator;
 
 import java.util.ArrayList;
@@ -83,7 +83,7 @@ class GoalInvitationServiceTest {
         Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(buildGoalInvitationEntity().getInvited()));
         Mockito.when(userRepository.findById(2L)).thenReturn(Optional.of(buildGoalInvitationEntity().getInviter()));
 
-        GoalInvitationNotFoundException e = Assertions.assertThrows(GoalInvitationNotFoundException.class,
+        GoalNotFoundException e = Assertions.assertThrows(GoalNotFoundException.class,
                 () -> goalInvitationService.createInvitation(buildGoalInvitationDto()));
         Assertions.assertEquals("Goal not found", e.getMessage());
     }
@@ -94,7 +94,7 @@ class GoalInvitationServiceTest {
         Mockito.when(userRepository.findById(1L)).thenReturn(Optional.empty());
         Mockito.when(userRepository.findById(2L)).thenReturn(Optional.of(buildGoalInvitationEntity().getInviter()));
 
-        MappingGoalInvitationDtoException e = Assertions.assertThrows(MappingGoalInvitationDtoException.class,
+        UserNotFoundException e = Assertions.assertThrows(UserNotFoundException.class,
                 () -> goalInvitationService.createInvitation(buildGoalInvitationDto()));
         Assertions.assertEquals("Invited user not found", e.getMessage());
     }
@@ -105,7 +105,7 @@ class GoalInvitationServiceTest {
         Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(buildGoalInvitationEntity().getInvited()));
         Mockito.when(userRepository.findById(2L)).thenReturn(Optional.empty());
 
-        MappingGoalInvitationDtoException e = Assertions.assertThrows(MappingGoalInvitationDtoException.class,
+        UserNotFoundException e = Assertions.assertThrows(UserNotFoundException.class,
                 () -> goalInvitationService.createInvitation(buildGoalInvitationDto()));
         Assertions.assertEquals("Inviter not found", e.getMessage());
     }
@@ -143,7 +143,7 @@ class GoalInvitationServiceTest {
                 goalInvitation
         ));
 
-        AcceptingGoalInvitationException e = Assertions.assertThrows(AcceptingGoalInvitationException.class,
+        EntityStateException e = Assertions.assertThrows(EntityStateException.class,
                 () -> goalInvitationService.acceptInvitation(1L));
         Assertions.assertEquals("Goal invitation is already accepted", e.getMessage());
     }
@@ -189,7 +189,7 @@ class GoalInvitationServiceTest {
     void rejectInvitation_GoalNotFound_ShouldThrowException() {
         Mockito.when(goalRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
-        RejectionGoalInvitationException e = Assertions.assertThrows(RejectionGoalInvitationException.class,
+        GoalInvitationNotFoundException e = Assertions.assertThrows(GoalInvitationNotFoundException.class,
                 () -> goalInvitationService.rejectInvitation(1L));
         Assertions.assertEquals("Goal invitation with this id not found", e.getMessage());
     }
@@ -200,7 +200,7 @@ class GoalInvitationServiceTest {
                 GoalInvitation.builder().id(1L).status(RequestStatus.REJECTED).build()
         ));
 
-        RejectionGoalInvitationException  e = Assertions.assertThrows(RejectionGoalInvitationException.class,
+        EntityStateException  e = Assertions.assertThrows(EntityStateException.class,
                 () -> goalInvitationService.rejectInvitation(1L));
         Assertions.assertEquals("Goal invitation is already rejected", e.getMessage());
     }

@@ -8,11 +8,11 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserActivity;
+import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserActivityJpaRepository;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class CustomInterceptor implements Interceptor {
@@ -33,6 +33,7 @@ public class CustomInterceptor implements Interceptor {
         if (Arrays.asList(types).contains("rating")) {
             return false;
         }
+
         Long userId = null;
         long rating = 0;
         for (Activity activity : activities) {
@@ -41,16 +42,8 @@ public class CustomInterceptor implements Interceptor {
                 rating = activity.getRating(entity);
             }
         }
-
         if (userId == null) {
             return false;
-        }
-        Optional<UserActivity> byUserActivityId = userActivityJpaRepository.findByUserId(userId);
-        if (byUserActivityId.isPresent()) {
-            UserActivity userActivity = byUserActivityId.get();
-            rating += userActivity.getRating();
-            userActivity.setRating(rating);
-            userActivityJpaRepository.save(userActivity);
         }
 
         userActivityJpaRepository.save(UserActivity
@@ -61,6 +54,8 @@ public class CustomInterceptor implements Interceptor {
                         .build())
                 .rating(rating)
                 .build());
+
+//        userActivityJpaRepository.updateRating(rating, userId);
 
         return Interceptor.super.onSave(entity, id, state, propertyNames, types);
     }

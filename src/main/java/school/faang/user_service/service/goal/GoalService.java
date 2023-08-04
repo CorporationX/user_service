@@ -1,5 +1,6 @@
 package school.faang.user_service.service.goal;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -46,7 +47,7 @@ public class GoalService {
     @Transactional
     public GoalDto updateGoal(GoalDto goalDto, Long userId) {
          Goal goal = goalRepository.findById(goalDto.getId())
-               .orElseThrow(() -> new  IllegalArgumentException(
+               .orElseThrow(() -> new EntityNotFoundException(
                      MessageFormat.format("Goal {0} not found", goalDto.getId())));
 
         goal.setTitle(goalDto.getTitle());
@@ -60,7 +61,7 @@ public class GoalService {
     public void deleteGoal(Long goalId){
         Goal goal = goalRepository.findById(goalId)
                 .orElseThrow(() ->
-                        new IllegalArgumentException(MessageFormat.format("Goal {0} not found", goalId)));
+                        new EntityNotFoundException(MessageFormat.format("Goal {0} not found", goalId)));
 
         goalRepository.delete(goal);
     }

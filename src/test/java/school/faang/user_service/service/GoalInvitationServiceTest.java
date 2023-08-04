@@ -18,10 +18,10 @@ import school.faang.user_service.mapper.GoalInvitationMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.util.exception.AcceptingGoalInvitationException;
-import school.faang.user_service.util.exception.GoalInvitationNotFoundException;
-import school.faang.user_service.util.exception.MappingGoalInvitationDtoException;
-import school.faang.user_service.util.exception.RejectionGoalInvitationException;
+import school.faang.user_service.exception.AcceptingGoalInvitationException;
+import school.faang.user_service.exception.GoalInvitationNotFoundException;
+import school.faang.user_service.exception.MappingGoalInvitationDtoException;
+import school.faang.user_service.exception.RejectionGoalInvitationException;
 import school.faang.user_service.util.validator.GoalInvitationServiceValidator;
 
 import java.util.ArrayList;

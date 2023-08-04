@@ -7,16 +7,16 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import school.faang.user_service.dto.response.ErrorResponse;
-import school.faang.user_service.util.exception.UserNotFoundException;
-import school.faang.user_service.util.exception.AcceptingGoalInvitationException;
-import school.faang.user_service.util.exception.CreateInvitationException;
-import school.faang.user_service.util.exception.GoalInvitationNotFoundException;
-import school.faang.user_service.util.exception.GoalNotFoundException;
-import school.faang.user_service.util.exception.IncorrectIdException;
-import school.faang.user_service.util.exception.IncorrectStatusException;
-import school.faang.user_service.util.exception.MappingGoalInvitationDtoException;
-import school.faang.user_service.util.exception.RejectionGoalInvitationException;
-import school.faang.user_service.util.exception.UseFiltersException;
+import school.faang.user_service.exception.UserNotFoundException;
+import school.faang.user_service.exception.AcceptingGoalInvitationException;
+import school.faang.user_service.exception.CreateInvitationException;
+import school.faang.user_service.exception.GoalInvitationNotFoundException;
+import school.faang.user_service.exception.GoalNotFoundException;
+import school.faang.user_service.exception.IncorrectIdException;
+import school.faang.user_service.exception.IncorrectStatusException;
+import school.faang.user_service.exception.MappingGoalInvitationDtoException;
+import school.faang.user_service.exception.RejectionGoalInvitationException;
+import school.faang.user_service.exception.UseFiltersException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler4 {

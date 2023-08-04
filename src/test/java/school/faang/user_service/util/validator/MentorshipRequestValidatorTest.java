@@ -13,10 +13,10 @@ import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-import school.faang.user_service.util.exception.RequestMentorshipException;
-import school.faang.user_service.util.exception.SameMentorAndMenteeException;
-import school.faang.user_service.util.exception.TimeHasNotPassedException;
-import school.faang.user_service.util.exception.UserNotFoundException;
+import school.faang.user_service.exception.RequestMentorshipException;
+import school.faang.user_service.exception.SameMentorAndMenteeException;
+import school.faang.user_service.exception.TimeHasNotPassedException;
+import school.faang.user_service.exception.UserNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.Optional;

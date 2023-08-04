@@ -13,9 +13,9 @@ import school.faang.user_service.filter.mentorshiprequest.MentorshipRequestFilte
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-import school.faang.user_service.util.exception.NoRequestsException;
-import school.faang.user_service.util.exception.RequestIsAlreadyAcceptedException;
-import school.faang.user_service.util.exception.RequestIsAlreadyRejectedException;
+import school.faang.user_service.exception.NoRequestsException;
+import school.faang.user_service.exception.RequestIsAlreadyAcceptedException;
+import school.faang.user_service.exception.RequestIsAlreadyRejectedException;
 import school.faang.user_service.util.validator.MentorshipRequestValidator;
 
 import java.util.List;

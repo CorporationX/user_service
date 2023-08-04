@@ -7,16 +7,16 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import school.faang.user_service.dto.response.ErrorResponse;
-import school.faang.user_service.util.exception.GetRequestsMentorshipsException;
-import school.faang.user_service.util.exception.IncorrectIdException;
-import school.faang.user_service.util.exception.NoRequestsException;
-import school.faang.user_service.util.exception.RequestIsAlreadyAcceptedException;
-import school.faang.user_service.util.exception.RequestIsAlreadyRejectedException;
-import school.faang.user_service.util.exception.RequestMentorshipException;
-import school.faang.user_service.util.exception.SameMentorAndMenteeException;
-import school.faang.user_service.util.exception.TimeHasNotPassedException;
-import school.faang.user_service.util.exception.UnknownRejectionReasonException;
-import school.faang.user_service.util.exception.UserNotFoundException;
+import school.faang.user_service.exception.GetRequestsMentorshipsException;
+import school.faang.user_service.exception.IncorrectIdException;
+import school.faang.user_service.exception.NoRequestsException;
+import school.faang.user_service.exception.RequestIsAlreadyAcceptedException;
+import school.faang.user_service.exception.RequestIsAlreadyRejectedException;
+import school.faang.user_service.exception.RequestMentorshipException;
+import school.faang.user_service.exception.SameMentorAndMenteeException;
+import school.faang.user_service.exception.TimeHasNotPassedException;
+import school.faang.user_service.exception.UnknownRejectionReasonException;
+import school.faang.user_service.exception.UserNotFoundException;
 
 import java.util.NoSuchElementException;
 

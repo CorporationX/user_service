@@ -1,4 +1,4 @@
-package school.faang.user_service.util.exception;
+package school.faang.user_service.exception;
 
 public class MappingGoalInvitationDtoException extends RuntimeException{
     public MappingGoalInvitationDtoException(String message) {

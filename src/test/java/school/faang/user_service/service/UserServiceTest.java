@@ -12,7 +12,7 @@ import school.faang.user_service.mapper.mymappers.Goal1MapperImpl;
 import school.faang.user_service.mapper.mymappers.Skill1MapperImpl;
 import school.faang.user_service.mapper.mymappers.User1MapperImpl;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.util.exception.UserNotFoundException;
+import school.faang.user_service.exception.UserNotFoundException;
 
 import java.util.Collections;
 import java.util.List;

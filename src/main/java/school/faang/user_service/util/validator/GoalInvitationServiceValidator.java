@@ -5,10 +5,10 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
-import school.faang.user_service.util.exception.AcceptingGoalInvitationException;
-import school.faang.user_service.util.exception.GoalInvitationNotFoundException;
-import school.faang.user_service.util.exception.MappingGoalInvitationDtoException;
-import school.faang.user_service.util.exception.RejectionGoalInvitationException;
+import school.faang.user_service.exception.AcceptingGoalInvitationException;
+import school.faang.user_service.exception.GoalInvitationNotFoundException;
+import school.faang.user_service.exception.MappingGoalInvitationDtoException;
+import school.faang.user_service.exception.RejectionGoalInvitationException;
 
 import java.util.Optional;
 

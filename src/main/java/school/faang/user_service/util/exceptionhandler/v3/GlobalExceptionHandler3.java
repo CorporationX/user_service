@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import school.faang.user_service.dto.response.ErrorResponse;
 import school.faang.user_service.util.exception.DataValidationException;
-import school.faang.user_service.util.exception.UserNotFoundException;
+import school.faang.user_service.exception.UserNotFoundException;
 
 @ControllerAdvice
 @Slf4j

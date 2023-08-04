@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.dto.recommendation.filter.RequestFilterDto;
+import school.faang.user_service.exception.tasksEntity.invalidFieldException.EntityIsNullOrEmptyException;
+import school.faang.user_service.exception.tasksEntity.invalidFieldException.InvalidIdException;
 import school.faang.user_service.service.recommendation.RecommendationRequestService;
 
 import java.util.List;
@@ -28,7 +30,7 @@ public class RecommendationRequestController {
 
     private void validateRejection(RejectionDto rejection) {
         if (rejection.getReason() == null || rejection.getReason().isEmpty()) {
-            throw new IllegalArgumentException("Rejection reason is null or empty");
+            throw new EntityIsNullOrEmptyException("Rejection reason is null or empty");
         }
     }
 
@@ -52,13 +54,13 @@ public class RecommendationRequestController {
 
     private void validateId(Long id) {
         if (id == null) {
-            throw new IllegalArgumentException(INVALID_ID);
+            throw new InvalidIdException(INVALID_ID);
         }
     }
 
     private void validateRequest(RecommendationRequestDto recommendationRequest) {
         if (recommendationRequest.getMessage() == null || recommendationRequest.getMessage().isBlank()) {
-            throw new IllegalArgumentException(MESSAGE_EXCEPTION);
+            throw new EntityIsNullOrEmptyException(MESSAGE_EXCEPTION);
         }
     }
 

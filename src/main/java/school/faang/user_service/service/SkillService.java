@@ -8,7 +8,8 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.SkillOffer;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.tasksEntity.invalidFieldException.DataValidationException;
+import school.faang.user_service.exception.tasksEntity.EntityAlreadyExistException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
@@ -29,7 +30,7 @@ public class SkillService {
 
     public SkillDto create(SkillDto skill) {
         if (skillRepository.existsByTitle(skill.getTitle().toLowerCase().trim())) {
-            throw new DataValidationException("This skill already exist");
+            throw new EntityAlreadyExistException("This skill already exist");
         }
         Skill savedSkill = skillRepository.save(skillMapper.toEntity(skill));
         return skillMapper.toDTO(savedSkill);

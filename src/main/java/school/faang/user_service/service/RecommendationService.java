@@ -10,7 +10,11 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.tasksEntity.invalidFieldException.DataValidationException;
+import school.faang.user_service.exception.tasksEntity.TimingException;
+import school.faang.user_service.exception.tasksEntity.notFoundExceptions.SkillNotFoundException;
+import school.faang.user_service.exception.tasksEntity.notFoundExceptions.contact.UserNotFoundException;
+import school.faang.user_service.exception.tasksEntity.notFoundExceptions.recommendation.RecommendationNotFoundException;
 import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -52,7 +56,7 @@ public class RecommendationService {
                 .toList();
         var skills = skillRepository.findAllById(skillIds);
         if (skillIds.size() != skills.size()) {
-            throw new DataValidationException("Some skills do not exist");
+            throw new SkillNotFoundException("Some skills do not exist");
         }
 
         List<Long> recommendationIds = recommendationDto.getSkillOffers()
@@ -61,7 +65,7 @@ public class RecommendationService {
                 .toList();
         var recommendations = recommendationRepository.findAllById(recommendationIds);
         if (recommendationIds.size() != recommendations.size()) {
-            throw new DataValidationException("Some recommendations do not exist");
+            throw new RecommendationNotFoundException("Some recommendations do not exist");
         }
 
         recommendationDto.getSkillOffers()
@@ -98,7 +102,7 @@ public class RecommendationService {
         recommendationDto.getSkillOffers()
                 .forEach(skillOffer -> {
                     if (!skillRepository.existsById(skillOffer.getSkillId())) {
-                        throw new DataValidationException(
+                        throw new SkillNotFoundException(
                                 String.format("Skill with id=%d is missing in db!", skillOffer.getSkillId()));
                     }
                 });
@@ -109,7 +113,7 @@ public class RecommendationService {
                 .toList();
         var skills = skillRepository.findAllById(skillIds);
         if (skillIds.size() != skills.size()) {
-            throw new DataValidationException("Some skills do not exist");
+            throw new SkillNotFoundException("Some skills do not exist");
         }
 
         List<Long> recommendationIds = recommendationDto.getSkillOffers()
@@ -118,7 +122,7 @@ public class RecommendationService {
                 .toList();
         var recommendations = recommendationRepository.findAllById(recommendationIds);
         if (recommendationIds.size() != recommendations.size()) {
-            throw new DataValidationException("Some recommendations do not exist");
+            throw new RecommendationNotFoundException("Some recommendations do not exist");
         }
 
         Recommendation updatedRecommendation = recommendationRepository
@@ -186,22 +190,22 @@ public class RecommendationService {
         }
         LocalDateTime recommendationCreate = recommendation.get().getCreatedAt();
         if (!recommendationCreate.isAfter(LocalDateTime.now().minusMonths(6))) {
-            throw new DataValidationException("Recommendation duration has not expired");
+            throw new TimingException("Recommendation duration has not expired");
         }
     }
 
     private Skill getSkill(long skillId) {
         return skillRepository.findById(skillId)
-                .orElseThrow(() -> new DataValidationException("Skill not exist"));
+                .orElseThrow(() -> new SkillNotFoundException("Skill not exist"));
     }
 
     private User getUser(long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new DataValidationException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
     public Recommendation getRecommendation(long recommendationId) {
         return recommendationRepository.findById(recommendationId)
-                .orElseThrow(() -> new DataValidationException("Recommendation not found"));
+                .orElseThrow(() -> new RecommendationNotFoundException("Recommendation not found"));
     }
 }

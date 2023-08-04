@@ -8,13 +8,18 @@ import school.faang.user_service.dto.recommendation.filter.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.exception.tasksEntity.EntityStateException;
+import school.faang.user_service.exception.tasksEntity.TimingException;
+import school.faang.user_service.exception.tasksEntity.SameEntityException;
+import school.faang.user_service.exception.tasksEntity.notFoundExceptions.SkillNotFoundException;
+import school.faang.user_service.exception.tasksEntity.notFoundExceptions.contact.UserNotFoundException;
+import school.faang.user_service.exception.tasksEntity.notFoundExceptions.recommendation.RecommendationRequestNotFoundException;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 import school.faang.user_service.util.filter.recommendationRequest.RecommendationRequestFilter;
 
-import java.time.DateTimeException;
 import java.time.LocalDateTime;
 
 import java.util.List;
@@ -53,7 +58,7 @@ public class RecommendationRequestService {
 
     public RecommendationRequestDto getRequest(long id) {
         Optional<RecommendationRequest> request = recommendationRequestRepository.findById(id);
-        return recommendationRequestMapper.toDto(request.orElseThrow(() -> new IllegalArgumentException(REQUEST_NOT_FOUND)));
+        return recommendationRequestMapper.toDto(request.orElseThrow(() -> new RecommendationRequestNotFoundException(REQUEST_NOT_FOUND)));
     }
 
     public List<RecommendationRequestDto> getRequest(RequestFilterDto filters) {
@@ -68,9 +73,9 @@ public class RecommendationRequestService {
 
     public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
         RecommendationRequest request = recommendationRequestRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(REQUEST_NOT_FOUND));
+                .orElseThrow(() -> new RecommendationRequestNotFoundException(REQUEST_NOT_FOUND));
         if (request.getStatus() != RequestStatus.PENDING) {
-            throw new IllegalArgumentException(String.format(REQUEST_ALREADY_IS, request.getStatus()));
+            throw new EntityStateException(String.format(REQUEST_ALREADY_IS, request.getStatus()));
         }
         request.setStatus(RequestStatus.REJECTED);
         request.setRejectionReason(rejection.getReason());
@@ -83,10 +88,10 @@ public class RecommendationRequestService {
         long receiverId = recommendationRequest.getReceiverId();
         long requesterId = recommendationRequest.getRequesterId();
         if (requesterId == receiverId) {
-            throw new IllegalArgumentException(REQUESTER_AND_RECEIVER_SAME);
+            throw new SameEntityException(REQUESTER_AND_RECEIVER_SAME);
         }
         if (!isRequesterAndReceiverExist(requesterId, receiverId)) {
-            throw new IllegalArgumentException(REQUESTER_OR_RECEIVER_NOT_FOUND);
+            throw new UserNotFoundException(REQUESTER_OR_RECEIVER_NOT_FOUND);
         }
 
         Optional<RecommendationRequest> lastRequest = recommendationRequestRepository.findLatestPendingRequest(requesterId, receiverId);
@@ -94,7 +99,7 @@ public class RecommendationRequestService {
             LocalDateTime prevRequestsDate = lastRequest.get().getUpdatedAt();
             LocalDateTime curRequestDate = recommendationRequest.getCreatedAt();
             if (prevRequestsDate.plusMonths(REQUEST_TIME_LIMIT).isAfter(curRequestDate)) {
-                throw new DateTimeException(REQUEST_IS_PENDING);
+                throw new TimingException(REQUEST_IS_PENDING);
             }
         }
 
@@ -111,7 +116,7 @@ public class RecommendationRequestService {
         recommendationRequest.getSkillRequests()
                 .forEach(skillRequestDto -> {
                     if (!skillRequestRepository.existsById(skillRequestDto.getSkillId())) {
-                        throw new IllegalArgumentException(SKILL_NOT_FOUND);
+                        throw new SkillNotFoundException(SKILL_NOT_FOUND);
                     }
                 });
     }

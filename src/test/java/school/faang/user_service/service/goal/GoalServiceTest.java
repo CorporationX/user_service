@@ -1,5 +1,6 @@
 package school.faang.user_service.service.goal;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -160,7 +161,7 @@ public class GoalServiceTest {
     public void testUpdateGoal_GoalNotFound() {
         Mockito.lenient().when(goalRepository.findById(goalDto.getId())).thenReturn(Optional.empty());
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
                 () -> goalService.updateGoal(goalDto, userId));
 
         assertEquals("Goal 1 not found", exception.getMessage());
@@ -184,7 +185,7 @@ public class GoalServiceTest {
 
         when(goalRepository.findById(nonExistingGoalId)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> goalService.deleteGoal(nonExistingGoalId));
+        assertThrows(EntityNotFoundException.class, () -> goalService.deleteGoal(nonExistingGoalId));
     }
 
     @Test

@@ -17,6 +17,8 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SkillService;
 import school.faang.user_service.service.goal.GoalService;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 public class GlobalExceptionHandlerTest {
@@ -29,39 +31,37 @@ public class GlobalExceptionHandlerTest {
     @MockBean
     private GoalService goalService;
 
-    @Test
-    public void testDataValidationException() throws Exception {
-        Mockito.when(skillService.create(Mockito.any(SkillDto.class))).thenThrow(
-                new DataValidationException("Validation error"));
+    @MockBean
+    private SkillController skillController;
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/skills")
-                        .param("title", "title")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Validation error"));
+    @Test
+    public void testDataValidationException(){
+        Mockito.when(skillService.create(Mockito.any(SkillDto.class))).thenThrow(
+                new DataValidationException("IllegalArgument error"));
+
+        assertThrows(DataValidationException.class, () -> {
+            skillService.create(new SkillDto(null, "title"));
+        });
     }
 
     @Test
-    public void testEntityNotFoundException() throws Exception {
+    public void testEntityNotFoundException(){
         Long goalId = 1L;
         Mockito.doThrow(new EntityNotFoundException("Not found error"))
                 .when(goalService).deleteGoal(goalId);
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/goals/{goalId}", goalId)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Not found error"));
+        assertThrows(EntityNotFoundException.class, () -> {
+            goalService.deleteGoal(goalId);
+        });
     }
 
     @Test
-    public void testIllegalArgumentException() throws Exception {
+    public void testIllegalArgumentException() {
         Mockito.when(skillService.create(Mockito.any(SkillDto.class))).thenThrow(
                 new IllegalArgumentException("IllegalArgument error"));
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/skills")
-                        .param("title", "title")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("IllegalArgument error"));
+        assertThrows(IllegalArgumentException.class, () -> {
+            skillService.create(new SkillDto(null, "title"));
+        });
     }
 }

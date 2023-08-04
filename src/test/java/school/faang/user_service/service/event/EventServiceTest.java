@@ -118,7 +118,7 @@ class EventServiceTest {
         Event event = createEvent();
         User user = createUser();
         Long userId = 1L;
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(eventRepository.save(ArgumentMatchers.any(Event.class))).thenReturn(event);
 
         EventDto eventDto = createEventDto();

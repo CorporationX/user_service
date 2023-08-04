@@ -8,7 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.mentorshipRequest.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorshiprequest.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.UserRepository;
@@ -17,7 +17,6 @@ import school.faang.user_service.util.exception.RequestMentorshipException;
 import school.faang.user_service.util.exception.SameMentorAndMenteeException;
 import school.faang.user_service.util.exception.TimeHasNotPassedException;
 import school.faang.user_service.util.exception.UserNotFoundException;
-import school.faang.user_service.util.validator.MentorshipRequestValidator;
 
 import java.time.LocalDateTime;
 import java.util.Optional;

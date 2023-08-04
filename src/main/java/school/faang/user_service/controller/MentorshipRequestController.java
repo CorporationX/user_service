@@ -4,10 +4,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import school.faang.user_service.dto.mentorshipRequest.MentorshipRequestDto;
-import school.faang.user_service.dto.mentorshipRequest.RejectionDto;
-import school.faang.user_service.dto.mentorshipRequest.RequestFilterDto;
-import school.faang.user_service.dto.mentorshipRequest.RequestResponse;
+import school.faang.user_service.dto.mentorshiprequest.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorshiprequest.RejectionDto;
+import school.faang.user_service.dto.mentorshiprequest.RequestFilterDto;
+import school.faang.user_service.dto.mentorshiprequest.RequestResponse;
 import school.faang.user_service.service.MentorshipRequestService;
 
 @RestController

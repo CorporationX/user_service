@@ -1,25 +1,24 @@
-package school.faang.user_service.dto.mentorshipRequest;
+package school.faang.user_service.dto.mentorshiprequest;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.validation.annotation.Validated;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Validated
 public class MentorshipRequestDto {
 
-    @NotNull
+    @NotBlank(message = "Description shouldn't be empty")
     private String description;
 
-    @NotNull
+    @NotNull(message = "Id can't be null")
     private Long requesterId;
 
-    @NotNull
+    @NotNull(message = "Id can't be null")
     private Long receiverId;
 }

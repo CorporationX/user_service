@@ -3,7 +3,7 @@ package school.faang.user_service.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.mentorshipRequest.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorshiprequest.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 
 @Component

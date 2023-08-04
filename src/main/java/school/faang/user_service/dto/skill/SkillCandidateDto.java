@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 
 @Data
 public class SkillCandidateDto {
+
     private final SkillDto skillDto;
+
     private final long offersAmount;
 }

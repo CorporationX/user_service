@@ -9,7 +9,7 @@ import java.util.List;
 @Validated
 public record UserIdsRequest(
 
-        @NotNull
+        @NotNull(message = "UserIds list can't be empty")
         @Size(min = 1, message = "UserIds list must contain at least one element")
         List<Long> ids
 ) {

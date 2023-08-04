@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +36,7 @@ public class SubscriptionController {
             @ApiResponse(responseCode = "200", description = "Followed"),
             @ApiResponse(responseCode = "400", description = "Bad request: Invalid input or business rule violation"),
     })
-    public ResponseEntity<?> followUser(@RequestBody SubscriptionDto dto) {
+    public ResponseEntity<?> followUser(@Valid @RequestBody SubscriptionDto dto) {
         validator.validateId(dto.getFollowerId(), dto.getFolloweeId());
         service.followUser(dto.getFollowerId(), dto.getFolloweeId());
         return ResponseEntity.ok().body("Followed");
@@ -46,7 +47,7 @@ public class SubscriptionController {
             summary = "Unfollow a user",
             description = "Unfollows a user based on the provided subscription data.",
             tags = {"unfollow"})
-    public ResponseEntity<?> unfollowUser(@RequestBody SubscriptionDto dto) {
+    public ResponseEntity<?> unfollowUser(@Valid @RequestBody SubscriptionDto dto) {
         validator.validateId(dto.getFollowerId(), dto.getFolloweeId());
         service.unfollowUser(dto.getFollowerId(), dto.getFolloweeId());
         return ResponseEntity.ok().body("Unfollowed");
@@ -61,8 +62,7 @@ public class SubscriptionController {
             @ApiResponse(responseCode = "200", description = "Found the book",
                     content = {@Content(mediaType = "application/json")}
             )})
-    public ResponseEntity<?> getFollowers(@PathVariable long followeeId, @RequestBody UserFilterDto filter) {
-        System.out.println(filter);
+    public ResponseEntity<?> getFollowers(@PathVariable long followeeId, @Valid @RequestBody UserFilterDto filter) {
         validator.validateId(followeeId);
         validator.validateFilterDto(filter);
         return ResponseEntity.ok(service.getFollowers(followeeId, filter));
@@ -84,7 +84,7 @@ public class SubscriptionController {
             summary = "Get users followed by a user",
             description = "Retrieves users followed by a user based on the provided followee ID.",
             tags = {"following"})
-    public ResponseEntity<?> getFollowing(@PathVariable long followeeId, @RequestBody UserFilterDto filter) {
+    public ResponseEntity<?> getFollowing(@PathVariable long followeeId, @Valid @RequestBody UserFilterDto filter) {
         validator.validateId(followeeId);
         validator.validateFilterDto(filter);
         List<UserDto> following = service.getFollowing(followeeId, filter);

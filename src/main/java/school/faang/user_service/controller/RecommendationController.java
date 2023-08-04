@@ -1,5 +1,6 @@
 package school.faang.user_service.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
@@ -15,13 +16,11 @@ public class RecommendationController {
     private final RecommendationService recommendationService;
     private final RecommendationDtoValidator recommendationDtoValidator;
 
-    public RecommendationDto giveRecommendation(RecommendationDto recommendation) {
-        recommendationDtoValidator.validateRecommendation(recommendation);
+    public RecommendationDto giveRecommendation(@Valid RecommendationDto recommendation) {
         return recommendationService.create(recommendation);
     }
 
-    public RecommendationDto updateRecommendation(RecommendationDto updated){
-        recommendationDtoValidator.validateRecommendation(updated);
+    public RecommendationDto updateRecommendation(@Valid RecommendationDto updated){
         return recommendationService.update(updated);
     }
 

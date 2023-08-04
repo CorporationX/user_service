@@ -1,6 +1,6 @@
-package school.faang.user_service.dto.mentorshipRequest;
+package school.faang.user_service.dto.mentorshiprequest;
 
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,12 +12,12 @@ import school.faang.user_service.entity.RequestStatus;
 @NoArgsConstructor
 @Builder
 public class RequestFilterDto {
+
+    @Size(max = 255, message = "Description can't be longer than 255")
     private String description;
 
-    @Min(value = 1, message = "Id can not be lower than 1")
     private Long requesterId;
 
-    @Min(value = 1, message = "Id can not be lower than 1")
     private Long receiverId;
 
     private RequestStatus status;

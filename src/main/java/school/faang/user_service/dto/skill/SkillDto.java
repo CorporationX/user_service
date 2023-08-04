@@ -1,11 +1,15 @@
 package school.faang.user_service.dto.skill;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 public class SkillDto {
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private final Long id;
+
+    @NotBlank(message = "Title shouldn't be empty")
     private final String title;
 }

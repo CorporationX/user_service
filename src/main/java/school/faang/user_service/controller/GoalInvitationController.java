@@ -47,7 +47,7 @@ public class GoalInvitationController {
 
     @GetMapping("/get")
     @ResponseStatus(HttpStatus.OK)
-    public FilteredResponse getInvitations(@RequestBody InvitationFilterDto invitationFilterDto) {
+    public FilteredResponse getInvitations(@Valid @RequestBody InvitationFilterDto invitationFilterDto) {
         return new FilteredResponse(goalInvitationService.getInvitations(invitationFilterDto));
     }
 }

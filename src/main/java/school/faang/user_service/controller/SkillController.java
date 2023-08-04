@@ -1,10 +1,10 @@
 package school.faang.user_service.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SkillService;
 
 import java.util.List;
@@ -15,8 +15,7 @@ import java.util.List;
 public class SkillController {
     private final SkillService skillService;
 
-    public SkillDto create(SkillDto skill) {
-        throwIfTrue(skill == null, "skill cannot be null");
+    public SkillDto create(@Valid SkillDto skill) {
         return skillService.create(skill);
     }
 
@@ -29,14 +28,7 @@ public class SkillController {
     }
 
     public SkillDto acquireSkillFromOffers(Long skillId, Long userId) {
-        throwIfTrue(skillId == null || userId == null, "skillId or userId cannot be null");
         return skillService.acquireSkillFromOffers(skillId, userId);
-    }
-
-    private void throwIfTrue(boolean condition, String errorMessage) {
-        if (condition) {
-            throw new DataValidationException(errorMessage);
-        }
     }
 }
 

@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
@@ -22,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static school.faang.user_service.entity.RequestStatus.ACCEPTED;
+import static school.faang.user_service.entity.RequestStatus.REJECTED;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipRequestServiceTest {
@@ -42,6 +44,7 @@ class MentorshipRequestServiceTest {
     private MentorshipRequestDto requestDto;
     private User requester;
     private User receiver;
+    private RejectionDto rejection;
 
     @BeforeEach
     void setUp() {
@@ -56,10 +59,14 @@ class MentorshipRequestServiceTest {
         request.setReceiver(receiver);
         request.setDescription(DESCRIPTION);
 
-        requestDto  = MentorshipRequestDto.builder()
+        requestDto = MentorshipRequestDto.builder()
                 .requesterId(REQUESTER_ID)
                 .receiverId(RECEIVER_ID)
                 .description(DESCRIPTION)
+                .build();
+
+        rejection = RejectionDto.builder()
+                .reason("reason")
                 .build();
     }
 
@@ -100,11 +107,27 @@ class MentorshipRequestServiceTest {
         assertEquals(actualMentors, expectedMentors);
         assertEquals(request.getStatus(), ACCEPTED);
     }
+
     @Test
     void testRequestMentorshipInvokeValidateAcceptRequest() {
         when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(Optional.of(request));
         mentorshipRequestService.acceptRequest(REQUEST_ID);
         verify(validator)
                 .validateAcceptRequest(REQUEST_ID);
+    }
+
+    @Test
+    void testRejectRequest() {
+        when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(Optional.of(request));
+        mentorshipRequestService.rejectRequest(REQUEST_ID, rejection);
+        assertEquals(request.getStatus(), REJECTED);
+    }
+
+    @Test
+    void testRequestMentorshipInvokeValidateRejectRequest() {
+        when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(Optional.of(request));
+        mentorshipRequestService.rejectRequest(REQUEST_ID, rejection);
+        verify(validator)
+                .validateRejectRequest(REQUEST_ID, rejection);
     }
 }

@@ -1,6 +1,7 @@
 package school.faang.user_service.validation;
 
 import lombok.RequiredArgsConstructor;
+import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.UserRepository;
@@ -55,7 +56,16 @@ public class MentorshipRequestValidator {
                 throw new IllegalArgumentException(receiver.getUsername() + "is already the requester mentor");
             }
         }
+    }
 
-
+    public void validateRejectRequest(Long requestId, RejectionDto rejection) {
+        Optional<MentorshipRequest> requestOpt = mentorshipRequestRepository.findById(requestId);
+        if(!requestOpt.isPresent()) {
+            throw new NullPointerException("Request must exist");
+        } else {
+            if(rejection.getReason().isEmpty() || rejection.getReason() == null) {
+                throw new IllegalArgumentException("Reason must be given");
+            }
+        }
     }
 }

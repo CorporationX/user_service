@@ -3,6 +3,7 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
@@ -12,6 +13,7 @@ import school.faang.user_service.validation.MentorshipRequestValidator;
 import java.util.List;
 
 import static school.faang.user_service.entity.RequestStatus.ACCEPTED;
+import static school.faang.user_service.entity.RequestStatus.REJECTED;
 
 @RequiredArgsConstructor
 @Service
@@ -46,5 +48,12 @@ public class MentorshipRequestService {
             requester.getMentors().add(receiver);
         }
         request.setStatus(ACCEPTED);
+   }
+
+   public void rejectRequest(long requestId, RejectionDto rejection) {
+       validator.validateRejectRequest(requestId, rejection);
+       MentorshipRequest request = repository.findById(requestId).get();
+       request.setStatus(REJECTED);
+       request.setRejectionReason(rejection.getReason());
    }
 }

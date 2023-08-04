@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.UserRepository;
@@ -35,6 +36,7 @@ class MentorshipRequestValidatorTest {
     private MentorshipRequest request;
     private User requester;
     private User receiver;
+    private RejectionDto rejection;
 
     @BeforeEach
     void setUp() {
@@ -48,6 +50,10 @@ class MentorshipRequestValidatorTest {
         request.setRequester(requester);
         request.setReceiver(receiver);
         request.setDescription(DESCRIPTION);
+
+        rejection = RejectionDto.builder()
+                .reason("reason")
+                .build();
     }
 
     @Test
@@ -98,15 +104,28 @@ class MentorshipRequestValidatorTest {
     }
 
     @Test
-    void requestExist() {
+    void requestNotExistForAcceptRequest() {
         when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(null);
         assertThrows(NullPointerException.class, () -> validator.validateAcceptRequest(REQUEST_ID));
     }
 
     @Test
-    void receiverNotMentor() {
+    void receiverNotMentorForAcceptRequest() {
         requester.setMentors(List.of(receiver));
         when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(Optional.of(request));
         assertThrows(IllegalArgumentException.class, () -> validator.validateAcceptRequest(REQUEST_ID));
+    }
+
+    @Test
+    void requestNotExistForRejectRequest() {
+        when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(null);
+        assertThrows(NullPointerException.class, () -> validator.validateRejectRequest(REQUEST_ID, rejection));
+    }
+
+    @Test
+    void rejectionHaveReasonForRejectRequest() {
+        rejection.setReason("");
+        when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(Optional.of(request));
+        assertThrows(IllegalArgumentException.class, () -> validator.validateRejectRequest(REQUEST_ID, rejection));
     }
 }

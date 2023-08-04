@@ -31,9 +31,6 @@ public class GlobalExceptionHandlerTest {
     @MockBean
     private GoalService goalService;
 
-    @MockBean
-    private SkillController skillController;
-
     @Test
     public void testDataValidationException(){
         Mockito.when(skillService.create(Mockito.any(SkillDto.class))).thenThrow(

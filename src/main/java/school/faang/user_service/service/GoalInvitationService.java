@@ -3,25 +3,21 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
-import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
+import school.faang.user_service.validator.GoalInvitationValidator;
 
 @Service
 @RequiredArgsConstructor
 public class GoalInvitationService {
     private final GoalInvitationRepository goalInvitationRepository;
 
-    private final UserRepository userRepository;
+    private final GoalInvitationValidator goalInvitationValidator;
+
+    private final GoalInvitationMapper goalInvitationMapper;
 
     public void createInvitation(GoalInvitationDto invitation) {
-        if (invitation.getInviterId() == invitation.getInvitedUserId()) {
-            throw new DataValidationException("Users cannot send invitations to themselves");
-        }
-        if (!userRepository.isUserPresent(invitation.getInviterId()) ||
-                !userRepository.isUserPresent(invitation.getInvitedUserId())) {
-            throw new DataValidationException("Only existing users can send or accept invitations");
-        }
-        goalInvitationRepository.create(invitation.getGoalId(), invitation.getInviterId(), invitation.getInvitedUserId());
+        goalInvitationValidator.validateGoalInvitation(invitation);
+        goalInvitationRepository.save(goalInvitationMapper.toEntity(invitation));
     }
 }

@@ -2,7 +2,6 @@ package school.faang.user_service.util;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -28,7 +27,7 @@ public class GlobalExceptionHandler {
         log.error("Exception caused: {}. \n" +
                 "Stacktrace: {}", ex.getMessage(), ex.getStackTrace());
 
-        return ResponseEntity.badRequest().body(ex.getMessage());
+        return ResponseEntity.notFound().build();
     }
 
     @ExceptionHandler(TimingException.class)
@@ -81,13 +80,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleRuntimeException(RuntimeException ex) {
         log.error("Unknown runtime exception caused: {}. \n" +
                 "Stacktrace: {}", ex.getMessage(), ex.getStackTrace());
-        return ResponseEntity.badRequest().body(ex.getMessage());
+        return ResponseEntity.internalServerError().body(ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleException(Exception ex) {
         log.error("Unknown exception caused: {}. \n" +
                 "Stacktrace: {}", ex.getMessage(), ex.getStackTrace());
-        return ResponseEntity.badRequest().body(ex.getMessage());
+        return ResponseEntity.internalServerError().body(ex.getMessage());
     }
 }

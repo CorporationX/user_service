@@ -19,7 +19,7 @@ import school.faang.user_service.dto.mentorship.RejectionReasonDto;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
 
 @RestController
-@RequestMapping("api/v1//mentorship")
+@RequestMapping("/mentorship")
 @RequiredArgsConstructor
 @Slf4j
 @Validated

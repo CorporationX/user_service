@@ -14,7 +14,7 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
 @RestController
-@RequestMapping("api/v1//mentorship")
+@RequestMapping("/mentorship")
 @RequiredArgsConstructor
 @Slf4j
 @Validated

@@ -21,28 +21,21 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleEntityNotFoundException(EntityNotFoundException exception, HttpServletRequest request) {
         log.error("EntityNotFoundException: {}", exception.getMessage());
-        return new ErrorResponse(request.getRequestURL().toString(), 404, "EntityNotFoundException", exception.getMessage());
-    }
-
-    @ExceptionHandler(jakarta.persistence.EntityNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleEntityNotFoundExceptionPersistence(jakarta.persistence.EntityNotFoundException exception, HttpServletRequest request) {
-        log.error("EntityNotFoundException: {}", exception.getMessage());
-        return new ErrorResponse(request.getRequestURL().toString(), 404, "EntityNotFoundException", exception.getMessage());
+        return new ErrorResponse(request.getRequestURL().toString(), HttpStatus.NOT_FOUND, "EntityNotFoundException", exception.getMessage());
     }
 
     @ExceptionHandler(DataValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleDataValidationException(DataValidationException exception, HttpServletRequest request) {
         log.error("DataValidationException: {}", exception.getMessage());
-        return new ErrorResponse(request.getRequestURL().toString(), 400, "DataValidationException", exception.getMessage());
+        return new ErrorResponse(request.getRequestURL().toString(), HttpStatus.BAD_REQUEST, "DataValidationException", exception.getMessage());
     }
 
     @ExceptionHandler(NullPointerException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleNullPointerException(NullPointerException exception, HttpServletRequest request) {
         log.error("NullPointerException: {}", exception.getMessage());
-        return new ErrorResponse(request.getRequestURL().toString(), 500, "NullPointerException", exception.getMessage());
+        return new ErrorResponse(request.getRequestURL().toString(), HttpStatus.INTERNAL_SERVER_ERROR, "NullPointerException", exception.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -56,17 +49,10 @@ public class GlobalExceptionHandler {
                 ));
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleRuntimeException(IllegalArgumentException exception, HttpServletRequest request) {
-        log.error("IllegalArgumentException: {}", exception.getMessage());
-        return new ErrorResponse(request.getRequestURL().toString(), 500, "IllegalArgumentException", exception.getMessage());
-    }
-
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleRuntimeException(RuntimeException exception, HttpServletRequest request) {
         log.error("RuntimeException: {}", exception.getMessage());
-        return new ErrorResponse(request.getRequestURL().toString(), 500, "RuntimeException", exception.getMessage());
+        return new ErrorResponse(request.getRequestURL().toString(), HttpStatus.INTERNAL_SERVER_ERROR, "RuntimeException", exception.getMessage());
     }
 }

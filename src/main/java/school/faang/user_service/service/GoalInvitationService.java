@@ -20,4 +20,8 @@ public class GoalInvitationService {
         goalInvitationValidator.validateGoalInvitation(invitation);
         goalInvitationRepository.save(goalInvitationMapper.toEntity(invitation));
     }
+
+    public void acceptGoalInvitation(long invitationId) {
+        goalInvitationValidator.validateAcceptedGoalInvitation(invitationId);
+    }
 }

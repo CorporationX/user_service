@@ -17,4 +17,9 @@ public class GoalInvitationController {
         goalInvitationValidator.validateControllerInputData(invitation);
         goalInvitationService.createInvitation(invitation);
     }
+
+    public void acceptGoalInvitation(long id) {
+        goalInvitationValidator.validateId(id);
+        goalInvitationService.acceptGoalInvitation(id);
+    }
 }

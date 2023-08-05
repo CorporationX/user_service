@@ -12,6 +12,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.mapper.GoalInvitationMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
+import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validator.GoalInvitationValidator;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,10 +26,13 @@ public class GoalInvitationServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private GoalInvitationValidator goalInvitationValidator = new GoalInvitationValidator(userRepository);
+    private GoalRepository goalRepository;
 
     @Spy
     private GoalInvitationMapperImpl goalInvitationMapper;
+
+    @Mock
+    private GoalInvitationValidator goalInvitationValidator = new GoalInvitationValidator(userRepository, goalRepository, goalInvitationRepository, goalInvitationMapper);
 
     @InjectMocks
     private GoalInvitationService goalInvitationService;

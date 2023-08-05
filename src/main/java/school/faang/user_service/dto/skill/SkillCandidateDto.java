@@ -1,4 +1,4 @@
-package school.faang.user_service.entity.dto.skill;
+package school.faang.user_service.dto.skill;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -6,8 +6,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class SkillCandidateDto {
-
     private SkillDto skill;
-
     private Long offersAmount;
 }

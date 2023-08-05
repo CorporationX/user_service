@@ -16,13 +16,13 @@ import java.util.List;
 
 import school.faang.user_service.exception.DataValidationException;
 
-@RestController
 @RequiredArgsConstructor
+@RestController
 @RequestMapping(value = "/skill")
 public class SkillController {
     private final SkillService skillService;
 
-    @PostMapping()
+    @PostMapping
     public SkillDto create(@RequestBody SkillDto skill) {
         validateSkill(skill);
         return skillService.create(skill);
@@ -38,7 +38,7 @@ public class SkillController {
         return skillService.getOfferedSkills(userId);
     }
 
-    @PutMapping("/{skillId}/{userId}")
+    @PutMapping("/acquire/{skillId}/user/{userId}")
     public SkillDto acquireSkillFromOffers(@PathVariable long skillId, @PathVariable long userId) {
         return skillService.acquireSkillFromOffers(skillId, userId);
     }

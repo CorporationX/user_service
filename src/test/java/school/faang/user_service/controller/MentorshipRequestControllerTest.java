@@ -46,7 +46,7 @@ public class MentorshipRequestControllerTest {
     @Test
     void testRequestMentorshipWithDescription() {
         requestController.requestMentorship(correctRequestDto);
-        verify(requestService, times(1)).requestMentorship(correctRequestDto);
+        verify(requestService).requestMentorship(correctRequestDto);
     }
 
     @Test
@@ -57,18 +57,18 @@ public class MentorshipRequestControllerTest {
     @Test
     void testGetRequest() {
         requestController.getRequests(correctFilterDto);
-        verify(requestService, times(1)).getRequests(correctFilterDto);
+        verify(requestService).getRequests(correctFilterDto);
     }
 
     @Test
     void testAcceptRequest() {
         requestController.acceptRequest(CORRECT_ID);
-        verify(requestService, times(1)).acceptRequest(CORRECT_ID);
+        verify(requestService).acceptRequest(CORRECT_ID);
     }
 
     @Test
     void testRejectRequest() {
         requestController.rejectRequest(CORRECT_ID, rejectionDto);
-        verify(requestService, times(1)).rejectRequest(CORRECT_ID, rejectionDto);
+        verify(requestService).rejectRequest(CORRECT_ID, rejectionDto);
     }
 }

@@ -62,12 +62,12 @@ public class MentorshipRequestService {
     }
 
     public void acceptRequest(long id) {
-        MentorshipRequest mentorshipRequest = findRequestInDB(id);
+        MentorshipRequest mentorshipRequest = getRequest(id);
 
         User receiver = mentorshipRequest.getReceiver();
         User requester = mentorshipRequest.getRequester();
 
-        checkAcceptedRequest(mentorshipRequest, RequestStatus.ACCEPTED);
+        checkIsRequestAlreadyAccepted(mentorshipRequest, RequestStatus.ACCEPTED);
 
         if (requester.getMentors() == null) {
             requester.setMentors(List.of(receiver));
@@ -88,12 +88,12 @@ public class MentorshipRequestService {
     }
 
     public void rejectRequest(long id, RejectionDto rejection) {
-        MentorshipRequest mentorshipRequest = findRequestInDB(id);
+        MentorshipRequest mentorshipRequest = getRequest(id);
 
         User requester = mentorshipRequest.getRequester();
         User receiver = mentorshipRequest.getReceiver();
 
-        checkAcceptedRequest(mentorshipRequest, RequestStatus.REJECTED);
+        checkIsRequestAlreadyAccepted(mentorshipRequest, RequestStatus.REJECTED);
 
         mentorshipRequest.setStatus(RequestStatus.REJECTED);
         mentorshipRequest.setRejectionReason(rejection.getReason());
@@ -102,19 +102,19 @@ public class MentorshipRequestService {
         log.info("The request rejected successfully, requestId={}", id);
     }
 
-    private void checkAcceptedRequest(MentorshipRequest request, RequestStatus status ) {
+    private void checkIsRequestAlreadyAccepted(MentorshipRequest request, RequestStatus status ) {
         if (request.getStatus() == status) {
             throw new RequestAlreadyAcceptedException("This request has already been accepted");
         }
     }
 
-    private MentorshipRequest findRequestInDB(long id) {
+    private MentorshipRequest getRequest(long id) {
         return mentorshipRequestRepository.findById(id)
                 .orElseThrow(() -> new MentorshipRequestNotFoundException("This mentorship request does not exist"));
     }
 
     private void dataValidate(long requesterId, long receiverId, MentorshipRequestDto requestDto) {
-        userValidate(requesterId, receiverId);
+        checkIfUsersExistsAndNotSame(requesterId, receiverId);
 
         if (mentorshipRequestRepository.findLatestRequest(requesterId, receiverId).isPresent()) {
             MentorshipRequest latestRequest = mentorshipRequestRepository.findLatestRequest(requesterId, receiverId).get();
@@ -125,7 +125,7 @@ public class MentorshipRequestService {
         }
     }
 
-    private void userValidate(long requesterId, long receiverId) {
+    private void checkIfUsersExistsAndNotSame(long requesterId, long receiverId) {
         if (!mentorshipRepository.existsById(requesterId)) {
             throw new UserNotFoundException("This requester does not exist");
         }

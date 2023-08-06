@@ -1,62 +1,76 @@
 package school.faang.user_service.service;
 
-import com.google.api.client.util.DateTime;
-import com.google.api.services.calendar.Calendar;
-import com.google.api.services.calendar.model.EventDateTime;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeRequestUrl;
+import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.client.util.store.FileDataStoreFactory;
+import com.google.api.services.calendar.CalendarScopes;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.GoogleCalendarEventDto;
-import com.google.api.services.calendar.model.Event;
-import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.GoogleCalendarMapper;
+import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.repository.event.EventRepository;
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.security.GeneralSecurityException;
+import java.text.MessageFormat;
+
+import java.util.Collections;
+import java.util.List;
 
 
 @Service
 @RequiredArgsConstructor
 public class GoogleCalendarService {
-    private final Calendar calendar;
     private final EventRepository eventRepository;
-    private final GoogleCalendarMapper calendarMapper;
+    private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
+    private static final String TOKENS_DIRECTORY_PATH = "tokens";
+    private static final List<String> SCOPES =
+            Collections.singletonList(CalendarScopes.CALENDAR);
+    private static final String CREDENTIALS_FILE_PATH = "/google-calendar-credentials.json";
 
-    public ResponseEntity<?> createEvent(Long id) throws IOException {
-        school.faang.user_service.entity.event.Event newEvent = eventRepository.findById(id)
-                .orElseThrow(() -> new DataValidationException("Event not found"));
-        GoogleCalendarEventDto eventDto = calendarMapper.toDto(newEvent);
 
-        com.google.api.services.calendar.model.Event event = createEvent(eventDto);
-        calendar.events().insert("primary", event).execute();
+    public String createCalendarEvent(Long eventId) throws IOException, GeneralSecurityException {
+        Event eventEntity = eventRepository.findById(eventId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        MessageFormat.format("Event {0} not found", eventId)));
 
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        GoogleAuthorizationCodeFlow flow = getFlow();
+
+        return getRedirectionUrl(eventEntity.getId(), flow).build();
+   }
+
+    private static GoogleAuthorizationCodeRequestUrl getRedirectionUrl(Long eventId, GoogleAuthorizationCodeFlow flow) {
+        return flow.newAuthorizationUrl()
+                .setAccessType("offline")
+                .setRedirectUri("http://localhost:8080/api/v1/calendar/auth/callback?event=" + eventId);
     }
 
-    private Event createEvent(GoogleCalendarEventDto eventDto) {
-        Event event = new Event();
-        event.setDescription(eventDto.getDescription());
-        event.setSummary(eventDto.getTitle());
-        event.setLocation(eventDto.getLocation());
+    public void getCredentialsFromCallback(String code, Long eventId) throws IOException, GeneralSecurityException {
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException(
+                MessageFormat.format("Event {0} not found", eventId)));
 
-        LocalDateTime localDateTime = eventDto.getStartDate();
-        ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.systemDefault());
-        DateTime dataStart = new DateTime(zonedDateTime.toInstant().toEpochMilli());
-
-        EventDateTime eventDateTime = new EventDateTime()
-                .setDateTime(dataStart);
-        event.setStart(eventDateTime);
-
-        LocalDateTime localDateTime1 = eventDto.getEndDate();
-        ZonedDateTime zonedDateTime1 = localDateTime1.atZone(ZoneId.systemDefault());
-        DateTime dataEnd = new DateTime(zonedDateTime1.toInstant().toEpochMilli());
-
-        EventDateTime eventDateTime2 = new EventDateTime()
-                .setDateTime(dataEnd);
-        event.setEnd(eventDateTime2);
-        return event;
+        GoogleAuthorizationCodeFlow flow = getFlow();
     }
-}
+
+    private GoogleAuthorizationCodeFlow getFlow() throws GeneralSecurityException, IOException {
+        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+        InputStream in = GoogleCalendarService.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
+        if (in == null) {
+            throw new FileNotFoundException("File not found " + CREDENTIALS_FILE_PATH);
+        }
+
+        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
+
+        return new GoogleAuthorizationCodeFlow.Builder(
+                HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
+                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
+                .setAccessType("offline")
+                .build();
+    }}

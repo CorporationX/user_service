@@ -1,15 +1,17 @@
 package school.faang.user_service.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.GoogleCalendarService;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,15 +20,14 @@ public class GoogleCalendarController {
 
     private final GoogleCalendarService googleCalendarService;
 
-    @PostMapping("/{id}")
-    public ResponseEntity<?> createEvent(@PathVariable("id") Long id) throws IOException {
-        idValidation(id);
-        return googleCalendarService.createEvent(id);
+    @PostMapping("/{eventId}")
+    public String createEvent(@Valid @PathVariable Long eventId) throws GeneralSecurityException, IOException {
+        return googleCalendarService.createCalendarEvent(eventId);
     }
 
-    private void idValidation(Long id) {
-        if (id <= 0) {
-            throw new DataValidationException("Id must be greater than 0");
-        }
+    @GetMapping("/auth/callback")
+    public void handleAuthorizationCallback(@RequestParam("code") String code,
+                                            @RequestParam("event") Long eventId) throws GeneralSecurityException, IOException {
+        googleCalendarService.getCredentialsFromCallback(code, eventId);
     }
 }

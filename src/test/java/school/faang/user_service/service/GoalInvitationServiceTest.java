@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
@@ -17,11 +18,18 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -80,6 +88,43 @@ class GoalInvitationServiceTest {
         assertEquals(goalInvitationDto, result);
     }
 
+    @Test
+    void testAcceptGoalInvitation() {
+        long invitationId = 1L;
+
+        GoalInvitation invitation = createGoalInvitation();
+        Goal goal = new Goal();
+        goal.setId(1L);
+
+        when(goalInvitationRepository.findById(invitationId)).thenReturn(Optional.of(invitation));
+        when(goalRepository.existsById(goal.getId())).thenReturn(true);
+
+        goalInvitationService.acceptGoalInvitation(invitationId);
+
+        verify(goalInvitationRepository, times(1)).findById(invitationId);
+        verify(goalRepository, times(1)).existsById(goal.getId());
+        verify(goalInvitationRepository, times(1)).save(invitation);
+
+        assertEquals(RequestStatus.ACCEPTED, invitation.getStatus());
+
+        assertTrue(invitation.getInvited().getGoals().contains(goal));
+    }
+
+    @Test
+    void testAcceptGoalInvitation_InvitedHasMaxGoals() {
+        long invitationId = 1L;
+
+        GoalInvitation invitation = new GoalInvitation();
+        User invited = new User();
+        invited.setGoals(Arrays.asList(new Goal(), new Goal(), new Goal(), new Goal(), new Goal()));
+        invitation.setInvited(invited);
+
+        when(goalInvitationRepository.findById(invitationId)).thenReturn(Optional.of(invitation));
+
+        Exception ex = assertThrows(DataValidException.class, () -> goalInvitationService.acceptGoalInvitation(invitationId));
+        assertTrue(ex.getMessage().contains("invited has reached the limit"));
+    }
+
     private GoalInvitationDto createInvitationDto() {
         return GoalInvitationDto.builder().id(1L).inviterId(1L).invitedUserId(2L).goalId(1L).build();
     }
@@ -90,10 +135,12 @@ class GoalInvitationServiceTest {
 
         User user1 = new User();
         user1.setId(1L);
+        user1.setGoals(new ArrayList<>(List.of(new Goal())));
         goalInvitation.setInviter(user1);
 
         User user2 = new User();
         user2.setId(2L);
+        user2.setGoals(new ArrayList<>(List.of(new Goal())));
         goalInvitation.setInvited(user2);
 
         Goal goal = new Goal();

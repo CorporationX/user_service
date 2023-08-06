@@ -8,7 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.mentorship.UserDto;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.IncorrectIdException;
 import school.faang.user_service.mapper.UserMapperImpl;
@@ -142,10 +142,10 @@ public class MentorshipServiceTest {
 
     @Test
     void testGetMentorsCorrectUserId() {
-       when(mentorshipRepository.findById(CORRECT_USER_ID)).thenReturn(Optional.ofNullable(correctUser));
+        when(mentorshipRepository.findById(CORRECT_USER_ID)).thenReturn(Optional.ofNullable(correctUser));
 
-       List<UserDto> actualList = mentorshipService.getMentors(CORRECT_USER_ID);
-       assertEquals(expectedDtos, actualList);
+        List<UserDto> actualList = mentorshipService.getMentors(CORRECT_USER_ID);
+        assertEquals(expectedDtos, actualList);
     }
 
     @Test

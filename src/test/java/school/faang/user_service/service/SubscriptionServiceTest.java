@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.mentorship.UserDto;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
@@ -111,7 +111,7 @@ public class SubscriptionServiceTest {
 
 
     @Test
-    public void getFollowers_WithFilters(){
+    public void getFollowers_WithFilters() {
         long userId = 3L;
         UserFilterDto filterDto = UserFilterDto.builder()
                 .namePattern("46")
@@ -128,7 +128,7 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void getFollowers_NoFilters(){
+    public void getFollowers_NoFilters() {
         List<UserDto> expectedResult = users.stream().map(userMapper::toDto).toList();
         UserFilterDto filterDto = null;
 
@@ -139,13 +139,13 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void followersCount(){
+    public void followersCount() {
         subscriptionService.getFollowersCount(3L);
         verify(subscriptionRepository).findFollowersAmountByFolloweeId(3L);
     }
 
     @Test
-    public void getFollowings_NoFilter(){
+    public void getFollowings_NoFilter() {
         List<UserDto> expectedResult = users.stream().map(userMapper::toDto).toList();
         UserFilterDto filterDto = null;
 
@@ -156,7 +156,7 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void getFollowings_WithFilters(){
+    public void getFollowings_WithFilters() {
         long userId = 3L;
         UserFilterDto filterDto = UserFilterDto.builder()
                 .countryPattern("Russia")
@@ -172,7 +172,7 @@ public class SubscriptionServiceTest {
     }
 
     @Test
-    public void followingCount(){
+    public void followingCount() {
         subscriptionService.getFollowingCount(3L);
         verify(subscriptionRepository).findFolloweesAmountByFollowerId(3L);
     }

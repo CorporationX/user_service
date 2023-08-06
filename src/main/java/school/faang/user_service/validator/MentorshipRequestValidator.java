@@ -1,12 +1,13 @@
 package school.faang.user_service.validator;
 
-import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
-import school.faang.user_service.exception.mentorship.MentorshipRequestValidationException;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.user.UserService;
+
+import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
@@ -22,14 +23,13 @@ public class MentorshipRequestValidator {
         userValidator.validateUsers(requesterId, receiverId);
 
         if (requesterId == receiverId) {
-            throw new MentorshipRequestValidationException("Requester and receiver cannot be the same user.");
+            throw new DataValidationException("Requester and receiver cannot be the same user.");
         }
 
         mentorshipRequestRepository.findLatestRequest(requesterId, receiverId).ifPresent(
                 request -> {
                     if (request.getCreatedAt().isAfter(LocalDateTime.now().minusMonths(REQUEST_TIME_LIMIT))) {
-                        throw new MentorshipRequestValidationException(
-                                "Request has already been sent for the last three months.");
+                        throw new DataValidationException("Request has already been sent for the last three months.");
                     }
                 }
         );

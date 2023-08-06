@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -19,7 +20,7 @@ import java.net.URI;
 
 @Service
 @RequiredArgsConstructor
-public class PaymentService { //todo test
+public class PaymentService {
 
     @Getter
     private static final int MAX_RETRIES = 5;
@@ -37,7 +38,7 @@ public class PaymentService { //todo test
     private String paymentServicePort;
 
 
-    @Retryable(value = {ResourceAccessException.class}, maxAttempts = MAX_RETRIES, backoff = @Backoff(delay = RETRY_DELAY_MS))
+    @Retryable(value = {Exception.class}, maxAttempts = MAX_RETRIES, backoff = @Backoff(delay = RETRY_DELAY_MS))
     public PremiumResponseDto makePayment(Payment payment) {
         URI uri = urlBuilder.buildUrl(paymentServiceHost, paymentServicePort, ApiEndpoints.PAYMENT);
 
@@ -48,7 +49,11 @@ public class PaymentService { //todo test
                 new HttpEntity<>(payment),
                 PaymentResponse.class
             );
-            return premiumResponseMapper.toDto(exchange.getBody());
+            if (exchange.getStatusCode() == HttpStatus.OK) {
+                return premiumResponseMapper.toDto(exchange.getBody());
+            } else {
+                throw new IllegalArgumentException("Payment failed");
+            }
         } catch (ResourceAccessException e) {
             throw new IllegalStateException("Failed to connect to the payment service: " + e.getMessage());
         }

@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class PremiumService { //todo test
+public class PremiumService {
     private final UserContext userContext;
     private final PaymentService paymentService;
     private final PremiumRepository premiumRepository;
@@ -36,16 +36,12 @@ public class PremiumService { //todo test
         }
 
         PremiumResponseDto paymentResponse = paymentService.makePayment(premiumRequestDto.getPayment());
-        if (paymentResponse.getStatus().equals("SUCCESS")) {
-            TariffPlan tariffPlan = premiumRequestDto.getTariffPlan();
-            Premium premium = createPremiumForUser(userId, tariffPlan);
-            Premium savedPremium = premiumRepository.save(premium);
+        TariffPlan tariffPlan = premiumRequestDto.getTariffPlan();
+        Premium premium = createPremiumForUser(userId, tariffPlan);
+        Premium savedPremium = premiumRepository.save(premium);
 
-            responseDto = paymentResponse;
-            fillTariffPlan(responseDto, tariffPlan, savedPremium);
-        } else {
-            throw new IllegalArgumentException("Payment failed");
-        }
+        responseDto = paymentResponse;
+        fillTariffPlan(responseDto, tariffPlan, savedPremium);
 
         return responseDto;
     }

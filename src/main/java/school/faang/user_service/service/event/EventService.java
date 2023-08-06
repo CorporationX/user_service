@@ -56,7 +56,7 @@ public class EventService {
 
     public EventDto getEvent(long id) {
         Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new DataValidationException("There is no event with this id"));
+                .orElseThrow(() -> new EntityNotFoundException("There is no event with this id"));
         return eventMapper.toDTO(event);
     }
 

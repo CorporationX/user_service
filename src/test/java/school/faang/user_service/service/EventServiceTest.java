@@ -100,8 +100,8 @@ public class EventServiceTest {
 
     @Test
     public void testGetEventWithWrongId() {
-        Assertions.assertThrows(DataValidationException.class, () -> eventService.getEvent(0L));
-        Assertions.assertThrows(DataValidationException.class, () -> eventService.getEvent(-10L));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> eventService.getEvent(0L));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> eventService.getEvent(-10L));
     }
 
     @Test

@@ -55,11 +55,6 @@ public class RecommendationRequestService {
         if (dto.getMessage() == null || dto.getMessage().isEmpty()){
             throw new IllegalArgumentException("Empty recommendation request!");
         }
-
-        List<SkillRequest> skills = dto.getSkills();
-        if (skills == null || skills.isEmpty()){
-            throw new IllegalArgumentException("Recommendation request cannot be without any skills!");
-        }
     }
 
     private boolean hasPendingRequest(long requesterId, long receiverId) {

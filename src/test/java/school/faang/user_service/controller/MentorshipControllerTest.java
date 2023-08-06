@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.service.MentorshipService;
+import school.faang.user_service.service.mentorship.MentorshipService;
 
 import static org.mockito.Mockito.*;
 
@@ -22,24 +22,24 @@ public class MentorshipControllerTest {
     @Test
     void testGetMentees() {
         mentorshipController.getMentees(CORRECT_USER_ID);
-        verify(mentorshipService, times(1)).getMentees(CORRECT_USER_ID);
+        verify(mentorshipService).getMentees(CORRECT_USER_ID);
     }
 
     @Test
     void testGetMentors() {
         mentorshipController.getMentors(CORRECT_USER_ID);
-        verify(mentorshipService, times(1)).getMentors(CORRECT_USER_ID);
+        verify(mentorshipService).getMentors(CORRECT_USER_ID);
     }
 
     @Test
     void testDeleteMentees() {
         mentorshipController.deleteMentee(CORRECT_USER_ID, CORRECT_USER_ID);
-        verify(mentorshipService, times(1)).deleteMentee(CORRECT_USER_ID, CORRECT_USER_ID);
+        verify(mentorshipService).deleteMentee(CORRECT_USER_ID, CORRECT_USER_ID);
     }
 
     @Test
     void testDeleteMentors() {
         mentorshipController.deleteMentor(CORRECT_USER_ID, CORRECT_USER_ID);
-        verify(mentorshipService, times(1)).deleteMentor(CORRECT_USER_ID, CORRECT_USER_ID);
+        verify(mentorshipService).deleteMentor(CORRECT_USER_ID, CORRECT_USER_ID);
     }
 }

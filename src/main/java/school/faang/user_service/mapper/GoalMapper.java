@@ -26,7 +26,7 @@ public abstract class GoalMapper {
     @Autowired
     protected GoalRepository goalRepository;
     @Autowired
-    private SkillRepository skillRepository;
+    protected SkillRepository skillRepository;
 
     @Mapping(source = "parent.id", target = "parentId")
     @Mapping(source = "mentor.id", target = "mentorId")

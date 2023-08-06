@@ -21,8 +21,14 @@ public class EventController {
     }
 
     private void validate(EventDto event) {
-        if (event == null || event.getTitle() == null || event.getTitle().isBlank() || event.getStartDate() == null || event.getOwnerId() == null) {
-            throw new DataValidationException("Event is invalid");
+        if (event == null) {
+            throw new DataValidationException("Event can't be null");
+        }else if(event.getTitle() == null || event.getTitle().isBlank()){
+            throw new DataValidationException("Event's title can't be null or blank");
+        }else if(event.getStartDate() == null){
+            throw new DataValidationException("Event's start date can't be null");
+        }else if(event.getOwnerId() == null){
+            throw new DataValidationException("Event's ownerId can't be null");
         }
     }
 

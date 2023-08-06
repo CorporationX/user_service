@@ -31,11 +31,11 @@ public class EventService {
 
 
     public EventDto create(EventDto event) {
-        validate(event);
+        checkIfOwnerHasRequiredSkills(event);
         return eventMapper.toDTO(eventRepository.save(eventMapper.toEvent(event)));
     }
 
-    private void validate(EventDto event) {
+    private void checkIfOwnerHasRequiredSkills(EventDto event) {
         User user = userRepository.findById(event.getOwnerId()).orElseThrow(() -> new DataValidationException("Owner doesn't found"));
         if (!ownerHasSkills(event, user)) {
             throw new DataValidationException("Owner hasn't required skills");
@@ -43,7 +43,6 @@ public class EventService {
     }
 
     private boolean ownerHasSkills(EventDto event, User user) {
-
         return user.getSkills().stream()
                 .map(Skill::getTitle)
                 .collect(Collectors.toSet())
@@ -55,28 +54,20 @@ public class EventService {
     }
 
     public EventDto getEvent(long id) {
-
-        if (id <= 0) {
-            throw new DataValidationException("ID is incorrect");
-        }
-
-        return eventMapper.toDTO(
-                eventRepository
-                        .findById(id)
-                        .orElseThrow(() -> new DataValidationException("There is no event with this id"))
-        );
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new DataValidationException("There is no event with this id"));
+        return eventMapper.toDTO(event);
     }
 
     public void deleteEvent(long id) {
-        if (id > 0) {
-            eventRepository.deleteById(id);
-        }
+        eventRepository.deleteById(id);
     }
 
     public EventDto updateEvent(EventDto eventDto) {
-        validate(eventDto);
+        checkIfOwnerHasRequiredSkills(eventDto);
         Event event = eventRepository.findById(eventDto.getId()).orElseThrow(() -> new DataValidationException("Event not found"));
-        return eventMapper.toDTO(eventRepository.save(eventMapper.update(eventDto, event)));
+        Event udatedEvent = eventMapper.update(eventDto, event);
+        return eventMapper.toDTO(eventRepository.save(udatedEvent));
     }
 
     public List<EventDto> getOwnedEvents(long userId) {

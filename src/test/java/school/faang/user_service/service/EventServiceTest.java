@@ -3,7 +3,6 @@ package school.faang.user_service.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,7 +19,6 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filters.event.EventIdFilter;
 import school.faang.user_service.filters.event.EventOwnerIdFilter;
-import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.mapper.event.EventMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -106,7 +104,7 @@ public class EventServiceTest {
 
     @Test
     public void testGetNonExistentEvent() {
-        when(eventRepository.findById(10L)).thenReturn(Optional.ofNullable(null));
+        when(eventRepository.findById(10L)).thenReturn(Optional.empty());
         Assertions.assertThrows(EntityNotFoundException.class, () -> eventService.getEvent(10L));
     }
 
@@ -140,7 +138,7 @@ public class EventServiceTest {
     @Test
     public void testUpdateEventReturnsNull() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user2));
-        when(eventRepository.findById(1L)).thenReturn(Optional.ofNullable(null));
+        when(eventRepository.findById(1L)).thenReturn(Optional.empty());
         Assertions.assertThrows(DataValidationException.class, () -> eventService.updateEvent(eventDto));
     }
 

@@ -6,28 +6,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.controller.event.EventController;
 import school.faang.user_service.dto.event.EventDto;
-import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.event.EventMapper;
-import school.faang.user_service.mapper.event.EventMapperImpl;
 import school.faang.user_service.service.event.EventService;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 public class EventControllerTest {
     @Mock
     private EventService eventService;
-    @Spy
-    private EventMapperImpl eventMapper;
     @InjectMocks
     private EventController eventController;
     private EventDto eventDto = EventDto.builder()
@@ -52,7 +44,6 @@ public class EventControllerTest {
             .title("Hello BoottyCamp")
             .startDate(LocalDateTime.MAX)
             .build();
-    private EventDto eventDto5;
     private Event event = Event.builder()
             .title("Hello BoottyCamp")
             .startDate(LocalDateTime.MAX)
@@ -87,7 +78,7 @@ public class EventControllerTest {
 
     @Test
     public void testEventCreateEventIsNull() {
-        Assertions.assertThrows(DataValidationException.class, () -> eventController.create(eventDto5));
+        Assertions.assertThrows(DataValidationException.class, () -> eventController.create(null));
     }
 
     @Test
@@ -130,6 +121,6 @@ public class EventControllerTest {
 
     @Test
     public void testUpdateEventEventIsNull() {
-        Assertions.assertThrows(DataValidationException.class, () -> eventController.updateEvent(eventDto5));
+        Assertions.assertThrows(DataValidationException.class, () -> eventController.updateEvent(null));
     }
 }

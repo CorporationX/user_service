@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.service.event.EventService;
 
 import java.util.List;

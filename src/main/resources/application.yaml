@@ -35,6 +35,7 @@ server:
 logging:
   level:
     root: info
+    org.springframework.retry: DEBUG
 
 project-service:
   host: localhost

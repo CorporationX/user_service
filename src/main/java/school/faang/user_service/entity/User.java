@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import school.faang.user_service.entity.contact.Contact;
@@ -51,6 +52,7 @@ public class User {
 
     @ManyToOne
     @JoinColumn(name = "country_id", nullable = false)
+    @ToString.Exclude
     private Country country;
 
     @Column(name = "city", length = 64)

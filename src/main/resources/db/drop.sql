@@ -20,6 +20,5 @@ DROP TABLE goal;
 DROP TABLE skill;
 DROP TABLE users;
 DROP TABLE country;
-DROP TABLE user_activity;
 
 DELETE FROM databasechangelog;

@@ -12,6 +12,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.premium.PremiumDto;
 import school.faang.user_service.entity.premium.PremiumPeriod;
 import school.faang.user_service.service.PremiumService;
@@ -29,6 +30,9 @@ class PremiumControllerTest {
 
     @Mock
     private PremiumService premiumService;
+
+    @Mock
+    private UserContext userContext;
 
     @InjectMocks
     private PremiumController premiumController;
@@ -51,8 +55,10 @@ class PremiumControllerTest {
                 .startDate(now)
                 .endDate(now.plusMonths(3))
                 .build();
-        Mockito.when(premiumService.buyPremium(1L, PremiumPeriod.THREE_MONTH)).thenReturn(premiumDto);
-        mockMvc.perform(post("/premium/buy/1")
+        long userId = 1L;
+        Mockito.when(userContext.getUserId()).thenReturn(userId);
+        Mockito.when(premiumService.buyPremium(userId, PremiumPeriod.THREE_MONTH)).thenReturn(premiumDto);
+        mockMvc.perform(post("/premium/buy")
                         .param("days", "90"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(premiumDto)));

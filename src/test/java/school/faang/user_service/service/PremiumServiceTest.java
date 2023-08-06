@@ -94,13 +94,14 @@ class PremiumServiceTest {
 
     @Test
     void testPaymentPremium() {
+        long paymentNumber = 3L;
         PaymentResponse response = new PaymentResponse(
-                PaymentStatus.SUCCESS, 1, 1, new BigDecimal(25), Currency.USD,
+                PaymentStatus.SUCCESS, 1, paymentNumber, new BigDecimal(25), Currency.USD,
                 "Success");
-        PaymentRequest paymentRequest = new PaymentRequest(1, new BigDecimal(25), Currency.USD);
+        PaymentRequest paymentRequest = new PaymentRequest(paymentNumber, new BigDecimal(25), Currency.USD);
 
-        Mockito.lenient().when(paymentServiceClient.sendPayment(new PaymentRequest(1, new BigDecimal(25), Currency.USD)))
-                .thenReturn(ResponseEntity.ok(response));
+        Mockito.when(premiumRepository.count()).thenReturn(paymentNumber);
+        Mockito.when(paymentServiceClient.sendPayment(paymentRequest)).thenReturn(ResponseEntity.ok(response));
         ReflectionTestUtils.invokeMethod(premiumService, "paymentPremium", PremiumPeriod.THREE_MONTH);
 
         Mockito.verify(paymentServiceClient, Mockito.times(1)).sendPayment(paymentRequest);

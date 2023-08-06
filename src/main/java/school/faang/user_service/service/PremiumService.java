@@ -1,7 +1,9 @@
 package school.faang.user_service.service;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.client.PaymentServiceClient;
 import school.faang.user_service.dto.premium.Currency;
@@ -45,9 +47,11 @@ public class PremiumService {
         return premiumMapper.toDto(savePremium);
     }
 
+    @Retryable(retryFor = FeignException.class)
     private void paymentPremium(PremiumPeriod premiumPeriod) {
+        long payNumber = premiumRepository.count();
         PaymentRequest paymentRequest =
-                new PaymentRequest(1, new BigDecimal(premiumPeriod.getPrice()), Currency.USD);
+                new PaymentRequest(payNumber, new BigDecimal(premiumPeriod.getPrice()), Currency.USD);
         ResponseEntity<PaymentResponse> paymentResponseEntity = paymentServiceClient.sendPayment(paymentRequest);
         PaymentResponse response = paymentResponseEntity.getBody();
         premiumValidator.validateResponse(response);

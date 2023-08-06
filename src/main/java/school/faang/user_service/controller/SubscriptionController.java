@@ -34,9 +34,16 @@ public class SubscriptionController {
         return ResponseEntity.ok().body("Unfollowed");
     }
 
-    @PostMapping(value = "/followers/{followeeId}")
+    @PostMapping(value = "/following/{followeeId}")
+    @Operation(
+            summary = "Get users followed by a user",
+            description = "Retrieves users followed by a user based on the provided followee ID.",
+            tags = {"following"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found the book",
+                    content = {@Content(mediaType = "application/json")}
+            )})
     public ResponseEntity<?> getFollowers(@PathVariable long followeeId, @RequestBody UserFilterDto filter) {
-        System.out.println(filter);
         validator.validateId(followeeId);
         validator.validateFilterDto(filter);
         return ResponseEntity.ok(service.getFollowers(followeeId, filter));
@@ -49,9 +56,14 @@ public class SubscriptionController {
         return ResponseEntity.ok(followersCount);
     }
 
-    @PostMapping(value = "/following/{followeeId}")
-    public ResponseEntity<?> getFollowing(@PathVariable long followeeId, @RequestBody UserFilterDto filter) {
+    @PostMapping(value = "/followers/{followeeId}")
+    @Operation(
+            summary = "Get followers of a user",
+            description = "Retrieves followers of a user based on the provided followee ID.",
+            tags = {"followers"})
+    public ResponseEntity<?> getFollowing(@PathVariable long followeeId, @RequestBody(required = false) UserFilterDto filter) {
         validator.validateId(followeeId);
+        if (filter == null) filter = new UserFilterDto();
         validator.validateFilterDto(filter);
         List<UserDto> following = service.getFollowing(followeeId, filter);
         return ResponseEntity.ok().body(following);

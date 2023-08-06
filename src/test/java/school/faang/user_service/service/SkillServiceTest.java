@@ -84,12 +84,12 @@ class SkillServiceTest {
     }
 
     @Test
-    void testThrownUserDoesNotExistException() {
+    void testGetUserSkillsThrownUserDoesNotExistException() {
         long userId = 1L;
         Mockito.when(userRepository.existsById(any())).thenReturn(false);
         DataValidationException dataValidationException =
                 assertThrows(DataValidationException.class, () -> skillService.getUserSkills(userId));
-        Assertions.assertEquals("User doesn't exist", dataValidationException.getMessage());
+        Assertions.assertEquals(String.format("User with id=%d doesn't exist", userId), dataValidationException.getMessage());
     }
 
     @Test

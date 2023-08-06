@@ -10,7 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.dto.mentorship.RequestFilterDto;
-import school.faang.user_service.dto.mentorship.UserDto;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
@@ -165,7 +165,7 @@ public class MentorshipRequestServiceTest {
 
         when(requestRepository.findAll()).thenReturn(Collections.singleton(latestRequest));
         List<MentorshipRequestFilter> filters = getFilters();
-        requestService = new MentorshipRequestService(requestRepository,mentorshipRepository, requestMapper, filters);
+        requestService = new MentorshipRequestService(requestRepository, mentorshipRepository, requestMapper, filters);
 
         List<MentorshipRequestDto> actualList = requestService.getRequests(filterDto);
         List<MentorshipRequestDto> expectedList = List.of(requestDto);
@@ -183,7 +183,7 @@ public class MentorshipRequestServiceTest {
 
         when(requestRepository.findAll()).thenReturn(Collections.singleton(latestRequest));
         List<MentorshipRequestFilter> filters = getFilters();
-        requestService = new MentorshipRequestService(requestRepository,mentorshipRepository, requestMapper, filters);
+        requestService = new MentorshipRequestService(requestRepository, mentorshipRepository, requestMapper, filters);
 
         List<MentorshipRequestDto> actualList = requestService.getRequests(filterDto);
         List<MentorshipRequestDto> expectedList = new ArrayList<>();

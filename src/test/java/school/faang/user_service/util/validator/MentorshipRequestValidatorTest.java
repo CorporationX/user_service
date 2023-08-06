@@ -17,7 +17,6 @@ import school.faang.user_service.util.exception.RequestMentorshipException;
 import school.faang.user_service.util.exception.SameMentorAndMenteeException;
 import school.faang.user_service.util.exception.TimeHasNotPassedException;
 import school.faang.user_service.util.exception.UserNotFoundException;
-import school.faang.user_service.util.validator.MentorshipRequestValidator;
 
 import java.time.LocalDateTime;
 import java.util.Optional;

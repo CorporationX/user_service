@@ -1,7 +1,6 @@
 package school.faang.user_service.dto.skill;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 public class SkillCandidateDto {

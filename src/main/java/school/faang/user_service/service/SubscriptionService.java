@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.mentorship.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exeption.DataValidationException;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.filters.user.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;

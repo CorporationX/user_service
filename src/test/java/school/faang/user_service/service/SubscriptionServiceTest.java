@@ -10,7 +10,7 @@ import school.faang.user_service.dto.mentorship.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exeption.DataValidationException;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.filters.user.UserCountryFilter;
 import school.faang.user_service.service.filters.user.UserEmailFilter;
 import school.faang.user_service.service.filters.user.UserFilter;

@@ -34,14 +34,14 @@ public class SkillController {
         return skillService.create(skill);
     }
 
-    @GetMapping("{userId}")
+    @GetMapping("/{userId}")
     public List<SkillDto> getUserSkills(@PathVariable Long userId,
                                         @RequestParam("page number") int pageNumber,
                                         @RequestParam("element number") int pageSize) {
         return skillService.getUserSkills(userId, pageNumber, pageSize);
     }
 
-    @GetMapping("{userId}")
+    @GetMapping("/offered/{userId}")
     public List<SkillCandidateDto> getOfferedSkills(@PathVariable Long userId){
         return skillService.getOfferedSkills(userId);
     }

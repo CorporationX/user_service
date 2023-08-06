@@ -22,27 +22,24 @@ public class RecommendationRequestService {
     private final SkillRequestRepository skillRequestRepository;
     private final UserRepository userRepository;
     private final RecommendationRequestMapper recommendationRequestMapper;
+
     public void create(RecommendationRequestDto dto) {
         validateRecommendationRequest(dto);
-        RecommendationRequest recommendationRequest = recommendationRequestMapper.toEntity(dto);
 
-        Long requestId = recommendationRequest.getRequester().getId();
-        Long receiverId = recommendationRequest.getReceiver().getId();
-        String message = recommendationRequest.getMessage();
+        Long requestId = dto.getRequestId();
+        Long receiverId = dto.getReceiverId();
+        String message = dto.getMessage();
 
         if (userRepository.existsById(requestId) && userRepository.existsById(receiverId)) {
-            if (!hasPendingRequest(requestId, receiverId)){
-                recommendationRequest.setCreatedAt(LocalDateTime.now());
-                recommendationRequest.setUpdatedAt(LocalDateTime.now());
-                recommendationRequest.setStatus(RequestStatus.PENDING);
+            if (!hasPendingRequest(requestId, receiverId)) {
 
                 RecommendationRequest savedRequest = recommendationRequestRepository.
                         create(requestId, receiverId, message);
 
-                for (SkillRequest skillRequest : recommendationRequest.getSkills()) {
-                    skillRequest.setRequest(savedRequest);
-                    skillRequestRepository.create(requestId,skillRequest.getId());
+                for (Long skillId : dto.getSkillIds()){
+                    skillRequestRepository.create(savedRequest.getId(), skillId);
                 }
+
             } else {
                 throw new IllegalArgumentException("A recommendation request between the same users can only be sent once every six months!");
             }
@@ -52,7 +49,7 @@ public class RecommendationRequestService {
     }
 
     private void validateRecommendationRequest(RecommendationRequestDto dto) {
-        if (dto.getMessage() == null || dto.getMessage().isEmpty()){
+        if (dto.getMessage() == null || dto.getMessage().isEmpty()) {
             throw new IllegalArgumentException("Empty recommendation request!");
         }
     }

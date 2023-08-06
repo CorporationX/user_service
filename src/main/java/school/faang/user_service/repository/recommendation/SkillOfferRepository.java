@@ -29,4 +29,11 @@ public interface SkillOfferRepository extends JpaRepository<SkillOffer, Long> {
             WHERE so.skill.id = :skillId AND r.receiver.id = :userId
             """)
     List<SkillOffer> findAllOffersOfSkill(long skillId, long userId);
+
+    @Query(value = """
+            SELECT so FROM SkillOffer so
+            JOIN so.recommendation r
+            WHERE r.receiver.id = :userId
+            """)
+    List<SkillOffer> findAllByUserId(long userId);
 }

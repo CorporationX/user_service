@@ -55,7 +55,6 @@ public class GoalService {
             goals = filter.apply(goals, filters);
         }
         return goals.map(goalMapper::goalToGoalDto).toList();
-
     }
 
     public List<GoalDto> getSubtasksByGoalId(long goalId, GoalFilterDto filters) {

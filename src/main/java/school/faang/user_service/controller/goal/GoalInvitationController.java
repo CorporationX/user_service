@@ -23,4 +23,9 @@ public class GoalInvitationController {
     public void acceptGoalInvitation(long id) {
         goalInvitationService.acceptGoalInvitation(id);
     }
+
+    @PostMapping("/{id}/reject")
+    public void rejectGoalInvitation(long id) {
+        goalInvitationService.rejectGoalInvitation(id);
+    }
 }

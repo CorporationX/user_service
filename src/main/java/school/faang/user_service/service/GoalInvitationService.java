@@ -36,6 +36,14 @@ public class GoalInvitationService {
         validateAccept(invitation);
         invitation.setStatus(RequestStatus.ACCEPTED);
         invitation.getInvited().getGoals().add(invitation.getGoal());
+    }
+
+    @Transactional
+    public void rejectGoalInvitation(long id) {
+        GoalInvitation invitation = goalInvitationRepository.findById(id)
+                .orElseThrow(() -> new DataValidException("Goal Invitation nou found. Id: " + id));
+        checkGoalExists(invitation);
+        invitation.setStatus(RequestStatus.REJECTED);
         goalInvitationRepository.save(invitation);
     }
 
@@ -50,6 +58,13 @@ public class GoalInvitationService {
         }
         if (!goalRepository.existsById(invitation.getGoal().getId())) {
             throw new DataValidException("Unable to accept Goal Invitation, Goal not found. Id: " + id);
+        }
+    }
+
+    @Transactional(readOnly = true)
+    private void checkGoalExists(GoalInvitation invitation) {
+        if (!goalRepository.existsById(invitation.getGoal().getId())) {
+            throw new DataValidException("Unable to decline Invitation, Goal not found. Id: " + invitation.getId());
         }
     }
 

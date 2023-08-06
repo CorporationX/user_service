@@ -125,6 +125,20 @@ class GoalInvitationServiceTest {
         assertTrue(ex.getMessage().contains("invited has reached the limit"));
     }
 
+    @Test
+    void testRejectGoalInvitation() {
+        GoalInvitation invitation = createGoalInvitation();
+
+        when(goalInvitationRepository.findById(invitation.getId())).thenReturn(Optional.of(invitation));
+        when(goalRepository.existsById(anyLong())).thenReturn(true);
+
+        goalInvitationService.rejectGoalInvitation(invitation.getId());
+
+        verify(goalInvitationRepository).save(invitation);
+
+        assertEquals(RequestStatus.REJECTED, invitation.getStatus());
+    }
+
     private GoalInvitationDto createInvitationDto() {
         return GoalInvitationDto.builder().id(1L).inviterId(1L).invitedUserId(2L).goalId(1L).build();
     }

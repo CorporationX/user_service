@@ -3,6 +3,7 @@ package school.faang.user_service.service;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeRequestUrl;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
+import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -57,6 +58,10 @@ public class GoogleCalendarService {
                 MessageFormat.format("Event {0} not found", eventId)));
 
         GoogleAuthorizationCodeFlow flow = getFlow();
+
+        GoogleTokenResponse response = flow.newTokenRequest(code)
+                .setRedirectUri("http://localhost:8080/api/v1/google/auth/callback?event=" + event.getId())
+                .execute();
     }
 
     private GoogleAuthorizationCodeFlow getFlow() throws GeneralSecurityException, IOException {

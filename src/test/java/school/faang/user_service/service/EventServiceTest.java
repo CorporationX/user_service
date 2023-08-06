@@ -12,15 +12,19 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.filters.event.EventIdFilter;
+import school.faang.user_service.filters.event.EventOwnerIdFilter;
 import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.mapper.event.EventMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.filters.event.EventFilter;
 import school.faang.user_service.service.event.EventService;
 
 import java.util.ArrayList;
@@ -96,8 +100,8 @@ public class EventServiceTest {
 
     @Test
     public void testGetEventWithWrongId() {
-        Assertions.assertThrows(DataValidationException.class, () -> eventService.getEvent(0L));
-        Assertions.assertThrows(DataValidationException.class, () -> eventService.getEvent(-10L));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> eventService.getEvent(0L));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> eventService.getEvent(-10L));
     }
 
     @Test
@@ -164,5 +168,19 @@ public class EventServiceTest {
         List<Event> events = List.of(Event.builder().build());
         when(eventRepository.findParticipatedEventsByUserId(1L)).thenReturn(events);
         Assertions.assertEquals(1, eventService.getParticipatedEvents(1L).size());
+    }
+
+    @Test
+    public void testGetEventsByFilter() {
+        List<EventFilter> filters = List.of(new EventIdFilter(), new EventOwnerIdFilter());
+        EventService testEventService = new EventService(eventRepository, userRepository, eventMapper, filters);
+        EventFilterDto filter = EventFilterDto.builder().eventId(1L).ownerId(1L).build();
+        List<Event> events = List.of(
+                Event.builder().id(1L).owner(User.builder().id(1L).build()).build(),
+                Event.builder().id(2L).owner(User.builder().id(1L).build()).build(),
+                Event.builder().id(1L).owner(User.builder().id(2L).build()).build()
+        );
+        when(eventRepository.findAll()).thenReturn(events);
+        Assertions.assertEquals(1, testEventService.getEventsByFilter(filter).size());
     }
 }

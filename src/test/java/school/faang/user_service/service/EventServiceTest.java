@@ -1,6 +1,9 @@
 package school.faang.user_service.service;
 
+
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,6 +20,7 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filters.event.EventIdFilter;
 import school.faang.user_service.filters.event.EventOwnerIdFilter;
+import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.mapper.event.EventMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -103,7 +107,7 @@ public class EventServiceTest {
     @Test
     public void testGetNonExistentEvent() {
         when(eventRepository.findById(10L)).thenReturn(Optional.ofNullable(null));
-        Assertions.assertThrows(DataValidationException.class, () -> eventService.getEvent(10L));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> eventService.getEvent(10L));
     }
 
     @Test
@@ -147,9 +151,23 @@ public class EventServiceTest {
     }
 
     @Test
+    public void testGetOwnedEvents() {
+        List<Event> events = List.of(Event.builder().build());
+        when(eventRepository.findAllByUserId(1L)).thenReturn(events);
+        Assertions.assertEquals(1, eventService.getOwnedEvents(1L).size());
+    }
+
+    @Test
     public void testGetParticipatedEventsIsNull() {
         when(eventRepository.findParticipatedEventsByUserId(1L)).thenReturn(null);
         Assertions.assertEquals(0, eventService.getParticipatedEvents(1L).size());
+    }
+
+    @Test
+    public void testGetParticipatedEvents() {
+        List<Event> events = List.of(Event.builder().build());
+        when(eventRepository.findParticipatedEventsByUserId(1L)).thenReturn(events);
+        Assertions.assertEquals(1, eventService.getParticipatedEvents(1L).size());
     }
 
     @Test

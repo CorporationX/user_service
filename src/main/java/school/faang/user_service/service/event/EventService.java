@@ -1,5 +1,6 @@
 package school.faang.user_service.service.event;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.EventDto;
@@ -44,11 +45,11 @@ public class EventService {
 
     private boolean ownerHasSkills(EventDto event, User user) {
         return user.getSkills().stream()
-                .map(Skill::getTitle)
+                .map(Skill::getId)
                 .collect(Collectors.toSet())
                 .containsAll(
                         event.getRelatedSkills().stream()
-                                .map(SkillDto::getTitle)
+                                .map(SkillDto::getId)
                                 .collect(Collectors.toSet()));
 
     }

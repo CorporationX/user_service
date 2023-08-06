@@ -1,10 +1,9 @@
 package school.faang.user_service.dto.mentorship;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 import school.faang.user_service.entity.RequestStatus;
 
 import java.time.LocalDateTime;
@@ -16,6 +15,8 @@ import java.time.LocalDateTime;
 public class MentorshipRequestDto {
 
     private long id;
+    @NotNull(message = "Add a description to your mentoring request")
+    @NotBlank(message = "Add a description to your mentoring request")
     private String description;
     private long requester;
     private long receiver;

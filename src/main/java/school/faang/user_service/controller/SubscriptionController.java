@@ -1,5 +1,6 @@
 package school.faang.user_service.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.UserDto;
@@ -14,15 +15,15 @@ import java.util.List;
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
-    public void followUser(long followerId, long followeeId) {
-        if (!isValid(followerId, followeeId)) {
+    public void followUser(@Valid long followerId, long followeeId) {
+        if (followerId == followeeId) {
             throw new DataValidationException("user can't follow itself");
         }
         subscriptionService.followUser(followerId, followeeId);
     }
 
-    public void unfollowUser(long followerId, long followeeId) {
-        if (!isValid(followerId, followeeId)) {
+    public void unfollowUser(@Valid long followerId, long followeeId) {
+        if (followerId == followeeId) {
             throw new DataValidationException("user can't unfollow itself");
         }
         subscriptionService.unfollowUser(followerId, followeeId);
@@ -42,9 +43,5 @@ public class SubscriptionController {
 
     public int getFollowingCount(long followerId) {
         return subscriptionService.getFollowingCount(followerId);
-    }
-
-    private boolean isValid(long followerId, long followeeId) {
-        return followerId != followeeId;
     }
 }

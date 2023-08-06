@@ -1,9 +1,6 @@
 package school.faang.user_service.service;
 
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -74,7 +71,7 @@ class GoalInvitationServiceTest {
         goalInvitationDto.setId(0L);
 
         Exception ex = assertThrows(DataValidException.class, () -> goalInvitationService.createInvitation(goalInvitationDto));
-        assertEquals("Invitation illegal id", ex.getMessage());
+        assertEquals("Goal does not exist. Invitation Id: 0", ex.getMessage());
     }
 
     @Test
@@ -101,14 +98,13 @@ class GoalInvitationServiceTest {
 
     @Test
     void createSuccessful() {
-        GoalInvitationDto goalInvitationDto = createInvitationDto();
-
         when(userRepository.existsById(anyLong())).thenReturn(true);
         when(goalRepository.existsById(anyLong())).thenReturn(true);
         when(goalInvitationRepository.save(any(GoalInvitation.class))).thenReturn(createGoalInvitation());
 
-        GoalInvitationDto result = goalInvitationService.createInvitation(goalInvitationDto);
-        assertEquals(goalInvitationDto, result);
+        GoalInvitationDto result = goalInvitationService.createInvitation(createInvitationDto());
+
+        assertEquals(createInvitationDto(), result);
     }
 
     @Test
@@ -198,7 +194,13 @@ class GoalInvitationServiceTest {
     }
 
     private GoalInvitationDto createInvitationDto() {
-        return GoalInvitationDto.builder().id(1L).inviterId(1L).invitedUserId(2L).goalId(1L).build();
+        return GoalInvitationDto.builder()
+                .id(1L)
+                .inviterId(1L)
+                .invitedUserId(2L)
+                .goalId(1L)
+                .status(RequestStatus.PENDING)
+                .build();
     }
 
     private GoalInvitation createGoalInvitation() {
@@ -216,6 +218,7 @@ class GoalInvitationServiceTest {
         User user = new User();
         user.setId(id);
         user.setUsername("Tom");
+        user.setGoals(new ArrayList<>(List.of(createGoal(id))));
         return user;
     }
 

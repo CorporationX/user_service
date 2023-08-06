@@ -4,10 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
-import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.goal.GoalInvitation;
-import school.faang.user_service.exception.DataValidException;
 import school.faang.user_service.dto.goal.GoalInvitationFilterDto;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.exception.DataValidException;
 import school.faang.user_service.filter.goal.InvitationFilter;
@@ -44,6 +42,8 @@ public class GoalInvitationService {
         validateAccept(invitation);
         invitation.setStatus(RequestStatus.ACCEPTED);
         invitation.getInvited().getGoals().add(invitation.getGoal());
+
+        goalInvitationRepository.save(invitation);
     }
 
     @Transactional

@@ -29,7 +29,7 @@ public class EventService {
 
     @Transactional
     public EventDto create(EventDto event) {
-        validateEventSkills(event);
+        checkIfUserHasRequiredSkills(event);
 
         var attendees = userRepository.findAllById(event.getAttendees());
         Event eventEntity = eventMapper.toEntity(event);
@@ -60,11 +60,13 @@ public class EventService {
     }
 
     public void deleteEvent(long id) {
+        var event = eventRepository.findById(id).orElseThrow(() -> new NotFoundException("No post with id " + id));
+        event.getAttendees().forEach(user -> user.getParticipatedEvents().remove(event));
         eventRepository.deleteById(id);
     }
 
     public void updateEvent(EventDto eventDto) {
-        validateEventSkills(eventDto);
+        checkIfUserHasRequiredSkills(eventDto);
         eventRepository.save(eventMapper.toEntity(eventDto));
     }
 
@@ -76,7 +78,7 @@ public class EventService {
         return eventRepository.findParticipatedEventsByUserId(userId).stream().map(eventMapper::toDto).toList();
     }
 
-    private void validateEventSkills(EventDto event) {
+    private void checkIfUserHasRequiredSkills(EventDto event) {
         long ownerId = event.getOwnerId();
         var relatedSkills = event.getRelatedSkills();
         var userSkills = skillRepository.findAllByUserId(ownerId);

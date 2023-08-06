@@ -25,7 +25,6 @@ public class EventController {
 
     @GetMapping("/{eventId}")
     public ResponseEntity<?> getEvent(@PathVariable long eventId) {
-        validateId(eventId);
         return ResponseEntity.ok(eventService.getEvent(eventId));
     }
 
@@ -37,7 +36,6 @@ public class EventController {
 
     @DeleteMapping("/{eventId}")
     public ResponseEntity<?> deleteEvent(@PathVariable long eventId) {
-        validateId(eventId);
         eventService.deleteEvent(eventId);
         return ResponseEntity.ok().build();
     }
@@ -51,14 +49,12 @@ public class EventController {
 
     @GetMapping("/owned-events/{userId}")
     public ResponseEntity<List<EventDto>> getOwnedEvents(@PathVariable long userId) {
-        validateId(userId);
         List<EventDto> ownedEvents = eventService.getOwnedEvents(userId);
         return ResponseEntity.ok(ownedEvents);
     }
 
     @GetMapping("/participated-events/{userId}")
     public ResponseEntity<List<EventDto>> getParticipatedEvents(@PathVariable long userId) {
-        validateId(userId);
         List<EventDto> participatedEvents = eventService.getParticipatedEvents(userId);
         return ResponseEntity.ok(participatedEvents);
     }
@@ -72,12 +68,6 @@ public class EventController {
         }
         if (event.getOwnerId() == null) {
             throw new DataValidationException("Event owner ID cannot be null");
-        }
-    }
-
-    private void validateId(long id) {
-        if (id < 1) {
-            throw new DataValidationException("id have to be > 0");
         }
     }
 }

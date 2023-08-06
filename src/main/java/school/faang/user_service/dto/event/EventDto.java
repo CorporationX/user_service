@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import school.faang.user_service.dto.skill.SkillDto;
+import school.faang.user_service.entity.event.EventStatus;
+import school.faang.user_service.entity.event.EventType;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,7 +24,7 @@ public class EventDto {
     private List<SkillDto> relatedSkills;
     private List<Long> attendees;
     private String location;
-    private String type;
-    private String status;
+    private EventType type;
+    private EventStatus status;
     private int maxAttendees;
 }

@@ -142,10 +142,10 @@ public class MentorshipServiceTest {
 
     @Test
     void testGetMentorsCorrectUserId() {
-       when(mentorshipRepository.findById(CORRECT_USER_ID)).thenReturn(Optional.ofNullable(correctUser));
+        when(mentorshipRepository.findById(CORRECT_USER_ID)).thenReturn(Optional.ofNullable(correctUser));
 
-       List<UserDto> actualList = mentorshipService.getMentors(CORRECT_USER_ID);
-       assertEquals(expectedDtos, actualList);
+        List<UserDto> actualList = mentorshipService.getMentors(CORRECT_USER_ID);
+        assertEquals(expectedDtos, actualList);
     }
 
     @Test

@@ -34,7 +34,7 @@ public class SubscriptionService {
         subscriptionRepository.unfollowUser(followerId, followeeId);
     }
 
-    public List<UserDto> getFollowers(long followeeId, UserFilterDto filter){
+    public List<UserDto> getFollowers(long followeeId, UserFilterDto filter) {
         Stream<User> users = subscriptionRepository.findByFolloweeId(followeeId);
         return filterUsers(users, filter);
     }
@@ -43,7 +43,7 @@ public class SubscriptionService {
         return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
     }
 
-    public List<UserDto> getFollowing(long followerId, UserFilterDto filter){
+    public List<UserDto> getFollowing(long followerId, UserFilterDto filter) {
         Stream<User> users = subscriptionRepository.findByFollowerId(followerId);
         return filterUsers(users, filter);
     }
@@ -57,10 +57,10 @@ public class SubscriptionService {
             return users.map(userMapper::toDto).toList();
         }
         return userFilters.stream()
-                    .filter(filter -> filter.isApplicable(filters))
-                    .flatMap(filter -> filter.apply(users, filters))
-                    .map(userMapper::toDto)
-                    .toList();
+                .filter(filter -> filter.isApplicable(filters))
+                .flatMap(filter -> filter.apply(users, filters))
+                .map(userMapper::toDto)
+                .toList();
     }
 
     private boolean subscriptionExists(long followerId, long followeeId) {

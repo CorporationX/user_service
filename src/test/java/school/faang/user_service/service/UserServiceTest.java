@@ -6,8 +6,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.Optional;
@@ -18,10 +20,12 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserServiceTest {
 
     @Mock
-    UserRepository userRepository;
-
+    private UserRepository userRepository;
     @InjectMocks
-    UserService userService;
+    private UserService userService;
+    @Spy
+    private UserMapperImpl userMapper;
+
 
     @Test
     public void testFindUserThrowEntityNotFoundExc() {

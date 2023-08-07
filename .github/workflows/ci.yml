@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
     branches:
-      - feature/pipeline-BC-3931
+      - master
 
 jobs:
   build:

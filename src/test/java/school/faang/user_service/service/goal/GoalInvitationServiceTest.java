@@ -16,6 +16,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.dto.filter.GoalInvitationFilterIDto;
 import school.faang.user_service.mapper.goal.GoalInvitationMapperImpl;
 import school.faang.user_service.validation.goal.GoalInvitationValidator;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
@@ -53,6 +54,8 @@ public class GoalInvitationServiceTest {
     private long invitationId;
     private long badInvitationId;
 
+    private GoalInvitationFilterIDto goalInvitationFilterIDto;
+
     @BeforeEach
     void setUp() {
         goalInvitationDto = GoalInvitationDto.builder()
@@ -81,6 +84,14 @@ public class GoalInvitationServiceTest {
 
         invitationId = 1L;
         badInvitationId = -200L;
+
+        goalInvitationFilterIDto = GoalInvitationFilterIDto.builder()
+                .inviterId(1L)
+                .invitedId(2L)
+                .inviterNamePattern("Vlad Mishustin")
+                .invitedNamePattern("Oleg Kozhanov")
+                .status(RequestStatus.ACCEPTED)
+                .build();
     }
 
     @Test
@@ -124,5 +135,18 @@ public class GoalInvitationServiceTest {
     @DisplayName("Reject invitation: Invitation not found")
     void testRejectInvitationThrowsEntityNotFoundException() {
         Assertions.assertThrows(EntityNotFoundException.class, () -> goalInvitationService.rejectGoalInvitation(badInvitationId));
+    }
+
+    @Test
+    @DisplayName("Get invitations: Positive scenario")
+    void testGetInvitationsIsOk() {
+        Assertions.assertDoesNotThrow(() -> goalInvitationService.getInvitations(goalInvitationFilterIDto));
+    }
+
+    @Test
+    @DisplayName("Get invitations: Filter is null")
+    void testGetInvitationsThrowsNPA() {
+        when(goalInvitationService.getInvitations(null)).thenThrow(NullPointerException.class);
+        Assertions.assertThrows(NullPointerException.class, () -> goalInvitationService.getInvitations(null));
     }
 }

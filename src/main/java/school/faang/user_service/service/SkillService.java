@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
@@ -65,6 +66,10 @@ public class SkillService {
         verifyUserExist(userId);
         List<Skill> allByUserId = skillRepository.findAllByUserId(userId);
         return mapSkillsToDtos(allByUserId);
+    }
+
+    public List<Long> findSkillsByGoalId(long goalId) {
+        return skillRepository.findSkillsByGoalId(goalId).stream().map(Skill::getId).toList();
     }
 
     public SkillDto create(SkillDto skill) {

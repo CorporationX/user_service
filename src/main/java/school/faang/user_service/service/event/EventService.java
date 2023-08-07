@@ -133,5 +133,7 @@ public class EventService {
         return eventMapper.toListDto(participatedEvents);
     }
 
-
+    public boolean existsById(long id) {
+        return eventRepository.existsById(id);
+    }
 }

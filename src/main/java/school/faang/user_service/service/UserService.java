@@ -25,6 +25,7 @@ public class UserService {
 
         userRepository.findAllById(ids)
                 .forEach(user -> users.add(userMapper.toDto(user)));
+        log.info("Users have taken from DB successfully");
         return users;
     }
 

@@ -10,7 +10,6 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/events")
 public class EventController {
     private final EventService eventService;
 
@@ -24,7 +23,7 @@ public class EventController {
         return eventService.getEvent(id);
     }
 
-    @GetMapping("/events")
+    @GetMapping("/event")
     public List<EventDto> getEventsByFilter(@RequestParam(required = false) Long eventId,
                                             @RequestBody EventFilterDto filters) {
         return eventService.getEventsByFilter(eventId, filters);
@@ -40,12 +39,12 @@ public class EventController {
         return eventService.updateEvent(eventDto);
     }
 
-    @GetMapping("/owned-events/{userId}")
+    @GetMapping("/owned-event/{userId}")
     public List<EventDto> getOwnedEvents(@PathVariable Long userId) {
         return eventService.getOwnedEvents(userId);
     }
 
-    @GetMapping("/participated-events/{userId}")
+    @GetMapping("/participated-event/{userId}")
     public List<EventDto> getParticipatedEvents(@PathVariable Long userId) {
         return eventService.getParticipatedEvents(userId);
     }

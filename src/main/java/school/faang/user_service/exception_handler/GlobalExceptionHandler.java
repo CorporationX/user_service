@@ -5,12 +5,13 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import school.faang.user_service.exception.DataValidationException;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler /* extends ResponseEntityExceptionHandler */ {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleValidationExceptions(MethodArgumentNotValidException exception) {
@@ -21,5 +22,11 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
         return ResponseEntity.badRequest().body(errors);
+    }
+
+    @ExceptionHandler(DataValidationException.class)
+    public ResponseEntity<Object> handleDataValidationException(DataValidationException exception) {
+        Map<String, String> body = Map.of("message", exception.getMessage());
+        return ResponseEntity.badRequest().body(body);
     }
 }

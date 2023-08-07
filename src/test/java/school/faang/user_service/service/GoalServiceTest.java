@@ -29,7 +29,7 @@ public class GoalServiceTest {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> goalService.deleteGoal(anyLong()));
 
-        assertEquals("Goal not found", exception.getMessage());
+        assertEquals("Goal is not found", exception.getMessage());
 
         verify(goalRepository, times(0)).deleteById(anyLong());
     }

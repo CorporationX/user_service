@@ -4,9 +4,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.RecommendationUpdateDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
@@ -17,7 +22,9 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.RecommendationPeriodIsNotCorrect;
+import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.mapper.RecommendationMapperImpl;
+import school.faang.user_service.mapper.SkillOfferMapper;
 import school.faang.user_service.mapper.SkillOfferMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -47,6 +54,9 @@ class RecommendationServiceTest {
     private SkillOfferMapperImpl skillOfferMapper;
     @Mock
     private RecommendationRepository recommendationRepository;
+
+    @InjectMocks
+    private RecommendationService recommendationService;
     @Mock
     private SkillRepository skillRepository;
     @Mock
@@ -62,7 +72,7 @@ class RecommendationServiceTest {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     LocalDateTime dateTime = LocalDateTime.parse(str, formatter);
 
-    private RecommendationService recommendationService;
+
     @Mock
     private SkillChecker skillChecker;
     private RecommendationChecker recommendationChecker;
@@ -82,12 +92,12 @@ class RecommendationServiceTest {
         recommendationChecker = new RecommendationChecker(recommendationRepository);
         recommendationService = new RecommendationService(recommendationRepository,
                 skillRepository,
-                skillOfferRepository,
                 userRepository,
                 recommendationMapper,
                 userSkillGuaranteeRepository,
                 skillChecker,
-                recommendationChecker);
+                recommendationChecker,
+                skillOfferRepository);
 
         systemSkill = Skill.builder().id(1L).build();
         failedSkill = Skill.builder().id(148L).build();
@@ -146,7 +156,7 @@ class RecommendationServiceTest {
         RecommendationDto badRecommendationDto = RecommendationDto
                 .builder()
                 .id(1L)
-                .skillOffers(recommendationMapper.toListOfDto(doubleSkillOffers))
+                .skillOffers(skillOfferMapper.toDto(doubleSkillOffers))
                 .authorId(1L)
                 .receiverId(2L)
                 .content("anyText")
@@ -172,7 +182,7 @@ class RecommendationServiceTest {
         RecommendationDto validRecommendationDto = RecommendationDto
                 .builder()
                 .id(1L)
-                .skillOffers(recommendationMapper.toListOfDto(noSystemSkillOffers))
+                .skillOffers(skillOfferMapper.toDto(noSystemSkillOffers))
                 .authorId(1L)
                 .receiverId(2L)
                 .content("anyText")
@@ -210,7 +220,7 @@ class RecommendationServiceTest {
         RecommendationDto validRecommendationDto = RecommendationDto
                 .builder()
                 .id(1L)
-                .skillOffers(recommendationMapper.toListOfDto(receiverSkillOfferToCreate))
+                .skillOffers(skillOfferMapper.toDto(receiverSkillOfferToCreate))
                 .authorId(1L)
                 .receiverId(2L)
                 .content("anyText")
@@ -277,7 +287,7 @@ class RecommendationServiceTest {
         RecommendationDto validRecommendationDto = RecommendationDto
                 .builder()
                 .id(1L)
-                .skillOffers(recommendationMapper.toListOfDto(receiverSkillOfferToCreate))
+                .skillOffers(skillOfferMapper.toDto(receiverSkillOfferToCreate))
                 .authorId(1L)
                 .receiverId(2L)
                 .content("anyText")
@@ -403,5 +413,126 @@ class RecommendationServiceTest {
         RecommendationDto result = recommendationService.update(recommendationUpdateDto);
         verify(recommendationRepository).save(oldRecommendation);
         assertEquals(recommendationMapper.toDto(expectedRecommendation), result);
+    }
+    @Test
+    public void testGetAllReceiverRecommendations() {
+        Long receiverId = 2L;
+        LocalDateTime createdAt = LocalDateTime.now();
+        Pageable pageable = PageRequest.of(0, 5);
+
+        User receiver = new User();
+        receiver.setId(receiverId);
+
+        Recommendation recommendation1 = Recommendation
+                .builder()
+                .id(1L)
+                .content("recommendation 1")
+                .author(User
+                        .builder()
+                        .id(1L)
+                        .build())
+                .receiver(receiver)
+                .createdAt(createdAt)
+                .updatedAt(createdAt)
+                .build();
+
+        Recommendation recommendation2 = Recommendation
+                .builder()
+                .id(2L)
+                .content("recommendation 2")
+                .author(User
+                        .builder()
+                        .id(4L)
+                        .build())
+                .receiver(receiver)
+                .createdAt(createdAt)
+                .updatedAt(createdAt)
+                .build();
+
+        List<Recommendation> recommendations = new ArrayList<>();
+        recommendations.addAll(List.of(recommendation1, recommendation2));
+
+        List<RecommendationDto> recommendationDtoList = new ArrayList<>();
+        RecommendationDto recommendationDto1 = new RecommendationDto(1L, 1L, receiverId, "recommendation 1", null, createdAt);
+        RecommendationDto recommendationDto2 = new RecommendationDto(2L, 4L, receiverId, "recommendation 2", null, createdAt);
+        recommendationDtoList.addAll(List.of(recommendationDto1, recommendationDto2));
+        Page<Recommendation> recommendationPage = new PageImpl<>(recommendations);
+        Page<RecommendationDto> recommendationDtoPage = new PageImpl<>(recommendationDtoList);
+
+        when(recommendationRepository.findAllByReceiverId(receiverId, pageable)).thenReturn(recommendationPage);
+
+        Page<RecommendationDto> result = recommendationService.getAllReceiverRecommendations(
+                receiverId,
+                pageable.getPageNumber(),
+                pageable.getPageSize()
+        );
+
+        verify(recommendationRepository).findAllByReceiverId(receiverId, pageable);
+        verify(recommendationMapper).toDto(recommendation1);
+        verify(recommendationMapper).toDto(recommendation2);
+        assertEquals(2, recommendationDtoList.size());
+        assertEquals(recommendationDtoPage.getContent(), result.getContent());
+    }
+
+    @Test
+    public void testGetAllAuthorRecommendations() {
+        Long authorId = 2L;
+        LocalDateTime createdAt = LocalDateTime.now();
+        Pageable pageable = PageRequest.of(0, 5);
+
+        User author = new User();
+        author.setId(authorId);
+
+        Recommendation recommendation1 = Recommendation
+                .builder()
+                .id(1L)
+                .content("recommendation 1")
+                .author(author)
+                .receiver(User
+                        .builder()
+                        .id(1L)
+                        .build())
+                .createdAt(createdAt)
+                .updatedAt(createdAt)
+                .build();
+
+        Recommendation recommendation2 = Recommendation
+                .builder()
+                .id(2L)
+                .content("recommendation 2")
+                .author(author)
+                .receiver(User
+                        .builder()
+                        .id(4L)
+                        .build())
+                .createdAt(createdAt)
+                .updatedAt(createdAt)
+                .build();
+
+
+        List<Recommendation> recommendations = new ArrayList<>();
+        recommendations.addAll(List.of(recommendation1, recommendation2));
+
+        List<RecommendationDto> recommendationDtoList = new ArrayList<>();
+
+        RecommendationDto recommendationDto1 = new RecommendationDto(1L, authorId, 1L, "recommendation 1", null, createdAt);
+        RecommendationDto recommendationDto2 = new RecommendationDto(2L, authorId, 4L, "recommendation 2", null, createdAt);
+        recommendationDtoList.addAll(List.of(recommendationDto1, recommendationDto2));
+        Page<Recommendation> recommendationPage = new PageImpl<>(recommendations);
+        Page<RecommendationDto> recommendationDtoPage = new PageImpl<>(recommendationDtoList);
+
+        when(recommendationRepository.findAllByAuthorId(authorId, pageable)).thenReturn(recommendationPage);
+
+        Page<RecommendationDto> result = recommendationService.getAllAuthorRecommendations(
+                authorId,
+                pageable.getPageNumber(),
+                pageable.getPageSize()
+        );
+
+        verify(recommendationRepository).findAllByAuthorId(authorId, pageable);
+        verify(recommendationMapper).toDto(recommendation1);
+        verify(recommendationMapper).toDto(recommendation2);
+        assertEquals(2, recommendationDtoList.size());
+        assertEquals(recommendationDtoPage.getContent(), result.getContent());
     }
 }

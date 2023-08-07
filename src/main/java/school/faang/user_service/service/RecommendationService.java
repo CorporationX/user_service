@@ -4,6 +4,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
@@ -36,12 +38,12 @@ public class RecommendationService {
     private static int MIN_OFFERS_TO_CONVERT_SKILL;
     private final RecommendationRepository recommendationRepository;
     private final SkillRepository skillRepository;
-    private final SkillOfferRepository skillOfferRepository;
     private final UserRepository userRepository;
     private final RecommendationMapper recommendationMapper;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final SkillChecker skillChecker;
     private final RecommendationChecker recommendationChecker;
+    private final SkillOfferRepository skillOfferRepository;
 
     @Transactional
     public RecommendationDto create(RecommendationDto recommendationDto) {
@@ -99,6 +101,23 @@ public class RecommendationService {
         recommendation.setSkillOffers(skillOffers);
         recommendation.setUpdatedAt(toUpdate.getCreatedAt() != null ? toUpdate.getCreatedAt() : LocalDateTime.now());
         return recommendationMapper.toDto(recommendationRepository.save(recommendation));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<RecommendationDto> getAllReceiverRecommendations(Long receiverId, int page, int pageSize) {
+        Page<Recommendation> recommendations = recommendationRepository.findAllByReceiverId(
+                receiverId,
+                PageRequest.of(page, pageSize));
+        return recommendations.map(recommendationMapper::toDto);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<RecommendationDto> getAllAuthorRecommendations(Long authorId, int page, int pageSize) {
+        Page<Recommendation> recommendationPage = recommendationRepository.findAllByAuthorId(
+                authorId,
+                PageRequest.of(page, pageSize)
+        );
+        return recommendationPage.map(recommendationMapper::toDto);
     }
 
     private void saveUserSkillsWithGuarantee(User author, User receiver, List<SkillOfferDto> skillOffers) {

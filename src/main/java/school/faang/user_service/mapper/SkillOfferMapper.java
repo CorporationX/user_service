@@ -23,4 +23,8 @@ public interface SkillOfferMapper {
 
     @Mapping(target = "skill", ignore = true)
     SkillOffer toEntity(SkillOfferDto skillOfferDTO);
+
+    List<SkillOfferDto> toDto(List<SkillOffer> skillOffers);
+
+    List<SkillOffer> toEntity(List<SkillOfferDto> skillOffers);
 }

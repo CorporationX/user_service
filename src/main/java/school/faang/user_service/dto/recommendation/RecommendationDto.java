@@ -18,5 +18,5 @@ public class RecommendationDto {
     private Long receiverId;
     private String content;
     private List<SkillOfferDto> skillOffers;
-    LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 }

@@ -17,15 +17,20 @@ public class RecommendationService {
     private final RecommendationMapper recommendationMapper;
 
     @Transactional(readOnly = true)
-    public Page<RecommendationDto> getAllUserRecommendations(Long receiverId, int page, int pageSize) {
-        Page<Recommendation> recommendations = recommendationRepository.findAllByReceiverId(receiverId, PageRequest.of(page,
-                pageSize));
+    public Page<RecommendationDto> getAllReceiverRecommendations(Long receiverId, int page, int pageSize) {
+        Page<Recommendation> recommendations = recommendationRepository.findAllByReceiverId(
+                receiverId,
+                PageRequest.of(page, pageSize)
+        );
         return recommendations.map(recommendationMapper::toDto);
     }
 
     @Transactional(readOnly = true)
-    public Page<RecommendationDto> getAllGivenRecommendations(Long authorId, int page, int pageSize) {
-        Page<Recommendation> recommendationPage = recommendationRepository.findAllByAuthorId(authorId, PageRequest.of(page, pageSize));
+    public Page<RecommendationDto> getAllAuthorRecommendations(Long authorId, int page, int pageSize) {
+        Page<Recommendation> recommendationPage = recommendationRepository.findAllByAuthorId(
+                authorId,
+                PageRequest.of(page, pageSize)
+        );
         return recommendationPage.map(recommendationMapper::toDto);
     }
 }

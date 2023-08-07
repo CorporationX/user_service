@@ -34,7 +34,7 @@ class RecommendationServiceTest {
     private RecommendationService recommendationService;
 
     @Test
-    public void testGetAllUserRecommendations() {
+    public void testGetAllReceiverRecommendations() {
         Long receiverId = 2L;
         LocalDateTime createdAt = LocalDateTime.now();
         Pageable pageable = PageRequest.of(0, 5);
@@ -42,37 +42,49 @@ class RecommendationServiceTest {
         User receiver = new User();
         receiver.setId(receiverId);
 
-        Recommendation recommendation1 = new Recommendation();
-        recommendation1.setId(1L);
-        recommendation1.setContent("recommendation 1");
-        recommendation1.setAuthor(User.builder().id(1L).build());
-        recommendation1.setReceiver(receiver);
-        recommendation1.setCreatedAt(createdAt);
-        recommendation1.setUpdatedAt(createdAt);
+        Recommendation recommendation1 = Recommendation
+                .builder()
+                .id(1L)
+                .content("recommendation 1")
+                .author(User
+                        .builder()
+                        .id(1L)
+                        .build())
+                .receiver(receiver)
+                .createdAt(createdAt)
+                .updatedAt(createdAt)
+                .build();
 
-        Recommendation recommendation2 = new Recommendation();
-        recommendation2.setId(2L);
-        recommendation2.setContent("recommendation 2");
-        recommendation2.setAuthor(User.builder().id(4L).build());
-        recommendation2.setReceiver(receiver);
-        recommendation2.setCreatedAt(createdAt);
-        recommendation2.setUpdatedAt(createdAt);
+        Recommendation recommendation2 = Recommendation
+                .builder()
+                .id(2L)
+                .content("recommendation 2")
+                .author(User
+                        .builder()
+                        .id(4L)
+                        .build())
+                .receiver(receiver)
+                .createdAt(createdAt)
+                .updatedAt(createdAt)
+                .build();
 
         List<Recommendation> recommendations = new ArrayList<>();
-        recommendations.add(recommendation1);
-        recommendations.add(recommendation2);
+        recommendations.addAll(List.of(recommendation1, recommendation2));
 
         List<RecommendationDto> recommendationDtoList = new ArrayList<>();
         RecommendationDto recommendationDto1 = new RecommendationDto(1L, 1L, receiverId, "recommendation 1", null, createdAt);
         RecommendationDto recommendationDto2 = new RecommendationDto(2L, 4L, receiverId, "recommendation 2", null, createdAt);
-        recommendationDtoList.add(recommendationDto1);
-        recommendationDtoList.add(recommendationDto2);
+        recommendationDtoList.addAll(List.of(recommendationDto1, recommendationDto2));
         Page<Recommendation> recommendationPage = new PageImpl<>(recommendations);
         Page<RecommendationDto> recommendationDtoPage = new PageImpl<>(recommendationDtoList);
 
         when(recommendationRepository.findAllByReceiverId(receiverId, pageable)).thenReturn(recommendationPage);
 
-        Page<RecommendationDto> result = recommendationService.getAllUserRecommendations(receiverId, pageable.getPageNumber(), pageable.getPageSize());
+        Page<RecommendationDto> result = recommendationService.getAllReceiverRecommendations(
+                receiverId,
+                pageable.getPageNumber(),
+                pageable.getPageSize()
+        );
 
         verify(recommendationRepository).findAllByReceiverId(receiverId, pageable);
         verify(recommendationMapper).toDto(recommendation1);
@@ -80,8 +92,9 @@ class RecommendationServiceTest {
         assertEquals(2, recommendationDtoList.size());
         assertEquals(recommendationDtoPage.getContent(), result.getContent());
     }
+
     @Test
-    public void testGetAllGivenRecommendations() {
+    public void testGetAllAuthorRecommendations() {
         Long authorId = 2L;
         LocalDateTime createdAt = LocalDateTime.now();
         Pageable pageable = PageRequest.of(0, 5);
@@ -89,38 +102,51 @@ class RecommendationServiceTest {
         User author = new User();
         author.setId(authorId);
 
-        Recommendation recommendation1 = new Recommendation();
-        recommendation1.setId(1L);
-        recommendation1.setContent("recommendation 1");
-        recommendation1.setAuthor(author);
-        recommendation1.setReceiver(User.builder().id(1L).build());
-        recommendation1.setCreatedAt(createdAt);
-        recommendation1.setUpdatedAt(createdAt);
+        Recommendation recommendation1 = Recommendation
+                .builder()
+                .id(1L)
+                .content("recommendation 1")
+                .author(author)
+                .receiver(User
+                        .builder()
+                        .id(1L)
+                        .build())
+                .createdAt(createdAt)
+                .updatedAt(createdAt)
+                .build();
 
-        Recommendation recommendation2 = new Recommendation();
-        recommendation2.setId(2L);
-        recommendation2.setContent("recommendation 2");
-        recommendation2.setAuthor(author);
-        recommendation2.setReceiver(User.builder().id(4L).build());
-        recommendation2.setCreatedAt(createdAt);
-        recommendation2.setUpdatedAt(createdAt);
+        Recommendation recommendation2 = Recommendation
+                .builder()
+                .id(2L)
+                .content("recommendation 2")
+                .author(author)
+                .receiver(User
+                        .builder()
+                        .id(4L)
+                        .build())
+                .createdAt(createdAt)
+                .updatedAt(createdAt)
+                .build();
+
 
         List<Recommendation> recommendations = new ArrayList<>();
-        recommendations.add(recommendation1);
-        recommendations.add(recommendation2);
+        recommendations.addAll(List.of(recommendation1, recommendation2));
 
         List<RecommendationDto> recommendationDtoList = new ArrayList<>();
 
         RecommendationDto recommendationDto1 = new RecommendationDto(1L, authorId, 1L, "recommendation 1", null, createdAt);
         RecommendationDto recommendationDto2 = new RecommendationDto(2L, authorId, 4L, "recommendation 2", null, createdAt);
-        recommendationDtoList.add(recommendationDto1);
-        recommendationDtoList.add(recommendationDto2);
+        recommendationDtoList.addAll(List.of(recommendationDto1, recommendationDto2));
         Page<Recommendation> recommendationPage = new PageImpl<>(recommendations);
         Page<RecommendationDto> recommendationDtoPage = new PageImpl<>(recommendationDtoList);
 
         when(recommendationRepository.findAllByAuthorId(authorId, pageable)).thenReturn(recommendationPage);
 
-        Page<RecommendationDto> result = recommendationService.getAllGivenRecommendations(authorId, pageable.getPageNumber(), pageable.getPageSize());
+        Page<RecommendationDto> result = recommendationService.getAllAuthorRecommendations(
+                authorId,
+                pageable.getPageNumber(),
+                pageable.getPageSize()
+        );
 
         verify(recommendationRepository).findAllByAuthorId(authorId, pageable);
         verify(recommendationMapper).toDto(recommendation1);

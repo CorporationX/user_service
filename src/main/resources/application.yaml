@@ -49,7 +49,7 @@ payment-service:
 aws:
   accessKey: "8hzEe6m0CHClRlZudZ6l"
   secretKey: "qXXnIDz2CUW0eXReb6Ghb77guwmnXL3OLzEGe5KQ"
-  region: "http://localhost:9000/"
+  region: "http://127.0.0.1:9000/"
 
 services:
   s3:

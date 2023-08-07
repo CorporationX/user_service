@@ -5,6 +5,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.dto.recommendation.UserSkillGuaranteeDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.UserSkillGuarantee;

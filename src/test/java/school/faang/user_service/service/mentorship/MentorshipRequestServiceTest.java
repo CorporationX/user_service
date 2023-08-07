@@ -1,9 +1,5 @@
 package school.faang.user_service.service.mentorship;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,8 +14,8 @@ import school.faang.user_service.dto.mentorship.RejectionReasonDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
-import school.faang.user_service.exception.mentorship.MentorshipRequestValidationException;
 import school.faang.user_service.filter.mentorship.MentorshipRequestDescriptionFilter;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.filter.mentorship.MentorshipRequestReceiverFilter;
@@ -28,6 +24,11 @@ import school.faang.user_service.filter.mentorship.MentorshipRequestStatusFilter
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.validator.MentorshipRequestValidator;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -169,7 +170,7 @@ class MentorshipRequestServiceTest {
     void acceptRequest_shouldThrowMentorshipRequestValidationException() {
         request.getRequester().getMentors().add(request.getReceiver());
 
-        assertThrows(MentorshipRequestValidationException.class,
+        assertThrows(DataValidationException.class,
                 () -> mentorshipRequestService.acceptRequest(request.getId()),
                 "Receiver is already mentor of this requester.");
     }

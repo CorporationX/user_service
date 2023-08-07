@@ -1,7 +1,5 @@
 package school.faang.user_service.validator;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,14 +10,17 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
-import school.faang.user_service.exception.mentorship.MentorshipRequestValidationException;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.user.UserService;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -58,7 +59,7 @@ class MentorshipRequestValidatorTest {
     void validate_shouldThrowMentorshipRequestValidationException_whenRequesterAndReceiverAreTheSameUser() {
         requestDto.setReceiverId(REQUESTER_ID);
 
-        assertThrows(MentorshipRequestValidationException.class,
+        assertThrows(DataValidationException.class,
                 () -> mentorshipRequestValidator.validate(requestDto),
                 "Requester and receiver cannot be the same user.");
     }
@@ -71,7 +72,7 @@ class MentorshipRequestValidatorTest {
                         .createdAt(LocalDateTime.now().minusMonths(2))
                         .build()));
 
-        assertThrows(MentorshipRequestValidationException.class,
+        assertThrows(DataValidationException.class,
                 () -> mentorshipRequestValidator.validate(requestDto),
                 "Request has already been sent for the last three months.");
     }

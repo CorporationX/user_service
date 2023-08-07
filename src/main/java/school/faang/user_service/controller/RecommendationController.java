@@ -8,29 +8,12 @@ import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.RecommendationUpdateDto;
 import school.faang.user_service.service.RecommendationService;
-import school.faang.user_service.validator.RecommendationChecker;
 
 @RestController
 @RequestMapping("/api/v1/recommendations")
 public class RecommendationController {
     @Autowired
     private RecommendationService recommendationService;
-    @Autowired
-    private RecommendationChecker recommendationChecker;
-
-    @GetMapping("/receiver/{id}")
-    public Page<RecommendationDto> getAllReceiverRecommendations(@PathVariable(name = "id") Long receiverId,
-                                                             @RequestParam(value = "page") int page,
-                                                             @RequestParam(value = "pageSize") int pageSize) {
-        return recommendationService.getAllReceiverRecommendations(receiverId, page, pageSize);
-    }
-
-    @GetMapping("/author/{id}")
-    public Page<RecommendationDto> getAllAuthorRecommendations(@PathVariable(name = "id") Long authorId,
-                                                              @RequestParam(value = "page") int page,
-                                                              @RequestParam(value = "pageSize") int pageSize) {
-        return recommendationService.getAllAuthorRecommendations(authorId, page, pageSize);
-    }
 
     @PostMapping("/create")
     public ResponseEntity<RecommendationDto> giveRecommendation(@Valid @RequestBody RecommendationDto recommendation) {
@@ -42,6 +25,26 @@ public class RecommendationController {
     public ResponseEntity<RecommendationDto> updateRecommendation(@Valid @RequestBody RecommendationUpdateDto toUpdate) {
         RecommendationDto updatedRecommendation = recommendationService.update(toUpdate);
         return ResponseEntity.ok(updatedRecommendation);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity deleteRecommendation(@PathVariable Long id) {
+        recommendationService.delete(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/receiver/{id}")
+    public Page<RecommendationDto> getAllReceiverRecommendations(@PathVariable(name = "id") Long receiverId,
+                                                                 @RequestParam(value = "page") int page,
+                                                                 @RequestParam(value = "pageSize") int pageSize) {
+        return recommendationService.getAllReceiverRecommendations(receiverId, page, pageSize);
+    }
+
+    @GetMapping("/author/{id}")
+    public Page<RecommendationDto> getAllAuthorRecommendations(@PathVariable(name = "id") Long authorId,
+                                                               @RequestParam(value = "page") int page,
+                                                               @RequestParam(value = "pageSize") int pageSize) {
+        return recommendationService.getAllAuthorRecommendations(authorId, page, pageSize);
     }
 }
 

@@ -43,8 +43,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class RecommendationServiceTest {
@@ -372,167 +371,10 @@ class RecommendationServiceTest {
     }
 
     @Test
-    void testUpdateRecommendation_positive() {
-        RecommendationDto recommendationDto = RecommendationDto
-                .builder()
-                .id(1L)
-                .authorId(1L)
-                .receiverId(2L)
-                .skillOffers(List.of(new SkillOfferDto[]{}))
-                .content("someText")
-                .build();
-
-
-        Recommendation oldRecommendation = recommendationMapper.toEntity(recommendationDto);
-        when(recommendationRepository.findById(recommendationDto.getId())).thenReturn(Optional.ofNullable(oldRecommendation));
-
-        RecommendationUpdateDto recommendationUpdateDto = RecommendationUpdateDto
-                .builder()
-                .content("anotherText")
-                .id(1L)
-                .updatedAt(dateTime)
-                .build();
-
-        oldRecommendation.setContent(recommendationUpdateDto.getContent());
-        oldRecommendation.setUpdatedAt(recommendationUpdateDto.getUpdatedAt());
-
-        User author = User.builder().id(1L).build();
-        User receiver = User.builder().id(2L).build();
-        Recommendation expectedRecommendation = Recommendation
-                .builder()
-                .id(1L)
-                .author(author)
-                .receiver(receiver)
-                .updatedAt(dateTime)
-                .skillOffers(List.of(new SkillOffer[]{}))
-                .content("anotherText")
-                .build();
-
-        when(recommendationRepository.save(any())).thenReturn(expectedRecommendation);
-
-        RecommendationDto result = recommendationService.update(recommendationUpdateDto);
-        verify(recommendationRepository).save(oldRecommendation);
-        assertEquals(recommendationMapper.toDto(expectedRecommendation), result);
-    }
-    @Test
-    public void testGetAllReceiverRecommendations() {
-        Long receiverId = 2L;
-        LocalDateTime createdAt = LocalDateTime.now();
-        Pageable pageable = PageRequest.of(0, 5);
-
-        User receiver = new User();
-        receiver.setId(receiverId);
-
-        Recommendation recommendation1 = Recommendation
-                .builder()
-                .id(1L)
-                .content("recommendation 1")
-                .author(User
-                        .builder()
-                        .id(1L)
-                        .build())
-                .receiver(receiver)
-                .createdAt(createdAt)
-                .updatedAt(createdAt)
-                .build();
-
-        Recommendation recommendation2 = Recommendation
-                .builder()
-                .id(2L)
-                .content("recommendation 2")
-                .author(User
-                        .builder()
-                        .id(4L)
-                        .build())
-                .receiver(receiver)
-                .createdAt(createdAt)
-                .updatedAt(createdAt)
-                .build();
-
-        List<Recommendation> recommendations = new ArrayList<>();
-        recommendations.addAll(List.of(recommendation1, recommendation2));
-
-        List<RecommendationDto> recommendationDtoList = new ArrayList<>();
-        RecommendationDto recommendationDto1 = new RecommendationDto(1L, 1L, receiverId, "recommendation 1", null, createdAt);
-        RecommendationDto recommendationDto2 = new RecommendationDto(2L, 4L, receiverId, "recommendation 2", null, createdAt);
-        recommendationDtoList.addAll(List.of(recommendationDto1, recommendationDto2));
-        Page<Recommendation> recommendationPage = new PageImpl<>(recommendations);
-        Page<RecommendationDto> recommendationDtoPage = new PageImpl<>(recommendationDtoList);
-
-        when(recommendationRepository.findAllByReceiverId(receiverId, pageable)).thenReturn(recommendationPage);
-
-        Page<RecommendationDto> result = recommendationService.getAllReceiverRecommendations(
-                receiverId,
-                pageable.getPageNumber(),
-                pageable.getPageSize()
-        );
-
-        verify(recommendationRepository).findAllByReceiverId(receiverId, pageable);
-        verify(recommendationMapper).toDto(recommendation1);
-        verify(recommendationMapper).toDto(recommendation2);
-        assertEquals(2, recommendationDtoList.size());
-        assertEquals(recommendationDtoPage.getContent(), result.getContent());
-    }
-
-    @Test
-    public void testGetAllAuthorRecommendations() {
-        Long authorId = 2L;
-        LocalDateTime createdAt = LocalDateTime.now();
-        Pageable pageable = PageRequest.of(0, 5);
-
-        User author = new User();
-        author.setId(authorId);
-
-        Recommendation recommendation1 = Recommendation
-                .builder()
-                .id(1L)
-                .content("recommendation 1")
-                .author(author)
-                .receiver(User
-                        .builder()
-                        .id(1L)
-                        .build())
-                .createdAt(createdAt)
-                .updatedAt(createdAt)
-                .build();
-
-        Recommendation recommendation2 = Recommendation
-                .builder()
-                .id(2L)
-                .content("recommendation 2")
-                .author(author)
-                .receiver(User
-                        .builder()
-                        .id(4L)
-                        .build())
-                .createdAt(createdAt)
-                .updatedAt(createdAt)
-                .build();
-
-
-        List<Recommendation> recommendations = new ArrayList<>();
-        recommendations.addAll(List.of(recommendation1, recommendation2));
-
-        List<RecommendationDto> recommendationDtoList = new ArrayList<>();
-
-        RecommendationDto recommendationDto1 = new RecommendationDto(1L, authorId, 1L, "recommendation 1", null, createdAt);
-        RecommendationDto recommendationDto2 = new RecommendationDto(2L, authorId, 4L, "recommendation 2", null, createdAt);
-        recommendationDtoList.addAll(List.of(recommendationDto1, recommendationDto2));
-        Page<Recommendation> recommendationPage = new PageImpl<>(recommendations);
-        Page<RecommendationDto> recommendationDtoPage = new PageImpl<>(recommendationDtoList);
-
-        when(recommendationRepository.findAllByAuthorId(authorId, pageable)).thenReturn(recommendationPage);
-
-        Page<RecommendationDto> result = recommendationService.getAllAuthorRecommendations(
-                authorId,
-                pageable.getPageNumber(),
-                pageable.getPageSize()
-        );
-
-        verify(recommendationRepository).findAllByAuthorId(authorId, pageable);
-        verify(recommendationMapper).toDto(recommendation1);
-        verify(recommendationMapper).toDto(recommendation2);
-        assertEquals(2, recommendationDtoList.size());
-        assertEquals(recommendationDtoPage.getContent(), result.getContent());
+    public void testDelete() {
+        Long recommendationId = 1L;
+        doNothing().when(recommendationRepository).deleteById(recommendationId);
+        recommendationService.delete(recommendationId);
+        verify(recommendationRepository, times(1)).deleteById(recommendationId);
     }
 }

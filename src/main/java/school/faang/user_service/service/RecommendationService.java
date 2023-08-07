@@ -120,6 +120,10 @@ public class RecommendationService {
         return recommendationPage.map(recommendationMapper::toDto);
     }
 
+    public void delete(Long id) {
+        recommendationRepository.deleteById(id);
+    }
+
     private void saveUserSkillsWithGuarantee(User author, User receiver, List<SkillOfferDto> skillOffers) {
         skillChecker.check(skillOffers);
         List<Long> receiverSkillsIds = receiver.getSkills().stream()
@@ -209,4 +213,5 @@ public class RecommendationService {
             userSkillGuaranteeRepository.saveAll(userSkillGuarantees);
         }
     }
+
 }

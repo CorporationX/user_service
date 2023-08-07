@@ -16,7 +16,7 @@ public class SkillChecker {
 
     private final SkillRepository skillRepository;
 
-    public void validate(List<SkillOfferDto> skills) {
+    public void check(List<SkillOfferDto> skills) {
         if (skills == null || skills.isEmpty()) {
             return;
         }
@@ -27,12 +27,12 @@ public class SkillChecker {
                 .collect(Collectors.toList());
 
         if (skills.size() != skillIds.size()) {
-            throw new DataValidationException("list of skills contains not unique skills, please, check this");
+            throw new DataValidationException("List of skills contains not unique skills!");
         }
 
 //        if (!skillIds.isEmpty()) {
         if (skillIds.size() != skillRepository.countExisting(skillIds)) {
-            throw new DataValidationException("list of skills contains not valid skills, please, check this");
+            throw new DataValidationException("List of skills contains not valid skills!");
         }
     }
 }

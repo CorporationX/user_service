@@ -19,15 +19,14 @@ public class RecommendationController {
 
     @PostMapping("/create")
     public ResponseEntity<RecommendationDto> giveRecommendation(@Valid @RequestBody RecommendationDto recommendation) {
-        recommendationChecker.validate(recommendation);
         RecommendationDto newRecommendation = recommendationService.create(recommendation);
         return ResponseEntity.ok(newRecommendation);
     }
 
     @PutMapping("/update")
     public ResponseEntity<RecommendationDto> updateRecommendation(@Valid @RequestBody RecommendationUpdateDto toUpdate) {
-        RecommendationDto newUpdatedRecommendation = recommendationService.update(toUpdate);
-        return ResponseEntity.ok(newUpdatedRecommendation);
+        RecommendationDto updatedRecommendation = recommendationService.update(toUpdate);
+        return ResponseEntity.ok(updatedRecommendation);
     }
 }
 

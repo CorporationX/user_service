@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +21,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
+import school.faang.user_service.validator.RecommendationChecker;
 import school.faang.user_service.validator.SkillChecker;
 
 import java.time.LocalDateTime;
@@ -39,16 +41,11 @@ public class RecommendationService {
     private final RecommendationMapper recommendationMapper;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final SkillChecker skillChecker;
+    private final RecommendationChecker recommendationChecker;
 
-    /**
-     * Метод, позволяющий пользователю дать рекомендацию другому пользователю в виде текста,
-     * а также подтвердить определенный набор навыков у получателя рекомендации.
-     *
-     * @param recommendationDto
-     * @return
-     */
     @Transactional
     public RecommendationDto create(RecommendationDto recommendationDto) {
+        recommendationChecker.check(recommendationDto);
         Long recommendationId = recommendationRepository.create(recommendationDto.getAuthorId(),
                 recommendationDto.getReceiverId(),
                 recommendationDto.getContent());
@@ -66,16 +63,10 @@ public class RecommendationService {
         return recommendationMapper.toDto(recommendationRepository.save(recommendation));
     }
 
-    /**
-     * Метод, позволяющий пользователю править текст собственной рекомендации
-     *
-     * @param toUpdate - входящие параметры обновления в форме Dto
-     * @return RecommendationDto (Dto обновленной рекомендации)
-     */
     @Transactional
     public RecommendationDto update(RecommendationUpdateDto toUpdate) {
         Recommendation toUpdateRecommendation = recommendationRepository.findById(toUpdate.getId())
-                .orElseThrow(() -> new DataValidationException("entity not found exception"));
+                .orElseThrow(() -> new EntityNotFoundException("Entity not found"));
         toUpdateRecommendation.setContent(toUpdate.getContent());
         toUpdateRecommendation.setUpdatedAt(LocalDateTime.now());
         return recommendationMapper.toDto(recommendationRepository.save(toUpdateRecommendation));
@@ -85,8 +76,6 @@ public class RecommendationService {
      * Метод, предоставляющий возможность обновить все поля рекомендации, включая список офферов.
      * Также осуществляет добавление оферов в список скиллов согласно бизнес-логике
      * (если произошло накопление одинаковых офферов).
-     * <p>
-     * !! Не имеет представления в контроллере в текущей версии
      *
      * @param toUpdate - входящие параметры обновления в форме Dto
      * @return RecommendationDto (Dto обновленной рекомендации)
@@ -95,9 +84,9 @@ public class RecommendationService {
     public RecommendationDto extendedUpdate(RecommendationDto toUpdate) {
         skillOfferRepository.deleteAllByRecommendationId(toUpdate.getId());
         User author = userRepository.findById(toUpdate.getAuthorId())
-                .orElseThrow(() -> new DataValidationException("entity not found exception"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found!"));
         User receiver = userRepository.findById(toUpdate.getReceiverId())
-                .orElseThrow(() -> new DataValidationException("entity not found exception"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found!"));
         Recommendation recommendation = recommendationMapper.toEntity(toUpdate);
         saveUserSkillsWithGuarantee(author, receiver, toUpdate.getSkillOffers());
         recommendation.setAuthor(author);
@@ -112,17 +101,8 @@ public class RecommendationService {
         return recommendationMapper.toDto(recommendationRepository.save(recommendation));
     }
 
-    /**
-     * Метод, добавляющий скилл из рекомендации в список скилов,
-     * если есть необходимое количество подтверждений у данного скила.
-     * Также добавляет гаранторов из текущего и предыдущих оферов в список гаранторов к новому скилу.
-     *
-     * @param author
-     * @param receiver
-     * @param skillOffers
-     */
     private void saveUserSkillsWithGuarantee(User author, User receiver, List<SkillOfferDto> skillOffers) {
-        skillChecker.validate(skillOffers);
+        skillChecker.check(skillOffers);
         List<Long> receiverSkillsIds = receiver.getSkills().stream()
                 .map(Skill::getId)
                 .toList();
@@ -163,7 +143,7 @@ public class RecommendationService {
                                                 User author,
                                                 User receiver,
                                                 List<SkillOfferDto> skillOffers) {
-        skillChecker.validate(skillOffers);
+        skillChecker.check(skillOffers);
         List<Long> skillIds = skillOffers.stream()
                 .map(SkillOfferDto::getSkillId)
                 .toList();

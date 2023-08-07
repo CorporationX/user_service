@@ -15,15 +15,12 @@ public class RecommendationChecker {
 
     private final RecommendationRepository recommendationRepository;
 
-    public void validate(RecommendationDto recommendation) {
-        if (recommendation.getContent() == null || recommendation.getContent().isBlank()) {
-            throw new DataValidationException("Recommendation content should not be empty");
-        }
-
+    public void check(RecommendationDto recommendation) {
         recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(
                 recommendation.getAuthorId(),
                 recommendation.getReceiverId()
         ).filter(rec -> rec.getCreatedAt()
+
                 .plusMonths(RECOMMENDATION_PERIOD_IN_MONTH)
                 .isAfter(LocalDateTime.now()))
                 .ifPresent(r -> {

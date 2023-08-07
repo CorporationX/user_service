@@ -35,7 +35,7 @@ class RecommendationCheckerTest {
                 .content("").build();
 
         DataValidationException ex = assertThrows(DataValidationException.class,
-                () -> recommendationChecker.validate(recommendationDto));
+                () -> recommendationChecker.check(recommendationDto));
 
         assertEquals("Recommendation content should not be empty", ex.getMessage());
     }
@@ -57,7 +57,7 @@ class RecommendationCheckerTest {
         )
                 .thenReturn(java.util.Optional.of(recommendation));
 
-        RecommendationPeriodIsNotCorrect ex = assertThrows(RecommendationPeriodIsNotCorrect.class, () -> recommendationChecker.validate(recommendationDto));
+        RecommendationPeriodIsNotCorrect ex = assertThrows(RecommendationPeriodIsNotCorrect.class, () -> recommendationChecker.check(recommendationDto));
         assertEquals("Date of new recommendation should be after "
                 + RECOMMENDATION_PERIOD_IN_MONTH
                 + " months of the last recommendation", ex.getMessage());
@@ -80,7 +80,7 @@ class RecommendationCheckerTest {
         )
                 .thenReturn(java.util.Optional.of(recommendation));
 
-        assertDoesNotThrow(() -> recommendationChecker.validate(recommendationDto));
+        assertDoesNotThrow(() -> recommendationChecker.check(recommendationDto));
     }
 
 }

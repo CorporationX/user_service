@@ -23,10 +23,4 @@ public class UserService {
         log.info("User with id={} has taken successfully from DB", userId);
         return userMapper.toDto(user);
     }
-
-    public User findUserById(Long userId) {
-        return userRepository
-                .findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("Invalid request. Requester user not found"));
-    }
 }

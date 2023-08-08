@@ -3,12 +3,16 @@ package school.faang.user_service.service.mentorship;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorship.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.mapper.mentorship.MentorshipMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 
 @Component
@@ -17,6 +21,7 @@ public class MentorshipRequestService {
 
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final MentorshipMapper mentorshipMapper;
+    private final MentorshipFilter mentorshipFilter;
 
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         if (mentorshipRequestDto.getRequesterId().equals(mentorshipRequestDto.getReceiverId())) {
@@ -47,5 +52,13 @@ public class MentorshipRequestService {
         }
 
         return mentorshipMapper.toDto(mentorshipRequest.get());
+    }
+
+    public List<MentorshipRequestDto> getRequests(RequestFilterDto filter){
+        List<MentorshipRequest> mentorshipRequestsAll = StreamSupport.stream(mentorshipRequestRepository.findAll().spliterator(), false).collect(Collectors.toList());;
+        return mentorshipRequestsAll.stream()
+                .map(mentorshipMapper::toDto)
+                .filter(mentorshipRequestDto -> mentorshipFilter.filter(mentorshipRequestDto, filter))
+                .toList();
     }
 }

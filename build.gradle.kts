@@ -1,3 +1,5 @@
+import java.util.regex.Pattern.compile
+
 plugins {
 	java
 	jacoco
@@ -73,6 +75,15 @@ dependencies {
 	testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.2")
 	testImplementation("org.assertj:assertj-core:3.24.2")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+	/**
+	 * Google calendar
+	 */
+	implementation("com.google.oauth-client:google-oauth-client:1.34.1")
+	implementation("com.google.apis:google-api-services-calendar:v3-rev20220715-2.0.0")
+	implementation("com.google.http-client:google-http-client-jackson2:1.43.3")
+	implementation("com.google.oauth-client:google-oauth-client-jetty:1.34.1")
+//	implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.1.2")
 }
 
 jsonSchema2Pojo {

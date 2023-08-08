@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class ImageServiceTest {
+class UserProfilePicServiceTest {
     @Mock
     private UserRepository userRepository;
     @Mock
@@ -44,7 +44,7 @@ class ImageServiceTest {
     }
 
     @Test
-    void success() {
+    void uploadTest() {
         byte[] byteFile = {1, 2, 3, 4, 5};
         MultipartFile file = new MockMultipartFile("Name", byteFile);
         User user = new User();

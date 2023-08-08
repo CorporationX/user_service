@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.IncorrectIdException;
 import school.faang.user_service.exception.NoUserInDataBaseException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
@@ -55,9 +54,6 @@ public class MentorshipService {
     }
 
     private User validateId(long userId) {
-        if (userId < 1) {
-            throw new IncorrectIdException("Incorrect input id");
-        }
         return mentorshipRepository.findById(userId).orElseThrow(() -> {
             throw new NoUserInDataBaseException("User with this id does not exist");
         });

@@ -5,14 +5,18 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import school.faang.user_service.service.goal.GoalInvitationService;
+import school.faang.user_service.dto.filter.GoalInvitationFilterIDto;
+
+import java.util.List;
 
 @Tag(name = "Управление приглашениями к цели")
 @RestController
@@ -40,5 +44,11 @@ public class GoalInvitationController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public GoalInvitationDto rejectGoalInvitation(@PathVariable Long id) {
         return goalInvitationService.rejectGoalInvitation(id);
+    }
+
+    @GetMapping("/goal/invitations")
+    @ResponseStatus(HttpStatus.OK)
+    public List<GoalInvitationDto> getInvitations(@Valid @RequestBody GoalInvitationFilterIDto filter) {
+        return goalInvitationService.getInvitations(filter);
     }
 }

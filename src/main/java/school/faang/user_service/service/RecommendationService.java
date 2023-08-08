@@ -23,8 +23,8 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.validator.RecommendationChecker;
-import school.faang.user_service.validator.SkillChecker;
+import school.faang.user_service.checker.RecommendationChecker;
+import school.faang.user_service.checker.SkillChecker;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -209,7 +209,7 @@ public class RecommendationService {
                     }
                 }
         );
-        if(!userSkillGuarantees.isEmpty()) {
+        if (!userSkillGuarantees.isEmpty()) {
             userSkillGuaranteeRepository.saveAll(userSkillGuarantees);
         }
     }

@@ -1,9 +1,8 @@
-package school.faang.user_service.validator;
+package school.faang.user_service.checker;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.RecommendationPeriodIsNotCorrect;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 

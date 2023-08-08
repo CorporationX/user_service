@@ -1,7 +1,6 @@
-package school.faang.user_service.validator;
+package school.faang.user_service.checker;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.exception.DataValidationException;
@@ -30,7 +29,6 @@ public class SkillChecker {
             throw new DataValidationException("List of skills contains not unique skills!");
         }
 
-//        if (!skillIds.isEmpty()) {
         if (skillIds.size() != skillRepository.countExisting(skillIds)) {
             throw new DataValidationException("List of skills contains not valid skills!");
         }

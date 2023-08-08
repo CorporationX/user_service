@@ -1,6 +1,7 @@
 package school.faang.user_service.service.mentorship;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +22,7 @@ class MentorshipRequestServiceTest {
     @Mock
     private MentorshipRequestRepository mentorshipRequestRepository;
 
-    @Mock
+    @InjectMocks
     private MentorshipRequestService mentorshipRequestService;
 
     @Mock
@@ -79,7 +80,7 @@ class MentorshipRequestServiceTest {
 
         mentorshipRequestRepository.create(requestUser.getId(), receiverUser.getId(), "Test");
 
-        MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto(LocalDateTime.now(), "Test", requestUser.getId(), receiverUser.getId());
+        Assertions.assertDoesNotThrow(() -> new MentorshipRequestDto(LocalDateTime.now(), "Test", requestUser.getId(), receiverUser.getId()));
 
     }
 }

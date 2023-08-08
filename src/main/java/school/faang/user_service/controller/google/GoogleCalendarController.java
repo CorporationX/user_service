@@ -13,8 +13,11 @@ import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.GoogleEventResponseDto;
 import school.faang.user_service.service.google.GoogleCalendarService;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+
 @RestController
-@RequestMapping("/api/v1/google/calendar")
+@RequestMapping("/google/calendar")
 @RequiredArgsConstructor
 @Slf4j
 @Validated
@@ -23,26 +26,19 @@ public class GoogleCalendarController {
     private final UserContext userContext;
 
     @PostMapping("/events/{eventId}")
-    public GoogleEventResponseDto createEvent(@PathVariable Long eventId) {
+    public GoogleEventResponseDto createEvent(@PathVariable Long eventId) throws IOException {
         Long userId = userContext.getUserId();
-        try {
-            return googleCalendarService.createEvent(userId, eventId);
-        } catch (Exception e) {
-            log.error("Failed to push event to Google Calendar for user with id:{}\nException: {}",
-                    userId, e.getMessage());
-            return GoogleEventResponseDto.builder().build();
-        }
+        log.debug("Received request to create event for user with id: {}", userId);
+        return googleCalendarService.createEvent(userId, eventId);
     }
 
-    @GetMapping("/Callback")
-    public GoogleEventResponseDto handleCallback(@RequestParam String code, @RequestParam String state) {
-        try {
-            Long userId = Long.parseLong(state.split("-")[0]);
-            Long eventId = Long.parseLong(state.split("-")[1]);
-            return googleCalendarService.handleCallback(code, userId, eventId);
-        } catch (Exception e) {
-            log.error("Failed to push event to Google Calendar\nException: {}", e.getMessage());
-            return GoogleEventResponseDto.builder().build();
-        }
+    @GetMapping("/callback")
+    public GoogleEventResponseDto handleCallback(@RequestParam String code, @RequestParam String state)
+            throws IOException {
+        String[] args = state.split("-");
+        Long userId = Long.parseLong(args[0]);
+        Long eventId = Long.parseLong(args[1]);
+        log.debug("Handled redirect request to create event for user with id: {}", userId);
+        return googleCalendarService.handleCallback(code, userId, eventId);
     }
 }

@@ -16,6 +16,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.service.calendar.google.GoogleCalendarService;
@@ -34,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class GoogleCalendarServiceTest {
+class EventServiceTest {
     EventDto eventDto;
 
     @Mock
@@ -48,6 +49,9 @@ class GoogleCalendarServiceTest {
     private List<EventFilter> eventFilters;
 
     @Mock
+    private UserRepository userRepository;
+
+    @Mock
     private GoogleCalendarService googleCalendarService;
 
     private EventService eventService;
@@ -59,7 +63,7 @@ class GoogleCalendarServiceTest {
     public void init() {
         EventFilter eventTitleFilter = new EventTitleFilter();
         List<EventFilter> eventFilterList = List.of(eventTitleFilter);
-        eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList, googleCalendarService);
+        eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList, userRepository, googleCalendarService);
 
         userSkill.setTitle("Coding");
         userSkill.setId(1L);
@@ -68,7 +72,11 @@ class GoogleCalendarServiceTest {
 
     @Test
     public void testCreateEvent() {
+        User alex = new User();
+        alex.setId(1L);
+
         Mockito.when(eventMapper.toEntity(eventDto)).thenReturn(new Event());
+        Mockito.when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(alex));
 
         eventService.create(eventDto);
         Mockito.verify(eventRepository, Mockito.times(1)).save(eventMapper.toEntity(eventDto));
@@ -76,7 +84,12 @@ class GoogleCalendarServiceTest {
 
     @Test
     public void testUpdateEvent() {
+        User alex = new User();
+        alex.setId(1L);
         Long anyId = 1L;
+
+        Mockito.when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(alex));
+        Mockito.lenient().when(eventMapper.toEntity(eventDto)).thenReturn(new Event());
 
         EventDto existingEventDto = EventMock.getEventDto();
         Event existingEventEntity = EventMock.getEventEntity();
@@ -100,7 +113,7 @@ class GoogleCalendarServiceTest {
         Skill mockedSkill = new Skill();
         mockedSkill.setTitle("Running");
 
-        Mockito.when(skillRepository.findSkillsByGoalId(1L)).thenReturn(List.of(mockedSkill));
+        Mockito.when(skillRepository.findAllByUserId(1L)).thenReturn(List.of(mockedSkill));
 
         assertThrows(DataValidationException.class, () -> {
             eventService.create(eventDto);
@@ -112,7 +125,7 @@ class GoogleCalendarServiceTest {
         Skill mockedSkill = new Skill();
         mockedSkill.setTitle("Running");
 
-        Mockito.when(skillRepository.findSkillsByGoalId(1L)).thenReturn(List.of(mockedSkill));
+        Mockito.when(skillRepository.findAllByUserId(1L)).thenReturn(List.of(mockedSkill));
 
         assertThrows(DataValidationException.class, () -> {
             eventService.updateEvent(eventDto);
@@ -192,7 +205,7 @@ class GoogleCalendarServiceTest {
     @Test
     void testGetAllUserEventsByStartDateFilter() {
         List<EventFilter> eventFilterList = List.of(new EventStartDateFilter());
-        eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList, googleCalendarService);
+        eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList, userRepository, googleCalendarService);
 
         Event javaEvent = new Event();
         javaEvent.setTitle("Java");
@@ -223,7 +236,7 @@ class GoogleCalendarServiceTest {
     @Test
     void testGetAllUserEventsByEndDateFilter() {
         List<EventFilter> eventFilterList = List.of(new EventEndDateFilter());
-        eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList, googleCalendarService);
+        eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList, userRepository, googleCalendarService);
 
         Event javaEvent = new Event();
         javaEvent.setTitle("Java");

@@ -20,7 +20,7 @@ public class GoogleCalendar {
     private final EventService eventService;
     private final GoogleCalendarMapper googleCalendarMapper;
 
-    @GetMapping("/add-to-calendar")
+    @PostMapping("/add-to-calendar")
     public GoogleCalendarResponseDto createCalendarEvent(@PathVariable("id") Long eventId) throws GeneralSecurityException, IOException {
         EventDto event = eventService.get(eventId);
         return eventService.createCalendarEvent(googleCalendarMapper.toGoogleEventDto(event));

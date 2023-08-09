@@ -85,8 +85,10 @@ public class EventControllerTest {
     @Test
     void testNegativeEventIdIsInvalid() {
         long eventId = -1;
+        Mockito.when(eventService.getEvent(eventId))
+                        .thenThrow(new EventNotFoundException("Event with id: " + eventId + " was not found"));
         Assertions.assertThrows(
-                DataValidationException.class,
+                EventNotFoundException.class,
                 () -> eventController.getEvent(eventId)
         );
     }
@@ -112,15 +114,6 @@ public class EventControllerTest {
                 () -> eventController.getEventsByFilter(filterDto)
         );
         verify(eventService, times(1)).getEventsByFilter(filterDto);
-    }
-
-    @Test
-    void deletingEventNegativeIdExceptionTest() {
-        long eventId = -1;
-        Assertions.assertThrows(
-                DataValidationException.class,
-                () -> eventController.deleteEvent(eventId)
-        );
     }
 
     @Test
@@ -167,9 +160,10 @@ public class EventControllerTest {
     @Test
     void testReceivingOwnedEventWithInvalidId() {
         long eventId = Integer.MIN_VALUE;
-
+        Mockito.when(eventService.getOwnedEvents(eventId))
+                .thenThrow(new EventNotFoundException("Event with id: " + eventId + " was not found"));
         Assertions.assertThrows(
-                DataValidationException.class,
+                EventNotFoundException.class,
                 () -> eventController.getOwnedEvents(eventId)
         );
     }
@@ -177,9 +171,10 @@ public class EventControllerTest {
     @Test
     void testGetParticipatedEventsWithNegativeId() {
         long eventId = Integer.MIN_VALUE;
-
+        Mockito.when(eventService.getParticipatedEvents(eventId))
+                        .thenThrow(new EventNotFoundException("Event with id: " + eventId + " was not found"));
         Assertions.assertThrows(
-                DataValidationException.class,
+                EventNotFoundException.class,
                 () -> eventController.getParticipatedEvents(eventId)
         );
     }

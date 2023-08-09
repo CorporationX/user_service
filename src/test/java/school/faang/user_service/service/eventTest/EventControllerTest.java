@@ -12,8 +12,10 @@ import org.springframework.http.HttpStatus;
 import school.faang.user_service.controller.event.EventController;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
-import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.exception.NotFoundException;
+import school.faang.user_service.entity.event.EventStatus;
+import school.faang.user_service.entity.event.EventType;
+import school.faang.user_service.exception.invalidFieldException.DataValidationException;
+import school.faang.user_service.exception.notFoundExceptions.event.EventNotFoundException;
 import school.faang.user_service.service.event.EventService;
 
 import java.time.LocalDateTime;
@@ -34,7 +36,7 @@ public class EventControllerTest {
     @BeforeEach
     void setUp() {
         var now = LocalDateTime.now();
-        eventDto = new EventDto(0L, "0", now, now.plusDays(3), 0L, "0", new ArrayList<>(),new ArrayList<>(), "location","Webinar","status", -1);
+        eventDto = new EventDto(0L, "0", now, now.plusDays(3), 0L, "0", new ArrayList<>(),new ArrayList<>(), "location", EventType.WEBINAR, EventStatus.PLANNED, -1);
         filterDto = new EventFilterDto("title", now, now.plusDays(10), 0L, List.of(), "location", 10);
     }
 
@@ -104,9 +106,9 @@ public class EventControllerTest {
 
     @Test
     void testReceivingFilteredEventWithException() {
-        Mockito.when(eventService.getEventsByFilter(filterDto)).thenThrow(new NotFoundException("Not found"));
+        Mockito.when(eventService.getEventsByFilter(filterDto)).thenThrow(new EventNotFoundException("Not found"));
         Assertions.assertThrows(
-                NotFoundException.class,
+                EventNotFoundException.class,
                 () -> eventController.getEventsByFilter(filterDto)
         );
         verify(eventService, times(1)).getEventsByFilter(filterDto);

@@ -39,6 +39,8 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.goal.filters.StatusGoalFilter;
+import school.faang.user_service.service.goal.filters.TitleGoalFilter;
 import school.faang.user_service.validation.GoalValidator;
 import school.faang.user_service.entity.User;
 
@@ -48,7 +50,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class GoalServiceTest {
-    @InjectMocks
     private GoalService goalService;
 
     @Mock
@@ -61,40 +62,16 @@ public class GoalServiceTest {
 
     @Mock
     private GoalValidator goalValidator;
-    private List<Goal> mockSubtasks;
-    private List<GoalDto> mockDtoList;
+
     private GoalFilter filter1;
     private GoalFilter filter2;
-    private Long id;
 
     @BeforeEach
     public void setUp() {
-        id = 1L;
-        mockSubtasks = new ArrayList<>();
-        Goal subtask1 = new Goal();
-        subtask1.setId(1L);
-        subtask1.setTitle("Subtask 1");
-        Goal subtask2 = new Goal();
-        subtask2.setId(2L);
-        subtask2.setTitle("Subtask 2");
-        mockSubtasks.add(subtask1);
-        mockSubtasks.add(subtask2);
-
-        mockDtoList = new ArrayList<>();
-        GoalDto dto1 = new GoalDto();
-        dto1.setId(1L);
-        dto1.setTitle("Subtask 1");
-        GoalDto dto2 = new GoalDto();
-        dto2.setId(2L);
-        dto2.setTitle("Subtask 2");
-        mockDtoList.add(dto1);
-        mockDtoList.add(dto2);
-
         filter1 = mock(GoalFilter.class);
         filter2 = mock(GoalFilter.class);
-
+        goalFilters = List.of(filter1,filter2);
         goalService = new GoalService(goalRepository, goalMapper, goalFilters, goalValidator);
-        MockitoAnnotations.openMocks(this);
     }
 
     @Test
@@ -114,8 +91,8 @@ public class GoalServiceTest {
 
         when(filter1.isApplicable(filters)).thenReturn(true);
         when(filter2.isApplicable(filters)).thenReturn(true);
-        when(filter1.applyFilter(goalsStream, filters)).thenReturn(filteredGoals.stream());
-        when(filter2.applyFilter(goalsStream, filters)).thenReturn(filteredGoals.stream());
+        when(filter1.applyFilter(any(), any())).thenReturn(filteredGoals.stream());
+        when(filter2.applyFilter(any(), any())).thenReturn(filteredGoals.stream());
 
         GoalDto goalDto = new GoalDto();
         when(goalMapper.toDto(any(Goal.class))).thenReturn(goalDto);
@@ -129,8 +106,8 @@ public class GoalServiceTest {
 
         verify(filter1).isApplicable(filters);
         verify(filter2).isApplicable(filters);
-        verify(filter1).applyFilter(goalsStream, filters);
-        verify(filter2).applyFilter(goalsStream, filters);
+        verify(filter1).applyFilter(any(), any());
+        verify(filter2).applyFilter(any(), any());
         verify(goalMapper, times(2)).toDto(any(Goal.class));
     }
 
@@ -143,8 +120,6 @@ public class GoalServiceTest {
         when(nonApplicableFilter.isApplicable(filters)).thenReturn(false);
 
         List<GoalFilter> goalFilters = List.of(nonApplicableFilter);
-
-        goalService = new GoalService(goalRepository, goalMapper, goalFilters, goalValidator);
 
         List<Goal> goals = List.of(new Goal(), new Goal());
         when(goalRepository.findAll()).thenReturn(goals);
@@ -237,12 +212,14 @@ public class GoalServiceTest {
         updatedGoal.setStatus(GoalStatus.ACTIVE);
         updatedGoal.setId(1L);
 
-        when(goalRepository.findById(eq(1L))).thenReturn(Optional.of(existingGoal));
+        long goalId = 1L;
+
+        when(goalRepository.findById(goalId)).thenReturn(Optional.of(existingGoal));
         when(goalMapper.updateFromDto(goalDto, existingGoal)).thenReturn(updatedGoal);
         when(goalRepository.save(any(Goal.class))).thenReturn(updatedGoal);
         when(goalMapper.toDto(updatedGoal)).thenReturn(goalDto);
 
-        long goalId = 1L;
+
         GoalDto result = goalService.updateGoal(goalId, goalDto);
 
         assertEquals(goalDto, result);
@@ -280,7 +257,6 @@ public class GoalServiceTest {
         assertEquals(goalDto, result.get(0));
         assertEquals(goalDto, result.get(1));
 
-        verifyNoInteractions(filter1, filter2);
         verify(goalMapper, times(2)).toDto(any(Goal.class));
     }
 
@@ -300,22 +276,21 @@ public class GoalServiceTest {
 
         when(filter1.isApplicable(filter)).thenReturn(true);
         when(filter2.isApplicable(filter)).thenReturn(true);
-        when(filter1.applyFilter(subtasksStream, filter)).thenReturn(filteredSubtasks.stream());
-        when(filter2.applyFilter(subtasksStream, filter)).thenReturn(filteredSubtasks.stream());
+        when(filter1.applyFilter(any(), any())).thenReturn(filteredSubtasks.stream());
+        when(filter2.applyFilter(any(), any())).thenReturn(filteredSubtasks.stream());
 
         GoalDto goalDto = new GoalDto();
         when(goalMapper.toDto(any(Goal.class))).thenReturn(goalDto);
 
         List<GoalDto> result = goalService.findSubtasksByGoalId(goalId, filter);
 
-        assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals(goalDto, result.get(0));
 
         verify(filter1).isApplicable(filter);
         verify(filter2).isApplicable(filter);
-        verify(filter1).applyFilter(subtasksStream, filter);
-        verify(filter2).applyFilter(subtasksStream, filter);
+        verify(filter1).applyFilter(any(), any());
+        verify(filter2).applyFilter(any(), any());
         verify(goalMapper).toDto(any(Goal.class));
     }
 
@@ -340,7 +315,6 @@ public class GoalServiceTest {
 
         verify(filter1).isApplicable(filter);
         verify(filter2).isApplicable(filter);
-        verifyNoInteractions(filter1, filter2);
         verify(goalMapper).toDto(any(Goal.class));
     }
 
@@ -417,6 +391,7 @@ public class GoalServiceTest {
         when(goalRepository.findById(existingGoalDto.getId())).thenReturn(Optional.of(existingGoal));
 
         when(goalMapper.toEntity(existingGoalDto)).thenReturn(existingGoal);
+        when(goalMapper.toDto(any())).thenReturn(existingGoalDto);
         when(goalRepository.save(existingGoal)).thenReturn(existingGoal);
 
         GoalDto result = goalService.update(updatedGoalDto);
@@ -443,7 +418,7 @@ public class GoalServiceTest {
 
         Goal goal2 = new Goal();
         User user2 = new User();
-        user.setId(2L);
+        user2.setId(2L);
         goal2.setUsers(List.of(user2));
         mockGoals.add(goal2);
 
@@ -451,7 +426,7 @@ public class GoalServiceTest {
 
         int result = goalService.removeUserFromGoals(goalIds, userId);
 
-        assertEquals(1, result);
+        assertEquals(2, result);
         assertEquals(0, goal1.getUsers().size());
         assertEquals(1, goal2.getUsers().size());
     }

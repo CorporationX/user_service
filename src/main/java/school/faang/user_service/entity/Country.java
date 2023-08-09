@@ -31,4 +31,13 @@ public class Country {
 
     @OneToMany(mappedBy = "country")
     private List<User> residents;
+
+    @Override
+    public String toString() {
+        return "Country{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", residentUserIds=" + (residents == null ? " " : residents.stream().map(User::getId).toList()) +
+                '}';
+    }
 }

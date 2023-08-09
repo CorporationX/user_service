@@ -1,6 +1,5 @@
 package school.faang.user_service.controller.user;
 
-import com.amazonaws.services.s3.model.S3Object;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +14,6 @@ import school.faang.user_service.dto.userProfilePic.UserProfilePicDto;
 import school.faang.user_service.service.UserProfilePicService;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor

@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
@@ -76,7 +77,7 @@ public class SkillService {
 
     private void verifyUserExist(long userId) {
         if (!(userRepository.existsById(userId))) {
-            throw new DataValidationException("User doesn't exist");
+            throw new EntityNotFoundException("User doesn't exist");
         }
     }
 

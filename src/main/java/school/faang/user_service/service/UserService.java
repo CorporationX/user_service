@@ -37,7 +37,7 @@ public class UserService {
     }
 
     public UserDto signup(UserDto userDto) {
-        //TODO Вместо 40 строки должна быть логика создания юзера
+        //TODO Нужно реализовать логику создания юзера
         User user = userRepository.findById(userDto.getId()).orElseThrow(() -> new UserNotFoundException("User is not found"));
         setDefaultAvatar(user);
         return userDto;

@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -115,7 +116,7 @@ public class EventService {
 
         events.forEach(event -> {
             List<User> currentUsers = event.getAttendees();
-            event.setAttendees(currentUsers.stream().filter(user -> user.getId() != userId).toList());
+            event.setAttendees(currentUsers.stream().filter(user -> !Objects.equals(user.getId(), userId)).toList());
         });
 
         return events.size();

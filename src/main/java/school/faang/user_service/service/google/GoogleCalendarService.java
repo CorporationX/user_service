@@ -93,6 +93,7 @@ public class GoogleCalendarService {
 
         googleEvent.setStart(getEventDateTime(zonedStart));
         googleEvent.setEnd(getEventDateTime(zonedEnd));
+
         return googleEvent;
     }
 
@@ -114,8 +115,8 @@ public class GoogleCalendarService {
     }
 
     private EventDateTime getEventDateTime(ZonedDateTime zonedDateTime) {
-        return new EventDateTime()
-                .setDateTime(new DateTime(zonedDateTime.format(FORMATTER)));
+        DateTime dateTime = new DateTime(zonedDateTime.format(FORMATTER));
+        return new EventDateTime().setDateTime(dateTime);
     }
 
     private String getAuthorizationLink(Long userId, Long eventId) {

@@ -19,6 +19,11 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
+    @PostMapping
+    public UserDto signup(@RequestBody UserDto userDto){
+       return userService.signup(userDto);
+    }
+
     @GetMapping("/{userId}")
     UserDto getUser(@PathVariable long userId) {
         return userService.getUser(userId);

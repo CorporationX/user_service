@@ -7,8 +7,8 @@ import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.exception.NotFoundException;
+import school.faang.user_service.exception.invalidFieldException.DataValidationException;
+import school.faang.user_service.exception.notFoundExceptions.event.EventNotFoundException;
 import school.faang.user_service.filter.event.Filter;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
@@ -45,7 +45,7 @@ public class EventService {
 
     public EventDto getEvent(long eventId) {
         var event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException(String.format("Event with id: %d was not found", eventId)));
+                .orElseThrow(() -> new EventNotFoundException(String.format("Event with id: %d was not found", eventId)));
         return eventMapper.toDto(event);
     }
 
@@ -60,7 +60,7 @@ public class EventService {
     }
 
     public void deleteEvent(long id) {
-        var event = eventRepository.findById(id).orElseThrow(() -> new NotFoundException("No post with id " + id));
+        var event = eventRepository.findById(id).orElseThrow(() -> new EventNotFoundException("No post with id " + id));
         event.getAttendees().forEach(user -> user.getParticipatedEvents().remove(event));
         eventRepository.deleteById(id);
     }

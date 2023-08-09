@@ -18,9 +18,15 @@ public class GoalValidator {
     private final GoalRepository goalRepository;
     private final SkillRepository skillRepository;
 
+    public void updateGoalControllerValidation(GoalDto goalDto) {
+        if (goalDto.getTitle() == null || goalDto.getTitle().isBlank()) {
+            throw new DataValidationException("Title can not be blank or null");
+        }
+    }
+
     public void updateGoalServiceValidation(long id, GoalDto goalDto) {
-        Goal oldg = goalRepository.findById(id).orElse(null);
-        if (oldg.getStatus().equals(GoalStatus.COMPLETED)) {
+        Goal goal = goalRepository.findById(id).orElse(null);
+        if (goal.getStatus().equals(GoalStatus.COMPLETED)) {
             throw new DataValidationException("Goal already completed!");
         }
 

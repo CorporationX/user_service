@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.mapper.goal.GoalMapperImpl;
@@ -42,11 +43,11 @@ class GoalServiceTest {
 
         when(goalMapper.toEntity(goalDto)).thenReturn(goal);
         when(goalDto.getSkillIds()).thenReturn(skillIds);
-        when(goalRepository.findUsersByGoalId(id)).thenReturn(List.of());
+        when(goalRepository.findUsersByGoalId(id)).thenReturn(List.of(User.builder().build()));
 
         goalService.updateGoal(id, goalDto);
 
-        verify(goalRepository).deleteById(id);
+        verify(skillRepository, times(2)).assignSkillToUser(anyLong(), anyLong());
     }
 
     @Test

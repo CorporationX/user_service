@@ -34,6 +34,13 @@ public class GoalValidatorTest {
     GoalDto goalDto = mock(GoalDto.class);
     long id = 1;
 
+    @Test
+    void updateGoalControllerValidation_Test() {
+        DataValidationException exception = assertThrows(DataValidationException.class,
+                () -> validator.updateGoalControllerValidation(goalDto));
+
+        assertEquals("Title can not be blank or null", exception.getMessage());
+    }
 
     @Test
     void updateCompletedGoalTest() {

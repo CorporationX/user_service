@@ -58,7 +58,10 @@ public class EventServiceTest {
         var now = LocalDateTime.now();
         eventDto = new EventDto(0L, "title", now, now.plusDays(3), 0L, "0", new ArrayList<>(), new ArrayList<>(), "location", EventType.WEBINAR, EventStatus.PLANNED, -1);
         filterDto = new EventFilterDto("title", now.plusHours(1), now.plusDays(10), 0L, List.of(), "location", 10);
-        event = Event.builder().id(1).build();
+        event = Event.builder()
+                .id(1)
+                .attendees(new ArrayList<>())
+                .build();
 
         Filter<Event, EventFilterDto> filter = Mockito.mock(Filter.class);
         filters = List.of(filter);
@@ -143,6 +146,8 @@ public class EventServiceTest {
 
     @Test
     void deletingEventTest() {
+        Mockito.when(eventRepository.findById(1L))
+                .thenReturn(Optional.of(event));
         eventService.deleteEvent(1);
         Mockito.verify(eventRepository, Mockito.times(1)).deleteById(1L);
     }

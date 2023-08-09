@@ -14,7 +14,6 @@ import school.faang.user_service.dto.GoogleEventResponseDto;
 import school.faang.user_service.service.google.GoogleCalendarService;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 
 @RestController
 @RequestMapping("/google/calendar")

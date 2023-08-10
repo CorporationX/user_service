@@ -12,6 +12,8 @@ import java.io.InputStream;
 
 @Service
 public class ImageService {
+    private final Integer BMAX = 1080;
+    private final Integer SMAX = 170;
 
     public byte[] resizeImage(MultipartFile image, boolean isBig) {
         try {
@@ -38,9 +40,9 @@ public class ImageService {
     private void getNewSize(BufferedImage image, boolean isBig, int height, int width) {
         int px;
         if (isBig) {
-            px = 1080;
+            px = BMAX;
         } else {
-            px = 170;
+            px = SMAX;
         }
 
         double multiplier;

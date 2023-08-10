@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +27,7 @@ public class UserProfilePicService {
     @Transactional
     public UserProfilePicDto upload(MultipartFile file, long userId) {
         User user = userRepository.findById(userId).orElseThrow(() ->
-                new DataValidException("User with id " + userId + " is not found"));
+                new EntityNotFoundException("User with id " + userId + " is not found"));
 
         byte[] big = imageService.resizeImage(file, true);
         String bigKey = fileStorageService.uploadFile(big, file, userId, "big");

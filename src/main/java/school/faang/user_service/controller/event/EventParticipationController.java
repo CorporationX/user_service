@@ -3,7 +3,6 @@ package school.faang.user_service.controller.event;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.dto.subscription.UserDto;
 import school.faang.user_service.service.event.EventParticipationService;
 
@@ -26,7 +25,7 @@ public class EventParticipationController {
         return service.getParticipant(eventId);
     }
 
-    public int getParticipantsCount(long eventId) {
+    public int getParticipantsCount(long eventId){
         return service.getParticipantsCount(eventId);
     }
 }

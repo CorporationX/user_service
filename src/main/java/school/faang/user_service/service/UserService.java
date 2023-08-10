@@ -4,18 +4,22 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.subscription.UserDto;
+import school.faang.user_service.dto.subscription.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.UserNotFoundException;
+import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class UserService {
     private final UserRepository userRepository;
+    private final List<UserFilter> userFilters;
     private final UserMapper userMapper;
 
     public UserDto getUser(long id) {
@@ -30,5 +34,21 @@ public class UserService {
         List<User> users = userRepository.findAllById(usersIds);
         log.info("Return list of users: {}", users);
         return userMapper.toUserListDto(users);
+    }
+
+    public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
+        Stream<User> premiumUsers = userRepository.findPremiumUsers();
+
+        premiumUsers = filter(userFilterDto, premiumUsers);
+        return userMapper.toUserListDto(premiumUsers.toList());
+    }
+
+    private Stream<User> filter(UserFilterDto userFilterDto, Stream<User> premiumUsers) {
+        for (UserFilter filter : userFilters) {
+            if (filter.isApplicable(userFilterDto)) {
+                premiumUsers = filter.apply(premiumUsers, userFilterDto);
+            }
+        }
+        return premiumUsers;
     }
 }

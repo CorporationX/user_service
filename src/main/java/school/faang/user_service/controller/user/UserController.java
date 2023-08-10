@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.subscription.UserDto;
+import school.faang.user_service.dto.subscription.UserFilterDto;
 import school.faang.user_service.service.UserService;
 
 import java.util.ArrayList;
@@ -15,13 +16,17 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/users")
+@RequestMapping("/api/v1/users")
 public class UserController {
     private final UserService userService;
 
     @GetMapping("/{userId}")
     UserDto getUser(@PathVariable long userId) {
         return userService.getUser(userId);
+    }
+    @GetMapping("/premium-users")
+    public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
+        return userService.getPremiumUsers(userFilterDto);
     }
 
     @PostMapping("/get-by-ids")

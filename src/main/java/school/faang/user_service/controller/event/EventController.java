@@ -26,7 +26,7 @@ public class EventController {
 
     @PostMapping
     public EventDto create(@RequestBody EventDto event) {
-        log.info("PostMapping endpoint 'create()', uri='/events' was called successfully");
+        log.info("POST endpoint 'create()' was called successfully");
         validate(event);
         return eventService.create(event);
     }
@@ -45,46 +45,38 @@ public class EventController {
 
     @GetMapping("/{eventId}")
     public EventDto getEvent(@PathVariable("eventId") long id) {
-        log.info(
-                String.format("GetMapping endpoint 'getEvent()', uri='/events/{eventId}' was called successfully with eventId %d", id)
-        );
+        log.info("GET endpoint 'getEvent()' was called successfully with eventId {}", id);
         return eventService.getEvent(id);
     }
 
     @DeleteMapping("/{eventId}")
     public void deleteEvent(@PathVariable("eventId") long id) {
-        log.info(
-                String.format("DeleteMapping endpoint 'deleteEvent()', uri='/events/{eventId}' was called successfully with eventId %d", id)
-        );
+        log.info("DELETE endpoint 'deleteEvent()' was called successfully with eventId {}", id);
         eventService.deleteEvent(id);
     }
 
     @PutMapping
     public EventDto updateEvent(@RequestBody EventDto event) {
-        log.info("PutMapping endpoint 'updateEvent()', uri='/events' was called successfully");
+        log.info("PUT endpoint 'updateEvent()' was called successfully");
         validate(event);
         return eventService.updateEvent(event);
     }
 
     @GetMapping("/owner/{userId}")
     public List<EventDto> getOwnedEvents(@PathVariable("userId") long userId) {
-        log.info(
-                String.format("GetMapping endpoint 'getOwnedEvents()', uri='/events/owner/{userId}' was called successfully with userId %d", userId)
-        );
+        log.info("GET endpoint 'getOwnedEvents()' was called successfully with userId {}", userId);
         return eventService.getOwnedEvents(userId);
     }
 
     @GetMapping("/participant/{userId}")
     public List<EventDto> getParticipatedEvents(@PathVariable("userId") long userId) {
-        log.info(
-                String.format("GetMapping endpoint 'getParticipatedEvents()', uri='/events/participant/{userId}' was called successfully with userId %d", userId)
-        );
+        log.info("GET endpoint 'getParticipatedEvents()' was called successfully with userId {}", userId);
         return eventService.getParticipatedEvents(userId);
     }
 
     @GetMapping("/filter")
     public List<EventDto> getEventsByFilter(@RequestBody EventFilterDto filter) {
-        log.info("GetMapping endpoint 'getEventsByFilter()', uri='/events/filter' was called successfully");
+        log.info("GET endpoint 'getEventsByFilter()' was called successfully");
         return eventService.getEventsByFilter(filter);
     }
 }

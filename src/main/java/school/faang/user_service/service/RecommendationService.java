@@ -34,8 +34,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class RecommendationService {
-    @Value("${min.offers.to.convert.skill:2}")
     private static final int RECOMMENDATION_PERIOD_IN_MONTH = 6;
+    @Value("${min.offers.to.convert.skill:2}")
     private static int MIN_OFFERS_TO_CONVERT_SKILL;
     private final RecommendationRepository recommendationRepository;
     private final SkillRepository skillRepository;

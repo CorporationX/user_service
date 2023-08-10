@@ -23,7 +23,7 @@ import java.io.InputStream;
 @RequiredArgsConstructor
 @Slf4j
 public class FileStorageService {
-    @Value("${services.s3.bucket-name}")
+    @Value("${aws.bucket-name}")
     private String bucketName;
     private final AmazonS3 amazonS3;
 

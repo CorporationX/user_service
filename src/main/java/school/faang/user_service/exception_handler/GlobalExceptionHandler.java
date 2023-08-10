@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.IncorrectIdException;
-import school.faang.user_service.exception.NoUserInDataBaseException;
+import school.faang.user_service.exception.UserNotFoundException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(body);
     }
 
-    @ExceptionHandler({EntityNotFoundException.class, NoUserInDataBaseException.class})
+    @ExceptionHandler({EntityNotFoundException.class, UserNotFoundException.class})
     public ResponseEntity<Object> handleEntityNotFoundException(Exception exception) {
         Map<String, String> body = Map.of("message", exception.getMessage());
         log.error(exception.getMessage(), exception);

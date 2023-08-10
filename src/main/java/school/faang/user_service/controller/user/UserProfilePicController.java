@@ -17,7 +17,7 @@ public class UserProfilePicController {
     private final UserProfilePicService userProfilePicService;
     private final UserContext userContext;
 
-    @PostMapping()
+    @PostMapping
     public UserProfilePicDto upload(@RequestParam("file") MultipartFile file) {
         return userProfilePicService.upload(file, userContext.getUserId());
     }

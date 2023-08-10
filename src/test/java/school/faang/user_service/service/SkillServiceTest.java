@@ -85,12 +85,12 @@ class SkillServiceTest {
     }
 
     @Test
-    void testThrownUserDoesNotExistException() {
+    void testGetUserSkillsThrownUserDoesNotExistException() {
         long userId = 1L;
         Mockito.when(userRepository.existsById(any())).thenReturn(false);
         EntityNotFoundException entityNotFoundException =
                 assertThrows(EntityNotFoundException.class, () -> skillService.getUserSkills(userId));
-        Assertions.assertEquals("User doesn't exist", entityNotFoundException.getMessage());
+        Assertions.assertEquals(String.format("User with id=%d doesn't exist", userId), entityNotFoundException.getMessage());
     }
 
     @Test

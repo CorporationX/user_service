@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,6 +12,7 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
+import school.faang.user_service.service.mentorship.MentorshipService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,13 +82,19 @@ public class MentorshipServiceTest {
     }
 
     @Test
+    void testDeleteMenteeWithoutMentorInDB() {
+        when(mentorshipRepository.findById(CORRECT_USER_ID)).thenThrow(EntityNotFoundException.class);
+        assertThrows(EntityNotFoundException.class, () -> mentorshipService.deleteMentee(CORRECT_USER_ID, CORRECT_USER_ID));
+    }
+
+    @Test
     void testGetMenteesNonExistentUserId() {
         when(mentorshipRepository.findById(NON_EXISTENT_USER_ID)).thenReturn(Optional.ofNullable(nonExistentUser));
 
         List<UserDto> actualList = mentorshipService.getMentees(NON_EXISTENT_USER_ID);
         List<UserDto> expectedList = new ArrayList<>();
 
-        verify(mentorshipRepository, times(1)).findById(NON_EXISTENT_USER_ID);
+        verify(mentorshipRepository).findById(NON_EXISTENT_USER_ID);
         assertEquals(expectedList, actualList);
     }
 
@@ -97,7 +105,7 @@ public class MentorshipServiceTest {
         List<UserDto> actualList = mentorshipService.getMentors(NON_EXISTENT_USER_ID);
         List<UserDto> expectedList = new ArrayList<>();
 
-        verify(mentorshipRepository, times(1)).findById(NON_EXISTENT_USER_ID);
+        verify(mentorshipRepository).findById(NON_EXISTENT_USER_ID);
         assertEquals(expectedList, actualList);
     }
 
@@ -107,16 +115,16 @@ public class MentorshipServiceTest {
 
         List<UserDto> actualList = mentorshipService.getMentees(CORRECT_USER_ID);
 
-        verify(mentorshipRepository, times(1)).findById(CORRECT_USER_ID);
+        verify(mentorshipRepository).findById(CORRECT_USER_ID);
         assertEquals(expectedDtos, actualList);
     }
 
     @Test
     void testGetMentorsCorrectUserId() {
-       when(mentorshipRepository.findById(CORRECT_USER_ID)).thenReturn(Optional.ofNullable(correctUser));
+        when(mentorshipRepository.findById(CORRECT_USER_ID)).thenReturn(Optional.ofNullable(correctUser));
 
-       List<UserDto> actualList = mentorshipService.getMentors(CORRECT_USER_ID);
-       assertEquals(expectedDtos, actualList);
+        List<UserDto> actualList = mentorshipService.getMentors(CORRECT_USER_ID);
+        assertEquals(expectedDtos, actualList);
     }
 
     @Test

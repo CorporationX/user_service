@@ -1,12 +1,12 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.mentorship;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.NoUserInDataBaseException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
@@ -55,7 +55,7 @@ public class MentorshipService {
 
     private User validateId(long userId) {
         return mentorshipRepository.findById(userId).orElseThrow(() -> {
-            throw new NoUserInDataBaseException("User with this id does not exist");
+            throw new EntityNotFoundException("User with this id does not exist");
         });
     }
 

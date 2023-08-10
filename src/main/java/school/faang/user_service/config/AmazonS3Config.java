@@ -18,7 +18,7 @@ public class AmazonS3Config {
     private String secretKey;
     @Value("${aws.region}")
     private String region;
-    @Value("${services.s3.bucket-name}")
+    @Value("${aws.bucket-name}")
     private String bucketName;
 
     @Bean

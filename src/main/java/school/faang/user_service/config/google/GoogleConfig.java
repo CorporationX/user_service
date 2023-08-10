@@ -58,6 +58,7 @@ public class GoogleConfig {
                 .setAccessType(accessType)
                 .build();
     }
+
     public Calendar getService(Credential credential) throws GeneralSecurityException, IOException {
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         JsonFactory jsonFactory = getDefaultInstance();

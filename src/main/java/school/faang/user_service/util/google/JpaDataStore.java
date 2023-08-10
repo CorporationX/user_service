@@ -4,11 +4,13 @@ import com.google.api.client.auth.oauth2.StoredCredential;
 import com.google.api.client.util.store.AbstractDataStore;
 import com.google.api.client.util.store.DataStore;
 import com.google.api.client.util.store.DataStoreFactory;
+
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+
 import school.faang.user_service.entity.GoogleToken;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.EntityNotFoundException;
@@ -16,6 +18,7 @@ import school.faang.user_service.repository.GoogleTokenRepository;
 
 public class JpaDataStore extends AbstractDataStore<StoredCredential> {
     private final GoogleTokenRepository repository;
+
     protected JpaDataStore(DataStoreFactory dataStoreFactory,
                            String id,
                            GoogleTokenRepository repository) {

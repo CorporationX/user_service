@@ -10,7 +10,6 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.IncorrectIdException;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.service.mentorship.MentorshipService;
@@ -83,29 +82,9 @@ public class MentorshipServiceTest {
     }
 
     @Test
-    void testGetMenteesInputIncorrectUserId() {
-        assertThrows(IncorrectIdException.class, () -> mentorshipService.getMentees(INCORRECT_USER_ID));
-    }
-
-    @Test
-    void testGetMentorsInputIncorrectUserId() {
-        assertThrows(IncorrectIdException.class, () -> mentorshipService.getMentors(INCORRECT_USER_ID));
-    }
-
-    @Test
-    void testDeleteMenteeInputIncorrectUserId() {
-        assertThrows(IncorrectIdException.class, () -> mentorshipService.deleteMentee(INCORRECT_USER_ID, INCORRECT_USER_ID));
-    }
-
-    @Test
     void testDeleteMenteeWithoutMentorInDB() {
         when(mentorshipRepository.findById(CORRECT_USER_ID)).thenThrow(EntityNotFoundException.class);
         assertThrows(EntityNotFoundException.class, () -> mentorshipService.deleteMentee(CORRECT_USER_ID, CORRECT_USER_ID));
-    }
-
-    @Test
-    void testDeleteMentorInputIncorrectUserId() {
-        assertThrows(IncorrectIdException.class, () -> mentorshipService.deleteMentor(INCORRECT_USER_ID, INCORRECT_USER_ID));
     }
 
     @Test

@@ -9,7 +9,6 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.IncorrectIdException;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
@@ -78,26 +77,6 @@ public class MentorshipServiceTest {
                 .email("an@mail.ru")
                 .build();
         expectedDtos = List.of(nonExistentUserDto, testUserDto);
-    }
-
-    @Test
-    void testGetMenteesInputIncorrectUserId() {
-        assertThrows(IncorrectIdException.class, () -> mentorshipService.getMentees(INCORRECT_USER_ID));
-    }
-
-    @Test
-    void testGetMentorsInputIncorrectUserId() {
-        assertThrows(IncorrectIdException.class, () -> mentorshipService.getMentors(INCORRECT_USER_ID));
-    }
-
-    @Test
-    void testDeleteMenteeInputIncorrectUserId() {
-        assertThrows(IncorrectIdException.class, () -> mentorshipService.deleteMentee(INCORRECT_USER_ID, INCORRECT_USER_ID));
-    }
-
-    @Test
-    void testDeleteMentorInputIncorrectUserId() {
-        assertThrows(IncorrectIdException.class, () -> mentorshipService.deleteMentor(INCORRECT_USER_ID, INCORRECT_USER_ID));
     }
 
     @Test

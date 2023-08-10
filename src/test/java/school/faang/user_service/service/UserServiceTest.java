@@ -1,100 +1,88 @@
 package school.faang.user_service.service;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.skill.SkillCandidateDto;
-import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.recommendation.SkillOffer;
-import school.faang.user_service.exception.DataValidException;
-import school.faang.user_service.mapper.skill.SkillMapper;
-import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.recommendation.SkillOfferRepository;
+import school.faang.user_service.dto.subscription.UserDto;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.UserNotFoundException;
+import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.repository.UserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
-    private final SkillMapper skillMapper = SkillMapper.INSTANCE;
     @Mock
-    private SkillOfferRepository skillOfferRepository;
+    private UserRepository userRepository;
     @Mock
-    private SkillRepository skillRepository;
+    private UserMapper userMapper;
     @InjectMocks
-    private SkillService skillService;
+    private UserService userService;
 
     @Test
-    void createTest_Should_Return_SkillDto() {
-        SkillDto skillDto = new SkillDto(1L, "title");
-        Skill skill = skillMapper.toEntity(skillDto);
+    void getUser_Test() {
+        User user1 = User.builder()
+                .id(1)
+                .build();
 
-        when(skillRepository.existsByTitle(skillDto.getTitle())).thenReturn(false);
-        when(skillRepository.save(skill)).thenReturn(skill);
+        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.ofNullable(user1));
 
-        SkillDto result = skillService.create(skillDto);
+        UserDto result = userService.getUser(1);
 
-        assertNotNull(result);
-        assertEquals(1L, result.getId());
-        assertEquals("title", result.getTitle());
-
-        verify(skillRepository).existsByTitle(skillDto.getTitle());
-        verify(skillRepository).save(any(Skill.class));
+        Mockito.verify(userRepository).findById(1L);
+        Mockito.verify(userMapper).toUserDto(user1);
     }
 
     @Test
-    void createTest_Should_Throw_DataValidException() {
-        SkillDto skillDto = new SkillDto(1L, "title");
+    void getUser_UserNotFound_Test() {
+        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
-        when(skillRepository.existsByTitle(skillDto.getTitle())).thenReturn(true);
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class,
+                () -> userService.getUser(1L));
 
-        DataValidException dataValidException = assertThrows(DataValidException.class, () -> {
-            skillService.create(skillDto);
-        });
-        assertEquals("Skill already exists", dataValidException.getMessage());
+        assertEquals("User with id 1 not found", exception.getMessage());
 
-        verify(skillRepository).existsByTitle(skillDto.getTitle());
+        Mockito.verify(userRepository).findById(1L);
     }
 
     @Test
-    void getUserSkillsTest() {
-        long userId = 1L;
-        List<Skill> skills = List.of(
-                Skill.builder().title("Skill1").build(),
-                Skill.builder().title("Skill2").build()
-        );
+    void getUsersByIds_Test() {
+        User user1 = User.builder()
+                .id(1)
+                .build();
 
-        when(skillRepository.findAllByUserId(userId)).thenReturn(skills);
+        User user2 = User.builder()
+                .id(2)
+                .build();
 
-        List<SkillDto> userSkills = skillService.getUserSkills(userId, 1, 2);
+        List<User> users = List.of(user1, user2);
 
-        assertEquals(2, userSkills.size());
+        Mockito.when(userRepository.findAllById(List.of(1L, 2L))).thenReturn(users);
 
-        verify(skillRepository).findAllByUserId(userId);
+        List<UserDto> usersByIds = userService.getUsersByIds(List.of(1L, 2L));
+
+        Mockito.verify(userRepository).findAllById(List.of(1L, 2L));
     }
 
     @Test
-    void getOfferedSkillsTest() {
-        List<SkillOffer> offers = List.of(
-                mock(SkillOffer.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS)),
-                mock(SkillOffer.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS)),
-                mock(SkillOffer.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS))
-        );
+    void getUsersByIds_ReturnEmptyList_Test() {
 
-        when(skillOfferRepository.findAllOffersToUser(anyLong())).thenReturn(offers);
+        Mockito.when(userRepository.findAllById(List.of(1L, 2L))).thenReturn(new ArrayList<>());
 
-        List<SkillCandidateDto> candidates = skillService.getOfferedSkills(anyLong());
+        List<UserDto> usersByIds = userService.getUsersByIds(List.of(1L, 2L));
 
-        assertNotNull(candidates);
-        assertEquals(3, candidates.size());
+        Mockito.verify(userRepository).findAllById(List.of(1L, 2L));
 
-        verify(skillOfferRepository).findAllOffersToUser(anyLong());
+        Assertions.assertEquals(0, usersByIds.size());
     }
 }

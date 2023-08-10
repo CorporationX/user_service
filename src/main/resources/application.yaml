@@ -52,4 +52,7 @@ aws:
   region: http://127.0.0.1:9000/
   bucket-name: user-bucket
 
+dicebear:
+  url: https://api.dicebear.com/6.x/adventurer/svg?seed=
+
 springfox.documentation.swagger.v2.path: /api-docs

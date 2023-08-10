@@ -56,4 +56,4 @@ services:
     bucket-name: user-bucket
     isMocked: true
 
-
+springfox.documentation.swagger.v2.path: /api-docs

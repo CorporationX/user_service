@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -41,7 +42,7 @@ class UserProfilePicServiceTest {
     void upload_User_Not_Found() {
         MultipartFile file = new MockMultipartFile("Name", new byte[1]);
 
-        DataValidException exception = assertThrows(DataValidException.class, () -> {
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
             userProfilePicService.upload(file, 1L);
         });
 

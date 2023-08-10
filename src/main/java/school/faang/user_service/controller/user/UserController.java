@@ -15,13 +15,17 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/users")
+@RequestMapping("/api/v1/users")
 public class UserController {
     private final UserService userService;
 
     @GetMapping("/{userId}")
     UserDto getUser(@PathVariable long userId) {
         return userService.getUser(userId);
+    }
+    @GetMapping("/premium-users")
+    public List<school.faang.user_service.dto.mentor.UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
+        return userService.getPremiumUsers(userFilterDto);
     }
 
     @PostMapping("/get-by-ids")

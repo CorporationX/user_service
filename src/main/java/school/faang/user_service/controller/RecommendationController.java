@@ -15,19 +15,19 @@ public class RecommendationController {
     @Autowired
     private RecommendationService recommendationService;
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<RecommendationDto> giveRecommendation(@Valid @RequestBody RecommendationDto recommendation) {
         RecommendationDto newRecommendation = recommendationService.create(recommendation);
         return ResponseEntity.ok(newRecommendation);
     }
 
-    @PutMapping("/update")
+    @PutMapping
     public ResponseEntity<RecommendationDto> updateRecommendation(@Valid @RequestBody RecommendationUpdateDto toUpdate) {
         RecommendationDto updatedRecommendation = recommendationService.update(toUpdate);
         return ResponseEntity.ok(updatedRecommendation);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping
     public ResponseEntity deleteRecommendation(@PathVariable Long id) {
         recommendationService.delete(id);
         return ResponseEntity.ok().build();

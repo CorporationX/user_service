@@ -18,7 +18,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.DataValidException;
 import school.faang.user_service.exception.RecommendationPeriodIsNotCorrect;
 import school.faang.user_service.mapper.RecommendationMapperImpl;
 import school.faang.user_service.mapper.SkillOfferMapperImpl;
@@ -27,8 +27,6 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.checker.RecommendationChecker;
-import school.faang.user_service.checker.SkillChecker;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -67,10 +65,6 @@ class RecommendationServiceTest {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     LocalDateTime dateTime = LocalDateTime.parse(str, formatter);
 
-
-    @Mock
-    private SkillChecker skillChecker;
-    private RecommendationChecker recommendationChecker;
     private Skill systemSkill;
     private Skill failedSkill;
     List<SkillOffer> doubleSkillOffers = new ArrayList<>();
@@ -83,15 +77,11 @@ class RecommendationServiceTest {
 
     @BeforeEach
     void setUp() {
-        skillChecker = new SkillChecker(skillRepository);
-        recommendationChecker = new RecommendationChecker(recommendationRepository);
         recommendationService = new RecommendationService(recommendationRepository,
                 skillRepository,
                 userRepository,
                 recommendationMapper,
                 userSkillGuaranteeRepository,
-                skillChecker,
-                recommendationChecker,
                 skillOfferRepository);
 
         systemSkill = Skill.builder().id(1L).build();
@@ -139,7 +129,8 @@ class RecommendationServiceTest {
         )
                 .thenReturn(java.util.Optional.of(recommendation));
 
-        RecommendationPeriodIsNotCorrect ex = assertThrows(RecommendationPeriodIsNotCorrect.class, () -> recommendationChecker.check(recommendationDto));
+        RecommendationPeriodIsNotCorrect ex = assertThrows(RecommendationPeriodIsNotCorrect.class,
+                () -> recommendationService.create(recommendationDto));
         assertEquals("Date of new recommendation should be after "
                 + RECOMMENDATION_PERIOD_IN_MONTH
                 + " months of the last recommendation", ex.getMessage());
@@ -167,7 +158,7 @@ class RecommendationServiceTest {
                 anyLong()))
                 .thenReturn(entity);
 
-        assertThrows(DataValidationException.class,
+        assertThrows(DataValidException.class,
                 () -> recommendationService.create(badRecommendationDto));
     }
 
@@ -205,7 +196,7 @@ class RecommendationServiceTest {
 
         when(skillRepository.countExisting(anyList())).thenReturn(1);
 
-        assertThrows(DataValidationException.class, () -> recommendationService.create(validRecommendationDto));
+        assertThrows(DataValidException.class, () -> recommendationService.create(validRecommendationDto));
     }
 
     @Test

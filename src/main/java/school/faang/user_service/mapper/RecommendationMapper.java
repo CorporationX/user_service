@@ -21,7 +21,6 @@ public interface RecommendationMapper {
     @Mapping(target = "receiver", ignore = true)
     Recommendation toEntity(RecommendationDto dto);
 
-
     List<Recommendation> toEntity(List<RecommendationDto> recommendations);
 
     List<RecommendationDto> toDto(List<Recommendation> recommendations);

@@ -18,7 +18,10 @@ import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillOffer;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.TimingException;
+import school.faang.user_service.exception.invalidFieldException.DataValidationException;
+import school.faang.user_service.exception.notFoundExceptions.SkillNotFoundException;
+import school.faang.user_service.exception.notFoundExceptions.contact.UserNotFoundException;
 import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.mapper.SkillOfferMapper;
 import school.faang.user_service.repository.SkillRepository;
@@ -83,7 +86,7 @@ class RecommendationServiceTest {
                 .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(1L,2L))
                 .thenReturn(Optional.empty());
 
-        assertThrows(DataValidationException.class,
+        assertThrows(SkillNotFoundException.class,
                 ()-> recommendationService.create(RecommendationDto
                         .builder().authorId(1L)
                         .receiverId(2L)
@@ -99,11 +102,11 @@ class RecommendationServiceTest {
                         .createdAt(LocalDateTime.now().minusMonths(7))
                         .build()));
 
-        assertThrows(DataValidationException.class,
+        assertThrows(TimingException.class,
                 ()-> recommendationService.create(RecommendationDto
                         .builder().authorId(1L)
                         .receiverId(2L)
-                        .skillOffers(List.of(new SkillOfferDto()))
+                        .skillOffers(new ArrayList<>())
                         .build()));
 
         Mockito.verify(recommendationRepository, Mockito.times(1))
@@ -116,7 +119,7 @@ class RecommendationServiceTest {
         recommendationDto.getSkillOffers()
                 .forEach(skillOffer -> skillRepository.existsById(skillOffer.getSkillId()));
 
-        assertThrows(DataValidationException.class,
+        assertThrows(SkillNotFoundException.class,
                 () -> recommendationService.create(RecommendationDto
                         .builder().authorId(1L)
                         .skillOffers(List.of(new SkillOfferDto()))
@@ -133,7 +136,7 @@ class RecommendationServiceTest {
 
         assertEquals(skillIds.size(), skills.size());
 
-        assertThrows(DataValidationException.class,
+        assertThrows(SkillNotFoundException.class,
                 () -> recommendationService.create(RecommendationDto
                         .builder().authorId(1L)
                         .skillOffers(List.of(new SkillOfferDto()))
@@ -150,7 +153,7 @@ class RecommendationServiceTest {
 
         assertEquals(recommendationIds.size(), recommendations.size());
 
-        assertThrows(DataValidationException.class,
+        assertThrows(SkillNotFoundException.class,
                 () -> recommendationService.create(RecommendationDto
                         .builder().authorId(1L)
                         .skillOffers(List.of(new SkillOfferDto()))
@@ -163,11 +166,11 @@ class RecommendationServiceTest {
                         .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(1L,2L))
                 .thenReturn(Optional.empty());
 
-        assertThrows(DataValidationException.class,
+        assertThrows(UserNotFoundException.class,
                 ()-> recommendationService.update(RecommendationDto
                         .builder().authorId(1L)
                         .receiverId(2L)
-                        .skillOffers(List.of(new SkillOfferDto()))
+                        .skillOffers(new ArrayList<>())
                         .build()));
     }
 
@@ -179,11 +182,11 @@ class RecommendationServiceTest {
                         .createdAt(LocalDateTime.now().minusMonths(7))
                         .build()));
 
-        assertThrows(DataValidationException.class,
+        assertThrows(TimingException.class,
                 ()-> recommendationService.update(RecommendationDto
                         .builder().authorId(1L)
                         .receiverId(2L)
-                        .skillOffers(List.of(new SkillOfferDto()))
+                        .skillOffers(new ArrayList<>())
                         .build()));
 
         Mockito.verify(recommendationRepository, Mockito.times(1))
@@ -196,7 +199,7 @@ class RecommendationServiceTest {
         recommendationDto.getSkillOffers()
                 .forEach(skillOffer -> skillRepository.existsById(skillOffer.getSkillId()));
 
-        assertThrows(DataValidationException.class,
+        assertThrows(SkillNotFoundException.class,
                 () -> recommendationService.update(RecommendationDto
                         .builder().authorId(1L)
                         .skillOffers(List.of(new SkillOfferDto()))
@@ -213,7 +216,7 @@ class RecommendationServiceTest {
 
         assertEquals(skillIds.size(), skills.size());
 
-        assertThrows(DataValidationException.class,
+        assertThrows(SkillNotFoundException.class,
                 () -> recommendationService.update(RecommendationDto
                         .builder().authorId(1L)
                         .skillOffers(List.of(new SkillOfferDto()))
@@ -230,10 +233,10 @@ class RecommendationServiceTest {
 
         assertEquals(recommendationIds.size(), recommendations.size());
 
-        assertThrows(DataValidationException.class,
+        assertThrows(UserNotFoundException.class,
                 () -> recommendationService.update(RecommendationDto
                         .builder().authorId(1L)
-                        .skillOffers(List.of(new SkillOfferDto()))
+                        .skillOffers(new ArrayList<>())
                         .receiverId(2L).build()));
     }
 

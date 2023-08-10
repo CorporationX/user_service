@@ -10,7 +10,7 @@ import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.invalidFieldException.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;

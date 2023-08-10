@@ -4,7 +4,7 @@ import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.invalidFieldException.DataValidationException;
 
 import java.util.List;
 

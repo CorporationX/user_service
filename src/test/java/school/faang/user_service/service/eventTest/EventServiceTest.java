@@ -11,8 +11,10 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.exception.NotFoundException;
+import school.faang.user_service.entity.event.EventStatus;
+import school.faang.user_service.entity.event.EventType;
+import school.faang.user_service.exception.invalidFieldException.DataValidationException;
+import school.faang.user_service.exception.notFoundExceptions.event.EventNotFoundException;
 import school.faang.user_service.filter.event.Filter;
 import school.faang.user_service.filter.event.LocationFilter;
 import school.faang.user_service.mapper.EventMapper;
@@ -54,9 +56,12 @@ public class EventServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         var now = LocalDateTime.now();
-        eventDto = new EventDto(0L, "title", now, now.plusDays(3), 0L, "0", new ArrayList<>(), new ArrayList<>(), "location", "Webinar", "Planned", -1);
+        eventDto = new EventDto(0L, "title", now, now.plusDays(3), 0L, "0", new ArrayList<>(), new ArrayList<>(), "location", EventType.WEBINAR, EventStatus.PLANNED, -1);
         filterDto = new EventFilterDto("title", now.plusHours(1), now.plusDays(10), 0L, List.of(), "location", 10);
-        event = Event.builder().id(1).build();
+        event = Event.builder()
+                .id(1)
+                .attendees(new ArrayList<>())
+                .build();
 
         Filter<Event, EventFilterDto> filter = Mockito.mock(Filter.class);
         filters = List.of(filter);
@@ -99,7 +104,7 @@ public class EventServiceTest {
         );
 
         Assert.assertThrows(
-                NotFoundException.class,
+                EventNotFoundException.class,
                 () -> eventService.getEvent(5)
         );
     }
@@ -141,6 +146,8 @@ public class EventServiceTest {
 
     @Test
     void deletingEventTest() {
+        Mockito.when(eventRepository.findById(1L))
+                .thenReturn(Optional.of(event));
         eventService.deleteEvent(1);
         Mockito.verify(eventRepository, Mockito.times(1)).deleteById(1L);
     }

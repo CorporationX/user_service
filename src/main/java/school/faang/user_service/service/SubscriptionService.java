@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.exception.NotFoundException;
+import school.faang.user_service.exception.EntityStateException;
+import school.faang.user_service.exception.notFoundExceptions.contact.UserNotFoundException;
 import school.faang.user_service.filter.subfilter.SubscriberFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
@@ -25,14 +25,14 @@ public class SubscriptionService {
     @Transactional
     public void followUser(long followerId, long followeeId) {
         if (repository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
-            throw new DataValidationException("User has already followed");
+            throw new EntityStateException("User has already followed");
         }
         repository.followUser(followerId, followeeId);
     }
     @Transactional
     public void unfollowUser(long followerId, long followeeId) {
         if (!repository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
-            throw new DataValidationException("User wasn't following");
+            throw new EntityStateException("User wasn't following");
         }
         repository.unfollowUser(followerId, followeeId);
     }
@@ -74,7 +74,7 @@ public class SubscriptionService {
 
     private void checkExistence(List<UserDto> users, String exceptionMsg) {
         if (users.isEmpty()) {
-            throw new NotFoundException(String.format("No %s with current filters", exceptionMsg));
+            throw new UserNotFoundException(String.format("No %s with current filters", exceptionMsg));
         }
     }
 }

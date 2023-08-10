@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
@@ -18,6 +19,7 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -46,7 +48,8 @@ public class SkillService {
     }
 
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
-        if (skillRepository.findUserSkill(skillId, userId).isPresent()) {
+        Optional<Skill> userSkill = skillRepository.findUserSkill(skillId, userId);
+        if (userSkill.isPresent()) {
             return null;
         }
         List<SkillOffer> allOffersOfSkill = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
@@ -76,7 +79,7 @@ public class SkillService {
 
     private void verifyUserExist(long userId) {
         if (!(userRepository.existsById(userId))) {
-            throw new DataValidationException("User doesn't exist");
+            throw new EntityNotFoundException(String.format("User with id=%d doesn't exist", userId));
         }
     }
 
@@ -93,12 +96,11 @@ public class SkillService {
     }
 
     private void addGuarantees(Skill skill, List<SkillOffer> offers, long userId) {
-        User user;
-        if (userRepository.findById(userId).isPresent()) {
-            user = userRepository.findById(userId).get();
-        } else {
-            throw new DataValidationException("User not found");
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isEmpty()) {
+            throw new EntityNotFoundException(String.format("User with id=%d doesn't exist", userId));
         }
+        User user = optionalUser.get();
 
         List<UserSkillGuarantee> listGuarantees = offers.stream().map(skillOffer ->
                         UserSkillGuarantee.builder()

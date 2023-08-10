@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -84,12 +85,12 @@ class SkillServiceTest {
     }
 
     @Test
-    void testThrownUserDoesNotExistException() {
+    void testGetUserSkillsThrownUserDoesNotExistException() {
         long userId = 1L;
         Mockito.when(userRepository.existsById(any())).thenReturn(false);
-        DataValidationException dataValidationException =
-                assertThrows(DataValidationException.class, () -> skillService.getUserSkills(userId));
-        Assertions.assertEquals("User doesn't exist", dataValidationException.getMessage());
+        EntityNotFoundException entityNotFoundException =
+                assertThrows(EntityNotFoundException.class, () -> skillService.getUserSkills(userId));
+        Assertions.assertEquals(String.format("User with id=%d doesn't exist", userId), entityNotFoundException.getMessage());
     }
 
     @Test

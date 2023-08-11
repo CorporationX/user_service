@@ -2,18 +2,37 @@ package school.faang.user_service.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 
-@Component
-@RequiredArgsConstructor
-public class UserService {
-    private final UserRepository userRepository;
+import java.util.ArrayList;
+import java.util.List;
 
-    public User findUserById(Long userId) {
-        return userRepository
-                .findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("Invalid request. Requester user not found"));
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class UserService {
+
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+
+    public List<UserDto> getUsersByIds(List<Long> ids) {
+        List<UserDto> users = new ArrayList<>();
+
+        userRepository.findAllById(ids)
+                .forEach(user -> users.add(userMapper.toDto(user)));
+        log.info("Users have taken from DB successfully");
+        return users;
+    }
+
+    public UserDto getUser(long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("This user was not found"));
+        log.info("User with id={} has taken successfully from DB", userId);
+        return userMapper.toDto(user);
     }
 }

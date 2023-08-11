@@ -40,16 +40,16 @@ public class EventController {
     }
 
     @GetMapping("/filtered")
-    public List<EventDto> getEventsByFilter(@RequestBody EventFilterDto filter) {
+    public List<EventDto> getEventsByFilter(EventFilterDto filter) {
         return eventService.getEventsByFilter(filter);
     }
 
-    @GetMapping("/{userId}/owner")
+    @GetMapping("/owner/{userId}")
     public List<EventDto> getOwnedEvents(@PathVariable long userId) {
         return eventService.getOwnedEvents(userId);
     }
 
-    @GetMapping("/{userId}/participant")
+    @GetMapping("/participant/{userId}")
     public List<EventDto> getParticipatedEvents(@PathVariable long userId) {
         return eventService.getParticipatedEvents(userId);
     }

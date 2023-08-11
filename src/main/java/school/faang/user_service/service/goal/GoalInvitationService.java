@@ -2,6 +2,7 @@ package school.faang.user_service.service.goal;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
@@ -12,7 +13,7 @@ import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validator.GoalInvitationValidation;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class GoalInvitationService {
     private final GoalInvitationRepository repository;

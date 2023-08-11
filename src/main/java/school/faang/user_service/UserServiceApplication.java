@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Bean;
 @OpenAPIDefinition(
         info = @Info(
                 title = "User Service",
+                description = "[swagger for unicorns team]",
                 version = "1.0.0")
 )
 public class UserServiceApplication {

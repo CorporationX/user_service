@@ -20,6 +20,8 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -129,7 +131,8 @@ class SkillServiceTest {
 
         when(skillRepository.findSkillsOfferedToUser(userId)).thenReturn(skillsOfferedToUser);
 
-        List<SkillCandidateDto> offeredSkillsDto = skillService.getOfferedSkills(userId);
+        List<SkillCandidateDto> offeredSkillsDto = new ArrayList<>(skillService.getOfferedSkills(userId));
+        offeredSkillsDto.sort(Comparator.comparing(SkillCandidateDto::getOffersAmount));
 
         String expectedTitle = "Soft Skill";
         String actualTitle = offeredSkillsDto.get(0).getSkill().getTitle();

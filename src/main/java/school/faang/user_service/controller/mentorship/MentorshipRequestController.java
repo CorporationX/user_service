@@ -1,5 +1,7 @@
-package school.faang.user_service.controller;
+package school.faang.user_service.controller.mentorship;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,30 +19,35 @@ import school.faang.user_service.service.mentorship.MentorshipRequestService;
 
 import java.util.List;
 
+@Tag(name = "Управление запросами на менторство")
 @RestController
 @RequiredArgsConstructor
 public class MentorshipRequestController {
 
     private final MentorshipRequestService mentorshipRequestService;
 
+    @Operation(summary = "Добавить запрос на менторство")
     @PostMapping("/mentorship/request")
     @ResponseStatus(HttpStatus.CREATED)
     public MentorshipRequestDto requestMentorship(@Valid @RequestBody MentorshipRequestDto mentorshipRequest) {
         return mentorshipRequestService.requestMentorship(mentorshipRequest);
     }
 
+    @Operation(summary = "Получить запрос на менторство")
     @GetMapping("/mentorship/request")
     @ResponseStatus(HttpStatus.OK)
     public List<MentorshipRequestDto> getRequests(@Valid @RequestBody RequestFilterDto requestFilter) {
         return mentorshipRequestService.getRequests(requestFilter);
     }
 
+    @Operation(summary = "Принять запрос на менторство")
     @PutMapping("/mentorship/request/{id}/accept")
     @ResponseStatus(HttpStatus.OK)
     public MentorshipRequestDto acceptRequest(@PathVariable Long id) {
         return mentorshipRequestService.acceptRequest(id);
     }
 
+    @Operation(summary = "Отклонить запрос на менторство")
     @PutMapping("/mentorship/request/{id}/reject")
     @ResponseStatus(HttpStatus.OK)
     public MentorshipRequestDto rejectRequest(@PathVariable Long id, @RequestBody RejectionDto rejection) {

@@ -9,6 +9,9 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -16,6 +19,15 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+
+    public List<UserDto> getUsersByIds(List<Long> ids) {
+        List<UserDto> users = new ArrayList<>();
+
+        userRepository.findAllById(ids)
+                .forEach(user -> users.add(userMapper.toDto(user)));
+        log.info("Users have taken from DB successfully");
+        return users;
+    }
 
     public UserDto getUser(long userId) {
         User user = userRepository.findById(userId)

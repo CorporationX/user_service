@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.GoalValidationException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -34,6 +36,21 @@ public class GoalValidator {
         List<Skill> existingSkills = skillRepository.findAllById(skillIds);
         if (existingSkills.size() < skillIds.size()) {
             throw new GoalValidationException("One or more skills do not exist");
+        }
+    }
+
+    public void validateGoalBeforeUpdate(Goal goal) {
+        if (goal.getStatus().equals(GoalStatus.COMPLETED)) {
+            throw new GoalValidationException("Goal already completed");
+        }
+
+        List<Skill> skillsToAchieve = goal.getSkillsToAchieve();
+        if (skillsToAchieve != null) {
+            for (Skill skill : skillsToAchieve) {
+                if (!skillRepository.existsByTitle(skill.getTitle())) {
+                    throw new GoalValidationException("Skill " + skill.getTitle() + " does not exist");
+                }
+            }
         }
     }
 }

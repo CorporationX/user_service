@@ -28,6 +28,9 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -122,5 +125,35 @@ public class GoalControllerTest {
         goalController.deleteGoal(nonExistentGoalId);
 
         verify(goalService, times(1)).deleteGoal(nonExistentGoalId);
+    }
+
+    @Test
+    public void testUpdateGoal_ValidGoal() {
+        GoalDto goalDto = new GoalDto();
+        goalDto.setTitle("Learn Java");
+        goalDto.setDescription("Master Java programming language");
+
+        when(goalService.updateGoal(anyLong(), any(GoalDto.class))).thenReturn(goalDto);
+
+        long goalId = 1L;
+        GoalDto result = goalController.updateGoal(goalId, goalDto);
+
+        assertNotNull(result);
+        assertEquals("Learn Java", result.getTitle());
+        assertEquals("Master Java programming language", result.getDescription());
+    }
+
+    @Test
+    public void testUpdateGoal_CorrectServiceMethodInvocation() {
+        GoalDto goalDto = new GoalDto();
+        goalDto.setTitle("Learn Kotlin");
+        goalDto.setDescription("Explore Kotlin programming language");
+
+        when(goalService.updateGoal(anyLong(), any(GoalDto.class))).thenReturn(goalDto);
+
+        long goalId = 3L;
+        GoalDto result = goalController.updateGoal(goalId, goalDto);
+
+        verify(goalService, times(1)).updateGoal(goalId, goalDto);
     }
 }

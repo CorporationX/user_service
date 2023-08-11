@@ -12,24 +12,27 @@ import school.faang.user_service.entity.Skill;
 
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.mapper.goal.GoalMapperImpl;
+import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validation.GoalValidator;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 @Service
 public class GoalService {
     private final GoalRepository goalRepository;
-    private final GoalMapperImpl goalMapper;
+    private final GoalMapper goalMapper;
     private final List<GoalFilter> goalFilters;
     private final GoalValidator goalValidator;
 
     @Autowired
-    public GoalService(GoalRepository goalRepository, GoalMapperImpl goalMapper, List<GoalFilter> goalFilters, GoalValidator goalValidator) {
+    public GoalService(GoalRepository goalRepository, GoalMapper goalMapper, List<GoalFilter> goalFilters, GoalValidator goalValidator) {
         this.goalRepository = goalRepository;
         this.goalMapper = goalMapper;
         this.goalFilters = Optional.ofNullable(goalFilters).orElse(List.of());
@@ -46,6 +49,29 @@ public class GoalService {
                 .toList();
     }
 
+    public GoalDto updateGoal(long goalId, GoalDto goalDto) {
+        Goal goal = goalRepository.findById(goalId)
+                .orElseThrow(() -> new IllegalArgumentException("Goal not found by id " + goalId));
+        goalValidator.validateGoalBeforeUpdate(goal);
+        assignSkillsToUsers(goal, goalDto);
+        goalMapper.updateFromDto(goalDto, goal);
+        return goalMapper.toDto(goalRepository.save(goal));
+    }
+
+    private void assignSkillsToUsers(Goal goal, GoalDto updatedGoal) {
+        if (updatedGoal.getStatus().equals(GoalStatus.COMPLETED) &&
+                !goal.getSkillsToAchieve().isEmpty()) {
+            Set<User> users = new HashSet<>(goal.getUsers());
+            Set<Skill> skills = new HashSet<>(goal.getSkillsToAchieve());
+
+            for (User user : users) {
+                for (Skill skill : skills) {
+                    if (!skill.getUsers().contains(user))
+                        skill.getUsers().add(user);
+                }
+            }
+        }
+    }
 
     public List<GoalDto> findSubtasksByGoalId(long goalId, GoalFilterDto filter) {
         Stream<Goal> subtasks = goalRepository.findByParent(goalId);
@@ -101,8 +127,7 @@ public class GoalService {
 
     public GoalDto update (GoalDto goal){
         GoalDto existingGoal = get(goal.getId());
-
-        goalMapper.update(existingGoal, goal);
+        goalMapper.updateFromDto(existingGoal, goalMapper.toEntity(goal));
         goalRepository.save(goalMapper.toEntity(existingGoal));
 
         return existingGoal;
@@ -117,6 +142,5 @@ public class GoalService {
         });
 
         return goals.size();
-
     }
 }

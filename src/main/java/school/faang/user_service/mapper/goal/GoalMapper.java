@@ -1,6 +1,8 @@
-package school.faang.user_service.mapper.goal;
+package school.faang.user_service.mapper;
 
 import org.mapstruct.*;
+import org.mapstruct.factory.Mappers;
+import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
@@ -10,6 +12,8 @@ import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.FIELD, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface GoalMapper {
+    GoalMapper INSTANCE = Mappers.getMapper(GoalMapper.class);
+
     @Mapping(source = "parent.id", target = "parentId")
     @Mapping(source = "skillsToAchieve", target = "skillIds", qualifiedByName = "mapSkillsToSkillIdsMapper")
     GoalDto toDto(Goal goal);
@@ -25,5 +29,6 @@ public interface GoalMapper {
                 .collect(Collectors.toList());
     }
 
-    GoalDto update(@MappingTarget GoalDto target, GoalDto updatingSource);
+    @Mapping(target = "id", ignore = true)
+    Goal updateFromDto(GoalDto dto, @MappingTarget Goal goal);
 }

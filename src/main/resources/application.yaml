@@ -27,6 +27,15 @@ spring:
         profile_view_channel:
             name: profile_view_channel
 
+  google:
+    calendar:
+      application-name: Corporation-X
+      credentials-file-path: /credentials.json
+      calendar-id: primary
+      redirect-uri: http://localhost:8080/google/calendar/callback
+      scopes: https://www.googleapis.com/auth/calendar
+      access-type: offline
+
 server:
   port: 8080
 

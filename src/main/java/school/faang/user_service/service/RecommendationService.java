@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 
-import school.faang.user_service.dto.recommendation.SkillOfferDto;
-import school.faang.user_service.dto.recommendation.UserSkillGuaranteeDto;
+import school.faang.user_service.dto.skill.SkillOfferDto;
+import school.faang.user_service.dto.skill.UserSkillGuaranteeDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;

@@ -2,7 +2,7 @@ package school.faang.user_service.controller.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import school.faang.user_service.dto.EventFilterDto;
+import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.service.event.EventService;
 
@@ -20,7 +20,7 @@ public class EventController {
 
     @GetMapping("/event/{id}")
     public EventDto getEvent(@PathVariable Long id) {
-        return eventService.getEvent(id);
+        return eventService.getEventById(id);
     }
 
     @GetMapping("/event")

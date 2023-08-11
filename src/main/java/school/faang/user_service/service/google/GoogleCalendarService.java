@@ -17,8 +17,8 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.GoogleTokenRepository;
-import school.faang.user_service.service.EventService;
-import school.faang.user_service.service.UserService;
+import school.faang.user_service.service.event.EventService;
+import school.faang.user_service.service.user.UserService;
 
 import java.io.IOException;
 import java.time.ZoneId;

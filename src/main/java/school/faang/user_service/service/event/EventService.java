@@ -2,12 +2,13 @@ package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.EventFilterDto;
+import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.exception.event.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.mapper.skill.SkillMapper;
 import school.faang.user_service.repository.UserRepository;
@@ -58,10 +59,8 @@ public class EventService {
         }
     }
 
-    public EventDto getEvent(Long id) {
-        Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new DataValidationException("Event not found"));
-        return eventMapper.toDto(event);
+    public EventDto getEventById(Long id) {
+        return eventMapper.toDto(getEvent(id));
     }
 
     public List<EventDto> getEventsByFilter(Long eventId, EventFilterDto filters) {
@@ -135,5 +134,10 @@ public class EventService {
 
     public boolean existsById(long id) {
         return eventRepository.existsById(id);
+    }
+
+    public Event getEvent(Long id) {
+        return eventRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Event with id " + id + " not found"));
     }
 }

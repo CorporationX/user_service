@@ -29,6 +29,7 @@ public class UserController {
             return new ArrayList<>();
         }
         return userService.getUsersByIds(ids);
+    }
 
     @GetMapping("/{userId}")
     public UserDto getUser(@PathVariable("userId") long userId) {

@@ -28,7 +28,11 @@ class UserServiceTest {
     private UserService userService;
     @Spy
     private UserMapperImpl userMapper;
+
     private final List<Long> USERS_IDS = List.of(1L, 2L, 3L);
+    private long USER_ID = 1L;
+    private User user;
+    private UserDto userDto;
 
     @Test
     void testGetUsersByIds() {
@@ -37,10 +41,7 @@ class UserServiceTest {
         List<UserDto> expectedList = getCorrectListOfUserDto();
 
         assertEquals(expectedList, actualLust);
-
-    private long USER_ID = 1L;
-    private User user;
-    private UserDto userDto;
+    }
 
     @BeforeEach
     void setUp() {
@@ -59,12 +60,6 @@ class UserServiceTest {
         when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
         assertThrows(EntityNotFoundException.class, () -> userService.getUser(USER_ID));
     }
-  
-    public void testFindUserCallFindById() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(new User()));
-        userService.findUserById(1L);
-        verify(userRepository, times(1)).findById(1L);
-    }
 
     private List<User> getListOfUser() {
         return List.of(User.builder().id(1L).build(),
@@ -74,8 +69,9 @@ class UserServiceTest {
 
     private List<UserDto> getCorrectListOfUserDto() {
         return List.of(UserDto.builder().id(1L).build(),
-                       UserDto.builder().id(2L).build(),
-                       UserDto.builder().id(3L).build());
+                UserDto.builder().id(2L).build(),
+                UserDto.builder().id(3L).build());
+    }
 
     @Test
     void getUser() {

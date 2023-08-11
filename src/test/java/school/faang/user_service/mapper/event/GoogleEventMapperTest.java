@@ -14,11 +14,10 @@ import java.time.ZonedDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+
 class GoogleEventMapperTest {
 
-    @Autowired
-    private GoogleEventDtoMapper googleEventMapper;
+    private GoogleEventDtoMapper googleEventMapper = new GoogleEventDtoMapperImpl();
 
     @Test
     void testMapToGoogleEvent() {
@@ -49,11 +48,11 @@ class GoogleEventMapperTest {
         event.setStart(eventDateTimeStart);
         event.setEnd(eventDateTimeEnd);
 
-        assertEquals(event.getDescription(),googleEventMapper.toGoogleEventDto(newEvent).getDescription());
-        assertEquals(event.getSummary(),googleEventMapper.toGoogleEventDto(newEvent).getSummary());
-        assertEquals(event.getEnd(),googleEventMapper.toGoogleEventDto(newEvent).getEnd());
-        assertEquals(event.getStart(),googleEventMapper.toGoogleEventDto(newEvent).getStart());
-        assertEquals(event.getLocation(),googleEventMapper.toGoogleEventDto(newEvent).getLocation());
-        assertEquals(event,googleEventMapper.toGoogleEventDto(newEvent));
+        assertEquals(event.getDescription(), googleEventMapper.toGoogleEventDto(newEvent).getDescription());
+        assertEquals(event.getSummary(), googleEventMapper.toGoogleEventDto(newEvent).getSummary());
+        assertEquals(event.getEnd(), googleEventMapper.toGoogleEventDto(newEvent).getEnd());
+        assertEquals(event.getStart(), googleEventMapper.toGoogleEventDto(newEvent).getStart());
+        assertEquals(event.getLocation(), googleEventMapper.toGoogleEventDto(newEvent).getLocation());
+        assertEquals(event, googleEventMapper.toGoogleEventDto(newEvent));
     }
 }

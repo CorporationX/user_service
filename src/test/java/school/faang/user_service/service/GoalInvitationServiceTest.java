@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.RequestStatus;
@@ -17,6 +18,7 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.filter.InvitationFilter;
 import school.faang.user_service.mapper.GoalInvitationMapper;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
@@ -60,6 +62,9 @@ class GoalInvitationServiceTest {
 
     @InjectMocks
     GoalInvitationService goalInvitationService;
+
+    @Mock
+    UserMapper userMapper;
 
     @Nested
     class NegativeTestGroup {
@@ -123,14 +128,14 @@ class GoalInvitationServiceTest {
 
         @Test
         public void testCreateInvitationThrowIllegalArgExc() {
-            Mockito.when(userService.findUserById(1L)).thenReturn(new User());
+            Mockito.when(userService.getUser(1L)).thenReturn(new UserDto());
             assertThrows(IllegalArgumentException.class, () -> goalInvitationService.createInvitation(
                     new GoalInvitationDto(1L, 1L, 1L, 1L, RequestStatus.PENDING)));
         }
 
         @Test
         public void testCreateInvitationThrowEntityExc() {
-            Mockito.when(userService.findUserById(1L)).thenReturn(new User());
+            Mockito.when(userService.getUser(1L)).thenReturn(new UserDto());
             Mockito.when(goalRepository.findById(1L)).thenReturn(Optional.empty());
 
             assertThrows(EntityNotFoundException.class, () -> goalInvitationService.createInvitation(
@@ -189,7 +194,7 @@ class GoalInvitationServiceTest {
     class PositiveTestGroupB {
         @BeforeEach
         public void setUp() {
-            Mockito.when(userService.findUserById(1L)).thenReturn(new User());
+            Mockito.when(userService.getUser(1L)).thenReturn(new UserDto());
             Mockito.when(goalRepository.findById(1L)).thenReturn(Optional.of(new Goal()));
 
             goalInvitationService.createInvitation(new GoalInvitationDto(1L, 1L, 2L, 1L, RequestStatus.PENDING));
@@ -197,7 +202,7 @@ class GoalInvitationServiceTest {
 
         @Test
         public void testCreateInvitationCallFindUserById() {
-            Mockito.verify(userService, Mockito.times(2)).findUserById(Mockito.anyLong());
+            Mockito.verify(userService, Mockito.times(2)).getUser(Mockito.anyLong());
         }
 
         @Test
@@ -244,7 +249,8 @@ class GoalInvitationServiceTest {
                     goalRepository,
                     invitationFilters,
                     goalInvitationMapper,
-                    goalInvitationRepository);
+                    goalInvitationRepository,
+                    userMapper);
 
             Mockito.when(goalInvitationRepository.findAll()).thenReturn(invitations);
 

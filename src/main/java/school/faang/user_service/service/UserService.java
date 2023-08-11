@@ -29,9 +29,10 @@ public class UserService {
         return users;
     }
 
-    public User findUserById(Long userId) {
-        return userRepository
-                .findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("Invalid request. Requester user not found"));
+    public UserDto getUser(long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("This user was not found"));
+        log.info("User with id={} has taken successfully from DB", userId);
+        return userMapper.toDto(user);
     }
 }

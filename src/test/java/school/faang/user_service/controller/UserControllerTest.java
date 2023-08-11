@@ -33,5 +33,9 @@ public class UserControllerTest {
     void testGetUsersByIds() {
         userController.getUsersByIds(List.of(USER_ID));
         verify(userService).getUsersByIds(List.of(USER_ID));
+
+    void testGetUser() {
+        userController.getUser(USER_ID);
+        verify(userService).getUser(USER_ID);
     }
 }

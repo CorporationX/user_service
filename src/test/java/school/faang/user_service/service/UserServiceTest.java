@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
@@ -38,11 +37,27 @@ class UserServiceTest {
         List<UserDto> expectedList = getCorrectListOfUserDto();
 
         assertEquals(expectedList, actualLust);
+
+    private long USER_ID = 1L;
+    private User user;
+    private UserDto userDto;
+
+    @BeforeEach
+    void setUp() {
+        user = User.builder()
+                .id(USER_ID)
+                .username("Nikita")
+                .build();
+        userDto = UserDto.builder()
+                .id(USER_ID)
+                .username("Nikita")
+                .build();
     }
 
     @Test
-    public void testFindUserThrowEntityNotFoundExc() {
-        assertThrows(EntityNotFoundException.class, () -> userService.findUserById(null));
+    void getUserWithoutUserInDataBase() {
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
+        assertThrows(EntityNotFoundException.class, () -> userService.getUser(USER_ID));
     }
   
     public void testFindUserCallFindById() {
@@ -61,5 +76,11 @@ class UserServiceTest {
         return List.of(UserDto.builder().id(1L).build(),
                        UserDto.builder().id(2L).build(),
                        UserDto.builder().id(3L).build());
+
+    @Test
+    void getUser() {
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.ofNullable(user));
+        UserDto actualUser = userService.getUser(USER_ID);
+        assertEquals(userDto, actualUser);
     }
 }

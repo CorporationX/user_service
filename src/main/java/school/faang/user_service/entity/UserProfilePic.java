@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @Embeddable
 public class UserProfilePic {
+    private String name;
     private String fileId;
     private String smallFileId;
 }

@@ -35,6 +35,7 @@ server:
 logging:
   level:
     root: info
+    org.springframework.retry: DEBUG
 
 project-service:
   host: localhost
@@ -43,6 +44,10 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+  endpoint: /api/payment
+  retry:
+    max-attempts: 5
+    delay-ms: 3000
 
 aws:
   accessKey: access_key

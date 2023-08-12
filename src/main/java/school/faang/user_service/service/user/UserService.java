@@ -2,8 +2,11 @@ package school.faang.user_service.service.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.MentorshipService;
 import school.faang.user_service.service.event.EventService;
@@ -17,12 +20,19 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
     private final GoalService goalService;
     private final EventService eventService;
     private final MentorshipService mentorshipService;
 
     public boolean isUserExist(Long userId) {
         return userRepository.existsById(userId);
+    }
+
+    public UserDto getUserById(Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new IllegalStateException("User not found with ID: " + userId));
+        return userMapper.toDto(user);
     }
 
     private boolean shouldGoalBeDeleted(GoalDto goal, Long userId) {

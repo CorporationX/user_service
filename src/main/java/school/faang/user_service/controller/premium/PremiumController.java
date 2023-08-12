@@ -19,10 +19,9 @@ public class PremiumController {
     private final PremiumService premiumService;
     private final ObjectValidator objectValidator;
 
-    @PostMapping("/buyPremium")
-    public ResponseEntity<PremiumResponseDto> buyPremium(@RequestBody PremiumRequestDto premiumRequestDto) {
+    @PostMapping("/premium")
+    public PremiumResponseDto buyPremium(@RequestBody PremiumRequestDto premiumRequestDto) {
         objectValidator.validate(premiumRequestDto);
-        PremiumResponseDto paymentResponse = premiumService.buyPremium(premiumRequestDto);
-        return ResponseEntity.ok(paymentResponse);
+        return premiumService.buyPremium(premiumRequestDto);
     }
 }

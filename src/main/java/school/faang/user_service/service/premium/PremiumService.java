@@ -2,18 +2,23 @@ package school.faang.user_service.service.premium;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.premium.PremiumDto;
 import school.faang.user_service.dto.premium.PremiumRequestDto;
 import school.faang.user_service.dto.premium.PremiumResponseDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.integration.PaymentService;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.mapper.premium.PremiumMapper;
 import school.faang.user_service.model.TariffPlan;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
+import school.faang.user_service.service.user.UserService;
 
 import java.time.LocalDateTime;
 
@@ -22,17 +27,17 @@ import java.time.LocalDateTime;
 public class PremiumService {
     private final UserContext userContext;
     private final PaymentService paymentService;
+    private final UserService userService;
+    private final UserMapper userMapper;
     private final PremiumRepository premiumRepository;
-    private final UserRepository userRepository;
     private final PremiumMapper premiumMapper;
 
+    @Transactional
     public PremiumResponseDto buyPremium(PremiumRequestDto premiumRequestDto) {
         long userId = userContext.getUserId();
-        PremiumResponseDto responseDto = new PremiumResponseDto();
 
         if (premiumRepository.existsByUserId(userId)) {
-            responseDto.setMessage("User already has premium access");
-            return responseDto;
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User already has premium access");
         }
 
         PremiumResponseDto paymentResponse = paymentService.makePayment(premiumRequestDto.getPayment());
@@ -40,10 +45,9 @@ public class PremiumService {
         Premium premium = createPremiumForUser(userId, tariffPlan);
         Premium savedPremium = premiumRepository.save(premium);
 
-        responseDto = paymentResponse;
-        fillTariffPlan(responseDto, tariffPlan, savedPremium);
+        fillTariffPlan(paymentResponse, tariffPlan, savedPremium);
 
-        return responseDto;
+        return paymentResponse;
     }
 
     private void fillTariffPlan(PremiumResponseDto responseDto,
@@ -56,8 +60,8 @@ public class PremiumService {
 
     private Premium createPremiumForUser(long userId, TariffPlan tariffPlan) {
         LocalDateTime endDate = tariffPlan.getEndDate();
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new IllegalStateException("User not found with ID: " + userId));
+        UserDto userById = userService.getUserById(userId);
+        User user = userMapper.toEntity(userById);
 
         return Premium.builder()
             .user(user)

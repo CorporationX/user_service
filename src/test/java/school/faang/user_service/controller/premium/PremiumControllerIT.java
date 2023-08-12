@@ -6,7 +6,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 class PremiumControllerIT {
-    private static final String URL = "http://localhost:8080/api/v1/buyPremium";
+    private static final String URL = "http://localhost:8080/api/v1/premium";
     private static final String STATUS = "SUCCESS";
     private static final long USER_ID = 11112L;
     private static final long PAYMENT_NUMBER = 1111_1111_1111_1111L;
@@ -61,7 +60,7 @@ class PremiumControllerIT {
             )
         );
 
-        when(premiumController.buyPremium(request)).thenReturn(ResponseEntity.ok(mockResponse));
+        when(premiumController.buyPremium(request)).thenReturn(mockResponse);
 
         mockMvc.perform(MockMvcRequestBuilders.post(URL)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -75,6 +74,5 @@ class PremiumControllerIT {
             .andExpect(jsonPath("$.currency").value("USD"))
             .andExpect(jsonPath("$.tariffPlan.userId").value(USER_ID))
             .andExpect(jsonPath("$.tariffPlan.tariffPlan").value(TariffPlan.MONTHLY.name()));
-
     }
 }

@@ -32,9 +32,4 @@ public class UserServiceApplication {
         objectMapper.registerModule(new JavaTimeModule());
         return objectMapper;
     }
-
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
 }

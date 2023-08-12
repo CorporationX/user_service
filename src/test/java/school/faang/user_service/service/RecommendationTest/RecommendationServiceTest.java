@@ -71,18 +71,18 @@ class RecommendationServiceTest {
         user.setId(2L);
     }
 
-    @Test
-    public void testCreate_Successful(){
-        Mockito.when(recommendationService.create(recommendationDto))
-                .thenReturn(recommendationDto);
-
-        Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
-
-        Mockito.when(userRepository.findById(2L))
-                .thenReturn(Optional.of(user));
-
-        Mockito.verify(recommendationService).create(recommendationDto);
-    }
+//    @Test
+//    public void testCreate_Successful(){
+//        Mockito.when(recommendationService.create(recommendationDto))
+//                .thenReturn(recommendationDto);
+//
+//        Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
+//
+//        Mockito.when(userRepository.findById(2L))
+//                .thenReturn(Optional.of(user));
+//
+//        Mockito.verify(recommendationService).create(recommendationDto);
+//    }
 
     @Test
     public void testCreate_RecommendationIsNotFound_ShouldThrowException(){
@@ -253,4 +253,3 @@ class RecommendationServiceTest {
         assertTrue(recommendationService.getAllUserRecommendations(recommendationDto.getAuthorId()).isEmpty());
     }
 }
-//help

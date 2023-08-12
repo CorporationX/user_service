@@ -10,12 +10,16 @@ import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.mapper.GoogleCalendarMapper;
 import school.faang.user_service.service.event.EventMock;
 import school.faang.user_service.service.event.EventService;
+import school.faang.user_service.service.google.calendar.GoogleCalendarService;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 @ExtendWith(MockitoExtension.class)
 public class GoogleCalendarControllerTest {
+    @Mock
+    private GoogleCalendarService googleCalendarService;
+
     @Mock
     private EventService eventService;
 
@@ -34,6 +38,6 @@ public class GoogleCalendarControllerTest {
 
         Mockito.verify(eventService, Mockito.times(1)).get(1L);
         Mockito.verify(googleCalendarMapper, Mockito.times(1)).toGoogleEventDto(eventDto);
-        Mockito.verify(eventService, Mockito.times(1)).createCalendarEvent(googleCalendarMapper.toGoogleEventDto(eventDto));
+        Mockito.verify(googleCalendarService, Mockito.times(1)).createEvent(googleCalendarMapper.toGoogleEventDto(eventDto));
     }
 }

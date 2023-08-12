@@ -7,6 +7,7 @@ import school.faang.user_service.dto.calendar.GoogleEventResponseDto;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.mapper.GoogleCalendarMapper;
 import school.faang.user_service.service.event.EventService;
+import school.faang.user_service.service.google.calendar.GoogleCalendarService;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -15,6 +16,7 @@ import java.security.GeneralSecurityException;
 @RequestMapping("/api/v1/calendar")
 @RequiredArgsConstructor
 public class GoogleCalendarController {
+    private final GoogleCalendarService googleCalendarService;
     private final EventService eventService;
     private final GoogleCalendarMapper googleCalendarMapper;
 
@@ -22,6 +24,6 @@ public class GoogleCalendarController {
     @PostMapping("/{id}")
     public GoogleEventResponseDto createCalendarEvent(@PathVariable("id") Long eventId) throws GeneralSecurityException, IOException {
         EventDto event = eventService.get(eventId);
-        return eventService.createCalendarEvent(googleCalendarMapper.toGoogleEventDto(event));
+        return googleCalendarService.createEvent(googleCalendarMapper.toGoogleEventDto(event));
     }
 }

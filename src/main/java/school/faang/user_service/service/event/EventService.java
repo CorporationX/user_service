@@ -4,8 +4,6 @@ package school.faang.user_service.service.event;
 import lombok.RequiredArgsConstructor;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.calendar.GoogleEventDto;
-import school.faang.user_service.dto.calendar.GoogleEventResponseDto;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.Skill;
@@ -16,11 +14,8 @@ import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.service.google.calendar.GoogleCalendarService;
 import school.faang.user_service.service.event.filters.EventFilter;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -35,7 +30,6 @@ public class EventService {
     private final EventMapper eventMapper;
     private final List<EventFilter> eventFilters;
     private final UserRepository userRepository;
-    private final GoogleCalendarService googleCalendarService;
 
     private void validateUserAccess(List<Long> skills, Long ownerId) {
         List<Skill> userSkills = skillRepository.findAllByUserId(ownerId);
@@ -120,9 +114,5 @@ public class EventService {
         });
 
         return events.size();
-    }
-
-    public GoogleEventResponseDto createCalendarEvent(GoogleEventDto eventDto) throws GeneralSecurityException, IOException {
-        return googleCalendarService.createEvent(eventDto);
     }
 }

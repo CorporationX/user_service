@@ -26,25 +26,14 @@ import java.io.FileNotFoundException;
 
 @Component
 public class GoogleCalendarProvider {
-    /**
-     * Application name.
-     */
     @Value("${google.calendar.application-name}")
     private String applicationName;
-    /**
-     * Global instance of the JSON factory.
-     */
+
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-    /**
-     * Directory to store authorization tokens for this application.
-     */
+
     @Value("${google.calendar.tokens-path}")
     private String tokensDirectoryPath;
 
-    /**
-     * Global instance of the scopes required by this quickstart.
-     * If modifying these scopes, delete your previously saved tokens/ folder.
-     */
     @Value("${google.calendar.scopes}")
     private List<String> scopes;
 
@@ -54,16 +43,9 @@ public class GoogleCalendarProvider {
     @Value("${google.calendar.access-type}")
     private String accessType;
 
-    /**
-     * Creates an authorized Credential object.
-     *
-     * @param HTTP_TRANSPORT The network HTTP Transport.
-     * @return An authorized Credential object.
-     * @throws IOException If the credentials.json file cannot be found.
-     */
     private Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT)
         throws IOException {
-        // Load client secrets.
+
         InputStream in = GoogleCalendarProvider.class.getResourceAsStream(credentialsFilePath);
         if (in == null) {
             throw new FileNotFoundException("Resource not found: " + credentialsFilePath);
@@ -71,7 +53,7 @@ public class GoogleCalendarProvider {
         GoogleClientSecrets clientSecrets =
             GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
-        // Build flow and trigger user authorization request.
+
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
             HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, scopes)
             .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(tokensDirectoryPath)))
@@ -80,7 +62,6 @@ public class GoogleCalendarProvider {
 
         LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
 
-        //returns an authorized Credential object.
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
     }
 

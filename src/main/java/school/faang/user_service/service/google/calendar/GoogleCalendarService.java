@@ -4,6 +4,7 @@ import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.calendar.GoogleEventResponseDto;
@@ -15,6 +16,7 @@ import java.security.GeneralSecurityException;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GoogleCalendarService {
     private final GoogleCalendarMapper googleCalendarMapper;
     private final GoogleCalendarProvider googleCalendarProvider;
@@ -30,12 +32,11 @@ public class GoogleCalendarService {
 
         Event event = googleCalendarMapper.toGoogleEvent(eventDto);
 
-
         Calendar.Events events = googleCalendar.events();
         Calendar.Events.Insert insert = events.insert(calendarId, event);
         event = insert.execute();
 
-        System.out.printf("Event created: %s\n", event.getHtmlLink());
+        log.info("Event created: %s\n" + event.getHtmlLink());
 
         return new GoogleEventResponseDto(
             SUCCESSFUL_MESSAGE,

@@ -12,10 +12,9 @@ import school.faang.user_service.dto.google.GoogleEventResponseDto;
 import school.faang.user_service.service.event.GoogleCalendarService;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 
 @RestController
-@RequestMapping("/api/v1/calendar")
+@RequestMapping("/calendar")
 @RequiredArgsConstructor
 public class GoogleController {
 
@@ -23,13 +22,13 @@ public class GoogleController {
     private final UserContext userContext;
 
     @PostMapping("/{id}")
-    public GoogleEventResponseDto createEvent(@PathVariable("id") Long eventId) throws IOException, GeneralSecurityException {
+    public GoogleEventResponseDto createEvent(@PathVariable("id") Long eventId) throws IOException {
         Long userId = userContext.getUserId();
         return googleCalendarService.createEvent(userId, eventId);
     }
 
-    @GetMapping("/Callback")
-    public GoogleEventResponseDto handleCallback(@RequestParam String code, @RequestParam String state) throws GeneralSecurityException, IOException {
+    @GetMapping("/callback")
+    public GoogleEventResponseDto handleCallback(@RequestParam String code, @RequestParam String state) throws IOException {
         Long userId = Long.parseLong(state.split("-")[0]);
         return googleCalendarService.handleCallback(code, userId);
     }

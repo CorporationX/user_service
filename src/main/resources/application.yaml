@@ -31,7 +31,7 @@ spring:
       application-name: Corporation-X
       credentials-file-path: /credentials.json
       calendar-id: primary
-      redirect-uri: http://localhost:8080/api/v1/calendar/Callback
+      redirect-uri: http://localhost:8080/calendar/callback
       scopes: https://www.googleapis.com/auth/calendar
       access-type: offline
 

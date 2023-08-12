@@ -1,25 +1,21 @@
 package school.faang.user_service.service.event;
 
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.config.google.GoogleConfig;
 import school.faang.user_service.dto.google.CalendarEventDto;
 import school.faang.user_service.dto.google.GoogleEventResponseDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.BadRequestException;
-import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.mapper.event.CalendarMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.google.GoogleTokenRepository;
-import school.faang.user_service.util.GoogleConfig;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 
 @Service
 @RequiredArgsConstructor
@@ -31,20 +27,18 @@ public class GoogleCalendarService {
     private final UserRepository userRepository;
 
 
-    public GoogleEventResponseDto createEvent(Long userId, Long eventId) throws IOException, GeneralSecurityException {
-        school.faang.user_service.entity.event.Event newEvent = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Event not found"));
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
+    public GoogleEventResponseDto createEvent(Long userId, Long eventId) throws IOException {
+        school.faang.user_service.entity.event.Event newEvent = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException("Event not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         if (!user.getParticipatedEvents().contains(newEvent)) {
             throw new BadRequestException("User with id " + userId + " is not part of event with id " + eventId);
         }
 
-        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-
         if (!googleTokenRepository.existsByUser(user)) {
             return GoogleEventResponseDto.builder()
                     .message("Follow the link to authorize your calendar")
-                    .link(googleConfig.getAuthorizationLink(HTTP_TRANSPORT, userId, eventId))
+                    .link(googleConfig.getAuthorizationLink(userId, eventId))
                     .build();
         }
         CalendarEventDto eventDto = calendarMapper.toDto(newEvent);
@@ -54,7 +48,7 @@ public class GoogleCalendarService {
         return googleConfig.getResponse(result.getHtmlLink());
     }
 
-    public GoogleEventResponseDto handleCallback(String code, Long userId) throws IOException, GeneralSecurityException {
+    public GoogleEventResponseDto handleCallback(String code, Long userId) throws IOException {
         googleConfig.callBack(code, userId);
         return GoogleEventResponseDto.builder().message("User authorized").build();
     }

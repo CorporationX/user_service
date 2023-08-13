@@ -1,6 +1,17 @@
 package school.faang.user_service.controller.goal;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.goal.CreateGoalDto;
 import school.faang.user_service.dto.goal.GoalDto;
@@ -13,26 +24,33 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("api/v1/goals")
 public class GoalController {
     private final GoalService goalService;
 
-    public void deleteGoal(long goalId) {
+    @DeleteMapping("{goalId}")
+    public void deleteGoal(@PathVariable long goalId) {
         goalService.deleteGoal(goalId);
     }
 
-    public ResponseGoalDto createGoal(Long userId, CreateGoalDto goal){
-      return goalService.createGoal(userId, goal);
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseGoalDto createGoal(@RequestParam Long userId, @Valid @RequestBody CreateGoalDto goal){
+        return goalService.createGoal(userId, goal);
     }
 
-    public List<GoalDto> getSubGoalsByFilter(Long parentId, GoalFilterDto filterDto) {
+    @GetMapping("/filtered")
+    public List<GoalDto> getSubGoalsByFilter(@RequestParam Long parentId, @RequestBody GoalFilterDto filterDto) {
         return goalService.getSubGoalsByFilter(parentId, filterDto);
     }
 
-    public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filterDto) {
+    @GetMapping("/owner/{userId}")
+    public List<GoalDto> getGoalsByUser(@PathVariable Long userId, @RequestBody GoalFilterDto filterDto) {
         return goalService.getGoalsByUser(userId, filterDto);
     }
 
-    public UpdateGoalDto updateGoal(UpdateGoalDto updateGoalDto){
-       return goalService.updateGoal(updateGoalDto);
+    @PutMapping
+    public UpdateGoalDto updateGoal(@Valid @RequestBody UpdateGoalDto updateGoalDto){
+        return goalService.updateGoal(updateGoalDto);
     }
 }

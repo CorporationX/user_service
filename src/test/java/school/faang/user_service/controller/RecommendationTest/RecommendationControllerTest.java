@@ -36,4 +36,11 @@ class RecommendationControllerTest {
         Mockito.verify(recommendationDtoValidator).validateRecommendation(recommendationDto);
         Mockito.verify(recommendationService).update(recommendationDto);
     }
+
+    @Test
+    void deleteRecommendation() {
+        long id = Mockito.anyLong();
+        recommendationController.deleteRecommendation(id);
+        Mockito.verify(recommendationService).delete(id);
+    }
 }

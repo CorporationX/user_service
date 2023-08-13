@@ -2,6 +2,8 @@ package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,7 +35,8 @@ public class RecommendationController {
         return recommendationService.update(updated);
     }
 
-    public void deleteRecommendation(long id) {
+    @DeleteMapping("/deleteRecommendation")
+    public void deleteRecommendation(@PathVariable("id") long id) {
         recommendationService.delete(id);
     }
 

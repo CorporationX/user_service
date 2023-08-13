@@ -1,4 +1,4 @@
-package school.faang.user_service.service.filter;
+package school.faang.user_service.filter.mentorship_request;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.mentorship.RequestFilterDto;
@@ -7,14 +7,14 @@ import school.faang.user_service.entity.MentorshipRequest;
 import java.util.stream.Stream;
 
 @Component
-public class MentorshipRequestStatusFilter implements MentorshipRequestFilter{
+public class MentorshipRequestRequesterIdFilter implements MentorshipRequestFilter{
     @Override
     public boolean isApplicable(RequestFilterDto filters) {
-        return filters.getStatus()!=null;
+        return filters.getRequesterId()!=null;
     }
 
     @Override
     public void apply(Stream<MentorshipRequest> mentorshipRequests, RequestFilterDto filters) {
-        mentorshipRequests.filter(request -> request.getStatus()==filters.getStatus());
+        mentorshipRequests.filter(request -> request.getRequester().getId()==filters.getRequesterId());
     }
 }

@@ -70,7 +70,7 @@ public class RecommendationService {
         return recommendationMapper.toDto(recommendation);
     }
 
-    public RecommendationDto update(RecommendationDto recommendationDto){
+    public RecommendationDto update(RecommendationDto recommendationDto) {
         validatePreviousRecommendation(recommendationDto);
 
         recommendationDto.getSkillOffers()
@@ -127,14 +127,14 @@ public class RecommendationService {
         return recommendationMapper.toDto(updatedRecommendation);
     }
 
-    public void delete(long id){
+    public void delete(long id) {
         recommendationRepository.deleteById(id);
     }
 
-    public List<RecommendationDto> getAllUserRecommendations(long receiverId){
+    public List<RecommendationDto> getAllUserRecommendations(long receiverId) {
         Page<Recommendation> recommendations = recommendationRepository
                 .findAllByReceiverId(receiverId, Pageable.unpaged());
-        if(recommendations==null) {
+        if (recommendations == null) {
             return new ArrayList<>();
         }
         return recommendations.getContent()
@@ -143,10 +143,10 @@ public class RecommendationService {
                 .toList();
     }
 
-    public List<RecommendationDto> getAllGivenRecommendations(long authorId){
+    public List<RecommendationDto> getAllGivenRecommendations(long authorId) {
         Page<Recommendation> recommendations = recommendationRepository
                 .findAllByReceiverId(authorId, Pageable.unpaged());
-        if(recommendations==null) {
+        if (recommendations == null) {
             return new ArrayList<>();
         }
         return recommendations.getContent()
@@ -168,7 +168,7 @@ public class RecommendationService {
         }
     }
 
-    private void checkSkills(RecommendationDto recommendationDto){
+    private void checkSkills(RecommendationDto recommendationDto) {
         Set<Long> skillIds = recommendationDto.getSkillOffers()
                 .stream()
                 .map(SkillOfferDto::getSkillId)
@@ -179,7 +179,7 @@ public class RecommendationService {
         }
     }
 
-    private void checkRecommendations(RecommendationDto recommendationDto){
+    private void checkRecommendations(RecommendationDto recommendationDto) {
         Set<Long> recommendationIds = recommendationDto.getSkillOffers()
                 .stream()
                 .map(SkillOfferDto::getRecommendationId)

@@ -71,18 +71,15 @@ class RecommendationServiceTest {
         user.setId(2L);
     }
 
-//    @Test
-//    public void testCreate_Successful(){
-//        Mockito.when(recommendationService.create(recommendationDto))
-//                .thenReturn(recommendationDto);
-//
-//        Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
-//
-//        Mockito.when(userRepository.findById(2L))
-//                .thenReturn(Optional.of(user));
-//
-//        Mockito.verify(recommendationService).create(recommendationDto);
-//    }
+    @Test
+    public void testCreate_Successful(){
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.of(user));
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.of(user));
+        recommendationService.create(recommendationDto);
+        Mockito.verify(recommendationRepository).save(Mockito.any());
+    }
 
     @Test
     public void testCreate_RecommendationIsNotFound_ShouldThrowException(){

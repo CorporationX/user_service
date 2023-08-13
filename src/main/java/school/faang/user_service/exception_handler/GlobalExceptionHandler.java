@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.IncorrectIdException;
+import school.faang.user_service.exception.NotPartOfEventException;
 import school.faang.user_service.exception.UserNotFoundException;
 
 import java.util.HashMap;
@@ -29,6 +30,13 @@ public class GlobalExceptionHandler {
         });
         log.error(exception.getMessage(), exception);
         return ResponseEntity.badRequest().body(errors);
+    }
+
+    @ExceptionHandler(NotPartOfEventException.class)
+    public ResponseEntity<Object> handleNotPartOfEventException(NotPartOfEventException exception) {
+        Map<String, String> body = Map.of("message", exception.getMessage());
+        log.error(exception.getMessage(), exception);
+        return ResponseEntity.status(HttpStatus.SC_CONFLICT).body(body);
     }
 
     @ExceptionHandler(DataValidationException.class)

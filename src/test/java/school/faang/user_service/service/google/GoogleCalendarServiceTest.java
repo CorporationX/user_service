@@ -18,6 +18,7 @@ import school.faang.user_service.mapper.event.GoogleEventDtoMapperImpl;
 import school.faang.user_service.mapper.event.GoogleEventMapper;
 import school.faang.user_service.mapper.event.GoogleEventMapperImpl;
 import school.faang.user_service.repository.GoogleTokenRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.UserService;
 
@@ -39,7 +40,7 @@ class GoogleCalendarServiceTest {
     @Mock
     private EventRepository eventRepository;
     @Mock
-    private UserService userService;
+    private UserRepository userRepository;
     @Mock
     private Calendar calendar;
     @Spy
@@ -74,22 +75,22 @@ class GoogleCalendarServiceTest {
     void testCreateEventThrowsNotPartOfEventException() {
         user.setParticipatedEvents(new ArrayList<>());
         Mockito.when(eventRepository.findById(1L)).thenReturn(Optional.of(newEvent));
-        Mockito.when(userService.findUserById(1L)).thenReturn(user);
+        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.ofNullable(user));
 
-        assertThrows(NotPartOfEventException.class, ()-> googleCalendarService.createEvent(user.getId(),1L));
+        assertThrows(NotPartOfEventException.class, () -> googleCalendarService.createEvent(user.getId(), 1L));
     }
 
     @Test
     void testCreateEventThrowsEventNotFoundException() {
         Mockito.when(eventRepository.findById(1L)).thenReturn(Optional.ofNullable(null));
 
-        assertThrows(EventNotFoundException.class, ()-> googleCalendarService.createEvent(user.getId(),1L));
+        assertThrows(EventNotFoundException.class, () -> googleCalendarService.createEvent(user.getId(), 1L));
     }
 
     @Test
     void testHandleCallbackThrowsEventNotFoundException() {
         Mockito.when(eventRepository.findById(1L)).thenReturn(Optional.ofNullable(null));
 
-        assertThrows(EventNotFoundException.class, ()-> googleCalendarService.handleCallback("1",user.getId(),1L));
+        assertThrows(EventNotFoundException.class, () -> googleCalendarService.handleCallback("1", user.getId(), 1L));
     }
 }

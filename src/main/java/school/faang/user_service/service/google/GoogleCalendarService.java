@@ -8,6 +8,7 @@ import com.google.api.services.calendar.Calendar;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,25 +22,26 @@ import school.faang.user_service.exception.NotPartOfEventException;
 import school.faang.user_service.mapper.event.GoogleEventDtoMapper;
 import school.faang.user_service.mapper.event.GoogleEventMapper;
 import school.faang.user_service.repository.GoogleTokenRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.service.UserService;
 
 @Service
 @RequiredArgsConstructor
 public class GoogleCalendarService {
     private final GoogleTokenRepository googleTokenRepository;
     private final EventRepository eventRepository;
-    private final UserService userService;
     private final GoogleEventDtoMapper googleEventDtoMapper;
     private final GoogleEventMapper googleEventMapper;
     private final GoogleConfig googleConfig;
     private final GoogleProperties googleProperties;
+    private final UserRepository userRepository;
 
     @Transactional
     public GoogleEventResponseDto createEvent(Long userId, Long eventId) throws GeneralSecurityException, IOException {
         school.faang.user_service.entity.event.Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotFoundException("Event not found"));
-        User user = userService.findUserById(userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("This user was not found"));
 
         if (!user.getParticipatedEvents().contains(event)) {
             throw new NotPartOfEventException("User with id " + userId + " is not part of event with id " + eventId);

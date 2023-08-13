@@ -13,6 +13,9 @@ import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.event.GoogleEventResponseDto;
 import school.faang.user_service.service.google.GoogleCalendarService;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+
 @RestController
 @RequestMapping("/api/v1/events")
 @RequiredArgsConstructor
@@ -23,26 +26,17 @@ public class GoogleCalendarController {
     private final UserContext userContext;
 
     @PostMapping("/google/{eventId}")
-    public GoogleEventResponseDto createEvent(@PathVariable Long eventId) {
+    public GoogleEventResponseDto createEvent(@PathVariable Long eventId)
+            throws GeneralSecurityException, IOException {
         Long userId = userContext.getUserId();
-        try {
-            return googleCalendarService.createEvent(userId, eventId);
-        } catch (Exception e) {
-            log.error("Failed to push event to Google Calendar for user with id:{}\nException: {}",
-                    userId, e.getMessage());
-            return GoogleEventResponseDto.builder().build();
-        }
+        return googleCalendarService.createEvent(userId, eventId);
     }
 
     @GetMapping("/callback")
-    public GoogleEventResponseDto handleCallback(@RequestParam String code, @RequestParam String state) {
-        try {
-            Long userId = Long.parseLong(state.split("-")[0]);
-            Long eventId = Long.parseLong(state.split("-")[1]);
-            return googleCalendarService.handleCallback(code, userId, eventId);
-        } catch (Exception e) {
-            log.error("Failed to push event to Google Calendar\nException: {}", e.getMessage());
-            return GoogleEventResponseDto.builder().build();
-        }
+    public GoogleEventResponseDto handleCallback(@RequestParam String code, @RequestParam String state)
+            throws GeneralSecurityException, IOException {
+        Long userId = Long.parseLong(state.split("-")[0]);
+        Long eventId = Long.parseLong(state.split("-")[1]);
+        return googleCalendarService.handleCallback(code, userId, eventId);
     }
 }

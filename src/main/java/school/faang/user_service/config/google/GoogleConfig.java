@@ -11,7 +11,6 @@ import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.repository.GoogleTokenRepository;
 import school.faang.user_service.util.google.JpaDataStoreFactory;
@@ -30,21 +29,6 @@ import static com.google.api.client.json.gson.GsonFactory.getDefaultInstance;
 public class GoogleConfig {
 
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-
-//    @Value("${google.calendar.application-name}")
-//    private String applicationName;
-//
-//    @Value("${google.calendar.credentials-file-path}")
-//    private String credentialsFilePath;
-//
-//    @Value("${google.calendar.redirect-uri}")
-//    private String redirectUri;
-//
-//    @Value("${google.calendar.access-type}")
-//    private String accessType;
-//
-//    @Value("${google.calendar.calendar-id}")
-//    private String calendarId;
 
     private final GoogleTokenRepository googleTokenRepository;
 

@@ -3,6 +3,7 @@ package school.faang.user_service.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.RequestStatus;
@@ -11,6 +12,7 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.filter.InvitationFilter;
 import school.faang.user_service.mapper.GoalInvitationMapper;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
@@ -27,10 +29,11 @@ public class GoalInvitationService {
     private final List<InvitationFilter> invitationFilters;
     private final GoalInvitationMapper goalInvitationMapper;
     private final GoalInvitationRepository goalInvitationRepository;
+    private final UserMapper userMapper;
 
     public GoalInvitationDto createInvitation(GoalInvitationDto invitation) {
-        User inviter = userService.findUserById(invitation.getInviterId());
-        User invited = userService.findUserById(invitation.getInvitedUserId());
+        UserDto inviter = userService.getUser(invitation.getInviterId());
+        UserDto invited = userService.getUser(invitation.getInvitedUserId());
 
         if (inviter.equals(invited)) {
             throw new IllegalArgumentException("Invalid request. Inviter and invited users must be different");
@@ -42,8 +45,8 @@ public class GoalInvitationService {
             GoalInvitation savedGoalInvitation = goalInvitationRepository.save(new GoalInvitation(
                     invitation.getId(),
                     goal.get(),
-                    inviter,
-                    invited,
+                    userMapper.toEntity(inviter),
+                    userMapper.toEntity(invited),
                     invitation.getStatus(),
                     LocalDateTime.now(),
                     LocalDateTime.now()));

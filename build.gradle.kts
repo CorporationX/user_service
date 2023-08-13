@@ -74,6 +74,11 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 
 	/**
+	 * Swagger
+	 */
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
+
+	/**
 	 * Google Calendar
 	 */
 	implementation ("com.google.api-client:google-api-client:2.0.0")

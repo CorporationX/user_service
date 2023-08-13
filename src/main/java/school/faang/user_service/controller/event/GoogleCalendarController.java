@@ -1,4 +1,4 @@
-package school.faang.user_service.controller;
+package school.faang.user_service.controller.event;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +37,7 @@ public class GoogleCalendarController {
             throws GeneralSecurityException, IOException {
         Long userId = Long.parseLong(state.split("-")[0]);
         Long eventId = Long.parseLong(state.split("-")[1]);
+        log.info("Handle callback endpoint was called, userId: {}", userId);
         return googleCalendarService.handleCallback(code, userId, eventId);
     }
 }

@@ -8,8 +8,8 @@ import com.google.api.services.calendar.Calendar;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.config.google.GoogleConfig;
@@ -19,12 +19,14 @@ import school.faang.user_service.dto.event.GoogleEventResponseDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.EventNotFoundException;
 import school.faang.user_service.exception.NotPartOfEventException;
+import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.mapper.event.GoogleEventDtoMapper;
 import school.faang.user_service.mapper.event.GoogleEventMapper;
 import school.faang.user_service.repository.GoogleTokenRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GoogleCalendarService {
@@ -41,13 +43,14 @@ public class GoogleCalendarService {
         school.faang.user_service.entity.event.Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotFoundException("Event not found"));
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("This user was not found"));
+                .orElseThrow(() -> new UserNotFoundException("This user was not found"));
 
         if (!user.getParticipatedEvents().contains(event)) {
             throw new NotPartOfEventException("User with id " + userId + " is not part of event with id " + eventId);
         }
 
         if (!googleTokenRepository.existsByUser(user)) {
+            log.debug("User:{} start authorization in googleCalendar API", user.getId());
             return GoogleEventResponseDto.builder()
                     .message("Follow the link to authorize your calendar")
                     .link(googleConfig.getAuthorizationLink(userId, eventId))
@@ -82,6 +85,7 @@ public class GoogleCalendarService {
         GoogleEventDto googleEventDto = googleEventDtoMapper.toGoogleEventDto(event);
         com.google.api.services.calendar.model.Event googleEvent = googleEventMapper.toGoogleEvent(googleEventDto);
         googleEvent = service.events().insert(googleProperties.getCalendarId(), googleEvent).execute();
+        log.debug("User:{} authorized in googleCalendar API and create first event in google calendar", userId);
 
         return getResponse(googleEvent.getHtmlLink());
     }

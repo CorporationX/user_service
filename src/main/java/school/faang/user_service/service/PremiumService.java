@@ -30,10 +30,8 @@ public class PremiumService {
     private final PremiumRepository premiumRepository;
     private final UserRepository userRepository;
     private final PaymentServiceClient paymentServiceClient;
-
     private final PremiumValidator premiumValidator;
     private final PremiumMapper premiumMapper;
-
     private final Clock clock = Clock.systemUTC();
 
     public PremiumDto buyPremium(long userId, PremiumPeriod premiumPeriod) {
@@ -66,4 +64,14 @@ public class PremiumService {
         premium.setEndDate(endDate);
         return premiumRepository.save(premium);
     }
+
+//    public static void main(String[] args) {
+//        Premium premium = Premium.builder()
+//                .id(1l)
+//                .user(User.builder().id(1l).phone("+7 999 999 99 99").build())
+//                .endDate(LocalDateTime.now())
+//                .startDate(LocalDateTime.now())
+//                .build();
+//        PremiumMapperImpl premiumMapperImpl = new PremiumMapperImpl();
+//    }
 }

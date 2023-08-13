@@ -11,5 +11,4 @@ public class RecommendationDtoValidator {
             throw new EntityIsNullOrEmptyException("Content is null or empty!");
         }
     }
-
 }

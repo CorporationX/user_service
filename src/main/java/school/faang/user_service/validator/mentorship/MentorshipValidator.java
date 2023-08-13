@@ -1,7 +1,9 @@
 package school.faang.user_service.validator.mentorship;
 
+import org.springframework.stereotype.Component;
 import school.faang.user_service.exception.DataValidationException;
 
+@Component
 public class MentorshipValidator {
     public void idValidator(long id) {
         if (id < 1) {

@@ -2,7 +2,7 @@ package school.faang.user_service.controller.mentorship;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.validator.mentorship.MentorshipValidator;
 
@@ -19,26 +19,26 @@ public class MentorshipController {
     private final MentorshipService mentorshipService;
     private final MentorshipValidator mentorshipValidator;
 
-    @GetMapping("mentee/{id}")
+    @GetMapping("/mentee/{id}")
     public List<UserDto> getMentees(@PathVariable long id) {
         mentorshipValidator.idValidator(id);
         return mentorshipService.getMentees(id);
     }
 
-    @GetMapping("mentor/{id}")
+    @GetMapping("/mentor/{id}")
     public List<UserDto> getMentors(@PathVariable long id) {
         mentorshipValidator.idValidator(id);
         return mentorshipService.getMentors(id);
     }
 
-    @DeleteMapping("/mentee/{id}/mentor/{id}")
-    public void deleteMentee(long menteeId, long mentorId) {
+    @DeleteMapping("/mentee/{menteeId}/mentor/{mentorId}")
+    public void deleteMentee(@PathVariable long menteeId, @PathVariable long mentorId) {
         mentorshipValidator.equalsIdValidator(mentorId, menteeId);
         mentorshipService.deleteMentee(menteeId, mentorId);
     }
 
-    @DeleteMapping("/mentor/{id}/mentee/{id}")
-    public void deleteMentor(long mentorId, long menteeId) {
+    @DeleteMapping("/mentor/{mentorId}/mentee/{menteeId}")
+    public void deleteMentor(@PathVariable long mentorId, @PathVariable long menteeId) {
         mentorshipValidator.equalsIdValidator(mentorId, menteeId);
         mentorshipService.deleteMentor(menteeId, mentorId);
     }

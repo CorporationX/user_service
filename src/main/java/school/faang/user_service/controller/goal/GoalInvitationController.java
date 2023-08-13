@@ -3,7 +3,7 @@ package school.faang.user_service.controller.goal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
-import school.faang.user_service.service.GoalInvitationService;
+import school.faang.user_service.service.goal.GoalInvitationService;
 import school.faang.user_service.validator.GoalInvitationValidator;
 
 @Controller

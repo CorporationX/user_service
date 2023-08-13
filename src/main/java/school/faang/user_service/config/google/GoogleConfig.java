@@ -31,22 +31,24 @@ public class GoogleConfig {
 
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
 
-    @Value("${google.calendar.application-name}")
-    private String applicationName;
-
-    @Value("${google.calendar.credentials-file-path}")
-    private String credentialsFilePath;
-
-    @Value("${google.calendar.redirect-uri}")
-    private String redirectUri;
-
-    @Value("${google.calendar.access-type}")
-    private String accessType;
-
-    @Value("${google.calendar.calendar-id}")
-    private String calendarId;
+//    @Value("${google.calendar.application-name}")
+//    private String applicationName;
+//
+//    @Value("${google.calendar.credentials-file-path}")
+//    private String credentialsFilePath;
+//
+//    @Value("${google.calendar.redirect-uri}")
+//    private String redirectUri;
+//
+//    @Value("${google.calendar.access-type}")
+//    private String accessType;
+//
+//    @Value("${google.calendar.calendar-id}")
+//    private String calendarId;
 
     private final GoogleTokenRepository googleTokenRepository;
+
+    private final GoogleProperties googleProperties;
 
     public GoogleAuthorizationCodeFlow getFlow()
             throws IOException, GeneralSecurityException {
@@ -55,7 +57,7 @@ public class GoogleConfig {
         return new GoogleAuthorizationCodeFlow
                 .Builder(HTTP_TRANSPORT, jsonFactory, getClientSecrets(), Collections.singleton(CalendarScopes.CALENDAR))
                 .setDataStoreFactory(new JpaDataStoreFactory(googleTokenRepository))
-                .setAccessType(accessType)
+                .setAccessType(googleProperties.getAccessType())
                 .build();
     }
 
@@ -63,7 +65,7 @@ public class GoogleConfig {
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         JsonFactory jsonFactory = getDefaultInstance();
         return new Calendar.Builder(HTTP_TRANSPORT, jsonFactory, credential)
-                .setApplicationName(applicationName)
+                .setApplicationName(googleProperties.getApplicationName())
                 .build();
     }
 
@@ -72,7 +74,7 @@ public class GoogleConfig {
         GoogleAuthorizationCodeFlow flow = getFlow();
 
         return flow.newAuthorizationUrl()
-                .setRedirectUri(redirectUri)
+                .setRedirectUri(googleProperties.getRedirectUri())
                 .setState(userId + "-" + eventId)
                 .build();
     }
@@ -80,6 +82,6 @@ public class GoogleConfig {
     private GoogleClientSecrets getClientSecrets() throws IOException {
         JsonFactory jsonFactory = getDefaultInstance();
         return GoogleClientSecrets.load(jsonFactory,
-                new FileReader(credentialsFilePath));
+                new FileReader(googleProperties.getCredentialsFilePath()));
     }
 }

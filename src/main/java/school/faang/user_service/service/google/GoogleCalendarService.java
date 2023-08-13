@@ -4,6 +4,7 @@ import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.services.calendar.Calendar;
+
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.config.google.GoogleConfig;
+import school.faang.user_service.config.google.GoogleProperties;
 import school.faang.user_service.dto.event.GoogleEventDto;
 import school.faang.user_service.dto.event.GoogleEventResponseDto;
 import school.faang.user_service.entity.User;
@@ -31,6 +33,7 @@ public class GoogleCalendarService {
     private final GoogleEventDtoMapper googleEventDtoMapper;
     private final GoogleEventMapper googleEventMapper;
     private final GoogleConfig googleConfig;
+    private final GoogleProperties googleProperties;
 
     @Transactional
     public GoogleEventResponseDto createEvent(Long userId, Long eventId) throws GeneralSecurityException, IOException {
@@ -55,7 +58,7 @@ public class GoogleCalendarService {
 
         GoogleEventDto googleEventDto = googleEventDtoMapper.toGoogleEventDto(event);
         com.google.api.services.calendar.model.Event googleEvent = googleEventMapper.toGoogleEvent(googleEventDto);
-        googleEvent = service.events().insert(googleConfig.getCalendarId(), googleEvent).execute();
+        googleEvent = service.events().insert(googleProperties.getCalendarId(), googleEvent).execute();
 
         return getResponse(googleEvent.getHtmlLink());
     }
@@ -69,14 +72,14 @@ public class GoogleCalendarService {
         GoogleAuthorizationCodeFlow flow = googleConfig.getFlow();
 
         TokenResponse response = flow.newTokenRequest(code)
-                .setRedirectUri(googleConfig.getRedirectUri())
+                .setRedirectUri(googleProperties.getRedirectUri())
                 .execute();
         Credential credential = flow.createAndStoreCredential(response, String.valueOf(userId));
         Calendar service = googleConfig.getService(credential);
 
         GoogleEventDto googleEventDto = googleEventDtoMapper.toGoogleEventDto(event);
         com.google.api.services.calendar.model.Event googleEvent = googleEventMapper.toGoogleEvent(googleEventDto);
-        googleEvent = service.events().insert(googleConfig.getCalendarId(), googleEvent).execute();
+        googleEvent = service.events().insert(googleProperties.getCalendarId(), googleEvent).execute();
 
         return getResponse(googleEvent.getHtmlLink());
     }

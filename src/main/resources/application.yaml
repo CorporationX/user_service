@@ -52,11 +52,10 @@ services:
     bucket-name: user_backet
     isMocked: true
 
-google:
-  calendar:
-    application-name: Corporation-X
-    credentials-file-path: src/main/resources/credentials.json
-    calendar-id: primary
-    redirect-uri: http://localhost:8080/api/v1/google/calendar/Callback
-    scopes: https://www.googleapis.com/auth/calendar
-    access-type: offline
+google-calendar:
+  applicationName: Corporation-X
+  credentialsFilePath: src/main/resources/credentials.json
+  calendarId: primary
+  redirectUri: http://localhost:8080/api/v1/events/callback
+  scopes: https://www.googleapis.com/auth/calendar
+  accessType: offline

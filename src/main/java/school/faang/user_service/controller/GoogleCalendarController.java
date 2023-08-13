@@ -14,7 +14,7 @@ import school.faang.user_service.dto.event.GoogleEventResponseDto;
 import school.faang.user_service.service.google.GoogleCalendarService;
 
 @RestController
-@RequestMapping("/api/v1/google/calendar")
+@RequestMapping("/api/v1/events")
 @RequiredArgsConstructor
 @Slf4j
 @Validated
@@ -22,7 +22,7 @@ public class GoogleCalendarController {
     private final GoogleCalendarService googleCalendarService;
     private final UserContext userContext;
 
-    @PostMapping("/events/{eventId}")
+    @PostMapping("/google/{eventId}")
     public GoogleEventResponseDto createEvent(@PathVariable Long eventId) {
         Long userId = userContext.getUserId();
         try {
@@ -34,7 +34,7 @@ public class GoogleCalendarController {
         }
     }
 
-    @GetMapping("/Callback")
+    @GetMapping("/callback")
     public GoogleEventResponseDto handleCallback(@RequestParam String code, @RequestParam String state) {
         try {
             Long userId = Long.parseLong(state.split("-")[0]);

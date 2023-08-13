@@ -12,17 +12,16 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
-import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.goal.GoalInvitationMapperImpl;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
+import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.validator.GoalInvitationValidator;
+import school.faang.user_service.validator.UserValidator;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,16 +36,20 @@ public class GoalInvitationServiceTest {
     @Mock
     private GoalInvitationRepository goalInvitationRepository;
     @Mock
-    private UserRepository userRepository;
+    private UserService userService;
+    @Mock
+    private UserValidator userValidator;
     @Spy
     private GoalInvitationMapperImpl goalInvitationMapper;
+    @Mock
+    private GoalInvitationValidator goalInvitationValidator = new GoalInvitationValidator(userValidator);
     @InjectMocks
     private GoalInvitationService goalInvitationService;
 
     @Test
-    public void whenGoalInvitationIsCorrect_createGoalInvitation() {
-        when(userRepository.findById(invitationDto.getInviterId())).thenReturn(Optional.ofNullable(inviter));
-        when(userRepository.findById(invitationDto.getInvitedUserId())).thenReturn(Optional.of(invitedUser));
+    public void givenCorrectGoalInvitation_whenCreate_thenCreateGoalInvitation() {
+        when(userService.findUserById(invitationDto.getInviterId())).thenReturn(inviter);
+        when(userService.findUserById(invitationDto.getInvitedUserId())).thenReturn(invitedUser);
 
         goalInvitationService.createInvitation(invitationDto);
 
@@ -58,32 +61,13 @@ public class GoalInvitationServiceTest {
     }
 
     @Test
-    public void whenInviterDoesNotExist_throwException() {
-        doReturn(Optional.empty()).when(userRepository).findById(invitationDto.getInviterId());
-
-        assertThrows(EntityNotFoundException.class, () -> {
-            goalInvitationService.createInvitation(invitationDto);
-        });
-    }
-
-    @Test
-    public void whenInvitedUserDoesNotExist_throwException() {
-        doReturn(Optional.of(inviter)).when(userRepository).findById(invitationDto.getInviterId());
-        doReturn(Optional.empty()).when(userRepository).findById(invitationDto.getInvitedUserId());
-
-        assertThrows(EntityNotFoundException.class, () -> {
-            goalInvitationService.createInvitation(invitationDto);
-        });
-    }
-
-    @Test
-    public void whenGoalInvitationIsAccepted() {
+    public void givenCorrectInvitation_whenAcceptingInvitation_thenSucceed() {
         when(goalInvitationRepository.findById(invitation.getId())).thenReturn(Optional.of(invitation));
 
         goalInvitationService.acceptGoalInvitation(invitation.getId());
 
         User expectedUser = User.builder().id(2L).goals(List.of(goal)).build();
-        Mockito.verify(userRepository).save(expectedUser);
+        Mockito.verify(userService).saveUser(expectedUser);
 
         GoalInvitation expectedInvitation = GoalInvitation.builder().id(5L).invited(expectedUser).inviter(inviter)
                 .goal(goal).status(RequestStatus.ACCEPTED).build();

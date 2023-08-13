@@ -23,4 +23,8 @@ public class UserService {
         }
         return userRepository.countOwnedSkills(userId, skillIds) == skillIds.size();
     }
+
+    public void saveUser(User user) {
+        userRepository.save(user);
+    }
 }

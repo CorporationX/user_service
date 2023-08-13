@@ -72,32 +72,8 @@ public class RecommendationService {
 
     public RecommendationDto update(RecommendationDto recommendationDto) {
         validatePreviousRecommendation(recommendationDto);
-
-        recommendationDto.getSkillOffers()
-                .forEach(skillOffer -> {
-                    if (!skillRepository.existsById(skillOffer.getSkillId())) {
-                        throw new DataValidationException(
-                                String.format("Skill with id=%d is missing in db!", skillOffer.getSkillId()));
-                    }
-                });
-
-        List<Long> skillIds = recommendationDto.getSkillOffers()
-                .stream()
-                .map(SkillOfferDto::getSkillId)
-                .toList();
-        var skills = skillRepository.findAllById(skillIds);
-        if (skillIds.size() != skills.size()) {
-            throw new DataValidationException("Some skills do not exist");
-        }
-
-        List<Long> recommendationIds = recommendationDto.getSkillOffers()
-                .stream()
-                .map(SkillOfferDto::getRecommendationId)
-                .toList();
-        var recommendations = recommendationRepository.findAllById(recommendationIds);
-        if (recommendationIds.size() != recommendations.size()) {
-            throw new DataValidationException("Some recommendations do not exist");
-        }
+        checkSkills(recommendationDto);
+        checkRecommendations(recommendationDto);
 
         Recommendation updatedRecommendation = recommendationRepository
                 .update(recommendationDto.getAuthorId(), recommendationDto.getReceiverId(), recommendationDto.getContent());
@@ -124,6 +100,7 @@ public class RecommendationService {
                     }
                 });
 
+        recommendationRepository.save(updatedRecommendation);
         return recommendationMapper.toDto(updatedRecommendation);
     }
 

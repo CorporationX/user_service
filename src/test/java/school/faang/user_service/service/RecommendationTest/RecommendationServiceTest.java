@@ -144,6 +144,16 @@ class RecommendationServiceTest {
     }
 
     @Test
+    public void testUpdate_Successful(){
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.of(user));
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.of(user));
+        recommendationService.update(recommendationDto);
+        Mockito.verify(recommendationRepository).save(Mockito.any());
+    }
+
+    @Test
     public void testUpdate_RecommendationIsNotFound_ShouldThrowException(){
         Mockito.when(recommendationRepository
                         .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(1L,2L))

@@ -28,4 +28,12 @@ class RecommendationControllerTest {
         Mockito.verify(recommendationDtoValidator).validateRecommendation(recommendationDto);
         Mockito.verify(recommendationService).create(recommendationDto);
     }
+
+    @Test
+    void updateRecommendation() {
+        RecommendationDto recommendationDto = RecommendationDto.builder().build();
+        recommendationController.updateRecommendation(recommendationDto);
+        Mockito.verify(recommendationDtoValidator).validateRecommendation(recommendationDto);
+        Mockito.verify(recommendationService).update(recommendationDto);
+    }
 }

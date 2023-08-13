@@ -59,3 +59,10 @@ google-calendar:
   redirectUri: http://localhost:8080/api/v1/events/callback
   scopes: https://www.googleapis.com/auth/calendar
   accessType: offline
+
+event:
+  cleanup:
+    scheduler:
+      cron: "0 0 12 * * ?" # every day 12:00
+    batch:
+      size: 50

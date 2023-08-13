@@ -1,6 +1,5 @@
 package school.faang.user_service.service.RecommendationTest;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,7 +14,6 @@ import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
-import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.RecommendationMapperImpl;
 import school.faang.user_service.mapper.SkillOfferMapperImpl;
@@ -25,16 +23,18 @@ import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.service.RecommendationService;
+import school.faang.user_service.utils.validator.RecommendationDtoValidator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 class RecommendationServiceTest {
@@ -43,16 +43,14 @@ class RecommendationServiceTest {
     private RecommendationMapperImpl recommendationMapper;
     @Spy
     private SkillOfferMapperImpl skillOfferMapper;
+    @Spy
+    private RecommendationDtoValidator recommendationDtoValidator;
     @Mock
     private RecommendationRepository recommendationRepository;
-    @Mock
-    private SkillOfferRepository skillOfferRepository;
     @Mock
     private SkillRepository skillRepository;
     @Mock
     private UserRepository userRepository;
-    @Mock
-    private UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private RecommendationDto recommendationDto;
     private User user;
     @InjectMocks
@@ -90,6 +88,7 @@ class RecommendationServiceTest {
         assertThrows(DataValidationException.class,
                 ()-> recommendationService.create(RecommendationDto
                         .builder().authorId(1L)
+                        .content("Hi")
                         .receiverId(2L)
                         .skillOffers(List.of(new SkillOfferDto()))
                         .build()));
@@ -106,6 +105,7 @@ class RecommendationServiceTest {
         assertThrows(DataValidationException.class,
                 ()-> recommendationService.create(RecommendationDto
                         .builder().authorId(1L)
+                        .content("Hi")
                         .receiverId(2L)
                         .skillOffers(List.of(new SkillOfferDto()))
                         .build()));
@@ -162,6 +162,7 @@ class RecommendationServiceTest {
         assertThrows(DataValidationException.class,
                 ()-> recommendationService.update(RecommendationDto
                         .builder().authorId(1L)
+                        .content("Hi")
                         .receiverId(2L)
                         .skillOffers(List.of(new SkillOfferDto()))
                         .build()));
@@ -179,6 +180,7 @@ class RecommendationServiceTest {
                 ()-> recommendationService.update(RecommendationDto
                         .builder().authorId(1L)
                         .receiverId(2L)
+                        .content("Hi")
                         .skillOffers(List.of(new SkillOfferDto()))
                         .build()));
 

@@ -1,8 +1,8 @@
 package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.service.RecommendationService;
-import school.faang.user_service.utils.validator.RecommendationDtoValidator;
 
 import java.util.List;
 
@@ -21,30 +20,29 @@ import java.util.List;
 public class RecommendationController {
 
     private final RecommendationService recommendationService;
-    private final RecommendationDtoValidator recommendationDtoValidator;
 
-    @PostMapping("/giveRecommendation")
+    @PostMapping("/give")
     public RecommendationDto giveRecommendation(@RequestBody RecommendationDto recommendation) {
-        recommendationDtoValidator.validateRecommendation(recommendation);
         return recommendationService.create(recommendation);
     }
 
-    @PutMapping("/updateRecommendation")
-    public RecommendationDto updateRecommendation(@RequestBody RecommendationDto updated){
-        recommendationDtoValidator.validateRecommendation(updated);
+    @PutMapping
+    public RecommendationDto updateRecommendation(@RequestBody RecommendationDto updated) {
         return recommendationService.update(updated);
     }
 
-    @DeleteMapping("/deleteRecommendation")
+    @DeleteMapping
     public void deleteRecommendation(@PathVariable("id") long id) {
         recommendationService.delete(id);
     }
 
-    public List<RecommendationDto> getAllUserRecommendation(long receiverId){
+    @GetMapping("/{receiverId}/list-received")
+    public List<RecommendationDto> getAllUserRecommendation(@PathVariable long receiverId) {
         return recommendationService.getAllUserRecommendations(receiverId);
     }
 
-    public List<RecommendationDto> getAllGivenRecommendations(long authorId){
+    @GetMapping("/{authorId}/list-given")
+    public List<RecommendationDto> getAllGivenRecommendations(@PathVariable long authorId) {
         return recommendationService.getAllGivenRecommendations(authorId);
     }
 }

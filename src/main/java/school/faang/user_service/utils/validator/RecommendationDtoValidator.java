@@ -11,5 +11,4 @@ public class RecommendationDtoValidator {
             throw new DataValidationException("Content is null or empty!");
         }
     }
-
 }

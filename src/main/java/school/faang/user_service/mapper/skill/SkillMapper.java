@@ -9,8 +9,6 @@ import school.faang.user_service.dto.skill.UserSkillGuaranteeDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.UserSkillGuarantee;
-
-
 import java.util.List;
 import java.util.stream.Collectors;
 

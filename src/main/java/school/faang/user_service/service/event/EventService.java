@@ -114,7 +114,7 @@ public class EventService {
         validateEvent(eventDto);
 
         Event event = eventRepository.findById(eventDto.getId())
-                .orElseThrow(() -> new DataValidationException("Event not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Event not found"));
 
         eventMapper.updateDto(eventDto, event);
         Event updatedEvent = eventRepository.save(event);

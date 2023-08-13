@@ -8,31 +8,42 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.skill.SkillDto;
+import school.faang.user_service.dto.skill.UserSkillGuaranteeDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.UserSkillGuarantee;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 class SkillMapperTest {
     @Spy
     private SkillMapperImpl skillMapper;
-
     private Skill skill;
     private SkillDto skillDto;
     private SkillDto updatedSkillDto;
 
     @BeforeEach
     void setUp() {
-        skill = new Skill();
-        skill.setId(1L);
-        skill.setTitle("Programming");
+        UserSkillGuarantee userSkillGuarantee1 = UserSkillGuarantee.builder()
+                .id(31L)
+                .build();
 
-        skillDto = new SkillDto();
-        skillDto.setId(1L);
-        skillDto.setTitle("Programming");
+        skill = Skill.builder()
+                .id(30L)
+                .title("Programming")
+                .guarantees(List.of(userSkillGuarantee1))
+                .build();
 
-        updatedSkillDto = new SkillDto();
-        updatedSkillDto.setId(1L);
-        updatedSkillDto.setTitle("Updated Programming");
+        skillDto = SkillDto.builder()
+                .id(30L)
+                .title("Programming")
+                .guarantees(List.of(
+                        UserSkillGuaranteeDto.builder().id(31L).build()
+                )).build();
+
+        updatedSkillDto = SkillDto.builder()
+                .id(1L)
+                .title("Updated Programming")
+                .build();
     }
 
     @Test

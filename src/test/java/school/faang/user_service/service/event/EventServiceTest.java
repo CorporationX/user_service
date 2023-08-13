@@ -15,11 +15,15 @@ import org.mockito.quality.Strictness;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.skill.SkillDto;
+import school.faang.user_service.dto.skill.UserSkillGuaranteeDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.exception.event.DataValidationException;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.event.EventMapperImpl;
+import school.faang.user_service.mapper.skill.SkillMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import java.time.LocalDateTime;
@@ -36,6 +40,8 @@ class EventServiceTest {
     private EventService eventService;
     @Spy
     private EventMapperImpl eventMapper;
+    @Spy
+    private SkillMapperImpl skillMapper;
     @Mock
     private EventRepository eventRepository;
     @Mock
@@ -48,11 +54,14 @@ class EventServiceTest {
     @BeforeEach
     void setUp() {
         user = new User();
-        user.setId(1L);
+        user.setId(200L);
 
         skill = new Skill();
-        skill.setId(1L);
+        skill.setId(22L);
         skill.setTitle("Ability");
+        skill.setGuarantees(List.of(
+                UserSkillGuarantee.builder().id(31L).build()
+        ));
 
         user.setSkills(List.of(skill));
 
@@ -62,7 +71,16 @@ class EventServiceTest {
                 .startDate(LocalDateTime.of(2023, 7, 27, 10, 0))
                 .endDate(LocalDateTime.of(2023, 7, 27, 15, 0))
                 .ownerId(1L)
-                .relatedSkills(List.of(SkillDto.builder().id(1L).title("Ability").build()))
+                .relatedSkills(List.of(
+                        SkillDto.builder()
+                                .id(22L)
+                                .title("Ability")
+                                .guarantees(List.of(
+                                        UserSkillGuaranteeDto.builder()
+                                                .id(31L)
+                                                .build()
+                                ))
+                                .build()))
                 .location("Conference Hall")
                 .maxAttendees(100)
                 .build();
@@ -81,10 +99,9 @@ class EventServiceTest {
 
     @Test
     void testCreate_EventExists() {
-        List<Event> existingEvents = new ArrayList<>();
-        existingEvents.add(event);
+        List<Event> existingEvents = List.of(event);
 
-        when(eventRepository.findByEventId(event.getId())).thenReturn(existingEvents);
+        when(eventRepository.findAllByUserId(event.getOwner().getId())).thenReturn(existingEvents);
 
         assertThrows(DataValidationException.class, () -> eventService.create(eventDto));
     }
@@ -93,7 +110,20 @@ class EventServiceTest {
     void testCreate_EventDoesNotExist_ReturnsDto() {
         when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(user));
         when(eventMapper.toEvent(eventDto)).thenReturn(event);
-        when(eventRepository.findByEventId(event.getId())).thenReturn(new ArrayList<>());
+        when(eventRepository.findAllByUserId(event.getOwner().getId())).thenReturn(new ArrayList<>());
+        when(eventRepository.save(any(Event.class))).thenReturn(event);
+
+        EventDto result = eventService.create(eventDto);
+
+        assertNotNull(result);
+        assertEquals(eventDto.getId(), result.getId());
+    }
+
+    @Test
+    void testCreate_UserHasNecessarySkills_ReturnsDto() {
+        when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(user));
+        when(eventMapper.toEvent(eventDto)).thenReturn(event);
+        when(eventRepository.findAllByUserId(event.getOwner().getId())).thenReturn(new ArrayList<>());
         when(eventRepository.save(any(Event.class))).thenReturn(event);
 
         EventDto result = eventService.create(eventDto);
@@ -145,19 +175,6 @@ class EventServiceTest {
     }
 
     @Test
-    void testCreate_UserHasNecessarySkills_ReturnsDto() {
-        when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(user));
-        when(eventMapper.toEvent(eventDto)).thenReturn(event);
-        when(eventRepository.findByEventId(event.getId())).thenReturn(new ArrayList<>());
-        when(eventRepository.save(any(Event.class))).thenReturn(event);
-
-        EventDto result = eventService.create(eventDto);
-
-        assertNotNull(result);
-        assertEquals(eventDto.getId(), result.getId());
-    }
-
-    @Test
     void testCreate_UserDoesNotHaveNecessarySkills() {
         eventDto.setRelatedSkills(List.of(SkillDto.builder().id(2L).title("Expertise").build()));
 
@@ -172,7 +189,7 @@ class EventServiceTest {
         when(eventMapper.toDto(any(Event.class))).thenReturn(eventDto);
         when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
 
-        EventDto result = eventService.getEvent(1L);
+        Event result = eventService.getEvent(1L);
 
         assertNotNull(result);
         assertEquals(eventDto.getId(), result.getId());
@@ -184,7 +201,7 @@ class EventServiceTest {
         when(eventMapper.toDto(any(Event.class))).thenReturn(eventDto);
         when(eventRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(DataValidationException.class, () -> eventService.getEvent(1L));
+        assertThrows(EntityNotFoundException.class, () -> eventService.getEvent(1L));
     }
 
     @Test
@@ -286,7 +303,7 @@ class EventServiceTest {
     @Test
     @DisplayName("Test getting owned events for existing user")
     void testGetOwnedEventsForExistingUser() {
-        Long userId = 1L;
+        long userId = 1L;
 
         List<Event> ownedEvents = List.of(event);
 
@@ -302,7 +319,7 @@ class EventServiceTest {
     @Test
     @DisplayName("Test getting owned events for non-existing user")
     void testGetOwnedEventsForNonExistingUser() {
-        Long nonExistingUserId = 100L;
+        long nonExistingUserId = 100L;
 
         when(eventRepository.findAllByUserId(nonExistingUserId)).thenReturn(Collections.emptyList());
 
@@ -315,7 +332,7 @@ class EventServiceTest {
     @Test
     @DisplayName("Test getting participated events for existing user")
     void testGetParticipatedEventsForExistingUser() {
-        Long userId = 1L;
+        long userId = 1L;
 
         List<Event> participatedEvents = List.of(event);
 
@@ -331,7 +348,7 @@ class EventServiceTest {
     @Test
     @DisplayName("Test getting participated events for non-existing user")
     void testGetParticipatedEventsForNonExistingUser() {
-        Long nonExistingUserId = 100L;
+        long nonExistingUserId = 100L;
 
         when(eventRepository.findParticipatedEventsByUserId(nonExistingUserId)).thenReturn(Collections.emptyList());
 

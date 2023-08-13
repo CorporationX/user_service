@@ -24,8 +24,5 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             """)
     List<Event> findParticipatedEventsByUserId(long userId);
 
-    //List<Event> findByEventId(Long id); - это не работает, из-за этого не заводится проект.
-    // Метод используется только в тестах, надо проверить, нужен ли вообще
-
     List<Event> findAll();
 }

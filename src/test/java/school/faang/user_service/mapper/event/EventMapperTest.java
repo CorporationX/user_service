@@ -11,7 +11,6 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.mapper.skill.SkillMapperImpl;
 import java.time.LocalDateTime;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,7 +35,8 @@ class EventMapperTest {
                 .build();
         Skill skill2 = Skill.builder()
                 .id(2L)
-                .title("Expertise").build();
+                .title("Expertise")
+                .build();
 
         event = Event.builder()
                 .id(1L)

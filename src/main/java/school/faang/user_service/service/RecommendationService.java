@@ -10,14 +10,13 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.invalidFieldException.DataValidationException;
 import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.utils.validator.RecommendationDtoValidator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -36,10 +35,8 @@ public class RecommendationService {
     private final SkillRepository skillRepository;
     private final UserRepository userRepository;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
-    private final RecommendationDtoValidator recommendationDtoValidator;
 
     public RecommendationDto create(RecommendationDto recommendationDto) {
-        recommendationDtoValidator.validateRecommendation(recommendationDto);
         validatePreviousRecommendation(recommendationDto);
         checkSkills(recommendationDto);
         checkRecommendations(recommendationDto);
@@ -73,7 +70,6 @@ public class RecommendationService {
     }
 
     public RecommendationDto update(RecommendationDto recommendationDto) {
-        recommendationDtoValidator.validateRecommendation(recommendationDto);
         validatePreviousRecommendation(recommendationDto);
         checkSkills(recommendationDto);
         checkRecommendations(recommendationDto);

@@ -14,16 +14,13 @@ import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.invalidFieldException.DataValidationException;
 import school.faang.user_service.mapper.RecommendationMapperImpl;
 import school.faang.user_service.mapper.SkillOfferMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
-import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.service.RecommendationService;
-import school.faang.user_service.utils.validator.RecommendationDtoValidator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -43,8 +40,6 @@ class RecommendationServiceTest {
     private RecommendationMapperImpl recommendationMapper;
     @Spy
     private SkillOfferMapperImpl skillOfferMapper;
-    @Spy
-    private RecommendationDtoValidator recommendationDtoValidator;
     @Mock
     private RecommendationRepository recommendationRepository;
     @Mock

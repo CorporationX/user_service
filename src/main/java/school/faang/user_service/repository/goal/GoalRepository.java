@@ -1,7 +1,7 @@
 package school.faang.user_service.repository.goal;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @Repository
-public interface GoalRepository extends CrudRepository<Goal, Long> {
+public interface GoalRepository extends JpaRepository<Goal, Long> {
 
     @Query(nativeQuery = true, value = """
-            SELECT * FROM goal g
+            SELECT g.* FROM goal g
             JOIN user_goal ug ON g.id = ug.goal_id
             WHERE ug.user_id = ?1
             """)

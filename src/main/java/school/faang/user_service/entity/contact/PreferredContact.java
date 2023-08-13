@@ -1,5 +1,7 @@
 package school.faang.user_service.entity.contact;
 
+import school.faang.user_service.exception.invalidFieldException.InvalidEnumValueException;
+
 public enum PreferredContact {
     EMAIL, PHONE, TELEGRAM;
 
@@ -9,6 +11,6 @@ public enum PreferredContact {
                 return contact;
             }
         }
-        throw new IllegalArgumentException("No contact preference with name " + preference + " found");
+        throw new InvalidEnumValueException("No contact preference with name " + preference + " found");
     }
 }

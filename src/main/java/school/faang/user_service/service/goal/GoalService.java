@@ -77,6 +77,11 @@ public class GoalService {
             throw new DataValidationException("Goal with given id was not found!");
         goalRepository.deleteById(goalId);
     }
+    @Transactional
+    public void save(Goal goal) {
+        goalRepository.save(goal);
+    }
+
 
     private List<GoalDto> checkExistFilterAndApplyFilters(Stream<Goal> goalStream, GoalFilterDto filter) {
         if (filter == null) {

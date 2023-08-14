@@ -1,15 +1,12 @@
 package school.faang.user_service.controller.user;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.subscription.UserDto;
 import school.faang.user_service.service.UserService;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +25,21 @@ public class UserController {
     List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         validateUsersIds(ids);
         return userService.getUsersByIds(ids);
+    }
+
+    @PostMapping("/send-a-file")
+    public String sendAfile(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return "";
+        }
+
+        try {
+            userService.registerAnArrayOfUser(file.getInputStream());
+        } catch (IOException e) {
+
+        }
+
+        return "";
     }
 
     private static List<Long> validateUsersIds(List<Long> ids) {

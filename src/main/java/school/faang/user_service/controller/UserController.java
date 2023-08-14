@@ -13,11 +13,11 @@ import school.faang.user_service.service.UserService;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/user")
+@RequestMapping("/api/v1/users")
 public class UserController {
     private final UserService deactivatingService;
 
-    @PostMapping("/activation/{userId}")
+    @PostMapping("/deactivation/{userId}")
     public DeactivateResponseDto deactivating(@PathVariable @Min(0) long userId) {
         return deactivatingService.deactivateUser(userId);
     }

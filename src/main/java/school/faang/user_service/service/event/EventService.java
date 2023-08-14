@@ -2,6 +2,7 @@ package school.faang.user_service.service.event;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
@@ -22,6 +23,7 @@ import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EventService {
     private final EventRepository eventRepository;
     private final SkillRepository skillRepository;
@@ -94,12 +96,13 @@ public class EventService {
         List<List<EventDto>> subLists = getSubLists(pastEvents);
         for (List<EventDto> list : subLists) {
             CompletableFuture.runAsync(
-                    () -> eventRepository.deleteAllById(
-                            list.stream()
-                                    .map(EventDto::getId)
-                                    .toList()
+                            () -> eventRepository.deleteAllById(
+                                    list.stream()
+                                            .map(EventDto::getId)
+                                            .toList()
+                            )
                     )
-            );
+                    .thenRun(() -> log.info("Finished deleting past events"));
         }
     }
 

@@ -35,7 +35,7 @@ public class RecommendationRequestController {
         return recommendationRequestService.getRecommendationRequests(filterDto);
     }
 
-    @PutMapping({"{id}/reject"})
+    @PutMapping({"/{id}/reject"})
     public RecommendationRequestDto rejectRequest(@PathVariable long id, @Valid @RequestBody RejectionDto rejection) {
         return recommendationRequestService.rejectRequest(id, rejection);
     }

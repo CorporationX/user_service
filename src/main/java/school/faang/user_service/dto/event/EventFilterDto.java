@@ -20,4 +20,5 @@ public class EventFilterDto {
     private List<Long> relatedSkillIds;
     private String location;
     private Integer maxAttendees;
+    private Boolean isNeedPastEvents;
 }

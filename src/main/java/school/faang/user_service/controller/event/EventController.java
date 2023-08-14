@@ -29,12 +29,12 @@ public class EventController {
         return eventService.create(eventDto);
     }
 
-    @GetMapping("{eventId}")
+    @GetMapping("/{eventId}")
     public EventDto get(@PathVariable Long eventId) {
         return eventService.get(eventId);
     }
 
-    @DeleteMapping("{eventId}")
+    @DeleteMapping("/{eventId}")
     public boolean deleteEvent(@PathVariable Long eventId) {
         return eventService.deleteEvent(eventId);
     }

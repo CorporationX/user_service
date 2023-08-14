@@ -51,3 +51,6 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
+
+cron:
+  daily: 0 0 * * *

@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,6 +53,11 @@ public class UserService {
 
         premiumUsers = filter(userFilterDto, premiumUsers);
         return userMapper.toUserListDto(premiumUsers.toList());
+    }
+
+    @Transactional
+    public void banUser(long id) {
+        userRepository.banUser(id);
     }
 
     private Stream<User> filter(UserFilterDto userFilterDto, Stream<User> premiumUsers) {

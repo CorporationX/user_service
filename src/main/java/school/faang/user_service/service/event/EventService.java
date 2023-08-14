@@ -1,6 +1,7 @@
 package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +15,7 @@ import java.util.stream.StreamSupport;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class EventService {
     private final EventRepository eventRepository;
     private final EventAsyncService eventAsyncService;
@@ -33,7 +35,10 @@ public class EventService {
                 .filter(event -> event.getEndDate().isBefore(LocalDateTime.now()))
                 .toList();
 
-        List<List<Event>> partitions = ListUtils.partition(events, events.size() / partitionSize);
-        partitions.forEach(eventAsyncService::clearEventsPartition);
+        if (events.size() > 0) {
+            log.info("Scheduled clearing of obsolete events, amount: {}", events.size());
+            List<List<Event>> partitions = ListUtils.partition(events, events.size() / partitionSize);
+            partitions.forEach(eventAsyncService::clearEventsPartition);
+        }
     }
 }

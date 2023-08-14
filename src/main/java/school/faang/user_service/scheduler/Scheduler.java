@@ -8,7 +8,7 @@ import school.faang.user_service.service.event.EventService;
 
 @Component
 @RequiredArgsConstructor
-public class EventScheduler {
+public class Scheduler {
     @Value("${spring.scheduler.partitionSize}")
     private int partitionSize;
     private final EventService eventService;

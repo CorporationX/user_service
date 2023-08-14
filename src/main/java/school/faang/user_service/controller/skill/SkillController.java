@@ -16,7 +16,6 @@ public class SkillController {
     private final SkillService skillService;
 
     public SkillDto create(SkillDto skillDTO) {
-        skillDTO.validateSkill();
         return skillService.create(skillDTO);
     }
 

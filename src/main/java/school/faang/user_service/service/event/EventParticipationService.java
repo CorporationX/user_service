@@ -50,7 +50,7 @@ public class EventParticipationService {
 
     public List<UserDto> getParticipant(Long eventId) {
         validateEventId(eventId);
-        return getParticipantsByEventId(eventId).stream().map(mapper::userToDto).toList();
+        return getParticipantsByEventId(eventId).stream().map(mapper::toDto).toList();
     }
 
     public long getParticipantsCount(Long eventId) {

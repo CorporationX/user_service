@@ -17,6 +17,6 @@ public class PastEventFilter implements Filter<Event, EventFilterDto> {
     @Override
     public Stream<Event> applyFilter(Stream<Event> events, EventFilterDto filter) {
         return events
-                .filter(event -> event.getEndDate().isAfter(LocalDateTime.now()));
+                .filter(event -> event.getEndDate().isBefore(LocalDateTime.now()));
     }
 }

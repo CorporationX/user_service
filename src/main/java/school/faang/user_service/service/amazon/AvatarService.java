@@ -30,7 +30,7 @@ public class AvatarService implements AvatarRepository {
     @Value("${services.s3.bucket-name}")
     private String bucketName;
 
-    @Async
+    @Async("avatar")
     public void saveToAmazonS3(UserProfilePic userProfilePic) {
         byte[] imageData = new byte[0];
 

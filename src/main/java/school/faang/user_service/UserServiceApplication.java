@@ -2,7 +2,6 @@ package school.faang.user_service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import feign.RequestInterceptor;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import org.springframework.boot.SpringApplication;
@@ -21,9 +20,6 @@ public class UserServiceApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(UserServiceApplication.class, args);
-//        RequestInterceptor requestInterceptor = new RequestInterceptor() {
-//
-//        };
     }
 
     @Bean

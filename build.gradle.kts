@@ -16,6 +16,11 @@ configurations {
 	}
 }
 
+jacoco {
+	toolVersion = "0.8.9"
+	reportsDirectory.set(layout.buildDirectory.dir("customJacocoReportDir"))
+}
+
 repositories {
 	mavenCentral()
 }
@@ -97,4 +102,57 @@ val test by tasks.getting(Test::class) { testLogging.showStandardStreams = true 
 
 tasks.bootJar {
 	archiveFileName.set("service.jar")
+}
+
+tasks.test{
+	finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+	dependsOn(tasks.test)
+	reports {
+		xml.required.set(false)
+		csv.required.set(false)
+		html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+	}
+
+	classDirectories.setFrom(files(classDirectories.files.map {
+		fileTree(it).apply {
+			exclude(
+					"com/json/**",
+					"school/faang/user_service/client/**",
+					"school/faang/user_service/config/**",
+					"school/faang/user_service/controller/google/**",
+					"school/faang/user_service/controller/mentorship/**",
+					"school/faang/user_service/dto/**",
+					"school/faang/user_service/entity/**",
+					"school/faang/user_service/exception/**",
+					"school/faang/user_service/util/**",
+					"school/faang/user_service/repository/**",
+					"school/faang/user_service/UserServiceApplication.class")
+		}
+	}))
+}
+
+tasks.jacocoTestCoverageVerification{
+	violationRules{
+		rule{
+			element = "CLASS"
+			excludes = listOf(
+					"com/json/**",
+					"school/faang/user_service/client/**",
+					"school/faang/user_service/config/**",
+					"school/faang/user_service/controller/google/**",
+					"school/faang/user_service/controller/mentorship/**",
+					"school/faang/user_service/event/**",
+					"school/faang/user_service/entity/**",
+					"school/faang/user_service/exception/**",
+					"school/faang/user_service/util/**",
+					"school/faang/user_service/repository/**",
+					"school/faang/user_service/UserServiceApplication")
+			limit {
+				minimum = "0.8".toBigDecimal()
+			}
+		}
+	}
 }

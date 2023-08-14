@@ -1,6 +1,7 @@
 package school.faang.user_service.dto.event;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 @NoArgsConstructor
+@Builder
 public class EventFilterDto {
     private String title;
     private LocalDateTime startDate;

@@ -15,7 +15,9 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 @Service
@@ -26,6 +28,8 @@ public class EventService {
     private final UserRepository userRepository;
     private final EventMapper eventMapper;
     private final List<Filter<Event, EventFilterDto>> filters;
+
+    private final Integer NUMBER_OF_PARTS = 5;
 
     @Transactional
     public EventDto create(EventDto event) {
@@ -76,6 +80,42 @@ public class EventService {
 
     public List<EventDto> getParticipatedEvents(long userId) {
         return eventRepository.findParticipatedEventsByUserId(userId).stream().map(eventMapper::toDto).toList();
+    }
+
+    public void deletePastEvents() {
+        List<EventDto> pastEvents = getEventsByFilter(EventFilterDto.builder()
+                .isNeedPastEvents(true)
+                .build());
+
+        deleteEventsAsync(pastEvents);
+    }
+
+    private void deleteEventsAsync(List<EventDto> pastEvents) {
+        List<List<EventDto>> subLists = getSubLists(pastEvents);
+        for (List<EventDto> list : subLists) {
+            CompletableFuture.runAsync(
+                    () -> eventRepository.deleteAllById(
+                            list.stream()
+                                    .map(EventDto::getId)
+                                    .toList()
+                    )
+            );
+        }
+    }
+
+    private List<List<EventDto>> getSubLists(List<EventDto> pastEvents) {
+        int size = pastEvents.size();
+        int subListSize = size / NUMBER_OF_PARTS;
+        if (size % NUMBER_OF_PARTS != 0) {
+            subListSize++;
+        }
+        List<List<EventDto>> subLists = new ArrayList<>();
+        for (int i = 0; i < subListSize; i++) {
+            int fromIndex = i * NUMBER_OF_PARTS;
+            int toIndex = Math.min(i * NUMBER_OF_PARTS + NUMBER_OF_PARTS, size);
+            subLists.add(pastEvents.subList(fromIndex, toIndex));
+        }
+        return subLists;
     }
 
     private void checkIfUserHasRequiredSkills(EventDto event) {

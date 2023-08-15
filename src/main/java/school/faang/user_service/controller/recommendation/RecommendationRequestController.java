@@ -2,7 +2,8 @@ package school.faang.user_service.controller.recommendation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestFilterDto;
 import school.faang.user_service.service.recommendation.RecommendationRequestService;
 
 import java.util.List;
@@ -13,7 +14,7 @@ public class RecommendationRequestController {
 
     private RecommendationRequestService recommendationRequestService;
 
-    public List<RequestFilterDto> getRecommendationRequests(RequestFilterDto filterDto) {
+    public List<RecommendationRequestDto> getRecommendationRequests(RecommendationRequestFilterDto filterDto) {
         return recommendationRequestService.getRecommendationRequests(filterDto);
     }
 }

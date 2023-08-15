@@ -2,7 +2,8 @@ package school.faang.user_service.service.recommendation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestFilterDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.filter.recommendation.RecommendationRequestFilter;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
@@ -18,7 +19,7 @@ public class RecommendationRequestService {
     private RecommendationRequestMapper recommendationRequestMapper;
     private List<RecommendationRequestFilter> recommendationRequestFilters;
 
-    public List<RequestFilterDto> getRecommendationRequests(RequestFilterDto filterDto) {
+    public List<RecommendationRequestDto> getRecommendationRequests(RecommendationRequestFilterDto filterDto) {
         Stream<RecommendationRequest> recommendationRequests = recommendationRequestRepository.findAll().stream();
 
         for (RecommendationRequestFilter filter : recommendationRequestFilters) {

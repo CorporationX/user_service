@@ -1,4 +1,4 @@
-package school.faang.user_service.dto;
+package school.faang.user_service.dto.recommendation;
 
 import lombok.Builder;
 import lombok.Data;
@@ -8,12 +8,11 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class RequestFilterDto {
+public class RecommendationRequestFilterDto {
     private String messagePattern;
     private RequestStatus status;
     private LocalDateTime createdAfter;
     private LocalDateTime createdBefore;
     private LocalDateTime updatedAfter;
     private LocalDateTime updatedBefore;
-
 }

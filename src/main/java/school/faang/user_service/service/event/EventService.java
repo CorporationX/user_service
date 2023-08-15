@@ -2,23 +2,24 @@ package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.mapper.skill.SkillMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-@Service
 @RequiredArgsConstructor
+@Service
 public class EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;

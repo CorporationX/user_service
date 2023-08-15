@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.user.RedisUserDto;
+import school.faang.user_service.dto.user.UserUpdateEventDto;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ import java.util.List;
 @Service
 @Slf4j
 public class RedisUserUpdateSubscriber implements MessageListener {
-    public List<RedisUserDto> userDtos = new ArrayList<>();
+    public List<UserUpdateEventDto> userDtos = new ArrayList<>();
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
@@ -22,7 +22,7 @@ public class RedisUserUpdateSubscriber implements MessageListener {
 
         ObjectMapper mapper = new ObjectMapper();
         try {
-            RedisUserDto user = mapper.readValue(message.getBody(), RedisUserDto.class);
+            UserUpdateEventDto user = mapper.readValue(message.getBody(), UserUpdateEventDto.class);
             userDtos.add(user);
 
             log.info("Received user: {}", user);

@@ -20,6 +20,7 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -224,9 +225,9 @@ class EventParticipationServiceTest {
 
     private List<UserDto> getUsersDto() {
         return List.of(
-                UserDto.builder().id(EXISTING_USER_ID).build(),
-                UserDto.builder().id(2L).build(),
-                UserDto.builder().id(3L).build()
+                UserDto.builder().id(EXISTING_USER_ID).followerIds(new ArrayList<>()).build(),
+                UserDto.builder().id(2L).followerIds(new ArrayList<>()).build(),
+                UserDto.builder().id(3L).followerIds(new ArrayList<>()).build()
         );
     }
 }

@@ -76,11 +76,11 @@ public class RecommendationService {
         return receiverRecommendations.map(recommendationMapper::toDto);
     }
 
-    public Page<RecommendationDto>  getAllGivenRecommendations(long authorId, int pageNumber, int pageSize){
+    public Page<RecommendationDto> getAllGivenRecommendations(long authorId, int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<Recommendation> authorRecommendations = recommendationRepository.findAllByAuthorId(authorId, pageable);
 
-        return   authorRecommendations.map(recommendationMapper::toDto);
+        return authorRecommendations.map(recommendationMapper::toDto);
     }
 
     private void processSkillOffers(Recommendation recommendation) {

@@ -40,7 +40,7 @@ spring:
     corePoolSize: 8
     maxPoolSize: 10
     queueCapacity: 1000
-    threadNamePrefix: "task-executor-"
+    threadNamePrefix: "task-executor-thread-"
 
   scheduler:
     partitionSize: 1000

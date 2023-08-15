@@ -18,12 +18,13 @@ public class AsyncConfig {
     private String threadNamePrefix;
 
     @Bean
-    Executor taskExecutor() {
+    public Executor taskExecutor() {
         ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
         threadPoolTaskExecutor.setCorePoolSize(corePoolSize);
         threadPoolTaskExecutor.setMaxPoolSize(maxPoolSize);
         threadPoolTaskExecutor.setQueueCapacity(queueCapacity);
         threadPoolTaskExecutor.setThreadNamePrefix(threadNamePrefix);
+        threadPoolTaskExecutor.initialize();
         return threadPoolTaskExecutor;
     }
 }

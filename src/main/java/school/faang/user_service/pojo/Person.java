@@ -3,6 +3,8 @@ package school.faang.user_service.pojo;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class Person {
     public String firstName;
@@ -17,6 +19,8 @@ public class Person {
     public String status;
     public String admissionDate;
     public String graduationDate;
+    @JsonUnwrapped
+    private PreviousEducation previousEducation;
     public Boolean scholarship;
     public String employer;
 

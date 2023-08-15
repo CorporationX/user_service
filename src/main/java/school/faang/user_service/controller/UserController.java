@@ -15,6 +15,7 @@ import school.faang.user_service.pojo.Person;
 import school.faang.user_service.service.user.UserService;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,9 +29,9 @@ public class UserController {
     public void uploadStudents(@RequestParam("students") MultipartFile students) throws IOException {
         CsvMapper mapper = new CsvMapper();
         CsvSchema schema = mapper.schemaFor(Person.class).withHeader().withColumnReordering(true);
-//        mapper.enable(CsvParser.Feature.IGNORE_TRAILING_UNMAPPABLE);
 
         MappingIterator<Person> persons = mapper.readerFor(Person.class).with(schema).readValues(students.getInputStream());
-        System.out.println(persons.nextValue().getFirstName());
+        List<Person> personList = persons.readAll();
+        personList.forEach(System.out::println);
     }
 }

@@ -1,5 +1,8 @@
 package school.faang.user_service.pojo;
 
+import lombok.Data;
+
+@Data
 public class Address {
     public String street;
     public String city;

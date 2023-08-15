@@ -1,7 +1,9 @@
 package school.faang.user_service.pojo;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import lombok.Data;
 
+@Data
 public class ContactInfo {
     public String email;
     public String phone;

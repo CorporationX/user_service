@@ -44,13 +44,13 @@ class EventParticipationServiceTest {
 
     @BeforeEach
     public void setUp() {
-        this.user = new User();
-        this.event = new Event();
+        this.user = User.builder().id(1L).build();
+        this.event = Event.builder().id(1L).build();
         this.participants = List.of(
-                new User(),
-                new User(),
-                new User(),
-                new User()
+                User.builder().id(1L).build(),
+                User.builder().id(2L).build(),
+                User.builder().id(3L).build(),
+                User.builder().id(4L).build()
         );
     }
 
@@ -73,12 +73,13 @@ class EventParticipationServiceTest {
         Mockito.when(eventService.existsById(eventId)).thenReturn(true);
         eventParticipationService.registerParticipant(eventId, userId);
 
-        Event otherEvent = new Event();
+        Event otherEvent = Event.builder().id(2L).build();
         long otherEventId = otherEvent.getId();
         Mockito.when(userService.existsById(userId)).thenReturn(true);
-        Mockito.when(eventService.existsById(eventId)).thenReturn(true);
+        Mockito.when(eventService.existsById(otherEventId)).thenReturn(true);
+
         eventParticipationService.registerParticipant(otherEventId, userId);
-        Mockito.verify(eventParticipationRepository, Mockito.times(2)).register(eventId, userId);
+        Mockito.verify(eventParticipationRepository, Mockito.times(1)).register(eventId, userId);
     }
 
     @Test

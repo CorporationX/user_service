@@ -2,11 +2,13 @@ package school.faang.user_service.dto.mentorship;
 
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.RequestStatus;
 import java.time.LocalDateTime;
 
 @Data
 @Builder
+@Component
 public class MentorshipRequestDto {
     private String description;
     private Long requesterId;

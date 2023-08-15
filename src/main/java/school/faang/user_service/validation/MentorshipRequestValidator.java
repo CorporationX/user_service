@@ -1,6 +1,7 @@
 package school.faang.user_service.validation;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.UserRepository;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @RequiredArgsConstructor
+@Component
 public class MentorshipRequestValidator {
     private final UserRepository userRepository;
     private final MentorshipRequestRepository mentorshipRequestRepository;

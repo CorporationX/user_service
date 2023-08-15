@@ -9,6 +9,8 @@ import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class RecommendationRequestService {
@@ -23,6 +25,7 @@ public class RecommendationRequestService {
 
         request.setStatus(RequestStatus.REJECTED);
         request.setRejectionReason(rejection.getReason());
+        request.setUpdatedAt(LocalDateTime.now());
 
         return recommendationRequestMapper.toDto(request);
     }

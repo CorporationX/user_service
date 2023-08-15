@@ -10,13 +10,11 @@ import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
 
 @Service
 @RequiredArgsConstructor
@@ -44,9 +42,8 @@ public class UserService {
     public void registerAnArrayOfUser(InputStream stream) throws IOException {
 
 
-
         //CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> );
-      //  pull = Executors.newFixedThreadPool(100);
+        //  pull = Executors.newFixedThreadPool(100);
 
 //
 //        byte[] bytes = new byte[1024 * 10];

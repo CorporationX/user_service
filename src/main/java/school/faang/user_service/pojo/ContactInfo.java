@@ -9,5 +9,4 @@ public class ContactInfo {
     public String phone;
     @JsonUnwrapped
     public Address address;
-
 }

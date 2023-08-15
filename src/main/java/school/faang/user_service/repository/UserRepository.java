@@ -1,8 +1,8 @@
 package school.faang.user_service.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.User;
 
@@ -26,4 +26,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
             WHERE up.end_date > NOW()
             """)
     Stream<User> findPremiumUsers();
+
+    @Modifying
+    @Query("UPDATE User u SET u.banned = true WHERE u.id = ?1")
+    void banUser(Long userId);
 }

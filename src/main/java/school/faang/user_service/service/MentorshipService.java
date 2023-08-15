@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.subscription.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
@@ -14,8 +15,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MentorshipService {
     private final MentorshipRepository mentorshipRepository;
-    private final  UserRepository userRepository;
+    private final UserRepository userRepository;
     private final UserMapper userMapper;
+
+    public void cancelMentoring(User user, List<Goal> goals) {
+        user.getMentees().stream().map(User::getMentors).forEach(list -> list.remove(user));
+        goals.stream().filter(goal -> goal.getMentor().getId() == user.getId()).forEach(goal -> goal.setMentor(null));
+    }
 
     public List<UserDto> getMentees(Long userId) {
         User user = mentorshipRepository.findById(userId)

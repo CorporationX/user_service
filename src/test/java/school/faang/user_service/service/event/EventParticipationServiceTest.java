@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.UserAlreadyRegisteredAtEvent;
 import school.faang.user_service.exception.UserNotRegisteredAtEvent;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
 import java.util.List;
@@ -22,12 +23,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class EventParticipationServiceTest {
     @Mock
     private EventParticipationRepository repository;
+    private final UserMapper userMapper = UserMapper.INSTANCE;
 
     private EventParticipationService service;
 
     @BeforeEach
     void setUp(){
-        service = new EventParticipationService(repository);
+        service = new EventParticipationService(repository, userMapper);
     }
 
     @Test
@@ -122,7 +124,7 @@ class EventParticipationServiceTest {
         assertEquals(2, service.getParticipant(someEventId).size());
     }
     @Test
-    public void getParticipant_ShouldReturnCorrectParticipantsCount() {
+    public void getParticipantCount_ShouldReturnCorrectParticipantsCount() {
         long someUserId = new Random().nextLong();
         long someEventId = new Random().nextLong();
 

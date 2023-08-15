@@ -1,6 +1,7 @@
 package school.faang.user_service.service.messaging;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
@@ -13,14 +14,15 @@ import java.util.List;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class RedisUserUpdateSubscriber implements MessageListener {
     public List<UserUpdateEventDto> userDtos = new ArrayList<>();
+    private final ObjectMapper mapper;
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
         log.info("Received message: {}", new String(message.getBody()));
 
-        ObjectMapper mapper = new ObjectMapper();
         try {
             UserUpdateEventDto user = mapper.readValue(message.getBody(), UserUpdateEventDto.class);
             userDtos.add(user);

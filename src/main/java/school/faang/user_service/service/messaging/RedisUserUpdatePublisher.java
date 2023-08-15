@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.dto.user.UserUpdateEventDto;
 
 @RequiredArgsConstructor
 @Service
@@ -15,9 +15,9 @@ import school.faang.user_service.entity.User;
 public class RedisUserUpdatePublisher {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ChannelTopic userTopic;
+    private final ObjectMapper mapper;
 
-    public void publish(User user) {
-        ObjectMapper mapper = new ObjectMapper();
+    public void publish(UserUpdateEventDto user) {
         try {
             redisTemplate.convertAndSend(userTopic.getTopic(), mapper.writeValueAsString(user));
             log.info("Published user: {}", user);

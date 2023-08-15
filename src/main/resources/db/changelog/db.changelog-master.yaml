@@ -13,3 +13,8 @@ databaseChangeLog:
       file: db/changelog/changeset/user_V006__insert_users.sql
   - include:
       file: db/changelog/changeset/user_V007__user_premium.sql
+  - include:
+      file: db/changelog/changeset/user_V008_user_banned.sql
+
+
+

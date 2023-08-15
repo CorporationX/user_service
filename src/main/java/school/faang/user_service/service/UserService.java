@@ -87,6 +87,11 @@ public class UserService {
         return new DeactivateResponseDto("The user is deactivated", userId);
     }
 
+    @Transactional
+    public void banUser(long id) {
+        userRepository.banUser(id);
+    }
+
     private void deleteUser(Goal goal, User user) {
         List<User> users = new ArrayList<>(goal.getUsers());
         users.remove(user);

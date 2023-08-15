@@ -1,23 +1,27 @@
 package school.faang.user_service.service.mentorship;
 
-import org.junit.Assert;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.controller.mentorship.MentorshipRequestController;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.mentorship.MentorshipMapper;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.Random;
 
+import static org.mockito.Mockito.when;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(value = {MockitoExtension.class})
@@ -33,6 +37,8 @@ class MentorshipRequestServiceTest {
     private MentorshipMapper mentorshipMapper;
 
     @Mock
+    private UserRepository userRepository;
+    @Mock
     private MentorshipFilter mentorshipFilter;
 
     @InjectMocks
@@ -42,52 +48,36 @@ class MentorshipRequestServiceTest {
 
     @BeforeEach
     void setUp() {
-        mentorshipRequestService = new MentorshipRequestService(mentorshipRequestRepository, mentorshipMapper, mentorshipFilter);
+
     }
 
     @Test
-    void descriptionIsEmpty() {
-        Long requestUserId = new Random().nextLong();
-        Long receiverUserId = new Random().nextLong();
-        MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto(LocalDateTime.now(), "  ", requestUserId, receiverUserId, RequestStatus.ACCEPTED);
-
-        Assert.assertThrows(IllegalArgumentException.class, () -> {
-            mentorshipRequestController.requestMentorship(mentorshipRequestDto);
-        });
-    }
-
-    @Test
-    void requestUserEqualReceiver() {
+    void testRequestUserEqualReceiver() {
         Long userId = new Random().nextLong();
 
-        MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto(LocalDateTime.now(), "Test", userId, userId, RequestStatus.ACCEPTED);
+        MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto("Test", userId, userId);
 
-        Assert.assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             mentorshipRequestService.requestMentorship(mentorshipRequestDto);
         });
     }
 
     @Test
-    void requestUserReceiverUserZero() {
+    void testRequestUserReceiverUserZero() {
         Long userId = 0L;
-        MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto(LocalDateTime.now(), "Test", userId, userId, RequestStatus.ACCEPTED);
+        MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto("Test", userId, userId);
 
-        Assert.assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             mentorshipRequestService.requestMentorship(mentorshipRequestDto);
         });
     }
 
-
-
     @Test
-    void requesterNotEqualReceiver() {
-        Long requestUserId = new Random().nextLong();
-        Long receiverUserId = new Random().nextLong();
+    void testRequestMentorshipSuccess() {
+        Long requestUserId = 1L;
+        Long receiverUserId = 2L;
 
-        User requestUser = new User().builder().id(requestUserId).build();
-        User receiverUser = new User().builder().id(receiverUserId).build();
-
-        mentorshipRequestRepository.create(requestUser.getId(), receiverUser.getId(), "Test");
+        MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto("Test", requestUserId, receiverUserId);
 
         Assertions.assertDoesNotThrow(() -> new MentorshipRequestDto(LocalDateTime.now(), "Test", requestUser.getId(), receiverUser.getId(), RequestStatus.ACCEPTED));
 
@@ -103,5 +93,12 @@ class MentorshipRequestServiceTest {
     void requestFilterDtoIsNotWorked() {
         when(mentorshipRequestService.getRequests(null)).thenThrow(NullPointerException.class);
         Assertions.assertThrows(NullPointerException.class, () -> mentorshipRequestService.getRequests(null));
+        when(mentorshipMapper.toEntity(mentorshipRequestDto)).thenReturn(any());
+        when(userRepository.findById(mentorshipRequestDto.getRequesterId())).thenReturn(Optional.of(new User()));
+        when(userRepository.findById(mentorshipRequestDto.getReceiverId())).thenReturn(Optional.of(new User()));
+        mentorshipRequestService.requestMentorship(mentorshipRequestDto);
+        mentorshipMapper.toEntity(mentorshipRequestDto);
+        verify(mentorshipMapper, times(2)).toEntity(mentorshipRequestDto);
+        verify(mentorshipRequestRepository).save(any());
     }
 }

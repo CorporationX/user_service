@@ -28,7 +28,6 @@ public interface GoogleCalendarMapper {
 
     @Named("mapDate")
     default EventDateTime mapDate(LocalDateTime date) {
-        // Convert LocalDateTime to DateTime
         DateTime dateTime = new DateTime(Date.from(date.atZone(ZoneId.systemDefault()).toInstant()));
 
         EventDateTime eventDateTime = new EventDateTime();

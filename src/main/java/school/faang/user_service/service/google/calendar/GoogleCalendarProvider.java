@@ -9,8 +9,6 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.Calendar;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.util.List;
 
@@ -19,40 +17,43 @@ import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInsta
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.http.javanet.NetHttpTransport;
+import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.entity.GoogleCredential;
+import school.faang.user_service.mapper.GoogleCredentialMapper;
+import school.faang.user_service.repository.GoogleCredentialRepository;
 
-import java.io.FileNotFoundException;
 
+@Lazy(value = true)
 @Component
+@Data
 public class GoogleCalendarProvider {
-    @Value("${google.calendar.application-name}")
     private String applicationName;
+    private String tokensDirectoryPath;
+    private List<String> scopes;
+    private String accessType;
+    private String clientEmail;
 
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
+    private GoogleCredentialRepository googleCredentialRepository;
+    private GoogleCredentialMapper googleCredentialMapper;
 
-    @Value("${google.calendar.tokens-path}")
-    private String tokensDirectoryPath;
-
-    @Value("${google.calendar.scopes}")
-    private List<String> scopes;
-
-    @Value("${google.calendar.credentials-file-path}")
-    private String credentialsFilePath;
-
-    @Value("${google.calendar.access-type}")
-    private String accessType;
+    @Getter
+    private Calendar calendar;
 
     private Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT)
         throws IOException {
 
-        InputStream in = GoogleCalendarProvider.class.getResourceAsStream(credentialsFilePath);
-        if (in == null) {
-            throw new FileNotFoundException("Resource not found: " + credentialsFilePath);
-        }
-        GoogleClientSecrets clientSecrets =
-            GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
+        GoogleCredential googleCredential = googleCredentialRepository.findByClientEmail(clientEmail);
 
+        GoogleClientSecrets.Details clientSecretsDetails = googleCredentialMapper.toDetails(googleCredential);
+
+        GoogleClientSecrets clientSecrets = new GoogleClientSecrets().setWeb(clientSecretsDetails);
 
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
             HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, scopes)
@@ -65,10 +66,28 @@ public class GoogleCalendarProvider {
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
     }
 
-    public Calendar getGoogleCalendar() throws IOException, GeneralSecurityException {
+    public GoogleCalendarProvider(
+        @Value("${google.calendar.application-name}") String applicationName,
+        @Value("${google.calendar.tokens-path}") String tokensDirectoryPath,
+        @Value("${google.calendar.scopes}") List<String> scopes,
+        @Value("${google.calendar.access-type}") String accessType,
+        @Value("${google.calendar.client-email}") String clientEmail,
+
+        GoogleCredentialRepository googleCredentialRepository,
+        GoogleCredentialMapper googleCredentialMapper
+    ) throws GeneralSecurityException, IOException {
+        this.applicationName = applicationName;
+        this.tokensDirectoryPath = tokensDirectoryPath;
+        this.scopes = scopes;
+        this.accessType = accessType;
+        this.clientEmail = clientEmail;
+
+        this.googleCredentialRepository = googleCredentialRepository;
+        this.googleCredentialMapper = googleCredentialMapper;
+
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-        return new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
-                .setApplicationName(applicationName)
-                .build();
+        calendar = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+            .setApplicationName(applicationName)
+            .build();
     }
 }

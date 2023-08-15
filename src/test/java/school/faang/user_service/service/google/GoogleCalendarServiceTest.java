@@ -55,7 +55,7 @@ public class GoogleCalendarServiceTest {
         event.setHtmlLink("test-link");
 
         Mockito.when(googleCalendarMapper.toGoogleEvent(googleEventDto)).thenReturn(event);
-        Mockito.when(googleCalendarProvider.getGoogleCalendar()).thenReturn(mockCalendarService);
+        Mockito.when(googleCalendarProvider.getCalendar()).thenReturn(mockCalendarService);
 
         Calendar.Events events = mock(Calendar.Events.class);
 
@@ -72,10 +72,10 @@ public class GoogleCalendarServiceTest {
 
         GoogleEventResponseDto createdEvent = googleCalendarService.createEvent(googleEventDto);
 
-        Mockito.verify(events).insert(calendarId, event); // Verify the insert method was called
-        Mockito.verify(insertRequest).execute(); // Verify the execute method was called
+        Mockito.verify(events).insert(calendarId, event);
+        Mockito.verify(insertRequest).execute();
 
-        Mockito.verify(googleCalendarProvider, Mockito.times(1)).getGoogleCalendar();
+        Mockito.verify(googleCalendarProvider, Mockito.times(1)).getCalendar();
         Mockito.verify(googleCalendarMapper, Mockito.times(1)).toGoogleEvent(googleEventDto);
 
         assertEquals(createdEvent.getMessage(), GoogleCalendarService.SUCCESSFUL_MESSAGE);

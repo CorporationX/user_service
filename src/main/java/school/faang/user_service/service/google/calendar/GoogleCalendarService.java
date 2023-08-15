@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.calendar.GoogleEventResponseDto;
 import school.faang.user_service.dto.calendar.GoogleEventDto;
@@ -19,6 +20,8 @@ import java.security.GeneralSecurityException;
 @Slf4j
 public class GoogleCalendarService {
     private final GoogleCalendarMapper googleCalendarMapper;
+
+    @Lazy(value = true)
     private final GoogleCalendarProvider googleCalendarProvider;
 
     public static final String SUCCESSFUL_MESSAGE = "Event was successfully created";
@@ -28,7 +31,7 @@ public class GoogleCalendarService {
     public String calendarId;
 
     public GoogleEventResponseDto createEvent(GoogleEventDto eventDto) throws GeneralSecurityException, IOException {
-        Calendar googleCalendar = googleCalendarProvider.getGoogleCalendar();
+        Calendar googleCalendar = googleCalendarProvider.getCalendar();
 
         Event event = googleCalendarMapper.toGoogleEvent(eventDto);
 

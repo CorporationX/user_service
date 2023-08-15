@@ -28,13 +28,6 @@ spring:
           name: profile_view_channel
         analytic_channel:
           name: analytics_channel
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: 1074499156848-r70ij83ah45s2n2sj1a7n60h61ni7rob.apps.googleusercontent.com
-            client-secret: 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
 
 server:
   port: 8080
@@ -70,7 +63,7 @@ google:
   calendar:
     scopes: https://www.googleapis.com/auth/calendar
     application-name: Corporation-X
-    credentials-file-path: /credentials.json
     tokens-path: tokens
     calendar-id: primary
     access-type: offline
+    client-email: serhii.rubets@gmail.com

@@ -11,6 +11,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.recommendation.UserSkillGuaranteeDto;
+import school.faang.user_service.dto.skill.UserSkillGuaranteeDto;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.mapper.skill.UserSkillGuaranteeMapper;
 

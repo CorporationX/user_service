@@ -1,29 +1,31 @@
 package school.faang.user_service.service.mentorship;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.mapper.mentorship.MentorshipMapper;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class MentorshipRequestService {
 
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final MentorshipMapper mentorshipMapper;
+    private final UserRepository userRepository;
 
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
-        if (mentorshipRequestDto.getRequesterId().equals(mentorshipRequestDto.getReceiverId())) {
+        if (isRequesterEqualReceiver(mentorshipRequestDto)) {
             throw new IllegalArgumentException("The request cannot be sent to itself");
         }
 
-        if (mentorshipMapper.toEmpty(mentorshipRequestDto).getRequester().getId() == 0 || mentorshipMapper.toEmpty(mentorshipRequestDto).getReceiver().getId() == 0) {
+        if (isRequesterOrReceiverZero(mentorshipRequestDto)) {
             throw new IllegalArgumentException("Requester or Receiver not found");
         }
 
@@ -39,13 +41,19 @@ public class MentorshipRequestService {
         });
 
         if (mentorshipRequest.isEmpty()) {
-            MentorshipRequest mentorshipRequestNew = mentorshipRequestRepository.create(
-                    mentorshipMapper.toEmpty(mentorshipRequestDto).getRequester().getId(),
-                    mentorshipMapper.toEmpty(mentorshipRequestDto).getReceiver().getId(),
-                    mentorshipMapper.toEmpty(mentorshipRequestDto).getDescription());
+            MentorshipRequest mentorshipRequestNew = mentorshipRequestRepository.save(
+                    mentorshipMapper.toEntity(mentorshipRequestDto));
             return mentorshipMapper.toDto(mentorshipRequestNew);
         }
 
         return mentorshipMapper.toDto(mentorshipRequest.get());
+    }
+
+    private boolean isRequesterEqualReceiver(MentorshipRequestDto mentorshipRequestDto) {
+        return mentorshipRequestDto.getRequesterId().equals(mentorshipRequestDto.getReceiverId());
+    }
+
+    private boolean isRequesterOrReceiverZero(MentorshipRequestDto mentorshipRequestDto) {
+        return userRepository.findById(mentorshipRequestDto.getRequesterId()).isEmpty() || userRepository.findById(mentorshipRequestDto.getReceiverId()).isEmpty();
     }
 }

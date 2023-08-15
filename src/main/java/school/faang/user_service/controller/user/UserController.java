@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.user;
 
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.dto.DeactivateResponseDto;
 import school.faang.user_service.dto.subscription.UserDto;
 import school.faang.user_service.dto.subscription.UserFilterDto;
 import school.faang.user_service.service.UserService;
@@ -38,6 +40,11 @@ public class UserController {
     List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         validateUsersIds(ids);
         return userService.getUsersByIds(ids);
+    }
+
+    @PostMapping("/deactivation/{userId}")
+    public DeactivateResponseDto deactivating(@PathVariable @Min(0) long userId) {
+        return userService.deactivateUser(userId);
     }
 
     private static List<Long> validateUsersIds(List<Long> ids) {

@@ -6,7 +6,7 @@ import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.pojo.Person;
+import school.faang.user_service.pojo.student.Person;
 
 import java.util.Objects;
 
@@ -15,15 +15,15 @@ import java.util.Objects;
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface PersonMapper {
 
-    @Mapping(target = "username", expression = "java(mapToUsername(person.getFirstName(), person.getLastName()))")
+    @Mapping(target = "username", expression = "java(getUsername(person.getFirstName(), person.getLastName()))")
     @Mapping(target = "email", source = "contactInfo.email")
     @Mapping(target = "phone", source = "contactInfo.phone")
     @Mapping(target = "city", source = "contactInfo.address.city")
     @Mapping(target = "country", source = "contactInfo.address.country", qualifiedByName = "mapCountry")
-    @Mapping(target = "aboutMe", expression = "java(mapToAboutMe(person))")
+    @Mapping(target = "aboutMe", expression = "java(getAboutMe(person))")
     User toUser(Person person);
 
-    default String mapToUsername(String firstname, String lastname) {
+    default String getUsername(String firstname, String lastname) {
         return firstname + "_" + lastname;
     }
 
@@ -32,7 +32,7 @@ public interface PersonMapper {
         return Country.builder().title(country).build();
     }
 
-    default String mapToAboutMe(Person person) {
+    default String getAboutMe(Person person) {
         String aboutMe = "about me: ";
 
         String state = person.getContactInfo().getAddress().getState();

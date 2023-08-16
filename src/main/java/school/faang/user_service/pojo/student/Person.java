@@ -1,4 +1,4 @@
-package school.faang.user_service.pojo;
+package school.faang.user_service.pojo.student;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Data;

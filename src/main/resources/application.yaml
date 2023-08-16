@@ -36,6 +36,15 @@ spring:
       scopes: https://www.googleapis.com/auth/calendar
       access-type: offline
 
+  async:
+    corePoolSize: 8
+    maxPoolSize: 10
+    queueCapacity: 1000
+    threadNamePrefix: "task-executor-thread-"
+
+  students:
+    partitionSize: 100
+
 server:
   port: 8080
 

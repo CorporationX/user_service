@@ -5,7 +5,7 @@ import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import school.faang.user_service.pojo.Person;
+import school.faang.user_service.pojo.student.Person;
 
 import java.io.IOException;
 import java.util.List;

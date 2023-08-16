@@ -7,7 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
@@ -71,7 +71,9 @@ class EventParticipationServiceTest {
     @Test
     public void getParticipants() {
         User user = User.builder().id(1L).username("test").build();
-        UserDto userDto = new UserDto(1L, "test", "test");
+        UserDto userDto = UserDto.builder()
+                .id(1L)
+                .build();
         Mockito.when(eventRepository.existsById(1L)).thenReturn(true);
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(List.of(user));
         Mockito.when(userMapper.toDto(user)).thenReturn(userDto);

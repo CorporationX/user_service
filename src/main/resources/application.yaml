@@ -25,7 +25,7 @@ spring:
         follower_channel:
           name: follower_channel
         profile_view_channel:
-            name: profile_view_channel
+          name: profile_view_channel
 
 server:
   port: 8080
@@ -51,3 +51,7 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
+
+  dice-bear:
+    url: https://api.dicebear.com
+    size: ?seed

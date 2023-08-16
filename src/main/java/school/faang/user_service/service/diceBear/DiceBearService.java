@@ -13,18 +13,18 @@ import java.awt.image.BufferedImage;
 public class DiceBearService {
     private final AvatarService avatarService;
     private final int sizeSmallPicture = 20;
-    @Value("${dicebear.url}")
-    private final String url;
-    @Value("${dicebear.size}")
-    private final String size;
+    @Value("${services.dice-bear.url}")
+    private String URL;
+    @Value("${services.dice-bear.size}")
+    private String SIZE;
 
     public UserProfilePic createAvatar(String username, long userId) {
         UserProfilePic userProfilePic = new UserProfilePic();
 
         String nameUserProfilePic = username + userId;
         userProfilePic.setName(nameUserProfilePic);
-        userProfilePic.setFileId(url + nameUserProfilePic + size);
-        userProfilePic.setSmallFileId(url + nameUserProfilePic + size + sizeSmallPicture);
+        userProfilePic.setFileId(URL + nameUserProfilePic + SIZE);
+        userProfilePic.setSmallFileId(URL + nameUserProfilePic + SIZE + sizeSmallPicture);
 
         avatarService.saveToAmazonS3(userProfilePic);
         return userProfilePic;
@@ -37,6 +37,4 @@ public class DiceBearService {
     public void deleteFileAmazonS3(String fileName) {
         avatarService.deleteFile(fileName);
     }
-
-
 }

@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
@@ -62,7 +62,11 @@ class MentorshipServiceTest {
         mentor.setMentees(new ArrayList<>());
 
         mentor.setMentees(List.of(new User()));
-        List<UserDto> userDtoList = List.of(new UserDto(0, "any", "any"));
+        UserDto userDto = UserDto.builder()
+                .id(0).build();
+        List<UserDto> userDtoList = List.of(userDto);
+
+        //List<UserDto> userDtoList = List.of(new UserDto(0, "any", "any"));
 
         Mockito.when(mentorshipRepository.findById(mentorId))
                 .thenReturn(Optional.of(mentor));
@@ -85,7 +89,10 @@ class MentorshipServiceTest {
     void getMentors() {
         mentee.setMentors(new ArrayList<>());
         mentee.setMentors(List.of(new User(), new User()));
-        List<UserDto> userDtoList = List.of(new UserDto(0, "any", "any"));
+        UserDto userDto = UserDto.builder()
+                .id(0).build();
+        List<UserDto> userDtoList = List.of(userDto);
+        //List<UserDto> userDtoList = List.of(new UserDto(0, "any", "any"));
 
         Mockito.when(mentorshipRepository.findById(menteeId))
                 .thenReturn(Optional.of(mentee));

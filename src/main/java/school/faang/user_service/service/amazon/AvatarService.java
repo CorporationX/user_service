@@ -23,7 +23,6 @@ import java.net.URL;
 import java.net.URLConnection;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class AvatarService implements AvatarRepository {
     private final AmazonS3 amazonS3;

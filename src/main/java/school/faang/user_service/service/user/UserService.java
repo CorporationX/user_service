@@ -1,15 +1,23 @@
 package school.faang.user_service.service.user;
 
+import com.fasterxml.jackson.databind.MappingIterator;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import com.json.student.Person;
+import com.json.student.PersonSchemaForUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.FileException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.diceBear.DiceBearService;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -23,10 +31,28 @@ public class UserService {
     public UserDto createUser(UserDto userDto) {
         User user = userMapper.toEntity(userDto);
 
-        addCreateData(user);
-        User newUser =userRepository.save(user);
+        User newUser = userRepository.save(user);
+        addCreateData(newUser);
 
         return userMapper.toDto(newUser);
+    }
+
+    public List<UserDto> createUserCSV(InputStream inputStream) {
+        List<PersonSchemaForUser> persons = parseCsv(inputStream);
+        List<UserDto> users = userMapper.toDtoPersons(persons);
+        return null;
+    }
+
+    private List<PersonSchemaForUser> parseCsv(InputStream inputStream) {
+        CsvMapper csvMapper = new CsvMapper();
+        CsvSchema schema = CsvSchema.emptySchema().withHeader();
+        MappingIterator<PersonSchemaForUser> iterator = null;
+        try {
+            iterator = csvMapper.readerFor(PersonSchemaForUser.class).with(schema).readValues(inputStream);
+            return iterator.readAll();
+        } catch (IOException e) {
+            throw new FileException("Can't read file: " + e.getMessage());
+        }
     }
 
     public User findUserById(long userId) {

@@ -37,7 +37,7 @@ public class EventControllerTest {
     void setUp() {
         var now = LocalDateTime.now();
         eventDto = new EventDto(0L, "0", now, now.plusDays(3), 0L, "0", new ArrayList<>(),new ArrayList<>(), "location", EventType.WEBINAR, EventStatus.PLANNED, -1);
-        filterDto = new EventFilterDto("title", now, now.plusDays(10), 0L, List.of(), "location", 10);
+        filterDto = new EventFilterDto("title", now, now.plusDays(10), 0L, List.of(), "location", 10, false);
     }
 
     @Test

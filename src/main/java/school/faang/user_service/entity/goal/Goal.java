@@ -42,7 +42,7 @@ public class Goal {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="parent_goal_id")
+    @JoinColumn(name = "parent_goal_id")
     private Goal parent;
 
     @Column(name = "title", length = 64, nullable = false, unique = true)
@@ -74,7 +74,7 @@ public class Goal {
     private User mentor;
 
     @OneToMany(mappedBy = "goal")
-    private List<GoalInvitation> invitations ;
+    private List<GoalInvitation> invitations;
 
     @ManyToMany
     @JoinTable(

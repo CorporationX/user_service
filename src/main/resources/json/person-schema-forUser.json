@@ -12,10 +12,6 @@
       "format": "email",
       "minLength": 1
     },
-    "password": {
-      "type": "string",
-      "maxLength": 128
-    },
     "phone": {
       "type": "string",
       "minLength": 9,

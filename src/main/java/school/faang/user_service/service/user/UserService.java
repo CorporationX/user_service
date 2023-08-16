@@ -3,8 +3,8 @@ package school.faang.user_service.service.user;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import com.json.student.Person;
 import com.json.student.PersonSchemaForUser;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.user.UserDto;
@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -27,20 +28,75 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final DiceBearService diceBearService;
+    private final int lenPassword = 4;
 
     public UserDto createUser(UserDto userDto) {
         User user = userMapper.toEntity(userDto);
 
-        User newUser = userRepository.save(user);
-        addCreateData(newUser);
+        synchronized (userRepository) {
+            user = userRepository.save(user);
+        }
+        addCreateData(user);
 
-        return userMapper.toDto(newUser);
+        return userMapper.toDto(user);
     }
 
     public List<UserDto> createUserCSV(InputStream inputStream) {
         List<PersonSchemaForUser> persons = parseCsv(inputStream);
-        List<UserDto> users = userMapper.toDtoPersons(persons);
-        return null;
+
+
+        // Один поток
+        List<UserDto> users = persons.stream()
+                .map(person -> userMapper.personToUserDto(person))
+                .peek(user -> {
+                    user.setPassword(generatePassword(lenPassword));
+                    validateUserDto(user);
+                    createUser(user);
+                })
+                .toList();
+
+        return users;
+
+
+        /*
+        //выебоны
+        List<CompletableFuture<UserDto>> futures = persons.stream()
+                .map(person -> CompletableFuture.supplyAsync(() -> {
+                    UserDto userDto = userMapper.personToUserDto(person);
+                    userDto.setPassword(generatePassword(lenPassword));
+
+                    validateUserDto(userDto);
+                    createUser(userDto);
+                    //SMS to user.getEmail with - "You password for CorporationX is:"+user.getPassword()
+                    return userDto;
+                }))
+                .toList();
+
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                .thenApply(v -> futures.stream().map(CompletableFuture::join).toList())
+                .join();
+
+         */
+    }
+
+    public void validateUserDto(@Valid UserDto userDto) {
+        System.out.println(userDto);
+    }
+
+    private String generatePassword(int length) {
+        if (length <= 0) {
+            throw new IllegalArgumentException("Password length must be greater than 0");
+        }
+
+        Random random = new Random();
+        StringBuilder password = new StringBuilder();
+
+        for (int i = 0; i < length; i++) {
+            int digit = random.nextInt(10);
+            password.append(digit);
+        }
+
+        return password.toString();
     }
 
     private List<PersonSchemaForUser> parseCsv(InputStream inputStream) {

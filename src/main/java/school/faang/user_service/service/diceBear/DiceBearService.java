@@ -12,7 +12,6 @@ import java.awt.image.BufferedImage;
 @RequiredArgsConstructor
 public class DiceBearService {
     private final AvatarService avatarService;
-    private final int sizeSmallPicture = 20;
     @Value("${services.dice-bear.url}")
     private String URL;
     @Value("${services.dice-bear.size}")
@@ -23,10 +22,10 @@ public class DiceBearService {
 
         String nameUserProfilePic = username + userId;
         userProfilePic.setName(nameUserProfilePic);
-        userProfilePic.setFileId(URL + nameUserProfilePic + SIZE);
-        userProfilePic.setSmallFileId(URL + nameUserProfilePic + SIZE + sizeSmallPicture);
+        userProfilePic.setFileId(URL + nameUserProfilePic);
+        userProfilePic.setSmallFileId(URL + nameUserProfilePic + SIZE);
 
-        avatarService.saveToAmazonS3(userProfilePic);
+        //avatarService.saveToAmazonS3(userProfilePic);
         return userProfilePic;
     }
 

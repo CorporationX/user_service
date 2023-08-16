@@ -16,6 +16,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.service.event.filters.EventEndDateFilter;
@@ -44,7 +45,7 @@ class EventServiceTest {
     private SkillRepository skillRepository;
 
     @Mock
-    private List<EventFilter> eventFilters;
+    private UserRepository userRepository;
 
     private EventService eventService;
 
@@ -55,7 +56,7 @@ class EventServiceTest {
     public void init() {
         EventFilter eventTitleFilter = new EventTitleFilter();
         List<EventFilter> eventFilterList = List.of(eventTitleFilter);
-        eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList);
+        eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList, userRepository);
 
         userSkill.setTitle("Coding");
         userSkill.setId(1L);
@@ -64,7 +65,11 @@ class EventServiceTest {
 
     @Test
     public void testCreateEvent() {
+        User alex = new User();
+        alex.setId(1L);
+
         Mockito.when(eventMapper.toEntity(eventDto)).thenReturn(new Event());
+        Mockito.when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(alex));
 
         eventService.create(eventDto);
         Mockito.verify(eventRepository, Mockito.times(1)).save(eventMapper.toEntity(eventDto));
@@ -72,7 +77,12 @@ class EventServiceTest {
 
     @Test
     public void testUpdateEvent() {
+        User alex = new User();
+        alex.setId(1L);
         Long anyId = 1L;
+
+        Mockito.when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(alex));
+        Mockito.lenient().when(eventMapper.toEntity(eventDto)).thenReturn(new Event());
 
         EventDto existingEventDto = EventMock.getEventDto();
         Event existingEventEntity = EventMock.getEventEntity();
@@ -96,7 +106,7 @@ class EventServiceTest {
         Skill mockedSkill = new Skill();
         mockedSkill.setTitle("Running");
 
-        Mockito.when(skillRepository.findSkillsByGoalId(1L)).thenReturn(List.of(mockedSkill));
+        Mockito.when(skillRepository.findAllByUserId(1L)).thenReturn(List.of(mockedSkill));
 
         assertThrows(DataValidationException.class, () -> {
             eventService.create(eventDto);
@@ -108,7 +118,7 @@ class EventServiceTest {
         Skill mockedSkill = new Skill();
         mockedSkill.setTitle("Running");
 
-        Mockito.when(skillRepository.findSkillsByGoalId(1L)).thenReturn(List.of(mockedSkill));
+        Mockito.when(skillRepository.findAllByUserId(1L)).thenReturn(List.of(mockedSkill));
 
         assertThrows(DataValidationException.class, () -> {
             eventService.updateEvent(eventDto);
@@ -188,7 +198,7 @@ class EventServiceTest {
     @Test
     void testGetAllUserEventsByStartDateFilter() {
         List<EventFilter> eventFilterList = List.of(new EventStartDateFilter());
-        eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList);
+        eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList, userRepository);
 
         Event javaEvent = new Event();
         javaEvent.setTitle("Java");
@@ -219,7 +229,7 @@ class EventServiceTest {
     @Test
     void testGetAllUserEventsByEndDateFilter() {
         List<EventFilter> eventFilterList = List.of(new EventEndDateFilter());
-        eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList);
+        eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList, userRepository);
 
         Event javaEvent = new Event();
         javaEvent.setTitle("Java");

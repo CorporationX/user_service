@@ -58,3 +58,12 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
+
+google:
+  calendar:
+    scopes: https://www.googleapis.com/auth/calendar
+    application-name: Corporation-X
+    tokens-path: tokens
+    calendar-id: primary
+    access-type: offline
+    client-email: serhii.rubets@gmail.com

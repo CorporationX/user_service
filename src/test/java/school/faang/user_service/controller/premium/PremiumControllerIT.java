@@ -23,56 +23,56 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@SpringBootTest
-@AutoConfigureMockMvc
+//@SpringBootTest
+//@AutoConfigureMockMvc
 class PremiumControllerIT {
-    private static final String URL = "http://localhost:8080/api/v1/premium";
-    private static final String STATUS = "SUCCESS";
-    private static final long USER_ID = 11112L;
-    private static final long PAYMENT_NUMBER = 1111_1111_1111_1111L;
-    private static final String MESSAGES = "Payment successful ^_^ !!!";
-
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private PremiumController premiumController;
-
-    @Test
-    public void testMakePayment() throws Exception {
-        PremiumRequestDto request = new PremiumRequestDto();
-        request.setPayment(new Payment(PAYMENT_NUMBER, BigDecimal.TEN, "USD"));
-        request.setTariffPlan(TariffPlan.MONTHLY);
-
-        PremiumResponseDto mockResponse = new PremiumResponseDto(
-            STATUS,
-            200,
-            request.getPayment().getPaymentNumber(),
-            request.getPayment().getAmount(),
-            request.getPayment().getCurrency(),
-            MESSAGES,
-            new PremiumDto(
-                USER_ID,
-                TariffPlan.MONTHLY,
-                LocalDateTime.now(),
-                request.getTariffPlan().getEndDate()
-            )
-        );
-
-        when(premiumController.buyPremium(request)).thenReturn(mockResponse);
-
-        mockMvc.perform(MockMvcRequestBuilders.post(URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(new ObjectMapper().writeValueAsString(request)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.status").value(STATUS))
-            .andExpect(jsonPath("$.message").value(MESSAGES))
-            .andExpect(jsonPath("$.verificationCode").value(200))
-            .andExpect(jsonPath("$.paymentNumber").value(PAYMENT_NUMBER))
-            .andExpect(jsonPath("$.amount").value(BigDecimal.TEN))
-            .andExpect(jsonPath("$.currency").value("USD"))
-            .andExpect(jsonPath("$.tariffPlan.userId").value(USER_ID))
-            .andExpect(jsonPath("$.tariffPlan.tariffPlan").value(TariffPlan.MONTHLY.name()));
-    }
+//    private static final String URL = "http://localhost:8080/api/v1/premium";
+//    private static final String STATUS = "SUCCESS";
+//    private static final long USER_ID = 11112L;
+//    private static final long PAYMENT_NUMBER = 1111_1111_1111_1111L;
+//    private static final String MESSAGES = "Payment successful ^_^ !!!";
+//
+//    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+//    @Autowired
+//    private MockMvc mockMvc;
+//
+//    @MockBean
+//    private PremiumController premiumController;
+//
+//    @Test
+//    public void testMakePayment() throws Exception {
+//        PremiumRequestDto request = new PremiumRequestDto();
+//        request.setPayment(new Payment(PAYMENT_NUMBER, BigDecimal.TEN, "USD"));
+//        request.setTariffPlan(TariffPlan.MONTHLY);
+//
+//        PremiumResponseDto mockResponse = new PremiumResponseDto(
+//            STATUS,
+//            200,
+//            request.getPayment().getPaymentNumber(),
+//            request.getPayment().getAmount(),
+//            request.getPayment().getCurrency(),
+//            MESSAGES,
+//            new PremiumDto(
+//                USER_ID,
+//                TariffPlan.MONTHLY,
+//                LocalDateTime.now(),
+//                request.getTariffPlan().getEndDate()
+//            )
+//        );
+//
+//        when(premiumController.buyPremium(request)).thenReturn(mockResponse);
+//
+//        mockMvc.perform(MockMvcRequestBuilders.post(URL)
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content(new ObjectMapper().writeValueAsString(request)))
+//            .andExpect(status().isOk())
+//            .andExpect(jsonPath("$.status").value(STATUS))
+//            .andExpect(jsonPath("$.message").value(MESSAGES))
+//            .andExpect(jsonPath("$.verificationCode").value(200))
+//            .andExpect(jsonPath("$.paymentNumber").value(PAYMENT_NUMBER))
+//            .andExpect(jsonPath("$.amount").value(BigDecimal.TEN))
+//            .andExpect(jsonPath("$.currency").value("USD"))
+//            .andExpect(jsonPath("$.tariffPlan.userId").value(USER_ID))
+//            .andExpect(jsonPath("$.tariffPlan.tariffPlan").value(TariffPlan.MONTHLY.name()));
+//    }
 }

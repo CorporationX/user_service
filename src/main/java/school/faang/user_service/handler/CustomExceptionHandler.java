@@ -11,6 +11,8 @@ import school.faang.user_service.exception.GoalValidationException;
 import school.faang.user_service.exception.RequestValidationException;
 import school.faang.user_service.exception.UserAlreadyRegisteredException;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
 
 
@@ -30,6 +32,16 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(GoalValidationException.class)
     public ResponseEntity<Object> handleGoalValidationException(GoalValidationException e, HttpServletRequest request) {
         return buildErrorResponse(e, request, HttpStatus.BAD_REQUEST, "Goal Validation Error");
+    }
+
+    @ExceptionHandler(GeneralSecurityException.class)
+    public ResponseEntity<Object> handleGeneralSecurityException(GeneralSecurityException e, HttpServletRequest request) {
+        return buildErrorResponse(e, request, HttpStatus.BAD_REQUEST, "Security exception");
+    }
+
+    @ExceptionHandler(IOException.class)
+    public ResponseEntity<Object> handleGeneralSecurityException(IOException e, HttpServletRequest request) {
+        return buildErrorResponse(e, request, HttpStatus.BAD_REQUEST, " I/O exception of some sort has occurred");
     }
 
     private ResponseEntity<Object> buildErrorResponse(Exception e, HttpServletRequest rq, HttpStatus status, String error) {

@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.exception.DataValidationException;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -47,7 +48,10 @@ public class GoalInvitationValidatorTest {
     }
 
     @Test
-    void givenValidGoalInvitation_whenAcceptInvitation_thenSucceed() {
-
+    void givenInvalidStatus_whenValidateAcceptedGoalInvitation_thenThrowException() {
+        GoalInvitation invitation = GoalInvitation.builder().status(RequestStatus.ACCEPTED).build();
+        assertThrows(DataValidationException.class, () -> {
+            goalInvitationValidator.validateAcceptedGoalInvitation(invitation);
+        });
     }
 }

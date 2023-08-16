@@ -1,6 +1,7 @@
 package school.faang.user_service.validator;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.entity.RequestStatus;
@@ -17,6 +18,7 @@ import java.util.List;
 public class GoalInvitationValidator {
     private static final int GOALS_MAX_NUM = 3;
 
+    @Autowired
     private final UserValidator userValidator;
 
     public void validateControllerInputData(GoalInvitationDto invitation) {

@@ -1,6 +1,7 @@
 package school.faang.user_service.service.goal;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.entity.RequestStatus;
@@ -18,12 +19,16 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class GoalInvitationService {
+    @Autowired
     private final GoalInvitationRepository goalInvitationRepository;
 
+    @Autowired
     private final GoalInvitationMapper goalInvitationMapper;
 
+    @Autowired
     private final GoalInvitationValidator goalInvitationValidator;
 
+    @Autowired
     private final UserService userService;
 
     public GoalInvitationDto createInvitation(GoalInvitationDto invitation) {

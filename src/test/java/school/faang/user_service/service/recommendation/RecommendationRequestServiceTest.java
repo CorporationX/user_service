@@ -1,5 +1,6 @@
 package school.faang.user_service.service.recommendation;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,9 +11,13 @@ import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RecommendationRequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.filter.recommendation.RecommendationRequestCreatedAfterFilter;
+import school.faang.user_service.filter.recommendation.RecommendationRequestCreatedBeforeFilter;
 import school.faang.user_service.filter.recommendation.RecommendationRequestFilter;
 import school.faang.user_service.filter.recommendation.RecommendationRequestMessageFilter;
 import school.faang.user_service.filter.recommendation.RecommendationRequestStatusFilter;
+import school.faang.user_service.filter.recommendation.RecommendationRequestUpdatedAfterFilter;
+import school.faang.user_service.filter.recommendation.RecommendationRequestUpdatedBeforeFilter;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 
@@ -28,8 +33,22 @@ public class RecommendationRequestServiceTest {
     private RecommendationRequestRepository recommendationRequestRepository;
     @Spy
     private RecommendationRequestMapper recommendationRequestMapper = RecommendationRequestMapper.INSTANCE;
-    @InjectMocks
+
     private RecommendationRequestService recommendationRequestService;
+
+    @BeforeEach
+    void startup() {
+        RecommendationRequestUpdatedBeforeFilter recommendationRequestUpdatedBeforeFilter = new RecommendationRequestUpdatedBeforeFilter();
+        RecommendationRequestUpdatedAfterFilter recommendationRequestUpdatedAfterFilter = new RecommendationRequestUpdatedAfterFilter();
+        RecommendationRequestCreatedBeforeFilter recommendationRequestCreatedBeforeFilter = new RecommendationRequestCreatedBeforeFilter();
+        RecommendationRequestCreatedAfterFilter recommendationRequestCreatedAfterFilter = new RecommendationRequestCreatedAfterFilter();
+        RecommendationRequestMessageFilter recommendationRequestMessageFilter = new RecommendationRequestMessageFilter();
+        RecommendationRequestStatusFilter recommendationRequestStatusFilter = new RecommendationRequestStatusFilter();
+        List<RecommendationRequestFilter> recommendationRequestFilters = List.of(recommendationRequestUpdatedBeforeFilter, recommendationRequestUpdatedAfterFilter,
+                recommendationRequestCreatedBeforeFilter, recommendationRequestCreatedAfterFilter, recommendationRequestMessageFilter, recommendationRequestStatusFilter);
+
+        recommendationRequestService = new RecommendationRequestService(recommendationRequestRepository, recommendationRequestMapper, recommendationRequestFilters);
+    }
 
     @Test
     void testRecommendationRequestMessageFilter() {
@@ -51,8 +70,6 @@ public class RecommendationRequestServiceTest {
                         .build();
 
         when(recommendationRequestRepository.findAll()).thenReturn(requests);
-
-        recommendationRequestService = new RecommendationRequestService(recommendationRequestRepository, recommendationRequestMapper, requestFilters);
 
         List<RecommendationRequestDto> eventsByFilter = recommendationRequestService.getRecommendationRequests(recommendationRequestFilterDto);
         assertEquals(2, eventsByFilter.size());
@@ -80,8 +97,6 @@ public class RecommendationRequestServiceTest {
                         .build();
 
         when(recommendationRequestRepository.findAll()).thenReturn(requests);
-
-        recommendationRequestService = new RecommendationRequestService(recommendationRequestRepository, recommendationRequestMapper, requestFilters);
 
         List<RecommendationRequestDto> eventsByFilter = recommendationRequestService.getRecommendationRequests(requestFilterDto);
 
@@ -118,12 +133,10 @@ public class RecommendationRequestServiceTest {
 
         when(recommendationRequestRepository.findAll()).thenReturn(requests);
 
-        recommendationRequestService = new RecommendationRequestService(recommendationRequestRepository, recommendationRequestMapper, requestFilters);
-
         List<RecommendationRequestDto> eventsByFilter = recommendationRequestService.getRecommendationRequests(requestFilterDto);
 
         assertEquals(2, eventsByFilter.size());
-        assertEquals("Hello", eventsByFilter.get(0).getMessagePattern());
+        assertEquals("Hello", eventsByFilter.get(0).getMessage());
         assertEquals(RequestStatus.ACCEPTED, eventsByFilter.get(0).getStatus());
     }
 

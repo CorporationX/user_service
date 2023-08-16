@@ -106,7 +106,7 @@ public class User {
     private List<Goal> setGoals;
 
     @ManyToMany(mappedBy = "users")
-    private List<Goal> goals ;
+    private List<Goal> goals;
 
     @ManyToMany(mappedBy = "users")
     private List<Skill> skills;

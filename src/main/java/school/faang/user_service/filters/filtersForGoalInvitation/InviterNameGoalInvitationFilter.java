@@ -9,13 +9,13 @@ import java.util.stream.Stream;
 @Component
 public class InviterNameGoalInvitationFilter implements GoalInvitationFilter {
     @Override
-    public boolean isApplicable( InvitationFilterDto filterDto) {
-        return filterDto.getInviterNamePattern()!=null;
+    public boolean isApplicable(InvitationFilterDto filterDto) {
+        return filterDto.getInviterNamePattern() != null;
     }
 
     @Override
     public Stream<GoalInvitation> apply(Stream<GoalInvitation> goalInvitationStream, InvitationFilterDto filterDto) {
-        return goalInvitationStream.filter(goalInvt->goalInvt.getInviter().getUsername().contains(filterDto.getInviterNamePattern()));
+        return goalInvitationStream.filter(goalInvt -> goalInvt.getInviter().getUsername().contains(filterDto.getInviterNamePattern()));
     }
 
 }

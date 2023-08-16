@@ -19,30 +19,23 @@ public interface UserMapper {
 
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
-   // UserDto map(User user);
-
-    @Mapping(source = "goals",target = "goalIds",qualifiedByName = "listToGoalDto")
-    //@Mapping(source = "goals",target = "goalIds",qualifiedByName = "listToGoalDto" )
+    @Mapping(source = "goals", target = "goalIds", qualifiedByName = "listToGoalDto")
     UserDto userToDto(User user);
 
-    //@Mapping(source = "goalIds",target = "goals",qualifiedByName = "goalDtoToList")
-    @Mapping(source = "goalIds",target = "goals",qualifiedByName = "goalDtoToList" )
+    @Mapping(source = "goalIds", target = "goals", qualifiedByName = "goalDtoToList")
     User dtoToUser(UserDto userDto);
 
-
-    //List<UserDto> toUserDtoList(List<User> users);
-    //List<User> toUserList(List<UserDto> userDtoList);
-
     @Named("listToGoalDto")
-    default List<GoalDto>  listToGoalDto(List<Goal> goals){
-        List<GoalDto> goalDtos = new ArrayList<>() ;
+    default List<GoalDto> listToGoalDto(List<Goal> goals) {
+        List<GoalDto> goalDtos = new ArrayList<>();
         goals.stream().forEach(goal ->
                 goalDtos.add(GoalMapper.INSTANCE.toDto(goal)));
         return goalDtos;
     }
+
     @Named("goalDtoToList")
-    default List<Goal>  goalDtoToList(List<GoalDto> list){
-        List<Goal> goalDtos = new ArrayList<>() ;
+    default List<Goal> goalDtoToList(List<GoalDto> list) {
+        List<Goal> goalDtos = new ArrayList<>();
         list.stream().forEach(lists ->
                 goalDtos.add(GoalMapper.INSTANCE.toEntity(lists)));
         return goalDtos;

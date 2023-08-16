@@ -7,13 +7,13 @@ import java.util.stream.Stream;
 
 public class InviterIdGoalInvitationFilter implements GoalInvitationFilter {
     @Override
-    public boolean isApplicable( InvitationFilterDto filterDto) {
-        return filterDto.getInviterId()>0;
+    public boolean isApplicable(InvitationFilterDto filterDto) {
+        return filterDto.getInviterId() > 0;
     }
 
     @Override
     public Stream<GoalInvitation> apply(Stream<GoalInvitation> goalInvitationStream, InvitationFilterDto filterDto) {
-        return goalInvitationStream.filter(goalInvt->goalInvt.getInviter().getId()==filterDto.getInviterId().longValue());
+        return goalInvitationStream.filter(goalInvt -> goalInvt.getInviter().getId() == filterDto.getInviterId().longValue());
     }
 
 }

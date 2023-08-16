@@ -1,12 +1,8 @@
 package school.faang.user_service.service.premium;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,32 +17,24 @@ import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.integration.PaymentService;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.mapper.premium.PremiumMapper;
-import school.faang.user_service.model.EventType;
 import school.faang.user_service.model.TariffPlan;
+import school.faang.user_service.publisher.PremiumEventPublisher;
 import school.faang.user_service.repository.premium.PremiumRepository;
-import school.faang.user_service.service.redis.RedisMessagePublisher;
-import school.faang.user_service.service.redis.events.PremiumEvent;
 import school.faang.user_service.service.user.UserService;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class PremiumService {
-    @Setter
-    @Value("${spring.data.redis.channels.premium_events_channel.name}")
-    private String premiumEventChannelName;
-
     private final UserContext userContext;
     private final PaymentService paymentService;
     private final UserService userService;
     private final UserMapper userMapper;
     private final PremiumRepository premiumRepository;
     private final PremiumMapper premiumMapper;
-    private final RedisMessagePublisher redisMessagePublisher;
-    private final ObjectMapper objectMapper;
+    private final PremiumEventPublisher premiumEventPublisher;
 
     @Transactional
     public PremiumResponseDto buyPremium(PremiumRequestDto premiumRequestDto) {
@@ -63,26 +51,9 @@ public class PremiumService {
 
         fillTariffPlan(paymentResponse, tariffPlan, savedPremium);
 
-        try {
-            sendPremiumPurchasedSuccessEvent(userId);
-            log.info("Premium purchase success notification was published");
-        }  catch (JsonProcessingException e) {
-            log.error(e.toString());
-        }
+        premiumEventPublisher.purchaseSuccessful(userId);
 
         return paymentResponse;
-    }
-
-    private void sendPremiumPurchasedSuccessEvent(Long userId) throws JsonProcessingException {
-        PremiumEvent premiumEvent = new PremiumEvent();
-
-        premiumEvent.setEventType(EventType.PREMIUM_PURCHASED);
-        premiumEvent.setUserId(userId);
-        premiumEvent.setReceivedAt(new Date());
-
-        String json = objectMapper.writeValueAsString(premiumEvent);
-
-        redisMessagePublisher.publish(premiumEventChannelName, json);
     }
 
     private void fillTariffPlan(PremiumResponseDto responseDto,

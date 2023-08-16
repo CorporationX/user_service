@@ -1,6 +1,5 @@
 package school.faang.user_service.service.premium;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,15 +18,13 @@ import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.integration.PaymentService;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.mapper.premium.PremiumMapper;
-import school.faang.user_service.model.EventType;
 import school.faang.user_service.model.Payment;
 import school.faang.user_service.model.TariffPlan;
+import school.faang.user_service.publisher.PremiumEventPublisher;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.redis.RedisMessagePublisher;
-import school.faang.user_service.service.redis.events.PremiumEvent;
 import school.faang.user_service.service.user.UserService;
 
-import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -64,7 +61,7 @@ class PremiumServiceTest {
     private RedisMessagePublisher redisMessagePublisher;
 
     @Mock
-    private ObjectMapper objectMapper;
+    private PremiumEventPublisher premiumEventPublisher;
 
     @Test
     void whenUserAlreadyHasPremiumThenMessage() {
@@ -101,18 +98,11 @@ class PremiumServiceTest {
         when(premiumRepository.save(any())).thenReturn(any());
         when(premiumMapper.toDto(new Premium())).thenReturn(new PremiumDto());
 
-        premiumService.setPremiumEventChannelName("Test");
+
         PremiumResponseDto response = premiumService.buyPremium(premiumRequestDto);
 
-        PremiumEvent premiumEvent = new PremiumEvent();
 
-        premiumEvent.setEventType(EventType.PREMIUM_PURCHASED);
-        premiumEvent.setUserId(USER_ID);
-        premiumEvent.setReceivedAt(new Date());
-
-        Mockito.verify(redisMessagePublisher, Mockito.times(1))
-            .publish(Mockito.eq("Test"), any());
-
+Mockito.verify(premiumEventPublisher, Mockito.times(1)).purchaseSuccessful(USER_ID);
         assertEquals(expectedResponse.getStatus(), response.getStatus());
         assertEquals(expectedResponse.getTariffPlan(), response.getTariffPlan());
     }

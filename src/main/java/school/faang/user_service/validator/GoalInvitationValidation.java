@@ -18,9 +18,10 @@ public class GoalInvitationValidation {
         Long inviterId = invitation.getInviterId();
         Long invitedUserId = invitation.getInvitedUserId();
 
+        ExistUsers(inviterId, invitedUserId);
         EmptyUsers(inviterId, invitedUserId);
         SameUsers(inviterId, invitedUserId);
-        ExistUsers(inviterId, invitedUserId);
+
     }
 
     private void EmptyUsers(Long inviterId, Long invitedUserId) {

@@ -12,9 +12,14 @@ import school.faang.user_service.service.event.EventService;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 @ExtendWith(MockitoExtension.class)
 class EventCleanupSchedulerServiceTest {
+    ThreadPoolExecutor threadPoolExecutor;
+
     @Mock
     EventService eventService;
 
@@ -23,6 +28,8 @@ class EventCleanupSchedulerServiceTest {
 
     @Test
     public void testClearPastEvents() {
+        threadPoolExecutor = new ThreadPoolExecutor(1, 10, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
+        eventSchedulerService = new EventCleanupSchedulerService(eventService, threadPoolExecutor);
         Event event = Event.builder().endDate(LocalDateTime.now()).build();
         eventSchedulerService.setBatchSize(50);
         Mockito.when(eventService.getAllEvents()).thenReturn(List.of(event));

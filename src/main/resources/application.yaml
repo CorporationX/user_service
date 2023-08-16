@@ -66,3 +66,8 @@ event:
       cron: "0 0 12 * * ?" # every day 12:00
     batch:
       size: 50
+    thread-pool:
+      core-pool-size: 1
+      maximum-pool-size: 10
+      keep-alive-time: 0
+      time-unit: MILLISECONDS

@@ -56,13 +56,13 @@ payment-service:
     delay-ms: 3000
 
 aws:
-  accessKey: access_key
-  secretKey: secret_key
-  region: bucket_region
+  accessKey: AKIAZ3KSEE34R2FW4VM7
+  secretKey: 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
+  region: Regions.EU_NORTH_1
 
 services:
   s3:
-    bucket-name: user_backet
+    bucket-name: corpx-unicorn-dicebear-bucket
     isMocked: true
 
 google:

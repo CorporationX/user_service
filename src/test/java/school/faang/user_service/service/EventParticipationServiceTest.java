@@ -64,7 +64,7 @@ public class EventParticipationServiceTest {
     @Test
     public void getParticipantTest() {
         User user = User.builder().id(1L).username("name").build();
-        UserDto userDto = new UserDto(1L, "name", "email");
+        UserDto userDto = UserDto.builder().id(1L).username("name").email("mail").build();
         Mockito.when(eventParticipationRepository.existsById(1L)).thenReturn(true);
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(List.of(user));
         Mockito.when(userMapper.toDto(user)).thenReturn(userDto);

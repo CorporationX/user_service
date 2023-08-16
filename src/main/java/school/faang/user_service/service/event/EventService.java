@@ -15,10 +15,10 @@ import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -96,5 +96,13 @@ public class EventService {
             events = eventFilter.apply(events, filter);
         }
         return events.map(eventMapper::toDTO).toList();
+    }
+
+    public List<Event> getAllEvents() {
+        return eventRepository.findAll();
+    }
+
+    public void deleteByIds(Set<Long> ids) {
+        eventRepository.deleteAllById(ids);
     }
 }

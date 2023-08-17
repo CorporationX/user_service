@@ -4,7 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
@@ -20,10 +22,12 @@ public class GoalServiceTest {
     private GoalRepository goalRepository;
     @Mock
     private SkillRepository skillRepository;
-    @Mock
+    @Spy
     private GoalMapper goalMapper;
     @Mock
     private GoalValidator validator;
+    @Mock
+    private UserContext userContext;
 
     @InjectMocks
     private GoalService service;
@@ -33,7 +37,7 @@ public class GoalServiceTest {
 
     @Test
     void createGoalTest() {
-        service.createGoal(userId, goalDto);
+        service.createGoal(goalDto);
         verify(goalRepository).save(goalMapper.toEntity(goalDto));
     }
 }

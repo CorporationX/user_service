@@ -36,6 +36,9 @@ public interface GoalMapper {
 
     @Named("idsToSkills")
     default List<Skill> mapIdsToSkills(List<Long> value) {
+        if (value.equals(null)) {
+            return null;
+        }
         List<Skill> res = new ArrayList<>(value.size());
         for (Long id : value) {
             Skill skill = new Skill();
@@ -47,6 +50,9 @@ public interface GoalMapper {
 
     @Named("idsToUsers")
     default List<User> mapIdsToUsers(List<Long> value) {
+        if (value.equals(null)) {
+            return null;
+        }
         List<User> res = new ArrayList<>(value.size());
         for (Long id : value) {
             User user = new User();

@@ -2,8 +2,8 @@ package school.faang.user_service.service.goal;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.goal.GoalDto;
-import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -18,11 +18,14 @@ public class GoalService {
     private final SkillRepository skillRepository;
     private final GoalMapper goalMapper;
     private final GoalValidator validator;
+    private final UserContext userContext;
 
-    public GoalDto createGoal(long userId, GoalDto goalDto) {
+    public GoalDto createGoal(GoalDto goalDto) {
+        long userId = userContext.getUserId();
         validator.creatingGoalServiceValidation(userId, goalDto);
         goalDto.setUserIds(List.of(userId));
-        //goalDto.getSkillIds().forEach(id -> goalRepository.addSkillToGoal(id, goal.getId())); По заданию этот метод должен быть и мне его делать не нужно
+        //goalDto.getSkillIds().forEach(id -> goalRepository.addSkillToGoal(id, goal.getId())); По заданию этот метод
+        //должен быть  репозитории и мне его делать не нужно
         goalRepository.save(goalMapper.toEntity(goalDto));
         return goalDto;
     }

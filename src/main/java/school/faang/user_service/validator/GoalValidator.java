@@ -19,12 +19,9 @@ public class GoalValidator {
     private final GoalMapper goalMapper;
     private static final int MAX_ACTIVE_GOALS = 3;
 
-    public void createGoalControllerValidation(long userId, GoalDto goalDto) {
+    public void createGoalControllerValidation(GoalDto goalDto) {
         if (goalDto == null) {
             throw new DataValidationException("Goal cannot be null");
-        }
-        if (userId < 1) {
-            throw new DataValidationException("ID can not be null or less than 1");
         }
         if (goalDto.getTitle() == null || goalDto.getTitle().isBlank()) {
             throw new DataValidationException("Title can not be blank or null");

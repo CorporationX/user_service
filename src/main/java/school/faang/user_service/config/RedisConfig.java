@@ -7,7 +7,11 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import school.faang.user_service.config.messaging.MessagePublisher;
+import school.faang.user_service.config.messaging.ProfileViewEventPublisher;
+import school.faang.user_service.config.messaging.events.ProfileViewEvent;
 
 @Configuration
 public class RedisConfig {
@@ -31,5 +35,15 @@ public class RedisConfig {
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new StringRedisSerializer());
         return redisTemplate;
+    }
+
+    @Bean
+    public ChannelTopic viewProfileTopic(){
+        return new ChannelTopic("viewProfileTopic");
+    }
+
+    @Bean
+    ProfileViewEventPublisher redisPublisher() {
+        return new ProfileViewEventPublisher(redisTemplate(redisConnectionFactory()), viewProfileTopic());
     }
 }

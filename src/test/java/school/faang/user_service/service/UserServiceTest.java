@@ -10,6 +10,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.config.messaging.MessagePublisher;
+import school.faang.user_service.config.messaging.events.ProfileViewEvent;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;
@@ -30,6 +33,10 @@ public class UserServiceTest {
     private UserService userService;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private UserContext userContext;
+    @Mock
+    private MessagePublisher<ProfileViewEvent> profileViewEventMessagePublisher;
     @Spy
     private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
@@ -47,7 +54,7 @@ public class UserServiceTest {
         user3 = User.builder().id(3).active(true).premium(new Premium()).build();
         UserFilter userFilter = new ActiveUserFilter();
         List<UserFilter> userFilters = List.of(userFilter);
-        userService = new UserService(userRepository, userFilters, userMapper);
+        userService = new UserService(userRepository, userFilters, userMapper,profileViewEventMessagePublisher, userContext);
         userList = List.of(user1, user2, user3);
         filter = new UserFilterDto();
         filter.setActive(true);

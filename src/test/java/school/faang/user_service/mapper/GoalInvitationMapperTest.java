@@ -1,8 +1,6 @@
 package school.faang.user_service.mapper;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
@@ -11,10 +9,8 @@ import school.faang.user_service.entity.goal.GoalInvitation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest
 class GoalInvitationMapperTest {
-    @Autowired
-    GoalInvitationMapper mapper;
+    GoalInvitationMapperImpl mapper = new GoalInvitationMapperImpl();
 
     @Test
     public void testToDto() {

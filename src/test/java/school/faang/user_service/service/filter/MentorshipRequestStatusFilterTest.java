@@ -6,7 +6,7 @@ import school.faang.user_service.dto.filter.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.service.mentorship.filter.MentorshipRequestStatusFilter;
+import school.faang.user_service.dto.mentorship.service.mentorship.filter.MentorshipRequestStatusFilter;
 
 import java.util.ArrayList;
 import java.util.List;

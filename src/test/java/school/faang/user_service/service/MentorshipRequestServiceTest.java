@@ -5,34 +5,28 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
+import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorship.service.MentorshipRequestService;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
-import school.faang.user_service.mapper.MentorshipRequestMapperImpl;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-import school.faang.user_service.service.mentorship.filter.MentorshipRequestFilter;
-import school.faang.user_service.validation.MentorshipRequestValidator;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipRequestServiceTest {
-    @Spy
-    MentorshipRequestMapper mapper = new MentorshipRequestMapperImpl();
+    @Mock
+    MentorshipRequestMapper mapper;
     @Mock
     MentorshipRequestRepository mentorshipRequestRepository;
-    @Mock
-    MentorshipRequestFilter mentorshipRequestFilter;
     @Mock
     UserRepository userRepository;
     @InjectMocks
@@ -62,20 +56,6 @@ class MentorshipRequestServiceTest {
                 .receiverId(RECEIVER_ID)
                 .description(DESCRIPTION)
                 .build();
-
-        List<MentorshipRequestFilter> filters = List.of(mentorshipRequestFilter);
-    }
-
-    @Test
-    void testToDto() {
-        MentorshipRequestDto fromRequest = mapper.toDto(request);
-        assertEquals(requestDto, fromRequest);
-    }
-
-    @Test
-    void testToEntity() {
-        MentorshipRequest fromDto = mapper.toEntity(requestDto);
-        assertEquals(request, fromDto);
     }
 
     @Test

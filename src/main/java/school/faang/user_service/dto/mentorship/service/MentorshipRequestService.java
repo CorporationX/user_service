@@ -1,12 +1,12 @@
-package school.faang.user_service.service;
+package school.faang.user_service.dto.mentorship.service;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import school.faang.user_service.dto.MentorshipRequestDto;
-import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.filter.RequestFilterDto;
+import school.faang.user_service.dto.mentorship.service.mentorship.filter.MentorshipRequestFilter;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
@@ -14,15 +14,12 @@ import school.faang.user_service.repository.mentorship.MentorshipRequestReposito
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-import school.faang.user_service.service.mentorship.filter.MentorshipRequestFilter;
-import school.faang.user_service.validation.MentorshipRequestValidator;
 
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-@RequiredArgsConstructor
 @Service
 @RequiredArgsConstructor
 @Validated

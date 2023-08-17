@@ -72,7 +72,7 @@ public class UserControllerTest {
         long userId = 1;
         Mockito.when(userService.deactivateUser(Mockito.anyLong())).thenReturn(userDto);
 
-        mockMvc.perform(post("/users/deactivate/{userId}", userId)
+        mockMvc.perform(post("/users/deactivate", userId)
                         .header("x-user-id", userId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(userDto.id()));

@@ -5,12 +5,12 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.mentorshipRequest.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.TimingException;
+import school.faang.user_service.exception.SameEntityException;
+import school.faang.user_service.exception.notFoundExceptions.MentorshipRequestNotFoundException;
+import school.faang.user_service.exception.notFoundExceptions.contact.UserNotFoundException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-import school.faang.user_service.util.exception.RequestMentorshipException;
-import school.faang.user_service.util.exception.SameMentorAndMenteeException;
-import school.faang.user_service.util.exception.TimeHasNotPassedException;
-import school.faang.user_service.util.exception.UserNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -33,13 +33,13 @@ public class MentorshipRequestValidator {
             throw new UserNotFoundException("User not found");
         }
         if (requester.get().getId() == receiver.get().getId()) {
-            throw new SameMentorAndMenteeException("Same mentor and mentee");
+            throw new SameEntityException("Same mentor and mentee");
         }
         if (lastRequest.isEmpty()) {
-            throw new RequestMentorshipException("There is no requests");
+            throw new MentorshipRequestNotFoundException();
         }
         if (lastRequest.get().getCreatedAt().isAfter(LocalDateTime.now().minusMonths(3))) {
-            throw new TimeHasNotPassedException("The request can be sent once every three months");
+            throw new TimingException("The request can be sent once every three months");
         }
     }
 }

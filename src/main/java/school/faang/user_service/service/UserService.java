@@ -7,9 +7,9 @@ import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.dto.mydto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.filter.user.UserFilter;
+import school.faang.user_service.exception.notFoundExceptions.contact.UserNotFoundException;
 import school.faang.user_service.mapper.mymappers.User1Mapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.util.exception.UserNotFoundException;
 
 import java.util.List;
 import java.util.stream.Stream;

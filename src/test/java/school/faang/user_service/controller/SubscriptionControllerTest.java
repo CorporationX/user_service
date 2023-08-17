@@ -11,7 +11,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import school.faang.user_service.dto.SubscriptionDto;
 import school.faang.user_service.dto.UserFilterDto;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.SameEntityException;
+import school.faang.user_service.exception.invalidFieldException.DataValidationException;
+import school.faang.user_service.exception.invalidFieldException.InvalidIdException;
 import school.faang.user_service.service.SubscriptionService;
 import school.faang.user_service.util.validator.SubscriptionValidator;
 @ExtendWith(MockitoExtension.class)
@@ -40,7 +42,7 @@ public class SubscriptionControllerTest {
     @Test
     void followUserSameIdExceptionTest() {
         dto.setFolloweeId(1);
-        Assertions.assertThrows(DataValidationException.class,
+        Assertions.assertThrows(SameEntityException.class,
                 () -> controller.followUser(dto));
     }
 
@@ -53,7 +55,7 @@ public class SubscriptionControllerTest {
     @Test
     void unfollowUserSameIdExceptionTest() {
         dto.setFolloweeId(1);
-        Assertions.assertThrows(DataValidationException.class,
+        Assertions.assertThrows(SameEntityException.class,
                 () -> controller.unfollowUser(dto));
     }
 
@@ -65,7 +67,7 @@ public class SubscriptionControllerTest {
 
     @Test
     void GetByFolloweeInvalidIdExceptionTest() {
-        Assertions.assertThrows(DataValidationException.class,
+        Assertions.assertThrows(InvalidIdException.class,
                 () -> controller.getFollowers(0,filterDto));
     }
 
@@ -77,7 +79,7 @@ public class SubscriptionControllerTest {
 
     @Test
     void GetFollowersCountInvalidIdExceptionTest() {
-        Assertions.assertThrows(DataValidationException.class,
+        Assertions.assertThrows(InvalidIdException.class,
                 () -> controller.getFollowers(0,filterDto));
     }
     @Test
@@ -93,7 +95,7 @@ public class SubscriptionControllerTest {
     }
     @Test
     void GetFolloweesCountInvalidIdTest() {
-        Assertions.assertThrows(DataValidationException.class,
+        Assertions.assertThrows(InvalidIdException.class,
                 () -> controller.getFollowing(-1, filterDto));
     }
 }

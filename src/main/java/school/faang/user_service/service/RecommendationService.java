@@ -10,7 +10,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.invalidFieldException.DataValidationException;
 import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -22,6 +22,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,34 +37,9 @@ public class RecommendationService {
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
 
     public RecommendationDto create(RecommendationDto recommendationDto) {
-
         validatePreviousRecommendation(recommendationDto);
-
-        recommendationDto.getSkillOffers()
-                .forEach(skillOffer -> {
-                    if (!skillRepository.existsById(skillOffer.getSkillId())) {
-                        throw new DataValidationException(
-                                String.format("Skill with id=%d is missing in db!", skillOffer.getSkillId()));
-                    }
-                });
-
-        List<Long> skillIds = recommendationDto.getSkillOffers()
-                .stream()
-                .map(SkillOfferDto::getSkillId)
-                .toList();
-        var skills = skillRepository.findAllById(skillIds);
-        if (skillIds.size() != skills.size()) {
-            throw new DataValidationException("Some skills do not exist");
-        }
-
-        List<Long> recommendationIds = recommendationDto.getSkillOffers()
-                .stream()
-                .map(SkillOfferDto::getRecommendationId)
-                .toList();
-        var recommendations = recommendationRepository.findAllById(recommendationIds);
-        if (recommendationIds.size() != recommendations.size()) {
-            throw new DataValidationException("Some recommendations do not exist");
-        }
+        checkSkills(recommendationDto);
+        checkRecommendations(recommendationDto);
 
         recommendationDto.getSkillOffers()
                 .forEach(sod -> skillOfferRepository.create(sod.getSkillId(), sod.getRecommendationId()));
@@ -92,34 +69,10 @@ public class RecommendationService {
         return recommendationMapper.toDto(recommendation);
     }
 
-    public RecommendationDto update(RecommendationDto recommendationDto){
+    public RecommendationDto update(RecommendationDto recommendationDto) {
         validatePreviousRecommendation(recommendationDto);
-
-        recommendationDto.getSkillOffers()
-                .forEach(skillOffer -> {
-                    if (!skillRepository.existsById(skillOffer.getSkillId())) {
-                        throw new DataValidationException(
-                                String.format("Skill with id=%d is missing in db!", skillOffer.getSkillId()));
-                    }
-                });
-
-        List<Long> skillIds = recommendationDto.getSkillOffers()
-                .stream()
-                .map(SkillOfferDto::getSkillId)
-                .toList();
-        var skills = skillRepository.findAllById(skillIds);
-        if (skillIds.size() != skills.size()) {
-            throw new DataValidationException("Some skills do not exist");
-        }
-
-        List<Long> recommendationIds = recommendationDto.getSkillOffers()
-                .stream()
-                .map(SkillOfferDto::getRecommendationId)
-                .toList();
-        var recommendations = recommendationRepository.findAllById(recommendationIds);
-        if (recommendationIds.size() != recommendations.size()) {
-            throw new DataValidationException("Some recommendations do not exist");
-        }
+        checkSkills(recommendationDto);
+        checkRecommendations(recommendationDto);
 
         Recommendation updatedRecommendation = recommendationRepository
                 .update(recommendationDto.getAuthorId(), recommendationDto.getReceiverId(), recommendationDto.getContent());
@@ -146,17 +99,18 @@ public class RecommendationService {
                     }
                 });
 
+        recommendationRepository.save(updatedRecommendation);
         return recommendationMapper.toDto(updatedRecommendation);
     }
 
-    public void delete(long id){
+    public void delete(long id) {
         recommendationRepository.deleteById(id);
     }
 
-    public List<RecommendationDto> getAllUserRecommendations(long receiverId){
+    public List<RecommendationDto> getAllUserRecommendations(long receiverId) {
         Page<Recommendation> recommendations = recommendationRepository
                 .findAllByReceiverId(receiverId, Pageable.unpaged());
-        if(recommendations==null) {
+        if (recommendations == null) {
             return new ArrayList<>();
         }
         return recommendations.getContent()
@@ -165,10 +119,10 @@ public class RecommendationService {
                 .toList();
     }
 
-    public List<RecommendationDto> getAllGivenRecommendations(long authorId){
+    public List<RecommendationDto> getAllGivenRecommendations(long authorId) {
         Page<Recommendation> recommendations = recommendationRepository
                 .findAllByReceiverId(authorId, Pageable.unpaged());
-        if(recommendations==null) {
+        if (recommendations == null) {
             return new ArrayList<>();
         }
         return recommendations.getContent()
@@ -187,6 +141,28 @@ public class RecommendationService {
         LocalDateTime recommendationCreate = recommendation.get().getCreatedAt();
         if (!recommendationCreate.isAfter(LocalDateTime.now().minusMonths(6))) {
             throw new DataValidationException("Recommendation duration has not expired");
+        }
+    }
+
+    private void checkSkills(RecommendationDto recommendationDto) {
+        Set<Long> skillIds = recommendationDto.getSkillOffers()
+                .stream()
+                .map(SkillOfferDto::getSkillId)
+                .collect(Collectors.toSet());
+        var skills = skillRepository.findAllById(skillIds);
+        if (skillIds.size() != skills.size()) {
+            throw new DataValidationException("Some skills do not exist");
+        }
+    }
+
+    private void checkRecommendations(RecommendationDto recommendationDto) {
+        Set<Long> recommendationIds = recommendationDto.getSkillOffers()
+                .stream()
+                .map(SkillOfferDto::getRecommendationId)
+                .collect(Collectors.toSet());
+        var recommendations = recommendationRepository.findAllById(recommendationIds);
+        if (recommendationIds.size() != recommendations.size()) {
+            throw new DataValidationException("Some recommendations do not exist");
         }
     }
 

@@ -1,19 +1,17 @@
 package school.faang.user_service.mapper.mymappers;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.Named;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import school.faang.user_service.dto.mydto.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.exception.notFoundExceptions.SkillNotFoundException;
+import school.faang.user_service.exception.notFoundExceptions.contact.UserNotFoundException;
+import school.faang.user_service.exception.notFoundExceptions.goal.GoalNotFoundException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.util.exception.DataValidationException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,13 +49,13 @@ public abstract class Goal1Mapper {
     public void convertDtoDependenciesToEntity(GoalDto goalDto, Goal goal) {
         if (goalDto.getMentorId() != null) {
             User mentor = userRepository.findById(goalDto.getMentorId())
-                    .orElseThrow(() -> new DataValidationException("Mentor with given id was not found!"));
+                    .orElseThrow(() -> new UserNotFoundException("Mentor with given id was not found!"));
             goal.setMentor(mentor);
         }
 
         if (goalDto.getParentId() != null) {
             Goal goalParent = goalRepository.findById(goalDto.getParentId())
-                    .orElseThrow(() -> new DataValidationException("Goal-parent with given id was not found!"));
+                    .orElseThrow(() -> new GoalNotFoundException("Goal-parent with given id was not found!"));
             goal.setParent(goalParent);
         }
 
@@ -65,7 +63,7 @@ public abstract class Goal1Mapper {
             List<Skill> skills = new ArrayList<>();
             goalDto.getSkillIds().forEach(skillId -> {
                 Skill skill = skillRepository.findById(skillId)
-                        .orElseThrow(() -> new DataValidationException("There is no way to add a goal with a non-existent skill!"));
+                        .orElseThrow(() -> new SkillNotFoundException("There is no way to add a goal with a non-existent skill!"));
                 skills.add(skill);
             });
             goal.setSkillsToAchieve(skills);

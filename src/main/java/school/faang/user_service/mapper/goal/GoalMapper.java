@@ -13,6 +13,7 @@ public interface GoalMapper {
     @Mapping(target = "parentId", source = "parent.id")
     GoalDto toDto(Goal goal);
 
+
     List<GoalDto> goalsToDtos(List<Goal> list);
 
     @Named("skillsToIds")

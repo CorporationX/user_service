@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.mydto.UserDto;
-import school.faang.user_service.exception.invalidFieldException.DataValidationException;
 import school.faang.user_service.service.UserService;
 import school.faang.user_service.util.validator.UserControllerValidator;
 
@@ -32,9 +31,8 @@ public class UserController {
         return userService.getUsersByIds(ids);
     }
 
-    @PostMapping("/deactivate/{userId}")
-    public ResponseEntity<UserDto> deactivateUser(@RequestHeader(value = "x-user-id") long id, @PathVariable Long userId) {
-        if (id != userId) throw new DataValidationException("Only the user can deactivate their own account");
+    @PostMapping("/deactivate")
+    public ResponseEntity<UserDto> deactivateUser(@RequestHeader(value = "x-user-id") long userId) {
         return ResponseEntity.ok(userService.deactivateUser(userId));
     }
 }

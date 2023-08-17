@@ -60,9 +60,10 @@ public class UserService {
         if (user.getMentees() == null) return;
         user.getMentees().forEach(mentee -> {
             mentee.getMentors().remove(user);
-            if (mentee.getSetGoals() != null) {
-                mentee.getSetGoals().forEach(goal -> {
-                            if (goal.getMentor() != null && goal.getMentor().equals(user)) {
+            var goals = mentee.getSetGoals();
+            if (goals != null) {
+                goals.forEach(goal -> {
+                            if (goal.getMentor() != null && goal.getMentor().getId() == user.getId()) {
                                 goal.setMentor(null);
                                 goalService.save(goal);
                             }

@@ -12,11 +12,13 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.filters.EventFilter;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -27,9 +29,10 @@ public class EventService {
     private final SkillRepository skillRepository;
     private final EventMapper eventMapper;
     private final List<EventFilter> eventFilters;
+    private final UserRepository userRepository;
 
     private void validateUserAccess(List<Long> skills, Long ownerId) {
-        List<Skill> userSkills = skillRepository.findSkillsByGoalId(ownerId);
+        List<Skill> userSkills = skillRepository.findAllByUserId(ownerId);
 
         Set<Long> eventSkills = new HashSet<>(skills);
         Set<Long> userSkillIds = new HashSet<>(userSkills.stream().map(Skill::getId).toList());
@@ -44,9 +47,13 @@ public class EventService {
     public EventDto create(EventDto event) {
         validateUserAccess(event.getRelatedSkills(), event.getOwnerId());
         List<Skill> skills = skillRepository.findAllById(event.getRelatedSkills());
+        User owner = userRepository
+            .findById(event.getOwnerId())
+            .orElseThrow(() -> new EntityNotFoundException("User with id: " + event.getOwnerId() + " is not exist"));
 
         Event newEvent = eventMapper.toEntity(event);
         newEvent.setRelatedSkills(skills);
+        newEvent.setOwner(owner);
 
         Event createdEvent = eventRepository.save(newEvent);
         return eventMapper.toDto(createdEvent);
@@ -103,7 +110,7 @@ public class EventService {
 
         events.forEach(event -> {
             List<User> currentUsers = event.getAttendees();
-            event.setAttendees(currentUsers.stream().filter(user -> user.getId() != userId).toList());
+            event.setAttendees(currentUsers.stream().filter(user -> !Objects.equals(user.getId(), userId)).toList());
         });
 
         return events.size();

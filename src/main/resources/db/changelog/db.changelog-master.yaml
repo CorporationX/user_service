@@ -13,3 +13,9 @@ databaseChangeLog:
       file: db/changelog/changeset/user_V006__insert_users.sql
   - include:
       file: db/changelog/changeset/user_V007__user_premium.sql
+  - include:
+      file: db/changelog/changeset/user_V008__google_credentials.sql
+  - include:
+      file: db/changelog/changeset/user_V009__insert_user_rating.sql
+  - include:
+      file: db/changelog/changeset/user_V010__insert_google_credentials.sql

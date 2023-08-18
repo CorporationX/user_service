@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -19,8 +20,11 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.mapper.premium.PremiumMapper;
 import school.faang.user_service.model.Payment;
 import school.faang.user_service.model.TariffPlan;
+import school.faang.user_service.publisher.PremiumEventPublisher;
 import school.faang.user_service.repository.premium.PremiumRepository;
+import school.faang.user_service.service.redis.RedisMessagePublisher;
 import school.faang.user_service.service.user.UserService;
+
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -52,6 +56,12 @@ class PremiumServiceTest {
 
     @Mock
     private PremiumMapper premiumMapper;
+
+    @Mock
+    private RedisMessagePublisher redisMessagePublisher;
+
+    @Mock
+    private PremiumEventPublisher premiumEventPublisher;
 
     @Test
     void whenUserAlreadyHasPremiumThenMessage() {
@@ -88,8 +98,11 @@ class PremiumServiceTest {
         when(premiumRepository.save(any())).thenReturn(any());
         when(premiumMapper.toDto(new Premium())).thenReturn(new PremiumDto());
 
+
         PremiumResponseDto response = premiumService.buyPremium(premiumRequestDto);
 
+
+Mockito.verify(premiumEventPublisher, Mockito.times(1)).purchaseSuccessful(USER_ID);
         assertEquals(expectedResponse.getStatus(), response.getStatus());
         assertEquals(expectedResponse.getTariffPlan(), response.getTariffPlan());
     }

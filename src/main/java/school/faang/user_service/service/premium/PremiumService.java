@@ -2,6 +2,7 @@ package school.faang.user_service.service.premium;
 
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import school.faang.user_service.integration.PaymentService;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.mapper.premium.PremiumMapper;
 import school.faang.user_service.model.TariffPlan;
+import school.faang.user_service.publisher.PremiumEventPublisher;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.user.UserService;
 
@@ -24,6 +26,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PremiumService {
     private final UserContext userContext;
     private final PaymentService paymentService;
@@ -31,6 +34,7 @@ public class PremiumService {
     private final UserMapper userMapper;
     private final PremiumRepository premiumRepository;
     private final PremiumMapper premiumMapper;
+    private final PremiumEventPublisher premiumEventPublisher;
 
     @Transactional
     public PremiumResponseDto buyPremium(PremiumRequestDto premiumRequestDto) {
@@ -46,6 +50,8 @@ public class PremiumService {
         Premium savedPremium = premiumRepository.save(premium);
 
         fillTariffPlan(paymentResponse, tariffPlan, savedPremium);
+
+        premiumEventPublisher.purchaseSuccessful(userId);
 
         return paymentResponse;
     }

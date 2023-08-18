@@ -28,6 +28,12 @@ spring:
           name: profile_view_channel
         analytic_channel:
           name: analytics_channel
+        user_events_channel:
+          name: user_events_channel
+        premium_events_channel:
+          name: premium_events_channel
+        project_events_channel:
+          name: project_events_channel
 
 server:
   port: 8080
@@ -58,3 +64,12 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
+
+google:
+  calendar:
+    scopes: https://www.googleapis.com/auth/calendar
+    application-name: Corporation-X
+    tokens-path: tokens
+    calendar-id: primary
+    access-type: offline
+    client-email: serhii.rubets@gmail.com

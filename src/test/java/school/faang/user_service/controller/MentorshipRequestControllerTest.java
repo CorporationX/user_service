@@ -6,13 +6,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.dto.mentorship.RequestFilterDto;
-import school.faang.user_service.exception.DataValidationException;
+
+import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -47,11 +49,6 @@ public class MentorshipRequestControllerTest {
     void testRequestMentorshipWithDescription() {
         requestController.requestMentorship(correctRequestDto);
         verify(requestService).requestMentorship(correctRequestDto);
-    }
-
-    @Test
-    void testRequestMentorshipWithoutDescription() {
-        assertThrows(DataValidationException.class, () -> requestController.requestMentorship(incorrectRequestDto));
     }
 
     @Test

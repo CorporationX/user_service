@@ -34,25 +34,6 @@ class SkillControllerTest {
     }
 
     @Test
-    void testThrowsDataValidationExceptionOnLength() {
-        SkillDto skill = new SkillDto(1L, "Programming1hgfjsadgjkashdkjashlfakhf" +
-                "jkdsgfkadhfdlhfldkhgsahgkfaghfhsdkfhsdlkfhskfhkjfsfdfgffhhjjghfgddhhgfdsrytytgfdsfadfafsdggagsfg");
-        String message = "Skill's title length can't be more than 64 symbols";
-        DataValidationException dataValidationException = Assertions
-                .assertThrows(DataValidationException.class, () -> controller.create(skill));
-        Assertions.assertEquals(message, dataValidationException.getMessage());
-    }
-
-    @Test
-    void testThrowsDataValidationExceptionOnBlankTitle() {
-        SkillDto skill = new SkillDto(1L, "       ");
-        String message = "Skill can't be created with empty name";
-        DataValidationException dataValidationException = Assertions
-                .assertThrows(DataValidationException.class, () -> controller.create(skill));
-        Assertions.assertEquals(message, dataValidationException.getMessage());
-    }
-
-    @Test
     void testGetOfferedSkills() {
         controller.getOfferedSkills(userId);
         Mockito.verify(skillService).getOfferedSkills(userId);

@@ -1,5 +1,6 @@
 package school.faang.user_service.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,11 +26,8 @@ public class MentorshipRequestController {
     private final MentorshipRequestService mentorshipRequestService;
 
     @PostMapping("/")
-    public void requestMentorship(@RequestBody MentorshipRequestDto mentorshipRequestDto) {
+    public void requestMentorship(@Valid @RequestBody MentorshipRequestDto mentorshipRequestDto) {
         log.info("Endpoint <requestMentorship>, uri='/mentorship/requests' was called successfully");
-        if (mentorshipRequestDto.getDescription() == null || mentorshipRequestDto.getDescription().isBlank()) {
-            throw new DataValidationException("Add a description to your mentoring request");
-        }
         mentorshipRequestService.requestMentorship(mentorshipRequestDto);
     }
 

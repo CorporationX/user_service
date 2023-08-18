@@ -11,6 +11,7 @@ import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.RecommendationMapper;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.publisher.RecommendationReceivedEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
@@ -32,6 +33,7 @@ public class RecommendationService {
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final UserRepository userRepository;
     private final RecommendationMapper recommendationMapper;
+    private final RecommendationReceivedEventPublisher recommendationReceivedEventPublisher;
 
     public Long create(RecommendationDto recommendationDto) {
         recommendationEmptyValidation(recommendationDto);
@@ -40,6 +42,11 @@ public class RecommendationService {
 
         createSkillOffer(recommendationDto);
         existsUserSkill(recommendationDto);
+
+        recommendationReceivedEventPublisher.sendEvent(
+                recommendationDto.getAuthorId(),
+                recommendationDto.getReceiverId(),
+                recommendationDto.getId());
 
         return recommendationRepository.create(recommendationDto.getAuthorId(),
                 recommendationDto.getReceiverId(),

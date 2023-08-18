@@ -3,6 +3,7 @@ package school.faang.user_service.dto.event;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import school.faang.user_service.dto.skill.SkillDto;
+import school.faang.user_service.entity.event.EventStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,4 +20,5 @@ public class EventDto {
     private List<SkillDto> relatedSkills;
     private String location;
     private int maxAttendees;
+    private EventStatus eventStatus;
 }

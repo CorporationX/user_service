@@ -5,12 +5,15 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
+import school.faang.user_service.dto.redis.EventStartDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.mapper.skill.SkillMapper;
+import school.faang.user_service.publisher.EventStartPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.exception.DataValidException;
@@ -28,10 +31,12 @@ public class EventService {
     private final EventMapper eventMapper = EventMapper.INSTANCE;
     private final SkillMapper skillMapper = SkillMapper.INSTANCE;
     private final List<EventFilter> filters;
+    private final EventStartPublisher eventStartPublisher;
 
     public EventDto create(EventDto eventDto) {
         validateEventDto(eventDto);
         Event event = eventRepository.save(eventMapper.toEntity(eventDto));
+        notifyUsersThatEventStarted(event);
         return eventMapper.toDto(event);
     }
 
@@ -86,6 +91,7 @@ public class EventService {
         }
 
         Event result = eventRepository.save(eventMapper.toEntity(target));
+        notifyUsersThatEventStarted(result);
         return eventMapper.toDto(result);
     }
 
@@ -113,6 +119,16 @@ public class EventService {
         boolean anySkillMissing = eventDto.getRelatedSkills().stream().anyMatch(skill -> !userSkills.contains(skill));
         if (anySkillMissing) {
             throw new DataValidException("User has no related skills. Id: " + eventDto.getOwnerId());
+        }
+    }
+
+    private void notifyUsersThatEventStarted(Event event) {
+        if (event.getStatus().equals(EventStatus.IN_PROGRESS)) {
+            List<Long> userIds = event.getAttendees().stream()
+                    .map(User::getId)
+                    .toList();
+            EventStartDto eventStartDto = new EventStartDto(event.getId(), userIds);
+            eventStartPublisher.publishMessage(eventStartDto);
         }
     }
 }

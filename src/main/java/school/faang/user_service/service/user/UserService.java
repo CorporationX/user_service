@@ -2,7 +2,7 @@ package school.faang.user_service.service.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DataValidationException;
@@ -12,6 +12,7 @@ import school.faang.user_service.service.diceBear.DiceBearService;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -40,9 +41,20 @@ public class UserService {
         return userRepository.countOwnedSkills(userId, skillIds) == skillIds.size();
     }
 
+    public UserDto getUser(long id) {
+        return userMapper.toDto(findUserById(id));
+    }
+
     private void addCreateData(User user) {
         user.setCreatedAt(LocalDateTime.now());
         UserProfilePic userProfilePic = diceBearService.createAvatar(user.getUsername(), user.getId());
         user.setUserProfilePic(userProfilePic);
+    }
+
+    public List<UserDto> getUsersByIds(List<Long> ids) {
+        List<User> users = StreamSupport.stream(userRepository.findAllById(ids).spliterator(), false).toList();
+        return users.stream()
+                .map(userMapper::toDto)
+                .toList();
     }
 }

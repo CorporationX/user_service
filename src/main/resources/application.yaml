@@ -27,7 +27,7 @@ spring:
         profile_view_channel:
           name: profile_view_channel
         user_banner_channel:
-          name:
+          name: user_banner_channel
         event_start_channel:
           name: event_start_channel
 

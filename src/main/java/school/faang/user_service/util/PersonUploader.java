@@ -1,4 +1,4 @@
-package school.faang.user_service.util.uploader;
+package school.faang.user_service.util;
 
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;

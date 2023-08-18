@@ -21,6 +21,8 @@ import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,11 +33,13 @@ public class UserService {
     private final int lenPassword = 4;
 
     public UserDto createUser(UserDto userDto) {
+
         User user = userMapper.toEntity(userDto);
 
         synchronized (userRepository) {
             user = userRepository.save(user);
         }
+
         addCreateData(user);
 
         return userMapper.toDto(user);
@@ -44,22 +48,6 @@ public class UserService {
     public List<UserDto> createUserCSV(InputStream inputStream) {
         List<PersonSchemaForUser> persons = parseCsv(inputStream);
 
-
-        // Один поток
-        List<UserDto> users = persons.stream()
-                .map(person -> userMapper.personToUserDto(person))
-                .peek(user -> {
-                    user.setPassword(generatePassword(lenPassword));
-                    validateUserDto(user);
-                    createUser(user);
-                })
-                .toList();
-
-        return users;
-
-
-        /*
-        //выебоны
         List<CompletableFuture<UserDto>> futures = persons.stream()
                 .map(person -> CompletableFuture.supplyAsync(() -> {
                     UserDto userDto = userMapper.personToUserDto(person);
@@ -72,11 +60,14 @@ public class UserService {
                 }))
                 .toList();
 
-        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-                .thenApply(v -> futures.stream().map(CompletableFuture::join).toList())
+        var res = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                .thenApply(dto -> futures.stream()
+                        .map(CompletableFuture::join)
+                        .collect(Collectors.toList()))
                 .join();
 
-         */
+        return res;
+
     }
 
     public void validateUserDto(@Valid UserDto userDto) {

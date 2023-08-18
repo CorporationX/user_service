@@ -1,9 +1,5 @@
 package school.faang.user_service.service.event;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-import org.apache.commons.collections4.ListUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,8 +10,8 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.dto.skill.UserSkillGuaranteeDto;
 import school.faang.user_service.entity.Skill;
@@ -28,12 +24,25 @@ import school.faang.user_service.mapper.event.EventMapperImpl;
 import school.faang.user_service.mapper.skill.SkillMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -51,7 +60,6 @@ class EventServiceTest {
     @Mock
     private EventAsyncService eventAsyncService;
 
-    private List<Event> events;
     EventDto eventDto;
     Event event;
     User user;
@@ -365,17 +373,15 @@ class EventServiceTest {
     }
 
     @Test
-    void clearEvents_shouldSplitEventListAndInvokeClearEventsPartition() {
+    void clearEvents_shouldInvokeClearEventsPartitionThreeTimes() {
         Event event = mock(Event.class);
         when(event.getEndDate()).thenReturn(LocalDateTime.now().minusDays(1));
-        events = List.of(event, event, event);
+        List<Event> events = List.of(event, event, event);
 
         when(eventRepository.findAll()).thenReturn(events);
 
         eventService.clearEvents(1);
 
-        List<List<Event>> partitions = ListUtils.partition(events, events.size());
-
-        partitions.forEach(partition -> verify(eventAsyncService).clearEventsPartition(partition));
+        verify(eventAsyncService, times(3)).clearEventsPartition(any());
     }
 }

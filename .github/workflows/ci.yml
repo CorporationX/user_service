@@ -1,4 +1,4 @@
-name: Java CI with Gradle
+name: CI
 
 on:
   pull_request:
@@ -6,35 +6,21 @@ on:
       - cerberus-master
 
 jobs:
-  build_and_run_tests:
+  build:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_USER: user
-          POSTGRES_PASSWORD: password
-          POSTGRES_DB: postgres
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Java
-        uses: actions/setup-java@v1.4.4
+      - name: Set up JDK
+        uses: actions/setup-java@v3
         with:
-          java-version: 17
-          distribution: 'adopt'
+          java-version: '17'
+          distribution: 'corretto'
 
-      - name: Build
+      - name: Build with Gradle
         run: ./gradlew build --no-daemon
 
-      - name: Build and Run Tests with Gradle
+      - name: Run tests with Gradle
         run: ./gradlew test --no-daemon

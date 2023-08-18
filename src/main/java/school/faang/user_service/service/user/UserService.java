@@ -15,16 +15,16 @@ public class UserService {
         return userRepository.existsById(id);
     }
 
+    public User getUser(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() ->  new EntityNotFoundException("User with id " + id + " not found"));
+    }
+
     public void validateUsers(Long... userIds) {
         for (Long userId : userIds) {
             if (!userRepository.existsById(userId)) {
                 throw new EntityNotFoundException("User with id " + userId + " not found.");
             }
         }
-    }
-
-    public User getUser(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() ->  new EntityNotFoundException("User with id " + id + " not found"));
     }
 }

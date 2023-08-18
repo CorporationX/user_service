@@ -12,7 +12,6 @@ import school.faang.user_service.pojo.student.Person;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.util.PersonUploader;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController

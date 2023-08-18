@@ -1,5 +1,7 @@
 package school.faang.user_service.controller.event;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,16 +15,16 @@ import school.faang.user_service.validation.EventParticipationRequestValidator;
 
 import java.util.List;
 
-
+@Tag(name = "Управление участиями в событиях")
 @RestController
 @RequestMapping("api/v1/events")
 @RequiredArgsConstructor
 public class EventParticipationController {
-
     private final EventParticipationService eventParticipationService;
     private final EventParticipationRequestValidator validator;
 
 
+    @Operation(summary = "Регистрация пользователя по идентификатору, на событие")
     @PostMapping("/{eventId}/register/{userId}")
     public ResponseEntity<Void> registerParticipant(@PathVariable("eventId") long eventId,
                                                     @PathVariable("userId") long userId) {
@@ -31,6 +33,7 @@ public class EventParticipationController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "Получить количество участников события по идентификатору")
     @GetMapping("{eventId}/participants/count")
     public ResponseEntity<Integer> getParticipantsCount(@PathVariable Long eventId) {
         validator.validate(eventId);
@@ -38,6 +41,7 @@ public class EventParticipationController {
         return ResponseEntity.ok(count);
     }
 
+    @Operation(summary = "Получить список участников события по идентификатору")
     @GetMapping("{eventId}/participants")
     public ResponseEntity<List<UserDto>> getAllParticipants(@PathVariable Long eventId) {
         validator.validate(eventId);

@@ -25,7 +25,15 @@ spring:
         follower_channel:
           name: follower_channel
         profile_view_channel:
-            name: profile_view_channel
+          name: profile_view_channel
+        analytic_channel:
+          name: analytics_channel
+        user_events_channel:
+          name: user_events_channel
+        premium_events_channel:
+          name: premium_events_channel
+        project_events_channel:
+          name: project_events_channel
 
 server:
   port: 8080
@@ -33,6 +41,7 @@ server:
 logging:
   level:
     root: info
+    org.springframework.retry: DEBUG
 
 project-service:
   host: localhost
@@ -41,6 +50,10 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+  endpoint: /api/payment
+  retry:
+    max-attempts: 5
+    delay-ms: 3000
 
 aws:
   accessKey: access_key
@@ -51,3 +64,12 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
+
+google:
+  calendar:
+    scopes: https://www.googleapis.com/auth/calendar
+    application-name: Corporation-X
+    tokens-path: tokens
+    calendar-id: primary
+    access-type: offline
+    client-email: serhii.rubets@gmail.com

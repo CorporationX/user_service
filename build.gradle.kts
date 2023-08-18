@@ -30,6 +30,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.0.2")
+	implementation("org.springframework.retry:spring-retry:1.3.1")
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
 	/**
@@ -45,6 +46,15 @@ dependencies {
 	implementation("com.amazonaws:aws-java-sdk-s3:1.12.464")
 
 	/**
+	 * Google integration
+	 */
+	implementation("com.google.api-client:google-api-client:2.0.0")
+	implementation("com.google.oauth-client:google-oauth-client-jetty:1.34.1")
+	implementation("com.google.apis:google-api-services-calendar:v3-rev20220715-2.0.0")
+
+
+
+	/**
 	 * Utils & Logging
 	 */
 	implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
@@ -55,7 +65,8 @@ dependencies {
 	annotationProcessor("org.projectlombok:lombok:1.18.26")
 	implementation("org.mapstruct:mapstruct:1.5.3.Final")
 	annotationProcessor("org.mapstruct:mapstruct-processor:1.5.3.Final")
-	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
+
 
 	implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.13.0")
 
@@ -82,8 +93,48 @@ jsonSchema2Pojo {
 	setSourceType("jsonschema")
 }
 
+jacoco {
+	toolVersion = "0.8.9"
+	reportsDirectory.set(layout.buildDirectory.dir("customJacocoReportDir"))
+}
+
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+tasks.test {
+	finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+	dependsOn(tasks.test)
+	reports {
+		xml.required.set(false)
+		csv.required.set(false)
+		html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+	}
+}
+
+tasks.jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			limit {
+				minimum = "0.5".toBigDecimal()
+			}
+		}
+
+		rule {
+			isEnabled = false
+			element = "CLASS"
+			includes = listOf("org.gradle.*")
+
+			limit {
+				counter = "LINE"
+				value = "TOTALCOUNT"
+				maximum = "0.3".toBigDecimal()
+			}
+		}
+	}
 }
 
 val test by tasks.getting(Test::class) { testLogging.showStandardStreams = true }

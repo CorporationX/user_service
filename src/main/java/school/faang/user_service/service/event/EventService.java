@@ -151,13 +151,13 @@ public class EventService {
 
     @Transactional
     public void clearEvents(int partitionSize) {
-        List<Event> events = StreamSupport.stream(eventRepository.findAll().spliterator(), false)
+        List<Event> events = eventRepository.findAll().stream()
                 .filter(event -> event.getEndDate().isBefore(LocalDateTime.now()))
                 .toList();
 
         if (events.size() > 0) {
             log.info("Scheduled clearing of obsolete events, amount: {}", events.size());
-            List<List<Event>> partitions = ListUtils.partition(events, events.size() / partitionSize);
+            List<List<Event>> partitions = ListUtils.partition(events, partitionSize);
             partitions.forEach(eventAsyncService::clearEventsPartition);
         }
     }

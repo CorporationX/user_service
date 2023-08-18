@@ -1,7 +1,10 @@
 package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.ListUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
@@ -14,12 +17,15 @@ import school.faang.user_service.mapper.skill.SkillMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
@@ -132,6 +138,7 @@ public class EventService {
         List<Event> participatedEvents = eventRepository.findParticipatedEventsByUserId(userId);
         return eventMapper.toListDto(participatedEvents);
     }
+    private final EventAsyncService eventAsyncService;
 
     public boolean existsById(long id) {
         return eventRepository.existsById(id);
@@ -140,5 +147,20 @@ public class EventService {
     public Event getEvent(Long id) {
         return eventRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Event with id " + id + " not found"));
+    }
+
+    @Transactional
+    public void clearEvents(int partitionSize) {
+        List<Event> events = eventRepository.findAll().stream()
+                .filter(event -> event.getEndDate().isBefore(LocalDateTime.now()))
+                .toList();
+
+        if (events.size() > partitionSize) {
+            log.info("Scheduled clearing of obsolete events, amount: {}", events.size());
+            List<List<Event>> partitions = ListUtils.partition(events, partitionSize);
+            partitions.forEach(eventAsyncService::clearEventsPartition);
+        } else {
+            eventAsyncService.clearEventsPartition(events);
+        }
     }
 }

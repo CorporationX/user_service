@@ -45,6 +45,10 @@ spring:
   students:
     partitionSize: 100
 
+  scheduler:
+    partitionSize: 1000
+    cron: "0 0 0 7/7 * ?" # every 7 days ("0 * * * * *" every minute - for testing)
+
 server:
   port: 8080
 

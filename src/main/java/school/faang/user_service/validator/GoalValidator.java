@@ -4,12 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
-import school.faang.user_service.exсeption.DataValidationException;
-import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exсeption.DataValidationException;
 import school.faang.user_service.exсeption.EntityNotFoundException;
+import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
@@ -27,6 +26,7 @@ public class GoalValidator {
         if (goalDto == null) {
             throw new DataValidationException("Goal cannot be null");
         }
+    }
 
     public void updateGoalControllerValidation(GoalDto goalDto) {
         if (goalDto.getTitle() == null || goalDto.getTitle().isBlank()) {
@@ -45,6 +45,8 @@ public class GoalValidator {
                 throw new DataValidationException("Contains a non-existence skill");
             }
         });
+    }
+
     public void updateGoalServiceValidation(long id, GoalDto goalDto) {
         Goal goal = goalRepository.findById(id).orElse(null);
         if (goal.getStatus().equals(GoalStatus.COMPLETED)) {

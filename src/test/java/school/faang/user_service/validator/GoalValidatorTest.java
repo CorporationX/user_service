@@ -40,9 +40,10 @@ class GoalValidatorTest {
     }
 
     @Test
-    void createGoalControllerValidation_blankTitle_Test() {
+    void updateGoalControllerValidation_blankTitle_Test() {
         Exception exception = assertThrows(DataValidationException.class, () ->
-                goalValidator.createGoalControllerValidation(goalDto));
+                goalValidator.updateGoalControllerValidation(goalDto));
+        System.out.println(goalDto.getTitle());
 
         assertEquals(exception.getMessage(), "Title can not be blank or null");
     }

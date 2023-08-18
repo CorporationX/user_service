@@ -5,8 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.exception.DataValidationException;
@@ -54,4 +52,5 @@ public class GoalController {
         if (userId < 1) {
             throw new DataValidationException("userId can not be less than 1");
         }
+    }
 }

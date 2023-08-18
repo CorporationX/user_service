@@ -1,7 +1,7 @@
 package school.faang.user_service.mapper.skill;
 
 import org.mapstruct.*;
-import school.faang.user_service.dto.recommendation.SkillOfferDto;
+import school.faang.user_service.dto.skill.SkillOfferDto;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 
 import java.util.Collections;

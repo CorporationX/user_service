@@ -2,7 +2,7 @@ package school.faang.user_service.mapper.skill;
 
 import org.mapstruct.*;
 
-import school.faang.user_service.dto.recommendation.UserSkillGuaranteeDto;
+import school.faang.user_service.dto.skill.UserSkillGuaranteeDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;

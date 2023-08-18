@@ -5,19 +5,13 @@ import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
-import org.mapstruct.InjectionStrategy;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.ReportingPolicy;
-import school.faang.user_service.dto.goal.GoalDto;
-import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.goal.Goal;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.FIELD, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface GoalMapper {
+
     @Mapping(target = "skillIds", source = "skillsToAchieve", qualifiedByName = "skillsToIds")
     @Mapping(target = "userIds", source = "users", qualifiedByName = "usersToIds")
     @Mapping(target = "parentId", source = "parent.id")
@@ -29,7 +23,7 @@ public interface GoalMapper {
     @Mapping(target = "parent.id", source = "parentId")
     Goal toEntity(GoalDto goal);
 
-    List<GoalDto> goalListToDto(List<Goal> list);
+    List<GoalDto> goalsToDtos(List<Goal> list);
 
     @Named("skillsToIds")
     default List<Long> mapSkillsToIds(List<Skill> value) {
@@ -53,12 +47,6 @@ public interface GoalMapper {
             res.add(skill);
         }
         return res;
-
-    List<GoalDto> goalsToDtos(List<Goal> list);
-
-    @Named("skillsToIds")
-    default List<Long> map(List<Skill> value) {
-        return value.stream().map(Skill::getId).toList();
     }
 
     @Named("idsToUsers")

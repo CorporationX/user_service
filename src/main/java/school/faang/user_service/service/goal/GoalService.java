@@ -1,29 +1,31 @@
 package school.faang.user_service.service.goal;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-import school.faang.user_service.exeptions.EntityNotFoundException;
-import school.faang.user_service.repository.goal.GoalRepository;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exeptions.EntityNotFoundException;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.validator.GoalValidator;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class GoalService {
+    private final GoalValidator validator;
+    private final UserContext userContext;
     private final GoalRepository goalRepository;
     private final SkillRepository skillRepository;
     private final GoalMapper goalMapper;
     private final List<GoalFilter> filterList;
-  
+
     public void deleteGoal(Long goalId) {
         if (!goalRepository.existsById(goalId)) {
             throw new EntityNotFoundException("Goal does not exist");
@@ -65,5 +67,12 @@ public class GoalService {
                     .filter((fil) -> fil.isApplicable(filter))
                     .forEach((fil) -> fil.apply(dtoList, filter));
         }
+    }
+    public GoalDto createGoal(GoalDto goalDto) {
+        long userId = userContext.getUserId();
+        validator.creatingGoalServiceValidation(userId, goalDto);
+        goalDto.setUserIds(List.of(userId));
+        goalRepository.save(goalMapper.toEntity(goalDto));
+        return goalDto;
     }
 }

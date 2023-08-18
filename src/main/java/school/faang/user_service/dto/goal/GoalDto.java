@@ -15,5 +15,6 @@ public class GoalDto {
     private Long parentId;
     private String title;
     private GoalStatus status;
+    private List<Long> userIds;
     private List<Long> skillIds;
 }

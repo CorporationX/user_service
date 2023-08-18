@@ -1,5 +1,6 @@
 package school.faang.user_service.controller;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -7,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.skill.SkillDto;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SkillService;
 
 @ExtendWith(MockitoExtension.class)

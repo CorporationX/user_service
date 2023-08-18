@@ -9,13 +9,13 @@ import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.validator.GoalValidator;
 
-@RestController
+@RestController("/goals")
 @RequiredArgsConstructor
 public class GoalController {
     private final GoalService service;
     private final GoalValidator validator;
 
-    @PutMapping("/goals/{goalId}")
+    @PutMapping("/{goalId}")
     public GoalDto updateGoal(@PathVariable long id, @RequestBody GoalDto goalDto) {
         validator.updateGoalControllerValidation(goalDto);
         return service.updateGoal(id, goalDto);

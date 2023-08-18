@@ -5,6 +5,13 @@ import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
+import org.mapstruct.InjectionStrategy;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
+import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.goal.Goal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +53,12 @@ public interface GoalMapper {
             res.add(skill);
         }
         return res;
+
+    List<GoalDto> goalsToDtos(List<Goal> list);
+
+    @Named("skillsToIds")
+    default List<Long> map(List<Skill> value) {
+        return value.stream().map(Skill::getId).toList();
     }
 
     @Named("idsToUsers")

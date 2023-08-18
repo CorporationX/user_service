@@ -14,7 +14,6 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 public class RecommendationReceivedEvent implements Serializable {
-
         private EventType eventType;
         private Date receivedAt;
         private Long authorId;

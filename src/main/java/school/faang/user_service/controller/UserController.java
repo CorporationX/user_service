@@ -25,6 +25,7 @@ public class UserController {
 
     @PostMapping("/students/upload")
     public void uploadStudents(@RequestParam("students") MultipartFile students) {
+        log.debug("Received request to upload students to the database from file: {}", students.getName());
         List<Person> studentList = personUploader.upload(students);
         userService.saveStudents(studentList);
     }

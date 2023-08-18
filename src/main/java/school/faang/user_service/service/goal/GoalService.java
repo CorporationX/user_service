@@ -24,8 +24,6 @@ public class GoalService {
         long userId = userContext.getUserId();
         validator.creatingGoalServiceValidation(userId, goalDto);
         goalDto.setUserIds(List.of(userId));
-        //goalDto.getSkillIds().forEach(id -> goalRepository.addSkillToGoal(id, goal.getId())); По заданию этот метод
-        //должен быть  репозитории и мне его делать не нужно
         goalRepository.save(goalMapper.toEntity(goalDto));
         return goalDto;
     }

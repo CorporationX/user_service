@@ -35,7 +35,7 @@ spring:
         project_events_channel:
           name: project_events_channel
         recommendation_receive_channel:
-          name: recommendation_receive_channel
+          name: recommendation_channel
 
 server:
   port: 8080

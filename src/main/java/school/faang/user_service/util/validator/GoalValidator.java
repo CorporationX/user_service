@@ -1,4 +1,4 @@
-package school.faang.user_service.validator;
+package school.faang.user_service.util.validator;
 
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.User;

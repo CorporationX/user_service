@@ -155,10 +155,12 @@ public class EventService {
                 .filter(event -> event.getEndDate().isBefore(LocalDateTime.now()))
                 .toList();
 
-        if (events.size() > 0) {
+        if (events.size() > partitionSize) {
             log.info("Scheduled clearing of obsolete events, amount: {}", events.size());
             List<List<Event>> partitions = ListUtils.partition(events, partitionSize);
             partitions.forEach(eventAsyncService::clearEventsPartition);
+        } else {
+            eventAsyncService.clearEventsPartition(events);
         }
     }
 }

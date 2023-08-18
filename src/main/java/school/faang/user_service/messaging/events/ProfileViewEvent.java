@@ -1,4 +1,4 @@
-package school.faang.user_service.config.messaging.events;
+package school.faang.user_service.messaging.events;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

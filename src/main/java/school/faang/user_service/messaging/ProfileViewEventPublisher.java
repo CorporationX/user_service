@@ -1,9 +1,9 @@
-package school.faang.user_service.config.messaging;
+package school.faang.user_service.messaging;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.config.messaging.events.ProfileViewEvent;
+import school.faang.user_service.messaging.events.ProfileViewEvent;
 
 @Component
 public class ProfileViewEventPublisher implements MessagePublisher<ProfileViewEvent> {

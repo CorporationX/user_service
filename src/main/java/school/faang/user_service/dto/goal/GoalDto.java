@@ -11,9 +11,9 @@ import java.util.List;
 @Builder
 public class GoalDto {
     private Long id;
+    private String title;
     private String description;
     private Long parentId;
-    private String title;
     private GoalStatus status;
     private List<Long> userIds;
     private List<Long> skillIds;

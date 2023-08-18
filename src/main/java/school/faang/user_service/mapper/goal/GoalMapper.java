@@ -27,17 +27,23 @@ public interface GoalMapper {
 
     @Named("skillsToIds")
     default List<Long> mapSkillsToIds(List<Skill> value) {
+        if (value == null) {
+            return null;
+        }
         return value.stream().map(Skill::getId).toList();
     }
 
     @Named("usersToIds")
     default List<Long> mapUsersToIds(List<User> value) {
+        if (value == null) {
+            return null;
+        }
         return value.stream().map(User::getId).toList();
     }
 
     @Named("idsToSkills")
     default List<Skill> mapIdsToSkills(List<Long> value) {
-        if (value.equals(null)) {
+        if (value == null) {
             return null;
         }
         List<Skill> res = new ArrayList<>(value.size());
@@ -51,7 +57,7 @@ public interface GoalMapper {
 
     @Named("idsToUsers")
     default List<User> mapIdsToUsers(List<Long> value) {
-        if (value.equals(null)) {
+        if (value == null) {
             return null;
         }
         List<User> res = new ArrayList<>(value.size());

@@ -6,6 +6,7 @@ import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exeptions.EntityNotFoundException;
 import school.faang.user_service.filter.goal.GoalFilter;
@@ -25,6 +26,31 @@ public class GoalService {
     private final SkillRepository skillRepository;
     private final GoalMapper goalMapper;
     private final List<GoalFilter> filterList;
+
+    public GoalDto createGoal(GoalDto goalDto) {
+        long userId = userContext.getUserId();
+        validator.creatingGoalServiceValidation(userId, goalDto);
+        goalDto.setUserIds(List.of(userId));
+        goalRepository.save(goalMapper.toEntity(goalDto));
+        return goalDto;
+    }
+
+    public GoalDto updateGoal(long id, GoalDto goalDto) {
+        validator.updateGoalServiceValidation(id, goalDto);
+
+        Goal goal = goalMapper.toEntity(goalDto);
+
+        if (goal.getStatus().equals(GoalStatus.COMPLETED)) {
+            List<Long> skillIds = goalDto.getSkillIds();
+            goalRepository.findUsersByGoalId(id).forEach(user -> {
+                skillIds.forEach(skillId -> skillRepository.assignSkillToUser(skillId, user.getId()));
+            });
+        } else {
+            return goalMapper.toDto(goalRepository.save(goal));
+        }
+
+        return null;
+    }
 
     public void deleteGoal(Long goalId) {
         if (!goalRepository.existsById(goalId)) {
@@ -67,12 +93,5 @@ public class GoalService {
                     .filter((fil) -> fil.isApplicable(filter))
                     .forEach((fil) -> fil.apply(dtoList, filter));
         }
-    }
-    public GoalDto createGoal(GoalDto goalDto) {
-        long userId = userContext.getUserId();
-        validator.creatingGoalServiceValidation(userId, goalDto);
-        goalDto.setUserIds(List.of(userId));
-        goalRepository.save(goalMapper.toEntity(goalDto));
-        return goalDto;
     }
 }

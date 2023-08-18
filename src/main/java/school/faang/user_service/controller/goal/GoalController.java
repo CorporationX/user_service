@@ -1,6 +1,8 @@
 package school.faang.user_service.controller.goal;
 
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.goal.GoalDto;
@@ -28,6 +30,12 @@ public class GoalController {
             throw new DataValidationException("If cannot be less than 1");
         }
         service.deleteGoal(goalId);
+    }
+
+    @PutMapping("/update/{goalId}")
+    public GoalDto updateGoal(@PathVariable long id, @RequestBody GoalDto goalDto) {
+        validator.updateGoalControllerValidation(goalDto);
+        return service.updateGoal(id, goalDto);
     }
 
     public List<GoalDto> getGoalsByUser(long userId, GoalFilterDto filter) {

@@ -42,12 +42,8 @@ public class UserService {
     @Transactional
     public void saveStudents(List<Person> students) {
         if (students.size() > partitionSize) {
-            ListUtils.partition(students, partitionSize)
-                    .forEach(p -> {
-                        System.out.println("partitionedStudents: " + p.size());
-                        userAsyncService.mapAndSaveStudents(p);
-                    });
-        } else if (students.size() > 0) {
+            ListUtils.partition(students, partitionSize).forEach(userAsyncService::mapAndSaveStudents);
+        } else {
             userAsyncService.mapAndSaveStudents(students);
         }
     }

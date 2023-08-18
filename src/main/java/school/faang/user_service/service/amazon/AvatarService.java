@@ -6,7 +6,6 @@ import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.util.IOUtils;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,6 @@ import java.net.URL;
 import java.net.URLConnection;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class AvatarService implements AvatarRepository {
     private final AmazonS3 amazonS3;
@@ -35,7 +33,7 @@ public class AvatarService implements AvatarRepository {
         byte[] imageData = new byte[0];
 
         try {
-            imageData = getImageBytesFromUrl(userProfilePic.getFileId());
+            imageData = convertUrlToByte(userProfilePic.getFileId());
         } catch (IOException e) {
             throw new DiceBearConnect("Can't get image: " + e.getMessage());
         }
@@ -79,7 +77,7 @@ public class AvatarService implements AvatarRepository {
 
     }
 
-    private byte[] getImageBytesFromUrl(String imageUrl) throws IOException {
+    private byte[] convertUrlToByte(String imageUrl) throws IOException {
         URL url = new URL(imageUrl);
         URLConnection connection = url.openConnection();
         try (InputStream inputStream = connection.getInputStream()) {

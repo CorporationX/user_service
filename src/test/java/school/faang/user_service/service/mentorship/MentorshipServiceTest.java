@@ -62,7 +62,7 @@ class MentorshipServiceTest {
         mentor.setMentees(new ArrayList<>());
 
         mentor.setMentees(List.of(new User()));
-        List<UserDto> userDtoList = List.of(new UserDto(0, "any", "any"));
+        List<UserDto> userDtoList = List.of(new UserDto(0L, "any", "any"));
 
         Mockito.when(mentorshipRepository.findById(mentorId))
                 .thenReturn(Optional.of(mentor));
@@ -85,7 +85,7 @@ class MentorshipServiceTest {
     void getMentors() {
         mentee.setMentors(new ArrayList<>());
         mentee.setMentors(List.of(new User(), new User()));
-        List<UserDto> userDtoList = List.of(new UserDto(0, "any", "any"));
+        List<UserDto> userDtoList = List.of(new UserDto(0L, "any", "any"));
 
         Mockito.when(mentorshipRepository.findById(menteeId))
                 .thenReturn(Optional.of(mentee));

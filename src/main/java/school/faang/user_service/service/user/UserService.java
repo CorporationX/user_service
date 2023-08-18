@@ -23,11 +23,10 @@ public class UserService {
 
     public UserDto createUser(UserDto userDto) {
         User user = userMapper.toEntity(userDto);
-
         addCreateData(user);
-        User newUser =userRepository.save(user);
 
-        return userMapper.toDto(newUser);
+        user =userRepository.save(user);
+        return userMapper.toDto(user);
     }
 
     public User findUserById(long userId) {
@@ -45,16 +44,20 @@ public class UserService {
         return userMapper.toDto(findUserById(id));
     }
 
-    private void addCreateData(User user) {
-        user.setCreatedAt(LocalDateTime.now());
-        UserProfilePic userProfilePic = diceBearService.createAvatar(user.getUsername(), user.getId());
-        user.setUserProfilePic(userProfilePic);
-    }
-
     public List<UserDto> getUsersByIds(List<Long> ids) {
         List<User> users = StreamSupport.stream(userRepository.findAllById(ids).spliterator(), false).toList();
         return users.stream()
                 .map(userMapper::toDto)
                 .toList();
+    }
+
+    private void addCreateData(User user) {
+        user.setCreatedAt(LocalDateTime.now());
+        UserProfilePic userProfilePic = UserProfilePic.builder()
+                .name(user.getUsername()+user.getId())
+                .build();
+
+        diceBearService.createAvatar(userProfilePic);
+        user.setUserProfilePic(userProfilePic);
     }
 }

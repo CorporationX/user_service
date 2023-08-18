@@ -1,6 +1,5 @@
 package school.faang.user_service.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,7 +21,7 @@ public class SkillController {
     private final SkillService skillService;
 
     @PostMapping
-    public SkillDto create(@Valid @RequestBody SkillDto skill) {
+    public SkillDto create(@RequestBody SkillDto skill) {
         return skillService.create(skill);
     }
 

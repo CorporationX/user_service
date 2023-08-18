@@ -2,6 +2,8 @@ package school.faang.user_service.service.event;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
+import org.apache.commons.collections4.ListUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,6 +48,10 @@ class EventServiceTest {
     private EventRepository eventRepository;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private EventAsyncService eventAsyncService;
+
+    private List<Event> events;
     EventDto eventDto;
     Event event;
     User user;
@@ -358,5 +364,18 @@ class EventServiceTest {
         assertTrue(result.isEmpty());
     }
 
-    //ТЕСТЫ К МЕТОДУ updateEvent() тут не написаны, т.к. они уже есть в соответствующих тестах к Мапперам..
+    @Test
+    void clearEvents_shouldSplitEventListAndInvokeClearEventsPartition() {
+        Event event = mock(Event.class);
+        when(event.getEndDate()).thenReturn(LocalDateTime.now().minusDays(1));
+        events = List.of(event, event, event);
+
+        when(eventRepository.findAll()).thenReturn(events);
+
+        eventService.clearEvents(1);
+
+        List<List<Event>> partitions = ListUtils.partition(events, events.size());
+
+        partitions.forEach(partition -> verify(eventAsyncService).clearEventsPartition(partition));
+    }
 }

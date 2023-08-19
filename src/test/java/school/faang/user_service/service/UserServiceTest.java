@@ -12,6 +12,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.messaging.MessagePublisher;
+import school.faang.user_service.messaging.ProfileViewEventPublisher;
 import school.faang.user_service.messaging.events.ProfileViewEvent;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
@@ -36,7 +37,7 @@ public class UserServiceTest {
     @Mock
     private UserContext userContext;
     @Mock
-    private MessagePublisher<ProfileViewEvent> profileViewEventMessagePublisher;
+    private ProfileViewEventPublisher profileViewEventMessagePublisher;
     @Spy
     private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 

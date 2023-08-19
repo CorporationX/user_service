@@ -6,26 +6,35 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.config.executors.ExecutorsPull;
+import school.faang.user_service.csv_parser.CsvToPerson.CsvToPerson;
 import school.faang.user_service.dto.DeactivateResponseDto;
 import school.faang.user_service.dto.subscription.UserDto;
 import school.faang.user_service.dto.subscription.UserFilterDto;
+import school.faang.user_service.dto.user.person_dto.UserPersonDto;
+import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.exception.DataValidException;
 import school.faang.user_service.exception.DeactivationException;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.filter.user.UserFilter;
+import school.faang.user_service.mapper.PersonToUserMapper;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.repository.CountryRepository;
+import school.faang.user_service.repository.UserCheckRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
+import java.io.InputStreamReader;
+import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 
@@ -33,15 +42,24 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 @Slf4j
 public class UserService {
+    private final CsvToPerson csvToPerson;
+    private final PersonToUserMapper personToUserMapper;
     private final EventRepository eventRepository;
     private final GoalRepository goalRepository;
     private final MentorshipService mentorshipService;
     private final UserRepository userRepository;
     private final List<UserFilter> userFilters;
     private final UserMapper userMapper;
+    private final CountryRepository countryRepository;
+    private final UserCheckRepository userCheckRepository;
+
+    private final String upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private final String lower = upper.toLowerCase(Locale.ROOT);
+    private final String numbers = "0123456789";
+    private final String set = upper + lower + numbers;
 
     @Autowired
-    private ExecutorService pull;
+    private ExecutorsPull executorsPull;
 
     @Value("${dicebear.url}")
     private String dicebearUrl;
@@ -61,33 +79,54 @@ public class UserService {
     }
 
     public void registerAnArrayOfUser(InputStream stream) throws IOException {
-
-
-        //CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> );
-        //  pull = Executors.newFixedThreadPool(100);
-
-//
-//        byte[] bytes = new byte[1024 * 10];
-//        while (stream.read(bytes) != -1) {
-//
-//        }
-
-//        try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream))) {
-//            String line;
-//            while ((line = reader.readLine()) != null) {
-//                String finalLine = line;
-//               Future<String> future = pull.submit(() -> get(finalLine));
-//
-//            }
-//        } catch (IOException e) {
-//
-//        }
+        String line;
+        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+        reader.readLine();
+        while ((line = reader.readLine()) != null) {
+            try {
+                String finalLine = line;
+                executorsPull.pullUserService().getPull().execute(() -> saveUserStudent(finalLine));
+            } catch (DataValidException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+        reader.close();
     }
 
-    private String get(String line) {
-        line.length();
-        userRepository.saveAll(new ArrayList<>());
-        return "";
+    private void saveUserStudent(String line) {
+        Supplier<String> password = () -> {
+            int size = new Random().nextInt(10, 20);
+            char[] chars = new char[size];
+            for (int i = 0; i < chars.length; i++) {
+                chars[i] = set.charAt(new Random().nextInt(set.length()));
+            }
+            return new String(chars);
+        };
+
+        UserPersonDto personDto = csvToPerson.getPerson(line);
+        User user = personToUserMapper.toUser(personDto);
+
+        String personCountry = personDto.getContactInfo().getAddress().getCountry();
+        List<User> users = userCheckRepository.findDistinctPeopleByUsernameOrEmailOrPhone(personDto.getFirstName(),
+                personDto.getContactInfo().getEmail(), personDto.getContactInfo().getPhone());
+        List<UserPersonDto> personDtos = users.stream().map(personToUserMapper::toUserPersonDto).toList();
+        if (personDtos.contains(personDto)) {
+            return;
+        }
+
+        user.setPassword(password.get());
+
+        Map<String, Country> countryMap = new HashMap<>();
+        countryRepository.findAll().forEach(country -> countryMap.put(country.getTitle(), country));
+        if (countryMap.containsKey(personCountry)) {
+            user.setCountry(countryMap.get(personCountry));
+        } else {
+            Country countrySave = new Country();
+            countrySave.setTitle(personCountry.strip());
+            countryRepository.save(countrySave);
+        }
+
+        userRepository.save(user);
     }
 
     public UserDto signup(UserDto userDto) {

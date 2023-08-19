@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.redisEvents.FollowerEvent;
+import school.faang.user_service.dto.subscription.FollowerEvent;
 import school.faang.user_service.messaging.Publisher;
 
 @Component

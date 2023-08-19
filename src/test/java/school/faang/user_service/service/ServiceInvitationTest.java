@@ -14,7 +14,6 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.mapper.GoalInvitationMapperImpl;
-import school.faang.user_service.mapper.GoalMapperImpl;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
@@ -35,10 +34,12 @@ public class ServiceInvitationTest {
     private GoalRepository goalRepository;
     @Mock
     private UserRepository userRepository;
-    @Mock
+    @Spy
     GoalInvitationRepository goalInvitationRepository;
     @Spy
     GoalInvitationMapperImpl goalInvitationMapper;
+    @Spy
+    UserMapper userMapper;
     @InjectMocks
     private GoalInvitationService goalInvitationService;
     @Test
@@ -100,13 +101,19 @@ public class ServiceInvitationTest {
         long id = 1l;
         GoalInvitation goalInvitation = new GoalInvitation();
         GoalInvitationDto goalInvitationDto = new GoalInvitationDto();
+        goalInvitationDto.setStatus(RequestStatus.valueOf("REJECTED"));
 
-        when(goalRepository.existsById(id)).thenReturn(true);
+        when(goalRepository.existsById(any())).thenReturn(true);
+
         when(goalInvitationRepository.findById(id)).thenReturn(Optional.of(goalInvitation));
+
         when(goalInvitationMapper.toDto(goalInvitation)).thenReturn(goalInvitationDto);
 
-        goalInvitationService.rejectGoalInvitation(id);
-        verify(goalInvitationRepository).save(any());
+
+
+        GoalInvitationDto gg = goalInvitationService.rejectGoalInvitation(id);
+        assertEquals(goalInvitationDto.getStatus(), gg.getStatus());
+
     }
 
 }

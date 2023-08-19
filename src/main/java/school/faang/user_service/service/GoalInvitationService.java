@@ -78,28 +78,22 @@ public class GoalInvitationService {
                 return invitationDto;
             }
 
-
-
     public GoalInvitationDto rejectGoalInvitation(long id)
     {
         if(!goalRepository.existsById(id))
         {
             throw new GoalInvitationException("target not found in database");
         }
-        GoalInvitationDto  invitationDto =  goalInvitationMapper.toDto
+        goalInvitationRepository.findById(id).get().setStatus(RequestStatus.valueOf("REJECTED"));
+
+        GoalInvitationDto invitationDto = goalInvitationMapper.toDto
                 ((goalInvitationRepository.findById(id)
                         .stream()
                         .findAny()
                         .get()));
 
-        invitationDto.setStatus(RequestStatus.valueOf("REJECTED"));
-
-        GoalInvitation goalInvitation = GoalInvitationMapper.INSTANCE.toEntity(invitationDto);
-        return goalInvitationMapper.toDto(goalInvitationRepository.save(goalInvitation));
+        return invitationDto;
     }
 
-    public List<GoalInvitationDto> getInvitations(InvitationFilterDto filter){
 
-        return new ArrayList<>();
-    }
 }

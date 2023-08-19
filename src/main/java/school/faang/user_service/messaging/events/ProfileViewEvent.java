@@ -8,4 +8,9 @@ import lombok.Data;
 public class ProfileViewEvent {
     private Long idVisitor;
     private Long idVisited;
+
+    @Override
+    public String toString() {
+        return idVisitor + "\n" + idVisited;
+    }
 }

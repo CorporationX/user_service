@@ -88,6 +88,19 @@ public class UserServiceTest {
     }
 
     @Test
+    public void testGetUserCallsProfileViewPublisher(){
+        Long idViewer = 1L;
+        Long idViewed = 2L;
+        ProfileViewEvent profileViewEvent = new ProfileViewEvent(idViewer, idViewed);
+        Mockito.when(userContext.getUserId()).thenReturn(idViewer);
+        Mockito.when(userRepository.findById(idViewed)).thenReturn(Optional.of(user2));
+
+        userService.getUser(idViewed);
+        Mockito.verify(profileViewEventMessagePublisher, Mockito.times(1))
+                .publish(profileViewEvent);
+    }
+
+    @Test
     public void testGetUsersByIds() {
         List<Long> userIds = List.of(1L, 2L, 3L);
         user1.setEmail("aaa");

@@ -8,12 +8,9 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import school.faang.user_service.publisher.MessagePublisher;
 import school.faang.user_service.publisher.RedisMessagePublisher;
-import school.faang.user_service.subscriber.RedisMessageSubscriber;
 
 @Configuration
 public class RedisConfig {
@@ -22,6 +19,8 @@ public class RedisConfig {
     private String host;
     @Value("${spring.data.redis.port}")
     private int port;
+    @Value("${spring.data.redis.channels.follower_channel.name}")
+    private String topicName;
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
@@ -40,26 +39,12 @@ public class RedisConfig {
     }
 
     @Bean
-    public MessageListenerAdapter messageListener() {
-        return new MessageListenerAdapter(new RedisMessageSubscriber());
-    }
-
-    @Bean
-    public RedisMessageListenerContainer redisContainer() {
-        RedisMessageListenerContainer container
-                = new RedisMessageListenerContainer();
-        container.setConnectionFactory(redisConnectionFactory());
-        container.addMessageListener(messageListener(), topic());
-        return container;
-    }
-
-    @Bean
     public MessagePublisher redisPublisher() {
         return new RedisMessagePublisher(redisTemplate(redisConnectionFactory()), topic());
     }
 
     @Bean
     public ChannelTopic topic() {
-        return new ChannelTopic("messageQueue");
+        return new ChannelTopic(topicName);
     }
 }

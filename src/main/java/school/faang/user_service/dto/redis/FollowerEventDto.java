@@ -1,4 +1,4 @@
-package school.faang.user_service.broker_dtos;
+package school.faang.user_service.dto.redis;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,9 +9,8 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 @AllArgsConstructor
-public class FollowerEvent {
-    private int followerId;
-    private int followeeId;
-    private int projectId;
+public class FollowerEventDto {
+    private long followerId;
+    private long followeeId;
     private LocalDateTime subscriptionTime;
 }

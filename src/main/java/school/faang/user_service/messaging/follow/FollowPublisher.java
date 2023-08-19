@@ -21,8 +21,6 @@ public class FollowPublisher extends Publisher<FollowerEvent> {
     @Override
     public void publish(FollowerEvent event) {
         String eventJson = toJson(event);
-        System.out.println(eventJson);
         redisTemplate.convertAndSend(followerTopic.getTopic(), eventJson);
-        System.out.println(eventJson);
     }
 }

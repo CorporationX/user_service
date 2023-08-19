@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.exception.EntityStateException;
 import school.faang.user_service.exception.notFoundExceptions.contact.UserNotFoundException;
-import school.faang.user_service.filter.subfilter.SubscriberFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 
@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 public class SubscriptionService {
     private final SubscriptionRepository repository;
     private final UserMapper mapper;
-    private final List<SubscriberFilter> filters;
+    private final List<UserFilter> filters;
 
     @Transactional
     public void followUser(long followerId, long followeeId) {

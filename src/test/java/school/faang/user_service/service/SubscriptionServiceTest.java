@@ -8,6 +8,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.redis.FollowerEventDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
@@ -101,7 +102,7 @@ public class SubscriptionServiceTest {
     @Test
     public void followUserSendEventTest() {
         subscriptionService.followUser(user1.getId(), user2.getId());
-        verify(publisher).sendEvent(any());
+        verify(publisher).sendEvent(any(FollowerEventDto.class));
     }
 
     @Test

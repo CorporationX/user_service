@@ -2,9 +2,11 @@ package school.faang.user_service.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.messaging.MessagePublisher;
+import school.faang.user_service.messaging.ProfileViewEventPublisher;
 import school.faang.user_service.messaging.events.ProfileViewEvent;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
@@ -22,7 +24,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final List<UserFilter> userFilters;
     private final UserMapper userMapper;
-    private final MessagePublisher<ProfileViewEvent> profileViewEventMessagePublisher;
+    private final ProfileViewEventPublisher profileViewEventMessagePublisher;
     private final UserContext userContext;
 
     public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {

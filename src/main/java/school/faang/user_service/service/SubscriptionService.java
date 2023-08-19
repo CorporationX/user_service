@@ -2,25 +2,31 @@ package school.faang.user_service.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.redisEvents.FollowerEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.EntityStateException;
 import school.faang.user_service.exception.notFoundExceptions.contact.UserNotFoundException;
 import school.faang.user_service.filter.subfilter.SubscriberFilter;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.messaging.Publisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SubscriptionService {
     private final SubscriptionRepository repository;
     private final UserMapper mapper;
     private final List<SubscriberFilter> filters;
+    private final Publisher<FollowerEvent> followerEventPublisher;
 
     @Transactional
     public void followUser(long followerId, long followeeId) {
@@ -28,7 +34,11 @@ public class SubscriptionService {
             throw new EntityStateException("User has already followed");
         }
         repository.followUser(followerId, followeeId);
+
+        FollowerEvent event = new FollowerEvent(followerId, followeeId, null, LocalDateTime.now());
+        followerEventPublisher.publish(event);
     }
+
     @Transactional
     public void unfollowUser(long followerId, long followeeId) {
         if (!repository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
@@ -57,6 +67,7 @@ public class SubscriptionService {
         checkExistence(filteredUsers, "followees");
         return filteredUsers;
     }
+
     @Transactional
     public int getFollowingCount(long followerId) {
         return repository.findFolloweesAmountByFollowerId(followerId);

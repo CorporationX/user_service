@@ -6,15 +6,16 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.json.student.PersonSchemaForUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.FileException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.diceBear.DiceBearService;
+import school.faang.user_service.service.amazon.AvatarService;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,17 +24,22 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final DiceBearService diceBearService;
+    private final AvatarService avatarService;
+    @Value("${service.dice-bear.url}")
+    private String URL;
+    @Value("${service.dice-bear.size}")
+    private String SIZE;
     private final int lenPassword = 4;
 
-    public UserDto createUser(UserDto userDto) {
 
+    public UserDto createUser(UserDto userDto) {
         User user = userMapper.toEntity(userDto);
 
         synchronized (userRepository) {
@@ -113,9 +119,31 @@ public class UserService {
         return userRepository.countOwnedSkills(userId, skillIds) == skillIds.size();
     }
 
+    public UserDto getUser(long id) {
+        return userMapper.toDto(findUserById(id));
+    }
+
+    public List<UserDto> getUsersByIds(List<Long> ids) {
+        List<User> users = StreamSupport.stream(userRepository.findAllById(ids).spliterator(), false).toList();
+        return users.stream()
+                .map(userMapper::toDto)
+                .toList();
+    }
+
     private void addCreateData(User user) {
         user.setCreatedAt(LocalDateTime.now());
-        UserProfilePic userProfilePic = diceBearService.createAvatar(user.getUsername(), user.getId());
+        UserProfilePic userProfilePic = UserProfilePic.builder()
+                .name(user.getUsername()+user.getId())
+                .build();
+
+        createDiceBearAvatar(userProfilePic);
         user.setUserProfilePic(userProfilePic);
+    }
+
+    private void createDiceBearAvatar(UserProfilePic userProfilePic) {
+        userProfilePic.setFileId(URL + userProfilePic.getName());
+        userProfilePic.setSmallFileId(URL + userProfilePic.getName() + SIZE);
+
+        avatarService.saveToAmazonS3(userProfilePic);
     }
 }

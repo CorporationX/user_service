@@ -1,4 +1,4 @@
-package school.faang.user_service.dto.user;
+package school.faang.user_service.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -22,12 +22,19 @@ public class UserDto {
     @NotBlank
     @Max(128)
     private String password;
-    @Size(min = 9, max = 15)
+    @Max(15)
     private String phone;
     @Max(4096)
     private String aboutMe;
     private Country country;
     @Max(64)
     private String city;
+    @Max(100)
     private Integer experience;
+
+    public UserDto(Long id, String username, String email) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+    }
 }

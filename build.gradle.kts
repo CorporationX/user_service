@@ -31,6 +31,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.0.2")
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+	implementation("org.springframework.retry:spring-retry:1.3.1")
 
 	/**
 	 * Database
@@ -73,6 +74,13 @@ dependencies {
 	testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.2")
 	testImplementation("org.assertj:assertj-core:3.24.2")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+	/**
+	 * Google Calendar API
+	 */
+	implementation("com.google.api-client:google-api-client:2.0.0")
+	implementation("com.google.oauth-client:google-oauth-client-jetty:1.34.1")
+	implementation("com.google.apis:google-api-services-calendar:v3-rev20220715-2.0.0")
 }
 
 jsonSchema2Pojo {

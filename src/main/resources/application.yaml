@@ -4,6 +4,9 @@ spring:
     url: jdbc:postgresql://localhost:5432/postgres
     username: user
     password: password
+  servlet:
+    multipart:
+      max-file-size: 10MB
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect

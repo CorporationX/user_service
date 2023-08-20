@@ -1,6 +1,14 @@
 package school.faang.user_service.service.user;
 
+import com.fasterxml.jackson.databind.MappingIterator;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import com.json.student.Person;
+import com.sun.codemodel.JCodeModel;
 import lombok.RequiredArgsConstructor;
+import org.jsonschema2pojo.*;
+import org.jsonschema2pojo.rules.RuleFactory;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.event.EventDto;
@@ -12,6 +20,10 @@ import school.faang.user_service.service.MentorshipService;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.goal.GoalService;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -31,7 +43,7 @@ public class UserService {
 
     public UserDto getUserById(Long userId) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new IllegalStateException("User not found with ID: " + userId));
+                .orElseThrow(() -> new IllegalStateException("User not found with ID: " + userId));
         return userMapper.toDto(user);
     }
 
@@ -96,4 +108,55 @@ public class UserService {
         stopUserEvents(userId);
         cancelMentoring(userId);
     }
+
+
+    public void processFile(InputStream inputStream) {
+//        URL schemaSource = getClass().getResource("/json/person-schema.json");
+//        URL outputResourceUrl = getClass().getResource("/output");
+//        File outputJavaClassDirectory = new File(outputResourceUrl.getPath());
+//        String packageName = "school/faang/user_service/model";
+//        String javaClassName = "Person";
+//        try {
+//            convertJsonToJavaClass(schemaSource, outputJavaClassDirectory, packageName, javaClassName);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+
+        CsvMapper csvMapper = new CsvMapper();
+        CsvSchema schema = CsvSchema.emptySchema().withHeader();
+        try {
+            MappingIterator<Person> iterator = csvMapper.readerFor(Person.class).with(schema).readValues(inputStream);
+            List<Person> students = iterator.readAll();
+            System.out.println(students);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public void convertJsonToJavaClass(URL inputJsonUrl, File outputJavaClassDirectory, String packageName, String javaClassName)
+            throws IOException {
+        JCodeModel jcodeModel = new JCodeModel();
+
+        GenerationConfig config = new DefaultGenerationConfig() {
+            @Override
+            public boolean isGenerateBuilders() {
+                return true;
+            }
+
+            @Override
+            public SourceType getSourceType() {
+                return SourceType.JSON;
+            }
+        };
+
+        SchemaMapper mapper = new SchemaMapper(new RuleFactory(config, new Jackson2Annotator(config), new SchemaStore()), new SchemaGenerator());
+        mapper.generate(jcodeModel, javaClassName, packageName, inputJsonUrl);
+
+        jcodeModel.build(outputJavaClassDirectory);
+        System.out.println(outputJavaClassDirectory.getAbsolutePath());
+
+    }
+
+
 }

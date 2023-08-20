@@ -130,12 +130,12 @@ public class MentorshipRequestService {
     }
 
     private void checkIfUsersExistsAndNotSame(long requesterId, long receiverId) {
-//        if (!mentorshipRepository.existsById(requesterId)) {
-//            throw new UserNotFoundException("This requester does not exist");
-//        }
-//        if (!mentorshipRepository.existsById(receiverId)) {
-//            throw new UserNotFoundException("This receiver does not exist");
-//        }
+        if (!mentorshipRepository.existsById(requesterId)) {
+            throw new UserNotFoundException("This requester does not exist");
+        }
+        if (!mentorshipRepository.existsById(receiverId)) {
+            throw new UserNotFoundException("This receiver does not exist");
+        }
         if (requesterId == receiverId) {
             throw new DataValidationException("The user cannot send himself a mentorship request");
         }

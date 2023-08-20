@@ -291,6 +291,8 @@ public class MentorshipRequestServiceTest {
 
     @Test
     void publishEventMentorshipTest() {
+        when(mentorshipRepository.existsById(CORRECT_REQUESTER_ID)).thenReturn(true);
+        when(mentorshipRepository.existsById(CORRECT_RECEIVER_ID)).thenReturn(true);
         MentorshipRequestedEvent event = new MentorshipRequestedEvent(1L, 2L, LocalDateTime.now());
         MentorshipRequestDto dto = MentorshipRequestDto.builder()
                 .id(CORRECT_REQUEST_ID)

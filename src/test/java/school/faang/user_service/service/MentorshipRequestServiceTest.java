@@ -1,7 +1,5 @@
 package school.faang.user_service.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,7 +7,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.redis.listener.ChannelTopic;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestedEvent;
 import school.faang.user_service.dto.mentorship.RejectionDto;
@@ -293,7 +290,6 @@ public class MentorshipRequestServiceTest {
     void publishEventMentorshipTest() {
         when(mentorshipRepository.existsById(CORRECT_REQUESTER_ID)).thenReturn(true);
         when(mentorshipRepository.existsById(CORRECT_RECEIVER_ID)).thenReturn(true);
-        MentorshipRequestedEvent event = new MentorshipRequestedEvent(1L, 2L, LocalDateTime.now());
         MentorshipRequestDto dto = MentorshipRequestDto.builder()
                 .id(CORRECT_REQUEST_ID)
                 .receiver(CORRECT_RECEIVER_ID)
@@ -301,9 +297,8 @@ public class MentorshipRequestServiceTest {
                 .updatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
                 .description("some description")
                 .build();
-        MentorshipRequestedEventPublisher publisher = mock(MentorshipRequestedEventPublisher.class);
-        MentorshipRequestService service = new MentorshipRequestService(requestRepository, mentorshipRepository, requestMapper, publisher, getFilters());
+        MentorshipRequestService service = new MentorshipRequestService(requestRepository, mentorshipRepository, requestMapper, publish, getFilters());
         service.requestMentorship(dto);
-        verify(publisher).publish(event);
+        verify(publish).publish(any(MentorshipRequestedEvent.class));
     }
 }

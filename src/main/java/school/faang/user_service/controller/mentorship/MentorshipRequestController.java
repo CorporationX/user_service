@@ -28,7 +28,7 @@ public class MentorshipRequestController {
 
     @Operation(summary = "Добавить запрос на менторство")
     @PostMapping("/mentorship/request")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public MentorshipRequestDto requestMentorship(@Valid @RequestBody MentorshipRequestDto mentorshipRequest) {
         return mentorshipRequestService.requestMentorship(mentorshipRequest);
     }

@@ -1,5 +1,6 @@
 package school.faang.user_service.mapper;
 
+import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -10,25 +11,16 @@ import school.faang.user_service.entity.User;
 import java.util.ArrayList;
 import java.util.List;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", uses = {GoalMapper.class, SkillMapper.class},
+        unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE, injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface UserMapper {
 
-    @Mapping(source = "followers", target = "followerIds", qualifiedByName = "toFollowerIds")
-    UserDto toDto(User user);
+    @Mapping(target = "followers", expression = "java(entity.getFollowers().stream().map(fol -> fol.getId()).toList())")
+    @Mapping(target = "followees", expression = "java(entity.getFollowees().stream().map(fol -> fol.getId()).toList())")
+    @Mapping(target = "mentors", expression = "java(entity.getMentors().stream().map(men -> men.getId()).toList())")
+    @Mapping(target = "mentees", expression = "java(entity.getMentees().stream().map(men -> men.getId()).toList())")
+    UserDto toDto(User entity);
 
-    User toEntity(UserDto userDto);
+    List<UserDto> toDtos(List<User> entities);
 
-    @Named(value = "toFollowerIds")
-    default List<Long> toFollowerIds(List<User> followers) {
-        if (followers == null) {
-            return new ArrayList<>();
-        }
-
-        List<Long> followerIds = new ArrayList<>();
-        for (User follower : followers) {
-            followerIds.add(follower.getId());
-        }
-
-        return followerIds;
-    }
 }

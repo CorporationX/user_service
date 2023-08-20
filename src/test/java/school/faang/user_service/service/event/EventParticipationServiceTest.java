@@ -225,9 +225,9 @@ class EventParticipationServiceTest {
 
     private List<UserDto> getUsersDto() {
         return List.of(
-                UserDto.builder().id(EXISTING_USER_ID).followerIds(new ArrayList<>()).build(),
-                UserDto.builder().id(2L).followerIds(new ArrayList<>()).build(),
-                UserDto.builder().id(3L).followerIds(new ArrayList<>()).build()
+                UserDto.builder().id(EXISTING_USER_ID).followers(new ArrayList<>()).build(),
+                UserDto.builder().id(2L).followers(new ArrayList<>()).build(),
+                UserDto.builder().id(3L).followers(new ArrayList<>()).build()
         );
     }
 }

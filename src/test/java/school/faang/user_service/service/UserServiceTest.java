@@ -11,6 +11,7 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.mapper.MapperUserDto;
 import school.faang.user_service.messaging.MessagePublisher;
 import school.faang.user_service.messaging.ProfileViewEventPublisher;
 import school.faang.user_service.messaging.events.ProfileViewEvent;
@@ -39,7 +40,7 @@ public class UserServiceTest {
     @Mock
     private ProfileViewEventPublisher profileViewEventMessagePublisher;
     @Spy
-    private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
+    private MapperUserDto userMapper = Mappers.getMapper(MapperUserDto.class);
 
     private User user1;
     private User user2;
@@ -79,11 +80,11 @@ public class UserServiceTest {
                 .id(1L)
                 .email("aaa")
                 .username("John")
-                .followerIds(new ArrayList<>())
+                .followers(new ArrayList<>())
                 .build();
 
         Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
-        UserDto output = userService.getUser(1L);
+        UserDto output = userService.getUser(1L, 2L);
 
         Assertions.assertEquals(expected, output);
     }
@@ -96,7 +97,7 @@ public class UserServiceTest {
         Mockito.when(userContext.getUserId()).thenReturn(idViewer);
         Mockito.when(userRepository.findById(idViewed)).thenReturn(Optional.of(user2));
 
-        userService.getUser(idViewed);
+        userService.getUser(idViewer, idViewed);
         Mockito.verify(profileViewEventMessagePublisher, Mockito.times(1))
                 .publish(profileViewEvent);
     }
@@ -115,21 +116,21 @@ public class UserServiceTest {
                 .id(1L)
                 .email("aaa")
                 .username("John")
-                .followerIds(new ArrayList<>())
+                .followers(new ArrayList<>())
                 .build();
 
         UserDto userDto2 = UserDto.builder()
                 .id(2L)
                 .email("ooo")
                 .username("Peter")
-                .followerIds(new ArrayList<>())
+                .followers(new ArrayList<>())
                 .build();
 
         UserDto userDto3 = UserDto.builder()
                 .id(3L)
                 .email("uuu")
                 .username("Michel")
-                .followerIds(new ArrayList<>())
+                .followers(new ArrayList<>())
                 .build();
 
         List<UserDto> expected = List.of(userDto1, userDto2, userDto3);

@@ -35,7 +35,7 @@ public class MentorshipRequestService {
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final MentorshipRepository mentorshipRepository;
     private final MentorshipRequestMapper requestMapper;
-    private final MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
+    private final MentorshipRequestedEventPublisher publisher;
     private final List<MentorshipRequestFilter> filters;
 
     public void requestMentorship(MentorshipRequestDto requestDto) {
@@ -44,7 +44,7 @@ public class MentorshipRequestService {
 
         dataValidate(requesterId, receiverId, requestDto);
         mentorshipRequestRepository.create(requesterId, receiverId, requestDto.getDescription());
-        mentorshipRequestedEventPublisher.publish(new MentorshipRequestedEvent(requesterId, receiverId, LocalDateTime.now()));
+        publisher.publish(new MentorshipRequestedEvent(requesterId, receiverId, LocalDateTime.now()));
         log.info("Mentorship request from requesterId={} to receiverId={} has been saved in DB successfully", requesterId, receiverId);
     }
 
@@ -130,12 +130,12 @@ public class MentorshipRequestService {
     }
 
     private void checkIfUsersExistsAndNotSame(long requesterId, long receiverId) {
-        if (!mentorshipRepository.existsById(requesterId)) {
-            throw new UserNotFoundException("This requester does not exist");
-        }
-        if (!mentorshipRepository.existsById(receiverId)) {
-            throw new UserNotFoundException("This receiver does not exist");
-        }
+//        if (!mentorshipRepository.existsById(requesterId)) {
+//            throw new UserNotFoundException("This requester does not exist");
+//        }
+//        if (!mentorshipRepository.existsById(receiverId)) {
+//            throw new UserNotFoundException("This receiver does not exist");
+//        }
         if (requesterId == receiverId) {
             throw new DataValidationException("The user cannot send himself a mentorship request");
         }

@@ -11,6 +11,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.listener.ChannelTopic;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorship.MentorshipRequestedEvent;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.dto.mentorship.RequestFilterDto;
 import school.faang.user_service.dto.UserDto;
@@ -22,7 +23,6 @@ import school.faang.user_service.exception.MentorshipRequestNotFoundException;
 import school.faang.user_service.exception.RequestAlreadyAcceptedException;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapperImpl;
-import school.faang.user_service.mapper.redis.MentorshipEventMapperImpl;
 import school.faang.user_service.publisher.MentorshipRequestedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -43,15 +43,13 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static school.faang.user_service.entity.RequestStatus.ACCEPTED;
 
 @ExtendWith(MockitoExtension.class)
 public class MentorshipRequestServiceTest {
 
     @Spy
     private MentorshipRequestMapperImpl requestMapper;
-
-    @Spy
-    private MentorshipEventMapperImpl mentorshipEventMapper;
 
     @Mock
     private MentorshipRequestRepository requestRepository;
@@ -179,7 +177,7 @@ public class MentorshipRequestServiceTest {
 
         when(requestRepository.findAll()).thenReturn(Collections.singleton(latestRequest));
         List<MentorshipRequestFilter> filters = getFilters();
-        requestService = new MentorshipRequestService(requestRepository, mentorshipRepository, requestMapper, filters);
+        requestService = new MentorshipRequestService(requestRepository, mentorshipRepository, requestMapper, publish, getFilters());
 
         List<MentorshipRequestDto> actualList = requestService.getRequests(filterDto);
         List<MentorshipRequestDto> expectedList = List.of(requestDto);
@@ -197,7 +195,7 @@ public class MentorshipRequestServiceTest {
 
         when(requestRepository.findAll()).thenReturn(Collections.singleton(latestRequest));
         List<MentorshipRequestFilter> filters = getFilters();
-        requestService = new MentorshipRequestService(requestRepository, mentorshipRepository, requestMapper, filters);
+        requestService = new MentorshipRequestService(requestRepository, mentorshipRepository, requestMapper, publish, getFilters());
 
         List<MentorshipRequestDto> actualList = requestService.getRequests(filterDto);
         List<MentorshipRequestDto> expectedList = new ArrayList<>();
@@ -213,7 +211,7 @@ public class MentorshipRequestServiceTest {
 
     @Test
     void testAcceptRequestWithAlreadyAcceptedRequest() {
-        latestRequest.setStatus(RequestStatus.ACCEPTED);
+        latestRequest.setStatus(ACCEPTED);
 
         when(requestRepository.findById(CORRECT_REQUEST_ID)).thenReturn(Optional.of(latestRequest));
         assertThrows(RequestAlreadyAcceptedException.class, () -> requestService.acceptRequest(CORRECT_REQUEST_ID));
@@ -241,7 +239,7 @@ public class MentorshipRequestServiceTest {
         List<User> expectedUserList = List.of(receiver);
 
         assertEquals(expectedUserList, actualMentorList);
-        assertEquals(RequestStatus.ACCEPTED, latestRequest.getStatus());
+        assertEquals(ACCEPTED, latestRequest.getStatus());
     }
 
     @Test
@@ -292,10 +290,12 @@ public class MentorshipRequestServiceTest {
     }
 
     @Test
-    void eventMentorshipTest() throws JsonProcessingException {
-        String message = """
-                "requesterId": 2,
-                    "receiverId": 1,
-                    "createdAt": "2023-08-18T20:00:00\"""";
+    void publishEventMentorshipTest() {
+        MentorshipRequestedEvent event = new MentorshipRequestedEvent(1L, 2L, LocalDateTime.now());
+        MentorshipRequestDto dto = new MentorshipRequestDto(1L, "des", 1L, 2L, ACCEPTED, "reason", LocalDateTime.now().minusDays(1), LocalDateTime.now());
+        MentorshipRequestedEventPublisher publisher = mock(MentorshipRequestedEventPublisher.class);
+        MentorshipRequestService service = new MentorshipRequestService(requestRepository, mentorshipRepository, requestMapper, publisher, getFilters());
+        service.requestMentorship(dto);
+        verify(publisher).publish(event);
     }
 }

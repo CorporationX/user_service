@@ -11,7 +11,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DiceBearConnect;
-import school.faang.user_service.repository.amazon.AvatarRepository;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -23,7 +22,7 @@ import java.net.URLConnection;
 
 @Service
 @RequiredArgsConstructor
-public class AvatarService implements AvatarRepository {
+public class AvatarService {
     private final AmazonS3 amazonS3;
     @Value("${services.s3.bucket-name}")
     private String bucketName;
@@ -41,7 +40,6 @@ public class AvatarService implements AvatarRepository {
         uploadFile(userProfilePic.getFileId(), imageData);
     }
 
-    @Override
     public void uploadFile(String nameFile, byte[] data) {
         try {
             amazonS3.putObject(bucketName, nameFile, new ByteArrayInputStream(data), null);
@@ -50,7 +48,6 @@ public class AvatarService implements AvatarRepository {
         }
     }
 
-    @Override
     public BufferedImage getFileAmazonS3(String fileName) {
         S3Object s3Object = amazonS3.getObject(bucketName, fileName);
         S3ObjectInputStream objectContent = s3Object.getObjectContent();
@@ -72,10 +69,6 @@ public class AvatarService implements AvatarRepository {
         return image;
     }
 
-    @Override
-    public void deleteFile(String objectKey) {
-
-    }
 
     private byte[] convertUrlToByte(String imageUrl) throws IOException {
         URL url = new URL(imageUrl);

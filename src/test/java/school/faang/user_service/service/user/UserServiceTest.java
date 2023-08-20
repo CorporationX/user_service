@@ -12,7 +12,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.diceBear.DiceBearService;
+import school.faang.user_service.service.amazon.AvatarService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,9 +27,9 @@ class UserServiceTest {
     @Spy
     private UserMapperImpl userMapper;
     @Mock
-    private DiceBearService diceBearService;
-    @Mock
     private UserRepository userRepository;
+    @Mock
+    private AvatarService avatarService;
     @InjectMocks
     private UserService userService;
 
@@ -60,8 +60,6 @@ class UserServiceTest {
                 .toEntity(userDto);
         Mockito.verify(userRepository, Mockito.times(1))
                 .save(user);
-        Mockito.verify(diceBearService, Mockito.times(1))
-                        .createAvatar(userProfilePic);
         Mockito.verify(userMapper, Mockito.times(1))
                 .toDto(user);
 
@@ -84,6 +82,35 @@ class UserServiceTest {
         assertTrue(user.getCreatedAt().isBefore(LocalDateTime.now()));
         assertEquals(user.getUserProfilePic().getName(),
                 user.getUsername() + user.getId());
+    }
+
+    @Test
+    public void testCreateAvatar() {
+        UserDto userDto = UserDto.builder()
+                .id(1L)
+                .username("test")
+                .build();
+
+        User user = User.builder()
+                .id(1L)
+                .username("test")
+                .build();
+
+        UserProfilePic userProfilePic = UserProfilePic.builder()
+                .name(userDto.getUsername() + userDto.getId())
+                .fileId("nulltest1")
+                .smallFileId("nulltest1null")
+                .build();
+
+        Mockito.when(userMapper.toEntity(userDto))
+                .thenReturn(user);
+        Mockito.when(userRepository.save(user))
+                .thenReturn(user);
+
+        userService.createUser(userDto);
+
+        Mockito.verify(avatarService, Mockito.times(1))
+                .saveToAmazonS3(userProfilePic);
     }
 
     @Test

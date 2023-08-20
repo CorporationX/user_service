@@ -3,9 +3,11 @@ package school.faang.user_service.controller.recommendation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.RecommendationRequestService;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -19,12 +21,16 @@ public class RecommendationRequestController {
             return recommendationRequestService.create(recommendationRequest);
         }
     }
+  
+    public List<RecommendationRequestDto> getRecommendationRequests(RequestFilterDto filter) {
+        return recommendationRequestService.getRequests(filter);
+    }
     
     public RecommendationRequestDto getRecommendationRequest(long id) {
         return recommendationRequestService.getRequest(id);
     }
   
-  public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
+    public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
         if (rejection.getReason() == null || rejection.getReason().isBlank()) {
             throw new DataValidationException("Recommendation request rejection reason should not be empty");
         } else {

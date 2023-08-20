@@ -4,6 +4,9 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.filter.recommendation.RecommendationRequestFilter;
+import java.util.List;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
@@ -17,8 +20,9 @@ import school.faang.user_service.validator.RecommendationRequestValidator;
 @RequiredArgsConstructor
 public class RecommendationRequestService {
     private final RecommendationRequestRepository recommendationRequestRepository;
-    private final SkillRequestRepository skillRequestRepository;
     private final RecommendationRequestMapper recommendationRequestMapper;
+    private final List<RecommendationRequestFilter> recommendationRequestFilters;
+    private final SkillRequestRepository skillRequestRepository;
     private final RecommendationRequestValidator recommendationRequestValidator;
 
     public RecommendationRequestDto create (RecommendationRequestDto recommendationRequest) {
@@ -32,7 +36,16 @@ public class RecommendationRequestService {
 
         return recommendationRequestMapper.toDto(createdRequest);
     }
-   
+  
+    public List<RecommendationRequestDto> getRequests(RequestFilterDto filter) {
+
+        List<RecommendationRequest> allRecommendationRequests = (List<RecommendationRequest>) recommendationRequestRepository.findAll();
+        recommendationRequestFilters.stream().filter(requestFilter -> requestFilter.isApplicable(filter))
+                .forEach(requestFilter -> requestFilter.apply(allRecommendationRequests.stream(), filter));
+
+        return allRecommendationRequests.stream().map(recommendationRequestMapper::toDto).toList();
+    }
+      
     public RecommendationRequestDto getRequest(long id) {
         RecommendationRequest request = recommendationRequestRepository.findById(id)
                 .orElseThrow(() -> {
@@ -41,7 +54,7 @@ public class RecommendationRequestService {
         return recommendationRequestMapper.toDto(request);
     }
   
-  public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
+    public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
         RecommendationRequest recommendationRequest = recommendationRequestRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Recommendation Request does not exist"));
 
@@ -55,4 +68,5 @@ public class RecommendationRequestService {
             throw new EntityNotFoundException("The request has already been accepted or rejected");
         }
   }
+}
 }

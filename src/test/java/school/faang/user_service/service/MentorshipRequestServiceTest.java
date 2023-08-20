@@ -292,7 +292,13 @@ public class MentorshipRequestServiceTest {
     @Test
     void publishEventMentorshipTest() {
         MentorshipRequestedEvent event = new MentorshipRequestedEvent(1L, 2L, LocalDateTime.now());
-        MentorshipRequestDto dto = new MentorshipRequestDto(1L, "des", 1L, 2L, ACCEPTED, "reason", LocalDateTime.now().minusDays(1), LocalDateTime.now());
+        MentorshipRequestDto dto = MentorshipRequestDto.builder()
+                .id(CORRECT_REQUEST_ID)
+                .receiver(CORRECT_RECEIVER_ID)
+                .requester(CORRECT_REQUESTER_ID)
+                .updatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
+                .description("some description")
+                .build();
         MentorshipRequestedEventPublisher publisher = mock(MentorshipRequestedEventPublisher.class);
         MentorshipRequestService service = new MentorshipRequestService(requestRepository, mentorshipRepository, requestMapper, publisher, getFilters());
         service.requestMentorship(dto);

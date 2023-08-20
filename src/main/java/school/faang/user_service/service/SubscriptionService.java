@@ -12,7 +12,7 @@ import school.faang.user_service.exception.EntityStateException;
 import school.faang.user_service.exception.notFoundExceptions.contact.UserNotFoundException;
 import school.faang.user_service.filter.subfilter.SubscriberFilter;
 import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.messaging.Publisher;
+import school.faang.user_service.messaging.follow.FollowPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 
 import java.time.LocalDateTime;
@@ -26,7 +26,7 @@ public class SubscriptionService {
     private final SubscriptionRepository repository;
     private final UserMapper mapper;
     private final List<SubscriberFilter> filters;
-    private final Publisher<FollowerEvent> followerEventPublisher;
+    private final FollowPublisher followerEventPublisher;
 
     @Transactional
     public void followUser(long followerId, long followeeId) {

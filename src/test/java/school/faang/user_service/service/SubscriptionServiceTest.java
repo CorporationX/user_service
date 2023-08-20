@@ -18,7 +18,7 @@ import school.faang.user_service.exception.EntityStateException;
 import school.faang.user_service.exception.notFoundExceptions.contact.UserNotFoundException;
 import school.faang.user_service.filter.subfilter.SubscriberFilter;
 import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.messaging.Publisher;
+import school.faang.user_service.messaging.follow.FollowPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 
 import java.util.List;
@@ -35,7 +35,7 @@ public class SubscriptionServiceTest {
     @Mock
     private List<SubscriberFilter> filters;
     @Mock
-    private Publisher<FollowerEvent> followerEventPublisher;
+    private FollowPublisher followerEventPublisher;
     @InjectMocks
     private SubscriptionService service;
     private UserFilterDto filterDto;

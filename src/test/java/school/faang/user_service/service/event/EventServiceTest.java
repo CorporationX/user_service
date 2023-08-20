@@ -60,17 +60,16 @@ class EventServiceTest {
     @Mock
     private EventAsyncService eventAsyncService;
 
-    EventDto eventDto;
-    Event event;
-    User user;
-    Skill skill;
+    private EventDto eventDto;
+    private Event event;
+    private User user;
 
     @BeforeEach
     void setUp() {
         user = new User();
         user.setId(200L);
 
-        skill = new Skill();
+        Skill skill = new Skill();
         skill.setId(22L);
         skill.setTitle("Ability");
         skill.setGuarantees(List.of(

@@ -1,5 +1,7 @@
 package school.faang.user_service.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -7,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.redis.listener.ChannelTopic;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.dto.mentorship.RequestFilterDto;
@@ -19,6 +22,8 @@ import school.faang.user_service.exception.MentorshipRequestNotFoundException;
 import school.faang.user_service.exception.RequestAlreadyAcceptedException;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapperImpl;
+import school.faang.user_service.mapper.redis.MentorshipEventMapperImpl;
+import school.faang.user_service.publisher.MentorshipRequestedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
@@ -44,10 +49,19 @@ public class MentorshipRequestServiceTest {
 
     @Spy
     private MentorshipRequestMapperImpl requestMapper;
+
+    @Spy
+    private MentorshipEventMapperImpl mentorshipEventMapper;
+
     @Mock
     private MentorshipRequestRepository requestRepository;
+
     @Mock
     private MentorshipRepository mentorshipRepository;
+
+    @Mock
+    private MentorshipRequestedEventPublisher publish;
+
     @InjectMocks
     private MentorshipRequestService requestService;
 
@@ -275,5 +289,13 @@ public class MentorshipRequestServiceTest {
         return List.of(new MentorshipRequestFilterByDescription(), new MentorshipRequestFilterByReceiver(),
                 new MentorshipRequestFilterByRequester(), new MentorshipRequestFilterByRequestStatus(),
                 new MentorshipRequestFilterByUpdatedTime());
+    }
+
+    @Test
+    void eventMentorshipTest() throws JsonProcessingException {
+        String message = """
+                "requesterId": 2,
+                    "receiverId": 1,
+                    "createdAt": "2023-08-18T20:00:00\"""";
     }
 }

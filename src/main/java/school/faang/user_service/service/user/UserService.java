@@ -3,8 +3,7 @@ package school.faang.user_service.service.user;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import com.json.student.PersonSchemaForUser;
-import jakarta.validation.Valid;
+import com.json.student.PersonForUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,6 +15,7 @@ import school.faang.user_service.exception.FileException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.amazon.AvatarService;
+import school.faang.user_service.validator.user.UserValidator;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,11 +32,12 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final AvatarService avatarService;
+    private final UserValidator userValidator;
     @Value("${service.dice-bear.url}")
     private String URL;
     @Value("${service.dice-bear.size}")
     private String SIZE;
-    private final int lenPassword = 4;
+    private final int LEN_PASSWORD = 4;
 
 
     public UserDto createUser(UserDto userDto) {
@@ -52,32 +53,26 @@ public class UserService {
     }
 
     public List<UserDto> createUserCSV(InputStream inputStream) {
-        List<PersonSchemaForUser> persons = parseCsv(inputStream);
+        List<PersonForUser> persons = parseCsv(inputStream);
 
         List<CompletableFuture<UserDto>> futures = persons.stream()
                 .map(person -> CompletableFuture.supplyAsync(() -> {
                     UserDto userDto = userMapper.personToUserDto(person);
-                    userDto.setPassword(generatePassword(lenPassword));
+                    userDto.setPassword(generatePassword(LEN_PASSWORD));
 
-                    validateUserDto(userDto);
+                    userValidator.validateUserDto(userDto);
                     createUser(userDto);
-                    //SMS to user.getEmail with - "You password for CorporationX is:"+user.getPassword()
+                    // SMS to user.getEmail with - "You password for CorporationX is:"+user.getPassword()
                     return userDto;
                 }))
                 .toList();
 
-        var res = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
                 .thenApply(dto -> futures.stream()
                         .map(CompletableFuture::join)
                         .collect(Collectors.toList()))
                 .join();
-
-        return res;
-
-    }
-
-    public void validateUserDto(@Valid UserDto userDto) {
-        System.out.println(userDto);
     }
 
     private String generatePassword(int length) {
@@ -96,12 +91,13 @@ public class UserService {
         return password.toString();
     }
 
-    private List<PersonSchemaForUser> parseCsv(InputStream inputStream) {
+    private List<PersonForUser> parseCsv(InputStream inputStream) {
         CsvMapper csvMapper = new CsvMapper();
         CsvSchema schema = CsvSchema.emptySchema().withHeader();
-        MappingIterator<PersonSchemaForUser> iterator = null;
+        MappingIterator<PersonForUser> iterator = null;
+
         try {
-            iterator = csvMapper.readerFor(PersonSchemaForUser.class).with(schema).readValues(inputStream);
+            iterator = csvMapper.readerFor(PersonForUser.class).with(schema).readValues(inputStream);
             return iterator.readAll();
         } catch (IOException e) {
             throw new FileException("Can't read file: " + e.getMessage());
@@ -133,7 +129,7 @@ public class UserService {
     private void addCreateData(User user) {
         user.setCreatedAt(LocalDateTime.now());
         UserProfilePic userProfilePic = UserProfilePic.builder()
-                .name(user.getUsername()+user.getId())
+                .name(user.getUsername() + user.getId())
                 .build();
 
         createDiceBearAvatar(userProfilePic);

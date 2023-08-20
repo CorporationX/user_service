@@ -1,6 +1,6 @@
 package school.faang.user_service.mapper;
 
-import com.json.student.PersonSchemaForUser;
+import com.json.student.PersonForUser;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -20,5 +20,5 @@ public interface UserMapper {
     List<UserDto> toDto(List<User> users);
 
     @Mapping(target = "country", ignore = true)
-    UserDto personToUserDto(PersonSchemaForUser person);
+    UserDto personToUserDto(PersonForUser person);
 }

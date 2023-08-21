@@ -1,6 +1,5 @@
 package school.faang.user_service.service;
 
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,8 +14,6 @@ import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserCheckRepository;
 import school.faang.user_service.repository.UserRepository;
 
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -39,11 +36,6 @@ public class UserServiceTest {
     private UserService userService;
 
     @Test
-    void registerAnArrayOfUser() {
-
-    }
-
-    @Test
     void saveUserStudent() {
         String line1 = "Christopher,Clark,1989,Group C,159357,christopherclark@example.com,6667778888,Sixth Street,Boston,MA,USA,98765,Business,2022,Marketing,3.4,Graduated,2020-01-01,2022-12-31,Bachelor,STU University,2020,true,XYZ Marketing Agency";
         String line2 = "Jennifer,Lee,1994,Group A,753951,jenniferlee@example.com,2223334444,Fifth Avenue,San Francisco,CA,USA,23456,Engineering,2021,Electrical Engineering,3.8,Graduated,2019-01-01,2021-12-31,Bachelor,MNO University,2019,true,PQR Company";
@@ -62,7 +54,7 @@ public class UserServiceTest {
         when(csvToPerson.getPerson(line1)).thenReturn(personDto1);
         when(personToUserMapper.toUser(personDto1)).thenReturn(user1);
 
-        when(userCheckRepository.findDistinctPeopleByUsernameOrEmailOrPhone(personDto1.getFirstName(),
+        when(userCheckRepository.findDistinctPeopleByUsernameOrEmailOrPhone(personDto1.getUsername(),
                 personDto1.getContactInfo().getEmail(), personDto1.getContactInfo().getPhone())).thenReturn(List.of(user1));
         Map<String, Country> countryMap = Map.of();
         userService.saveUserStudent(line1, countryMap);

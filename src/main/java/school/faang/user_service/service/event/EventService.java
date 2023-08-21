@@ -3,14 +3,18 @@ package school.faang.user_service.service.event;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
+import school.faang.user_service.dto.redis.EventStartDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.mapper.skill.SkillMapper;
+import school.faang.user_service.publisher.EventStartPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.exception.DataValidException;
@@ -28,6 +32,7 @@ public class EventService {
     private final EventMapper eventMapper = EventMapper.INSTANCE;
     private final SkillMapper skillMapper = SkillMapper.INSTANCE;
     private final List<EventFilter> filters;
+    private final EventStartPublisher eventStartPublisher;
 
     public EventDto create(EventDto eventDto) {
         validateEventDto(eventDto);
@@ -87,6 +92,24 @@ public class EventService {
 
         Event result = eventRepository.save(eventMapper.toEntity(target));
         return eventMapper.toDto(result);
+    }
+
+    @Transactional(readOnly = true)
+    public EventStartDto startEvent(Long eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new DataValidException("Event with id " + eventId + " is not found"));
+
+        if (!event.getStatus().equals(EventStatus.PLANNED)) {
+            throw new DataValidException("You can only start events in Planned state");
+        }
+
+        List<Long> userIds = event.getAttendees().stream()
+                .map(User::getId)
+                .toList();
+
+        EventStartDto eventStartDto = new EventStartDto(event.getId(), userIds);
+        eventStartPublisher.publishMessage(eventStartDto);
+        return eventStartDto;
     }
 
     private void validateEventDto(EventDto eventDto) {

@@ -49,7 +49,7 @@ public class GoalInvitationService {
     @Transactional
     public void rejectGoalInvitation(long id) {
         GoalInvitation invitation = goalInvitationRepository.findById(id)
-                .orElseThrow(() -> new DataValidException("Goal Invitation nou found. Id: " + id));
+                .orElseThrow(() -> new DataValidException("Goal Invitation not found. Id: " + id));
         checkGoalExists(invitation);
         invitation.setStatus(RequestStatus.REJECTED);
         goalInvitationRepository.save(invitation);
@@ -91,9 +91,7 @@ public class GoalInvitationService {
 
     @Transactional(readOnly = true)
     private void validateInvitation(GoalInvitationDto invitation) {
-        if (invitation.getId() != null && goalInvitationRepository.existsById(invitation.getId())) {
-            throw new DataValidException("Invitation already exist. Id: " + invitation.getId());
-        }
+        invitation.setId(null);
         if (!goalRepository.existsById(invitation.getGoalId())) {
             throw new DataValidException("Goal does not exist. Invitation Id: " + invitation.getId());
         }
@@ -106,6 +104,5 @@ public class GoalInvitationService {
         if (invitation.getInviterId().equals(invitation.getInvitedUserId())) {
             throw new DataValidException("Inviter and invited are equal. Invitation Id: " + invitation.getId());
         }
-        invitation.setId(null);
     }
 }

@@ -2,6 +2,7 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.redis.FollowerEventDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
@@ -22,14 +23,15 @@ public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final UserMapper userMapper;
     private final List<UserFilter> userFilters;
-    private final FollowerEventPublisher publisher;
+    private final FollowerEventPublisher followerEventPublisher;
 
+    @Transactional
     public void followUser(long followerId, long followeeId) {
         if (subscriptionExists(followerId, followeeId)) {
             throw new DataValidationException(String.format("User with id %d already follow user with id %d", followerId, followeeId));
         }
         subscriptionRepository.followUser(followerId, followeeId);
-        publisher.sendEvent(FollowerEventDto.builder().
+        followerEventPublisher.sendEvent(FollowerEventDto.builder().
                 followerId(followerId)
                 .followeeId(followeeId)
                 .subscriptionTime(LocalDateTime.now())

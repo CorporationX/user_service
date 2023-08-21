@@ -1,5 +1,6 @@
 package school.faang.user_service.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,8 +10,7 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import school.faang.user_service.publisher.MessagePublisher;
-import school.faang.user_service.publisher.RedisMessagePublisher;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 
 @Configuration
 public class RedisConfig {
@@ -39,8 +39,8 @@ public class RedisConfig {
     }
 
     @Bean
-    public MessagePublisher redisPublisher() {
-        return new RedisMessagePublisher(redisTemplate(redisConnectionFactory()), topic());
+    public FollowerEventPublisher followerEventPublisher() {
+        return new FollowerEventPublisher(new ObjectMapper(), redisTemplate(redisConnectionFactory()), topic());
     }
 
     @Bean

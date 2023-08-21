@@ -57,9 +57,7 @@ public class UserService {
     private final String lower = upper.toLowerCase(Locale.ROOT);
     private final String numbers = "0123456789";
     private final String set = upper + lower + numbers;
-
     private final Object lock = new Object();
-
     @Autowired
     private final ExecutorsPull executorsPull;
 

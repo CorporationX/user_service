@@ -8,11 +8,26 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.dto.mydto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.Country;
+import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.filter.user.AboutPatternFilter;
+import school.faang.user_service.filter.user.CityPatternFilter;
+import school.faang.user_service.filter.user.ContactPatternFilter;
+import school.faang.user_service.filter.user.CountryPatternFilter;
+import school.faang.user_service.filter.user.EmailPatternFilter;
+import school.faang.user_service.filter.user.ExperienceRangeFilter;
+import school.faang.user_service.filter.user.NamePatternFilter;
+import school.faang.user_service.filter.user.PhonePatternFilter;
+import school.faang.user_service.filter.user.SkillPatternFilter;
+import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.exception.notFoundExceptions.contact.UserNotFoundException;
 import school.faang.user_service.mapper.mymappers.Country1MapperImpl;
 import school.faang.user_service.mapper.mymappers.Goal1MapperImpl;
@@ -30,6 +45,9 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -52,6 +70,7 @@ class UserServiceTest {
     @Spy
     private User1MapperImpl userMapper = new User1MapperImpl(goalMapper, skillMapper, countryMapper);
 
+
     @InjectMocks
     private UserService userService;
 
@@ -60,6 +79,18 @@ class UserServiceTest {
     @BeforeEach
     void setUp() {
         user = User.builder().id(1).build();
+    }
+
+    private List<UserFilter> userFilters = new ArrayList<>(List.of(new AboutPatternFilter(), new CityPatternFilter(),
+            new ContactPatternFilter(), new CountryPatternFilter(), new EmailPatternFilter(), new ExperienceRangeFilter(),
+            new NamePatternFilter(), new PhonePatternFilter(), new SkillPatternFilter()));
+
+    private UserService service;
+
+
+    @BeforeEach
+    public void setup() {
+        service = new UserService(repository, userMapper, userFilters);
     }
 
     @Test
@@ -109,5 +140,56 @@ class UserServiceTest {
         verify(userRepository, times(1)).save(any());
         verify(userMapper, times(1)).toDto(any());
         assertEquals(user.getOwnedEvents().get(0).getStatus(), EventStatus.CANCELED);
+    }
+
+    @Test
+    void getPremiumUsers_UsernameFilter() {
+        UserFilterDto filterDto = new UserFilterDto();
+        filterDto.setNamePattern("name3");
+        List<User> users = List.of(
+                buildUser(1L),
+                buildUser(2L),
+                buildUser(3L)
+        );
+        when(repository.findPremiumUsers())
+                .thenReturn(users.stream());
+        List<UserDto> userDtoList = users.stream().map(user -> userMapper.toDto(user)).toList();
+
+        assertEquals(userDtoList.subList(2, 3), service.getPremiumUsers(filterDto));
+    }
+
+    @Test
+    void getPremiumUsers() {
+        UserFilterDto filterDto = new UserFilterDto();
+        List<User> users = List.of(
+                buildUser(1L),
+                buildUser(2L),
+                buildUser(3L)
+        );
+        when(repository.findPremiumUsers())
+                .thenReturn(users.stream());
+        service.getPremiumUsers(filterDto);
+        verify(repository).findPremiumUsers();
+        verify(userMapper, times(3)).toDto(any());
+    }
+
+    private User buildUser(long id) {
+        return User.builder()
+                .id(id)
+                .username("name" + id)
+                .email("email" + id)
+                .phone("phone" + id)
+                .aboutMe("aboutMe" + id)
+                .active(true)
+                .city("city" + id)
+                .experience((int) id)
+                .followers(List.of(User.builder().id(1L).build(), User.builder().id(2L).build()))
+                .followees(List.of(User.builder().id(3L).build(), User.builder().id(4L).build()))
+                .mentors(List.of(User.builder().id(5L).build(), User.builder().id(6L).build()))
+                .mentees(List.of(User.builder().id(7L).build(), User.builder().id(8L).build()))
+                .country(Country.builder().id(1L).title("title").build())
+                .goals(List.of(Goal.builder().id(1L).build(), Goal.builder().id(2L).build()))
+                .skills(List.of(Skill.builder().id(1L).title("skill" + id).build(), Skill.builder().id(2L).title("skill" + id).build()))
+                .build();
     }
 }

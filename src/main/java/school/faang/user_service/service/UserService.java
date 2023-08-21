@@ -3,9 +3,11 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.dto.mydto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.EventStatus;
+import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.exception.notFoundExceptions.contact.UserNotFoundException;
 import school.faang.user_service.mapper.mymappers.User1Mapper;
 import school.faang.user_service.repository.UserRepository;
@@ -14,6 +16,7 @@ import school.faang.user_service.service.goal.GoalService;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +26,8 @@ public class UserService {
     private final User1Mapper mapper;
     private final GoalService goalService;
     private final EventService eventService;
+    private final List<UserFilter> userFilters;
+
 
     @Transactional
     public UserDto getUser(long id) {
@@ -38,6 +43,19 @@ public class UserService {
 
         return mapper.toDtos(foundUsers);
     }
+  
+    public List<UserDto> getPremiumUsers(UserFilterDto filterDto) {
+        Stream<User> premiumUserStream = repository.findPremiumUsers();
+
+        for (UserFilter userFilter : userFilters) {
+            if (userFilter.isApplicable(filterDto)) {
+                premiumUserStream = userFilter.apply(premiumUserStream, filterDto);
+            }
+        }
+
+        return premiumUserStream.map(mapper::toDto).toList();
+    }
+
 
     @Transactional
     public UserDto deactivateUser(Long userId) {

@@ -1,4 +1,4 @@
-package school.faang.user_service.filter.subfilter;
+package school.faang.user_service.filter.user;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.UserFilterDto;
@@ -6,7 +6,7 @@ import school.faang.user_service.entity.User;
 
 import java.util.stream.Stream;
 @Component
-public class ExperienceRangeFilter implements SubscriberFilter {
+public class ExperienceRangeFilter implements UserFilter {
 
     @Override
     public boolean isApplicable(UserFilterDto filter) {

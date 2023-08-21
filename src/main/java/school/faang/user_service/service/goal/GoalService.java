@@ -15,7 +15,7 @@ import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.validator.GoalValidator;
+import school.faang.user_service.util.validator.GoalValidator;
 
 import java.util.ArrayList;
 import java.util.List;

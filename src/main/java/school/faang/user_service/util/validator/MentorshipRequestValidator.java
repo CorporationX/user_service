@@ -35,10 +35,7 @@ public class MentorshipRequestValidator {
         if (requester.get().getId() == receiver.get().getId()) {
             throw new SameEntityException("Same mentor and mentee");
         }
-        if (lastRequest.isEmpty()) {
-            throw new MentorshipRequestNotFoundException();
-        }
-        if (lastRequest.get().getCreatedAt().isAfter(LocalDateTime.now().minusMonths(3))) {
+        if (lastRequest.isPresent() && (lastRequest.get().getCreatedAt().isAfter(LocalDateTime.now().minusMonths(3)))) {
             throw new TimingException("The request can be sent once every three months");
         }
     }

@@ -62,18 +62,6 @@ class MentorshipRequestValidatorTest {
     }
 
     @Test
-    void validate_LastRequestNotFound_ShouldThrowException() {
-        Mockito.when(userRepository.findById(1L))
-                .thenReturn(Optional.of(User.builder().id(1L).build()));
-        Mockito.when(mentorshipRequestRepository.findLatestRequest(1L, 2L))
-                .thenReturn(Optional.empty());
-
-        MentorshipRequestNotFoundException e = Assertions.assertThrows(MentorshipRequestNotFoundException.class,
-                () -> validator.validate(buildDto()));
-        Assertions.assertEquals("Mentorship request not found", e.getMessage());
-    }
-
-    @Test
     void validate_LastRequestIsMoreThan3Months_ShouldThrowException() {
         Mockito.when(userRepository.findById(1L))
                 .thenReturn(Optional.of(User.builder().id(1L).build()));

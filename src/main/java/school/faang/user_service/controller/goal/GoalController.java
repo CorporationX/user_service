@@ -40,12 +40,12 @@ public class GoalController {
     }
 
     @GetMapping("/filtered")
-    public List<GoalDto> getSubGoalsByFilter(@RequestParam Long parentId, @RequestBody GoalFilterDto filterDto) {
+    public List<GoalDto> getSubGoalsByFilter(@RequestParam Long parentId, GoalFilterDto filterDto) {
         return goalService.getSubGoalsByFilter(parentId, filterDto);
     }
 
     @GetMapping("/owner/{userId}")
-    public List<GoalDto> getGoalsByUser(@PathVariable Long userId, @RequestBody GoalFilterDto filterDto) {
+    public List<GoalDto> getGoalsByUser(@PathVariable Long userId, GoalFilterDto filterDto) {
         return goalService.getGoalsByUser(userId, filterDto);
     }
 

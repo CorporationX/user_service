@@ -40,7 +40,7 @@ public class SkillController {
     }
 
     @PutMapping("/acquire/{skillId}/offer/{userId}")
-    public SkillDto acquireSkillFromOffers(long skillId, long userId) {
+    public SkillDto acquireSkillFromOffers(@PathVariable long skillId, @PathVariable long userId) {
         return skillService.acquireSkillFromOffers(skillId, userId);
     }
 }

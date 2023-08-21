@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.subscription.UserDto;
@@ -24,7 +23,7 @@ public class UserController {
     }
 
     @GetMapping("/get-by-ids")
-    List<UserDto> getUsersByIds(@RequestBody @NotEmpty(message = "ids cannot be empty") List<Long> ids) {
+    List<UserDto> getUsersByIds(@NotEmpty(message = "ids cannot be empty") List<Long> ids) {
         return userService.getUsersByIds(ids);
     }
 }

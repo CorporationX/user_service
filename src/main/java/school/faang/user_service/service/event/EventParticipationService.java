@@ -40,7 +40,7 @@ public class EventParticipationService {
         repository.unregister(eventId, userId);
     }
 
-    public List<User> getParticipant(long eventId){
+    public List<User> getParticipants(long eventId){
         return repository.findAllParticipantsByEventId(eventId);
     }
 

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.entity.contact.PreferredContact;
 import school.faang.user_service.mapper.MapperUserDto;
 import school.faang.user_service.messaging.MessagePublisher;
 import school.faang.user_service.messaging.ProfileViewEventPublisher;
@@ -17,6 +18,7 @@ import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Stream;
 
 @Service
@@ -46,7 +48,10 @@ public class UserService {
         String message = String.format("Entity with ID %d not found", userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(message));
-        profileViewEventMessagePublisher.publish(new ProfileViewEvent(currentUserId, userId, user.getContactPreference().getPreference()));
+        profileViewEventMessagePublisher.publish(new ProfileViewEvent(currentUserId, userId,
+                PreferredContact.EMAIL));
+//        profileViewEventMessagePublisher.publish(new ProfileViewEvent(currentUserId, userId,
+//                user.getContactPreference().getPreference()));
 
         return userMapper.toDto(user);
     }

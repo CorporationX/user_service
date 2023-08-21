@@ -34,25 +34,14 @@ public class RedisConfig {
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
-        redisTemplate.setKeySerializer(new Jackson2JsonRedisSerializer<Object>(Object.class));
-        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<Object>(Object.class));
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
         return redisTemplate;
     }
-
-//    @Bean
-//    public ObjectMapper objectMapper() {
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        objectMapper.registerModule(new JavaTimeModule());
-//        return objectMapper;
-//    }
 
     @Bean
     public ChannelTopic viewProfileTopic() {
         return new ChannelTopic("viewProfileTopic");
     }
 
-//    @Bean
-//    ProfileViewEventPublisher redisPublisher() {
-//        return new ProfileViewEventPublisher(redisTemplate(redisConnectionFactory()), viewProfileTopic());
-//    }
 }

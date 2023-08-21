@@ -37,7 +37,7 @@ public class RedisConfig {
     }
 
     @Bean
-    public ChannelTopic likeTopic(){
+    public ChannelTopic mentorshipTopic(){
         return new ChannelTopic(mentorshipName);
     }
 }

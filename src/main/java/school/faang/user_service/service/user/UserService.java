@@ -2,16 +2,20 @@ package school.faang.user_service.service.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.MentorshipService;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.goal.GoalService;
+import school.faang.user_service.service.redis.events.ProfileViewEvent;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -24,6 +28,8 @@ public class UserService {
     private final GoalService goalService;
     private final EventService eventService;
     private final MentorshipService mentorshipService;
+    private final ProfileViewEventPublisher profileViewEventPublisher;
+    private final UserContext userContext;
 
     public boolean isUserExist(Long userId) {
         return userRepository.existsById(userId);
@@ -32,6 +38,7 @@ public class UserService {
     public UserDto getUserById(Long userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new IllegalStateException("User not found with ID: " + userId));
+        profileViewEventPublisher.publish(new ProfileViewEvent(userContext.getUserId(), userId, LocalDateTime.now()));
         return userMapper.toDto(user);
     }
 

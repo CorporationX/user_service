@@ -44,8 +44,8 @@ public class EventParticipationService {
         repository.unregister(eventId, userId);
     }
 
-    public List<UserDto> getParticipant(long eventId) {
-        return userMapper.toUserListDto(repository.findAllParticipantsByEventId(eventId));
+    public List<User> getParticipants(long eventId){
+        return repository.findAllParticipantsByEventId(eventId);
     }
 
     public int getParticipantsCount(long eventId) {

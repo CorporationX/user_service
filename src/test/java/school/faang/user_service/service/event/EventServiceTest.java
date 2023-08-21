@@ -15,6 +15,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.exception.DataValidException;
+import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.filter.event.EventDateFilter;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.filter.event.EventIdFilter;
@@ -38,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -69,40 +71,11 @@ class EventServiceTest {
     }
 
     @Test
-    public void invalid_EventId() {
+    void invalid_InvalidOwnerId() {
         EventDto eventDto = createEventDto();
-        eventDto.setId(0L);
 
-        Exception exception = assertThrows(DataValidException.class, () -> eventService.create(eventDto));
-        assertEquals("Event Id must be greater than 0",
-                exception.getMessage());
-    }
-
-    @Test
-    public void invalid_TitleBlank() {
-        EventDto eventDto = createEventDto();
-        eventDto.setTitle("");
-
-        Exception exception = assertThrows(DataValidException.class, () -> eventService.create(eventDto));
-        assertEquals("Event must have a title. Id: 1", exception.getMessage());
-    }
-
-    @Test
-    void invalid_NullStartDate() {
-        EventDto eventDto = createEventDto();
-        eventDto.setStartDate(null);
-
-        Exception exception = assertThrows(DataValidException.class, () -> eventService.create(eventDto));
-        assertEquals("Event must have a start date. Id: 1", exception.getMessage());
-    }
-
-    @Test
-    void invalid_NullOwnerId() {
-        EventDto eventDto = createEventDto();
-        eventDto.setOwnerId(null);
-
-        Exception exception = assertThrows(DataValidException.class, () -> eventService.create(eventDto));
-        assertEquals("Event must have a user. Id: 1", exception.getMessage());
+        Exception exception = assertThrows(UserNotFoundException.class, () -> eventService.create(eventDto));
+        assertEquals("User not found. ID: 1", exception.getMessage());
     }
 
     @Test
@@ -110,6 +83,7 @@ class EventServiceTest {
         EventDto eventDto = createEventDto();
         eventDto.setRelatedSkills(List.of(new SkillDto(3L, "C"), new SkillDto(2L, "B")));
 
+        when(userRepository.existsById(anyLong())).thenReturn(true);
         when(userRepository.findById(1L)).thenReturn(Optional.of(createUser()));
 
         Exception exception = assertThrows(DataValidException.class, () -> eventService.create(eventDto));
@@ -123,6 +97,7 @@ class EventServiceTest {
         Event event = createEvent();
         User user = createUser();
         Long userId = 1L;
+        when(userRepository.existsById(anyLong())).thenReturn(true);
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(eventRepository.save(ArgumentMatchers.any(Event.class))).thenReturn(event);
 
@@ -275,6 +250,7 @@ class EventServiceTest {
         when(eventRepository.findById(eventDto.getId())).thenReturn(Optional.of(event));
         when(eventRepository.save(any(Event.class))).thenReturn(eventMapper.toEntity(eventDto));
         when(userRepository.findById(1L)).thenReturn(Optional.of(createUser()));
+        when(userRepository.existsById(anyLong())).thenReturn(true);
 
         EventDto updatedEvent = eventService.updateEvent(eventDto);
 
@@ -292,6 +268,7 @@ class EventServiceTest {
         EventDto eventDto = createEventDto();
         when(eventRepository.findById(eventDto.getId())).thenReturn(Optional.empty());
         when(userRepository.findById(1L)).thenReturn(Optional.of(createUser()));
+        when(userRepository.existsById(anyLong())).thenReturn(true);
 
         Exception exception = assertThrows(RuntimeException.class, () -> eventService.updateEvent(eventDto));
         assertEquals("Event not found. ID: 1", exception.getMessage());

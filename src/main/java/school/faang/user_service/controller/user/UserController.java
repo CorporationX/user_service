@@ -1,6 +1,6 @@
 package school.faang.user_service.controller.user;
 
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/users")
+@RequestMapping("api/v1/users")
 public class UserController {
     private final UserService userService;
 
@@ -36,21 +36,13 @@ public class UserController {
         return userService.getPremiumUsers(userFilterDto);
     }
 
-    @PostMapping("/get-by-ids")
-    List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
-        validateUsersIds(ids);
+    @GetMapping("/get-by-ids")
+    List<UserDto> getUsersByIds(@NotEmpty(message = "ids cannot be empty") List<Long> ids) {
         return userService.getUsersByIds(ids);
     }
 
     @PostMapping("/deactivation/{userId}")
     public DeactivateResponseDto deactivating(@PathVariable @Min(0) long userId) {
         return userService.deactivateUser(userId);
-    }
-
-    private static List<Long> validateUsersIds(List<Long> ids) {
-        if (ids.isEmpty()) {
-            return new ArrayList<>();
-        }
-        return ids;
     }
 }

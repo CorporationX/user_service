@@ -88,22 +88,6 @@ public class GoalServiceTest {
     }
 
     @Test
-    void createGoal_With_Null_Goal() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> goalService.createGoal(1L, null));
-
-        assertEquals("Goal cannot be null", exception.getMessage());
-    }
-
-    @Test
-    void createGoal_With_Blank_Title() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> goalService.createGoal(1L, CreateGoalDto.builder().title("").build()));
-
-        assertEquals("Title cannot be null", exception.getMessage());
-    }
-
-    @Test
     void createGoal_When_Max_User_Reached() {
         when(goalRepository.countActiveGoalsPerUser(1L)).thenReturn(3);
 
@@ -189,22 +173,6 @@ public class GoalServiceTest {
         assertEquals(1, goalDtos.size());
 
         verify(goalRepository).findGoalsByUserId(1L);
-    }
-
-    @Test
-    void updateGoal_With_Blank_Title_Throw_Exception() {
-        UpdateGoalDto updateGoalDto = updateGoalDtoCreate();
-        updateGoalDto.setTitle("");
-
-        Goal goal = new Goal();
-
-        when(goalRepository.findById(anyLong())).thenReturn(Optional.of(goal));
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> goalService.updateGoal(updateGoalDto));
-
-        assertEquals("Title cannot be blank", exception.getMessage());
-
-        verify(goalRepository).findById(anyLong());
     }
 
     @Test

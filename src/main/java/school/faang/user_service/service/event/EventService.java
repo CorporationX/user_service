@@ -11,13 +11,14 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
+import school.faang.user_service.exception.DataValidException;
+import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.mapper.skill.SkillMapper;
 import school.faang.user_service.publisher.EventStartPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.exception.DataValidException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +37,10 @@ public class EventService {
 
     public EventDto create(EventDto eventDto) {
         validateEventDto(eventDto);
-        Event event = eventRepository.save(eventMapper.toEntity(eventDto));
-        return eventMapper.toDto(event);
+        eventDto.setId(null);
+        Event event = eventMapper.toEntity(eventDto);
+        event.setStatus(EventStatus.PLANNED);
+        return eventMapper.toDto(eventRepository.save(event));
     }
 
     public EventDto get(Long eventId) {
@@ -113,24 +116,15 @@ public class EventService {
     }
 
     private void validateEventDto(EventDto eventDto) {
-        if (eventDto.getId() == null || eventDto.getId() < 1) {
-            throw new DataValidException("Event Id must be greater than 0");
-        }
-        if (eventDto.getTitle().isBlank()) {
-            throw new DataValidException("Event must have a title. Id: " + eventDto.getId());
-        }
-        if (eventDto.getStartDate() == null) {
-            throw new DataValidException("Event must have a start date. Id: " + eventDto.getId());
-        }
-        if (eventDto.getOwnerId() == null) {
-            throw new DataValidException("Event must have a user. Id: " + eventDto.getId());
+        if (!userRepository.existsById(eventDto.getOwnerId())) {
+            throw new UserNotFoundException("User not found. ID: " + eventDto.getOwnerId());
         }
         checkUserContainsSkills(eventDto);
     }
 
     private void checkUserContainsSkills(EventDto eventDto) {
         User user = userRepository.findById(eventDto.getOwnerId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found. ID: " + eventDto.getOwnerId()));
+                .orElseThrow(() -> new UserNotFoundException("User not found. ID: " + eventDto.getOwnerId()));
 
         List<SkillDto> userSkills = skillMapper.toListSkillsDTO(user.getSkills());
         boolean anySkillMissing = eventDto.getRelatedSkills().stream().anyMatch(skill -> !userSkills.contains(skill));

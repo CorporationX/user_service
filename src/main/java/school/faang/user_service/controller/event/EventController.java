@@ -1,10 +1,15 @@
 package school.faang.user_service.controller.event;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
@@ -19,28 +24,34 @@ import java.util.List;
 public class EventController {
     private final EventService eventService;
 
-    public EventDto create(EventDto eventDto) {
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public EventDto create(@Valid @RequestBody EventDto eventDto) {
         return eventService.create(eventDto);
     }
 
-    @GetMapping("{eventId}")
+    @GetMapping("/{eventId}")
     public EventDto get(@PathVariable Long eventId) {
         return eventService.get(eventId);
     }
 
-    public boolean deleteEvent(Long eventId) {
+    @DeleteMapping("/{eventId}")
+    public boolean deleteEvent(@PathVariable Long eventId) {
         return eventService.deleteEvent(eventId);
     }
 
+    @GetMapping("/filtered")
     public List<EventDto> getEventsByFilter(EventFilterDto filter) {
         return eventService.getEventsByFilter(filter);
     }
 
-    public List<EventDto> getOwnedEvents(long userId) {
+    @GetMapping("/owner/{userId}")
+    public List<EventDto> getOwnedEvents(@PathVariable long userId) {
         return eventService.getOwnedEvents(userId);
     }
 
-    public List<EventDto> getParticipatedEvents(long userId) {
+    @GetMapping("/participant/{userId}")
+    public List<EventDto> getParticipatedEvents(@PathVariable long userId) {
         return eventService.getParticipatedEvents(userId);
     }
 

@@ -1,6 +1,7 @@
 package school.faang.user_service.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,9 +12,13 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import school.faang.user_service.publisher.FollowerEventPublisher;
+import school.faang.user_service.publisher.JsonObjectMapper;
 
 @Configuration
+@RequiredArgsConstructor
 public class RedisConfig {
+
+    private final ObjectMapper mapper;
 
     @Value("${spring.data.redis.host}")
     private String host;
@@ -40,7 +45,7 @@ public class RedisConfig {
 
     @Bean
     public FollowerEventPublisher publisher() {
-        return new FollowerEventPublisher(new ObjectMapper(), redisTemplate(redisConnectionFactory()), topic());
+        return new FollowerEventPublisher(redisTemplate(redisConnectionFactory()), new JsonObjectMapper(mapper), topic());
     }
 
     @Bean

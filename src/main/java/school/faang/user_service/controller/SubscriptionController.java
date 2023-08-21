@@ -1,6 +1,9 @@
 package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
@@ -8,11 +11,13 @@ import school.faang.user_service.service.SubscriptionService;
 
 import java.util.List;
 
+@RestController
 @RequiredArgsConstructor
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
-    public void followUser(long followerId, long followeeId) {
+    @PostMapping("follower/{followerId}/follow/{followeeId}")
+    public void followUser(@PathVariable long followerId, @PathVariable long followeeId) {
         if (!isValid(followerId, followeeId)) {
             throw new DataValidationException("user can't follow itself");
         }

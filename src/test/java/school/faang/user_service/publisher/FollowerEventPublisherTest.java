@@ -1,7 +1,5 @@
 package school.faang.user_service.publisher;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,7 +19,7 @@ import static org.mockito.Mockito.when;
 class FollowerEventPublisherTest {
 
     @Mock
-    private ObjectMapper mapper;
+    private JsonObjectMapper mapper;
     @Mock
     private RedisTemplate<String, Object> redisTemplate;
     @Mock
@@ -31,7 +29,7 @@ class FollowerEventPublisherTest {
     private FollowerEventPublisher followerEventPublisher;
 
     @Test
-    void sendEventTest() throws JsonProcessingException {
+    void sendEventTest() {
         FollowerEventDto followerEventDto = FollowerEventDto.builder()
                 .followerId(1)
                 .followerId(2)

@@ -10,7 +10,7 @@ import school.faang.user_service.entity.contact.PreferredContact;
 public class ProfileViewEvent {
     private Long idVisitor;
     private Long idVisited;
-    private PreferredContact preferredContact;
+    private int preferredContact;
 
     @Override
     public String toString() {

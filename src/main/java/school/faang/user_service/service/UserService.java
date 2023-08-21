@@ -48,10 +48,10 @@ public class UserService {
         String message = String.format("Entity with ID %d not found", userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(message));
-        profileViewEventMessagePublisher.publish(new ProfileViewEvent(currentUserId, userId,
-                PreferredContact.EMAIL));
 //        profileViewEventMessagePublisher.publish(new ProfileViewEvent(currentUserId, userId,
-//                user.getContactPreference().getPreference()));
+//                PreferredContact.EMAIL.ordinal()));
+        profileViewEventMessagePublisher.publish(new ProfileViewEvent(currentUserId, userId,
+                user.getContactPreference().getPreference().ordinal()));
 
         return userMapper.toDto(user);
     }

@@ -11,6 +11,7 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.entity.contact.ContactPreference;
 import school.faang.user_service.entity.contact.PreferredContact;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.mapper.MapperUserDto;
@@ -85,6 +86,7 @@ public class UserServiceTest {
         user1.setEmail("aaa");
         user1.setUsername("John");
         user1.setActive(false);
+        user1.setContactPreference(ContactPreference.builder().preference(PreferredContact.EMAIL).build());
         UserDto expected = UserDto.builder()
                 .id(1L)
                 .email("aaa")
@@ -107,7 +109,8 @@ public class UserServiceTest {
     public void testGetUserCallsProfileViewPublisher(){
         Long idViewer = 1L;
         Long idViewed = 2L;
-        ProfileViewEvent profileViewEvent = new ProfileViewEvent(idViewer, idViewed, PreferredContact.EMAIL);
+        user2.setContactPreference(ContactPreference.builder().preference(PreferredContact.EMAIL).build());
+        ProfileViewEvent profileViewEvent = new ProfileViewEvent(idViewer, idViewed, PreferredContact.EMAIL.ordinal());
         Mockito.when(userRepository.findById(idViewed)).thenReturn(Optional.of(user2));
 
         userService.getUser(idViewer, idViewed);

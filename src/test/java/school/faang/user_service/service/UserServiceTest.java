@@ -66,17 +66,18 @@ class UserServiceTest {
     @Spy
     private User1MapperImpl userMapper = new User1MapperImpl(goalMapper, skillMapper, countryMapper);
 
-    @InjectMocks
-    private UserService userService;
-
     private List<UserFilter> userFilters = new ArrayList<>(List.of(new AboutPatternFilter(), new CityPatternFilter(),
             new ContactPatternFilter(), new CountryPatternFilter(), new EmailPatternFilter(), new ExperienceRangeFilter(),
             new NamePatternFilter(), new PhonePatternFilter(), new SkillPatternFilter()));
+
+    private UserService userService;
+
     User user;
 
     @BeforeEach
     void setUp() {
         user = User.builder().id(1).build();
+        userService = new UserService(userRepository, userMapper, goalService, eventService, userFilters);
     }
 
     @Test

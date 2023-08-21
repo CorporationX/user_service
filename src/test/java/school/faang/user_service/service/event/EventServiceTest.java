@@ -3,7 +3,6 @@ package school.faang.user_service.service.event;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import org.apache.commons.collections4.ListUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,16 +15,19 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.EventStartDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.dto.skill.UserSkillGuaranteeDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.event.EventMapperImpl;
 import school.faang.user_service.mapper.skill.SkillMapperImpl;
+import school.faang.user_service.publisher.event.EventStartPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import java.time.LocalDateTime;
@@ -50,8 +52,9 @@ class EventServiceTest {
     private UserRepository userRepository;
     @Mock
     private EventAsyncService eventAsyncService;
-
-    private List<Event> events;
+    @Mock
+    private EventStartPublisher eventStartPublisher;
+    private Event eventMock;
     EventDto eventDto;
     Event event;
     User user;
@@ -101,6 +104,11 @@ class EventServiceTest {
                 .location("Conference Hall")
                 .maxAttendees(100)
                 .build();
+
+        eventMock = mock(Event.class);
+        when(eventMock.getStatus()).thenReturn(EventStatus.PLANNED);
+        when(eventMock.getAttendees()).thenReturn(Collections.emptyList());
+        when(eventRepository.findById(1L)).thenReturn(Optional.of(eventMock));
     }
 
     @Test
@@ -365,17 +373,41 @@ class EventServiceTest {
     }
 
     @Test
-    void clearEvents_shouldSplitEventListAndInvokeClearEventsPartition() {
+    void clearEvents_shouldInvokeClearEventsPartitionThreeTimes() {
         Event event = mock(Event.class);
         when(event.getEndDate()).thenReturn(LocalDateTime.now().minusDays(1));
-        events = List.of(event, event, event);
+        List<Event> events = List.of(event, event, event);
 
         when(eventRepository.findAll()).thenReturn(events);
 
         eventService.clearEvents(1);
 
-        List<List<Event>> partitions = ListUtils.partition(events, events.size());
+        verify(eventAsyncService, times(3)).clearEventsPartition(List.of(event));
+    }
 
-        partitions.forEach(partition -> verify(eventAsyncService).clearEventsPartition(partition));
+    @Test
+    void startEvent_shouldInvokeFindByIdMethod() {
+        eventService.startEvent(1L);
+        verify(eventRepository).findById(1L);
+    }
+
+    @Test
+    void startEvent_shouldThrowDataValidationException() {
+        when(eventMock.getStatus()).thenReturn(EventStatus.COMPLETED);
+
+        assertThrows(DataValidationException.class,
+                () -> eventService.startEvent(1L),
+                "You can start only planned events");
+    }
+
+    @Test
+    void startEvent_shouldInvokePublishMethod() {
+        EventStartDto eventStartDto = EventStartDto.builder()
+                .id(0L)
+                .attendeeIds(Collections.emptyList())
+                .build();
+
+        eventService.startEvent(1L);
+        verify(eventStartPublisher).publish(eventStartDto);
     }
 }

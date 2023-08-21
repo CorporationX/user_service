@@ -3,6 +3,7 @@ package school.faang.user_service.service.event;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.redis.EventStartDto;
@@ -36,7 +37,6 @@ public class EventService {
     public EventDto create(EventDto eventDto) {
         validateEventDto(eventDto);
         Event event = eventRepository.save(eventMapper.toEntity(eventDto));
-        notifyUsersThatEventStarted(event);
         return eventMapper.toDto(event);
     }
 
@@ -91,8 +91,25 @@ public class EventService {
         }
 
         Event result = eventRepository.save(eventMapper.toEntity(target));
-        notifyUsersThatEventStarted(result);
         return eventMapper.toDto(result);
+    }
+
+    @Transactional(readOnly = true)
+    public EventStartDto startEvent(Long eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new DataValidException("Event with id " + eventId + " is not found"));
+
+        EventStartDto eventStartDto;
+        if (event.getStatus().equals(EventStatus.PLANNED)) {
+            List<Long> userIds = event.getAttendees().stream()
+                    .map(User::getId)
+                    .toList();
+            eventStartDto = new EventStartDto(event.getId(), userIds);
+            eventStartPublisher.publishMessage(eventStartDto);
+        } else {
+            throw new DataValidException("You can only start events in Planned state");
+        }
+        return eventStartDto;
     }
 
     private void validateEventDto(EventDto eventDto) {
@@ -119,16 +136,6 @@ public class EventService {
         boolean anySkillMissing = eventDto.getRelatedSkills().stream().anyMatch(skill -> !userSkills.contains(skill));
         if (anySkillMissing) {
             throw new DataValidException("User has no related skills. Id: " + eventDto.getOwnerId());
-        }
-    }
-
-    private void notifyUsersThatEventStarted(Event event) {
-        if (event.getStatus().equals(EventStatus.IN_PROGRESS)) {
-            List<Long> userIds = event.getAttendees().stream()
-                    .map(User::getId)
-                    .toList();
-            EventStartDto eventStartDto = new EventStartDto(event.getId(), userIds);
-            eventStartPublisher.publishMessage(eventStartDto);
         }
     }
 }

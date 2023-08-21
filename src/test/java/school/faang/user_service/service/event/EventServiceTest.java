@@ -8,10 +8,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
+import school.faang.user_service.dto.redis.EventStartDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.exception.DataValidException;
 import school.faang.user_service.filter.event.EventDateFilter;
 import school.faang.user_service.filter.event.EventFilter;
@@ -19,6 +21,7 @@ import school.faang.user_service.filter.event.EventIdFilter;
 import school.faang.user_service.filter.event.EventMaxAttendeesFilter;
 import school.faang.user_service.filter.event.EventTitleFilter;
 import school.faang.user_service.mapper.event.EventMapper;
+import school.faang.user_service.publisher.EventStartPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
@@ -49,6 +52,8 @@ class EventServiceTest {
     private UserRepository userRepository;
 
     private final EventMapper eventMapper = EventMapper.INSTANCE;
+    @Mock
+    private EventStartPublisher eventStartPublisher;
 
     private EventService eventService;
 
@@ -60,7 +65,7 @@ class EventServiceTest {
                 new EventDateFilter(),
                 new EventMaxAttendeesFilter()
         );
-        eventService = new EventService(eventRepository, userRepository, eventFilters);
+        eventService = new EventService(eventRepository, userRepository, eventFilters, eventStartPublisher);
     }
 
     @Test
@@ -290,6 +295,24 @@ class EventServiceTest {
 
         Exception exception = assertThrows(RuntimeException.class, () -> eventService.updateEvent(eventDto));
         assertEquals("Event not found. ID: 1", exception.getMessage());
+    }
+
+    @Test
+    void startEventTest() {
+        User user = User.builder().id(1L).build();
+        Event event = Event.builder().id(2L)
+                .attendees(new ArrayList<>(List.of(user, user, user)))
+                .status(EventStatus.PLANNED)
+                .build();
+
+        when(eventRepository.findById(2L)).thenReturn(Optional.of(event));
+
+        EventStartDto result = eventService.startEvent(2L);
+
+        assertEquals(3, result.getUserIds().size());
+        assertEquals(2, result.getEventId());
+
+        verify(eventStartPublisher).publishMessage(result);
     }
 
     private EventDto createEventDto() {

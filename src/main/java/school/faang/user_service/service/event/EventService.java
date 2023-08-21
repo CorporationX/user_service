@@ -99,16 +99,16 @@ public class EventService {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new DataValidException("Event with id " + eventId + " is not found"));
 
-        EventStartDto eventStartDto;
-        if (event.getStatus().equals(EventStatus.PLANNED)) {
-            List<Long> userIds = event.getAttendees().stream()
-                    .map(User::getId)
-                    .toList();
-            eventStartDto = new EventStartDto(event.getId(), userIds);
-            eventStartPublisher.publishMessage(eventStartDto);
-        } else {
+        if (!event.getStatus().equals(EventStatus.PLANNED)) {
             throw new DataValidException("You can only start events in Planned state");
         }
+
+        List<Long> userIds = event.getAttendees().stream()
+                .map(User::getId)
+                .toList();
+
+        EventStartDto eventStartDto = new EventStartDto(event.getId(), userIds);
+        eventStartPublisher.publishMessage(eventStartDto);
         return eventStartDto;
     }
 

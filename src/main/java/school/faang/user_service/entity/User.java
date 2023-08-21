@@ -17,6 +17,7 @@ import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.recommendation.Recommendation;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -69,66 +70,83 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Builder.Default
     @ManyToMany
     @JoinTable(name = "subscription",
             joinColumns = @JoinColumn(name = "followee_id"), inverseJoinColumns = @JoinColumn(name = "follower_id"))
-    private List<User> followers;
+    private List<User> followers = new ArrayList<>();
 
+    @Builder.Default
     @ManyToMany(mappedBy = "followers")
-    private List<User> followees;
+    private List<User> followees = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "owner")
-    private List<Event> ownedEvents;
+    private List<Event> ownedEvents = new ArrayList<>();
 
+    @Builder.Default
     @ManyToMany(mappedBy = "mentors")
-    private List<User> mentees;
+    private List<User> mentees = new ArrayList<>();
 
+    @Builder.Default
     @ManyToMany
     @JoinTable(name = "mentorship",
             joinColumns = @JoinColumn(name = "mentee_id"),
             inverseJoinColumns = @JoinColumn(name = "mentor_id"))
-    private List<User> mentors;
+    private List<User> mentors = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "receiver")
-    private List<MentorshipRequest> receivedMentorshipRequests;
+    private List<MentorshipRequest> receivedMentorshipRequests = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "requester")
-    private List<MentorshipRequest> sentMentorshipRequests;
+    private List<MentorshipRequest> sentMentorshipRequests = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "inviter")
-    private List<GoalInvitation> sentGoalInvitations;
+    private List<GoalInvitation> sentGoalInvitations = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "invited")
-    private List<GoalInvitation> receivedGoalInvitations;
+    private List<GoalInvitation> receivedGoalInvitations = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "mentor")
-    private List<Goal> setGoals;
+    private List<Goal> setGoals = new ArrayList<>();
 
+    @Builder.Default
     @ManyToMany(mappedBy = "users")
-    private List<Goal> goals;
+    private List<Goal> goals = new ArrayList<>();
 
+    @Builder.Default
     @ManyToMany(mappedBy = "users")
-    private List<Skill> skills;
+    private List<Skill> skills = new ArrayList<>();
 
+    @Builder.Default
     @ManyToMany
     @JoinTable(
             name = "user_event",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "event_id")
     )
-    private List<Event> participatedEvents;
+    private List<Event> participatedEvents = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "author")
-    private List<Recommendation> recommendationsGiven;
+    private List<Recommendation> recommendationsGiven = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "receiver")
-    private List<Recommendation> recommendationsReceived;
+    private List<Recommendation> recommendationsReceived = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "user")
-    private List<Contact> contacts;
+    private List<Contact> contacts = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "user")
-    private List<Rating> ratings;
+    private List<Rating> ratings = new ArrayList<>();
 
     @Embedded
     @AttributeOverrides({

@@ -11,7 +11,11 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.entity.contact.PreferredContact;
+import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.mapper.MapperUserDto;
+import school.faang.user_service.mapper.MapperUserDtoImpl;
+import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.messaging.MessagePublisher;
 import school.faang.user_service.messaging.ProfileViewEventPublisher;
 import school.faang.user_service.messaging.events.ProfileViewEvent;
@@ -40,7 +44,11 @@ public class UserServiceTest {
     @Mock
     private ProfileViewEventPublisher profileViewEventMessagePublisher;
     @Spy
-    private MapperUserDto userMapper = Mappers.getMapper(MapperUserDto.class);
+    private GoalMapper goalMapper;
+    @Spy
+    private SkillMapper skillMapper;
+    @Spy
+    private MapperUserDto userMapper = new MapperUserDtoImpl(goalMapper, skillMapper);
 
     private User user1;
     private User user2;
@@ -76,15 +84,21 @@ public class UserServiceTest {
     public void testGetUser() {
         user1.setEmail("aaa");
         user1.setUsername("John");
+        user1.setActive(false);
         UserDto expected = UserDto.builder()
                 .id(1L)
                 .email("aaa")
                 .username("John")
                 .followers(new ArrayList<>())
+                .followees(new ArrayList<>())
+                .mentors(new ArrayList<>())
+                .mentees(new ArrayList<>())
+                .goals(new ArrayList<>())
+                .skills(new ArrayList<>())
                 .build();
 
         Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
-        UserDto output = userService.getUser(1L, 2L);
+        UserDto output = userService.getUser(2L, 1L);
 
         Assertions.assertEquals(expected, output);
     }
@@ -93,8 +107,7 @@ public class UserServiceTest {
     public void testGetUserCallsProfileViewPublisher(){
         Long idViewer = 1L;
         Long idViewed = 2L;
-        ProfileViewEvent profileViewEvent = new ProfileViewEvent(idViewer, idViewed);
-        Mockito.when(userContext.getUserId()).thenReturn(idViewer);
+        ProfileViewEvent profileViewEvent = new ProfileViewEvent(idViewer, idViewed, PreferredContact.EMAIL);
         Mockito.when(userRepository.findById(idViewed)).thenReturn(Optional.of(user2));
 
         userService.getUser(idViewer, idViewed);
@@ -116,21 +129,39 @@ public class UserServiceTest {
                 .id(1L)
                 .email("aaa")
                 .username("John")
+                .active(true)
                 .followers(new ArrayList<>())
+                .followees(new ArrayList<>())
+                .mentors(new ArrayList<>())
+                .mentees(new ArrayList<>())
+                .goals(new ArrayList<>())
+                .skills(new ArrayList<>())
                 .build();
 
         UserDto userDto2 = UserDto.builder()
                 .id(2L)
                 .email("ooo")
                 .username("Peter")
+                .active(false)
                 .followers(new ArrayList<>())
+                .followees(new ArrayList<>())
+                .mentors(new ArrayList<>())
+                .mentees(new ArrayList<>())
+                .goals(new ArrayList<>())
+                .skills(new ArrayList<>())
                 .build();
 
         UserDto userDto3 = UserDto.builder()
                 .id(3L)
                 .email("uuu")
                 .username("Michel")
+                .active(true)
                 .followers(new ArrayList<>())
+                .followees(new ArrayList<>())
+                .mentors(new ArrayList<>())
+                .mentees(new ArrayList<>())
+                .goals(new ArrayList<>())
+                .skills(new ArrayList<>())
                 .build();
 
         List<UserDto> expected = List.of(userDto1, userDto2, userDto3);

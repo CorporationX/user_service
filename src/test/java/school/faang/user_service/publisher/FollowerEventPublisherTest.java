@@ -8,11 +8,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.model.EventType;
 import school.faang.user_service.service.redis.RedisMessagePublisher;
 import school.faang.user_service.service.redis.events.FollowerEvent;
 
-import java.util.Date;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -33,12 +31,6 @@ class FollowerEventPublisherTest {
     void testFollowerSubscribedSuccess() throws JsonProcessingException {
         Long followerId = 1L;
         Long followeeId = 2L;
-        FollowerEvent followerEvent = FollowerEvent.builder()
-                .eventType(EventType.FOLLOWER)
-                .receivedAt(new Date())
-                .followerId(followerId)
-                .followeeId(followeeId)
-                .build();
         String json = "json";
 
         when(objectMapper.writeValueAsString(any(FollowerEvent.class))).thenReturn(json);

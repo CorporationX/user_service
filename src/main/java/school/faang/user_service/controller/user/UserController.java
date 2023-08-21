@@ -41,12 +41,16 @@ public class UserController {
     }
 
     @PostMapping("/send-a-file")
-    public void uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
+    public void uploadFile(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
             throw new RuntimeException("empty file");
         }
 
-        userService.registerAnArrayOfUser(file.getInputStream());
+        try {
+            userService.registerAnArrayOfUser(file.getInputStream());
+        } catch (IOException e) {
+            throw new RuntimeException("recording error, repeat request");
+        }
     }
 
     @PostMapping("/deactivation/{userId}")

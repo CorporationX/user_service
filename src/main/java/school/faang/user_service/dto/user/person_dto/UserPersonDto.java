@@ -14,6 +14,7 @@ import java.util.List;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class UserPersonDto {
     @EqualsAndHashCode.Include
+    private String username;
     private String firstName;
     private String lastName;
     private Integer yearOfBirth;

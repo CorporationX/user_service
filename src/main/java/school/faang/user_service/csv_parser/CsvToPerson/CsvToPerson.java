@@ -18,6 +18,7 @@ public class CsvToPerson {
         AddressDto address = new AddressDto();
         PreviousEducationDto previousEducation = new PreviousEducationDto();
 
+        person.setUsername(personArr[0] + personArr[1]);
         person.setFirstName(personArr[0]);
         person.setLastName(personArr[1]);
         person.setYearOfBirth(personArr[2].matches("\\d{4}") ? Integer.valueOf(personArr[2]) : null);

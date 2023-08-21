@@ -58,8 +58,10 @@ public class UserService {
     private final String numbers = "0123456789";
     private final String set = upper + lower + numbers;
 
+    private final Object lock = new Object();
+
     @Autowired
-    private ExecutorsPull executorsPull;
+    private final ExecutorsPull executorsPull;
 
     @Value("${dicebear.url}")
     private String dicebearUrl;
@@ -78,22 +80,26 @@ public class UserService {
         return userMapper.toUserListDto(users);
     }
 
-    public void registerAnArrayOfUser(InputStream stream) throws IOException {
+    public void registerAnArrayOfUser(InputStream stream) {
+        Map<String, Country> countryMap = new HashMap<>();
+        countryRepository.findAll().forEach(country -> countryMap.put(country.getTitle(), country));
         String line;
-        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-        reader.readLine();
-        while ((line = reader.readLine()) != null) {
-            try {
-                String finalLine = line;
-                executorsPull.pullUserService().getPull().execute(() -> saveUserStudent(finalLine));
-            } catch (DataValidException e) {
-                System.out.println(e.getMessage());
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream))) {
+            reader.readLine();
+            while ((line = reader.readLine()) != null) {
+                try {
+                    String finalLine = line;
+                    executorsPull.pullUserService().getPull().execute(() -> saveUserStudent(finalLine, countryMap));
+                } catch (DataValidException e) {
+                    System.out.println(e.getMessage());
+                }
             }
+        } catch (IOException e) {
+            throw new RuntimeException("recording error, repeat request");
         }
-        reader.close();
     }
 
-    private void saveUserStudent(String line) {
+    public void saveUserStudent(String line, Map<String, Country> countryBD) {
         Supplier<String> password = () -> {
             int size = new Random().nextInt(10, 20);
             char[] chars = new char[size];
@@ -106,8 +112,8 @@ public class UserService {
         UserPersonDto personDto = csvToPerson.getPerson(line);
         User user = personToUserMapper.toUser(personDto);
 
-        String personCountry = personDto.getContactInfo().getAddress().getCountry();
-        List<User> users = userCheckRepository.findDistinctPeopleByUsernameOrEmailOrPhone(personDto.getFirstName(),
+        String personCountry = personDto.getContactInfo().getAddress().getCountry().strip();
+        List<User> users = userCheckRepository.findDistinctPeopleByUsernameOrEmailOrPhone(personDto.getUsername(),
                 personDto.getContactInfo().getEmail(), personDto.getContactInfo().getPhone());
         List<UserPersonDto> personDtos = users.stream().map(personToUserMapper::toUserPersonDto).toList();
         if (personDtos.contains(personDto)) {
@@ -116,14 +122,21 @@ public class UserService {
 
         user.setPassword(password.get());
 
-        Map<String, Country> countryMap = new HashMap<>();
-        countryRepository.findAll().forEach(country -> countryMap.put(country.getTitle(), country));
-        if (countryMap.containsKey(personCountry)) {
-            user.setCountry(countryMap.get(personCountry));
+        if (countryBD.containsKey(personCountry)) {
+            user.setCountry(countryBD.get(personCountry));
         } else {
-            Country countrySave = new Country();
-            countrySave.setTitle(personCountry.strip());
-            countryRepository.save(countrySave);
+            synchronized (lock) {
+                Map<String, Country> countryMap = new HashMap<>();
+                countryRepository.findAll().forEach(country -> countryMap.put(country.getTitle(), country));
+                if (countryMap.containsKey(personCountry)) {
+                    user.setCountry(countryMap.get(personCountry));
+                } else {
+                    Country countrySave = new Country();
+                    countrySave.setTitle(personCountry.strip());
+                    Country country = countryRepository.save(countrySave);
+                    user.setCountry(country);
+                }
+            }
         }
 
         userRepository.save(user);

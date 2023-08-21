@@ -2,6 +2,7 @@ package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,25 +21,30 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
 
-    private final UserService service;
+    private final UserService userService;
     private final UserControllerValidator validator;
 
     @GetMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
     UserDto getUser(@PathVariable Long userId) {
         validator.validateId(userId);
-        return service.getUser(userId);
+        return userService.getUser(userId);
     }
 
     @PostMapping("/list")
     @ResponseStatus(HttpStatus.OK)
     List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
-        return service.getUsersByIds(ids);
+        return userService.getUsersByIds(ids);
+    }
+
+    @PostMapping("/deactivate")
+    public ResponseEntity<UserDto> deactivateUser(@RequestHeader(value = "x-user-id") long userId) {
+        return ResponseEntity.ok(userService.deactivateUser(userId));
     }
 
     @GetMapping("/users/premium")
     @ResponseStatus(HttpStatus.OK)
     List<UserDto> getPremiumUsers(@RequestBody UserFilterDto filterDto) {
-        return service.getPremiumUsers(filterDto);
+        return userService.getPremiumUsers(filterDto);
     }
 }

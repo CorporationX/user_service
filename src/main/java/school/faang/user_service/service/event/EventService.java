@@ -78,6 +78,11 @@ public class EventService {
         return eventRepository.findParticipatedEventsByUserId(userId).stream().map(eventMapper::toDto).toList();
     }
 
+    @Transactional
+    public void save(Event event) {
+        eventRepository.save(event);
+    }
+
     private void checkIfUserHasRequiredSkills(EventDto event) {
         long ownerId = event.getOwnerId();
         var relatedSkills = event.getRelatedSkills();

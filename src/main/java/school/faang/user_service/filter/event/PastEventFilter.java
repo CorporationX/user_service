@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 public class PastEventFilter implements Filter<Event, EventFilterDto> {
     @Override
     public boolean isApplicable(EventFilterDto filter) {
-        return filter.getIsNeedPastEvents();
+        return filter.getIsNeedPastEvents() != null && filter.getIsNeedPastEvents();
     }
 
     @Override

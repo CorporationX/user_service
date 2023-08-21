@@ -2,9 +2,11 @@ package school.faang.user_service.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.entity.contact.PreferredContact;
+import school.faang.user_service.mapper.MapperUserDto;
 import school.faang.user_service.messaging.MessagePublisher;
 import school.faang.user_service.messaging.ProfileViewEventPublisher;
 import school.faang.user_service.messaging.events.ProfileViewEvent;
@@ -16,6 +18,7 @@ import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Stream;
 
 @Service
@@ -23,10 +26,11 @@ import java.util.stream.Stream;
 public class UserService {
     private final UserRepository userRepository;
     private final List<UserFilter> userFilters;
-    private final UserMapper userMapper;
-    private final ProfileViewEventPublisher profileViewEventMessagePublisher;
+    private final MapperUserDto userMapper;
+    private final MessagePublisher<ProfileViewEvent> profileViewEventMessagePublisher;
     private final UserContext userContext;
 
+    @Transactional(readOnly = true)
     public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
         return applyFilter(userRepository.findPremiumUsers(), userFilterDto);
     }
@@ -39,15 +43,20 @@ public class UserService {
                 .toList();
     }
 
-    public UserDto getUser(long userId) {
+    @Transactional(readOnly = true)
+    public UserDto getUser(long currentUserId , long userId) {
         String message = String.format("Entity with ID %d not found", userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(message));
-        profileViewEventMessagePublisher.publish(new ProfileViewEvent(userContext.getUserId(), userId));
+        profileViewEventMessagePublisher.publish(new ProfileViewEvent(currentUserId, userId,
+                PreferredContact.EMAIL));
+//        profileViewEventMessagePublisher.publish(new ProfileViewEvent(currentUserId, userId,
+//                user.getContactPreference().getPreference()));
 
         return userMapper.toDto(user);
     }
 
+    @Transactional(readOnly = true)
     public List<UserDto> getUsersByIds(List<Long> ids) {
         List<User> allById = userRepository.findAllById(ids);
 

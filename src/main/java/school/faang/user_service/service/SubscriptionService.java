@@ -23,7 +23,7 @@ public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final UserMapper userMapper;
     private final List<UserFilter> userFilters;
-    private final FollowerEventPublisher followerEventPublisher;
+    private final FollowerEventPublisher publisher;
 
     @Transactional
     public void followUser(long followerId, long followeeId) {
@@ -31,7 +31,7 @@ public class SubscriptionService {
             throw new DataValidationException(String.format("User with id %d already follow user with id %d", followerId, followeeId));
         }
         subscriptionRepository.followUser(followerId, followeeId);
-        followerEventPublisher.sendEvent(FollowerEventDto.builder().
+        publisher.sendEvent(FollowerEventDto.builder().
                 followerId(followerId)
                 .followeeId(followeeId)
                 .subscriptionTime(LocalDateTime.now())

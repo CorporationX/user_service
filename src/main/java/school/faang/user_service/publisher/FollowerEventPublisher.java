@@ -13,7 +13,6 @@ import school.faang.user_service.dto.redis.FollowerEventDto;
 @RequiredArgsConstructor
 @Slf4j
 public class FollowerEventPublisher {
-
     private final ObjectMapper mapper;
     private final RedisTemplate<String, Object> redisTemplate;
 
@@ -23,7 +22,7 @@ public class FollowerEventPublisher {
         log.info("User subscription event sending started");
         try {
             String json = mapper.writeValueAsString(event);
-            redisTemplate.convertAndSend(topic.getTopic(), json);
+            redisTemplate.convertAndSend(topic.getTopic(),json);
         } catch (JsonProcessingException exception) {
             exception.printStackTrace();
             log.error("Error while processing JSON: {}", exception.getMessage(), exception);

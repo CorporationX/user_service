@@ -39,7 +39,7 @@ public class RedisConfig {
     }
 
     @Bean
-    public FollowerEventPublisher followerEventPublisher() {
+    public FollowerEventPublisher publisher() {
         return new FollowerEventPublisher(new ObjectMapper(), redisTemplate(redisConnectionFactory()), topic());
     }
 

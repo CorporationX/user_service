@@ -1,5 +1,6 @@
 package school.faang.user_service.controller;
 
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -10,7 +11,6 @@ import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RejectionDto;
-import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.RecommendationRequestService;
 import java.time.LocalDateTime;

@@ -15,7 +15,7 @@ import school.faang.user_service.dto.mentorship.MentorshipOfferedEventDto;
 public class MentorshipOfferedEventPublisher {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
-    @Value("${spring.data.redis.topic.mentorshipOffered}")
+    @Value("${spring.data.redis.channels.mentorship-offer_channel.name}")
     private String topicMentorshipOffered;
 
     public void publish(MentorshipOfferedEventDto mentorshipOfferedEventDto) {
@@ -23,7 +23,7 @@ public class MentorshipOfferedEventPublisher {
         try {
             json = objectMapper.writeValueAsString(mentorshipOfferedEventDto);
         } catch (JsonProcessingException e) {
-            log.error(e.getMessage());
+            log.error("Can't use publish ",e.getMessage());
         }
         redisTemplate.convertAndSend(topicMentorshipOffered, json);
     }

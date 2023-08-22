@@ -19,13 +19,15 @@ spring:
 
   data:
     redis:
-      port: 6379
+      port: 6380
       host: localhost
       channels:
         follower_channel:
           name: follower_channel
         profile_view_channel:
-            name: profile_view_channel
+          name: profile_view_channel
+        mentorship-offer_channel:
+          name: mentorship.new
   google:
     calendar:
       application-name: Corporation-X

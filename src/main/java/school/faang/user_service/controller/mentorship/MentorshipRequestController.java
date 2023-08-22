@@ -17,8 +17,8 @@ public class MentorshipRequestController {
     private final MentorshipRequestService mentorshipRequestService;
 
     @PostMapping("/request")
-    public void requestMentorship(@RequestBody MentorshipRequestDto dto) {
-        mentorshipRequestService.requestMentorship(dto);
+    public MentorshipRequestDto requestMentorship(@RequestBody MentorshipRequestDto dto) {
+        return mentorshipRequestService.requestMentorship(dto);
     }
 
     @PostMapping("/request/list")

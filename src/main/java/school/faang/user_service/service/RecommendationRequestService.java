@@ -1,16 +1,15 @@
 package school.faang.user_service.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filter.recommendation.RecommendationRequestFilter;
 import java.util.List;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
@@ -68,5 +67,4 @@ public class RecommendationRequestService {
             throw new EntityNotFoundException("The request has already been accepted or rejected");
         }
   }
-}
 }

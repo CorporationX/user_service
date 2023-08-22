@@ -1,5 +1,6 @@
 package school.faang.user_service.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
@@ -29,11 +30,15 @@ public class UserDto {
     @Schema(description = "Телефон")
     private String phone;
     @Schema(description = "Информация о пользователе")
+    @JsonIgnore
     private String aboutMe;
+    @JsonIgnore
     @Schema(description = "Страна")
     private String country;
+    @JsonIgnore
     @Schema(description = "Город")
     private String city;
+    @JsonIgnore
     @Schema(description = "Опыт")
     private Integer experience;
 }

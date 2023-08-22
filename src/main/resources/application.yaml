@@ -26,6 +26,8 @@ spring:
           name: follower_channel
         profile_view_channel:
             name: profile_view_channel
+        search_appearance_channel:
+            name: search_appearance_channel
 
   google:
     calendar:

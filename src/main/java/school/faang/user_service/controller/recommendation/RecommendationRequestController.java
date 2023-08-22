@@ -24,13 +24,13 @@ public class RecommendationRequestController {
         }
     }
 
-    @GetMapping("/request")
+    @PostMapping("/request")
     public List<RecommendationRequestDto> getRecommendationRequests(@RequestBody RequestFilterDto filter) {
         return recommendationRequestService.getRequests(filter);
     }
 
-    @GetMapping("/request/{id}")
-    public RecommendationRequestDto getRecommendationRequest(@PathVariable long id) {
+    @GetMapping("/request")
+    public RecommendationRequestDto getRecommendationRequest(@RequestParam long id) {
         return recommendationRequestService.getRequest(id);
     }
 

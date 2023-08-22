@@ -55,6 +55,15 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    public UserDto getUserInternal(long currentUserId , long userId) {
+        String message = String.format("Entity with ID %d not found", userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(message));
+
+        return userMapper.toDto(user);
+    }
+
+    @Transactional(readOnly = true)
     public List<UserDto> getUsersByIds(List<Long> ids) {
         List<User> allById = userRepository.findAllById(ids);
 

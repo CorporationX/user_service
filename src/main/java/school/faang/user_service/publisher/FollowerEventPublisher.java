@@ -1,13 +1,15 @@
 package school.faang.user_service.publisher;
 
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.redis.FollowerEventDto;
 
 @Component
+@Data
 @RequiredArgsConstructor
 @Slf4j
 public class FollowerEventPublisher {
@@ -15,13 +17,11 @@ public class FollowerEventPublisher {
     private final RedisTemplate<String, Object> redisTemplate;
     private final JsonObjectMapper mapper;
 
-    private final ChannelTopic topic;
+    @Value("${spring.data.redis.channels.follower_channel.name}")
+    private String followerTopicName;
 
     public void sendEvent(FollowerEventDto event) {
-        log.info("User subscription event sending started");
-            String json = mapper.writeValueAsString(event);
-            redisTemplate.convertAndSend(topic.getTopic(),json);
-
-        log.info("User subscription event sending finished");
+        String json = mapper.writeValueAsString(event);
+        redisTemplate.convertAndSend(followerTopicName, json);
     }
 }

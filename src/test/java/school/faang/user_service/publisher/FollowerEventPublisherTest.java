@@ -1,12 +1,12 @@
 package school.faang.user_service.publisher;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.listener.ChannelTopic;
 import school.faang.user_service.dto.redis.FollowerEventDto;
 
 import java.time.LocalDateTime;
@@ -22,11 +22,14 @@ class FollowerEventPublisherTest {
     private JsonObjectMapper mapper;
     @Mock
     private RedisTemplate<String, Object> redisTemplate;
-    @Mock
-    private ChannelTopic topic;
-
     @InjectMocks
     private FollowerEventPublisher followerEventPublisher;
+
+    @BeforeEach
+    void setUp() {
+        followerEventPublisher = new FollowerEventPublisher(redisTemplate, mapper);
+        followerEventPublisher.setFollowerTopicName("follower_channel");
+    }
 
     @Test
     void sendEventTest() {
@@ -39,7 +42,6 @@ class FollowerEventPublisherTest {
         String json = "{\"followerId\":\"123\",\"followeeId\":\"456\",\"subscriptionTime\":\"2023-08-18T10:30:00\"}";
 
         when(mapper.writeValueAsString(followerEventDto)).thenReturn(json);
-        when(topic.getTopic()).thenReturn("follower_channel");
 
         followerEventPublisher.sendEvent(followerEventDto);
 

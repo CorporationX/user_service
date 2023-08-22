@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MentorshipAcceptedDto {
 
-    private Integer id;
-    private Integer receiverId;
-    private Integer requesterId;
+    private Long id;
+    private Long receiverId;
+    private Long requesterId;
 }

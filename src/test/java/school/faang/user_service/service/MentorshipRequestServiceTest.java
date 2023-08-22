@@ -14,13 +14,13 @@ import school.faang.user_service.dto.mentorshipRequest.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.EntityStateException;
+import school.faang.user_service.exception.notFoundExceptions.MentorshipRequestNotFoundException;
 import school.faang.user_service.filter.mentorshiprequest.*;
 import school.faang.user_service.mapper.MentorshipRequestMapperImpl;
+import school.faang.user_service.messaging.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-import school.faang.user_service.util.exception.NoRequestsException;
-import school.faang.user_service.util.exception.RequestIsAlreadyAcceptedException;
-import school.faang.user_service.util.exception.RequestIsAlreadyRejectedException;
 import school.faang.user_service.util.validator.MentorshipRequestValidator;
 
 import java.util.ArrayList;
@@ -43,6 +43,10 @@ class MentorshipRequestServiceTest {
     @Spy
     private MentorshipRequestMapperImpl mentorshipRequestMapper;
 
+    @Mock
+    private MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher;
+
+
     private List<MentorshipRequestFilter> filters = List.of(
             new MentorshipRequestReqIdFilter(),
             new MentorshipRequestRecIdFilter(),
@@ -59,6 +63,7 @@ class MentorshipRequestServiceTest {
                 mentorshipRequestMapper,
                 mentorshipRequestValidator,
                 userRepository,
+                mentorshipAcceptedEventPublisher,
                 filters
         );
     }
@@ -99,7 +104,7 @@ class MentorshipRequestServiceTest {
     void testAcceptRequest_RequestNoFound_ShouldThrowException() {
         Mockito.when(mentorshipRequestRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(NoRequestsException.class,
+        Assertions.assertThrows(MentorshipRequestNotFoundException.class,
                 () -> service.acceptRequest(1L));
     }
 
@@ -114,10 +119,10 @@ class MentorshipRequestServiceTest {
                                         .build())
                                 .requester(User.builder().id(2L).build())
                                 .status(RequestStatus.ACCEPTED)
-                        .build()
+                                .build()
                 ));
 
-        Assertions.assertThrows(RequestIsAlreadyAcceptedException.class,
+        Assertions.assertThrows(EntityStateException.class,
                 () -> service.acceptRequest(1L));
     }
 
@@ -136,7 +141,7 @@ class MentorshipRequestServiceTest {
                                 .build()
                 ));
 
-        Assertions.assertThrows(RequestIsAlreadyAcceptedException.class,
+        Assertions.assertThrows(EntityStateException.class,
                 () -> service.acceptRequest(1L));
     }
 
@@ -167,6 +172,18 @@ class MentorshipRequestServiceTest {
     }
 
     @Test
+    void testAcceptRequest_InputsAreValid_ShouldPublishToTopic() {
+        MentorshipRequest request = buildRequestForAcceptingRequest();
+
+        Mockito.when(mentorshipRequestRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.of(request));
+
+        service.acceptRequest(1L);
+
+        Mockito.verify(mentorshipAcceptedEventPublisher).publish(Mockito.any());
+    }
+
+    @Test
     void testAcceptRequest_InputsAreValid_ShouldSaveMentorAndMentee() {
         MentorshipRequest request = buildRequestForAcceptingRequest();
 
@@ -182,7 +199,7 @@ class MentorshipRequestServiceTest {
     void testRejectRequest_RequestNoFound_ShouldThrowException() {
         Mockito.when(mentorshipRequestRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(NoRequestsException.class,
+        Assertions.assertThrows(MentorshipRequestNotFoundException.class,
                 () -> service.rejectRequest(1L, new RejectionDto("reason")));
     }
 
@@ -200,7 +217,7 @@ class MentorshipRequestServiceTest {
                                 .build()
                 ));
 
-        Assertions.assertThrows(RequestIsAlreadyRejectedException.class,
+        Assertions.assertThrows(EntityStateException.class,
                 () -> service.rejectRequest(1L, new RejectionDto("reason")));
     }
 

@@ -17,7 +17,8 @@ public class UserUpdatePublisher {
     private final Mapper mapper;
 
     public void publish(UserUpdateEventDto user) {
-        String eventJson = mapper.toJson(user);
-        redisTemplate.convertAndSend(userUpdateChannel.getTopic(), eventJson);
+        mapper.toJson(user).ifPresent(
+                (eventJson) -> redisTemplate.convertAndSend(userUpdateChannel.getTopic(), eventJson)
+        );
     }
 }

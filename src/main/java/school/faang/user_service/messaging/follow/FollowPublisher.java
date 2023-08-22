@@ -15,7 +15,8 @@ public class FollowPublisher {
     private final Mapper mapper;
 
     public void publish(FollowerEvent event) {
-        String eventJson = mapper.toJson(event);
-        redisTemplate.convertAndSend(followerTopic.getTopic(), eventJson);
+        mapper.toJson(event).ifPresent(
+                (eventJson) -> redisTemplate.convertAndSend(followerTopic.getTopic(), eventJson)
+        );
     }
 }

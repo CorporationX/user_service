@@ -110,6 +110,9 @@ public class RecommendationServiceTest {
         verify(recommendationRepository).create(recommendationDto.getAuthorId(),
                 recommendationDto.getReceiverId(),
                 recommendationDto.getContent());
+        verify(recommendationReceivedEventPublisher).sendEvent(recommendationDto.getAuthorId(),
+                recommendationDto.getReceiverId(),
+                resultId);
         assertEquals(expectedId, resultId);
     }
 

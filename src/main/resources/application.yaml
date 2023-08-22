@@ -34,7 +34,7 @@ spring:
           name: premium_events_channel
         project_events_channel:
           name: project_events_channel
-        recommendation_receive_channel:
+        recommendation_channel:
           name: recommendation_channel
 
 server:

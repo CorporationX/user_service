@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
@@ -18,7 +19,6 @@ import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
-import org.springframework.data.domain.Page;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -43,14 +43,17 @@ public class RecommendationService {
         createSkillOffer(recommendationDto);
         existsUserSkill(recommendationDto);
 
+        Long recommendationId = recommendationRepository.create(
+                recommendationDto.getAuthorId(),
+                recommendationDto.getReceiverId(),
+                recommendationDto.getContent());
+
         recommendationReceivedEventPublisher.sendEvent(
                 recommendationDto.getAuthorId(),
                 recommendationDto.getReceiverId(),
-                recommendationDto.getId());
+                recommendationId);
 
-        return recommendationRepository.create(recommendationDto.getAuthorId(),
-                recommendationDto.getReceiverId(),
-                recommendationDto.getContent());
+        return recommendationId;
     }
 
     public Recommendation update(RecommendationDto recommendationDto) {

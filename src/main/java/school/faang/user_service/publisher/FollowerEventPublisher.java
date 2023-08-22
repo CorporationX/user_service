@@ -21,6 +21,9 @@ public class FollowerEventPublisher {
     private String followerTopicName;
 
     public void sendEvent(FollowerEventDto event) {
+        log.info("User subscription event sending with followerId: {}, followeeid: {}, started",
+                event.getFollowerId(), event.getFolloweeId());
+
         String json = mapper.writeValueAsString(event);
         redisTemplate.convertAndSend(followerTopicName, json);
     }

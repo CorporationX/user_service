@@ -8,9 +8,11 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.redis.FollowerEventDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.service.filters.user.UserCountryFilter;
 import school.faang.user_service.service.filters.user.UserEmailFilter;
 import school.faang.user_service.service.filters.user.UserFilter;
@@ -32,6 +34,8 @@ import static org.mockito.Mockito.*;
 public class SubscriptionServiceTest {
     @Mock
     private SubscriptionRepository subscriptionRepository;
+    @Mock
+    private FollowerEventPublisher publisher;
     private SubscriptionService subscriptionService;
 
     @Spy
@@ -50,7 +54,8 @@ public class SubscriptionServiceTest {
         userFilters.add(new UserEmailFilter());
         userFilters.add(new UserNameFilter());
         userFilters.add(new UserCountryFilter());
-        subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, userFilters);
+
+        subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, userFilters, publisher);
         user1 = User.builder()
                 .id(1L)
                 .username("46")
@@ -92,6 +97,12 @@ public class SubscriptionServiceTest {
     public void userFollowedSuccess() {
         subscriptionService.followUser(user1.getId(), user2.getId());
         verify(subscriptionRepository).followUser(user1.getId(), user2.getId());
+    }
+
+    @Test
+    public void followUserSendEventTest() {
+        subscriptionService.followUser(user1.getId(), user2.getId());
+        verify(publisher).sendEvent(any(FollowerEventDto.class));
     }
 
     @Test
@@ -150,7 +161,7 @@ public class SubscriptionServiceTest {
         UserFilterDto filterDto = null;
 
         when(subscriptionRepository.findByFollowerId(3L)).thenReturn(users.stream());
-        List<UserDto> result = subscriptionService.getFollowing(3l, filterDto);
+        List<UserDto> result = subscriptionService.getFollowing(3L, filterDto);
 
         assertEquals(expectedResult, result);
     }

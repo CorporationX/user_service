@@ -5,7 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.DeactivateResponseDto;
+import school.faang.user_service.dto.redis.UserTrafficDto;
 import school.faang.user_service.dto.subscription.UserDto;
 import school.faang.user_service.dto.subscription.UserFilterDto;
 import school.faang.user_service.entity.User;
@@ -16,10 +18,12 @@ import school.faang.user_service.exception.DeactivationException;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.UserTrafficPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -34,14 +38,18 @@ public class UserService {
     private final UserRepository userRepository;
     private final List<UserFilter> userFilters;
     private final UserMapper userMapper;
+    private final UserContext userContext;
+    private final UserTrafficPublisher userTrafficPublisher;
     @Value("${dicebear.url}")
     private String dicebearUrl;
 
     public UserDto getUser(long id) {
-        User foundUser = userRepository.findById(id).orElseThrow(() -> {
-            throw new UserNotFoundException("User with id " + id + " not found");
-        });
+        User foundUser = userRepository.findById(id).orElseThrow(() ->
+                new UserNotFoundException("User with id " + id + " not found"));
         log.info("Return user with id: {}", foundUser.getId());
+
+        viewUserProfile(foundUser);
+
         return userMapper.toUserDto(foundUser);
     }
 
@@ -112,5 +120,14 @@ public class UserService {
         userProfilePic.setFileId(dicebearUrl + user.getUsername() + "&scale=" + 130);
         userProfilePic.setSmallFileId(dicebearUrl + user.getUsername() + "&scale=" + 22);
         user.setUserProfilePic(userProfilePic);
+    }
+
+    private void viewUserProfile(User user){
+        UserTrafficDto userTrafficDto = new UserTrafficDto();
+        userTrafficDto.setViewerId(userContext.getUserId());
+        userTrafficDto.setUserProfileId(user.getId());
+        userTrafficDto.setViewDate(LocalDateTime.now());
+
+        userTrafficPublisher.publishMessage(userTrafficDto);
     }
 }

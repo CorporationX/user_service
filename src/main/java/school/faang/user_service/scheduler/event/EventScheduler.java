@@ -11,9 +11,9 @@ public class EventScheduler {
 
     private final EventService service;
 
-    @Scheduled(cron = "${cron.daily}")
+    @Scheduled(cron = "${cron.past-events-deletion}")
     public void clearEvents(){
-        service.deletePastEvents();
         log.info("Started deleting past events");
+        service.deletePastEvents();
     }
 }

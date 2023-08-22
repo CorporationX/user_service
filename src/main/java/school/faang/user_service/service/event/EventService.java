@@ -3,6 +3,8 @@ package school.faang.user_service.service.event;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.BatchSize;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
@@ -31,7 +33,8 @@ public class EventService {
     private final EventMapper eventMapper;
     private final List<Filter<Event, EventFilterDto>> filters;
 
-    private final Integer NUMBER_OF_PARTS = 5;
+    @Value("${event.batch-size}")
+    private final Integer BATCH_SIZE;
 
     @Transactional
     public EventDto create(EventDto event) {
@@ -85,9 +88,9 @@ public class EventService {
     }
 
     public void deletePastEvents() {
-        List<EventDto> pastEvents = getEventsByFilter(EventFilterDto.builder()
-                .isNeedPastEvents(true)
-                .build());
+        EventFilterDto filter = new EventFilterDto();
+        filter.setIsNeedPastEvents(true);
+        List<EventDto> pastEvents = getEventsByFilter(filter);
 
         deleteEventsAsync(pastEvents);
     }
@@ -108,14 +111,14 @@ public class EventService {
 
     private List<List<EventDto>> getSubLists(List<EventDto> pastEvents) {
         int size = pastEvents.size();
-        int subListSize = size / NUMBER_OF_PARTS;
-        if (size % NUMBER_OF_PARTS != 0) {
+        int subListSize = size / BATCH_SIZE;
+        if (size % BATCH_SIZE != 0) {
             subListSize++;
         }
         List<List<EventDto>> subLists = new ArrayList<>();
         for (int i = 0; i < subListSize; i++) {
-            int fromIndex = i * NUMBER_OF_PARTS;
-            int toIndex = Math.min(i * NUMBER_OF_PARTS + NUMBER_OF_PARTS, size);
+            int fromIndex = i * BATCH_SIZE;
+            int toIndex = Math.min(i * BATCH_SIZE + BATCH_SIZE, size);
             subLists.add(pastEvents.subList(fromIndex, toIndex));
         }
         return subLists;

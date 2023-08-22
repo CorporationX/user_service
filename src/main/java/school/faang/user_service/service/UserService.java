@@ -53,10 +53,10 @@ public class UserService {
     private final CountryRepository countryRepository;
     private final UserCheckRepository userCheckRepository;
 
-    private final String upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    private final String lower = upper.toLowerCase(Locale.ROOT);
-    private final String numbers = "0123456789";
-    private final String set = upper + lower + numbers;
+    private final String UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private final String LOWER = UPPER.toLowerCase(Locale.ROOT);
+    private final String NUMBERS = "0123456789";
+    private final String SET = UPPER + LOWER + NUMBERS;
     private final Object lock = new Object();
     @Autowired
     private final ExecutorsPull executorsPull;
@@ -102,7 +102,7 @@ public class UserService {
             int size = new Random().nextInt(10, 20);
             char[] chars = new char[size];
             for (int i = 0; i < chars.length; i++) {
-                chars[i] = set.charAt(new Random().nextInt(set.length()));
+                chars[i] = SET.charAt(new Random().nextInt(SET.length()));
             }
             return new String(chars);
         };

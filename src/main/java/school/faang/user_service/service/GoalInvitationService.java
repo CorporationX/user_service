@@ -2,17 +2,11 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.GoalInvitation;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.GoalInvitationException;
 import school.faang.user_service.mapper.GoalInvitationMapper;
-import school.faang.user_service.mapper.GoalMapper;
-import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -25,8 +19,7 @@ public class GoalInvitationService {
     private final UserRepository userRepository;
     private final GoalRepository goalRepository;
     private final GoalInvitationMapper goalInvitationMapper;
-    private final UserMapper userMapper;
-    private final GoalMapper goalMapper;
+    private static final int maxGoals = 3;
 
     public GoalInvitationDto createInvitation(GoalInvitationDto invitationDto) {
         if (invitationDto.getInvitedUserId() <= 0 && invitationDto.getInviterId() <= 0) {
@@ -42,21 +35,20 @@ public class GoalInvitationService {
 
     public GoalInvitationDto acceptGoalInvitation(long id) {
 
-        GoalInvitationDto invitationDto = goalInvitationMapper.toDto((goalInvitationRepository.findById(id).stream().findAny().get()));
+        long idUser = goalInvitationRepository.findById(id).get().getInvited().getId();
 
-        UserDto userDto = userMapper.userToDto(userRepository.findById(invitationDto.getInvitedUserId()).stream().findAny().get());
+        boolean haveTask = userRepository.findById(idUser).get().getGoals().contains(goalRepository.findById(id).get());
 
-        GoalDto goalDto = goalMapper.toDto(goalRepository.findById(invitationDto.getGoalId()).stream().findAny().get());
+        boolean sizeUserGoals = userRepository.findById(idUser).get().getGoals().size()>=maxGoals;
 
-        if (!userDto.getGoals().contains(goalDto) && userDto.getGoals().size() >= 3) {
+        if (!haveTask || sizeUserGoals) {
             throw new GoalInvitationException("The user is already in the goal or he is already participating in three goals");
         }
-        userDto.addGoals(goalDto);
-        invitationDto.setStatus(RequestStatus.valueOf("ACCEPTED"));
-        User user = userMapper.dtoToUser(userDto);
-        GoalInvitation goalInvitation = goalInvitationMapper.toEntity(invitationDto);
-        goalInvitationRepository.save(goalInvitation);
-        userRepository.save(user);
+
+        goalInvitationRepository.findById(id).get().setStatus(RequestStatus.valueOf("ACCEPTED"));
+
+        GoalInvitationDto invitationDto = goalInvitationMapper.toDto((goalInvitationRepository.findById(id).stream().findAny().get()));
+
         return invitationDto;
     }
 }

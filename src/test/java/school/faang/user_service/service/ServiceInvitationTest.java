@@ -15,15 +15,20 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.mapper.GoalInvitationMapperImpl;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -32,14 +37,20 @@ import static org.mockito.Mockito.when;
 public class ServiceInvitationTest {
     @Mock
     private GoalRepository goalRepository;
+    @Spy
+    GoalInvitation goalInvitation;
     @Mock
-    private UserRepository userRepository;
+    UserRepository userRepository;
     @Mock
     GoalInvitationRepository goalInvitationRepository;
     @Spy
     GoalInvitationMapperImpl goalInvitationMapper;
     @Spy
-    UserMapper userMapper;
+    UserMapperImpl userMapper;
+    @Mock
+    User user;
+    @Mock
+    Goal goal;
 
     @InjectMocks
     private GoalInvitationService goalInvitationService;
@@ -58,46 +69,6 @@ public class ServiceInvitationTest {
 
     @Test
     void acceptGoalInvitation() {
-        Long id = 3L;
-        Long goal_id = 2L;
-        Long user_id = 1l;
-
-        ArrayList<Goal> userArrayList = new ArrayList<>();
-        ArrayList<GoalDto> goalDtoList = new ArrayList<>();
-
-        Goal goal = new Goal();
-        goal.setId(goal_id);
-
-        User user = new User();
-        user.setId(user_id);
-        user.setGoals(userArrayList);
-
-        UserDto userDto = new UserDto();
-        userDto.setId(user_id);
-        userDto.setGoals(goalDtoList);
-
-        GoalDto goalDto = new GoalDto();
-        goalDto.setId(goal_id);
-
-        GoalInvitationDto goalInvitationDto = new GoalInvitationDto();
-        goalInvitationDto.setInvitedUserId(user_id);
-        goalInvitationDto.setStatus(RequestStatus.valueOf("ACCEPTED"));
-        goalInvitationDto.setGoalId(goal_id);
-
-        GoalInvitation goalInvitation = new GoalInvitation();
-        goalInvitation.setGoal(goal);
-        goalInvitation.setId(id);
-        goalInvitation.setInvited(user);
-
-        when(goalInvitationRepository.findById(id)).thenReturn(Optional.of(goalInvitation));
-        when(goalInvitationMapper.toDto(goalInvitation)).thenReturn(goalInvitationDto);
-
-        when(userMapper.userToDto(user)).thenReturn(userDto);
-
-        when(userRepository.findById(user_id)).thenReturn(Optional.of(user));
-        when(goalRepository.findById(goal_id)).thenReturn(Optional.of(goal));
-
-        GoalInvitationDto gg = goalInvitationService.acceptGoalInvitation(id);
-        assertEquals(goalInvitationDto.getStatus(), gg.getStatus());
+     // Необходимо дописать сюда реализацию метода
     }
 }

@@ -44,12 +44,7 @@ public class MentorshipRequestService {
         MentorshipRequest mentorshipRequest = mentorshipRequestRepository.save(mentorshipRequestMapper.toEntity(dto));
 
         MentorshipRequestDto mentorshipRequestDto = mentorshipRequestMapper.toDto(mentorshipRequest);
-
-        MentorshipOfferedEventDto mentorshipOfferedEventDto = mentorshipOfferedEventMapper.toMentorshipOfferedEvent(mentorshipRequestDto);
-        //TODO finish to create user
-        mentorshipOfferedEventDto.setPreferredContact(PreferredContact.EMAIL);
-        mentorshipOfferedEventDto.setTimestamp(LocalDateTime.now());
-        mentorshipOfferedEventPublisher.publish(mentorshipOfferedEventDto);
+        sendNotification(mentorshipRequestDto);
 
         return mentorshipRequestDto;
     }
@@ -69,7 +64,7 @@ public class MentorshipRequestService {
 
     @Transactional
     public void acceptRequest(long id) {
-        MentorshipRequest request =requestFindById(id);
+        MentorshipRequest request = requestFindById(id);
         mentorshipRequestValidator.acceptRequestValidator(request);
 
         User requester = request.getRequester();
@@ -95,8 +90,16 @@ public class MentorshipRequestService {
         request.setRejectionReason(rejection.getReason());
     }
 
-    private MentorshipRequest requestFindById(long id){
+    private MentorshipRequest requestFindById(long id) {
         return mentorshipRequestRepository.findById(id)
                 .orElseThrow(() -> new DataValidationException("Request is not exist"));
+    }
+
+    private void sendNotification(MentorshipRequestDto mentorshipRequestDto) {
+        MentorshipOfferedEventDto mentorshipOfferedEventDto = mentorshipOfferedEventMapper.toMentorshipOfferedEvent(mentorshipRequestDto);
+        //TODO finish to create user
+        mentorshipOfferedEventDto.setPreferredContact(PreferredContact.EMAIL);
+        mentorshipOfferedEventDto.setTimestamp(LocalDateTime.now());
+        mentorshipOfferedEventPublisher.publish(mentorshipOfferedEventDto);
     }
 }

@@ -6,13 +6,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import school.faang.user_service.dto.mentorship.MentorshipOfferedEventDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.dto.mentorship.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
+import school.faang.user_service.entity.PreferredContact;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.mapper.mentorship.MentorshipOfferedEventMapper;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
+import school.faang.user_service.message.MentorshipOfferedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.filter.mentorship_request.MentorshipRequestFilter;
 import school.faang.user_service.service.user.UserService;
@@ -35,6 +39,10 @@ public class MentorshipRequestServiceTest {
     private MentorshipRequestRepository mentorshipRequestRepository;
     @Mock
     private MentorshipRequestMapper mentorshipRequestMapper;
+    @Mock
+    private MentorshipOfferedEventMapper mentorshipOfferedEventMapper;
+    @Mock
+    private MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
     @InjectMocks
     private MentorshipRequestService mentorshipRequestService;
     private MentorshipRequestDto mentorshipRequestDto;
@@ -69,10 +77,21 @@ public class MentorshipRequestServiceTest {
 
     @Test
     public void testRequestMentorship() {
+        MentorshipOfferedEventDto mentorshipOfferedEventDto = MentorshipOfferedEventDto.builder()
+                .preferredContact(PreferredContact.EMAIL)
+                .build();
         Mockito.when(userService.findUserById(1L))
                 .thenReturn(requester);
         Mockito.when(userService.findUserById(2L))
                 .thenReturn(receiver);
+        Mockito.when(mentorshipRequestMapper.toEntity(mentorshipRequestDto))
+                        .thenReturn(mentorshipRequest);
+        Mockito.when(mentorshipRequestMapper.toDto(mentorshipRequest))
+                .thenReturn(mentorshipRequestDto);
+        Mockito.when(mentorshipRequestRepository.save(mentorshipRequest))
+                        .thenReturn(mentorshipRequest);
+        Mockito.when(mentorshipOfferedEventMapper.toMentorshipOfferedEvent(mentorshipRequestDto))
+                .thenReturn(mentorshipOfferedEventDto);
 
         mentorshipRequestService.requestMentorship(mentorshipRequestDto);
 
@@ -81,6 +100,7 @@ public class MentorshipRequestServiceTest {
         Mockito.verify(mentorshipRequestValidator, Mockito.times(1)).requestValidate(requester, receiver);
         Mockito.verify(mentorshipRequestMapper, Mockito.times(1)).toEntity(mentorshipRequestDto);
         Mockito.verify(mentorshipRequestRepository, Mockito.times(1)).save(mentorshipRequestMapper.toEntity(mentorshipRequestDto));
+        Mockito.verify(mentorshipOfferedEventPublisher, Mockito.times(1)).publish(mentorshipOfferedEventDto);
     }
 
     @Test

@@ -27,6 +27,11 @@ spring:
         profile_view_channel:
             name: profile_view_channel
 
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: group
+
 server:
   port: 8080
 

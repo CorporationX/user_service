@@ -16,7 +16,7 @@ import school.faang.user_service.service.MentorshipRequestService;
 public class MentorshipRequestController {
 
     private final MentorshipRequestService mentorshipRequestService;
-
+    
     @PostMapping("/send_request")
     @ResponseStatus(HttpStatus.OK)
     public MentorshipRequestDto requestMentorship(@Valid @RequestBody MentorshipRequestDto dto) {

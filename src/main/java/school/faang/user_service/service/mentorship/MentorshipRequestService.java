@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.dto.mentorship.RequestFilterDto;
+import school.faang.user_service.dto.mentorship.MentorshipRequestedEvent;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
@@ -14,6 +15,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.MentorshipRequestNotFoundException;
 import school.faang.user_service.exception.RequestAlreadyAcceptedException;
 import school.faang.user_service.exception.UserNotFoundException;
+import school.faang.user_service.publisher.MentorshipRequestedEventPublisher;
 import school.faang.user_service.service.mentorship.filter.MentorshipRequestFilter;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
@@ -33,6 +35,7 @@ public class MentorshipRequestService {
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final MentorshipRepository mentorshipRepository;
     private final MentorshipRequestMapper requestMapper;
+    private final MentorshipRequestedEventPublisher publisher;
     private final List<MentorshipRequestFilter> filters;
 
     public void requestMentorship(MentorshipRequestDto requestDto) {
@@ -41,6 +44,7 @@ public class MentorshipRequestService {
 
         dataValidate(requesterId, receiverId, requestDto);
         mentorshipRequestRepository.create(requesterId, receiverId, requestDto.getDescription());
+        publisher.publish(new MentorshipRequestedEvent(requesterId, receiverId, LocalDateTime.now()));
         log.info("Mentorship request from requesterId={} to receiverId={} has been saved in DB successfully", requesterId, receiverId);
     }
 

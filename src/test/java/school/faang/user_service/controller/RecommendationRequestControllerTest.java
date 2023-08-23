@@ -3,9 +3,11 @@ package school.faang.user_service.controller;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.controller.recommendation.RecommendationRequestController;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
@@ -15,6 +17,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.RecommendationRequestService;
 import java.time.LocalDateTime;
 
+@ExtendWith(MockitoExtension.class)
 public class RecommendationRequestControllerTest {
     private RequestFilterDto filterDto;
     private RejectionDto rejection;
@@ -37,14 +40,19 @@ public class RecommendationRequestControllerTest {
         rejection = RejectionDto.builder()
                 .reason("reason")
                 .build();
+
+        recommendationRequest = RecommendationRequestDto.builder()
+                .id(5L)
+                .message("message")
+                .status(RequestStatus.REJECTED)
+                .skills(null)
+                .requesterId(4L)
+                .receiverId(11L)
+                .createdAt(LocalDateTime.now().minusMonths(1))
+                .build();
     }
 
     @Test
-    public void testRecommendationRequestsFiltered() {
-        recommendationRequestController.getRecommendationRequests(filterDto);
-        Mockito.verify(recommendationRequestService, Mockito.times(1)).getRequests(filterDto);
-    }
-
     public void testNullMessageIsInvalid() {
         recommendationRequest.setMessage(null);
         Assert.assertThrows(
@@ -66,6 +74,12 @@ public class RecommendationRequestControllerTest {
     public void testRecommendationRequestCreated() {
         recommendationRequestController.requestRecommendation(recommendationRequest);
         Mockito.verify(recommendationRequestService, Mockito.times(1)).create(recommendationRequest);
+    }
+
+    @Test
+    public void testRecommendationRequestsFiltered() {
+        recommendationRequestController.getRecommendationRequests(filterDto);
+        Mockito.verify(recommendationRequestService, Mockito.times(1)).getRequests(filterDto);
     }
   
     @Test
@@ -99,8 +113,7 @@ public class RecommendationRequestControllerTest {
     public void testRecommendationRequestRejected() {
         long id = 12;
         rejection = RejectionDto.builder().reason("reason").build();
-        recommendationRequestController.requestRecommendation(recommendationRequest);
+        recommendationRequestController.rejectRequest(id, rejection);
         Mockito.verify(recommendationRequestService, Mockito.times(1)).rejectRequest(id, rejection);
     }
 }
-

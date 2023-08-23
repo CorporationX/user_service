@@ -4,9 +4,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.User;
@@ -24,6 +26,7 @@ import school.faang.user_service.validator.RecommendationRequestValidator;
 import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+@ExtendWith(MockitoExtension.class)
 public class RecommendationRequestServiceTest {
     private RecommendationRequestDto recommendationRequest;
     private RecommendationRequest requestData;
@@ -58,7 +61,7 @@ public class RecommendationRequestServiceTest {
 
     @Test
     public void testRequesterNotExistValidation() {
-        recommendationRequest.setRequesterId(8888888L);
+        recommendationRequest.setRequesterId(8L);
         Assert.assertThrows(
                 EntityNotFoundException.class,
                 () -> recommendationRequestValidator.validateUsersExist(recommendationRequest)
@@ -75,7 +78,7 @@ public class RecommendationRequestServiceTest {
     }
 
     @Test
-    void testUserExistsValidation() {
+    public void testUserExistsValidation() {
         recommendationRequest.setRequesterId(1L);
         Mockito.when(userRepository.existsById(1L)).thenReturn(true);
         assertDoesNotThrow(() -> recommendationRequestValidator.validateUsersExist(recommendationRequest));
@@ -90,7 +93,7 @@ public class RecommendationRequestServiceTest {
     }
 
     @Test
-    void testSkillExistsValidation() {
+    public void testSkillExistsValidation() {
         Mockito.when(skillRepository.existsById(1L)).thenReturn(true);
         assertDoesNotThrow(() -> recommendationRequestValidator.validateSkillsExist(recommendationRequest));
     }
@@ -139,7 +142,7 @@ public class RecommendationRequestServiceTest {
     }
 
     @Test
-    void testRecommendationRequestStatusFilter() {
+    public void testRecommendationRequestStatusFilter() {
         RecommendationRequest recommendationRequest1 = new RecommendationRequest();
         RecommendationRequest recommendationRequest2 = new RecommendationRequest();
         RecommendationRequest recommendationRequest3 = new RecommendationRequest();
@@ -162,7 +165,7 @@ public class RecommendationRequestServiceTest {
     }
 
     @Test
-    void testRecommendationRequestRequesterIdFilter() {
+    public void testRecommendationRequestRequesterIdFilter() {
         RecommendationRequest recommendationRequest1 = new RecommendationRequest();
         RecommendationRequest recommendationRequest2 = new RecommendationRequest();
         RecommendationRequest recommendationRequest3 = new RecommendationRequest();
@@ -185,7 +188,7 @@ public class RecommendationRequestServiceTest {
     }
 
     @Test
-    void testGetRequestsWithManyFilters() {
+    public void testGetRequestsWithManyFilters() {
         RecommendationRequest recommendationRequest1 = new RecommendationRequest();
         RecommendationRequest recommendationRequest2 = new RecommendationRequest();
 

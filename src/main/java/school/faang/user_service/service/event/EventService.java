@@ -17,7 +17,9 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.stream.Stream;
 
@@ -101,11 +103,33 @@ public class EventService {
         deleteEventsAsync(pastEvents);
     }
 
-    @Transactional
     private void deleteEventsAsync(List<EventDto> pastEvents) {
-        for (EventDto pastEvent : pastEvents) {
-            executor.execute(() -> deleteEvent(pastEvent.getId()));
+        List<List<EventDto>> subLists = getSubLists(pastEvents);
+        for (List<EventDto> list : subLists) {
+            CompletableFuture.runAsync(
+                            () -> eventRepository.deleteAllById(
+                                    list.stream()
+                                            .map(EventDto::getId)
+                                            .toList()
+                            )
+                    , executor)
+                    .thenRun(() -> log.info("Finished deleting past events"));
         }
+    }
+
+    private List<List<EventDto>> getSubLists(List<EventDto> pastEvents) {
+        int size = pastEvents.size();
+        int subListSize = size / batchSize;
+        if (size % batchSize != 0) {
+            subListSize++;
+        }
+        List<List<EventDto>> subLists = new ArrayList<>();
+        for (int i = 0; i < subListSize; i++) {
+            int fromIndex = i * batchSize;
+            int toIndex = Math.min(i * batchSize + batchSize, size);
+            subLists.add(pastEvents.subList(fromIndex, toIndex));
+        }
+        return subLists;
     }
 
     private void checkIfUserHasRequiredSkills(EventDto event) {

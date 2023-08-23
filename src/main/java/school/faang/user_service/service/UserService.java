@@ -2,7 +2,6 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,13 +27,16 @@ import school.faang.user_service.repository.UserCheckRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.util.PasswordGeneration;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.*;
-import java.util.function.Supplier;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 
@@ -52,13 +54,8 @@ public class UserService {
     private final UserMapper userMapper;
     private final CountryRepository countryRepository;
     private final UserCheckRepository userCheckRepository;
-
-    private final String UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    private final String LOWER = UPPER.toLowerCase(Locale.ROOT);
-    private final String NUMBERS = "0123456789";
-    private final String SET = UPPER + LOWER + NUMBERS;
+    private final PasswordGeneration passwordGeneration;
     private final Object lock = new Object();
-    @Autowired
     private final ExecutorsPull executorsPull;
 
     @Value("${dicebear.url}")
@@ -98,15 +95,6 @@ public class UserService {
     }
 
     public void saveUserStudent(String line, Map<String, Country> countryBD) {
-        Supplier<String> password = () -> {
-            int size = new Random().nextInt(10, 20);
-            char[] chars = new char[size];
-            for (int i = 0; i < chars.length; i++) {
-                chars[i] = SET.charAt(new Random().nextInt(SET.length()));
-            }
-            return new String(chars);
-        };
-
         UserPersonDto personDto = csvToPerson.getPerson(line);
         User user = personToUserMapper.toUser(personDto);
 
@@ -118,8 +106,14 @@ public class UserService {
             return;
         }
 
-        user.setPassword(password.get());
+        user.setPassword(passwordGeneration.getPassword().get());
 
+        checkingAndCreatingACountry(countryBD, personCountry, user);
+
+        userRepository.save(user);
+    }
+
+    private void checkingAndCreatingACountry(Map<String, Country> countryBD, String personCountry, User user) {
         if (countryBD.containsKey(personCountry)) {
             user.setCountry(countryBD.get(personCountry));
         } else {
@@ -136,8 +130,6 @@ public class UserService {
                 }
             }
         }
-
-        userRepository.save(user);
     }
 
     public UserDto signup(UserDto userDto) {

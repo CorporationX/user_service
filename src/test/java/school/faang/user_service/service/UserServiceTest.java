@@ -13,7 +13,12 @@ import school.faang.user_service.mapper.PersonToUserMapper;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserCheckRepository;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.util.PasswordGeneration;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -32,32 +37,35 @@ public class UserServiceTest {
     private CsvToPerson csvToPerson;
     @Mock
     private PersonToUserMapper personToUserMapper;
+    @Mock
+    private PasswordGeneration passwordGeneration;
     @InjectMocks
     private UserService userService;
 
     @Test
     void saveUserStudent() {
-        String line1 = "Christopher,Clark,1989,Group C,159357,christopherclark@example.com,6667778888,Sixth Street,Boston,MA,USA,98765,Business,2022,Marketing,3.4,Graduated,2020-01-01,2022-12-31,Bachelor,STU University,2020,true,XYZ Marketing Agency";
-        String line2 = "Jennifer,Lee,1994,Group A,753951,jenniferlee@example.com,2223334444,Fifth Avenue,San Francisco,CA,USA,23456,Engineering,2021,Electrical Engineering,3.8,Graduated,2019-01-01,2021-12-31,Bachelor,MNO University,2019,true,PQR Company";
-        UserPersonDto personDto1 = new CsvToPerson().getPerson(line1);
-        User user1 = new User();
-        user1.setUsername(personDto1.getFirstName());
-        user1.setEmail(personDto1.getContactInfo().getEmail());
-        user1.setPhone(personDto1.getContactInfo().getPhone());
+        UserPersonDto personDto1 = null;
+        UserPersonDto personDto2 = null;
+        File file = new File("src/main/resources/files/test_user.csv");
 
-        UserPersonDto personDto2 = new CsvToPerson().getPerson(line2);
-        User user2 = new User();
-        user2.setUsername(personDto2.getFirstName());
-        user2.setPhone(personDto2.getContactInfo().getPhone());
-        user2.setEmail(personDto2.getContactInfo().getEmail());
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            personDto1 = new CsvToPerson().getPerson(reader.readLine());
+            personDto2 = new CsvToPerson().getPerson(reader.readLine());
+        } catch (IOException ignored) {
+        }
 
-        when(csvToPerson.getPerson(line1)).thenReturn(personDto1);
+        User user1 = createUser(personDto1);
+
+        User user2 = createUser(personDto2);
+
+        when(passwordGeneration.getPassword()).thenReturn(new PasswordGeneration().getPassword());
+        when(csvToPerson.getPerson("line1")).thenReturn(personDto1);
         when(personToUserMapper.toUser(personDto1)).thenReturn(user1);
 
         when(userCheckRepository.findDistinctPeopleByUsernameOrEmailOrPhone(personDto1.getUsername(),
                 personDto1.getContactInfo().getEmail(), personDto1.getContactInfo().getPhone())).thenReturn(List.of(user1));
         Map<String, Country> countryMap = Map.of();
-        userService.saveUserStudent(line1, countryMap);
+        userService.saveUserStudent("line1", countryMap);
         verify(userRepository, times(1)).save(user1);
         verify(userRepository, never()).save(user2);
 
@@ -68,5 +76,13 @@ public class UserServiceTest {
 
         verify(countryRepository, times(1)).save(country1);
         verify(countryRepository, never()).save(country2);
+    }
+
+    private User createUser(UserPersonDto userPersonDto) {
+        User user = new User();
+        user.setUsername(userPersonDto.getFirstName());
+        user.setEmail(userPersonDto.getContactInfo().getEmail());
+        user.setPhone(userPersonDto.getContactInfo().getPhone());
+        return user;
     }
 }

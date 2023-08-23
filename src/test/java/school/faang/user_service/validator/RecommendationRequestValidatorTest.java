@@ -7,15 +7,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.RecommendationRequestDto;
-import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class RecommendationRequestValidatorTest {
@@ -25,18 +25,12 @@ class RecommendationRequestValidatorTest {
     @Mock
     private UserRepository userRepository;
 
-    RecommendationRequestDto requestDto;
+    private RecommendationRequest request;
 
     @BeforeEach
     void setUp() {
-        requestDto = RecommendationRequestDto.builder()
-                .id(1L)
-                .message("message")
-                .status(RequestStatus.ACCEPTED)
-                .skillsId(List.of(1L))
-                .requesterId(1L)
-                .receiverId(1L)
-                .createdAt(LocalDateTime.now().minusMonths(7))
+        request = RecommendationRequest.builder()
+                .createdAt(LocalDateTime.now().minusMonths(5))
                 .build();
     }
 
@@ -53,12 +47,14 @@ class RecommendationRequestValidatorTest {
 
     @Test
     void testValidationRequestDateNegative() {
-        requestDto.setCreatedAt(LocalDateTime.now().minusMonths(5));
-        assertThrows(DataValidationException.class, () -> recommendationRequestValidator.validationRequestDate(requestDto));
+        Optional<RecommendationRequest> recommendationRequest = Optional.of(request);
+        assertThrows(DataValidationException.class, () -> recommendationRequestValidator.validationRequestDate(recommendationRequest));
     }
 
     @Test
     void testValidationRequestDatePositive() {
-        assertDoesNotThrow(() -> recommendationRequestValidator.validationRequestDate(requestDto));
+        request.setCreatedAt(LocalDateTime.now().minusMonths(7));
+        Optional<RecommendationRequest> recommendationRequest = Optional.of(request);
+        assertDoesNotThrow(() -> recommendationRequestValidator.validationRequestDate(recommendationRequest));
     }
 }

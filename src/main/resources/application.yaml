@@ -26,6 +26,8 @@ spring:
           name: follower_channel
         profile_view_channel:
             name: profile_view_channel
+        recommendation_request_channel:
+            name: recommendation_request_channel
   google:
     calendar:
       application-name: Corporation-X

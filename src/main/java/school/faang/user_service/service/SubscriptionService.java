@@ -3,15 +3,18 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.analytics.SearchAppearanceEventDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.filter.user_filters.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.filter.user_filters.UserFilter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -21,6 +24,7 @@ public class SubscriptionService {
     private final UserMapper userMapper;
     private final List<UserFilter> userFilters;
     private final SearchAppearanceEventPublisher searchAppearanceEventPublisher;
+    private final UserContext userContext;
 
     @Transactional
     public void followUser(long followerId, long followeeId) {
@@ -66,6 +70,11 @@ public class SubscriptionService {
     private List<UserDto> getUsersDtoAfterFiltration(List<User> users, UserFilterDto filters) {
         userFilters.stream().filter(filter -> filter.isApplicable(filters))
                 .forEach(filter -> filter.apply(users, filters));
+
+        long receiverId = userContext.getUserId();
+
+        users.forEach(user -> searchAppearanceEventPublisher
+                .publish(new SearchAppearanceEventDto(user.getId(), receiverId, LocalDateTime.now())));
 
         return users.stream().map(userMapper::toDto).toList();
     }

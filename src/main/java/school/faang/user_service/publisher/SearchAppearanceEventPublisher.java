@@ -16,7 +16,7 @@ public class SearchAppearanceEventPublisher {
     private String searchAppearanceTopic;
 
     public void publish(SearchAppearanceEventDto searchAppearanceEventDto) {
-        byte[] json = jsonObjectMapper.toJson(searchAppearanceEventDto);
+        String json = jsonObjectMapper.toJson(searchAppearanceEventDto);
         redisTemplate.convertAndSend(searchAppearanceTopic, json);
     }
 }

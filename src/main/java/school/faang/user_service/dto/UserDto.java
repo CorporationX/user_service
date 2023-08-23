@@ -19,11 +19,11 @@ public class UserDto {
     @Email
     @NotBlank
     private String email;
+    @Max(15)
+    private String phone;
     @NotBlank
     @Size(min = 1, max = 64)
     private String password;
-    @Max(15)
-    private String phone;
     @Max(4096)
     private String aboutMe;
     private Country country;

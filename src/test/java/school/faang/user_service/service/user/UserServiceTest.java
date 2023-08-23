@@ -18,9 +18,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -43,10 +41,6 @@ class UserServiceTest {
         User user = User.builder()
                 .id(1L)
                 .username("test")
-                .build();
-
-        UserProfilePic userProfilePic = UserProfilePic.builder()
-                .name(userDto.getUsername() + userDto.getId())
                 .build();
 
         Mockito.when(userMapper.toEntity(userDto))
@@ -99,7 +93,7 @@ class UserServiceTest {
         UserProfilePic userProfilePic = UserProfilePic.builder()
                 .name(userDto.getUsername() + userDto.getId())
                 .fileId("nulltest1")
-                .smallFileId("nulltest1null")
+                .smallFileId("nulltest1&null")
                 .build();
 
         Mockito.when(userMapper.toEntity(userDto))

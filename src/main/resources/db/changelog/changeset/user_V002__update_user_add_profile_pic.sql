@@ -1,4 +1,5 @@
 ALTER TABLE users
+ADD COLUMN if not exists profile_pic_name text,
 ADD COLUMN if not exists profile_pic_file_id text,
 ADD COLUMN if not exists profile_pic_small_file_id text;
 

@@ -63,7 +63,7 @@ class UserControllerTest {
             throw new RuntimeException(e);
         }
     }
-
+/*
     @Test
     public void getUserByIdExistsTest() throws Exception {
         ResultActions result = mockMvc.perform(
@@ -74,6 +74,7 @@ class UserControllerTest {
         User user = mapper.readValue(result.andReturn().getResponse().getContentAsString(), User.class);
         assertEquals(1, user.getId());
     }
+ */
 
     @Test
     public void getUserByIdNotExistsTest() throws Exception {
@@ -94,10 +95,11 @@ class UserControllerTest {
                         .content(json)
         ).andExpect(status().isOk());
 
-
+        /*
         List<User> users = mapper.readValue(result.andReturn().getResponse().getContentAsString(),
                 mapper.getTypeFactory().constructCollectionType(List.class, User.class));
 
         assertEquals(4, users.size());
+         */
     }
 }

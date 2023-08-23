@@ -21,9 +21,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final AvatarService avatarService;
-    @Value("${service.dice-bear.url}")
+    @Value("${services.dice-bear.url}")
     private String URL;
-    @Value("${service.dice-bear.size}")
+    @Value("${services.dice-bear.size}")
     private String SIZE;
 
     public UserDto createUser(UserDto userDto) {
@@ -68,7 +68,7 @@ public class UserService {
 
     private void createDiceBearAvatar(UserProfilePic userProfilePic) {
         userProfilePic.setFileId(URL + userProfilePic.getName());
-        userProfilePic.setSmallFileId(URL + userProfilePic.getName() + SIZE);
+        userProfilePic.setSmallFileId(URL + userProfilePic.getName()+"&" + SIZE);
 
         avatarService.saveToAmazonS3(userProfilePic);
     }

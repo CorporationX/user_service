@@ -54,5 +54,6 @@ services:
     bucket-name: user_backet
     isMocked: true
 
-cron:
+schedule:
   past-events-deletion: 0 0 * * *
+

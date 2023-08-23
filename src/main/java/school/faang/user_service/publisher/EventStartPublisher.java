@@ -5,10 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.dto.redis.EventStartDto;
 
 @Component
-public class EventStartPublisher extends EventPublisher<Event> {
+public class EventStartPublisher extends EventPublisher<EventStartDto> {
     @Value("${spring.data.redis.channels.event_start_channel.name}")
     private String channel;
 

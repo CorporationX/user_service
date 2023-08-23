@@ -22,6 +22,7 @@ import school.faang.user_service.filter.goal.GoalStatusFilter;
 import school.faang.user_service.filter.goal.GoalTitleFilter;
 import school.faang.user_service.mapper.goal.CreateGoalMapper;
 import school.faang.user_service.mapper.goal.GoalMapper;
+import school.faang.user_service.publisher.GoalSetPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -49,6 +50,8 @@ public class GoalServiceTest {
     private SkillRepository skillRepository;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private GoalSetPublisher goalSetPublisher;
     @Spy
     private CreateGoalMapper createGoalMapper = CreateGoalMapper.INSTANCE;
     private GoalMapper goalMapper = GoalMapper.INSTANCE;
@@ -63,7 +66,7 @@ public class GoalServiceTest {
                 new GoalSkillFilter(), new GoalStatusFilter());
 
         goalService = new GoalService(goalRepository, skillRepository, userRepository,
-                goalMapper, createGoalMapper, goalFilters);
+                goalMapper, createGoalMapper, goalFilters, goalSetPublisher);
     }
 
     @Test

@@ -21,6 +21,7 @@ import school.faang.user_service.filter.goal.InvitationInviterIdFilter;
 import school.faang.user_service.filter.goal.InvitationInviterNameFilter;
 import school.faang.user_service.filter.goal.InvitationStatusFilter;
 import school.faang.user_service.mapper.goal.GoalInvitationMapper;
+import school.faang.user_service.publisher.GoalSetPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -47,6 +48,8 @@ class GoalInvitationServiceTest {
     private GoalRepository goalRepository;
     @Mock
     private GoalInvitationRepository goalInvitationRepository;
+    @Mock
+    private GoalSetPublisher goalSetPublisher;
     @Spy
     private GoalInvitationMapper goalInvitationMapper = GoalInvitationMapper.INSTANCE;
     private GoalInvitationService goalInvitationService;
@@ -62,7 +65,8 @@ class GoalInvitationServiceTest {
                 goalRepository,
                 goalInvitationRepository,
                 goalInvitationMapper,
-                filters);
+                filters,
+                goalSetPublisher);
     }
 
     @Test

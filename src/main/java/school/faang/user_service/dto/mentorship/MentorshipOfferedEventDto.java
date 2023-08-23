@@ -17,4 +17,5 @@ public class MentorshipOfferedEventDto {
     private Long requesterId;
     private LocalDateTime timestamp;
     private PreferredContact preferredContact;
+    private String email;
 }

@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.mentorship;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.mentorship.RequestFilterDto;
@@ -13,11 +14,10 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/mentorship")
 public class MentorshipRequestController {
-
     private final MentorshipRequestService mentorshipRequestService;
 
     @PostMapping("/request")
-    public MentorshipRequestDto requestMentorship(@RequestBody MentorshipRequestDto dto) {
+    public MentorshipRequestDto requestMentorship(@RequestBody @Valid MentorshipRequestDto dto) {
         return mentorshipRequestService.requestMentorship(dto);
     }
 

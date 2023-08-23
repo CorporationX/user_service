@@ -16,6 +16,7 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.amazon.AvatarService;
 import school.faang.user_service.validator.user.UserValidator;
+import school.faang.user_service.validator.user.UserValidator;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,15 +34,16 @@ public class UserService {
     private final UserMapper userMapper;
     private final AvatarService avatarService;
     private final UserValidator userValidator;
-    @Value("${service.dice-bear.url}")
+    @Value("${services.dice-bear.url}")
     private String URL;
-    @Value("${service.dice-bear.size}")
+    @Value("${services.dice-bear.size}")
     private String SIZE;
     private final int LEN_PASSWORD = 4;
 
 
     public UserDto createUser(UserDto userDto) {
         User user = userMapper.toEntity(userDto);
+        addCreateData(user);
 
         synchronized (userRepository) {
             user = userRepository.save(user);
@@ -138,7 +140,7 @@ public class UserService {
 
     private void createDiceBearAvatar(UserProfilePic userProfilePic) {
         userProfilePic.setFileId(URL + userProfilePic.getName());
-        userProfilePic.setSmallFileId(URL + userProfilePic.getName() + SIZE);
+        userProfilePic.setSmallFileId(URL + userProfilePic.getName()+"&" + SIZE);
 
         avatarService.saveToAmazonS3(userProfilePic);
     }

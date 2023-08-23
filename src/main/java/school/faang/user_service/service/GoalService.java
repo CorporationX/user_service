@@ -8,6 +8,7 @@ import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.dto.goal.ResponseGoalDto;
 import school.faang.user_service.dto.goal.UpdateGoalDto;
+import school.faang.user_service.dto.redis.GoalSetEventDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
@@ -16,6 +17,7 @@ import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.goal.CreateGoalMapper;
 import school.faang.user_service.mapper.goal.GoalMapper;
+import school.faang.user_service.publisher.GoalSetPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -33,6 +35,7 @@ public class GoalService {
     private final GoalMapper goalMapper;
     private final CreateGoalMapper createGoalMapper;
     private final List<GoalFilter> goalFilters;
+    private final GoalSetPublisher goalSetPublisher;
     private final int MAX_GOALS_PER_USER = 3;
 
     @Transactional
@@ -83,8 +86,10 @@ public class GoalService {
     @Transactional
     public ResponseGoalDto createGoal(Long userId, CreateGoalDto goalDto) {
         validateGoalToCreate(userId, goalDto);
-
-        return createGoalMapper.toResponseGoalDtoFromGoal(goalRepository.save(createGoalMapper.toGoalFromCreateGoalDto(goalDto)));
+        Goal goal = goalRepository.save(createGoalMapper.toGoalFromCreateGoalDto(goalDto));
+        goal.setUsers(List.of(User.builder().id(userId).build()));
+        goalSetPublisher.publishMessage(new GoalSetEventDto(goal.getId(), userId));
+        return createGoalMapper.toResponseGoalDtoFromGoal(goal);
     }
 
     private void validateGoalToCreate(Long userId, CreateGoalDto goalDto) {

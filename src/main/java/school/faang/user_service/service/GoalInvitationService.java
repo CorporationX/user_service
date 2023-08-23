@@ -5,11 +5,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.dto.goal.GoalInvitationFilterDto;
+import school.faang.user_service.dto.redis.GoalSetEventDto;
 import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.exception.DataValidException;
 import school.faang.user_service.filter.goal.InvitationFilter;
 import school.faang.user_service.mapper.goal.GoalInvitationMapper;
+import school.faang.user_service.publisher.GoalSetPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -25,12 +29,12 @@ public class GoalInvitationService {
     private final GoalInvitationRepository goalInvitationRepository;
     private final GoalInvitationMapper goalInvitationMapper;
     private final List<InvitationFilter> filters;
+    private final GoalSetPublisher goalSetPublisher;
     private static final int MAX_GOALS = 3;
 
     @Transactional
     public GoalInvitationDto createInvitation(GoalInvitationDto invitationDto) {
         validateInvitation(invitationDto);
-
         GoalInvitation invitation = goalInvitationRepository.save(goalInvitationMapper.toEntity(invitationDto));
         return goalInvitationMapper.toDto(invitation);
     }
@@ -40,10 +44,18 @@ public class GoalInvitationService {
         GoalInvitation invitation = goalInvitationRepository.findById(id)
                 .orElseThrow(() -> new DataValidException("Goal Invitation not found. Id: " + id));
         validateAccept(invitation);
+
+        User invited = invitation.getInvited();
+        Goal goal = invitation.getGoal();
+
+        goal.setUsers(List.of(invited));
+        invited.getGoals().add(goal);
+
+        invitation.setInvited(invited);
         invitation.setStatus(RequestStatus.ACCEPTED);
-        invitation.getInvited().getGoals().add(invitation.getGoal());
 
         goalInvitationRepository.save(invitation);
+        goalSetPublisher.publishMessage(new GoalSetEventDto(goal.getId(), invited.getId()));
     }
 
     @Transactional

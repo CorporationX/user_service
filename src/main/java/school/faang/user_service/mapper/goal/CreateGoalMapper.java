@@ -22,12 +22,14 @@ public interface CreateGoalMapper {
     Goal toGoalFromCreateGoalDto(CreateGoalDto createGoalDto);
 
     @Mapping(source = "skillsToAchieve", target = "skillsToAchieve", qualifiedByName = "skillsToSkillDtos")
+    @Mapping(source = "parent.id", target = "parentId")
     ResponseGoalDto toResponseGoalDtoFromGoal(Goal goal);
 
     @Named("skillDtosToSkills")
     default List<Skill> skillDtosToSkills(List<SkillDto> skillDtos) {
         return skillDtos.stream()
                 .map(skillDto -> Skill.builder()
+                        .id(skillDto.getId())
                         .title(skillDto.getTitle())
                         .build())
                 .collect(Collectors.toList());
@@ -37,6 +39,7 @@ public interface CreateGoalMapper {
     default List<SkillDto> skillsToSkillDtos(List<Skill> skills) {
         return skills.stream()
                 .map(skillDto -> SkillDto.builder()
+                        .id(skillDto.getId())
                         .title(skillDto.getTitle())
                         .build())
                 .collect(Collectors.toList());

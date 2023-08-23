@@ -3,7 +3,6 @@ package school.faang.user_service.service.event;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.annotations.BatchSize;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
@@ -18,9 +17,8 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.stream.Stream;
 
 @Service
@@ -30,11 +28,14 @@ public class EventService {
     private final EventRepository eventRepository;
     private final SkillRepository skillRepository;
     private final UserRepository userRepository;
+
     private final EventMapper eventMapper;
+
     private final List<Filter<Event, EventFilterDto>> filters;
 
-    @Value("${event.batch-size}")
-    private final Integer BATCH_SIZE;
+    private final Executor executor;
+    @Value("${spring.jpa.properties.hibernate.jdbc.batch_size}")
+    private int batchSize;
 
     @Transactional
     public EventDto create(EventDto event) {
@@ -100,33 +101,11 @@ public class EventService {
         deleteEventsAsync(pastEvents);
     }
 
+    @Transactional
     private void deleteEventsAsync(List<EventDto> pastEvents) {
-        List<List<EventDto>> subLists = getSubLists(pastEvents);
-        for (List<EventDto> list : subLists) {
-            CompletableFuture.runAsync(
-                            () -> eventRepository.deleteAllById(
-                                    list.stream()
-                                            .map(EventDto::getId)
-                                            .toList()
-                            )
-                    )
-                    .thenRun(() -> log.info("Finished deleting past events"));
+        for (EventDto pastEvent : pastEvents) {
+            executor.execute(() -> deleteEvent(pastEvent.getId()));
         }
-    }
-
-    private List<List<EventDto>> getSubLists(List<EventDto> pastEvents) {
-        int size = pastEvents.size();
-        int subListSize = size / BATCH_SIZE;
-        if (size % BATCH_SIZE != 0) {
-            subListSize++;
-        }
-        List<List<EventDto>> subLists = new ArrayList<>();
-        for (int i = 0; i < subListSize; i++) {
-            int fromIndex = i * BATCH_SIZE;
-            int toIndex = Math.min(i * BATCH_SIZE + BATCH_SIZE, size);
-            subLists.add(pastEvents.subList(fromIndex, toIndex));
-        }
-        return subLists;
     }
 
     private void checkIfUserHasRequiredSkills(EventDto event) {

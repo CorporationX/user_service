@@ -1,5 +1,6 @@
 package school.faang.user_service.pojo.student;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,5 +14,6 @@ public class Education {
     public String faculty;
     public Integer yearOfStudy;
     public String major;
+    @JsonProperty("GPA")
     public Double gpa;
 }

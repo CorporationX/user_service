@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.pojo.student.Person;
 import school.faang.user_service.service.user.UserService;
-import school.faang.user_service.util.PersonUploader;
+import school.faang.user_service.parser.PersonParser;
 
 import java.util.List;
 
@@ -21,12 +21,11 @@ import java.util.List;
 @Slf4j
 public class UserController {
     private final UserService userService;
-    private final PersonUploader personUploader;
+    private final PersonParser personParser;
 
     @PostMapping("/students/upload")
     public void uploadStudents(@RequestParam("students") MultipartFile students) {
         log.debug("Received request to upload students to the database from file: {}", students.getName());
-        List<Person> studentList = personUploader.upload(students);
-        userService.saveStudents(studentList);
+        userService.saveStudents(students);
     }
 }

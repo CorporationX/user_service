@@ -33,22 +33,24 @@ public interface PersonMapper {
     }
 
     default String getAboutMe(Person person) {
-        String aboutMe = "about me: ";
+        StringBuilder aboutMe = new StringBuilder("about me: ");
 
-        String state = person.getContactInfo().getAddress().getState();
-        if (Objects.nonNull(state)) {
-            aboutMe += "state - " + state + ", ";
+        if (Objects.nonNull(person.getContactInfo())
+                && Objects.nonNull(person.getContactInfo().getAddress())
+                && Objects.nonNull(person.getContactInfo().getAddress().getState())) {
+            String state = person.getContactInfo().getAddress().getState();
+            aboutMe.append("state - ").append(state).append(", ");
         }
 
-        aboutMe += "faculty - " + person.getEducation().getFaculty() + ", ";
-        aboutMe += "year of study - " + person.getEducation().getYearOfStudy() + ", ";
-        aboutMe += "major - " + person.getEducation().getMajor();
+        aboutMe.append("faculty - ").append(person.getEducation().getFaculty()).append(", ");
+        aboutMe.append("year of study - ").append(person.getEducation().getYearOfStudy()).append(", ");
+        aboutMe.append("major - ").append(person.getEducation().getMajor());
 
-        String employer = person.getEmployer();
-        if (Objects.nonNull(employer)) {
-            aboutMe += ", employer - " + employer;
+        if (Objects.nonNull(person.getEmployer())) {
+            String employer = person.getEmployer();
+            aboutMe.append(", employer - ").append(employer);
         }
 
-        return aboutMe;
+        return aboutMe.toString().trim();
     }
 }

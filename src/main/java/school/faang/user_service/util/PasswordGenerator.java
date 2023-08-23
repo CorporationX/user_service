@@ -16,11 +16,11 @@ public class PasswordGenerator {
         String specialChar = RandomStringUtils.random(2, 33, 47, false, false);
         String totalChars = RandomStringUtils.randomAlphanumeric(2);
 
-        String combinedChars = upperCaseLetters
-                .concat(lowerCaseLetters)
-                .concat(numbers)
-                .concat(specialChar)
-                .concat(totalChars);
+        StringBuilder combinedChars = new StringBuilder(upperCaseLetters)
+                .append(lowerCaseLetters)
+                .append(numbers)
+                .append(specialChar)
+                .append(totalChars);
 
         List<Character> pwdChars = combinedChars.chars()
                 .mapToObj(c -> (char) c)

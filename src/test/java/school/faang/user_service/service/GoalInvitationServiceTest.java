@@ -121,7 +121,7 @@ class GoalInvitationServiceTest {
 
         assertEquals(RequestStatus.ACCEPTED, invitation.getStatus());
 
-        assertTrue(invitation.getInvited().getGoals().contains(goal));
+        assertEquals(2, invitation.getInvited().getGoals().size());
     }
 
     @Test

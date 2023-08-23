@@ -57,3 +57,5 @@ services:
 schedule:
   past-events-deletion: 0 0 * * *
 
+multithreading:
+  batch-size: 10

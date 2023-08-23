@@ -28,7 +28,7 @@ public class GoogleCalendarConfig {
     private static final String CREDENTIALS_FILE_PATH = "src/main/resources/credentials.json";
 
     @Bean
-    public Calendar getCalendar() throws IOException, GeneralSecurityException {
+    public Calendar googleCalendar() throws IOException, GeneralSecurityException {
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new FileReader(CREDENTIALS_FILE_PATH));
 

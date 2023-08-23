@@ -6,6 +6,6 @@ import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.EventCalendarDto;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface MapperCalendar {
+public interface CalendarMapper {
     EventCalendarDto toDto(Event event);
 }

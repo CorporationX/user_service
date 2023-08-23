@@ -6,10 +6,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.DeactivateResponseDto;
+import school.faang.user_service.dto.contact.ExtendedContactDto;
+import school.faang.user_service.dto.contact.TgContactDto;
 import school.faang.user_service.dto.subscription.UserDto;
 import school.faang.user_service.dto.subscription.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.entity.contact.Contact;
+import school.faang.user_service.entity.contact.ContactType;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.DeactivationException;
@@ -112,5 +116,31 @@ public class UserService {
         userProfilePic.setFileId(dicebearUrl + user.getUsername() + "&scale=" + 130);
         userProfilePic.setSmallFileId(dicebearUrl + user.getUsername() + "&scale=" + 22);
         user.setUserProfilePic(userProfilePic);
+    }
+
+    public void updateUserContact(TgContactDto tgContactDto) {
+        User user = userRepository.findById(tgContactDto.getUserId()).orElseThrow();
+        Contact contact = user.getContacts().stream().filter(c -> c.getType().equals(ContactType.TELEGRAM)).findFirst().orElseThrow();
+        contact.setContact(tgContactDto.getTgChatId());
+        userRepository.save(user);
+    }
+
+    public ExtendedContactDto getUserContact(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow();
+        Contact contact = user.getContacts().stream().filter(c -> c.getType().equals(ContactType.TELEGRAM)).findFirst().orElseThrow();
+        ExtendedContactDto tgContact = ExtendedContactDto
+                .builder()
+                .userId(userId)
+                .username(user.getUsername())
+                .phone(user.getPhone())
+                .tgChatId(contact.getContact())
+                .build();
+        return tgContact;
+    }
+
+
+    public Long findUserIdByPhoneNumber(String phoneNumber){
+        return userRepository.findUserByPhone(phoneNumber)
+                .orElseThrow(()-> new UserNotFoundException("No user found by this phone: " + phoneNumber)).getId();
     }
 }

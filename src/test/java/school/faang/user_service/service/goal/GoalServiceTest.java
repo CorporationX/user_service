@@ -20,7 +20,7 @@ import school.faang.user_service.mapper.GoalMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.validator.GoalValidator;
+import school.faang.user_service.util.validator.GoalValidator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

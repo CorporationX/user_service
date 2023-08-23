@@ -15,7 +15,7 @@ import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.validator.GoalValidator;
+import school.faang.user_service.util.validator.GoalValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,6 +77,11 @@ public class GoalService {
             throw new DataValidationException("Goal with given id was not found!");
         goalRepository.deleteById(goalId);
     }
+    @Transactional
+    public void save(Goal goal) {
+        goalRepository.save(goal);
+    }
+
 
     private List<GoalDto> checkExistFilterAndApplyFilters(Stream<Goal> goalStream, GoalFilterDto filter) {
         if (filter == null) {

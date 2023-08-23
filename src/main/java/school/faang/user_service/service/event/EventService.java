@@ -87,6 +87,11 @@ public class EventService {
         return eventRepository.findParticipatedEventsByUserId(userId).stream().map(eventMapper::toDto).toList();
     }
 
+    @Transactional
+    public void save(Event event) {
+        eventRepository.save(event);
+    }
+
     public void deletePastEvents() {
         EventFilterDto filter = new EventFilterDto();
         filter.setIsNeedPastEvents(true);

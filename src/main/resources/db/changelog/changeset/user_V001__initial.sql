@@ -14,6 +14,7 @@ CREATE TABLE users (
     city varchar(64),
     country_id bigint NOT NULL,
     experience int,
+    preference smallint DEFAULT 0 NOT NULL,
     created_at timestamptz DEFAULT current_timestamp,
     updated_at timestamptz DEFAULT current_timestamp,
 

@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import school.faang.user_service.entity.PreferredContact;
 
 @Data
 @AllArgsConstructor
@@ -41,4 +42,6 @@ public class UserDto {
     @JsonIgnore
     @Schema(description = "Опыт")
     private Integer experience;
+    @Schema(description = "Предпочтительный контакт")
+    private PreferredContact preference;
 }

@@ -5,6 +5,8 @@ import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -74,6 +76,10 @@ public class User {
 
     @Column(name = "experience")
     private Integer experience;
+
+    @Column(name = "preference", nullable = false)
+    @Enumerated(EnumType.ORDINAL)
+    private PreferredContact preference;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)

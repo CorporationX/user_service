@@ -77,10 +77,6 @@ public class User {
     @Column(name = "experience")
     private Integer experience;
 
-    @Column(name = "preference", nullable = false)
-    @Enumerated(EnumType.ORDINAL)
-    private PreferredContact preference;
-
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at")

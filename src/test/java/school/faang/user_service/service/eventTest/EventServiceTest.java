@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
@@ -65,7 +66,7 @@ public class EventServiceTest {
 
         Filter<Event, EventFilterDto> filter = Mockito.mock(Filter.class);
         filters = List.of(filter);
-        eventService = new EventService(eventRepository, skillRepository, userRepository, eventMapper, filters);
+        eventService = new EventService(eventRepository, skillRepository, userRepository, eventMapper, filters, new ThreadPoolTaskExecutor());
 
         Mockito.when(skillRepository.findAllByUserId(eventDto.getOwnerId()))
                 .thenReturn(List.of(

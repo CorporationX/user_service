@@ -11,7 +11,7 @@ import school.faang.user_service.model.EventType;
 import school.faang.user_service.service.redis.RedisMessagePublisher;
 import school.faang.user_service.service.redis.events.FollowerEvent;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
@@ -28,7 +28,7 @@ public class FollowerEventPublisher {
         FollowerEvent followerEvent = new FollowerEvent();
 
         followerEvent.setEventType(EventType.FOLLOWER);
-        followerEvent.setReceivedAt(new Date());
+        followerEvent.setReceivedAt(LocalDateTime.now());
         followerEvent.setFollowerId(followerId);
         followerEvent.setFolloweeId(followeeId);
 

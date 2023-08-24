@@ -30,6 +30,8 @@ spring:
           name: user_banner_channel
         event_start_channel:
           name: event_start_channel
+        goal_set_channel:
+          name: goal_set_channel
 
   servlet:
     multipart:

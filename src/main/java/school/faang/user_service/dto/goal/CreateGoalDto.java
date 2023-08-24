@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import school.faang.user_service.dto.skill.SkillDto;
+import school.faang.user_service.entity.goal.GoalStatus;
 
 import java.util.List;
 
@@ -25,4 +26,6 @@ public class CreateGoalDto {
     private String description;
     @NotNull(message = "Skills To Achieve cannot be null")
     private List<SkillDto> skillsToAchieve;
+    @Builder.Default
+    private GoalStatus status = GoalStatus.ACTIVE;
 }

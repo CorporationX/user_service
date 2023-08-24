@@ -21,9 +21,9 @@ import school.faang.user_service.filter.goal.InvitationInviterIdFilter;
 import school.faang.user_service.filter.goal.InvitationInviterNameFilter;
 import school.faang.user_service.filter.goal.InvitationStatusFilter;
 import school.faang.user_service.mapper.goal.GoalInvitationMapper;
+import school.faang.user_service.publisher.GoalSetPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
-import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,9 +44,11 @@ class GoalInvitationServiceTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    private GoalRepository goalRepository;
+    private GoalService goalService;
     @Mock
     private GoalInvitationRepository goalInvitationRepository;
+    @Mock
+    private GoalSetPublisher goalSetPublisher;
     @Spy
     private GoalInvitationMapper goalInvitationMapper = GoalInvitationMapper.INSTANCE;
     private GoalInvitationService goalInvitationService;
@@ -59,17 +61,18 @@ class GoalInvitationServiceTest {
                 new InvitationInviterIdFilter(),
                 new InvitationStatusFilter());
         goalInvitationService = new GoalInvitationService(userRepository,
-                goalRepository,
                 goalInvitationRepository,
                 goalInvitationMapper,
-                filters);
+                filters,
+                goalService,
+                goalSetPublisher);
     }
 
     @Test
     void createTestIllegalEventId() {
         GoalInvitationDto goalInvitationDto = createInvitationDto();
 
-        when(goalRepository.existsById(anyLong())).thenReturn(false);
+        when(goalService.existGoalById(anyLong())).thenReturn(false);
         Exception ex = assertThrows(DataValidException.class, () -> goalInvitationService.createInvitation(goalInvitationDto));
         assertTrue(ex.getMessage().contains("Goal does not exist"));
     }
@@ -79,7 +82,7 @@ class GoalInvitationServiceTest {
         GoalInvitationDto goalInvitationDto = createInvitationDto();
         goalInvitationDto.setInvitedUserId(1L);
 
-        when(goalRepository.existsById(anyLong())).thenReturn(true);
+        when(goalService.existGoalById(anyLong())).thenReturn(true);
         when(userRepository.existsById(anyLong())).thenReturn(true);
 
         Exception ex = assertThrows(DataValidException.class, () -> goalInvitationService.createInvitation(goalInvitationDto));
@@ -90,7 +93,7 @@ class GoalInvitationServiceTest {
     @Test
     void createSuccessful() {
         when(userRepository.existsById(anyLong())).thenReturn(true);
-        when(goalRepository.existsById(anyLong())).thenReturn(true);
+        when(goalService.existGoalById(anyLong())).thenReturn(true);
         when(goalInvitationRepository.save(any(GoalInvitation.class))).thenReturn(createGoalInvitation());
 
         GoalInvitationDto result = goalInvitationService.createInvitation(createInvitationDto());
@@ -107,17 +110,18 @@ class GoalInvitationServiceTest {
         goal.setId(1L);
 
         when(goalInvitationRepository.findById(invitationId)).thenReturn(Optional.of(invitation));
-        when(goalRepository.existsById(goal.getId())).thenReturn(true);
+        when(goalService.existGoalById(goal.getId())).thenReturn(true);
+        when(goalService.canAddGoalToUser(anyLong())).thenReturn(true);
 
         goalInvitationService.acceptGoalInvitation(invitationId);
 
         verify(goalInvitationRepository, times(1)).findById(invitationId);
-        verify(goalRepository, times(1)).existsById(goal.getId());
+        verify(goalService, times(1)).existGoalById(goal.getId());
         verify(goalInvitationRepository, times(1)).save(invitation);
 
         assertEquals(RequestStatus.ACCEPTED, invitation.getStatus());
 
-        assertTrue(invitation.getInvited().getGoals().contains(goal));
+        assertEquals(2, invitation.getInvited().getGoals().size());
     }
 
     @Test
@@ -130,9 +134,11 @@ class GoalInvitationServiceTest {
         invitation.setInvited(invited);
 
         when(goalInvitationRepository.findById(invitationId)).thenReturn(Optional.of(invitation));
+        when(goalService.canAddGoalToUser(anyLong())).thenReturn(false);
 
         Exception ex = assertThrows(DataValidException.class, () -> goalInvitationService.acceptGoalInvitation(invitationId));
         assertTrue(ex.getMessage().contains("invited has reached the limit"));
+
     }
 
     @Test
@@ -140,7 +146,7 @@ class GoalInvitationServiceTest {
         GoalInvitation invitation = createGoalInvitation();
 
         when(goalInvitationRepository.findById(invitation.getId())).thenReturn(Optional.of(invitation));
-        when(goalRepository.existsById(anyLong())).thenReturn(true);
+        when(goalService.existGoalById(anyLong())).thenReturn(true);
 
         goalInvitationService.rejectGoalInvitation(invitation.getId());
 

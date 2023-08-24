@@ -4,14 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.redis.EventStartDto;
+import school.faang.user_service.dto.redis.GoalSetEventDto;
 
 @Component
-public class EventStartPublisher extends EventPublisher<EventStartDto> {
-    @Value("${spring.data.redis.channels.event_start_channel.name}")
+public class GoalSetPublisher extends EventPublisher<GoalSetEventDto> {
+    @Value("${spring.data.redis.channels.goal_set_channel.name}")
     private String channel;
 
-    public EventStartPublisher(RedisTemplate<String, String> redisTemplate, ObjectMapper objectMapper) {
+    public GoalSetPublisher(RedisTemplate<String, String> redisTemplate, ObjectMapper objectMapper) {
         super(redisTemplate, objectMapper);
     }
 

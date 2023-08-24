@@ -37,12 +37,14 @@ public class RecommendationRequestService {
     }
   
     public List<RecommendationRequestDto> getRequests(RequestFilterDto filter) {
+        List<RecommendationRequest> recommendationRequests = (List<RecommendationRequest>) recommendationRequestRepository.findAll();
 
-        List<RecommendationRequest> allRecommendationRequests = (List<RecommendationRequest>) recommendationRequestRepository.findAll();
-        recommendationRequestFilters.stream().filter(requestFilter -> requestFilter.isApplicable(filter))
-                .forEach(requestFilter -> requestFilter.apply(allRecommendationRequests.stream(), filter));
-
-        return allRecommendationRequests.stream().map(recommendationRequestMapper::toDto).toList();
+        for (RecommendationRequestFilter recommendationRequestFilter : recommendationRequestFilters) {
+            if (recommendationRequestFilter.isApplicable(filter)) {
+                recommendationRequests = recommendationRequestFilter.apply(recommendationRequests.stream(), filter).toList();
+            }
+        }
+        return recommendationRequests.stream().map(recommendationRequestMapper::toDto).toList();
     }
       
     public RecommendationRequestDto getRequest(long id) {

@@ -13,7 +13,7 @@ public class RecommendationCreatedAtFilter implements RecommendationRequestFilte
         return filter.getCreatedAt() != null;
     }
     @Override
-    public List<RecommendationRequest> apply(Stream<RecommendationRequest> recommendationRequests, RequestFilterDto filter) {
-        return recommendationRequests.filter(request -> request.getCreatedAt().equals(filter.getCreatedAt())).toList();
+    public Stream<RecommendationRequest> apply(Stream<RecommendationRequest> recommendationRequests, RequestFilterDto filter) {
+        return recommendationRequests.filter(request -> request.getCreatedAt().equals(filter.getCreatedAt()));
     }
 }

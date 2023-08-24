@@ -37,13 +37,15 @@ public class RecommendationRequestFilterTest {
 
         RequestFilterDto requestFilterDto = RequestFilterDto.builder().status(RequestStatus.REJECTED).build();
 
-        recommendationRequestFilters.stream()
-                .filter(filter -> filter.isApplicable(requestFilterDto))
-                .forEach(filter -> filter.apply(requests.stream(), requestFilterDto));
+        for (RecommendationRequestFilter recommendationRequestFilter : recommendationRequestFilters) {
+            if (recommendationRequestFilter.isApplicable(requestFilterDto)) {
+                requests = recommendationRequestFilter.apply(requests.stream(), requestFilterDto).toList();
+            }
+        }
 
-        Assertions.assertEquals(3, requests.size());
+        Assertions.assertEquals(2, requests.size());
         Assertions.assertEquals(RequestStatus.REJECTED, requests.get(0).getStatus());
-        Assertions.assertEquals(RequestStatus.ACCEPTED, requests.get(1).getStatus());
+        Assertions.assertEquals(RequestStatus.REJECTED, requests.get(1).getStatus());
     }
 
     @Test
@@ -52,21 +54,23 @@ public class RecommendationRequestFilterTest {
         RecommendationRequest recommendationRequest2 = new RecommendationRequest();
         RecommendationRequest recommendationRequest3 = new RecommendationRequest();
 
-        recommendationRequest1.setReceiver(User.builder().id(1L).build());
-        recommendationRequest2.setReceiver(User.builder().id(2L).build());
+        recommendationRequest1.setReceiver(User.builder().id(2L).build());
+        recommendationRequest2.setReceiver(User.builder().id(1L).build());
         recommendationRequest3.setReceiver(User.builder().id(1L).build());
 
         List<RecommendationRequest> requests = List.of(recommendationRequest1, recommendationRequest2, recommendationRequest3);
 
         RequestFilterDto requestFilterDto = RequestFilterDto.builder().receiverId(1L).build();
 
-        recommendationRequestFilters.stream()
-                .filter(filter -> filter.isApplicable(requestFilterDto))
-                .forEach(filter -> filter.apply(requests.stream(), requestFilterDto));
+        for (RecommendationRequestFilter recommendationRequestFilter : recommendationRequestFilters) {
+            if (recommendationRequestFilter.isApplicable(requestFilterDto)) {
+                requests = recommendationRequestFilter.apply(requests.stream(), requestFilterDto).toList();
+            }
+        }
 
-        Assertions.assertEquals(3, requests.size());
+        Assertions.assertEquals(2, requests.size());
         Assertions.assertEquals(1L, requests.get(0).getReceiver().getId());
-        Assertions.assertEquals(2L, requests.get(1).getReceiver().getId());
+        Assertions.assertEquals(1L, requests.get(1).getReceiver().getId());
     }
 
     @Test
@@ -74,13 +78,13 @@ public class RecommendationRequestFilterTest {
         RecommendationRequest recommendationRequest1 = new RecommendationRequest();
         RecommendationRequest recommendationRequest2 = new RecommendationRequest();
 
-        recommendationRequest1.setStatus(RequestStatus.ACCEPTED);
-        recommendationRequest1.setRequester(User.builder().id(1L).build());
-        recommendationRequest1.setReceiver(User.builder().id(2L).build());
+        recommendationRequest1.setStatus(RequestStatus.REJECTED);
+        recommendationRequest1.setRequester(User.builder().id(2L).build());
+        recommendationRequest1.setReceiver(User.builder().id(1L).build());
 
-        recommendationRequest2.setStatus(RequestStatus.REJECTED);
-        recommendationRequest2.setRequester(User.builder().id(2L).build());
-        recommendationRequest2.setReceiver(User.builder().id(1L).build());
+        recommendationRequest2.setStatus(RequestStatus.ACCEPTED);
+        recommendationRequest2.setRequester(User.builder().id(1L).build());
+        recommendationRequest2.setReceiver(User.builder().id(2L).build());
 
         List<RecommendationRequest> requests = List.of(recommendationRequest1, recommendationRequest2);
 
@@ -90,11 +94,13 @@ public class RecommendationRequestFilterTest {
                 .receiverId(2L)
                 .build();
 
-        recommendationRequestFilters.stream()
-                .filter(filter -> filter.isApplicable(requestFilterDto))
-                .forEach(filter -> filter.apply(requests.stream(), requestFilterDto));
+        for (RecommendationRequestFilter recommendationRequestFilter : recommendationRequestFilters) {
+            if (recommendationRequestFilter.isApplicable(requestFilterDto)) {
+                requests = recommendationRequestFilter.apply(requests.stream(), requestFilterDto).toList();
+            }
+        }
 
-        Assertions.assertEquals(2, requests.size());
+        Assertions.assertEquals(1, requests.size());
         Assertions.assertEquals(RequestStatus.ACCEPTED, requests.get(0).getStatus());
         Assertions.assertEquals(1L, requests.get(0).getRequester().getId());
         Assertions.assertEquals(2L, requests.get(0).getReceiver().getId());

@@ -76,6 +76,7 @@ public class SubscriptionServiceTest {
                 .id(1L)
                 .username("46")
                 .email("46@gmail.com")
+                .countryId(1L)
                 .build();
         UserDto userDto2 = UserDto.builder()
                 .id(2L)

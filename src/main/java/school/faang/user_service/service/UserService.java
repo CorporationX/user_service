@@ -75,6 +75,7 @@ public class UserService {
         return userMapper.toUserListDto(users);
     }
 
+    @Transactional
     public void registerAnArrayOfUser(InputStream stream) {
         Map<String, Country> countryMap = new HashMap<>();
         countryRepository.findAll().forEach(country -> countryMap.put(country.getTitle(), country));
@@ -94,6 +95,7 @@ public class UserService {
         }
     }
 
+    @Transactional
     public void saveUserStudent(String line, Map<String, Country> countryBD) {
         UserPersonDto personDto = csvToPerson.getPerson(line);
         User user = personToUserMapper.toUser(personDto);
@@ -113,7 +115,8 @@ public class UserService {
         userRepository.save(user);
     }
 
-    private void checkingAndCreatingACountry(Map<String, Country> countryBD, String personCountry, User user) {
+    @Transactional
+    public void checkingAndCreatingACountry(Map<String, Country> countryBD, String personCountry, User user) {
         if (countryBD.containsKey(personCountry)) {
             user.setCountry(countryBD.get(personCountry));
         } else {

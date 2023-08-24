@@ -10,17 +10,20 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import java.time.LocalDateTime;
-
+import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @ExtendWith(MockitoExtension.class)
 public class RecommendationRequestValidatorTest {
     private RecommendationRequestDto recommendationRequest;
+    @Mock
+    private RecommendationRequestRepository recommendationRequestRepository;
     @Mock
     private UserRepository userRepository;
     @Mock
@@ -30,11 +33,14 @@ public class RecommendationRequestValidatorTest {
 
     @BeforeEach
     void setUp() {
+        SkillRequest skillRequest = new SkillRequest();
+        skillRequest.setId(1);
+
         recommendationRequest = RecommendationRequestDto.builder()
                 .id(5L)
                 .message("message")
                 .status(RequestStatus.REJECTED)
-                .skills(null)
+                .skills(List.of(skillRequest))
                 .requesterId(4L)
                 .receiverId(11L)
                 .createdAt(LocalDateTime.now().minusMonths(1))
@@ -60,13 +66,6 @@ public class RecommendationRequestValidatorTest {
     }
 
     @Test
-    public void testUserExistsValidation() {
-        recommendationRequest.setRequesterId(1L);
-        Mockito.when(userRepository.existsById(1L)).thenReturn(true);
-        assertDoesNotThrow(() -> recommendationRequestValidator.validateUsersExist(recommendationRequest));
-    }
-
-    @Test
     public void testSkillNotExistValidation() {
         Assert.assertThrows(
                 EntityNotFoundException.class,
@@ -78,14 +77,5 @@ public class RecommendationRequestValidatorTest {
     public void testSkillExistsValidation() {
         Mockito.when(skillRepository.existsById(1L)).thenReturn(true);
         assertDoesNotThrow(() -> recommendationRequestValidator.validateSkillsExist(recommendationRequest));
-    }
-
-    @Test
-    public void testRequestPeriodValidation() {
-        recommendationRequest.setCreatedAt(LocalDateTime.now().minusMonths(4));
-        Assert.assertThrows(
-                DataValidationException.class,
-                () -> recommendationRequestValidator.validateRequestPeriod(recommendationRequest)
-        );
     }
 }

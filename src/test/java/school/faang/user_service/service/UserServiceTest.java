@@ -1,95 +1,69 @@
 package school.faang.user_service.service;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.entity.Skill;
-import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.SkillMapper;
-import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.premium.Premium;
+import school.faang.user_service.filter.user.ActiveUserFilter;
+import school.faang.user_service.filter.user.UserFilterDto;
+import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.filter.user.UserFilter;
+import school.faang.user_service.repository.UserRepository;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
-class UserServiceTest {
-    @Mock
-    private SkillRepository skillRepository;
+public class UserServiceTest {
+
     @InjectMocks
-    private SkillService skillService;
-    List<Skill> skillList;
+    private UserService userService;
 
-    @Test
-    void createReturnsSkillDto(){
-        SkillDto skillDto = new SkillDto(0L, "title");
-        Skill skill = SkillMapper.INSTANCE.skillToEntity(skillDto);
+    @Mock
+    private UserRepository userRepository;
 
-        when(skillRepository.existsByTitle(skillDto.getTitle())).thenReturn(false);
-        when(skillRepository.save(any(Skill.class))).thenReturn(skill);
+    @Mock
+    private List<UserFilter> userFilters;
 
-        SkillDto result = skillService.create(skillDto);
+    @Spy
+    private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
-        assertNotNull(result);
-        assertEquals(0, result.getId());
-        assertEquals("title", result.getTitle());
+    private User user1;
+    private User user2;
+    private User user3;
 
-        verify(skillRepository).existsByTitle(skillDto.getTitle());
-        verify(skillRepository).save(any(Skill.class));
+    List<User> userList;
+    private UserFilterDto filter;
+
+
+    @BeforeEach
+    void setUp(){
+        user1 = User.builder().id(1).active(true).premium(new Premium()).build();
+        user2 = User.builder().id(2).active(false).premium(null).build();
+        user3 = User.builder().id(3).active(true).premium(new Premium()).build();
+        UserFilter userFilter = new ActiveUserFilter();
+        List<UserFilter> userFilters = List.of(userFilter);
+        userService = new UserService(userRepository, userFilters, userMapper);
+        userList = List.of(user1, user2, user3);
+        filter = new UserFilterDto();
+        filter.setActive(true);
     }
 
     @Test
-    void getAllSkillsByIdTest(){
-        Long userId = 1L;
-        skillList = new ArrayList<>();
+    public void getAllPremiumUsersTest(){
+        Mockito.when(userRepository.findPremiumUsers()).thenReturn(userList.stream());
 
-        skillList.add(createSkill(1L, "title"));
-        skillList.add(createSkill(2L, "title"));
+        int expected = 2;
+        int actual = userService.getPremiumUsers(filter).size();
 
-        List<SkillDto> expectedSkillDtoList = List.of(new SkillDto(1L, "title"),
-                new SkillDto(1L, "title"));
+        Assertions.assertEquals(expected, actual);
 
-        when(skillRepository.findAllByUserId(userId)).thenReturn(skillList);
-
-        List<SkillDto> result = skillService.getUserSkills(userId, 1, 5);
-
-        assertEquals(expectedSkillDtoList.size(), result.size());
-        verify(skillRepository).findAllByUserId(userId);
-    }
-
-    @Test
-    void createReturnsValidationException() {
-        SkillDto skillDto = new SkillDto(1L, "title");
-
-        when(skillRepository.existsByTitle(skillDto.getTitle())).thenReturn(true);
-
-        assertThrows(DataValidationException.class, () -> {
-            skillService.create(skillDto);
-        });
-
-        verify(skillRepository).existsByTitle(skillDto.getTitle());
-    }
-
-    private Skill createSkill(Long id, String title){
-        Skill skill = Skill.builder()
-                .id(id)
-                .title(title)
-                .users(List.of())
-                .guarantees(List.of())
-                .events(List.of())
-                .goals(List.of())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
-
-        return skill;
     }
 }

@@ -2,15 +2,14 @@ package school.faang.user_service.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
-import org.mapstruct.factory.Mappers;
+import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.goal.Goal;
 
+@Component
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface GoalMapper
-{
-    GoalMapper INSTANCE = Mappers.getMapper(GoalMapper.class);
+public interface GoalMapper {
 
-    Goal toEntity(GoalDto goalDto);
-    GoalDto toDto(Goal goal);
+    GoalDto goalToDto(Goal goal);
+    Goal goalToEntity(GoalDto goalDto);
 }

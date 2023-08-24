@@ -21,6 +21,7 @@ import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.contact.ContactRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
@@ -36,6 +37,7 @@ public class UserService {
     private final GoalRepository goalRepository;
     private final MentorshipService mentorshipService;
     private final UserRepository userRepository;
+    private final ContactRepository contactRepository;
     private final List<UserFilter> userFilters;
     private final UserMapper userMapper;
     @Value("${dicebear.url}")
@@ -120,20 +122,33 @@ public class UserService {
 
     public void updateUserContact(TgContactDto tgContactDto) {
         User user = userRepository.findById(tgContactDto.getUserId()).orElseThrow();
-        Contact contact = user.getContacts().stream().filter(c -> c.getType().equals(ContactType.TELEGRAM)).findFirst().orElseThrow();
+        Contact contact = user.getContacts()
+                .stream().filter(c -> c.getType().equals(ContactType.TELEGRAM))
+                .findFirst()
+                .orElse(null);
+        if(contact == null){
+            contact = Contact.builder()
+                    .user(user)
+                    .type(ContactType.TELEGRAM)
+                    .build();
+        }
         contact.setContact(tgContactDto.getTgChatId());
-        userRepository.save(user);
+        contactRepository.save(contact);
     }
 
     public ExtendedContactDto getUserContact(Long userId) {
         User user = userRepository.findById(userId).orElseThrow();
-        Contact contact = user.getContacts().stream().filter(c -> c.getType().equals(ContactType.TELEGRAM)).findFirst().orElseThrow();
+        Contact contact = user.getContacts()
+                .stream()
+                .filter(c -> c.getType().equals(ContactType.TELEGRAM))
+                .findFirst()
+                .orElse(null);
         ExtendedContactDto tgContact = ExtendedContactDto
                 .builder()
                 .userId(userId)
                 .username(user.getUsername())
                 .phone(user.getPhone())
-                .tgChatId(contact.getContact())
+                .tgChatId(contact !=null ?contact.getContact() : null)
                 .build();
         return tgContact;
     }

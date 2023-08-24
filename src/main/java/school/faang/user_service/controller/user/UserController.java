@@ -44,8 +44,8 @@ public class UserController {
         return userService.deactivateUser(userId);
     }
 
-    @PostMapping("/{userId}/contacts")
-    public void updateUserContact(TgContactDto tgContactDto) {
+    @PostMapping("/contacts")
+    public void updateUserContact(@RequestBody TgContactDto tgContactDto) {
         userService.updateUserContact(tgContactDto);
     }
 

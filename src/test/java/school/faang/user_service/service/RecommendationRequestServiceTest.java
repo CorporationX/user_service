@@ -1,23 +1,21 @@
 package school.faang.user_service.service;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestFilterDto;
 import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.dto.recommendation.RecommendationRequestFilterDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
-import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.filter.recommendation.RecommendationRequestFilter;
 import school.faang.user_service.filter.recommendation.RecommendationRequestMessageFilter;
 import school.faang.user_service.filter.recommendation.RecommendationRequestStatusFilter;
+import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
@@ -46,19 +44,6 @@ class RecommendationRequestServiceTest {
     private RecommendationRequestMapper recommendationRequestMapper = RecommendationRequestMapper.INSTANCE;
     @InjectMocks
     private RecommendationRequestService recommendationRequestService;
-
-    @Test
-    void create_EmptyMessage_ThrowsIllegalArgumentException() {
-        RecommendationRequestDto recommendationRequestDto = new RecommendationRequestDto();
-        recommendationRequestDto.setMessage("");
-
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            recommendationRequestService.create(recommendationRequestDto);
-        });
-
-        Mockito.verify(recommendationRequestRepository, Mockito.never()).create(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyString());
-        Mockito.verify(skillRequestRepository, Mockito.never()).create(Mockito.anyLong(), Mockito.anyLong());
-    }
 
     @Test
     void getRequestThrowsException() {
@@ -137,27 +122,6 @@ class RecommendationRequestServiceTest {
 
         assertEquals("Recommendation with id: " + requestId + " does not exist", exception.getMessage());
         verify(recommendationRequestRepository).findById(requestId);
-    }
-
-    @Test
-    void rejectRequestNullRejectionDto() {
-        long requestId = 1;
-
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> recommendationRequestService.rejectRequest(requestId, null));
-
-        assertEquals("Rejection and its reason must not be null or empty.", exception.getMessage());
-    }
-
-    @Test
-    void rejectRequestEmptyRejectionReason() {
-        long requestId = 1;
-        RejectionDto rejectionDto = new RejectionDto("");
-
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> recommendationRequestService.rejectRequest(requestId, rejectionDto));
-
-        assertEquals("Rejection and its reason must not be null or empty.", exception.getMessage());
     }
 
     @Test

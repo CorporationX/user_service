@@ -31,9 +31,8 @@ public class RecommendationRequestService {
     private static final String MSG = "There is no recommendation with such id";
 
     public RecommendationRequestDto getRequest(long id) {
-        RecommendationRequest foundPerson = recommendationRequestRepository.findById(id).orElseThrow(() -> {
-            throw new IllegalStateException(MSG);
-        });
+        RecommendationRequest foundPerson = recommendationRequestRepository.findById(id)
+                .orElseThrow(() -> new IllegalStateException(MSG));
         return recommendationRequestMapper.toDto(foundPerson);
     }
 
@@ -50,9 +49,8 @@ public class RecommendationRequestService {
 
     @Transactional
     public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
-        validateRejectionDto(rejection);
-
-        RecommendationRequest request = recommendationRequestRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Recommendation with id: " + id + " does not exist"));
+        RecommendationRequest request = recommendationRequestRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Recommendation with id: " + id + " does not exist"));
 
         request.setStatus(RequestStatus.REJECTED);
         request.setRejectionReason(rejection.getReason());
@@ -63,8 +61,6 @@ public class RecommendationRequestService {
 
     @Transactional
     public void create(RecommendationRequestDto recommendationRequestDto) {
-        validateRecommendationRequest(recommendationRequestDto);
-
         RecommendationRequest recommendationRequest = recommendationRequestMapper.toEntity(recommendationRequestDto);
 
         long requesterId = recommendationRequest.getRequester().getId();
@@ -99,24 +95,8 @@ public class RecommendationRequestService {
         }
     }
 
-    private static void validateRejectionDto(RejectionDto rejection) {
-        if (rejection == null || rejection.getReason().isBlank()) {
-            throw new IllegalArgumentException("Rejection and its reason must not be null or empty.");
-        }
-    }
-
     private boolean isUserNotExists(Long userId) {
         return !userRepository.existsById(userId);
-    }
-
-    private void validateRecommendationRequest(RecommendationRequestDto recommendationRequestDto) {
-        if (recommendationRequestDto.getMessage() == null || recommendationRequestDto.getMessage().isEmpty()) {
-            throw new IllegalArgumentException("Recommendation request message cannot be empty.");
-        }
-        List<Long> skillsIds = recommendationRequestDto.getSkillsId();
-        if (skillsIds == null || skillsIds.isEmpty()) {
-            throw new IllegalArgumentException("Recommendation request must contain at least one skill.");
-        }
     }
 
     private boolean hasPendingRequest(long requesterId, long receiverId) {

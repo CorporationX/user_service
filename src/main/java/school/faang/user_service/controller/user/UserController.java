@@ -1,12 +1,12 @@
 package school.faang.user_service.controller.user;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
-
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,12 +16,11 @@ import school.faang.user_service.dto.subscription.UserFilterDto;
 import school.faang.user_service.service.UserService;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/users")
+@RequestMapping("api/v1/users")
 public class UserController {
     private final UserService userService;
 
@@ -40,9 +39,8 @@ public class UserController {
         return userService.getPremiumUsers(userFilterDto);
     }
 
-    @PostMapping("/get-by-ids")
-    List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
-        validateUsersIds(ids);
+    @GetMapping("/get-by-ids")
+    List<UserDto> getUsersByIds(@NotEmpty(message = "ids cannot be empty") List<Long> ids) {
         return userService.getUsersByIds(ids);
     }
 
@@ -62,12 +60,5 @@ public class UserController {
     @PostMapping("/deactivation/{userId}")
     public DeactivateResponseDto deactivating(@PathVariable long userId) {
         return userService.deactivateUser(userId);
-    }
-
-    private static List<Long> validateUsersIds(List<Long> ids) {
-        if (ids.isEmpty()) {
-            return new ArrayList<>();
-        }
-        return ids;
     }
 }

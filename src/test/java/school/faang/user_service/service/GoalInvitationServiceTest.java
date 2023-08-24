@@ -66,15 +66,6 @@ class GoalInvitationServiceTest {
     }
 
     @Test
-    void createTestIllegalId() {
-        GoalInvitationDto goalInvitationDto = createInvitationDto();
-        goalInvitationDto.setId(0L);
-
-        Exception ex = assertThrows(DataValidException.class, () -> goalInvitationService.createInvitation(goalInvitationDto));
-        assertEquals("Goal does not exist. Invitation Id: 0", ex.getMessage());
-    }
-
-    @Test
     void createTestIllegalEventId() {
         GoalInvitationDto goalInvitationDto = createInvitationDto();
 

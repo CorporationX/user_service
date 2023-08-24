@@ -88,14 +88,6 @@ public class GoalService {
     }
 
     private void validateGoalToCreate(Long userId, CreateGoalDto goalDto) {
-        if (goalDto == null) {
-            throw new IllegalArgumentException("Goal cannot be null");
-        }
-
-        if (goalDto.getTitle().isBlank()) {
-            throw new IllegalArgumentException("Title cannot be null");
-        }
-
         if (goalRepository.countActiveGoalsPerUser(userId) >= MAX_GOALS_PER_USER) {
             throw new IllegalArgumentException("Maximum number of goals for this user reached");
         }
@@ -143,14 +135,9 @@ public class GoalService {
     }
 
     private void validateUpdate(Goal goalToUpdate, UpdateGoalDto updateGoalDto, List<SkillDto> skillDtos) {
-        if (updateGoalDto.getTitle().isBlank()) {
-            throw new IllegalArgumentException("Title cannot be blank");
-        }
-
         if (goalToUpdate.getStatus().equals(GoalStatus.COMPLETED)) {
             throw new IllegalArgumentException("Goal already completed");
         }
-
         skillDtos.forEach(skillToAchieve -> {
             if (!skillRepository.existsByTitle(skillToAchieve.getTitle())) {
                 throw new IllegalArgumentException("Skill " + skillToAchieve.getTitle() + " not found");

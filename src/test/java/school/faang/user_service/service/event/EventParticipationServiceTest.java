@@ -121,7 +121,7 @@ class EventParticipationServiceTest {
 
         Mockito.when(repository.findAllParticipantsByEventId(someEventId)).thenReturn(eventParticipants);
 
-        assertEquals(2, service.getParticipant(someEventId).size());
+        assertEquals(2, service.getParticipants(someEventId).size());
     }
     @Test
     public void getParticipantCount_ShouldReturnCorrectParticipantsCount() {

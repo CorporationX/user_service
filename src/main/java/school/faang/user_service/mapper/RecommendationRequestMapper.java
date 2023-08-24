@@ -17,11 +17,12 @@ public interface RecommendationRequestMapper {
     @Mapping(source = "skills", target = "skillsId", qualifiedByName = "mapToId")
     @Mapping(source = "requester.id", target = "requesterId")
     @Mapping(source = "receiver.id", target = "receiverId")
+    @Mapping(source = "recommendation.id", target = "recommendationId")
     RecommendationRequestDto toDto(RecommendationRequest recommendationRequest);
 
-    @Mapping(source = "skillsId", target = "skills", qualifiedByName = "mapToSkillRequest")
-    @Mapping(target = "requester", ignore = true)
-    @Mapping(target = "receiver", ignore = true)
+    @Mapping(source = "requesterId", target = "requester.id")
+    @Mapping(source = "receiverId", target = "receiver.id")
+    @Mapping(source = "recommendationId", target = "recommendation.id")
     RecommendationRequest toEntity(RecommendationRequestDto recommendationRequestDto);
 
     @Named("mapToId")
@@ -30,21 +31,7 @@ public interface RecommendationRequestMapper {
             return Collections.emptyList();
         }
         return skills.stream()
-                .map(SkillRequest::getId)
-                .toList();
-    }
-
-    @Named("mapToSkillRequest")
-    default List<SkillRequest> mapToSkillRequest(List<Long> skillsId) {
-        if (skillsId == null) {
-            return Collections.emptyList();
-        }
-        return skillsId.stream()
-                .map(recommendationRequest -> {
-                    SkillRequest skillRequest = new SkillRequest();
-                    skillRequest.setId(recommendationRequest);
-                    return skillRequest;
-                })
+                .map(skillRequest -> skillRequest.getSkill().getId())
                 .toList();
     }
 }

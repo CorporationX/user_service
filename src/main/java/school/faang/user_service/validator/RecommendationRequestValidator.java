@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -15,12 +17,14 @@ public class RecommendationRequestValidator {
 
     private final UserRepository userRepository;
 
-    public void validationRequestDate(RecommendationRequestDto recommendationRequestDto) {
-        LocalDateTime dateNowMinusSixMonths = LocalDateTime.now().minusMonths(6);
-        LocalDateTime createdAt = recommendationRequestDto.getCreatedAt();
-        if (createdAt.isAfter(dateNowMinusSixMonths)) {
-            throw new DataValidationException(
-                    "A recommendation request from the same user to another can be sent no more than once every 6 months");
+    public void validationRequestDate(Optional<RecommendationRequest> recommendationRequest) {
+        if (recommendationRequest.isPresent()) {
+            LocalDateTime dateNowMinusSixMonths = LocalDateTime.now().minusMonths(6);
+            LocalDateTime createdAt = recommendationRequest.get().getCreatedAt();
+            if (createdAt.isAfter(dateNowMinusSixMonths)) {
+                throw new DataValidationException(
+                        "A recommendation request from the same user to another can be sent no more than once every 6 months");
+            }
         }
     }
 

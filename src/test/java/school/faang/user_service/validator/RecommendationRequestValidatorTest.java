@@ -1,5 +1,4 @@
 package school.faang.user_service.validator;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class RecommendationRequestValidatorTest {
     @InjectMocks
     private RecommendationRequestValidator recommendationRequestValidator;
-
     @Mock
     private UserRepository userRepository;
 
@@ -38,7 +36,6 @@ class RecommendationRequestValidatorTest {
     void testValidationExistByIdThrowDataValidationException() {
         assertThrows(DataValidationException.class, () -> recommendationRequestValidator.validationExistById(1L));
     }
-
     @Test
     void testValidationExistByIdDoesNotThrowDataValidationException() {
         Mockito.when(userRepository.existsById(1L)).thenReturn(true);

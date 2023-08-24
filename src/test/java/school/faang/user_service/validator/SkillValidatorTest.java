@@ -19,13 +19,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class SkillValidatorTest {
-
     @InjectMocks
     private SkillValidator skillValidator;
-
     @Mock
     private SkillRepository skillRepository;
-
     RecommendationRequestDto requestDto;
 
     @BeforeEach

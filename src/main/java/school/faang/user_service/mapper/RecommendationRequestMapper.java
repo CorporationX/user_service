@@ -21,7 +21,6 @@ public interface RecommendationRequestMapper {
     @Mapping(source = "recommendation.id", target = "recommendationId")
     RecommendationRequestDto toDto(RecommendationRequest recommendationRequest);
 
-//    @Mapping(source = "skillsId", target = "skills", qualifiedByName = "mapToSkillRequest")
     @Mapping(source = "requesterId", target = "requester.id")
     @Mapping(source = "receiverId", target = "receiver.id")
     @Mapping(source = "recommendationId", target = "recommendation.id")
@@ -40,18 +39,4 @@ public interface RecommendationRequestMapper {
                 .map(skillRequest -> skillRequest.getSkill().getId())
                 .toList();
     }
-
-//    @Named("mapToSkillRequest")
-//    default List<SkillRequest> mapToSkillRequest(List<Long> skillsId) {
-//        if (skillsId == null) {
-//            return Collections.emptyList();
-//        }
-//        return skillsId.stream()
-//                .map(recommendationRequest -> {
-//                    SkillRequest skillRequest = new SkillRequest();
-//                    skillRequest.setId(recommendationRequest);
-//                    return skillRequest;
-//                })
-//                .toList();
-//    }
 }

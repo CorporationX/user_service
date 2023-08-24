@@ -30,17 +30,12 @@ import java.util.stream.StreamSupport;
 public class RecommendationRequestService {
 
     private final RecommendationRequestRepository recommendationRequestRepository;
-
     private final RecommendationRequestValidator recommendationRequestValidator;
-
     private final SkillValidator skillValidator;
-
     private List<RequestFilter> requestFilters;
-
     private final RecommendationRequestMapper recommendationRequestMapper;
-
-    private final RecommendationEventPublisher recommendationEventPublisher;
     private final SkillRequestRepository skillRequestRepository;
+    private final RecommendationEventPublisher recommendationEventPublisher;
 
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
         Optional<RecommendationRequest> recommendationRequestOpt = getRecommendationRequest(recommendationRequestDto);

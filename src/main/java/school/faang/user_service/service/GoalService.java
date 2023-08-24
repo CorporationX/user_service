@@ -23,6 +23,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -36,11 +37,18 @@ public class GoalService {
     private final CreateGoalMapper createGoalMapper;
     private final List<GoalFilter> goalFilters;
     private final GoalSetPublisher goalSetPublisher;
-    private final int MAX_GOALS_PER_USER = 3;
+    private static final int MAX_GOALS_PER_USER = 3;
+
+    public void addUser(Goal goal, User user) {
+        if (goal.getUsers() == null) {
+            goal.setUsers(new ArrayList<>());
+        }
+        goal.getUsers().add(user);
+    }
 
     @Transactional
     public void deleteGoal(long goalId) {
-        if (!goalRepository.existsById(goalId)) {
+        if (!existGoalById(goalId)) {
             throw new IllegalArgumentException("Goal is not found");
         }
 
@@ -92,8 +100,17 @@ public class GoalService {
         return createGoalMapper.toResponseGoalDtoFromGoal(goal);
     }
 
+    @Transactional(readOnly = true)
+    public boolean canAddGoalToUser(Long userId) {
+        return goalRepository.countActiveGoalsPerUser(userId) >= MAX_GOALS_PER_USER;
+    }
+
+    public boolean existGoalById(Long goalId) {
+        return goalRepository.existsById(goalId);
+    }
+
     private void validateGoalToCreate(Long userId, CreateGoalDto goalDto) {
-        if (goalRepository.countActiveGoalsPerUser(userId) >= MAX_GOALS_PER_USER) {
+        if (canAddGoalToUser(userId)) {
             throw new IllegalArgumentException("Maximum number of goals for this user reached");
         }
 
@@ -104,6 +121,7 @@ public class GoalService {
             }
         });
     }
+
 
     @Transactional
     public UpdateGoalDto updateGoal(UpdateGoalDto updateGoalDto) {

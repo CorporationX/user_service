@@ -16,7 +16,6 @@ import school.faang.user_service.mapper.goal.GoalInvitationMapper;
 import school.faang.user_service.publisher.GoalSetPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
-import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -25,12 +24,11 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class GoalInvitationService {
     private final UserRepository userRepository;
-    private final GoalRepository goalRepository;
     private final GoalInvitationRepository goalInvitationRepository;
     private final GoalInvitationMapper goalInvitationMapper;
     private final List<InvitationFilter> filters;
+    private final GoalService goalService;
     private final GoalSetPublisher goalSetPublisher;
-    private static final int MAX_GOALS = 3;
 
     @Transactional
     public GoalInvitationDto createInvitation(GoalInvitationDto invitationDto) {
@@ -48,7 +46,7 @@ public class GoalInvitationService {
         User invited = invitation.getInvited();
         Goal goal = invitation.getGoal();
 
-        goal.setUsers(List.of(invited));
+        goalService.addUser(goal, invited);
         invited.getGoals().add(goal);
 
         invitation.setInvited(invited);
@@ -70,13 +68,13 @@ public class GoalInvitationService {
     @Transactional(readOnly = true)
     private void validateAccept(GoalInvitation invitation) {
         long id = invitation.getId();
-        if (invitation.getInvited().getGoals().size() >= MAX_GOALS) {
+        if (!goalService.canAddGoalToUser(invitation.getInvited().getId())) {
             throw new DataValidException("Unable to accept Goal Invitation, invited has reached the limit. Id: " + id);
         }
         if (invitation.getInvited().getGoals().contains(invitation.getGoal())) {
             throw new DataValidException("Unable to accept Goal Invitation, invited already has goal. Id: " + id);
         }
-        if (!goalRepository.existsById(invitation.getGoal().getId())) {
+        if (!goalService.existGoalById(invitation.getGoal().getId())) {
             throw new DataValidException("Unable to accept Goal Invitation, Goal not found. Id: " + id);
         }
     }
@@ -96,7 +94,7 @@ public class GoalInvitationService {
 
     @Transactional(readOnly = true)
     private void checkGoalExists(GoalInvitation invitation) {
-        if (!goalRepository.existsById(invitation.getGoal().getId())) {
+        if (!goalService.existGoalById(invitation.getGoal().getId())) {
             throw new DataValidException("Unable to decline Invitation, Goal not found. Id: " + invitation.getId());
         }
     }
@@ -104,7 +102,7 @@ public class GoalInvitationService {
     @Transactional(readOnly = true)
     private void validateInvitation(GoalInvitationDto invitation) {
         invitation.setId(null);
-        if (!goalRepository.existsById(invitation.getGoalId())) {
+        if (!goalService.existGoalById(invitation.getGoalId())) {
             throw new DataValidException("Goal does not exist. Invitation Id: " + invitation.getId());
         }
         if (!userRepository.existsById(invitation.getInviterId())) {

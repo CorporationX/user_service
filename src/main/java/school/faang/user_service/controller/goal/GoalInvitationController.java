@@ -1,6 +1,11 @@
 package school.faang.user_service.controller.goal;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.filters.filtersForGoalInvitation.GoalInvitationFilter;
@@ -10,22 +15,23 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/v1/invitation")
 public class GoalInvitationController {
     private final GoalInvitationService goalInvitationService;
-
-    public GoalInvitationDto createInvitation(GoalInvitationDto invitation) {
-        return createInvitation(invitation);
+    @PostMapping("/create")
+    public GoalInvitationDto createInvitation(@RequestBody GoalInvitationDto invitation) {
+        return goalInvitationService.createInvitation(invitation);
     }
-
-    public GoalInvitationDto acceptGoalInvitation(long id) {
-        return acceptGoalInvitation(id);
+    @GetMapping("/accept/{id}")
+    public GoalInvitationDto acceptGoalInvitation(@PathVariable long id) {
+        return goalInvitationService.acceptGoalInvitation(id);
     }
-
-    public GoalInvitationDto rejectGoalInvitation(long id) {
-        return rejectGoalInvitation(id);
+    @GetMapping("/reject/{id}")
+    public GoalInvitationDto rejectGoalInvitation(@PathVariable long id) {
+        return goalInvitationService.rejectGoalInvitation(id);
     }
-
-    public List<GoalInvitationDto> getInvitations(GoalInvitationFilter goalInvitationFilter) {
+    @PostMapping("/filters")
+    public List<GoalInvitationDto> getInvitations(@RequestBody GoalInvitationFilter goalInvitationFilter) {
         return getInvitations(goalInvitationFilter);
     }
 

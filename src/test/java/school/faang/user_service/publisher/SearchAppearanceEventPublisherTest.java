@@ -34,7 +34,7 @@ class SearchAppearanceEventPublisherTest {
     }
 
     @Test
-    void publish() {
+    void testMethodPublish() {
         when(jsonObjectMapper.toJson(searchAppearanceEventDto)).thenReturn(json);
 
         searchAppearanceEventPublisher.publish(searchAppearanceEventDto);

@@ -5,18 +5,19 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
-
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.exception.NotFoundException;
-import school.faang.user_service.filter.subfilter.SubscriberFilter;
+import school.faang.user_service.filter.user.UserFilter;
+import school.faang.user_service.exception.EntityStateException;
+import school.faang.user_service.exception.notFoundExceptions.contact.UserNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.service.SubscriptionService;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -31,7 +32,7 @@ public class SubscriptionServiceTest {
     @Spy
     private UserMapper mapper;
     @Mock
-    private List<SubscriberFilter> filters;
+    private List<UserFilter> filters;
     @InjectMocks
     private SubscriptionService service;
     private UserFilterDto filterDto;
@@ -58,7 +59,7 @@ public class SubscriptionServiceTest {
         long followeeId = 2;
         when(repository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
 
-        Assert.assertThrows(DataValidationException.class,
+        Assert.assertThrows(EntityStateException.class,
                 () -> service.followUser(followerId, followeeId));
     }
 
@@ -92,7 +93,7 @@ public class SubscriptionServiceTest {
         when(repository.findByFollowerId(followeeId)).thenReturn(Stream.empty());
 
         Assert.assertThrows(
-                NotFoundException.class,
+                UserNotFoundException.class,
                 () -> service.getFollowers(followeeId, filterDto)
         );
     }
@@ -118,7 +119,7 @@ public class SubscriptionServiceTest {
         when(repository.findByFolloweeId(followeeId)).thenReturn(Stream.empty());
 
         Assert.assertThrows(
-                NotFoundException.class,
+                UserNotFoundException.class,
                 () -> service.getFollowing(followeeId, filterDto)
         );
     }

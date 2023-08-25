@@ -9,13 +9,12 @@ import school.faang.user_service.dto.mentorshipRequest.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.EntityStateException;
+import school.faang.user_service.exception.notFoundExceptions.MentorshipRequestNotFoundException;
 import school.faang.user_service.filter.mentorshiprequest.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-import school.faang.user_service.util.exception.NoRequestsException;
-import school.faang.user_service.util.exception.RequestIsAlreadyAcceptedException;
-import school.faang.user_service.util.exception.RequestIsAlreadyRejectedException;
 import school.faang.user_service.util.validator.MentorshipRequestValidator;
 
 import java.util.List;
@@ -56,14 +55,14 @@ public class MentorshipRequestService {
     @Transactional
     public MentorshipRequestDto acceptRequest(long id) {
         MentorshipRequest foundRequest =
-                mentorshipRequestRepository.findById(id).orElseThrow(NoRequestsException::new);
+                mentorshipRequestRepository.findById(id).orElseThrow(MentorshipRequestNotFoundException::new);
 
         User receiver = foundRequest.getReceiver();
         User requester = foundRequest.getRequester();
         boolean doesContain = receiver.getMentees().contains(requester);
 
         if (foundRequest.getStatus().equals(RequestStatus.ACCEPTED) || doesContain) {
-            throw new RequestIsAlreadyAcceptedException();
+            throw new EntityStateException("Request already accepted");
         }
 
         foundRequest.setStatus(RequestStatus.ACCEPTED);
@@ -80,13 +79,13 @@ public class MentorshipRequestService {
     @Transactional
     public MentorshipRequestDto rejectRequest(long id, RejectionDto rejectionDto) {
         MentorshipRequest foundRequest = mentorshipRequestRepository.findById(id)
-                .orElseThrow(NoRequestsException::new);
+                .orElseThrow(MentorshipRequestNotFoundException::new);
 
         User receiver = foundRequest.getReceiver();
         User requester = foundRequest.getRequester();
 
         if (foundRequest.getStatus().equals(RequestStatus.REJECTED)) {
-            throw new RequestIsAlreadyRejectedException();
+            throw new EntityStateException("Request already rejected");
         }
 
         foundRequest.setStatus(RequestStatus.REJECTED);

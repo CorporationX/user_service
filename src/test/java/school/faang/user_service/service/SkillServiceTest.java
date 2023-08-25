@@ -13,9 +13,10 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityAlreadyExistException;
+import school.faang.user_service.exception.invalidFieldException.DataValidationException;
+import school.faang.user_service.exception.notFoundExceptions.SkillNotFoundException;
 import school.faang.user_service.mapper.SkillMapper;
-import school.faang.user_service.mapper.mymappers.Skill1Mapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
@@ -55,7 +56,7 @@ class SkillServiceTest {
         Mockito.when(skillRepository.existsByTitle(skillDto.getTitle()))
                 .thenReturn(true);
 
-        Assert.assertThrows(DataValidationException.class, () -> skillService.create(skillDto));
+        Assert.assertThrows(EntityAlreadyExistException.class, () -> skillService.create(skillDto));
     }
 
     @Test
@@ -95,7 +96,7 @@ class SkillServiceTest {
     @Test
     void testAcquireSkillFromOffers_SkillDoesNotExist() {
         Mockito.when(skillRepository.findById(5L)).thenReturn(Optional.empty());
-        assertThrows(DataValidationException.class, () -> skillService.acquireSkillFromOffers(5, 0L));
+        assertThrows(SkillNotFoundException.class, () -> skillService.acquireSkillFromOffers(5, 0L));
     }
 
     @Test

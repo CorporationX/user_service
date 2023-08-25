@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import school.faang.user_service.entity.contact.PreferredContact;
 
+import java.util.Locale;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -19,6 +21,6 @@ public class UserDto {
     private String aboutMe;
     private String city;
     private Integer experience;
-    private Long countryId;
+    private Locale locale;
     private PreferredContact preference;
 }

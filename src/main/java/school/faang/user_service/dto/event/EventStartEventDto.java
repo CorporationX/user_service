@@ -13,5 +13,6 @@ import java.util.List;
 @Builder
 public class EventStartEventDto {
     private long id;
+    private String title;
     private List<Long> userIds;
 }

@@ -30,10 +30,12 @@ class EventStartEventMapperTest {
                 .build();
         event = Event.builder()
                 .id(1)
+                .title("Halloween")
                 .attendees(List.of(first, second))
                 .build();
         eventStartEventDto = EventStartEventDto.builder()
                 .id(1L)
+                .title("Halloween")
                 .userIds(List.of(1L, 2L))
                 .build();
     }

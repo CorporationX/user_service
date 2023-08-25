@@ -121,7 +121,8 @@ public class UserService {
     }
 
     public void updateUserContact(TgContactDto tgContactDto) {
-        User user = userRepository.findById(tgContactDto.getUserId()).orElseThrow();
+        User user = userRepository.findById(tgContactDto.getUserId())
+                .orElseThrow(()-> new UserNotFoundException("No user found by this id: " + tgContactDto.getUserId()));
         Contact contact = user.getContacts()
                 .stream().filter(c -> c.getType().equals(ContactType.TELEGRAM))
                 .findFirst()
@@ -137,7 +138,8 @@ public class UserService {
     }
 
     public ExtendedContactDto getUserContact(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new UserNotFoundException("No user found by this id: " + userId));
         Contact contact = user.getContacts()
                 .stream()
                 .filter(c -> c.getType().equals(ContactType.TELEGRAM))

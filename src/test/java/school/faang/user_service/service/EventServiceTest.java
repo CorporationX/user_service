@@ -20,6 +20,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filters.event.EventIdFilter;
 import school.faang.user_service.filters.event.EventOwnerIdFilter;
 import school.faang.user_service.mapper.event.EventMapperImpl;
+import school.faang.user_service.publisher.EventStartEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.filters.event.EventFilter;
@@ -37,6 +38,8 @@ public class EventServiceTest {
     private EventRepository eventRepository;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private EventStartEventPublisher eventStartEventPublisher;
     @Spy
     private EventMapperImpl eventMapper;
     @InjectMocks
@@ -91,9 +94,13 @@ public class EventServiceTest {
 
     @Test
     public void testOwnerHasSkillsForEvent() {
+        when(eventRepository.save(eventMapper.toEvent(eventDto))).thenReturn(event);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user2));
+
         eventService.create(eventDto);
+
         Mockito.verify(eventRepository, Mockito.times(1)).save(eventMapper.toEvent(eventDto));
+        Mockito.verify(eventStartEventPublisher).publish(event.getId(), event.getStartDate());
     }
 
     @Test
@@ -171,7 +178,7 @@ public class EventServiceTest {
     @Test
     public void testGetEventsByFilter() {
         List<EventFilter> filters = List.of(new EventIdFilter(), new EventOwnerIdFilter());
-        EventService testEventService = new EventService(eventRepository, userRepository, eventMapper, filters);
+        EventService testEventService = new EventService(eventRepository, userRepository, eventStartEventPublisher, eventMapper, filters);
         EventFilterDto filter = EventFilterDto.builder().eventId(1L).ownerId(1L).build();
         List<Event> events = List.of(
                 Event.builder().id(1L).owner(User.builder().id(1L).build()).build(),

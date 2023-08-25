@@ -40,7 +40,6 @@ public class RedisConfig {
         return redisTemplate;
     }
 
-
     @Bean
     public ChannelTopic mentorshipTopic(){
         return new ChannelTopic(mentorshipName);

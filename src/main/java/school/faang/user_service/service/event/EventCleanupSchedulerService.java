@@ -22,7 +22,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 @RequiredArgsConstructor
 public class EventCleanupSchedulerService {
     private final EventService eventService;
-    private final ThreadPoolExecutor threadPoolExecutor;
+    private final ThreadPoolExecutor scheduledEventCleanupThreadPoolExecutor;
 
     @Value("${event.cleanup.batch.size}")
     private int batchSize;
@@ -39,7 +39,7 @@ public class EventCleanupSchedulerService {
             List<Event> batch = events.subList(i, Math.min(i + batchSize, events.size()));
             futures.add(CompletableFuture.runAsync(() -> batch.stream()
                     .filter(event -> event.getEndDate().isBefore(currentTime))
-                    .forEach(event -> pastEventIds.add(event.getId())), threadPoolExecutor));
+                    .forEach(event -> pastEventIds.add(event.getId())), scheduledEventCleanupThreadPoolExecutor));
         }
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
         eventService.deleteByIds(pastEventIds);

@@ -16,6 +16,7 @@ import school.faang.user_service.repository.SubscriptionRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -41,13 +42,13 @@ public class SubscriptionService {
 
     @Transactional(readOnly = true)
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filters) {
-        List<User> followers = subscriptionRepository.findByFolloweeId(followeeId).toList();
+        List<User> followers = subscriptionRepository.findByFolloweeId(followeeId).collect(Collectors.toList());
         return getUsersDtoAfterFiltration(followers, filters);
     }
 
     @Transactional(readOnly = true)
     public List<UserDto> getFollowing(long followerId, UserFilterDto filters) {
-        List<User> followees = subscriptionRepository.findByFollowerId(followerId).toList();
+        List<User> followees = subscriptionRepository.findByFollowerId(followerId).collect(Collectors.toList());
         return getUsersDtoAfterFiltration(followees, filters);
     }
 
@@ -67,14 +68,18 @@ public class SubscriptionService {
         }
     }
 
-    private List<UserDto> getUsersDtoAfterFiltration(List<User> users, UserFilterDto filters) {
+    public List<UserDto> getUsersDtoAfterFiltration(List<User> users, UserFilterDto filters) {
         userFilters.stream().filter(filter -> filter.isApplicable(filters))
                 .forEach(filter -> filter.apply(users, filters));
 
-        long receiverId = userContext.getUserId();
+        long userId = userContext.getUserId();
 
         users.forEach(user -> searchAppearanceEventPublisher
-                .publish(new SearchAppearanceEventDto(user.getId(), receiverId, LocalDateTime.now())));
+                .publish(SearchAppearanceEventDto.builder()
+                        .actorId(userId)
+                        .receiverId(user.getId())
+                        .receivedAt(LocalDateTime.now())
+                        .build()));
 
         return users.stream().map(userMapper::toDto).toList();
     }

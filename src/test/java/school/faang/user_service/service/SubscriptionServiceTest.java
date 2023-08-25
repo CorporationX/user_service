@@ -7,20 +7,23 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.analytics.SearchAppearanceEventDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.filter.user_filters.UserFilter;
+import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
+import school.faang.user_service.repository.SubscriptionRepository;
 
 import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -38,6 +41,15 @@ class SubscriptionServiceTest {
     private UserFilterDto userFilterDto;
     @Mock
     private List<UserFilter> userFilters;
+    @Mock
+    private SearchAppearanceEventPublisher searchAppearanceEventPublisher;
+    @Mock
+    private User user;
+    @Mock
+    private UserDto userDto;
+    @Mock
+    private UserContext userContext;
+    private Stream<User> userStream;
 
     long followerId;
     long followeeId;
@@ -46,6 +58,7 @@ class SubscriptionServiceTest {
     public void setUp() {
         followerId = 2L;
         followeeId = 1L;
+        userStream = Stream.of(user);
     }
 
     @Test
@@ -91,10 +104,6 @@ class SubscriptionServiceTest {
 
     @Test
     public void testGetFollowers() {
-        User user = mock(User.class);
-        UserDto userDto = mock(UserDto.class);
-        Stream<User> userStream = Stream.of(user);
-
         when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(userStream);
         when(userMapper.toDto(user)).thenReturn(userDto);
 
@@ -106,10 +115,6 @@ class SubscriptionServiceTest {
 
     @Test
     public void testGetFollowing() {
-        User user = mock(User.class);
-        UserDto userDto = mock(UserDto.class);
-        Stream<User> userStream = Stream.of(user);
-
         when(subscriptionRepository.findByFollowerId(followerId)).thenReturn(userStream);
         when(userMapper.toDto(user)).thenReturn(userDto);
 
@@ -131,5 +136,16 @@ class SubscriptionServiceTest {
         subscriptionService.getFollowingCount(followerId);
 
         verify(subscriptionRepository, times(1)).findFolloweesAmountByFollowerId(followerId);
+    }
+
+    @Test
+    public void testGetUsersDtoAfterFiltration() {
+        List<User> users = userStream.toList();
+
+        subscriptionService.getUsersDtoAfterFiltration(users, userFilterDto);
+
+        users.forEach(user -> verify(searchAppearanceEventPublisher, times(users.size()))
+                .publish(any(SearchAppearanceEventDto.class)));
+
     }
 }

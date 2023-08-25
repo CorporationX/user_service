@@ -31,9 +31,49 @@ public class EventStartEventPublisher {
     private String eventStartEventTopicName;
 
     public void publish(long eventId, LocalDateTime publishDate) {
+        sendEventStartEventInStartDate(eventId, publishDate);
+        sendEventStartEventDayBefore(eventId, publishDate);
+        sendEventStartEventFiveHoursBefore(eventId, publishDate);
+        sendEventStartEventHourBefore(eventId, publishDate);
+        sendEventStartEventFiveMinutesBefore(eventId, publishDate);
+    }
+
+    private void sendEventStartEventInStartDate(long eventId, LocalDateTime publishDate) {
         LocalDateTime currentTime = LocalDateTime.now();
         long delay = Duration.between(currentTime, publishDate).getSeconds();
 
+        sendScheduledEventStartEvent(eventId, delay, publishDate);
+    }
+
+    private void sendEventStartEventDayBefore(long eventId, LocalDateTime publishDate) {
+        LocalDateTime dayBefore = publishDate.minusDays(1);
+        long delay = Duration.between(dayBefore, publishDate).getSeconds();
+
+        sendScheduledEventStartEvent(eventId, delay, publishDate);
+    }
+
+    private void sendEventStartEventFiveHoursBefore(long eventId, LocalDateTime publishDate) {
+        LocalDateTime fiveHoursBefore = publishDate.minusHours(5);
+        long delay = Duration.between(fiveHoursBefore, publishDate).getSeconds();
+
+        sendScheduledEventStartEvent(eventId, delay, publishDate);
+    }
+
+    private void sendEventStartEventHourBefore(long eventId, LocalDateTime publishDate) {
+        LocalDateTime hourBefore = publishDate.minusHours(1);
+        long delay = Duration.between(hourBefore, publishDate).getSeconds();
+
+        sendScheduledEventStartEvent(eventId, delay, publishDate);
+    }
+
+    private void sendEventStartEventFiveMinutesBefore(long eventId, LocalDateTime publishDate) {
+        LocalDateTime fiveMinutesBefore = publishDate.minusMinutes(5);
+        long delay = Duration.between(fiveMinutesBefore, publishDate).getSeconds();
+
+        sendScheduledEventStartEvent(eventId, delay, publishDate);
+    }
+
+    private void sendScheduledEventStartEvent(long eventId, long delay, LocalDateTime publishDate) {
         scheduledThreadPoolExecutor.schedule(() -> {
             Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException("Event with id %d has already been canceled"));
             EventStartEventDto eventToSend = eventStartEventMapper.toDto(event);

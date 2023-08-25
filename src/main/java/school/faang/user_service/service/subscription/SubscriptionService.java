@@ -8,6 +8,7 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.mapper.UserMapper;
@@ -22,6 +23,7 @@ public class SubscriptionService {
     private final UserMapper userMapper;
     private final SubscriptionRepository subscriptionRepository;
     private final UserRepository userRepository;
+    private final FollowerEventPublisher followerEventPublisher;
 
     private final List<UserFilter> userFilters;
 
@@ -30,6 +32,7 @@ public class SubscriptionService {
         validationUsersExists(followerId, followeeId);
         validationSubscriptionExists(followerId, followeeId);
         subscriptionRepository.followUser(followerId, followeeId);
+        followerEventPublisher.followerSubscribed(followerId, followeeId);
     }
 
     @Transactional

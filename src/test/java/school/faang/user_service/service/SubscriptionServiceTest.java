@@ -16,6 +16,7 @@ import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapperImpl;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.subscription.SubscriptionService;
@@ -30,6 +31,8 @@ public class SubscriptionServiceTest {
     private SubscriptionRepository subscriptionRepository;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private FollowerEventPublisher followerEventPublisher;
     @Spy
     private UserMapperImpl userMapper;
     @InjectMocks
@@ -61,6 +64,7 @@ public class SubscriptionServiceTest {
 
         Assertions.assertDoesNotThrow(() -> subscriptionService.followUser(followerId, followeeId));
         Mockito.verify(subscriptionRepository, Mockito.times(1)).followUser(followerId, followeeId);
+        Mockito.verify(followerEventPublisher, Mockito.times(1)).followerSubscribed(followerId, followeeId);
     }
 
     @Test
@@ -114,7 +118,7 @@ public class SubscriptionServiceTest {
 
         UserNameFilter nameFilter = Mockito.mock(UserNameFilter.class);
         subscriptionService = new SubscriptionService(userMapper, subscriptionRepository,
-                userRepository, List.of(nameFilter));
+                userRepository, followerEventPublisher, List.of(nameFilter));
 
         Mockito.when(userRepository.existsById(followeeId)).thenReturn(true);
         Mockito.when(subscriptionRepository.findByFolloweeId(followeeId))
@@ -149,7 +153,7 @@ public class SubscriptionServiceTest {
 
         UserNameFilter nameFilter = Mockito.mock(UserNameFilter.class);
         subscriptionService = new SubscriptionService(userMapper, subscriptionRepository,
-                userRepository, List.of(nameFilter));
+                userRepository, followerEventPublisher, List.of(nameFilter));
 
         Mockito.when(userRepository.existsById(followerId)).thenReturn(true);
         Mockito.when(subscriptionRepository.findByFollowerId(followerId))

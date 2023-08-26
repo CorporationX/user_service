@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorship.MentorshipRequestEventDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.dto.mentorship.RejectionReasonDto;
 import school.faang.user_service.entity.MentorshipRequest;
@@ -26,13 +27,19 @@ public class MentorshipRequestService {
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final MentorshipRequestValidator mentorshipRequestValidator;
     private final List<MentorshipRequestFilter> filters;
+    private final MentorshipRequestEventService mentorshipRequestEventService;
 
     @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         mentorshipRequestValidator.validate(mentorshipRequestDto);
         MentorshipRequest request = mentorshipRequestMapper.toEntity(mentorshipRequestDto);
         request.setStatus(RequestStatus.PENDING);
-        return mentorshipRequestMapper.toDto(mentorshipRequestRepository.save(request));
+
+        MentorshipRequest mentorshipRequestSaved = mentorshipRequestRepository.save(request);
+
+        publishRequestEvent(mentorshipRequestSaved);
+
+        return mentorshipRequestMapper.toDto(mentorshipRequestSaved);
     }
 
     @Transactional(readOnly = true)
@@ -78,5 +85,10 @@ public class MentorshipRequestService {
     private MentorshipRequest getMentorshipRequest(long requestId) {
         return mentorshipRequestRepository.findById(requestId)
                 .orElseThrow(() -> new EntityNotFoundException("Request with id " + requestId + " not found."));
+    }
+
+    private void publishRequestEvent(MentorshipRequest mentorshipRequestSaved) {
+        MentorshipRequestEventDto eventDto = mentorshipRequestEventService.getMentorshipRequestEventDto(mentorshipRequestSaved);
+        mentorshipRequestEventService.publishEventToChannel(eventDto);
     }
 }

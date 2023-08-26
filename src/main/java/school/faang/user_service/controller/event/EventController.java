@@ -14,7 +14,7 @@ public class EventController {
     private final EventService eventService;
 
     @PostMapping("/event")
-    public EventDto create(EventDto eventDto) {
+    public EventDto create(@RequestBody EventDto eventDto) {
         return eventService.create(eventDto);
     }
 

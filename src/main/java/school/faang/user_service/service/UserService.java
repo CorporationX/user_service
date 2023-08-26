@@ -5,35 +5,59 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.config.executors.ExecutorsPull;
+import school.faang.user_service.csv_parser.CsvToPerson.CsvToPerson;
 import school.faang.user_service.dto.DeactivateResponseDto;
 import school.faang.user_service.dto.subscription.UserDto;
 import school.faang.user_service.dto.subscription.UserFilterDto;
+import school.faang.user_service.dto.user.person_dto.UserPersonDto;
+import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.exception.DataValidException;
 import school.faang.user_service.exception.DeactivationException;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.filter.user.UserFilter;
+import school.faang.user_service.mapper.PersonToUserMapper;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.repository.CountryRepository;
+import school.faang.user_service.repository.UserCheckRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.util.PasswordGeneration;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
+
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class UserService {
+    private final CsvToPerson csvToPerson;
+    private final PersonToUserMapper personToUserMapper;
     private final EventRepository eventRepository;
     private final GoalRepository goalRepository;
     private final MentorshipService mentorshipService;
     private final UserRepository userRepository;
     private final List<UserFilter> userFilters;
     private final UserMapper userMapper;
+    private final CountryRepository countryRepository;
+    private final UserCheckRepository userCheckRepository;
+    private final PasswordGeneration passwordGeneration;
+    private final Object lock = new Object();
+    private final ExecutorsPull executorsPull;
+
     @Value("${dicebear.url}")
     private String dicebearUrl;
 
@@ -49,6 +73,66 @@ public class UserService {
         List<User> users = userRepository.findAllById(usersIds);
         log.info("Return list of users: {}", users);
         return userMapper.toUserListDto(users);
+    }
+
+    @Transactional
+    public void registerAnArrayOfUser(InputStream stream) {
+        Map<String, Country> countryMap = new HashMap<>();
+        countryRepository.findAll().forEach(country -> countryMap.put(country.getTitle(), country));
+        String line;
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream))) {
+            reader.readLine();
+            while ((line = reader.readLine()) != null) {
+                try {
+                    String finalLine = line;
+                    executorsPull.pullUserService().getPull().execute(() -> saveUserStudent(finalLine, countryMap));
+                } catch (DataValidException e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("recording error, repeat request");
+        }
+    }
+
+    @Transactional
+    public void saveUserStudent(String line, Map<String, Country> countryBD) {
+        UserPersonDto personDto = csvToPerson.getPerson(line);
+        User user = personToUserMapper.toUser(personDto);
+
+        String personCountry = personDto.getContactInfo().getAddress().getCountry().strip();
+        List<User> users = userCheckRepository.findDistinctPeopleByUsernameOrEmailOrPhone(personDto.getUsername(),
+                personDto.getContactInfo().getEmail(), personDto.getContactInfo().getPhone());
+        List<UserPersonDto> personDtos = users.stream().map(personToUserMapper::toUserPersonDto).toList();
+        if (personDtos.contains(personDto)) {
+            return;
+        }
+
+        user.setPassword(passwordGeneration.getPassword().get());
+
+        checkingAndCreatingACountry(countryBD, personCountry, user);
+
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void checkingAndCreatingACountry(Map<String, Country> countryBD, String personCountry, User user) {
+        if (countryBD.containsKey(personCountry)) {
+            user.setCountry(countryBD.get(personCountry));
+        } else {
+            synchronized (lock) {
+                Map<String, Country> countryMap = new HashMap<>();
+                countryRepository.findAll().forEach(country -> countryMap.put(country.getTitle(), country));
+                if (countryMap.containsKey(personCountry)) {
+                    user.setCountry(countryMap.get(personCountry));
+                } else {
+                    Country countrySave = new Country();
+                    countrySave.setTitle(personCountry.strip());
+                    Country country = countryRepository.save(countrySave);
+                    user.setCountry(country);
+                }
+            }
+        }
     }
 
     public UserDto signup(UserDto userDto) {

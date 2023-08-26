@@ -11,6 +11,8 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import school.faang.user_service.dto.subscription.FollowerEvent;
 import school.faang.user_service.util.Mapper;
 
+import java.util.Optional;
+
 @ExtendWith(MockitoExtension.class)
 public class FollowPublisherTest {
     @Mock
@@ -24,7 +26,7 @@ public class FollowPublisherTest {
 
     @Test
     void eventPublishTest() {
-        Mockito.when(mapper.toJson(Mockito.any())).thenReturn("JSON");
+        Mockito.when(mapper.toJson(Mockito.any())).thenReturn(Optional.of("JSON"));
 
         followPublisher.publish(new FollowerEvent());
 

@@ -13,16 +13,17 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
+import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.exception.EntityStateException;
 import school.faang.user_service.exception.notFoundExceptions.contact.UserNotFoundException;
 import school.faang.user_service.exception.notFoundExceptions.goal.GoalInvitationNotFoundException;
 import school.faang.user_service.exception.notFoundExceptions.goal.GoalNotFoundException;
-import school.faang.user_service.filter.goalinvitation.*;
 import school.faang.user_service.mapper.GoalInvitationMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.util.validator.GoalInvitationServiceValidator;
+import school.faang.user_service.filter.goalinvitation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +42,7 @@ class GoalInvitationServiceTest {
     private GoalRepository goalRepository;
 
     @Spy
-    private GoalInvitationMapperImpl goalInvitationMapper;
+    private GoalInvitationMapper goalInvitationMapper;
 
     @Spy
     private GoalInvitationServiceValidator validator;

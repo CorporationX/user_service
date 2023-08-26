@@ -21,7 +21,8 @@ public class GoalInvitationService {
     private final GoalRepository goalRepository;
     private final GoalInvitationMapper mapper;
 
-    public GoalInvitationDto createInvitation(GoalInvitationDto invitation) {
+    public GoalInvitationDto createInvitation1(GoalInvitationDto invitation) {
+
         goalInvitationValidation.invitationValidationUser(invitation);
 
         GoalInvitation goalInvitation = mapper.toEntity(invitation);

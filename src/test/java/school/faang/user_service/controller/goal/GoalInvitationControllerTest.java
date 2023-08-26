@@ -1,6 +1,6 @@
 package school.faang.user_service.controller.goal;
 
-import org.junit.jupiter.api.BeforeEach;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,7 +24,7 @@ class GoalInvitationControllerTest {
         GoalInvitationDto goalInvitationDto = new GoalInvitationDto(1L, 1L, 1L, 1L, PENDING);
         controller.createInvitation(goalInvitationDto);
         Mockito.verify(service, Mockito.times(1))
-                .createInvitation(goalInvitationDto);
+                .createInvitation1(goalInvitationDto);
 
     }
 }

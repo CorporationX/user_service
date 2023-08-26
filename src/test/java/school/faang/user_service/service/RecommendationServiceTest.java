@@ -17,6 +17,7 @@ import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
 import school.faang.user_service.mapper.skill.SkillMapper;
 import school.faang.user_service.mapper.skill.UserSkillGuaranteeMapper;
+import school.faang.user_service.publisher.recommendation.RecommendationEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
@@ -59,6 +60,8 @@ class RecommendationServiceTest {
     private SkillMapper skillMapper;
     @Mock
     private UserSkillGuaranteeMapper userSkillGuaranteeMapper;
+    @Mock
+    private RecommendationEventPublisher publisher;
 
     @Test
     void testCreate() {

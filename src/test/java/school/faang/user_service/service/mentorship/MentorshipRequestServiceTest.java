@@ -48,6 +48,8 @@ class MentorshipRequestServiceTest {
     private MentorshipRequestValidator mentorshipRequestValidator;
     @Mock
     private List<MentorshipRequestFilter> filters;
+    @Mock
+    private MentorshipRequestEventService mentorshipRequestEventService;
     @InjectMocks
     private MentorshipRequestService mentorshipRequestService;
     private MentorshipRequestDto requestDto;

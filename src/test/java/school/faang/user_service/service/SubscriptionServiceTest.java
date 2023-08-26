@@ -12,18 +12,19 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.subscription.FollowerEvent;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.exception.EntityStateException;
 import school.faang.user_service.exception.notFoundExceptions.contact.UserNotFoundException;
+import school.faang.user_service.filter.subfilter.SubscriberFilter;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.messaging.follow.FollowPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class SubscriptionServiceTest {
@@ -32,6 +33,9 @@ public class SubscriptionServiceTest {
     @Spy
     private UserMapper mapper;
     @Mock
+    private List<SubscriberFilter> filters;
+    @Mock
+    private FollowPublisher followerEventPublisher;
     private List<UserFilter> filters;
     @InjectMocks
     private SubscriptionService service;
@@ -51,6 +55,7 @@ public class SubscriptionServiceTest {
 
         service.followUser(followerId, followeeId);
         verify(repository).followUser(followerId, followeeId);
+        verify(followerEventPublisher, times(1)).publish(Mockito.any());
     }
 
     @Test
@@ -61,6 +66,8 @@ public class SubscriptionServiceTest {
 
         Assert.assertThrows(EntityStateException.class,
                 () -> service.followUser(followerId, followeeId));
+        verify(followerEventPublisher, times(0)).publish(Mockito.any());
+
     }
 
     @Test

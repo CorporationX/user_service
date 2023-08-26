@@ -2,9 +2,10 @@ package school.faang.user_service.util.google;
 
 import com.google.api.client.util.store.DataStore;
 import com.google.api.client.util.store.DataStoreFactory;
-import java.io.Serializable;
 import lombok.RequiredArgsConstructor;
 import school.faang.user_service.repository.GoogleTokenRepository;
+
+import java.io.Serializable;
 
 @RequiredArgsConstructor
 public class JpaDataStoreFactory implements DataStoreFactory {

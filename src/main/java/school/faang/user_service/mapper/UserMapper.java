@@ -9,6 +9,6 @@ import school.faang.user_service.entity.User;
 public interface UserMapper {
   
     User toEntity(UserDto userDto);
-    @Mapping(target = "preferredContact", source = "contactPreference.preference")
+    @Mapping(target = "preference", source = "contactPreference.preference")
     UserDto toDto(User user);
 }

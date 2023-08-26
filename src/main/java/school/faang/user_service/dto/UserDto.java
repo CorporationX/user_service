@@ -23,4 +23,3 @@ public class UserDto {
     private Integer experience;
     private Locale locale;
     private PreferredContact preference;
-}

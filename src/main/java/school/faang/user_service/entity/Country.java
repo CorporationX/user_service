@@ -25,4 +25,11 @@ public class Country {
 
     @OneToMany(mappedBy = "country")
     private List<User> residents;
+
+    @Override
+    public String toString() {
+        return "Country{" +
+                "title='" + title + '\'' +
+                '}';
+    }
 }

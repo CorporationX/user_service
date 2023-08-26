@@ -16,10 +16,15 @@ import school.faang.user_service.commonMessages.ErrorMessagesForEvent;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.RegistrationUserForEventException;
+import school.faang.user_service.mapper.GoalMapper;
+import school.faang.user_service.mapper.MapperUserDto;
+import school.faang.user_service.mapper.MapperUserDtoImpl;
+import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -39,7 +44,11 @@ class EventParticipationServiceTest {
     @Mock
     private EventParticipationRepository eventParticipationRepository;
     @Spy
-    private UserMapper mapper = Mappers.getMapper(UserMapper.class);
+    private GoalMapper goalMapper;
+    @Spy
+    private SkillMapper skillMapper;
+    @Spy
+    private MapperUserDto userMapper = new MapperUserDtoImpl(goalMapper, skillMapper);
     @InjectMocks
     private EventParticipationService eventParticipationService;
 
@@ -224,9 +233,28 @@ class EventParticipationServiceTest {
 
     private List<UserDto> getUsersDto() {
         return List.of(
-                UserDto.builder().id(EXISTING_USER_ID).build(),
-                UserDto.builder().id(2L).build(),
-                UserDto.builder().id(3L).build()
+                UserDto.builder().id(EXISTING_USER_ID)
+                        .followers(new ArrayList<>())
+                        .followees(new ArrayList<>())
+                        .mentors(new ArrayList<>())
+                        .mentees(new ArrayList<>())
+                        .goals(new ArrayList<>())
+                        .skills(new ArrayList<>()).build(),
+                UserDto.builder().id(2L)
+                        .followers(new ArrayList<>())
+                        .followees(new ArrayList<>())
+                        .mentors(new ArrayList<>())
+                        .mentees(new ArrayList<>())
+                        .goals(new ArrayList<>())
+                        .skills(new ArrayList<>())
+                        .build(),
+                UserDto.builder().id(3L).followers(new ArrayList<>())
+                        .followees(new ArrayList<>())
+                        .mentors(new ArrayList<>())
+                        .mentees(new ArrayList<>())
+                        .goals(new ArrayList<>())
+                        .skills(new ArrayList<>())
+                        .build()
         );
     }
 }

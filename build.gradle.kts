@@ -107,4 +107,44 @@ tasks.jacocoTestReport {
 		csv.required.set(false)
 		html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
 	}
+    classDirectories.setFrom(files(classDirectories.files.map {
+        fileTree(it).apply {
+            exclude("school/faang/user_service/entity/**",
+                "school/faang/user_service/dto/**",
+                "school/faang/user_service/commonMessages/**",
+                "school/faang/user_service/config/**",
+                "school/faang/user_service/filter/**",
+                "school/faang/user_service/exception/**",
+                "school/faang/user_service/client/**",
+                "school/faang/user_service/model/**",
+                "school/faang/user_service/repository/**",
+                "school/faang/user_service/util/**",
+                "school/faang/user_service/UserServiceApplication.class",
+                "com/json/student/**",)
+        }
+    }))
 }
+
+tasks.jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            element = "CLASS"
+            excludes = listOf("school.faang.projectservice.entity.**",
+                "school.faang.user_service.dto.**",
+                "school.faang.user_service.commonMessages.**",
+                "school.faang.user_service.config.**",
+                "school.faang.user_service.filter.**",
+                "school.faang.user_service.exception.**",
+                "school.faang.user_service.model.**",
+                "school.faang.user_service.client.**",
+                "school.faang.school.user_service.repository.**",
+                "school.faang.school.user_service.util.**",
+                "school.faang.user_service.UserServiceApplication",
+                "com.json.student.**")
+            limit {
+                minimum = "0.8".toBigDecimal()
+            }
+        }
+    }
+}
+

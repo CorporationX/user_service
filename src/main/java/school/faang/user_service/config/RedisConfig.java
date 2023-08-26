@@ -50,6 +50,11 @@ public class RedisConfig {
     }
 
     @Bean
+    ChannelTopic MentorshipEvenTopic() {
+        return new ChannelTopic("MentorshipEvent");
+    }
+
+    @Bean
     RedisMessageListenerContainer redisContainer(MessageListenerAdapter messageListenerAdapter) {
         final RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(redisConnectionFactory());

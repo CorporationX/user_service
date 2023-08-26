@@ -18,6 +18,7 @@ import school.faang.user_service.exception.EntityStateException;
 import school.faang.user_service.exception.notFoundExceptions.MentorshipRequestNotFoundException;
 import school.faang.user_service.filter.mentorshiprequest.*;
 import school.faang.user_service.mapper.MentorshipRequestMapperImpl;
+import school.faang.user_service.messaging.MentorshipEventPublisher.MentorshipEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.util.validator.MentorshipRequestValidator;
@@ -39,6 +40,9 @@ class MentorshipRequestServiceTest {
     @Mock
     private MentorshipRequestValidator mentorshipRequestValidator;
 
+    @Mock
+    private MentorshipEventPublisher mentorshipEventPublisher;
+
     @Spy
     private MentorshipRequestMapperImpl mentorshipRequestMapper;
 
@@ -58,7 +62,8 @@ class MentorshipRequestServiceTest {
                 mentorshipRequestMapper,
                 mentorshipRequestValidator,
                 userRepository,
-                filters
+                filters,
+                mentorshipEventPublisher
         );
     }
 
@@ -69,6 +74,12 @@ class MentorshipRequestServiceTest {
         MentorshipRequest actual = mentorshipRequestMapper.toEntity(requestDto);
 
         Assertions.assertEquals(buildRequest(), actual);
+    }
+    @Test
+    void requestMentorship_publish() {
+        service.requestMentorship(buildRequestDto());
+        Mockito.verify(mentorshipEventPublisher, Mockito.times(1))
+                .publish(Mockito.any());
     }
 
     @Test

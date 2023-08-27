@@ -1,4 +1,4 @@
-package school.faang.user_service.service.redis;
+package school.faang.user_service.publisher;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;

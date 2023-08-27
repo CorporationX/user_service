@@ -1,4 +1,4 @@
-package school.faang.user_service.service.redis;
+package school.faang.user_service.publisher;
 
 public interface MessagePublisher {
     void publish(String topic, String message);

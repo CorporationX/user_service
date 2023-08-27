@@ -8,7 +8,7 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.mentorship.MentorshipRequestEventDto;
 import school.faang.user_service.entity.MentorshipRequest;
-import school.faang.user_service.service.redis.MentorshipOfferEventPublisher;
+import school.faang.user_service.publisher.MentorshipOfferEventPublisher;
 
 @Service
 @Slf4j
@@ -21,7 +21,11 @@ public class MentorshipRequestEventService {
     private final ChannelTopic mentorshipOfferTopic;
 
     public MentorshipRequestEventDto getMentorshipRequestEventDto(MentorshipRequest request) {
-        return MentorshipRequestEventDto.builder().id(request.getId()).requesterId(request.getRequester().getId()).receiverId(request.getReceiver().getId()).build();
+        return MentorshipRequestEventDto.builder()
+                .id(request.getId())
+                .requesterId(request.getRequester().getId())
+                .receiverId(request.getReceiver().getId())
+                .build();
     }
 
     public void publishEventToChannel(MentorshipRequestEventDto mentorshipRequestEventDto) {

@@ -8,6 +8,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -364,18 +366,26 @@ class EventServiceTest {
         assertTrue(result.isEmpty());
     }
 
-    @Test
-    void clearEvents_shouldSplitEventListAndInvokeClearEventsPartition() {
-        Event event = mock(Event.class);
-        when(event.getEndDate()).thenReturn(LocalDateTime.now().minusDays(1));
-        events = List.of(event, event, event);
+    @ParameterizedTest
+    @CsvSource({
+            "15, 10, 2",
+            "5, 10, 1",
+            "10, 10, 1"
+    })
+    public void testClearEvents(int totalEvents, int partitionSize, int expectedClearCalls) {
+        List<Event> mockEvents = new ArrayList<>();
+        for (int i = 0; i < totalEvents; i++) {
+            Event mockEvent = mock(Event.class);
+            when(mockEvent.getEndDate()).thenReturn(LocalDateTime.now().minusDays(i));
+            mockEvents.add(mockEvent);
+        }
 
-        when(eventRepository.findAll()).thenReturn(events);
+        when(eventRepository.findAll()).thenReturn(mockEvents);
 
-        eventService.clearEvents(1);
+        eventService.clearEvents(partitionSize);
 
-        List<List<Event>> partitions = ListUtils.partition(events, events.size());
+        verify(eventAsyncService, times(expectedClearCalls)).clearEventsPartition(anyList());
 
-        partitions.forEach(partition -> verify(eventAsyncService).clearEventsPartition(partition));
+        verify(eventRepository).findAll();
     }
 }

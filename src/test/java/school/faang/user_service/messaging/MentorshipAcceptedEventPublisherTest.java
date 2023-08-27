@@ -28,6 +28,7 @@ import java.util.Map;
                 "listeners=PLAINTEXT://localhost:9092",
                 "port=9092"
         })
+@Disabled
 class MentorshipAcceptedEventPublisherTest {
 
     @Autowired

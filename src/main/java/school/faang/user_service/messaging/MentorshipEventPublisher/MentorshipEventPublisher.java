@@ -14,7 +14,7 @@ import school.faang.user_service.dto.mentorshipRequest.MentorshipEventDto;
 @AllArgsConstructor
 public class MentorshipEventPublisher implements CommentEventPublisher {
     private final RedisTemplate<String, Object> redisTemplate;
-    private final ChannelTopic topic;
+    private final ChannelTopic mentorshipEventTopic;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -26,6 +26,6 @@ public class MentorshipEventPublisher implements CommentEventPublisher {
             log.error(e.getMessage());
             throw new RuntimeException(e);
         }
-        redisTemplate.convertAndSend(topic.getTopic(), json);
+        redisTemplate.convertAndSend(mentorshipEventTopic.getTopic(), json);
     }
 }

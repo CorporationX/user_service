@@ -22,6 +22,8 @@ public class RedisConfig {
     private int port;
     @Value("${spring.data.redis.channels.user_update_channel.name}")
     private String userUpdateChannel;
+    @Value("${spring.data.redis.channels.mentorship_event_topic.name}")
+    private String mentorshipEventTopic;
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
@@ -50,8 +52,8 @@ public class RedisConfig {
     }
 
     @Bean
-    ChannelTopic MentorshipEvenTopic() {
-        return new ChannelTopic("MentorshipEvent");
+    ChannelTopic mentorshipEventTopic() {
+        return new ChannelTopic(mentorshipEventTopic);
     }
 
     @Bean

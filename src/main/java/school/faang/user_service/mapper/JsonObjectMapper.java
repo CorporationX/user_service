@@ -12,12 +12,5 @@ import org.springframework.stereotype.Component;
 public class JsonObjectMapper {
     private final ObjectMapper objectMapper;
 
-    public String toJson(Object object) {
-        try {
-            return objectMapper.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            log.error("Error while converting object to string", e);
-        }
-        return null;
-    }
+
 }

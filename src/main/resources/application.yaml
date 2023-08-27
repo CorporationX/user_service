@@ -29,6 +29,7 @@ spring:
         user_update_channel:
           name: user_update_channel
 
+
 server:
   port: 8080
 

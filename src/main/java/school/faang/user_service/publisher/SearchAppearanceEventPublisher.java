@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.analytics.SearchAppearanceEventDto;
-import school.faang.user_service.mapper.JsonObjectMapper;
 
 @Component
 @Data

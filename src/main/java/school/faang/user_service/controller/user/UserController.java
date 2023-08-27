@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.user.UserService;
 
+import java.io.IOException;
+
 @Tag(name = "Управление пользователями")
 @RestController
 @RequiredArgsConstructor
@@ -23,7 +25,7 @@ public class UserController {
     }
 
     @PostMapping("/users/create")
-    public void createUser(@RequestBody UserDto userDto) {
+    public void createUser(@RequestBody UserDto userDto) throws IOException {
         userService.createUser(userDto);
     }
 }

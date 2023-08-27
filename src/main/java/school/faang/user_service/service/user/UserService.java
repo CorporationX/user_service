@@ -6,7 +6,6 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.MentorshipService;
@@ -14,6 +13,7 @@ import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.profile_picture.ProfilePictureService;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -21,11 +21,11 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserRepository userRepository;
+    private final UserMapper userMapper;
     private final GoalService goalService;
     private final EventService eventService;
+    private final UserRepository userRepository;
     private final MentorshipService mentorshipService;
-    private final UserMapper userMapper;
     private final ProfilePictureService profilePictureService;
 
     public boolean isUserExist(Long userId) {
@@ -100,9 +100,9 @@ public class UserService {
         cancelMentoring(userId);
     }
 
-    public void createUser(UserDto userDto) {
+    public void createUser(UserDto userDto) throws IOException {
         User user = userMapper.toEntity(userDto);
-
+        profilePictureService.setProfilePicture(user);
         userRepository.save(userMapper.toEntity(userDto));
     }
 }

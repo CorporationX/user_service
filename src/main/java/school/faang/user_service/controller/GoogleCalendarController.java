@@ -19,7 +19,7 @@ public class GoogleCalendarController {
     private final CalendarService calendarService;
 
     @PostMapping("/google")
-    public EventCalendarDto createEvent(@RequestBody EventCalendarDto eventCalendarDto) throws IOException, GeneralSecurityException {
+    public EventCalendarDto createEvent(@RequestBody EventCalendarDto eventCalendarDto) throws IOException {
         return calendarService.createEvent(eventCalendarDto);
     }
 }

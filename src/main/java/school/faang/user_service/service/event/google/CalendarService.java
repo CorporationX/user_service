@@ -5,7 +5,6 @@ import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.config.GoogleCalendarConfig;
 import school.faang.user_service.dto.EventCalendarDto;
 import school.faang.user_service.dto.mydto.UserDto;
 import school.faang.user_service.mapper.CalendarMapper;
@@ -13,7 +12,6 @@ import school.faang.user_service.service.UserService;
 
 import java.io.IOException;
 
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,13 +20,12 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class CalendarService {
-    private final GoogleCalendarConfig calendarConfig;
+    private final Calendar calendar;
     private final CalendarMapper calendarMapper;
     private final UserService userService;
     private final String PRIMARY = "primary";
 
-    public EventCalendarDto createEvent(EventCalendarDto eventCalendarDto) throws IOException, GeneralSecurityException {
-        Calendar service = calendarConfig.googleCalendar();
+    public EventCalendarDto createEvent(EventCalendarDto eventCalendarDto) throws IOException {
         Event event = getEvent(eventCalendarDto);
 
         setEventCreator(eventCalendarDto, event);
@@ -41,7 +38,7 @@ public class CalendarService {
 
         setEventReminder(event);
 
-        service.events().insert(PRIMARY, event).execute();
+        calendar.events().insert(PRIMARY, event).execute();
         return calendarMapper.toDto(event);
     }
 

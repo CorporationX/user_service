@@ -18,6 +18,7 @@ import school.faang.user_service.exception.EntityStateException;
 import school.faang.user_service.exception.notFoundExceptions.MentorshipRequestNotFoundException;
 import school.faang.user_service.filter.mentorshiprequest.*;
 import school.faang.user_service.mapper.MentorshipRequestMapperImpl;
+import school.faang.user_service.messaging.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.util.validator.MentorshipRequestValidator;
@@ -39,6 +40,9 @@ class MentorshipRequestServiceTest {
     @Mock
     private MentorshipRequestValidator mentorshipRequestValidator;
 
+    @Mock
+    private MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher;
+
     @Spy
     private MentorshipRequestMapperImpl mentorshipRequestMapper;
 
@@ -58,6 +62,7 @@ class MentorshipRequestServiceTest {
                 mentorshipRequestMapper,
                 mentorshipRequestValidator,
                 userRepository,
+                mentorshipAcceptedEventPublisher,
                 filters
         );
     }
@@ -175,6 +180,18 @@ class MentorshipRequestServiceTest {
 
         Mockito.verify(userRepository).save(request.getReceiver());
         Mockito.verify(userRepository).save(request.getRequester());
+    }
+
+    @Test
+    void testAcceptRequest_InputsAreValid_ShouldPublishToTopic() {
+        MentorshipRequest request = buildRequestForAcceptingRequest();
+
+        Mockito.when(mentorshipRequestRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.of(request));
+
+        service.acceptRequest(1L);
+
+        Mockito.verify(mentorshipAcceptedEventPublisher).publish(Mockito.any());
     }
 
     @Test

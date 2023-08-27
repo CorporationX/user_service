@@ -24,9 +24,9 @@ spring:
       channels:
         follower_channel:
           name: follower_channel
-        profile_view_channel:
+        profile-view-channel:
           name: profile_view_channel
-        mentorship_offer_channel:
+        mentorship-offer-channel:
           name: mentorship_offer_channel
 
   google:

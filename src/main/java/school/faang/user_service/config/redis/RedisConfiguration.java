@@ -17,7 +17,7 @@ public class RedisConfiguration {
     private String host;
     @Value("${spring.data.redis.port}")
     private int port;
-    @Value("${spring.data.redis.channels.mentorship_offer_channel.name}")
+    @Value("${spring.data.redis.channels.mentorship-offer-channel.name}")
     private String mentorshipOfferTopicName;
 
     @Bean

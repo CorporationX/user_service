@@ -46,12 +46,7 @@ public class MentorshipRequestService {
 
         dataValidate(requesterId, receiverId, requestDto);
         mentorshipRequestRepository.create(requesterId, receiverId, requestDto.getDescription());
-        Optional<MentorshipRequest> latestRequest = mentorshipRequestRepository.findLatestRequest(requesterId, receiverId);
-        if (latestRequest.isPresent()) {
-            MentorshipRequest mentorshipRequest = latestRequest.get();
-            Long requestId = mentorshipRequest.getId();
-            publisher.publish(new MentorshipOfferedEvent(requesterId, receiverId, requestId));
-        }
+        publisher.publish(new MentorshipOfferedEvent(requesterId, receiverId));
         log.info("Mentorship request from requesterId={} to receiverId={} has been saved in DB successfully", requesterId, receiverId);
     }
 

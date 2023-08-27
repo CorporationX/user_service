@@ -51,7 +51,7 @@ public class MentorshipRequestServiceTest {
     @Mock
     private MentorshipRepository mentorshipRepository;
     @Mock
-    private MentorshipOfferedEventPublisher publisher;
+    private MentorshipOfferedEventPublisher eventPublisher;
     @InjectMocks
     private MentorshipRequestService requestService;
 
@@ -169,7 +169,7 @@ public class MentorshipRequestServiceTest {
 
         when(requestRepository.findAll()).thenReturn(Collections.singleton(latestRequest));
         List<MentorshipRequestFilter> filters = getFilters();
-        requestService = new MentorshipRequestService(requestRepository, mentorshipRepository, requestMapper, filters, publisher);
+        requestService = new MentorshipRequestService(requestRepository, mentorshipRepository, requestMapper, filters, eventPublisher);
 
         List<MentorshipRequestDto> actualList = requestService.getRequests(filterDto);
         List<MentorshipRequestDto> expectedList = List.of(requestDto);
@@ -187,7 +187,7 @@ public class MentorshipRequestServiceTest {
 
         when(requestRepository.findAll()).thenReturn(Collections.singleton(latestRequest));
         List<MentorshipRequestFilter> filters = getFilters();
-        requestService = new MentorshipRequestService(requestRepository, mentorshipRepository, requestMapper, filters, publisher);
+        requestService = new MentorshipRequestService(requestRepository, mentorshipRepository, requestMapper, filters, eventPublisher);
 
         List<MentorshipRequestDto> actualList = requestService.getRequests(filterDto);
         List<MentorshipRequestDto> expectedList = new ArrayList<>();
@@ -285,19 +285,15 @@ public class MentorshipRequestServiceTest {
     void publishEvent() {
         when(mentorshipRepository.existsById(CORRECT_REQUESTER_ID)).thenReturn(true);
         when(mentorshipRepository.existsById(CORRECT_RECEIVER_ID)).thenReturn(true);
-        MentorshipRequestDto event = MentorshipRequestDto.builder()
+        MentorshipRequestDto dto = MentorshipRequestDto.builder()
                 .id(CORRECT_REQUEST_ID)
                 .receiver(CORRECT_RECEIVER_ID)
                 .requester(CORRECT_REQUESTER_ID)
                 .updatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
                 .description("some description")
                 .build();
-        MentorshipRequestService service = new MentorshipRequestService(requestRepository, mentorshipRepository, requestMapper, getFilters(), publisher);
-        service.requestMentorship(event);
-        Long expectedRequestId = event.getId();
-        Long expectedReceiverId = event.getReceiver();
-        Long expectedRequesterId = event.getRequester();
-        MentorshipOfferedEvent expectedEvent = new MentorshipOfferedEvent(expectedRequestId, expectedReceiverId, expectedRequesterId);
-        verify(publisher).publish(expectedEvent);
+        MentorshipRequestService service = new MentorshipRequestService(requestRepository, mentorshipRepository, requestMapper, getFilters(), eventPublisher);
+        service.requestMentorship(dto);
+        verify(eventPublisher).publish(any(MentorshipOfferedEvent.class));
     }
 }

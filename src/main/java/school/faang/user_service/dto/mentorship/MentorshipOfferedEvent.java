@@ -10,5 +10,4 @@ import lombok.Data;
 public class MentorshipOfferedEvent {
     private Long requesterId;
     private Long receiverId;
-    private Long requestId;
 }

@@ -36,4 +36,14 @@ public class UserController {
         log.info("Endpoint <getUser>, uri='/users/{}' was called successfully", userId);
         return userService.getUser(userId);
     }
+
+    @PostMapping("/telegram")
+    public String setTelegramContact() {
+        return userService.setTelegramContact();
+    }
+
+    @PostMapping("{userId}/telegram/{chatId}")
+    public void saveTelegramChatId(@PathVariable long userId, @PathVariable long chatId) {
+        userService.saveTelegramChatId(userId, chatId);
+    }
 }

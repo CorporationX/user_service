@@ -9,9 +9,15 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.contact.ContactDto;
+import school.faang.user_service.dto.contact.ContactPreferenceDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.contact.ContactType;
+import school.faang.user_service.entity.contact.PreferredContact;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.contact.ContactPreferenceService;
+import school.faang.user_service.service.contact.ContactService;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +30,10 @@ class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private ContactService contactService;
+    @Mock
+    private ContactPreferenceService contactPreferenceService;
     @InjectMocks
     private UserService userService;
     @Spy
@@ -63,8 +73,8 @@ class UserServiceTest {
 
     private List<User> getListOfUser() {
         return List.of(User.builder().id(1L).build(),
-                       User.builder().id(2L).build(),
-                       User.builder().id(3L).build());
+                User.builder().id(2L).build(),
+                User.builder().id(3L).build());
     }
 
     private List<UserDto> getCorrectListOfUserDto() {
@@ -78,5 +88,24 @@ class UserServiceTest {
         when(userRepository.findById(USER_ID)).thenReturn(Optional.ofNullable(user));
         UserDto actualUser = userService.getUser(USER_ID);
         assertEquals(userDto, actualUser);
+    }
+
+    @Test
+    void testSaveTelegramChatId() {
+        long chatId = 1L;
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        ContactPreferenceDto contactPreference = ContactPreferenceDto.builder()
+                .user(user)
+                .preference(PreferredContact.TELEGRAM)
+                .build();
+        ContactDto contact = ContactDto.builder()
+                .user(user)
+                .contact(String.valueOf(chatId))
+                .type(ContactType.TELEGRAM)
+                .build();
+
+        userService.saveTelegramChatId(USER_ID, chatId);
+        verify(contactService).save(contact);
+        verify(contactPreferenceService).save(contactPreference);
     }
 }

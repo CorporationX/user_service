@@ -72,3 +72,6 @@ event:
       maximum-pool-size: 10
       keep-alive-time: 0
       time-unit: MILLISECONDS
+
+telegram:
+  botUrl: https://t.me/CorpX_bot?start=

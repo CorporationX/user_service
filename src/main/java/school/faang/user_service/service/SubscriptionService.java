@@ -29,6 +29,7 @@ public class SubscriptionService {
         }
         repository.followUser(followerId, followeeId);
     }
+
     @Transactional
     public void unfollowUser(long followerId, long followeeId) {
         if (!repository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
@@ -57,6 +58,7 @@ public class SubscriptionService {
         checkExistence(filteredUsers, "followees");
         return filteredUsers;
     }
+
     @Transactional
     public int getFollowingCount(long followerId) {
         return repository.findFolloweesAmountByFollowerId(followerId);

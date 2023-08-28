@@ -61,6 +61,7 @@ public class RedisConfig {
         final RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(redisConnectionFactory());
         container.addMessageListener(messageListenerAdapter, userUpdateChannel());
+        container.addMessageListener(messageListenerAdapter, mentorshipEventTopic());
         return container;
     }
 }

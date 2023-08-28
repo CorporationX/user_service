@@ -24,7 +24,7 @@ class GoalInvitationControllerTest {
         GoalInvitationDto goalInvitationDto = new GoalInvitationDto(1L, 1L, 1L, 1L, PENDING);
         controller.createInvitation(goalInvitationDto);
         Mockito.verify(service, Mockito.times(1))
-                .createInvitation1(goalInvitationDto);
+                .createInvitation(goalInvitationDto);
 
     }
 }

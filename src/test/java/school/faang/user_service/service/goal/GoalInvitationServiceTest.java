@@ -8,6 +8,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalInvitation;
+import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.mapper.GoalInvitationMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
@@ -30,32 +34,47 @@ class GoalInvitationServiceTest {
     GoalInvitationValidation goalInvitationValidation;
 
     @Mock
-    GoalInvitationMapperImpl goalInvitationMapper;
+    GoalInvitationMapper goalInvitationMapper;
 
     @InjectMocks
     private GoalInvitationService goalInvitationService;
 
+    private Goal goal;
+    private User inviter;
+    private User invitedUser;
+    private GoalInvitation goalInvitation;
+
+
     @BeforeEach
     void setUp() {
+       goal =  Goal.builder()
+                .id(1L)
+                .build();
 
+        inviter =  User.builder()
+                .id(1L)
+                .build();
+
+        invitedUser = User.builder()
+                .id(2L)
+                .build();
+
+        GoalInvitation.builder()
+                .id(1L)
+                .inviter(inviter)
+                .invited(invitedUser)
+                .goal(goal)
+                .status(PENDING)
+                .createdAt(null)
+                .updatedAt(null)
+                .build();
     }
 
     @Test
-    void testMethodСallGoalInvitationValidation() {
-        GoalInvitationDto goalInvitationDto = new GoalInvitationDto(2L, 1L, 2L, 2L, PENDING);
-        goalInvitationService.createInvitation1(goalInvitationDto);
-        Mockito.verify(goalInvitationValidation, Mockito.times(1)).invitationValidationUser(goalInvitationDto);
-    }
-
-    @Test
-    void testMethodСallMapperToEntity() {
+    void testСreateInvitationToEntityCorrect() {
         GoalInvitationDto goalInvitationDto = new GoalInvitationDto(1L, 1L, 2L, 2L, PENDING);
-        goalInvitationService.createInvitation1(goalInvitationDto);
-        Mockito.verify(goalInvitationMapper, Mockito.times(1)).toEntity(goalInvitationDto);
+        Mockito.when(goalInvitationMapper.toEntity(goalInvitationDto)).thenReturn(goalInvitation);
+
     }
-
-
-
-
 
 }

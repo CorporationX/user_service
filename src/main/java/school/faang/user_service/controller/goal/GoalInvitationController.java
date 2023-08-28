@@ -16,6 +16,6 @@ public class GoalInvitationController {
 
     @PostMapping()
     public GoalInvitationDto createInvitation(@RequestBody GoalInvitationDto invitation) {
-        return service.createInvitation1(invitation);
+        return service.createInvitation(invitation);
     }
 }

@@ -11,9 +11,8 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.repository.GoogleTokenRepository;
-import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.GoogleCalendarService;
 
 import java.io.FileNotFoundException;
@@ -23,21 +22,35 @@ import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Component
+@Slf4j
 public class GoogleCalendarClient {
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
     private static final String APP_NAME = "corporation-x";
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
     private static final String CREDENTIALS_FILE_PATH = "/google-calendar-credentials.json";
     private static final List<String> SCOPES = Collections.singletonList(CalendarScopes.CALENDAR);
+    private NetHttpTransport httpTransport;
 
+    public GoogleAuthorizationCodeFlow getFlow() throws IOException{
+        GoogleClientSecrets googleClientSecrets = new GoogleClientSecrets();
 
+        try (InputStream in = this.getClass().getResourceAsStream(CREDENTIALS_FILE_PATH)) {
+            if (Objects.isNull(in)) {
+                throw new FileNotFoundException("File not found: " + CREDENTIALS_FILE_PATH);
+            }
+            googleClientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
+        } catch (IOException e) {
+            log.error("Failed to load client secrets", e);
+        }
 
-
-    public GoogleAuthorizationCodeFlow getFlow() throws IOException, GeneralSecurityException {
-        NetHttpTransport httpTransport = getHttpTransport();
-        GoogleClientSecrets googleClientSecrets = getClientSecrets();
+        try {
+            httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+        } catch (GeneralSecurityException | IOException e) {
+            log.error("Failed to initialize GoogleNetHttpTransport", e);
+        }
         return new GoogleAuthorizationCodeFlow.Builder(
                 httpTransport, JSON_FACTORY, googleClientSecrets, SCOPES)
                 .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))

@@ -56,8 +56,6 @@ public class GoogleCalendarService {
 
         GoogleToken googleToken = googleTokenRepository.findByUser(event.getOwner());
 
-
-
         if (googleToken != null && googleToken.getAccessToken() != null){
             return sendEventToCalendar(event, googleToken).getHtmlLink();
         }
@@ -85,13 +83,14 @@ public class GoogleCalendarService {
             Event event, GoogleToken googleToken) throws IOException, GeneralSecurityException {
 
         Credential credential = googleCalendarClient.getCredential();
+        System.out.println("credential:" + credential);
 
         credential.setAccessToken(googleToken.getAccessToken());
         credential.setRefreshToken(googleToken.getRefreshToken());
         credential.setExpirationTimeMilliseconds(googleToken.getExpirationTimeMilliseconds());
 
         Calendar calendar = googleCalendarClient.getCalendar();
-
+        System.out.println("calendar:" + calendar);
 
         com.google.api.services.calendar.model.Event googleCalendarEvent = createGoogleCalendarEvent(event);
         String calendarId = "primary";

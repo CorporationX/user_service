@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.mentorshipRequest.MentorshipEventDto;
+import school.faang.user_service.dto.mentorshipRequest.MentorshipAcceptedDto;
 import school.faang.user_service.dto.mentorshipRequest.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorshipRequest.RejectionDto;
 import school.faang.user_service.dto.mentorshipRequest.RequestFilterDto;
@@ -15,6 +16,7 @@ import school.faang.user_service.exception.notFoundExceptions.MentorshipRequestN
 import school.faang.user_service.filter.mentorshiprequest.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.messaging.MentorshipEventPublisher.MentorshipEventPublisher;
+import school.faang.user_service.messaging.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.util.validator.MentorshipRequestValidator;
@@ -31,6 +33,7 @@ public class MentorshipRequestService {
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final MentorshipRequestValidator mentorshipRequestValidator;
     private final UserRepository userRepository;
+    private final MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher;
     private final List<MentorshipRequestFilter> filters;
     private final MentorshipEventPublisher mentorshipEventPublisher;
 
@@ -72,9 +75,12 @@ public class MentorshipRequestService {
         receiver.getMentees().add(requester);
         requester.getMentors().add(receiver);
 
-        mentorshipRequestRepository.save(foundRequest);
+        MentorshipRequest saved = mentorshipRequestRepository.save(foundRequest);
         userRepository.save(receiver);
         userRepository.save(requester);
+
+        MentorshipAcceptedDto toPublish = mentorshipRequestMapper.toAcceptedDto(saved);
+        mentorshipAcceptedEventPublisher.publish(toPublish);
 
         return mentorshipRequestMapper.toDto(foundRequest);
     }

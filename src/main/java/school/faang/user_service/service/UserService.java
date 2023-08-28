@@ -6,6 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.dto.mydto.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.contact.Contact;
+import school.faang.user_service.entity.contact.ContactType;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.exception.notFoundExceptions.contact.UserNotFoundException;
@@ -27,6 +29,7 @@ public class UserService {
     private final GoalService goalService;
     private final EventService eventService;
     private final List<UserFilter> userFilters;
+    private final ContactService contactService;
 
     public UserDto getUser(long id) {
         User foundUser = userRepository.findById(id)
@@ -51,6 +54,15 @@ public class UserService {
         }
 
         return premiumUserStream.map(mapper::toDto).toList();
+    }
+    @Transactional
+    public void setUserTelegramId(long userId, long telegramId){
+        var optionalUser = userRepository.findById(userId);
+        optionalUser.ifPresent(user -> {
+            var contact = Contact.builder().contact(Long.toString(telegramId)).user(user).type(ContactType.TELEGRAM).build();
+            contactService.save(contact);
+            user.getContacts().add(contact);
+        });
     }
 
     @Transactional

@@ -9,9 +9,7 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import school.faang.user_service.messaging.RedisUserUpdateSubscriber;
 
 @Configuration
 public class RedisConfig {
@@ -24,6 +22,9 @@ public class RedisConfig {
     private String userUpdateChannel;
     @Value("${spring.data.redis.channels.mentorship_event_topic.name}")
     private String mentorshipEventTopic;
+    @Value("${spring.data.redis.channels.follower_channel.name}")
+    private String followerChannel;
+
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
@@ -42,13 +43,13 @@ public class RedisConfig {
     }
 
     @Bean
-    MessageListenerAdapter messageListener(RedisUserUpdateSubscriber redisUserUpdateSubscriber) {
-        return new MessageListenerAdapter(redisUserUpdateSubscriber);
+    ChannelTopic userUpdateChannel() {
+        return new ChannelTopic(userUpdateChannel);
     }
 
     @Bean
-    ChannelTopic userUpdateChannel() {
-        return new ChannelTopic(userUpdateChannel);
+    ChannelTopic followerTopic() {
+        return new ChannelTopic(followerChannel);
     }
 
     @Bean
@@ -58,9 +59,10 @@ public class RedisConfig {
 
     @Bean
     RedisMessageListenerContainer redisContainer(MessageListenerAdapter messageListenerAdapter) {
-        final RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(redisConnectionFactory());
-        container.addMessageListener(messageListenerAdapter, userUpdateChannel());
-        return container;
+       final RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+       container.setConnectionFactory(redisConnectionFactory());
+       container.addMessageListener(messageListenerAdapter, userUpdateChannel());
+       container.addMessageListener(messageListenerAdapter, mentorshipEventTopic());
+       return container;
     }
 }

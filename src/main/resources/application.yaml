@@ -33,6 +33,8 @@ spring:
           name: profile_view_channel
         user_update_channel:
           name: user_update_channel
+        skill-event:
+          skill-offered-channel: skill_offered_channel
 
 
 server:

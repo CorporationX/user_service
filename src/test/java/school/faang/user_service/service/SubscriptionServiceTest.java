@@ -139,7 +139,7 @@ class SubscriptionServiceTest {
     }
 
     @Test
-    public void testGetUsersDtoAfterFiltration() {
+    public void testGetUsersDtoAfterFiltration_AndTestMethodPublish() {
         List<User> users = userStream.toList();
 
         subscriptionService.getUsersDtoAfterFiltration(users, userFilterDto);

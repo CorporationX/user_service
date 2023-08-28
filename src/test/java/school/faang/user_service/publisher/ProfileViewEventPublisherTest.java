@@ -9,19 +9,23 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.service.redis.RedisMessagePublisher;
 import school.faang.user_service.service.redis.events.ProfileViewEvent;
+
+import java.time.LocalDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(value = {MockitoExtension.class})
 public class ProfileViewEventPublisherTest {
-    @Mock
-    private ObjectMapper objectMapper;
 
     @Mock
     private RedisMessagePublisher redisMessagePublisher;
+
+    @Mock
+    private UserContext userContext;
 
     @InjectMocks
     private ProfileViewEventPublisher profileViewEventPublisher;
@@ -32,18 +36,11 @@ public class ProfileViewEventPublisherTest {
     }
 
     @Test
-    public void testPublish() throws JsonProcessingException {
-        ProfileViewEvent event = new ProfileViewEvent(1L, 2L, null);
+    public void testPublish() {
         String channel = "testChannel";
-        String json = "{\n" +
-                "  \"userId\": 1,\n" +
-                "  \"profileViewedId\": 2,\n" +
-                "  \"date\": null\n" +
-                "}";
-
-        when(objectMapper.writeValueAsString(event)).thenReturn(json);
-        profileViewEventPublisher.publish(event);
-        verify(redisMessagePublisher).publish(channel, json);
+        when(userContext.getUserId()).thenReturn(1L);
+        profileViewEventPublisher.publishProfileViewEvent(2L);
+        verify(redisMessagePublisher).publish(eq(channel), any());
     }
 
 }

@@ -15,6 +15,7 @@ import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.event.EventMapper;
+import school.faang.user_service.mapper.event.EventStartMapper;
 import school.faang.user_service.mapper.skill.SkillMapper;
 import school.faang.user_service.publisher.event.EventStartPublisher;
 import school.faang.user_service.repository.UserRepository;
@@ -32,6 +33,7 @@ public class EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final EventMapper eventMapper;
+    private final EventStartMapper eventStartMapper;
     private final SkillMapper skillMapper;
     private final EventStartPublisher eventStartPublisher;
 
@@ -175,14 +177,7 @@ public class EventService {
             throw new DataValidationException("You can start only planned events");
         }
 
-        List<Long> attendeeIds = event.getAttendees().stream()
-                .map(User::getId)
-                .toList();
-
-        EventStartDto eventStartDto = EventStartDto.builder()
-                .id(event.getId())
-                .attendeeIds(attendeeIds)
-                .build();
+        EventStartDto eventStartDto = eventStartMapper.toDto(event);
 
         eventStartPublisher.publish(eventStartDto);
         return eventStartDto;

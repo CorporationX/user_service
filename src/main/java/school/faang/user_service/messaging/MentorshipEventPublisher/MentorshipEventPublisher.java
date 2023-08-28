@@ -8,11 +8,12 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.mentorshipRequest.MentorshipEventDto;
+import school.faang.user_service.messaging.EventPublisher;
 
 @Component
 @Slf4j
 @AllArgsConstructor
-public class MentorshipEventPublisher implements CommentEventPublisher {
+public class MentorshipEventPublisher implements EventPublisher<MentorshipEventDto> {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ChannelTopic mentorshipEventTopic;
     private final ObjectMapper objectMapper;
@@ -24,7 +25,6 @@ public class MentorshipEventPublisher implements CommentEventPublisher {
             json = objectMapper.writeValueAsString(mentorshipEventDto);
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());
-            throw new RuntimeException(e);
         }
         redisTemplate.convertAndSend(mentorshipEventTopic.getTopic(), json);
     }

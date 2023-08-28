@@ -35,7 +35,8 @@ public class RecommendationValidator {
 
     private void validateRecommendationTerm(Recommendation recommendation, RecommendationDto recommendationDto) {
         LocalDateTime lastRecommendation = recommendation.getCreatedAt();
-        LocalDateTime recommendationTerm = recommendationDto.getCreatedAt();
+        LocalDateTime recommendationTerm = recommendationDto.getCreatedAt() == null ?
+                LocalDateTime.now() : recommendationDto.getCreatedAt();
 
         if (recommendationTerm.isBefore(lastRecommendation.plusMonths(MONTHS_LAST_RECOMMENDATION))) {
             throw new DataValidationException("The author has already recommended this user in the last 6 months.");

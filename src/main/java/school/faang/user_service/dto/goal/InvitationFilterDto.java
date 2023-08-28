@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import school.faang.user_service.entity.RequestStatus;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class InvitationFilterDto {

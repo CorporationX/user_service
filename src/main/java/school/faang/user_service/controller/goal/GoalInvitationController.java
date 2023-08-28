@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
-import school.faang.user_service.filters.filtersForGoalInvitation.GoalInvitationFilter;
+import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.service.GoalInvitationService;
 
 import java.util.List;
@@ -18,21 +18,25 @@ import java.util.List;
 @RequestMapping("/api/v1/invitation")
 public class GoalInvitationController {
     private final GoalInvitationService goalInvitationService;
+
     @PostMapping("/create")
     public GoalInvitationDto createInvitation(@RequestBody GoalInvitationDto invitation) {
         return goalInvitationService.createInvitation(invitation);
     }
+
     @GetMapping("/accept/{id}")
     public GoalInvitationDto acceptGoalInvitation(@PathVariable long id) {
         return goalInvitationService.acceptGoalInvitation(id);
     }
+
     @GetMapping("/reject/{id}")
     public GoalInvitationDto rejectGoalInvitation(@PathVariable long id) {
         return goalInvitationService.rejectGoalInvitation(id);
     }
+
     @PostMapping("/filters")
-    public List<GoalInvitationDto> getInvitations(@RequestBody GoalInvitationFilter goalInvitationFilter) {
-        return getInvitations(goalInvitationFilter);
+    public List<GoalInvitationDto> getInvitations(@RequestBody InvitationFilterDto invitationFilterDto) {
+        return goalInvitationService.getInvitations(invitationFilterDto);
     }
 
 }

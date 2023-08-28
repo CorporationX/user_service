@@ -1,3 +1,5 @@
+import java.util.regex.Pattern.compile
+
 plugins {
 	java
 	jacoco
@@ -31,6 +33,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.0.2")
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+	implementation ("org.springframework.kafka:spring-kafka")
 
 	/**
 	 * Database
@@ -65,6 +68,8 @@ dependencies {
 	testImplementation("org.testcontainers:junit-jupiter")
 	testImplementation("org.testcontainers:postgresql")
 	testImplementation("com.redis.testcontainers:testcontainers-redis-junit-jupiter:1.4.6")
+	testImplementation("org.testcontainers:kafka:1.18.3")
+
 
 	/**
 	 * Tests
@@ -72,8 +77,18 @@ dependencies {
 	testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.2")
 	testImplementation("org.assertj:assertj-core:3.24.2")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.springframework.kafka:spring-kafka-test:3.0.9")
+
 
 	/**
+	 * Google calendar
+	 */
+	implementation("com.google.oauth-client:google-oauth-client:1.34.1")
+	implementation("com.google.apis:google-api-services-calendar:v3-rev20220715-2.0.0")
+	implementation("com.google.http-client:google-http-client-jackson2:1.43.3")
+	implementation("com.google.oauth-client:google-oauth-client-jetty:1.34.1")
+
+  /**
 	 * swagger
 	 */
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")

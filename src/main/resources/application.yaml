@@ -14,6 +14,11 @@ spring:
       hibernate:
         format_sql: true
 
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: group
+
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
 
@@ -30,6 +35,7 @@ spring:
           name: user_update_channel
         mentorship_event_topic:
           name: mentorship_event_topic
+
 
 server:
   port: 8080

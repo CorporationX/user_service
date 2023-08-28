@@ -54,6 +54,8 @@ class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+    @Mock
+    ContactService contactService;
 
     private Goal1MapperImpl goalMapper = new Goal1MapperImpl();
 
@@ -69,7 +71,6 @@ class UserServiceTest {
     private List<UserFilter> userFilters = new ArrayList<>(List.of(new AboutPatternFilter(), new CityPatternFilter(),
             new ContactPatternFilter(), new CountryPatternFilter(), new EmailPatternFilter(), new ExperienceRangeFilter(),
             new NamePatternFilter(), new PhonePatternFilter(), new SkillPatternFilter()));
-
     private UserService userService;
 
     User user;
@@ -77,7 +78,7 @@ class UserServiceTest {
     @BeforeEach
     void setUp() {
         user = User.builder().id(1).build();
-        userService = new UserService(userRepository, userMapper, goalService, eventService, userFilters);
+        userService = new UserService(userRepository, userMapper, goalService, eventService, userFilters, contactService);
     }
 
     @Test

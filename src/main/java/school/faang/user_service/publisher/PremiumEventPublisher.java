@@ -21,7 +21,6 @@ public class PremiumEventPublisher {
     @Value("${spring.data.redis.channels.premium_events_channel.name}")
     private String premiumEventChannelName;
 
-    private final ObjectMapper objectMapper;
     private final RedisMessagePublisher redisMessagePublisher;
 
     public void purchaseSuccessful(Long userId) {
@@ -31,13 +30,6 @@ public class PremiumEventPublisher {
         premiumEvent.setUserId(userId);
         premiumEvent.setReceivedAt(new Date());
 
-        try {
-            String json = objectMapper.writeValueAsString(premiumEvent);
-
-            redisMessagePublisher.publish(premiumEventChannelName, json);
-            log.info("Premium purchase success notification was published");
-        }  catch (JsonProcessingException e) {
-            log.error(e.toString());
-        }
+        redisMessagePublisher.publish(premiumEventChannelName, premiumEvent);
     }
 }

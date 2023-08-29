@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.user.UserService;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -29,5 +31,10 @@ public class UserController {
     @PostMapping
     public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);
+
+    @PostMapping("/students/upload")
+    public void uploadStudents(@RequestParam("students") MultipartFile students) {
+        log.debug("Received request to upload students to the database from file: {}", students.getName());
+        userService.saveStudents(students);
     }
 }

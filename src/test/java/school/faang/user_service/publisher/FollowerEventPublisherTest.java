@@ -7,7 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
-import school.faang.user_service.dto.redis.FollowerEventDto;
+import school.faang.user_service.dto.event.FollowerEventDto;
 
 import java.time.LocalDateTime;
 

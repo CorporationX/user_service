@@ -3,6 +3,7 @@ package school.faang.user_service.service.event;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
@@ -12,6 +13,7 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filters.event.EventFilter;
 import school.faang.user_service.mapper.event.EventMapper;
+import school.faang.user_service.publisher.EventStartEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
@@ -27,13 +29,16 @@ import java.util.stream.Stream;
 public class EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
+    private final EventStartEventPublisher eventStartEventPublisher;
     private final EventMapper eventMapper;
     private final List<EventFilter> filters;
 
-
+    @Transactional
     public EventDto create(EventDto event) {
         checkIfOwnerHasRequiredSkills(event);
-        return eventMapper.toDTO(eventRepository.save(eventMapper.toEvent(event)));
+        Event newEvent = eventRepository.save(eventMapper.toEvent(event));
+        eventStartEventPublisher.publish(newEvent.getId(), newEvent.getStartDate());
+        return eventMapper.toDTO(newEvent);
     }
 
     private void checkIfOwnerHasRequiredSkills(EventDto event) {

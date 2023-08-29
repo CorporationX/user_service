@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.dto.mydto.UserDto;
+import school.faang.user_service.dto.notification.UserNotificationDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.contact.Contact;
 import school.faang.user_service.entity.contact.ContactType;
@@ -36,6 +37,15 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException("User with id " + id + " not found"));
 
         return mapper.toDto(foundUser);
+    }
+
+    public UserNotificationDto getUserForNotification(long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User with id " + id + " not found"));
+        var a = user.getContactPreference().getPreference();
+        var userNotificationDto = mapper.toNotificationDto(user);
+        userNotificationDto.setPreference(a);
+        return  userNotificationDto;
     }
 
     public List<UserDto> getUsersByIds(List<Long> userIds) {

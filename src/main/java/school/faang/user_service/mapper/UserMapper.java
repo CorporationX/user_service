@@ -16,5 +16,6 @@ public interface UserMapper {
     UserDto toDto(User user);
 
     @Mapping(target = "country", ignore = true)
+    @Mapping(target = "contactPreference.preference", source = "preference")
     User toEntity(UserDto userDto);
 }

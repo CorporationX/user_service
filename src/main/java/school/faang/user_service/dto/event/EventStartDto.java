@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -14,4 +15,6 @@ import java.util.List;
 public class EventStartDto {
     private Long id;
     private List<Long> attendeeIds;
+    private String title;
+    private LocalDateTime startDate;
 }

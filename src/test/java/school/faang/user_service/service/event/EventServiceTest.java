@@ -26,6 +26,7 @@ import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.event.EventMapperImpl;
+import school.faang.user_service.mapper.event.EventStartMapper;
 import school.faang.user_service.mapper.skill.SkillMapperImpl;
 import school.faang.user_service.publisher.event.EventStartPublisher;
 import school.faang.user_service.repository.UserRepository;
@@ -47,6 +48,8 @@ class EventServiceTest {
     @Spy
     private SkillMapperImpl skillMapper;
     @Mock
+    private EventStartMapper eventStartMapper;
+    @Mock
     private EventRepository eventRepository;
     @Mock
     private UserRepository userRepository;
@@ -58,6 +61,7 @@ class EventServiceTest {
     private EventDto eventDto;
     private Event event;
     private User user;
+    private EventStartDto eventStartDto;
 
     @BeforeEach
     void setUp() {
@@ -104,10 +108,18 @@ class EventServiceTest {
                 .maxAttendees(100)
                 .build();
 
+        eventStartDto = EventStartDto.builder()
+                .id(0L)
+                .title("Title")
+                .attendeeIds(Collections.emptyList())
+                .startDate(LocalDateTime.of(2023, 1, 1, 0, 0))
+                .build();
+
         eventMock = mock(Event.class);
         when(eventMock.getStatus()).thenReturn(EventStatus.PLANNED);
         when(eventMock.getAttendees()).thenReturn(Collections.emptyList());
         when(eventRepository.findById(1L)).thenReturn(Optional.of(eventMock));
+        when(eventStartMapper.toDto(eventMock)).thenReturn(eventStartDto);
     }
 
     @Test
@@ -400,12 +412,13 @@ class EventServiceTest {
     }
 
     @Test
-    void startEvent_shouldInvokePublishMethod() {
-        EventStartDto eventStartDto = EventStartDto.builder()
-                .id(0L)
-                .attendeeIds(Collections.emptyList())
-                .build();
+    void startEvent_shouldInvokeEventStartMapperToDtoMethod() {
+        eventService.startEvent(1L);
+        verify(eventStartMapper).toDto(eventMock);
+    }
 
+    @Test
+    void startEvent_shouldInvokePublishMethod() {
         eventService.startEvent(1L);
         verify(eventStartPublisher).publish(eventStartDto);
     }

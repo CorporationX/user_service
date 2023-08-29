@@ -28,6 +28,9 @@ spring:
             name: profile-view-channel
         recommendation_channel:
             name: recommendation-channel
+        event_channel:
+            name: event-start-channel
+
 
   google:
     calendar:
@@ -43,6 +46,9 @@ spring:
     maxPoolSize: 10
     queueCapacity: 1000
     threadNamePrefix: "task-executor-thread-"
+
+  students:
+    partitionSize: 100
 
   scheduler:
     partitionSize: 1000

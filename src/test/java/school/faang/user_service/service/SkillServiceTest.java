@@ -1,8 +1,12 @@
 package school.faang.user_service.service;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -14,18 +18,20 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.EntityAlreadyExistException;
-import school.faang.user_service.exception.invalidFieldException.DataValidationException;
 import school.faang.user_service.exception.notFoundExceptions.SkillNotFoundException;
-import school.faang.user_service.mapper.SkillMapper;
+import school.faang.user_service.mapper.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -38,7 +44,7 @@ class SkillServiceTest {
     private SkillRepository skillRepository;
 
     @Spy
-    private SkillMapper skillMapper;
+    private SkillMapperImpl skillMapper;
 
     @Mock
     private SkillOfferRepository skillOfferRepository;
@@ -110,5 +116,31 @@ class SkillServiceTest {
         Mockito.when(skillMapper.toDTO(skill)).thenReturn(skillDto);
 
         assertEquals(skillDto, skillService.acquireSkillFromOffers(4L, 4L));
+    }
+
+    @ParameterizedTest
+    @MethodSource("getId")
+    @DisplayName("get skill by id")
+    void testGetSkillById(long id) {
+        Skill skill = new Skill();
+        skill.setId(id);
+        skill.setTitle("privet");
+
+        when(skillRepository.findById(id))
+                .thenReturn(Optional.of(skill));
+        SkillDto skillDto = skillService.getSkillById(id);
+        assertEquals(id, skillDto.getId());
+    }
+
+    static Stream<Arguments> getId() {
+        return Stream.of(
+                Arguments.of(new Random().nextLong()),
+                Arguments.of(new Random().nextLong()),
+                Arguments.of(new Random().nextLong()),
+                Arguments.of(new Random().nextLong()),
+                Arguments.of(new Random().nextLong()),
+                Arguments.of(new Random().nextLong()),
+                Arguments.of(new Random().nextLong())
+        );
     }
 }

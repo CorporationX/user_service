@@ -1,7 +1,10 @@
 package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.exception.invalidFieldException.DataValidationException;
@@ -10,8 +13,9 @@ import school.faang.user_service.service.SkillService;
 import java.util.List;
 
 
-@Controller
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("/skill")
 public class SkillController {
     private final SkillService skillService;
 
@@ -31,6 +35,11 @@ public class SkillController {
     public SkillDto acquireSkillFromOffers(Long skillId, Long userId) {
         throwIfTrue(skillId == null || userId == null, "skillId or userId cannot be null");
         return skillService.acquireSkillFromOffers(skillId, userId);
+    }
+
+    @GetMapping("/{skillId}")
+    public SkillDto getSkillById(@PathVariable Long skillId) {
+        return skillService.getSkillById(skillId);
     }
 
     private void throwIfTrue(boolean condition, String errorMessage) {

@@ -12,12 +12,10 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.mapper.GoalInvitationMapper;
-import school.faang.user_service.mapper.GoalInvitationMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validator.GoalInvitationValidation;
-
 import static school.faang.user_service.entity.RequestStatus.PENDING;
 
 @ExtendWith(MockitoExtension.class)
@@ -59,7 +57,7 @@ class GoalInvitationServiceTest {
                 .id(2L)
                 .build();
 
-        GoalInvitation.builder()
+        goalInvitation = GoalInvitation.builder()
                 .id(1L)
                 .inviter(inviter)
                 .invited(invitedUser)
@@ -74,7 +72,8 @@ class GoalInvitationServiceTest {
     void testСreateInvitationToEntityCorrect() {
         GoalInvitationDto goalInvitationDto = new GoalInvitationDto(1L, 1L, 2L, 2L, PENDING);
         Mockito.when(goalInvitationMapper.toEntity(goalInvitationDto)).thenReturn(goalInvitation);
-
+        goalInvitationService.createInvitation(goalInvitationDto);
+        Mockito.verify(goalInvitationRepository, Mockito.times(1)).save(goalInvitation);
     }
 
 }

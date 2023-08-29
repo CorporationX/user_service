@@ -26,7 +26,6 @@ public class GoalInvitationService {
         goalInvitationValidation.invitationValidationUser(invitation);
 
         GoalInvitation goalInvitation = mapper.toEntity(invitation);
-
 //        User inviter = userRepository.findById(invitation.getInviterId()).orElseThrow();
 //        User invited = userRepository.findById(invitation.getInvitedUserId()).orElseThrow();
 //        Goal goal = goalRepository.findById(invitation.getGoalId()).orElseThrow();

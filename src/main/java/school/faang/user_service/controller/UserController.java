@@ -57,7 +57,7 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/notification/{userId}")
-    UserNotificationDto setUserTelegramId(@PathVariable long userId) {
+    UserNotificationDto getUser(@PathVariable long userId) {
         return userService.getUserForNotification(userId);
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import school.faang.user_service.messaging.mentorshipEventPublisher.MentorshipEventPublisher;
 import school.faang.user_service.messaging.RedisUserUpdateSubscriber;
 
 @Configuration
@@ -65,11 +66,15 @@ public class RedisConfig {
     }
 
     @Bean
+    MentorshipEventPublisher mentorshipEventPublisher() {
+        return new MentorshipEventPublisher(redisTemplate(redisConnectionFactory()), mentorshipEventTopic());
+    }
+
+    @Bean
     RedisMessageListenerContainer redisContainer(MessageListenerAdapter messageListenerAdapter) {
        final RedisMessageListenerContainer container = new RedisMessageListenerContainer();
        container.setConnectionFactory(redisConnectionFactory());
        container.addMessageListener(messageListenerAdapter, userUpdateChannel());
-       container.addMessageListener(messageListenerAdapter, mentorshipEventTopic());
        return container;
     }
 }

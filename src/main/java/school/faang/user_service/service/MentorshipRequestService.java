@@ -15,7 +15,7 @@ import school.faang.user_service.exception.EntityStateException;
 import school.faang.user_service.exception.notFoundExceptions.MentorshipRequestNotFoundException;
 import school.faang.user_service.filter.mentorshiprequest.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
-import school.faang.user_service.messaging.MentorshipEventPublisher.MentorshipEventPublisher;
+import school.faang.user_service.messaging.mentorshipEventPublisher.MentorshipEventPublisher;
 import school.faang.user_service.messaging.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -33,9 +33,9 @@ public class MentorshipRequestService {
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final MentorshipRequestValidator mentorshipRequestValidator;
     private final UserRepository userRepository;
-    private final MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher;
     private final List<MentorshipRequestFilter> filters;
     private final MentorshipEventPublisher mentorshipEventPublisher;
+    private final MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher;
 
     @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto dto) {

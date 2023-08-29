@@ -9,6 +9,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.contact.ContactPreference;
+import school.faang.user_service.entity.contact.PreferredContact;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,6 +33,7 @@ class UserMapperTest {
                 .country(Country.builder().title("country").build())
                 .city("city")
                 .experience(10)
+                .contactPreference(ContactPreference.builder().preference(PreferredContact.EMAIL).build())
                 .build();
 
         userDto = UserDto.builder()
@@ -41,6 +44,7 @@ class UserMapperTest {
                 .aboutMe("aboutUser")
                 .city("city")
                 .experience(10)
+                .preference(PreferredContact.EMAIL)
                 .build();
     }
 
@@ -56,6 +60,7 @@ class UserMapperTest {
             assertEquals("country", actual.getCountry());
             assertEquals("city", actual.getCity());
             assertEquals(10, actual.getExperience());
+            assertEquals(PreferredContact.EMAIL, actual.getPreference());
         });
     }
 
@@ -70,6 +75,7 @@ class UserMapperTest {
             assertEquals("aboutUser", actual.getAboutMe());
             assertEquals("city", actual.getCity());
             assertEquals(10, actual.getExperience());
+            assertEquals(PreferredContact.EMAIL, actual.getContactPreference().getPreference());
         });
     }
 

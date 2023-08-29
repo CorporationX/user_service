@@ -12,6 +12,7 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.service.GoogleCalendarService;
 
@@ -34,6 +35,7 @@ public class GoogleCalendarClient {
     private static final List<String> SCOPES = Collections.singletonList(CalendarScopes.CALENDAR);
     private NetHttpTransport httpTransport;
 
+    @Bean
     public GoogleAuthorizationCodeFlow getFlow() throws IOException{
         GoogleClientSecrets googleClientSecrets = new GoogleClientSecrets();
 

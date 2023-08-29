@@ -47,6 +47,7 @@ public class GoogleCalendarService {
     private final EventRepository eventRepository;
     private final GoogleTokenRepository googleTokenRepository;
     private final GoogleCalendarClient googleCalendarClient;
+    private final GoogleAuthorizationCodeFlow flow;
 
     @Transactional
     public String createCalendarEvent(Long eventId) throws IOException, GeneralSecurityException {
@@ -58,12 +59,10 @@ public class GoogleCalendarService {
         GoogleToken googleToken = googleTokenRepository.findByUser(event.getOwner());
 
         if (googleToken != null && googleToken.getAccessToken() != null){
-            System.out.println("sending event to a calendar");
             return sendEventToCalendar(event, googleToken).getHtmlLink();
         }
 
-        System.out.println("getting redirection url");
-        return getRedirectionUrl(userId, event.getId(), googleCalendarClient.getFlow());
+        return getRedirectionUrl(userId, event.getId());
    }
 
     @Transactional
@@ -71,18 +70,13 @@ public class GoogleCalendarService {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException(
                 MessageFormat.format("Event {0} not found", eventId)));
 
-        GoogleAuthorizationCodeFlow flow = googleCalendarClient.getFlow();
-
         GoogleTokenResponse response = flow.newTokenRequest(code)
                 .setRedirectUri("http://localhost:8080/api/v1/calendar/auth/callback")
                 .execute();
-        System.out.println(response.getIdToken());
 
         Credential credential = flow.createAndStoreCredential(response, String.valueOf(event.getOwner().getId()));
-        System.out.println(credential.getAccessToken());
 
         GoogleToken googleToken = buildGoogleToken(credential, event.getOwner(), googleCalendarClient.getClientSecrets());
-        System.out.println(googleToken.getAccessToken());
         sendEventToCalendar(event, googleToken);
     }
 
@@ -137,17 +131,7 @@ public class GoogleCalendarService {
         return googleCalendarEvent;
     }
 
-//    private GoogleAuthorizationCodeRequestUrl getRedirectionUrl(Long userId, Long eventId, GoogleAuthorizationCodeFlow flow) {
-//        GoogleAuthorizationCodeRequestUrl url =  flow.newAuthorizationUrl()
-//                .setAccessType("offline")
-//                .setRedirectUri("http://localhost:8080/api/v1/calendar/auth/callback")
-//                .setState(userId + "-" + eventId);
-//        System.out.println(url);
-//
-//        return url;
-//    }
-
-    private String getRedirectionUrl (Long userId, Long eventId, GoogleAuthorizationCodeFlow flow) {
+    private String getRedirectionUrl (Long userId, Long eventId) {
         return flow.newAuthorizationUrl()
                 .setAccessType("offline")
                 .setRedirectUri("http://localhost:8080/api/v1/calendar/auth/callback")
@@ -167,5 +151,4 @@ public class GoogleCalendarService {
                 .oauthClientId(googleClientSecrets.getDetails().getClientId())
                 .build();
     }
-
 }

@@ -21,8 +21,6 @@ import school.faang.user_service.util.PasswordGenerator;
 import java.util.List;
 import java.util.concurrent.Executor;
 
-import java.util.List;
-
 @RequiredArgsConstructor
 @Service
 @Slf4j
@@ -32,6 +30,7 @@ public class UserService {
     private final PasswordGenerator passwordGenerator;
     private final UserMapper userMapper;
     private final PersonMapper personMapper;
+    private final PersonParser personParser;
     private final Executor taskExecutor;
     @Value("${spring.students.partitionSize}")
     private int partitionSize;

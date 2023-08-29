@@ -31,6 +31,7 @@ public class UserController {
     @PostMapping
     public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);
+    }
 
     @PostMapping("/students/upload")
     public void uploadStudents(@RequestParam("students") MultipartFile students) {

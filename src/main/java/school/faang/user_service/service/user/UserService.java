@@ -6,6 +6,8 @@ import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.mapper.UserMapper;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.EntityNotFoundException;
@@ -26,6 +28,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final CountryRepository countryRepository;
     private final PasswordGenerator passwordGenerator;
+    private final UserMapper userMapper;
     private final PersonMapper personMapper;
     private final PersonParser personParser;
     private final Executor taskExecutor;
@@ -48,7 +51,20 @@ public class UserService {
             }
         }
     }
+  
+    @Transactional(readOnly = true)
+    public UserDto getUserById(long id) {
+        return userMapper.toDto(getUser(id));
+    }
 
+    @Transactional(readOnly = true)
+    public List<UserDto> getUsersByIds(List<Long> userIds) {
+        return userRepository.findAllById(userIds)
+                .stream()
+                .map(userMapper::toDto)
+                .toList();
+    }
+  
     @Transactional
     public void saveStudents(MultipartFile studentsFile) {
         List<Person> students = personParser.parse(studentsFile);

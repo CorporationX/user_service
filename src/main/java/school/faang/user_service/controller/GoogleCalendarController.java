@@ -2,6 +2,7 @@ package school.faang.user_service.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,18 +17,33 @@ import java.security.GeneralSecurityException;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/calendar")
+@Slf4j
 public class GoogleCalendarController {
 
     private final GoogleCalendarService googleCalendarService;
 
     @PostMapping("/{eventId}")
     public String createEvent(@Valid @PathVariable Long eventId) throws GeneralSecurityException, IOException {
+        log.debug("Request for event creation. Event id: {}", eventId);
+        System.out.println("Request for event creation. Event id: " + eventId);
         return googleCalendarService.createCalendarEvent(eventId);
     }
 
-    @GetMapping("/auth/callback")
-    public void handleAuthorizationCallback(@RequestParam("code") String code,
-                                            @RequestParam("event") Long eventId) throws GeneralSecurityException, IOException {
-        googleCalendarService.getCredentialsFromCallback(code, eventId);
-    }
+//    @GetMapping("/auth/callback")
+//    public void handleAuthorizationCallback(@RequestParam("code") String code,
+//                                            @RequestParam("event") Long eventId) throws GeneralSecurityException, IOException {
+//        log.debug("Redirect for event creation");
+//        googleCalendarService.getCredentialsFromCallback(code, eventId);
+//    }
+@GetMapping("/callback")
+public void handleCallback(@RequestParam String code, @RequestParam String state)
+        throws IOException, GeneralSecurityException {
+    System.out.println("Handled redirect request to create event for user with id: " );
+    String[] args = state.split("-");
+    Long userId = Long.parseLong(args[0]);
+    Long eventId = Long.parseLong(args[1]);
+    log.debug("Handled redirect request to create event for user with id: {}", userId);
+
+    googleCalendarService.getCredentialsFromCallback(code, eventId);
+}
 }

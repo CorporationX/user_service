@@ -25,7 +25,6 @@ public class GoalInvitationValidation {
         existGoal(goalId);
         emptyUsers(inviterId, invitedUserId);
         sameUsers(inviterId, invitedUserId);
-
     }
 
     private void emptyUsers(Long inviterId, Long invitedUserId) {

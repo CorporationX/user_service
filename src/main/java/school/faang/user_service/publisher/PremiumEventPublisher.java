@@ -36,7 +36,7 @@ public class PremiumEventPublisher {
 
             redisMessagePublisher.publish(premiumEventChannelName, json);
             log.info("Premium purchase success notification was published");
-        }  catch (JsonProcessingException e) {
+        } catch (JsonProcessingException e) {
             log.error(e.toString());
         }
     }

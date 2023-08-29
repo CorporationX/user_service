@@ -87,4 +87,10 @@ public class EventController {
         validateEvent(event);
         return eventService.updateEvent(event);
     }
+
+    @Operation(summary = "Начать событие")
+    @PutMapping("/{id}")
+    public EventDto startEvent(@PathVariable Long id) {
+        return eventService.startEvent(id);
+    }
 }

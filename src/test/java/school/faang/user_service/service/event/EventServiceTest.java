@@ -15,6 +15,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.publisher.EventStartEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -43,6 +44,8 @@ class EventServiceTest {
     private EventMapper eventMapper;
     @Mock
     private SkillRepository skillRepository;
+    @Mock
+    private EventStartEventPublisher eventStartEventPublisher;
 
     @Mock
     private UserRepository userRepository;
@@ -56,7 +59,7 @@ class EventServiceTest {
     public void init() {
         EventFilter eventTitleFilter = new EventTitleFilter();
         List<EventFilter> eventFilterList = List.of(eventTitleFilter);
-        eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList, userRepository);
+        eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList, userRepository, eventStartEventPublisher);
 
         userSkill.setTitle("Coding");
         userSkill.setId(1L);
@@ -198,7 +201,7 @@ class EventServiceTest {
     @Test
     void testGetAllUserEventsByStartDateFilter() {
         List<EventFilter> eventFilterList = List.of(new EventStartDateFilter());
-        eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList, userRepository);
+        eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList, userRepository, eventStartEventPublisher);
 
         Event javaEvent = new Event();
         javaEvent.setTitle("Java");
@@ -229,7 +232,7 @@ class EventServiceTest {
     @Test
     void testGetAllUserEventsByEndDateFilter() {
         List<EventFilter> eventFilterList = List.of(new EventEndDateFilter());
-        eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList, userRepository);
+        eventService = new EventService(eventRepository, skillRepository, eventMapper, eventFilterList, userRepository, eventStartEventPublisher);
 
         Event javaEvent = new Event();
         javaEvent.setTitle("Java");

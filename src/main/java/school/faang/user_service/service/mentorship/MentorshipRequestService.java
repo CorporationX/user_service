@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.mentorship.MentorshipOfferedEvent;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.dto.mentorship.RequestFilterDto;
@@ -14,6 +15,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.MentorshipRequestNotFoundException;
 import school.faang.user_service.exception.RequestAlreadyAcceptedException;
 import school.faang.user_service.exception.UserNotFoundException;
+import school.faang.user_service.publisher.MentorshipOfferedEventPublisher;
 import school.faang.user_service.service.mentorship.filter.MentorshipRequestFilter;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
@@ -34,13 +36,16 @@ public class MentorshipRequestService {
     private final MentorshipRepository mentorshipRepository;
     private final MentorshipRequestMapper requestMapper;
     private final List<MentorshipRequestFilter> filters;
+    private final MentorshipOfferedEventPublisher publisher;
 
+    @Transactional
     public void requestMentorship(MentorshipRequestDto requestDto) {
         long requesterId = requestDto.getRequester();
         long receiverId = requestDto.getReceiver();
 
         dataValidate(requesterId, receiverId, requestDto);
         mentorshipRequestRepository.create(requesterId, receiverId, requestDto.getDescription());
+        publisher.sendEvent(new MentorshipOfferedEvent(requesterId, receiverId));
         log.info("Mentorship request from requesterId={} to receiverId={} has been saved in DB successfully", requesterId, receiverId);
     }
 

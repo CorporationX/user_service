@@ -7,9 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.listener.ChannelTopic;
 import school.faang.user_service.dto.MentorshipRequestedEventDto;
 
 import static org.mockito.Mockito.verify;
@@ -23,15 +21,13 @@ class MentorshipRequestedEventPublisherTest {
     @Mock
     private ObjectMapper objectMapper;
 
-    @Mock
-    @Qualifier("mentorshipRequestedTopic")
-    private ChannelTopic mentorshipRequestedTopic;
+
 
     private MentorshipRequestedEventPublisher eventPublisher;
 
     @BeforeEach
     void setUp() {
-        eventPublisher = new MentorshipRequestedEventPublisher(redisTemplate, objectMapper, mentorshipRequestedTopic);
+        eventPublisher = new MentorshipRequestedEventPublisher(redisTemplate, objectMapper, "topic");
     }
 
     @Test
@@ -45,6 +41,6 @@ class MentorshipRequestedEventPublisherTest {
 
         eventPublisher.publish(eventDto);
 
-        verify(redisTemplate).convertAndSend(mentorshipRequestedTopic.getTopic(), "JSON_STRING");
+        verify(redisTemplate).convertAndSend("topic", "JSON_STRING");
     }
 }

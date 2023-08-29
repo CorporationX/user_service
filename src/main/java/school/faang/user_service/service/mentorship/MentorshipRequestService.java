@@ -24,7 +24,6 @@ import school.faang.user_service.repository.mentorship.MentorshipRequestReposito
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 @Service
@@ -46,7 +45,7 @@ public class MentorshipRequestService {
 
         dataValidate(requesterId, receiverId, requestDto);
         mentorshipRequestRepository.create(requesterId, receiverId, requestDto.getDescription());
-        publisher.publish(new MentorshipOfferedEvent(requesterId, receiverId));
+        publisher.sendEvent(new MentorshipOfferedEvent(requesterId, receiverId));
         log.info("Mentorship request from requesterId={} to receiverId={} has been saved in DB successfully", requesterId, receiverId);
     }
 

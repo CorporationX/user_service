@@ -294,6 +294,6 @@ public class MentorshipRequestServiceTest {
                 .build();
         MentorshipRequestService service = new MentorshipRequestService(requestRepository, mentorshipRepository, requestMapper, getFilters(), eventPublisher);
         service.requestMentorship(dto);
-        verify(eventPublisher).publish(any(MentorshipOfferedEvent.class));
+        verify(eventPublisher).sendEvent(any(MentorshipOfferedEvent.class));
     }
 }

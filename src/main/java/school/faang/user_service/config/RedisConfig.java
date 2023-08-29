@@ -22,6 +22,8 @@ public class RedisConfig {
     private String userUpdateChannel;
     @Value("${spring.data.redis.channels.follower_channel.name}")
     private String followerChannel;
+    @Value("${spring.data.redis.channels.skill-event.skill-offered-channel}")
+    private String skillOfferedChannel;
 
 
     @Bean
@@ -48,6 +50,11 @@ public class RedisConfig {
     @Bean
     ChannelTopic followerTopic() {
         return new ChannelTopic(followerChannel);
+    }
+
+    @Bean
+    ChannelTopic skillOfferedTopic() {
+        return new ChannelTopic(skillOfferedChannel);
     }
 
     @Bean

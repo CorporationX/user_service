@@ -23,9 +23,11 @@ spring:
       host: localhost
       channels:
         follower_channel:
-          name: follower_channel
+          name: follower-channel
         profile_view_channel:
-            name: profile_view_channel
+          name: profile-view-channel
+        mentorship_requested_channel:
+          name: mentorship-requested-channel
 
   google:
     calendar:

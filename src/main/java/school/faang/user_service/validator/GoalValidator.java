@@ -6,8 +6,8 @@ import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
-import school.faang.user_service.exсeption.DataValidationException;
-import school.faang.user_service.exсeption.EntityNotFoundException;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -47,8 +47,7 @@ public class GoalValidator {
         });
     }
 
-    public void updateGoalServiceValidation(long id, GoalDto goalDto) {
-        Goal goal = goalRepository.findById(id).orElse(null);
+    public void updateGoalServiceValidation(Goal goal, GoalDto goalDto) {
         if (goal.getStatus().equals(GoalStatus.COMPLETED)) {
             throw new DataValidationException("Goal already completed!");
         }

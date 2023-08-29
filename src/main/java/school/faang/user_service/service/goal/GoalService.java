@@ -8,7 +8,7 @@ import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.exeptions.EntityNotFoundException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
@@ -36,9 +36,10 @@ public class GoalService {
     }
 
     public GoalDto updateGoal(long id, GoalDto goalDto) {
-        validator.updateGoalServiceValidation(id, goalDto);
+        Goal goal = goalRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Goal not found"));
+        validator.updateGoalServiceValidation(goal, goalDto);
 
-        Goal goal = goalMapper.toEntity(goalDto);
+        goal = goalMapper.toEntity(goalDto);
 
         if (goal.getStatus().equals(GoalStatus.COMPLETED)) {
             List<Long> skillIds = goalDto.getSkillIds();

@@ -73,7 +73,12 @@ dependencies {
 	testImplementation("org.assertj:assertj-core:3.24.2")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 
+	/**
+	 * Other
+	 */
 	implementation("io.minio:minio:8.5.4")
+	implementation("commons-fileupload:commons-fileupload:1.5")
+
 }
 
 jsonSchema2Pojo {

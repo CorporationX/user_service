@@ -21,7 +21,6 @@ public class UserServiceApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(UserServiceApplication.class, args);
-        ProfilePicGenerator.generateProfilePic("T", "O", 1L);
     }
 
     @Bean
@@ -29,6 +28,5 @@ public class UserServiceApplication {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         return objectMapper;
-
     }
 }

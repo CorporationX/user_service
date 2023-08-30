@@ -6,22 +6,32 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.csv_parser.CsvToPerson.CsvToPerson;
+import school.faang.user_service.dto.contact.ExtendedContactDto;
+import school.faang.user_service.dto.contact.TgContactDto;
 import school.faang.user_service.dto.user.person_dto.UserPersonDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.contact.Contact;
+import school.faang.user_service.entity.contact.ContactType;
+import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.mapper.PersonToUserMapper;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserCheckRepository;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.contact.ContactRepository;
 import school.faang.user_service.util.PasswordGeneration;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 
@@ -41,6 +51,8 @@ public class UserServiceTest {
     private PasswordGeneration passwordGeneration;
     @InjectMocks
     private UserService userService;
+    @Mock
+    ContactRepository contactRepository;
 
     @Test
     void saveUserStudent() {
@@ -85,35 +97,6 @@ public class UserServiceTest {
         user.setPhone(userPersonDto.getContactInfo().getPhone());
         return user;
     }
-}
-
-import school.faang.user_service.dto.contact.ExtendedContactDto;
-import school.faang.user_service.dto.contact.TgContactDto;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.contact.Contact;
-import school.faang.user_service.entity.contact.ContactType;
-import school.faang.user_service.exception.UserNotFoundException;
-import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.contact.ContactRepository;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-@ExtendWith(MockitoExtension.class)
-class UserServiceTest {
-    @Mock
-    UserRepository userRepository;
-    @Mock
-    ContactRepository contactRepository;
-    @InjectMocks
-    UserService userService;
 
     @Test
     void testUpdateUserContact_UserNotFound() {

@@ -1,9 +1,9 @@
 package school.faang.user_service.controller.user;
 
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.DeactivateResponseDto;
 import school.faang.user_service.dto.contact.ExtendedContactDto;
 import school.faang.user_service.dto.contact.TgContactDto;

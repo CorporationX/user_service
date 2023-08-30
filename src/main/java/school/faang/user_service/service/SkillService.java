@@ -8,7 +8,6 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.SkillOffer;
-import school.faang.user_service.exception.invalidFieldException.DataValidationException;
 import school.faang.user_service.exception.EntityAlreadyExistException;
 import school.faang.user_service.exception.notFoundExceptions.SkillNotFoundException;
 import school.faang.user_service.mapper.SkillMapper;
@@ -62,6 +61,15 @@ public class SkillService {
             }
         }
         return skillMapper.toDTO(skill);
+    }
+
+    public SkillDto getSkillById(Long skillId) {
+        Optional<Skill> skill = skillRepository.findById(skillId);
+        if (skill.isEmpty()) {
+            throw new SkillNotFoundException("This skill doesn't exist");
+        }
+
+        return skillMapper.toDTO(skill.get());
     }
 
     private void addGuarantees(List<SkillOffer> allOffersOfSkill) {

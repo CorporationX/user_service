@@ -35,6 +35,9 @@ spring:
           name: user_update_channel
         mentorship_event_topic:
           name: mentorship_event_topic
+        skill-event:
+          skill-offered-channel: skill_offered_channel
+
 
 
 server:

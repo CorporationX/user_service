@@ -11,7 +11,6 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import school.faang.user_service.messaging.mentorshipEventPublisher.MentorshipEventPublisher;
 import school.faang.user_service.messaging.RedisUserUpdateSubscriber;
 
 @Configuration
@@ -29,6 +28,8 @@ public class RedisConfig {
     private String followerChannel;
     @Value("${spring.data.redis.channels.skill-event.skill-offered-channel}")
     private String skillOfferedChannel;
+    @Value("${spring.data.redis.channels.mentorship_offered_event.name}")
+    private String mentorshipOfferedEvent;
 
 
     @Bean
@@ -68,19 +69,20 @@ public class RedisConfig {
     }
 
     @Bean
-    MentorshipEventPublisher mentorshipEventPublisher() {
-        return new MentorshipEventPublisher(redisTemplate(redisConnectionFactory()), mentorshipEventTopic());
+    ChannelTopic skillOfferedTopic() {
+        return new ChannelTopic(skillOfferedChannel);
+    }
+
+    @Bean
+    ChannelTopic mentorshipOfferedEvent() {
+        return new ChannelTopic(mentorshipOfferedEvent);
     }
 
     @Bean
     RedisMessageListenerContainer redisContainer(MessageListenerAdapter messageListenerAdapter) {
-       final RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-       container.setConnectionFactory(redisConnectionFactory());
-       container.addMessageListener(messageListenerAdapter, userUpdateChannel());
-       return container;
-    }
-  
-    ChannelTopic skillOfferedTopic() {
-        return new ChannelTopic(skillOfferedChannel);
+        final RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(redisConnectionFactory());
+        container.addMessageListener(messageListenerAdapter, userUpdateChannel());
+        return container;
     }
 }

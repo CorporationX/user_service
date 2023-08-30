@@ -75,5 +75,4 @@ class GoalInvitationServiceTest {
         goalInvitationService.createInvitation(goalInvitationDto);
         Mockito.verify(goalInvitationRepository, Mockito.times(1)).save(goalInvitation);
     }
-
 }

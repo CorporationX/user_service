@@ -66,6 +66,13 @@ class GoalInvitationValidationTest {
         goalInvitationDto.setInviterId(null);
         assertThrows(IllegalArgumentException.class, () -> goalInvitationValidation.invitationValidationUser(goalInvitationDto));
     }
+    @Test
+    void emptyUsers_DoesNotThrows() {
+        Mockito.when(userRepository.existsById(1L)).thenReturn(true);
+        Mockito.when(userRepository.existsById(2L)).thenReturn(true);
+        Mockito.when(goalRepository.existsById(1L)).thenReturn(true);
+        assertDoesNotThrow(() -> goalInvitationValidation.invitationValidationUser(goalInvitationDto));
+    }
 
     @Test
     void sameUsers_ThrowsException() {
@@ -73,5 +80,13 @@ class GoalInvitationValidationTest {
         Mockito.when(goalRepository.existsById(1L)).thenReturn(true);
         goalInvitationDto.setInvitedUserId(1L);
         assertThrows(IllegalArgumentException.class, () -> goalInvitationValidation.invitationValidationUser(goalInvitationDto));
+    }
+
+    @Test
+    void sameUsers_DoesNotThrows() {
+        Mockito.when(userRepository.existsById(1L)).thenReturn(true);
+        Mockito.when(userRepository.existsById(2L)).thenReturn(true);
+        Mockito.when(goalRepository.existsById(1L)).thenReturn(true);
+        assertDoesNotThrow(() -> goalInvitationValidation.invitationValidationUser(goalInvitationDto));
     }
 }

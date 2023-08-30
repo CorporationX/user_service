@@ -12,20 +12,17 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class SkillValidatorTest {
-
     @InjectMocks
     private SkillValidator skillValidator;
-
     @Mock
     private SkillRepository skillRepository;
-
     RecommendationRequestDto requestDto;
 
     @BeforeEach
@@ -37,7 +34,6 @@ class SkillValidatorTest {
                 .skillsId(List.of(1L))
                 .requesterId(1L)
                 .receiverId(1L)
-                .createdAt(LocalDateTime.now().minusMonths(7))
                 .build();
     }
 

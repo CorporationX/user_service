@@ -20,6 +20,7 @@ import school.faang.user_service.filter.mentorshiprequest.*;
 import school.faang.user_service.mapper.MentorshipRequestMapperImpl;
 import school.faang.user_service.messaging.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.messaging.mentorship.MentorshipEventPublisher;
+import school.faang.user_service.messaging.mentorship.MentorshipOfferedEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.util.validator.MentorshipRequestValidator;
@@ -45,6 +46,7 @@ class MentorshipRequestServiceTest {
     private MentorshipEventPublisher mentorshipEventPublisher;
 
     private MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher;
+    private  MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
 
 
     @Spy
@@ -68,7 +70,8 @@ class MentorshipRequestServiceTest {
                 userRepository,
                 filters,
                 mentorshipEventPublisher,
-                mentorshipAcceptedEventPublisher
+                mentorshipAcceptedEventPublisher,
+                mentorshipOfferedEventPublisher
         );
     }
 

@@ -15,7 +15,6 @@ import school.faang.user_service.repository.goal.GoalRepository;
 import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class GoalInvitationValidationTest {
-
     @Mock
     private GoalRepository goalRepository;
 

@@ -12,4 +12,5 @@ public class FeignConfig {
     public FeignUserInterceptor feignUserInterceptor(UserContext userContext) {
         return new FeignUserInterceptor(userContext);
     }
+
 }

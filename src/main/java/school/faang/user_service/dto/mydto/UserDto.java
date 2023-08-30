@@ -1,6 +1,7 @@
 package school.faang.user_service.dto.mydto;
 
 import lombok.Builder;
+import school.faang.user_service.entity.contact.PreferredContact;
 
 import java.util.List;
 
@@ -9,6 +10,7 @@ public record UserDto(Long id,
                       String username,
                       String email,
                       String phone,
+                      PreferredContact preference,
                       String aboutMe,
                       boolean active,
                       String city,

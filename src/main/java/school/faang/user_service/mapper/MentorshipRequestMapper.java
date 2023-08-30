@@ -23,5 +23,6 @@ public interface MentorshipRequestMapper {
 
     @Mapping(target = "requesterId", source = "requester.id")
     @Mapping(target = "receiverId", source = "receiver.id")
+    @Mapping(target = "receiverUsername", source = "receiver.username")
     MentorshipAcceptedDto toAcceptedDto(MentorshipRequest mentorshipRequest);
 }

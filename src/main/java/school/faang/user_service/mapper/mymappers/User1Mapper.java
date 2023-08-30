@@ -12,6 +12,7 @@ import java.util.List;
         unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE, injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface User1Mapper {
 
+    @Mapping(target = "preference", source = "contactPreference.preference")
     @Mapping(target = "followers", expression = "java(entity.getFollowers().stream().map(fol -> fol.getId()).toList())")
     @Mapping(target = "followees", expression = "java(entity.getFollowees().stream().map(fol -> fol.getId()).toList())")
     @Mapping(target = "mentors", expression = "java(entity.getMentors().stream().map(men -> men.getId()).toList())")

@@ -3,7 +3,7 @@ package school.faang.user_service.service.user;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import com.json.student.PersonForUser;
+import com.json.student.PersonSchemaForUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,6 @@ import school.faang.user_service.exception.FileException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.amazon.AvatarService;
-import school.faang.user_service.validator.user.UserValidator;
 import school.faang.user_service.validator.user.UserValidator;
 
 import java.io.IOException;
@@ -34,16 +33,17 @@ public class UserService {
     private final UserMapper userMapper;
     private final AvatarService avatarService;
     private final UserValidator userValidator;
+    private final CsvMapper csvMapper;
     @Value("${services.dice-bear.url}")
     private String URL;
     @Value("${services.dice-bear.size}")
     private String SIZE;
-    private final int LEN_PASSWORD = 4;
+    @Value("${userCSV.password-length}")
+    private final int LEN_PASSWORD;
 
 
     public UserDto createUser(UserDto userDto) {
         User user = userMapper.toEntity(userDto);
-        addCreateData(user);
 
         synchronized (userRepository) {
             user = userRepository.save(user);
@@ -55,7 +55,7 @@ public class UserService {
     }
 
     public List<UserDto> createUserCSV(InputStream inputStream) {
-        List<PersonForUser> persons = parseCsv(inputStream);
+        List<PersonSchemaForUser> persons = parseCsv(inputStream);
 
         List<CompletableFuture<UserDto>> futures = persons.stream()
                 .map(person -> CompletableFuture.supplyAsync(() -> {
@@ -93,13 +93,13 @@ public class UserService {
         return password.toString();
     }
 
-    private List<PersonForUser> parseCsv(InputStream inputStream) {
-        CsvMapper csvMapper = new CsvMapper();
+    private List<PersonSchemaForUser> parseCsv(InputStream inputStream) {
+        //CsvMapper csvMapper = new CsvMapper();
         CsvSchema schema = CsvSchema.emptySchema().withHeader();
-        MappingIterator<PersonForUser> iterator = null;
+        MappingIterator<PersonSchemaForUser> iterator = null;
 
         try {
-            iterator = csvMapper.readerFor(PersonForUser.class).with(schema).readValues(inputStream);
+            iterator = csvMapper.readerFor(PersonSchemaForUser.class).with(schema).readValues(inputStream);
             return iterator.readAll();
         } catch (IOException e) {
             throw new FileException("Can't read file: " + e.getMessage());

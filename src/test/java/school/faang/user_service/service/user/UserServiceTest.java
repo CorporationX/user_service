@@ -7,13 +7,17 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Value;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.exception.FileException;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.amazon.AvatarService;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +34,10 @@ class UserServiceTest {
     private AvatarService avatarService;
     @InjectMocks
     private UserService userService;
+    @Value("${services.dice-bear.url}")
+    private String URL;
+    @Value("${services.dice-bear.size}")
+    private String SIZE;
 
     @Test
     public void testCreateUser() {
@@ -56,9 +64,22 @@ class UserServiceTest {
                 .save(user);
         Mockito.verify(userMapper, Mockito.times(1))
                 .toDto(user);
+    }
+
+
+    @Test
+    public void testCreateUserCSV() {
+
+    }
+    @Test
+    public void testGeneratePassword() {
 
     }
 
+    @Test
+    public void testParseCsv_ThrowsFileException() {
+
+    }
     @Test
     public void testAddCreateData() {
         UserDto userDto = UserDto.builder()
@@ -79,7 +100,7 @@ class UserServiceTest {
     }
 
     @Test
-    public void testCreateAvatar() {
+    public void testCreateDiceBearAvatar() {
         UserDto userDto = UserDto.builder()
                 .id(1L)
                 .username("test")
@@ -90,10 +111,12 @@ class UserServiceTest {
                 .username("test")
                 .build();
 
+        String filename = user.getUsername() + user.getId();
+
         UserProfilePic userProfilePic = UserProfilePic.builder()
-                .name(userDto.getUsername() + userDto.getId())
-                .fileId("nulltest1")
-                .smallFileId("nulltest1&null")
+                .name(filename)
+                .fileId(URL + filename)
+                .smallFileId(URL + filename + SIZE)
                 .build();
 
         Mockito.when(userMapper.toEntity(userDto))

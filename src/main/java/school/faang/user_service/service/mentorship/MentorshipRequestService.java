@@ -66,12 +66,14 @@ public class MentorshipRequestService {
         mentors.add(request.getReceiver());
         request.setStatus(RequestStatus.ACCEPTED);
 
-        mentorshipAcceptedEventPublisher.publish(MentorshipAcceptedEventDto.builder()
+        MentorshipAcceptedEventDto mentorshipAcceptedEventDto = MentorshipAcceptedEventDto.builder()
                 .authorId(request.getRequester().getId())
                 .receiverId(request.getReceiver().getId())
                 .requestId(requestId)
                 .time(LocalDateTime.now())
-                .build());
+                .build();
+
+        mentorshipAcceptedEventPublisher.publish(mentorshipAcceptedEventDto);
 
         return mentorshipRequestMapper.toDto(request);
     }

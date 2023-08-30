@@ -1,8 +1,7 @@
 package school.faang.user_service.pulisher;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
@@ -13,23 +12,22 @@ import school.faang.user_service.mapper.RecommendationRequestMapper;
 import java.time.LocalDateTime;
 
 @Component
-@RequiredArgsConstructor
-public class RecommendationEventPublisher {
+public class RecommendationEventPublisher extends AbstractEventPublisher<EventRecommendationRequestDto> {
 
-    private final RedisTemplate<String, Object> redisTemplate;
     private final RecommendationRequestMapper mapper;
-    private final ObjectMapper objectMapper;
-    private final ChannelTopic topic;
+    private final ChannelTopic topicRecommendationRequest;
+
+    @Autowired
+    public RecommendationEventPublisher(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper,
+                                        RecommendationRequestMapper mapper, ChannelTopic topicRecommendationRequest) {
+        super(redisTemplate, objectMapper);
+        this.mapper = mapper;
+        this.topicRecommendationRequest = topicRecommendationRequest;
+    }
 
     public void publish(RecommendationRequest recommendationRequest) {
         EventRecommendationRequestDto event = mapper.toEventDto(recommendationRequest);
         event.setReceivedAt(LocalDateTime.now());
-        String json;
-        try {
-            json = objectMapper.writeValueAsString(event);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        redisTemplate.convertAndSend(topic.getTopic(), json);
+        publishInTopic(topicRecommendationRequest, event);
     }
 }

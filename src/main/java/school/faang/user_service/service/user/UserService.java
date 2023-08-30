@@ -140,7 +140,7 @@ public class UserService {
 
     private void createDiceBearAvatar(UserProfilePic userProfilePic) {
         userProfilePic.setFileId(URL + userProfilePic.getName());
-        userProfilePic.setSmallFileId(URL + userProfilePic.getName()+"&" + SIZE);
+        userProfilePic.setSmallFileId(URL + userProfilePic.getName() + SIZE);
 
         avatarService.saveToAmazonS3(userProfilePic);
     }

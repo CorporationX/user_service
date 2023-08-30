@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.mentorshipRequest.MentorshipAcceptedDto;
+import school.faang.user_service.dto.mentorshipRequest.MentorshipEventDto;
 import school.faang.user_service.dto.mentorshipRequest.MentorshipOfferRequestSentDto;
 import school.faang.user_service.dto.mentorshipRequest.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
@@ -29,4 +30,8 @@ public interface MentorshipRequestMapper {
     @Mapping(target = "requesterId", source = "requester.id")
     @Mapping(target = "receiverId", source = "receiver.id")
     MentorshipOfferRequestSentDto toRequestDto(MentorshipRequest mentorshipRequest);
+
+    @Mapping(target = "mentorId", source = "receiver.id")
+    @Mapping(target = "userId", source = "requester.id")
+    MentorshipEventDto toEventDto(MentorshipRequest mentorshipRequest);
 }

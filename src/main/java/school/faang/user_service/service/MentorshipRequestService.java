@@ -41,14 +41,12 @@ public class MentorshipRequestService {
         MentorshipRequest request = mentorshipRequestMapper.toEntity(dto);
         MentorshipRequest save = mentorshipRequestRepository.save(request);
 
-        mentorshipEventPublisher.publish(new MentorshipEventDto(dto.getRequesterId(), dto.getReceiverId()));
+        MentorshipEventDto mentorshipEventToAnalytics = mentorshipRequestMapper.toEventDto(save);
+        MentorshipOfferRequestSentDto mentorshipOfferToNotification = mentorshipRequestMapper.toRequestDto(save);
 
-        MentorshipOfferRequestSentDto mentorshipOffer = mentorshipRequestMapper.toRequestDto(save);
-        mentorshipOfferedEventPublisher
-                .publish(new MentorshipOfferedEventDto(
-                        mentorshipOffer.getId(),
-                        mentorshipOffer.getRequesterId(),
-                        mentorshipOffer.getRequesterId()));
+        mentorshipEventPublisher.publish(mentorshipEventToAnalytics);
+        mentorshipOfferedEventPublisher.publish(mentorshipOfferToNotification);
+
         return mentorshipRequestMapper.toDto(request);
     }
 

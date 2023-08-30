@@ -45,9 +45,11 @@ class MentorshipRequestServiceTest {
     @Mock
     private MentorshipEventPublisher mentorshipEventPublisher;
 
+    @Mock
     private MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher;
-    private  MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
 
+    @Mock
+    private  MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
 
     @Spy
     private MentorshipRequestMapperImpl mentorshipRequestMapper;
@@ -73,6 +75,8 @@ class MentorshipRequestServiceTest {
                 mentorshipAcceptedEventPublisher,
                 mentorshipOfferedEventPublisher
         );
+
+        Mockito.lenient().doNothing().when(mentorshipOfferedEventPublisher).publish(Mockito.any());
     }
 
     @Test

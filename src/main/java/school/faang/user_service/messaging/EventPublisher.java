@@ -1,5 +1,6 @@
 package school.faang.user_service.messaging;
 
+import school.faang.user_service.dto.mentorshipRequest.MentorshipEventDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import lombok.RequiredArgsConstructor;

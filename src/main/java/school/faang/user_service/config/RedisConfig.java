@@ -9,7 +9,10 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import school.faang.user_service.messaging.mentorshipEventPublisher.MentorshipEventPublisher;
+import school.faang.user_service.messaging.RedisUserUpdateSubscriber;
 
 @Configuration
 public class RedisConfig {
@@ -20,6 +23,8 @@ public class RedisConfig {
     private int port;
     @Value("${spring.data.redis.channels.user_update_channel.name}")
     private String userUpdateChannel;
+    @Value("${spring.data.redis.channels.mentorship_event_topic.name}")
+    private String mentorshipEventTopic;
     @Value("${spring.data.redis.channels.follower_channel.name}")
     private String followerChannel;
     @Value("${spring.data.redis.channels.skill-event.skill-offered-channel}")
@@ -43,6 +48,11 @@ public class RedisConfig {
     }
 
     @Bean
+    MessageListenerAdapter messageListener(RedisUserUpdateSubscriber redisUserUpdateSubscriber) {
+        return new MessageListenerAdapter(redisUserUpdateSubscriber);
+    }
+
+    @Bean
     ChannelTopic userUpdateChannel() {
         return new ChannelTopic(userUpdateChannel);
     }
@@ -53,14 +63,24 @@ public class RedisConfig {
     }
 
     @Bean
-    ChannelTopic skillOfferedTopic() {
-        return new ChannelTopic(skillOfferedChannel);
+    ChannelTopic mentorshipEventTopic() {
+        return new ChannelTopic(mentorshipEventTopic);
     }
 
     @Bean
-    RedisMessageListenerContainer redisContainer() {
-        final RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(redisConnectionFactory());
-        return container;
+    MentorshipEventPublisher mentorshipEventPublisher() {
+        return new MentorshipEventPublisher(redisTemplate(redisConnectionFactory()), mentorshipEventTopic());
+    }
+
+    @Bean
+    RedisMessageListenerContainer redisContainer(MessageListenerAdapter messageListenerAdapter) {
+       final RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+       container.setConnectionFactory(redisConnectionFactory());
+       container.addMessageListener(messageListenerAdapter, userUpdateChannel());
+       return container;
+    }
+  
+    ChannelTopic skillOfferedTopic() {
+        return new ChannelTopic(skillOfferedChannel);
     }
 }

@@ -369,13 +369,14 @@ class EventServiceTest {
         Event event = mock(Event.class);
         when(event.getEndDate()).thenReturn(LocalDateTime.now().minusDays(1));
         events = List.of(event, event, event);
+        int partitionSize = 1;
 
         when(eventRepository.findAll()).thenReturn(events);
 
-        eventService.clearEvents(1);
+        eventService.clearEvents(partitionSize);
 
-        List<List<Event>> partitions = ListUtils.partition(events, events.size());
+        List<List<Event>> partitions = ListUtils.partition(events, partitionSize);
 
-        partitions.forEach(partition -> verify(eventAsyncService).clearEventsPartition(partition));
+        partitions.forEach(partition -> verify(eventAsyncService, times(events.size())).clearEventsPartition(partition));
     }
 }

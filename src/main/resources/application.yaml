@@ -78,3 +78,8 @@ event:
     scheduler:
       thread-pool:
         core-pool-size: 5
+      delays:
+        days: [1]
+        hours: [5,1]
+        minutes: [10]
+        publish-date: true

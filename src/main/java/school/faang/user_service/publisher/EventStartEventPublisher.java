@@ -1,32 +1,30 @@
 package school.faang.user_service.publisher;
 
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.service.event.ScheduledEventService;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@Setter
 public class EventStartEventPublisher {
 
     private final ScheduledEventService scheduledEventService;
+    @Value("${event.publisher.scheduler.delays.days}")
+    private Set<Integer> daysDelay;
+    @Value("${event.publisher.scheduler.delays.hours}")
+    private Set<Integer> hoursDelay;
+    @Value("${event.publisher.scheduler.delays.minutes}")
+    private Set<Integer> minutesDelay;
 
     public void publish(long eventId, LocalDateTime publishDate) {
-        List<LocalDateTime> publishingScheduledTime = calculateDelayTime(publishDate);
-
-        for (int i = 0; i < 5; i++) {
-            scheduledEventService.publishScheduledEvent(eventId,i,publishingScheduledTime.get(i));
-        }
-    }
-    private List<LocalDateTime> calculateDelayTime(LocalDateTime publishDate){
-        LocalDateTime first = publishDate.minusDays(1);
-        LocalDateTime second = publishDate.minusHours(5);
-        LocalDateTime third = publishDate.minusHours(1);
-        LocalDateTime fourth = publishDate.minusMinutes(10);
-        return List.of(first, second, third, fourth, publishDate);
+        scheduledEventService.sendScheduledEventStartEvent(daysDelay, hoursDelay, minutesDelay, eventId, publishDate);
     }
 }

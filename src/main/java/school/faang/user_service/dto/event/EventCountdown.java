@@ -1,10 +1,9 @@
 package school.faang.user_service.dto.event;
 
 public enum EventCountdown {
-    DAY,
-    FIVE_HOURS,
-    ONE_HOUR,
-    TEN_MINUTES,
+    DAYS,
+    HOURS,
+    MINUTES,
     START;
 
     public static EventCountdown of(int type) {

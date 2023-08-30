@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Value;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
@@ -30,6 +31,10 @@ class UserServiceTest {
     private AvatarService avatarService;
     @InjectMocks
     private UserService userService;
+    @Value("${services.dice-bear.url}")
+    private String URL;
+    @Value("${services.dice-bear.size}")
+    private String SIZE;
 
     @Test
     public void testCreateUser() {
@@ -56,7 +61,6 @@ class UserServiceTest {
                 .save(user);
         Mockito.verify(userMapper, Mockito.times(1))
                 .toDto(user);
-
     }
 
     @Test
@@ -90,10 +94,11 @@ class UserServiceTest {
                 .username("test")
                 .build();
 
+        String filename = user.getUsername() + user.getId();
         UserProfilePic userProfilePic = UserProfilePic.builder()
-                .name(userDto.getUsername() + userDto.getId())
-                .fileId("nulltest1")
-                .smallFileId("nulltest1&null")
+                .name(filename)
+                .fileId(URL + filename)
+                .smallFileId(URL + filename + SIZE)
                 .build();
 
         Mockito.when(userMapper.toEntity(userDto))

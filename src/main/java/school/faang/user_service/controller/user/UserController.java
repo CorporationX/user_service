@@ -1,16 +1,12 @@
 package school.faang.user_service.controller.user;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.DeactivateResponseDto;
+import school.faang.user_service.dto.contact.ExtendedContactDto;
+import school.faang.user_service.dto.contact.TgContactDto;
 import school.faang.user_service.dto.subscription.UserDto;
 import school.faang.user_service.dto.subscription.UserFilterDto;
 import school.faang.user_service.service.UserService;
@@ -60,5 +56,20 @@ public class UserController {
     @PostMapping("/deactivation/{userId}")
     public DeactivateResponseDto deactivating(@PathVariable long userId) {
         return userService.deactivateUser(userId);
+    }
+
+    @PostMapping("/contacts")
+    public void updateUserContact(@RequestBody TgContactDto tgContactDto) {
+        userService.updateUserContact(tgContactDto);
+    }
+
+    @GetMapping("/{userId}/contacts")
+    public ExtendedContactDto getUserContact(@PathVariable Long userId) {
+        return userService.getUserContact(userId);
+    }
+
+    @GetMapping("/get-by-phone")
+    public Long findUserIdByPhoneNumber(@RequestParam(name = "phone") String phoneNumber){
+        return userService.findUserIdByPhoneNumber(phoneNumber);
     }
 }

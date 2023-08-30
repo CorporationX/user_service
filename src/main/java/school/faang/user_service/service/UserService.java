@@ -8,12 +8,16 @@ import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.config.executors.ExecutorsPull;
 import school.faang.user_service.csv_parser.CsvToPerson.CsvToPerson;
 import school.faang.user_service.dto.DeactivateResponseDto;
+import school.faang.user_service.dto.contact.ExtendedContactDto;
+import school.faang.user_service.dto.contact.TgContactDto;
 import school.faang.user_service.dto.subscription.UserDto;
 import school.faang.user_service.dto.subscription.UserFilterDto;
 import school.faang.user_service.dto.user.person_dto.UserPersonDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.entity.contact.Contact;
+import school.faang.user_service.entity.contact.ContactType;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.DataValidException;
@@ -25,6 +29,7 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserCheckRepository;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.contact.ContactRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.util.PasswordGeneration;
@@ -50,6 +55,7 @@ public class UserService {
     private final GoalRepository goalRepository;
     private final MentorshipService mentorshipService;
     private final UserRepository userRepository;
+    private final ContactRepository contactRepository;
     private final List<UserFilter> userFilters;
     private final UserMapper userMapper;
     private final CountryRepository countryRepository;
@@ -196,5 +202,46 @@ public class UserService {
         userProfilePic.setFileId(dicebearUrl + user.getUsername() + "&scale=" + 130);
         userProfilePic.setSmallFileId(dicebearUrl + user.getUsername() + "&scale=" + 22);
         user.setUserProfilePic(userProfilePic);
+    }
+
+    public void updateUserContact(TgContactDto tgContactDto) {
+        User user = userRepository.findById(tgContactDto.getUserId())
+                .orElseThrow(() -> new UserNotFoundException("No user found by this id: " + tgContactDto.getUserId()));
+        Contact contact = user.getContacts()
+                .stream().filter(c -> c.getType().equals(ContactType.TELEGRAM))
+                .findFirst()
+                .orElse(null);
+        if (contact == null) {
+            contact = Contact.builder()
+                    .user(user)
+                    .type(ContactType.TELEGRAM)
+                    .build();
+        }
+        contact.setContact(tgContactDto.getTgChatId());
+        contactRepository.save(contact);
+    }
+
+    public ExtendedContactDto getUserContact(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("No user found by this id: " + userId));
+        Contact contact = user.getContacts()
+                .stream()
+                .filter(c -> c.getType().equals(ContactType.TELEGRAM))
+                .findFirst()
+                .orElse(null);
+        ExtendedContactDto tgContact = ExtendedContactDto
+                .builder()
+                .userId(userId)
+                .username(user.getUsername())
+                .phone(user.getPhone())
+                .tgChatId(contact != null ? contact.getContact() : null)
+                .build();
+        return tgContact;
+    }
+
+
+    public Long findUserIdByPhoneNumber(String phoneNumber) {
+        return userRepository.findUserByPhone(phoneNumber)
+                .orElseThrow(() -> new UserNotFoundException("No user found by this phone: " + phoneNumber)).getId();
     }
 }

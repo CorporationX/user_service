@@ -8,15 +8,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.service.MinIOService;
 
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 
 @Component
 @RequiredArgsConstructor
@@ -66,8 +62,6 @@ public class ProfilePicGenerator {
 
     private MultipartFile convertToMultipartFile(String pic, String fileName){
         byte[] bytes = pic.getBytes(StandardCharsets.UTF_8);
-        CommonsMu
-
         return new ByteArrayMultipartFile(bytes, fileName + ".svg", fileName, "image/svg+xml");
     }
 }

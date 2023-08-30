@@ -28,6 +28,8 @@ spring:
           name: profile_view_channel
         mentorship_channel:
           name: mentorship
+        event_start_channel:
+          name: event_start_channel
 server:
   port: 8080
 
@@ -72,3 +74,7 @@ event:
       maximum-pool-size: 10
       keep-alive-time: 0
       time-unit: MILLISECONDS
+  publisher:
+    scheduler:
+      thread-pool:
+        core-pool-size: 5

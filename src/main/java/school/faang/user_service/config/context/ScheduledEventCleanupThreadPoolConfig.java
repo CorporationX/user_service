@@ -22,7 +22,7 @@ public class ScheduledEventCleanupThreadPoolConfig {
     @Value("${event.cleanup.thread-pool.time-unit}")
     private String timeUnit;
 
-    @Bean
+    @Bean("scheduledEventCleanupThreadPoolExecutor")
     public ThreadPoolExecutor scheduledEventCleanupThreadPoolExecutor() {
         return new ThreadPoolExecutor(
                 corePoolSize,

@@ -56,7 +56,6 @@ dependencies {
 	implementation("org.mapstruct:mapstruct:1.5.3.Final")
 	annotationProcessor("org.mapstruct:mapstruct-processor:1.5.3.Final")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
-
 	implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.13.0")
 
 	/**
@@ -73,6 +72,13 @@ dependencies {
 	testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.2")
 	testImplementation("org.assertj:assertj-core:3.24.2")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+	/**
+	 * Other
+	 */
+	implementation("io.minio:minio:8.5.4")
+	implementation("commons-fileupload:commons-fileupload:1.5")
+
 }
 
 jsonSchema2Pojo {

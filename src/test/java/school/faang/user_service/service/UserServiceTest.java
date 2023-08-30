@@ -33,7 +33,6 @@ class UserServiceTest {
     @InjectMocks
     UserService userService;
 
-
     @Test
     void testUpdateUserContact_UserNotFound() {
         TgContactDto tgContactDto = TgContactDto.builder().userId(1L).build();

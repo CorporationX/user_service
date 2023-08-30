@@ -122,12 +122,12 @@ public class UserService {
 
     public void updateUserContact(TgContactDto tgContactDto) {
         User user = userRepository.findById(tgContactDto.getUserId())
-                .orElseThrow(()-> new UserNotFoundException("No user found by this id: " + tgContactDto.getUserId()));
+                .orElseThrow(() -> new UserNotFoundException("No user found by this id: " + tgContactDto.getUserId()));
         Contact contact = user.getContacts()
                 .stream().filter(c -> c.getType().equals(ContactType.TELEGRAM))
                 .findFirst()
                 .orElse(null);
-        if(contact == null){
+        if (contact == null) {
             contact = Contact.builder()
                     .user(user)
                     .type(ContactType.TELEGRAM)
@@ -139,7 +139,7 @@ public class UserService {
 
     public ExtendedContactDto getUserContact(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(()-> new UserNotFoundException("No user found by this id: " + userId));
+                .orElseThrow(() -> new UserNotFoundException("No user found by this id: " + userId));
         Contact contact = user.getContacts()
                 .stream()
                 .filter(c -> c.getType().equals(ContactType.TELEGRAM))
@@ -150,14 +150,14 @@ public class UserService {
                 .userId(userId)
                 .username(user.getUsername())
                 .phone(user.getPhone())
-                .tgChatId(contact !=null ?contact.getContact() : null)
+                .tgChatId(contact != null ? contact.getContact() : null)
                 .build();
         return tgContact;
     }
 
 
-    public Long findUserIdByPhoneNumber(String phoneNumber){
+    public Long findUserIdByPhoneNumber(String phoneNumber) {
         return userRepository.findUserByPhone(phoneNumber)
-                .orElseThrow(()-> new UserNotFoundException("No user found by this phone: " + phoneNumber)).getId();
+                .orElseThrow(() -> new UserNotFoundException("No user found by this phone: " + phoneNumber)).getId();
     }
 }

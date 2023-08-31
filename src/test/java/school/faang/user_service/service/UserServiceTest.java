@@ -29,6 +29,7 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -57,6 +58,7 @@ public class UserServiceTest {
 
     List<User> userList;
     private UserFilterDto filter;
+    private LocalDateTime dateTime;
 
     @BeforeEach
     void setUp() {
@@ -69,6 +71,7 @@ public class UserServiceTest {
         userList = List.of(user1, user2, user3);
         filter = new UserFilterDto();
         filter.setActive(true);
+        dateTime = LocalDateTime.now();
     }
 
     @Test
@@ -110,7 +113,7 @@ public class UserServiceTest {
         Long idViewer = 1L;
         Long idViewed = 2L;
         user2.setContactPreference(ContactPreference.builder().preference(PreferredContact.EMAIL).build());
-        ProfileViewEvent profileViewEvent = new ProfileViewEvent(idViewer, idViewed, PreferredContact.EMAIL.ordinal());
+        ProfileViewEvent profileViewEvent = new ProfileViewEvent(idViewer, idViewed, dateTime);
         Mockito.when(userRepository.findById(idViewed)).thenReturn(Optional.of(user2));
 
         userService.getUser(idViewer, idViewed);

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class MentorshipRequestedEvent {
+public class MentorshipRequestedEventDto {
     private Long requesterId;
     private Long receiverId;
     private LocalDateTime createdAt;

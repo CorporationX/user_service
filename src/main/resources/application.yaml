@@ -32,8 +32,8 @@ spring:
           name: event_start_channel
         goal_set_channel:
           name: goal_set_channel
-        mentorship_request_event:
-          name: mentorship_request_event_channel
+        mentorship_requested_channel:
+          name: mentorship-requested-channel
   servlet:
     multipart:
       max-file-size: 15MB

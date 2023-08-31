@@ -1,5 +1,6 @@
 package school.faang.user_service.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,10 +14,11 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import school.faang.user_service.listeners.UserBannerListener;
 
 @Configuration
+@Slf4j
 public class RedisConfig {
     @Value("${spring.data.redis.channels.user_banner_channel.name}")
     private String userBannerChannel;
-    @Value("${spring.data.redis.channels.mentorship_request_event_channel.name}")
+    @Value("${spring.data.redis.channels.mentorship_requested_channel.name}")
     private String mentorshipRequestEventChannel;
     @Value("${spring.data.redis.host}")
     private String host;
@@ -25,6 +27,7 @@ public class RedisConfig {
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
+        log.info("Created redis connection factory with host: {}, port: {}", host, port);
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
         return new JedisConnectionFactory(config);
     }

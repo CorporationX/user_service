@@ -16,6 +16,8 @@ import school.faang.user_service.listeners.UserBannerListener;
 public class RedisConfig {
     @Value("${spring.data.redis.channels.user_banner_channel.name}")
     private String userBannerChannel;
+    @Value("${spring.data.redis.channels.mentorship_request_event_channel.name}")
+    private String mentorshipRequestEventChannel;
     @Value("${spring.data.redis.host}")
     private String host;
     @Value("${spring.data.redis.port}")

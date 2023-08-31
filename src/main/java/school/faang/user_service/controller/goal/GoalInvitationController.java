@@ -12,6 +12,7 @@ import school.faang.user_service.service.goal.GoalInvitationService;
 @RequiredArgsConstructor
 @RequestMapping("/invitations")
 public class GoalInvitationController {
+
     private final GoalInvitationService service;
 
     @PostMapping()

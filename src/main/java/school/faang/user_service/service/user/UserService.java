@@ -13,6 +13,7 @@ import school.faang.user_service.service.amazon.AvatarService;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -30,7 +31,7 @@ public class UserService {
         User user = userMapper.toEntity(userDto);
         addCreateData(user);
 
-        user =userRepository.save(user);
+        user = userRepository.save(user);
         return userMapper.toDto(user);
     }
 
@@ -59,7 +60,7 @@ public class UserService {
     private void addCreateData(User user) {
         user.setCreatedAt(LocalDateTime.now());
         UserProfilePic userProfilePic = UserProfilePic.builder()
-                .name(user.getUsername()+user.getId())
+                .name(user.getUsername() + ThreadLocalRandom.current().nextInt())
                 .build();
 
         createDiceBearAvatar(userProfilePic);

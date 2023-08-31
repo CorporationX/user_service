@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -78,8 +79,7 @@ class UserServiceTest {
         userService.createUser(userDto);
 
         assertTrue(user.getCreatedAt().isBefore(LocalDateTime.now()));
-        assertEquals(user.getUserProfilePic().getName(),
-                user.getUsername() + user.getId());
+        assertTrue(user.getUserProfilePic().getName()!=null);
     }
 
     @Test
@@ -109,7 +109,7 @@ class UserServiceTest {
         userService.createUser(userDto);
 
         Mockito.verify(avatarService, Mockito.times(1))
-                .saveToAmazonS3(userProfilePic);
+                .saveToAmazonS3(any(UserProfilePic.class));
     }
 
     @Test

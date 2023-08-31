@@ -111,9 +111,7 @@ class EventServiceTest {
 
         Mockito.when(skillRepository.findAllByUserId(1L)).thenReturn(List.of(mockedSkill));
 
-        assertThrows(DataValidationException.class, () -> {
-            eventService.create(eventDto);
-        });
+        assertThrows(DataValidationException.class, () -> eventService.create(eventDto));
     }
 
     @Test
@@ -123,9 +121,7 @@ class EventServiceTest {
 
         Mockito.when(skillRepository.findAllByUserId(1L)).thenReturn(List.of(mockedSkill));
 
-        assertThrows(DataValidationException.class, () -> {
-            eventService.updateEvent(eventDto);
-        });
+        assertThrows(DataValidationException.class, () -> eventService.updateEvent(eventDto));
     }
 
     @Test
@@ -139,6 +135,7 @@ class EventServiceTest {
             eventService.get(anyId);
             Mockito.verify(eventRepository, Mockito.times(1)).findById(anyId);
         } catch (Exception e) {
+            System.out.println("Event with ID " + anyId + " does not exists");
         }
     }
 
@@ -147,9 +144,7 @@ class EventServiceTest {
         Long anyId = 1L;
         Mockito.lenient().when(skillRepository.findById(anyId)).thenReturn(null);
 
-        assertThrows(EntityNotFoundException.class, () -> {
-            eventService.get(anyId);
-        });
+        assertThrows(EntityNotFoundException.class, () -> eventService.get(anyId));
     }
 
 

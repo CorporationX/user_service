@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.mentorship.MentorshipOfferedEvent;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.dto.mentorship.RequestFilterDto;
@@ -19,6 +20,7 @@ import school.faang.user_service.exception.MentorshipRequestNotFoundException;
 import school.faang.user_service.exception.RequestAlreadyAcceptedException;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapperImpl;
+import school.faang.user_service.publisher.MentorshipOfferedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
@@ -48,6 +50,8 @@ public class MentorshipRequestServiceTest {
     private MentorshipRequestRepository requestRepository;
     @Mock
     private MentorshipRepository mentorshipRepository;
+    @Mock
+    private MentorshipOfferedEventPublisher eventPublisher;
     @InjectMocks
     private MentorshipRequestService requestService;
 
@@ -165,7 +169,7 @@ public class MentorshipRequestServiceTest {
 
         when(requestRepository.findAll()).thenReturn(Collections.singleton(latestRequest));
         List<MentorshipRequestFilter> filters = getFilters();
-        requestService = new MentorshipRequestService(requestRepository, mentorshipRepository, requestMapper, filters);
+        requestService = new MentorshipRequestService(requestRepository, mentorshipRepository, requestMapper, filters, eventPublisher);
 
         List<MentorshipRequestDto> actualList = requestService.getRequests(filterDto);
         List<MentorshipRequestDto> expectedList = List.of(requestDto);
@@ -183,7 +187,7 @@ public class MentorshipRequestServiceTest {
 
         when(requestRepository.findAll()).thenReturn(Collections.singleton(latestRequest));
         List<MentorshipRequestFilter> filters = getFilters();
-        requestService = new MentorshipRequestService(requestRepository, mentorshipRepository, requestMapper, filters);
+        requestService = new MentorshipRequestService(requestRepository, mentorshipRepository, requestMapper, filters, eventPublisher);
 
         List<MentorshipRequestDto> actualList = requestService.getRequests(filterDto);
         List<MentorshipRequestDto> expectedList = new ArrayList<>();
@@ -275,5 +279,21 @@ public class MentorshipRequestServiceTest {
         return List.of(new MentorshipRequestFilterByDescription(), new MentorshipRequestFilterByReceiver(),
                 new MentorshipRequestFilterByRequester(), new MentorshipRequestFilterByRequestStatus(),
                 new MentorshipRequestFilterByUpdatedTime());
+    }
+
+    @Test
+    void publishEvent() {
+        when(mentorshipRepository.existsById(CORRECT_REQUESTER_ID)).thenReturn(true);
+        when(mentorshipRepository.existsById(CORRECT_RECEIVER_ID)).thenReturn(true);
+        MentorshipRequestDto dto = MentorshipRequestDto.builder()
+                .id(CORRECT_REQUEST_ID)
+                .receiver(CORRECT_RECEIVER_ID)
+                .requester(CORRECT_REQUESTER_ID)
+                .updatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
+                .description("some description")
+                .build();
+        MentorshipRequestService service = new MentorshipRequestService(requestRepository, mentorshipRepository, requestMapper, getFilters(), eventPublisher);
+        service.requestMentorship(dto);
+        verify(eventPublisher).sendEvent(any(MentorshipOfferedEvent.class));
     }
 }

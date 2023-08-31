@@ -46,4 +46,9 @@ public class RedisConfig {
         container.addMessageListener(messageListener, new ChannelTopic(userBannerChannel));
         return container;
     }
+
+    @Bean
+    ChannelTopic mentorshipRequestEventChannel() {
+        return new ChannelTopic(mentorshipRequestEventChannel);
+    }
 }

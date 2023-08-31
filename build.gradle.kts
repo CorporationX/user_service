@@ -90,8 +90,6 @@ jsonSchema2Pojo {
 	setSourceType("jsonschema")
 }
 
-
-
 tasks.withType<Test> {
 	useJUnitPlatform()
 }

@@ -21,8 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -34,76 +34,33 @@ public class UserService {
     private final AvatarService avatarService;
     private final UserValidator userValidator;
     private final CsvMapper csvMapper;
+    private final CsvSchema schema;
     @Value("${services.dice-bear.url}")
     private String URL;
     @Value("${services.dice-bear.size}")
     private String SIZE;
-    @Value("${userCSV.password-length}")
-    private final int LEN_PASSWORD;
 
 
     public UserDto createUser(UserDto userDto) {
         User user = userMapper.toEntity(userDto);
+        addCreateData(user);
 
         synchronized (userRepository) {
             user = userRepository.save(user);
         }
-
-        addCreateData(user);
-
         return userMapper.toDto(user);
     }
 
     public List<UserDto> createUserCSV(InputStream inputStream) {
-        List<PersonSchemaForUser> persons = parseCsv(inputStream);
-
-        List<CompletableFuture<UserDto>> futures = persons.stream()
-                .map(person -> CompletableFuture.supplyAsync(() -> {
-                    UserDto userDto = userMapper.personToUserDto(person);
-                    userDto.setPassword(generatePassword(LEN_PASSWORD));
-
-                    userValidator.validateUserDto(userDto);
-                    createUser(userDto);
-                    // SMS to user.getEmail with - "You password for CorporationX is:"+user.getPassword()
-                    return userDto;
-                }))
-                .toList();
-
-
-        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-                .thenApply(dto -> futures.stream()
-                        .map(CompletableFuture::join)
-                        .collect(Collectors.toList()))
-                .join();
-    }
-
-    private String generatePassword(int length) {
-        if (length <= 0) {
-            throw new IllegalArgumentException("Password length must be greater than 0");
-        }
-
-        Random random = new Random();
-        StringBuilder password = new StringBuilder();
-
-        for (int i = 0; i < length; i++) {
-            int digit = random.nextInt(10);
-            password.append(digit);
-        }
-
-        return password.toString();
-    }
-
-    private List<PersonSchemaForUser> parseCsv(InputStream inputStream) {
-        //CsvMapper csvMapper = new CsvMapper();
-        CsvSchema schema = CsvSchema.emptySchema().withHeader();
-        MappingIterator<PersonSchemaForUser> iterator = null;
-
+        List<PersonSchemaForUser> persons = null;
         try {
-            iterator = csvMapper.readerFor(PersonSchemaForUser.class).with(schema).readValues(inputStream);
-            return iterator.readAll();
+            persons = parseCsv(inputStream);
         } catch (IOException e) {
-            throw new FileException("Can't read file: " + e.getMessage());
+            throw new FileException("File exception " + e);
         }
+
+        List<CompletableFuture<UserDto>> futures = makeFutureList(persons);
+        return completeFutureList(futures);
     }
 
     public User findUserById(long userId) {
@@ -128,10 +85,38 @@ public class UserService {
                 .toList();
     }
 
+    private List<PersonSchemaForUser> parseCsv(InputStream inputStream) throws IOException {
+        MappingIterator<PersonSchemaForUser> iterator = csvMapper.readerFor(PersonSchemaForUser.class)
+                .with(schema)
+                .readValues(inputStream);
+        return iterator.readAll();
+    }
+
+    private List<CompletableFuture<UserDto>> makeFutureList(List<PersonSchemaForUser> persons) {
+        return persons.stream()
+                .map(person -> CompletableFuture.supplyAsync(() -> {
+                    UserDto userDto = userMapper.personToUserDto((PersonSchemaForUser) person);
+                    userDto.setPassword(ThreadLocalRandom.current().nextInt() + "");
+                    userValidator.validateUserDto(userDto);
+                    createUser(userDto);
+                    // SMS to user.getEmail with - "You password for CorporationX is:"+user.getPassword()
+                    return userDto;
+                }))
+                .toList();
+    }
+
+    private List<UserDto> completeFutureList(List<CompletableFuture<UserDto>> futures) {
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                .thenApply(dto -> futures.stream()
+                        .map(CompletableFuture::join)
+                        .collect(Collectors.toList()))
+                .join();
+    }
+
     private void addCreateData(User user) {
         user.setCreatedAt(LocalDateTime.now());
         UserProfilePic userProfilePic = UserProfilePic.builder()
-                .name(user.getUsername() + user.getId())
+                .name(user.getUsername() + ThreadLocalRandom.current().nextInt())
                 .build();
 
         createDiceBearAvatar(userProfilePic);
@@ -141,7 +126,6 @@ public class UserService {
     private void createDiceBearAvatar(UserProfilePic userProfilePic) {
         userProfilePic.setFileId(URL + userProfilePic.getName());
         userProfilePic.setSmallFileId(URL + userProfilePic.getName() + SIZE);
-
         avatarService.saveToAmazonS3(userProfilePic);
     }
 }

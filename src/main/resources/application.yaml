@@ -63,6 +63,3 @@ services:
   dice-bear:
     url: https://api.dicebear.com/6.x/pixel-art/svg?seed=
     size: '&size=100'
-
-userCsv:
-  password-length: 4

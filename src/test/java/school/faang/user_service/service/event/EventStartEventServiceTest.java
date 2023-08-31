@@ -10,6 +10,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import school.faang.user_service.dto.event.EventStartEventDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.event.EventStartEventMapper;
 import school.faang.user_service.mapper.event.EventStartEventMapperImpl;
 import school.faang.user_service.publisher.JsonObjectMapper;
@@ -18,6 +19,8 @@ import school.faang.user_service.repository.event.EventRepository;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -35,6 +38,14 @@ class EventStartEventServiceTest {
 
     @InjectMocks
     private EventStartEventService eventStartEventService;
+
+    @Test
+    void sendScheduledEventThrowException() {
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+                () -> eventStartEventService.sendScheduledEvent(2));
+
+        assertEquals("Event with id 2 has already been canceled", exception.getMessage());
+    }
 
     @Test
     void sendScheduledEventTest() {

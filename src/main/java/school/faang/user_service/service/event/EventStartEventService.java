@@ -1,6 +1,5 @@
 package school.faang.user_service.service.event;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +8,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventStartEventDto;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.event.EventStartEventMapper;
 import school.faang.user_service.publisher.JsonObjectMapper;
 import school.faang.user_service.repository.event.EventRepository;

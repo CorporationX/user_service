@@ -16,10 +16,13 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.filters.EventFilter;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 
 @Service
@@ -65,12 +68,12 @@ public class EventService {
 
     public List<EventDto> getParticipatedEvents(Long userId) {
         List<Event> events = eventRepository.findParticipatedEventsByUserId(userId);
-        return events.stream().map(event -> eventMapper.toDto(event)).toList();
+        return events.stream().map(eventMapper::toDto).toList();
     }
 
     public List<EventDto> getOwnedEvents(Long ownerId) {
         List<Event> events = eventRepository.findAllByUserId(ownerId);
-        return events.stream().map(event -> eventMapper.toDto(event)).toList();
+        return events.stream().map(eventMapper::toDto).toList();
     }
 
     public List<EventDto> getEventsByFilter(EventFilterDto filters) {
@@ -115,4 +118,25 @@ public class EventService {
 
         return events.size();
     }
+
+    public void clearPastEvents() {
+        Stream<Event> allEvents = eventRepository.findAll().stream();
+        EventFilterDto filters = EventFilterDto.builder().endDate(LocalDateTime.now()).build();
+
+        List<Event> pastEvents = eventFilters.stream()
+                .filter(filter -> filter.isApplicable(filters))
+                .flatMap(filter -> filter.apply(allEvents, filters))
+                .toList();
+
+        int batchSize = Integer.parseInt("${scheduler.batch-size}");
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
+
+        for (int i = 0; i < pastEvents.size(); i += batchSize) {
+            int endIndex = Math.min(i + batchSize, pastEvents.size());
+            List<Event> batch = pastEvents.subList(i, endIndex);
+
+            executorService.execute(() -> eventRepository.deleteAllInBatch(batch));
+        }
+    }
+
 }

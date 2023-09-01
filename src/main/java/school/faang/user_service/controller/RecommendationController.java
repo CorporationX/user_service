@@ -31,10 +31,11 @@ public class RecommendationController {
         return recommendationService.create(recommendation);
     }
 
-    @PutMapping
-    public RecommendationDto updateRecommendation(@Valid @RequestBody RecommendationDto updated) {
+    @PutMapping("/{id}")
+    public RecommendationDto updateRecommendation(@PathVariable long id,
+                                                  @Valid @RequestBody RecommendationDto updated) {
         log.info("Received request to update recommendation: {}", updated);
-        return recommendationService.update(updated);
+        return recommendationService.update(id, updated);
     }
 
     @DeleteMapping("{id}")

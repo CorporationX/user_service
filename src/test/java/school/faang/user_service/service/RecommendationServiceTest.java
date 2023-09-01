@@ -11,12 +11,14 @@ import org.mockito.quality.Strictness;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.RecommendationEventDto;
 import school.faang.user_service.dto.skill.SkillOfferDto;
+import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
 import school.faang.user_service.publisher.recommendation.RecommendationEventPublisher;
-import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.validator.RecommendationValidator;
@@ -28,9 +30,9 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -45,9 +47,9 @@ class RecommendationServiceTest {
     @Mock
     private RecommendationRepository recommendationRepository;
     @Mock
-    private SkillOfferRepository skillOfferRepository;
+    private UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     @Mock
-    private SkillRepository skillRepository;
+    private SkillOfferRepository skillOfferRepository;
     @Mock
     private RecommendationValidator recommendationValidator;
     @Mock
@@ -55,7 +57,10 @@ class RecommendationServiceTest {
     @Mock
     private RecommendationEventPublisher publisher;
     private RecommendationDto recommendationDto;
-    private Recommendation recommendationEntity;
+    private Recommendation recommendation;
+    private Skill skill;
+    private User author;
+    private User receiver;
 
     @BeforeEach
     void setUp() {
@@ -64,34 +69,58 @@ class RecommendationServiceTest {
                 .skill(1L)
                 .recommendation(1L)
                 .build();
-        List<SkillOfferDto> skillOffers = Collections.singletonList(skillOfferDto);
+        List<SkillOfferDto> skillOfferDtos = Collections.singletonList(skillOfferDto);
         recommendationDto = RecommendationDto.builder()
                 .id(1L)
                 .authorId(1L)
                 .receiverId(2L)
                 .content("Test recommendation")
-                .skillOffers(skillOffers)
+                .skillOffers(skillOfferDtos)
                 .build();
-        User author = User.builder().id(1L).build();
-        User receiver = User.builder().id(2L).build();
-        recommendationEntity = Recommendation.builder()
+
+        skill = Skill.builder()
+                .id(1L)
+                .users(new ArrayList<>())
+                .guarantees(new ArrayList<>())
+                .build();
+
+        author = User.builder()
+                .id(1L)
+                .build();
+        receiver = User.builder()
+                .id(2L)
+                .skills(new ArrayList<>())
+                .build();
+
+        UserSkillGuarantee userSkillGuarantee = UserSkillGuarantee.builder()
+                .id(1L)
+                .skill(skill)
+                .user(receiver)
+                .guarantor(author)
+                .build();
+
+        SkillOffer skillOffer = SkillOffer.builder()
+                .id(1L)
+                .skill(skill)
+                .build();
+        List<SkillOffer> skillOffers = new ArrayList<>();
+        skillOffers.add(skillOffer);
+
+        recommendation = Recommendation.builder()
                 .id(1L)
                 .author(author)
                 .receiver(receiver)
                 .content("Test recommendation")
-                .skillOffers(new ArrayList<>())
-                .build();
-        SkillOffer skillOffer = SkillOffer.builder()
-                .id(1L)
+                .skillOffers(skillOffers)
                 .build();
 
-        when(recommendationMapper.toDto(any(Recommendation.class))).thenReturn(recommendationDto);
-        when(recommendationRepository.create(anyLong(), anyLong(), anyString())).thenReturn(1L);
-        when(recommendationRepository.update(anyLong(), anyLong(), anyString())).thenReturn(recommendationEntity);
-        when(recommendationRepository.findById(1L)).thenReturn(Optional.of(recommendationEntity));
-        when(skillOfferRepository.create(anyLong(), anyLong())).thenReturn(1L);
+        when(recommendationMapper.toDto(recommendation)).thenReturn(recommendationDto);
+        when(recommendationRepository.create(1L, 2L, "Test recommendation")).thenReturn(1L);
+        when(recommendationRepository.findById(1L)).thenReturn(Optional.of(recommendation));
+        when(skillOfferRepository.create(1L, 1L)).thenReturn(1L);
         when(skillOfferRepository.findById(1L)).thenReturn(Optional.of(skillOffer));
         when(skillOfferService.getSkillOffer(1L)).thenReturn(skillOffer);
+        when(userSkillGuaranteeRepository.save(any(UserSkillGuarantee.class))).thenReturn(userSkillGuarantee);
     }
 
     @Test
@@ -119,13 +148,26 @@ class RecommendationServiceTest {
     }
 
     @Test
-    void create_shouldShouldAddSkillToRecommendation() {
-        assertEquals(0, recommendationEntity.getSkillOffers().size());
-        recommendationService.create(recommendationDto);
+    void create_shouldAddNewSkillToReceiver() {
+        assertEquals(0, receiver.getSkills().size());
 
+        recommendationService.create(recommendationDto);
         assertAll(() -> {
-            assertEquals(1, recommendationEntity.getSkillOffers().size());
-            assertEquals(1L, recommendationEntity.getSkillOffers().get(0).getId());
+            assertEquals(1, receiver.getSkills().size());
+            assertEquals(1L, receiver.getSkills().get(0).getId());
+        });
+    }
+
+    @Test
+    void create_shouldAddNewGuarantorToReceiverSkill() {
+        receiver.getSkills().add(skill);
+        assertTrue(receiver.getSkills().get(0).getGuarantees().isEmpty());
+
+        recommendationService.create(recommendationDto);
+        assertAll(() -> {
+            assertEquals(1, receiver.getSkills().get(0).getGuarantees().size());
+            assertEquals(1L, receiver.getSkills().get(0).getGuarantees().get(0).getId());
+            assertEquals(author, receiver.getSkills().get(0).getGuarantees().get(0).getGuarantor());
         });
     }
 
@@ -137,49 +179,62 @@ class RecommendationServiceTest {
 
     @Test
     void create_shouldInvokeMapperToDtoMethod() {
-        recommendationService.update(recommendationDto);
-        verify(recommendationMapper).toDto(recommendationEntity);
+        recommendationService.create(recommendationDto);
+        verify(recommendationMapper).toDto(recommendation);
     }
 
     @Test
     void update_shouldInvokeValidateToUpdateMethod() {
-        recommendationService.update(recommendationDto);
+        recommendationService.update(1L, recommendationDto);
         verify(recommendationValidator).validateToUpdate(recommendationDto);
     }
 
     @Test
     void update_shouldInvokeRepositoryUpdateMethod() {
-        recommendationService.update(recommendationDto);
-        verify(recommendationRepository).update(1L, 2L, "Test recommendation");
+        recommendationService.update(1L, recommendationDto);
+        verify(recommendationRepository).update(1L,  "Test recommendation");
     }
 
     @Test
     void update_shouldSkillOfferRepositoryDeleteAllByRecommendationId() {
-        recommendationService.update(recommendationDto);
+        recommendationService.update(1L, recommendationDto);
         verify(skillOfferRepository).deleteAllByRecommendationId(1L);
     }
 
     @Test
     void update_shouldInvokeSkillOfferRepositoryCreateMethod() {
-        recommendationService.update(recommendationDto);
+        recommendationService.update(1L, recommendationDto);
         verify(skillOfferRepository).create(1L, 1L);
     }
 
     @Test
-    void update_shouldShouldAddSkillToRecommendation() {
-        assertEquals(0, recommendationEntity.getSkillOffers().size());
-        recommendationService.update(recommendationDto);
+    void update_shouldAddNewSkillToReceiver() {
+        assertEquals(0, recommendation.getReceiver().getSkills().size());
 
+        recommendationService.update(1L,(recommendationDto));
         assertAll(() -> {
-            assertEquals(1, recommendationEntity.getSkillOffers().size());
-            assertEquals(1L, recommendationEntity.getSkillOffers().get(0).getId());
+            assertEquals(1, recommendation.getReceiver().getSkills().size());
+            assertEquals(1L, recommendation.getReceiver().getSkills().get(0).getId());
+        });
+    }
+
+    @Test
+    void update_shouldAddNewGuarantorToReceiverSkill() {
+        receiver.getSkills().add(skill);
+        assertTrue(receiver.getSkills().get(0).getGuarantees().isEmpty());
+
+        recommendationService.update(1L,(recommendationDto));
+        assertAll(() -> {
+            assertEquals(1, receiver.getSkills().get(0).getGuarantees().size());
+            assertEquals(1L, receiver.getSkills().get(0).getGuarantees().get(0).getId());
+            assertEquals(author, receiver.getSkills().get(0).getGuarantees().get(0).getGuarantor());
         });
     }
 
     @Test
     void update_shouldInvokeMapperToDtoMethod() {
-        recommendationService.update(recommendationDto);
-        verify(recommendationMapper).toDto(recommendationEntity);
+        recommendationService.update(1L, recommendationDto);
+        verify(recommendationMapper).toDto(recommendation);
     }
 
     @Test

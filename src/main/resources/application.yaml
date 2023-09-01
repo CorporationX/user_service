@@ -78,3 +78,6 @@ event:
     scheduler:
       thread-pool:
         core-pool-size: 5
+
+telegram:
+  botUrl: https://t.me/CorpX_bot?start=

@@ -9,7 +9,7 @@ import org.springframework.data.redis.listener.ChannelTopic;
 
 @RequiredArgsConstructor
 @Slf4j
-public class AbstractPublisher<T> {
+public abstract class AbstractPublisher<T> {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
     private final ChannelTopic topic;

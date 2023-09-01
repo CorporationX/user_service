@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.mentorship.MentorshipOfferedEventDto;
+import school.faang.user_service.exception.DataValidationException;
 
 @Component
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ public class MentorshipOfferedEventPublisher {
             json = objectMapper.writeValueAsString(mentorshipOfferedEventDto);
         } catch (JsonProcessingException e) {
             log.error("Can't use publish ",e.getMessage());
+            throw new DataValidationException("Problem with json");
         }
         redisTemplate.convertAndSend(topicMentorshipOffered, json);
     }

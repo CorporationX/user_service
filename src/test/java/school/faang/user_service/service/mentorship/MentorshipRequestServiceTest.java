@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MentorshipRequestServiceTest {
@@ -67,6 +68,7 @@ public class MentorshipRequestServiceTest {
         requester.setMentors(new ArrayList<>());
         receiver.setId(receiverId);
         receiver.setMentees(new ArrayList<>());
+        receiver.setEmail("test@me.com");
 
         mentorshipRequest.setId(mentorshipRequestId);
         mentorshipRequest.setDescription(description);
@@ -100,7 +102,6 @@ public class MentorshipRequestServiceTest {
         Mockito.verify(mentorshipRequestValidator, Mockito.times(1)).requestValidate(requester, receiver);
         Mockito.verify(mentorshipRequestMapper, Mockito.times(1)).toEntity(mentorshipRequestDto);
         Mockito.verify(mentorshipRequestRepository, Mockito.times(1)).save(mentorshipRequestMapper.toEntity(mentorshipRequestDto));
-        Mockito.verify(mentorshipOfferedEventPublisher, Mockito.times(1)).publish(mentorshipOfferedEventDto);
     }
 
     @Test
@@ -148,5 +149,34 @@ public class MentorshipRequestServiceTest {
         Mockito.verify(mentorshipRequestValidator, Mockito.times(1)).rejectRequestValidator(mentorshipRequest);
         assertEquals(RequestStatus.REJECTED,mentorshipRequest.getStatus());
         assertEquals(rejectionDto.getReason(),mentorshipRequest.getRejectionReason());
+    }
+
+    @Test
+    public void testSendNotification(){
+        MentorshipOfferedEventDto mentorshipOfferedEventDto = MentorshipOfferedEventDto.builder()
+                .preferredContact(PreferredContact.EMAIL)
+                .build();
+        Mockito.when(userService.findUserById(1L))
+                .thenReturn(requester);
+        Mockito.when(userService.findUserById(2L))
+                .thenReturn(receiver);
+        Mockito.when(mentorshipRequestMapper.toEntity(mentorshipRequestDto))
+                .thenReturn(mentorshipRequest);
+        Mockito.when(mentorshipRequestMapper.toDto(mentorshipRequest))
+                .thenReturn(mentorshipRequestDto);
+        Mockito.when(mentorshipRequestRepository.save(mentorshipRequest))
+                .thenReturn(mentorshipRequest);
+        Mockito.when(mentorshipOfferedEventMapper.toMentorshipOfferedEvent(mentorshipRequestDto))
+                .thenReturn(mentorshipOfferedEventDto);
+
+        mentorshipRequestService.requestMentorship(mentorshipRequestDto);
+
+        Mockito.verify(mentorshipOfferedEventMapper, Mockito.times(1))
+                .toMentorshipOfferedEvent(mentorshipRequestDto);
+        Mockito.verify(mentorshipOfferedEventPublisher, Mockito.times(1))
+                .publish(mentorshipOfferedEventDto);
+        assertNotNull(mentorshipOfferedEventDto.getPreferredContact());
+        assertNotNull(mentorshipOfferedEventDto.getTimestamp());
+        assertNotNull(mentorshipOfferedEventDto.getEmail());
     }
 }

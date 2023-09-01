@@ -99,7 +99,7 @@ public class MentorshipRequestService {
     private void sendNotification(MentorshipRequestDto mentorshipRequestDto, String email) {
         MentorshipOfferedEventDto mentorshipOfferedEventDto = mentorshipOfferedEventMapper.toMentorshipOfferedEvent(mentorshipRequestDto);
 
-        //TODO finish to create user
+        //TODO finish to create user method
         mentorshipOfferedEventDto.setPreferredContact(PreferredContact.EMAIL);
         mentorshipOfferedEventDto.setTimestamp(LocalDateTime.now());
         mentorshipOfferedEventDto.setEmail(email);

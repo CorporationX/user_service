@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import school.faang.user_service.dto.MentorshipAcceptedEventDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.dto.mentorship.RejectionReasonDto;
@@ -22,6 +23,7 @@ import school.faang.user_service.filter.mentorship.MentorshipRequestReceiverFilt
 import school.faang.user_service.filter.mentorship.MentorshipRequestRequesterFilter;
 import school.faang.user_service.filter.mentorship.MentorshipRequestStatusFilter;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.validator.MentorshipRequestValidator;
 
@@ -33,6 +35,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -48,6 +51,8 @@ class MentorshipRequestServiceTest {
     private MentorshipRequestValidator mentorshipRequestValidator;
     @Mock
     private List<MentorshipRequestFilter> filters;
+    @Mock
+    private MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher;
     @InjectMocks
     private MentorshipRequestService mentorshipRequestService;
     private MentorshipRequestDto requestDto;
@@ -206,5 +211,11 @@ class MentorshipRequestServiceTest {
         assertThrows(EntityNotFoundException.class,
                 () -> mentorshipRequestService.rejectRequest(request.getId(), rejectionReason),
                 "Request with id" + request.getId() + "not found.");
+    }
+
+    @Test
+    void test_sendMentorshipAcceptedEvent(){
+        mentorshipRequestService.acceptRequest(request.getId());
+        verify(mentorshipAcceptedEventPublisher).publish(any(MentorshipAcceptedEventDto.class));
     }
 }

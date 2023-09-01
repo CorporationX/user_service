@@ -3,7 +3,6 @@ package school.faang.user_service.service.event;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import org.apache.commons.collections4.ListUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,7 +50,6 @@ class EventServiceTest {
     @Mock
     private EventAsyncService eventAsyncService;
 
-    private List<Event> events;
     EventDto eventDto;
     Event event;
     User user;
@@ -365,17 +363,15 @@ class EventServiceTest {
     }
 
     @Test
-    void clearEvents_shouldSplitEventListAndInvokeClearEventsPartition() {
+    void clearEvents_shouldInvokeClearEventsPartitionThreeTimes() {
         Event event = mock(Event.class);
         when(event.getEndDate()).thenReturn(LocalDateTime.now().minusDays(1));
-        events = List.of(event, event, event);
+        List<Event> events = List.of(event, event, event);
 
         when(eventRepository.findAll()).thenReturn(events);
 
         eventService.clearEvents(1);
 
-        List<List<Event>> partitions = ListUtils.partition(events, events.size());
-
-        partitions.forEach(partition -> verify(eventAsyncService).clearEventsPartition(partition));
+        verify(eventAsyncService, times(3)).clearEventsPartition(List.of(event));
     }
 }

@@ -15,5 +15,5 @@ public class MentorshipAcceptedEventDto {
     private long authorId;
     private long receiverId;
     private long requestId;
-    LocalDateTime time;
+    private LocalDateTime time;
 }

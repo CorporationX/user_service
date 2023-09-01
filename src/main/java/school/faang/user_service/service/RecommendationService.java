@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.RecommendationEventDto;
+import school.faang.user_service.dto.skill.SkillAcquiredEventDto;
 import school.faang.user_service.dto.skill.SkillOfferDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
@@ -15,6 +16,7 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
+import school.faang.user_service.publisher.SkillAcquiredEventPublisher;
 import school.faang.user_service.publisher.recommendation.RecommendationEventPublisher;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
@@ -36,7 +38,8 @@ public class RecommendationService {
     private final SkillOfferRepository skillOfferRepository;
     private final RecommendationMapper recommendationMapper;
     private final RecommendationValidator recommendationValidator;
-    private final RecommendationEventPublisher publisher;
+    private final RecommendationEventPublisher recommendationEventPublisher;
+    private final SkillAcquiredEventPublisher skillAcquiredEventPublisher;
 
     @Transactional
     public RecommendationDto create(RecommendationDto recommendationDto) {
@@ -129,6 +132,7 @@ public class RecommendationService {
         addGuarantorToSkill(recommendation, skill);
         recommendation.getReceiver().getSkills().add(skill);
         skill.getUsers().add(recommendation.getReceiver());
+        publishSkillAcquiredEvent(recommendation, skill);
     }
 
     private void addGuarantorToSkill(Recommendation recommendationEntity, Skill skill) {
@@ -148,8 +152,18 @@ public class RecommendationService {
                 .recipientId(recommendation.getReceiver().getId())
                 .date(LocalDateTime.now())
                 .build();
-        publisher.publish(recommendationEvent);
+        recommendationEventPublisher.publish(recommendationEvent);
         log.info("Published new recommendation event: {}", recommendationEvent);
+    }
+
+    private void publishSkillAcquiredEvent(Recommendation recommendation, Skill skill) {
+        SkillAcquiredEventDto skillAcquiredEvent = SkillAcquiredEventDto.builder()
+                .authorId(recommendation.getAuthor().getId())
+                .receiverId(recommendation.getReceiver().getId())
+                .skillId(skill.getId())
+                .build();
+        skillAcquiredEventPublisher.publish(skillAcquiredEvent);
+        log.info("Published new skill acquired event: {}", skillAcquiredEvent);
     }
 
     private Recommendation getRecommendation(long id) {

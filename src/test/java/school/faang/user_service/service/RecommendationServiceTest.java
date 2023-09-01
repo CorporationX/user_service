@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.RecommendationEventDto;
+import school.faang.user_service.dto.skill.SkillAcquiredEventDto;
 import school.faang.user_service.dto.skill.SkillOfferDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
@@ -17,6 +18,7 @@ import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
+import school.faang.user_service.publisher.SkillAcquiredEventPublisher;
 import school.faang.user_service.publisher.recommendation.RecommendationEventPublisher;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
@@ -55,7 +57,10 @@ class RecommendationServiceTest {
     @Mock
     private RecommendationMapper recommendationMapper;
     @Mock
-    private RecommendationEventPublisher publisher;
+    private RecommendationEventPublisher recommendationEventPublisher;
+    @Mock
+    private SkillAcquiredEventPublisher skillAcquiredEventPublisher;
+
     private RecommendationDto recommendationDto;
     private Recommendation recommendation;
     private Skill skill;
@@ -148,14 +153,16 @@ class RecommendationServiceTest {
     }
 
     @Test
-    void create_shouldAddNewSkillToReceiver() {
+    void create_shouldAddNewSkillToReceiverAndPublishEvent() {
         assertEquals(0, receiver.getSkills().size());
 
         recommendationService.create(recommendationDto);
         assertAll(() -> {
             assertEquals(1, receiver.getSkills().size());
-            assertEquals(1L, receiver.getSkills().get(0).getId());
+            assertEquals(skill, receiver.getSkills().get(0));
         });
+
+        verify(skillAcquiredEventPublisher).publish(any(SkillAcquiredEventDto.class));
     }
 
     @Test
@@ -174,7 +181,7 @@ class RecommendationServiceTest {
     @Test
     void create_shouldInvokePublisherPublishMethod() {
         recommendationService.create(recommendationDto);
-        verify(publisher).publish(any(RecommendationEventDto.class));
+        verify(recommendationEventPublisher).publish(any(RecommendationEventDto.class));
     }
 
     @Test
@@ -208,14 +215,16 @@ class RecommendationServiceTest {
     }
 
     @Test
-    void update_shouldAddNewSkillToReceiver() {
+    void update_shouldAddNewSkillToReceiverAndPublishEvent() {
         assertEquals(0, recommendation.getReceiver().getSkills().size());
 
         recommendationService.update(1L,(recommendationDto));
         assertAll(() -> {
             assertEquals(1, recommendation.getReceiver().getSkills().size());
-            assertEquals(1L, recommendation.getReceiver().getSkills().get(0).getId());
+            assertEquals(skill, recommendation.getReceiver().getSkills().get(0));
         });
+
+        verify(skillAcquiredEventPublisher).publish(any(SkillAcquiredEventDto.class));
     }
 
     @Test

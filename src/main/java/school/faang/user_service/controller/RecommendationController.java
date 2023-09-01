@@ -33,9 +33,9 @@ public class RecommendationController {
 
     @PutMapping("/{id}")
     public RecommendationDto updateRecommendation(@PathVariable long id,
-                                                  @Valid @RequestBody RecommendationDto updated) {
-        log.info("Received request to update recommendation: {}", updated);
-        return recommendationService.update(id, updated);
+                                                  @Valid @RequestBody RecommendationDto recommendationDto) {
+        log.info("Received request to update recommendation: {}", recommendationDto);
+        return recommendationService.update(id, recommendationDto);
     }
 
     @DeleteMapping("{id}")

@@ -7,7 +7,7 @@ import school.faang.user_service.service.goal.GoalInvitationService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/invitations")
+@RequestMapping("/invitation")
 public class GoalInvitationController {
 
     private final GoalInvitationService service;
@@ -17,8 +17,8 @@ public class GoalInvitationController {
         return service.createInvitation(invitation);
     }
     @GetMapping
-    public GoalInvitationDto acceptGoalInvitation(long id) {
-       return service.acceptGoalInvitation(id);
+    public GoalInvitationDto acceptGoalInvitation(long idGoalInvitation) {
+       return service.acceptGoalInvitation(idGoalInvitation);
     }
 
 }

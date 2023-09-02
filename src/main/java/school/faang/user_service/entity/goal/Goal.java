@@ -1,10 +1,8 @@
 package school.faang.user_service.entity.goal;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import school.faang.user_service.entity.Skill;
@@ -38,6 +36,7 @@ public class Goal {
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.ORDINAL)
+    @NotNull
     private GoalStatus status;
 
     @Temporal(TemporalType.TIMESTAMP)

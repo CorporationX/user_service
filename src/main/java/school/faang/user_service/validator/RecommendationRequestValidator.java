@@ -6,10 +6,10 @@ import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.exception.EntityNotFoundException;
-import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
+import school.faang.user_service.service.skill.SkillService;
+import school.faang.user_service.service.user.UserService;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -18,23 +18,20 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class RecommendationRequestValidator {
     private final RecommendationRequestRepository recommendationRequestRepository;
-    private final UserRepository userRepository;
-    private final SkillRepository skillRepository;
+    private final SkillService skillValidator;
+    private final UserService userValidator;
     private static final int MONTHS_BETWEEN_RECOMMENDATIONS = 6;
 
     public void validateUsersExist(RecommendationRequestDto recommendationRequest) {
-        if (!userRepository.existsById(recommendationRequest.getRequesterId()) || !userRepository.existsById(recommendationRequest.getReceiverId())) {
-            throw new EntityNotFoundException("User not found");
-        }
+        long requesterId = recommendationRequest.getRequesterId();
+        long receiverId = recommendationRequest.getReceiverId();
+
+        userValidator.validateUsers(requesterId, receiverId);
     }
 
     public void validateSkillsExist(RecommendationRequestDto recommendationRequest) {
         List<Long> skillIds = recommendationRequest.getSkills().stream().map(SkillRequest::getId).toList();
-        for (Long skillId : skillIds) {
-            if (!skillRepository.existsById(skillId)) {
-                throw new EntityNotFoundException("Such skill does not exist");
-            }
-        }
+        skillValidator.validateSkills(skillIds);
     }
 
     public void validateRequestPeriod (RecommendationRequestDto recommendationRequest) {

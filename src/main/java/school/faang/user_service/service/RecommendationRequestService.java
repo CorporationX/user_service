@@ -4,11 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filter.recommendation.RecommendationRequestFilter;
 import java.util.List;
-import java.util.Optional;
-
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
@@ -55,9 +54,7 @@ public class RecommendationRequestService {
       
     public RecommendationRequestDto getRequest(long id) {
         RecommendationRequest request = recommendationRequestRepository.findById(id)
-                .orElseThrow(() -> {
-                    throw new EntityNotFoundException("Recommendation does not exist");
-                });
+                .orElseThrow(() -> new EntityNotFoundException("Recommendation Request does not exist"));
         return recommendationRequestMapper.toDto(request);
     }
   
@@ -72,7 +69,7 @@ public class RecommendationRequestService {
 
             return recommendationRequestMapper.toDto(recommendationRequest);
         } else {
-            throw new EntityNotFoundException("The request has already been accepted or rejected");
+            throw new DataValidationException("The request has already been accepted or rejected");
         }
    }
 

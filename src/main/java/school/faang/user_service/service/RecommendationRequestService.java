@@ -7,6 +7,8 @@ import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filter.recommendation.RecommendationRequestFilter;
 import java.util.List;
+import java.util.Optional;
+
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
@@ -30,7 +32,11 @@ public class RecommendationRequestService {
         recommendationRequestValidator.validateSkillsExist(recommendationRequest);
         recommendationRequestValidator.validateRequestPeriod(recommendationRequest);
 
-        RecommendationRequest createdRequest = recommendationRequestRepository.create(recommendationRequest.getRequesterId(), recommendationRequest.getReceiverId(), recommendationRequest.getMessage());
+        RecommendationRequest createdRequest = recommendationRequestRepository.create(
+                recommendationRequest.getRequesterId(),
+                recommendationRequest.getReceiverId(),
+                recommendationRequest.getMessage());
+
         createdRequest.getSkills().forEach(skill -> skillRequestRepository.create(recommendationRequest.getRequesterId(), skill.getId()));
 
         return recommendationRequestMapper.toDto(createdRequest);
@@ -68,5 +74,12 @@ public class RecommendationRequestService {
         } else {
             throw new EntityNotFoundException("The request has already been accepted or rejected");
         }
-  }
+   }
+
+    public RecommendationRequest getLastRequest(RecommendationRequestDto recommendationRequest) {
+        long requesterId = recommendationRequest.getRequesterId();
+        long receiverId = recommendationRequest.getReceiverId();
+        return recommendationRequestRepository.findLatestPendingRequest(requesterId, receiverId)
+                .orElseThrow(() -> new EntityNotFoundException("Recommendation Request between users does not exist"));
+    }
 }

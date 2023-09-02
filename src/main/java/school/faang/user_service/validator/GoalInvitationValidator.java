@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.dto.goal.GoalInvitationFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
@@ -61,6 +62,21 @@ public class GoalInvitationValidator {
         }
         if (currentUserGoals.contains(goal)) {
             throw new DataValidationException("User already has this goal");
+        }
+    }
+
+    public void validateRejectedGoalInvitation(GoalInvitation goalInvitation) {
+        if (!goalInvitation.getStatus().equals(RequestStatus.PENDING)) {
+            throw new DataValidationException("Invitation cannot be rejected");
+        }
+        if (goalInvitation.getGoal() == null) {
+            throw new EntityNotFoundException("Goal not found");
+        }
+    }
+
+    public void validateFilter(GoalInvitationFilterDto filter) {
+        if (filter == null) {
+            throw new DataValidationException("Filter cannot be null");
         }
     }
 

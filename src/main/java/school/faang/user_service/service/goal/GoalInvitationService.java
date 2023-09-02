@@ -90,9 +90,6 @@ public class GoalInvitationService {
             invitationStream = fil.apply(invitationStream, filter);
         };
 
-//        filters.stream().filter(fl -> fl.isApplicable(filter))
-//                .forEach(fl -> fl.apply(invitationStream, filter));
-
         return invitationStream.map(goalInvitationMapper::toDto).toList();
     }
 

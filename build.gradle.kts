@@ -16,6 +16,11 @@ configurations {
 	}
 }
 
+jacoco {
+	toolVersion = "0.8.9"
+	reportsDirectory.set(layout.buildDirectory.dir("customJacocoReportDir"))
+}
+
 repositories {
 	mavenCentral()
 }
@@ -73,6 +78,13 @@ dependencies {
 	testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.2")
 	testImplementation("org.assertj:assertj-core:3.24.2")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+	/**
+	 * Google API integration
+	 */
+	implementation("com.google.api-client:google-api-client:2.2.0")
+	implementation("com.google.oauth-client:google-oauth-client-jetty:1.34.1")
+	implementation("com.google.apis:google-api-services-calendar:v3-rev20220715-2.0.0")
 }
 
 jsonSchema2Pojo {
@@ -90,4 +102,57 @@ val test by tasks.getting(Test::class) { testLogging.showStandardStreams = true 
 
 tasks.bootJar {
 	archiveFileName.set("service.jar")
+}
+
+tasks.test{
+	finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+	dependsOn(tasks.test)
+	reports {
+		xml.required.set(false)
+		csv.required.set(false)
+		html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+	}
+
+	classDirectories.setFrom(files(classDirectories.files.map {
+		fileTree(it).apply {
+			exclude(
+					"com/json/**",
+					"school/faang/user_service/client/**",
+					"school/faang/user_service/config/**",
+					"school/faang/user_service/controller/google/**",
+					"school/faang/user_service/controller/mentorship/**",
+					"school/faang/user_service/dto/**",
+					"school/faang/user_service/entity/**",
+					"school/faang/user_service/exception/**",
+					"school/faang/user_service/util/**",
+					"school/faang/user_service/repository/**",
+					"school/faang/user_service/UserServiceApplication.class")
+		}
+	}))
+}
+
+tasks.jacocoTestCoverageVerification{
+	violationRules{
+		rule{
+			element = "CLASS"
+			excludes = listOf(
+					"com/json/**",
+					"school/faang/user_service/client/**",
+					"school/faang/user_service/config/**",
+					"school/faang/user_service/controller/google/**",
+					"school/faang/user_service/controller/mentorship/**",
+					"school/faang/user_service/event/**",
+					"school/faang/user_service/entity/**",
+					"school/faang/user_service/exception/**",
+					"school/faang/user_service/util/**",
+					"school/faang/user_service/repository/**",
+					"school/faang/user_service/UserServiceApplication")
+			limit {
+				minimum = "0.8".toBigDecimal()
+			}
+		}
+	}
 }

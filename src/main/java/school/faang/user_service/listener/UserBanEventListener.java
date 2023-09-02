@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.listener.events.BanEvent;
@@ -19,7 +18,6 @@ import java.io.IOException;
 @Component
 public class UserBanEventListener implements MessageListener {
     private final UserRepository userRepository;
-    private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
 
     @Override

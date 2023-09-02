@@ -1,9 +1,7 @@
 package school.faang.user_service.service.user;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
@@ -102,21 +100,5 @@ public class UserService {
         stopUserGoals(userId);
         stopUserEvents(userId);
         cancelMentoring(userId);
-    }
-
-    @EventListener
-    public void handleUserBanEvent(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalStateException("User not found with ID: " + userId));
-        user.setBanned(true);
-        userRepository.save(user);
-    }
-
-    @PostConstruct
-    public void subscribeToUserBanChannel() {
-        redisTemplate.getConnectionFactory().getConnection().subscribe((message, pattern) -> {
-            Long userId = (Long) redisTemplate.getValueSerializer().deserialize(message.getBody());
-            handleUserBanEvent(userId);
-        }, redisTemplate.getStringSerializer().serialize(userBanChannelName));
     }
 }

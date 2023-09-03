@@ -14,4 +14,5 @@ public class MentorshipAcceptedDto {
     private Long id;
     private Long receiverId;
     private Long requesterId;
+    private String receiverUsername;
 }

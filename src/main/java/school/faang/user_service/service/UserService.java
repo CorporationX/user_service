@@ -1,15 +1,18 @@
 package school.faang.user_service.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.config.executors.ExecutorsPull;
 import school.faang.user_service.csv_parser.CsvToPerson.CsvToPerson;
 import school.faang.user_service.dto.DeactivateResponseDto;
 import school.faang.user_service.dto.contact.ExtendedContactDto;
 import school.faang.user_service.dto.contact.TgContactDto;
+import school.faang.user_service.dto.redis.ProfileViewEventDto;
 import school.faang.user_service.dto.subscription.UserDto;
 import school.faang.user_service.dto.subscription.UserFilterDto;
 import school.faang.user_service.dto.user.person_dto.UserPersonDto;
@@ -26,6 +29,7 @@ import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.PersonToUserMapper;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.ProfileViewPublisher;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserCheckRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -61,17 +65,21 @@ public class UserService {
     private final CountryRepository countryRepository;
     private final UserCheckRepository userCheckRepository;
     private final PasswordGeneration passwordGeneration;
+    private final ProfileViewPublisher profileViewPublisher;
+    private final UserContext userContext;
     private final Object lock = new Object();
     private final ExecutorsPull executorsPull;
 
     @Value("${dicebear.url}")
     private String dicebearUrl;
 
-    public UserDto getUser(long id) {
+    public UserDto getUser(long id) throws JsonProcessingException {
         User foundUser = userRepository.findById(id).orElseThrow(() -> {
             throw new UserNotFoundException("User with id " + id + " not found");
         });
         log.info("Return user with id: {}", foundUser.getId());
+        long viewerId = userContext.getUserId();
+        profileViewPublisher.publish(new ProfileViewEventDto(viewerId, id));
         return userMapper.toUserDto(foundUser);
     }
 

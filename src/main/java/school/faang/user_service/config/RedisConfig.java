@@ -17,6 +17,8 @@ public class RedisConfig {
     private String host;
     @Value("${spring.data.redis.port}")
     private int port;
+    @Value("${spring.data.redis.channels.recommendation_request_channel}")
+    private String recommendationRequestChannelName;
     @Value("${spring.data.redis.channels.skill_offer_channel}")
     private String skillOfferChannelName;
 
@@ -33,6 +35,11 @@ public class RedisConfig {
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new StringRedisSerializer());
         return redisTemplate;
+    }
+
+    @Bean
+    ChannelTopic topicRecommendationRequest() {
+        return new ChannelTopic(recommendationRequestChannelName);
     }
 
     @Bean

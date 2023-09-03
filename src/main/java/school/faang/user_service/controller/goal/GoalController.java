@@ -1,18 +1,42 @@
 package school.faang.user_service.controller.goal;
 
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.goal.GoalService;
+import school.faang.user_service.validator.GoalValidator;
 
 import java.util.List;
 
-@Controller
+@RestController("/goal")
 @RequiredArgsConstructor
 public class GoalController {
     private final GoalService service;
+    private final GoalValidator validator;
+
+    @PutMapping("/create")
+    public GoalDto createGoal(GoalDto goalDto) {
+        validator.createGoalControllerValidation(goalDto);
+        return service.createGoal(goalDto);
+    }
+
+    public void deleteGoal(Long goalId) {
+        if (goalId < 1) {
+            throw new DataValidationException("If cannot be less than 1");
+        }
+        service.deleteGoal(goalId);
+    }
+
+    @PutMapping("/update/{goalId}")
+    public GoalDto updateGoal(@PathVariable long id, @RequestBody GoalDto goalDto) {
+        validator.updateGoalControllerValidation(goalDto);
+        return service.updateGoal(id, goalDto);
+    }
 
     public List<GoalDto> getGoalsByUser(long userId, GoalFilterDto filter) {
         validate(userId);

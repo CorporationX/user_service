@@ -7,15 +7,21 @@ import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filter.requestfilter.RequestFilter;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
+import school.faang.user_service.pulisher.RecommendationEventPublisher;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
+import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 import school.faang.user_service.validator.RecommendationRequestValidator;
 import school.faang.user_service.validator.SkillValidator;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -24,22 +30,34 @@ import java.util.stream.StreamSupport;
 public class RecommendationRequestService {
 
     private final RecommendationRequestRepository recommendationRequestRepository;
-
     private final RecommendationRequestValidator recommendationRequestValidator;
-
     private final SkillValidator skillValidator;
-
     private List<RequestFilter> requestFilters;
-
     private final RecommendationRequestMapper recommendationRequestMapper;
+    private final SkillRequestRepository skillRequestRepository;
+    private final RecommendationEventPublisher recommendationEventPublisher;
 
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
+        Optional<RecommendationRequest> recommendationRequestOpt = getRecommendationRequest(recommendationRequestDto);
         recommendationRequestValidator.validationExistById(recommendationRequestDto.getRequesterId());
         recommendationRequestValidator.validationExistById(recommendationRequestDto.getReceiverId());
-        recommendationRequestValidator.validationRequestDate(recommendationRequestDto);
+        recommendationRequestValidator.validationRequestDate(recommendationRequestOpt);
         skillValidator.validationExistSkill(recommendationRequestDto);
+
         RecommendationRequest entity = recommendationRequestMapper.toEntity(recommendationRequestDto);
-        return recommendationRequestMapper.toDto(recommendationRequestRepository.save(entity));
+        RecommendationRequest recommendationRequest = recommendationRequestRepository.save(entity);
+
+        for (Long skillId : recommendationRequestDto.getSkillsId()) {
+            SkillRequest skillRequest = SkillRequest.builder()
+                    .request(recommendationRequest)
+                    .skill(Skill.builder().id(skillId).build())
+                    .build();
+
+            skillRequestRepository.save(skillRequest);
+        }
+
+        recommendationEventPublisher.publish(recommendationRequest);
+        return recommendationRequestMapper.toDto(recommendationRequest);
     }
 
     public List<RecommendationRequestDto> getRequests(RequestFilterDto filters) {
@@ -76,6 +94,13 @@ public class RecommendationRequestService {
     private RecommendationRequest getRecommendationRequestById(Long id) {
         return recommendationRequestRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("RecommendationRequest with id " + id + " does not exist"));
+    }
+
+    private Optional<RecommendationRequest> getRecommendationRequest(RecommendationRequestDto recommendationRequestDto) {
+        return StreamSupport.stream(recommendationRequestRepository.findAll().spliterator(), false)
+                .filter(request -> request.getReceiver().getId() == recommendationRequestDto.getReceiverId())
+                .filter(request -> request.getRequester().getId() == recommendationRequestDto.getRequesterId())
+                .max(Comparator.comparing(RecommendationRequest::getCreatedAt));
     }
 
     @Autowired

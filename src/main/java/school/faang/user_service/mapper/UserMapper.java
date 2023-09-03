@@ -6,6 +6,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 import school.faang.user_service.dto.subscription.UserDto;
+import school.faang.user_service.dto.user.UserNameDto;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
@@ -18,6 +19,9 @@ public interface UserMapper {
 
     @Mapping(target = "preference", source = "contactPreference.preference")
     UserDto toUserDto(User user);
+
+    @Mapping(target = "preference", source = "contactPreference.preference")
+    UserNameDto toUserNameDto(User user);
 
     User toEntity(UserDto userDto);
 

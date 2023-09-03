@@ -10,6 +10,7 @@ import school.faang.user_service.dto.contact.ExtendedContactDto;
 import school.faang.user_service.dto.contact.TgContactDto;
 import school.faang.user_service.dto.subscription.UserDto;
 import school.faang.user_service.dto.subscription.UserFilterDto;
+import school.faang.user_service.dto.user.UserNameDto;
 import school.faang.user_service.service.UserService;
 
 import java.io.IOException;
@@ -29,6 +30,11 @@ public class UserController {
     @GetMapping("/{userId}")
     UserDto getUser(@PathVariable long userId) throws JsonProcessingException {
         return userService.getUser(userId);
+    }
+
+    @GetMapping("/username/{userId}")
+    UserNameDto getUserName(@PathVariable long userId){
+        return userService.getUserName(userId);
     }
 
     @GetMapping("/premium-users")

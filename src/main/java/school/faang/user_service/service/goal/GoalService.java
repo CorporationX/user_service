@@ -5,9 +5,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.filter.goal.dto.GoalFilterDto;
 import school.faang.user_service.mapper.GoalMapper;
+import school.faang.user_service.messaging.GoalCompletedEventPublisher;
+import school.faang.user_service.messaging.events.GoalCompletedEvent;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.util.Message;
@@ -24,6 +28,7 @@ public class GoalService {
     private final SkillRepository skillRepository;
     private final GoalMapper goalMapper;
     private final List<GoalFilter> goalFilters;
+    private final GoalCompletedEventPublisher goalCompletedEventPublisher;
 
     @Transactional
     public GoalDto createGoal(GoalDto goal, Long userId) {
@@ -83,5 +88,17 @@ public class GoalService {
                 .flatMap(goalFilter -> goalFilter.apply(goals, goalFilterDto))
                 .map(goalMapper::goalToDto)
                 .toList();
+    }
+
+    @Transactional
+    public GoalDto completeGoal(Long goalId){
+        Goal goal = goalRepository.findById(goalId)
+                .orElseThrow(() ->
+                        new DataValidationException(MessageFormat.format("Goal {0} not found", goalId)));
+        goal.setStatus(GoalStatus.COMPLETED);
+        goalRepository.save(goal);
+        goalCompletedEventPublisher.publish(new GoalCompletedEvent(goalId));
+
+        return goalMapper.goalToDto(goal);
     }
 }

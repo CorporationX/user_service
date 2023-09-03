@@ -50,4 +50,9 @@ public class GoalController {
     public List<GoalDto> findSubtasksByGoalId(Long parentGoalId, GoalFilterDto goalFilterDto){
         return goalService.findSubtasksByGoalId(parentGoalId, goalFilterDto);
     }
+
+    @PutMapping("/{goalId}/complete")
+    public GoalDto completeGoal(@PathVariable Long goalId){
+        return goalService.completeGoal(goalId);
+    }
 }

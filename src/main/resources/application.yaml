@@ -26,6 +26,8 @@ spring:
           name: follower_channel
         profile_view_channel:
             name: profile_view_channel
+        goal_completed_channel:
+          name: goal_completed_topic
 
 server:
   port: 8080

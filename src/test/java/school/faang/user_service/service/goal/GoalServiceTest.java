@@ -17,6 +17,7 @@ import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.filter.goal.GoalStatusFilter;
 import school.faang.user_service.filter.goal.dto.GoalFilterDto;
 import school.faang.user_service.mapper.GoalMapper;
+import school.faang.user_service.messaging.GoalCompletedEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import static org.mockito.Mockito.when;
@@ -47,6 +48,9 @@ public class GoalServiceTest {
     @Mock
     private SkillRepository skillRepository;
 
+    @Mock
+    private GoalCompletedEventPublisher goalCompletedEventPublisher;
+
     @Spy
     private GoalMapper goalMapper = Mappers.getMapper(GoalMapper.class);
 
@@ -66,7 +70,8 @@ public class GoalServiceTest {
     void setUp(){
         GoalFilter goalFilter = new GoalStatusFilter();
         List<GoalFilter> goalFilters = List.of(goalFilter);
-        goalService = new GoalService(goalRepository, skillRepository, goalMapper, goalFilters);
+        goalService = new GoalService(goalRepository, skillRepository, goalMapper, goalFilters,
+                goalCompletedEventPublisher);
         userId = 1L;
         id = 1L;
         title = "title";

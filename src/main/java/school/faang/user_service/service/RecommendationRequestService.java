@@ -7,7 +7,6 @@ import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filter.recommendation.RecommendationRequestFilter;
-import java.time.LocalDateTime;
 import java.util.List;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.entity.RequestStatus;
@@ -25,20 +24,17 @@ public class RecommendationRequestService {
     private final List<RecommendationRequestFilter> recommendationRequestFilters;
     private final SkillRequestRepository skillRequestRepository;
     private final RecommendationRequestValidator recommendationRequestValidator;
-    private static final int MONTHS_BETWEEN_RECOMMENDATIONS = 6;
 
     public RecommendationRequestDto create (RecommendationRequestDto recommendationRequest) {
 
         recommendationRequestValidator.validateUsersExist(recommendationRequest);
         recommendationRequestValidator.validateSkillsExist(recommendationRequest);
-        validateRequestPeriod(recommendationRequest);
+        recommendationRequestValidator.validateRequestPeriod(recommendationRequest);
 
         RecommendationRequest createdRequest = recommendationRequestRepository.create(
                 recommendationRequest.getRequesterId(),
                 recommendationRequest.getReceiverId(),
                 recommendationRequest.getMessage());
-
-        createdRequest.getSkills().forEach(skill -> skillRequestRepository.create(recommendationRequest.getRequesterId(), skill.getId()));
 
         return recommendationRequestMapper.toDto(createdRequest);
     }
@@ -74,20 +70,4 @@ public class RecommendationRequestService {
             throw new DataValidationException("The request has already been accepted or rejected");
         }
    }
-
-    public void validateRequestPeriod(RecommendationRequestDto recommendationRequest) {
-        long requesterId = recommendationRequest.getRequesterId();
-        long receiverId = recommendationRequest.getReceiverId();
-
-        RecommendationRequest lastRequest = recommendationRequestRepository.findLatestPendingRequest(requesterId, receiverId)
-                .orElseThrow(() -> new EntityNotFoundException("Recommendation Request between users does not exist"));
-
-        LocalDateTime lastRequestsDate = lastRequest.getUpdatedAt();
-        LocalDateTime currentRequestDate = recommendationRequest.getCreatedAt();
-
-        if (currentRequestDate.minusMonths(MONTHS_BETWEEN_RECOMMENDATIONS).isAfter(lastRequestsDate)) {
-            throw new DataValidationException("A recommendation request from the same requester to the receiver " +
-                    "has already been made in the last 6 months");
-        }
-    }
 }

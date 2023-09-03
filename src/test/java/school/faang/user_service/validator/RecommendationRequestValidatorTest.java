@@ -1,46 +1,43 @@
 package school.faang.user_service.validator;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.SkillRequest;
-import school.faang.user_service.exception.EntityNotFoundException;
-import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
+import school.faang.user_service.service.skill.SkillService;
+import school.faang.user_service.service.user.UserService;
+
 import java.time.LocalDateTime;
 import java.util.List;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class RecommendationRequestValidatorTest {
     private RecommendationRequestDto recommendationRequest;
     @Mock
-    private RecommendationRequestRepository recommendationRequestRepository;
+    private UserService userValidator;
     @Mock
-    private UserRepository userRepository;
-    @Mock
-    private SkillRepository skillRepository;
+    private SkillService skillValidator;
     @InjectMocks
     private RecommendationRequestValidator recommendationRequestValidator;
 
     @BeforeEach
     void setUp() {
-        SkillRequest skillRequest = new SkillRequest();
-        skillRequest.setId(1);
+        SkillRequest skillRequest1 = new SkillRequest();
+        SkillRequest skillRequest2 = new SkillRequest();
+        skillRequest1.setId(1);
+        skillRequest2.setId(2);
 
         recommendationRequest = RecommendationRequestDto.builder()
                 .id(5L)
                 .message("message")
                 .status(RequestStatus.REJECTED)
-                .skills(List.of(skillRequest))
+                .skills(List.of(skillRequest1, skillRequest2))
                 .requesterId(4L)
                 .receiverId(11L)
                 .createdAt(LocalDateTime.now().minusMonths(1))
@@ -48,34 +45,23 @@ public class RecommendationRequestValidatorTest {
     }
 
     @Test
-    public void testRequesterNotExistValidation() {
-        recommendationRequest.setRequesterId(8L);
-        Assert.assertThrows(
-                EntityNotFoundException.class,
-                () -> recommendationRequestValidator.validateUsersExist(recommendationRequest)
-        );
-    }
-
-    @Test
-    public void testReceiverNotExistValidation() {
-        recommendationRequest.setReceiverId(8888888L);
-        Assert.assertThrows(
-                EntityNotFoundException.class,
-                () -> recommendationRequestValidator.validateUsersExist(recommendationRequest)
-        );
-    }
-
-    @Test
-    public void testSkillNotExistValidation() {
-        Assert.assertThrows(
-                EntityNotFoundException.class,
-                () -> recommendationRequestValidator.validateSkillsExist(recommendationRequest)
-        );
+    public void testValidateUsersExist() {
+        recommendationRequest.setRequesterId(5L);
+        recommendationRequest.setReceiverId(4L);
+        recommendationRequestValidator.validateUsersExist(recommendationRequest);
+        verify(userValidator).validateUsers(5L, 4L);
     }
 
     @Test
     public void testSkillExistsValidation() {
-        Mockito.when(skillRepository.existsById(1L)).thenReturn(true);
-        assertDoesNotThrow(() -> recommendationRequestValidator.validateSkillsExist(recommendationRequest));
+        SkillRequest skillRequest1 = new SkillRequest();
+        SkillRequest skillRequest2 = new SkillRequest();
+        skillRequest1.setId(11);
+        skillRequest2.setId(15);
+        recommendationRequest = RecommendationRequestDto.builder()
+                .skills(List.of(skillRequest1, skillRequest2))
+                        .build();
+        recommendationRequestValidator.validateSkillsExist(recommendationRequest);
+        verify(skillValidator).validateSkills(List.of(skillRequest1.getId(), skillRequest2.getId()));
     }
 }

@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import java.util.List;

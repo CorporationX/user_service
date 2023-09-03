@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import school.faang.user_service.dto.MentorshipRequestedEventDto;
 import school.faang.user_service.dto.MentorshipAcceptedEventDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
@@ -24,6 +25,7 @@ import school.faang.user_service.filter.mentorship.MentorshipRequestRequesterFil
 import school.faang.user_service.filter.mentorship.MentorshipRequestStatusFilter;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
+import school.faang.user_service.publisher.MentorshipRequestedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.validator.MentorshipRequestValidator;
 
@@ -51,6 +53,8 @@ class MentorshipRequestServiceTest {
     private MentorshipRequestValidator mentorshipRequestValidator;
     @Mock
     private List<MentorshipRequestFilter> filters;
+    @Mock
+    private  MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
     @Mock
     private MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher;
     @InjectMocks
@@ -211,6 +215,11 @@ class MentorshipRequestServiceTest {
         assertThrows(EntityNotFoundException.class,
                 () -> mentorshipRequestService.rejectRequest(request.getId(), rejectionReason),
                 "Request with id" + request.getId() + "not found.");
+    }
+    @Test
+    void rejectRequest_shouldInvokePublishAndSentEvent() {
+        mentorshipRequestService.requestMentorship(requestDto);
+        verify(mentorshipRequestedEventPublisher).publish(any(MentorshipRequestedEventDto.class));
     }
 
     @Test

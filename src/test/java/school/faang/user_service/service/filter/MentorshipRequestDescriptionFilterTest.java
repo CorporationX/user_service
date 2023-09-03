@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.filter.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
-import school.faang.user_service.dto.mentorship.service.mentorship.filter.MentorshipRequestDescriptionFilter;
+import school.faang.user_service.service.mentorship.filter.MentorshipRequestDescriptionFilter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +15,6 @@ import java.util.stream.Stream;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-
 
 @ExtendWith(MockitoExtension.class)
 public class MentorshipRequestDescriptionFilterTest {

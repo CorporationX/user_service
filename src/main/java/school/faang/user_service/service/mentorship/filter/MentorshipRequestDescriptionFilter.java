@@ -1,10 +1,11 @@
-package school.faang.user_service.dto.mentorship.service.mentorship.filter;
+package school.faang.user_service.service.mentorship.filter;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.filter.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 
 import java.util.stream.Stream;
+
 @Component
 public class MentorshipRequestDescriptionFilter implements MentorshipRequestFilter{
 

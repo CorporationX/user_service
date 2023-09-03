@@ -12,8 +12,6 @@ public class PreferenceService {
     private final UserPreferenceRepository userPreferenceRepository;
 
     public List<Long> getPreference(long id) {
-        List<Long> preferences = userPreferenceRepository.getUserPreference(id);
-        preferences.forEach(System.out::println);
-        return preferences;
+        return userPreferenceRepository.getUserPreference(id);
     }
 }

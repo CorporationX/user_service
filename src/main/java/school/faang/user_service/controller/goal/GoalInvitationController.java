@@ -18,6 +18,7 @@ public class GoalInvitationController {
     }
     @GetMapping
     public GoalInvitationDto acceptGoalInvitation(long idGoalInvitation) {
+
        return service.acceptGoalInvitation(idGoalInvitation);
     }
 

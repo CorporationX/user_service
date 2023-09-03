@@ -15,6 +15,7 @@ public class GoalInvitationValidationMaxActiveGoal {
 
     public boolean isCheckActiveTargetUser(GoalInvitation invitation){
         User invitedUser = invitation.getInvited();
+
         return false;
     }
 

@@ -35,6 +35,7 @@ public class GoalInvitationService {
        GoalInvitation invitation = goalInvitationRepository.findById(idGoalInvitation).orElseThrow();
 
         goalInvitationValidationMaxActiveGoal.isCheckActiveTargetUser(invitation);
+
         return null;
     }
 }

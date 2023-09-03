@@ -4,6 +4,7 @@ import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import school.faang.user_service.dto.mydto.UserDto;
+import school.faang.user_service.dto.notification.UserNotificationDto;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
@@ -19,4 +20,6 @@ public interface User1Mapper {
     UserDto toDto(User entity);
 
     List<UserDto> toDtos(List<User> entities);
+
+    UserNotificationDto toNotificationDto(User user);
 }

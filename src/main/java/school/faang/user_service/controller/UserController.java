@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.UserFilterDto;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.mydto.UserDto;
+import school.faang.user_service.dto.notification.UserNotificationDto;
 import school.faang.user_service.service.UserService;
 import school.faang.user_service.util.validator.UserControllerValidator;
 
@@ -42,9 +43,21 @@ public class UserController {
         return ResponseEntity.ok(userService.deactivateUser(userId));
     }
 
-    @GetMapping("/users/premium")
+    @GetMapping("/premium")
     @ResponseStatus(HttpStatus.OK)
     List<UserDto> getPremiumUsers(@RequestBody UserFilterDto filterDto) {
         return userService.getPremiumUsers(filterDto);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @PostMapping("/{userId}/telegram/{telegramId}")
+    void setUserTelegramId(@PathVariable long userId, @PathVariable long telegramId) {
+        userService.setUserTelegramId(userId, telegramId);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/notification/{userId}")
+    UserNotificationDto getUser(@PathVariable long userId) {
+        return userService.getUserForNotification(userId);
     }
 }

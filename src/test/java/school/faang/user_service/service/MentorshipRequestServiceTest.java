@@ -18,6 +18,9 @@ import school.faang.user_service.exception.EntityStateException;
 import school.faang.user_service.exception.notFoundExceptions.MentorshipRequestNotFoundException;
 import school.faang.user_service.filter.mentorshiprequest.*;
 import school.faang.user_service.mapper.MentorshipRequestMapperImpl;
+import school.faang.user_service.messaging.MentorshipAcceptedEventPublisher;
+import school.faang.user_service.messaging.mentorship.MentorshipEventPublisher;
+import school.faang.user_service.messaging.mentorship.MentorshipOfferedEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.util.validator.MentorshipRequestValidator;
@@ -39,6 +42,15 @@ class MentorshipRequestServiceTest {
     @Mock
     private MentorshipRequestValidator mentorshipRequestValidator;
 
+    @Mock
+    private MentorshipEventPublisher mentorshipEventPublisher;
+
+    @Mock
+    private MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher;
+
+    @Mock
+    private  MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
+
     @Spy
     private MentorshipRequestMapperImpl mentorshipRequestMapper;
 
@@ -58,8 +70,13 @@ class MentorshipRequestServiceTest {
                 mentorshipRequestMapper,
                 mentorshipRequestValidator,
                 userRepository,
-                filters
+                filters,
+                mentorshipEventPublisher,
+                mentorshipAcceptedEventPublisher,
+                mentorshipOfferedEventPublisher
         );
+
+        Mockito.lenient().doNothing().when(mentorshipOfferedEventPublisher).publish(Mockito.any());
     }
 
     @Test
@@ -69,6 +86,12 @@ class MentorshipRequestServiceTest {
         MentorshipRequest actual = mentorshipRequestMapper.toEntity(requestDto);
 
         Assertions.assertEquals(buildRequest(), actual);
+    }
+    @Test
+    void requestMentorship_publish() {
+        service.requestMentorship(buildRequestDto());
+        Mockito.verify(mentorshipEventPublisher, Mockito.times(1))
+                .publish(Mockito.any());
     }
 
     @Test
@@ -175,6 +198,18 @@ class MentorshipRequestServiceTest {
 
         Mockito.verify(userRepository).save(request.getReceiver());
         Mockito.verify(userRepository).save(request.getRequester());
+    }
+
+    @Test
+    void testAcceptRequest_InputsAreValid_ShouldPublishToTopic() {
+        MentorshipRequest request = buildRequestForAcceptingRequest();
+
+        Mockito.when(mentorshipRequestRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.of(request));
+
+        service.acceptRequest(1L);
+
+        Mockito.verify(mentorshipAcceptedEventPublisher).publish(Mockito.any());
     }
 
     @Test

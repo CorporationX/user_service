@@ -22,6 +22,15 @@ public class RedisConfig {
     private int port;
     @Value("${spring.data.redis.channels.user_update_channel.name}")
     private String userUpdateChannel;
+    @Value("${spring.data.redis.channels.mentorship_event_topic.name}")
+    private String mentorshipEventTopic;
+    @Value("${spring.data.redis.channels.follower_channel.name}")
+    private String followerChannel;
+    @Value("${spring.data.redis.channels.skill-event.skill-offered-channel}")
+    private String skillOfferedChannel;
+    @Value("${spring.data.redis.channels.mentorship_offered_event.name}")
+    private String mentorshipOfferedEvent;
+
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
@@ -47,6 +56,26 @@ public class RedisConfig {
     @Bean
     ChannelTopic userUpdateChannel() {
         return new ChannelTopic(userUpdateChannel);
+    }
+
+    @Bean
+    ChannelTopic followerTopic() {
+        return new ChannelTopic(followerChannel);
+    }
+
+    @Bean
+    ChannelTopic mentorshipEventTopic() {
+        return new ChannelTopic(mentorshipEventTopic);
+    }
+
+    @Bean
+    ChannelTopic skillOfferedTopic() {
+        return new ChannelTopic(skillOfferedChannel);
+    }
+
+    @Bean
+    ChannelTopic mentorshipOfferedEvent() {
+        return new ChannelTopic(mentorshipOfferedEvent);
     }
 
     @Bean

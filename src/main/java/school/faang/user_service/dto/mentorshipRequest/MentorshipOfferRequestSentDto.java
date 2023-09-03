@@ -12,9 +12,9 @@ import org.springframework.validation.annotation.Validated;
 @NoArgsConstructor
 @Builder
 @Validated
-public class MentorshipRequestDto {
+public class MentorshipOfferRequestSentDto {
     @NotNull
-    private String description;
+    private Long id;
 
     @NotNull
     private Long requesterId;
@@ -22,3 +22,4 @@ public class MentorshipRequestDto {
     @NotNull
     private Long receiverId;
 }
+

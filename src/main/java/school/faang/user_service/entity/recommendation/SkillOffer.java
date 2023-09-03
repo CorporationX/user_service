@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
 
 @Data
 @AllArgsConstructor
@@ -26,4 +27,12 @@ public class SkillOffer {
     @ManyToOne
     @JoinColumn(name = "recommendation_id", nullable = false)
     private Recommendation recommendation;
+
+    @ManyToOne
+    @JoinColumn(name = "author_id", nullable = false)
+    private User author;
+
+    @ManyToOne
+    @JoinColumn(name = "receiver_id", nullable = false)
+    private User receiver;
 }

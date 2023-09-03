@@ -19,6 +19,7 @@ public abstract class AbstractPublisher<T> {
         try {
             json = jsonMapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
+            log.error("Error occurred while serializing object to JSON: {}", e.getMessage(), e);
             throw new RuntimeException(e);
         }
 

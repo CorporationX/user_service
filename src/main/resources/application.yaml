@@ -32,6 +32,8 @@ spring:
             name: recommendation-channel
         event_channel:
             name: event-start-channel
+        skill_offered_channel:
+           name: skill-offered-channel
 
 
   google:

@@ -20,6 +20,7 @@ import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.mapper.*;
+import school.faang.user_service.publisher.SkillOfferedEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
@@ -58,6 +59,8 @@ class RecommendationServiceTest {
     private UserSkillGuaranteeMapper userSkillGuaranteeMapper = new UserSkillGuaranteeMapperImpl();
     @Spy
     private SkillMapper skillMapper = new SkillMapperImpl(userSkillGuaranteeMapper);
+    @Mock
+    private SkillOfferedEventPublisher skillOfferedEventPublisher;
 
 
     SkillOfferDto skillOfferDto;
@@ -118,7 +121,7 @@ class RecommendationServiceTest {
         Mockito.when(recommendationRepository.create(1L, 1L, "content"))
                 .thenReturn(1L);
         Mockito.when(recommendationRepository.findById(1L))
-                        .thenReturn(Optional.empty());
+                .thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> recommendationService.create(recommendationDto));
     }
@@ -174,7 +177,7 @@ class RecommendationServiceTest {
                 .id(2L)
                 .guarantees(guaranteesList)
                 .build();
-        recommendation.setSkillOffers(List.of( SkillOffer
+        recommendation.setSkillOffers(List.of(SkillOffer
                 .builder()
                 .id(2L)
                 .skill(skill1)

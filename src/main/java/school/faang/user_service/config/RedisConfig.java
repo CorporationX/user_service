@@ -30,6 +30,8 @@ public class RedisConfig {
     private String skillOfferedChannel;
     @Value("${spring.data.redis.channels.mentorship_offered_event.name}")
     private String mentorshipOfferedEvent;
+    @Value("${spring.data.redis.channels.fund-raised-event.name}")
+    private String fundRaisedChannel;
 
 
     @Bean
@@ -76,6 +78,11 @@ public class RedisConfig {
     @Bean
     ChannelTopic mentorshipOfferedEvent() {
         return new ChannelTopic(mentorshipOfferedEvent);
+    }
+
+    @Bean
+    ChannelTopic fundRaisedChannel() {
+        return new ChannelTopic(fundRaisedChannel);
     }
 
     @Bean

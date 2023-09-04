@@ -39,6 +39,8 @@ spring:
           skill-offered-channel: skill_offered_channel
         mentorship_offered_event:
           name: mentorship_offered_event
+        fund-raised-event:
+          name: fund-raised-channel
 
 
 

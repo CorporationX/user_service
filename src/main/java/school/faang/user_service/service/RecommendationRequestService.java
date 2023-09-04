@@ -15,7 +15,6 @@ import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filter.requestfilter.RequestFilter;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.publisher.RecommendationRequestedEventPublisher;
-import school.faang.user_service.pulisher.RecommendationEventPublisher;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 import school.faang.user_service.validator.RecommendationRequestValidator;

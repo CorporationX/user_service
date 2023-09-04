@@ -16,10 +16,11 @@ public class GoalInvitationController {
     public GoalInvitationDto createInvitation(@RequestBody GoalInvitationDto invitation) {
         return service.createInvitation(invitation);
     }
-    @GetMapping
-    public GoalInvitationDto acceptGoalInvitation(long idGoalInvitation) {
+    @GetMapping("/{id}")
+    public GoalInvitationDto acceptGoalInvitation(@PathVariable("id") long idGoalInvitation) {
 
        return service.acceptGoalInvitation(idGoalInvitation);
+
     }
 
 }

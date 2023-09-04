@@ -11,6 +11,8 @@ import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validator.GoalInvitationValidation;
 import school.faang.user_service.validator.GoalInvitationValidationMaxActiveGoal;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class GoalInvitationService {
@@ -24,17 +26,18 @@ public class GoalInvitationService {
     public GoalInvitationDto createInvitation(GoalInvitationDto invitation) {
 
         goalInvitationValidation.invitationValidationUser(invitation);
-
         GoalInvitation goalInvitation = mapper.toEntity(invitation);
 
         return mapper.toDto(goalInvitationRepository.save(goalInvitation));
     }
 
-    public GoalInvitationDto acceptGoalInvitation(long idGoalInvitation) { //invitedUser
+    public GoalInvitationDto acceptGoalInvitation(long idGoalInvitation) {
 
-       GoalInvitation invitation = goalInvitationRepository.findById(idGoalInvitation).orElseThrow();
+       Optional<GoalInvitation> invitation = goalInvitationRepository.findById(idGoalInvitation);
+//        goalInvitationValidationMaxActiveGoal.isCheckActiveTargetUser(invitation);
 
-        goalInvitationValidationMaxActiveGoal.isCheckActiveTargetUser(invitation);
+
+
 
         return null;
     }

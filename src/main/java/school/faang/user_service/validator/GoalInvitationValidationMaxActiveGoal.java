@@ -13,10 +13,8 @@ public class GoalInvitationValidationMaxActiveGoal {
     private final UserRepository userRepository;
     private final int MAXIMUM_NUMBER_OF_ACTIVE_TARGETS = 3;
 
-    public boolean isCheckActiveTargetUser(GoalInvitation invitation){
+    public void isCheckActiveTargetUser(GoalInvitation invitation){
         User invitedUser = invitation.getInvited();
-
-        return false;
     }
 
     private int countActiveGoal(User user) {

@@ -6,6 +6,8 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.repository.UserRepository;
 
+import java.util.Optional;
+
 @Component
 @RequiredArgsConstructor
 public class GoalInvitationValidationMaxActiveGoal {
@@ -14,7 +16,7 @@ public class GoalInvitationValidationMaxActiveGoal {
     private final int MAXIMUM_NUMBER_OF_ACTIVE_TARGETS = 3;
 
     public void isCheckActiveTargetUser(GoalInvitation invitation){
-        User invitedUser = invitation.getInvited();
+//        User invitedUser = invitation.getInvited();
     }
 
     private int countActiveGoal(User user) {

@@ -34,6 +34,7 @@ public class GoalInvitationService {
     public GoalInvitationDto acceptGoalInvitation(long idGoalInvitation) {
 
        Optional<GoalInvitation> invitation = goalInvitationRepository.findById(idGoalInvitation);
+       invitation.ifPresent(goalInvitation -> goalInvitationValidationMaxActiveGoal.isCheckActiveTargetUser(invitation));
 //        goalInvitationValidationMaxActiveGoal.isCheckActiveTargetUser(invitation);
 
 

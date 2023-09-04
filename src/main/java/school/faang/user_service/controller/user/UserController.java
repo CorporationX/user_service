@@ -34,7 +34,7 @@ public class UserController {
     }
 
     @PostMapping("/CSV")
-    public List<UserDto> createCSV(@RequestParam MultipartFile file) {
+    public List<UserDto> createUsersCSV(@RequestParam MultipartFile file) {
         try {
             InputStream inputStream = file.getInputStream();
             return userService.createUserCSV(inputStream);

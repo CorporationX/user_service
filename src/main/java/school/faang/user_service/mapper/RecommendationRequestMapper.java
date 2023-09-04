@@ -26,8 +26,9 @@ public interface RecommendationRequestMapper {
     @Mapping(source = "recommendationId", target = "recommendation.id")
     RecommendationRequest toEntity(RecommendationRequestDto recommendationRequestDto);
 
-    @Mapping(source = "id", target = "recommendationId")
-    @Mapping(source = "requester.id", target = "actorId")
+    @Mapping(source = "requester.id", target = "authorId")
+    @Mapping(source = "receiver.id", target = "receiverId")
+    @Mapping(source = "id", target = "requestId")
     EventRecommendationRequestDto toEventDto(RecommendationRequest recommendationRequest);
 
     @Named("mapToId")

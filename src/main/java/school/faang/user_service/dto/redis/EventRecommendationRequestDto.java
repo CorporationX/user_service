@@ -8,10 +8,7 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class EventRecommendationRequestDto {
-
-    private Long recommendationId;
-
-    private Long actorId;
-
-    private LocalDateTime receivedAt;
+    private Long authorId;
+    private Long receiverId;
+    private Long requestId;
 }

@@ -13,7 +13,6 @@ import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filter.requestfilter.RequestFilter;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
-import school.faang.user_service.pulisher.RecommendationEventPublisher;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 import school.faang.user_service.validator.RecommendationRequestValidator;
@@ -35,7 +34,6 @@ public class RecommendationRequestService {
     private List<RequestFilter> requestFilters;
     private final RecommendationRequestMapper recommendationRequestMapper;
     private final SkillRequestRepository skillRequestRepository;
-    private final RecommendationEventPublisher recommendationEventPublisher;
 
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
         Optional<RecommendationRequest> recommendationRequestOpt = getRecommendationRequest(recommendationRequestDto);
@@ -56,7 +54,6 @@ public class RecommendationRequestService {
             skillRequestRepository.save(skillRequest);
         }
 
-        recommendationEventPublisher.publish(recommendationRequest);
         return recommendationRequestMapper.toDto(recommendationRequest);
     }
 

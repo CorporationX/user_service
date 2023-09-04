@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class EventRecommendationRequestDto {
+public class EventRecommendationDto {
 
     private Long recommendationId;
 

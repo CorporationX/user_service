@@ -1,0 +1,5 @@
+username,email,phone,aboutMe,country,city,experience
+john_doe,john@example.com,1234567890,About John,USA,New York,5
+jane_smith,jane@example.com,9876543210,About Jane,Canada,Toronto,3
+alice_carter,alice@example.com,5551234567,About Alice,UK,London,7
+chel,mail@mail.ru,phone,about,Country,city,5 

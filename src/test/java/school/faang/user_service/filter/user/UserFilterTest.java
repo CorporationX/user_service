@@ -1,4 +1,4 @@
-package school.faang.user_service.filters;
+package school.faang.user_service.filter.user;
 
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.UserFilterDto;

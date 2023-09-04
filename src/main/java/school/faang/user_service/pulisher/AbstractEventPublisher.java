@@ -1,4 +1,4 @@
-package school.faang.user_service.publisher;
+package school.faang.user_service.pulisher;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

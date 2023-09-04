@@ -17,13 +17,16 @@ public class RedisConfig {
     private String host;
     @Value("${spring.data.redis.port}")
     private int port;
+    @Value("${spring.data.redis.channels.recommendation_request_channel}")
+    private String recommendationRequestChannelName;
+    @Value("${spring.data.redis.channels.skill_offer_channel}")
+    private String skillOfferChannelName;
 
     @Value("${spring.data.redis.channels.recommendation_channel.name}")
     private String recommendationChannelName;
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
-        System.out.println(port);
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
         return new JedisConnectionFactory(config);
     }
@@ -40,5 +43,13 @@ public class RedisConfig {
     @Bean
     ChannelTopic topicRecommendation() {
         return new ChannelTopic(recommendationChannelName);
+      
+    ChannelTopic topicRecommendationRequest() {
+        return new ChannelTopic(recommendationRequestChannelName);
+    }
+
+    @Bean
+    ChannelTopic topicSkillOffer() {
+        return new ChannelTopic(skillOfferChannelName);
     }
 }

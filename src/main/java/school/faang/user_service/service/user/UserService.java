@@ -1,6 +1,7 @@
 package school.faang.user_service.service.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
@@ -14,6 +15,7 @@ import java.util.stream.StreamSupport;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+    @Autowired
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
@@ -28,6 +30,10 @@ public class UserService {
         return userRepository.countOwnedSkills(userId, skillIds) == skillIds.size();
     }
 
+    public void saveUser(User user) {
+        userRepository.save(user);
+    }
+  
     public UserDto getUser(long id) {
         return userMapper.toDto(findUserById(id));
     }

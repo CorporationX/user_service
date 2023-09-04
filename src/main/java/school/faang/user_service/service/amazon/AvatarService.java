@@ -14,6 +14,7 @@ import school.faang.user_service.exception.DiceBearConnect;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.awt.image.ImagingOpException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,7 +64,7 @@ public class AvatarService {
         try {
             image = biteToImage(data);
         } catch (IOException e) {
-            throw new RuntimeException("Wrong file saved in amazon s3: " + e.getMessage());
+            throw new ImagingOpException("Wrong file saved in amazon s3: " + e.getMessage());
         }
 
         return image;

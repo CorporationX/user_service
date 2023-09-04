@@ -80,7 +80,6 @@ class UserServiceTest {
                 .toDto(user);
     }
 
-
     @Test
     public void testCreateUserCSV_ThrowsException() {
         ObjectReader testObject = Mockito.mock(ObjectReader.class);
@@ -158,7 +157,6 @@ class UserServiceTest {
         Mockito.verify(iterator, Mockito.times(1))
                 .readAll();
     }
-
     @Test
     public void testAddCreateData() {
         UserDto userDto = UserDto.builder()
@@ -190,7 +188,6 @@ class UserServiceTest {
                 .build();
 
         String filename = user.getUsername() + user.getId();
-
         UserProfilePic userProfilePic = UserProfilePic.builder()
                 .name(filename)
                 .fileId(URL + filename)

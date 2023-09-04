@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -39,7 +40,6 @@ public class UserService {
     private String URL;
     @Value("${services.dice-bear.size}")
     private String SIZE;
-
 
     public UserDto createUser(UserDto userDto) {
         User user = userMapper.toEntity(userDto);

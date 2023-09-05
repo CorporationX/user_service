@@ -9,6 +9,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.user.UserService;
+
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
@@ -21,6 +23,6 @@ class UserServiceTest {
     @Test
     void testGetUserSkillsUserIsNotExist() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundException.class, () -> userService.checkUserById(1L));
+        assertThrows(EntityNotFoundException.class, () -> userService.getUser(1L));
     }
 }

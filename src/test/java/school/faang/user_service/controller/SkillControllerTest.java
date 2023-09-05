@@ -1,7 +1,6 @@
 package school.faang.user_service.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,9 +9,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.SkillService;
+import school.faang.user_service.service.skill.SkillService;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -23,18 +21,18 @@ class SkillControllerTest {
     private SkillController skillController;
     @Mock
     private SkillService skillService;
-    SkillDto skillDto = new SkillDto(1L, "flexibility");
+    SkillDto skillDto = SkillDto.builder().id(1L).title("flexibility").build();
 
     @Test
     void testBlankTitleIsInvalid() {
         assertThrows(DataValidationException.class,
-                () -> skillController.create(new SkillDto(1L, "   ")));
+                () -> skillController.create(SkillDto.builder().id(1L).title("   ").build()));
     }
 
     @Test
     void testNullTitleIsInvalid() {
         assertThrows(DataValidationException.class,
-                () -> skillController.create(new SkillDto(1L, null)));
+                () -> skillController.create(SkillDto.builder().id(1L).title(null).build()));
     }
 
     @Test

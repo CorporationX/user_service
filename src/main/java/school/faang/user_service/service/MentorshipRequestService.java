@@ -59,22 +59,15 @@ public class MentorshipRequestService {
         return mapper.toDto(newRequest);
     }
 
-    public List<MentorshipRequestDto> getRequests(RequestFilterDto filters) {
+    public List<MentorshipRequestDto> getRequests(@Valid RequestFilterDto filters) {
         List<MentorshipRequest> allRequests = new ArrayList<>();
         mentorshipRequestRepository.findAll().forEach(allRequests::add);
         Stream<MentorshipRequest> requestsStream = allRequests.stream();
-        mentorshipRequestFilters.stream()
-                .filter(filter -> filter.isApplicable(filters))
-                .forEach(filter -> filter.apply(requestsStream, filters));
 
-        return requestsStream
+        return mentorshipRequestFilters.stream()
+                .filter(filter -> filter.isApplicable(filters))
+                .flatMap(filter -> filter.apply(requestsStream, filters))
                 .map(request -> mapper.toDto(request))
                 .toList();
-
-        //return mentorshipRequestFilters.stream()
-                //.filter(filter -> filter.isApplicable(filters))
-                //.flatMap(filter -> filter.apply(requestsStream, filters))
-                //.map(request -> mapper.toDto(request))
-                //.toList();
     }
 }

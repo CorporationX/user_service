@@ -19,7 +19,7 @@ public class MentorshipRequestController {
         return mentorshipRequestService.requestMentorship(mentorshipRequestDto);
     }
 
-    @GetMapping("/request")
+    @GetMapping("/request_filter")
     public List<MentorshipRequestDto> getRequests(@RequestBody RequestFilterDto filters) {
         return mentorshipRequestService.getRequests(filters);
     }

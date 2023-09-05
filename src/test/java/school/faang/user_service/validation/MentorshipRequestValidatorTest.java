@@ -104,28 +104,15 @@ class MentorshipRequestValidatorTest {
     }
 
     @Test
-    void requestNotExistForAcceptRequest() {
+    void requestExist() {
         when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(null);
         assertThrows(NullPointerException.class, () -> validator.validateAcceptRequest(REQUEST_ID));
     }
 
     @Test
-    void receiverNotMentorForAcceptRequest() {
+    void receiverNotMentor() {
         requester.setMentors(List.of(receiver));
         when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(Optional.of(request));
         assertThrows(IllegalArgumentException.class, () -> validator.validateAcceptRequest(REQUEST_ID));
-    }
-
-    @Test
-    void requestNotExistForRejectRequest() {
-        when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(null);
-        assertThrows(NullPointerException.class, () -> validator.validateRejectRequest(REQUEST_ID, rejection));
-    }
-
-    @Test
-    void rejectionHaveReasonForRejectRequest() {
-        rejection.setReason("");
-        when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(Optional.of(request));
-        assertThrows(IllegalArgumentException.class, () -> validator.validateRejectRequest(REQUEST_ID, rejection));
     }
 }

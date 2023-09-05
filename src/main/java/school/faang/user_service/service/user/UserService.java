@@ -1,6 +1,8 @@
 package school.faang.user_service.service.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.event.EventDto;
@@ -25,6 +27,9 @@ public class UserService {
     private final GoalService goalService;
     private final EventService eventService;
     private final MentorshipService mentorshipService;
+    private final RedisTemplate<String, Object> redisTemplate;
+    @Value("${spring.data.redis.channels.user_ban_channel.name}")
+    private String userBanChannelName;
     private final ProfileViewEventPublisher profileViewEventPublisher;
 
     public boolean isUserExist(Long userId) {

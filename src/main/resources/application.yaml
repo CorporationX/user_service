@@ -34,6 +34,8 @@ spring:
           name: premium_events_channel
         project_events_channel:
           name: project_events_channel
+        user_ban_channel:
+          name: user_ban_channel
         started_events_channel:
           name: started_events_channel
 

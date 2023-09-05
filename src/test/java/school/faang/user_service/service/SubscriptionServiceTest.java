@@ -14,6 +14,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 
 import java.util.List;
@@ -40,8 +41,8 @@ class SubscriptionServiceTest {
     UserFilterDto userFilterDto;
     @Mock
     List<UserFilter> userFilters;
-
-
+    @Mock
+    FollowerEventPublisher followerEventPublisher;
 
     @Test
     void testUnfollowSuccessfully() {

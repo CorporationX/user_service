@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import school.faang.user_service.entity.RequestStatus;
+
 @Data
 @Builder
 @NoArgsConstructor

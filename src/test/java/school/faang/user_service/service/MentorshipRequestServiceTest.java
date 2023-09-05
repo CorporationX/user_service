@@ -47,13 +47,6 @@ class MentorshipRequestServiceTest {
     private final long REQUESTER_ID = 1L;
     private final long RECEIVER_ID = 2L;
     private final LocalDateTime THREE_MONTH_AGO = LocalDateTime.now().minusMonths(3);
-    private MentorshipRequest request1;
-    private MentorshipRequest request2;
-    private MentorshipRequest request3;
-    private MentorshipRequestDto requestDto1;
-    private MentorshipRequestDto requestDto2;
-    private MentorshipRequestDto requestDto3;
-
     private RequestFilterDto filter = new RequestFilterDto();
 
     private MentorshipRequest createMentorshipRequest(Long requesterId, long receiverId, String description, RequestStatus status, String requesterName, String receiverName) {
@@ -72,19 +65,10 @@ class MentorshipRequestServiceTest {
         return request;
     }
 
-    @BeforeEach
-    void setUp() {
-        request1 = createMentorshipRequest(REQUESTER_ID, RECEIVER_ID, "1", ACCEPTED, "John", "Jim");
-        request2 = createMentorshipRequest(REQUESTER_ID, RECEIVER_ID, "2", REJECTED, "Jared", "Java");
-        request3 = createMentorshipRequest(REQUESTER_ID, RECEIVER_ID, "3", PENDING, "Jamal", "Jabahaba");
-
-        requestDto1 = mapper.toDto(request1);
-        requestDto2 = mapper.toDto(request2);
-        requestDto3 = mapper.toDto(request3);
-    }
-
     @Test
     void testCorrectRequest() {
+        MentorshipRequest request1 = createMentorshipRequest(REQUESTER_ID, RECEIVER_ID, "1", ACCEPTED, "John", "Jim");
+        MentorshipRequestDto requestDto1 = mapper.toDto(request1);
         when(userRepository.existsById(REQUESTER_ID)).thenReturn(true);
         when(userRepository.existsById(RECEIVER_ID)).thenReturn(true);
         assertDoesNotThrow(() -> mentorshipRequestService.requestMentorship(requestDto1));
@@ -92,18 +76,24 @@ class MentorshipRequestServiceTest {
 
     @Test
     void testRequestWithoutDescription() {
+        MentorshipRequest request1 = createMentorshipRequest(REQUESTER_ID, RECEIVER_ID, "1", ACCEPTED, "John", "Jim");
+        MentorshipRequestDto requestDto1 = mapper.toDto(request1);
         requestDto1.setDescription("");
         assertThrows(Exception.class, () -> mentorshipRequestService.requestMentorship(requestDto1));
     }
 
     @Test
     void testRequesterDoesNotExists() {
+        MentorshipRequest request1 = createMentorshipRequest(REQUESTER_ID, RECEIVER_ID, "1", ACCEPTED, "John", "Jim");
+        MentorshipRequestDto requestDto1 = mapper.toDto(request1);
         when(userRepository.existsById(REQUESTER_ID)).thenReturn(false);
         assertThrows(IndexOutOfBoundsException.class, () -> mentorshipRequestService.requestMentorship(requestDto1));
     }
 
     @Test
     void testReceiverDoesNotExists() {
+        MentorshipRequest request1 = createMentorshipRequest(REQUESTER_ID, RECEIVER_ID, "1", ACCEPTED, "John", "Jim");
+        MentorshipRequestDto requestDto1 = mapper.toDto(request1);
         when(userRepository.existsById(REQUESTER_ID)).thenReturn(true);
         when(userRepository.existsById(RECEIVER_ID)).thenReturn(false);
         assertThrows(IndexOutOfBoundsException.class, () -> mentorshipRequestService.requestMentorship(requestDto1));
@@ -111,6 +101,8 @@ class MentorshipRequestServiceTest {
 
     @Test
     void testReceiverIsRequester() {
+        MentorshipRequest request1 = createMentorshipRequest(REQUESTER_ID, RECEIVER_ID, "1", ACCEPTED, "John", "Jim");
+        MentorshipRequestDto requestDto1 = mapper.toDto(request1);
         requestDto1.setReceiverId(REQUESTER_ID);
 
         when(userRepository.existsById(REQUESTER_ID)).thenReturn(true);
@@ -119,6 +111,8 @@ class MentorshipRequestServiceTest {
 
     @Test
     void testOneRequestAt3Months() {
+        MentorshipRequest request1 = createMentorshipRequest(REQUESTER_ID, RECEIVER_ID, "1", ACCEPTED, "John", "Jim");
+        MentorshipRequestDto requestDto1 = mapper.toDto(request1);
         requestDto1.setUpdatedAt(THREE_MONTH_AGO.plusDays(1));
 
         when(userRepository.existsById(REQUESTER_ID)).thenReturn(true);
@@ -130,6 +124,10 @@ class MentorshipRequestServiceTest {
 
     @Test
     void testDescriptionFilterFilters() {
+        MentorshipRequest request1 = createMentorshipRequest(REQUESTER_ID, RECEIVER_ID, "1", ACCEPTED, "John", "Jim");
+        MentorshipRequest request2 = createMentorshipRequest(REQUESTER_ID, RECEIVER_ID, "2", REJECTED, "Jared", "Java");
+        MentorshipRequest request3 = createMentorshipRequest(REQUESTER_ID, RECEIVER_ID, "3", PENDING, "Jamal", "Jabahaba");
+
         List<MentorshipRequest> requests = List.of(request1, request2, request3);
         filter.setDescriptionPattern("1");
         when(mentorshipRequestRepository.findAll()).thenReturn(requests);
@@ -140,6 +138,10 @@ class MentorshipRequestServiceTest {
 
     @Test
     void testRequesterNameFilterTest() {
+        MentorshipRequest request1 = createMentorshipRequest(REQUESTER_ID, RECEIVER_ID, "1", ACCEPTED, "John", "Jim");
+        MentorshipRequest request2 = createMentorshipRequest(REQUESTER_ID, RECEIVER_ID, "2", REJECTED, "Jared", "Java");
+        MentorshipRequest request3 = createMentorshipRequest(REQUESTER_ID, RECEIVER_ID, "3", PENDING, "Jamal", "Jabahaba");
+
         List<MentorshipRequest> requests = List.of(request1, request2, request3);
         filter.setRequesterNamePattern("Jamal");
         when(mentorshipRequestRepository.findAll()).thenReturn(requests);
@@ -150,6 +152,10 @@ class MentorshipRequestServiceTest {
 
     @Test
     void testReceiverNameFilterTest() {
+        MentorshipRequest request1 = createMentorshipRequest(REQUESTER_ID, RECEIVER_ID, "1", ACCEPTED, "John", "Jim");
+        MentorshipRequest request2 = createMentorshipRequest(REQUESTER_ID, RECEIVER_ID, "2", REJECTED, "Jared", "Java");
+        MentorshipRequest request3 = createMentorshipRequest(REQUESTER_ID, RECEIVER_ID, "3", PENDING, "Jamal", "Jabahaba");
+
         List<MentorshipRequest> requests = List.of(request1, request2, request3);
         filter.setReceiverNamePattern("Java");
         when(mentorshipRequestRepository.findAll()).thenReturn(requests);
@@ -160,6 +166,10 @@ class MentorshipRequestServiceTest {
 
     @Test
     void testRequestStatusFilterTest() {
+        MentorshipRequest request1 = createMentorshipRequest(REQUESTER_ID, RECEIVER_ID, "1", ACCEPTED, "John", "Jim");
+        MentorshipRequest request2 = createMentorshipRequest(REQUESTER_ID, RECEIVER_ID, "2", REJECTED, "Jared", "Java");
+        MentorshipRequest request3 = createMentorshipRequest(REQUESTER_ID, RECEIVER_ID, "3", PENDING, "Jamal", "Jabahaba");
+
         List<MentorshipRequest> requests = List.of(request1, request2, request3);
         filter.setRequestStatusPattern(PENDING);
         when(mentorshipRequestRepository.findAll()).thenReturn(requests);

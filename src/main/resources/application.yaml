@@ -32,6 +32,8 @@ spring:
           name: recommendation-channel
         event_channel:
           name: event-start-channel
+        skill_channel:
+          name: skill-acquired-channel
         mentorship_channel:
           name: mentorship-accepted-channel
         search_appearance_channel:

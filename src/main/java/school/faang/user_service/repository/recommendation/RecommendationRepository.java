@@ -22,10 +22,10 @@ public interface RecommendationRepository extends CrudRepository<Recommendation,
 
     @Query(nativeQuery = true, value = """
             UPDATE recommendation SET content = :content, updated_at = now()
-            WHERE author_id = :authorId AND receiverId = :receiverId
+            WHERE id = :id
             """)
     @Modifying
-    Recommendation update(long authorId, long receiverId, String content);
+    void update(long id, String content);
 
     Page<Recommendation> findAllByReceiverId(long receiverId, Pageable pageable);
 

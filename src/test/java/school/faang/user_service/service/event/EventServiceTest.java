@@ -397,7 +397,7 @@ class EventServiceTest {
     void clearEvents_shouldSplitEventListAndInvokeClearEventsPartition() {
         Event event = mock(Event.class);
         when(event.getEndDate()).thenReturn(LocalDateTime.now().minusDays(1));
-        events = List.of(event, event, event);
+        List <Event> events = List.of(event, event, event);
 
         when(eventRepository.findAll()).thenReturn(events);
 

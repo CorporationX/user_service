@@ -9,9 +9,9 @@ import school.faang.user_service.publisher.AbstractPublisher;
 
 @Component
 public class EventStartPublisher extends AbstractPublisher<EventStartDto> {
-    public EventStartPublisher(RedisTemplate<String, Object> redisTemplate,
-                               ObjectMapper jsonMapper,
+    public EventStartPublisher(ObjectMapper jsonMapper,
+                               RedisTemplate<String, Object> redisTemplate,
                                @Value("${spring.data.redis.channels.event_channel.name}") String channel) {
-        super(redisTemplate, jsonMapper, channel);
+        super(jsonMapper,redisTemplate, channel);
     }
 }

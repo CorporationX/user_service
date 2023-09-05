@@ -9,8 +9,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 @RequiredArgsConstructor
 @Slf4j
 public abstract class AbstractPublisher<T> {
-    private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper jsonMapper;
+    private final RedisTemplate<String, Object> redisTemplate;
     private final String channel;
 
     public void publish(T object) {

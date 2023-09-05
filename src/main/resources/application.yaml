@@ -29,9 +29,11 @@ spring:
         mentorship_requested_channel:
           name: mentorship-requested-channel
         recommendation_channel:
-            name: recommendation-channel
+          name: recommendation-channel
         event_channel:
-            name: event-start-channel
+          name: event-start-channel
+        mentorship_channel:
+          name: mentorship-accepted-channel
 
 
   google:

@@ -14,20 +14,25 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.EventStartDto;
+import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.dto.skill.UserSkillGuaranteeDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.event.EventMapperImpl;
+import school.faang.user_service.mapper.event.EventStartMapper;
 import school.faang.user_service.mapper.skill.SkillMapperImpl;
+import school.faang.user_service.publisher.event.EventStartPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,24 +50,27 @@ class EventServiceTest {
     @Spy
     private SkillMapperImpl skillMapper;
     @Mock
+    private EventStartMapper eventStartMapper;
+    @Mock
     private EventRepository eventRepository;
     @Mock
     private UserRepository userRepository;
     @Mock
     private EventAsyncService eventAsyncService;
-
-    private List<Event> events;
-    EventDto eventDto;
-    Event event;
-    User user;
-    Skill skill;
+    @Mock
+    private EventStartPublisher eventStartPublisher;
+    private Event eventMock;
+    private EventStartDto eventStartDto;
+    private EventDto eventDto;
+    private Event event;
+    private User user;
 
     @BeforeEach
     void setUp() {
         user = new User();
         user.setId(200L);
 
-        skill = new Skill();
+        Skill skill = new Skill();
         skill.setId(22L);
         skill.setTitle("Ability");
         skill.setGuarantees(List.of(
@@ -101,6 +109,19 @@ class EventServiceTest {
                 .location("Conference Hall")
                 .maxAttendees(100)
                 .build();
+
+        eventStartDto = EventStartDto.builder()
+                .id(0L)
+                .title("Title")
+                .attendeeIds(Collections.emptyList())
+                .startDate(LocalDateTime.of(2023, 1, 1, 0, 0))
+                .build();
+
+        eventMock = mock(Event.class);
+        when(eventMock.getStatus()).thenReturn(EventStatus.PLANNED);
+        when(eventMock.getAttendees()).thenReturn(Collections.emptyList());
+        when(eventRepository.findById(1L)).thenReturn(Optional.of(eventMock));
+        when(eventStartMapper.toDto(eventMock)).thenReturn(eventStartDto);
     }
 
     @Test
@@ -368,14 +389,39 @@ class EventServiceTest {
     void clearEvents_shouldSplitEventListAndInvokeClearEventsPartition() {
         Event event = mock(Event.class);
         when(event.getEndDate()).thenReturn(LocalDateTime.now().minusDays(1));
-        events = List.of(event);
+        List <Event> events = List.of(event, event, event);
 
         when(eventRepository.findAll()).thenReturn(events);
 
         eventService.clearEvents(1);
 
-        List<List<Event>> partitions = ListUtils.partition(events, events.size());
+        verify(eventAsyncService, times(3)).clearEventsPartition(List.of(event));
+    }
 
-        partitions.forEach(partition -> verify(eventAsyncService).clearEventsPartition(partition));
+    @Test
+    void startEvent_shouldInvokeFindByIdMethod() {
+        eventService.startEvent(1L);
+        verify(eventRepository).findById(1L);
+    }
+
+    @Test
+    void startEvent_shouldThrowDataValidationException() {
+        when(eventMock.getStatus()).thenReturn(EventStatus.COMPLETED);
+
+        assertThrows(DataValidationException.class,
+                () -> eventService.startEvent(1L),
+                "You can start only planned events");
+    }
+
+    @Test
+    void startEvent_shouldInvokeEventStartMapperToDtoMethod() {
+        eventService.startEvent(1L);
+        verify(eventStartMapper).toDto(eventMock);
+    }
+
+    @Test
+    void startEvent_shouldInvokePublishMethod() {
+        eventService.startEvent(1L);
+        verify(eventStartPublisher).publish(eventStartDto);
     }
 }

@@ -28,7 +28,7 @@ public class RecommendationValidator {
 
     public void validateToUpdate(RecommendationDto recommendationDto) {
         Recommendation recommendation = getByAuthorIdAndReceiverId(recommendationDto)
-                .orElseThrow(() -> new DataValidationException("The author has not given a recommendation to this user"));
+                .orElseThrow(() -> new DataValidationException("The author has not recommended this user before"));
         validateRecommendationTerm(recommendation, recommendationDto);
         validateSkillOffersDto(recommendationDto);
     }
@@ -45,11 +45,11 @@ public class RecommendationValidator {
 
     private void validateSkillOffersDto(RecommendationDto recommendationDto) {
         if (recommendationDto.getSkillOffers() != null || !recommendationDto.getSkillOffers().isEmpty()) {
-            recommendationDto.getSkillOffers().stream().
-                    map(SkillOfferDto::getSkill)
+            recommendationDto.getSkillOffers().stream()
+                    .map(SkillOfferDto::getSkill)
                     .forEach(skillId -> skillRepository.findById(skillId)
-                            .orElseThrow(() -> new DataValidationException(
-                                    "One or more suggested skills do not exist in the system.")));
+                            .orElseThrow(() ->
+                                    new DataValidationException("The skill with id " + skillId + " does not exist.")));
         }
     }
 

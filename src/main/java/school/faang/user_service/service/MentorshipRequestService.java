@@ -3,10 +3,7 @@ package school.faang.user_service.service;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 import school.faang.user_service.dto.MentorshipRequestDto;
-import school.faang.user_service.dto.filter.RequestFilterDto;
-import school.faang.user_service.service.mentorship.filter.MentorshipRequestFilter;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
@@ -20,22 +17,15 @@ import java.util.List;
 
 import static school.faang.user_service.entity.RequestStatus.ACCEPTED;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
-
 @Service
 @RequiredArgsConstructor
 public class MentorshipRequestService {
-    private final List<MentorshipRequestFilter> mentorshipRequestFilters;
     private final UserRepository userRepository;
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final MentorshipRequestMapper mapper;
 
-
     public MentorshipRequestDto requestMentorship(@Valid MentorshipRequestDto mentorshipRequestDto) {
         MentorshipRequest mentorshipRequest = mapper.toEntity(mentorshipRequestDto);
-        validator.validateRequest(mentorshipRequest);
 
         Long requesterId = mentorshipRequest.getRequester().getId();
         Long receiverId = mentorshipRequest.getReceiver().getId();
@@ -62,21 +52,32 @@ public class MentorshipRequestService {
 
         MentorshipRequest newRequest = mentorshipRequestRepository.create(requesterId, receiverId, description);
         return mapper.toDto(newRequest);
+    }
 
+    public void acceptRequest(long requestId) {
+        Optional<MentorshipRequest> requestOpt = mentorshipRequestRepository.findById(requestId);
+        if (!requestOpt.isPresent()) {
+            throw new NullPointerException("Request must exist");
+        } else {
+            MentorshipRequest request = requestOpt.get();
+            User requester = request.getRequester();
+            User receiver = request.getReceiver();
+            List<User> mentorsOfRequester = requester.getMentors();
 
-   }
+            if (mentorsOfRequester != null && mentorsOfRequester.contains(receiver)) {
+                throw new IllegalArgumentException(receiver.getUsername() + "is already the requester mentor");
+            }
+        }
 
-   public void acceptRequest(long requestId) {
-        validator.validateAcceptRequest(requestId);
-        MentorshipRequest request = repository.findById(requestId).get();
+        MentorshipRequest request = mentorshipRequestRepository.findById(requestId).get();
         User requester = request.getRequester();
         User receiver = request.getReceiver();
 
-        if(requester.getMentors() == null) {
+        if (requester.getMentors() == null) {
             requester.setMentors(List.of(receiver));
         } else {
             requester.getMentors().add(receiver);
         }
         request.setStatus(ACCEPTED);
-   }
+    }
 }

@@ -7,6 +7,7 @@ import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.GoalNotFoundException;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.filter.goal.dto.GoalFilterDto;
 import school.faang.user_service.mapper.GoalMapper;
@@ -51,8 +52,7 @@ public class GoalService {
     @Transactional
     public GoalDto updateGoal(GoalDto goalDto, Long userId) {
          Goal goal = goalRepository.findById(goalDto.getId())
-               .orElseThrow(() -> new  IllegalArgumentException(
-                     MessageFormat.format("Goal {0} not found", goalDto.getId())));
+               .orElseThrow(() -> new GoalNotFoundException(userId));
 
         goal.setTitle(goalDto.getTitle());
         goal.setUpdatedAt(LocalDateTime.now());
@@ -65,7 +65,7 @@ public class GoalService {
     public void deleteGoal(Long goalId){
         Goal goal = goalRepository.findById(goalId)
                 .orElseThrow(() ->
-                        new IllegalArgumentException(MessageFormat.format("Goal {0} not found", goalId)));
+                        new GoalNotFoundException(goalId));
 
         goalRepository.delete(goal);
     }
@@ -94,7 +94,7 @@ public class GoalService {
     public GoalDto completeGoal(Long goalId){
         Goal goal = goalRepository.findById(goalId)
                 .orElseThrow(() ->
-                        new DataValidationException(MessageFormat.format("Goal {0} not found", goalId)));
+                        new GoalNotFoundException(goalId));
         goal.setStatus(GoalStatus.COMPLETED);
         goalRepository.save(goal);
         goalCompletedEventPublisher.publish(new GoalCompletedEvent(goalId));

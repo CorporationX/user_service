@@ -10,15 +10,15 @@ import school.faang.user_service.dto.redis.EventRecommendationRequestDto;
 @Component
 public class RecommendationRequestedEventPublisher extends AbstractEventPublisher<EventRecommendationRequestDto> {
 
-    private final ChannelTopic topicRecommendationRequest;
+    private final ChannelTopic topicRecommendationRequestedEvent;
 
     @Autowired
-    public RecommendationRequestedEventPublisher(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper, ChannelTopic topicRecommendationRequested, ChannelTopic topicRecommendationRequest) {
+    public RecommendationRequestedEventPublisher(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper, ChannelTopic topicRecommendationRequestedEvent) {
         super(redisTemplate, objectMapper);
-        this.topicRecommendationRequest = topicRecommendationRequest;
+        this.topicRecommendationRequestedEvent = topicRecommendationRequestedEvent;
     }
 
     public void publish(EventRecommendationRequestDto event) {
-        publishInTopic(topicRecommendationRequest, event);
+        publishInTopic(topicRecommendationRequestedEvent, event);
     }
 }

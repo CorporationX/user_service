@@ -31,7 +31,7 @@ class SearchAppearanceEventPublisherTest {
     @BeforeEach
     void setUp() {
         String topic = "search-appearance-channel";
-        searchAppearanceEventPublisher = new SearchAppearanceEventPublisher(objectMapper, redisTemplate, topic);
+        searchAppearanceEventPublisher = new SearchAppearanceEventPublisher(redisTemplate, objectMapper, topic);
         json = "EXPECTED_JSON";
 
     }

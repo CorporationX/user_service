@@ -9,9 +9,9 @@ import school.faang.user_service.dto.analytics.SearchAppearanceEventDto;
 @Component
 public class SearchAppearanceEventPublisher extends AbstractPublisher<SearchAppearanceEventDto> {
 
-    public SearchAppearanceEventPublisher(ObjectMapper objectMapper,
-                                          RedisTemplate<String, Object> redisTemplate,
+    public SearchAppearanceEventPublisher(RedisTemplate<String, Object> redisTemplate,
+                                          ObjectMapper objectMapper,
                                           @Value("${spring.data.redis.channels.search-appearance-channel.name}") String searchAppearanceTopic) {
-        super(objectMapper, redisTemplate, searchAppearanceTopic);
+        super(redisTemplate, objectMapper, searchAppearanceTopic);
     }
 }

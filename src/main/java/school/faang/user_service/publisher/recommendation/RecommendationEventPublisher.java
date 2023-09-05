@@ -10,9 +10,9 @@ import school.faang.user_service.publisher.AbstractPublisher;
 @Component
 public class RecommendationEventPublisher extends AbstractPublisher<RecommendationEventDto> {
 
-    public RecommendationEventPublisher(ObjectMapper mapper,
-                                        RedisTemplate<String, Object> redisTemplate,
+    public RecommendationEventPublisher(RedisTemplate<String, Object> redisTemplate,
+                                        ObjectMapper mapper,
                                         @Value("${spring.data.redis.channels.recommendation_channel.name}") String channel) {
-        super(mapper,redisTemplate, channel);
+        super(redisTemplate, mapper, channel);
     }
 }

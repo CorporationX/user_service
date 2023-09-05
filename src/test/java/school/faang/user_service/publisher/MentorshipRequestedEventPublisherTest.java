@@ -22,12 +22,11 @@ class MentorshipRequestedEventPublisherTest {
     private ObjectMapper objectMapper;
 
 
-
     private MentorshipRequestedEventPublisher eventPublisher;
 
     @BeforeEach
     void setUp() {
-        eventPublisher = new MentorshipRequestedEventPublisher(objectMapper, redisTemplate, "topic");
+        eventPublisher = new MentorshipRequestedEventPublisher(redisTemplate, objectMapper, "topic");
     }
 
     @Test

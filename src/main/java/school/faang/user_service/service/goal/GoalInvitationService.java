@@ -3,7 +3,9 @@ package school.faang.user_service.service.goal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.GoalInvitation;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
@@ -34,8 +36,8 @@ public class GoalInvitationService {
     public GoalInvitationDto acceptGoalInvitation(long idGoalInvitation) {
 
        Optional<GoalInvitation> invitation = goalInvitationRepository.findById(idGoalInvitation);
-       invitation.ifPresent(goalInvitation -> goalInvitationValidationMaxActiveGoal.isCheckActiveTargetUser(invitation));
-//        goalInvitationValidationMaxActiveGoal.isCheckActiveTargetUser(invitation);
+        User invitedUser = invitation.orElseThrow(() -> new EntityNotFoundException("Invited user not found")).getInviter();
+        goalInvitationValidationMaxActiveGoal.isCheckActiveTargetUser(invitedUser);
 
 
 

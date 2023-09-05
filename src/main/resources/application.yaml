@@ -23,9 +23,38 @@ spring:
       host: localhost
       channels:
         follower_channel:
-          name: follower_channel
+          name: follower-channel
         profile_view_channel:
-            name: profile_view_channel
+          name: profile-view-channel
+        mentorship_requested_channel:
+          name: mentorship-requested-channel
+        recommendation_channel:
+            name: recommendation-channel
+        event_channel:
+            name: event-start-channel
+
+
+  google:
+    calendar:
+      application-name: Corporation-X
+      credentials-file-path: /credentials.json
+      calendar-id: primary
+      redirect-uri: http://localhost:8080/google/calendar/callback
+      scopes: https://www.googleapis.com/auth/calendar
+      access-type: offline
+
+  async:
+    corePoolSize: 8
+    maxPoolSize: 10
+    queueCapacity: 1000
+    threadNamePrefix: "task-executor-thread-"
+
+  students:
+    partitionSize: 100
+
+  scheduler:
+    partitionSize: 1000
+    cron: "0 0 0 7/7 * ?" # every 7 days ("0 * * * * *" every minute - for testing)
 
 server:
   port: 8080

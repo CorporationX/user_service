@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
-import school.faang.user_service.dto.redis.EventRecommendationRequestDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
@@ -14,7 +13,6 @@ import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filter.requestfilter.RequestFilter;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
-import school.faang.user_service.publisher.RecommendationRequestedEventPublisher;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 import school.faang.user_service.validator.RecommendationRequestValidator;
@@ -36,7 +34,6 @@ public class RecommendationRequestService {
     private List<RequestFilter> requestFilters;
     private final RecommendationRequestMapper recommendationRequestMapper;
     private final SkillRequestRepository skillRequestRepository;
-    private final RecommendationRequestedEventPublisher recommendationRequestedEventPublisher;
 
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
         Optional<RecommendationRequest> recommendationRequestOpt = getRecommendationRequest(recommendationRequestDto);
@@ -56,8 +53,7 @@ public class RecommendationRequestService {
 
             skillRequestRepository.save(skillRequest);
         }
-        EventRecommendationRequestDto event = recommendationRequestMapper.toEventDto(recommendationRequest);
-        recommendationRequestedEventPublisher.publish(event);
+
         return recommendationRequestMapper.toDto(recommendationRequest);
     }
 

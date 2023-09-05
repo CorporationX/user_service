@@ -5,6 +5,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
+import school.faang.user_service.dto.redis.EventRecommendationDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR,
@@ -14,4 +15,8 @@ public interface RecommendationMapper {
     @Mapping(source = "receiver.id", target = "receiverId")
     @Mapping(source = "skillOffers", target = "skillOffers", qualifiedByName = "listSkillOffersDto")
     RecommendationDto toDto(Recommendation recommendation);
+
+    @Mapping(source = "id", target = "recommendationId")
+    @Mapping(source = "author.id", target = "actorId")
+    EventRecommendationDto toEventDto(Recommendation recommendation);
 }

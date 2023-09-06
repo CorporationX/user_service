@@ -72,4 +72,9 @@ public class UserController {
     public Long findUserIdByPhoneNumber(@RequestParam(name = "phone") String phoneNumber){
         return userService.findUserIdByPhoneNumber(phoneNumber);
     }
+
+    @GetMapping("/exists/{id}")
+    public Boolean checkUserExist(@PathVariable long id) {
+        return userService.checkUserExist(id);
+    }
 }

@@ -64,3 +64,6 @@ dicebear:
   url: https://api.dicebear.com/6.x/adventurer/svg?seed=
 
 springfox.documentation.swagger.v2.path: /api-docs
+
+delete_past_events_every_sunday_at_3AM:
+  cron: 0 3 * * 0

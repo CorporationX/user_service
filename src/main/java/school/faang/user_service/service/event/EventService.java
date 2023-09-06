@@ -132,4 +132,9 @@ public class EventService {
             throw new DataValidException("User has no related skills. Id: " + eventDto.getOwnerId());
         }
     }
+
+
+    public void deletePastEvents() {
+
+    }
 }

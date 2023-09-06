@@ -129,13 +129,13 @@ class MentorshipRequestServiceTest {
     }
 
     @Test
-    void requestExist() {
+    void testRequestExistForAcceptRequest() {
         when(mentorshipRequestRepository.findById(REQUESTER_ID)).thenReturn(null);
         assertThrows(NullPointerException.class, () -> mentorshipRequestService.acceptRequest(REQUESTER_ID));
     }
 
     @Test
-    void receiverNotMentor() {
+    void testReceiverNotMentorForAcceptRequest() {
         MentorshipRequest request = createMentorshipRequest(REQUESTER_ID, RECEIVER_ID, "1", PENDING, "John", "Jim");
         User requester = request.getRequester();
         User receiver = request.getReceiver();
@@ -148,16 +148,21 @@ class MentorshipRequestServiceTest {
 
     @Test
     void testRejectRequest() {
-        when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(Optional.of(request));
-        mentorshipRequestService.rejectRequest(REQUEST_ID, rejection);
+        MentorshipRequest request = createMentorshipRequest(REQUESTER_ID, RECEIVER_ID, "1", PENDING, "John", "Jim");
+        RejectionDto rejection = RejectionDto.builder()
+                .reason("reason")
+                .build();
+        when(mentorshipRequestRepository.findById(REQUESTER_ID)).thenReturn(Optional.of(request));
+        mentorshipRequestService.rejectRequest(REQUESTER_ID, rejection);
         assertEquals(request.getStatus(), REJECTED);
     }
 
     @Test
-    void testRequestMentorshipInvokeValidateRejectRequest() {
-        when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(Optional.of(request));
-        mentorshipRequestService.rejectRequest(REQUEST_ID, rejection);
-        verify(validator)
-                .validateRejectRequest(REQUEST_ID, rejection);
+    void requestExistForRejectRequest() {
+        RejectionDto rejection = RejectionDto.builder()
+                .reason("reason")
+                .build();
+        when(mentorshipRequestRepository.findById(REQUESTER_ID)).thenReturn(null);
+        assertThrows(NullPointerException.class, () -> mentorshipRequestService.rejectRequest(REQUESTER_ID, rejection));
     }
 }

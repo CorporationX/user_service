@@ -84,8 +84,16 @@ public class MentorshipRequestService {
    }
 
    public void rejectRequest(long requestId, RejectionDto rejection) {
-       validator.validateRejectRequest(requestId, rejection);
-       MentorshipRequest request = repository.findById(requestId).get();
+       Optional<MentorshipRequest> requestOpt = mentorshipRequestRepository.findById(requestId);
+       if(!requestOpt.isPresent()) {
+           throw new NullPointerException("Request must exist");
+       } else {
+           if(rejection.getReason().isEmpty() || rejection.getReason() == null) {
+               throw new IllegalArgumentException("Reason must be given");
+           }
+       }
+
+       MentorshipRequest request = requestOpt.get();
        request.setStatus(REJECTED);
        request.setRejectionReason(rejection.getReason());
    }

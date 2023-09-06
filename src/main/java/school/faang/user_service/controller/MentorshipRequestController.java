@@ -18,11 +18,12 @@ public class MentorshipRequestController {
         return mentorshipRequestService.requestMentorship(mentorshipRequestDto);
     }
 
-    @PostMapping("/{id}")
+    @PostMapping("/{id}/accept")
     public void acceptRequest(@PathVariable long requestId) {
         mentorshipRequestService.acceptRequest(requestId);
     }
 
+    @PostMapping("/{id}/reject")
     public void rejectRequest(long requestId, RejectionDto rejection) {
         mentorshipRequestService.rejectRequest(requestId, rejection);
     }

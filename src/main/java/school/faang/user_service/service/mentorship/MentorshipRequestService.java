@@ -59,6 +59,7 @@ public class MentorshipRequestService {
             requester.getMentors().add(receiver);
             request.setStatus(RequestStatus.ACCEPTED);
             mentorshipStartEventPublisher.publishMentorshipEvent(receiver.getId(), requester.getId());
+            mentorshipRequestRepository.delete(request);
             return mentorshipRequestMapper.toDto(request);
         }
         throw new IllegalArgumentException("Invalid request. Mentorship request is already accepted");

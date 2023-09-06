@@ -80,7 +80,7 @@ public class MentorshipRequestControllerTest {
     @Test
     @DisplayName("Request Mentorship: Valid request, should return 201")
     void testRequestMentorship200isOk() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/mentorship/request")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/mentorship/request")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(mentorshipRequestDto)))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
@@ -90,7 +90,7 @@ public class MentorshipRequestControllerTest {
     @Test
     @DisplayName("Request Mentorship: Bad request, should return 400")
     void testRequestMentorship400badRequest() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/mentorship/request")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/mentorship/request")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(badMentorshipRequestDto)))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
@@ -100,7 +100,7 @@ public class MentorshipRequestControllerTest {
     @Test
     @DisplayName("Get requests: Valid request, should return 200")
     void testGetRequests200IsOk() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/mentorship/request")
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/mentorship/request")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestFilterDto)))
                 .andExpect(MockMvcResultMatchers.status().isOk());
@@ -109,7 +109,7 @@ public class MentorshipRequestControllerTest {
     @Test
     @DisplayName("Get requests: Bad request, should return 400")
     void testGetRequests400BadRequest() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/mentorship/request")
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/mentorship/request")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(badRequestFilterDto)))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
@@ -118,7 +118,7 @@ public class MentorshipRequestControllerTest {
     @Test
     @DisplayName("Accept request: Positive scenario")
     public void testAcceptRequest200IsOk() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.put("/mentorship/request/" + requestId + "/accept")
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/mentorship/request/" + requestId + "/accept")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print());
@@ -127,7 +127,7 @@ public class MentorshipRequestControllerTest {
     @Test
     @DisplayName("Accept request: Bad request")
     public void testAcceptRequest400BadRequest() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.put("/mentorship/request/" + null + "/accept")
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/mentorship/request/" + null + "/accept")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
@@ -135,7 +135,7 @@ public class MentorshipRequestControllerTest {
     @Test
     @DisplayName("Reject request: Positive scenario")
     void testRejectRequest200IsOk() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.put("/mentorship/request/" + requestId + "/reject")
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/mentorship/request/" + requestId + "/reject")
                 .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(rejectionDto)))
                 .andExpect(MockMvcResultMatchers.status().isOk());
@@ -144,7 +144,7 @@ public class MentorshipRequestControllerTest {
     @Test
     @DisplayName("Reject request: Bad request, should return 400")
     void testRejectRequest400BadRequest() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.put("/mentorship/request/" + null + "/reject")
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/mentorship/request/" + null + "/reject")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }

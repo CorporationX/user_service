@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
@@ -16,6 +17,7 @@ import java.util.Optional;
 import java.util.List;
 
 import static school.faang.user_service.entity.RequestStatus.ACCEPTED;
+import static school.faang.user_service.entity.RequestStatus.REJECTED;
 
 @Service
 @RequiredArgsConstructor
@@ -73,11 +75,26 @@ public class MentorshipRequestService {
         User requester = request.getRequester();
         User receiver = request.getReceiver();
 
-        if (requester.getMentors() == null) {
+        if(requester.getMentors() == null) {
             requester.setMentors(List.of(receiver));
         } else {
             requester.getMentors().add(receiver);
         }
         request.setStatus(ACCEPTED);
-    }
+   }
+
+   public void rejectRequest(long requestId, RejectionDto rejection) {
+       Optional<MentorshipRequest> requestOpt = mentorshipRequestRepository.findById(requestId);
+       if(!requestOpt.isPresent()) {
+           throw new NullPointerException("Request must exist");
+       } else {
+           if(rejection.getReason().isEmpty() || rejection.getReason() == null) {
+               throw new IllegalArgumentException("Reason must be given");
+           }
+       }
+
+       MentorshipRequest request = requestOpt.get();
+       request.setStatus(REJECTED);
+       request.setRejectionReason(rejection.getReason());
+   }
 }

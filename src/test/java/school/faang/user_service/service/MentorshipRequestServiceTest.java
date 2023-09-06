@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
@@ -24,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static school.faang.user_service.entity.RequestStatus.ACCEPTED;
 import static school.faang.user_service.entity.RequestStatus.PENDING;
+import static school.faang.user_service.entity.RequestStatus.REJECTED;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipRequestServiceTest {
@@ -127,13 +129,13 @@ class MentorshipRequestServiceTest {
     }
 
     @Test
-    void requestExist() {
+    void testRequestExistForAcceptRequest() {
         when(mentorshipRequestRepository.findById(REQUESTER_ID)).thenReturn(null);
         assertThrows(NullPointerException.class, () -> mentorshipRequestService.acceptRequest(REQUESTER_ID));
     }
 
     @Test
-    void receiverNotMentor() {
+    void testReceiverNotMentorForAcceptRequest() {
         MentorshipRequest request = createMentorshipRequest(REQUESTER_ID, RECEIVER_ID, "1", PENDING, "John", "Jim");
         User requester = request.getRequester();
         User receiver = request.getReceiver();
@@ -142,5 +144,25 @@ class MentorshipRequestServiceTest {
 
         when(mentorshipRequestRepository.findById(REQUESTER_ID)).thenReturn(Optional.of(request));
         assertThrows(IllegalArgumentException.class, () -> mentorshipRequestService.acceptRequest(REQUESTER_ID));
+    }
+
+    @Test
+    void testRejectRequest() {
+        MentorshipRequest request = createMentorshipRequest(REQUESTER_ID, RECEIVER_ID, "1", PENDING, "John", "Jim");
+        RejectionDto rejection = RejectionDto.builder()
+                .reason("reason")
+                .build();
+        when(mentorshipRequestRepository.findById(REQUESTER_ID)).thenReturn(Optional.of(request));
+        mentorshipRequestService.rejectRequest(REQUESTER_ID, rejection);
+        assertEquals(request.getStatus(), REJECTED);
+    }
+
+    @Test
+    void requestExistForRejectRequest() {
+        RejectionDto rejection = RejectionDto.builder()
+                .reason("reason")
+                .build();
+        when(mentorshipRequestRepository.findById(REQUESTER_ID)).thenReturn(null);
+        assertThrows(NullPointerException.class, () -> mentorshipRequestService.rejectRequest(REQUESTER_ID, rejection));
     }
 }

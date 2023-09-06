@@ -2,9 +2,8 @@ package school.faang.user_service.service.amazon;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
-import com.amazonaws.util.IOUtils;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -12,9 +11,6 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DiceBearConnect;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.awt.image.ImagingOpException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,8 +20,8 @@ import java.net.URLConnection;
 @Service
 @RequiredArgsConstructor
 public class AvatarService {
-    private final AmazonS3 amazonS3;
-    @Value("${services.s3.bucket-name}")
+    private final AmazonS3 clientAmazonS3;
+    @Value("${services.s3.bucket-name-for-avatars}")
     private String bucketName;
 
     @Async("avatar")
@@ -37,39 +33,36 @@ public class AvatarService {
         } catch (IOException e) {
             throw new DiceBearConnect("Can't get image: " + e.getMessage());
         }
-
         uploadFile(userProfilePic.getFileId(), imageData);
     }
 
     public void uploadFile(String nameFile, byte[] data) {
+        checkBucketName(bucketName);
         try {
-            amazonS3.putObject(bucketName, nameFile, new ByteArrayInputStream(data), null);
+            PutObjectRequest request = new PutObjectRequest(
+                    bucketName,
+                    nameFile,
+                    new ByteArrayInputStream(data),
+                    addMetadata(data));
+
+            clientAmazonS3.putObject(request);
         } catch (AmazonServiceException e) {
             new DiceBearConnect("Can't upload file: " + e.getMessage());
         }
     }
 
-    public BufferedImage getFileAmazonS3(String fileName) {
-        S3Object s3Object = amazonS3.getObject(bucketName, fileName);
-        S3ObjectInputStream objectContent = s3Object.getObjectContent();
-
-        byte[] data = new byte[0];
-        try {
-            data = IOUtils.toByteArray(objectContent);
-        } catch (IOException e) {
-            throw new RuntimeException("Wrong file: " + e.getMessage());
-        }
-
-        BufferedImage image = null;
-        try {
-            image = biteToImage(data);
-        } catch (IOException e) {
-            throw new ImagingOpException("Wrong file saved in amazon s3: " + e.getMessage());
-        }
-
-        return image;
+    private ObjectMetadata addMetadata(byte[] data) {
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(data.length);
+        metadata.setContentType("image/png");
+        return metadata;
     }
 
+    private void checkBucketName(String bucketName) {
+        if (!clientAmazonS3.doesBucketExistV2(bucketName)) {
+            clientAmazonS3.createBucket(bucketName);
+        }
+    }
 
     private byte[] convertUrlToByte(String imageUrl) throws IOException {
         URL url = new URL(imageUrl);
@@ -83,10 +76,5 @@ public class AvatarService {
             }
             return buffer;
         }
-    }
-
-    private BufferedImage biteToImage(byte[] imageData) throws IOException {
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(imageData);
-        return ImageIO.read(inputStream);
     }
 }

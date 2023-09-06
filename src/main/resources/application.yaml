@@ -38,6 +38,8 @@ spring:
           name: user_ban_channel
         started_events_channel:
           name: started_events_channel
+        mentorship_channel:
+          name: mentorship_channel
 
 server:
   port: 8080

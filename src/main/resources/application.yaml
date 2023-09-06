@@ -25,7 +25,7 @@ spring:
         follower_channel:
           name: follower_channel
         profile_view_channel:
-            name: profile_view_channel
+          name: profile_view_channel
   google:
     calendar:
       application-name: Corporation-X
@@ -50,16 +50,13 @@ payment-service:
   host: localhost
   port: 9080
 
-aws:
-  accessKey: access_key
-  secretKey: secret_key
-  region: bucket_region
-
 services:
   s3:
-    bucket-name: user_backet
-    isMocked: true
-
+    endpoint: http://localhost:9000
+    accessKey: user
+    secretKey: password
+    bucket-name-for-avatars: avatar
+    isMocked: false
   dice-bear:
     url: https://api.dicebear.com/6.x/pixel-art/svg?seed=
     size: '&size=100'

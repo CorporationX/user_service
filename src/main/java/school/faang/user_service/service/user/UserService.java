@@ -7,6 +7,8 @@ import com.json.student.PersonSchemaForUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.CountryDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
@@ -21,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -32,15 +35,19 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final AvatarService avatarService;
+    private final CountryService countryService;
     private final UserValidator userValidator;
     private final CsvMapper csvMapper;
     private final CsvSchema schema;
+
     @Value("${services.dice-bear.url}")
     private String URL;
     @Value("${services.dice-bear.size}")
     private String SIZE;
 
+    @Transactional
     public UserDto createUser(UserDto userDto) {
+        userDto.setCountry(getCountryId(userDto.getCountry()));
         User user = userMapper.toEntity(userDto);
         addCreateData(user);
 
@@ -120,6 +127,16 @@ public class UserService {
 
         createDiceBearAvatar(userProfilePic);
         user.setUserProfilePic(userProfilePic);
+    }
+
+    private CountryDto getCountryId(CountryDto countryDto) {
+        Optional<Long> id = countryService.getIdByTitle(countryDto.getTitle());
+        if (id.isEmpty()) {
+            countryDto = countryService.create(countryDto);
+        } else {
+            countryDto.setId(Long.valueOf(id.get()));
+        }
+        return countryDto;
     }
 
     private void createDiceBearAvatar(UserProfilePic userProfilePic) {

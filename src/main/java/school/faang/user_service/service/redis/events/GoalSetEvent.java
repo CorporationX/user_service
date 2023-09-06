@@ -1,4 +1,4 @@
-package school.faang.user_service.listener.events;
+package school.faang.user_service.service.redis.events;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,6 +11,7 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BanEvent implements Serializable {
-    private long userId;
+public class GoalSetEvent implements Serializable {
+    Long userId;
+    Long goalId;
 }

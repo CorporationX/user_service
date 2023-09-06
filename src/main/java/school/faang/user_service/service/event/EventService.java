@@ -144,7 +144,6 @@ public class EventService {
                 .toList();
 
         if (eventsToDelete.size() > partitionSize) {
-            eventAsyncService.clearEventsPartition(eventsToDelete);
             List<List<Event>> partitions = ListUtils.partition(eventsToDelete, partitionSize);
             partitions.forEach(eventAsyncService::clearEventsPartition);
         } else {

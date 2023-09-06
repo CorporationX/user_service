@@ -67,3 +67,10 @@ springfox.documentation.swagger.v2.path: /api-docs
 
 delete_past_events_every_sunday_at_3AM:
   cron: 0 3 * * 0
+
+scheduler:
+  partition_size: 10
+  removeEventsExecutor:
+    corePoolSize: 10
+    maxPoolSize: 20
+    queueCapacity: 50

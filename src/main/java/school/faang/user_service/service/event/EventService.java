@@ -1,6 +1,7 @@
 package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ import school.faang.user_service.publisher.EventStartPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -34,6 +36,7 @@ public class EventService {
     private final SkillMapper skillMapper = SkillMapper.INSTANCE;
     private final List<EventFilter> filters;
     private final EventStartPublisher eventStartPublisher;
+    private final EventAsyncService eventAsyncService;
 
     public EventDto create(EventDto eventDto) {
         validateEventDto(eventDto);
@@ -134,7 +137,18 @@ public class EventService {
     }
 
 
-    public void deletePastEvents() {
+    @Transactional
+    public void deletePastEvents(int partitionSize) {
+        List<Event> eventsToDelete = eventRepository.findAll().stream()
+                .filter(event -> event.getEndDate().isBefore(LocalDateTime.now()))
+                .toList();
 
+        if (eventsToDelete.size() > partitionSize) {
+            eventAsyncService.clearEventsPartition(eventsToDelete);
+            List<List<Event>> partitions = ListUtils.partition(eventsToDelete, partitionSize);
+            partitions.forEach(eventAsyncService::clearEventsPartition);
+        } else {
+            eventAsyncService.clearEventsPartition(eventsToDelete);
+        }
     }
 }

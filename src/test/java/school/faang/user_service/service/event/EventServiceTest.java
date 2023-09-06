@@ -57,6 +57,9 @@ class EventServiceTest {
     @Mock
     private EventStartPublisher eventStartPublisher;
 
+    @Mock
+    private EventAsyncService eventAsyncService;
+
     private EventService eventService;
 
     @BeforeEach
@@ -67,7 +70,7 @@ class EventServiceTest {
                 new EventDateFilter(),
                 new EventMaxAttendeesFilter()
         );
-        eventService = new EventService(eventRepository, userRepository, eventFilters, eventStartPublisher);
+        eventService = new EventService(eventRepository, userRepository, eventFilters, eventStartPublisher, eventAsyncService);
     }
 
     @Test

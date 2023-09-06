@@ -15,14 +15,14 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @Component
-public class MentorshipStartPublisher extends AbstractEventPublisher {
+public class MentorshipStartEventPublisher extends AbstractEventPublisher {
     @Setter
     @Value("${spring.data.redis.channels.mentorship_channel.name}")
     private String mentorshipChannel;
 
     @Autowired
-    public MentorshipStartPublisher(EventMapper eventMapper, ObjectMapper objectMapper,
-                                    RedisMessagePublisher redisMessagePublisher) {
+    public MentorshipStartEventPublisher(EventMapper eventMapper, ObjectMapper objectMapper,
+                                         RedisMessagePublisher redisMessagePublisher) {
         super(eventMapper, objectMapper, redisMessagePublisher);
     }
 

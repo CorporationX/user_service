@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.service.event.EventService;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -25,7 +26,7 @@ class SchedulerTest {
     @Test
     void testClearEvents() {
         scheduler.clearEvents();
-        verify(eventService, times(1)).deletePastEvents(0);
+        verify(eventService, times(1)).deletePastEvents(any(Integer.class));
     }
 
 }

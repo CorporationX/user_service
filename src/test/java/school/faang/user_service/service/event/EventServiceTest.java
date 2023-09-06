@@ -27,6 +27,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -361,4 +362,20 @@ class EventServiceTest {
         }
         return events;
     }
+
+    @Test
+    void testDeletePastEvents() {
+        LocalDateTime now = LocalDateTime.now();
+        List<Event> pastEvents = new ArrayList<>();
+        pastEvents.add(Event.builder().description("Event 1").endDate(now.minusDays(1)).build());
+        pastEvents.add(Event.builder().description("Event 2").endDate(now.minusDays(2)).build());
+
+        when(eventRepository.findAll()).thenReturn(pastEvents);
+
+        eventService.deletePastEvents(10);
+
+        verify(eventRepository).findAll();
+        verify(eventAsyncService).clearEventsPartition(pastEvents);
+    }
+
 }

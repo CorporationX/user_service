@@ -38,8 +38,7 @@ public class UserController {
     public List<UserDto> createUsersCSV(@RequestParam MultipartFile file) {
         try {
             InputStream inputStream = file.getInputStream();
-            List<UserDto> users = userService.createUserCSV(inputStream);
-            return users;
+            return userService.createUserCSV(inputStream);
         } catch (IOException e) {
             throw new FileException("Can't read file: " + e.getMessage());
         }

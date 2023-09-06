@@ -1,39 +1,58 @@
 package school.faang.user_service.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.service.RecommendationService;
-import school.faang.user_service.validator.RecommendationValidator;
 
 import java.util.List;
 
-@Controller
+@RestController
+@RequestMapping("/recommendations")
+@Slf4j
 @RequiredArgsConstructor
+@Validated
 public class RecommendationController {
-
     private final RecommendationService recommendationService;
-    private final RecommendationValidator recommendationValidator;
 
-    public RecommendationDto giveRecommendation(RecommendationDto recommendation) {
-        recommendationValidator.validateRecommendationContent(recommendation);
+    @PostMapping
+    public RecommendationDto giveRecommendation(@Valid @RequestBody RecommendationDto recommendation) {
+        log.info("Received request to create recommendation: {}", recommendation);
         return recommendationService.create(recommendation);
     }
 
-    public RecommendationDto updateRecommendation(RecommendationDto updated) {
-        recommendationValidator.validateRecommendationContent(updated);
-        return recommendationService.update(updated);
+    @PutMapping("/{id}")
+    public RecommendationDto updateRecommendation(@PathVariable long id,
+                                                  @Valid @RequestBody RecommendationDto recommendationDto) {
+        log.info("Received request to update recommendation: {}", recommendationDto);
+        return recommendationService.update(id, recommendationDto);
     }
 
-    public void deleteRecommendation(long id) {
+    @DeleteMapping("{id}")
+    public void deleteRecommendation(@PathVariable long id) {
+        log.info("Received request to delete recommendation with id: {}", id);
         recommendationService.delete(id);
     }
 
-    public List<RecommendationDto> getAllUserRecommendations(long receiverId) {
-        return recommendationService.getAllUserRecommendations(receiverId);
+    @GetMapping("/receiver/{id}")
+    public List<RecommendationDto> getAllUserRecommendations(@PathVariable long id) {
+        log.info("Received request to get all user recommendations for user with id: {}", id);
+        return recommendationService.getAllUserRecommendations(id);
     }
 
-    public List<RecommendationDto> getAllGivenRecommendations(long authorId) {
-        return recommendationService.getAllGivenRecommendations(authorId);
+    @GetMapping("/author/{id}")
+    public List<RecommendationDto> getAllGivenRecommendations(@PathVariable long id) {
+        log.info("Received request to get all given recommendations for user with id: {}", id);
+        return recommendationService.getAllGivenRecommendations(id);
     }
 }

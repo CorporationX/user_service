@@ -26,8 +26,19 @@ spring:
           name: follower-channel
         profile_view_channel:
           name: profile-view-channel
-        mentorship_accepted_channel:
+        mentorship_requested_channel:
+          name: mentorship-requested-channel
+        recommendation_channel:
+          name: recommendation-channel
+        event_channel:
+          name: event-start-channel
+        skill_channel:
+          name: skill-acquired-channel
+        mentorship_channel:
           name: mentorship-accepted-channel
+        search_appearance_channel:
+          name: search-appearance-channel
+
 
   google:
     calendar:
@@ -43,6 +54,9 @@ spring:
     maxPoolSize: 10
     queueCapacity: 1000
     threadNamePrefix: "task-executor-thread-"
+
+  students:
+    partitionSize: 100
 
   scheduler:
     partitionSize: 1000
@@ -66,9 +80,9 @@ payment-service:
 aws:
   accessKey: access_key
   secretKey: secret_key
-  region: bucket_region
+  region: bucket-region
 
 services:
   s3:
-    bucket-name: user_backet
+    bucket-name: user-backet
     isMocked: true

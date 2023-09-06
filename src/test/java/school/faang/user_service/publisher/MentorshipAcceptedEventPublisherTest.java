@@ -31,7 +31,7 @@ class MentorshipAcceptedEventPublisherTest {
     @BeforeEach
     void setUp() {
         String channel = "mentorship-accepted-channel";
-        mentorshipAcceptedEventPublisher = new MentorshipAcceptedEventPublisher(objectMapper, redisTemplate, channel);
+        mentorshipAcceptedEventPublisher = new MentorshipAcceptedEventPublisher(redisTemplate, objectMapper, channel);
         json = "EXPECTED_JSON";
 
     }

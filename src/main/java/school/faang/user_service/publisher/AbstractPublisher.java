@@ -9,13 +9,13 @@ import org.springframework.data.redis.core.RedisTemplate;
 @RequiredArgsConstructor
 @Slf4j
 public abstract class AbstractPublisher<T> {
-    private final ObjectMapper objectMapper;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final ObjectMapper objectMapper;
     private final String channel;
 
-    public void publish(T eventType){
+    public void publish(T eventType) {
         String json;
-        try{
+        try {
             json = objectMapper.writeValueAsString(eventType);
         } catch (JsonProcessingException e) {
             log.error("Error while converting object to string", e);

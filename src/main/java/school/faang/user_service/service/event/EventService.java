@@ -7,13 +7,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
+import school.faang.user_service.dto.event.EventStartDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.event.EventMapper;
+import school.faang.user_service.mapper.event.EventStartMapper;
 import school.faang.user_service.mapper.skill.SkillMapper;
+import school.faang.user_service.publisher.event.EventStartPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
@@ -29,7 +33,9 @@ public class EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final EventMapper eventMapper;
+    private final EventStartMapper eventStartMapper;
     private final SkillMapper skillMapper;
+    private final EventStartPublisher eventStartPublisher;
 
     public EventDto create(EventDto eventDto) {
         validateEvent(eventDto);
@@ -161,5 +167,19 @@ public class EventService {
         } else {
             eventAsyncService.clearEventsPartition(events);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public EventStartDto startEvent(Long id) {
+        Event event = getEvent(id);
+
+        if (!event.getStatus().equals(EventStatus.PLANNED)) {
+            throw new DataValidationException("You can start only planned events");
+        }
+
+        EventStartDto eventStartDto = eventStartMapper.toDto(event);
+
+        eventStartPublisher.publish(eventStartDto);
+        return eventStartDto;
     }
 }

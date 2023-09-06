@@ -8,9 +8,9 @@ import school.faang.user_service.dto.MentorshipAcceptedEventDto;
 
 @Component
 public class MentorshipAcceptedEventPublisher extends AbstractPublisher<MentorshipAcceptedEventDto> {
-    public MentorshipAcceptedEventPublisher(ObjectMapper objectMapper,
-                                            RedisTemplate<String, Object> redisTemplate,
-                                            @Value("${spring.data.redis.channels.mentorship-accepted-channel.name}") String mentorshipAcceptedChannel) {
-        super(objectMapper, redisTemplate, mentorshipAcceptedChannel);
+    public MentorshipAcceptedEventPublisher(RedisTemplate<String, Object> redisTemplate,
+                                            ObjectMapper objectMapper,
+                                            @Value("${spring.data.redis.channels.mentorship-channel.name}") String mentorshipAcceptedChannel) {
+        super(redisTemplate, objectMapper, mentorshipAcceptedChannel);
     }
 }

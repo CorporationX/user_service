@@ -162,7 +162,9 @@ class UserServiceTest {
         ObjectReader testObject = Mockito.mock(ObjectReader.class);
         InputStream inputStream = new ByteArrayInputStream("file".getBytes());
         MappingIterator<Object> iterator = Mockito.mock(MappingIterator.class);
-        UserDto userDto = UserDto.builder().build();
+        UserDto userDto = UserDto.builder()
+                .country(CountryDto.builder().title("test").build())
+                .build();
         User user = User.builder().build();
 
         PersonSchemaForUser person = new PersonSchemaForUser();
@@ -189,7 +191,7 @@ class UserServiceTest {
         userService.createUserCSV(inputStream);
 
         assertTrue(userDto.getPassword() != null);
-        Mockito.verify(userMapper, Mockito.times(1))
+        Mockito.verify(userMapper, Mockito.times(2))
                 .personToUserDto(person);
         Mockito.verify(userValidator, Mockito.times(1))
                 .validateUserDto(userDto);

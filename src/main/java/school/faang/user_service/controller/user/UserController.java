@@ -10,6 +10,7 @@ import school.faang.user_service.service.user.UserService;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -37,7 +38,8 @@ public class UserController {
     public List<UserDto> createUsersCSV(@RequestParam MultipartFile file) {
         try {
             InputStream inputStream = file.getInputStream();
-            return userService.createUserCSV(inputStream);
+            List<UserDto> users = userService.createUserCSV(inputStream);
+            return users;
         } catch (IOException e) {
             throw new FileException("Can't read file: " + e.getMessage());
         }

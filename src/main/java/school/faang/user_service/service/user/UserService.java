@@ -5,7 +5,9 @@ import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.json.student.PersonSchemaForUser;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.CountryDto;
@@ -30,6 +32,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
@@ -54,6 +57,7 @@ public class UserService {
         synchronized (userRepository) {
             user = userRepository.save(user);
         }
+
         return userMapper.toDto(user);
     }
 
@@ -101,12 +105,19 @@ public class UserService {
     private List<CompletableFuture<UserDto>> makeFutureList(List<PersonSchemaForUser> persons) {
         return persons.stream()
                 .map(person -> CompletableFuture.supplyAsync(() -> {
-                    UserDto userDto = userMapper.personToUserDto((PersonSchemaForUser) person);
-                    userDto.setPassword(ThreadLocalRandom.current().nextInt() + "");
-                    userValidator.validateUserDto(userDto);
-                    createUser(userDto);
-                    // SMS to user.getEmail with - "You password for CorporationX is:"+user.getPassword()
-                    return userDto;
+                    try {
+                        UserDto userDto = userMapper.personToUserDto(person);
+                        userDto.setPassword(ThreadLocalRandom.current().nextInt() + "");
+                        userValidator.validateUserDto(userDto);
+                        createUser(userDto);
+                        // SMS to user.getEmail with - "You password for CorporationX is:"+user.getPassword()
+                        return userDto;
+                    } catch (Exception e) {
+                        return UserDto.builder()
+                                .username(person.getUsername())
+                                .aboutMe("Didn't save " + e.getMessage())
+                                .build();
+                    }
                 }))
                 .toList();
     }

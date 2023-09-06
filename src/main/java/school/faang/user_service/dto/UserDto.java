@@ -22,7 +22,7 @@ public class UserDto {
     @Size(max = 15)
     private String phone;
     @NotBlank
-    @Max(128)
+    @Size(max = 128)
     private String password;
     @Size(max = 4096)
     private String aboutMe;

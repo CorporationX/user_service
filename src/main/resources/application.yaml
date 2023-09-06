@@ -29,11 +29,15 @@ spring:
         mentorship_requested_channel:
           name: mentorship-requested-channel
         recommendation_channel:
-            name: recommendation-channel
+          name: recommendation-channel
         event_channel:
-            name: event-start-channel
+          name: event-start-channel
         skill_channel:
-            name: skill-acquired-channel
+          name: skill-acquired-channel
+        mentorship_channel:
+          name: mentorship-accepted-channel
+        search_appearance_channel:
+          name: search-appearance-channel
 
 
   google:
@@ -76,9 +80,9 @@ payment-service:
 aws:
   accessKey: access_key
   secretKey: secret_key
-  region: bucket_region
+  region: bucket-region
 
 services:
   s3:
-    bucket-name: user_backet
+    bucket-name: user-backet
     isMocked: true

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.MentorshipRequestedEventDto;
+import school.faang.user_service.dto.MentorshipAcceptedEventDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.dto.mentorship.RejectionReasonDto;
@@ -15,6 +16,7 @@ import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.publisher.MentorshipRequestedEventPublisher;
+import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.validator.MentorshipRequestValidator;
 
@@ -30,6 +32,7 @@ public class MentorshipRequestService {
     private final MentorshipRequestValidator mentorshipRequestValidator;
     private final List<MentorshipRequestFilter> filters;
     private final MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
+    private final MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher;
 
     @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
@@ -71,6 +74,15 @@ public class MentorshipRequestService {
         List<User> mentors = request.getRequester().getMentors();
         mentors.add(request.getReceiver());
         request.setStatus(RequestStatus.ACCEPTED);
+
+        MentorshipAcceptedEventDto mentorshipAcceptedEventDto = MentorshipAcceptedEventDto.builder()
+                .authorId(request.getRequester().getId())
+                .receiverId(request.getReceiver().getId())
+                .requestId(requestId)
+                .time(LocalDateTime.now())
+                .build();
+
+        mentorshipAcceptedEventPublisher.publish(mentorshipAcceptedEventDto);
 
         return mentorshipRequestMapper.toDto(request);
     }

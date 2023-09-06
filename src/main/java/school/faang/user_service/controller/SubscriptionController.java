@@ -25,6 +25,7 @@ import java.util.List;
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
+
     @Operation(summary = "Подписаться на пользователя")
     @PostMapping("/{followerId}/followers/{followeeId}")
     public void followUser(

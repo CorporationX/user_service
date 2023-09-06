@@ -21,7 +21,7 @@ public class RedisConfig {
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
-        log.info("Crated redis connection factory with host: {}, port: {}", host, port);
+        log.info("Created redis connection factory with host: {}, port: {}", host, port);
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
         return new JedisConnectionFactory(config);
     }

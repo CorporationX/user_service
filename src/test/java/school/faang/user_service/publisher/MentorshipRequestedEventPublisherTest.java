@@ -22,7 +22,6 @@ class MentorshipRequestedEventPublisherTest {
     private ObjectMapper objectMapper;
 
 
-
     private MentorshipRequestedEventPublisher eventPublisher;
 
     @BeforeEach

@@ -3,15 +3,20 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.analytics.SearchAppearanceEventDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.filter.user_filters.UserFilter;
+import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
+import school.faang.user_service.repository.SubscriptionRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +24,8 @@ public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final UserMapper userMapper;
     private final List<UserFilter> userFilters;
+    private final SearchAppearanceEventPublisher searchAppearanceEventPublisher;
+    private final UserContext userContext;
 
     @Transactional
     public void followUser(long followerId, long followeeId) {
@@ -35,13 +42,13 @@ public class SubscriptionService {
 
     @Transactional(readOnly = true)
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filters) {
-        List<User> followers = subscriptionRepository.findByFolloweeId(followeeId).toList();
+        List<User> followers = subscriptionRepository.findByFolloweeId(followeeId).collect(Collectors.toList());
         return getUsersDtoAfterFiltration(followers, filters);
     }
 
     @Transactional(readOnly = true)
     public List<UserDto> getFollowing(long followerId, UserFilterDto filters) {
-        List<User> followees = subscriptionRepository.findByFollowerId(followerId).toList();
+        List<User> followees = subscriptionRepository.findByFollowerId(followerId).collect(Collectors.toList());
         return getUsersDtoAfterFiltration(followees, filters);
     }
 
@@ -61,9 +68,19 @@ public class SubscriptionService {
         }
     }
 
-    private List<UserDto> getUsersDtoAfterFiltration(List<User> users, UserFilterDto filters) {
+    public List<UserDto> getUsersDtoAfterFiltration(List<User> users, UserFilterDto filters) {
         userFilters.stream().filter(filter -> filter.isApplicable(filters))
                 .forEach(filter -> filter.apply(users, filters));
+
+        long userId = userContext.getUserId();
+
+        users.forEach(user -> searchAppearanceEventPublisher
+                .publish(SearchAppearanceEventDto.builder()
+                        .actorId(userId)
+                        .receiverId(user.getId())
+                        .receivedAt(LocalDateTime.now())
+                        .build()));
+
         return users.stream().map(userMapper::toDto).toList();
     }
 }

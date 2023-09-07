@@ -29,7 +29,7 @@ import java.util.Objects;
 @Slf4j
 public class GoogleCalendarClient {
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-    private static final String APP_NAME = "corporation-x";
+    private static final String APP_NAME = "Google Calendar API";
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
     private static final String CREDENTIALS_FILE_PATH = "/google-calendar-credentials.json";
     private static final List<String> SCOPES = Collections.singletonList(CalendarScopes.CALENDAR);

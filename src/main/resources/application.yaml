@@ -13,6 +13,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        jdbc:
+          batch_size: 10
 
   kafka:
     bootstrap-servers: localhost:9092
@@ -66,3 +68,6 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
+
+schedule:
+  past-events-deletion: 0 0 * * *

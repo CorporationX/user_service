@@ -11,7 +11,7 @@ import school.faang.user_service.messaging.events.GoalCompletedEvent;
 @Component
 @RequiredArgsConstructor
 public class GoalCompletedEventPublisher {
-    @Value("${spring.data.redis.channels.goal_completed_channel}")
+    @Value("${spring.data.redis.channels.goal_completed_channel.name}")
     private String topic;
 
     private final RedisTemplate<String, Object> redisTemplate;

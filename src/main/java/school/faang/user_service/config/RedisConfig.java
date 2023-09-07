@@ -17,8 +17,8 @@ public class RedisConfig {
     private String host;
     @Value("${spring.data.redis.port}")
     private int port;
-    @Value("${spring.data.redis.channels.recommendation_request_channel}")
-    private String recommendationRequestChannelName;
+    @Value("${spring.data.redis.channels.recommendation_channel}")
+    private String recommendationChannelName;
     @Value("${spring.data.redis.channels.skill_offer_channel}")
     private String skillOfferChannelName;
 
@@ -43,9 +43,6 @@ public class RedisConfig {
     @Bean
     ChannelTopic topicRecommendation() {
         return new ChannelTopic(recommendationChannelName);
-      
-    ChannelTopic topicRecommendationRequest() {
-        return new ChannelTopic(recommendationRequestChannelName);
     }
 
     @Bean

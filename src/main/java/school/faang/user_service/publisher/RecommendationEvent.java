@@ -10,17 +10,17 @@ import school.faang.user_service.mapper.RecommendationMapper;
 
 @Component
 public class RecommendationEvent extends AbstractEventPublisher<RecommendationEventDto> {
-    private final ChannelTopic topicInvitation;
+    private final ChannelTopic topicRecommendation;
     private final RecommendationMapper recommendationMapper;
 
-    public RecommendationEvent(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper, ChannelTopic topicInvitation, RecommendationMapper recommendationMapper) {
+    public RecommendationEvent(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper, ChannelTopic topicRecommendation, RecommendationMapper recommendationMapper) {
         super(redisTemplate, objectMapper);
-        this.topicInvitation = topicInvitation;
+        this.topicRecommendation = topicRecommendation;
         this.recommendationMapper = recommendationMapper;
     }
 
     public void publish(Recommendation recommendation) {
-        RecommendationEventDto event = recommendationMapper.toEventDto(recommendation);
-        publishInTopic(topicInvitation, event);
+        RecommendationEventDto event = recommendationMapper.toRecommendationEventDto(recommendation);
+        publishInTopic(topicRecommendation, event);
     }
 }

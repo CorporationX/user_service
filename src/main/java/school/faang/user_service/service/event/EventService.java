@@ -35,7 +35,7 @@ public class EventService {
 
     private final List<Filter<Event, EventFilterDto>> filters;
 
-    private final Executor executor;
+    private final Executor eventExecutor;
     @Value("${spring.jpa.properties.hibernate.jdbc.batch_size}")
     private int batchSize;
 
@@ -90,14 +90,14 @@ public class EventService {
         return eventRepository.findParticipatedEventsByUserId(userId).stream().map(eventMapper::toDto).toList();
     }
 
-    @Transactional
     public void save(Event event) {
         eventRepository.save(event);
     }
 
     public void deletePastEvents() {
-        EventFilterDto filter = new EventFilterDto();
-        filter.setIsNeedPastEvents(true);
+        EventFilterDto filter = EventFilterDto.builder()
+                .isNeedPastEvents(true)
+                .build();
         List<EventDto> pastEvents = getEventsByFilter(filter);
 
         deleteEventsAsync(pastEvents);
@@ -112,7 +112,7 @@ public class EventService {
                                             .map(EventDto::getId)
                                             .toList()
                             )
-                    , executor)
+                            , eventExecutor)
                     .thenRun(() -> log.info("Finished deleting past events"));
         }
     }

@@ -2,12 +2,14 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.follower.FollowerEvent;
 import school.faang.user_service.dto.subscription.UserDto;
 import school.faang.user_service.dto.subscription.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidException;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 
 import java.util.List;
@@ -19,6 +21,7 @@ public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final UserMapper userMapper;
     private final List<UserFilter> userFilters;
+    private final FollowerEventPublisher followerEventPublisher;
 
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filter) {
         validateUserId(followeeId);
@@ -51,6 +54,7 @@ public class SubscriptionService {
     public void followUser(long followerId, long followeeId) {
         validate(followerId, followeeId);
         subscriptionRepository.followUser(followerId, followeeId);
+        followerEventPublisher.followerSubscribed(followerId, followeeId);
     }
 
     private void validate(long followerId, long followeeId) {

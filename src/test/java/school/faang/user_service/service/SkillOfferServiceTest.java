@@ -9,7 +9,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import school.faang.user_service.mapper.skill.EventSkillOfferedMapperImpl;
 import org.junit.jupiter.api.Test;
-import school.faang.user_service.dto.event.EventSkillOfferedDto;
+import school.faang.user_service.dto.skill.EventSkillOfferedDto;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;

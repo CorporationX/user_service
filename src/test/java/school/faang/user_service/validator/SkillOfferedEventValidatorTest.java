@@ -9,7 +9,7 @@ import org.mockito.quality.Strictness;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import org.junit.jupiter.api.Test;
-import school.faang.user_service.dto.event.EventSkillOfferedDto;
+import school.faang.user_service.dto.skill.EventSkillOfferedDto;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 

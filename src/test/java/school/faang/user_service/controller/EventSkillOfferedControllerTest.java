@@ -6,7 +6,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.service.SkillOfferService;
 import org.junit.jupiter.api.Test;
-import school.faang.user_service.dto.event.EventSkillOfferedDto;
+import school.faang.user_service.dto.skill.EventSkillOfferedDto;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import java.util.ArrayList;
 import java.util.List;

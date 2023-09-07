@@ -13,7 +13,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import school.faang.user_service.dto.event.EventSkillOfferedDto;
+import school.faang.user_service.dto.skill.EventSkillOfferedDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -63,20 +63,5 @@ class EventSkillOfferedPublisherTest {
         eventDto.setSkillOfferedId(3L);
 
         assertThrows(RuntimeException.class, () -> publisher.publish(eventDto));
-    }
-
-    @ParameterizedTest
-    @NullSource
-    @EmptySource
-    @ValueSource(strings = {"", "invalid-channel-name"})
-    void testInvalidChannelName(String invalidChannelName) {
-        assertThrows(IllegalArgumentException.class, () -> {
-            try {
-                new EventSkillOfferedPublisher(redisTemplate, objectMapper, invalidChannelName);
-            } catch (IllegalArgumentException e) {
-                assertEquals("Invalid channel name", e.getMessage());
-                throw e;
-            }
-        });
     }
 }

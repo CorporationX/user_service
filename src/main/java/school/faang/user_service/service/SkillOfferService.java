@@ -2,7 +2,7 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.event.EventSkillOfferedDto;
+import school.faang.user_service.dto.skill.EventSkillOfferedDto;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.skill.EventSkillOfferedMapper;

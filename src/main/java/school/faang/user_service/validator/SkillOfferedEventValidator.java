@@ -2,7 +2,7 @@ package school.faang.user_service.validator;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.event.EventSkillOfferedDto;
+import school.faang.user_service.dto.skill.EventSkillOfferedDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 

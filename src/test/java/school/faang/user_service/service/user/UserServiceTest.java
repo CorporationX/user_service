@@ -1,5 +1,10 @@
 package school.faang.user_service.service.user;
 
+import com.fasterxml.jackson.databind.MappingIterator;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import com.json.student.PersonSchemaForUser;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,8 +20,13 @@ import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.amazon.AvatarService;
+import school.faang.user_service.validator.user.UserValidator;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,7 +40,13 @@ class UserServiceTest {
     @Mock
     private UserRepository userRepository;
     @Mock
+    private UserValidator userValidator;
+    @Mock
     private AvatarService avatarService;
+    @Mock
+    private CsvMapper csvMapper;
+    @Mock
+    private CsvSchema csvSchema;
     @Mock
     private CountryService countryService;
     @InjectMocks
@@ -129,6 +145,85 @@ class UserServiceTest {
     }
 
     @Test
+    public void testCreateUserCSV_ThrowsException() {
+        ObjectReader testObject = Mockito.mock(ObjectReader.class);
+        InputStream inputStream = new ByteArrayInputStream("file".getBytes());
+
+        Mockito.when(csvMapper.readerFor(any(Class.class)))
+                .thenReturn(testObject);
+        Mockito.when(testObject.with(csvSchema))
+                .thenReturn(testObject);
+
+        assertThrows(Exception.class, () -> userService.createUserCSV(inputStream));
+    }
+
+    @Test
+    public void testMakeFutureList() throws IOException {
+        ObjectReader testObject = Mockito.mock(ObjectReader.class);
+        InputStream inputStream = new ByteArrayInputStream("file".getBytes());
+        MappingIterator<Object> iterator = Mockito.mock(MappingIterator.class);
+        UserDto userDto = UserDto.builder()
+                .country(CountryDto.builder().title("test").build())
+                .build();
+        User user = User.builder().build();
+
+        PersonSchemaForUser person = new PersonSchemaForUser();
+        List<Object> persons = List.of(person);
+
+        Mockito.when(csvMapper.readerFor(any(Class.class)))
+                .thenReturn(testObject);
+        Mockito.when(testObject.with(csvSchema))
+                .thenReturn(testObject);
+        Mockito.when(testObject.readValues(any(InputStream.class)))
+                .thenReturn(iterator);
+        Mockito.when(iterator.readAll())
+                .thenReturn(persons);
+
+        Mockito.when(userMapper.personToUserDto(person))
+                .thenReturn(userDto);
+        Mockito.when(userMapper.toEntity(userDto))
+                .thenReturn(user);
+        Mockito.when(userRepository.save(user))
+                .thenReturn(user);
+        Mockito.when(userMapper.toDto(any(User.class)))
+                .thenReturn(userDto);
+
+        userService.createUserCSV(inputStream);
+
+        assertTrue(userDto.getPassword() != null);
+        Mockito.verify(userMapper, Mockito.times(2))
+                .personToUserDto(person);
+        Mockito.verify(userValidator, Mockito.times(1))
+                .validateUserDto(userDto);
+    }
+
+    @Test
+    public void testParseCsv() throws IOException {
+        ObjectReader testObject = Mockito.mock(ObjectReader.class);
+        InputStream inputStream = new ByteArrayInputStream("file".getBytes());
+        MappingIterator<Object> iterator = Mockito.mock(MappingIterator.class);
+
+        Mockito.when(csvMapper.readerFor(any(Class.class)))
+                .thenReturn(testObject);
+        Mockito.when(testObject.with(csvSchema))
+                .thenReturn(testObject);
+        Mockito.when(testObject.readValues(any(InputStream.class)))
+                .thenReturn(iterator);
+        Mockito.when(iterator.readAll())
+                .thenReturn(new ArrayList<>());
+
+        userService.createUserCSV(inputStream);
+
+        Mockito.verify(csvMapper, Mockito.times(1))
+                .readerFor(PersonSchemaForUser.class);
+        Mockito.verify(testObject, Mockito.times(1))
+                .with(csvSchema);
+        Mockito.verify(testObject, Mockito.times(1))
+                .readValues(inputStream);
+        Mockito.verify(iterator, Mockito.times(1))
+                .readAll();
+    }
+    @Test
     public void testAddCreateData() {
         UserDto userDto = UserDto.builder()
                 .id(1L)
@@ -146,11 +241,11 @@ class UserServiceTest {
         userService.createUser(userDto);
 
         assertTrue(user.getCreatedAt().isBefore(LocalDateTime.now()));
-        assertTrue(user.getUserProfilePic().getName()!=null);
+        assertTrue(user.getUserProfilePic().getName() != null);
     }
 
     @Test
-    public void testCreateAvatar() {
+    public void testCreateDiceBearAvatar() {
         UserDto userDto = UserDto.builder()
                 .id(1L)
                 .country(CountryDto.builder().title("test").build())

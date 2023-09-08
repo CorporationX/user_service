@@ -16,7 +16,7 @@ public class AsyncConfig {
         executor.setCorePoolSize(5);
         executor.setMaxPoolSize(10);
         executor.setQueueCapacity(25);
-        executor.setThreadNamePrefix("AsyncThread-");
+        executor.setThreadNamePrefix("Thread - Avatar - ");
         executor.initialize();
         return executor;
     }

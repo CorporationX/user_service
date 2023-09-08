@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "username": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "minLength": 1
+    },
+    "phone": {
+      "type": "string",
+      "minLength": 9,
+      "maxLength": 15
+    },
+    "aboutMe": {
+      "type": "string",
+      "maxLength": 4096
+    },
+    "country": {
+      "type": "string",
+      "maxLength": 64
+    },
+    "city": {
+      "type": "string",
+      "maxLength": 64
+    },
+    "experience": {
+      "type": "integer"
+    }
+  },
+  "required": ["username", "email"]
+}

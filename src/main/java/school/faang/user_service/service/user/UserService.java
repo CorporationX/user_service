@@ -1,7 +1,13 @@
 package school.faang.user_service.service.user;
 
+import com.fasterxml.jackson.databind.MappingIterator;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import com.json.student.PersonSchemaForUser;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.CountryDto;
@@ -9,23 +15,33 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.FileException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.amazon.AvatarService;
+import school.faang.user_service.validator.user.UserValidator;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final AvatarService avatarService;
     private final CountryService countryService;
+    private final UserValidator userValidator;
+    private final CsvMapper csvMapper;
+    private final CsvSchema schema;
 
     @Value("${services.dice-bear.url}")
     private String URL;
@@ -38,8 +54,23 @@ public class UserService {
         User user = userMapper.toEntity(userDto);
         addCreateData(user);
 
-        user = userRepository.save(user);
+        synchronized (userRepository) {
+            user = userRepository.save(user);
+        }
+
         return userMapper.toDto(user);
+    }
+
+    public List<UserDto> createUserCSV(InputStream inputStream) {
+        List<PersonSchemaForUser> persons = null;
+        try {
+            persons = parseCsv(inputStream);
+        } catch (IOException e) {
+            throw new FileException("File exception " + e);
+        }
+
+        List<CompletableFuture<UserDto>> futures = makeFutureList(persons);
+        return completeFutureList(futures);
     }
 
     public User findUserById(long userId) {
@@ -62,6 +93,41 @@ public class UserService {
         return users.stream()
                 .map(userMapper::toDto)
                 .toList();
+    }
+
+    private List<PersonSchemaForUser> parseCsv(InputStream inputStream) throws IOException {
+        MappingIterator<PersonSchemaForUser> iterator = csvMapper.readerFor(PersonSchemaForUser.class)
+                .with(schema)
+                .readValues(inputStream);
+        return iterator.readAll();
+    }
+
+    private List<CompletableFuture<UserDto>> makeFutureList(List<PersonSchemaForUser> persons) {
+        return persons.stream()
+                .map(person -> CompletableFuture.supplyAsync(() -> {
+                    try {
+                        UserDto userDto = userMapper.personToUserDto(person);
+                        userDto.setPassword(ThreadLocalRandom.current().nextInt() + "");
+                        userValidator.validateUserDto(userDto);
+                        createUser(userDto);
+                        // SMS to user.getEmail with - "You password for CorporationX is:"+user.getPassword()
+                        return userDto;
+                    } catch (Exception e) {
+                        return UserDto.builder()
+                                .username(person.getUsername())
+                                .aboutMe("Didn't save " + e.getMessage())
+                                .build();
+                    }
+                }))
+                .toList();
+    }
+
+    private List<UserDto> completeFutureList(List<CompletableFuture<UserDto>> futures) {
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                .thenApply(dto -> futures.stream()
+                        .map(CompletableFuture::join)
+                        .collect(Collectors.toList()))
+                .join();
     }
 
     private void addCreateData(User user) {

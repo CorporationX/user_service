@@ -6,10 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import school.faang.user_service.exception.ErrorResponse;
-import school.faang.user_service.exception.GoalValidationException;
-import school.faang.user_service.exception.RequestValidationException;
-import school.faang.user_service.exception.UserAlreadyRegisteredException;
+import school.faang.user_service.exception.*;
 
 import java.time.LocalDateTime;
 
@@ -30,6 +27,11 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(GoalValidationException.class)
     public ResponseEntity<Object> handleGoalValidationException(GoalValidationException e, HttpServletRequest request) {
         return buildErrorResponse(e, request, HttpStatus.BAD_REQUEST, "Goal Validation Error");
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<Object> handleFileUploadException(FileUploadException e, HttpServletRequest request) {
+        return buildErrorResponse(e, request, HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
     private ResponseEntity<Object> buildErrorResponse(Exception e, HttpServletRequest rq, HttpStatus status, String error) {

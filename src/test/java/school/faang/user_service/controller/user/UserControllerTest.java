@@ -15,7 +15,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 
@@ -58,25 +58,27 @@ class UserControllerTest {
     }
 
     @Test
-    public void getUserByIdExistsTest() throws Exception {
+    void getUserByIdExistsTest() throws Exception {
         ResultActions result = mockMvc.perform(
                         get("/users/1"))
                 .andExpect(status().isOk());
 
+        System.out.println(result.andReturn().getResponse().getContentAsString());
+
         ObjectMapper mapper = new ObjectMapper();
-        User user = mapper.readValue(result.andReturn().getResponse().getContentAsString(), User.class);
+        UserDto user = mapper.readValue(result.andReturn().getResponse().getContentAsString(), UserDto.class);
         assertEquals(1, user.getId());
     }
 
     @Test
-    public void getUserByIdNotExistsTest() throws Exception {
+    void getUserByIdNotExistsTest() throws Exception {
         mockMvc.perform(
                         get("/users/32"))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    public void getUsersByIdsTest() throws Exception {
+    void getUsersByIdsTest() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         List<Long> ids = List.of(1L, 2L, 3L, 4L);
         String json = mapper.writeValueAsString(ids);
@@ -88,8 +90,8 @@ class UserControllerTest {
         ).andExpect(status().isOk());
 
 
-        List<User> users = mapper.readValue(result.andReturn().getResponse().getContentAsString(),
-                mapper.getTypeFactory().constructCollectionType(List.class, User.class));
+        List<UserDto> users = mapper.readValue(result.andReturn().getResponse().getContentAsString(),
+                mapper.getTypeFactory().constructCollectionType(List.class, UserDto.class));
 
         assertEquals(4, users.size());
     }

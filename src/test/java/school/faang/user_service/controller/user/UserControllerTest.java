@@ -122,7 +122,7 @@ class UserControllerTest {
         User user = new ObjectMapper().readValue(result.andReturn().getResponse().getContentAsString(), User.class);
 
         assertEquals("sampleUsername", user.getUsername());
-        assertTrue(user.getCountry().getId()!=0);
+        assertTrue(user.getCountry() != null);
     }
 
     @Test

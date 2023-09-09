@@ -27,6 +27,10 @@ public class UserService {
     private final UserRepository userRepository;
     private final MentorshipService mentorshipService;
     private final ProfilePictureService profilePictureService;
+    private final RedisTemplate<String, Object> redisTemplate;
+    @Value("${spring.data.redis.channels.user_ban_channel.name}")
+    private String userBanChannelName;
+    private final ProfileViewEventPublisher profileViewEventPublisher;
 
     public boolean isUserExist(Long userId) {
         return userRepository.existsById(userId);
@@ -35,6 +39,7 @@ public class UserService {
     public UserDto getUserById(Long userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new IllegalStateException("User not found with ID: " + userId));
+        profileViewEventPublisher.publishProfileViewEvent(userId);
         return userMapper.toDto(user);
     }
 

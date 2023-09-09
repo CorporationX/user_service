@@ -9,13 +9,19 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.MentorshipService;
+import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.goal.GoalService;
+import school.faang.user_service.service.redis.RedisMessagePublisher;
 
 import java.util.List;
+import java.util.Optional;
 
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -33,8 +39,15 @@ public class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
+
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private ProfileViewEventPublisher profileViewEventPublisher;
+
+    @Mock
+    private UserMapper userMapper;
 
     @Test
     @DisplayName("Test: User exists")
@@ -197,5 +210,16 @@ public class UserServiceTest {
     public void testCancelMentoring() {
         userService.deactivateUser(1L);
         Mockito.verify(mentorshipService, Mockito.times(1)).cancelMentoring(1L);
+    }
+
+    @Test
+    public void testPublishProfileViewEvent() {
+        Long id = 1L;
+        User user = User.builder()
+                .id(id)
+                .build();
+        when(userRepository.findById(id)).thenReturn(Optional.of(user));
+        userService.getUserById(id);
+        verify(profileViewEventPublisher).publishProfileViewEvent(id);
     }
 }

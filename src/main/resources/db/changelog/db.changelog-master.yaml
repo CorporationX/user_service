@@ -19,3 +19,8 @@ databaseChangeLog:
       file: db/changelog/changeset/user_V009__insert_user_rating.sql
   - include:
       file: db/changelog/changeset/user_V010__insert_google_credentials.sql
+  - include:
+      file: db/changelog/changeset/user_V011_alter_user_add_column_telegram_chat_id.sql
+  - include:
+      file: db/changelog/changeset/user_V012__update_user_add_banned_field.sql
+

@@ -74,7 +74,7 @@ public class UserService {
     @Value("${dicebear.url}")
     private String dicebearUrl;
 
-    public UserDto getUser(long id) throws JsonProcessingException {
+    public UserDto getUserWithPublishProfileViewEvent(long id) throws JsonProcessingException {
         User foundUser = userRepository.findById(id).orElseThrow(() -> {
             throw new UserNotFoundException("User with id " + id + " not found");
         });

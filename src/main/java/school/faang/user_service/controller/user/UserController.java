@@ -29,7 +29,7 @@ public class UserController {
 
     @GetMapping("/{userId}")
     UserDto getUser(@PathVariable long userId) throws JsonProcessingException {
-        return userService.getUser(userId);
+        return userService.getUserWithPublishProfileViewEvent(userId);
     }
 
     @GetMapping("/username/{userId}")

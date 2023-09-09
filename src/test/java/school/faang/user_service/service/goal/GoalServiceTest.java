@@ -13,12 +13,18 @@ import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.exception.GoalNotFoundException;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.filter.goal.GoalStatusFilter;
 import school.faang.user_service.filter.goal.dto.GoalFilterDto;
 import school.faang.user_service.mapper.GoalMapper;
+import school.faang.user_service.messaging.GoalCompletedEventPublisher;
+import school.faang.user_service.messaging.events.GoalCompletedEvent;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
@@ -26,8 +32,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -46,6 +50,9 @@ public class GoalServiceTest {
 
     @Mock
     private SkillRepository skillRepository;
+
+    @Mock
+    private GoalCompletedEventPublisher goalCompletedEventPublisher;
 
     @Spy
     private GoalMapper goalMapper = Mappers.getMapper(GoalMapper.class);
@@ -66,7 +73,8 @@ public class GoalServiceTest {
     void setUp(){
         GoalFilter goalFilter = new GoalStatusFilter();
         List<GoalFilter> goalFilters = List.of(goalFilter);
-        goalService = new GoalService(goalRepository, skillRepository, goalMapper, goalFilters);
+        goalService = new GoalService(goalRepository, skillRepository, goalMapper, goalFilters,
+                goalCompletedEventPublisher);
         userId = 1L;
         id = 1L;
         title = "title";
@@ -149,7 +157,7 @@ public class GoalServiceTest {
         GoalDto newGoalDto = new GoalDto(id, newTitle);
 
         when(goalRepository.findById(existingGoalId)).thenReturn(Optional.of(existingGoal));
-        when(goalRepository.save(Mockito.any(Goal.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(goalRepository.save(any(Goal.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         GoalDto result = goalService.updateGoal(newGoalDto, id);
 
@@ -160,7 +168,7 @@ public class GoalServiceTest {
     public void testUpdateGoal_GoalNotFound() {
         Mockito.lenient().when(goalRepository.findById(goalDto.getId())).thenReturn(Optional.empty());
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        GoalNotFoundException exception = assertThrows(GoalNotFoundException.class,
                 () -> goalService.updateGoal(goalDto, userId));
 
         assertEquals("Goal 1 not found", exception.getMessage());
@@ -184,7 +192,7 @@ public class GoalServiceTest {
 
         when(goalRepository.findById(nonExistingGoalId)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> goalService.deleteGoal(nonExistingGoalId));
+        assertThrows(GoalNotFoundException.class, () -> goalService.deleteGoal(nonExistingGoalId));
     }
 
     @Test
@@ -206,5 +214,24 @@ public class GoalServiceTest {
         List<GoalDto> result = goalService.findSubtasksByGoalId(goal3.getId(), filter);
 
         assertEquals(expected, result);
+    }
+
+    @Test
+    public void testCompleteGoal_Successful(){
+        when(goalRepository.findById(goal1.getId())).thenReturn(Optional.of(goal1));
+        GoalDto goalDto = goalService.completeGoal(goal1.getId());
+        verify(goalCompletedEventPublisher, times(1)).publish(any(GoalCompletedEvent.class));
+
+        assertTrue(goalDto.getStatus() == GoalStatus.COMPLETED);
+    }
+
+    @Test
+    public void testCompleteGoal_ThrowsException(){
+        when(goalRepository.findById(goal1.getId())).thenReturn(Optional.empty());
+
+        GoalNotFoundException exception = assertThrows(GoalNotFoundException.class,
+                () -> goalService.completeGoal(goal1.getId()));
+
+        assertEquals("Goal 1 not found", exception.getMessage());
     }
 }

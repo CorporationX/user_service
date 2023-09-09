@@ -35,4 +35,5 @@ public class UserController {
     public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);
     }
+
 }

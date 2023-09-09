@@ -3,7 +3,7 @@ package school.faang.user_service.mapper.skill;
 import org.mapstruct.*;
 import school.faang.user_service.dto.skill.SkillOfferDto;
 import school.faang.user_service.entity.recommendation.SkillOffer;
-
+import school.faang.user_service.entity.recommendation.Recommendation;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,10 +13,14 @@ public interface SkillOfferMapper {
 
     @Mapping(source = "skill", target = "skill.id")
     @Mapping(source = "recommendation", target = "recommendation.id")
+    @Mapping(source = "authorId",target = "recommendation.author.id")
+    @Mapping(source = "receiverId", target = "recommendation.receiver.id")
     SkillOffer toEntity(SkillOfferDto dto);
 
     @Mapping(source = "skill.id", target = "skill")
     @Mapping(source = "recommendation.id", target = "recommendation")
+    @Mapping(source = "recommendation.author.id", target = "authorId")
+    @Mapping(source = "recommendation.receiver.id", target = "receiverId")
     SkillOfferDto toDto(SkillOffer entity);
 
     @Named("toSkillOfferDtos")
@@ -27,5 +31,15 @@ public interface SkillOfferMapper {
         return skills.stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
+    }
+
+    @Named("mapAuthorId")
+    default Long mapAuthorId(Recommendation recommendation) {
+        return recommendation.getAuthor().getId();
+    }
+
+    @Named("mapReceiverId")
+    default Long mapReceiverId(Recommendation recommendation) {
+        return recommendation.getReceiver().getId();
     }
 }

@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
 
 @Data
 @AllArgsConstructor

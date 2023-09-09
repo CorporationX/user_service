@@ -1,7 +1,9 @@
 package school.faang.user_service.repository.event;
 
+import jakarta.persistence.QueryHint;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.event.Event;
 
@@ -24,6 +26,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             """)
     List<Event> findParticipatedEventsByUserId(long userId);
 
+    @QueryHints(@QueryHint(name = "org.hibernate.annotations.QueryHints.INDEX", value = "created_at_index"))
     @Query(nativeQuery = true, value = """
             SELECT e.* FROM event e
             WHERE e.created_at < :date

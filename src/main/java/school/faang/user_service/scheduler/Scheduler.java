@@ -15,7 +15,7 @@ public class Scheduler {
     @Value("${scheduler.partition_size}")
     private int partitionSize;
 
-    @Scheduled(cron = "${delete_past_events_every_sunday_at_3AM.cron}")
+    @Scheduled(cron = "${delete_past_events.cron}")
     public void clearEvents() {
         log.info("Clearing events");
         eventService.deletePastEvents(partitionSize);

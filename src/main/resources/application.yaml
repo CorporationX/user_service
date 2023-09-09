@@ -65,8 +65,8 @@ dicebear:
 
 springfox.documentation.swagger.v2.path: /api-docs
 
-delete_past_events_every_sunday_at_3AM:
-  cron: 0 3 * * 0
+delete_past_events:
+  cron: "0 0 0 7/7 * ?" # every seven days
 
 scheduler:
   partition_size: 10

@@ -35,16 +35,17 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.any;
+
 
 @ExtendWith(MockitoExtension.class)
 class EventServiceTest {
@@ -365,16 +366,16 @@ class EventServiceTest {
 
     @Test
     void testDeletePastEvents() {
-        LocalDateTime now = LocalDateTime.now();
         List<Event> pastEvents = new ArrayList<>();
-        pastEvents.add(Event.builder().description("Event 1").endDate(now.minusDays(1)).build());
-        pastEvents.add(Event.builder().description("Event 2").endDate(now.minusDays(2)).build());
+        pastEvents.add(Event.builder().description("Event 1").endDate(LocalDateTime.now().withNano(0)).build());
+        pastEvents.add(Event.builder().description("Event 2").endDate(LocalDateTime.now().withNano(0)).build());
 
-        when(eventRepository.findAll()).thenReturn(pastEvents);
+        LocalDateTime date = LocalDateTime.now().withNano(0);
+        when(eventRepository.findAllByCreatedAtBefore(date)).thenReturn(pastEvents);
 
         eventService.deletePastEvents(10);
 
-        verify(eventRepository).findAll();
+        verify(eventRepository).findAllByCreatedAtBefore(date);
         verify(eventAsyncService).clearEventsPartition(pastEvents);
     }
 

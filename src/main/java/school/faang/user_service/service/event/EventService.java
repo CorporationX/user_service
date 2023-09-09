@@ -139,7 +139,7 @@ public class EventService {
 
     @Transactional
     public void deletePastEvents(int partitionSize) {
-        List<Event> eventsToDelete = eventRepository.findAllByCreatedAtBefore(LocalDateTime.now());
+        List<Event> eventsToDelete = eventRepository.findAllByCreatedAtBefore(LocalDateTime.now().withNano(0));
 
         if (eventsToDelete.size() > partitionSize) {
             List<List<Event>> partitions = ListUtils.partition(eventsToDelete, partitionSize);

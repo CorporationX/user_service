@@ -3,6 +3,7 @@ package school.faang.user_service.service.mentorship;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.mentorship.MentorshipRequestEvent;
 import school.faang.user_service.dto.mentorship.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
@@ -11,11 +12,13 @@ import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipRequestedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.filter.mentorship_request.MentorshipRequestFilter;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -28,6 +31,7 @@ public class MentorshipRequestService {
     private final MentorshipRequestValidator mentorshipRequestValidator;
     private final UserService userService;
     private final List<MentorshipRequestFilter> mentorshipRequestFilters;
+    private final MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
 
     @Transactional
     public void requestMentorship(MentorshipRequestDto dto) {
@@ -37,6 +41,8 @@ public class MentorshipRequestService {
         mentorshipRequestValidator.requestValidate(requester, receiver);
         MentorshipRequest mentorshipRequest = mentorshipRequestMapper.toEntity(dto);
         mentorshipRequestRepository.save(mentorshipRequest);
+        mentorshipRequestedEventPublisher.publish(
+                new MentorshipRequestEvent(dto.getRequesterId(), dto.getReceiverId(), LocalDateTime.now()));
     }
 
     @Transactional

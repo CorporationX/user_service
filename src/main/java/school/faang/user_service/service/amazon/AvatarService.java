@@ -9,11 +9,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.UserProfilePic;
-import school.faang.user_service.exception.DiceBearConnect;
+import school.faang.user_service.exception.DiceBearApiException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -24,14 +25,14 @@ public class AvatarService {
     @Value("${services.s3.bucket-name-for-avatars}")
     private String bucketName;
 
-    @Async("avatar")
+    @Async("avatarImageThreadPoolExecutor")
     public void saveToAmazonS3(UserProfilePic userProfilePic) {
         byte[] imageData = new byte[0];
 
         try {
             imageData = convertUrlToByte(userProfilePic.getFileId());
         } catch (IOException e) {
-            throw new DiceBearConnect("Can't get image: " + e.getMessage());
+            throw new DiceBearApiException("Can't get image: " + e.getMessage());
         }
         uploadFile(userProfilePic.getFileId(), imageData);
     }
@@ -47,7 +48,7 @@ public class AvatarService {
 
             clientAmazonS3.putObject(request);
         } catch (AmazonServiceException e) {
-            new DiceBearConnect("Can't upload file: " + e.getMessage());
+           throw new DiceBearApiException("Can't upload file: " + e.getMessage());
         }
     }
 
@@ -67,14 +68,6 @@ public class AvatarService {
     private byte[] convertUrlToByte(String imageUrl) throws IOException {
         URL url = new URL(imageUrl);
         URLConnection connection = url.openConnection();
-        try (InputStream inputStream = connection.getInputStream()) {
-            int contentLength = connection.getContentLength();
-            byte[] buffer = new byte[contentLength];
-            int bytesRead = inputStream.read(buffer);
-            if (bytesRead != contentLength) {
-                throw new IOException("Failed to read full content from URL");
-            }
-            return buffer;
-        }
+        return new byte[connection.getContentLength()];
     }
 }

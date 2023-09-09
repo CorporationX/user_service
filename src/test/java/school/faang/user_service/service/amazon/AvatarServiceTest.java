@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.UserProfilePic;
-import school.faang.user_service.exception.DiceBearConnect;
+import school.faang.user_service.exception.DiceBearApiException;
 
 import java.io.IOException;
 
@@ -22,7 +22,7 @@ class AvatarServiceTest {
         UserProfilePic userProfilePic = UserProfilePic.builder()
                 .fileId("fileId")
                 .build();
-        assertThrows(DiceBearConnect.class,
+        assertThrows(DiceBearApiException.class,
                 () -> avatarService.saveToAmazonS3(userProfilePic));
     }
 

@@ -1,5 +1,6 @@
 package school.faang.user_service.config.threads;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -10,7 +11,8 @@ import java.util.concurrent.Executor;
 @Configuration
 @EnableAsync(proxyTargetClass = true)
 public class AsyncConfig {
-    @Bean(name = "avatar")
+
+    @Bean(name = "avatarImageThreadPoolExecutor")
     public Executor asyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(5);

@@ -26,10 +26,9 @@ public class S3Config {
     public AmazonS3 amazons3() {
         AWSCredentials awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
 
-        AmazonS3 clientAmazonS3 = AmazonS3ClientBuilder.standard()
+        return AmazonS3ClientBuilder.standard()
                 .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint, null))
                 .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
                 .build();
-        return clientAmazonS3;
     }
 }

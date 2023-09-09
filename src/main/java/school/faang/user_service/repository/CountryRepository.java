@@ -10,6 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface CountryRepository extends CrudRepository<Country, Long> {
-    @Query("SELECT c.id FROM Country c WHERE c.title = :title")
-    Optional<Long> findIdByTitle(@Param("title") String title);
+    @Query("SELECT c FROM Country c WHERE c.title = :title")
+    Optional<Country> findCountryByTitle(@Param("title") String title);
 }

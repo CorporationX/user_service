@@ -58,90 +58,38 @@ class UserServiceTest {
 
     @Test
     public void testCreateUser() {
+        CountryDto countryDto = CountryDto.builder()
+                .id(1L)
+                .title("Test")
+                .build();
         UserDto userDto = UserDto.builder()
                 .id(1L)
-                .country(CountryDto.builder().title("test").build())
+                .country(countryDto)
                 .username("test")
                 .build();
-
         User user = User.builder()
                 .id(1L)
                 .username("test")
                 .build();
 
+
         Mockito.when(userMapper.toEntity(userDto))
                 .thenReturn(user);
         Mockito.when(userRepository.save(user))
                 .thenReturn(user);
-        Mockito.when(countryService.getIdByTitle(userDto.getCountry().getTitle()))
-                .thenReturn(Optional.of(1L));
+        Mockito.when(countryService.findCountryByTitle(userDto.getCountry().getTitle()))
+                        .thenReturn(countryDto);
 
         userService.createUser(userDto);
 
+        Mockito.verify(countryService, Mockito.times(1))
+                        .findCountryByTitle(userDto.getCountry().getTitle());
         Mockito.verify(userMapper, Mockito.times(2))
                 .toEntity(userDto);
         Mockito.verify(userRepository, Mockito.times(1))
                 .save(user);
         Mockito.verify(userMapper, Mockito.times(1))
                 .toDto(user);
-    }
-
-    @Test
-    public void testGetCountryId_Exist() {
-        UserDto userDto = UserDto.builder()
-                .id(1L)
-                .country(CountryDto.builder().title("test").build())
-                .username("test")
-                .build();
-
-        User user = User.builder()
-                .id(1L)
-                .username("test")
-                .build();
-
-        Mockito.when(userMapper.toEntity(userDto))
-                .thenReturn(user);
-        Mockito.when(userRepository.save(user))
-                .thenReturn(user);
-        Mockito.when(countryService.getIdByTitle(userDto.getCountry().getTitle()))
-                .thenReturn(Optional.of(1L));
-
-        userService.createUser(userDto);
-
-        Mockito.verify(countryService, Mockito.times(1))
-                .getIdByTitle(userDto.getCountry().getTitle());
-        Mockito.verify(countryService, Mockito.times(0))
-                .create(userDto.getCountry());
-    }
-
-    @Test
-    public void testGetCountryId_DoesNotExist() {
-        UserDto userDto = UserDto.builder()
-                .id(1L)
-                .country(CountryDto.builder().title("test").build())
-                .username("test")
-                .build();
-
-        User user = User.builder()
-                .id(1L)
-                .username("test")
-                .build();
-
-        Mockito.when(userMapper.toEntity(userDto))
-                .thenReturn(user);
-        Mockito.when(userRepository.save(user))
-                .thenReturn(user);
-        Mockito.when(countryService.getIdByTitle(userDto.getCountry().getTitle()))
-                .thenReturn(Optional.empty());
-        Mockito.when(countryService.create(userDto.getCountry()))
-                .thenReturn(userDto.getCountry());
-
-        userService.createUser(userDto);
-
-        Mockito.verify(countryService, Mockito.times(1))
-                .getIdByTitle(userDto.getCountry().getTitle());
-        Mockito.verify(countryService, Mockito.times(1))
-                .create(userDto.getCountry());
     }
 
     @Test
@@ -179,6 +127,7 @@ class UserServiceTest {
         Mockito.when(iterator.readAll())
                 .thenReturn(persons);
 
+
         Mockito.when(userMapper.personToUserDto(person))
                 .thenReturn(userDto);
         Mockito.when(userMapper.toEntity(userDto))
@@ -187,6 +136,7 @@ class UserServiceTest {
                 .thenReturn(user);
         Mockito.when(userMapper.toDto(any(User.class)))
                 .thenReturn(userDto);
+
 
         userService.createUserCSV(inputStream);
 
@@ -223,11 +173,16 @@ class UserServiceTest {
         Mockito.verify(iterator, Mockito.times(1))
                 .readAll();
     }
+
     @Test
     public void testAddCreateData() {
+        CountryDto countryDto = CountryDto.builder()
+                .id(1L)
+                .title("Test")
+                .build();
         UserDto userDto = UserDto.builder()
                 .id(1L)
-                .country(CountryDto.builder().title("test").build())
+                .country(countryDto)
                 .username("test")
                 .build();
         User user = new User();
@@ -235,8 +190,8 @@ class UserServiceTest {
                 .thenReturn(user);
         Mockito.when(userRepository.save(user))
                 .thenReturn(user);
-        Mockito.when(countryService.getIdByTitle(userDto.getCountry().getTitle()))
-                        .thenReturn(Optional.of(1L));
+        Mockito.when(countryService.findCountryByTitle(userDto.getCountry().getTitle()))
+                .thenReturn(countryDto);
 
         userService.createUser(userDto);
 
@@ -246,12 +201,15 @@ class UserServiceTest {
 
     @Test
     public void testCreateDiceBearAvatar() {
+        CountryDto countryDto = CountryDto.builder()
+                .id(1L)
+                .title("Test")
+                .build();
         UserDto userDto = UserDto.builder()
                 .id(1L)
-                .country(CountryDto.builder().title("test").build())
+                .country(countryDto)
                 .username("test")
                 .build();
-
         User user = User.builder()
                 .id(1L)
                 .username("test")
@@ -261,8 +219,8 @@ class UserServiceTest {
                 .thenReturn(user);
         Mockito.when(userRepository.save(user))
                 .thenReturn(user);
-        Mockito.when(countryService.getIdByTitle(userDto.getCountry().getTitle()))
-                .thenReturn(Optional.of(1L));
+        Mockito.when(countryService.findCountryByTitle(userDto.getCountry().getTitle()))
+                .thenReturn(countryDto);
 
         userService.createUser(userDto);
 

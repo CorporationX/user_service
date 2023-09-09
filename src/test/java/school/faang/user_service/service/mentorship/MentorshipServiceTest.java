@@ -32,7 +32,7 @@ class MentorshipServiceTest {
 
     private long mentorId;
     private long menteeId;
-    private long wrongUserId=3L;
+    private long wrongUserId = 3L;
 
     @BeforeEach
     void setUp() {
@@ -62,7 +62,11 @@ class MentorshipServiceTest {
         mentor.setMentees(new ArrayList<>());
 
         mentor.setMentees(List.of(new User()));
-        List<UserDto> userDtoList = List.of(new UserDto(0L, "any", "any"));
+        List<UserDto> userDtoList = List.of(UserDto.builder()
+                .id(0L)
+                .username("any")
+                .email("any")
+                .build());
 
         Mockito.when(mentorshipRepository.findById(mentorId))
                 .thenReturn(Optional.of(mentor));
@@ -85,7 +89,11 @@ class MentorshipServiceTest {
     void getMentors() {
         mentee.setMentors(new ArrayList<>());
         mentee.setMentors(List.of(new User(), new User()));
-        List<UserDto> userDtoList = List.of(new UserDto(0L, "any", "any"));
+        List<UserDto> userDtoList = List.of(UserDto.builder()
+                .id(0L)
+                .username("any")
+                .email("any")
+                .build());
 
         Mockito.when(mentorshipRepository.findById(menteeId))
                 .thenReturn(Optional.of(mentee));

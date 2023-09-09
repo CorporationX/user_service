@@ -10,7 +10,6 @@ import school.faang.user_service.service.user.UserService;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController

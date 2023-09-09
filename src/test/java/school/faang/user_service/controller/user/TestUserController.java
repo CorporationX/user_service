@@ -45,7 +45,7 @@ public class TestUserController {
                 .username("test")
                 .email("test@test.com")
                 .password("test")
-                .country(CountryDto.builder().id(1L).title("test").build())
+                .country(CountryDto.builder().title("test").build())
                 .build();
     }
 

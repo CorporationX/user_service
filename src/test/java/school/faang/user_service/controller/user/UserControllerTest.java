@@ -75,17 +75,17 @@ class UserControllerTest {
                    "password": "samplePassword",
                    "aboutMe": "About me text goes here.",
                    "country": {
-                    "title": "France"
-                  },
+                       "title": "France"
+                       },
                    "city": "Sample City",
                    "experience": 5
                 }
                 """;
 
         ResultActions result = mockMvc.perform(
-                post("/users/create")
-                        .contentType("application/json")
-                        .content(json))
+                        post("/users/create")
+                                .contentType("application/json")
+                                .content(json))
                 .andExpect(status().isOk());
 
         User user = new ObjectMapper().readValue(result.andReturn().getResponse().getContentAsString(), User.class);
@@ -106,8 +106,8 @@ class UserControllerTest {
                    "password": "samplePassword",
                    "aboutMe": "About me text goes here.",
                    "country": {
-                    "title": "NewCountry"
-                  },
+                       "title": "France"
+                   },
                    "city": "Sample City",
                    "experience": 5
                 }

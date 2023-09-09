@@ -9,6 +9,7 @@ import school.faang.user_service.entity.Country;
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.FIELD,
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface CountryMapper {
-    Country toEntity(CountryDto countryDto);
-    CountryDto toDto(Country country);
+    Country toCountry(CountryDto countryDto);
+
+    CountryDto toCountryDto(Country country);
 }

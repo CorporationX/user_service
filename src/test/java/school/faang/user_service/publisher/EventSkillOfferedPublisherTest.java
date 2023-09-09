@@ -4,17 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EmptySource;
-import org.junit.jupiter.params.provider.NullSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import school.faang.user_service.dto.skill.EventSkillOfferedDto;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import school.faang.user_service.dto.skill.SkillOfferDto;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -37,30 +31,31 @@ class EventSkillOfferedPublisherTest {
 
     @Test
     void testPublishSuccessful() throws JsonProcessingException {
-        EventSkillOfferedDto eventDto = new EventSkillOfferedDto();
-        eventDto.setAuthorId(1L);
-        eventDto.setReceiverId(2L);
-        eventDto.setSkillOfferedId(3L);
+        SkillOfferDto eventDto = SkillOfferDto.builder()
+                .id(1L)
+                .authorId(10L)
+                .receiverId(20L)
+                .skill(30L)
+                .build();
 
-        String expectedJson = "JSON representation of the object";
-
-        when(objectMapper.writeValueAsString(eventDto)).thenReturn(expectedJson);
+        when(objectMapper.writeValueAsString(eventDto)).thenReturn("JSON_STRING");
 
         publisher.publish(eventDto);
 
         verify(objectMapper, times(1)).writeValueAsString(eventDto);
-        verify(redisTemplate, times(1)).convertAndSend(channel, expectedJson);
+        verify(redisTemplate, times(1)).convertAndSend(channel, "JSON_STRING");
     }
 
     @Test
-    void testJsonSerializationError() throws JsonProcessingException {
-        Mockito.when(objectMapper.writeValueAsString(Mockito.any())).thenThrow(JsonProcessingException.class);
+    void testPublishJsonProcessingException() throws JsonProcessingException {
+        SkillOfferDto eventDto = SkillOfferDto.builder()
+                .id(1L)
+                .authorId(10L)
+                .receiverId(20L)
+                .skill(30L)
+                .build();
 
-        EventSkillOfferedDto eventDto = new EventSkillOfferedDto();
-        eventDto.setId(1L);
-        eventDto.setAuthorId(1L);
-        eventDto.setReceiverId(2L);
-        eventDto.setSkillOfferedId(3L);
+        when(objectMapper.writeValueAsString(eventDto)).thenThrow(JsonProcessingException.class);
 
         assertThrows(RuntimeException.class, () -> publisher.publish(eventDto));
     }

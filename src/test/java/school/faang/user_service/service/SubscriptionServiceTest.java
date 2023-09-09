@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.FollowerEventDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
@@ -70,6 +71,11 @@ class SubscriptionServiceTest {
         subscriptionService.followUser(22, 23);
         verify(subscriptionRepository, times(1)).followUser(Mockito.anyLong(),
                 Mockito.anyLong());
+        Mockito.verify(followerEventPublisher, times(1)).publish(FollowerEventDto
+                .builder()
+                .followerId(22L)
+                .foloweeId(23L)
+                .build());
     }
 
     @Test
@@ -88,14 +94,14 @@ class SubscriptionServiceTest {
     }
 
     @Test
-    void testGetFollowersCount(){
+    void testGetFollowersCount() {
         when(subscriptionRepository.existsById(1122L)).thenReturn(true);
         subscriptionService.getFollowersCount(1122);
         verify(subscriptionRepository, times(1)).findFollowersAmountByFolloweeId(Mockito.anyLong());
     }
 
     @Test
-    void testGetFolloweesCount(){
+    void testGetFolloweesCount() {
         when(subscriptionRepository.existsById(2211L)).thenReturn(true);
         subscriptionService.getFolloweesCount(2211);
         verify(subscriptionRepository, times(1)).findFolloweesAmountByFollowerId(Mockito.anyLong());

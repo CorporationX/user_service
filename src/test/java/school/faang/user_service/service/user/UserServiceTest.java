@@ -15,8 +15,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Value;
 import school.faang.user_service.dto.CountryDto;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.mapper.CountryMapper;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.amazon.AvatarService;
@@ -49,6 +51,8 @@ class UserServiceTest {
     private CsvSchema csvSchema;
     @Mock
     private CountryService countryService;
+    @Mock
+    private CountryMapper countryMapper;
     @InjectMocks
     private UserService userService;
     @Value("${services.dice-bear.url}")
@@ -62,6 +66,10 @@ class UserServiceTest {
                 .id(1L)
                 .title("Test")
                 .build();
+        Country country = Country.builder()
+                .id(1L)
+                .title("Test")
+                .build();
         UserDto userDto = UserDto.builder()
                 .id(1L)
                 .country(countryDto)
@@ -70,18 +78,22 @@ class UserServiceTest {
         User user = User.builder()
                 .id(1L)
                 .username("test")
+                .country(country)
                 .build();
-
 
         Mockito.when(userMapper.toEntity(userDto))
                 .thenReturn(user);
+        Mockito.when(countryService.findCountryByTitle(userDto.getCountry().getTitle()))
+                .thenReturn(countryDto);
+        Mockito.when(countryMapper.toCountry(countryDto))
+                        .thenReturn(country);
         Mockito.when(userRepository.save(user))
                 .thenReturn(user);
-        Mockito.when(countryService.findCountryByTitle(userDto.getCountry().getTitle()))
-                        .thenReturn(countryDto);
 
         userService.createUser(userDto);
 
+        Mockito.verify(countryMapper, Mockito.times(1))
+                        .toCountry(countryDto);
         Mockito.verify(countryService, Mockito.times(1))
                         .findCountryByTitle(userDto.getCountry().getTitle());
         Mockito.verify(userMapper, Mockito.times(2))
@@ -127,16 +139,10 @@ class UserServiceTest {
         Mockito.when(iterator.readAll())
                 .thenReturn(persons);
 
-
         Mockito.when(userMapper.personToUserDto(person))
                 .thenReturn(userDto);
         Mockito.when(userMapper.toEntity(userDto))
                 .thenReturn(user);
-        Mockito.when(userRepository.save(user))
-                .thenReturn(user);
-        Mockito.when(userMapper.toDto(any(User.class)))
-                .thenReturn(userDto);
-
 
         userService.createUserCSV(inputStream);
 
@@ -180,18 +186,29 @@ class UserServiceTest {
                 .id(1L)
                 .title("Test")
                 .build();
+        Country country = Country.builder()
+                .id(1L)
+                .title("Test")
+                .build();
         UserDto userDto = UserDto.builder()
                 .id(1L)
                 .country(countryDto)
                 .username("test")
                 .build();
-        User user = new User();
+        User user = User.builder()
+                .id(1L)
+                .username("test")
+                .country(country)
+                .build();
+
         Mockito.when(userMapper.toEntity(userDto))
-                .thenReturn(user);
-        Mockito.when(userRepository.save(user))
                 .thenReturn(user);
         Mockito.when(countryService.findCountryByTitle(userDto.getCountry().getTitle()))
                 .thenReturn(countryDto);
+        Mockito.when(countryMapper.toCountry(countryDto))
+                .thenReturn(country);
+        Mockito.when(userRepository.save(user))
+                .thenReturn(user);
 
         userService.createUser(userDto);
 
@@ -205,6 +222,10 @@ class UserServiceTest {
                 .id(1L)
                 .title("Test")
                 .build();
+        Country country = Country.builder()
+                .id(1L)
+                .title("Test")
+                .build();
         UserDto userDto = UserDto.builder()
                 .id(1L)
                 .country(countryDto)
@@ -213,14 +234,17 @@ class UserServiceTest {
         User user = User.builder()
                 .id(1L)
                 .username("test")
+                .country(country)
                 .build();
 
         Mockito.when(userMapper.toEntity(userDto))
                 .thenReturn(user);
-        Mockito.when(userRepository.save(user))
-                .thenReturn(user);
         Mockito.when(countryService.findCountryByTitle(userDto.getCountry().getTitle()))
                 .thenReturn(countryDto);
+        Mockito.when(countryMapper.toCountry(countryDto))
+                .thenReturn(country);
+        Mockito.when(userRepository.save(user))
+                .thenReturn(user);
 
         userService.createUser(userDto);
 

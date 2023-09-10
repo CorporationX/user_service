@@ -14,6 +14,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.FileException;
+import school.faang.user_service.mapper.CountryMapper;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.amazon.AvatarService;
@@ -39,6 +40,7 @@ public class UserService {
     private final CsvMapper csvMapper;
     private final CsvSchema schema;
     private final CountryService countryService;
+    private final CountryMapper countryMapper;
 
     @Value("${services.dice-bear.url}")
     private String URL;
@@ -47,7 +49,6 @@ public class UserService {
 
     @Transactional
     public UserDto createUser(UserDto userDto) {
-        userDto.setCountry(countryService.findCountryByTitle(userDto.getCountry().getTitle()));
         User user = userMapper.toEntity(userDto);
         addCreateData(user);
 
@@ -128,6 +129,7 @@ public class UserService {
     }
 
     private void addCreateData(User user) {
+        user.setCountry(countryMapper.toCountry(countryService.findCountryByTitle(user.getCountry().getTitle())));
         user.setCreatedAt(LocalDateTime.now());
         UserProfilePic userProfilePic = UserProfilePic.builder()
                 .name(user.getUsername() + ThreadLocalRandom.current().nextInt())

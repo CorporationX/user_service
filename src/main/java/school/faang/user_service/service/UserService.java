@@ -15,7 +15,6 @@ import school.faang.user_service.dto.contact.TgContactDto;
 import school.faang.user_service.dto.redis.ProfileViewEventDto;
 import school.faang.user_service.dto.subscription.UserDto;
 import school.faang.user_service.dto.subscription.UserFilterDto;
-import school.faang.user_service.dto.user.UserNameDto;
 import school.faang.user_service.dto.user.person_dto.UserPersonDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
@@ -84,12 +83,12 @@ public class UserService {
         return userMapper.toUserDto(foundUser);
     }
 
-    public UserNameDto getUserName(long id) {
+    public UserDto getUser(long id) {
         User foundUser = userRepository.findById(id).orElseThrow(() -> {
             throw new UserNotFoundException("User with id " + id + " not found");
         });
         log.info("Return user with id: {}", foundUser.getId());
-        return userMapper.toUserNameDto(foundUser);
+        return userMapper.toUserDto(foundUser);
     }
 
     public List<UserDto> getUsersByIds(List<Long> usersIds) {

@@ -10,7 +10,6 @@ import school.faang.user_service.dto.contact.TgContactDto;
 import school.faang.user_service.dto.subscription.UserDto;
 import school.faang.user_service.dto.subscription.UserFilterDto;
 import school.faang.user_service.service.UserService;
-import school.faang.user_service.service.event.PreferenceService;
 
 import java.io.IOException;
 import java.util.List;
@@ -20,7 +19,6 @@ import java.util.List;
 @RequestMapping("api/v1/users")
 public class UserController {
     private final UserService userService;
-    private final PreferenceService preferenceService;
 
     @PostMapping
     public UserDto signup(@RequestBody UserDto userDto) {
@@ -73,10 +71,5 @@ public class UserController {
     @GetMapping("/get-by-phone")
     public Long findUserIdByPhoneNumber(@RequestParam(name = "phone") String phoneNumber) {
         return userService.findUserIdByPhoneNumber(phoneNumber);
-    }
-
-    @GetMapping("/preference{id}")
-    public List<Long> getPreference(@PathVariable long id) {
-        return preferenceService.getPreference(id);
     }
 }

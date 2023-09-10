@@ -22,9 +22,6 @@ public class RedisConfig {
     @Value("${spring.data.redis.channels.skill_offer_channel}")
     private String skillOfferChannelName;
 
-    @Value("${spring.data.redis.channels.recommendation_channel.name}")
-    private String recommendationChannelName;
-
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);

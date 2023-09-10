@@ -26,7 +26,6 @@ spring:
         profile_view_channel: profile-view-channel
         recommendation_channel: recommendation-channel
         skill_offer_channel: skill-offer-channel
-        recommendation_channel: recommendation-channel
 
   google:
     calendar:

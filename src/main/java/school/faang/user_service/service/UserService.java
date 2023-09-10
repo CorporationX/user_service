@@ -244,4 +244,9 @@ public class UserService {
         return userRepository.findUserByPhone(phoneNumber)
                 .orElseThrow(() -> new UserNotFoundException("No user found by this phone: " + phoneNumber)).getId();
     }
+
+    @Transactional(readOnly = true)
+    public Boolean checkUserExist(long id) {
+        return userRepository.existsById(id);
+    }
 }

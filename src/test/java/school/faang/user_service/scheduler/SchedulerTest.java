@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.service.event.EventService;
 
@@ -19,7 +20,8 @@ class SchedulerTest {
 
     @BeforeEach
     public void init() {
-        scheduler = new Scheduler(eventService, 10);
+        scheduler = new Scheduler(eventService);
+        ReflectionTestUtils.setField(scheduler, "batchSize", 10);
     }
 
     @Test

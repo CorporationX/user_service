@@ -2,6 +2,7 @@ package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
@@ -85,6 +86,7 @@ public class EventService {
         return eventRepository.findAllEventsToDelete(LocalDateTime.now().withNano(0));
     }
 
+    @Transactional
     public void deleteEvents(List<Event> subList) {
         eventRepository.deleteAll(subList);
     }

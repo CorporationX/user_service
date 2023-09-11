@@ -8,7 +8,9 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import school.faang.user_service.listener.AuthorBannerListener;
 
 @Configuration
 public class RedisConfig {
@@ -21,6 +23,8 @@ public class RedisConfig {
     private String recommendationChannelName;
     @Value("${spring.data.redis.channels.skill_offer_channel}")
     private String skillOfferChannelName;
+    @Value("${spring.data.redis.channels.user_ban}")
+    private String userBanChannel;
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
@@ -35,6 +39,14 @@ public class RedisConfig {
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new StringRedisSerializer());
         return redisTemplate;
+    }
+
+    @Bean
+    public RedisMessageListenerContainer redisContainer(AuthorBannerListener authorBannerListener) {
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(redisConnectionFactory());
+        container.addMessageListener(authorBannerListener, new ChannelTopic(userBanChannel));
+        return container;
     }
 
     @Bean

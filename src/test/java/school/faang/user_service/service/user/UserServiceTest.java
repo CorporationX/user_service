@@ -53,4 +53,18 @@ class UserServiceTest {
         List<UserDto> users = userService.getUsersByIds(List.of(1L, 2L));
         assertEquals(2, users.size());
     }
+
+    @Test
+    void testBanAuthors() {
+        User user1 = User.builder().id(1L).banned(false).build();
+        User user2 = User.builder().id(2L).banned(false).build();
+        User user3 = User.builder().id(3L).banned(false).build();
+        Mockito.when(userRepository.findAllById(List.of(1L, 2L, 3L))).thenReturn(List.of(user1, user2, user3));
+
+        userService.banAuthors(List.of(1L, 2L, 3L));
+
+        assertTrue(user1.isBanned());
+        assertTrue(user2.isBanned());
+        assertTrue(user3.isBanned());
+    }
 }

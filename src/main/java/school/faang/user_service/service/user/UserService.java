@@ -1,8 +1,8 @@
 package school.faang.user_service.service.user;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
@@ -15,7 +15,6 @@ import java.util.stream.StreamSupport;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    @Autowired
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
@@ -43,5 +42,11 @@ public class UserService {
         return users.stream()
                 .map(userMapper::toDto)
                 .toList();
+    }
+
+    @Transactional
+    public void banAuthors(List<Long> bannerId) {
+        userRepository.findAllById(bannerId)
+                .forEach(user -> user.setBanned(true));
     }
 }

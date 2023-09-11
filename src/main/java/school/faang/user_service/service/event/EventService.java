@@ -11,6 +11,7 @@ import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.validator.EventValidator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -78,5 +79,13 @@ public class EventService {
     private Event getEventById(Long id) {
         return eventRepository.findById(id)
                 .orElseThrow(() -> new DataValidationException("Event not found"));
+    }
+
+    public List<Event> getEventsToDelete() {
+        return eventRepository.findAllEventsToDelete(LocalDateTime.now().withNano(0));
+    }
+
+    public void deleteEvents(List<Event> subList) {
+        eventRepository.deleteAll(subList);
     }
 }

@@ -40,6 +40,9 @@ spring:
           name: started_events_channel
         goal_channel:
           name: goal_channel
+        mentorship_channel:
+          name: mentorship_channel
+
 
 server:
   port: 8080

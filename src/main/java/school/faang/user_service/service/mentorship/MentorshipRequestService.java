@@ -10,6 +10,7 @@ import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.dto.filter.RequestFilterDto;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipStartEventPublisher;
 import school.faang.user_service.service.filter.MentorshipFilter;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.validation.mentorship.MentorshipRequestValidator;
@@ -26,6 +27,7 @@ public class MentorshipRequestService {
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final MentorshipRequestValidator mentorshipRequestValidator;
     private final MentorshipRequestRepository mentorshipRequestRepository;
+    private final MentorshipStartEventPublisher mentorshipStartEventPublisher;
 
     @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
@@ -56,6 +58,7 @@ public class MentorshipRequestService {
         if (!requester.getMentors().contains(receiver)) {
             requester.getMentors().add(receiver);
             request.setStatus(RequestStatus.ACCEPTED);
+            mentorshipStartEventPublisher.publishMentorshipEvent(receiver.getId(), requester.getId());
             return mentorshipRequestMapper.toDto(request);
         }
         throw new IllegalArgumentException("Invalid request. Mentorship request is already accepted");

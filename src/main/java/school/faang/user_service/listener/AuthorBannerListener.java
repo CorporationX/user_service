@@ -25,7 +25,7 @@ public class AuthorBannerListener extends AbstractListener<Long> {
     @Override
     public void onMessage(Message message, byte[] pattern) {
         log.info("Received message in AuthorBannerListener");
-        List<Long> bannerId = deserializeListJson(message, new TypeReference<>() {});
-        userService.banAuthors(bannerId);
+        List<Long> idsForBan = deserializeListJson(message, new TypeReference<>() {});
+        userService.banAuthors(idsForBan);
     }
 }

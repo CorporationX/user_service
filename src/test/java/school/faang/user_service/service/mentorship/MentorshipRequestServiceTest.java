@@ -17,6 +17,7 @@ import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.dto.filter.RequestFilterDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapperImpl;
+import school.faang.user_service.publisher.MentorshipStartEventPublisher;
 import school.faang.user_service.validation.mentorship.MentorshipRequestValidator;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
@@ -25,6 +26,7 @@ import java.util.Optional;
 
 import java.util.ArrayList;
 
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,6 +41,8 @@ public class MentorshipRequestServiceTest {
     private MentorshipRequestValidator mentorshipRequestValidator;
     @Mock
     private MentorshipRequestRepository mentorshipRequestRepository;
+    @Mock
+    private MentorshipStartEventPublisher mentorshipStartEventPublisher;
 
     @InjectMocks
     private MentorshipRequestService mentorshipRequestService;
@@ -125,6 +129,8 @@ public class MentorshipRequestServiceTest {
                 .build();
 
         when(mentorshipRequestRepository.findById(requestId)).thenReturn(Optional.of(mentorshipRequest));
+        doNothing().when(mentorshipStartEventPublisher).publishMentorshipEvent(receiver.getId(), requester.getId());
+
         MentorshipRequestDto accepted = mentorshipRequestService.acceptRequest(requestId);
         assertEquals(RequestStatus.ACCEPTED, accepted.getStatus());
         assertEquals(1, requester.getMentors().size());

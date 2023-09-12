@@ -37,13 +37,13 @@ public class MentorshipRequestService {
         String description = mentorshipRequest.getDescription();
 
         if (!userRepository.existsById(requesterId)) {
-            throw new IndexOutOfBoundsException("Requester must be registered");
+            throw new IllegalArgumentException("Requester must be registered");
         }
         if (!userRepository.existsById(receiverId)) {
-            throw new IndexOutOfBoundsException("Receiver must be registered");
+            throw new IllegalArgumentException("Receiver must be registered");
         }
         if (requesterId == receiverId) {
-            throw new IndexOutOfBoundsException("A requester cannot be a receiver fo itself");
+            throw new IllegalArgumentException("A requester cannot be a receiver fo itself");
         }
 
         Optional<MentorshipRequest> optionalLatestRequest = mentorshipRequestRepository.findLatestRequest(requesterId, receiverId);

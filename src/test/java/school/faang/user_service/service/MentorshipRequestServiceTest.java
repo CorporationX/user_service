@@ -87,7 +87,7 @@ class MentorshipRequestServiceTest {
         MentorshipRequest request1 = createMentorshipRequest(REQUESTER_ID, RECEIVER_ID, "1", ACCEPTED, "John", "Jim");
         MentorshipRequestDto requestDto1 = mapper.toDto(request1);
         when(userRepository.existsById(REQUESTER_ID)).thenReturn(false);
-        assertThrows(IndexOutOfBoundsException.class, () -> mentorshipRequestService.requestMentorship(requestDto1));
+        assertThrows(IllegalArgumentException.class, () -> mentorshipRequestService.requestMentorship(requestDto1));
     }
 
     @Test
@@ -96,7 +96,7 @@ class MentorshipRequestServiceTest {
         MentorshipRequestDto requestDto1 = mapper.toDto(request1);
         when(userRepository.existsById(REQUESTER_ID)).thenReturn(true);
         when(userRepository.existsById(RECEIVER_ID)).thenReturn(false);
-        assertThrows(IndexOutOfBoundsException.class, () -> mentorshipRequestService.requestMentorship(requestDto1));
+        assertThrows(IllegalArgumentException.class, () -> mentorshipRequestService.requestMentorship(requestDto1));
     }
 
     @Test
@@ -106,7 +106,7 @@ class MentorshipRequestServiceTest {
         requestDto1.setReceiverId(REQUESTER_ID);
 
         when(userRepository.existsById(REQUESTER_ID)).thenReturn(true);
-        assertThrows(IndexOutOfBoundsException.class, () -> mentorshipRequestService.requestMentorship(requestDto1));
+        assertThrows(IllegalArgumentException.class, () -> mentorshipRequestService.requestMentorship(requestDto1));
     }
 
     @Test

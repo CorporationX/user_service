@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class DtoMentorshipStartEvent {
+public class MentorshipStartEventDto {
     private Long requesterId;
     private Long receiverId;
 }

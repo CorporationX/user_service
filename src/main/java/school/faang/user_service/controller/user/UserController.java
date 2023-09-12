@@ -79,4 +79,9 @@ public class UserController {
     public List<Long> getPreference(@PathVariable long id) {
         return preferenceService.getPreference(id);
     }
+
+    @GetMapping("/exists/{id}")
+    public Boolean checkUserExist(@PathVariable long id) {
+        return userService.checkUserExist(id);
+    }
 }

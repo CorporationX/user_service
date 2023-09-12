@@ -34,6 +34,8 @@ spring:
           name: goal_set_channel
         mentorship_requested_channel:
           name: mentorship-requested-channel
+        search_appearance_channel:
+          name: search_appearance_channel
   servlet:
     multipart:
       max-file-size: 15MB

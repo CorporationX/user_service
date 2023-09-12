@@ -24,6 +24,8 @@ public class RedisConfig {
     private String eventStartChannel;
     @Value("${spring.data.redis.channels.goal_set_channel.name}")
     private String goalSetEventChannel;
+    @Value("${spring.data.redis.channels.search_appearance_channel.name}")
+    private String searchAppearanceEventChannel;
     @Value("${spring.data.redis.host}")
     private String host;
     @Value("${spring.data.redis.port}")
@@ -67,5 +69,10 @@ public class RedisConfig {
     @Bean
     ChannelTopic goalSetEventChannel() {
         return new ChannelTopic(goalSetEventChannel);
+    }
+
+    @Bean
+    ChannelTopic searchAppearanceEventChannel() {
+        return new ChannelTopic(searchAppearanceEventChannel);
     }
 }

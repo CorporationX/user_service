@@ -20,6 +20,10 @@ public class RedisConfig {
     private String userBannerChannel;
     @Value("${spring.data.redis.channels.mentorship_requested_channel.name}")
     private String mentorshipRequestEventChannel;
+    @Value("${spring.data.redis.channels.event_start_channel.name}")
+    private String eventStartChannel;
+    @Value("${spring.data.redis.channels.goal_set_channel.name}")
+    private String goalSetEventChannel;
     @Value("${spring.data.redis.host}")
     private String host;
     @Value("${spring.data.redis.port}")
@@ -53,5 +57,15 @@ public class RedisConfig {
     @Bean
     ChannelTopic mentorshipRequestEventChannel() {
         return new ChannelTopic(mentorshipRequestEventChannel);
+    }
+
+    @Bean
+    ChannelTopic eventStartChannel() {
+        return new ChannelTopic(eventStartChannel);
+    }
+
+    @Bean
+    ChannelTopic goalSetEventChannel() {
+        return new ChannelTopic(goalSetEventChannel);
     }
 }

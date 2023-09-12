@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
 import school.faang.user_service.dto.redis.GoalSetEventDto;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -17,15 +18,17 @@ import static org.mockito.Mockito.when;
 
 class GoalSetPublisherTest {
     @Mock
-    private RedisTemplate<String, String> redisTemplate;
+    private RedisTemplate<String, Object> redisTemplate;
     @Mock
     private ObjectMapper objectMapper;
+    @Mock
+    private ChannelTopic goalSetTopic;
     private GoalSetPublisher goalSetPublisher;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        goalSetPublisher = new GoalSetPublisher(redisTemplate, objectMapper);
+        goalSetPublisher = new GoalSetPublisher(redisTemplate, objectMapper, goalSetTopic);
     }
 
     @Test
@@ -35,7 +38,7 @@ class GoalSetPublisherTest {
 
         when(objectMapper.writeValueAsString(any())).thenReturn(serializedEvent);
 
-        goalSetPublisher.publishMessage(eventDto);
+        goalSetPublisher.publish(eventDto);
 
         verify(redisTemplate).convertAndSend(any(), eq(serializedEvent));
     }

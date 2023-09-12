@@ -26,7 +26,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             """)
     List<Event> findParticipatedEventsByUserId(long userId);
 
-    @QueryHints(@QueryHint(name = "org.hibernate.annotations.QueryHints.INDEX", value = "created_at_index"))
     @Query(nativeQuery = true, value = """
             SELECT e.* FROM event e
             WHERE e.created_at < :date

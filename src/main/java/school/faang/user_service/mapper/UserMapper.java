@@ -3,7 +3,6 @@ package school.faang.user_service.mapper;
 import com.json.student.PersonSchemaForUser;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.CountryDto;
 import school.faang.user_service.dto.UserDto;
@@ -21,6 +20,7 @@ public interface UserMapper {
     List<UserDto> toDto(List<User> users);
 
     UserDto personToUserDto(PersonSchemaForUser person);
+
     default CountryDto mapCountry(String country) {
         CountryDto countryDto = new CountryDto();
         countryDto.setTitle(country);

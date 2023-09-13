@@ -22,7 +22,6 @@ import school.faang.user_service.validator.user.UserValidator;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
@@ -130,7 +129,6 @@ public class UserService {
 
     private void addCreateData(User user) {
         user.setCountry(countryMapper.toCountry(countryService.findCountryByTitle(user.getCountry().getTitle())));
-        user.setCreatedAt(LocalDateTime.now());
         UserProfilePic userProfilePic = UserProfilePic.builder()
                 .name(user.getUsername() + ThreadLocalRandom.current().nextInt())
                 .build();

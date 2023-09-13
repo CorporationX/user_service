@@ -212,7 +212,6 @@ class UserServiceTest {
 
         userService.createUser(userDto);
 
-        assertTrue(user.getCreatedAt().isBefore(LocalDateTime.now()));
         assertTrue(user.getUserProfilePic().getName() != null);
     }
 

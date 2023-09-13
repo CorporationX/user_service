@@ -27,6 +27,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,16 +35,17 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.any;
+
 
 @ExtendWith(MockitoExtension.class)
 class EventServiceTest {
@@ -57,6 +59,9 @@ class EventServiceTest {
     @Mock
     private EventStartPublisher eventStartPublisher;
 
+    @Mock
+    private EventAsyncService eventAsyncService;
+
     private EventService eventService;
 
     @BeforeEach
@@ -67,7 +72,7 @@ class EventServiceTest {
                 new EventDateFilter(),
                 new EventMaxAttendeesFilter()
         );
-        eventService = new EventService(eventRepository, userRepository, eventFilters, eventStartPublisher);
+        eventService = new EventService(eventRepository, userRepository, eventFilters, eventStartPublisher, eventAsyncService);
     }
 
     @Test
@@ -358,4 +363,20 @@ class EventServiceTest {
         }
         return events;
     }
+
+    @Test
+    void testDeletePastEvents() {
+        List<Event> pastEvents = new ArrayList<>();
+        pastEvents.add(Event.builder().description("Event 1").endDate(LocalDateTime.now().withNano(0)).build());
+        pastEvents.add(Event.builder().description("Event 2").endDate(LocalDateTime.now().withNano(0)).build());
+
+        LocalDateTime date = LocalDateTime.now().withNano(0);
+        when(eventRepository.findAllByCreatedAtBefore(date)).thenReturn(pastEvents);
+
+        eventService.deletePastEvents(10);
+
+        verify(eventRepository).findAllByCreatedAtBefore(date);
+        verify(eventAsyncService).clearEventsPartition(pastEvents);
+    }
+
 }

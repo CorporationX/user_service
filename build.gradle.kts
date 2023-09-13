@@ -56,6 +56,9 @@ dependencies {
 	annotationProcessor("org.mapstruct:mapstruct-processor:1.5.3.Final")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
 
+	implementation ("org.springframework.retry:spring-retry:1.3.1")
+
+
 	implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.13.0")
 
 	/**

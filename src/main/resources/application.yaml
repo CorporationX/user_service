@@ -66,3 +66,13 @@ dicebear:
   url: https://api.dicebear.com/6.x/adventurer/svg?seed=
 
 springfox.documentation.swagger.v2.path: /api-docs
+
+delete_past_events:
+  cron: "0 0 0 7/7 * ?" # every seven days
+
+scheduler:
+  partition_size: 10
+  removeEventsExecutor:
+    corePoolSize: 10
+    maxPoolSize: 20
+    queueCapacity: 50

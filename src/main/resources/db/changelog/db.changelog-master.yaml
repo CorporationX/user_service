@@ -15,6 +15,7 @@ databaseChangeLog:
       file: db/changelog/changeset/user_V007__user_premium.sql
   - include:
       file: db/changelog/changeset/user_V008_user_banned.sql
-
+  - include:
+      file: db/changelog/changeset/user_V009_event_created_at_index.sql
 
 

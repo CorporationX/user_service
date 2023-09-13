@@ -34,6 +34,8 @@ spring:
           name: goal_set_channel
         mentorship_requested_channel:
           name: mentorship-requested-channel
+        follower_project:
+          name: follower_project
   servlet:
     multipart:
       max-file-size: 15MB

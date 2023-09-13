@@ -25,7 +25,7 @@ import school.faang.user_service.filter.requestfilter.RequestStatusFilter;
 import school.faang.user_service.filter.requestfilter.SkillRequestFilter;
 import school.faang.user_service.filter.requestfilter.UpdateAtFilter;
 import school.faang.user_service.mapper.RecommendationRequestMapperImpl;
-import school.faang.user_service.pulisher.RecommendationEventPublisher;
+import school.faang.user_service.publisher.RecommendationEventPublisher;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 import school.faang.user_service.validator.RecommendationRequestValidator;

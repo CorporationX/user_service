@@ -1,23 +1,28 @@
 package school.faang.user_service.service;
 
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.dto.FollowerEventDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Builder
 public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final UserMapper userMapper;
     private final List<UserFilter> userFilters;
+    private final FollowerEventPublisher followerEventPublisher;
 
     public void followUser(long followerId, long followeeId) {
         if (!subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
@@ -25,6 +30,11 @@ public class SubscriptionService {
         } else {
             throw new DataValidationException("This subscription already exists");
         }
+        followerEventPublisher.publish(FollowerEventDto
+                .builder()
+                .followerId(followerId)
+                .foloweeId(followeeId)
+                .build());
     }
 
     public void unfollowUser(long followerId, long followeeId){

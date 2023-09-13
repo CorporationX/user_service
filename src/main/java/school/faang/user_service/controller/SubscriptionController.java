@@ -2,6 +2,10 @@ package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
@@ -9,12 +13,14 @@ import school.faang.user_service.service.SubscriptionService;
 
 import java.util.List;
 
-@Component
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("/subscription")
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
-    public void followUser(long followerId, long followeeId) {
+    @PostMapping("{followerId}/{followeeId}")
+    public void followUser(@PathVariable long followerId, @PathVariable long followeeId) {
         validateFollow(followerId, followeeId);
         subscriptionService.followUser(followerId, followeeId);
     }

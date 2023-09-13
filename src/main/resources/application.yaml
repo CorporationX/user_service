@@ -38,10 +38,8 @@ spring:
           name: mentorship-accepted-channel
         search_appearance_channel:
           name: search-appearance-channel
-            name: event-start-channel
         skill_offered_channel:
-           name: skill-offered-channel
-
+          name: skill-offered-channel
 
   google:
     calendar:

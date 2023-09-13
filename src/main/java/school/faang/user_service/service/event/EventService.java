@@ -3,6 +3,8 @@ package school.faang.user_service.service.event;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.event.EventDto;
@@ -138,6 +140,7 @@ public class EventService {
 
 
     @Transactional
+    @Retryable(maxAttempts = 2, backoff = @Backoff(delayExpression = "10000"))
     public void deletePastEvents(int partitionSize) {
         List<Event> eventsToDelete = eventRepository.findAllByCreatedAtBefore(LocalDateTime.now().withNano(0));
 

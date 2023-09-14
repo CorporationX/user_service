@@ -82,11 +82,10 @@ public class EventService {
                 .orElseThrow(() -> new DataValidationException("Event not found"));
     }
 
-    public List<Event> getEventsToDelete() {
-        return eventRepository.findAllEventsToDelete(LocalDateTime.now().withNano(0));
+    public List<Event> getAllPastEventsToDelete() {
+        return eventRepository.findAllPastEventsToDelete(LocalDateTime.now().withNano(0));
     }
 
-    @Transactional
     public void deleteEvents(List<Event> subList) {
         eventRepository.deleteAll(subList);
     }

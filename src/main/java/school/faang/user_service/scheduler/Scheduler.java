@@ -22,7 +22,7 @@ public class Scheduler {
 
     @Scheduled(cron = "${scheduler.clearEventsCron}")
     public void clearEvents() {
-        List<Event> eventsToDelete = eventService.getEventsToDelete();
+        List<Event> eventsToDelete = eventService.getAllPastEventsToDelete();
 
         List<List<Event>> eventSubLists = ListUtils.partition(eventsToDelete, batchSize);
 

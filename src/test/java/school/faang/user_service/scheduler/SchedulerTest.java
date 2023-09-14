@@ -28,7 +28,7 @@ class SchedulerTest {
     public void clearEvents() {
         List<Event> eventsToDelete = List.of(Event.builder().build());
 
-        Mockito.when(eventService.getEventsToDelete()).thenReturn(eventsToDelete);
+        Mockito.when(eventService.getAllPastEventsToDelete()).thenReturn(eventsToDelete);
 
         scheduler.clearEvents();
         Mockito.verify(eventService).deleteEvents(eventsToDelete);

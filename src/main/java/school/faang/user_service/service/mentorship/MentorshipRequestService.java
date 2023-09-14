@@ -15,7 +15,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.mentorship_request.MentorshipRequestFilter;
 import school.faang.user_service.mapper.mentorship.MentorshipOfferedEventMapper;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
-import school.faang.user_service.message.MentorshipOfferedEventPublisher;
+import school.faang.user_service.publisher.MentorshipOfferedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
@@ -40,7 +40,7 @@ public class MentorshipRequestService {
         User requester = userService.findUserById(dto.getRequesterId());
         User receiver = userService.findUserById(dto.getReceiverId());
 
-        //TODO change entity to dto
+        //TODO: fix validator (change entity to dto)
         mentorshipRequestValidator.requestValidate(requester, receiver);
         MentorshipRequest mentorshipRequest = mentorshipRequestRepository.save(mentorshipRequestMapper.toEntity(dto));
 
@@ -98,12 +98,7 @@ public class MentorshipRequestService {
 
     private void sendNotification(MentorshipRequestDto mentorshipRequestDto, String email) {
         MentorshipOfferedEventDto mentorshipOfferedEventDto = mentorshipOfferedEventMapper.toMentorshipOfferedEvent(mentorshipRequestDto);
-
-        //TODO finish to create user method
-        mentorshipOfferedEventDto.setPreferredContact(PreferredContact.EMAIL);
-        mentorshipOfferedEventDto.setTimestamp(LocalDateTime.now());
-        mentorshipOfferedEventDto.setEmail(email);
-
+        mentorshipOfferedEventDto.setMessage(mentorshipRequestDto.getDescription());
         mentorshipOfferedEventPublisher.publish(mentorshipOfferedEventDto);
     }
 }

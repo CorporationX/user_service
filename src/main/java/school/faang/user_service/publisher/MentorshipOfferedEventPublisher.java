@@ -1,4 +1,4 @@
-package school.faang.user_service.message;
+package school.faang.user_service.publisher;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,7 +16,7 @@ import school.faang.user_service.exception.DataValidationException;
 public class MentorshipOfferedEventPublisher {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
-    @Value("${spring.data.redis.channels.mentorship-offer_channel.name}")
+    @Value("${spring.data.redis.channels.mentorship_offer_channel.name}")
     private String topicMentorshipOffered;
 
     public void publish(MentorshipOfferedEventDto mentorshipOfferedEventDto) {

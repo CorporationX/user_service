@@ -1,5 +1,6 @@
 package school.faang.user_service.dto.mentorship;
 
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +16,6 @@ import java.time.LocalDateTime;
 public class MentorshipOfferedEventDto {
     private Long receiverId;
     private Long requesterId;
-    private LocalDateTime timestamp;
-    private PreferredContact preferredContact;
-    private String email;
+    @Size(max = 150)
+    private String message;
 }

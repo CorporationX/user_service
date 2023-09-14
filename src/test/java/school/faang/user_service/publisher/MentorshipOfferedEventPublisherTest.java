@@ -1,4 +1,4 @@
-package school.faang.user_service.message;
+package school.faang.user_service.publisher;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

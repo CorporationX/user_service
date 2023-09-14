@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.filter.RequestFilterDto;
+import school.faang.user_service.service.mentorship.filter.MentorshipRequestFilter;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
@@ -14,10 +16,14 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
 @Service
 @RequiredArgsConstructor
-@Validated
 public class MentorshipRequestService {
+    private final List<MentorshipRequestFilter> mentorshipRequestFilters;
     private final UserRepository userRepository;
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final MentorshipRequestMapper mapper;
@@ -31,10 +37,10 @@ public class MentorshipRequestService {
         String description = mentorshipRequest.getDescription();
 
         if (!userRepository.existsById(requesterId)) {
-            throw new IndexOutOfBoundsException("Requester must be registered");
+            throw new IllegalArgumentException("Requester must be registered");
         }
         if (!userRepository.existsById(receiverId)) {
-            throw new IndexOutOfBoundsException("Receiver must be registered");
+            throw new IllegalArgumentException("Receiver must be registered");
         }
         if (requesterId == receiverId) {
             throw new IllegalArgumentException("A requester cannot be a receiver fo itself");
@@ -51,5 +57,16 @@ public class MentorshipRequestService {
 
         MentorshipRequest newRequest = mentorshipRequestRepository.create(requesterId, receiverId, description);
         return mapper.toDto(newRequest);
+    }
+
+    public List<MentorshipRequestDto> getRequests(@Valid RequestFilterDto filters) {
+        List<MentorshipRequest> allRequests = mentorshipRequestRepository.findAll();
+        Stream<MentorshipRequest> requestsStream = allRequests.stream();
+
+        return mentorshipRequestFilters.stream()
+                .filter(filter -> filter.isApplicable(filters))
+                .flatMap(filter -> filter.apply(requestsStream, filters))
+                .map(request -> mapper.toDto(request))
+                .toList();
     }
 }

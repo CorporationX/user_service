@@ -15,6 +15,7 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.mapper.SkillMapper;
+import school.faang.user_service.publisher.RecommendationEvent;
 import school.faang.user_service.publisher.RecommendationEventPublisher;
 import school.faang.user_service.publisher.SkillOfferedEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
@@ -36,6 +37,7 @@ public class RecommendationService {
     private final SkillMapper skillMapper;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final RecommendationMapper recommendationMapper;
+    private final RecommendationEvent recommendationEvent;
     private final SkillOfferedEventPublisher skillOfferedEventPublisher;
     private final RecommendationEventPublisher recommendationEventPublisher;
 
@@ -46,6 +48,7 @@ public class RecommendationService {
         Recommendation entity = getRecommendation(entityId);
         recommendationEventPublisher.publish(entity);
         saveSkill(entity, recommendation.getSkillOffers());
+        recommendationEvent.publish(entity);
         return recommendationMapper.toDto(entity);
     }
 

@@ -26,6 +26,7 @@ spring:
         profile_view_channel: profile-view-channel
         recommendation_channel: recommendation-channel
         skill_offer_channel: skill-offer-channel
+        recommendation_requested_event_channel: recommendation-requested-event-channel
         user_ban: user-ban
 
   google:

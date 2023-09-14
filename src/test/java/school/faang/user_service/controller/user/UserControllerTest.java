@@ -17,7 +17,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import org.testcontainers.utility.DockerImageName;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 
@@ -43,7 +43,6 @@ class UserControllerTest {
     @Container
     public static PostgreSQLContainer<?> POSTGRESQL_CONTAINER =
             new PostgreSQLContainer<>("postgres:13.6");
-
     @Container
     private static final RedisContainer REDIS_CONTAINER =
             new RedisContainer(DockerImageName.parse("redis/redis-stack:latest"));
@@ -73,8 +72,10 @@ class UserControllerTest {
                         get("/users/1"))
                 .andExpect(status().isOk());
 
+        System.out.println(result.andReturn().getResponse().getContentAsString());
+
         ObjectMapper mapper = new ObjectMapper();
-        User user = mapper.readValue(result.andReturn().getResponse().getContentAsString(), User.class);
+        UserDto user = mapper.readValue(result.andReturn().getResponse().getContentAsString(), UserDto.class);
         assertEquals(1, user.getId());
     }
 
@@ -98,8 +99,8 @@ class UserControllerTest {
         ).andExpect(status().isOk());
 
 
-        List<User> users = mapper.readValue(result.andReturn().getResponse().getContentAsString(),
-                mapper.getTypeFactory().constructCollectionType(List.class, User.class));
+        List<UserDto> users = mapper.readValue(result.andReturn().getResponse().getContentAsString(),
+                mapper.getTypeFactory().constructCollectionType(List.class, UserDto.class));
 
         assertEquals(4, users.size());
     }

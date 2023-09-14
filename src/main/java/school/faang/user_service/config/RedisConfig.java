@@ -19,10 +19,6 @@ public class RedisConfig {
     private String host;
     @Value("${spring.data.redis.port}")
     private int port;
-    @Value("${spring.data.redis.channels.recommendation_channel}")
-    private String recommendationChannelName;
-    @Value("${spring.data.redis.channels.skill_offer_channel}")
-    private String skillOfferChannelName;
     @Value("${spring.data.redis.channels.user_ban}")
     private String userBanChannel;
 
@@ -47,15 +43,5 @@ public class RedisConfig {
         container.setConnectionFactory(redisConnectionFactory());
         container.addMessageListener(authorBannerListener, new ChannelTopic(userBanChannel));
         return container;
-    }
-
-    @Bean
-    ChannelTopic topicRecommendation() {
-        return new ChannelTopic(recommendationChannelName);
-    }
-
-    @Bean
-    ChannelTopic topicSkillOffer() {
-        return new ChannelTopic(skillOfferChannelName);
     }
 }

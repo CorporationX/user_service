@@ -3,6 +3,7 @@ package school.faang.user_service.service;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.dto.FollowerEventDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
@@ -32,7 +33,7 @@ public class SubscriptionService {
         followerEventPublisher.publish(FollowerEventDto
                 .builder()
                 .followerId(followerId)
-                .foloweeId(followeeId)
+                .followeeId(followeeId)
                 .build());
     }
 

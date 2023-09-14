@@ -22,12 +22,11 @@ import school.faang.user_service.mapper.CountryMapper;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.amazon.AvatarService;
-import school.faang.user_service.validator.user.UserValidator;
+import school.faang.user_service.validator.UserValidator;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

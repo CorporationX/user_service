@@ -18,7 +18,7 @@ import school.faang.user_service.mapper.CountryMapper;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.amazon.AvatarService;
-import school.faang.user_service.validator.user.UserValidator;
+import school.faang.user_service.validator.UserValidator;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -81,12 +81,12 @@ public class UserService {
         return userRepository.countOwnedSkills(userId, skillIds) == skillIds.size();
     }
 
-    public void saveUser(User user) {
-        userRepository.save(user);
-    }
-
     public UserDto getUser(long id) {
         return userMapper.toDto(findUserById(id));
+    }
+
+    public void saveUser(User user) {
+        userRepository.save(user);
     }
 
     public List<UserDto> getUsersByIds(List<Long> ids) {

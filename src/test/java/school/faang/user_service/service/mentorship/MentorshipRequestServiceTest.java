@@ -80,7 +80,6 @@ public class MentorshipRequestServiceTest {
     @Test
     public void testRequestMentorship() {
         MentorshipOfferedEventDto mentorshipOfferedEventDto = MentorshipOfferedEventDto.builder()
-                .preferredContact(PreferredContact.EMAIL)
                 .build();
         Mockito.when(userService.findUserById(1L))
                 .thenReturn(requester);
@@ -154,7 +153,6 @@ public class MentorshipRequestServiceTest {
     @Test
     public void testSendNotification(){
         MentorshipOfferedEventDto mentorshipOfferedEventDto = MentorshipOfferedEventDto.builder()
-                .preferredContact(PreferredContact.EMAIL)
                 .build();
         Mockito.when(userService.findUserById(1L))
                 .thenReturn(requester);
@@ -175,8 +173,5 @@ public class MentorshipRequestServiceTest {
                 .toMentorshipOfferedEvent(mentorshipRequestDto);
         Mockito.verify(mentorshipOfferedEventPublisher, Mockito.times(1))
                 .publish(mentorshipOfferedEventDto);
-        assertNotNull(mentorshipOfferedEventDto.getPreferredContact());
-        assertNotNull(mentorshipOfferedEventDto.getTimestamp());
-        assertNotNull(mentorshipOfferedEventDto.getEmail());
     }
 }

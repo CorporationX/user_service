@@ -3,6 +3,8 @@ package school.faang.user_service.controller.user;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,9 +20,11 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.user.UserService;
 
 import java.util.List;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -32,6 +36,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UserControllerTest {
+    @InjectMocks
+    private UserController userController;
+    @Mock
+    private UserService userService;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -58,6 +66,66 @@ class UserControllerTest {
     }
 
     @Test
+    public void createUserTest() throws Exception {
+        String json = """
+                {
+                   "username": "sampleUsername2",
+                   "email": "sample@email.com2",
+                   "phone": "1234",
+                   "password": "samplePassword",
+                   "aboutMe": "About me text goes here.",
+                   "country": {
+                       "title": "France"
+                       },
+                   "city": "Sample City",
+                   "experience": 5
+                }
+                """;
+
+        ResultActions result = mockMvc.perform(
+                        post("/users/create")
+                                .contentType("application/json")
+                                .content(json))
+                .andExpect(status().isOk());
+
+        User user = new ObjectMapper().readValue(result.andReturn().getResponse().getContentAsString(), User.class);
+
+        assertEquals("sampleUsername2", user.getUsername());
+
+        //france hava id 4
+        assertEquals(4, user.getCountry().getId());
+    }
+
+    @Test
+    public void createUserTest_NewCountry() throws Exception {
+        String json = """
+                {
+                   "username": "sampleUsername",
+                   "email": "sample@email.com",
+                   "phone": "123",
+                   "password": "samplePassword",
+                   "aboutMe": "About me text goes here.",
+                   "country": {
+                       "title": "France"
+                   },
+                   "city": "Sample City",
+                   "experience": 5
+                }
+                """;
+
+        ResultActions result = mockMvc.perform(
+                        post("/users/create")
+                                .contentType("application/json")
+                                .content(json))
+                .andExpect(status().isOk());
+
+        User user = new ObjectMapper().readValue(result.andReturn().getResponse().getContentAsString(), User.class);
+
+        assertEquals("sampleUsername", user.getUsername());
+        assertTrue(user.getCountry() != null);
+    }
+
+    @Test
     public void getUserByIdExistsTest() throws Exception {
         ResultActions result = mockMvc.perform(
                         get("/users/1"))
@@ -67,6 +135,7 @@ class UserControllerTest {
         User user = mapper.readValue(result.andReturn().getResponse().getContentAsString(), User.class);
         assertEquals(1, user.getId());
     }
+
 
     @Test
     public void getUserByIdNotExistsTest() throws Exception {
@@ -86,7 +155,6 @@ class UserControllerTest {
                         .contentType("application/json")
                         .content(json)
         ).andExpect(status().isOk());
-
 
         List<User> users = mapper.readValue(result.andReturn().getResponse().getContentAsString(),
                 mapper.getTypeFactory().constructCollectionType(List.class, User.class));

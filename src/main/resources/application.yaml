@@ -59,5 +59,12 @@ aws:
 
 services:
   s3:
-    bucket-name: user_backet
+    bucket_name: user_bucket
     isMocked: true
+    endpoint: http://localhost:9000
+    accessKey: user
+    secretKey: password
+    bucket_name_for_avatars: avatar
+    dice_bear:
+      url: https://api.dicebear.com/6.x/pixel-art/svg?seed=
+      size: '&size=100'

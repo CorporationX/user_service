@@ -12,6 +12,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
@@ -94,5 +95,14 @@ class UserControllerTest {
                 mapper.getTypeFactory().constructCollectionType(List.class, UserDto.class));
 
         assertEquals(4, users.size());
+    }
+
+    @Test
+    public void deactivateUser() throws Exception {
+        long userId = 1L;
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/{userId}/deactivate", userId)
+                        .contentType("application/json"))
+                .andExpect(status().isOk());
     }
 }

@@ -14,6 +14,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.event.EventStatus;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.event.EventEndDateFilter;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.filter.event.EventStartDateFilter;
@@ -162,5 +164,20 @@ class EventServiceTest {
         Mockito.when(eventRepository.findById(1L)).thenReturn(Optional.ofNullable(event));
         Mockito.when(eventMapper.toDto(event)).thenReturn(eventDto);
         assertEquals(eventDto, eventService.getEvent(1L));
+    }
+
+    @Test
+    public void testCancelEventValid() {
+        var eventId = 1L;
+        Mockito.when(eventRepository.findById(eventId)).thenReturn(Optional.ofNullable(event));
+        eventService.cancelEvent(eventId);
+        assertEquals(event.getStatus(), EventStatus.CANCELED);
+    }
+
+    @Test
+    public void testCancelEventIncorrectId() {
+        var eventId = 0L;
+        Mockito.when(eventRepository.findById(eventId)).thenThrow(DataValidationException.class);
+        assertThrows(DataValidationException.class, () -> eventService.cancelEvent(eventId));
     }
 }

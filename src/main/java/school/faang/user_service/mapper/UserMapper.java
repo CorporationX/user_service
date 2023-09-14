@@ -19,4 +19,14 @@ public interface UserMapper {
     UserDto toDto(User user);
 
     List<UserDto> toDto(List<User> users);
+
+    default void obfuscateUser(User user) {
+        user.setActive(false);
+        user.setPhone(null);
+        user.setAboutMe(null);
+        user.setCity(null);
+        user.setExperience(null);
+        user.setUserProfilePic(null);
+        user.getSetGoals().clear();
+    }
 }

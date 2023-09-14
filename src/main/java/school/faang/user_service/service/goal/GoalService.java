@@ -95,4 +95,14 @@ public class GoalService {
                     .forEach((fil) -> fil.apply(dtoList, filter));
         }
     }
+
+    private Goal getGoalById(long id) {
+        return goalRepository
+                .findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Goal with id: " + id + " not found"));
+    }
+
+    public void setGoalStatusOnHold(long id) {
+        getGoalById(id).setStatus(GoalStatus.ON_HOLD);
+    }
 }

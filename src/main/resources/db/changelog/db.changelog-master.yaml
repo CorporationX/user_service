@@ -14,8 +14,8 @@ databaseChangeLog:
   - include:
       file: db/changelog/changeset/user_V007__user_premium.sql
   - include:
-      file: db/changelog/changeset/user_V007__user_premium.sql
-  - include:
       file: db/changelog/changeset/user_V008__google_token.sql
   - include:
-      file: db/changelog/changeset/user_V009_alter_user_pic_name.sql
+      file: db/changelog/changeset/user_V009_insert-contact_preferences.sql
+  - include:
+      file: db/changelog/changeset/user_V010_alter_user_pic_name.sql

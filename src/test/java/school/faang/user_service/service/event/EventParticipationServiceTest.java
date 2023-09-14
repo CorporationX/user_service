@@ -9,6 +9,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.contact.PreferredContact;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
@@ -28,7 +29,7 @@ class EventParticipationServiceTest {
     private EventParticipationService eventParticipationService;
 
     @Test
-    public void registerParticipantAlreadyRegisteredThrowsException() {
+    void registerParticipantAlreadyRegisteredThrowsException() {
         User user = User.builder().id(1L).username("test").build();
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(List.of(user));
         Assertions.assertThrows(DataValidationException.class, () -> {
@@ -37,14 +38,14 @@ class EventParticipationServiceTest {
     }
 
     @Test
-    public void registerParticipant() {
+    void registerParticipant() {
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(List.of());
         eventParticipationService.registerParticipant(1L, 1L);
         Mockito.verify(eventParticipationRepository).register(1L, 1L);
     }
 
     @Test
-    public void unregisterParticipantThrowsException() {
+    void unregisterParticipantThrowsException() {
         User user = User.builder().id(1L).username("test").build();
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(List.of(user));
         Assertions.assertThrows(DataValidationException.class, () -> {
@@ -53,7 +54,7 @@ class EventParticipationServiceTest {
     }
 
     @Test
-    public void unregisterParticipant() {
+    void unregisterParticipant() {
         User user = User.builder().id(1L).username("test").build();
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(List.of(user));
         eventParticipationService.unregisterParticipant(1L, 1L);
@@ -61,7 +62,7 @@ class EventParticipationServiceTest {
     }
 
     @Test
-    public void getParticipantsThrowsException() {
+    void getParticipantsThrowsException() {
         Mockito.when(eventRepository.existsById(1L)).thenReturn(false);
         Assertions.assertThrows(DataValidationException.class, () -> {
             eventParticipationService.getParticipants(1L);
@@ -69,11 +70,9 @@ class EventParticipationServiceTest {
     }
 
     @Test
-    public void getParticipants() {
+    void getParticipants() {
         User user = User.builder().id(1L).username("test").build();
-        UserDto userDto = UserDto.builder()
-                .id(1L)
-                .build();
+        UserDto userDto = new UserDto(1L, "test", "test", PreferredContact.EMAIL);
         Mockito.when(eventRepository.existsById(1L)).thenReturn(true);
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(1L)).thenReturn(List.of(user));
         Mockito.when(userMapper.toDto(user)).thenReturn(userDto);
@@ -81,7 +80,7 @@ class EventParticipationServiceTest {
     }
 
     @Test
-    public void getParticipantsCountThrowsException() {
+    void getParticipantsCountThrowsException() {
         Mockito.when(eventRepository.existsById(1L)).thenReturn(false);
         Assertions.assertThrows(DataValidationException.class, () -> {
             eventParticipationService.getParticipantsCount(1L);
@@ -89,7 +88,7 @@ class EventParticipationServiceTest {
     }
 
     @Test
-    public void getParticipantsCount() {
+    void getParticipantsCount() {
         Mockito.when(eventRepository.existsById(1L)).thenReturn(true);
         Mockito.when(eventParticipationRepository.countParticipants(1L)).thenReturn(1);
         Assertions.assertEquals(1, eventParticipationService.getParticipantsCount(1L));

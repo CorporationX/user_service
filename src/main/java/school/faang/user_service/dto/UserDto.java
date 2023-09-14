@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import school.faang.user_service.entity.Country;
+import school.faang.user_service.entity.contact.PreferredContact;
 
 @Data
 @Builder
@@ -32,4 +32,6 @@ public class UserDto {
     private String city;
     @Max(100)
     private Integer experience;
+    private PreferredContact preferredContact;
+
 }

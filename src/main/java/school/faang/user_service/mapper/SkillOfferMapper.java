@@ -7,7 +7,6 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 import java.util.List;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR, unmappedTargetPolicy = ReportingPolicy.IGNORE)
-
 public interface SkillOfferMapper {
     @Mapping(source = "skill.id", target = "skillId")
     @Mapping(source = "recommendation.id", target = "recommendationId")

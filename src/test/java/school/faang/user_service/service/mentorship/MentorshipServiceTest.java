@@ -8,6 +8,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.contact.PreferredContact;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
@@ -66,6 +67,7 @@ class MentorshipServiceTest {
                 .id(0L)
                 .username("any")
                 .email("any")
+                .preferrdeContact(PreferredContact.EMAIL)
                 .build());
 
         Mockito.when(mentorshipRepository.findById(mentorId))
@@ -93,6 +95,7 @@ class MentorshipServiceTest {
                 .id(0L)
                 .username("any")
                 .email("any")
+                .preferdContact(PreferredContact.EMAIL)
                 .build());
 
         Mockito.when(mentorshipRepository.findById(menteeId))

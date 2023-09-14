@@ -13,3 +13,9 @@ databaseChangeLog:
       file: db/changelog/changeset/user_V006__insert_users.sql
   - include:
       file: db/changelog/changeset/user_V007__user_premium.sql
+  - include:
+      file: db/changelog/changeset/user_V007__user_premium.sql
+  - include:
+      file: db/changelog/changeset/user_V008__google_token.sql
+  - include:
+      file: db/changelog/changeset/user_V009_alter_user_pic_name.sql

@@ -57,44 +57,45 @@ public class MentorshipRequestService {
     }
 
     public void acceptRequest(long requestId) {
-        Optional<MentorshipRequest> requestOpt = mentorshipRequestRepository.findById(requestId);
-        if (!requestOpt.isPresent()) {
-            throw new NullPointerException("Request must exist");
-        } else {
-            MentorshipRequest request = requestOpt.get();
-            User requester = request.getRequester();
-            User receiver = request.getReceiver();
-            List<User> mentorsOfRequester = requester.getMentors();
-
-            if (mentorsOfRequester != null && mentorsOfRequester.contains(receiver)) {
-                throw new IllegalArgumentException(receiver.getUsername() + "is already the requester mentor");
-            }
-        }
-
-        MentorshipRequest request = mentorshipRequestRepository.findById(requestId).get();
+        MentorshipRequest request = acceptRequestValidate(requestId);
         User requester = request.getRequester();
         User receiver = request.getReceiver();
 
-        if(requester.getMentors() == null) {
+        if (requester.getMentors() == null) {
             requester.setMentors(List.of(receiver));
         } else {
             requester.getMentors().add(receiver);
         }
         request.setStatus(ACCEPTED);
-   }
+    }
 
    public void rejectRequest(long requestId, RejectionDto rejection) {
-       Optional<MentorshipRequest> requestOpt = mentorshipRequestRepository.findById(requestId);
-       if(!requestOpt.isPresent()) {
-           throw new NullPointerException("Request must exist");
-       } else {
-           if(rejection.getReason().isEmpty() || rejection.getReason() == null) {
-               throw new IllegalArgumentException("Reason must be given");
-           }
-       }
-
-       MentorshipRequest request = requestOpt.get();
+       MentorshipRequest request = rejectRequestValidate(requestId, rejection);
        request.setStatus(REJECTED);
        request.setRejectionReason(rejection.getReason());
    }
+
+    private MentorshipRequest acceptRequestValidate(long requestId) {
+        MentorshipRequest request = mentorshipRequestRepository.findById(requestId)
+                .orElseThrow(() -> new NullPointerException("Request must exist"));
+
+        User requester = request.getRequester();
+        User receiver = request.getReceiver();
+        List<User> mentorsOfRequester = requester.getMentors();
+
+        if (mentorsOfRequester != null && mentorsOfRequester.contains(receiver)) {
+            throw new IllegalArgumentException(receiver.getUsername() + "is already the requester mentor");
+        }
+        return request;
+    }
+
+    private MentorshipRequest rejectRequestValidate(long requestId, RejectionDto rejection) {
+        MentorshipRequest request = mentorshipRequestRepository.findById(requestId)
+                .orElseThrow(() -> new NullPointerException("Request must exist"));
+
+        if (rejection.getReason().isEmpty() || rejection.getReason() == null) {
+            throw new IllegalArgumentException("Reason must be given");
+        }
+        return request;
+    }
 }

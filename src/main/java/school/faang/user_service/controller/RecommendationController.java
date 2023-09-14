@@ -1,9 +1,13 @@
 package school.faang.user_service.controller;
 
-import lombok.AllArgsConstructor;
-
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.service.RecommendationService;
 import school.faang.user_service.validator.RecommendationValidator;
@@ -34,7 +38,7 @@ public class RecommendationController {
     }
 
     @GetMapping("/recommendation/receiver/{receiverId}")
-    public List<RecommendationDto> getAllUserRecommendations(@PathVariable long receiverId){
+    public List<RecommendationDto> getAllUserRecommendations(@PathVariable long receiverId) {
         return recommendationService.getAllUserRecommendations(receiverId);
     }
 

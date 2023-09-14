@@ -18,7 +18,7 @@ import school.faang.user_service.mapper.CountryMapper;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.amazon.AvatarService;
-import school.faang.user_service.validator.user.UserValidator;
+import school.faang.user_service.validator.UserValidator;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,9 +41,9 @@ public class UserService {
     private final CountryService countryService;
     private final CountryMapper countryMapper;
 
-    @Value("${services.dice-bear.url}")
+    @Value("${services.s3.dice-bear.url}")
     private String URL;
-    @Value("${services.dice-bear.size}")
+    @Value("${services.s3.dice-bear.size}")
     private String SIZE;
 
     @Transactional
@@ -71,7 +71,8 @@ public class UserService {
     }
 
     public User findUserById(long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new DataValidationException("User was not found"));
+        return userRepository.findById(userId).orElseThrow(()
+                -> new DataValidationException("User was not found"));
     }
 
     public boolean areOwnedSkills(long userId, List<Long> skillIds) {
@@ -83,6 +84,10 @@ public class UserService {
 
     public UserDto getUser(long id) {
         return userMapper.toDto(findUserById(id));
+    }
+
+    public void saveUser(User user) {
+        userRepository.save(user);
     }
 
     public List<UserDto> getUsersByIds(List<Long> ids) {

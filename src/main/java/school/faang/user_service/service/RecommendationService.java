@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
+import school.faang.user_service.dto.redis.SkillOfferEventDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.UserSkillGuarantee;
@@ -14,6 +15,9 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.mapper.SkillMapper;
+import school.faang.user_service.publisher.RecommendationEvent;
+import school.faang.user_service.publisher.RecommendationEventPublisher;
+import school.faang.user_service.publisher.SkillOfferedEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
@@ -33,23 +37,34 @@ public class RecommendationService {
     private final SkillMapper skillMapper;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final RecommendationMapper recommendationMapper;
+    private final RecommendationEvent recommendationEvent;
+    private final SkillOfferedEventPublisher skillOfferedEventPublisher;
+    private final RecommendationEventPublisher recommendationEventPublisher;
 
     public RecommendationDto create(RecommendationDto recommendation) {
         recommendationValidator.validateData(recommendation);
         Long entityId = recommendationRepository.create(recommendation.getAuthorId(), recommendation.getReceiverId(),
                 recommendation.getContent());
         Recommendation entity = getRecommendation(entityId);
+        recommendationEventPublisher.publish(entity);
         saveSkill(entity, recommendation.getSkillOffers());
+        recommendationEvent.publish(entity);
         return recommendationMapper.toDto(entity);
     }
 
     public void saveSkill(Recommendation recommendation, List<SkillOfferDto> list) {
         list.forEach(offer -> {
-            if (recommendation.getSkillOffers().stream()
-                    .noneMatch(skillOffer -> skillOffer.getId() == offer.getId())) {
+            if (recommendation.getSkillOffers().isEmpty() ||
+                    recommendation.getSkillOffers().stream()
+                    .noneMatch(skillOffer -> skillOffer.getSkill().getId() == offer.getSkillId())) {
                 long offerId = skillOffersRepository.create(offer.getSkillId(), recommendation.getId());
                 recommendation.addSkillOffer(skillOffersRepository.findById(offerId)
                         .orElseThrow(() -> new EntityNotFoundException("Skill offer not found")));
+
+                SkillOfferEventDto event = new SkillOfferEventDto(recommendation.getAuthor().getId(),
+                        recommendation.getReceiver().getId(), offerId);
+                skillOfferedEventPublisher.publish(event);
+
                 giveGuaranteesHaveSkill(recommendation);
             }
         });

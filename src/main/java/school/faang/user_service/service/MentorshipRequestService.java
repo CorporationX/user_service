@@ -60,8 +60,7 @@ public class MentorshipRequestService {
     }
 
     public List<MentorshipRequestDto> getRequests(@Valid RequestFilterDto filters) {
-        List<MentorshipRequest> allRequests = new ArrayList<>();
-        mentorshipRequestRepository.findAll().forEach(allRequests::add);
+        List<MentorshipRequest> allRequests = mentorshipRequestRepository.findAll();
         Stream<MentorshipRequest> requestsStream = allRequests.stream();
 
         return mentorshipRequestFilters.stream()

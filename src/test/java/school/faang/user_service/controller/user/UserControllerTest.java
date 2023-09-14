@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.user;
 
+import com.redis.testcontainers.RedisContainer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +16,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
+import org.testcontainers.utility.DockerImageName;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -41,14 +43,21 @@ class UserControllerTest {
     @Container
     public static PostgreSQLContainer<?> POSTGRESQL_CONTAINER =
             new PostgreSQLContainer<>("postgres:13.6");
+    @Container
+    private static final RedisContainer REDIS_CONTAINER =
+            new RedisContainer(DockerImageName.parse("redis/redis-stack:latest"));
 
     @DynamicPropertySource
     static void postgresqlProperties(DynamicPropertyRegistry registry) {
         POSTGRESQL_CONTAINER.start();
+        REDIS_CONTAINER.start();
 
         registry.add("spring.datasource.url", POSTGRESQL_CONTAINER::getJdbcUrl);
         registry.add("spring.datasource.username", POSTGRESQL_CONTAINER::getUsername);
         registry.add("spring.datasource.password", POSTGRESQL_CONTAINER::getPassword);
+
+        registry.add("spring.data.redis.port", () -> REDIS_CONTAINER.getMappedPort(6379));
+        registry.add("spring.data.redis.host", REDIS_CONTAINER::getHost);
 
         try {
             Thread.sleep(1000);

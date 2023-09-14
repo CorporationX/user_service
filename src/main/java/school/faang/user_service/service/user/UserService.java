@@ -41,9 +41,9 @@ public class UserService {
     private final CountryService countryService;
     private final CountryMapper countryMapper;
 
-    @Value("${services.dice-bear.url}")
+    @Value("${services.s3.dice-bear.url}")
     private String URL;
-    @Value("${services.dice-bear.size}")
+    @Value("${services.s3.dice-bear.size}")
     private String SIZE;
 
     @Transactional
@@ -71,7 +71,8 @@ public class UserService {
     }
 
     public User findUserById(long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new DataValidationException("User was not found"));
+        return userRepository.findById(userId).orElseThrow(()
+                -> new DataValidationException("User was not found"));
     }
 
     public boolean areOwnedSkills(long userId, List<Long> skillIds) {

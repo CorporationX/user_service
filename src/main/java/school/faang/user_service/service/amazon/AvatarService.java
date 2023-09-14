@@ -22,7 +22,7 @@ import java.net.URLConnection;
 @RequiredArgsConstructor
 public class AvatarService {
     private final AmazonS3 clientAmazonS3;
-    @Value("${services.s3.bucket-name-for-avatars}")
+    @Value("${services.s3.bucket_name_for_avatars}")
     private String bucketName;
 
     @Async("avatarImageThreadPoolExecutor")

@@ -55,21 +55,7 @@ public class MentorshipRequestService {
     }
 
     public void acceptRequest(long requestId) {
-        Optional<MentorshipRequest> requestOpt = mentorshipRequestRepository.findById(requestId);
-        if (!requestOpt.isPresent()) {
-            throw new NullPointerException("Request must exist");
-        } else {
-            MentorshipRequest request = requestOpt.get();
-            User requester = request.getRequester();
-            User receiver = request.getReceiver();
-            List<User> mentorsOfRequester = requester.getMentors();
-
-            if (mentorsOfRequester != null && mentorsOfRequester.contains(receiver)) {
-                throw new IllegalArgumentException(receiver.getUsername() + "is already the requester mentor");
-            }
-        }
-
-        MentorshipRequest request = mentorshipRequestRepository.findById(requestId).get();
+        MentorshipRequest request = acceptRequestValidate(requestId);
         User requester = request.getRequester();
         User receiver = request.getReceiver();
 
@@ -79,5 +65,19 @@ public class MentorshipRequestService {
             requester.getMentors().add(receiver);
         }
         request.setStatus(ACCEPTED);
+    }
+
+    private MentorshipRequest acceptRequestValidate(long requestId) {
+        MentorshipRequest request = mentorshipRequestRepository.findById(requestId)
+                .orElseThrow(() -> new NullPointerException("Request must exist"));
+
+        User requester = request.getRequester();
+        User receiver = request.getReceiver();
+        List<User> mentorsOfRequester = requester.getMentors();
+
+        if (mentorsOfRequester != null && mentorsOfRequester.contains(receiver)) {
+            throw new IllegalArgumentException(receiver.getUsername() + "is already the requester mentor");
+        }
+        return request;
     }
 }

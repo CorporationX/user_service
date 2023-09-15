@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.model.EventType;
+import school.faang.user_service.service.kafka.KafkaMessagePublisher;
 import school.faang.user_service.service.redis.RedisMessagePublisher;
 import school.faang.user_service.service.redis.events.MentorshipStartEvent;
 
@@ -21,9 +22,11 @@ public class MentorshipStartEventPublisher extends AbstractEventPublisher {
     private String mentorshipChannel;
 
     @Autowired
-    public MentorshipStartEventPublisher(EventMapper eventMapper, ObjectMapper objectMapper,
-                                         RedisMessagePublisher redisMessagePublisher) {
-        super(eventMapper, objectMapper, redisMessagePublisher);
+    public MentorshipStartEventPublisher(EventMapper eventMapper,
+                                         ObjectMapper objectMapper,
+                                         RedisMessagePublisher redisMessagePublisher,
+                                         KafkaMessagePublisher kafkaMessagePublisher) {
+        super(eventMapper, objectMapper, redisMessagePublisher, kafkaMessagePublisher);
     }
 
     public void publishMentorshipEvent(Long mentorId, Long menteeId) {

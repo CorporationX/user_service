@@ -40,6 +40,9 @@ spring:
           name: started_events_channel
         mentorship_channel:
           name: mentorship_channel
+    kafka:
+      port: 9092
+      host: localhost
 
 server:
   port: 8080

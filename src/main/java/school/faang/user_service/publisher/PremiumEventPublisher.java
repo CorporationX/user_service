@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.model.EventType;
+import school.faang.user_service.service.kafka.KafkaMessagePublisher;
 import school.faang.user_service.service.redis.RedisMessagePublisher;
 import school.faang.user_service.service.redis.events.PremiumEvent;
 
@@ -21,9 +22,11 @@ public class PremiumEventPublisher extends AbstractEventPublisher {
     private String premiumEventChannelName;
 
     @Autowired
-    public PremiumEventPublisher(EventMapper eventMapper, ObjectMapper objectMapper,
-                                 RedisMessagePublisher redisMessagePublisher) {
-        super(eventMapper, objectMapper, redisMessagePublisher);
+    public PremiumEventPublisher(EventMapper eventMapper,
+                                 ObjectMapper objectMapper,
+                                 RedisMessagePublisher redisMessagePublisher,
+                                 KafkaMessagePublisher kafkaMessagePublisher) {
+        super(eventMapper, objectMapper, redisMessagePublisher, kafkaMessagePublisher);
     }
 
     public void purchaseSuccessful(Long userId) {

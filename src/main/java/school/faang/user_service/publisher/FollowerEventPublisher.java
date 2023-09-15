@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.model.EventType;
+import school.faang.user_service.service.kafka.KafkaMessagePublisher;
 import school.faang.user_service.service.redis.RedisMessagePublisher;
 import school.faang.user_service.service.redis.events.FollowerEvent;
 
@@ -22,9 +23,11 @@ public class FollowerEventPublisher extends AbstractEventPublisher {
     private String followerEventChannelName;
 
     @Autowired
-    public FollowerEventPublisher(EventMapper eventMapper, ObjectMapper objectMapper,
-                                  RedisMessagePublisher redisMessagePublisher) {
-        super(eventMapper, objectMapper, redisMessagePublisher);
+    public FollowerEventPublisher(EventMapper eventMapper,
+                                  ObjectMapper objectMapper,
+                                  RedisMessagePublisher redisMessagePublisher,
+                                  KafkaMessagePublisher kafkaMessagePublisher) {
+        super(eventMapper, objectMapper, redisMessagePublisher, kafkaMessagePublisher);
     }
 
     public void followerSubscribed(Long followerId, Long followeeId) {

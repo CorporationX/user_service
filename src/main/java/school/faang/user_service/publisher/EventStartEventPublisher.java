@@ -7,9 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.model.EventType;
+import school.faang.user_service.service.kafka.KafkaMessagePublisher;
 import school.faang.user_service.service.redis.RedisMessagePublisher;
 import school.faang.user_service.service.redis.events.EventInfo;
 
@@ -22,9 +24,11 @@ public class EventStartEventPublisher extends AbstractEventPublisher{
     private String startedEventsChannel;
 
     @Autowired
-    public EventStartEventPublisher(EventMapper eventMapper, ObjectMapper objectMapper,
-                                    RedisMessagePublisher redisMessagePublisher) {
-        super(eventMapper, objectMapper, redisMessagePublisher);
+    public EventStartEventPublisher(EventMapper eventMapper,
+                                    ObjectMapper objectMapper,
+                                    RedisMessagePublisher redisMessagePublisher,
+                                    KafkaMessagePublisher kafkaMessagePublisher) {
+        super(eventMapper, objectMapper, redisMessagePublisher, kafkaMessagePublisher);
     }
 
     public void publish(Event event) {

@@ -40,6 +40,7 @@ public class UserService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new IllegalStateException("User not found with ID: " + userId));
         profileViewEventPublisher.publishProfileViewEvent(userId);
+        profileViewEventPublisher.publishProfileViewEventToKafka(userId);
         return userMapper.toDto(user);
     }
 

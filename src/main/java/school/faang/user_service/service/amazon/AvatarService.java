@@ -45,8 +45,8 @@ public class AvatarService {
                     nameFile,
                     new ByteArrayInputStream(data),
                     addMetadata(data));
-
-            clientAmazonS3.putObject(request);
+            //TODO The specified bucket is not valid.
+            //clientAmazonS3.putObject(request);
         } catch (AmazonServiceException e) {
            throw new DiceBearApiException("Can't upload file: " + e.getMessage());
         }

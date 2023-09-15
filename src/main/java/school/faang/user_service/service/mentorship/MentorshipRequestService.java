@@ -3,16 +3,16 @@ package school.faang.user_service.service.mentorship;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.mentorship.RequestFilterDto;
-import school.faang.user_service.entity.MentorshipRequest;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
+import school.faang.user_service.dto.mentorship.RequestFilterDto;
+import school.faang.user_service.entity.MentorshipRequest;
+import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.filter.mentorship_request.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-import school.faang.user_service.filter.mentorship_request.MentorshipRequestFilter;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
 
@@ -34,6 +34,7 @@ public class MentorshipRequestService {
         User requester = userService.findUserById(dto.getRequesterId());
         User receiver = userService.findUserById(dto.getReceiverId());
 
+        //TODO change entity to dto
         mentorshipRequestValidator.requestValidate(requester, receiver);
         MentorshipRequest mentorshipRequest = mentorshipRequestMapper.toEntity(dto);
         mentorshipRequestRepository.save(mentorshipRequest);

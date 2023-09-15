@@ -97,6 +97,12 @@ public class UserService {
                 .toList();
     }
 
+    @Transactional
+    public void banAuthors(List<Long> bannerId) {
+        userRepository.findAllById(bannerId)
+                .forEach(user -> user.setBanned(true));
+    }
+
     private List<PersonSchemaForUser> parseCsv(InputStream inputStream) throws IOException {
         MappingIterator<PersonSchemaForUser> iterator = csvMapper.readerFor(PersonSchemaForUser.class)
                 .with(schema)

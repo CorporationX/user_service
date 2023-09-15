@@ -8,17 +8,20 @@ import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.CountryDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.contact.PreferredContact;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.FIELD,
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper {
-
-    @Mapping(source = "preferredContact", target = "contactPreference.preference")
+    @Mapping(target = "contactPreference", source = "preferredContact")
     User toEntity(UserDto userDto);
 
-    @Mapping(source = "contactPreference.preference", target = "preferredContact")
+    default PreferredContact mapPreferredContact(PreferredContact preferredContact) {
+        return preferredContact != null ? preferredContact : PreferredContact.EMAIL;
+    }
+    @Mapping(target = "preferredContact", source = "contactPreference.preference")
     UserDto toDto(User user);
 
     List<UserDto> toDto(List<User> users);

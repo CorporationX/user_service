@@ -67,7 +67,7 @@ class MentorshipServiceTest {
                 .id(0L)
                 .username("any")
                 .email("any")
-                .preferrdeContact(PreferredContact.EMAIL)
+                .preferredContact(PreferredContact.EMAIL)
                 .build());
 
         Mockito.when(mentorshipRepository.findById(mentorId))
@@ -95,7 +95,7 @@ class MentorshipServiceTest {
                 .id(0L)
                 .username("any")
                 .email("any")
-                .preferdContact(PreferredContact.EMAIL)
+                .preferredContact(PreferredContact.EMAIL)
                 .build());
 
         Mockito.when(mentorshipRepository.findById(menteeId))

@@ -3,8 +3,6 @@ package school.faang.user_service.controller.user;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,9 +16,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.repository.CountryRepository;
-import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.entity.contact.PreferredContact;
 
 import java.util.List;
 
@@ -36,14 +32,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UserControllerTest {
-    @InjectMocks
-    private UserController userController;
-    @Mock
-    private UserService userService;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private CountryRepository countryRepository;
     @Autowired
     private MockMvc mockMvc;
     @Container
@@ -94,6 +82,8 @@ class UserControllerTest {
 
         //france hava id 4
         assertEquals(4, user.getCountry().getId());
+        assertEquals("France", user.getCountry().getTitle());
+        assertEquals(PreferredContact.EMAIL, user.getPreferredContact());
     }
 
     @Test
@@ -119,7 +109,7 @@ class UserControllerTest {
                                 .content(json))
                 .andExpect(status().isOk());
 
-        UserDto user = new ObjectMapper().readValue(result.andReturn().getResponse().getContentAsString(), User.class);
+        UserDto user = new ObjectMapper().readValue(result.andReturn().getResponse().getContentAsString(), UserDto.class);
 
         assertEquals("sampleUsername", user.getUsername());
         assertTrue(user.getCountry() != null);

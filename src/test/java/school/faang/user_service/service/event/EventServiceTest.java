@@ -289,7 +289,7 @@ class EventServiceTest {
         assertEquals(3, result.getUserIds().size());
         assertEquals(2, result.getEventId());
 
-        verify(eventStartPublisher).publishMessage(result);
+        verify(eventStartPublisher).publish(result);
     }
 
     private EventDto createEventDto() {

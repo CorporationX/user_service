@@ -23,6 +23,5 @@ public interface UserMapper {
 
     default List<UserDto> toDtoList(List<User> users) {
         return users.stream().map(this::toUserDto).toList();
-    }
-
+    };
 }

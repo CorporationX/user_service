@@ -62,10 +62,10 @@ payment-service:
     delay-ms: 3000
 
 aws:
-  accessKey: AKIAZ3KSEE34R2FW4VM7
-  secretKey: KgrdesfPA5j6OEhDzSvfn+26yzwxwc3Qy23msoNz
-  bucketName: corpx-unicorn-dicebear-bucket
-  region: Regions.EU_NORTH_1
+  accessKey: your-access-key
+  secretKey: your-secret-key
+  bucketName: your-bucket-name
+  region: your-region
 
 services:
   s3:
@@ -80,3 +80,42 @@ google:
     calendar-id: primary
     access-type: offline
     client-email: serhii.rubets@gmail.com
+
+profile-picture-service:
+  styles:
+    - adventurer
+    - adventurer-neutral
+    - avataaars
+    - avataaars-neutral
+    - big-ears
+    - big-ears-neutral
+    - big-smile
+    - bottts
+    - bottts-neutral
+    - croodles
+    - croodles-neutral
+    - fun-emoji
+    - icons
+    - identicon
+    - initials
+    - lorelei
+    - lorelei-neutral
+    - micah
+    - miniavs
+    - notionists
+    - notionists-neutral
+    - open-peeps
+    - personas
+    - pixel-art
+    - pixel-art-neutral
+    - shapes
+    - thumbs
+  dicebear:
+    baseUrl: "https://api.dicebear.com/6.x/"
+  image:
+    resized-dimensions:
+      width: 180
+      height: 180
+  extensions:
+    original: ".svg"
+    resized: "_small.jpg"

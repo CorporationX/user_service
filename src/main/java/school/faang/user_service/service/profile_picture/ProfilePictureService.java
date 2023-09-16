@@ -1,12 +1,10 @@
 package school.faang.user_service.service.profile_picture;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.config.ProfilePictureServiceConfig;
 import school.faang.user_service.entity.User;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClients;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.service.s3.S3Client;
 
@@ -15,87 +13,78 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Set;
-
-import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProfilePictureService {
 
-    private final Set<String> STYLES = Set.of("adventurer", "adventurer-neutral", "avataaars", "avataaars-neutral",
-            "big-ears", "big-ears-neutral", "big-smile", "bottts", "bottts-neutral", "croodles", "croodles-neutral",
-            "fun-emoji", "icons", "identicon", "initials", "lorelei", "lorelei-neutral", "micah", "miniavs", "notionists",
-            "notionists-neutral", "open-peeps", "personas", "pixel-art", "pixel-art-neutral", "shapes", "thumbs");
-
-    private final String DICE_BEAR_BASE_URL =
-            String.format("https://api.dicebear.com/6.x/%s/svg?seed=", STYLES.iterator().next());
-
     private final S3Client s3Client;
+    private final ProfilePictureServiceConfig config;
 
-    private final int WIDTH = 180;
-    private final int HEIGHT = 180;
-
-    private final String ORIGINAL_EXTENSION = ".svg";
-    private final String SMALL_EXTENSION = "_small.jpg";
-
-    public String generatePictureUrl(User user) throws IOException {
+    public String generatePictureUrl(User user) {
         String encodedUsername = URLEncoder.encode(user.getUsername(), StandardCharsets.UTF_8);
-        String avatarUrl = DICE_BEAR_BASE_URL + encodedUsername;
-
-        HttpClient httpClient = HttpClients.createDefault();
-        HttpGet httpGet = new HttpGet(avatarUrl);
-        HttpResponse httpResponse = httpClient.execute(httpGet);
-
-        if (httpResponse.getStatusLine().getStatusCode() == 200) {
-            return avatarUrl;
-        } else {
-            throw new IOException("Failed to generate the avatar URL for the user.");
-        }
+        return config.getDiceBearBaseUrlWithStyle() + encodedUsername;
     }
 
-    public byte[] downloadPicture(String pictureURL) throws IOException {
-        URL url = new URL(pictureURL);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+    public byte[] downloadPicture(String pictureURL) {
+        byte[] pictureBytes = new byte[0];
 
-        try (InputStream in = connection.getInputStream()) {
-            return in.readAllBytes();
-        } finally {
-            connection.disconnect();
+        try {
+            URL url = new URL(pictureURL);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            try (InputStream in = connection.getInputStream()) {
+                pictureBytes = in.readAllBytes();
+            }
+        } catch (MalformedURLException e) {
+            log.error("Invalid picture URL: {}", pictureURL);
+        } catch (IOException e) {
+            log.error("Failed to download picture from URL: {}", pictureURL);
         }
+
+        return pictureBytes;
     }
 
-    public byte[] resizePicture(byte[] pictureData) throws IOException {
-        BufferedImage originalImage = ImageIO.read(new ByteArrayInputStream(pictureData));
-        BufferedImage resizedImage = new BufferedImage(WIDTH, HEIGHT, originalImage.getType());
-
-        Graphics2D g = resizedImage.createGraphics();
-        g.drawImage(originalImage, 0, 0, WIDTH, HEIGHT, null);
-        g.dispose();
-
+    public byte[] resizePicture(byte[] pictureData) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(resizedImage, "jpg", baos);
+
+        try {
+            BufferedImage originalImage = ImageIO.read(new ByteArrayInputStream(pictureData));
+            BufferedImage resizedImage = new BufferedImage(config.getWidth(), config.getHeight(), BufferedImage.TYPE_INT_RGB);
+
+            Graphics2D g = resizedImage.createGraphics();
+            g.drawImage(originalImage, 0, 0, config.getWidth(), config.getHeight(), null);
+            g.dispose();
+
+            ImageIO.write(resizedImage, "JPEG", baos);
+        } catch (IOException e) {
+            log.error("Invalid request. Failed to resize picture.");
+        }
+
         return baos.toByteArray();
     }
 
-    public void setProfilePicture(User user) throws IOException {
+    public void setProfilePicture(User user) {
         String pictureURL = generatePictureUrl(user);
 
         byte[] picture = downloadPicture(pictureURL);
         byte[] resizedPicture = resizePicture(picture);
 
-        s3Client.upload(user, picture, ORIGINAL_EXTENSION);
-        s3Client.upload(user, resizedPicture, SMALL_EXTENSION);
+        s3Client.uploadProfilePicture(user, picture, config.getOriginalExtension());
+        s3Client.uploadProfilePicture(user, resizedPicture, config.getResizedExtension());
 
         UserProfilePic profilePic = new UserProfilePic();
 
-        profilePic.setFileId(s3Client.getURLById(user.getId(), ORIGINAL_EXTENSION));
-        profilePic.setSmallFileId(s3Client.getURLById(user.getId(), SMALL_EXTENSION));
+        profilePic.setFileId(s3Client.getURLById(user.getId(), config.getOriginalExtension()));
+        profilePic.setSmallFileId(s3Client.getURLById(user.getId(), config.getResizedExtension()));
 
         user.setUserProfilePic(profilePic);
     }

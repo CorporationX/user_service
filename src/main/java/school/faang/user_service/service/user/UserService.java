@@ -1,16 +1,19 @@
 package school.faang.user_service.service.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.MentorshipService;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.goal.GoalService;
+import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.service.profile_picture.ProfilePictureService;
 
 import java.io.IOException;

@@ -1,43 +1,55 @@
 package school.faang.user_service.service.s3;
 
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import org.checkerframework.checker.units.qual.A;
-import org.junit.jupiter.api.DisplayName;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.service.profile_picture.ProfilePictureService;
 
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
-@Data
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
 public class S3ClientTest {
 
-    private final Environment environment;
+    @Mock
+    private AmazonS3 amazonS3;
 
-    @Autowired
-    private final S3Client s3Client;
-
-    private ProfilePictureService profilePictureService = new ProfilePictureService(s3Client);
-
+    @InjectMocks
+    private S3Client s3Client;
 
     @Test
-    @DisplayName("Should upload a file")
-    void testPictureUploading() throws IOException {
+    public void testUploadProfilePicture() {
+        User user = new User();
+        user.setId(123L);
+        user.setUsername("testuser");
+        byte[] imageData = {};
+        String extension = ".jpg";
 
-        User user = User.builder().id(1L).username("Tony").build();
-        String url = profilePictureService.generatePictureUrl(user);
-        byte[] pic = profilePictureService.downloadPicture(url);
-        s3Client.upload(user, pic, ".svg");
+        s3Client.uploadProfilePicture(user, imageData, extension);
+        verify(amazonS3).putObject(eq(s3Client.getBucketName()), eq(user.getId() + extension), any(ByteArrayInputStream.class), any(ObjectMetadata.class));
     }
 
-//    @Test
-//    @DisplayName("Should return profile picture link")
-//    void testGetPictureURL() {
-//        S3Client s3 = new S3Client();
-//        System.out.println(s3.getPictureURLById(1L));
-//    }
+    @Test
+    public void testGetURLById() throws MalformedURLException {
+        Long id = 123L;
+        String extension = ".jpg";
+
+        when(amazonS3.generatePresignedUrl(any())).thenReturn(new URL("https://example.com/image.jpg"));
+        String url = s3Client.getURLById(id, extension);
+
+        verify(amazonS3).generatePresignedUrl(any(GeneratePresignedUrlRequest.class));
+        assertEquals("https://example.com/image.jpg", url);
+    }
 }

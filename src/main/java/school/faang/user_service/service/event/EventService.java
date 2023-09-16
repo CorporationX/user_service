@@ -111,7 +111,7 @@ public class EventService {
                 .toList();
 
         EventStartDto eventStartDto = new EventStartDto(event.getId(), userIds);
-        eventStartPublisher.publishMessage(eventStartDto);
+        eventStartPublisher.publish(eventStartDto);
         return eventStartDto;
     }
 

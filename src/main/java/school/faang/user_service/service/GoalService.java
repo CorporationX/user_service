@@ -96,7 +96,7 @@ public class GoalService {
         validateGoalToCreate(userId, goalDto);
         Goal goal = goalRepository.save(createGoalMapper.toGoalFromCreateGoalDto(goalDto));
         goal.setUsers(List.of(User.builder().id(userId).build()));
-        goalSetPublisher.publishMessage(new GoalSetEventDto(goal.getId(), userId));
+        goalSetPublisher.publish(new GoalSetEventDto(goal.getId(), userId));
         return createGoalMapper.toResponseGoalDtoFromGoal(goal);
     }
 

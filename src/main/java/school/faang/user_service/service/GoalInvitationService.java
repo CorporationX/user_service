@@ -53,7 +53,7 @@ public class GoalInvitationService {
         invitation.setStatus(RequestStatus.ACCEPTED);
 
         goalInvitationRepository.save(invitation);
-        goalSetPublisher.publishMessage(new GoalSetEventDto(goal.getId(), invited.getId()));
+        goalSetPublisher.publish(new GoalSetEventDto(goal.getId(), invited.getId()));
     }
 
     @Transactional

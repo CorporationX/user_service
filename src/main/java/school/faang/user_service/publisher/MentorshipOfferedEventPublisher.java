@@ -11,22 +11,14 @@ import school.faang.user_service.dto.mentorship.MentorshipOfferedEventDto;
 import school.faang.user_service.exception.DataValidationException;
 
 @Component
-@RequiredArgsConstructor
-@Slf4j
-public class MentorshipOfferedEventPublisher {
-    private final RedisTemplate<String, Object> redisTemplate;
-    private final ObjectMapper objectMapper;
-    @Value("${spring.data.redis.channels.mentorship_offer_channel.name}")
-    private String topicMentorshipOffered;
+public class MentorshipOfferedEventPublisher extends EventPublisher<MentorshipOfferedEventDto> {
+    public MentorshipOfferedEventPublisher(RedisTemplate<String, Object> redisTemplate,
+                                           ObjectMapper objectMapper,
+                                           @Value("${spring.data.redis.channels.mentorship_offer_channel.name}") String topicMentorshipOffered) {
+        super(redisTemplate, objectMapper, topicMentorshipOffered);
+    }
 
     public void publish(MentorshipOfferedEventDto mentorshipOfferedEventDto) {
-        String json = null;
-        try {
-            json = objectMapper.writeValueAsString(mentorshipOfferedEventDto);
-        } catch (JsonProcessingException e) {
-            log.error("Can't use publish ",e.getMessage());
-            throw new DataValidationException("Problem with json");
-        }
-        redisTemplate.convertAndSend(topicMentorshipOffered, json);
+        publishToChannel(mentorshipOfferedEventDto);
     }
 }

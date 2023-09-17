@@ -27,7 +27,7 @@ spring:
         profile_view_channel:
           name: profile_view_channel
         mentorship_offer_channel:
-          name: mentorship_offered_channel
+          name: mentorship-offered-channel
   google:
     calendar:
       application-name: Corporation-X

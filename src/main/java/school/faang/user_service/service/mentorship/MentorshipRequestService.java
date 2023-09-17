@@ -2,13 +2,13 @@ package school.faang.user_service.service.mentorship;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.mentorship.MentorshipOfferedEventDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.dto.mentorship.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
-import school.faang.user_service.entity.PreferredContact;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
@@ -20,7 +20,6 @@ import school.faang.user_service.repository.mentorship.MentorshipRequestReposito
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -42,10 +41,12 @@ public class MentorshipRequestService {
 
         //TODO: fix validator (change entity to dto)
         mentorshipRequestValidator.requestValidate(requester, receiver);
-        MentorshipRequest mentorshipRequest = mentorshipRequestRepository.save(mentorshipRequestMapper.toEntity(dto));
+        MentorshipRequest mentorshipRequest = mentorshipRequestMapper.toEntity(dto);
+        mentorshipRequest.setStatus(RequestStatus.PENDING);
+        mentorshipRequest = mentorshipRequestRepository.save(mentorshipRequest);
 
         MentorshipRequestDto mentorshipRequestDto = mentorshipRequestMapper.toDto(mentorshipRequest);
-        sendNotification(mentorshipRequestDto, receiver.getEmail());
+        sendNotification(mentorshipRequestDto);
 
         return mentorshipRequestDto;
     }
@@ -96,9 +97,9 @@ public class MentorshipRequestService {
                 .orElseThrow(() -> new DataValidationException("Request is not exist"));
     }
 
-    private void sendNotification(MentorshipRequestDto mentorshipRequestDto, String email) {
+    @Async
+    private void sendNotification(MentorshipRequestDto mentorshipRequestDto) {
         MentorshipOfferedEventDto mentorshipOfferedEventDto = mentorshipOfferedEventMapper.toMentorshipOfferedEvent(mentorshipRequestDto);
-        mentorshipOfferedEventDto.setMessage(mentorshipRequestDto.getDescription());
         mentorshipOfferedEventPublisher.publish(mentorshipOfferedEventDto);
     }
 }

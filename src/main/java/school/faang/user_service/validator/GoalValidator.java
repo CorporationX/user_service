@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.GoalDto;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
@@ -20,11 +19,11 @@ public class GoalValidator {
     private final GoalRepository goalRepository;
     private final SkillRepository skillRepository;
     @Value("${spring.goals.user_max_count}")
-    private int maxGoals;
+    private int userMaxGoalsCount;
 
     public void validateToCreate(Long userId, GoalDto goalDto) {
         long userSkillCount = goalRepository.countActiveGoalsPerUser(userId);
-        if (userSkillCount >= maxGoals) {
+        if (userSkillCount >= userMaxGoalsCount) {
             throw new DataValidationException("User can't have more than 3 active goals");
         }
         checkSkills(goalDto);

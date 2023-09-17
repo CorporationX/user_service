@@ -27,8 +27,8 @@ import java.util.stream.Collectors;
 public class GoalService {
 
     private final UserService userService;
-    private final SkillService skillService;
     private final GoalRepository goalRepository;
+    private final SkillService skillService;
     private final SkillRepository skillRepository;
     private final GoalMapper goalMapper;
     private final List<GoalFilter> filters;
@@ -133,7 +133,7 @@ public class GoalService {
                 .forEach(filter -> filter.apply(goals, filterDto));
     }
 
-    public Goal getGoal(Long goalId) {
+    private Goal getGoal(Long goalId) {
         return goalRepository.findById(goalId)
                 .orElseThrow(() -> new EntityNotFoundException("Goal with id " + goalId + " does not exist"));
     }

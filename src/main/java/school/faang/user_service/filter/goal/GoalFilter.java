@@ -8,8 +8,6 @@ import java.util.List;
 
 @Component
 public interface GoalFilter {
-
     boolean isApplicable(GoalFilterDto filter);
-
     void apply(List<GoalDto> goals, GoalFilterDto filter);
 }

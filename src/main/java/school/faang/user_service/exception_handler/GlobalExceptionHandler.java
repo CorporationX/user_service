@@ -9,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.FileFormatException;
 import school.faang.user_service.exception.IncorrectIdException;
 import school.faang.user_service.exception.NotPartOfEventException;
 import school.faang.user_service.exception.UserNotFoundException;
@@ -37,6 +38,13 @@ public class GlobalExceptionHandler {
         Map<String, String> body = Map.of("message", exception.getMessage());
         log.error(exception.getMessage(), exception);
         return ResponseEntity.status(HttpStatus.SC_CONFLICT).body(body);
+    }
+
+    @ExceptionHandler(FileFormatException.class)
+    public ResponseEntity<Object> handleFileFormatException(FileFormatException exception) {
+        Map<String, String> body = Map.of("message", exception.getMessage());
+        log.error(exception.getMessage(), exception);
+        return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body(body);
     }
 
     @ExceptionHandler(DataValidationException.class)

@@ -36,7 +36,7 @@ class GoalValidatorTest {
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(goalValidator, "maxUserGoalsCount", 3);
+        ReflectionTestUtils.setField(goalValidator, "userMaxGoalsCount", 3);
 
         goalDto = GoalDto.builder()
                 .id(1L)

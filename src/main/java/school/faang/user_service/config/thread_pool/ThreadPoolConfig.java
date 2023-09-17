@@ -13,8 +13,7 @@ public class ThreadPoolConfig {
     private int scheduledThreadPoolCorePoolSize;
 
     @Bean("scheduledThreadPoolExecutor")
-    public ScheduledThreadPoolExecutor scheduledThreadPoolExecutor(){
+    public ScheduledThreadPoolExecutor scheduledThreadPoolExecutor() {
         return new ScheduledThreadPoolExecutor(scheduledThreadPoolCorePoolSize);
-
     }
 }

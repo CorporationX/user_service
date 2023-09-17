@@ -81,3 +81,7 @@ event:
 
 telegram:
   botUrl: https://t.me/CorpX_bot?start=
+
+students:
+  partitionSize: 100
+  passwordLength: 10

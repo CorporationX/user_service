@@ -93,6 +93,7 @@ services:
 
 users:
   profile_picture:
+    folder: profile_pictures
     max_file_size: 5242880
     big:
       max_size: 1080

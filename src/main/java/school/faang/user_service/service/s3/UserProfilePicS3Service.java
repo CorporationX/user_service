@@ -10,6 +10,7 @@ import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.util.ImageHandler;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 @Service
 @Slf4j
@@ -51,12 +52,14 @@ public class UserProfilePicS3Service extends AbstractS3Service<UserProfilePic> {
                 .build();
     }
 
-    public UserProfilePic download(String key) {
-        return null;
+    @Override
+    public InputStream download(String key) {
+        return downloadFile(bucketName, key);
     }
 
+    @Override
     public void delete(String key) {
-
+        deleteFile(bucketName, key);
     }
 
     private String getKey(String folder, long size, String fileName) {

@@ -23,6 +23,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.s3.UserProfilePicS3Service;
 import school.faang.user_service.util.PasswordGenerator;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -43,6 +44,8 @@ public class UserService {
     private int partitionSize;
     @Value("${users.profile_picture.max_file_size}")
     private long maxFileSize;
+    @Value("${users.profile_picture.folder}")
+    private String folder;
 
     public boolean existsById(long id) {
         return userRepository.existsById(id);
@@ -87,18 +90,35 @@ public class UserService {
     }
 
     @Transactional
-    public UserProfilePicDto uploadProfilePic(MultipartFile file, Long userId) {
+    public UserProfilePicDto saveProfilePic(MultipartFile file, Long userId) {
         if (file.getSize() >= maxFileSize) {
             throw new DataValidationException("File size must be less than 5MB");
         }
-
         User user = getUser(userId);
-        String folder = String.format("profile_pictures/%d_%s", user.getId(), user.getUsername());
+        String folder = getFolder(user);
 
         UserProfilePic userProfilePic = userProfilePicS3Service.upload(file, folder);
         user.setUserProfilePic(userProfilePic);
 
         return profilePicMapper.toDto(userProfilePic);
+    }
+
+    @Transactional(readOnly = true)
+    public InputStream getProfilePic(Long userId) {
+        User user = getUser(userId);
+        String key = user.getUserProfilePic().getFileId();
+        return userProfilePicS3Service.download(key);
+    }
+
+    @Transactional
+    public void deleteProfilePic(Long userId) {
+        User user = getUser(userId);
+        UserProfilePic userProfilePic = user.getUserProfilePic();
+        userProfilePicS3Service.delete(userProfilePic.getFileId());
+        userProfilePicS3Service.delete(userProfilePic.getSmallFileId());
+
+        user.setUserProfilePic(null);
+        userRepository.save(user);
     }
 
     private void mapAndSaveStudents(List<Person> students) {
@@ -118,4 +138,7 @@ public class UserService {
         userRepository.saveAll(users);
     }
 
+    private String getFolder(User user) {
+        return String.format("%s/%d_%s", folder, user.getId(), user.getUsername());
+    }
 }

@@ -2,10 +2,10 @@ package school.faang.user_service.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -19,7 +19,17 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
-import school.faang.user_service.mapper.*;
+import school.faang.user_service.mapper.RecommendationMapper;
+import school.faang.user_service.mapper.RecommendationMapperImpl;
+import school.faang.user_service.mapper.SkillMapper;
+import school.faang.user_service.mapper.SkillMapperImpl;
+import school.faang.user_service.mapper.SkillOfferMapper;
+import school.faang.user_service.mapper.SkillOfferMapperImpl;
+import school.faang.user_service.mapper.UserSkillGuaranteeMapper;
+import school.faang.user_service.mapper.UserSkillGuaranteeMapperImpl;
+import school.faang.user_service.publisher.RecommendationEvent;
+import school.faang.user_service.publisher.RecommendationEventPublisher;
+import school.faang.user_service.publisher.SkillOfferedEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
@@ -58,8 +68,12 @@ class RecommendationServiceTest {
     private UserSkillGuaranteeMapper userSkillGuaranteeMapper = new UserSkillGuaranteeMapperImpl();
     @Spy
     private SkillMapper skillMapper = new SkillMapperImpl(userSkillGuaranteeMapper);
-
-
+    @Mock
+    private SkillOfferedEventPublisher skillOfferedEventPublisher;
+    @Mock
+    private RecommendationEventPublisher recommendationEventPublisher;
+    @Mock
+    private RecommendationEvent recommendationEvent;
     SkillOfferDto skillOfferDto;
     RecommendationDto recommendationDto;
     Recommendation recommendation;
@@ -118,7 +132,7 @@ class RecommendationServiceTest {
         Mockito.when(recommendationRepository.create(1L, 1L, "content"))
                 .thenReturn(1L);
         Mockito.when(recommendationRepository.findById(1L))
-                        .thenReturn(Optional.empty());
+                .thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> recommendationService.create(recommendationDto));
     }
@@ -174,7 +188,7 @@ class RecommendationServiceTest {
                 .id(2L)
                 .guarantees(guaranteesList)
                 .build();
-        recommendation.setSkillOffers(List.of( SkillOffer
+        recommendation.setSkillOffers(List.of(SkillOffer
                 .builder()
                 .id(2L)
                 .skill(skill1)

@@ -22,12 +22,15 @@ spring:
       port: 6379
       host: localhost
       channels:
-        follower_channel:
-          name: follower_channel
-        profile_view_channel:
-          name: profile_view_channel
+        follower_channel: follower-channel
+        profile_view_channel: profile-view-channel
+        recommendation_channel: recommendation-channel
+        skill_offer_channel: skill-offer-channel
+        recommendation_requested_event_channel: recommendation-requested-event-channel
         mentorship_offer_channel:
           name: mentorship-offered-channel
+        user_ban: user-ban
+
   google:
     calendar:
       application-name: Corporation-X
@@ -59,5 +62,12 @@ aws:
 
 services:
   s3:
-    bucket-name: user_backet
+    bucket_name: user_bucket
     isMocked: true
+    endpoint: http://localhost:9000
+    accessKey: user
+    secretKey: password
+    bucket_name_for_avatars: avatar
+    dice_bear:
+      url: https://api.dicebear.com/6.x/pixel-art/svg?seed=
+      size: '&size=100'

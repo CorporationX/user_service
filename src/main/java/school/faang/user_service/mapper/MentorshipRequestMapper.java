@@ -1,5 +1,6 @@
-package school.faang.user_service.mapper.mentorship;
+package school.faang.user_service.mapper;
 
+import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -8,7 +9,8 @@ import school.faang.user_service.entity.MentorshipRequest;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", typeConversionPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.FIELD,
+        unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface MentorshipRequestMapper {
     @Mapping(source = "requester.id", target = "requesterId")
     @Mapping(source = "receiver.id", target = "receiverId")

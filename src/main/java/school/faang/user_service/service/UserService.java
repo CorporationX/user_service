@@ -5,21 +5,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.entity.contact.PreferredContact;
 import school.faang.user_service.mapper.MapperUserDto;
 import school.faang.user_service.messaging.MessagePublisher;
-import school.faang.user_service.messaging.ProfileViewEventPublisher;
 import school.faang.user_service.messaging.events.ProfileViewEvent;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.filter.user.UserFilterDto;
-import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Stream;
 
 @Service

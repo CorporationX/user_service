@@ -38,6 +38,7 @@ class SkillServiceTest {
 
     List<Skill> skillList;
 
+
     @Test
     void getOfferedSkillsTest() {
         long userId = 1L;

@@ -2,8 +2,7 @@ package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.filter.user.UserFilterDto;
 import school.faang.user_service.service.UserService;
 

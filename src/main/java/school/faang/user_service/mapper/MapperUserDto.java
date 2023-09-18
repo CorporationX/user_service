@@ -3,10 +3,8 @@ package school.faang.user_service.mapper;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.ReportingPolicy;
-import school.faang.user_service.dto.UserDto;import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.GoalMapper;
-import school.faang.user_service.mapper.SkillMapper;
+import school.faang.user_service.dto.user.LightUserDto;
+import school.faang.user_service.dto.user.UserDto;import school.faang.user_service.entity.User;
 
 import java.util.List;
 
@@ -28,4 +26,8 @@ public interface MapperUserDto {
 
     List<UserDto> toDto(List<User> userList);
     List<User> toEntity(List<UserDto> userDtoList);
+
+
+    @Mapping(target = "followerIds", expression = "java(entity.getFollowers().stream().map(fol -> fol.getId()).toList())")
+    LightUserDto toLight(User entity);
 }

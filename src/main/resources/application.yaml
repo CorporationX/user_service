@@ -51,7 +51,9 @@ aws:
 
 services:
   s3:
-    bucket-name: user_backet
-    isMocked: true
+    endpoint: <http://localhost:9000>
+    accessKey: user
+    secretKey: password
+    bucketName: projectbucket
 redis:
   postTopic: postTopic

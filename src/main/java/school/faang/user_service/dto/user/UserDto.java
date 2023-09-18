@@ -1,6 +1,7 @@
-package school.faang.user_service.dto;
+package school.faang.user_service.dto.user;
 
 import lombok.Builder;
+import school.faang.user_service.dto.CountryDto;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.contact.PreferredContact;

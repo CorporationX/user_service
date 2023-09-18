@@ -37,9 +37,9 @@ public class PremiumService {
         var price = period.getPrice();
 
         PaymentRequest paymentRequest = createPaymentRequest(price);
-        PaymentResponse paymentResponse = paymentService.sendPayment(paymentRequest).getBody();
+        PaymentResponse paymentResponse = paymentService.sendPayment(paymentRequest);
         Premium premium = new Premium(-1, user, LocalDateTime.now(), LocalDateTime.now().plusDays(period.getDays()));
-        premiumRepository.save(premium);
+        premium = premiumRepository.save(premium);
         user.setPremium(premium);
         return buildPremiumDto(premium, user);
     }

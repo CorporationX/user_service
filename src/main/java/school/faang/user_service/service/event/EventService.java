@@ -35,7 +35,7 @@ public class EventService {
 
     private final List<Filter<Event, EventFilterDto>> filters;
 
-    private final Executor eventExecutor;
+    private final Executor taskScheduler;
     @Value("${spring.jpa.properties.hibernate.jdbc.batch_size}")
     private int batchSize;
 
@@ -112,7 +112,7 @@ public class EventService {
                                             .map(EventDto::getId)
                                             .toList()
                             )
-                            , eventExecutor)
+                            , taskScheduler)
                     .thenRun(() -> log.info("Finished deleting past events"));
         }
     }

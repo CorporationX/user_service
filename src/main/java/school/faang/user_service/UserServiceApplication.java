@@ -1,5 +1,7 @@
 package school.faang.user_service;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -37,6 +39,5 @@ public class UserServiceApplication {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         return objectMapper;
-
     }
 }

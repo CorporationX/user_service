@@ -6,11 +6,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.contact.ContactPreference;
 import school.faang.user_service.entity.contact.PreferredContact;
+import school.faang.user_service.mapper.user.UserMapperImpl;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;

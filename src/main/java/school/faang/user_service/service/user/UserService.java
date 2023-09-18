@@ -6,16 +6,21 @@ import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserProfilePicDto;
+import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.mapper.user.UserMapper;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.PersonMapper;
+import school.faang.user_service.mapper.user.UserProfilePicMapper;
 import school.faang.user_service.parser.PersonParser;
 import school.faang.user_service.pojo.student.Person;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.s3.UserProfilePicS3Service;
 import school.faang.user_service.util.PasswordGenerator;
 
 import java.util.List;
@@ -31,9 +36,13 @@ public class UserService {
     private final UserMapper userMapper;
     private final PersonMapper personMapper;
     private final PersonParser personParser;
+    private final UserProfilePicMapper profilePicMapper;
     private final Executor taskExecutor;
+    private final UserProfilePicS3Service userProfilePicS3Service;
     @Value("${spring.students.partitionSize}")
     private int partitionSize;
+    @Value("${users.profile_picture.max_file_size}")
+    private long maxFileSize;
 
     public boolean existsById(long id) {
         return userRepository.existsById(id);
@@ -75,6 +84,21 @@ public class UserService {
         } else {
             taskExecutor.execute(() -> mapAndSaveStudents(students));
         }
+    }
+
+    @Transactional
+    public UserProfilePicDto uploadProfilePic(MultipartFile file, Long userId) {
+        if (file.getSize() >= maxFileSize) {
+            throw new DataValidationException("File size must be less than 5MB");
+        }
+
+        User user = getUser(userId);
+        String folder = String.format("profile_pictures/%d_%s", user.getId(), user.getUsername());
+
+        UserProfilePic userProfilePic = userProfilePicS3Service.upload(file, folder);
+        user.setUserProfilePic(userProfilePic);
+
+        return profilePicMapper.toDto(userProfilePic);
     }
 
     private void mapAndSaveStudents(List<Person> students) {

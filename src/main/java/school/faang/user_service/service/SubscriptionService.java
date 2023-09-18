@@ -4,13 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.dto.analytics.SearchAppearanceEventDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.user_filters.UserFilter;
-import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 

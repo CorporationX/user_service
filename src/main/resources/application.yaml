@@ -85,5 +85,16 @@ aws:
 
 services:
   s3:
-    bucket-name: user-backet
-    isMocked: true
+    endpoint: http://localhost:9000
+    username: user
+    password: password
+    bucketName: corpbucket
+    isMocked: false
+
+users:
+  profile_picture:
+    max_file_size: 5242880
+    big:
+      max_size: 1080
+    small:
+      max_size: 170

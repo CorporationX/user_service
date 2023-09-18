@@ -74,7 +74,7 @@ class SubscriptionServiceTest {
         Mockito.verify(followerEventPublisher, times(1)).publish(FollowerEventDto
                 .builder()
                 .followerId(22L)
-                .foloweeId(23L)
+                .followeeId(23L)
                 .build());
     }
 

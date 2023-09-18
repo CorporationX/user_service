@@ -26,6 +26,8 @@ spring:
         profile_view_channel: profile-view-channel
         recommendation_channel: recommendation-channel
         skill_offer_channel: skill-offer-channel
+        recommendation_requested_event_channel: recommendation-requested-event-channel
+        user_ban: user-ban
 
   google:
     calendar:
@@ -58,5 +60,12 @@ aws:
 
 services:
   s3:
-    bucket-name: user_backet
+    bucket_name: user_bucket
     isMocked: true
+    endpoint: http://localhost:9000
+    accessKey: user
+    secretKey: password
+    bucket_name_for_avatars: avatar
+    dice_bear:
+      url: https://api.dicebear.com/6.x/pixel-art/svg?seed=
+      size: '&size=100'

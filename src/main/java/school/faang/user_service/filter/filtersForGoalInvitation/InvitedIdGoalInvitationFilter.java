@@ -18,5 +18,4 @@ public class InvitedIdGoalInvitationFilter implements GoalInvitationFilter {
     public List<GoalInvitation> apply(Stream<GoalInvitation> goalInvitationStream, InvitationFilterDto filterDto) {
         return goalInvitationStream.filter(goalInvt -> goalInvt.getInvited().getId() == filterDto.getInvitedId()).toList();
     }
-
 }

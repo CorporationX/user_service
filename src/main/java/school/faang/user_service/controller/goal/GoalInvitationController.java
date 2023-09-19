@@ -19,7 +19,7 @@ import java.util.List;
 public class GoalInvitationController {
     private final GoalInvitationService goalInvitationService;
 
-    @PostMapping("/create")
+    @PostMapping
     public GoalInvitationDto createInvitation(@RequestBody GoalInvitationDto invitation) {
         return goalInvitationService.createInvitation(invitation);
     }
@@ -38,5 +38,4 @@ public class GoalInvitationController {
     public List<GoalInvitationDto> getInvitations(@RequestBody InvitationFilterDto invitationFilterDto) {
         return goalInvitationService.getInvitations(invitationFilterDto);
     }
-
 }

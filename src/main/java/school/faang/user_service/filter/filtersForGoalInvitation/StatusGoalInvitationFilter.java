@@ -18,5 +18,4 @@ public class StatusGoalInvitationFilter implements GoalInvitationFilter {
     public List<GoalInvitation> apply(Stream<GoalInvitation> goalInvitationStream, InvitationFilterDto filterDto) {
         return goalInvitationStream.filter(goalInvt -> goalInvt.getStatus().equals(filterDto.getStatus())).toList();
     }
-
 }

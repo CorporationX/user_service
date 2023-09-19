@@ -18,6 +18,7 @@ import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -34,23 +35,23 @@ public class GoalInvitationService {
 
     @Transactional
     public GoalInvitationDto createInvitation(GoalInvitationDto invitationDto) {
-
         User inviter = userRepository.findById(invitationDto.getInviterId()).get();
         User invited = userRepository.findById(invitationDto.getInvitedUserId()).get();
-        if (invitationDto.getInvitedUserId() <= 0 && invitationDto.getInviterId() <= 0) {
-            throw new GoalInvitationException("InvationDto not found");
-        }
+
         if (!userRepository.existsById(invitationDto.getInviterId())
                 && !userRepository.existsById(invitationDto.getInvitedUserId())) {
             throw new GoalInvitationException("InvationDto missing from the database");
         }
+
         if (invited.equals(inviter)) {
-            throw new GoalInvitationException("Invited equals inviter");
+            throw new GoalInvitationException("You cannot specify the same ID for the invitee and the inviter");
         }
-        Optional<Goal> goal = goalRepository.findById(invitationDto.getGoalId());
+
+        Goal goal = goalRepository.findById(invitationDto.getGoalId()).orElseThrow(() -> new GoalInvitationException("goal not found"));
+
         GoalInvitation savedGoalInvitation = goalInvitationRepository.save(new GoalInvitation(
                 new GoalInvitation().getId(),
-                goal.get(),
+                goal,
                 inviter,
                 invited,
                 invitationDto.getStatus(),
@@ -62,42 +63,27 @@ public class GoalInvitationService {
 
 
     public GoalInvitationDto acceptGoalInvitation(long id) {
-        GoalInvitation goalInvitation = goalInvitationRepository.findById(id).get();
+        GoalInvitation goalInvitation = getGoalInvitation(id);
         User user = goalInvitation.getInvited();
-        Goal goal = goalInvitation.getGoal();
-        if (!user.getGoals().contains(goalInvitation.getGoal()) && user.getGoals().size() > maxGoals) {
-            throw new GoalInvitationException("The user is already in the goal or he is already participating in three goals");
-        }
-        if (goal == null) {
-            throw new GoalInvitationException("goal not found");
-        }
-        goalInvitation.setStatus(RequestStatus.valueOf("ACCEPTED"));
-        user.getGoals().add(goal);
+
+        goalInvitation.setStatus(RequestStatus.ACCEPTED);
+        user.getGoals().add(goalInvitation.getGoal());
+        userRepository.save(user);
+        goalInvitationRepository.save(goalInvitation);
         return goalInvitationMapper.toDto(goalInvitation);
     }
 
     public GoalInvitationDto rejectGoalInvitation(long id) {
-        GoalInvitation goalInvitation = goalInvitationRepository.findById(id).get();
-        User user = goalInvitation.getInvited();
-        Goal goal = goalInvitation.getGoal();
-        if (!user.getGoals().contains(goalInvitation.getGoal()) && user.getGoals().size() > maxGoals) {
-            throw new GoalInvitationException("The user is already in the goal or he is already participating in three goals");
-        }
-        if (goal == null) {
-            throw new GoalInvitationException("goal not found");
-        }
-        goalInvitation.setStatus(RequestStatus.valueOf("REJECTED"));
 
+        GoalInvitation goalInvitation = getGoalInvitation(id);
+        goalInvitation.setStatus(RequestStatus.REJECTED);
+        goalInvitationRepository.save(goalInvitation);
         return goalInvitationMapper.toDto(goalInvitation);
     }
 
     public List<GoalInvitationDto> getInvitations(InvitationFilterDto filters) {
         List<GoalInvitation> invitations = (List<GoalInvitation>) goalInvitationRepository.findAll();
-        if (invitations.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        return applyFilter(invitations.stream(), filters);
+        return invitations.isEmpty() ? Collections.emptyList() : applyFilter(invitations.stream(), filters);
     }
 
     private List<GoalInvitationDto> applyFilter(Stream<GoalInvitation> goalInvitationStream, InvitationFilterDto filterDto) {
@@ -111,4 +97,18 @@ public class GoalInvitationService {
         return invitations.stream().map(goalInvitationMapper::toDto).toList();
     }
 
+    private GoalInvitation getGoalInvitation(long id) {
+        GoalInvitation goalInvitation = goalInvitationRepository.findById(id)
+                .orElseThrow(() -> new GoalInvitationException("GoalInvitation not found"));
+        User user = goalInvitation.getInvited();
+        Goal goal = Optional.of(goalInvitation.getGoal())
+                .orElseThrow(() -> new GoalInvitationException("goal not found"));
+        if (!user.getGoals().contains(goalInvitation.getGoal()) && user.getGoals().size() > maxGoals) {
+            throw new GoalInvitationException("The user is already in the goal or he is already participating in three goals");
+        }
+        if (goal == null) {
+            throw new GoalInvitationException("goal equals null");
+        }
+        return goalInvitation;
+    }
 }

@@ -18,5 +18,4 @@ public class InviterNameGoalInvitationFilter implements GoalInvitationFilter {
     public List<GoalInvitation> apply(Stream<GoalInvitation> goalInvitationStream, InvitationFilterDto filterDto) {
         return goalInvitationStream.filter(goalInvt -> goalInvt.getInviter().getUsername().contains(filterDto.getInviterNamePattern())).toList();
     }
-
 }

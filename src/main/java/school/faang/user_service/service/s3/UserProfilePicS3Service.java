@@ -26,8 +26,8 @@ public class UserProfilePicS3Service extends AbstractS3Service<UserProfilePic> {
                                    @Value("${users.profile_picture.big.max_size}") int maxSizePx,
                                    @Value("${users.profile_picture.small.max_size}") int smallMaxSizePx) {
         super(amazonS3);
-        this.bucketName = bucketName;
         this.imageHandler = imageHandler;
+        this.bucketName = bucketName;
         this.maxSizePx = maxSizePx;
         this.smallMaxSizePx = smallMaxSizePx;
     }
@@ -63,6 +63,6 @@ public class UserProfilePicS3Service extends AbstractS3Service<UserProfilePic> {
     }
 
     private String getKey(String folder, long size, String fileName) {
-        return String.format("%s/%d_%d_%s",folder, size, System.currentTimeMillis(), fileName);
+        return String.format("%s/%d_%d_%s", folder, size, System.currentTimeMillis(), fileName);
     }
 }

@@ -8,5 +8,5 @@ import school.faang.user_service.entity.UserProfilePic;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserProfilePicMapper {
     UserProfilePicDto toDto(UserProfilePic userProfilePic);
-    UserProfilePic toEntity(UserProfilePicMapper userProfilePicMapper);
+    UserProfilePic toEntity(UserProfilePicDto userProfilePicDto);
 }

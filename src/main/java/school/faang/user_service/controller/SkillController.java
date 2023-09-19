@@ -24,19 +24,23 @@ public class SkillController {
     private final SkillService skillService;
     private final SkillOfferService skillOfferService;
 
-    public SkillDto create(SkillDto skill) {
+    @PostMapping("/skill")
+    public SkillDto create(@RequestBody SkillDto skill) {
         validateSkill(skill);
         return skillService.create(skill);
     }
 
-    public List<SkillDto> getUserSkills(long userId) {
+    @GetMapping("/skill/{userId}")
+    public List<SkillDto> getUserSkills(@PathVariable long userId) {
         return skillService.getUserSkills(userId);
     }
 
-    public List<SkillCandidateDto> getOfferedSkills(long userId) {
+    @GetMapping("/skill/{userId}/offered")
+    public List<SkillCandidateDto> getOfferedSkills(@PathVariable long userId) {
         return skillService.getOfferedSkills(userId);
     }
 
+    @PostMapping("/skill/{userId}/offered/{skillId}")
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
         return skillService.acquireSkillFromOffers(skillId, userId);
     }

@@ -1,33 +1,30 @@
 package school.faang.user_service.dto;
 
-import lombok.Data;
+import lombok.Builder;
 import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.dto.skill.SkillDto;
+import school.faang.user_service.entity.contact.PreferredContact;
 
-import java.util.ArrayList;
 import java.util.List;
 
-@Data
-public class UserDto {
-    private long id;
-    private String username;
-    private String email;
-    private List<GoalDto> goalIds;
-
-    public List<GoalDto> getGoals() {
-        return goalIds;
+@Builder
+public record UserDto(Long id,
+                      String username,
+                      String email,
+                      String phone,
+                      String aboutMe,
+                      boolean active,
+                      String city,
+                      Integer experience,
+                      List<Long> followers,
+                      List<Long> followees,
+                      List<Long> mentors,
+                      List<Long> mentees,
+                      CountryDto country,
+                      List<GoalDto> goals,
+                      List<SkillDto> skills,
+                      PreferredContact preference) {
+    public enum PreferredContact {
+        EMAIL, SMS, TELEGRAM
     }
-    public void setGoals(List<GoalDto> goalIds) {
-        this.goalIds = goalIds;
-    }
-
-    public void addGoals(GoalDto goalDto) {
-        if (goalIds == null) {
-            goalIds = new ArrayList<>();
-        }
-        goalIds.add(goalDto);
-    }
-
-
-
-
 }

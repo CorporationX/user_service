@@ -15,6 +15,7 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
+import school.faang.user_service.messaging.RecommendationEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
@@ -25,7 +26,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +39,7 @@ public class RecommendationService {
     private final SkillRepository skillRepository;
     private final UserRepository userRepository;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
+    private final RecommendationEventPublisher eventPublisher;
 
     @Transactional
     public RecommendationDto create(RecommendationDto recommendationDto) {
@@ -47,6 +48,7 @@ public class RecommendationService {
         Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
         recommendationRepository.save(recommendation);
         processSkillOffers(recommendation);
+        eventPublisher.publish(recommendation);
 
         return recommendationMapper.toDto(recommendation);
     }
@@ -69,6 +71,7 @@ public class RecommendationService {
         recommendationRepository.deleteById(recommendationId);
     }
 
+    @Transactional(readOnly = true)
     public Page<RecommendationDto> getAllUserRecommendations(long receiverId, int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<Recommendation> receiverRecommendations = recommendationRepository.findAllByReceiverId(receiverId, pageable);
@@ -76,11 +79,12 @@ public class RecommendationService {
         return receiverRecommendations.map(recommendationMapper::toDto);
     }
 
-    public Page<RecommendationDto>  getAllGivenRecommendations(long authorId, int pageNumber, int pageSize){
+    @Transactional(readOnly = true)
+    public Page<RecommendationDto> getAllGivenRecommendations(long authorId, int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<Recommendation> authorRecommendations = recommendationRepository.findAllByAuthorId(authorId, pageable);
 
-        return   authorRecommendations.map(recommendationMapper::toDto);
+        return authorRecommendations.map(recommendationMapper::toDto);
     }
 
     private void processSkillOffers(Recommendation recommendation) {

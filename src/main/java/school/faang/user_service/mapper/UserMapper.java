@@ -11,6 +11,7 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.contact.PreferredContact;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.FIELD,
@@ -33,9 +34,10 @@ public interface UserMapper {
     @Named("usersToIds")
     default List<Long> mapUsersToIds(List<User> value) {
         if (value == null) {
-            return null;
+            return new ArrayList<>();
         }
         return value.stream().map(User::getId).toList();
+    }
 
     UserDto personToUserDto(PersonSchemaForUser person);
 

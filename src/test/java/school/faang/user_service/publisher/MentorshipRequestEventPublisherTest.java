@@ -26,7 +26,7 @@ public class MentorshipRequestEventPublisherTest {
     private ObjectMapper objectMapper;
 
     @Mock
-    private ChannelTopic topicMentorshipRequest;
+    private String topicMentorshipRequest;
 
     private MentorshipRequestedEventPublisher eventPublisher;
 

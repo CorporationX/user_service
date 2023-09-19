@@ -37,6 +37,9 @@ spring:
       scopes: https://www.googleapis.com/auth/calendar
       access-type: offline
 
+  config:
+    import: classpath:values/values.yaml
+
 server:
   port: 8080
 

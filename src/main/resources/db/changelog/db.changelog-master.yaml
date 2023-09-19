@@ -17,3 +17,5 @@ databaseChangeLog:
       file: db/changelog/changeset/user_V008__google_token.sql
   - include:
       file: db/changelog/changeset/user_V009_insert-contact_preferences.sql
+  - include:
+      file: db/changelog/changeset/user_V010__user_rating.sql

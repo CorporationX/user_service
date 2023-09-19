@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.client.PaymentServiceClient;
 import school.faang.user_service.dto.premium.Currency;
 import school.faang.user_service.dto.premium.PaymentRequest;
@@ -22,6 +23,8 @@ import school.faang.user_service.validator.PremiumValidator;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +36,9 @@ public class PremiumService {
     private final PremiumValidator premiumValidator;
     private final PremiumMapper premiumMapper;
     private final Clock clock = Clock.systemUTC();
+    private final UserRatingService userRatingService;
 
+    @Transactional
     public PremiumDto buyPremium(long userId, PremiumPeriod premiumPeriod) {
         premiumValidator.validateExistPremiumFromUser(userId);
         User user = userRepository.findById(userId)
@@ -41,8 +46,19 @@ public class PremiumService {
 
         paymentPremium(premiumPeriod);
 
-        Premium savePremium = savePremiumToRepository(premiumPeriod, user, clock);
+        Premium savePremium = savePremiumToRepository(premiumPeriod, user);
+        userRatingService.addRatingForPremium(userId);
         return premiumMapper.toDto(savePremium);
+    }
+
+    @Transactional
+    public void delete(Premium premium) {
+        premiumRepository.delete(premium);
+    }
+
+    public List<Premium> findAllPremium() {
+        return StreamSupport.stream(premiumRepository.findAll().spliterator(), false)
+                .toList();
     }
 
     @Retryable(retryFor = FeignException.class)
@@ -55,23 +71,13 @@ public class PremiumService {
         premiumValidator.validateResponse(response);
     }
 
-    private Premium savePremiumToRepository(PremiumPeriod premiumPeriod, User user, Clock clock) {
+    private Premium savePremiumToRepository(PremiumPeriod premiumPeriod, User user) {
         Premium premium = new Premium();
         premium.setUser(user);
         LocalDateTime startDate = LocalDateTime.now(clock);
-        LocalDateTime endDate = startDate.plusDays(premiumPeriod.getDays());
         premium.setStartDate(startDate);
+        LocalDateTime endDate = startDate.plusDays(premiumPeriod.getDays());
         premium.setEndDate(endDate);
         return premiumRepository.save(premium);
     }
-
-//    public static void main(String[] args) {
-//        Premium premium = Premium.builder()
-//                .id(1l)
-//                .user(User.builder().id(1l).phone("+7 999 999 99 99").build())
-//                .endDate(LocalDateTime.now())
-//                .startDate(LocalDateTime.now())
-//                .build();
-//        PremiumMapperImpl premiumMapperImpl = new PremiumMapperImpl();
-//    }
 }

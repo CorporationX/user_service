@@ -51,6 +51,8 @@ class PremiumServiceTest {
     private PremiumValidator premiumValidator;
 
     @Mock
+    private UserRatingService userRatingService;
+
     private Clock clock;
 
     @Spy
@@ -68,6 +70,7 @@ class PremiumServiceTest {
     void setUp() {
         user = User.builder().id(1L).build();
         clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
+        ReflectionTestUtils.setField(premiumService, "clock", clock);
 
         premium = new Premium();
         premium.setId(1L);
@@ -88,7 +91,6 @@ class PremiumServiceTest {
     @Test
     void testByPremium() {
         PremiumDto actual = premiumMapper.toDto(premium);
-
         assertEquals(premiumDto, actual);
     }
 
@@ -102,6 +104,7 @@ class PremiumServiceTest {
 
         Mockito.when(premiumRepository.count()).thenReturn(paymentNumber);
         Mockito.when(paymentServiceClient.sendPayment(paymentRequest)).thenReturn(ResponseEntity.ok(response));
+
         ReflectionTestUtils.invokeMethod(premiumService, "paymentPremium", PremiumPeriod.THREE_MONTH);
 
         Mockito.verify(paymentServiceClient, Mockito.times(1)).sendPayment(paymentRequest);
@@ -110,7 +113,7 @@ class PremiumServiceTest {
 
     @Test
     void testSavePremiumToRepository() {
-        ReflectionTestUtils.invokeMethod(premiumService, "savePremiumToRepository", PremiumPeriod.THREE_MONTH, user, clock);
+        ReflectionTestUtils.invokeMethod(premiumService, "savePremiumToRepository", PremiumPeriod.THREE_MONTH, user);
         premium.setId(0L);
 
         Mockito.verify(premiumRepository, Mockito.times(1)).save(premium);

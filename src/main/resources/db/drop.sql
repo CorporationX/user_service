@@ -4,7 +4,7 @@ DROP TABLE skill_request;
 DROP TABLE recommendation_request;
 DROP TABLE skill_offer;
 DROP TABLE recommendation;
-DROP TABLE skill_guarantee;
+DROP TABLE user_skill_guarantee;
 DROP TABLE user_skill;
 DROP TABLE mentorship_request;
 DROP TABLE mentorship;
@@ -20,5 +20,6 @@ DROP TABLE goal;
 DROP TABLE skill;
 DROP TABLE users;
 DROP TABLE country;
+DROP TABLE user_rating;
 
 DELETE FROM databasechangelog;

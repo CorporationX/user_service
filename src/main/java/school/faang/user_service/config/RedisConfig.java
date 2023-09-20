@@ -23,6 +23,12 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}")
     private int port;
 
+    @Value("${spring.data.redis.channels.mentorship_channel}")
+    private String mentorshipChannel;
+
+    @Value("${spring.data.redis.channels.goal_completed_channel}")
+    private String goalCompletedChannel;
+
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
         System.out.println(port);
@@ -44,4 +50,13 @@ public class RedisConfig {
         return new ChannelTopic("viewProfileTopic");
     }
 
+    @Bean
+    public ChannelTopic mentorshipChannelTopic() {
+        return new ChannelTopic(mentorshipChannel);
+    }
+
+    @Bean
+    public ChannelTopic goalCompletedChannelTopic() {
+        return new ChannelTopic(goalCompletedChannel);
+    }
 }

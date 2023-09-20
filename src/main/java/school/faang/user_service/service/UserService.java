@@ -42,9 +42,8 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserDto getUser(long currentUserId , long userId) {
-        String message = String.format("Entity with ID %d not found", userId);
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(message));
+                .orElseThrow(() -> new EntityNotFoundException(""));
         profileViewEventMessagePublisher.publish(new ProfileViewEvent(currentUserId, userId, LocalDateTime.now()));
 
         return userMapper.toDto(user);
@@ -52,9 +51,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserDto getUserInternal(long userId) {
-        String message = String.format("Entity with ID %d not found", userId);
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(message));
+        User user = findUserById(userId);
 
         return userMapper.toDto(user);
     }
@@ -66,5 +63,17 @@ public class UserService {
         return allById.stream()
                 .map(userMapper::toDto)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public User findUserById(Long userId){
+        String message = String.format("Entity with ID %d not found", userId);
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(message));
+    }
+
+    @Transactional
+    public User saveUser(User user){
+        return userRepository.save(user);
     }
 }

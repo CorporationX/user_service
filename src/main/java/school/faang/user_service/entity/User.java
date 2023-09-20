@@ -16,6 +16,7 @@ import school.faang.user_service.entity.event.Rating;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.recommendation.Recommendation;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -160,4 +161,10 @@ public class User {
 
     @OneToOne(mappedBy = "user")
     private Premium premium;
+
+    @Column(name = "storage_size")
+    private BigInteger storageSize;
+
+    @Column(name = "max_storage_size")
+    private BigInteger maxStorageSize;
 }

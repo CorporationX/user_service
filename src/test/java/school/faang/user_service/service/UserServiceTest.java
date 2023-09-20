@@ -112,6 +112,7 @@ public class UserServiceTest {
         user2.setContactPreference(ContactPreference.builder().preference(PreferredContact.EMAIL).build());
         ProfileViewEvent profileViewEvent = new ProfileViewEvent(idViewer, idViewed, dateTime);
         Mockito.when(userRepository.findById(idViewed)).thenReturn(Optional.of(user2));
+//        Mockito.when(userService.findUserById(idViewed)).thenReturn(user2);
 
         userService.getUser(idViewer, idViewed);
         Mockito.verify(profileViewEventMessagePublisher, Mockito.times(1))

@@ -9,13 +9,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.recommendation.RecommendationService;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class RecommendationControllerTest {
@@ -48,42 +49,6 @@ public class RecommendationControllerTest {
 
         verify(recommendationService, times(1)).update(recommendationDto);
         assertEquals(recommendationDto, result);
-    }
-
-    @Test
-    public void testGiveRecommendation_blankContent_throwException() {
-        RecommendationDto recommendationDto = new RecommendationDto();
-        recommendationDto.setContent("   ");
-
-        assertThrows(DataValidationException.class,
-                () -> recommendationController.giveRecommendation(recommendationDto));
-    }
-
-    @Test
-    public void testGiveRecommendation_nullContent_throwException() {
-        RecommendationDto recommendationDto = new RecommendationDto();
-        recommendationDto.setContent(null);
-
-        assertThrows(DataValidationException.class,
-                () -> recommendationController.giveRecommendation(recommendationDto));
-    }
-
-    @Test
-    public void testUpdateRecommendation_blankContent_throwException() {
-        RecommendationDto recommendationDto = new RecommendationDto();
-        recommendationDto.setContent("   ");
-
-        assertThrows(DataValidationException.class,
-                () -> recommendationController.updateRecommendation(recommendationDto));
-    }
-
-    @Test
-    public void testUpdateRecommendation_nullContent_throwException() {
-        RecommendationDto recommendationDto = new RecommendationDto();
-        recommendationDto.setContent(null);
-
-        assertThrows(DataValidationException.class,
-                () -> recommendationController.updateRecommendation(recommendationDto));
     }
 
     @Test

@@ -1,4 +1,4 @@
-package school.faang.user_service.pulisher;
+package school.faang.user_service.publisher;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.redis.EventRecommendationRequestDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
-
 import java.time.LocalDateTime;
 
 @Component

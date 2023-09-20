@@ -24,7 +24,7 @@ public class GoalValidator {
     public void validateToCreate(Long userId, GoalDto goalDto) {
         long userSkillCount = goalRepository.countActiveGoalsPerUser(userId);
         if (userSkillCount >= userMaxGoalsCount) {
-            throw new DataValidationException("User can't have more than 3 active goals");
+            throw new DataValidationException("User can't have more than " + userMaxGoalsCount + " active goals");
         }
         checkSkills(goalDto);
     }

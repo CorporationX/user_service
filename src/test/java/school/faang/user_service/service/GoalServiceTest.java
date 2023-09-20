@@ -221,14 +221,8 @@ class GoalServiceTest {
     }
 
     @Test
-    void delete_shouldInvokeRepositoryFindById() {
+    void delete_shouldInvokeRepositoryDeleteById() {
         goalService.delete(1L);
-        verify(goalRepository).findById(1L);
-    }
-
-    @Test
-    void delete_shouldInvokeRepositoryDelete() {
-        goalService.delete(1L);
-        verify(goalRepository).delete(goal);
+        verify(goalRepository).deleteById(1L);
     }
 }

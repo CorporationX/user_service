@@ -86,8 +86,7 @@ public class GoalService {
 
     @Transactional
     public void delete(Long goalId) {
-        Goal goal = getGoal(goalId);
-        goalRepository.delete(goal);
+        goalRepository.deleteById(goalId);
     }
 
     private void setParent(Goal goal, GoalDto goalDto) {

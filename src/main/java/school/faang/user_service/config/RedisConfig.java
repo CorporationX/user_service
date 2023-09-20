@@ -32,6 +32,8 @@ public class RedisConfig {
     private String mentorshipOfferedEvent;
     @Value("${spring.data.redis.channels.fund-raised-event.name}")
     private String fundRaisedChannel;
+    @Value("${spring.data.redis.channels.user_ban_channel.name}")
+    private String userBanEvent;
 
 
     @Bean
@@ -83,6 +85,11 @@ public class RedisConfig {
     @Bean
     ChannelTopic fundRaisedChannel() {
         return new ChannelTopic(fundRaisedChannel);
+    }
+
+    @Bean
+    ChannelTopic userBanTopic() {
+        return new ChannelTopic(userBanEvent);
     }
 
     @Bean

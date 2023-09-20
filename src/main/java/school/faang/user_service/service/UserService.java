@@ -19,6 +19,7 @@ import school.faang.user_service.service.goal.GoalService;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Service
@@ -125,5 +126,14 @@ public class UserService {
             event.setStatus(EventStatus.CANCELED);
             eventService.save(event);
         });
+    }
+
+    @Transactional
+    public void userBanEventSave(String message) {
+        Long userId = Long.valueOf(message);
+        Optional<User> userById = userRepository.findById(userId);
+        User user = userById.get();
+        user.setBanned(true);
+        userRepository.save(user);
     }
 }

@@ -42,8 +42,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserDto getUser(long currentUserId , long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(""));
+        User user = findUserById(userId);
         profileViewEventMessagePublisher.publish(new ProfileViewEvent(currentUserId, userId, LocalDateTime.now()));
 
         return userMapper.toDto(user);

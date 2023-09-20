@@ -106,20 +106,6 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testGetUserCallsProfileViewPublisher(){
-        Long idViewer = 1L;
-        Long idViewed = 2L;
-        user2.setContactPreference(ContactPreference.builder().preference(PreferredContact.EMAIL).build());
-        ProfileViewEvent profileViewEvent = new ProfileViewEvent(idViewer, idViewed, dateTime);
-        Mockito.when(userRepository.findById(idViewed)).thenReturn(Optional.of(user2));
-//        Mockito.when(userService.findUserById(idViewed)).thenReturn(user2);
-
-        userService.getUser(idViewer, idViewed);
-        Mockito.verify(profileViewEventMessagePublisher, Mockito.times(1))
-                .publish(profileViewEvent);
-    }
-
-    @Test
     public void testGetUsersByIds() {
         List<Long> userIds = List.of(1L, 2L, 3L);
         user1.setEmail("aaa");

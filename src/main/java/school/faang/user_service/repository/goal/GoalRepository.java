@@ -12,11 +12,8 @@ import java.util.stream.Stream;
 @Repository
 public interface GoalRepository extends CrudRepository<Goal, Long> {
 
-    @Query(nativeQuery = true, value = """
-            SELECT * FROM goal g
-            JOIN user_goal ug ON g.id = ug.goal_id
-            WHERE ug.user_id = ?1
-            """)
+    // в нативном запросе выдавало Encountered a duplicated sql alias [id] during auto-discovery of a native-sql query
+    @Query("SELECT g FROM Goal g JOIN User u WHERE u.id = :userId")
     Stream<Goal> findGoalsByUserId(long userId);
 
     @Query(nativeQuery = true, value = """
@@ -37,7 +34,7 @@ public interface GoalRepository extends CrudRepository<Goal, Long> {
             SELECT * FROM goal WHERE id = :goalId
             UNION
             SELECT g.* FROM goal g
-            JOIN subtasks st ON st.id = g.parent_id
+            JOIN subtasks st ON st.id = g.parent_goal_id
             )
             SELECT * FROM subtasks WHERE id != :goalId
             """)

@@ -63,6 +63,9 @@ spring:
     partitionSize: 1000
     cron: "0 0 0 7/7 * ?" # every 7 days ("0 * * * * *" every minute - for testing)
 
+  goals:
+    user_max_count: 3
+
 server:
   port: 8080
 

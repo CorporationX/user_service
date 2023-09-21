@@ -96,4 +96,9 @@ public class SkillService {
             }
         }
     }
+
+    public Skill getSKill(Long skillId) {
+        return skillRepository.findById(skillId)
+                .orElseThrow(() -> new EntityNotFoundException("Skill with id " + skillId + " does not exist"));
+    }
 }

@@ -19,9 +19,5 @@ public interface MentorshipRequestMapper {
 
     @Mapping(source = "requesterId", target = "requester.id")
     @Mapping(source = "receiverId", target = "receiver.id")
-    @Mapping(target = "status", ignore = true)
-    @Mapping(target = "rejectionReason", ignore = true)
-    @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
-    @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
     MentorshipRequest toEntity(MentorshipRequestDto mentorshipRequestDto);
 }

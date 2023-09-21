@@ -11,7 +11,7 @@ import school.faang.user_service.dto.mentorship.MentorshipOfferedEventDto;
 import school.faang.user_service.exception.DataValidationException;
 
 @Component
-public class MentorshipOfferedEventPublisher extends EventPublisher<MentorshipOfferedEventDto> {
+public class MentorshipOfferedEventPublisher extends AbstractEventPublisher<MentorshipOfferedEventDto> {
     public MentorshipOfferedEventPublisher(RedisTemplate<String, Object> redisTemplate,
                                            ObjectMapper objectMapper,
                                            @Value("${spring.data.redis.channels.mentorship_offer_channel.name}") String topicMentorshipOffered) {
@@ -19,6 +19,6 @@ public class MentorshipOfferedEventPublisher extends EventPublisher<MentorshipOf
     }
 
     public void publish(MentorshipOfferedEventDto mentorshipOfferedEventDto) {
-        publishToChannel(mentorshipOfferedEventDto);
+        publishInTopic(mentorshipOfferedEventDto);
     }
 }

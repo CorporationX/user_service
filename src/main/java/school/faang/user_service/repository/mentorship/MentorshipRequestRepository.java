@@ -33,4 +33,10 @@ public interface MentorshipRequestRepository extends JpaRepository<MentorshipReq
             ORDER BY created_at DESC
             """)
     List<MentorshipRequest> getAllRequestsForRequester(long requesterId);
+    //TODO потестить
+    @Query(nativeQuery = true, value = """
+            SELECT status FROM mentorship_request
+            WHERE id = :id
+            """)
+    RequestStatus getStatusById(Long id);
 }

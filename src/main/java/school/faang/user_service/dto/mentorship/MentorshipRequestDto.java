@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import school.faang.user_service.entity.RequestStatus;
 
 @Data
 @Builder
@@ -18,4 +19,6 @@ public class MentorshipRequestDto {
     private long requesterId;
     @NotNull
     private long receiverId;
+    private RequestStatus status;
+    private String rejectionReason;
 }

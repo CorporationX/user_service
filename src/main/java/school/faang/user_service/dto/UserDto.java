@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import school.faang.user_service.entity.contact.PreferredContact;
 
+import java.util.List;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -33,4 +35,5 @@ public class UserDto {
     @Max(100)
     private Integer experience;
     private PreferredContact preferredContact;
+    private List<Long> mentorIds;
 }

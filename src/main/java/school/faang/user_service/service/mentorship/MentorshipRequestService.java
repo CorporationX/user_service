@@ -9,16 +9,13 @@ import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.dto.mentorship.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.mentorship_request.MentorshipRequestFilter;
+import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.mapper.mentorship.MentorshipOfferedEventMapper;
-import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.publisher.MentorshipOfferedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-import school.faang.user_service.filter.mentorship_request.MentorshipRequestFilter;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
 
@@ -39,19 +36,16 @@ public class MentorshipRequestService {
 
     @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto dto) {
-        User requester = userService.findUserById(dto.getRequesterId());
-        User receiver = userService.findUserById(dto.getReceiverId());
+        mentorshipRequestValidator.requestValidate(dto);
 
-        //TODO: fix validator (change entity to dto)
-        mentorshipRequestValidator.requestValidate(requester, receiver);
         MentorshipRequest mentorshipRequest = mentorshipRequestMapper.toEntity(dto);
         mentorshipRequest.setStatus(RequestStatus.PENDING);
         mentorshipRequest = mentorshipRequestRepository.save(mentorshipRequest);
 
-        MentorshipRequestDto mentorshipRequestDto = mentorshipRequestMapper.toDto(mentorshipRequest);
-        sendNotification(mentorshipRequestDto);
+        dto = mentorshipRequestMapper.toDto(mentorshipRequest);
+        sendNotification(dto);
 
-        return mentorshipRequestDto;
+        return dto;
     }
 
     @Transactional
@@ -67,32 +61,42 @@ public class MentorshipRequestService {
         return mentorshipRequestMapper.toDto(mentorshipRequests.toList());
     }
 
-    @Transactional
-    public void acceptRequest(long id) {
-        MentorshipRequest request = requestFindById(id);
-        mentorshipRequestValidator.acceptRequestValidator(request);
-
-        User requester = request.getRequester();
-        User receiver = request.getReceiver();
-
-        request.setStatus(RequestStatus.ACCEPTED);
-
-        List<User> newMentees = receiver.getMentees();
-        newMentees.add(requester);
-        receiver.setMentees(newMentees);
-
-        List<User> newMentors = requester.getMentors();
-        newMentors.add(receiver);
-        requester.setMentors(newMentors);
+    public MentorshipRequestDto updateMentorshipRequest(MentorshipRequestDto mentorshipRequestDto) {
+        return mentorshipRequestMapper.
+                toDto(mentorshipRequestRepository
+                        .save(mentorshipRequestMapper
+                                .toEntity(mentorshipRequestDto)));
     }
 
     @Transactional
-    public void rejectRequest(long id, RejectionDto rejection) {
-        MentorshipRequest request = requestFindById(id);
-        mentorshipRequestValidator.rejectRequestValidator(request);
+    public MentorshipRequestDto acceptRequest(long id) {
+        MentorshipRequestDto mentorshipRequestDto = getMentorshipRequest(id);
+        mentorshipRequestValidator.acceptRequestValidator(mentorshipRequestDto, getStatusById(id));
+        mentorshipRequestDto.setStatus(RequestStatus.ACCEPTED);
 
-        request.setStatus(RequestStatus.REJECTED);
-        request.setRejectionReason(rejection.getReason());
+        userService.addMentor(mentorshipRequestDto.getRequesterId(),
+                mentorshipRequestDto.getReceiverId());
+
+        return updateMentorshipRequest(mentorshipRequestDto);
+    }
+
+    @Transactional
+    public MentorshipRequestDto rejectRequest(long id, RejectionDto rejection) {
+        MentorshipRequestDto mentorshipRequestDto = getMentorshipRequest(id);
+        mentorshipRequestValidator.rejectRequestValidator(mentorshipRequestDto, getStatusById(id));
+
+        mentorshipRequestDto.setStatus(RequestStatus.REJECTED);
+        mentorshipRequestDto.setRejectionReason(rejection.getReason());
+
+        return updateMentorshipRequest(mentorshipRequestDto);
+    }
+
+    public MentorshipRequestDto getMentorshipRequest(long id) {
+        return mentorshipRequestMapper.toDto(requestFindById(id));
+    }
+
+    public RequestStatus getStatusById(long id) {
+        return mentorshipRequestRepository.getStatusById(id);
     }
 
     private MentorshipRequest requestFindById(long id) {

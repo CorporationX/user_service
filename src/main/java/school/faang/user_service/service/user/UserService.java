@@ -75,6 +75,25 @@ public class UserService {
                 -> new DataValidationException("User was not found"));
     }
 
+    public UserDto addMentor(Long requesterId, Long receiverId) {
+        UserDto userDto = getUser(requesterId);
+        if (userDto.getMentorIds().isEmpty()){
+            userDto.setMentorIds(List.of(receiverId));
+        } else {
+            List<Long> mentorIds = userDto.getMentorIds();
+            mentorIds.add(receiverId);
+            userDto.setMentorIds(mentorIds);
+        }
+        return updateUser(userDto);
+    }
+
+    public UserDto updateUser(UserDto userDto) {
+        return userMapper
+                .toDto(userRepository
+                        .save(userMapper
+                                .toEntity(userDto)));
+    }
+
     public boolean areOwnedSkills(long userId, List<Long> skillIds) {
         if (skillIds.isEmpty()) {
             return true;

@@ -37,6 +37,7 @@ class MentorshipRequestControllerTest {
         MentorshipRequestDto mentorshipRequestDto = MentorshipRequestDto.builder()
                 .requesterId(1L)
                 .receiverId(2L)
+                .description("description")
                 .build();
 
         mockMvc.perform(post("/mentorship/request")

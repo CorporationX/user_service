@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.mapper.UserMapper;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.entity.User;
@@ -16,6 +17,7 @@ import school.faang.user_service.parser.PersonParser;
 import school.faang.user_service.pojo.student.Person;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.util.PasswordGenerator;
 
 import java.util.List;
@@ -27,6 +29,7 @@ import java.util.concurrent.Executor;
 public class UserService {
     private final UserRepository userRepository;
     private final CountryRepository countryRepository;
+    private final EventRepository eventRepository;
     private final PasswordGenerator passwordGenerator;
     private final UserMapper userMapper;
     private final PersonMapper personMapper;
@@ -94,4 +97,25 @@ public class UserService {
         userRepository.saveAll(users);
     }
 
+    public void deactivateUser(Long userId) {
+        User user = getUser(userId);
+        if (!user.isActive()) {
+            return;
+        }
+
+        cancelUserEvents(userId);
+        removeUserGoals(userId);
+        cancelUserMentorship(userId);
+    }
+
+    private void cancelUserMentorship(Long userId) {
+    }
+
+    private void removeUserGoals(Long userId) {
+    }
+
+    private void cancelUserEvents(Long userId) {
+        List<Event> events = eventRepository.findAllByUserId(userId);
+        eventRepository.deleteAll(events.stream().filter(event -> event.getOwner().getId() == userId).toList());
+    }
 }

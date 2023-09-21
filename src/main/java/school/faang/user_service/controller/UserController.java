@@ -38,4 +38,9 @@ public class UserController {
         log.debug("Received request to upload students to the database from file: {}", students.getName());
         userService.saveStudents(students);
     }
+
+    @PostMapping("deactivate/{id}")
+    public void deactivateUser(@PathVariable Long id) {
+        userService.deactivateUser(id);
+    }
 }

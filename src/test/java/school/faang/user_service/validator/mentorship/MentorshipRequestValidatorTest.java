@@ -172,7 +172,6 @@ class MentorshipRequestValidatorTest {
     @Test
     void testAcceptRequestValidatorAlreadyWorking_Throw() {
         UserDto requester = UserDto.builder()
-                .mentorIds(List.of(receiverId))
                 .build();
 
         Mockito.when(userService.getUser(requesterId))
@@ -185,7 +184,6 @@ class MentorshipRequestValidatorTest {
     @Test
     void testAcceptRequestValidatorGoodWay_True() {
         UserDto requester = UserDto.builder()
-                .mentorIds(List.of())
                 .build();
 
         Mockito.when(userService.getUser(requesterId))

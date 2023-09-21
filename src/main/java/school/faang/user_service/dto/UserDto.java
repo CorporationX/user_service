@@ -35,5 +35,4 @@ public class UserDto {
     @Max(100)
     private Integer experience;
     private PreferredContact preferredContact;
-    private List<Long> mentorIds;
 }

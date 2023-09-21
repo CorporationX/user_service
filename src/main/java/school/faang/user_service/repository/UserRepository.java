@@ -2,6 +2,7 @@ package school.faang.user_service.repository;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.User;
 
@@ -25,4 +26,11 @@ public interface UserRepository extends CrudRepository<User, Long> {
             WHERE up.end_date > NOW()
             """)
     Stream<User> findPremiumUsers();
+
+    @Query(nativeQuery = true, value = """
+            SELECT u.* FROM users u
+            JOIN mentorship m ON m.mentor_id = u.id
+            WHERE m.mentee_id = :userId
+            """)
+    List<User> findMentors(@Param("userId") long userId);
 }

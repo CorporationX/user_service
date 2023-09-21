@@ -14,7 +14,6 @@ import java.util.List;
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper {
     @Mapping(target = "contactPreference", source = "preferredContact")
-    //todo при добавление ментора нужно добавлять объект заполненного юзера,
         // а не просто оболочку с id
     User toEntity(UserDto userDto);
 
@@ -22,20 +21,11 @@ public interface UserMapper {
         return preferredContact != null ? preferredContact : PreferredContact.EMAIL;
     }
     @Mapping(target = "preferredContact", source = "contactPreference.preference")
-    @Mapping(target = "mentorIds", source = "mentors", qualifiedByName = "usersToIds")
     UserDto toDto(User user);
 
     List<UserDto> toDto(List<User> users);
 
     UserDto personToUserDto(PersonSchemaForUser person);
-
-    @Named("usersToIds")
-    default List<Long> mapUsersToIds(List<User> value) {
-        if (value == null) {
-            return new ArrayList<>();
-        }
-        return value.stream().map(User::getId).toList();
-    }
 
     default CountryDto mapCountry(String country) {
         CountryDto countryDto = new CountryDto();

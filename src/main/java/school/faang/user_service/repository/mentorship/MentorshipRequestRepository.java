@@ -3,6 +3,7 @@ package school.faang.user_service.repository.mentorship;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
@@ -33,10 +34,9 @@ public interface MentorshipRequestRepository extends JpaRepository<MentorshipReq
             ORDER BY created_at DESC
             """)
     List<MentorshipRequest> getAllRequestsForRequester(long requesterId);
-    //TODO потестить
-    @Query(nativeQuery = true, value = """
-            SELECT status FROM mentorship_request
-            WHERE id = :id
-            """)
-    RequestStatus getStatusById(Long id);
+
+    //TODO не работает
+    @Query(nativeQuery = true, value = "SELECT mr.status FROM mentorship_request mr WHERE mr.id = :id")
+    RequestStatus findStatusById(@Param("id") Long id);
+
 }

@@ -47,7 +47,9 @@ public class MentorshipRequestValidator {
         }
 
         UserDto requester = userService.getUser(mentorshipRequestDto.getRequesterId());
-        if (requester.getMentorIds().contains(mentorshipRequestDto.getReceiverId())) {
+        List<Long> mentorIds = userService.getMentorIds(requester.getId());
+        if (!mentorIds.isEmpty() &&
+                mentorIds.contains(mentorshipRequestDto.getReceiverId())) {
             throw new DataValidationException("Already working");
         }
     }

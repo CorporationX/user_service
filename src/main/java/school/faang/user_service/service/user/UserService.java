@@ -22,6 +22,8 @@ import school.faang.user_service.validator.UserValidator;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
@@ -75,24 +77,21 @@ public class UserService {
                 -> new DataValidationException("User was not found"));
     }
 
-    public UserDto addMentor(Long requesterId, Long receiverId) {
-        UserDto userDto = getUser(requesterId);
-        if (userDto.getMentorIds().isEmpty()){
-            userDto.setMentorIds(List.of(receiverId));
+    @Transactional
+    public void addMentor(Long requesterId, Long receiverId) {
+        User requester = findUserById(requesterId);
+        User receiver = findUserById(receiverId);
+
+        if (requester.getMentors().isEmpty()) {
+            requester.setMentors(List.of(receiver));
         } else {
-            List<Long> mentorIds = userDto.getMentorIds();
-            mentorIds.add(receiverId);
-            userDto.setMentorIds(mentorIds);
+            List<User> mentors = requester.getMentors();
+            mentors.add(receiver);
+            requester.setMentors(mentors);
         }
-        return updateUser(userDto);
+        userRepository.save(requester);
     }
 
-    public UserDto updateUser(UserDto userDto) {
-        return userMapper
-                .toDto(userRepository
-                        .save(userMapper
-                                .toEntity(userDto)));
-    }
 
     public boolean areOwnedSkills(long userId, List<Long> skillIds) {
         if (skillIds.isEmpty()) {
@@ -114,6 +113,13 @@ public class UserService {
         return users.stream()
                 .map(userMapper::toDto)
                 .toList();
+    }
+
+    public List<Long> getMentorIds(long userId) {
+        List<User> mentors = userRepository.findMentors(userId);
+        List<Long> ids = new ArrayList<>();
+        return mentors.isEmpty() ?
+                ids : mentors.stream().map(User::getId).toList();
     }
 
     @Transactional

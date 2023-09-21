@@ -96,7 +96,8 @@ public class MentorshipRequestService {
     }
 
     public RequestStatus getStatusById(long id) {
-        return mentorshipRequestRepository.getStatusById(id);
+        //не знаю как сразу получить статус из бд
+        return requestFindById(id).getStatus();
     }
 
     private MentorshipRequest requestFindById(long id) {

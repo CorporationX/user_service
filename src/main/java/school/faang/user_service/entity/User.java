@@ -123,18 +123,19 @@ public class User {
     @OneToMany(mappedBy = "mentor")
     private List<Goal> setGoals;
 
-    @ManyToMany(mappedBy = "users")
+    @ManyToMany
+    @JoinTable(name = "user_goal",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "goal_id"))
     private List<Goal> goals;
 
     @ManyToMany(mappedBy = "users")
     private List<Skill> skills;
 
     @ManyToMany
-    @JoinTable(
-            name = "user_event",
+    @JoinTable(name = "user_event",
             joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "event_id")
-    )
+            inverseJoinColumns = @JoinColumn(name = "event_id"))
     private List<Event> participatedEvents;
 
     @OneToMany(mappedBy = "author")

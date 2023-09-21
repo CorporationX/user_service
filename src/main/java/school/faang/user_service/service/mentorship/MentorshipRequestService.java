@@ -61,53 +61,39 @@ public class MentorshipRequestService {
         return mentorshipRequestMapper.toDto(mentorshipRequests.toList());
     }
 
-    public MentorshipRequestDto updateMentorshipRequest(MentorshipRequestDto mentorshipRequestDto) {
-        return mentorshipRequestMapper.
-                toDto(mentorshipRequestRepository
-                        .save(mentorshipRequestMapper
-                                .toEntity(mentorshipRequestDto)));
-    }
-
     @Transactional
     public MentorshipRequestDto acceptRequest(long id) {
-        MentorshipRequestDto mentorshipRequestDto = getMentorshipRequest(id);
-        mentorshipRequestValidator.acceptRequestValidator(mentorshipRequestDto, getStatusById(id));
-        mentorshipRequestDto.setStatus(RequestStatus.ACCEPTED);
+        MentorshipRequest mentorshipRequest = requestFindById(id);
+        mentorshipRequestValidator.acceptRequestValidator(mentorshipRequest.getRequester().getId(),
+                mentorshipRequest.getReceiver().getId(),
+                mentorshipRequest.getStatus());
 
-        userService.addMentor(mentorshipRequestDto.getRequesterId(),
-                mentorshipRequestDto.getReceiverId());
+        mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
+        userService.addMentor(mentorshipRequest.getRequester().getId(),
+                mentorshipRequest.getReceiver().getId());
 
-        return updateMentorshipRequest(mentorshipRequestDto);
+        return mentorshipRequestMapper.toDto(mentorshipRequest);
     }
 
     @Transactional
     public MentorshipRequestDto rejectRequest(long id, RejectionDto rejection) {
-        MentorshipRequestDto mentorshipRequestDto = getMentorshipRequest(id);
-        mentorshipRequestValidator.rejectRequestValidator(mentorshipRequestDto, getStatusById(id));
+        MentorshipRequest mentorshipRequest = requestFindById(id);
+        mentorshipRequestValidator.rejectRequestValidator(mentorshipRequest.getStatus());
 
-        mentorshipRequestDto.setStatus(RequestStatus.REJECTED);
-        mentorshipRequestDto.setRejectionReason(rejection.getReason());
+        mentorshipRequest.setStatus(RequestStatus.REJECTED);
+        mentorshipRequest.setRejectionReason(rejection.getReason());
 
-        return updateMentorshipRequest(mentorshipRequestDto);
-    }
-
-    public MentorshipRequestDto getMentorshipRequest(long id) {
-        return mentorshipRequestMapper.toDto(requestFindById(id));
-    }
-
-    public RequestStatus getStatusById(long id) {
-        //не знаю как сразу получить статус из бд
-        return requestFindById(id).getStatus();
+        return mentorshipRequestMapper.toDto(mentorshipRequest);
     }
 
     private MentorshipRequest requestFindById(long id) {
-        return mentorshipRequestRepository.findById(id)
-                .orElseThrow(() -> new DataValidationException("Request is not exist"));
+        return mentorshipRequestRepository.findById(id).orElseThrow(() -> new DataValidationException("Request is not exist"));
     }
 
     @Async
     private void sendNotification(MentorshipRequestDto mentorshipRequestDto) {
-        MentorshipOfferedEventDto mentorshipOfferedEventDto = mentorshipOfferedEventMapper.toMentorshipOfferedEvent(mentorshipRequestDto);
+        MentorshipOfferedEventDto mentorshipOfferedEventDto =
+                mentorshipOfferedEventMapper.toMentorshipOfferedEvent(mentorshipRequestDto);
         mentorshipOfferedEventPublisher.publish(mentorshipOfferedEventDto);
     }
 }

@@ -124,14 +124,11 @@ public class MentorshipRequestServiceTest {
         Mockito.when(mentorshipRequestMapper.toDto(mentorshipRequest))
                 .thenReturn(mentorshipRequestDto);
 
-        Mockito.when(mentorshipRequestService.getStatusById(id))
-                        .thenReturn(RequestStatus.PENDING);
-
         mentorshipRequestService.acceptRequest(id);
 
         Mockito.verify(mentorshipRequestRepository, Mockito.times(1)).findById(id);
-        Mockito.verify(mentorshipRequestValidator, Mockito.times(1)).acceptRequestValidator(mentorshipRequestDto, RequestStatus.PENDING);
-        assertEquals(RequestStatus.ACCEPTED,mentorshipRequestDto.getStatus());
+        Mockito.verify(mentorshipRequestValidator, Mockito.times(1)).acceptRequestValidator(requester.getId(),receiver.getId(), RequestStatus.PENDING);
+        assertEquals(RequestStatus.ACCEPTED,mentorshipRequest.getStatus());
     }
 
     @Test
@@ -143,14 +140,16 @@ public class MentorshipRequestServiceTest {
                 .thenReturn(Optional.of(mentorshipRequest));
         Mockito.when(mentorshipRequestMapper.toDto(mentorshipRequest))
                 .thenReturn(mentorshipRequestDto);
-        Mockito.when(mentorshipRequestService.getStatusById(id))
-                .thenReturn(RequestStatus.PENDING);
 
         mentorshipRequestService.rejectRequest(id,rejectionDto);
-        Mockito.verify(mentorshipRequestRepository, Mockito.times(1)).findById(id);
-        Mockito.verify(mentorshipRequestValidator, Mockito.times(1)).rejectRequestValidator(mentorshipRequestDto, RequestStatus.PENDING);
-        assertEquals(RequestStatus.REJECTED,mentorshipRequestDto.getStatus());
-        assertEquals(rejectionDto.getReason(),mentorshipRequestDto.getRejectionReason());
+
+        Mockito.verify(mentorshipRequestRepository, Mockito.times(1))
+                .findById(id);
+        Mockito.verify(mentorshipRequestValidator, Mockito.times(1))
+                .rejectRequestValidator(RequestStatus.PENDING);
+
+        assertEquals(RequestStatus.REJECTED,mentorshipRequest.getStatus());
+        assertEquals(rejectionDto.getReason(),mentorshipRequest.getRejectionReason());
     }
 
     @Test

@@ -89,7 +89,6 @@ public class UserService {
             mentors.add(receiver);
             requester.setMentors(mentors);
         }
-        userRepository.save(requester);
     }
 
 

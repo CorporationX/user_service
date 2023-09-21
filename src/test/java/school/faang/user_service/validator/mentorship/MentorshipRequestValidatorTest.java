@@ -164,9 +164,8 @@ class MentorshipRequestValidatorTest {
 
     @Test
     void testAcceptRequestValidatorAlreadyACCEPT_Throw() {
-
         assertThrows(DataValidationException.class,
-                () -> mentorshipRequestValidator.acceptRequestValidator(mentorshipRequestDto, RequestStatus.ACCEPTED));
+                () -> mentorshipRequestValidator.acceptRequestValidator(requesterId, receiverId, RequestStatus.ACCEPTED));
     }
 
     @Test
@@ -174,11 +173,11 @@ class MentorshipRequestValidatorTest {
         UserDto requester = UserDto.builder()
                 .build();
 
-        Mockito.when(userService.getUser(requesterId))
-                .thenReturn(requester);
+        Mockito.when(userService.getMentorIds(requesterId))
+                .thenReturn(List.of(requesterId));
 
         assertThrows(DataValidationException.class,
-                () -> mentorshipRequestValidator.acceptRequestValidator(mentorshipRequestDto, RequestStatus.PENDING));
+                () -> mentorshipRequestValidator.acceptRequestValidator(requesterId, requesterId, RequestStatus.PENDING));
     }
 
     @Test
@@ -186,12 +185,12 @@ class MentorshipRequestValidatorTest {
         UserDto requester = UserDto.builder()
                 .build();
 
-        Mockito.when(userService.getUser(requesterId))
-                .thenReturn(requester);
+        Mockito.when(userService.getMentorIds(requesterId))
+                .thenReturn(List.of());
 
 
         assertDoesNotThrow(() ->
-                mentorshipRequestValidator.acceptRequestValidator(mentorshipRequestDto, RequestStatus.PENDING)
+                mentorshipRequestValidator.acceptRequestValidator(requesterId, receiverId, RequestStatus.PENDING)
         );
     }
 
@@ -199,13 +198,13 @@ class MentorshipRequestValidatorTest {
     void testRejectRequestValidatorAlreadyREJECTEED_Throw() {
 
         assertThrows(DataValidationException.class,
-                () -> mentorshipRequestValidator.rejectRequestValidator(mentorshipRequestDto, RequestStatus.REJECTED));
+                () -> mentorshipRequestValidator.rejectRequestValidator(RequestStatus.REJECTED));
     }
 
     @Test
     void testRejectRequestValidatorNotREJECTED_True() {
         assertDoesNotThrow(() -> {
-            mentorshipRequestValidator.rejectRequestValidator(mentorshipRequestDto, RequestStatus.PENDING);
+            mentorshipRequestValidator.rejectRequestValidator(RequestStatus.PENDING);
         });
     }
 }

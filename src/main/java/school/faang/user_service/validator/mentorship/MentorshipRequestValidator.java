@@ -2,13 +2,11 @@ package school.faang.user_service.validator.mentorship;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.mentorship.MentorshipRequestService;
 import school.faang.user_service.service.user.UserService;
 
 import java.time.LocalDateTime;
@@ -41,20 +39,19 @@ public class MentorshipRequestValidator {
         }
     }
 
-    public void acceptRequestValidator(MentorshipRequestDto mentorshipRequestDto, RequestStatus currentStatus) {
+    public void acceptRequestValidator(Long requesterId, Long receiverId, RequestStatus currentStatus) {
         if (currentStatus.equals(RequestStatus.ACCEPTED)) {
             throw new DataValidationException("Already ACCEPTED");
         }
 
-        UserDto requester = userService.getUser(mentorshipRequestDto.getRequesterId());
-        List<Long> mentorIds = userService.getMentorIds(requester.getId());
+        List<Long> mentorIds = userService.getMentorIds(requesterId);
         if (!mentorIds.isEmpty() &&
-                mentorIds.contains(mentorshipRequestDto.getReceiverId())) {
+                mentorIds.contains(receiverId)) {
             throw new DataValidationException("Already working");
         }
     }
 
-    public void rejectRequestValidator(MentorshipRequestDto mentorshipRequestDto, RequestStatus currentStatus) {
+    public void rejectRequestValidator(RequestStatus currentStatus) {
         if (currentStatus.equals(RequestStatus.REJECTED)) {
             throw new DataValidationException("Already REJECTED");
         }

@@ -5,8 +5,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.user.UserService;
+
+import java.io.IOException;
 
 @Tag(name = "Управление пользователями")
 @RestController
@@ -18,5 +22,10 @@ public class UserController {
     @PostMapping("/users/deactivate/{id}")
     public void deactivateUser(@PathVariable Long id) {
         userService.deactivateUser(id);
+    }
+
+    @PostMapping("/users/create")
+    public void createUser(@RequestBody UserDto userDto) throws IOException {
+        userService.createUser(userDto);
     }
 }

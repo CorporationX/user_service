@@ -11,10 +11,12 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.goal.GoalService;
+import school.faang.user_service.service.mentorship.MentorshipService;
+import school.faang.user_service.service.profile_picture.ProfilePictureService;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -22,11 +24,12 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final GoalService goalService;
     private final EventService eventService;
+    private final UserRepository userRepository;
     private final MentorshipService mentorshipService;
+    private final ProfilePictureService profilePictureService;
     private final RedisTemplate<String, Object> redisTemplate;
     @Value("${spring.data.redis.channels.user_ban_channel.name}")
     private String userBanChannelName;
@@ -103,5 +106,11 @@ public class UserService {
         stopUserGoals(userId);
         stopUserEvents(userId);
         cancelMentoring(userId);
+    }
+
+    public void createUser(UserDto userDto) throws IOException {
+        User user = userMapper.toEntity(userDto);
+        profilePictureService.setProfilePicture(user);
+        userRepository.save(userMapper.toEntity(userDto));
     }
 }

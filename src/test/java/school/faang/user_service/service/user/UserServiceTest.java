@@ -10,15 +10,24 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.dto.user.UserProfilePicDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.PersonMapper;
+import school.faang.user_service.mapper.user.UserProfilePicMapper;
 import school.faang.user_service.parser.PersonParser;
 import school.faang.user_service.pojo.student.Person;
+import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.s3.UserProfilePicS3Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Executor;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -33,9 +42,17 @@ class UserServiceTest {
     private PersonParser personParser;
     @Mock
     private Executor taskExecutor;
+    @Mock
+    private UserProfilePicS3Service userProfilePicS3Service;
+    @Mock
+    private UserProfilePicMapper profilePicMapper;
+    @Mock
+    private UserRepository userRepository;
     @InjectMocks
     private UserService userService;
     private MultipartFile file;
+    private User user;
+    private UserProfilePic profilePic;
 
     @BeforeEach
     void setUp() {
@@ -44,12 +61,22 @@ class UserServiceTest {
         Person person = mock(Person.class);
         List<Person> students = List.of(person, person, person);
 
-        User user = mock(User.class);
+        user = mock(User.class);
+        profilePic = mock(UserProfilePic.class);
+        UserProfilePicDto profilePicDto = mock(UserProfilePicDto.class);
 
+        when(user.getUserProfilePic()).thenReturn(profilePic);
+        when(profilePic.getFileId()).thenReturn("fileId");
+        when(profilePicMapper.toDto(profilePic)).thenReturn(profilePicDto);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(personParser.parse(file)).thenReturn(students);
         when(personMapper.toUser(person)).thenReturn(user);
+        when(file.getSize()).thenReturn(99L);
+        when(userProfilePicS3Service.upload(any(MultipartFile.class), anyString())).thenReturn(profilePic);
 
         ReflectionTestUtils.setField(userService, "partitionSize", 1);
+        ReflectionTestUtils.setField(userService, "maxFileSize", 100);
+        ReflectionTestUtils.setField(userService, "folder", "folder");
     }
 
     @Test
@@ -69,5 +96,65 @@ class UserServiceTest {
         ReflectionTestUtils.setField(userService, "partitionSize", 3);
         userService.saveStudents(file);
         verify(taskExecutor, times(1)).execute(any(Runnable.class));
+    }
+
+    @Test
+    void saveProfilePic_shouldThrowException() {
+        when(file.getSize()).thenReturn(101L);
+        assertThrows(DataValidationException.class, () -> userService.saveProfilePic(file, 1L));
+    }
+
+    @Test
+    void saveProfilePic_shouldInvokeRepositoryFindById() {
+        userService.saveProfilePic(file, 1L);
+        verify(userRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    void saveProfilePic_shouldInvokeS3ServiceUploadMethod() {
+        userService.saveProfilePic(file, 1L);
+        verify(userProfilePicS3Service, times(1)).upload(any(MultipartFile.class), anyString());
+    }
+
+    @Test
+    void saveProfilePic_shouldInvokeUserSetProfilePicMethod() {
+        userService.saveProfilePic(file, 1L);
+        verify(user, times(1)).setUserProfilePic(profilePic);
+    }
+
+    @Test
+    void saveProfilePic_shouldInvokeProfilePicMapperToDtoMethod() {
+        userService.saveProfilePic(file, 1L);
+        verify(profilePicMapper, times(1)).toDto(profilePic);
+    }
+
+    @Test
+    void getProfilePic_shouldInvokeRepositoryFindById() {
+        userService.getProfilePic(1L);
+        verify(userRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    void getProfilePic_shouldInvokeS3ServiceDownloadMethod() {
+        userService.getProfilePic(1L);
+        verify(userProfilePicS3Service, times(1)).download("fileId");
+    }
+
+    @Test
+    void deleteProfilePic_shouldInvokeRepositoryFindById() {
+        userService.deleteProfilePic(1L);
+        verify(userRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    void deleteProfilePic_shouldInvokeUserSetProfilePicMethod() {
+        userService.deleteProfilePic(1L);
+        verify(user, times(1)).setUserProfilePic(null);
+    }
+
+    @Test
+    void deleteProfilePic_shouldInvokeS3ServiceDeleteMethod() {
+        userService.deleteProfilePic(1L);
+        verify(userProfilePicS3Service, times(1)).delete("fileId");
     }
 }

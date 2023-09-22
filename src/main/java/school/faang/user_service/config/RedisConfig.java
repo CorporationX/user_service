@@ -21,6 +21,8 @@ public class RedisConfig {
     private String recommendationChannelName;
     @Value("${spring.data.redis.channels.skill_offer_channel}")
     private String skillOfferChannelName;
+    @Value("${spring.data.redis.channels.start_event_channel}")
+    private String startEventChannelName;
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
@@ -45,5 +47,10 @@ public class RedisConfig {
     @Bean
     ChannelTopic topicSkillOffer() {
         return new ChannelTopic(skillOfferChannelName);
+    }
+
+    @Bean
+    ChannelTopic topicStartEvent() {
+        return new ChannelTopic(startEventChannelName);
     }
 }

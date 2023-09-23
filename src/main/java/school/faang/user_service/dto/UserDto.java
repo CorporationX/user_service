@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import school.faang.user_service.entity.contact.PreferredContact;
 
+import java.util.List;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -19,6 +21,7 @@ public class UserDto {
     @Email
     @NotBlank
     private String email;
+    private List<Long> followedUserIds;
     @Size(max = 15)
     private String phone;
     @NotBlank

@@ -40,6 +40,10 @@ spring:
       scopes: https://www.googleapis.com/auth/calendar
       access-type: offline
 
+scheduler:
+  clearEventsCron: "0 0 0 7/7 * ?"
+  clearEventsBatchSize: 100
+
 server:
   port: 8080
 

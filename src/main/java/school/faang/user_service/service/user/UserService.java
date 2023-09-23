@@ -4,11 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.ProfilePicEventPublisher;
 import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.event.EventService;
@@ -33,6 +35,7 @@ public class UserService {
     private final RedisTemplate<String, Object> redisTemplate;
     @Value("${spring.data.redis.channels.user_ban_channel.name}")
     private String userBanChannelName;
+    private final ProfilePicEventPublisher profilePicEventPublisher;
     private final ProfileViewEventPublisher profileViewEventPublisher;
 
     public boolean isUserExist(Long userId) {
@@ -108,9 +111,11 @@ public class UserService {
         cancelMentoring(userId);
     }
 
-    public void createUser(UserDto userDto) throws IOException {
+    @Transactional
+    public void createUser(UserDto userDto) {
         User user = userMapper.toEntity(userDto);
         profilePictureService.setProfilePicture(user);
+        profilePicEventPublisher.publish(user);
         userRepository.save(userMapper.toEntity(userDto));
     }
 }

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserFilterDto;
@@ -179,5 +180,16 @@ class UserServiceTest {
         verify(userRepository, times(1)).save(any());
         verify(userMapper, times(1)).toDto(any());
         assertEquals(user.getOwnedEvents().get(0).getStatus(), EventStatus.CANCELED);
+    }
+
+    @Test
+    void userBanEventSave() {
+        Mockito.when(userRepository.findById(1L))
+                .thenReturn(Optional.of(user));
+
+        userService.userBanEventSave(String.valueOf(1L));
+        assertTrue(user.isBanned());
+        Mockito.verify(userRepository, Mockito.times(1))
+                .save(user);
     }
 }

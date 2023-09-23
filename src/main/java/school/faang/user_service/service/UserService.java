@@ -130,6 +130,7 @@ public class UserService {
 
     @Transactional
     public void userBanEventSave(String message) {
+        message = message.replaceAll("\"", "");
         Long userId = Long.valueOf(message);
         Optional<User> userById = userRepository.findById(userId);
         User user = userById.get();

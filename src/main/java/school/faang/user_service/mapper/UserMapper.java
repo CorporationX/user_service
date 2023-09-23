@@ -15,7 +15,7 @@ import java.util.List;
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.FIELD,
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper {
-    @Mapping(target = "contactPreference", source = "preferredContact")
+    @Mapping(target = "contactPreference.preference", source = "preferredContact")
     User toEntity(UserDto userDto);
 
     default PreferredContact mapPreferredContact(PreferredContact preferredContact) {

@@ -13,7 +13,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.mentorship_request.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
-import school.faang.user_service.mapper.mentorship.MentorshipOfferedEventMapper;
+import school.faang.user_service.mapper.MentorshipOfferedEventMapper;
 import school.faang.user_service.publisher.MentorshipOfferedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.user.UserService;

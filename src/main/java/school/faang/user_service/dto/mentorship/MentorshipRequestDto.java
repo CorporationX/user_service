@@ -14,7 +14,7 @@ import school.faang.user_service.entity.RequestStatus;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MentorshipRequestDto {
-    private long id;
+    private Long id;
     @NotBlank
     @Size(max = 150)
     private String description;

@@ -7,8 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import school.faang.user_service.entity.contact.PreferredContact;
 
-import java.util.List;
-
 @Data
 @Builder
 @AllArgsConstructor

@@ -2,6 +2,7 @@ package school.faang.user_service.mapper;
 
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 import school.faang.user_service.dto.subscription.UserDto;
@@ -15,12 +16,11 @@ public interface UserMapper {
 
     List<UserDto> toUserListDto(List<User> userList);
 
+    @Mapping(target = "preference", source = "contactPreference.preference")
     UserDto toUserDto(User user);
-
     User toEntity(UserDto userDto);
 
     default List<UserDto> toDtoList(List<User> users) {
         return users.stream().map(this::toUserDto).toList();
     };
-
 }

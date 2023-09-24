@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import school.faang.user_service.entity.contact.PreferredContact;
 
 @Data
 @AllArgsConstructor
@@ -20,4 +21,6 @@ public class UserDto{
     private String username;
     @NotBlank(message = "Email cannot be blank")
     private String email;
+    private PreferredContact preference;
+    private String phone;
 }

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.annotation.Profile;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.userProfilePic.AvatarFromAwsDto;
@@ -13,6 +14,7 @@ import school.faang.user_service.dto.userProfilePic.UserProfilePicDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DataValidException;
+import school.faang.user_service.publisher.ProfilePicPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.util.FileStorageService;
 import school.faang.user_service.util.ImageService;
@@ -35,6 +37,8 @@ class UserProfilePicServiceTest {
     private FileStorageService fileStorageService;
     @Mock
     private ImageService imageService;
+    @Mock
+    private ProfilePicPublisher profilePicPublisher;
     @InjectMocks
     private UserProfilePicService userProfilePicService;
 

@@ -2,6 +2,7 @@ package school.faang.user_service.publisher;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -13,6 +14,8 @@ import school.faang.user_service.service.redis.events.FollowerEvent;
 
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -27,16 +30,17 @@ class FollowerEventPublisherTest {
     @Mock
     private RedisMessagePublisher redisMessagePublisher;
 
+    @BeforeEach
+    void setUp() {
+        followerEventPublisher.setFollowerEventChannelName("follower_channel");
+    }
+
     @Test
-    void testFollowerSubscribedSuccess() throws JsonProcessingException {
+    void testFollowerSubscribedSuccess() {
         Long followerId = 1L;
         Long followeeId = 2L;
-        String json = "json";
-
-        when(objectMapper.writeValueAsString(any(FollowerEvent.class))).thenReturn(json);
 
         followerEventPublisher.followerSubscribed(followerId, followeeId);
-
-        verify(redisMessagePublisher, times(1)).publish(any(), Mockito.eq(json));
+        verify(redisMessagePublisher, times(1)).publish(eq("follower_channel"), any(FollowerEvent.class));
     }
 }

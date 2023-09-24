@@ -31,13 +31,7 @@ public class EventStartEventPublisher extends AbstractEventPublisher{
         EventInfo eventStartEvent = eventMapper.toEventStartEvent(event);
         eventStartEvent.setEventType(EventType.EVENT_STARTED);
 
-        try {
-            String json = objectMapper.writeValueAsString(event);
-            redisMessagePublisher.publish(startedEventsChannel, json);
-            log.info("{} event with id {} successfully started", eventStartEvent.getTitle(), eventStartEvent.getId());
-        } catch (JsonProcessingException e) {
-            log.error("An error occurred while trying to start the '{}' event with id {}: {}",
-                    eventStartEvent.getTitle(), eventStartEvent.getId(), e.getMessage());
-        }
+        redisMessagePublisher.publish(startedEventsChannel, eventStartEvent);
+        log.info("{} event with id {} successfully started", eventStartEvent.getTitle(), eventStartEvent.getId());
     }
 }

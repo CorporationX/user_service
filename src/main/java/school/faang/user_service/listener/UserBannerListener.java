@@ -7,13 +7,15 @@ import school.faang.user_service.service.user.UserService;
 
 @Component
 public class UserBannerListener extends AbstractListener<Long> {
+    private final UserService userService;
+
     public UserBannerListener(ObjectMapper objectMapper, UserService userService) {
-        super(objectMapper, userService);
-    }
+        super(objectMapper);
+        this.userService = userService;}
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
         Long userId = readValue(message.getBody(), Long.class);
-        send(userId);
+        userService.setBanForUser(userId);
     }
 }

@@ -143,8 +143,8 @@ public class UserService {
     }
 
     @Transactional
-    public void setUserBanner(Long userId) {
+    public void setBanForUser(Long userId) {
         userRepository.setBanUser(userId);
-        log.debug("Banned user: {}", userId);
+        log.info("Banned user with id: {}", userId);
     }
 }

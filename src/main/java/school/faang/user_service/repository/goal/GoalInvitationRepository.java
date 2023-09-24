@@ -6,4 +6,6 @@ import school.faang.user_service.entity.goal.GoalInvitation;
 
 @Repository
 public interface GoalInvitationRepository extends CrudRepository<GoalInvitation, Long> {
+    @Override
+    boolean existsById(Long id);
 }

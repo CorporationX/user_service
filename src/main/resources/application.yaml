@@ -66,3 +66,7 @@ dicebear:
   url: https://api.dicebear.com/6.x/adventurer/svg?seed=
 
 springfox.documentation.swagger.v2.path: /api-docs
+
+urls:
+  base_dev: http://localhost:8080/
+  avatar_url: api/v1/users/avatars/

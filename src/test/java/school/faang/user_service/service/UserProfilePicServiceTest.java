@@ -43,7 +43,7 @@ class UserProfilePicServiceTest {
         MultipartFile file = new MockMultipartFile("Name", new byte[1]);
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
-            userProfilePicService.upload(file, 1L);
+            userProfilePicService.uploadWithPublishProfilePicEvent(file, 1L);
         });
 
         assertEquals("User with id 1 is not found", exception.getMessage());
@@ -61,7 +61,7 @@ class UserProfilePicServiceTest {
         when(fileStorageService.uploadFile(byteFile, file, 1L, "big")).thenReturn("BIG");
         when(fileStorageService.uploadFile(byteFile, file, 1L, "small")).thenReturn("SMALL");
 
-        UserProfilePicDto result = userProfilePicService.upload(file, 1L);
+        UserProfilePicDto result = userProfilePicService.uploadWithPublishProfilePicEvent(file, 1L);
 
         assertNotNull(result);
         assertEquals("BIG", result.getFileId());

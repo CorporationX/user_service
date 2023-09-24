@@ -1,16 +1,20 @@
 package school.faang.user_service.messaging;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
+import school.faang.user_service.util.Mapper;
+
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public abstract class EventPublisher<T> {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ChannelTopic topic;
-    private final JsonMapper mapper;
+    private final ObjectMapper mapper;
 
     public void publish(T event) {
         String json = getJson(event);

@@ -1,6 +1,7 @@
 package school.faang.user_service.messaging.fundRaising;
 
-import com.fasterxml.jackson.databind.json.JsonMapper;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
@@ -13,7 +14,7 @@ public class FundRaisedEventPublisher extends EventPublisher<FundRaisedEvent> {
     @Autowired
     public FundRaisedEventPublisher(RedisTemplate<String, Object> redisTemplate,
                                     ChannelTopic fundRaisedChannel,
-                                    JsonMapper mapper) {
+                                    ObjectMapper mapper) {
         super(redisTemplate, fundRaisedChannel, mapper);
     }
 }

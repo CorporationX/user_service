@@ -10,5 +10,5 @@ import school.faang.user_service.dto.payment.PaymentResponse;
 @FeignClient(name = "payment-service", url = "${payment-service.host}:${payment-service.port}")
 public interface PaymentServiceClient {
     @PostMapping("/api/payment")
-    ResponseEntity<PaymentResponse> sendPayment(@RequestBody PaymentRequest paymentRequest);
+    PaymentResponse sendPayment(@RequestBody PaymentRequest paymentRequest);
 }

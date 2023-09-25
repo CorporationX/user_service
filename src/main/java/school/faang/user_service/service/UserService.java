@@ -33,8 +33,7 @@ public class UserService {
     private final ContactService contactService;
 
     public UserDto getUser(long id) {
-        User foundUser = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User with id " + id + " not found"));
+        User foundUser = getUserEntity(id);
 
         return mapper.toDto(foundUser);
     }

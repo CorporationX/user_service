@@ -78,6 +78,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errors);
     }
 
+    @ExceptionHandler(PremiumAlreadyExistsException.class)
+    public ResponseEntity<Object> handlePremiumAlreadyExistsException(PremiumAlreadyExistsException ex) {
+        log.error("Exception caused: {}. \n" +
+                "Stacktrace: {}", ex.getMessage(), ex.getStackTrace());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleException(Exception ex) {
         log.error("Unknown exception caused: {}. \n" +

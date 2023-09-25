@@ -38,14 +38,15 @@ public class PremiumService {
 
         PaymentRequest paymentRequest = createPaymentRequest(price);
         PaymentResponse paymentResponse = paymentService.sendPayment(paymentRequest);
-        Premium premium = new Premium(-1, user, LocalDateTime.now(), LocalDateTime.now().plusDays(period.getDays()));
+        LocalDateTime now = LocalDateTime.now();
+        Premium premium = new Premium(-1, user, now, now.plusDays(period.getDays()));
         premium = premiumRepository.save(premium);
         user.setPremium(premium);
         return buildPremiumDto(premium, user);
     }
 
     private PaymentRequest createPaymentRequest(double price) {
-        long paymentNumber = new Random().nextInt(900000) + 100000;
+        long paymentNumber = new Random().nextInt(100000, 1000000);
         return new PaymentRequest(paymentNumber, BigDecimal.valueOf(price), Currency.USD);
     }
 

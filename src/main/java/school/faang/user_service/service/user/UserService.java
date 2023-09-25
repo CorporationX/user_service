@@ -115,6 +115,7 @@ public class UserService {
     public void createUser(UserDto userDto) {
         User user = userMapper.toEntity(userDto);
         profilePictureService.setProfilePicture(user);
+        profilePicEventPublisher.publish(user);
         userRepository.save(userMapper.toEntity(userDto));
         profilePicEventPublisher.publish(user);
     }

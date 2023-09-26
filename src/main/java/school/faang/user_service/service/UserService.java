@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.entity.contact.ContactPreference;
 import school.faang.user_service.entity.contact.PreferredContact;
 import school.faang.user_service.mapper.MapperUserDto;
 import school.faang.user_service.messaging.MessagePublisher;
@@ -16,6 +17,7 @@ import school.faang.user_service.filter.user.UserFilterDto;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.contact.ContactPreferenceRepository;
 
 import java.util.List;
 import java.util.Locale;
@@ -29,6 +31,7 @@ public class UserService {
     private final MapperUserDto userMapper;
     private final MessagePublisher<ProfileViewEvent> profileViewEventMessagePublisher;
     private final UserContext userContext;
+    private final ContactPreferenceRepository contactPreference;
 
     @Transactional(readOnly = true)
     public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
@@ -52,7 +55,8 @@ public class UserService {
                 PreferredContact.EMAIL));
 //        profileViewEventMessagePublisher.publish(new ProfileViewEvent(currentUserId, userId,
 //                user.getContactPreference().getPreference()));
-
+        //PreferredContact preferredContact =contactPreference.findById(userId).get().getPreference();
+       // System.out.println(preferredContact.name());
         return userMapper.toDto(user);
     }
 
@@ -60,8 +64,10 @@ public class UserService {
     public List<UserDto> getUsersByIds(List<Long> ids) {
         List<User> allById = userRepository.findAllById(ids);
 
+
         return allById.stream()
                 .map(userMapper::toDto)
                 .toList();
     }
+
 }

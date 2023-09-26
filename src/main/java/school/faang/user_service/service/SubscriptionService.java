@@ -5,12 +5,16 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.commonMessages.ErrorMessages;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.contact.PreferredContact;
 import school.faang.user_service.filter.user.UserFilterDto;
 import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.filter.user.UserFilter;
+import school.faang.user_service.messaging.ProjectFollowerEventPublisher;
+import school.faang.user_service.messaging.events.ProjectFollowerEvent;
 import school.faang.user_service.repository.SubscriptionRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -20,10 +24,13 @@ public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final List<UserFilter> userFilters;
     private final UserMapper userMapper;
+    private final ProjectFollowerEventPublisher publisher;
 
     public void followUser(long followerId, long followeeId) {
         validateFollower(followerId, followeeId);
-        subscriptionRepository.followUser(followerId, followeeId);
+       // subscriptionRepository.followUser(followerId, followeeId);
+
+        publisher.publish(new ProjectFollowerEvent(followerId,followeeId,PreferredContact.EMAIL));
     }
 
     public void unfollowUser(long followerId, long followeeId) {

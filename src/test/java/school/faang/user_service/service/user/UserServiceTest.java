@@ -157,4 +157,10 @@ class UserServiceTest {
         userService.deleteProfilePic(1L);
         verify(userProfilePicS3Service, times(1)).delete("fileId");
     }
+
+    @Test
+    void testSetBanForUser() {
+        userService.setBanForUser(1L);
+        verify(userRepository, times(1)).setBanUser(1L);
+    }
 }

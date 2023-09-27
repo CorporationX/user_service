@@ -43,6 +43,9 @@ spring:
     kafka:
       port: 9092
       host: localhost
+      channels:
+        profile_view_channel:
+          name: profile_view_channel
 
 server:
   port: 8080

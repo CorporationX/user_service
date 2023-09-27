@@ -53,7 +53,7 @@ public class UserService {
 
     public User getUser(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() ->  new EntityNotFoundException("User with id " + id + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User with id " + id + " not found"));
     }
 
     public void validateUsers(Long... userIds) {
@@ -63,7 +63,7 @@ public class UserService {
             }
         }
     }
-  
+
     @Transactional(readOnly = true)
     public UserDto getUserById(long id) {
         return userMapper.toDto(getUser(id));
@@ -76,7 +76,7 @@ public class UserService {
                 .map(userMapper::toDto)
                 .toList();
     }
-  
+
     @Transactional
     public void saveStudents(MultipartFile studentsFile) {
         List<Person> students = personParser.parse(studentsFile);
@@ -140,5 +140,11 @@ public class UserService {
 
     private String getFolder(User user) {
         return String.format("%s/%d_%s", folder, user.getId(), user.getUsername());
+    }
+
+    @Transactional
+    public void setBanForUser(Long userId) {
+        userRepository.setBanUser(userId);
+        log.info("Banned user with id: {}", userId);
     }
 }

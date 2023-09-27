@@ -40,6 +40,8 @@ spring:
           name: search-appearance-channel
         skill_offered_channel:
           name: skill-offered-channel
+        user_channels:
+          user-ban-channel
 
   google:
     calendar:

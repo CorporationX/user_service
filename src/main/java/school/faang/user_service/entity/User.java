@@ -165,4 +165,7 @@ public class User {
 
     @OneToOne(mappedBy = "user")
     private GoogleToken googleToken;
+
+    @Column(name = "banned")
+    private boolean banned;
 }

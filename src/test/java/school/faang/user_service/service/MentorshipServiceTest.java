@@ -2,19 +2,26 @@ package school.faang.user_service.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.entity.MentorshipRequest;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.mapper.MapperUserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.messaging.MentorshipEventPublisher;
+import school.faang.user_service.messaging.events.MentorshipStartEvent;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
+import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -24,6 +31,8 @@ import static org.mockito.Mockito.*;
 class MentorshipServiceTest {
     @Mock
     private MentorshipRepository mentorshipRepository;
+    @Mock
+    private MentorshipRequestRepository mentorshipRequestRepository;
     @Mock
     private UserRepository userRepository;
     @Mock

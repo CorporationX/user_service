@@ -3,6 +3,7 @@ package school.faang.user_service.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,10 +24,10 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}")
     private int port;
 
-    @Value("${spring.data.redis.channels.mentorship_channel}")
+    @Value("${spring.data.redis.channels.mentorship_channel.name}")
     private String mentorshipChannel;
 
-    @Value("${spring.data.redis.channels.goal_completed_channel}")
+    @Value("${spring.data.redis.channels.goal_completed_channel.name}")
     private String goalCompletedChannel;
 
     @Bean
@@ -48,15 +49,5 @@ public class RedisConfig {
     @Bean
     public ChannelTopic viewProfileTopic() {
         return new ChannelTopic("viewProfileTopic");
-    }
-
-    @Bean
-    public ChannelTopic mentorshipChannelTopic() {
-        return new ChannelTopic(mentorshipChannel);
-    }
-
-    @Bean
-    public ChannelTopic goalCompletedChannelTopic() {
-        return new ChannelTopic(goalCompletedChannel);
     }
 }

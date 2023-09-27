@@ -11,6 +11,7 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.messaging.MentorshipEventPublisher;
+import school.faang.user_service.messaging.events.MentorshipStartEvent;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -41,6 +42,8 @@ public class MentorshipService {
             request.setUpdatedAt(LocalDateTime.now());
             mentorshipRequestRepository.save(request);
         }
+        MentorshipStartEvent event = MentorshipStartEvent.builder().menteeId(requesterId).menteeId(receiverId).build();
+        mentorshipEventPublisher.publish(event);
     }
 
     public List<UserDto> getMentees(Long userId) {

@@ -9,7 +9,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
-import school.faang.user_service.service.MentorshipService;
 
 @SpringBootApplication
 @EnableFeignClients("school.faang.user_service.client")

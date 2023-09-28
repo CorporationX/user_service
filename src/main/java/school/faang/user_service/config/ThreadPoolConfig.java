@@ -12,13 +12,13 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 public class ThreadPoolConfig {
 
-    @Value("${thread-pools:notice:core}")
+    @Value("${thread-pools.notice.core}")
     private int noticeCoreSize;
-    @Value("${thread-pools:notice:max}")
+    @Value("${thread-pools.notice.max}")
     private int maxNoticeCoreSize;
-    @Value("${thread-pools:notice:alive-time}")
+    @Value("${thread-pools.notice.alive-time}")
     private int aliveTimeNotice;
-    @Value("${thread-pools:notice:queue}")
+    @Value("${thread-pools.notice.queue}")
     private int noticeQueue;
     @Bean
     public ExecutorService noticePool(){

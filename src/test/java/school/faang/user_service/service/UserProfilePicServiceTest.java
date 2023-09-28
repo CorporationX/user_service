@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.annotation.Profile;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.userProfilePic.AvatarFromAwsDto;
@@ -13,6 +14,7 @@ import school.faang.user_service.dto.userProfilePic.UserProfilePicDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DataValidException;
+import school.faang.user_service.publisher.ProfilePicPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.util.FileStorageService;
 import school.faang.user_service.util.ImageService;
@@ -35,6 +37,8 @@ class UserProfilePicServiceTest {
     private FileStorageService fileStorageService;
     @Mock
     private ImageService imageService;
+    @Mock
+    private ProfilePicPublisher profilePicPublisher;
     @InjectMocks
     private UserProfilePicService userProfilePicService;
 
@@ -43,7 +47,7 @@ class UserProfilePicServiceTest {
         MultipartFile file = new MockMultipartFile("Name", new byte[1]);
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
-            userProfilePicService.upload(file, 1L);
+            userProfilePicService.uploadWithPublishProfilePicEvent(file, 1L);
         });
 
         assertEquals("User with id 1 is not found", exception.getMessage());
@@ -61,7 +65,7 @@ class UserProfilePicServiceTest {
         when(fileStorageService.uploadFile(byteFile, file, 1L, "big")).thenReturn("BIG");
         when(fileStorageService.uploadFile(byteFile, file, 1L, "small")).thenReturn("SMALL");
 
-        UserProfilePicDto result = userProfilePicService.upload(file, 1L);
+        UserProfilePicDto result = userProfilePicService.uploadWithPublishProfilePicEvent(file, 1L);
 
         assertNotNull(result);
         assertEquals("BIG", result.getFileId());

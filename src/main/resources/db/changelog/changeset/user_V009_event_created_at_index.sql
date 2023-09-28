@@ -1,0 +1,1 @@
+CREATE INDEX created_at_index on event(created_at);

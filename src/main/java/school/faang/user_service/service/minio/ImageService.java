@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.ByteMultipartFile;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.exception.NotEnoughMemoryInDB;
 import school.faang.user_service.service.UserService;
 
 import javax.imageio.ImageIO;
@@ -19,6 +20,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @Slf4j
@@ -30,6 +33,8 @@ public class ImageService {
     private int maxSideBigField;
     @Value("${file-size.user.image.small}")
     private int maxSideSmallField;
+    private final Map<Long, Object> userLocks = new ConcurrentHashMap<>();
+
 
     @Transactional
     public UserProfilePic addImage(Long userId, MultipartFile file){
@@ -38,7 +43,11 @@ public class ImageService {
         MultipartFile smallImage = resizePicture(file, maxSideSmallField, maxSideSmallField);
         BigInteger storageForImages = BigInteger.valueOf(bigImage.getSize() + smallImage.getSize());
         BigInteger requiredStorage = user.getStorageSize().add(storageForImages);
-        checkAvailableStorage(user.getMaxStorageSize(), storageForImages);
+
+        Object userLock = userLocks.computeIfAbsent(userId, l -> new Object());
+        synchronized (userLock) {
+            checkAvailableStorage(user.getMaxStorageSize(), storageForImages);
+        }
         String folder = user.getId() + user.getUsername();
 
         String bigImageKey = minioService.uploadFile(bigImage, folder);
@@ -70,7 +79,7 @@ public class ImageService {
 
     private void checkAvailableStorage(BigInteger maxStorage, BigInteger requiredStorage){
         if(maxStorage.compareTo(requiredStorage) < 0){
-            throw new OutOfMemoryError("There is no available storage");
+            throw new NotEnoughMemoryInDB("There is no available storage");
         }
     }
 

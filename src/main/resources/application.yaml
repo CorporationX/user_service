@@ -31,6 +31,13 @@ spring:
         recommendation_chanel:
           name: recommendation_channel
 
+thread-pools:
+  notice:
+    core: 10
+    max: 15
+    alive-time: 5000
+    queue: 10000
+
 server:
   port: 8080
 

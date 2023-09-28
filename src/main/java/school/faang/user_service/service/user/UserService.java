@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.entity.contact.ContactPreference;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.FileException;
 import school.faang.user_service.mapper.CountryMapper;
@@ -41,6 +42,7 @@ public class UserService {
     private final CsvSchema schema;
     private final CountryService countryService;
     private final CountryMapper countryMapper;
+    private final ContactPreferenceService contactPreferenceService;
 
     @Value("${services.s3.dice-bear.url}")
     private String URL;
@@ -52,9 +54,13 @@ public class UserService {
         User user = userMapper.toEntity(userDto);
         addCreateData(user);
 
-        synchronized (userRepository) {
-            user = userRepository.save(user);
-        }
+        ContactPreference contactPreference = user.getContactPreference();
+        user.setContactPreference(null);
+
+        user = userRepository.save(user);
+
+        contactPreference.setUser(user);
+        user.setContactPreference(contactPreferenceService.createContactPreference(contactPreference));
 
         return userMapper.toDto(user);
     }
@@ -162,7 +168,9 @@ public class UserService {
     }
 
     private void addCreateData(User user) {
-        user.setCountry(countryMapper.toCountry(countryService.findCountryByTitle(user.getCountry().getTitle())));
+        user.setCountry(countryMapper.
+                toCountry(countryService.
+                        findCountryByTitle(user.getCountry().getTitle())));
         UserProfilePic userProfilePic = UserProfilePic.builder()
                 .name(user.getUsername() + ThreadLocalRandom.current().nextInt())
                 .build();

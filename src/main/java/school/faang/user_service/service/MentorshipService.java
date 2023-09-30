@@ -2,10 +2,12 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.redis.MentorshipStartEventDto;
 import school.faang.user_service.dto.subscription.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.MentorshipStartEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
@@ -17,6 +19,7 @@ public class MentorshipService {
     private final MentorshipRepository mentorshipRepository;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final MentorshipStartEventPublisher mentorshipStartEventPublisher;
 
     public void cancelMentoring(User user, List<Goal> goals) {
         user.getMentees().stream().map(User::getMentors).forEach(list -> list.remove(user));
@@ -53,5 +56,14 @@ public class MentorshipService {
                 .orElseThrow(() -> new IllegalArgumentException("Mentee with id " + menteeId + " not found"));
         mentee.getMentors().remove(mentor);
         userRepository.save(mentee);
+    }
+
+    // метод заглушка !!!!!!!!!!!!!!!!
+    public void acceptMentoring() {
+
+        MentorshipStartEventDto dto = new MentorshipStartEventDto();
+        dto.setRequesterId(1L);
+        dto.setReceiverId(2L);
+        mentorshipStartEventPublisher.publishMessage(dto);
     }
 }

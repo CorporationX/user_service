@@ -21,6 +21,6 @@ public class UserDto{
     private String username;
     @NotBlank(message = "Email cannot be blank")
     private String email;
-    private PreferredContact preference;
     private String phone;
+    private PreferredContact preference;
 }

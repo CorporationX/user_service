@@ -8,8 +8,10 @@ import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.DeactivateResponseDto;
 import school.faang.user_service.dto.contact.ExtendedContactDto;
 import school.faang.user_service.dto.contact.TgContactDto;
+import school.faang.user_service.dto.redis.MentorshipStartEventDto;
 import school.faang.user_service.dto.subscription.UserDto;
 import school.faang.user_service.dto.subscription.UserFilterDto;
+import school.faang.user_service.publisher.MentorshipStartEventPublisher;
 import school.faang.user_service.service.UserService;
 
 import java.io.IOException;
@@ -19,6 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("api/v1/users")
 public class UserController {
+    private final MentorshipStartEventPublisher mentorshipStartEventPublisher;
     private final UserService userService;
 
     @PostMapping
@@ -75,8 +78,16 @@ public class UserController {
     }
 
     @GetMapping("/get-by-phone")
-    public Long findUserIdByPhoneNumber(@RequestParam(name = "phone") String phoneNumber){
+    public Long findUserIdByPhoneNumber(@RequestParam(name = "phone") String phoneNumber) {
         return userService.findUserIdByPhoneNumber(phoneNumber);
+    }
+
+    @GetMapping("/test")
+    public void get() {
+        MentorshipStartEventDto dto = new MentorshipStartEventDto();
+        dto.setReceiverId(2L);
+        dto.setRequesterId(1L);
+        mentorshipStartEventPublisher.publishMessage(dto);
     }
 
     @GetMapping("/exists/{id}")

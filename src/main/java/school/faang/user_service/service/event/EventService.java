@@ -1,7 +1,10 @@
 package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.event.EventDto;
@@ -20,6 +23,7 @@ import school.faang.user_service.publisher.EventStartPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -34,6 +38,7 @@ public class EventService {
     private final SkillMapper skillMapper = SkillMapper.INSTANCE;
     private final List<EventFilter> filters;
     private final EventStartPublisher eventStartPublisher;
+    private final EventAsyncService eventAsyncService;
 
     public EventDto create(EventDto eventDto) {
         validateEventDto(eventDto);
@@ -130,6 +135,20 @@ public class EventService {
         boolean anySkillMissing = eventDto.getRelatedSkills().stream().anyMatch(skill -> !userSkills.contains(skill));
         if (anySkillMissing) {
             throw new DataValidException("User has no related skills. Id: " + eventDto.getOwnerId());
+        }
+    }
+
+
+    @Transactional
+    @Retryable(maxAttempts = 2, backoff = @Backoff(delayExpression = "10000"))
+    public void deletePastEvents(int partitionSize) {
+        List<Event> eventsToDelete = eventRepository.findAllByCreatedAtBefore(LocalDateTime.now().withNano(0));
+
+        if (eventsToDelete.size() > partitionSize) {
+            List<List<Event>> partitions = ListUtils.partition(eventsToDelete, partitionSize);
+            partitions.forEach(eventAsyncService::clearEventsPartition);
+        } else {
+            eventAsyncService.clearEventsPartition(eventsToDelete);
         }
     }
 }

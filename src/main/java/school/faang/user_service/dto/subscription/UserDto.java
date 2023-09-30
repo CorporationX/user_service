@@ -13,7 +13,7 @@ import school.faang.user_service.entity.contact.PreferredContact;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserDto {
+public class UserDto{
     @Min(value = 0, message = "Id should be a positive value")
     @NotNull(message = "Id cannot be bull")
     private long id;
@@ -23,4 +23,5 @@ public class UserDto {
     private String email;
     private String phone;
     private PreferredContact preference;
+    private String phone;
 }

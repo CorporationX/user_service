@@ -3,6 +3,7 @@ package school.faang.user_service.controller.user;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,19 +18,25 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/users/avatars/")
+@RequestMapping("${urls.avatar_url}")
+
 public class UserProfilePicController {
     private final UserProfilePicService userProfilePicService;
     private final UserContext userContext;
 
     @PostMapping
     public UserProfilePicDto upload(@RequestParam("file") MultipartFile file) {
-        return userProfilePicService.upload(file, userContext.getUserId());
+        return userProfilePicService.uploadWithPublishProfilePicEvent(file, userContext.getUserId());
     }
 
     @GetMapping
     public List<AvatarFromAwsDto> get() {
         return userProfilePicService.getByUserId(userContext.getUserId());
+    }
+
+    @GetMapping("/{id}")
+    public List<AvatarFromAwsDto> getByUserId(@PathVariable(name = "id") long userId) {
+        return userProfilePicService.getByUserId(userId);
     }
 
     @DeleteMapping

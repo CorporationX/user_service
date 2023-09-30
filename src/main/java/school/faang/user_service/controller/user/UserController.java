@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.user;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +30,12 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    UserDto getUser(@PathVariable long userId) {
+    UserDto getUser(@PathVariable long userId) throws JsonProcessingException {
+        return userService.getUserWithPublishProfileViewEvent(userId);
+    }
+
+    @GetMapping("/user/{userId}")
+    UserDto getUserNoPublish(@PathVariable long userId){
         return userService.getUser(userId);
     }
 
@@ -82,5 +88,10 @@ public class UserController {
         dto.setReceiverId(2L);
         dto.setRequesterId(1L);
         mentorshipStartEventPublisher.publishMessage(dto);
+    }
+
+    @GetMapping("/exists/{id}")
+    public Boolean checkUserExist(@PathVariable long id) {
+        return userService.checkUserExist(id);
     }
 }

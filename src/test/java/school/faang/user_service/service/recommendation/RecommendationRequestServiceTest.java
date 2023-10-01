@@ -34,6 +34,7 @@ public class RecommendationRequestServiceTest {
     @Spy
     private RecommendationRequestMapper recommendationRequestMapper = RecommendationRequestMapper.INSTANCE;
 
+    @InjectMocks
     private RecommendationRequestService recommendationRequestService;
 
     @BeforeEach
@@ -138,6 +139,64 @@ public class RecommendationRequestServiceTest {
         assertEquals(2, eventsByFilter.size());
         assertEquals("Hello", eventsByFilter.get(0).getMessage());
         assertEquals(RequestStatus.ACCEPTED, eventsByFilter.get(0).getStatus());
+    }
+  
+    @Test
+    void rejectRequestValidData() {
+        long requestId = 1;
+        String rejectionReason = "Not suitable for the position";
+
+        RejectionDto rejectionDto = new RejectionDto(rejectionReason);
+
+        RecommendationRequest recommendationRequest = new RecommendationRequest();
+        recommendationRequest.setId(requestId);
+        recommendationRequest.setStatus(RequestStatus.PENDING);
+
+        when(recommendationRequestRepository.findById(requestId)).thenReturn(Optional.of(recommendationRequest));
+        RecommendationRequestDto result = recommendationRequestService.rejectRequest(requestId, rejectionDto);
+
+        assertNotNull(result);
+        assertEquals(requestId, result.getId());
+        assertEquals(RequestStatus.REJECTED, recommendationRequest.getStatus());
+        assertEquals(rejectionReason, recommendationRequest.getRejectionReason());
+        verify(recommendationRequestRepository).findById(requestId);
+    }
+
+    @Test
+    void rejectRequestInvalidRequest() {
+        long requestId = 1;
+        String rejectionReason = "Not suitable for the position";
+
+        RejectionDto rejectionDto = new RejectionDto(rejectionReason);
+
+        when(recommendationRequestRepository.findById(requestId)).thenReturn(Optional.empty());
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> recommendationRequestService.rejectRequest(requestId, rejectionDto));
+
+        assertEquals("Recommendation with id: " + requestId + " does not exist", exception.getMessage());
+        verify(recommendationRequestRepository).findById(requestId);
+    }
+
+    @Test
+    void rejectRequestNullRejectionDto() {
+        long requestId = 1;
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> recommendationRequestService.rejectRequest(requestId, null));
+
+        assertEquals("RejectionDto cannot be null or empty", exception.getMessage());
+    }
+
+    @Test
+    void rejectRequestEmptyRejectionReason() {
+        long requestId = 1;
+        RejectionDto rejectionDto = new RejectionDto("");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> recommendationRequestService.rejectRequest(requestId, rejectionDto));
+
+        assertEquals("RejectionDto cannot be null or empty", exception.getMessage());
     }
 
 }

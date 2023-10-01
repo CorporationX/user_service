@@ -29,5 +29,23 @@ public class RecommendationRequestService {
         }
         return recommendationRequestMapper.toDtoList(recommendationRequests.toList());
     }
+    
+    public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
+        validateRejectionDto(rejection);
 
+        RecommendationRequest request = recommendationRequestRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Recommendation with id: " + id + " does not exist"));
+
+        request.setStatus(RequestStatus.REJECTED);
+        request.setRejectionReason(rejection.getReason());
+        request.setUpdatedAt(LocalDateTime.now());
+
+        return recommendationRequestMapper.toDto(request);
+    }
+
+    public static void validateRejectionDto(RejectionDto rejection) {
+        if (rejection == null || rejection.getReason().isBlank()) {
+            throw new IllegalArgumentException("RejectionDto cannot be null or empty");
+        }
+    }
 }

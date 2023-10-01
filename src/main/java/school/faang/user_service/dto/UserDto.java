@@ -35,5 +35,5 @@ public class UserDto {
     private String city;
     @Max(100)
     private Integer experience;
-    private PreferredContact preferredContact;
+   private PreferredContact preferredContact;
 }

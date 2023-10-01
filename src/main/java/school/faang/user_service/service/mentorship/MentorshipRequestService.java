@@ -2,17 +2,20 @@ package school.faang.user_service.service.mentorship;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.mentorship.RequestFilterDto;
-import school.faang.user_service.entity.MentorshipRequest;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.dto.mentorship.MentorshipOfferedEventDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
+import school.faang.user_service.dto.mentorship.RequestFilterDto;
+import school.faang.user_service.entity.MentorshipRequest;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.MentorshipRequestMapper;
-import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.filter.mentorship_request.MentorshipRequestFilter;
+import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.mapper.MentorshipOfferedEventMapper;
+import school.faang.user_service.publisher.MentorshipOfferedEventPublisher;
+import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
 
@@ -28,15 +31,21 @@ public class MentorshipRequestService {
     private final MentorshipRequestValidator mentorshipRequestValidator;
     private final UserService userService;
     private final List<MentorshipRequestFilter> mentorshipRequestFilters;
+    private final MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
+    private final MentorshipOfferedEventMapper mentorshipOfferedEventMapper;
 
     @Transactional
-    public void requestMentorship(MentorshipRequestDto dto) {
-        User requester = userService.findUserById(dto.getRequesterId());
-        User receiver = userService.findUserById(dto.getReceiverId());
+    public MentorshipRequestDto requestMentorship(MentorshipRequestDto dto) {
+        mentorshipRequestValidator.requestValidate(dto);
 
-        mentorshipRequestValidator.requestValidate(requester, receiver);
         MentorshipRequest mentorshipRequest = mentorshipRequestMapper.toEntity(dto);
-        mentorshipRequestRepository.save(mentorshipRequest);
+        mentorshipRequest.setStatus(RequestStatus.PENDING);
+        mentorshipRequest = mentorshipRequestRepository.save(mentorshipRequest);
+
+        dto = mentorshipRequestMapper.toDto(mentorshipRequest);
+        sendNotification(dto);
+
+        return dto;
     }
 
     @Transactional
@@ -53,35 +62,38 @@ public class MentorshipRequestService {
     }
 
     @Transactional
-    public void acceptRequest(long id) {
-        MentorshipRequest request =requestFindById(id);
-        mentorshipRequestValidator.acceptRequestValidator(request);
+    public MentorshipRequestDto acceptRequest(long id) {
+        MentorshipRequest mentorshipRequest = requestFindById(id);
+        mentorshipRequestValidator.acceptRequestValidator(mentorshipRequest.getRequester().getId(),
+                mentorshipRequest.getReceiver().getId(),
+                mentorshipRequest.getStatus());
 
-        User requester = request.getRequester();
-        User receiver = request.getReceiver();
+        mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
+        userService.addMentor(mentorshipRequest.getRequester().getId(),
+                mentorshipRequest.getReceiver().getId());
 
-        request.setStatus(RequestStatus.ACCEPTED);
-
-        List<User> newMentees = receiver.getMentees();
-        newMentees.add(requester);
-        receiver.setMentees(newMentees);
-
-        List<User> newMentors = requester.getMentors();
-        newMentors.add(receiver);
-        requester.setMentors(newMentors);
+        return mentorshipRequestMapper.toDto(mentorshipRequest);
     }
 
     @Transactional
-    public void rejectRequest(long id, RejectionDto rejection) {
-        MentorshipRequest request = requestFindById(id);
-        mentorshipRequestValidator.rejectRequestValidator(request);
+    public MentorshipRequestDto rejectRequest(long id, RejectionDto rejection) {
+        MentorshipRequest mentorshipRequest = requestFindById(id);
+        mentorshipRequestValidator.rejectRequestValidator(mentorshipRequest.getStatus());
 
-        request.setStatus(RequestStatus.REJECTED);
-        request.setRejectionReason(rejection.getReason());
+        mentorshipRequest.setStatus(RequestStatus.REJECTED);
+        mentorshipRequest.setRejectionReason(rejection.getReason());
+
+        return mentorshipRequestMapper.toDto(mentorshipRequest);
     }
 
-    private MentorshipRequest requestFindById(long id){
-        return mentorshipRequestRepository.findById(id)
-                .orElseThrow(() -> new DataValidationException("Request is not exist"));
+    private MentorshipRequest requestFindById(long id) {
+        return mentorshipRequestRepository.findById(id).orElseThrow(() -> new DataValidationException("Request is not exist"));
+    }
+
+    @Async
+    private void sendNotification(MentorshipRequestDto mentorshipRequestDto) {
+        MentorshipOfferedEventDto mentorshipOfferedEventDto =
+                mentorshipOfferedEventMapper.toMentorshipOfferedEvent(mentorshipRequestDto);
+        mentorshipOfferedEventPublisher.publish(mentorshipOfferedEventDto);
     }
 }

@@ -18,6 +18,8 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.entity.contact.ContactPreference;
+import school.faang.user_service.entity.contact.PreferredContact;
 import school.faang.user_service.mapper.CountryMapper;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
@@ -52,6 +54,8 @@ class UserServiceTest {
     private CountryService countryService;
     @Mock
     private CountryMapper countryMapper;
+    @Mock
+    private ContactPreferenceService contactPreferenceService;
     @InjectMocks
     private UserService userService;
     @Value("${services.dice-bear.url}")
@@ -61,6 +65,7 @@ class UserServiceTest {
 
     @Test
     public void testCreateUser() {
+        ContactPreference contactPreference = ContactPreference.builder().build();
         CountryDto countryDto = CountryDto.builder()
                 .id(1L)
                 .title("Test")
@@ -73,11 +78,13 @@ class UserServiceTest {
                 .id(1L)
                 .country(countryDto)
                 .username("test")
+                .preferredContact(PreferredContact.EMAIL)
                 .build();
         User user = User.builder()
                 .id(1L)
                 .username("test")
                 .country(country)
+                .contactPreference(contactPreference)
                 .build();
 
         Mockito.when(userMapper.toEntity(userDto))
@@ -88,6 +95,8 @@ class UserServiceTest {
                         .thenReturn(country);
         Mockito.when(userRepository.save(user))
                 .thenReturn(user);
+        Mockito.when(contactPreferenceService.createContactPreference(any()))
+                        .thenReturn(contactPreference);
 
         userService.createUser(userDto);
 
@@ -181,6 +190,7 @@ class UserServiceTest {
 
     @Test
     public void testAddCreateData() {
+        ContactPreference contactPreference = ContactPreference.builder().build();
         CountryDto countryDto = CountryDto.builder()
                 .id(1L)
                 .title("Test")
@@ -193,11 +203,13 @@ class UserServiceTest {
                 .id(1L)
                 .country(countryDto)
                 .username("test")
+                .preferredContact(PreferredContact.EMAIL)
                 .build();
         User user = User.builder()
                 .id(1L)
                 .username("test")
                 .country(country)
+                .contactPreference(contactPreference)
                 .build();
 
         Mockito.when(userMapper.toEntity(userDto))
@@ -208,6 +220,8 @@ class UserServiceTest {
                 .thenReturn(country);
         Mockito.when(userRepository.save(user))
                 .thenReturn(user);
+        Mockito.when(contactPreferenceService.createContactPreference(any()))
+                .thenReturn(contactPreference);
 
         userService.createUser(userDto);
 
@@ -216,6 +230,7 @@ class UserServiceTest {
 
     @Test
     public void testCreateDiceBearAvatar() {
+        ContactPreference contactPreference = ContactPreference.builder().build();
         CountryDto countryDto = CountryDto.builder()
                 .id(1L)
                 .title("Test")
@@ -228,11 +243,13 @@ class UserServiceTest {
                 .id(1L)
                 .country(countryDto)
                 .username("test")
+                .preferredContact(PreferredContact.EMAIL)
                 .build();
         User user = User.builder()
                 .id(1L)
                 .username("test")
                 .country(country)
+                .contactPreference(contactPreference)
                 .build();
 
         Mockito.when(userMapper.toEntity(userDto))
@@ -243,6 +260,8 @@ class UserServiceTest {
                 .thenReturn(country);
         Mockito.when(userRepository.save(user))
                 .thenReturn(user);
+        Mockito.when(contactPreferenceService.createContactPreference(any()))
+                .thenReturn(contactPreference);
 
         userService.createUser(userDto);
 

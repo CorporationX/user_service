@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.entity.contact.ContactPreference;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.FileException;
 import school.faang.user_service.mapper.CountryMapper;
@@ -22,6 +23,7 @@ import school.faang.user_service.validator.UserValidator;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
@@ -40,6 +42,7 @@ public class UserService {
     private final CsvSchema schema;
     private final CountryService countryService;
     private final CountryMapper countryMapper;
+    private final ContactPreferenceService contactPreferenceService;
 
     @Value("${services.s3.dice-bear.url}")
     private String URL;
@@ -51,9 +54,13 @@ public class UserService {
         User user = userMapper.toEntity(userDto);
         addCreateData(user);
 
-        synchronized (userRepository) {
-            user = userRepository.save(user);
-        }
+        ContactPreference contactPreference = user.getContactPreference();
+        user.setContactPreference(null);
+
+        user = userRepository.save(user);
+
+        contactPreference.setUser(user);
+        user.setContactPreference(contactPreferenceService.createContactPreference(contactPreference));
 
         return userMapper.toDto(user);
     }
@@ -75,6 +82,21 @@ public class UserService {
                 -> new DataValidationException("User was not found"));
     }
 
+    @Transactional
+    public void addMentor(Long requesterId, Long receiverId) {
+        User requester = findUserById(requesterId);
+        User receiver = findUserById(receiverId);
+
+        if (requester.getMentors().isEmpty()) {
+            requester.setMentors(List.of(receiver));
+        } else {
+            List<User> mentors = requester.getMentors();
+            mentors.add(receiver);
+            requester.setMentors(mentors);
+        }
+    }
+
+
     public boolean areOwnedSkills(long userId, List<Long> skillIds) {
         if (skillIds.isEmpty()) {
             return true;
@@ -95,6 +117,13 @@ public class UserService {
         return users.stream()
                 .map(userMapper::toDto)
                 .toList();
+    }
+
+    public List<Long> getMentorIds(long userId) {
+        List<User> mentors = userRepository.findMentors(userId);
+        List<Long> ids = new ArrayList<>();
+        return mentors.isEmpty() ?
+                ids : mentors.stream().map(User::getId).toList();
     }
 
     @Transactional
@@ -139,7 +168,9 @@ public class UserService {
     }
 
     private void addCreateData(User user) {
-        user.setCountry(countryMapper.toCountry(countryService.findCountryByTitle(user.getCountry().getTitle())));
+        user.setCountry(countryMapper.
+                toCountry(countryService.
+                        findCountryByTitle(user.getCountry().getTitle())));
         UserProfilePic userProfilePic = UserProfilePic.builder()
                 .name(user.getUsername() + ThreadLocalRandom.current().nextInt())
                 .build();

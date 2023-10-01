@@ -61,9 +61,8 @@ public class PremiumService {
 
     private void validateResponse(ResponseEntity<PaymentResponse> responseEntity) {
         PaymentResponse paymentResponse = responseEntity.getBody();
-        if (responseEntity.getStatusCode().is2xxSuccessful() &&
+        if (!responseEntity.getStatusCode().is2xxSuccessful() ||
                 !Objects.requireNonNull(paymentResponse).getStatus().equals(PaymentStatus.SUCCESS)) {
-            System.out.println(paymentResponse);
             throw new PaymentFailedException("Payment failed. Please try again");
         }
     }

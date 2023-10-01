@@ -44,6 +44,12 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return buildErrorResponse(e, request, HttpStatus.BAD_REQUEST, " I/O exception of some sort has occurred");
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Object> handleIllegalStateException(IllegalStateException e, HttpServletRequest request) {
+        return buildErrorResponse(e, request, HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+
     private ResponseEntity<Object> buildErrorResponse(Exception e, HttpServletRequest rq, HttpStatus status, String error) {
         ErrorResponse errorResponse = ErrorResponse.builder()
             .timestamp(LocalDateTime.now())

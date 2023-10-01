@@ -1,5 +1,6 @@
 package school.faang.user_service.repository.recommendation;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -8,7 +9,7 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 import java.util.List;
 
 @Repository
-public interface SkillOfferRepository extends CrudRepository<SkillOffer, Long> {
+public interface SkillOfferRepository extends JpaRepository<SkillOffer, Long> {
 
     @Query(nativeQuery = true, value = "INSERT INTO skill_offer (skill_id, recommendation_id) VALUES (?1, ?2) returning id")
     Long create(long skillId, long recommendationId);
@@ -28,4 +29,11 @@ public interface SkillOfferRepository extends CrudRepository<SkillOffer, Long> {
             WHERE so.skill.id = :skillId AND r.receiver.id = :userId
             """)
     List<SkillOffer> findAllOffersOfSkill(long skillId, long userId);
+
+    @Query(value = """
+            SELECT so FROM SkillOffer so
+            JOIN so.recommendation r
+            WHERE r.receiver.id = :userId
+            """)
+    List<SkillOffer> findAllByUserId(long userId);
 }

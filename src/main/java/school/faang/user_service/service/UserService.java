@@ -71,6 +71,13 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException(message));
     }
 
+    @Transactional(readOnly = true)
+    public User findUserByIdOptimisticLock(Long userId){
+        String message = String.format("Entity with ID %d not found", userId);
+        return userRepository.findByIdOptimisticLock(userId)
+                .orElseThrow(() -> new EntityNotFoundException(message));
+    }
+
     @Transactional
     public User saveUser(User user){
         return userRepository.save(user);

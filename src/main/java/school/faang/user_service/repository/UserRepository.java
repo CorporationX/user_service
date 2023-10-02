@@ -1,11 +1,15 @@
 package school.faang.user_service.repository;
 
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Repository
@@ -25,4 +29,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
             WHERE up.end_date > NOW()
             """)
     Stream<User> findPremiumUsers();
+
+    @Lock(LockModeType.OPTIMISTIC)
+    @Query(nativeQuery = true, value = """
+            SELECT * FROM users WHERE id = :id
+            """)
+    Optional<User> findByIdOptimisticLock(@Param("id") Long Id);
 }

@@ -167,4 +167,7 @@ public class User {
 
     @Column(name = "max_storage_size")
     private BigInteger maxStorageSize;
+
+    @Column(name = "version")
+    private BigInteger version;
 }

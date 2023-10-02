@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,25 +35,22 @@ public class ImageService {
     private int maxSideBigField;
     @Value("${file-size.user.image.small}")
     private int maxSideSmallField;
-    private final Map<Long, Object> userLocks = new ConcurrentHashMap<>();
 
-
+    @Retryable(maxAttempts = 3)
     @Transactional
-    public UserProfilePic addImage(Long userId, MultipartFile file){
-        User user = userService.findUserById(userId);
+    public UserProfilePic addImage(Long userId, MultipartFile file) {
+        User user = userService.findUserByIdOptimisticLock(userId);
         MultipartFile bigImage = resizePicture(file, maxSideBigField, maxSideBigField);
         MultipartFile smallImage = resizePicture(file, maxSideSmallField, maxSideSmallField);
         BigInteger storageForImages = BigInteger.valueOf(bigImage.getSize() + smallImage.getSize());
         BigInteger requiredStorage = user.getStorageSize().add(storageForImages);
 
-        Object userLock = userLocks.computeIfAbsent(userId, l -> new Object());
-        synchronized (userLock) {
-            checkAvailableStorage(user.getMaxStorageSize(), storageForImages);
-        }
+        checkAvailableStorage(user.getMaxStorageSize(), storageForImages);
+
         String folder = user.getId() + user.getUsername();
 
         String bigImageKey = minioService.uploadFile(bigImage, folder);
-        String smallImageKey = minioService.uploadFile(smallImage, folder)+"small";
+        String smallImageKey = minioService.uploadFile(smallImage, folder) + "small";
         UserProfilePic userProfilePic = new UserProfilePic(bigImageKey, smallImageKey);
 
         user.setUserProfilePic(userProfilePic);
@@ -62,13 +61,13 @@ public class ImageService {
     }
 
     @Transactional(readOnly = true)
-    public InputStream downloadImage(Long userId){
+    public InputStream downloadImage(Long userId) {
         User user = userService.findUserById(userId);
         return minioService.downloadFile(user.getUserProfilePic().getFileId());
     }
 
     @Transactional
-    public void deleteImage(Long userId){
+    public void deleteImage(Long userId) {
         User user = userService.findUserById(userId);
         minioService.deleteFile(user.getUserProfilePic().getFileId());
         minioService.deleteFile(user.getUserProfilePic().getSmallFileId());
@@ -77,13 +76,13 @@ public class ImageService {
         userService.saveUser(user);
     }
 
-    private void checkAvailableStorage(BigInteger maxStorage, BigInteger requiredStorage){
-        if(maxStorage.compareTo(requiredStorage) < 0){
+    private void checkAvailableStorage(BigInteger maxStorage, BigInteger requiredStorage) {
+        if (maxStorage.compareTo(requiredStorage) < 0) {
             throw new NotEnoughMemoryInDB("There is no available storage");
         }
     }
 
-    private MultipartFile resizePicture(MultipartFile inputFile, int height, int width)  {
+    private MultipartFile resizePicture(MultipartFile inputFile, int height, int width) {
         BufferedImage originalImage = null;
         BufferedImage resizedImage = null;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

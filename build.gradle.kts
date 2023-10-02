@@ -59,6 +59,7 @@ dependencies {
 	implementation ("com.google.code.gson:gson:2.8.8")
 	implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.13.0")
 	implementation("net.coobird:thumbnailator:0.4.20")
+	implementation("org.springframework.retry:spring-retry:2.0.3")
 
 	/**
 	 * Test containers

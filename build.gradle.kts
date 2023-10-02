@@ -111,3 +111,37 @@ val test by tasks.getting(Test::class) { testLogging.showStandardStreams = true 
 tasks.bootJar {
 	archiveFileName.set("service.jar")
 }
+
+tasks.test {
+	finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+	dependsOn(tasks.test)
+}
+
+jacoco {
+	toolVersion = "0.8.9"
+	reportsDirectory.set(layout.buildDirectory.dir("customJacocoReportDir"))
+}
+
+tasks.jacocoTestReport {
+	reports {
+		xml.required.set(false)
+		csv.required.set(false)
+		html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+	}
+	classDirectories.setFrom(files(classDirectories.files.map {
+		fileTree(it).apply {
+			exclude("school/faang/userservice/client/**",
+				"school/faang/userservice/config/**",
+				"school/faang/userservice/dto/**",
+				"school/faang/userservice/mapper/**",
+				"school/faang/userservice/model/**",
+				"school/faang/userservice/repository/**",
+				"school/faang/userservice/exception/**",
+				"school/faang/userservice/util/**",
+			)
+		}
+	}))
+}

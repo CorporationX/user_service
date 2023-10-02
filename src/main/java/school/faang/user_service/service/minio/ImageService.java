@@ -39,7 +39,7 @@ public class ImageService {
     @Retryable(maxAttempts = 3)
     @Transactional
     public UserProfilePic addImage(Long userId, MultipartFile file) {
-        User user = userService.findUserByIdOptimisticLock(userId);
+        User user = userService.findUserById(userId);
         MultipartFile bigImage = resizePicture(file, maxSideBigField, maxSideBigField);
         MultipartFile smallImage = resizePicture(file, maxSideSmallField, maxSideSmallField);
         BigInteger storageForImages = BigInteger.valueOf(bigImage.getSize() + smallImage.getSize());

@@ -168,6 +168,7 @@ public class User {
     @Column(name = "max_storage_size")
     private BigInteger maxStorageSize;
 
+    @Version
     @Column(name = "version")
-    private BigInteger version;
+    private long version;
 }

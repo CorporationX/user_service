@@ -29,10 +29,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
             WHERE up.end_date > NOW()
             """)
     Stream<User> findPremiumUsers();
-
-    @Lock(LockModeType.OPTIMISTIC)
-    @Query(nativeQuery = true, value = """
-            SELECT * FROM users WHERE id = :id
-            """)
-    Optional<User> findByIdOptimisticLock(@Param("id") Long Id);
 }

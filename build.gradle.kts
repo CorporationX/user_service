@@ -42,7 +42,7 @@ dependencies {
 	/**
 	 * Amazon S3
 	 */
-	implementation("com.amazonaws:aws-java-sdk-s3:1.12.464")
+	implementation("com.amazonaws:aws-java-sdk-s3:1.12.481")
 
 	/**
 	 * Utils & Logging
@@ -58,6 +58,8 @@ dependencies {
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
 	implementation ("com.google.code.gson:gson:2.8.8")
 	implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.13.0")
+	implementation("net.coobird:thumbnailator:0.4.20")
+	implementation("org.springframework.retry:spring-retry:2.0.3")
 
 	/**
 	 * Test containers

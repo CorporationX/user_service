@@ -2,8 +2,7 @@ package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.filter.user.UserFilterDto;
 import school.faang.user_service.service.UserService;
 
@@ -24,6 +23,11 @@ public class UserController {
     @GetMapping("/{userId}")
     public UserDto getUser(@RequestHeader("x-user-id")Long currentUserId ,@PathVariable long userId) {
         return userService.getUser(currentUserId, userId);
+    }
+
+    @GetMapping("/{userId}/internal")
+    public UserDto getUserInternal(@PathVariable long userId) {
+        return userService.getUserInternal(userId);
     }
 
     @PostMapping

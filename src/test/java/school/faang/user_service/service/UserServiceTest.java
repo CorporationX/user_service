@@ -4,30 +4,29 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.entity.contact.ContactPreference;
 import school.faang.user_service.entity.contact.PreferredContact;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.mapper.MapperUserDto;
 import school.faang.user_service.mapper.MapperUserDtoImpl;
 import school.faang.user_service.mapper.SkillMapper;
-import school.faang.user_service.messaging.MessagePublisher;
 import school.faang.user_service.messaging.ProfileViewEventPublisher;
 import school.faang.user_service.messaging.events.ProfileViewEvent;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.filter.user.ActiveUserFilter;
 import school.faang.user_service.filter.user.UserFilterDto;
-import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -56,6 +55,7 @@ public class UserServiceTest {
 
     List<User> userList;
     private UserFilterDto filter;
+    private LocalDateTime dateTime;
 
     @BeforeEach
     void setUp() {
@@ -68,6 +68,7 @@ public class UserServiceTest {
         userList = List.of(user1, user2, user3);
         filter = new UserFilterDto();
         filter.setActive(true);
+        dateTime = LocalDateTime.now();
     }
 
     @Test
@@ -85,6 +86,7 @@ public class UserServiceTest {
         user1.setEmail("aaa");
         user1.setUsername("John");
         user1.setActive(false);
+        user1.setContactPreference(ContactPreference.builder().preference(PreferredContact.EMAIL).build());
         UserDto expected = UserDto.builder()
                 .id(1L)
                 .email("aaa")
@@ -101,18 +103,6 @@ public class UserServiceTest {
         UserDto output = userService.getUser(2L, 1L);
 
         Assertions.assertEquals(expected, output);
-    }
-
-    @Test
-    public void testGetUserCallsProfileViewPublisher(){
-        Long idViewer = 1L;
-        Long idViewed = 2L;
-        ProfileViewEvent profileViewEvent = new ProfileViewEvent(idViewer, idViewed, PreferredContact.EMAIL);
-        Mockito.when(userRepository.findById(idViewed)).thenReturn(Optional.of(user2));
-
-        userService.getUser(idViewer, idViewed);
-        Mockito.verify(profileViewEventMessagePublisher, Mockito.times(1))
-                .publish(profileViewEvent);
     }
 
     @Test

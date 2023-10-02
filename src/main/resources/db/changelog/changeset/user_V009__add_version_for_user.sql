@@ -1,0 +1,2 @@
+ALTER TABLE users
+    ADD COLUMN version bigint NOT NULL DEFAULT 1;

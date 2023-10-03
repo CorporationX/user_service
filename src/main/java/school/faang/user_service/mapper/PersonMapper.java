@@ -35,9 +35,11 @@ public interface PersonMapper {
     default String getAboutMe(Person person) {
         StringBuilder aboutMe = new StringBuilder("about me: ");
 
-        if (Objects.nonNull(person.getContactInfo())
-                && Objects.nonNull(person.getContactInfo().getAddress())
-                && Objects.nonNull(person.getContactInfo().getAddress().getState())) {
+        boolean isStateNotNull = person.getContactInfo() != null &&
+                person.getContactInfo().getAddress() != null &&
+                person.getContactInfo().getAddress().getState() != null;
+
+        if (isStateNotNull) {
             String state = person.getContactInfo().getAddress().getState();
             aboutMe.append("state - ").append(state).append(", ");
         }
@@ -46,7 +48,7 @@ public interface PersonMapper {
         aboutMe.append("year of study - ").append(person.getEducation().getYearOfStudy()).append(", ");
         aboutMe.append("major - ").append(person.getEducation().getMajor());
 
-        if (Objects.nonNull(person.getEmployer())) {
+        if (person.getEmployer() != null) {
             String employer = person.getEmployer();
             aboutMe.append(", employer - ").append(employer);
         }

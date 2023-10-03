@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleFileFormatException(FileFormatException exception) {
         Map<String, String> body = Map.of("message", exception.getMessage());
         log.error(exception.getMessage(), exception);
-        return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body(body);
+        return ResponseEntity.badRequest().body(body);
     }
 
     @ExceptionHandler(DataValidationException.class)

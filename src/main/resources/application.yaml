@@ -26,9 +26,10 @@ spring:
         profile_view_channel: profile-view-channel
         recommendation_channel: recommendation-channel
         skill_offer_channel: skill-offer-channel
+        mentorship_request_channel: mentorship-request-channel
         recommendation_requested_event_channel: recommendation-requested-event-channel
-        mentorship_offer_channel:
-          name: mentorship-offered-channel
+        mentorship_offer_channel: mentorship-offer-channel
+        name: mentorship-offered-channel
         user_ban: user-ban
 
   google:

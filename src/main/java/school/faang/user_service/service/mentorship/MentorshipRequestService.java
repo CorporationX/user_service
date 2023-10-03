@@ -6,6 +6,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.mentorship.MentorshipOfferedEventDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorship.MentorshipRequestEvent;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.dto.mentorship.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
@@ -15,10 +16,12 @@ import school.faang.user_service.filter.mentorship_request.MentorshipRequestFilt
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.mapper.MentorshipOfferedEventMapper;
 import school.faang.user_service.publisher.MentorshipOfferedEventPublisher;
+import school.faang.user_service.publisher.MentorshipRequestedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -33,6 +36,7 @@ public class MentorshipRequestService {
     private final List<MentorshipRequestFilter> mentorshipRequestFilters;
     private final MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
     private final MentorshipOfferedEventMapper mentorshipOfferedEventMapper;
+    private final MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
 
     @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto dto) {
@@ -41,6 +45,8 @@ public class MentorshipRequestService {
         MentorshipRequest mentorshipRequest = mentorshipRequestMapper.toEntity(dto);
         mentorshipRequest.setStatus(RequestStatus.PENDING);
         mentorshipRequest = mentorshipRequestRepository.save(mentorshipRequest);
+        mentorshipRequestedEventPublisher.publish(
+                new MentorshipRequestEvent(dto.getRequesterId(), dto.getReceiverId(), LocalDateTime.now()));
 
         dto = mentorshipRequestMapper.toDto(mentorshipRequest);
         sendNotification(dto);

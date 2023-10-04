@@ -10,7 +10,9 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.mapper.mentorship.MentorshipAcceptedRequestMapper;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.filter.mentorship_request.MentorshipRequestFilter;
 import school.faang.user_service.service.user.UserService;
@@ -26,8 +28,10 @@ public class MentorshipRequestService {
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final MentorshipRequestValidator mentorshipRequestValidator;
+    private final MentorshipAcceptedRequestMapper acceptedRequestMapper;
     private final UserService userService;
     private final List<MentorshipRequestFilter> mentorshipRequestFilters;
+    private final MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher;
 
     @Transactional
     public void requestMentorship(MentorshipRequestDto dto) {
@@ -54,7 +58,7 @@ public class MentorshipRequestService {
 
     @Transactional
     public void acceptRequest(long id) {
-        MentorshipRequest request =requestFindById(id);
+        MentorshipRequest request = requestFindById(id);
         mentorshipRequestValidator.acceptRequestValidator(request);
 
         User requester = request.getRequester();
@@ -69,6 +73,7 @@ public class MentorshipRequestService {
         List<User> newMentors = requester.getMentors();
         newMentors.add(receiver);
         requester.setMentors(newMentors);
+        mentorshipAcceptedEventPublisher.publish(acceptedRequestMapper.toEventDto(request));
     }
 
     @Transactional

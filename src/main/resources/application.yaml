@@ -27,6 +27,7 @@ spring:
         recommendation_channel: recommendation-channel
         skill_offer_channel: skill-offer-channel
         recommendation_requested_event_channel: recommendation-requested-event-channel
+        mentorship_accepted_request_event_channel: mentorship-accepted-request-event-channel
 
   google:
     calendar:

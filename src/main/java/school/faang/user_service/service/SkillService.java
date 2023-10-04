@@ -2,12 +2,14 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.skill.SkillAcquiredEvent;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.mapper.SkillAcquiredEventMapper;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.publisher.SkillAcquiredEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
@@ -28,6 +30,7 @@ public class SkillService {
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
 
     private final SkillMapper skillMapper;
+    private final SkillAcquiredEventMapper skillAcquiredEventMapper;
     private final SkillAcquiredEventPublisher skillAcquiredEventPublisher;
 
     private static final int MIN_SKILL_OFFERS = 3;
@@ -70,8 +73,8 @@ public class SkillService {
                 return skillMapper.toDto(userSkill);
             }
         }
+        skillAcquiredEventPublisher.publish(skillAcquiredEventMapper.toEventDto(userSkill));
         return skillMapper.toDto(userSkill);
-        skillAcquiredEventPublisher.publish();
     }
 
     protected void addUserSkillGuarantee(Skill userSkill, List<SkillOffer> allOffersOfSkill) {

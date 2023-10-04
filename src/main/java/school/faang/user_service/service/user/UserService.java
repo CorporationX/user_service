@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.ResponseDeactivateDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.exception.DeactivateException;
 import school.faang.user_service.mapper.UserMapper;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.entity.User;
@@ -51,7 +50,7 @@ public class UserService {
 
     public User getUser(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() ->  new EntityNotFoundException("User with id " + id + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User with id " + id + " not found"));
     }
 
     public void validateUsers(Long... userIds) {
@@ -61,7 +60,7 @@ public class UserService {
             }
         }
     }
-  
+
     @Transactional(readOnly = true)
     public UserDto getUserById(long id) {
         return userMapper.toDto(getUser(id));
@@ -74,7 +73,7 @@ public class UserService {
                 .map(userMapper::toDto)
                 .toList();
     }
-  
+
     @Transactional
     public void saveStudents(MultipartFile studentsFile) {
         List<Person> students = personParser.parse(studentsFile);
@@ -108,7 +107,7 @@ public class UserService {
     public ResponseDeactivateDto deactivateUser(Long userId) {
         User user = getUser(userId);
         if (!user.isActive()) {
-            throw new DeactivateException("User with id " + userId + " is already deactivated.");
+            return new ResponseDeactivateDto("User is already deactivated", userId);
         }
 
         cancelUserEvents(userId);

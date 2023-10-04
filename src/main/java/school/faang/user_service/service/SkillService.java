@@ -2,6 +2,7 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
@@ -28,6 +29,7 @@ public class SkillService {
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final long MIN_SKILL_OFFERS = 3;
 
+    @Transactional
     public SkillDto create(SkillDto skill) {
         if (skillRepository.existsByTitle(skill.getTitle().toLowerCase().trim())) {
             throw new EntityAlreadyExistException("This skill already exist");
@@ -47,7 +49,7 @@ public class SkillService {
                 .map(skillOffer -> skillMapper.candidateToDTO(skillOffer))
                 .collect(Collectors.toList());
     }
-
+    @Transactional
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
         Skill skill = skillRepository.findById(skillId).orElseThrow(() -> new SkillNotFoundException("This skill doesn't exist"));
         Optional<Skill> userSkill = skillRepository.findUserSkill(skillId, userId);

@@ -7,9 +7,9 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.mentorship.MentorshipAcceptedEventDto;
 
 @Component
-public class MentorshipRequestedEventPublisher extends AbstractEventPublisher<MentorshipAcceptedEventDto>{
+public class MentorshipAcceptedEventPublisher extends AbstractEventPublisher<MentorshipAcceptedEventDto>{
 
-    public MentorshipRequestedEventPublisher(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper,
+    public MentorshipAcceptedEventPublisher(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper,
                                              @Value("${spring.data.redis.channels.mentorship_accepted_request_event_channel}") String topicMentorshipAcceptedRequestEvent) {
         super(redisTemplate, objectMapper, topicMentorshipAcceptedRequestEvent);
     }

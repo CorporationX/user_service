@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 public class MentorshipAcceptedEventDto {
+    private long id;
     private long requesterId;
     private long receiverId;
-    private LocalDateTime time;
 }

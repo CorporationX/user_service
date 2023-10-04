@@ -9,6 +9,7 @@ import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
+import school.faang.user_service.publisher.SkillAcquiredEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
@@ -27,6 +28,7 @@ public class SkillService {
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
 
     private final SkillMapper skillMapper;
+    private final SkillAcquiredEventPublisher skillAcquiredEventPublisher;
 
     private static final int MIN_SKILL_OFFERS = 3;
 
@@ -69,6 +71,7 @@ public class SkillService {
             }
         }
         return skillMapper.toDto(userSkill);
+        skillAcquiredEventPublisher.publish();
     }
 
     protected void addUserSkillGuarantee(Skill userSkill, List<SkillOffer> allOffersOfSkill) {

@@ -6,8 +6,10 @@ import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.ResponseDeactivateDto;
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.exception.DeactivateException;
 import school.faang.user_service.mapper.UserMapper;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.entity.User;
@@ -18,8 +20,11 @@ import school.faang.user_service.pojo.student.Person;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.util.PasswordGenerator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -30,6 +35,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final CountryRepository countryRepository;
     private final EventRepository eventRepository;
+    private final GoalRepository goalRepository;
+    private final MentorshipService mentorsService;
     private final PasswordGenerator passwordGenerator;
     private final UserMapper userMapper;
     private final PersonMapper personMapper;
@@ -97,25 +104,52 @@ public class UserService {
         userRepository.saveAll(users);
     }
 
-    public void deactivateUser(Long userId) {
+    @Transactional
+    public ResponseDeactivateDto deactivateUser(Long userId) {
         User user = getUser(userId);
         if (!user.isActive()) {
-            return;
+            throw new DeactivateException("User with id " + userId + " is already deactivated.");
         }
 
         cancelUserEvents(userId);
-        removeUserGoals(userId);
-        cancelUserMentorship(userId);
+        removeUserGoals(user);
+        mentorsService.cancelMentorship(userId);
+
+        user.setActive(false);
+        userRepository.save(user);
+
+        return new ResponseDeactivateDto("User was successfully deactivated", userId);
     }
 
-    private void cancelUserMentorship(Long userId) {
-    }
 
-    private void removeUserGoals(Long userId) {
+    private void removeUserGoals(User user) {
+        List<Goal> goals = new ArrayList<>(goalRepository.findGoalsByUserId(user.getId()).toList());
+        List<Goal> goalsToBeDeleted = goals.stream()
+                .filter(goal -> goal.getUsers().size() == 1)
+                .toList();
+        goalRepository.deleteAll(goalsToBeDeleted);
+
+        goals.removeAll(goalsToBeDeleted);
+        goals.forEach(goal -> deleteUser(goal, user));
+
+        goalRepository.saveAll(goals);
     }
 
     private void cancelUserEvents(Long userId) {
-        List<Event> events = eventRepository.findAllByUserId(userId);
-        eventRepository.deleteAll(events.stream().filter(event -> event.getOwner().getId() == userId).toList());
+        try {
+            eventRepository.deleteByOwnerId(userId);
+        } catch (Exception e) {
+            log.error("Error occurred while canceling events for user with ID {}: {}", userId, e.getMessage());
+        }
+    }
+
+    private void deleteUser(Goal goal, User user) {
+        List<User> users = new ArrayList<>(goal.getUsers());
+        if (!users.contains(user)) {
+            log.warn("User with id {} is not in goal with id {}", user.getId(), goal.getId());
+            return;
+        }
+        users.remove(user);
+        goal.setUsers(users);
     }
 }

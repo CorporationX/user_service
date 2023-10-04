@@ -1,5 +1,6 @@
 package school.faang.user_service.controller;
 
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.dto.ResponseDeactivateDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.user.UserService;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,7 +42,7 @@ public class UserController {
     }
 
     @PostMapping("deactivate/{id}")
-    public void deactivateUser(@PathVariable Long id) {
-        userService.deactivateUser(id);
+    public ResponseDeactivateDto deactivateUser(@PathVariable @Min(0) Long id) {
+        return userService.deactivateUser(id);
     }
 }

@@ -48,5 +48,10 @@ public class MentorshipService {
         return mentorshipRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
     }
+
+    public void cancelMentorship(Long userId) {
+        User mentor = getUserById(userId);
+        mentor.setMentees(null);
+    }
 }
 

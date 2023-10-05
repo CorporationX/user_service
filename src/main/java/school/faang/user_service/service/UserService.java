@@ -34,10 +34,16 @@ public class UserService {
     private final ContactService contactService;
 
     public UserDto getUser(long id) {
+        User foundUser = getUserEntity(id);
+
+        return mapper.toDto(foundUser);
+    }
+
+    public User getUserEntity(long id) {
         User foundUser = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User with id " + id + " not found"));
 
-        return mapper.toDto(foundUser);
+        return foundUser;
     }
 
     public UserNotificationDto getUserForNotification(long id) {
@@ -46,7 +52,7 @@ public class UserService {
         var a = user.getContactPreference().getPreference();
         var userNotificationDto = mapper.toNotificationDto(user);
         userNotificationDto.setPreference(a);
-        return  userNotificationDto;
+        return userNotificationDto;
     }
 
     public List<UserDto> getUsersByIds(List<Long> userIds) {
@@ -66,8 +72,9 @@ public class UserService {
 
         return premiumUserStream.map(mapper::toDto).toList();
     }
+
     @Transactional
-    public void setUserTelegramId(long userId, long telegramId){
+    public void setUserTelegramId(long userId, long telegramId) {
         var optionalUser = userRepository.findById(userId);
         optionalUser.ifPresent(user -> {
             var contact = Contact.builder().contact(Long.toString(telegramId)).user(user).type(ContactType.TELEGRAM).build();

@@ -23,15 +23,16 @@ public class RecommendationController {
 
     @PostMapping("/give")
     public RecommendationDto giveRecommendation(@RequestBody RecommendationDto recommendation) {
+        System.out.println(recommendation.getSkillOffers());
         return recommendationService.create(recommendation);
     }
 
-    @PutMapping
+    @PutMapping("/")
     public RecommendationDto updateRecommendation(@RequestBody RecommendationDto updated) {
         return recommendationService.update(updated);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     public void deleteRecommendation(@PathVariable("id") long id) {
         recommendationService.delete(id);
     }

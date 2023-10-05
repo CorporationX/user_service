@@ -21,9 +21,8 @@ public interface RecommendationRepository extends JpaRepository<Recommendation, 
 
     @Query(nativeQuery = true, value = """
             UPDATE recommendation SET content = :content, updated_at = now()
-            WHERE author_id = :authorId AND receiverId = :receiverId
+            WHERE author_id = :authorId AND receiver_id = :receiverId returning content
             """)
-    @Modifying
     Recommendation update(long authorId, long receiverId, String content);
 
     Page<Recommendation> findAllByReceiverId(long receiverId, Pageable pageable);

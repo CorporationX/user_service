@@ -1,5 +1,6 @@
 package school.faang.user_service.service.mentorship;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(value = {MockitoExtension.class})
 class MentorshipRequestServiceTest {
@@ -41,9 +41,6 @@ class MentorshipRequestServiceTest {
     @Mock
     private MentorshipFilter mentorshipFilter;
 
-    @InjectMocks
-    private MentorshipRequestController mentorshipRequestController;
-
     private RequestFilterDto requestFilterDto;
 
     @BeforeEach
@@ -55,7 +52,7 @@ class MentorshipRequestServiceTest {
     void testRequestUserEqualReceiver() {
         Long userId = new Random().nextLong();
 
-        MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto("Test", userId, userId);
+        MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto("Test", userId, userId, RequestStatus.ACCEPTED);
 
         assertThrows(IllegalArgumentException.class, () -> {
             mentorshipRequestService.requestMentorship(mentorshipRequestDto);
@@ -65,7 +62,7 @@ class MentorshipRequestServiceTest {
     @Test
     void testRequestUserReceiverUserZero() {
         Long userId = 0L;
-        MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto("Test", userId, userId);
+        MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto("Test", userId, userId, RequestStatus.ACCEPTED);
 
         assertThrows(IllegalArgumentException.class, () -> {
             mentorshipRequestService.requestMentorship(mentorshipRequestDto);
@@ -77,22 +74,8 @@ class MentorshipRequestServiceTest {
         Long requestUserId = 1L;
         Long receiverUserId = 2L;
 
-        MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto("Test", requestUserId, receiverUserId);
+        MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto("Test", requestUserId, receiverUserId, RequestStatus.ACCEPTED);
 
-        Assertions.assertDoesNotThrow(() -> new MentorshipRequestDto(LocalDateTime.now(), "Test", requestUser.getId(), receiverUser.getId(), RequestStatus.ACCEPTED));
-
-    }
-
-    @Test
-    void requestFilterDtoIsWorked() {
-        RequestFilterDto requestFilterDto = new RequestFilterDto("Test", 0L, 1L, RequestStatus.ACCEPTED);
-        Assertions.assertDoesNotThrow(() -> mentorshipRequestService.getRequests(requestFilterDto));
-    }
-
-    @Test
-    void requestFilterDtoIsNotWorked() {
-        when(mentorshipRequestService.getRequests(null)).thenThrow(NullPointerException.class);
-        Assertions.assertThrows(NullPointerException.class, () -> mentorshipRequestService.getRequests(null));
         when(mentorshipMapper.toEntity(mentorshipRequestDto)).thenReturn(any());
         when(userRepository.findById(mentorshipRequestDto.getRequesterId())).thenReturn(Optional.of(new User()));
         when(userRepository.findById(mentorshipRequestDto.getReceiverId())).thenReturn(Optional.of(new User()));
@@ -100,5 +83,17 @@ class MentorshipRequestServiceTest {
         mentorshipMapper.toEntity(mentorshipRequestDto);
         verify(mentorshipMapper, times(2)).toEntity(mentorshipRequestDto);
         verify(mentorshipRequestRepository).save(any());
+    }
+
+    @Test
+    void requestFilterDtoIsWorked() {
+        RequestFilterDto requestFilterDto = new RequestFilterDto("Test", "Test", "Test", RequestStatus.ACCEPTED);
+        Assertions.assertDoesNotThrow(() -> mentorshipRequestService.getRequests(requestFilterDto));
+    }
+
+    @Test
+    void requestFilterDtoIsNotWorked() {
+        when(mentorshipRequestService.getRequests(null)).thenThrow(NullPointerException.class);
+        Assertions.assertThrows(NullPointerException.class, () -> mentorshipRequestService.getRequests(null));
     }
 }

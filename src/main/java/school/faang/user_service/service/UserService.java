@@ -1,12 +1,16 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.dto.mydto.UserDto;
 import school.faang.user_service.dto.notification.UserNotificationDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.contact.Contact;
 import school.faang.user_service.entity.contact.ContactType;
 import school.faang.user_service.filter.user.UserFilter;
@@ -24,14 +28,15 @@ import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
-
     private final UserRepository userRepository;
     private final User1Mapper mapper;
     private final GoalService goalService;
     private final EventService eventService;
     private final List<UserFilter> userFilters;
     private final ContactService contactService;
+    private final UserProfilePicService userProfilePicService;
 
     public UserDto getUser(long id) {
         User foundUser = userRepository.findById(id)
@@ -46,7 +51,7 @@ public class UserService {
         var a = user.getContactPreference().getPreference();
         var userNotificationDto = mapper.toNotificationDto(user);
         userNotificationDto.setPreference(a);
-        return  userNotificationDto;
+        return userNotificationDto;
     }
 
     public List<UserDto> getUsersByIds(List<Long> userIds) {
@@ -66,8 +71,9 @@ public class UserService {
 
         return premiumUserStream.map(mapper::toDto).toList();
     }
+
     @Transactional
-    public void setUserTelegramId(long userId, long telegramId){
+    public void setUserTelegramId(long userId, long telegramId) {
         var optionalUser = userRepository.findById(userId);
         optionalUser.ifPresent(user -> {
             var contact = Contact.builder().contact(Long.toString(telegramId)).user(user).type(ContactType.TELEGRAM).build();
@@ -135,5 +141,28 @@ public class UserService {
         User user = userById.get();
         user.setBanned(true);
         userRepository.save(user);
+    }
+
+    @Transactional
+    public UserProfilePic saveAvatar(long userId, MultipartFile multipartFile) {
+        Optional<User> userById = userRepository.findById(userId);
+        User user = userById.get();
+        UserProfilePic uploadAvatar = userProfilePicService.upload(multipartFile);
+        user.setUserProfilePic(uploadAvatar);
+        userRepository.save(user);
+        return uploadAvatar;
+    }
+
+    @Transactional
+    public void deleteProfilePic(Long userId) {
+        Optional<User> userById = userRepository.findById(userId);
+        User user = userById.get();
+        if (user.getUserProfilePic() != null) {
+            UserProfilePic userProfilePic = user.getUserProfilePic();
+            userProfilePicService.deleteAvatar(userProfilePic.getFileId());
+            userProfilePicService.deleteAvatar(userProfilePic.getSmallFileId());
+            user.setUserProfilePic(null);
+            userRepository.save(user);
+        }
     }
 }

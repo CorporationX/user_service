@@ -40,6 +40,8 @@ spring:
           name: search-appearance-channel
         skill_offered_channel:
           name: skill-offered-channel
+        user_channels:
+          user-ban-channel
 
   google:
     calendar:
@@ -88,5 +90,17 @@ aws:
 
 services:
   s3:
-    bucket-name: user-backet
-    isMocked: true
+    endpoint: http://localhost:9000
+    username: user
+    password: password
+    bucketName: corpbucket
+    isMocked: false
+
+users:
+  profile_picture:
+    folder: profile_pictures
+    max_file_size: 5242880
+    big:
+      max_size: 1080
+    small:
+      max_size: 170

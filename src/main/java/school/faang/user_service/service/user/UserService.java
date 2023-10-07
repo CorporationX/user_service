@@ -11,6 +11,8 @@ import school.faang.user_service.dto.user.UserProfilePicDto;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.dto.ResponseDeactivateDto;
+import school.faang.user_service.entity.goal.Goal;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.EntityNotFoundException;
@@ -21,9 +23,13 @@ import school.faang.user_service.pojo.student.Person;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.s3.UserProfilePicS3Service;
+import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.util.PasswordGenerator;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -33,6 +39,9 @@ import java.util.concurrent.Executor;
 public class UserService {
     private final UserRepository userRepository;
     private final CountryRepository countryRepository;
+    private final EventRepository eventRepository;
+    private final GoalRepository goalRepository;
+    private final MentorshipService mentorsService;
     private final PasswordGenerator passwordGenerator;
     private final UserMapper userMapper;
     private final PersonMapper personMapper;
@@ -140,6 +149,50 @@ public class UserService {
 
     private String getFolder(User user) {
         return String.format("%s/%d_%s", folder, user.getId(), user.getUsername());
+    }
+
+    @Transactional
+    public ResponseDeactivateDto deactivateUser(Long userId) {
+        User user = getUser(userId);
+        ResponseDeactivateDto response = new ResponseDeactivateDto("", userId);
+        if (!user.isActive()) {
+            log.warn("User with id {} is already deactivated", userId);
+            response.setMessage("User is already deactivated");
+            return response;
+        } else {
+            cancelUserEvents(userId);
+            removeUserGoals(userId);
+            mentorsService.cancelMentorship(userId);
+
+            user.setActive(false);
+            response.setMessage("User was successfully deactivated");
+        }
+        return response;
+    }
+
+    private void removeUserGoals(long userId) {
+        List<Goal> goals = new ArrayList<>(goalRepository.findGoalsByUserId(userId).toList());
+        List<Goal> goalsToBeDeleted = goals.stream()
+                .filter(goal -> goal.getUsers().size() == 1)
+                .toList();
+        goalRepository.deleteAll(goalsToBeDeleted);
+
+        goals.removeAll(goalsToBeDeleted);
+        goals.forEach(goal -> deleteUser(goal, userId));
+
+        goalRepository.saveAll(goals);
+    }
+
+    private void cancelUserEvents(Long userId) {
+        try {
+            eventRepository.deleteByOwnerId(userId);
+        } catch (Exception e) {
+            log.error("Error occurred while canceling events for user with ID {}: {}", userId, e.getMessage());
+        }
+    }
+
+    private void deleteUser(Goal goal, long userId) {
+       goal.getUsers().removeIf(userGoal -> userGoal.getId() == (userId));
     }
 
     @Transactional

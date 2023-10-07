@@ -18,8 +18,7 @@ import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -135,5 +134,11 @@ class MentorshipServiceTest {
         assertThrows(EntityNotFoundException.class,
                 () -> mentorshipService.deleteMentee(INCORRECT_USER_ID, MENTOR_ID),
                 "User not found");
+    }
+
+    @Test
+    void cancelMentorship_shouldInvokeFindByIdMethod() {
+        mentorshipService.cancelMentorship(MENTOR_ID);
+        verify(mentorshipRepository).findById(MENTOR_ID);
     }
 }

@@ -1,5 +1,6 @@
 package school.faang.user_service.controller;
 
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.dto.ResponseDeactivateDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserProfilePicDto;
 import school.faang.user_service.service.user.UserService;
@@ -88,5 +90,10 @@ public class UserController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);
         return new ResponseEntity<>(responseBody, headers, HttpStatus.OK);
+    }
+
+    @PostMapping("deactivate/{id}")
+    public ResponseDeactivateDto deactivateUser(@PathVariable @Min(0) Long id) {
+        return userService.deactivateUser(id);
     }
 }

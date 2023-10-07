@@ -1,6 +1,7 @@
 package school.faang.user_service.service.mentorship;
 
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +48,11 @@ public class MentorshipService {
     private User getUserById(long userId) {
         return mentorshipRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
+    }
+
+    public void cancelMentorship(Long userId) {
+        User mentor = getUserById(userId);
+        mentor.setMentees(null);
     }
 }
 

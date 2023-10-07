@@ -106,30 +106,32 @@ public class UserService {
     @Transactional
     public ResponseDeactivateDto deactivateUser(Long userId) {
         User user = getUser(userId);
+        ResponseDeactivateDto response = new ResponseDeactivateDto("", userId);
         if (!user.isActive()) {
-            return new ResponseDeactivateDto("User is already deactivated", userId);
+            log.warn("User with id {} is already deactivated", userId);
+            response.setMessage("User is already deactivated");
+            return response;
+        } else {
+            cancelUserEvents(userId);
+            removeUserGoals(userId);
+            mentorsService.cancelMentorship(userId);
+
+            user.setActive(false);
+            response.setMessage("User was successfully deactivated");
         }
-
-        cancelUserEvents(userId);
-        removeUserGoals(user);
-        mentorsService.cancelMentorship(userId);
-
-        user.setActive(false);
-        userRepository.save(user);
-
-        return new ResponseDeactivateDto("User was successfully deactivated", userId);
+        return response;
     }
 
 
-    private void removeUserGoals(User user) {
-        List<Goal> goals = new ArrayList<>(goalRepository.findGoalsByUserId(user.getId()).toList());
+    private void removeUserGoals(long userId) {
+        List<Goal> goals = new ArrayList<>(goalRepository.findGoalsByUserId(userId).toList());
         List<Goal> goalsToBeDeleted = goals.stream()
                 .filter(goal -> goal.getUsers().size() == 1)
                 .toList();
         goalRepository.deleteAll(goalsToBeDeleted);
 
         goals.removeAll(goalsToBeDeleted);
-        goals.forEach(goal -> deleteUser(goal, user));
+        goals.forEach(goal -> deleteUser(goal, userId));
 
         goalRepository.saveAll(goals);
     }
@@ -142,13 +144,7 @@ public class UserService {
         }
     }
 
-    private void deleteUser(Goal goal, User user) {
-        List<User> users = new ArrayList<>(goal.getUsers());
-        if (!users.contains(user)) {
-            log.warn("User with id {} is not in goal with id {}", user.getId(), goal.getId());
-            return;
-        }
-        users.remove(user);
-        goal.setUsers(users);
+    private void deleteUser(Goal goal, long userId) {
+       goal.getUsers().removeIf(userGoal -> userGoal.getId() == (userId));
     }
 }

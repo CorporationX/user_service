@@ -14,6 +14,7 @@ import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -41,8 +42,8 @@ public class DeactivatingServiceTest {
         User user = User.builder().id(userId).username("Sasha").active(true).build();
         User user2 = User.builder().id(32L).username("Pavel").active(false).build();
 
-        List<User> users = List.of(user);
-        List<User> usersFalse = List.of(user2, user);
+        List<User> users = new ArrayList<>(List.of(user));
+        List<User> usersFalse =new ArrayList<>(List.of(user2, user));
 
         Goal goal1 = Goal.builder().id(1L).mentor(user).users(users).build();
         Goal goal2 = Goal.builder().id(2L).mentor(user2).users(usersFalse).build();
@@ -55,7 +56,6 @@ public class DeactivatingServiceTest {
         ResponseDeactivateDto response = userService.deactivateUser(userId);
 
         assertFalse(user.isActive());
-        verify(userRepository).save(user);
         verify(eventRepository).deleteByOwnerId(userId);
         assertEquals("User was successfully deactivated", response.getMessage());
     }

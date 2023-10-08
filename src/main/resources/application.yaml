@@ -68,6 +68,9 @@ spring:
   goals:
     user_max_count: 3
 
+  premium:
+    pay_for_day: 0.3
+
 server:
   port: 8080
 

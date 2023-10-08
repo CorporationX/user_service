@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.client.PaymentServiceClient;
 import school.faang.user_service.dto.PremiumDto;
 import school.faang.user_service.dto.payment.Currency;
@@ -26,6 +27,7 @@ import school.faang.user_service.service.user.UserService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -52,6 +54,7 @@ class PremiumServiceTest {
 
     @BeforeEach
     void setUp() {
+        ReflectionTestUtils.setField(premiumService, "random", new Random());
         premiumPeriod = PremiumPeriod.fromDays(30);
         userId = 1L;
         User user = User.builder().id(userId).build();

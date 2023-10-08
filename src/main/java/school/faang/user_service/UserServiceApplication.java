@@ -12,6 +12,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import java.util.Random;
+
 @SpringBootApplication
 @EnableFeignClients("school.faang.user_service.client")
 @EnableScheduling
@@ -37,5 +39,10 @@ public class UserServiceApplication {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         return objectMapper;
+    }
+
+    @Bean
+    public Random random() {
+        return new Random();
     }
 }

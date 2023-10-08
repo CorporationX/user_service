@@ -34,6 +34,7 @@ public class PremiumService {
     private final PremiumMapper premiumMapper;
     private final UserService userService;
     private final PaymentServiceClient paymentServiceClient;
+    private final Random random;
     @Value("${spring.premium.pay_for_day}")
     private double payForDay;
 
@@ -69,7 +70,7 @@ public class PremiumService {
 
     private PaymentRequest generatePaymentRequest(PremiumPeriod period) {
         return PaymentRequest.builder()
-                .paymentNumber(new Random().nextLong(10000L, 99999L)) // generates random payment number
+                .paymentNumber(random.nextLong(10000L, 99999L)) // generates random payment number
                 .amount(BigDecimal.valueOf(period.getDays() * payForDay)) // calculates amount
                 .currency(Currency.USD) // default currency
                 .build();

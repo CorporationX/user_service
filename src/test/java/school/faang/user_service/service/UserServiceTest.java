@@ -8,9 +8,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.dto.mydto.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
@@ -35,6 +38,8 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.goal.GoalService;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -58,6 +63,9 @@ class UserServiceTest {
     @Mock
     ContactService contactService;
 
+    @Mock
+    private UserProfilePicService userProfilePicService;
+
     private Goal1MapperImpl goalMapper = new Goal1MapperImpl();
 
 
@@ -73,13 +81,20 @@ class UserServiceTest {
             new ContactPatternFilter(), new CountryPatternFilter(), new EmailPatternFilter(), new ExperienceRangeFilter(),
             new NamePatternFilter(), new PhonePatternFilter(), new SkillPatternFilter()));
     private UserService userService;
+    private MultipartFile multipartFile;
+    private UserProfilePic userProfilePic;
 
     User user;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
         user = User.builder().id(1).build();
-        userService = new UserService(userRepository, userMapper, goalService, eventService, userFilters, contactService);
+        userService = new UserService(userRepository, userMapper, goalService, eventService, userFilters, contactService
+                , userProfilePicService);
+
+
+        multipartFile = new MockMultipartFile("file", byte[].class.getResourceAsStream("file"));
+        userProfilePic = UserProfilePic.builder().fileId("FILE").smallFileId("FILE").build();
     }
 
     @Test
@@ -189,6 +204,29 @@ class UserServiceTest {
 
         userService.userBanEventSave(String.valueOf(1L));
         assertTrue(user.isBanned());
+        Mockito.verify(userRepository, Mockito.times(1))
+                .save(user);
+    }
+
+    @Test
+    void saveAvatar() {
+        User user = User.builder().id(2).userProfilePic(userProfilePic).build();
+        Mockito.when(userRepository.findById(2L))
+                .thenReturn(Optional.of(user));
+
+        userService.saveAvatar(2L, multipartFile);
+        Mockito.verify(userRepository, Mockito.times(1))
+                .save(user);
+    }
+
+    @Test
+    void deleteProfilePic() {
+        user = User.builder().id(2).userProfilePic(userProfilePic).build();
+        Mockito.when(userRepository.findById(2L))
+                .thenReturn(Optional.of(user));
+
+        userService.deleteProfilePic(2L);
+        assertNull(user.getUserProfilePic());
         Mockito.verify(userRepository, Mockito.times(1))
                 .save(user);
     }

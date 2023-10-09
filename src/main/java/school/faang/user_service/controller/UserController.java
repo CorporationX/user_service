@@ -8,13 +8,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserFilterDto;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.mydto.UserDto;
 import school.faang.user_service.dto.notification.UserNotificationDto;
+import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.service.UserService;
 import school.faang.user_service.util.validator.UserControllerValidator;
 
+import java.awt.*;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -59,5 +63,15 @@ public class UserController {
     @GetMapping("/notification/{userId}")
     UserNotificationDto getUser(@PathVariable long userId) {
         return userService.getUserForNotification(userId);
+    }
+
+    @PutMapping("/{userId}")
+    public UserProfilePic uploadAvatar(@PathVariable long userId, @RequestParam("file") MultipartFile multipartFile) {
+        return userService.saveAvatar(userId, multipartFile);
+    }
+
+    @DeleteMapping("/{userId}")
+    public void deleteProfilePic(@PathVariable long userId) {
+        userService.deleteProfilePic(userId);
     }
 }

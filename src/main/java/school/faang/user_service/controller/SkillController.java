@@ -1,10 +1,7 @@
 package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.exception.invalidFieldException.DataValidationException;
@@ -19,33 +16,29 @@ import java.util.List;
 public class SkillController {
     private final SkillService skillService;
 
-    public SkillDto create(SkillDto skill) {
-        throwIfTrue(skill == null, "skill cannot be null");
+    @PostMapping("/")
+    public SkillDto create(@RequestBody SkillDto skill) {
         return skillService.create(skill);
     }
 
-    public List<SkillDto> getUserSkills(Long userId) {
+    @GetMapping("/{userId}/getUserSkill")
+    public List<SkillDto> getUserSkills(@PathVariable long userId) {
         return skillService.getUserSkills(userId);
     }
 
-    public List<SkillCandidateDto> getOfferedSkills(Long userId) {
+    @GetMapping("/{userId}")
+    public List<SkillCandidateDto> getOfferedSkills(@PathVariable long userId) {
         return skillService.getOfferedSkills(userId);
     }
 
-    public SkillDto acquireSkillFromOffers(Long skillId, Long userId) {
-        throwIfTrue(skillId == null || userId == null, "skillId or userId cannot be null");
+    @GetMapping("/{skillId}/{userId}")
+    public SkillDto acquireSkillFromOffers(@PathVariable long skillId, @PathVariable long userId) {
         return skillService.acquireSkillFromOffers(skillId, userId);
     }
 
     @GetMapping("/{skillId}")
-    public SkillDto getSkillById(@PathVariable Long skillId) {
+    public SkillDto getSkillById(@PathVariable long skillId) {
         return skillService.getSkillById(skillId);
-    }
-
-    private void throwIfTrue(boolean condition, String errorMessage) {
-        if (condition) {
-            throw new DataValidationException(errorMessage);
-        }
     }
 }
 

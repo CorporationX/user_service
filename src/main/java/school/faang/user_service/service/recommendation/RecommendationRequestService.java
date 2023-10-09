@@ -34,6 +34,7 @@ public class RecommendationRequestService {
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
         validate(recommendationRequestDto);
         RecommendationRequest entity = recommendationRequestMapper.toEntity(recommendationRequestDto);
+
         return recommendationRequestMapper.toDto(recommendationRequestRepository.save(entity));
     }
 

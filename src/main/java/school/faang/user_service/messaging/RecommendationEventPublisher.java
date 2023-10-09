@@ -9,6 +9,8 @@ import school.faang.user_service.dto.recommendation.RecommendationEventDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
 
+import java.time.ZonedDateTime;
+
 @Component
 public class RecommendationEventPublisher extends AbstractEventPublisher<RecommendationEventDto> {
     private final RecommendationMapper recommendationMapper;

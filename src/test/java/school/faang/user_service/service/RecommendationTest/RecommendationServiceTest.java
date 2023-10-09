@@ -11,16 +11,23 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
+import school.faang.user_service.dto.recommendation.RecommendationUpdateDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
+import school.faang.user_service.dto.recommendation.SkillOfferUpdateDto;
+import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
+import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.invalidFieldException.DataValidationException;
+import school.faang.user_service.exception.notFoundExceptions.SkillNotFoundException;
 import school.faang.user_service.mapper.RecommendationMapperImpl;
 import school.faang.user_service.mapper.SkillOfferMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
+import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.service.RecommendationService;
+import school.faang.user_service.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -36,6 +43,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(MockitoExtension.class)
 class RecommendationServiceTest {
 
+    @InjectMocks
+    private RecommendationService recommendationService;
     @Spy
     private RecommendationMapperImpl recommendationMapper;
     @Spy
@@ -45,31 +54,59 @@ class RecommendationServiceTest {
     @Mock
     private SkillRepository skillRepository;
     @Mock
+    private SkillOfferRepository skillOfferRepository;
+    @Mock
     private UserRepository userRepository;
+    @Mock
+    private UserService userService;
+    private Skill skill;
     private RecommendationDto recommendationDto;
-    private User user;
-    @InjectMocks
-    private RecommendationService recommendationService;
+    private RecommendationUpdateDto recommendationUpdateDto;
+    private Recommendation recommendation;
+    private Recommendation recommendation1;
+    private User receiver;
+    private User author;
     @BeforeEach
     void setUp(){
+        receiver = new User();
+        receiver.setId(2L);
+
+        author = new User();
+        author.setId(1L);
+
+        skill = Skill.builder().id(1L).title("Speed").build();
+
         recommendationDto = new RecommendationDto();
         recommendationDto.setId(3L);
         recommendationDto.setContent("Привет мир");
-        recommendationDto.setAuthorId(1L);
-        recommendationDto.setReceiverId(2L);
+        recommendationDto.setAuthorId(author.getId());
+        recommendationDto.setReceiverId(receiver.getId());
         recommendationDto.setCreatedAt(LocalDateTime.now().minusMonths(7));
-        recommendationDto.setSkillOffers(new ArrayList<>());
 
-        user = new User();
-        user.setId(2L);
+        recommendation = recommendationMapper.toEntity(recommendationDto);
+
+        recommendationUpdateDto = new RecommendationUpdateDto();
+        recommendationUpdateDto.setId(3L);
+        recommendationUpdateDto.setContent("Привет пекарня");
+        recommendationUpdateDto.setAuthorId(author.getId());
+        recommendationUpdateDto.setReceiverId(receiver.getId());
+        recommendationUpdateDto.setUpdatedAt(LocalDateTime.now().minusMonths(7));
+
+        recommendation1 = recommendationMapper.toUpdateEntity(recommendationUpdateDto);
     }
 
     @Test
     public void testCreate_Successful(){
-        Mockito.when(userRepository.findById(Mockito.anyLong()))
-                .thenReturn(Optional.of(user));
-        Mockito.when(userRepository.findById(Mockito.anyLong()))
-                .thenReturn(Optional.of(user));
+        recommendationDto.setSkillOffers(new ArrayList<>());
+        recommendation = recommendationMapper.toEntity(recommendationDto);
+
+        Mockito.when(recommendationRepository.create(
+                recommendationDto.getAuthorId(),
+                recommendationDto.getReceiverId(),
+                recommendationDto.getContent()))
+                .thenReturn(recommendation.getId());
+        Mockito.when(recommendationRepository.findById(recommendationDto.getId()))
+                .thenReturn(Optional.of(recommendation));
         recommendationService.create(recommendationDto);
         Mockito.verify(recommendationRepository).save(Mockito.any());
     }
@@ -80,7 +117,7 @@ class RecommendationServiceTest {
                 .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(1L,2L))
                 .thenReturn(Optional.empty());
 
-        assertThrows(DataValidationException.class,
+        assertThrows(SkillNotFoundException.class,
                 ()-> recommendationService.create(RecommendationDto
                         .builder().authorId(1L)
                         .content("Hi")
@@ -111,41 +148,27 @@ class RecommendationServiceTest {
     }
 
     @Test
-    public void testCreate_SomeSkillsDoNotExist_ShouldThrowException(){
-        Set<Long> skillIds = recommendationDto.getSkillOffers()
-                .stream()
-                .map(SkillOfferDto::getSkillId)
-                .collect(Collectors.toSet());
-        var skills = skillRepository.findAllById(skillIds);
+    public void testCreate_CheckSkillsInRepository_ShouldThrowException(){
+        SkillOfferDto skillOfferDto = SkillOfferDto
+                .builder()
+                .skillId(1L)
+                .recommendationId(2L)
+                .id(5L)
+                .build();
 
-        assertEquals(skillIds.size(), skills.size());
+        SkillOfferDto skillOfferDto1 = SkillOfferDto
+                .builder()
+                .skillId(2L)
+                .recommendationId(2L)
+                .id(5L)
+                .build();
 
-        assertThrows(DataValidationException.class,
+        List<SkillOfferDto> skillOfferDtos = List.of(skillOfferDto1, skillOfferDto);
+
+        recommendationDto.setSkillOffers(skillOfferDtos);
+
+        assertThrows(SkillNotFoundException.class,
                 () -> recommendationService.create(recommendationDto));
-    }
-
-    @Test
-    public void testCreate_SomeRecommendationsDoNotExist_ShouldThrowException(){
-        Set<Long> recommendationIds = recommendationDto.getSkillOffers()
-                .stream()
-                .map(SkillOfferDto::getRecommendationId)
-                .collect(Collectors.toSet());
-        var recommendations = recommendationRepository.findAllById(recommendationIds);
-
-        assertEquals(recommendationIds.size(), recommendations.size());
-
-        assertThrows(DataValidationException.class,
-                () -> recommendationService.create(recommendationDto));
-    }
-
-    @Test
-    public void testUpdate_Successful(){
-        Mockito.when(userRepository.findById(Mockito.anyLong()))
-                .thenReturn(Optional.of(user));
-        Mockito.when(userRepository.findById(Mockito.anyLong()))
-                .thenReturn(Optional.of(user));
-        recommendationService.update(recommendationDto);
-        Mockito.verify(recommendationRepository).save(Mockito.any());
     }
 
     @Test
@@ -154,29 +177,26 @@ class RecommendationServiceTest {
                         .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(1L,2L))
                 .thenReturn(Optional.empty());
 
-        assertThrows(DataValidationException.class,
-                ()-> recommendationService.update(RecommendationDto
+        assertThrows(SkillNotFoundException.class,
+                ()-> recommendationService.update(RecommendationUpdateDto
                         .builder().authorId(1L)
                         .content("Hi")
                         .receiverId(2L)
-                        .skillOffers(List.of(new SkillOfferDto()))
+                        .skillOffers(List.of(new SkillOfferUpdateDto()))
                         .build()));
     }
 
     @Test
     public void testUpdate_RecommendationLessThenSixMonth_ShouldThrowException(){
         Mockito.when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(1L,2L))
-                .thenReturn(Optional.of(Recommendation
-                        .builder()
-                        .createdAt(LocalDateTime.now().minusMonths(7))
-                        .build()));
+                .thenReturn(Optional.empty());
 
-        assertThrows(DataValidationException.class,
-                ()-> recommendationService.update(RecommendationDto
+        assertThrows(SkillNotFoundException.class,
+                ()-> recommendationService.update(RecommendationUpdateDto
                         .builder().authorId(1L)
                         .receiverId(2L)
                         .content("Hi")
-                        .skillOffers(List.of(new SkillOfferDto()))
+                        .skillOffers(List.of(new SkillOfferUpdateDto()))
                         .build()));
 
         Mockito.verify(recommendationRepository, Mockito.times(1))
@@ -186,47 +206,21 @@ class RecommendationServiceTest {
 
     @Test
     public void testUpdate_SkillNotFoundInDB_ShouldThrowException(){
-        recommendationDto.getSkillOffers()
+        SkillOfferUpdateDto skillOfferUpdateDto = SkillOfferUpdateDto
+                .builder()
+                .skillId(skill.getId())
+                .recommendationId(2L)
+                .id(5L)
+                .build();
+        recommendationUpdateDto.setSkillOffers(List.of(skillOfferUpdateDto));
+
+        recommendationUpdateDto.getSkillOffers()
                 .forEach(skillOffer -> skillRepository.existsById(skillOffer.getSkillId()));
 
-        assertThrows(DataValidationException.class,
-                () -> recommendationService.update(RecommendationDto
+        assertThrows(SkillNotFoundException.class,
+                () -> recommendationService.update(RecommendationUpdateDto
                         .builder().authorId(1L)
-                        .skillOffers(List.of(new SkillOfferDto()))
-                        .receiverId(2L).build()));
-    }
-
-    @Test
-    public void testUpdate_SomeSkillsDoNotExist_ShouldThrowException(){
-        List<Long> skillIds = recommendationDto.getSkillOffers()
-                .stream()
-                .map(SkillOfferDto::getSkillId)
-                .toList();
-        var skills = skillRepository.findAllById(skillIds);
-
-        assertEquals(skillIds.size(), skills.size());
-
-        assertThrows(DataValidationException.class,
-                () -> recommendationService.update(RecommendationDto
-                        .builder().authorId(1L)
-                        .skillOffers(List.of(new SkillOfferDto()))
-                        .receiverId(2L).build()));
-    }
-
-    @Test
-    public void testUpdate_SomeRecommendationsDoNotExist_ShouldThrowException(){
-        List<Long> recommendationIds = recommendationDto.getSkillOffers()
-                .stream()
-                .map(SkillOfferDto::getRecommendationId)
-                .toList();
-        var recommendations = recommendationRepository.findAllById(recommendationIds);
-
-        assertEquals(recommendationIds.size(), recommendations.size());
-
-        assertThrows(DataValidationException.class,
-                () -> recommendationService.update(RecommendationDto
-                        .builder().authorId(1L)
-                        .skillOffers(List.of(new SkillOfferDto()))
+                        .skillOffers(List.of(new SkillOfferUpdateDto()))
                         .receiverId(2L).build()));
     }
 

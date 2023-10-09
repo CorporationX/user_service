@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class SkillOfferDto {
+public class SkillOfferUpdateDto {
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
@@ -19,6 +19,6 @@ public class SkillOfferDto {
     @NotNull
     private Long skillId;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @NotNull
     private Long recommendationId;
 }

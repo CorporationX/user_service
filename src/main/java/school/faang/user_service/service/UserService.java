@@ -13,6 +13,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.contact.Contact;
 import school.faang.user_service.entity.contact.ContactType;
+import school.faang.user_service.exception.invalidFieldException.DataValidationException;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.exception.notFoundExceptions.contact.UserNotFoundException;
@@ -146,6 +147,12 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow();
         user.setBanned(true);
         userRepository.save(user);
+    }
+
+
+    public User getUserFromRepository(long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new DataValidationException("User not found"));
     }
 
     @Transactional

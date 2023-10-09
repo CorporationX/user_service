@@ -16,9 +16,9 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @Builder
-public class RecommendationDto {
+public class RecommendationUpdateDto {
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @NotNull
     private Long id;
 
     @NotNull
@@ -31,8 +31,8 @@ public class RecommendationDto {
     @Size(max = 4096, message = "Name must be less than 4096 characters")
     private String content;
 
-    private List<SkillOfferDto> skillOffers;
+    private List<SkillOfferUpdateDto> skillOffers;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

@@ -13,6 +13,7 @@ public interface SkillOfferRepository extends JpaRepository<SkillOffer, Long> {
     @Query(nativeQuery = true, value = "INSERT INTO skill_offer (skill_id, recommendation_id) VALUES (?1, ?2) returning id")
     Long create(long skillId, long recommendationId);
 
+    @Query(nativeQuery = true, value = "delete from skill_offer where recommendation_id = :recommendationId")
     void deleteAllByRecommendationId(long recommendationId);
 
     @Query(nativeQuery = true, value = """

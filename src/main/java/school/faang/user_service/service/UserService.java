@@ -137,16 +137,14 @@ public class UserService {
     @Transactional
     public void userBanEventSave(String message) {
         Long userId = Long.valueOf(message);
-        Optional<User> userById = userRepository.findById(userId);
-        User user = userById.get();
+        User user = userRepository.findById(userId).orElseThrow();
         user.setBanned(true);
         userRepository.save(user);
     }
 
     @Transactional
     public UserProfilePic saveAvatar(long userId, MultipartFile multipartFile) {
-        Optional<User> userById = userRepository.findById(userId);
-        User user = userById.get();
+        User user = userRepository.findById(userId).orElseThrow();
         UserProfilePic uploadAvatar = userProfilePicService.upload(multipartFile);
         user.setUserProfilePic(uploadAvatar);
         userRepository.save(user);
@@ -155,8 +153,7 @@ public class UserService {
 
     @Transactional
     public void deleteProfilePic(Long userId) {
-        Optional<User> userById = userRepository.findById(userId);
-        User user = userById.get();
+        User user = userRepository.findById(userId).orElseThrow();
         if (user.getUserProfilePic() != null) {
             UserProfilePic userProfilePic = user.getUserProfilePic();
             userProfilePicService.deleteAvatar(userProfilePic.getFileId());

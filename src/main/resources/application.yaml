@@ -87,3 +87,7 @@ google:
     calendar-id: primary
     access-type: offline
     client-email: serhii.rubets@gmail.com
+
+scheduler:
+  clear-events-cron: 0 0 * * * *
+  batch-size: 200

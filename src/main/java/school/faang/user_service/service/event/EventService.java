@@ -24,6 +24,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 
 @Service
@@ -119,6 +121,26 @@ public class EventService {
         });
 
         return events.size();
+    }
+
+    public void clearPastEvents() {
+        Stream<Event> allEvents = eventRepository.findAll().stream();
+        EventFilterDto filters = EventFilterDto.builder().endDate(LocalDateTime.now()).build();
+
+        List<Event> pastEvents = eventFilters.stream()
+                .filter(filter -> filter.isApplicable(filters))
+                .flatMap(filter -> filter.apply(allEvents, filters))
+                .toList();
+
+        int batchSize = Integer.parseInt("${scheduler.batch-size}");
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
+
+        for (int i = 0; i < pastEvents.size(); i += batchSize) {
+            int endIndex = Math.min(i + batchSize, pastEvents.size());
+            List<Event> batch = pastEvents.subList(i, endIndex);
+
+            executorService.execute(() -> eventRepository.deleteAllInBatch(batch));
+        }
     }
 
     @Transactional

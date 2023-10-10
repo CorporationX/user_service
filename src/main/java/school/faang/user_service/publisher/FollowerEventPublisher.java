@@ -38,13 +38,7 @@ public class FollowerEventPublisher extends AbstractEventPublisher {
         followerEvent.setFollowerId(followerId);
         followerEvent.setFolloweeId(followeeId);
 
-        try {
-            String json = objectMapper.writeValueAsString(followerEvent);
-
-            redisMessagePublisher.publish(followerEventChannelName, json);
-            log.info("Follower subscription notification was successfully published");
-        } catch (JsonProcessingException e) {
-            log.error("Failed to convert FollowerEvent to JSON: {}", e.getMessage());
-        }
+        redisMessagePublisher.publish(followerEventChannelName, followerEvent);
+        log.info("Follower subscription notification was successfully published");
     }
 }

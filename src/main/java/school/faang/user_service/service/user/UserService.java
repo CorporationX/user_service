@@ -118,5 +118,6 @@ public class UserService {
         profilePictureService.setProfilePicture(user);
         profilePicEventPublisher.publish(user);
         userRepository.save(userMapper.toEntity(userDto));
+        profilePicEventPublisher.publish(user);
     }
 }

@@ -1,6 +1,5 @@
 package school.faang.user_service.publisher;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -33,12 +32,7 @@ public class ProfilePicEventPublisher extends AbstractEventPublisher {
                 .profilePicLink(user.getUserProfilePic().getSmallFileId())
                 .build();
 
-        try {
-            String json = objectMapper.writeValueAsString(event);
-            redisMessagePublisher.publish(profilePicEventChannel, json);
-            log.info("User ID {} successfully uploaded a profile picture", event.getUserId());
-        } catch (JsonProcessingException e) {
-            log.error("Failed to convert ProfilePicEvent ID {} to JSON", event.getId());
-        }
+        redisMessagePublisher.publish(profilePicEventChannel, event);
+        log.info("User ID {} successfully uploaded a profile picture", event.getUserId());
     }
 }

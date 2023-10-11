@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
+import school.faang.user_service.dto.recommendation.RecommendationReceivedEvent;
 import school.faang.user_service.dto.recommendation.RecommendationUpdateDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.dto.recommendation.SkillOfferUpdateDto;
@@ -17,6 +18,7 @@ import school.faang.user_service.exception.invalidFieldException.DataValidationE
 import school.faang.user_service.exception.notFoundExceptions.SkillNotFoundException;
 import school.faang.user_service.exception.notFoundExceptions.recommendation.RecommendationNotFoundException;
 import school.faang.user_service.mapper.RecommendationMapper;
+import school.faang.user_service.messaging.recommendation.RecommendationReceivedEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
@@ -43,6 +45,7 @@ public class RecommendationService {
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final SkillService skillService;
     private final UserService userService;
+    private final RecommendationReceivedEventPublisher recommendationReceivedEventPublisher;
 
     public RecommendationDto create(RecommendationDto recommendationDto) {
         validatePreviousRecommendation(recommendationDto);
@@ -60,6 +63,13 @@ public class RecommendationService {
         checkGuarantee(recommendation);
 
         recommendationRepository.save(recommendation);
+
+        RecommendationReceivedEvent event = new RecommendationReceivedEvent(
+                recommendationDto.getId(),
+                recommendationDto.getAuthorId(),
+                recommendationDto.getReceiverId(),
+                recommendationDto.getCreatedAt());
+        recommendationReceivedEventPublisher.publish(event);
         return recommendationMapper.toDto(recommendation);
     }
 

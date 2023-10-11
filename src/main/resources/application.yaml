@@ -49,6 +49,8 @@ spring:
           name: fund-raised-channel
         user_ban_channel:
           name: user_ban_channel
+        recommendation_received_channel:
+          name: recommendation_received_channel
 
 
 

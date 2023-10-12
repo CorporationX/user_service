@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Data
 @Builder
@@ -16,6 +16,6 @@ public class FollowerEventDto {
     private long followerId;
     private long followeeId;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime subscriptionTime;
+    private ZonedDateTime subscriptionTime;
 }
 

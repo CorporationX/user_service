@@ -10,6 +10,7 @@ import school.faang.user_service.entity.event.EventType;
 import school.faang.user_service.entity.event.EventStatus;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Data
@@ -20,9 +21,9 @@ public class EventDto {
     @NotBlank(message = "Title cannot be blank")
     private String title;
     @NotNull(message = "Start Date cannot be null")
-    private LocalDateTime startDate;
+    private ZonedDateTime startDate;
     @NotNull(message = "End Date cannot be null")
-    private LocalDateTime endDate;
+    private ZonedDateTime endDate;
     @NotNull(message = "Owner cannot be null")
     private Long ownerId;
     @NotBlank(message = "Description cannot be blank")

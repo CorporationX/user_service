@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import school.faang.user_service.dto.skill.SkillDto;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 
@@ -17,8 +17,8 @@ import java.util.List;
 public class EventFilterDto {
     private Long id;
     private String titlePattern;
-    private LocalDateTime laterThanStartDate;
-    private LocalDateTime earlierThanEndDate;
+    private ZonedDateTime laterThanStartDate;
+    private ZonedDateTime earlierThanEndDate;
     private Long ownerId;
     private String descriptionPattern;
     private List<SkillDto> relatedSkills;

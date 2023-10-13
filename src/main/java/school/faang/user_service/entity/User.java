@@ -168,4 +168,7 @@ public class User {
 
     @Column(name = "banned")
     private boolean banned;
+
+    @Column(name = "avatar_Url")
+    private String avatarUrl;
 }

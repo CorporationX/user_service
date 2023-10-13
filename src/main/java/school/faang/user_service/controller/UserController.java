@@ -20,6 +20,7 @@ import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.ResponseDeactivateDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserProfilePicDto;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.service.user.UserService;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -61,7 +62,7 @@ public class UserController {
         return userService.saveProfilePic(profilePic, userId);
     }
 
-    @GetMapping(value = "/profile_pic",  produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @GetMapping(value = "/profile_pic", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<InputStreamResource> getProfilePic() {
         Long userId = userContext.getUserId();
         log.debug("Received request to get profile picture for user with id: {}", userId);
@@ -95,5 +96,23 @@ public class UserController {
     @PostMapping("deactivate/{id}")
     public ResponseDeactivateDto deactivateUser(@PathVariable @Min(0) Long id) {
         return userService.deactivateUser(id);
+    }
+
+    @PutMapping("/{userId}/createAvatar")
+    public ResponseEntity<User> createAvatar(@PathVariable Long userId) {
+        User user = userService.createAvatar(userId);
+        if (user != null) {
+            log.info("Avatar created for user with ID: {}", userId);
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/getRandomAvatar")
+    public ResponseEntity<String> generateRandomAvatarUrl() {
+        String avatarUrl = userService.generateRandomAvatarUrl();
+        log.info("Generated random avatar URL: {}", avatarUrl);
+        return new ResponseEntity<>(avatarUrl, HttpStatus.OK);
     }
 }

@@ -99,20 +99,16 @@ public class UserController {
     }
 
     @PutMapping("/{userId}/createAvatar")
-    public ResponseEntity<User> createAvatar(@PathVariable Long userId) {
+    public User createAvatar(@PathVariable Long userId) {
         User user = userService.createAvatar(userId);
-        if (user != null) {
-            log.info("Avatar created for user with ID: {}", userId);
-            return new ResponseEntity<>(user, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        log.info("Avatar created for user with ID: {}", userId);
+        return user;
     }
 
     @GetMapping("/getRandomAvatar")
-    public ResponseEntity<String> generateRandomAvatarUrl() {
+    public String generateRandomAvatarUrl() {
         String avatarUrl = userService.generateRandomAvatarUrl();
         log.info("Generated random avatar URL: {}", avatarUrl);
-        return new ResponseEntity<>(avatarUrl, HttpStatus.OK);
+        return avatarUrl;
     }
 }

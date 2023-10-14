@@ -204,22 +204,14 @@ public class UserService {
         log.info("Banned user with id: {}", userId);
     }
 
-//    public User avatarGenerationWhenRegisterUser(String username) {
-//        String avatarUrl = generateRandomAvatarUrl();
-//        User user = new User();
-//        user.setUsername(username);
-//        user.setAvatarUrl(avatarUrl);
-//        userRepository.save(user);
-//        return user;
-//    }
-
     public User createAvatar(Long userId) {
-        User user = userRepository.findById(userId).orElse(null);
-        if (user != null) {
-            String avatarUrl = generateRandomAvatarUrl();
-            user.setAvatarUrl(avatarUrl);
-            userRepository.save(user);
-        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+
+        String avatarUrl = generateRandomAvatarUrl();
+        user.setAvatarUrl(avatarUrl);
+        userRepository.save(user);
+
         return user;
     }
 

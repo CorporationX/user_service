@@ -14,6 +14,7 @@ import school.faang.user_service.dto.user.UserProfilePicDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.PersonMapper;
 import school.faang.user_service.mapper.user.UserProfilePicMapper;
 import school.faang.user_service.parser.PersonParser;
@@ -25,7 +26,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Executor;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -77,6 +80,7 @@ class UserServiceTest {
         ReflectionTestUtils.setField(userService, "partitionSize", 1);
         ReflectionTestUtils.setField(userService, "maxFileSize", 100);
         ReflectionTestUtils.setField(userService, "folder", "folder");
+        ReflectionTestUtils.setField(userService, "diceBearBaseUrl", "https://api.dicebear.com/7.x/adventurer/svg?seed=");
     }
 
     @Test
@@ -162,5 +166,32 @@ class UserServiceTest {
     void testSetBanForUser() {
         userService.setBanForUser(1L);
         verify(userRepository, times(1)).setBanUser(1L);
+    }
+
+    @Test
+    public void testCreateAvatar() {
+        Long userId = 1L;
+        User user = new User();
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        User result = userService.createAvatar(userId);
+
+        assertNotNull(result.getAvatarUrl());
+        verify(userRepository, times(1)).save(user);
+    }
+
+    @Test
+    public void testCreateAvatar_UserNotFound() {
+        Long userId = 1L;
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> userService.createAvatar(userId));
+    }
+
+    @Test
+    public void testGenerateRandomAvatarUrl() {
+        String avatarUrl = userService.generateRandomAvatarUrl();
+
+        assertTrue(avatarUrl.startsWith("https://api.dicebear.com/7.x/adventurer/svg?seed="));
     }
 }

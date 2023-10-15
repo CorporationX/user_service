@@ -37,6 +37,9 @@ public class RedisConfig {
     private String fundRaisedChannel;
     @Value("${spring.data.redis.channels.user_ban_channel.name}")
     private String userBanEvent;
+    @Value("${spring.data.redis.channels.recommendation_received_channel.name}")
+    private String recommendationReceivedChannel;
+
     private final UserBanEventListener userBanEventListener;
     private final RedisUserUpdateSubscriber redisUserUpdateSubscriber;
 
@@ -95,6 +98,11 @@ public class RedisConfig {
     @Bean
     ChannelTopic userBanTopic() {
         return new ChannelTopic(userBanEvent);
+    }
+
+    @Bean
+    ChannelTopic recommendationReceivedChannel() {
+        return new ChannelTopic(recommendationReceivedChannel);
     }
 
     @Bean

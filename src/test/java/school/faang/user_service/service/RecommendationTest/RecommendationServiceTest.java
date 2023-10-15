@@ -22,6 +22,7 @@ import school.faang.user_service.exception.invalidFieldException.DataValidationE
 import school.faang.user_service.exception.notFoundExceptions.SkillNotFoundException;
 import school.faang.user_service.mapper.RecommendationMapperImpl;
 import school.faang.user_service.mapper.SkillOfferMapperImpl;
+import school.faang.user_service.messaging.recommendation.RecommendationReceivedEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
@@ -59,6 +60,8 @@ class RecommendationServiceTest {
     private UserRepository userRepository;
     @Mock
     private UserService userService;
+    @Mock
+    private RecommendationReceivedEventPublisher recommendationReceivedEventPublisher;
     private Skill skill;
     private RecommendationDto recommendationDto;
     private RecommendationUpdateDto recommendationUpdateDto;

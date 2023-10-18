@@ -7,7 +7,7 @@ import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.listener.events.BanEvent;
+import school.faang.user_service.service.redis.events.BanEvent;
 import school.faang.user_service.repository.UserRepository;
 
 import java.io.IOException;

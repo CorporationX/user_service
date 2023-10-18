@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import school.faang.user_service.controller.goal.GoalController;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
+import school.faang.user_service.publisher.GoalEventPublisher;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.validation.GoalValidator;
 
@@ -44,6 +45,9 @@ public class GoalControllerTest {
 
     @Mock
     private GoalService goalService;
+
+    @Mock
+    private GoalEventPublisher goalEventPublisher;
 
     @InjectMocks
     private GoalController goalController;

@@ -38,6 +38,8 @@ spring:
           name: user_ban_channel
         started_events_channel:
           name: started_events_channel
+        goal_channel:
+          name: goal_channel
         mentorship_channel:
           name: mentorship_channel
         profile_pic_channel:
@@ -48,6 +50,7 @@ spring:
       channels:
         profile_view_channel:
           name: profile_view_channel
+
 
 server:
   port: 8080

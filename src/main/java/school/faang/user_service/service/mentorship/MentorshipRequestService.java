@@ -12,6 +12,9 @@ import school.faang.user_service.dto.mentorship.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.mapper.mentorship.MentorshipAcceptedRequestMapper;
+import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.filter.mentorship_request.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.mapper.MentorshipOfferedEventMapper;
@@ -32,8 +35,10 @@ public class MentorshipRequestService {
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final MentorshipRequestValidator mentorshipRequestValidator;
+    private final MentorshipAcceptedRequestMapper acceptedRequestMapper;
     private final UserService userService;
     private final List<MentorshipRequestFilter> mentorshipRequestFilters;
+    private final MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher;
     private final MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
     private final MentorshipOfferedEventMapper mentorshipOfferedEventMapper;
     private final MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
@@ -73,12 +78,26 @@ public class MentorshipRequestService {
         mentorshipRequestValidator.acceptRequestValidator(mentorshipRequest.getRequester().getId(),
                 mentorshipRequest.getReceiver().getId(),
                 mentorshipRequest.getStatus());
+    public void acceptRequest(long id) {
+        MentorshipRequest request = requestFindById(id);
+        mentorshipRequestValidator.acceptRequestValidator(request);
+
+        User requester = request.getRequester();
+        User receiver = request.getReceiver();
 
         mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
         userService.addMentor(mentorshipRequest.getRequester().getId(),
                 mentorshipRequest.getReceiver().getId());
 
         return mentorshipRequestMapper.toDto(mentorshipRequest);
+        List<User> newMentees = receiver.getMentees();
+        newMentees.add(requester);
+        receiver.setMentees(newMentees);
+
+        List<User> newMentors = requester.getMentors();
+        newMentors.add(receiver);
+        requester.setMentors(newMentors);
+        mentorshipAcceptedEventPublisher.publish(acceptedRequestMapper.toEventDto(request));
     }
 
     @Transactional

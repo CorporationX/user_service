@@ -26,11 +26,7 @@ spring:
         profile_view_channel: profile-view-channel
         recommendation_channel: recommendation-channel
         skill_offer_channel: skill-offer-channel
-        mentorship_request_channel: mentorship-request-channel
         recommendation_requested_event_channel: recommendation-requested-event-channel
-        mentorship_offer_channel: mentorship-offer-channel
-        name: mentorship-offered-channel
-        user_ban: user-ban
 
   google:
     calendar:
@@ -40,10 +36,6 @@ spring:
       redirect-uri: http://localhost:8080/calendar/callback
       scopes: https://www.googleapis.com/auth/calendar
       access-type: offline
-
-scheduler:
-  clearEventsCron: "0 0 0 7/7 * ?"
-  clearEventsBatchSize: 100
 
 server:
   port: 8080
@@ -67,12 +59,5 @@ aws:
 
 services:
   s3:
-    bucket_name: user_bucket
+    bucket-name: user_backet
     isMocked: true
-    endpoint: http://localhost:9000
-    accessKey: user
-    secretKey: password
-    bucket_name_for_avatars: avatar
-    dice_bear:
-      url: https://api.dicebear.com/6.x/pixel-art/svg?seed=
-      size: '&size=100'

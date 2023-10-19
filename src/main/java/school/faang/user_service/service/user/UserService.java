@@ -31,6 +31,7 @@ import school.faang.user_service.util.PasswordGenerator;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.Executor;
 
 @RequiredArgsConstructor
@@ -55,6 +56,8 @@ public class UserService {
     private long maxFileSize;
     @Value("${users.profile_picture.folder}")
     private String folder;
+    @Value("${dicebear.api.base_url}")
+    private String diceBearBaseUrl;
 
     public boolean existsById(long id) {
         return userRepository.existsById(id);
@@ -199,5 +202,21 @@ public class UserService {
     public void setBanForUser(Long userId) {
         userRepository.setBanUser(userId);
         log.info("Banned user with id: {}", userId);
+    }
+
+    public User createAvatar(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+
+        String avatarUrl = generateRandomAvatarUrl();
+        user.setAvatarUrl(avatarUrl);
+        userRepository.save(user);
+
+        return user;
+    }
+
+    public String generateRandomAvatarUrl() {
+        String uniqueFilename = UUID.randomUUID().toString();
+        return diceBearBaseUrl + uniqueFilename;
     }
 }

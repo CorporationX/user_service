@@ -107,3 +107,8 @@ users:
       max_size: 1080
     small:
       max_size: 170
+
+dicebear:
+  api:
+    base_url: https://api.dicebear.com/7.x/adventurer/svg?seed=
+

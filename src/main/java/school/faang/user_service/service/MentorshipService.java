@@ -37,10 +37,7 @@ public class MentorshipService {
             throw new RequestNotFoundException(requesterId, receiverId);
         }
         if (mentorshipRequest.get().getStatus().equals(RequestStatus.PENDING)){
-            MentorshipRequest request = mentorshipRequest.get();
-            request.setStatus(RequestStatus.ACCEPTED);
-            request.setUpdatedAt(LocalDateTime.now());
-            mentorshipRequestRepository.save(request);
+            setAcceptedStatus(mentorshipRequest.get());
         }
         MentorshipStartEvent event = MentorshipStartEvent.builder().menteeId(requesterId).menteeId(receiverId).build();
         mentorshipEventPublisher.publish(event);
@@ -94,6 +91,12 @@ public class MentorshipService {
         }
         return userRepository.findById(id).orElseThrow(() ->
                 new DataValidationException("Invalid ID"));
+    }
+
+    private void setAcceptedStatus(MentorshipRequest mentorshipRequest){
+        mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
+        mentorshipRequest.setUpdatedAt(LocalDateTime.now());
+        mentorshipRequestRepository.save(mentorshipRequest);
     }
 }
 

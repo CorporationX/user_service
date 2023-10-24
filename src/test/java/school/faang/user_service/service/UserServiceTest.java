@@ -11,6 +11,7 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.entity.contact.ContactPreference;
 import school.faang.user_service.entity.contact.PreferredContact;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.mapper.MapperUserDto;
@@ -28,6 +29,7 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -56,6 +58,7 @@ public class UserServiceTest {
 
     List<User> userList;
     private UserFilterDto filter;
+    private LocalDateTime dateTime;
 
     @BeforeEach
     void setUp() {
@@ -68,6 +71,7 @@ public class UserServiceTest {
         userList = List.of(user1, user2, user3);
         filter = new UserFilterDto();
         filter.setActive(true);
+        dateTime = LocalDateTime.now();
     }
 
     @Test
@@ -85,6 +89,7 @@ public class UserServiceTest {
         user1.setEmail("aaa");
         user1.setUsername("John");
         user1.setActive(false);
+        user1.setContactPreference(ContactPreference.builder().preference(PreferredContact.EMAIL).build());
         UserDto expected = UserDto.builder()
                 .id(1L)
                 .email("aaa")
@@ -107,7 +112,8 @@ public class UserServiceTest {
     public void testGetUserCallsProfileViewPublisher(){
         Long idViewer = 1L;
         Long idViewed = 2L;
-        ProfileViewEvent profileViewEvent = new ProfileViewEvent(idViewer, idViewed, PreferredContact.EMAIL);
+        user2.setContactPreference(ContactPreference.builder().preference(PreferredContact.EMAIL).build());
+        ProfileViewEvent profileViewEvent = new ProfileViewEvent(idViewer, idViewed, dateTime);
         Mockito.when(userRepository.findById(idViewed)).thenReturn(Optional.of(user2));
 
         userService.getUser(idViewer, idViewed);

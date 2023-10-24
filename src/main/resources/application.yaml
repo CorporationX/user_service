@@ -57,3 +57,5 @@ services:
   s3:
     bucket-name: user_bucket
     isMocked: true
+redis:
+  postTopic: postTopic

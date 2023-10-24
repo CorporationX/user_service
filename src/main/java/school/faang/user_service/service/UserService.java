@@ -17,6 +17,7 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Stream;
@@ -48,10 +49,16 @@ public class UserService {
         String message = String.format("Entity with ID %d not found", userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(message));
-        profileViewEventMessagePublisher.publish(new ProfileViewEvent(currentUserId, userId,
-                PreferredContact.EMAIL));
-//        profileViewEventMessagePublisher.publish(new ProfileViewEvent(currentUserId, userId,
-//                user.getContactPreference().getPreference()));
+        profileViewEventMessagePublisher.publish(new ProfileViewEvent(currentUserId, userId, LocalDateTime.now()));
+
+        return userMapper.toDto(user);
+    }
+
+    @Transactional(readOnly = true)
+    public UserDto getUserInternal(long userId) {
+        String message = String.format("Entity with ID %d not found", userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(message));
 
         return userMapper.toDto(user);
     }

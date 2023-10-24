@@ -26,6 +26,11 @@ public class UserController {
         return userService.getUser(currentUserId, userId);
     }
 
+    @GetMapping("/{userId}/internal")
+    public UserDto getUserInternal(@PathVariable long userId) {
+        return userService.getUserInternal(userId);
+    }
+
     @PostMapping
     public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);

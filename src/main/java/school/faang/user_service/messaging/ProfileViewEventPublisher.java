@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.messaging.events.ProfileViewEvent;
 
@@ -19,6 +20,7 @@ public class ProfileViewEventPublisher implements MessagePublisher<ProfileViewEv
     private final ObjectMapper objectMapper;
 
     @Override
+    @Async("noticePool")
     public void publish(ProfileViewEvent event) {
         String json;
         try {

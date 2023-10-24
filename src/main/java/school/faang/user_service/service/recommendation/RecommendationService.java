@@ -43,10 +43,9 @@ public class RecommendationService {
 
     @Transactional
     public RecommendationDto create(RecommendationDto recommendationDto) {
-        validate(recommendationDto);
-
+       validate(recommendationDto);
         Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
-        recommendationRepository.save(recommendation);
+       recommendationRepository.save(recommendation);
         processSkillOffers(recommendation);
         eventPublisher.publish(recommendation);
 

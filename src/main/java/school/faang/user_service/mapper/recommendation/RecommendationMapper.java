@@ -17,5 +17,7 @@ public interface RecommendationMapper {
 
     @Mapping(source = "author.id", target = "authorId")
     @Mapping(source = "receiver.id", target = "receiverId")
+    @Mapping(source = "id",target = "recomendationId")
+    @Mapping(source = "createdAt",target = "dateTime")
     RecommendationEventDto toEventDto(Recommendation recommendation);
 }

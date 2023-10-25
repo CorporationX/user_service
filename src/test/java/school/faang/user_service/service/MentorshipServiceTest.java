@@ -48,6 +48,7 @@ public class MentorshipServiceTest {
                 .username("Andrew")
                 .city("Milan")
                 .email("an@mail.ru")
+                .followers(new ArrayList<>())
                 .build();
         nonExistentUser = User.builder()
                 .id(NON_EXISTENT_USER_ID)
@@ -56,6 +57,7 @@ public class MentorshipServiceTest {
                 .email("nick@mail.ru")
                 .mentors(new ArrayList<>())
                 .mentees(new ArrayList<>())
+                .followers(new ArrayList<>())
                 .build();
         correctUser = User.builder()
                 .id(CORRECT_USER_ID)
@@ -64,6 +66,7 @@ public class MentorshipServiceTest {
                 .email("max@google.com")
                 .mentors(new ArrayList<>(List.of(nonExistentUser, testUser)))
                 .mentees(new ArrayList<>(List.of(nonExistentUser, testUser)))
+                .followers(new ArrayList<>())
                 .build();
 
         nonExistentUserDto = UserDto.builder()
@@ -71,12 +74,16 @@ public class MentorshipServiceTest {
                 .username("Nikita")
                 .city("Moscow")
                 .email("nick@mail.ru")
+                .followeeIds(new ArrayList<>())
+                .followerIds(new ArrayList<>())
                 .build();
         testUserDto = UserDto.builder()
                 .id(2L)
                 .username("Andrew")
                 .city("Milan")
                 .email("an@mail.ru")
+                .followeeIds(new ArrayList<>())
+                .followerIds(new ArrayList<>())
                 .build();
         expectedDtos = List.of(nonExistentUserDto, testUserDto);
     }

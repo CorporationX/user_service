@@ -76,11 +76,15 @@ public class SubscriptionServiceTest {
                 .id(1L)
                 .username("46")
                 .email("46@gmail.com")
+                .followeeIds(new ArrayList<>())
+                .followerIds(new ArrayList<>())
                 .build();
         UserDto userDto2 = UserDto.builder()
                 .id(2L)
                 .username("Angie")
                 .email("Angie@gmail.com")
+                .followeeIds(new ArrayList<>())
+                .followerIds(new ArrayList<>())
                 .build();
         usersDto = new ArrayList<>();
         usersDto.add(userDto1);

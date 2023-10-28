@@ -65,3 +65,6 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
+    accessKey: access_key
+    secretKey: secret_key
+    endpoint: bucket_region

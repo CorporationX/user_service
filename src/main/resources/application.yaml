@@ -67,4 +67,4 @@ services:
     isMocked: true
     accessKey: access_key
     secretKey: secret_key
-    endpoint: bucket_region
+    endpoint: http://127.0.0.1:9000

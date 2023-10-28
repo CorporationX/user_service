@@ -5,3 +5,7 @@ CREATE TABLE user_rating (
 
     CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users (id)
 );
+
+CREATE sequence unique_payment_sequence
+    start 1
+    increment 1;

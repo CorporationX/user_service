@@ -2,6 +2,7 @@ package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
@@ -11,6 +12,7 @@ import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.validator.EventValidator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -78,5 +80,14 @@ public class EventService {
     private Event getEventById(Long id) {
         return eventRepository.findById(id)
                 .orElseThrow(() -> new DataValidationException("Event not found"));
+    }
+    @Transactional
+    public List<Event> getAllPastEventsToDelete() {
+        return eventRepository.findAllPastEventsToDelete(LocalDateTime.now().withNano(0));
+    }
+
+    @Transactional
+    public void deleteEvents(List<Event> subList) {
+        eventRepository.deleteAll(subList);
     }
 }

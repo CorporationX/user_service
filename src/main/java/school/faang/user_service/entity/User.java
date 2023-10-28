@@ -132,6 +132,7 @@ public class User {
 
     @Embedded
     @AttributeOverrides({
+            @AttributeOverride(name = "name", column = @Column(name = "profile_pic_name")),
             @AttributeOverride(name = "fileId", column = @Column(name = "profile_pic_file_id")),
             @AttributeOverride(name = "smallFileId", column = @Column(name = "profile_pic_small_file_id"))
     })
@@ -142,4 +143,7 @@ public class User {
 
     @OneToOne(mappedBy = "user")
     private Premium premium;
+
+    @Column(name = "banned")
+    private boolean banned;
 }

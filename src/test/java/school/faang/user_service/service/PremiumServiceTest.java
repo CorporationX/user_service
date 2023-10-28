@@ -102,7 +102,7 @@ class PremiumServiceTest {
                 "Success");
         PaymentRequest paymentRequest = new PaymentRequest(paymentNumber, new BigDecimal(25), Currency.USD);
 
-        Mockito.when(premiumRepository.count()).thenReturn(paymentNumber);
+        Mockito.when(premiumRepository.getUniquePayment()).thenReturn(paymentNumber);
         Mockito.when(paymentServiceClient.sendPayment(paymentRequest)).thenReturn(ResponseEntity.ok(response));
 
         ReflectionTestUtils.invokeMethod(premiumService, "paymentPremium", PremiumPeriod.THREE_MONTH);

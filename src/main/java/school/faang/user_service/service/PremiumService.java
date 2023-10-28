@@ -42,7 +42,7 @@ public class PremiumService {
     public PremiumDto buyPremium(long userId, PremiumPeriod premiumPeriod) {
         premiumValidator.validateExistPremiumFromUser(userId);
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("User with %d not exists", userId)));
+                .orElseThrow(() -> new EntityNotFoundException("User was not found"));
 
         paymentPremium(premiumPeriod);
 
@@ -63,7 +63,7 @@ public class PremiumService {
 
     @Retryable(retryFor = FeignException.class)
     private void paymentPremium(PremiumPeriod premiumPeriod) {
-        long payNumber = premiumRepository.count();
+        long payNumber = premiumRepository.getUniquePayment();
         PaymentRequest paymentRequest =
                 new PaymentRequest(payNumber, new BigDecimal(premiumPeriod.getPrice()), Currency.USD);
         ResponseEntity<PaymentResponse> paymentResponseEntity = paymentServiceClient.sendPayment(paymentRequest);

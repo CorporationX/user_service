@@ -36,7 +36,7 @@ public class MentorshipRequestService {
 
         mentorshipRequestValidator.requestValidate(requester, receiver);
         MentorshipRequest mentorshipRequest = mentorshipRequestMapper.toEntity(dto);
-//        mentorshipRequest.setStatus(RequestStatus.PENDING);
+        mentorshipRequest.setStatus(RequestStatus.PENDING);
         mentorshipRequestRepository.save(mentorshipRequest);
     }
 

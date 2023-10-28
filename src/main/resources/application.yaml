@@ -28,6 +28,9 @@ spring:
         skill_offer_channel: skill-offer-channel
         recommendation_requested_event_channel: recommendation-requested-event-channel
         user_ban: user-ban
+        mentorship_request_channel: mentorship-request-channel
+        mentorship_accepted_request_event_channel: mentorship-accepted-request-event-channel
+        mentorship_offer_channel: mentorship-offer-channel
 
   google:
     calendar:
@@ -71,3 +74,7 @@ services:
     dice-bear:
       url: url
       size: size
+
+scheduler:
+  clearEventsBatchSize: 100
+  clearEventsCron: 0 0 0 * * * # every day at 00:00

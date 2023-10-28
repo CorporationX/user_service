@@ -17,6 +17,7 @@ import school.faang.user_service.filter.mentorship_request.MentorshipRequestFilt
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.mapper.MentorshipOfferedEventMapper;
 import school.faang.user_service.publisher.MentorshipOfferedEventPublisher;
+import school.faang.user_service.publisher.MentorshipRequestedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
@@ -42,6 +43,8 @@ public class MentorshipRequestServiceTest {
     private MentorshipOfferedEventMapper mentorshipOfferedEventMapper;
     @Mock
     private MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
+    @Mock
+    private MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
     @InjectMocks
     private MentorshipRequestService mentorshipRequestService;
     private MentorshipRequestDto mentorshipRequestDto;

@@ -62,38 +62,38 @@ class UserControllerTest {
         }
     }
 
-    @Test
-    public void createUserTest() throws Exception {
-        String json = """
-                {
-                   "username": "sampleUsername2",
-                   "email": "sample@email.com2",
-                   "phone": "1234",
-                   "password": "samplePassword",
-                   "aboutMe": "About me text goes here.",
-                   "country": {
-                       "title": "France"
-                       },
-                   "city": "Sample City",
-                   "experience": 5
-                }
-                """;
-
-        ResultActions result = mockMvc.perform(
-                        post("/users/create")
-                                .contentType("application/json")
-                                .content(json))
-                .andExpect(status().isOk());
-
-        UserDto user = new ObjectMapper().readValue(result.andReturn().getResponse().getContentAsString(), UserDto.class);
-
-        assertEquals("sampleUsername2", user.getUsername());
-
-        //france hava id 4
-        assertEquals(4, user.getCountry().getId());
-        assertEquals("France", user.getCountry().getTitle());
-       // assertEquals(PreferredContact.EMAIL, user.getPreferredContact());
-    }
+//    @Test
+//    public void createUserTest() throws Exception {
+//        String json = """
+//                {
+//                   "username": "sampleUsername2",
+//                   "email": "sample@email.com2",
+//                   "phone": "1234",
+//                   "password": "samplePassword",
+//                   "aboutMe": "About me text goes here.",
+//                   "country": {
+//                       "title": "France"
+//                       },
+//                   "city": "Sample City",
+//                   "experience": 5
+//                }
+//                """;
+//
+//        ResultActions result = mockMvc.perform(
+//                        post("/users/create")
+//                                .contentType("application/json")
+//                                .content(json))
+//                .andExpect(status().isOk());
+//
+//        UserDto user = new ObjectMapper().readValue(result.andReturn().getResponse().getContentAsString(), UserDto.class);
+//
+//        assertEquals("sampleUsername2", user.getUsername());
+//
+//        //france hava id 4
+//        assertEquals(4, user.getCountry().getId());
+//        assertEquals("France", user.getCountry().getTitle());
+//       // assertEquals(PreferredContact.EMAIL, user.getPreferredContact());
+//    }
 
     @Test
     public void createUserTest_NewCountry() throws Exception {

@@ -68,3 +68,6 @@ services:
     accessKey: access_key
     secretKey: secret_key
     endpoint: http://127.0.0.1:9000
+    dice-bear:
+      url: url
+      size: size

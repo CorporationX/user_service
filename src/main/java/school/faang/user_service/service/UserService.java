@@ -24,11 +24,11 @@ import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.contact.ContactPreferenceService;
 import school.faang.user_service.service.contact.ContactService;
+import school.faang.user_service.service.kafka.KafkaFeedHeaterProducer;
 import school.faang.user_service.util.PasswordGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 
 @Service
@@ -46,6 +46,7 @@ public class UserService {
     private final PersonParser personParser;
     private final ExecutorService parseExecutorService;
     private final PasswordGenerator passwordGenerator;
+    private final KafkaFeedHeaterProducer kafkaFeedHeaterProducer;
     @Value("${telegram.botUrl}")
     private String botUrl;
     @Value("${students.partitionSize}")
@@ -53,6 +54,7 @@ public class UserService {
     @Value("${students.passwordLength}")
     private int passwordLength;
 
+    @Transactional(readOnly = true)
     public List<UserDto> getUsersByIds(List<Long> ids) {
         List<UserDto> users = new ArrayList<>();
 
@@ -62,6 +64,7 @@ public class UserService {
         return users;
     }
 
+    @Transactional(readOnly = true)
     public UserDto getUser(long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("This user was not found"));
@@ -102,6 +105,13 @@ public class UserService {
         } else {
             parseExecutorService.execute(() -> mapAndSaveStudents(students));
         }
+    }
+
+    @Transactional(readOnly = true)
+    public void getAllUsersWithKafka() {
+        Iterable<User> allUsers = userRepository.findAll();
+        allUsers.forEach(user -> kafkaFeedHeaterProducer.sendMessage(userMapper.toDto(user)));
+        log.info("All users from DB was posted to Kafka Feed Heater");
     }
 
     private void mapAndSaveStudents(List<Person> students) {

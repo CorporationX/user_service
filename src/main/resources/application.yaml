@@ -30,6 +30,22 @@ spring:
           name: mentorship
         event_start_channel:
           name: event_start_channel
+
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
+      news-feed-topic: news_feed_heater
+      client-id: news_feed_events
+      partitions: 1
+      replicas: 1
+
+  async:
+    thread-pool:
+      settings:
+        core-pool-size: 4
+        max-pool-size: 8
+        queue-capacity: 100
+
 server:
   port: 8080
 

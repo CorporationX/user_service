@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import school.faang.user_service.dto.mentorship.MentorshipOfferedEventDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
@@ -16,7 +17,11 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.filter.mentorship_request.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.mapper.MentorshipOfferedEventMapper;
+import school.faang.user_service.mapper.mentorship.MentorshipAcceptedRequestMapper;
+import school.faang.user_service.mapper.mentorship.MentorshipAcceptedRequestMapperImpl;
+import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.publisher.MentorshipOfferedEventPublisher;
+import school.faang.user_service.publisher.MentorshipRequestedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
@@ -42,6 +47,12 @@ public class MentorshipRequestServiceTest {
     private MentorshipOfferedEventMapper mentorshipOfferedEventMapper;
     @Mock
     private MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
+    @Mock
+    private MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
+    @Spy
+    private MentorshipAcceptedRequestMapperImpl acceptedRequestMapper;
+    @Mock
+    private MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher;
     @InjectMocks
     private MentorshipRequestService mentorshipRequestService;
     private MentorshipRequestDto mentorshipRequestDto;

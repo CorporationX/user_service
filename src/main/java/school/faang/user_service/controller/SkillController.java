@@ -34,7 +34,6 @@ public class SkillController {
         return skillService.getUserSkills(userId);
     }
 
-
     @PutMapping("/offered/{userId}")
     public List<SkillCandidateDto> getOfferedSkills(@PathVariable Long userId) {
         validateId(userId);

@@ -21,3 +21,5 @@ databaseChangeLog:
       file: db/changelog/changeset/user_V010__alter_banned_user.sql
   - include:
       file: db/changelog/changeset/user_V011_alter_user_pic_name.sql
+  - include:
+      file: db/changelog/changeset/user_V012__user_rating.sql

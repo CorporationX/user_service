@@ -27,6 +27,10 @@ spring:
         recommendation_channel: recommendation-channel
         skill_offer_channel: skill-offer-channel
         recommendation_requested_event_channel: recommendation-requested-event-channel
+        user_ban: user-ban
+        mentorship_request_channel: mentorship-request-channel
+        mentorship_accepted_request_event_channel: mentorship-accepted-request-event-channel
+        mentorship_offer_channel: mentorship-offer-channel
 
   google:
     calendar:
@@ -36,6 +40,9 @@ spring:
       redirect-uri: http://localhost:8080/calendar/callback
       scopes: https://www.googleapis.com/auth/calendar
       access-type: offline
+
+  config:
+    import: classpath:values/values.yaml
 
 server:
   port: 8080
@@ -61,3 +68,13 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
+    accessKey: access_key
+    secretKey: secret_key
+    endpoint: http://127.0.0.1:9000
+    dice-bear:
+      url: url
+      size: size
+
+scheduler:
+  clearEventsBatchSize: 100
+  clearEventsCron: 0 0 0 * * * # every day at 00:00

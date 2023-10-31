@@ -41,6 +41,12 @@ public class UserController {
         return userService.getUser(userId);
     }
 
+    @GetMapping("/followers/{userId}")
+    public List<Long> getFollowersId(@PathVariable("userId") long userId){
+        log.info("Endpoint <getFollowersId>, was called successfully with userId {}", userId);
+        return userService.getFollowersId(userId);
+    }
+
     @PostMapping("/telegram")
     public String setTelegramContact() {
         return userService.setTelegramContact();

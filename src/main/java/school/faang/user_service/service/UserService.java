@@ -120,4 +120,13 @@ public class UserService {
         log.info("Successfully mapped from Person and saved {} users", users.size());
         userRepository.saveAll(users);
     }
+
+    public List<Long> getFollowersId(long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("User with id %d not found.", userId)));
+        return user.getFollowers()
+                .stream()
+                .map(User::getId)
+                .toList();
+    }
 }

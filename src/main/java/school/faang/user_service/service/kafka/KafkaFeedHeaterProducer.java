@@ -19,7 +19,7 @@ public class KafkaFeedHeaterProducer extends KafkaAbstractProducer {
 
     @Override
     @Async("kafkaThreadPool")
-    public void sendMessage(Object message) {
+    public void sendMessageAsync(Object message) {
         var future = kafkaTemplate.send(heaterTopicName, message);
         handleFuture(future);
     }

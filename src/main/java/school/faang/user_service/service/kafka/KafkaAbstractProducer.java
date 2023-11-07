@@ -13,7 +13,7 @@ public abstract class KafkaAbstractProducer {
 
     protected final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public abstract void sendMessage(Object message);
+    public abstract void sendMessageAsync(Object message);
 
     public void handleFuture(CompletableFuture<SendResult<String, Object>> future) {
         future.whenComplete(((sendResult, throwable) -> {

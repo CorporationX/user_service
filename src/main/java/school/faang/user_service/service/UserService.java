@@ -108,7 +108,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public void getAllUsersWithKafka() {
         Iterable<User> allUsers = userRepository.findAll();
-        allUsers.forEach(user -> kafkaFeedHeaterProducer.sendMessage(userMapper.toDto(user)));
+        allUsers.forEach(user -> kafkaFeedHeaterProducer.sendMessageAsync(userMapper.toDto(user)));
         log.info("All users from DB was posted to Kafka Feed Heater");
     }
 

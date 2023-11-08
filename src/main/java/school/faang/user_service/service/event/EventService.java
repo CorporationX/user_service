@@ -10,6 +10,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.EventMapper;
+import school.faang.user_service.messaging.StartEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
@@ -24,6 +25,7 @@ public class EventService {
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
     private final List<EventFilter> eventFilters;
+    private final StartEventPublisher startEventPublisher;
 
     public EventDto create(EventDto event) {
         User user = userRepository.findById(event.getId()).orElseThrow(
@@ -32,7 +34,9 @@ public class EventService {
             throw new DataValidationException("The event " + event.getId() +
                     " cannot be held with such skills at the user " + user.getId() + " in the method create");
         }
-        return eventMapper.toEventDto(eventRepository.save(eventMapper.toEvent(event)));
+        EventDto eventDto = eventMapper.toEventDto(eventRepository.save(eventMapper.toEvent(event)));
+        startEventPublisher.publish(event);
+        return eventDto;
     }
 
     public EventDto getEvent(long eventId) {

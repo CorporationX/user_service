@@ -32,6 +32,8 @@ spring:
           name: recommendation_channel
         mentorship_channel:
            name: mentorship_channel
+        start_event_chanel:
+          name: start_event_chanel
 
 server:
   port: 8080

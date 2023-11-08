@@ -15,6 +15,8 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.EventMapperImpl;
+import school.faang.user_service.messaging.StartEventPublisher;
+import school.faang.user_service.messaging.events.GoalCompletedEvent;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.event_filter.EventIdFilter;
@@ -43,6 +45,8 @@ class EventServiceTest {
     private EventService eventService;
     @Spy
     private EventMapperImpl eventMapper;
+    @Mock
+    private StartEventPublisher startEventPublisher;
 
     @Test
     void testCreateException() {
@@ -66,6 +70,9 @@ class EventServiceTest {
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         eventService.create(event);
+
+        verify(startEventPublisher, times(1)).publish(event);
+
         assertEquals(1L, event.getId());
         verify(eventRepository).save(any());
     }
@@ -134,7 +141,7 @@ class EventServiceTest {
                         "location",
                         1));
 
-        eventService = new EventService(userRepository, eventRepository, eventMapper, eventFilters);
+        eventService = new EventService(userRepository, eventRepository, eventMapper, eventFilters, startEventPublisher);
         List<EventDto> eventsByFilter = eventService.getEventsByFilter(eventFilterDto);
         verify(eventRepository, times(1)).findAll();
 

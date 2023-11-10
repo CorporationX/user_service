@@ -5,12 +5,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.dto.contact.ContactDto;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.contact.ContactDto;
 import school.faang.user_service.dto.contact.ContactPreferenceDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.contact.ContactType;
@@ -28,7 +31,6 @@ import school.faang.user_service.util.PasswordGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 
 @Service
@@ -62,6 +64,18 @@ public class UserService {
         return users;
     }
 
+    @Transactional(readOnly = true)
+    public Page<UserDto> getAllUsers(Pageable pageable) {
+        Page<User> userPage = userRepository.findAll(pageable);
+
+        List<UserDto> userDtos = userPage.getContent().stream()
+                .map(userMapper::toDto)
+                .toList();
+
+        return new PageImpl<>(userDtos);
+    }
+
+    @Transactional
     public UserDto getUser(long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("This user was not found"));

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import school.faang.user_service.entity.contact.PreferredContact;
 
+import java.util.List;
 import java.util.Locale;
 
 @Data
@@ -20,6 +21,9 @@ public class UserDto {
     private String phone;
     private String aboutMe;
     private String city;
+    private String smallFileId;
+    private List<Long> followerIds;
+    private List<Long> followeeIds;
     private Integer experience;
     private Locale locale;
     private String telegramChatId;

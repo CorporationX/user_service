@@ -37,7 +37,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class RecommendationServiceTest {
@@ -55,6 +56,7 @@ class RecommendationServiceTest {
     private RecommendationMapper recommendationMapper = new RecommendationMapperImpl(skillOfferMapper);
     @InjectMocks
     private RecommendationService recommendationService;
+
     private RecommendationDto recommendationDto;
     private Recommendation recommendation;
     private Page<Recommendation> recommendationPage;
@@ -70,6 +72,11 @@ class RecommendationServiceTest {
     private User firstUser;
     private User secondUser;
     private User emptyUser;
+
+    private Pageable pageable;
+
+    private final Long authorId = 2L;
+    private final Long receiverId = 3L;
 
     @BeforeEach
     void setUp() {
@@ -99,7 +106,7 @@ class RecommendationServiceTest {
                 .title("Java")
                 .guarantees(userSkillGuarantees)
                 .build();
-        this.skills = List.of(userSkill);
+        this.skills = new ArrayList<>(List.of(userSkill));
         this.skillOfferDto = new SkillOfferDto(1L, 1L, 1L);
         this.skillOffersDto = new ArrayList<>(List.of(skillOfferDto));
         this.skillOffer = SkillOffer
@@ -109,40 +116,10 @@ class RecommendationServiceTest {
                 .recommendation(Recommendation.builder().id(1).build())
                 .build();
         this.skillsOffers = new ArrayList<>(List.of(skillOffer));
-        this.recommendationDto = new RecommendationDto(1L, 2L, 3L, "Hello", skillOffersDto, LocalDateTime.now());
+        this.recommendationDto = new RecommendationDto(1L, authorId, receiverId, "Hello", skillOffersDto, LocalDateTime.now());
         this.recommendation = new Recommendation(1, "Hello", firstUser, secondUser, skillsOffers, null, LocalDateTime.now().minusYears(1), null);
-        this.recommendationPage = new PageImpl<>(Arrays.asList(recommendation, recommendation), PageRequest.of(0, 2), 2);
-    }
-
-    @Test
-    void createThrowExceptionWhenAuthorIdIsEmpty() {
-        RecommendationDto recommendationDtoWithAuthor = RecommendationDto
-                .builder()
-                .authorId(null)
-                .build();
-
-        assertThrows(DataValidationException.class, () -> recommendationService.create(recommendationDtoWithAuthor));
-    }
-
-    @Test
-    void createThrowExceptionWhenReceiverIdIsEmpty() {
-        RecommendationDto recommendationDtoWithAuthor = RecommendationDto
-                .builder()
-                .receiverId(null)
-                .build();
-
-        assertThrows(DataValidationException.class, () -> recommendationService.create(recommendationDtoWithAuthor));
-    }
-
-    @Test
-    void createThrowExceptionWhenAuthorIdEqualsReceiverId() {
-        RecommendationDto fakeRecommendation = RecommendationDto.builder()
-                .authorId(2L)
-                .receiverId(2L)
-                .content("Hello")
-                .build();
-
-        assertThrows(DataValidationException.class, () -> recommendationService.create(fakeRecommendation));
+        this.recommendationPage = new PageImpl<>(Arrays.asList(recommendation, recommendation), PageRequest.of(0, 5), 2);
+        this.pageable = PageRequest.of(0, 5);
     }
 
     @Test
@@ -152,20 +129,20 @@ class RecommendationServiceTest {
                         .builder()
                         .createdAt(LocalDateTime.now().minusDays(10)).build()));
 
-        recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(recommendationDto.getAuthorId(), recommendationDto.getReceiverId());
+        assertThrows(DataValidationException.class, () -> recommendationService.create(recommendationDto));
 
         Mockito.verify(recommendationRepository)
                 .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(recommendationDto.getAuthorId(), recommendationDto.getReceiverId());
-
-        assertThrows(DataValidationException.class, () -> recommendationService.create(recommendationDto));
     }
 
     @Test
     void createThrowExceptionWhenOneOfSkillsNotExistInDatabase() {
         SkillOfferDto nullOffer = null;
         List<SkillOfferDto> skillOffers = new ArrayList<>();
+
         skillOffers.add(skillOfferDto);
         skillOffers.add(nullOffer);
+
         RecommendationDto recommendationDto = new RecommendationDto(1L, 2L, 3L, "Hello", skillOffers, LocalDateTime.now());
 
         Mockito.when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(recommendationDto.getAuthorId(), recommendationDto.getReceiverId()))
@@ -178,12 +155,12 @@ class RecommendationServiceTest {
 
     @Test
     void createInvokesCreateMethod() {
-        Mockito.when(skillRepository.findAllByUserId(recommendationDto.getReceiverId())).thenReturn(skills);
+        Mockito.when(skillRepository.findAllByUserId(receiverId)).thenReturn(skills);
         Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(emptyUser));
 
         recommendationService.create(recommendationDto);
 
-        Mockito.verify(recommendationRepository).create(recommendationDto.getAuthorId(), recommendationDto.getReceiverId(), recommendationDto.getContent());
+        Mockito.verify(recommendationRepository).create(authorId, receiverId, recommendationDto.getContent());
     }
 
     @Test
@@ -198,19 +175,13 @@ class RecommendationServiceTest {
                         .title("Hello")
                         .guarantees(userSkillGuarantees)
                         .build()));
-        Mockito.when(skillRepository.findAllById(Mockito.anyList()))
-                .thenReturn(List.of(Skill
-                        .builder()
-                        .title("Hello")
-                        .guarantees(userSkillGuarantees)
-                        .build()));
 
-        assertThrows(EntityNotFoundException.class, () -> recommendationService.saveSkillOffer(firstRecommendationDto));
-        assertThrows(EntityNotFoundException.class, () -> recommendationService.saveSkillOffer(secondRecommendationDto));
+        assertThrows(EntityNotFoundException.class, () -> recommendationService.checkAndAddSkillsGuarantorAndUpdateUserSkills(firstRecommendationDto));
+        assertThrows(EntityNotFoundException.class, () -> recommendationService.checkAndAddSkillsGuarantorAndUpdateUserSkills(secondRecommendationDto));
     }
 
     @Test
-    void saveSkillOfferThrowExceptionWhenThereAreNoSameSkills() {
+    void checkAndAddSkillGuarantorAndUpdateUserSkillsThrowExceptionWhenThereAreNoSameSkills() {
         List<SkillOfferDto> wrongSkillOffers = List.of(skillOfferDto, new SkillOfferDto(2L, -2L, 2L));
         RecommendationDto firstRecommendationDto = new RecommendationDto(1L, 2L, -3L, "Hello", wrongSkillOffers, LocalDateTime.now());
 
@@ -220,82 +191,37 @@ class RecommendationServiceTest {
                         .title("Hello")
                         .guarantees(userSkillGuarantees)
                         .build()));
-        Mockito.when(skillRepository.findAllById(Mockito.anyList()))
-                .thenReturn(List.of(Skill
-                        .builder()
-                        .title("Python")
-                        .guarantees(userSkillGuarantees)
-                        .build()));
 
-        assertThrows(EntityNotFoundException.class, () -> recommendationService.saveSkillOffer(firstRecommendationDto));
+        assertThrows(EntityNotFoundException.class, () -> recommendationService.checkAndAddSkillsGuarantorAndUpdateUserSkills(firstRecommendationDto));
     }
 
     @Test
-    void saveSkillOfferInvokesCheckAndAddSkillsGuarantorInvokesSaveMethod() {
+    void checkAndAddSkillsGuarantorInvokesSaveMethod() {
         Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(firstUser));
 
-        recommendationService.saveSkillOffer(recommendationDto);
+        recommendationService.checkAndAddSkillsGuarantorAndUpdateUserSkills(recommendationDto);
 
         Mockito.verify(userRepository).save(firstUser);
     }
 
     @Test
-    void testSaveSkillOfferInvokesCheckAndAddSkillsGuarantorMethod() {
+    void checkAndAddSkillsGuarantorAndUpdateUserSkillsTest() {
         Mockito.when(skillRepository.findAllByUserId(Mockito.anyLong())).thenReturn(skills);
         Mockito.when(skillRepository.findAllById(Mockito.anyList())).thenReturn(List.of(userSkill));
         Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(emptyUser));
 
-        recommendationService.saveSkillOffer(recommendationDto);
+        recommendationService.checkAndAddSkillsGuarantorAndUpdateUserSkills(recommendationDto);
 
-        assertEquals(3, skills.get(0).getGuarantees().size());
+        assertEquals(4, skills.get(0).getGuarantees().size());
     }
 
-    //
     @Test
-    void testSaveSkillOfferInvokesFindAllByUserIdMethod() {
+    void testCheckAndAddSkillsGuarantorAndUpdateUserSkillsInvokesFindAllByUserIdMethod() {
         Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(emptyUser));
 
-        recommendationService.saveSkillOffer(recommendationDto);
+        recommendationService.checkAndAddSkillsGuarantorAndUpdateUserSkills(recommendationDto);
 
         Mockito.verify(skillRepository).findAllByUserId(3L);
-    }
-
-    @Test
-    void saveSkillOfferInvokesFindAllByIdMethod() {
-        Mockito.when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(emptyUser));
-
-        recommendationService.saveSkillOffer(recommendationDto);
-
-        Mockito.verify(skillOfferRepository).findAllById(List.of(1L));
-    }
-
-
-    @Test
-    void testValidateRecommendationInvokesFindFirstByAuthorIdAndReceiverIdOrderByCreatedAtDescMethod() {
-        Mockito.when(userRepository.findById(recommendationDto.getReceiverId()))
-                .thenReturn(Optional.of(firstUser));
-        recommendationService.create(recommendationDto);
-        Mockito.verify(recommendationRepository).findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(2, 3);
-    }
-
-    @Test
-    void testUpdateInvokesUpdateMethod() {
-        Mockito.when(userRepository.findById(recommendationDto.getReceiverId()))
-                .thenReturn(Optional.of(emptyUser));
-
-        recommendationService.update(recommendationDto);
-
-        Mockito.verify(recommendationRepository).update(recommendationDto.getAuthorId(), recommendationDto.getReceiverId(), recommendationDto.getContent());
-    }
-
-    @Test
-    void testUpdateInvokesDeleteAllByRecommendationIdMethod() {
-        Mockito.when(userRepository.findById(recommendationDto.getReceiverId()))
-                .thenReturn(Optional.of(emptyUser));
-
-        recommendationService.update(recommendationDto);
-
-        Mockito.verify(skillOfferRepository).deleteAllByRecommendationId(recommendationDto.getId());
     }
 
     @Test
@@ -317,85 +243,88 @@ class RecommendationServiceTest {
     void getAllUserRecommendationsTest() {
         RecommendationDto dto = new RecommendationDto(1L, 3L, 4L, "Hello", skillOffersDto, recommendation.getCreatedAt());
 
-        Mockito.when(recommendationRepository.findAllByReceiverId(1, Pageable.unpaged()))
-                .thenReturn(recommendationPage);
+        Page<Recommendation> returnRecommendationPage2 = new PageImpl<>(List.of(recommendation));
 
-        List<RecommendationDto> result = recommendationService.getAllUserRecommendations(1);
+        Mockito.when(recommendationRepository.findAllByReceiverId(1, pageable))
+                .thenReturn(returnRecommendationPage2);
 
-        assertEquals(2, result.size());
-        assertEquals(List.of(dto, dto), result);
+        Page<RecommendationDto> result = recommendationService.getAllUserRecommendations(1, pageable);
+
+        assertEquals(1, result.getContent().size());
+        assertEquals(List.of(dto), result.getContent());
+
     }
 
     @Test
     void getAllUserRecommendationsInvokesFindAllByReceiverId() {
-        Mockito.when(recommendationRepository.findAllByReceiverId(1, Pageable.unpaged()))
+        Mockito.when(recommendationRepository.findAllByReceiverId(1, pageable))
                 .thenReturn(recommendationPage);
 
-        recommendationService.getAllUserRecommendations(1);
+        recommendationService.getAllUserRecommendations(1, pageable);
 
-        Mockito.verify(recommendationRepository).findAllByReceiverId(1, Pageable.unpaged());
+        Mockito.verify(recommendationRepository).findAllByReceiverId(1, pageable);
     }
 
     @Test
     void getAllUserRecommendationsInvokesToRecommendationDtos() {
-        Mockito.when(recommendationRepository.findAllByReceiverId(1, Pageable.unpaged()))
+        Mockito.when(recommendationRepository.findAllByReceiverId(1, pageable))
                 .thenReturn(recommendationPage);
 
-        recommendationService.getAllUserRecommendations(1);
+        recommendationService.getAllUserRecommendations(1, pageable);
 
         Mockito.verify(recommendationMapper).toRecommendationDtos(recommendationPage.getContent());
     }
 
     @Test
     void getAllUserRecommendationsReturnEmptyList() {
-        Mockito.when(recommendationRepository.findAllByReceiverId(1, Pageable.unpaged()))
+        Mockito.when(recommendationRepository.findAllByReceiverId(1, pageable))
                 .thenReturn(Page.empty());
 
-        List<RecommendationDto> userRecommendations = recommendationService.getAllUserRecommendations(1);
+        Page<RecommendationDto> userRecommendations = recommendationService.getAllUserRecommendations(1, pageable);
 
-        assertEquals(Collections.emptyList(), userRecommendations);
+        assertEquals(Collections.emptyList(), userRecommendations.getContent());
     }
 
     @Test
     void getAllGivenRecommendationsTest() {
         RecommendationDto dto = new RecommendationDto(1L, 3L, 4L, "Hello", skillOffersDto, recommendation.getCreatedAt());
 
-        Mockito.when(recommendationRepository.findAllByAuthorId(1, Pageable.unpaged()))
+        Mockito.when(recommendationRepository.findAllByAuthorId(1, pageable))
                 .thenReturn(recommendationPage);
 
-        List<RecommendationDto> result = recommendationService.getAllGivenRecommendations(1);
+        Page<RecommendationDto> result = recommendationService.getAllGivenRecommendations(1, pageable);
 
-        assertEquals(2, result.size());
-        assertEquals(List.of(dto, dto), result);
+        assertEquals(2, result.getContent().size());
+        assertEquals(List.of(dto, dto), result.getContent());
     }
 
     @Test
     void getAllGivenRecommendationsInvokesToRecommendationDtos() {
-        Mockito.when(recommendationRepository.findAllByAuthorId(1, Pageable.unpaged()))
+        Mockito.when(recommendationRepository.findAllByAuthorId(1, pageable))
                 .thenReturn(recommendationPage);
 
-        recommendationService.getAllGivenRecommendations(1);
+        recommendationService.getAllGivenRecommendations(1, pageable);
 
         Mockito.verify(recommendationMapper).toRecommendationDtos(recommendationPage.getContent());
     }
 
     @Test
     void getAllGivenRecommendationsInvokesFindAllByReceiverId() {
-        Mockito.when(recommendationRepository.findAllByAuthorId(1, Pageable.unpaged()))
+        Mockito.when(recommendationRepository.findAllByAuthorId(1, pageable))
                 .thenReturn(recommendationPage);
 
-        recommendationService.getAllGivenRecommendations(1);
+        recommendationService.getAllGivenRecommendations(1, pageable);
 
-        Mockito.verify(recommendationRepository).findAllByAuthorId(1, Pageable.unpaged());
+        Mockito.verify(recommendationRepository).findAllByAuthorId(1, pageable);
     }
 
     @Test
     void getAllGivenRecommendationsReturnEmptyList() {
-        Mockito.when(recommendationRepository.findAllByAuthorId(1, Pageable.unpaged()))
+        Mockito.when(recommendationRepository.findAllByAuthorId(1, pageable))
                 .thenReturn(Page.empty());
 
-        List<RecommendationDto> givenRecommendations = recommendationService.getAllGivenRecommendations(1);
+        Page<RecommendationDto> givenRecommendations = recommendationService.getAllGivenRecommendations(1, pageable);
 
-        assertEquals(Collections.emptyList(), givenRecommendations);
+        assertEquals(Collections.emptyList(), givenRecommendations.getContent());
     }
 }

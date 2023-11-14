@@ -52,11 +52,12 @@ dependencies {
     implementation("org.slf4j:slf4j-api:2.0.5")
     implementation("ch.qos.logback:logback-classic:1.4.6")
     implementation("org.projectlombok:lombok:1.18.26")
-    annotationProcessor("org.projectlombok:lombok:1.18.26")
-    implementation("org.mapstruct:mapstruct:1.5.3.Final")
-    annotationProcessor("org.mapstruct:mapstruct-processor:1.5.3.Final")
-
+    implementation("org.springframework.kafka:spring-kafka:3.0.11")
+    implementation("org.apache.kafka:kafka-clients:3.5.1")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.13.0")
+    implementation("org.mapstruct:mapstruct:1.5.3.Final")
+    annotationProcessor("org.projectlombok:lombok:1.18.26")
+    annotationProcessor("org.mapstruct:mapstruct-processor:1.5.3.Final")
 
     /**
      * Test containers

@@ -11,7 +11,7 @@ public class UserContext {
         userIdHolder.set(userId);
     }
 
-    public long getUserId() {
+    public Long getUserId() {
         return userIdHolder.get();
     }
 

@@ -19,6 +19,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.contact.ContactPreferenceService;
 import school.faang.user_service.service.contact.ContactService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -62,6 +63,8 @@ class UserServiceTest {
         userDto = UserDto.builder()
                 .id(USER_ID)
                 .username("Nikita")
+                .followeeIds(new ArrayList<>())
+                .followerIds(new ArrayList<>())
                 .build();
     }
 
@@ -78,9 +81,21 @@ class UserServiceTest {
     }
 
     private List<UserDto> getCorrectListOfUserDto() {
-        return List.of(UserDto.builder().id(1L).build(),
-                UserDto.builder().id(2L).build(),
-                UserDto.builder().id(3L).build());
+        return List.of(UserDto.builder()
+                        .id(1L)
+                        .followeeIds(new ArrayList<>())
+                        .followerIds(new ArrayList<>())
+                        .build(),
+                UserDto.builder()
+                        .id(2L)
+                        .followeeIds(new ArrayList<>())
+                        .followerIds(new ArrayList<>())
+                        .build(),
+                UserDto.builder()
+                        .id(3L)
+                        .followeeIds(new ArrayList<>())
+                        .followerIds(new ArrayList<>())
+                        .build());
     }
 
     @Test

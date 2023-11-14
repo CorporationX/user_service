@@ -57,6 +57,12 @@ public class UserController {
         userService.saveStudents(multipartFile);
     }
 
+    @PostMapping("/heatFeed")
+    public void getAllUsersWithKafka() {
+        log.info("Received request to get all users and post them to Kafka");
+        userService.getAllUsersWithKafka();
+    }
+
     private void validateFile(MultipartFile multipartFile) {
         if (multipartFile == null || multipartFile.isEmpty()) {
             throw new EmptyFileException("You send empty file");

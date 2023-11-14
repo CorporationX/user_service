@@ -84,6 +84,8 @@ dependencies {
      * Swagger
      */
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
+
+    implementation("org.springframework.kafka:spring-kafka:3.0.11")
 }
 
 jsonSchema2Pojo {

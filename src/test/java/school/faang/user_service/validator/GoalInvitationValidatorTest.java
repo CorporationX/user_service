@@ -54,4 +54,12 @@ public class GoalInvitationValidatorTest {
             goalInvitationValidator.validateAcceptedGoalInvitation(invitation);
         });
     }
+
+    @Test
+    void givenInvalidStatus_whenValidateRejectedGoalInvitation_thenThrowException() {
+        GoalInvitation invitation = GoalInvitation.builder().status(RequestStatus.ACCEPTED).build();
+        assertThrows(DataValidationException.class, () -> {
+            goalInvitationValidator.validateRejectedGoalInvitation(invitation);
+        });
+    }
 }

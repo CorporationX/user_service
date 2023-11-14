@@ -32,6 +32,8 @@ public class GoalInvitationServiceTest {
     private static Goal goal = Goal.builder().id(1L).build();
     private static GoalInvitation invitation = GoalInvitation.builder().id(5L).invited(invitedUser).inviter(inviter)
             .goal(goal).status(RequestStatus.PENDING).build();
+    private static GoalInvitation invitation2 = GoalInvitation.builder().id(6L).invited(invitedUser).inviter(inviter)
+            .goal(goal).status(RequestStatus.ACCEPTED).build();
 
     @Mock
     private GoalInvitationRepository goalInvitationRepository;
@@ -71,6 +73,17 @@ public class GoalInvitationServiceTest {
 
         GoalInvitation expectedInvitation = GoalInvitation.builder().id(5L).invited(expectedUser).inviter(inviter)
                 .goal(goal).status(RequestStatus.ACCEPTED).build();
+        Mockito.verify(goalInvitationRepository).save(expectedInvitation);
+    }
+
+    @Test
+    public void givenCorrectInvitation_whenRejectingInvitation_thenSucceed() {
+        when(goalInvitationRepository.findById(invitation.getId())).thenReturn(Optional.of(invitation));
+
+        goalInvitationService.rejectGoalInvitation(invitation.getId());
+
+        GoalInvitation expectedInvitation = GoalInvitation.builder().id(5L).invited(invitedUser).inviter(inviter)
+                .goal(goal).status(RequestStatus.REJECTED).build();
         Mockito.verify(goalInvitationRepository).save(expectedInvitation);
     }
 }

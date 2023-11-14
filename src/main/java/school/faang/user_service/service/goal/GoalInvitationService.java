@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.dto.goal.GoalInvitationFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
@@ -11,10 +12,13 @@ import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.goal.GoalInvitationMapper;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
+import school.faang.user_service.filter.goal.GoalInvitationFilter;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.GoalInvitationValidator;
 
 import java.util.List;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +34,9 @@ public class GoalInvitationService {
 
     @Autowired
     private final UserService userService;
+
+    @Autowired
+    private final List<GoalInvitationFilter> filters;
 
     public GoalInvitationDto createInvitation(GoalInvitationDto invitation) {
         goalInvitationValidator.validateNewGoalInvitation(invitation);
@@ -62,6 +69,28 @@ public class GoalInvitationService {
         goalInvitationRepository.save(goalInvitation);
 
         return goalInvitationMapper.toDto(goalInvitation);
+    }
+
+    public GoalInvitationDto rejectGoalInvitation(long invitationId) {
+        GoalInvitation goalInvitation = getGoalInvitationById(invitationId);
+        goalInvitationValidator.validateRejectedGoalInvitation(goalInvitation);
+
+        goalInvitation.setStatus(RequestStatus.REJECTED);
+        goalInvitationRepository.save(goalInvitation);
+        return goalInvitationMapper.toDto(goalInvitation);
+    }
+
+    public List<GoalInvitationDto> getInvitations(GoalInvitationFilterDto filter) {
+        Stream<GoalInvitation> invitationStream = StreamSupport.stream(goalInvitationRepository
+                .findAll().spliterator(), false);
+
+        List<GoalInvitationFilter> applicableFilters = filters.stream().filter(fl -> fl.isApplicable(filter)).toList();
+
+        for (GoalInvitationFilter fil : applicableFilters) {
+            invitationStream = fil.apply(invitationStream, filter);
+        };
+
+        return invitationStream.map(goalInvitationMapper::toDto).toList();
     }
 
     private GoalInvitation getGoalInvitationById(long invitationId) {

@@ -4,6 +4,8 @@ import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.config.GoogleCalendarConfig;
 import school.faang.user_service.dto.EventCalendarDto;
@@ -21,14 +23,16 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CalendarService {
     private final GoogleCalendarConfig calendarConfig;
     private final CalendarMapper calendarMapper;
     private final UserService userService;
-    private final String PRIMARY = "primary";
+    @Value("${google}")
+    private final String PRIMARY;
 
-    public EventCalendarDto createEvent(EventCalendarDto eventCalendarDto) throws IOException, GeneralSecurityException {
-        Calendar service = calendarConfig.googleCalendar();
+    public EventCalendarDto createEvent(EventCalendarDto eventCalendarDto) {
+        Calendar service = getCalendar();
         Event event = getEvent(eventCalendarDto);
 
         setEventCreator(eventCalendarDto, event);
@@ -41,8 +45,29 @@ public class CalendarService {
 
         setEventReminder(event);
 
-        service.events().insert(PRIMARY, event).execute();
+        executeEvent(service, event);
+        log.info("Event was created {}", event);
         return calendarMapper.toDto(event);
+    }
+
+    private void executeEvent(Calendar service, Event event) {
+        try {
+            service.events().insert(PRIMARY, event).execute();
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Calendar getCalendar() {
+        Calendar service;
+        try {
+            service = calendarConfig.googleCalendar();
+        } catch (IOException | GeneralSecurityException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
+        return service;
     }
 
     private void setEventReminder(Event event) {

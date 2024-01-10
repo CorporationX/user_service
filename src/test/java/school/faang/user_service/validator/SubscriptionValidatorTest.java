@@ -8,8 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -21,14 +20,17 @@ class SubscriptionValidatorTest {
     @InjectMocks
     private SubscriptionValidator subscriptionValidator;
 
+    //Valid subscription
     @Test
     void validateSubscription_WhenFollowerIdEqualsFolloweeId_ShouldThrowException() {
         long followerId = 1;
         long followeeId = 1;
 
-        assertThrows(DataValidationException.class, () -> {
+        DataValidationException dataValidationException = assertThrows(DataValidationException.class, () -> {
             subscriptionValidator.validateSubscription(followerId, followeeId);
         });
+
+        assertEquals("Нельзя подписаться на самого себя", dataValidationException.getMessage());
     }
 
     @Test
@@ -38,9 +40,11 @@ class SubscriptionValidatorTest {
 
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
 
-        assertThrows(DataValidationException.class, () -> {
+        DataValidationException dataValidationException = assertThrows(DataValidationException.class, () -> {
             subscriptionValidator.validateSubscription(followerId, followeeId);
         });
+
+        assertEquals("Такая подписка уже существует", dataValidationException.getMessage());
     }
 
     @Test
@@ -52,6 +56,45 @@ class SubscriptionValidatorTest {
 
         assertDoesNotThrow(() -> {
             subscriptionValidator.validateSubscription(followerId, followeeId);
+        });
+    }
+
+    //Valid unsubscription
+    @Test
+    void validateUnsubscription_WhenFollowerIdEqualsFolloweeId_ShouldThrowException() {
+        long followerId = 1;
+        long followeeId = 1;
+
+        DataValidationException dataValidationException = assertThrows(DataValidationException.class, () -> {
+            subscriptionValidator.validateUnsubscription(followerId, followeeId);
+        });
+
+        assertEquals("Нельзя отписаться от самого себя", dataValidationException.getMessage());
+    }
+
+    @Test
+    void validateUnsubscription_WhenSubscriptionDoesNotExists_ShouldThrowException() {
+        long followerId = 1;
+        long followeeId = 2;
+
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(false);
+
+        DataValidationException dataValidationException = assertThrows(DataValidationException.class, () -> {
+            subscriptionValidator.validateUnsubscription(followerId, followeeId);
+        });
+
+        assertEquals("Такoй подписки не существует", dataValidationException.getMessage());
+    }
+
+    @Test
+    void validateUnsubscription_WhenValid_ShouldNotThrowException() {
+        long followerId = 1;
+        long followeeId = 2;
+
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
+
+        assertDoesNotThrow(() -> {
+            subscriptionValidator.validateUnsubscription(followerId, followeeId);
         });
     }
 }

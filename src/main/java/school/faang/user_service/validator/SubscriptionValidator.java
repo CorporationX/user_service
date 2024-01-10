@@ -19,4 +19,14 @@ public class SubscriptionValidator {
             throw new DataValidationException("Такая подписка уже существует");
         }
     }
+
+    public void validateUnsubscription(long followerId, long followeeId) {
+        if (followerId == followeeId) {
+            throw new DataValidationException("Нельзя отписаться от самого себя");
+        }
+
+        if (!subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
+            throw new DataValidationException("Такoй подписки не существует");
+        }
+    }
 }

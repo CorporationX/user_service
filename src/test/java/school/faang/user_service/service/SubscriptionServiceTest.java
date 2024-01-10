@@ -33,5 +33,16 @@ class SubscriptionServiceTest {
         verify(subscriptionValidator, times(1)).validateSubscription(followerId, followeeId);
         verify(subscriptionRepository, times(1)).followUser(followerId, followeeId);
     }
+
+    @Test
+    void unfollowUser_ShouldCallValidatorAndRepositoryMethod() {
+        long followerId = 1;
+        long followeeId = 2;
+
+        subscriptionService.unfollowUser(followerId, followeeId);
+
+        verify(subscriptionValidator, times(1)).validateUnsubscription(followerId, followeeId);
+        verify(subscriptionRepository, times(1)).unfollowUser(followerId, followeeId);
+    }
 }
 

@@ -28,4 +28,14 @@ class SubscriptionControllerTest {
 
         verify(subscriptionService, times(1)).followUser(followerId, followeeId);
     }
+
+    @Test
+    void unfollowUser_ShouldCallServiceMethod() {
+        long followerId = 1;
+        long followeeId = 2;
+
+        subscriptionController.unfollowUser(followerId, followeeId);
+
+        verify(subscriptionService, times(1)).unfollowUser(followerId, followeeId);
+    }
 }

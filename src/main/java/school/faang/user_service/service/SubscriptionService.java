@@ -22,12 +22,12 @@ public class SubscriptionService {
     private final SubscriptionValidator subscriptionValidator;
 
     public void followUser(long followerId, long followeeId) {
-        subscriptionValidator.validateSubscription(followerId, followeeId);
+        subscriptionValidator.validateSubscriptionExits(followerId, followeeId);
         subscriptionRepository.followUser(followerId, followeeId);
     }
 
     public void unfollowUser(long followerId, long followeeId) {
-        subscriptionValidator.validateUnsubscription(followerId, followeeId);
+        subscriptionValidator.validateUnsubscriptionExits(followerId, followeeId);
         subscriptionRepository.unfollowUser(followerId, followeeId);
     }
 

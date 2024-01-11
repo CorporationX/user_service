@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.service.SubscriptionService;
+import school.faang.user_service.validator.SubscriptionValidator;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -16,6 +17,9 @@ class SubscriptionControllerTest {
 
     @Mock
     private SubscriptionService subscriptionService;
+
+    @Mock
+    private SubscriptionValidator subscriptionValidator;
 
     @InjectMocks
     private SubscriptionController subscriptionController;
@@ -28,6 +32,7 @@ class SubscriptionControllerTest {
         subscriptionController.followUser(followerId, followeeId);
 
         verify(subscriptionService, times(1)).followUser(followerId, followeeId);
+        verify(subscriptionValidator, times(1)).validateSubscriptionId(followerId, followeeId);
     }
 
     @Test
@@ -38,6 +43,7 @@ class SubscriptionControllerTest {
         subscriptionController.unfollowUser(followerId, followeeId);
 
         verify(subscriptionService, times(1)).unfollowUser(followerId, followeeId);
+        verify(subscriptionValidator, times(1)).validateUnsubscriptionId(followerId, followeeId);
     }
 
     @Test

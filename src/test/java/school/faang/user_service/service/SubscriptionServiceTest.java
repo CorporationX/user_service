@@ -48,7 +48,7 @@ class SubscriptionServiceTest {
 
         subscriptionService.followUser(followerId, followeeId);
 
-        verify(subscriptionValidator, times(1)).validateSubscription(followerId, followeeId);
+        verify(subscriptionValidator, times(1)).validateSubscriptionExits(followerId, followeeId);
         verify(subscriptionRepository, times(1)).followUser(followerId, followeeId);
     }
 
@@ -59,7 +59,7 @@ class SubscriptionServiceTest {
 
         subscriptionService.unfollowUser(followerId, followeeId);
 
-        verify(subscriptionValidator, times(1)).validateUnsubscription(followerId, followeeId);
+        verify(subscriptionValidator, times(1)).validateUnsubscriptionExits(followerId, followeeId);
         verify(subscriptionRepository, times(1)).unfollowUser(followerId, followeeId);
     }
 

@@ -27,7 +27,7 @@ class SubscriptionValidatorTest {
         long followeeId = 1;
 
         DataValidationException dataValidationException = assertThrows(DataValidationException.class, () -> {
-            subscriptionValidator.validateSubscription(followerId, followeeId);
+            subscriptionValidator.validateSubscriptionId(followerId, followeeId);
         });
 
         assertEquals("Нельзя подписаться на самого себя", dataValidationException.getMessage());
@@ -41,7 +41,7 @@ class SubscriptionValidatorTest {
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
 
         DataValidationException dataValidationException = assertThrows(DataValidationException.class, () -> {
-            subscriptionValidator.validateSubscription(followerId, followeeId);
+            subscriptionValidator.validateSubscriptionExits(followerId, followeeId);
         });
 
         assertEquals("Такая подписка уже существует", dataValidationException.getMessage());
@@ -55,7 +55,7 @@ class SubscriptionValidatorTest {
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(false);
 
         assertDoesNotThrow(() -> {
-            subscriptionValidator.validateSubscription(followerId, followeeId);
+            subscriptionValidator.validateSubscriptionExits(followerId, followeeId);
         });
     }
 
@@ -66,7 +66,7 @@ class SubscriptionValidatorTest {
         long followeeId = 1;
 
         DataValidationException dataValidationException = assertThrows(DataValidationException.class, () -> {
-            subscriptionValidator.validateUnsubscription(followerId, followeeId);
+            subscriptionValidator.validateUnsubscriptionId(followerId, followeeId);
         });
 
         assertEquals("Нельзя отписаться от самого себя", dataValidationException.getMessage());
@@ -80,7 +80,7 @@ class SubscriptionValidatorTest {
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(false);
 
         DataValidationException dataValidationException = assertThrows(DataValidationException.class, () -> {
-            subscriptionValidator.validateUnsubscription(followerId, followeeId);
+            subscriptionValidator.validateUnsubscriptionExits(followerId, followeeId);
         });
 
         assertEquals("Такoй подписки не существует", dataValidationException.getMessage());
@@ -94,7 +94,7 @@ class SubscriptionValidatorTest {
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
 
         assertDoesNotThrow(() -> {
-            subscriptionValidator.validateUnsubscription(followerId, followeeId);
+            subscriptionValidator.validateUnsubscriptionExits(followerId, followeeId);
         });
     }
 }

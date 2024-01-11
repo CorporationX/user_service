@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.service.SubscriptionService;
+import school.faang.user_service.validator.SubscriptionValidator;
 
 import java.util.List;
 
@@ -12,12 +13,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
+    private final SubscriptionValidator subscriptionValidator;
 
     public void followUser(long followerId, long followeeId) {
+        subscriptionValidator.validateSubscriptionId(followerId, followeeId);
         subscriptionService.followUser(followerId, followeeId);
     }
 
     public void unfollowUser(long followerId, long followeeId) {
+        subscriptionValidator.validateUnsubscriptionId(followerId, followeeId);
         subscriptionService.unfollowUser(followerId, followeeId);
     }
 

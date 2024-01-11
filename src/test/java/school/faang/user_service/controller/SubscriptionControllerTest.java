@@ -69,4 +69,12 @@ class SubscriptionControllerTest {
         verify(subscriptionService, times(1)).getFollowing(followeeId, filters);
     }
 
+    @Test
+    void getFollowingCount_ShouldCallServiceMethod() {
+        long followerId = 1;
+
+        subscriptionController.getFollowingCount(followerId);
+
+        verify(subscriptionService, times(1)).getFollowingCount(followerId);
+    }
 }

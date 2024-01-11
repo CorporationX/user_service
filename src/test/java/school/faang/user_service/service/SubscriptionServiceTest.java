@@ -129,5 +129,14 @@ class SubscriptionServiceTest {
         assertEquals("ivan@example.com", actualDtos.get(0).getEmail());
         assertEquals("ivan@example.com", actualDtos.get(1).getEmail());
     }
+
+    @Test
+    void getFollowingCount_ShouldCallRepositoryMethod() {
+        long followerId = 1;
+
+        subscriptionService.getFollowingCount(followerId);
+
+        verify(subscriptionRepository, times(1)).findFolloweesAmountByFollowerId(followerId);
+    }
 }
 

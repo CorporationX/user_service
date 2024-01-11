@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.service.SubscriptionService;
 
 import static org.mockito.Mockito.times;
@@ -38,4 +39,15 @@ class SubscriptionControllerTest {
 
         verify(subscriptionService, times(1)).unfollowUser(followerId, followeeId);
     }
+
+    @Test
+    void getFollowers_ShouldCallServiceMethod() {
+        long followeeId = 1;
+        UserFilterDto filters = new UserFilterDto();
+
+        subscriptionController.getFollowers(followeeId, filters);
+
+        verify(subscriptionService, times(1)).getFollowers(followeeId, filters);
+    }
+
 }

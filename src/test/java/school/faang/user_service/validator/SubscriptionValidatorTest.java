@@ -53,10 +53,44 @@ class SubscriptionValidatorTest {
         long followeeId = 2;
 
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(false);
+        when(subscriptionRepository.existsById(followerId)).thenReturn(true);
+        when(subscriptionRepository.existsById(followeeId)).thenReturn(true);
+
 
         assertDoesNotThrow(() -> {
             subscriptionValidator.validateSubscriptionExits(followerId, followeeId);
         });
+    }
+
+    @Test
+    void validateSubscription_WhenFollowerDoesNotExist_ShouldThrowException() {
+        long followerId = 1;
+        long followeeId = 2;
+
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(false);
+        when(subscriptionRepository.existsById(followerId)).thenReturn(false);
+
+        DataValidationException exception = assertThrows(DataValidationException.class, () -> {
+            subscriptionValidator.validateSubscriptionExits(followerId, followeeId);
+        });
+
+        assertEquals("Пользователь не существует", exception.getMessage());
+    }
+
+    @Test
+    void validateSubscription_WhenFolloweeDoesNotExist_ShouldThrowException() {
+        long followerId = 1;
+        long followeeId = 2;
+
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(false);
+        when(subscriptionRepository.existsById(followerId)).thenReturn(true);
+        when(subscriptionRepository.existsById(followeeId)).thenReturn(false);
+
+        DataValidationException exception = assertThrows(DataValidationException.class, () -> {
+            subscriptionValidator.validateSubscriptionExits(followerId, followeeId);
+        });
+
+        assertEquals("Нельзя подписаться на несуществующего пользователя", exception.getMessage());
     }
 
     //Valid unsubscription
@@ -92,9 +126,42 @@ class SubscriptionValidatorTest {
         long followeeId = 2;
 
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
+        when(subscriptionRepository.existsById(followerId)).thenReturn(true);
+        when(subscriptionRepository.existsById(followeeId)).thenReturn(true);
 
         assertDoesNotThrow(() -> {
             subscriptionValidator.validateUnsubscriptionExits(followerId, followeeId);
         });
+    }
+
+    @Test
+    void validateUnsubscription_WhenFollowerDoesNotExist_ShouldThrowException() {
+        long followerId = 1;
+        long followeeId = 2;
+
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
+        when(subscriptionRepository.existsById(followerId)).thenReturn(false);
+
+        DataValidationException exception = assertThrows(DataValidationException.class, () -> {
+            subscriptionValidator.validateUnsubscriptionExits(followerId, followeeId);
+        });
+
+        assertEquals("Пользователь не существует", exception.getMessage());
+    }
+
+    @Test
+    void validateUnsubscription_WhenFolloweeDoesNotExist_ShouldThrowException() {
+        long followerId = 1;
+        long followeeId = 2;
+
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
+        when(subscriptionRepository.existsById(followerId)).thenReturn(true);
+        when(subscriptionRepository.existsById(followeeId)).thenReturn(false);
+
+        DataValidationException exception = assertThrows(DataValidationException.class, () -> {
+            subscriptionValidator.validateUnsubscriptionExits(followerId, followeeId);
+        });
+
+        assertEquals("Нельзя отписаться от несуществующего пользователя", exception.getMessage());
     }
 }

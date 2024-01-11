@@ -20,6 +20,14 @@ public class SubscriptionValidator {
         if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             throw new DataValidationException("Такая подписка уже существует");
         }
+
+        if (!subscriptionRepository.existsById(followerId)) {
+            throw new DataValidationException("Пользователь не существует");
+        }
+
+        if (!subscriptionRepository.existsById(followeeId)) {
+            throw new DataValidationException("Нельзя подписаться на несуществующего пользователя");
+        }
     }
 
     public void validateUnsubscriptionId(long followerId, long followeeId) {
@@ -31,6 +39,14 @@ public class SubscriptionValidator {
     public void validateUnsubscriptionExits(long followerId, long followeeId) {
         if (!subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             throw new DataValidationException("Такoй подписки не существует");
+        }
+
+        if (!subscriptionRepository.existsById(followerId)) {
+            throw new DataValidationException("Пользователь не существует");
+        }
+
+        if (!subscriptionRepository.existsById(followeeId)) {
+            throw new DataValidationException("Нельзя отписаться от несуществующего пользователя");
         }
     }
 }

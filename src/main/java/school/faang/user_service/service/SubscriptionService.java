@@ -32,11 +32,11 @@ public class SubscriptionService {
     }
 
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filters) {
-        List<User> initialUsers = subscriptionRepository.findByFollowerId(followeeId).collect(Collectors.toList());
+        List<User> initialUsers = subscriptionRepository.findByFollowerId(followeeId).toList();
 
         for (UserFilter filter : userFilters) {
             if (filter.isApplicable(filters)) {
-                initialUsers = filter.apply(initialUsers.stream(), filters).collect(Collectors.toList());
+                initialUsers = filter.apply(initialUsers.stream(), filters).toList();
             }
         }
 
@@ -45,6 +45,18 @@ public class SubscriptionService {
 
     public long getFollowersCount(long followeeId) {
         return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
+    }
+
+    public List<UserDto> getFollowing(long followeeId, UserFilterDto filters) {
+        List<User> initialUsers = subscriptionRepository.findByFolloweeId(followeeId).toList();
+
+        for (UserFilter filter : userFilters) {
+            if (filter.isApplicable(filters)) {
+                initialUsers = filter.apply(initialUsers.stream(), filters).toList();
+            }
+        }
+
+        return userMapper.toDto(initialUsers);
     }
 
 }

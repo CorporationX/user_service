@@ -100,5 +100,34 @@ class SubscriptionServiceTest {
 
         verify(subscriptionRepository, times(1)).findFollowersAmountByFolloweeId(followeeId);
     }
+
+    @Test
+    void getFollowing_ShouldApplyFiltersAndReturnUserDtoList() {
+        long followeeId = 1;
+        UserFilterDto filters = new UserFilterDto();
+        filters.setNamePattern("Ivan");
+        filters.setEmailPattern("ivan@example.com");
+
+        User user1 = new User();
+        user1.setUsername("Ivan");
+        user1.setEmail("ivan@example.com");
+        User user2 = new User();
+        user2.setUsername("Ivan");
+        user2.setEmail("ivan@example.com");
+        User user3 = new User();
+        user3.setUsername("Anna");
+        user3.setEmail("ivan@example.com");
+        List<User> followers = List.of(user1, user2, user3);
+
+        when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(followers.stream());
+
+        List<UserDto> actualDtos = subscriptionService.getFollowing(followeeId, filters);
+
+        assertEquals(2, actualDtos.size());
+        assertEquals("Ivan", actualDtos.get(0).getUsername());
+        assertEquals("Ivan", actualDtos.get(1).getUsername());
+        assertEquals("ivan@example.com", actualDtos.get(0).getEmail());
+        assertEquals("ivan@example.com", actualDtos.get(1).getEmail());
+    }
 }
 

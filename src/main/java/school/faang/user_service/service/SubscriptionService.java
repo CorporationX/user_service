@@ -43,4 +43,8 @@ public class SubscriptionService {
         return userMapper.toDto(initialUsers);
     }
 
+    public long getFollowersCount(long followeeId) {
+        return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
+    }
+
 }

@@ -41,7 +41,6 @@ class SubscriptionServiceTest {
         subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, userFilters, subscriptionValidator);
     }
 
-
     @Test
     void followUser_ShouldCallValidatorAndRepositoryMethod() {
         long followerId = 1;
@@ -91,6 +90,15 @@ class SubscriptionServiceTest {
         assertEquals("Ivan", actualDtos.get(1).getUsername());
         assertEquals("ivan@example.com", actualDtos.get(0).getEmail());
         assertEquals("ivan@example.com", actualDtos.get(1).getEmail());
+    }
+
+    @Test
+    void getFollowersCount_ShouldCallRepositoryMethod() {
+        long followeeId = 1;
+
+        subscriptionService.getFollowersCount(followeeId);
+
+        verify(subscriptionRepository, times(1)).findFollowersAmountByFolloweeId(followeeId);
     }
 }
 

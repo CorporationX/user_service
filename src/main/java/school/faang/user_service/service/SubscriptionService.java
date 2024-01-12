@@ -1,0 +1,15 @@
+package school.faang.user_service.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import school.faang.user_service.repository.recommendation.RecommendationRepository;
+
+@Service
+@RequiredArgsConstructor
+public class SubscriptionService {
+    private final RecommendationRepository recommendationRepository;
+
+    public void delete(long id) {
+        recommendationRepository.deleteById(id);
+    }
+}

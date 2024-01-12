@@ -32,40 +32,30 @@ class MentorshipServiceTest {
     private User user1;
     private User user2;
     private UserDto userDto;
-    private List<User> users;
     private List<User> users3;
     private List<UserDto> users2;
 
     @BeforeEach
     void setUp() {
         userDto = UserDto.builder().id(1L).build();
-        user1 = User.builder().id(1L).mentees(users).build();
+        user1 = User.builder().id(1L).build();
         users2 = List.of(userDto);
         users3 = List.of(user1);
         user2 = User.builder().id(2L).mentees(users3).build();
     }
 
     @Test
-    @DisplayName("Checking for list of mentees availability")
-    void testGetMentees_IllegalArgumentExceptionOne() {
+    @DisplayName("Checking for User availability")
+    void testGetMentees_ShouldFindsUserById() {
         assertThrows(IllegalArgumentException.class,
                 () -> mentorshipService.getMentees(1L));
     }
 
     @Test
     @DisplayName("Getting user's mentees")
-    void testGetMentees() {
+    void testGetMentees_ShouldReturnsListOfUserDto() {
         when(mentorshipRepository.findById(2L))
                 .thenReturn(Optional.of(user2));
         assertEquals(users2, mentorshipService.getMentees(2L));
-    }
-
-    @Test
-    @DisplayName("Checking for user availability")
-    void testGetMentees_IllegalArgumentExceptionTwo() {
-        when(mentorshipRepository.findById(1L))
-                .thenReturn(Optional.of(user1));
-        assertThrows(IllegalArgumentException.class,
-                () -> mentorshipService.getMentees(1L));
     }
 }

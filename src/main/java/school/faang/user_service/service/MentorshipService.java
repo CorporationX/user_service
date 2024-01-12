@@ -18,9 +18,6 @@ public class MentorshipService {
     public List<UserDto> getMentees(Long userId) {
         User user = getMentorById(userId);
         List<User> mentees = user.getMentees();
-        if (mentees == null) {
-            throw new IllegalArgumentException(MessageFormat.format("User with id {0} has not mentees ",userId));
-        }
         return mentees.stream()
                 .map(userMapper::toDto)
                 .toList();

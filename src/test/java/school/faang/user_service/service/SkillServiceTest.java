@@ -44,7 +44,7 @@ class SkillServiceTest {
         Mockito.verify(skillRepository, Mockito.times(1)).existsByTitle(inputSkillDto.getTitle());
         Mockito.verify(skillMapper, Mockito.times(1)).toEntity(inputSkillDto);
         Mockito.verify(skillRepository, Mockito.times(1)).save(skill);
-        Mockito.verify(skillMapper, Mockito.times(1)).toEntity(inputSkillDto);
+        Mockito.verify(skillMapper, Mockito.times(1)).toDto(skill);
 
     }
 

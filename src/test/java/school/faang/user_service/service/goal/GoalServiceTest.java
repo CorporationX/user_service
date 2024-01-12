@@ -44,7 +44,7 @@ class GoalServiceTest {
     @Test
     @DisplayName("Missing target remove test")
     void testGoalNotFound() {
-        //Mock для не отсутствующего id
+        //Mock для отсутствующего id
         Mockito.when(goalRepository.findById(1L)).thenReturn(Optional.empty());
         //проверяем кидает ли исключение
         assertThrows(IllegalArgumentException.class, () -> goalService.deleteGoal(1L));

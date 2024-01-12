@@ -6,6 +6,8 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.exception.skill.DataValidationException;
 import school.faang.user_service.service.SkillService;
 
+import java.util.List;
+
 @Component
 public class SkillController {
 
@@ -25,5 +27,9 @@ public class SkillController {
         if (skill.getTitle().isBlank()) {
             throw new DataValidationException("Введите наименование навыка");
         }
+    }
+
+    public List<SkillDto> getUserSkills(long userId) {
+        return skillService.getUserSkills(userId);
     }
 }

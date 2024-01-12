@@ -9,8 +9,13 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
+
+import java.util.List;
+import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 class SkillServiceTest {
@@ -19,14 +24,17 @@ class SkillServiceTest {
     private SkillRepository skillRepository;
     @Mock
     private SkillMapper skillMapper;
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private SkillService skillService;
 
-    private final SkillDto inputSkillDto = new SkillDto("Навык");
+    SkillDto inputSkillDto = new SkillDto("Навык");
+    long userId = 1l;
 
     @Test
-    public void create_whenSkillFromSkillDtoIsNew_thenSaveToDbAndReturnSkillDto() {
+    public void create_whenSkillFromSkillDtoIsNew_thenSaveToDb() {
         // Arrange
 
         Skill skill = new Skill();
@@ -45,7 +53,6 @@ class SkillServiceTest {
         Mockito.verify(skillMapper, Mockito.times(1)).toEntity(inputSkillDto);
         Mockito.verify(skillRepository, Mockito.times(1)).save(skill);
         Mockito.verify(skillMapper, Mockito.times(1)).toEntity(inputSkillDto);
-
     }
 
     @Test
@@ -55,5 +62,30 @@ class SkillServiceTest {
 
         // Act & Assert
         Assert.assertThrows(RuntimeException.class, () -> skillService.create(inputSkillDto));
+    }
+
+    @Test
+    public void getUserSkills_whenUserIdIsExist_thenGetUserSkills() {
+        // Arrange
+        List<Skill> skillList = List.of(Skill.builder().build(), Skill.builder().build());
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(User.builder().id(userId).build()));
+        Mockito.when(skillRepository.findAllByUserId(userId)).thenReturn(skillList);
+
+        // Act
+        skillService.getUserSkills(userId);
+
+        // Assert
+        Mockito.verify(userRepository, Mockito.times(1)).findById(userId);
+        Mockito.verify(skillRepository, Mockito.times(1)).findAllByUserId(userId);
+        Mockito.verify(skillMapper, Mockito.times(skillList.size())).toDto(Mockito.any());
+    }
+
+    @Test
+    public void getUserSkills_whenUserIdIsNotExist_thenThrowRuntimeException() {
+        // Arrange
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        Assert.assertThrows(RuntimeException.class, () -> skillService.getUserSkills(userId));
     }
 }

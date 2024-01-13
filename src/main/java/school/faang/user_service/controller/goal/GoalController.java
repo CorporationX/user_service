@@ -1,11 +1,8 @@
 package school.faang.user_service.controller.goal;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
-import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.service.goal.GoalService;
 
 @Controller
@@ -17,8 +14,12 @@ public class GoalController {
         this.goalService = goalService;
     }
 
-    public void createGoal(Long userId, GoalDto goalDto) {
+    public void createGoal(Long userId, Goal goal) {
         //Проверяем на наличие названия
+        if (goal.getTitle() == null || goal.getTitle().isBlank()) {
+            return;
+        }
         //Сохраняем в БД
+        goalService.createGoal(userId, goal);
     }
 }

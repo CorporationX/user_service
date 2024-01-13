@@ -15,9 +15,16 @@ public class MentorshipControllerTest {
     private MentorshipController mentorshipController;
 
     @Test
-    @DisplayName("Checking UserId")
-    void testGetMentees_ShouldReturnsListUserDto() {
+    @DisplayName("Trying to return list of mentees")
+    void testGetMentees_ShouldReturnsListMenteesDto() {
         assertThrows(IllegalArgumentException.class,
                 () -> mentorshipController.getMentees(null));
+    }
+
+    @Test
+    @DisplayName("Trying to return list of mentors")
+    void testGetMentees_ShouldReturnsListMentorsDto() {
+        assertThrows(IllegalArgumentException.class,
+                () -> mentorshipController.getMentors(null));
     }
 }

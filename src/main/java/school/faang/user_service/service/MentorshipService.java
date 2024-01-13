@@ -6,6 +6,7 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
+
 import java.text.MessageFormat;
 import java.util.List;
 
@@ -23,8 +24,16 @@ public class MentorshipService {
                 .toList();
     }
 
+    public List<UserDto> getMentors(Long userId) {
+        User user = getMentorById(userId);
+        List<User> mentors = user.getMentors();
+        return mentors.stream()
+                .map(userMapper::toDto)
+                .toList();
+    }
+
     private User getMentorById(Long userId) {
         return mentorshipRepository.findById(userId).orElseThrow(() ->
-                new IllegalArgumentException(MessageFormat.format("User with id {0} has not found",userId)));
+                new IllegalArgumentException(MessageFormat.format("User with id {0} has not found", userId)));
     }
 }

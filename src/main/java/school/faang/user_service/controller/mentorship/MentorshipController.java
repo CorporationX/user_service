@@ -13,9 +13,18 @@ public class MentorshipController {
     private final MentorshipService mentorshipService;
 
     public List<UserDto> getMentees(Long userId) {
+        validationForNullValue(userId);
+        return mentorshipService.getMentees(userId);
+    }
+
+    public List<UserDto> getMentors(Long userId) {
+        validationForNullValue(userId);
+        return mentorshipService.getMentors(userId);
+    }
+
+    private static void validationForNullValue(Long userId) {
         if (userId == null) {
             throw new IllegalArgumentException("userId must be a not null value");
         }
-        return mentorshipService.getMentees(userId);
     }
 }

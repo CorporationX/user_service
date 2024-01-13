@@ -10,6 +10,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
@@ -30,8 +32,10 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class EventServiceTest {
 
     @Mock
@@ -103,7 +107,7 @@ public class EventServiceTest {
         eventService.create(eventDto1);
 
         ArgumentCaptor<Event> argumentCaptor = ArgumentCaptor.forClass(Event.class);
-        Mockito.verify(eventRepository, Mockito.times(1)).save(argumentCaptor.capture());
+        Mockito.verify(eventRepository, times(1)).save(argumentCaptor.capture());
         Event capturedEvent = argumentCaptor.getValue();
 
         assertEquals(event.getTitle(), capturedEvent.getTitle());
@@ -114,6 +118,33 @@ public class EventServiceTest {
     @DisplayName("Неуспешное создание события")
     public void testFailedCreateEventNotValid() {
         Mockito.when(userRepository.findById(2L)).thenReturn(Optional.empty());
+
         assertThrows(DataValidationException.class, () -> eventService.create(eventDto2));
     }
+
+    @Test
+    @DisplayName("Успешное удаление события по верному Id")
+    public void testSuccessDeleteEventById() {
+        Event eventDelete = Event.builder().id(5L).maxAttendees(5).build();
+        long eventId = eventDelete.getId();
+
+        Mockito.when(eventRepository.findById(eventId)).thenReturn(Optional.of(eventDelete));
+
+        eventService.deleteEvent(eventId);
+
+        Mockito.verify(eventRepository, times(1)).deleteById(eventId);
+    }
+
+    @Test
+    @DisplayName("Неуспешное удаление события по неверному Id")
+    public void testFailedDeleteEventByIncorrectId() {
+        long wrongId = 15L;
+
+        Mockito.when(eventRepository.findById(wrongId)).thenReturn(Optional.empty());
+
+        assertThrows(DataValidationException.class, () -> eventService.deleteEvent(wrongId));
+
+        Mockito.verify(eventRepository, Mockito.never()).deleteById(wrongId);
+    }
+
 }

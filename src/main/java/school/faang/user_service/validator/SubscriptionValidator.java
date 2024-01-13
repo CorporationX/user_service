@@ -11,15 +11,15 @@ public class SubscriptionValidator {
 
     private final SubscriptionRepository subscriptionRepo;
 
-    public void validateExistsSubscription(long followerId, long followeeId) {
-        if (subscriptionRepo.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
-            throw new DataValidationException("Subscribe already exists!");
+    public void validateNonExistsSubscription(long followerId, long followeeId) {
+        if (!subscriptionRepo.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
+            throw new DataValidationException("Subscription non exists!");
         }
     }
 
-    public void validateUserSubscriptionToYourself(long followerId, long followeeId) {
+    public void validateUserUnfollowYourself(long followerId, long followeeId) {
         if (followerId == followeeId) {
-            throw new DataValidationException("You can't subscribe to yourself!");
+            throw new DataValidationException("You can't unfollow to yourself!");
         }
     }
 

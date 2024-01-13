@@ -12,11 +12,11 @@ public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepo;
     private final SubscriptionValidator subscriptionValidator;
 
-    public void followUser(long followerId, long followeeId) {
-        subscriptionValidator.validateExistsSubscription(followerId, followeeId);
+    public void unfollowUser(long followerId, long followeeId) {
+        subscriptionValidator.validateNonExistsSubscription(followerId, followeeId);
         subscriptionValidator.validateExistsUser(followerId);
         subscriptionValidator.validateExistsUser(followeeId);
-        subscriptionValidator.validateUserSubscriptionToYourself(followerId, followeeId);
-        subscriptionRepo.followUser(followerId, followeeId);
+        subscriptionValidator.validateUserUnfollowYourself(followerId,followeeId);
+        subscriptionRepo.unfollowUser(followerId, followeeId);
     }
 }

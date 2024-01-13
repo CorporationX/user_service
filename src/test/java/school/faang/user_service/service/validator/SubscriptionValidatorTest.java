@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
@@ -21,17 +20,15 @@ public class SubscriptionValidatorTest {
     private SubscriptionValidator subscriptionValidator;
 
     @Test
-    public void testAlreadyFollowedThrowsException() {
-        Mockito.when(subscriptionRepo.existsByFollowerIdAndFolloweeId(1L, 2L))
-                .thenReturn(true);
+    public void testUserUnfollowYourself() {
         Assert.assertThrows(DataValidationException.class, () ->
-                subscriptionValidator.validateExistsSubscription(1L, 2L));
+                subscriptionValidator.validateUserUnfollowYourself(1L, 1L));
     }
 
     @Test
-    public void testFollowUserThrowsException() {
+    public void testNonExistsSubscription() {
         Assert.assertThrows(DataValidationException.class, () ->
-                subscriptionValidator.validateUserSubscriptionToYourself(1L, 1L));
+                subscriptionValidator.validateNonExistsSubscription(1L, 2L));
     }
 
     @Test

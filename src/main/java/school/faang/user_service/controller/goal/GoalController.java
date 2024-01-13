@@ -9,4 +9,12 @@ import school.faang.user_service.service.goal.GoalService;
 public class GoalController {
 
     private final GoalService goalService;
+
+    public void deleteGoal(Long goalId) {
+        if (goalId != null && goalId > 0) {
+            goalService.deleteGoal(goalId);
+        } else {
+            throw new IllegalArgumentException("Invalid ID: " + goalId);
+        }
+    }
 }

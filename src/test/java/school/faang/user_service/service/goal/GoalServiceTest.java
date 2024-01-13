@@ -34,24 +34,4 @@ class GoalServiceTest {
 
         Mockito.verify(goalRepository).deleteById(goal.getId());
     }
-
-    //    @Test
-//    @DisplayName("Check for search by id")
-//    void testDeleteGoal() {
-//        // Mock для поиска  по id
-//        Mockito.when(goalRepository.findById(1L)).thenReturn(Optional.of(goal));
-//        //после успешного поиска, вызываем метод для удаления
-//        goalService.deleteGoal(1L);
-//        //проверяем вызвался ли метод
-//        Mockito.verify(goalRepository, Mockito.times(1)).delete(goal);
-//    }
-
-//    @Test
-//    @DisplayName("Missing target remove test")
-//    void testGoalNotFound() {
-//        //Mock для отсутствующего id
-//        Mockito.when(goalRepository.findById(1L)).thenReturn(Optional.empty());
-//        //проверяем кидает ли исключение
-//        assertThrows(IllegalArgumentException.class, () -> goalService.deleteGoal(1L));
-//    }
 }

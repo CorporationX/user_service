@@ -33,9 +33,7 @@ class GoalControllerTest {
     @Test
     @DisplayName("test Controller")
     void testDeleteGoal() {
-        // вызываем метод
         goalService.deleteGoal(1L);
-        // проверяем сработал ли
         Mockito.verify(goalService).deleteGoal(1L);
 
     }

@@ -43,6 +43,6 @@ class GoalControllerTest {
     @Test
     @DisplayName("test Exception")
     void testGoalIdNullOrNegativeMeaning() {
-        assertThrows(IllegalArgumentException.class, () -> goalController.deleteGoal(-2L));
+        assertThrows(IllegalArgumentException.class, () -> goalController.deleteGoal(null));
     }
 }

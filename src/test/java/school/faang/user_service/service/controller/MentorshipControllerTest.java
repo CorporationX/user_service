@@ -16,15 +16,22 @@ public class MentorshipControllerTest {
 
     @Test
     @DisplayName("Trying to return list of mentees")
-    void testGetMentees_ShouldReturnsListMenteesDto() {
+    void testGetMentees_ShouldThrowsExceptionIfIdIsNull() {
         assertThrows(IllegalArgumentException.class,
                 () -> mentorshipController.getMentees(null));
     }
 
     @Test
     @DisplayName("Trying to return list of mentors")
-    void testGetMentees_ShouldReturnsListMentorsDto() {
+    void testGetMentors_ShouldThrowsExceptionIfIdIsNull() {
         assertThrows(IllegalArgumentException.class,
                 () -> mentorshipController.getMentors(null));
+    }
+
+    @Test
+    @DisplayName("Trying to remove mentee of mentor")
+    void testRemoveMentorsMentee_ShouldThrowsException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> mentorshipController.removeMentorsMentee(null, 1L));
     }
 }

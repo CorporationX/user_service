@@ -50,7 +50,7 @@ class MentorshipServiceTest {
 
     @Test
     @DisplayName("Checking for User availability")
-    void testGetMentees_ShouldFindsUserById() {
+    void testGetMentees_ShouldThrowsException() {
         assertThrows(IllegalArgumentException.class,
                 () -> mentorshipService.getMentees(1L));
     }
@@ -65,16 +65,23 @@ class MentorshipServiceTest {
 
     @Test
     @DisplayName("Checking for User availability")
-    void testGetMentors_ShouldFindsUserById() {
+    void testGetMentors_ShouldThrowsException() {
         assertThrows(IllegalArgumentException.class,
                 () -> mentorshipService.getMentors(1L));
     }
 
     @Test
-    @DisplayName("Getting user's mentees")
+    @DisplayName("Getting user's mentors")
     void testGetMentors_ShouldReturnsListOfMentorsDto() {
         when(mentorshipRepository.findById(3L))
                 .thenReturn(Optional.of(user3));
         assertEquals(users2, mentorshipService.getMentors(3L));
+    }
+
+    @Test
+    @DisplayName("Checking for mentor and mentee availability")
+    void testRemoveMentorsMenteeIds_ShouldThrowsException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> mentorshipService.removeMentorsMentee(1L, 2L));
     }
 }

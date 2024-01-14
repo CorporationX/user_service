@@ -11,7 +11,10 @@ import school.faang.user_service.service.recommendation.RecommendationRequestSer
 public class RecommendationRequestController {
     private RecommendationRequestService recommendationRequestService;
 
-
+    public RecommendationRequestDto getRecommendationRequest(long id){
+        return recommendationRequestService.getRequest(id);
+    }
+    
     public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
         return recommendationRequestService.rejectRequest(id, rejection);
     }

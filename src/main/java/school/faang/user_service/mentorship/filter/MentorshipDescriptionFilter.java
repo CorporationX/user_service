@@ -3,7 +3,7 @@ package school.faang.user_service.mentorship.filter;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.MentorshipRequest;
 
-import java.util.stream.Stream;
+import java.util.List;
 
 @Component
 public class MentorshipDescriptionFilter implements MentorshipRequestFilter {
@@ -14,9 +14,7 @@ public class MentorshipDescriptionFilter implements MentorshipRequestFilter {
     }
 
     @Override
-    public Stream<MentorshipRequest> apply(Stream<MentorshipRequest> mentorshipRequests, RequestFilterDto filterDto) {
-        return mentorshipRequests
-                .filter(mentorshipRequest -> mentorshipRequest.getDescription()
-                        .contains(filterDto.getDescriptionFilter()));
+    public void apply(List<MentorshipRequest> mentorshipRequests, RequestFilterDto filterDto) {
+        mentorshipRequests.removeIf(mentorshipRequest -> !mentorshipRequest.getDescription().contains(filterDto.getDescriptionFilter()));
     }
 }

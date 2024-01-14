@@ -10,7 +10,7 @@ import school.faang.user_service.mentorship.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Component
@@ -22,10 +22,11 @@ public class MentorshipRequestService {
     private MentorshipRequestMapper mentorshipRequestMapper;
 
     public List<MentorshipRequestDto> getRequests(RequestFilterDto filters) {
-        Stream<MentorshipRequest> streams = StreamSupport.stream(mentorshipRequestRepository.findAll().spliterator(), false);
+        List<MentorshipRequest> mentorshipRequestList = StreamSupport.stream(mentorshipRequestRepository.findAll().spliterator(), false)
+                .collect(Collectors.toList());
         mentorshipRequestFilters.stream()
-                        .filter(filter -> filter.isApplicable(filters))
-                        .forEach(filter -> filter.apply(streams, filters));
-        return mentorshipRequestMapper.toDtoList(streams.toList());
+                .filter(filter -> filter.isApplicable(filters))
+                .forEach(filter -> filter.apply(mentorshipRequestList, filters));
+        return mentorshipRequestMapper.toDtoList(mentorshipRequestList);
     }
 }

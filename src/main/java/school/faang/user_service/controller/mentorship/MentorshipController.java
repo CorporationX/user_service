@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.mentorship;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +15,10 @@ import java.util.List;
 public class MentorshipController {
     private final MentorshipService mentorshipService;
 
-    public List<UserDTO> getMentees(long mentorId) {
+    public List<UserDTO> getMentees(Long mentorId) {
+        if (mentorId == null || mentorId < 1) {
+            throw new EntityNotFoundException("Incorrect id entered");
+        }
         return mentorshipService.getMenteesOfUser(mentorId);
     }
 }

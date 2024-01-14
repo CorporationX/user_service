@@ -28,8 +28,10 @@ class MentorshipServiceTest {
     private MentorshipService mentorshipService;
     private User user;
     private User userMentee;
+    private User userMentor;
     private UserDTO userDTO;
     private List<UserDTO> listOfMentee = new ArrayList<>();
+    private List<UserDTO> listOfMentors = new ArrayList<>();
 
     @BeforeEach
     public void init() {
@@ -40,9 +42,17 @@ class MentorshipServiceTest {
         List<User> menteesOfUser = new ArrayList<>();
         menteesOfUser.add(userMentee);
 
+        userMentor = User.builder()
+                .id(10)
+                .username("Alex")
+                .build();
+        List<User> mentorsOfUser = new ArrayList<>();
+        mentorsOfUser.add(userMentor);
+
         user = User.builder()
                 .id(1)
                 .mentees(menteesOfUser)
+                .mentors(mentorsOfUser)
                 .build();
 
         userDTO = UserDTO.builder()
@@ -51,12 +61,20 @@ class MentorshipServiceTest {
                 .build();
 
         listOfMentee.add(userDTO);
+        listOfMentors.add(userDTO);
     }
 
     @Test
     public void testMentorshipService_GoodId() {
         Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         assertEquals(listOfMentee.get(0), mentorshipService.getMenteesOfUser(1).get(0));
+        Mockito.verify(userRepository).findById(1L);
+    }
+
+    @Test
+    public void testMentorshipService_getMentorsOfUser(){
+        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        assertEquals(listOfMentors.get(0), mentorshipService.getMentorsOfUser(1).get(0));
         Mockito.verify(userRepository).findById(1L);
     }
 

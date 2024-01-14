@@ -24,4 +24,13 @@ public class MentorshipService {
                 .map(userMapper::toUserDTO)
                 .toList();
     }
+
+    public List<UserDTO> getMentorsOfUser(long menteeId) {
+        User menteeById = userRepository.findById(menteeId)
+                .orElseThrow(() -> new EntityNotFoundException("Mentee were not found for this id " + menteeId));
+
+        return menteeById.getMentors().stream()
+                .map(userMapper::toUserDTO)
+                .toList();
+    }
 }

@@ -16,9 +16,18 @@ public class MentorshipController {
     private final MentorshipService mentorshipService;
 
     public List<UserDTO> getMentees(Long mentorId) {
-        if (mentorId == null || mentorId < 1) {
+        validationOfInputData(mentorId);
+        return mentorshipService.getMenteesOfUser(mentorId);
+    }
+
+    public List<UserDTO> getMentors(Long menteeId) {
+        validationOfInputData(menteeId);
+        return mentorshipService.getMentorsOfUser(menteeId);
+    }
+
+    public void validationOfInputData(Long id){
+        if (id == null || id < 1) {
             throw new EntityNotFoundException("Incorrect id entered");
         }
-        return mentorshipService.getMenteesOfUser(mentorId);
     }
 }

@@ -29,9 +29,13 @@ public class EventService {
     }
 
     public void deleteEvent(long eventId) {
-        Event event = eventRepository.findById(eventId)
-                        .orElseThrow(() -> new DataValidationException("Event not found with ID - " + eventId));
+        Event event = validateAndGet(eventId);
         eventRepository.deleteById(event.getId());
+    }
+
+    public Event validateAndGet (long eventId) {
+        return eventRepository.findById(eventId)
+                        .orElseThrow(() -> new DataValidationException("Event not found with ID - " + eventId));
     }
 
     public void validateOwnerHasSkills(Event event) {

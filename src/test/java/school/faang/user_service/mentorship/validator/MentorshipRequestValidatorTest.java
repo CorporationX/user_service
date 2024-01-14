@@ -5,12 +5,11 @@ import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.shadow.com.univocity.parsers.common.DataValidationException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.testcontainers.shaded.com.google.common.base.Optional;
+import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mentorship.dto.MentorshipRequestDto;
 import school.faang.user_service.mentorship.exception.MentorshipRequestException;
@@ -18,6 +17,9 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
+
+import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipRequestValidatorTest {
@@ -33,7 +35,12 @@ class MentorshipRequestValidatorTest {
     @Mock
     private UserRepository userRepository;
 
-    private User user;
+    @InjectMocks
+    private MentorshipRequest mentorshipRequest;
+
+    private User requester;
+
+    private User receiver;
 
     @BeforeEach
     public void init() {
@@ -43,9 +50,12 @@ class MentorshipRequestValidatorTest {
         mentorshipRequestDto.setRequester(88L);
         mentorshipRequestDto.setReceiver(77L);
         mentorshipRequestDto.setCreatedAt(LocalDateTime.now());
-        user = new User();
-        user.setId(1L);
-        user.setUsername("John");
+        requester = new User();
+        requester.setId(1L);
+        requester.setUsername("John");
+        receiver = new User();
+        receiver.setId(2L);
+        receiver.setUsername("Mike");
     }
 
     @Test
@@ -56,10 +66,29 @@ class MentorshipRequestValidatorTest {
 
     @Test
     public void testExceptionWhenSameUser() {
-        Mockito.when(userRepository.findById(mentorshipRequestDto.getRequester())).thenReturn();
-        mentorshipRequestDto.setRequester(77L);
-        mentorshipRequestDto.setReceiver(77L);
+        Mockito.when(userRepository.findById(any())).thenReturn(Optional.of(requester));
         Assert.assertThrows(MentorshipRequestException.class, () ->
                 mentorshipRequestValidator.mainMentorshipRequestValidation(mentorshipRequestDto));
+    }
+
+    @Test
+    public void testSecondRequestInLast90Days() {
+        Mockito.when(userRepository.findById(mentorshipRequestDto.getRequester())).thenReturn(Optional.of(requester));
+        Mockito.when(userRepository.findById(mentorshipRequestDto.getReceiver())).thenReturn(Optional.of(receiver));
+        Mockito.when(mentorshipRequestRepository
+                .findLatestRequest(requester.getId(), receiver.getId())).thenReturn(Optional.of(mentorshipRequest));
+        mentorshipRequest.setCreatedAt(LocalDateTime.now().minusMonths(1));
+        Assert.assertThrows(MentorshipRequestException.class, () ->
+                mentorshipRequestValidator.mainMentorshipRequestValidation(mentorshipRequestDto));
+    }
+
+    @Test
+    public void testCorrectData() {
+        Mockito.when(userRepository.findById(mentorshipRequestDto.getRequester())).thenReturn(Optional.of(requester));
+        Mockito.when(userRepository.findById(mentorshipRequestDto.getReceiver())).thenReturn(Optional.of(receiver));
+        Mockito.when(mentorshipRequestRepository
+                .findLatestRequest(requester.getId(), receiver.getId())).thenReturn(Optional.of(mentorshipRequest));
+        mentorshipRequest.setCreatedAt(LocalDateTime.now().minusMonths(4));
+        mentorshipRequestValidator.mainMentorshipRequestValidation(mentorshipRequestDto);
     }
 }

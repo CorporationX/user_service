@@ -40,6 +40,14 @@ public class MentorshipService {
         }
     }
 
+    public void removeMentorOfMentee(Long mentorId, Long menteeId) {
+        User mentor = getMentorById(mentorId);
+        User mentee = getMenteeById(menteeId);
+        if (mentee.getMentors().contains(mentor)) {
+            mentee.getMentors().remove(mentor);
+        }
+    }
+
     private User getMentorById(Long userId) {
         return mentorshipRepository.findById(userId).orElseThrow(() ->
                 new IllegalArgumentException(MessageFormat.format("User with id {0} has not found", userId)));

@@ -25,8 +25,12 @@ public class MentorshipController {
     public void removeMentorsMentee(Long mentorId, Long menteeId) {
         validationForNullMentorAndMenteeIds(mentorId, menteeId);
         mentorshipService.removeMentorsMentee(mentorId, menteeId);
-
     }
+    public void removeMentorOfMentee(Long mentorId, Long menteeId) {
+        validationForNullMentorAndMenteeIds(mentorId, menteeId);
+        mentorshipService.removeMentorOfMentee(mentorId, menteeId);
+    }
+    
 
     private static void validationForNullUserId(Long userId) {
         if (userId == null) {

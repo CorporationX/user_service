@@ -1,6 +1,5 @@
 package school.faang.user_service.service.subscription;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -9,7 +8,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
@@ -22,9 +22,14 @@ class SubscriptionServiceImplTest {
     @InjectMocks
     private SubscriptionServiceImpl subscriptionService;
 
-    @BeforeEach
-    void setUp() {
+    @Test
+    void should_DeleteSubscription_when_FollowerAndFolloweeIdsAreDifferent() {
+        long followerId = 5L;
+        long followeeId = 2L;
 
+        subscriptionService.unfollowUser(followerId, followeeId);
+
+        verify(subscriptionRepository).unfollowUser(followerId, followeeId);
     }
 
     @Test

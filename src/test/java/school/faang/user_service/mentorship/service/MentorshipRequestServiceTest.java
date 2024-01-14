@@ -6,9 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mentorship.dto.MentorshipRequestDto;
+import school.faang.user_service.mentorship.mapper.MentorshipRequestMapper;
 import school.faang.user_service.mentorship.validator.MentorshipRequestValidator;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -27,10 +28,17 @@ class MentorshipRequestServiceTest {
     @Mock
     private MentorshipRequestValidator mentorshipRequestValidator;
 
+    @Mock
+    private MentorshipRequestMapper mentorshipRequestMapper;
+
     @InjectMocks
     private MentorshipRequestService mentorshipRequestService;
 
+    @InjectMocks
     private MentorshipRequestDto mentorshipRequestDto;
+
+    @InjectMocks
+    private MentorshipRequest mentorshipRequest;
 
     @Mock
     private UserRepository userRepository;
@@ -48,21 +56,21 @@ class MentorshipRequestServiceTest {
         user = new User();
         user.setId(1L);
         user.setUsername("John");
-    }
-
-    @Test
-    public void whenRequestForMembershipThenPending() {
-        Assertions.assertNull(mentorshipRequestDto.getStatus());
-        mentorshipRequestService.requestMentorship(mentorshipRequestDto);
-        Assertions.assertEquals(RequestStatus.PENDING, mentorshipRequestDto.getStatus());
+        Mockito.when(mentorshipRequestMapper.toEntity(mentorshipRequestDto))
+                .thenReturn(mentorshipRequest);
+        Mockito.when(mentorshipRequestMapper.toDTO(mentorshipRequest))
+                .thenReturn(mentorshipRequestDto);
     }
 
     @Test
     public void whenRequestForMembershipThenCreated() {
         mentorshipRequestService.requestMentorship(mentorshipRequestDto);
         Mockito.verify(mentorshipRequestRepository, times(1))
-                .create(mentorshipRequestDto.getRequester(), mentorshipRequestDto.getReceiver()
-                        , mentorshipRequestDto.getDescription());
+                .save(mentorshipRequest);
+        Mockito.verify(mentorshipRequestMapper, times(1))
+                .toDTO(mentorshipRequest);
+        Mockito.verify(mentorshipRequestMapper, times(1))
+                .toEntity(mentorshipRequestDto);
         Mockito.verify(mentorshipRequestValidator, times(1))
                 .mainMentorshipRequestValidation(mentorshipRequestDto);
         Assertions.assertEquals(mentorshipRequestService.requestMentorship(mentorshipRequestDto)

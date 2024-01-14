@@ -1,5 +1,6 @@
 package school.faang.user_service.service.mentorship;
 
+import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.mentorship.MentorshipRequestException;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -56,9 +58,11 @@ class MentorshipRequestServiceTest {
         receiver = new User();
         receiver.setId(2L);
         receiver.setUsername("Ivan");
-        Mockito.when(mentorshipRequestMapper.toEntity(mentorshipRequestDto))
-                .thenReturn(mentorshipRequest);
-        Mockito.when(mentorshipRequestMapper.toDTO(mentorshipRequest))
-                .thenReturn(mentorshipRequestDto);
+    }
+
+    @Test
+    public void whenRequestForMembershipThenNoDataInDB() {
+        Assert.assertThrows(MentorshipRequestException.class, () ->
+                mentorshipRequestService.acceptRequest(1L));
     }
 }

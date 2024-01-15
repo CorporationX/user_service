@@ -36,12 +36,12 @@ public class EventService {
 
     private void checkUserSkills(EventDto eventDto) {
         User user = userRepository.findById(eventDto.getOwnerId())
-                .orElseThrow(() -> new UserNotFoundException("User with ID: " + eventDto.getOwnerId() + " not found"));
+                .orElseThrow(() -> new UserNotFoundException("User by ID: " + eventDto.getOwnerId() + " not found"));
 
         List<SkillDto> userSkills = skillMapper.toListSkillDto(user.getSkills());
 
         if (!userSkills.containsAll(eventDto.getRelatedSkills())) {
-            throw new DataValidationException("User with ID: " + eventDto.getOwnerId() + " does not possess all required skills for this event");
+            throw new DataValidationException("User by ID: " + eventDto.getOwnerId() + " does not possess all required skills for this event");
         }
     }
 

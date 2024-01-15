@@ -6,7 +6,7 @@ import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
 @Component
 public class MentorshipRequestController {
-    private MentorshipRequestService mentorshipRequestService;
+    private final MentorshipRequestService mentorshipRequestService;
     @Autowired
     public MentorshipRequestController(MentorshipRequestService mentorshipRequestService) {
         this.mentorshipRequestService = mentorshipRequestService;

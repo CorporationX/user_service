@@ -8,7 +8,6 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
-import java.text.MessageFormat;
 import java.util.List;
 
 @Service
@@ -18,7 +17,7 @@ public class MentorshipService {
     private final UserMapper userMapper;
 
     public List<UserDto> getMentees(Long userId) {
-        User user = getMentorById(userId);
+        User user = getUserById(userId);
         List<User> mentees = user.getMentees();
         return mentees.stream()
                 .map(userMapper::toDto)
@@ -26,7 +25,7 @@ public class MentorshipService {
     }
 
     public List<UserDto> getMentors(Long userId) {
-        User user = getMentorById(userId);
+        User user = getUserById(userId);
         List<User> mentors = user.getMentors();
         return mentors.stream()
                 .map(userMapper::toDto)
@@ -34,28 +33,21 @@ public class MentorshipService {
     }
 
     public void removeMentorsMentee(Long mentorId, Long menteeId) {
-        User mentor = getMentorById(mentorId);
-        User mentee = getMenteeById(menteeId);
-        if (mentor.getMentees().contains(mentee)) {
-            mentor.getMentees().remove(mentee);
-        }
+        User mentor = getUserById(mentorId);
+        User mentee = getUserById(menteeId);
+        int index = mentor.getMentees().indexOf(mentee);
+        mentor.getMentees().remove(index);
     }
 
     public void removeMentorOfMentee(Long mentorId, Long menteeId) {
-        User mentor = getMentorById(mentorId);
-        User mentee = getMenteeById(menteeId);
-        if (mentee.getMentors().contains(mentor)) {
-            mentee.getMentors().remove(mentor);
-        }
+        User mentor = getUserById(mentorId);
+        User mentee = getUserById(menteeId);
+        int index = mentee.getMentors().indexOf(mentor);
+        mentee.getMentors().remove(index);
     }
 
-    private User getMentorById(Long userId) {
+    private User getUserById(Long userId) {
         return mentorshipRepository.findById(userId).orElseThrow(() ->
-                new DataValidationException("User with id "+userId+" has not found"));
-    }
-
-    private User getMenteeById(Long userId) {
-        return mentorshipRepository.findById(userId).orElseThrow(() ->
-                new DataValidationException("User with id "+userId+" has not found"));
+                new DataValidationException("User with id " + userId + " has not found"));
     }
 }

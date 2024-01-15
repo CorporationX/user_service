@@ -13,11 +13,14 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
@@ -36,16 +39,18 @@ class MentorshipServiceTest {
     private List<User> users;
     private List<User> users3;
     private List<UserDto> users2;
+    private List<UserDto> usersDto;
 
     @BeforeEach
     void setUp() {
         userDto = UserDto.builder().id(1L).build();
-        user1 = User.builder().id(1L).build();
+        usersDto = new ArrayList<>();
+        users = new ArrayList<>();
+        user1 = User.builder().id(1L).mentors(users).mentees(users).build();
         users2 = List.of(userDto);
         users3 = List.of(user1);
         user2 = User.builder().id(2L).mentees(users3).build();
-        users = List.of(user1);
-        user3 = User.builder().id(3L).mentors(users).build();
+        user3 = User.builder().id(3L).mentors(users3).build();
     }
 
     @Test
@@ -62,6 +67,13 @@ class MentorshipServiceTest {
     }
 
     @Test
+    void testGetMentees_ShouldReturnsEmptyList() {
+        when(mentorshipRepository.findById(1L))
+                .thenReturn(Optional.of(user1));
+        assertEquals(usersDto, mentorshipService.getMentees(1L));
+    }
+
+    @Test
     void testGetMentors_ShouldThrowsException() {
         assertThrows(DataValidationException.class,
                 () -> mentorshipService.getMentors(1L));
@@ -75,7 +87,14 @@ class MentorshipServiceTest {
     }
 
     @Test
-    void testRemoveMentorsMenteeIds_ShouldThrowsException() {
+    void testGetMentors_ShouldReturnsEmptyList() {
+        when(mentorshipRepository.findById(1L))
+                .thenReturn(Optional.of(user1));
+        assertEquals(usersDto, mentorshipService.getMentors(1L));
+    }
+
+    @Test
+    void testRemoveMentorsMentee_ShouldThrowsException() {
         assertThrows(DataValidationException.class,
                 () -> mentorshipService.removeMentorsMentee(1L, 2L));
     }
@@ -84,5 +103,12 @@ class MentorshipServiceTest {
     void testRemoveMentorOfMentee_ShouldThrowsException() {
         assertThrows(DataValidationException.class,
                 () -> mentorshipService.removeMentorOfMentee(1L, 2L));
+    }
+
+    @Test
+    void testGetMentors_ShouldCallsRepositoryMethod() {
+        when(mentorshipRepository.findById(1L)).thenReturn(Optional.of(user1));
+        mentorshipService.getMentors(user1.getId());
+        verify(mentorshipRepository, times(1)).findById(user1.getId());
     }
 }

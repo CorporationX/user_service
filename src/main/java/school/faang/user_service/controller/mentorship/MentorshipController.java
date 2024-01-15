@@ -3,6 +3,7 @@ package school.faang.user_service.controller.mentorship;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.MentorshipService;
 
 import java.util.List;
@@ -26,21 +27,22 @@ public class MentorshipController {
         validationForNullMentorAndMenteeIds(mentorId, menteeId);
         mentorshipService.removeMentorsMentee(mentorId, menteeId);
     }
+
     public void removeMentorOfMentee(Long mentorId, Long menteeId) {
         validationForNullMentorAndMenteeIds(mentorId, menteeId);
         mentorshipService.removeMentorOfMentee(mentorId, menteeId);
     }
-    
+
 
     private static void validationForNullUserId(Long userId) {
-        if (userId == null) {
-            throw new IllegalArgumentException("userId must be a not null value");
+        if (userId == null || userId <= 0) {
+            throw new DataValidationException("userId must be a not null value");
         }
     }
 
     private static void validationForNullMentorAndMenteeIds(Long mentorId, Long menteeId) {
-        if (mentorId == null || menteeId == null) {
-            throw new IllegalArgumentException("mentorId and menteeId must be a not null value");
+        if (mentorId == null || menteeId == null || mentorId <= 0 || menteeId <= 0) {
+            throw new DataValidationException("mentorId and menteeId must be a not null value");
         }
     }
 }

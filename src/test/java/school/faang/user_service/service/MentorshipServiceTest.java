@@ -1,7 +1,6 @@
 package school.faang.user_service.service;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,6 +9,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
@@ -50,7 +50,7 @@ class MentorshipServiceTest {
 
     @Test
     void testGetMentees_ShouldThrowsException() {
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(DataValidationException.class,
                 () -> mentorshipService.getMentees(1L));
     }
 
@@ -63,7 +63,7 @@ class MentorshipServiceTest {
 
     @Test
     void testGetMentors_ShouldThrowsException() {
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(DataValidationException.class,
                 () -> mentorshipService.getMentors(1L));
     }
 
@@ -76,13 +76,13 @@ class MentorshipServiceTest {
 
     @Test
     void testRemoveMentorsMenteeIds_ShouldThrowsException() {
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(DataValidationException.class,
                 () -> mentorshipService.removeMentorsMentee(1L, 2L));
     }
 
     @Test
     void testRemoveMentorOfMentee_ShouldThrowsException() {
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(DataValidationException.class,
                 () -> mentorshipService.removeMentorOfMentee(1L, 2L));
     }
 }

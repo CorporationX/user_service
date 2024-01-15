@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
@@ -50,11 +51,11 @@ public class MentorshipService {
 
     private User getMentorById(Long userId) {
         return mentorshipRepository.findById(userId).orElseThrow(() ->
-                new IllegalArgumentException(MessageFormat.format("User with id {0} has not found", userId)));
+                new DataValidationException(MessageFormat.format("User with id {0} has not found", userId)));
     }
 
     private User getMenteeById(Long userId) {
         return mentorshipRepository.findById(userId).orElseThrow(() ->
-                new IllegalArgumentException(MessageFormat.format("User with id {0} has not found", userId)));
+                new DataValidationException(MessageFormat.format("User with id {0} has not found", userId)));
     }
 }

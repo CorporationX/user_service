@@ -27,9 +27,16 @@ public class EventService {
 
     private final SkillMapper skillMapper;
 
-    public EventDto create(EventDto eventDto) {
+    public EventDto createEvent(EventDto eventDto) {
         checkUserSkills(eventDto);
         Event event = eventRepository.save(eventMapper.toEntity(eventDto));
+        return eventMapper.toDto(event);
+    }
+
+
+    public EventDto getEvent(Long eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new IllegalArgumentException("Event with ID: " + eventId + " not found"));
         return eventMapper.toDto(event);
     }
 

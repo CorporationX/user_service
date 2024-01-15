@@ -63,7 +63,7 @@ class EventServiceTest {
         eventDto.setOwnerId(100L);
 
         Mockito.when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.empty());
-        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> eventService.create(eventDto));
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> eventService.createEvent(eventDto));
         assertEquals("User with ID: " + eventDto.getOwnerId() + " not found", exception.getMessage());
     }
 
@@ -81,7 +81,7 @@ class EventServiceTest {
         user.setSkills(Arrays.asList(skill1, skill2));
 
         Mockito.when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(user));
-        DataValidationException exception = assertThrows(DataValidationException.class, () -> eventService.create(eventDto));
+        DataValidationException exception = assertThrows(DataValidationException.class, () -> eventService.createEvent(eventDto));
         assertEquals("User with ID: " + eventDto.getOwnerId() + " does not possess all required skills for this event", exception.getMessage());
     }
 
@@ -105,10 +105,19 @@ class EventServiceTest {
         Mockito.when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(user));
         Mockito.when(eventRepository.save(eventMapper.toEntity(eventDto))).thenReturn(event);
 
-        EventDto eventDto1 = assertDoesNotThrow(() -> eventService.create(eventDto));
+        EventDto eventDto1 = assertDoesNotThrow(() -> eventService.createEvent(eventDto));
 
         Mockito.verify(eventRepository).save(eventMapper.toEntity(eventDto));
         assertEquals(eventDto1, eventDto);
+    }
+
+
+    @Test
+    public void get_ShouldThrowDataValidationException() {
+        Long eventId = 1L;
+        Mockito.when(eventRepository.findById(eventId)).thenReturn(Optional.empty());
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> eventService.getEvent(eventId));
+        assertEquals("Event with ID: " + eventId + " not found", exception.getMessage());
     }
 
 

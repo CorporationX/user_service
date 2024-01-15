@@ -100,6 +100,17 @@ class MentorshipServiceTest {
     }
 
     @Test
+    public void testDeleteMentor_shouldNewListOfMentorsByMentee(){
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.findById(10L)).thenReturn(Optional.of(userMentor));
+        mentorshipService.deleteMentor(1, 10);
+        verify(userRepository).findById(1L);
+        verify(userRepository).findById(10L);
+        assertFalse(user.getMentors().contains(userMentor));
+        verify(userRepository).save(user);
+    }
+
+    @Test
     public void testGetUserById_shouldEntityNotFoundException() {
         long id = -1;
         assertThrows(EntityNotFoundException.class,

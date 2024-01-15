@@ -34,6 +34,14 @@ public class MentorshipService {
         userRepository.save(mentor);
     }
 
+    public void deleteMentor(long menteeId, long mentorId) {
+        User mentee = getUserById(menteeId);
+        User mentor = getUserById(mentorId);
+        if (mentee.getMentors().contains(mentor))
+            mentee.getMentors().remove(mentor);
+        userRepository.save(mentee);
+    }
+
     public User getUserById(long mentorId) {
         return userRepository.findById(mentorId)
                 .orElseThrow(() -> new EntityNotFoundException("User with id " + mentorId + " not found"));

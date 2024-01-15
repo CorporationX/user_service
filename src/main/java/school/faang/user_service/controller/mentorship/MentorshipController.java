@@ -31,6 +31,12 @@ public class MentorshipController {
         mentorshipService.deleteMentee(menteeId, mentorId);
     }
 
+    public void deleteMentor(long menteeId, long mentorId){
+        validationOfInputData(menteeId);
+        validationOfInputData(mentorId);
+        mentorshipService.deleteMentor(menteeId, mentorId);
+    }
+
     public void validationOfInputData(Long id){
         if (id == null || id < 1) {
             throw new EntityNotFoundException("Incorrect id entered");

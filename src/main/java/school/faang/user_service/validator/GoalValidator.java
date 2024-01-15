@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -39,5 +40,19 @@ public class GoalValidator {
             return true;
         }
         throw new DataValidationException("Title is empty!");
+    }
+
+    public Boolean isValidateByCompleted(Goal goal) {
+        if (goal.getStatus() == GoalStatus.ACTIVE) {
+            return true;
+        }
+        throw new DataValidationException("Goal was completed!");
+    }
+
+    public Boolean isValidateByExistingSkills(Goal goal) {
+        if (goal.getSkillsToAchieve().stream().allMatch(s -> skillRepository.existsByTitle(s.getTitle()))) {
+            return true;
+        }
+        throw new DataValidationException("Some skills do not exist in database!");
     }
 }

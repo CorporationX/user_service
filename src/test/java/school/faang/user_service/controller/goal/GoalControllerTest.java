@@ -33,8 +33,20 @@ public class GoalControllerTest {
 
         when(goalValidator.isValidateByEmptyTitle(goalDto)).thenReturn(true);
 
-        goalController.createGoal(userId,goalDto);
+        goalController.createGoal(userId, goalDto);
 
-        verify(goalService,times(1)).createGoal(userId,goalDto);
+        verify(goalService, times(1)).createGoal(userId, goalDto);
+    }
+
+    @Test
+    void testUpdateGoal() {
+        GoalDto goalDto = new GoalDto();
+        Long goalId = 1L;
+
+        when(goalValidator.isValidateByEmptyTitle(goalDto)).thenReturn(true);
+
+        goalController.updateGoal(goalId, goalDto);
+
+        verify(goalService, times(1)).updateGoal(goalId, goalDto);
     }
 }

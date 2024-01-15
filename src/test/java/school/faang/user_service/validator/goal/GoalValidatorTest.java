@@ -9,6 +9,7 @@ import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -18,6 +19,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 /**
@@ -107,5 +109,56 @@ public class GoalValidatorTest {
                 () -> goalValidator.isValidateByEmptyTitle(goalDto));
 
         assertEquals(dataValidationException.getMessage(), "Title is empty!");
+    }
+
+    @Test
+    void testIsValidateByCompletedShouldSuccess() {
+        Goal goal = new Goal();
+        goal.setStatus(GoalStatus.ACTIVE);
+
+        assertEquals(goalValidator.isValidateByCompleted(goal), true);
+    }
+
+    @Test
+    void testIsValidateByCompletedShouldException() {
+        Goal goal = new Goal();
+        goal.setStatus(GoalStatus.COMPLETED);
+
+        DataValidationException dataValidationException = assertThrows(DataValidationException.class,
+                () -> goalValidator.isValidateByCompleted(goal));
+
+        assertEquals(dataValidationException.getMessage(), "Goal was completed!");
+    }
+
+    @Test
+    void testIsValidateByExistingSkillsShouldSuccess() {
+        Goal goal = new Goal();
+        Skill skill_1 = new Skill();
+        skill_1.setTitle("Skill_1");
+        Skill skill_2 = new Skill();
+        skill_2.setTitle("Skill_2");
+        goal.setSkillsToAchieve(List.of(skill_1, skill_2));
+
+        when(skillRepository.existsByTitle(anyString())).thenReturn(true);
+
+        assertEquals(goalValidator.isValidateByExistingSkills(goal), true);
+    }
+
+    @Test
+    void testIsValidateByExistingSkillsShouldException() {
+        Goal goal = new Goal();
+        Skill skill_1 = new Skill();
+        skill_1.setTitle("Skill_1");
+        Skill skill_2 = new Skill();
+        skill_2.setTitle("Skill_2");
+        goal.setSkillsToAchieve(List.of(skill_1, skill_2));
+
+
+        when(skillRepository.existsByTitle(anyString())).thenReturn(false);
+
+        DataValidationException dataValidationException = assertThrows(DataValidationException.class,
+                () -> goalValidator.isValidateByExistingSkills(goal));
+
+        assertEquals(dataValidationException.getMessage(), "Some skills do not exist in database!");
     }
 }

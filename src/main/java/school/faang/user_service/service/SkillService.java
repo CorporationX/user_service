@@ -29,7 +29,7 @@ public class SkillService {
         if (!skillRepository.existsByTitle(skill.getTitle())) {
             Skill savedSkill = skillRepository.save(skillMapper.toEntity(skill));
             return skillMapper.toDto(savedSkill);
-        } else throw new DataValidationException("Навык с таким именем уже существует");
+        } else throw new DataValidationException("Такой навык уже существует");
     }
 
     public List<SkillDto> getUserSkills(long userId) {

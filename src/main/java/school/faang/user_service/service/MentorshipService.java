@@ -51,11 +51,11 @@ public class MentorshipService {
 
     private User getMentorById(Long userId) {
         return mentorshipRepository.findById(userId).orElseThrow(() ->
-                new DataValidationException(MessageFormat.format("User with id {0} has not found", userId)));
+                new DataValidationException("User with id "+userId+" has not found"));
     }
 
     private User getMenteeById(Long userId) {
         return mentorshipRepository.findById(userId).orElseThrow(() ->
-                new DataValidationException(MessageFormat.format("User with id {0} has not found", userId)));
+                new DataValidationException("User with id "+userId+" has not found"));
     }
 }

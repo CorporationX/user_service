@@ -1,45 +1,49 @@
 package school.faang.user_service.service;
 
-import jakarta.validation.constraints.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.UserSkillGuarantee;
+import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.skill.DataValidationException;
 import school.faang.user_service.mapper.skill.SkillCandidateMapper;
 import school.faang.user_service.mapper.skill.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.UserSkillGuaranteeRepository;
+import school.faang.user_service.repository.recommendation.SkillOfferRepository;
+import school.faang.user_service.validate.skill.SkillValidation;
 
 import java.util.List;
 
-@Component
+@Service
+@RequiredArgsConstructor
 public class SkillService {
 
     private final SkillRepository skillRepository;
+    private final SkillOfferRepository skillOfferRepository;
+    private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final SkillMapper skillMapper;
     private final SkillCandidateMapper skillCandidateMapper;
     private final UserRepository userRepository;
-
-    @Autowired
-    public SkillService(SkillRepository skillRepository, SkillMapper skillMapper, SkillCandidateMapper skillCandidateMapper, UserRepository userRepository) {
-        this.skillRepository = skillRepository;
-        this.skillMapper = skillMapper;
-        this.skillCandidateMapper = skillCandidateMapper;
-        this.userRepository = userRepository;
-    }
+    private final SkillValidation skillValidation;
+    private static final long MIN_SKILL_OFFERS = 3;
 
     public SkillDto create(SkillDto skill) {
         if (!skillRepository.existsByTitle(skill.getTitle())) {
             Skill savedSkill = skillRepository.save(skillMapper.toEntity(skill));
             return skillMapper.toDto(savedSkill);
-        } else throw new DataValidationException("Навык с таким именем уже существует");
+        } else {
+            throw new DataValidationException("Такой навык уже существует");
+        }
     }
 
     public List<SkillDto> getUserSkills(long userId) {
 
-        validateUserId(userId);
+        skillValidation.validateUserId(userId);
 
         List<Skill> skillsByUserId = skillRepository.findAllByUserId(userId);
         return skillsByUserId.stream()
@@ -49,7 +53,7 @@ public class SkillService {
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
 
-        validateUserId(userId);
+        skillValidation.validateUserId(userId);
 
         List<Skill> skillsOfferedToUser = skillRepository.findSkillsOfferedToUser(userId);
 
@@ -65,9 +69,26 @@ public class SkillService {
                 .toList();
     }
 
-    private void validateUserId(long userId) {
-        if (userRepository.findById(userId).isEmpty()) {
-            throw new DataValidationException("Пользователя с таким id не существует");
+    public SkillDto acquireSkillFromOffers(long skillId, long userId) {
+        skillValidation.validateUserId(userId);
+        skillValidation.validateSkillId(skillId);
+
+        Skill skill = Skill.builder().id(skillId).build();
+        SkillDto skillDto = skillMapper.toDto(skill);
+
+        if (skillRepository.findUserSkill(skillId, userId).isEmpty()) {
+            List<SkillOffer> allOffersOfSkill = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
+
+            if (allOffersOfSkill.size() >= MIN_SKILL_OFFERS) {
+                skillRepository.assignSkillToUser(skillId, userId);
+                User user = User.builder().id(userId).build();
+                allOffersOfSkill.forEach((offer) -> {
+                    User guarantor = new User();
+                    guarantor.setId(offer.getRecommendation().getAuthor().getId());
+                    userSkillGuaranteeRepository.save(new UserSkillGuarantee(null, user, skill, guarantor));
+                });
+            }
         }
+        return skillDto;
     }
 }

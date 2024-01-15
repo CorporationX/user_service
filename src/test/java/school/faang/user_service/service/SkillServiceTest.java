@@ -1,25 +1,34 @@
 package school.faang.user_service.service;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.recommendation.Recommendation;
+import school.faang.user_service.entity.recommendation.SkillOffer;
+import school.faang.user_service.exception.skill.DataValidationException;
 import school.faang.user_service.mapper.skill.SkillCandidateMapper;
 import school.faang.user_service.mapper.skill.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.UserSkillGuaranteeRepository;
+import school.faang.user_service.repository.recommendation.SkillOfferRepository;
+import school.faang.user_service.validate.skill.SkillValidation;
 
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class SkillServiceTest {
@@ -27,17 +36,23 @@ class SkillServiceTest {
     @Mock
     private SkillRepository skillRepository;
     @Mock
-    private UserRepository userRepository;
-    @Mock
     private SkillMapper skillMapper;
     @Mock
     private SkillCandidateMapper skillCandidateMapper;
+    @Mock
+    private UserSkillGuaranteeRepository userSkillGuaranteeRepository;
+    @Mock
+    private SkillOfferRepository skillOfferRepository;
+    @Mock
+    private SkillValidation skillValidation;
 
     @InjectMocks
     private SkillService skillService;
 
-    SkillDto inputSkillDto = new SkillDto("Навык");
-    long userId = 1l;
+    SkillDto inputSkillDto = new SkillDto(null, "Навык");
+    SkillDto skillDto = new SkillDto(1L, "Навык");
+    long userId = 1L;
+    long skillId = 1L;
 
     @Test
     public void create_whenSkillFromSkillDtoIsNew_thenSaveToDb() {
@@ -46,53 +61,48 @@ class SkillServiceTest {
         Skill skill = new Skill();
         skill.setTitle(inputSkillDto.getTitle());
 
-        Mockito.when(skillRepository.existsByTitle(inputSkillDto.getTitle())).thenReturn(false);
-        Mockito.when(skillMapper.toEntity(inputSkillDto)).thenReturn(skill);
-        Mockito.when(skillRepository.save(skill)).thenReturn(skill);
-        Mockito.when(skillMapper.toDto(skill)).thenReturn(new SkillDto("Навык"));
+        when(skillRepository.existsByTitle(inputSkillDto.getTitle())).thenReturn(false);
+        when(skillMapper.toEntity(inputSkillDto)).thenReturn(skill);
+        when(skillRepository.save(skill)).thenReturn(skill);
+        when(skillMapper.toDto(skill)).thenReturn(skillDto);
 
         // Act
-        skillService.create(inputSkillDto);
+        SkillDto result = skillService.create(inputSkillDto);
 
         // Assert
-        Mockito.verify(skillRepository, Mockito.times(1)).existsByTitle(inputSkillDto.getTitle());
-        Mockito.verify(skillMapper, Mockito.times(1)).toEntity(inputSkillDto);
-        Mockito.verify(skillRepository, Mockito.times(1)).save(skill);
-        Mockito.verify(skillMapper, Mockito.times(1)).toEntity(inputSkillDto);
+        assertAll(
+                () -> verify(skillRepository, times(1)).existsByTitle(inputSkillDto.getTitle()),
+                () -> verify(skillMapper, times(1)).toEntity(inputSkillDto),
+                () -> verify(skillRepository, times(1)).save(skill),
+                () -> verify(skillMapper, times(1)).toDto(skill),
+                () -> assertEquals(inputSkillDto.getTitle(), result.getTitle())
+        );
     }
 
     @Test
-    public void create_whenTitleOfSkillDtoIsExist_thenThrowRuntimeException() {
+    public void create_whenTitleOfSkillDtoIsExist_thenThrowDataValidationException() {
         // Arrange
-        Mockito.when(skillRepository.existsByTitle(inputSkillDto.getTitle())).thenReturn(true);
+        when(skillRepository.existsByTitle(inputSkillDto.getTitle())).thenReturn(true);
 
         // Act & Assert
-        Assert.assertThrows(RuntimeException.class, () -> skillService.create(inputSkillDto));
+        assertThrows(DataValidationException.class, () -> skillService.create(inputSkillDto));
     }
 
     @Test
     public void getUserSkills_whenUserIdIsExist_thenGetUserSkills() {
         // Arrange
         List<Skill> skillList = List.of(Skill.builder().build(), Skill.builder().build());
-        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(User.builder().id(userId).build()));
-        Mockito.when(skillRepository.findAllByUserId(userId)).thenReturn(skillList);
+        when(skillRepository.findAllByUserId(userId)).thenReturn(skillList);
 
         // Act
         skillService.getUserSkills(userId);
 
         // Assert
-        Mockito.verify(userRepository, Mockito.times(1)).findById(userId);
-        Mockito.verify(skillRepository, Mockito.times(1)).findAllByUserId(userId);
-        Mockito.verify(skillMapper, Mockito.times(skillList.size())).toDto(Mockito.any());
-    }
-
-    @Test
-    public void getUserSkills_whenUserIdIsNotExist_thenThrowRuntimeException() {
-        // Arrange
-        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.empty());
-
-        // Act & Assert
-        Assert.assertThrows(RuntimeException.class, () -> skillService.getUserSkills(userId));
+        assertAll(
+                () -> verify(skillRepository, times(1)).findAllByUserId(userId),
+                () -> verify(skillMapper, times(skillList.size())).toDto(any()),
+                () -> verify(skillValidation, times(1)).validateUserId(userId)
+        );
     }
 
     @Test
@@ -105,29 +115,44 @@ class SkillServiceTest {
                 Skill.builder().id(1).title("java").build()
         );
         int uniqueSKillsCount = (int) skillsOfferedToUser.stream().distinct().count();
-        SkillCandidateDto skillCandidateDto = new SkillCandidateDto(new SkillDto(1L, "Skill"), 1);
+        SkillCandidateDto skillCandidateDto = new SkillCandidateDto(skillDto, 1);
 
-        Mockito.when(skillRepository.findSkillsOfferedToUser(userId)).thenReturn(skillsOfferedToUser);
-        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(User.builder().id(userId).build()));
-        Mockito.when(skillCandidateMapper.toDto(Mockito.any())).thenReturn(skillCandidateDto);
+        when(skillRepository.findSkillsOfferedToUser(userId)).thenReturn(skillsOfferedToUser);
+        when(skillCandidateMapper.toDto(any())).thenReturn(skillCandidateDto);
 
         // Act
         skillService.getOfferedSkills(userId);
 
         // Assert
         assertAll(
-                () -> Mockito.verify(skillRepository, Mockito.times(1)).findSkillsOfferedToUser(userId),
-                () -> Mockito.verify(userRepository, Mockito.times(1)).findById(userId),
-                () -> Mockito.verify(skillCandidateMapper, Mockito.times(uniqueSKillsCount)).toDto(Mockito.any())
+                () -> verify(skillRepository, times(1)).findSkillsOfferedToUser(userId),
+                () -> verify(skillCandidateMapper, times(uniqueSKillsCount)).toDto(any()),
+                () -> verify(skillValidation, times(1)).validateUserId(userId)
         );
     }
 
     @Test
-    public void getOfferedSkills_whenUserIdIsNotExist_thenThrowRuntimeException() {
+    public void acquireSkillFromOffers_whenUserIdAndSkillIdIsExist_thenReturnSkillDto() {
         // Arrange
-        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        Skill skill = new Skill();
+        List<SkillOffer> skillOffers = List.of(
+                new SkillOffer(1, skill, Recommendation.builder().author(User.builder().id(3).build()).build()),
+                new SkillOffer(2, skill, Recommendation.builder().author(User.builder().id(4).build()).build()),
+                new SkillOffer(3, skill, Recommendation.builder().author(User.builder().id(5).build()).build()));
+        when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.empty());
+        when(skillOfferRepository.findAllOffersOfSkill(skillId, userId)).thenReturn(skillOffers);
 
-        // Act & Assert
-        Assert.assertThrows(RuntimeException.class, () -> skillService.getOfferedSkills(userId));
+        // Act
+        skillService.acquireSkillFromOffers(skillId, userId);
+
+        // Assert
+        assertAll(
+                () -> verify(skillMapper, times(1)).toDto(any()),
+                () -> verify(skillOfferRepository, times(1)).findAllOffersOfSkill(skillId, userId),
+                () -> verify(skillRepository, times(1)).assignSkillToUser(skillId, userId),
+                () -> verify(userSkillGuaranteeRepository, times(skillOffers.size())).save(any()),
+                () -> verify(skillValidation, times(1)).validateUserId(userId),
+                () -> verify(skillValidation, times(1)).validateSkillId(skillId)
+        );
     }
 }

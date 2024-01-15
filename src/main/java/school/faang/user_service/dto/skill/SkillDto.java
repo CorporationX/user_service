@@ -10,8 +10,4 @@ import lombok.NoArgsConstructor;
 public class SkillDto {
     private Long id;
     private String title;
-
-    public SkillDto(String title) {
-        this.title = title;
-    }
 }

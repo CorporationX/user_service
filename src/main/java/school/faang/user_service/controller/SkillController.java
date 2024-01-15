@@ -1,40 +1,39 @@
 package school.faang.user_service.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.exception.skill.DataValidationException;
 import school.faang.user_service.service.SkillService;
+import school.faang.user_service.validate.skill.SkillValidation;
 
 import java.util.List;
 
-@Component
+@Controller
+@RequiredArgsConstructor
 public class SkillController {
 
     private final SkillService skillService;
-
-    @Autowired
-    public SkillController(SkillService skillService) {
-        this.skillService = skillService;
-    }
+    private final SkillValidation skillValidation;
 
     public SkillDto create(SkillDto skill) {
-        validateSkill(skill);
+        skillValidation.validateSkillTitle(skill);
         return skillService.create(skill);
     }
 
-    public void validateSkill(SkillDto skill) {
-        if (skill.getTitle().isBlank()) {
-            throw new DataValidationException("Введите наименование навыка");
-        }
-    }
-
     public List<SkillDto> getUserSkills(long userId) {
+        skillValidation.validateNullUserId(userId);
         return skillService.getUserSkills(userId);
     }
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
+        skillValidation.validateNullUserId(userId);
         return skillService.getOfferedSkills(userId);
+    }
+
+    public SkillDto acquireSkillFromOffers(long skillId, long userId) {
+        skillValidation.validateNullSkillId(skillId);
+        skillValidation.validateNullUserId(userId);
+        return skillService.acquireSkillFromOffers(skillId, userId);
     }
 }

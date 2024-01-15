@@ -98,4 +98,10 @@ public class GoalServiceTest {
         verify(goalRepository, times(2)).addSkillToGoal(anyLong(), anyLong());
         verify(skillRepository, times(2)).assignSkillToUser(anyLong(), anyLong());
     }
+
+    @Test
+    void testDeleteGoal() {
+        goalService.deleteGoal(1L);
+        verify(goalRepository, times(1)).deleteById(1L);
+    }
 }

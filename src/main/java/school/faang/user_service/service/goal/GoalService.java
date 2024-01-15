@@ -47,4 +47,8 @@ public class GoalService {
                             .forEach(s1 -> skillRepository.assignSkillToUser(s1.getId(), user.getId())));
         }
     }
+
+    public void deleteGoal(Long goalId) {
+        goalRepository.deleteById(goalId);
+    }
 }

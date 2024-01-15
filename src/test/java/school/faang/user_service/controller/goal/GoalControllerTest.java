@@ -49,4 +49,10 @@ public class GoalControllerTest {
 
         verify(goalService, times(1)).updateGoal(goalId, goalDto);
     }
+
+    @Test
+    void testDeleteGoal() {
+        goalService.deleteGoal(1L);
+        verify(goalService, times(1)).deleteGoal(1L);
+    }
 }

@@ -27,4 +27,8 @@ public class GoalController {
             goalService.updateGoal(goalId, goal);
         }
     }
+
+    public void deleteGoal(Long goalId) {
+        goalService.deleteGoal(goalId);
+    }
 }

@@ -20,18 +20,11 @@ class GoalServiceTest {
     private GoalService goalService;
     Goal goal;
 
-    @BeforeEach
-    void init() {
-        goal = Goal.builder()
-                .id(1L)
-                .build();
-    }
-
     @Test
     @DisplayName("Missing target remove test")
     void testDeleteGoalById() {
-        goalService.deleteGoal(goal.getId());
+        goalService.deleteGoal(1L);
 
-        Mockito.verify(goalRepository).deleteById(goal.getId());
+        Mockito.verify(goalRepository).deleteById(1L);
     }
 }

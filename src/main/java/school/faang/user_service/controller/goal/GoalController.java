@@ -11,10 +11,10 @@ public class GoalController {
     private final GoalService goalService;
 
     public void deleteGoal(Long goalId) {
-        if (goalId != null && goalId > 0) {
-            goalService.deleteGoal(goalId);
-        } else {
+        if (goalId == null || goalId < 0) {
             throw new IllegalArgumentException("Invalid ID: " + goalId);
+        } else {
+            goalService.deleteGoal(goalId);
         }
     }
 }

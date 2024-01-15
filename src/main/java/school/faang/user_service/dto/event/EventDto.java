@@ -2,11 +2,13 @@ package school.faang.user_service.dto.event;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import school.faang.user_service.dto.event.validation.ValidationGroups;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.event.EventType;
@@ -19,6 +21,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EventDto {
+    @Null(message = "Id must be null for creation", groups = ValidationGroups.Create.class)
+    @NotNull(message = "Id cannot be null for update", groups = ValidationGroups.Update.class)
     private Long id;
     @NotBlank(message = "Title cannot be blank")
     private String title;

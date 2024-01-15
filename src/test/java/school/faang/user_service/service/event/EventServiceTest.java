@@ -138,4 +138,33 @@ class EventServiceTest {
         Mockito.verify(eventRepository).deleteById(eventId);
     }
 
+
+    @Test
+    public void update_ShouldUpdateEvent() {
+
+        SkillDto skillDto1 = SkillDto.builder().id(1L).title("Skill 1").build();
+        SkillDto skillDto2 = SkillDto.builder().id(2L).title("Skill 2").build();
+        eventDto.setId(1L);
+        eventDto.setOwnerId(1L);
+        eventDto.setRelatedSkills(Arrays.asList(skillDto1, skillDto2));
+
+
+        Skill skill1 = Skill.builder().id(1L).title("Skill 1").build();
+        Skill skill2 = Skill.builder().id(2L).title("Skill 2").build();
+        user.setId(1L);
+        user.setSkills(Arrays.asList(skill1, skill2));
+
+        Event event = Event.builder().id(1L).owner(user).relatedSkills(Arrays.asList(skill1, skill2)).build();
+
+        Mockito.when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(user));
+        Mockito.when(eventRepository.save(eventMapper.toEntity(eventDto))).thenReturn(event);
+
+        EventDto eventDto1 = assertDoesNotThrow(() -> eventService.updateEvent(eventDto));
+
+        Mockito.verify(eventRepository).save(eventMapper.toEntity(eventDto));
+        assertEquals(eventDto1, eventDto);
+
+    }
+
+
 }

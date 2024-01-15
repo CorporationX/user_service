@@ -48,6 +48,13 @@ public class EventService {
         eventRepository.deleteById(eventId);
     }
 
+
+    public EventDto updateEvent(EventDto eventDto) {
+        checkUserSkills(eventDto);
+        Event event = eventRepository.save(eventMapper.toEntity(eventDto));
+        return eventMapper.toDto(event);
+    }
+
     private void checkUserSkills(EventDto eventDto) {
         User user = userRepository.findById(eventDto.getOwnerId())
                 .orElseThrow(() -> new UserNotFoundException("User by ID: " + eventDto.getOwnerId() + " not found"));

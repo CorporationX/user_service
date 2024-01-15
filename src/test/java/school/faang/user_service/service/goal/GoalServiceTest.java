@@ -18,7 +18,6 @@ class GoalServiceTest {
 
     @InjectMocks
     private GoalService goalService;
-    Goal goal;
 
     @Test
     @DisplayName("Missing target remove test")

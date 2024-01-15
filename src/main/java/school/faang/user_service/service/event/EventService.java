@@ -7,6 +7,7 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EventNotFoundException;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.mapper.skill.SkillMapper;
@@ -36,7 +37,7 @@ public class EventService {
 
     public EventDto getEvent(Long eventId) {
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new IllegalArgumentException("Event with ID: " + eventId + " not found"));
+                .orElseThrow(() -> new EventNotFoundException("Event by ID: " + eventId + " not found"));
         return eventMapper.toDto(event);
     }
 

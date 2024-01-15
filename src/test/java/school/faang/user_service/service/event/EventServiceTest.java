@@ -117,7 +117,7 @@ class EventServiceTest {
     public void get_ShouldThrowDataValidationException() {
         Long eventId = 1L;
         Mockito.when(eventRepository.findById(eventId)).thenReturn(Optional.empty());
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> eventService.getEvent(eventId));
+        EventNotFoundException exception = assertThrows(EventNotFoundException.class, () -> eventService.getEvent(eventId));
         assertEquals("Event with ID: " + eventId + " not found", exception.getMessage());
     }
 

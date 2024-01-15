@@ -12,5 +12,6 @@ private final GoalService goalService;
 
     public void updateGoal(Long goalId, GoalDto goal){
         //Проверить на наличие названия
+
     }
 }

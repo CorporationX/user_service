@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
@@ -91,19 +92,19 @@ public class GoalValidatorTest {
 
     @Test
     void testIsValidateByEmptyTitleShouldSuccess() {
-        Goal goal = new Goal();
-        goal.setTitle("Goals title");
+        GoalDto goalDto = new GoalDto();
+        goalDto.setTitle("Goals title");
 
-        assertEquals(goalValidator.isValidateByEmptyTitle(goal), true);
+        assertEquals(goalValidator.isValidateByEmptyTitle(goalDto), true);
     }
 
     @Test
     void testIsValidateByEmptyTitleShouldException() {
-        Goal goal = new Goal();
-        goal.setTitle(" ");
+        GoalDto goalDto = new GoalDto();
+        goalDto.setTitle(" ");
 
         DataValidationException dataValidationException = assertThrows(DataValidationException.class,
-                () -> goalValidator.isValidateByEmptyTitle(goal));
+                () -> goalValidator.isValidateByEmptyTitle(goalDto));
 
         assertEquals(dataValidationException.getMessage(), "Title is empty!");
     }

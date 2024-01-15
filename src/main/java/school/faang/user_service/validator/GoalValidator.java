@@ -2,6 +2,7 @@ package school.faang.user_service.validator;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
@@ -33,7 +34,7 @@ public class GoalValidator {
         throw new DataValidationException("Not enough skills for the goal!");
     }
 
-    public Boolean isValidateByEmptyTitle(Goal goal) {
+    public Boolean isValidateByEmptyTitle(GoalDto goal) {
         if (!goal.getTitle().trim().isEmpty()) {
             return true;
         }

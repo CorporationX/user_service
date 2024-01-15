@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.validator.GoalValidator;
 
@@ -28,13 +28,13 @@ public class GoalControllerTest {
 
     @Test
     void testCreateGoal() {
-        Goal goal = new Goal();
+        GoalDto goalDto = new GoalDto();
         Long userId = 1L;
 
-        when(goalValidator.isValidateByEmptyTitle(goal)).thenReturn(true);
+        when(goalValidator.isValidateByEmptyTitle(goalDto)).thenReturn(true);
 
-        goalController.createGoal(userId,goal);
+        goalController.createGoal(userId,goalDto);
 
-        verify(goalService,times(1)).createGoal(userId,goal);
+        verify(goalService,times(1)).createGoal(userId,goalDto);
     }
 }

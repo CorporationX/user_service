@@ -1,5 +1,6 @@
 package school.faang.user_service.service.goal;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.Skill;
@@ -17,6 +18,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GoalService {
     private final GoalRepository goalRepository;
+    private final UserRepository userRepository;
+    private final SkillService skillService;
 
     public void deleteGoal(long goalID) {
         goalRepository.deleteById(goalID);

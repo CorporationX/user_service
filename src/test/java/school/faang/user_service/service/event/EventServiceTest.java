@@ -15,6 +15,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EventNotFoundException;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.mapper.event.EventMapperImpl;
@@ -120,5 +121,21 @@ class EventServiceTest {
         assertEquals("Event with ID: " + eventId + " not found", exception.getMessage());
     }
 
+    @Test
+    public void delete_ShouldThrowEventNotFoundException() {
+        Long eventId = 1L;
+        Mockito.when(eventRepository.existsById(eventId)).thenReturn(false);
+        EventNotFoundException exception = assertThrows(EventNotFoundException.class, () -> eventService.deleteEvent(eventId));
+        assertEquals("Event by ID: " + eventId + " not found for deleted", exception.getMessage());
+    }
+
+
+    @Test
+    public void delete_ShouldDeleteEvent() {
+        Long eventId = 1L;
+        Mockito.when(eventRepository.existsById(eventId)).thenReturn(true);
+        eventService.deleteEvent(eventId);
+        Mockito.verify(eventRepository).deleteById(eventId);
+    }
 
 }

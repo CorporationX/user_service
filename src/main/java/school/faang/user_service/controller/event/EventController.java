@@ -32,6 +32,12 @@ public class EventController {
         return eventService.getEvent(id);
     }
 
+
+    @DeleteMapping("/{id}")
+    public void deleteEvent(@PathVariable @Positive(message = "id cannot be negative or equals 0") Long id) {
+        eventService.deleteEvent(id);
+    }
+
     private void validateBindingResult(BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new DataValidationException(getErrMsgBindingRes(bindingResult));
     }

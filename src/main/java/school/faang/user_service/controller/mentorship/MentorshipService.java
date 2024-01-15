@@ -15,24 +15,27 @@ public class MentorshipService {
     private final UserMapper userMapper;
 
     public List<UserDTO> getMenteesOfUser(long mentorId) {
-        return getMentorById(mentorId).getMentees().stream()
+        return getUserById(mentorId).getMentees().stream()
                 .map(userMapper::toUserDTO)
                 .toList();
     }
 
     public List<UserDTO> getMentorsOfUser(long menteeId) {
-        return getMenteeById(menteeId).getMentors().stream()
+        return getUserById(menteeId).getMentors().stream()
                 .map(userMapper::toUserDTO)
                 .toList();
     }
 
-    public User getMentorById(long mentorId) {
-        return userRepository.findById(mentorId)
-                .orElseThrow(() -> new EntityNotFoundException("Mentor with id " + mentorId + " not found"));
+    public void deleteMentee(long menteeId, long mentorId) {
+        User mentee = getUserById(menteeId);
+        User mentor = getUserById(mentorId);
+        if (mentor.getMentees().contains(mentee))
+            mentor.getMentees().remove(mentee);
+        userRepository.save(mentor);
     }
 
-    public User getMenteeById(long menteeId) {
-        return userRepository.findById(menteeId)
-                .orElseThrow(() -> new EntityNotFoundException("Mentee were not found for this id " + menteeId));
+    public User getUserById(long mentorId) {
+        return userRepository.findById(mentorId)
+                .orElseThrow(() -> new EntityNotFoundException("User with id " + mentorId + " not found"));
     }
 }

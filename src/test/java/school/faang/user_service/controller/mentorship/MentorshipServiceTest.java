@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -80,7 +81,7 @@ class MentorshipServiceTest {
     }
 
     @Test
-    public void testMentorshipService_getMentorsOfUser(){
+    public void testMentorshipService_getMentorsOfUser() {
         when(userMapper.toUserDTO(userMentor)).thenReturn(userDTOMentor);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         assertEquals(listOfMentors.get(0), mentorshipService.getMentorsOfUser(1).get(0));
@@ -88,17 +89,21 @@ class MentorshipServiceTest {
     }
 
     @Test
-    public void testGetMentorById_shouldEntityNotFoundException(){
-        long id = -1;
-        assertThrows(EntityNotFoundException.class,
-                () -> mentorshipService.getMentorById(id));
+    public void testDeleteMentee_shouldNewListOfMenteeByMentor() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.findById(100L)).thenReturn(Optional.of(userMentee));
+        mentorshipService.deleteMentee(100, 1);
+        verify(userRepository).findById(1L);
+        verify(userRepository).findById(100L);
+        assertFalse(user.getMentees().contains(userMentee));
+        verify(userRepository).save(user);
     }
 
     @Test
-    public void testGetMenteeById_shouldEntityNotFoundException(){
+    public void testGetUserById_shouldEntityNotFoundException() {
         long id = -1;
         assertThrows(EntityNotFoundException.class,
-                () -> mentorshipService.getMenteeById(id));
+                () -> mentorshipService.getUserById(id));
     }
 
     @Test
@@ -106,10 +111,9 @@ class MentorshipServiceTest {
         Throwable exception = assertThrows(
                 EntityNotFoundException.class,
                 () -> {
-                    throw new EntityNotFoundException("Mentor with id not found");
+                    throw new EntityNotFoundException("User with id not found");
                 }
         );
-        assertEquals("Mentor with id not found", exception.getMessage());
+        assertEquals("User with id not found", exception.getMessage());
     }
-
 }

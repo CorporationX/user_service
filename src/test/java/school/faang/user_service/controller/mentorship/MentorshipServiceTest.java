@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipServiceTest {
@@ -29,7 +30,8 @@ class MentorshipServiceTest {
     private User user;
     private User userMentee;
     private User userMentor;
-    private UserDTO userDTO;
+    private UserDTO userDTOMentee;
+    private UserDTO userDTOMentor;
     private List<UserDTO> listOfMentee = new ArrayList<>();
     private List<UserDTO> listOfMentors = new ArrayList<>();
 
@@ -55,27 +57,48 @@ class MentorshipServiceTest {
                 .mentors(mentorsOfUser)
                 .build();
 
-        userDTO = UserDTO.builder()
+        userDTOMentee = UserDTO.builder()
                 .id(100)
                 .username("Vasiliy")
                 .build();
 
-        listOfMentee.add(userDTO);
-        listOfMentors.add(userDTO);
+        userDTOMentor = UserDTO.builder()
+                .id(10)
+                .username("Alex")
+                .build();
+
+        listOfMentee.add(userDTOMentee);
+        listOfMentors.add(userDTOMentor);
     }
 
     @Test
     public void testMentorshipService_GoodId() {
-        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userMapper.toUserDTO(userMentee)).thenReturn(userDTOMentee);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         assertEquals(listOfMentee.get(0), mentorshipService.getMenteesOfUser(1).get(0));
         Mockito.verify(userRepository).findById(1L);
     }
 
     @Test
     public void testMentorshipService_getMentorsOfUser(){
-        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userMapper.toUserDTO(userMentor)).thenReturn(userDTOMentor);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         assertEquals(listOfMentors.get(0), mentorshipService.getMentorsOfUser(1).get(0));
         Mockito.verify(userRepository).findById(1L);
+    }
+
+    @Test
+    public void testGetMentorById_shouldEntityNotFoundException(){
+        long id = -1;
+        assertThrows(EntityNotFoundException.class,
+                () -> mentorshipService.getMentorById(id));
+    }
+
+    @Test
+    public void testGetMenteeById_shouldEntityNotFoundException(){
+        long id = -1;
+        assertThrows(EntityNotFoundException.class,
+                () -> mentorshipService.getMenteeById(id));
     }
 
     @Test

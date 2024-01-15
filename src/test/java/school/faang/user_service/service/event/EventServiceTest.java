@@ -25,6 +25,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -164,6 +165,23 @@ class EventServiceTest {
         Mockito.verify(eventRepository).save(eventMapper.toEntity(eventDto));
         assertEquals(eventDto1, eventDto);
 
+    }
+
+
+    @Test
+    public void getList_ShouldGetOwnedEvents() {
+        Long userId = 1L;
+        Event event1 = Event.builder().id(1L).title("event 1").build();
+        Event event2 = Event.builder().id(2L).title("event 2").build();
+
+        EventDto eventDto1 = EventDto.builder().id(1L).title("event 1").build();
+        EventDto eventDto2 = EventDto.builder().id(2L).title("event 2").build();
+
+        List<EventDto> expectedEventDtoList = Arrays.asList(eventDto1, eventDto2);
+
+        Mockito.when(eventRepository.findAllByUserId(userId)).thenReturn(Arrays.asList(event1, event2));
+        List<EventDto> eventDtoList = eventService.getOwnedEvents(userId);
+        assertEquals(expectedEventDtoList, eventDtoList);
     }
 
 

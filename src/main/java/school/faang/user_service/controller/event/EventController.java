@@ -12,6 +12,8 @@ import school.faang.user_service.dto.event.validation.ValidationGroups;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventService;
 
+import java.util.List;
+
 import static school.faang.user_service.util.Utils.getErrMsgBindingRes;
 
 @RestController
@@ -46,6 +48,13 @@ public class EventController {
         return eventService.updateEvent(eventDto);
 
     }
+
+
+    @GetMapping("/owner/{userId}")
+    public List<EventDto> getOwnedEvents(@PathVariable @Positive(message = "id cannot be negative or equals 0") Long userId) {
+        return eventService.getOwnedEvents(userId);
+    }
+
 
     private void validateBindingResult(BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new DataValidationException(getErrMsgBindingRes(bindingResult));

@@ -6,8 +6,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
 
@@ -17,6 +20,8 @@ import java.util.Optional;
 public class MentorshipRequestServiceTest {
     @Mock
     private MentorshipRequestRepository mentorshipRequestRepository;
+    @Mock
+    private UserRepository userRepository;
     @Mock
     private MentorshipRequestMapper mentorshipRequestMapper;
 
@@ -29,15 +34,15 @@ public class MentorshipRequestServiceTest {
         long requesterId = 1L;
         long receiverId = 2L;
 
-        Mockito.when(mentorshipRequestRepository.existsById(receiverId)).thenReturn(false);
-        Mockito.when(mentorshipRequestRepository.existsById(requesterId)).thenReturn(true);
+        Mockito.when(userRepository.existsById(receiverId)).thenReturn(false);
+        Mockito.when(userRepository.existsById(requesterId)).thenReturn(true);
 
         Assert.assertThrows(
                 IllegalArgumentException.class,
                 () -> mentorshipRequestService.requestMentorship(new MentorshipRequestDto(requesterId, receiverId, "String")
         ));
 
-        Mockito.verify(mentorshipRequestRepository, Mockito.times(1))
+        Mockito.verify(userRepository, Mockito.times(1))
                 .existsById(receiverId);
     }
 
@@ -46,28 +51,28 @@ public class MentorshipRequestServiceTest {
         long requesterId = 1L;
         long receiverId = 2L;
 
-        Mockito.when(mentorshipRequestRepository.existsById(requesterId)).thenReturn(false);
-        Mockito.when(mentorshipRequestRepository.existsById(receiverId)).thenReturn(true);
+        Mockito.when(userRepository.existsById(requesterId)).thenReturn(false);
+        Mockito.when(userRepository.existsById(receiverId)).thenReturn(true);
 
         Assert.assertThrows(
                 IllegalArgumentException.class,
                 () -> mentorshipRequestService.requestMentorship(new MentorshipRequestDto(requesterId, receiverId, "String")
                 ));
 
-        Mockito.verify(mentorshipRequestRepository, Mockito.times(1))
+        Mockito.verify(userRepository, Mockito.times(1))
                 .existsById(requesterId);
     }
 
     @Test
     public void testIsNotRequestToYourselfIsInvalid() {
-        Mockito.when(mentorshipRequestRepository.existsById(1L)).thenReturn(true);
+        Mockito.when(userRepository.existsById(1L)).thenReturn(true);
 
         Assert.assertThrows(
           IllegalArgumentException.class,
                 () -> mentorshipRequestService.requestMentorship(new MentorshipRequestDto(1L, 1L, "description"))
         );
 
-        Mockito.verify(mentorshipRequestRepository, Mockito.times(1))
+        Mockito.verify(userRepository, Mockito.times(1))
                 .existsById(1L);
     }
 
@@ -76,8 +81,8 @@ public class MentorshipRequestServiceTest {
         Long requesterId = 1L;
         Long receiverId = 2L;
 
-        Mockito.when(mentorshipRequestRepository.existsById(requesterId)).thenReturn(true);
-        Mockito.when(mentorshipRequestRepository.existsById(receiverId)).thenReturn(true);
+        Mockito.when(userRepository.existsById(requesterId)).thenReturn(true);
+        Mockito.when(userRepository.existsById(receiverId)).thenReturn(true);
 
         MentorshipRequest request = new MentorshipRequest();
         request.setUpdatedAt(LocalDateTime.now().minusMonths(2));
@@ -94,11 +99,52 @@ public class MentorshipRequestServiceTest {
         Long requesterId = 1L;
         Long receiverId = 2L;
 
-        Mockito.when(mentorshipRequestRepository.existsById(requesterId)).thenReturn(true);
-        Mockito.when(mentorshipRequestRepository.existsById(receiverId)).thenReturn(true);
+        Mockito.when(userRepository.existsById(requesterId)).thenReturn(true);
+        Mockito.when(userRepository.existsById(receiverId)).thenReturn(true);
 
         mentorshipRequestService.requestMentorship(new MentorshipRequestDto(requesterId, receiverId, "description"));
         Mockito.verify(mentorshipRequestRepository, Mockito.times(1))
                 .create(requesterId, receiverId, "description");
+    }
+
+    @Test
+    public void testRequestExistsIsInvalid() {
+        long requestId = 1L;
+        Mockito.when(mentorshipRequestRepository.existsById(requestId)).thenReturn(false);
+
+        Assert.assertThrows(
+                IllegalArgumentException.class,
+                () -> mentorshipRequestService.rejectRequest(requestId, new RejectionDto("Reason"))
+        );
+    }
+
+    @Test
+    public void testReasonIsGiven() {
+        long requestId = 1L;
+        String reason = "Reason";
+
+        Mockito.when(mentorshipRequestRepository.existsById(requestId)).thenReturn(true);
+
+        MentorshipRequest mentorshipRequest = mentorshipRequestRepository.findById(requestId).orElseThrow();
+
+        mentorshipRequestService.rejectRequest(requestId, new RejectionDto(reason));
+        Mockito.verify(mentorshipRequest, Mockito.times(1))
+                .setRejectionReason(reason);
+    }
+
+    @Test
+    public void testStatusChanged() {
+        long requestId = 1L;
+
+        Mockito.when(mentorshipRequestRepository.existsById(requestId)).thenReturn(true);
+
+        MentorshipRequest mentorshipRequest = new MentorshipRequest();
+        mentorshipRequest.setId(requestId);
+        mentorshipRequest.setStatus(RequestStatus.PENDING);
+
+        Mockito.when(mentorshipRequestRepository.findById(requestId)).thenReturn(Optional.of(mentorshipRequest));
+        mentorshipRequestService.rejectRequest(requestId, new RejectionDto("Reason"));
+
+        Assert.assertEquals(RequestStatus.REJECTED, mentorshipRequest.getStatus());
     }
 }

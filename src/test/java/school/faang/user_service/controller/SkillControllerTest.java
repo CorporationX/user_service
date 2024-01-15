@@ -9,6 +9,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.service.SkillService;
 
+import static org.junit.Assert.*;
+
 @ExtendWith(MockitoExtension.class)
 class SkillControllerTest {
 
@@ -19,12 +21,17 @@ class SkillControllerTest {
     private SkillController skillController;
 
     @Test
-    public void validateSkill_whenNullTitleSkill_thenThrowRuntimeException() {
-        Assert.assertThrows(RuntimeException.class, () -> skillController.validateSkill(new SkillDto( null)));
+    public void create_whenNullOrBlankTitleSkill_thenThrowRuntimeException() {
+        assertThrows(RuntimeException.class, () -> skillController.create(new SkillDto(null)));
+        assertThrows(RuntimeException.class, () -> skillController.create(new SkillDto("   ")));
     }
 
     @Test
-    public void validateSkill_whenBlankTitleSkill_thenThrowRuntimeException() {
-        Assert.assertThrows(RuntimeException.class, () -> skillController.validateSkill(new SkillDto( "   ")));
+    public void getUserSkills_whenNullUserId_thenThrowRuntimeException() {
+        assertThrows(RuntimeException.class, ()-> skillController.getUserSkills(0));
+    }
+    @Test
+    public void getOfferedSkills_whenNullUserId_thenThrowRuntimeException() {
+        assertThrows(RuntimeException.class, ()-> skillController.getOfferedSkills(0));
     }
 }

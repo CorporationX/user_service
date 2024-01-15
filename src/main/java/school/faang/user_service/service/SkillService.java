@@ -1,7 +1,6 @@
 package school.faang.user_service.service;
 
-import jakarta.validation.constraints.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
@@ -15,6 +14,7 @@ import school.faang.user_service.repository.UserRepository;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class SkillService {
 
     private final SkillRepository skillRepository;
@@ -22,19 +22,11 @@ public class SkillService {
     private final SkillCandidateMapper skillCandidateMapper;
     private final UserRepository userRepository;
 
-    @Autowired
-    public SkillService(SkillRepository skillRepository, SkillMapper skillMapper, SkillCandidateMapper skillCandidateMapper, UserRepository userRepository) {
-        this.skillRepository = skillRepository;
-        this.skillMapper = skillMapper;
-        this.skillCandidateMapper = skillCandidateMapper;
-        this.userRepository = userRepository;
-    }
-
     public SkillDto create(SkillDto skill) {
         if (!skillRepository.existsByTitle(skill.getTitle())) {
             Skill savedSkill = skillRepository.save(skillMapper.toEntity(skill));
             return skillMapper.toDto(savedSkill);
-        } else throw new DataValidationException("Навык с таким именем уже существует");
+        } else throw new DataValidationException("Такой навык уже существует");
     }
 
     public List<SkillDto> getUserSkills(long userId) {

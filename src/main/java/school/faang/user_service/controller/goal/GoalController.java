@@ -1,25 +1,22 @@
 package school.faang.user_service.controller.goal;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.goal.GoalService;
 
 @Controller
+@RequiredArgsConstructor
 public class GoalController {
     private final GoalService goalService;
 
-    @Autowired
-    public GoalController(GoalService goalService) {
-        this.goalService = goalService;
-    }
 
-    public void createGoal(Long userId, Goal goal) {
-        //Проверяем на наличие названия
+    public GoalDto createGoal(Long userId, GoalDto goal) {
         if (goal.getTitle() == null || goal.getTitle().isBlank()) {
-            return;
+            throw new DataValidationException("Название цели не должно быть пустым");
         }
-        //Сохраняем в БД
-        goalService.createGoal(userId, goal);
+        return goalService.createGoal(userId, goal);
     }
 }

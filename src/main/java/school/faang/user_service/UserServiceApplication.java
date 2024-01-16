@@ -8,10 +8,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
-import school.faang.user_service.controller.goal.GoalController;
-import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.goal.GoalService;
 
 @SpringBootApplication
 @EnableFeignClients("school.faang.user_service.client")

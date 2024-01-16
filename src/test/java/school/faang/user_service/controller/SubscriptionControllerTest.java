@@ -5,15 +5,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.service.SubscriptionService;
 import school.faang.user_service.validator.SubscriptionValidator;
 
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SubscriptionControllerTest {
+    @Mock
+    private UserContext userContext;
 
     @Mock
     private SubscriptionService subscriptionService;
@@ -29,10 +31,11 @@ class SubscriptionControllerTest {
         long followerId = 1;
         long followeeId = 2;
 
-        subscriptionController.followUser(followerId, followeeId);
+        when(userContext.getUserId()).thenReturn(followerId);
+        subscriptionController.followUser(followeeId);
 
         verify(subscriptionService, times(1)).followUser(followerId, followeeId);
-        verify(subscriptionValidator, times(1)).validateSubscriptionId(followerId, followeeId);
+        verify(subscriptionValidator, times(1)).validateUserIds(followerId, followeeId);
     }
 
     @Test
@@ -40,10 +43,11 @@ class SubscriptionControllerTest {
         long followerId = 1;
         long followeeId = 2;
 
-        subscriptionController.unfollowUser(followerId, followeeId);
+        when(userContext.getUserId()).thenReturn(followerId);
+        subscriptionController.unfollowUser(followeeId);
 
         verify(subscriptionService, times(1)).unfollowUser(followerId, followeeId);
-        verify(subscriptionValidator, times(1)).validateUnsubscriptionId(followerId, followeeId);
+        verify(subscriptionValidator, times(1)).validateUserIds(followerId, followeeId);
     }
 
     @Test

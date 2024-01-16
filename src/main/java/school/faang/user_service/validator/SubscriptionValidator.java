@@ -4,49 +4,26 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
+import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.SubscriptionService;
 
 @Service
 @RequiredArgsConstructor
 public class SubscriptionValidator {
     private final SubscriptionRepository subscriptionRepository;
+    private final UserRepository userRepository;
 
-    public void validateSubscriptionId(long followerId, long followeeId) {
+    public void validateUserIds(long followerId, long followeeId) {
         if (followerId == followeeId) {
-            throw new DataValidationException("Нельзя подписаться на самого себя");
+            throw new DataValidationException("FollowerId и followeeId не могут совпадать");
         }
     }
 
-    public void validateSubscriptionExits(long followerId, long followeeId) {
-        if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
-            throw new DataValidationException("Такая подписка уже существует");
+    public boolean validateSubscription(long followerId, long followeeId) {
+        if (!userRepository.existsById(followerId) || !userRepository.existsById(followeeId)) {
+            throw new DataValidationException("Нет пользователя с таким айди");
         }
 
-        if (!subscriptionRepository.existsById(followerId)) {
-            throw new DataValidationException("Пользователь не существует");
-        }
-
-        if (!subscriptionRepository.existsById(followeeId)) {
-            throw new DataValidationException("Нельзя подписаться на несуществующего пользователя");
-        }
-    }
-
-    public void validateUnsubscriptionId(long followerId, long followeeId) {
-        if (followerId == followeeId) {
-            throw new DataValidationException("Нельзя отписаться от самого себя");
-        }
-    }
-
-    public void validateUnsubscriptionExits(long followerId, long followeeId) {
-        if (!subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
-            throw new DataValidationException("Такoй подписки не существует");
-        }
-
-        if (!subscriptionRepository.existsById(followerId)) {
-            throw new DataValidationException("Пользователь не существует");
-        }
-
-        if (!subscriptionRepository.existsById(followeeId)) {
-            throw new DataValidationException("Нельзя отписаться от несуществующего пользователя");
-        }
+        return subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
     }
 }

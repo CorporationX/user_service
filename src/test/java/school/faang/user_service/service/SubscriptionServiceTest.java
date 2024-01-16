@@ -46,9 +46,10 @@ class SubscriptionServiceTest {
         long followerId = 1;
         long followeeId = 2;
 
+        when(subscriptionValidator.validateSubscription(followerId, followeeId)).thenReturn(false);
         subscriptionService.followUser(followerId, followeeId);
 
-        verify(subscriptionValidator, times(1)).validateSubscriptionExits(followerId, followeeId);
+        verify(subscriptionValidator, times(1)).validateSubscription(followerId, followeeId);
         verify(subscriptionRepository, times(1)).followUser(followerId, followeeId);
     }
 
@@ -57,9 +58,10 @@ class SubscriptionServiceTest {
         long followerId = 1;
         long followeeId = 2;
 
+        when(subscriptionValidator.validateSubscription(followerId, followeeId)).thenReturn(true);
         subscriptionService.unfollowUser(followerId, followeeId);
 
-        verify(subscriptionValidator, times(1)).validateUnsubscriptionExits(followerId, followeeId);
+        verify(subscriptionValidator, times(1)).validateSubscription(followerId, followeeId);
         verify(subscriptionRepository, times(1)).unfollowUser(followerId, followeeId);
     }
 
@@ -81,7 +83,7 @@ class SubscriptionServiceTest {
         user3.setEmail("ivan@example.com");
         List<User> followers = List.of(user1, user2, user3);
 
-        when(subscriptionRepository.findByFollowerId(followeeId)).thenReturn(followers.stream());
+        when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(followers.stream());
 
         List<UserDto> actualDtos = subscriptionService.getFollowers(followeeId, filters);
 
@@ -119,7 +121,7 @@ class SubscriptionServiceTest {
         user3.setEmail("ivan@example.com");
         List<User> followers = List.of(user1, user2, user3);
 
-        when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(followers.stream());
+        when(subscriptionRepository.findByFollowerId(followeeId)).thenReturn(followers.stream());
 
         List<UserDto> actualDtos = subscriptionService.getFollowing(followeeId, filters);
 

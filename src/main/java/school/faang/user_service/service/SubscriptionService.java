@@ -2,16 +2,18 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.validator.SubscriptionValidator;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,42 +23,50 @@ public class SubscriptionService {
     private final List<UserFilter> userFilters;
     private final SubscriptionValidator subscriptionValidator;
 
+    @Transactional
     public void followUser(long followerId, long followeeId) {
-        subscriptionValidator.validateSubscriptionExits(followerId, followeeId);
+        if (subscriptionValidator.validateSubscription(followerId, followeeId)){
+            throw new DataValidationException("Такая подписка уже есть");
+        }
         subscriptionRepository.followUser(followerId, followeeId);
     }
 
+    @Transactional
     public void unfollowUser(long followerId, long followeeId) {
-        subscriptionValidator.validateUnsubscriptionExits(followerId, followeeId);
+        if (!subscriptionValidator.validateSubscription(followerId, followeeId)){
+            throw new DataValidationException("Такой подписки нет");
+        }
         subscriptionRepository.unfollowUser(followerId, followeeId);
     }
 
-    public List<UserDto> getFollowers(long followeeId, UserFilterDto filters) {
-        List<User> initialUsers = subscriptionRepository.findByFollowerId(followeeId).toList();
+    @Transactional(readOnly = true)
+    public List<UserDto> getFollowers(long followerId, UserFilterDto filters) {
+        List<User> followers = subscriptionRepository.findByFolloweeId(followerId).toList();
 
         for (UserFilter filter : userFilters) {
             if (filter.isApplicable(filters)) {
-                initialUsers = filter.apply(initialUsers.stream(), filters).toList();
+                followers = filter.apply(followers.stream(), filters).toList();
             }
         }
 
-        return userMapper.toDto(initialUsers);
+        return userMapper.toDto(followers);
     }
 
     public long getFollowersCount(long followeeId) {
         return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
     }
 
+    @Transactional(readOnly = true)
     public List<UserDto> getFollowing(long followeeId, UserFilterDto filters) {
-        List<User> initialUsers = subscriptionRepository.findByFolloweeId(followeeId).toList();
+        List<User> following = subscriptionRepository.findByFollowerId(followeeId).toList();
 
         for (UserFilter filter : userFilters) {
             if (filter.isApplicable(filters)) {
-                initialUsers = filter.apply(initialUsers.stream(), filters).toList();
+                following = filter.apply(following.stream(), filters).toList();
             }
         }
 
-        return userMapper.toDto(initialUsers);
+        return userMapper.toDto(following);
     }
 
     public long getFollowingCount(long followerId){

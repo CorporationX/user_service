@@ -1,7 +1,13 @@
 package school.faang.user_service.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.service.SubscriptionService;
@@ -9,35 +15,67 @@ import school.faang.user_service.validator.SubscriptionValidator;
 
 import java.util.List;
 
-@Controller
+@Tag(name = "Контролер подписок")
+@RequestMapping("/api")
+@RestController
 @RequiredArgsConstructor
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
     private final SubscriptionValidator subscriptionValidator;
+    private final UserContext userContext;
 
-    public void followUser(long followerId, long followeeId) {
-        subscriptionValidator.validateSubscriptionId(followerId, followeeId);
+    @Operation(
+            summary = "Подписка",
+            description = "Позволяет подписаться на пользователя",
+            parameters = {@Parameter(in = ParameterIn.HEADER, name = "x-user-id", description = "id пользователя", required = true)})
+    @PutMapping("/follow/{id}")
+    public void followUser(@PathVariable("id") long followeeId) {
+        long followerId = userContext.getUserId();
+        subscriptionValidator.validateUserIds(followerId, followeeId);
         subscriptionService.followUser(followerId, followeeId);
     }
 
-    public void unfollowUser(long followerId, long followeeId) {
-        subscriptionValidator.validateUnsubscriptionId(followerId, followeeId);
+    @Operation(
+            summary = "Отписка",
+            description = "Позволяет отписаться от пользователя",
+            parameters = {@Parameter(in = ParameterIn.HEADER, name = "x-user-id", description = "id пользователя", required = true)}
+    )
+    @DeleteMapping("/unfollow{id}")
+    public void unfollowUser(@PathVariable("id") long followeeId) {
+        long followerId = userContext.getUserId();
+        subscriptionValidator.validateUserIds(followerId, followeeId);
         subscriptionService.unfollowUser(followerId, followeeId);
     }
 
-    public List<UserDto> getFollowers(long followeeId, UserFilterDto filters) {
+    @Operation(
+            summary = "Получение подписчиков"
+    )
+    @PostMapping("/users/{id}/followers")
+    public List<UserDto> getFollowers(@PathVariable("id") long followeeId, @RequestBody UserFilterDto filters) {
         return subscriptionService.getFollowers(followeeId, filters);
     }
 
-    public long getFollowersCount(long followeeId) {
+    @Operation(
+            summary = "Получение тех на кого подписался пользователь"
+    )
+    @PostMapping("/users/{id}/followees")
+    public List<UserDto> getFollowing(@PathVariable("id") long followerId, @RequestBody UserFilterDto filter) {
+        return subscriptionService.getFollowing(followerId, filter);
+    }
+
+    @Operation(
+            summary = "Получение количества подписчиков пользователя"
+    )
+    @GetMapping("/users/{id}/followers/count")
+    public long getFollowersCount(@PathVariable("id") long followeeId) {
         return subscriptionService.getFollowersCount(followeeId);
     }
 
-    public List<UserDto> getFollowing(long followeeId, UserFilterDto filter) {
-        return subscriptionService.getFollowing(followeeId, filter);
-    }
-
-    public long getFollowingCount(long followerId){
+    @Operation(
+            summary = "Получение количества тех на кого подписался пользователь"
+    )
+    @GetMapping("/users/{id}/followees/count")
+    public long getFollowingCount(@PathVariable("id") long followerId){
         return subscriptionService.getFollowingCount(followerId);
     }
 }

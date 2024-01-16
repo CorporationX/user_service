@@ -14,9 +14,9 @@ import java.util.Optional;
 
 @Component
 public class MentorshipRequestService {
-    MentorshipRequestRepository mentorshipRequestRepository;
-    UserRepository userRepository;
-    MentorshipRequestMapper mentorshipRequestMapper;
+    private MentorshipRequestRepository mentorshipRequestRepository;
+    private UserRepository userRepository;
+    private MentorshipRequestMapper mentorshipRequestMapper;
     @Autowired
     public MentorshipRequestService(MentorshipRequestRepository mentorshipRequestRepository) {
         this.mentorshipRequestRepository = mentorshipRequestRepository;
@@ -28,8 +28,14 @@ public class MentorshipRequestService {
         boolean isRequesterExists = userRepository.existsById(mentorshipRequestDto.getRequesterId());
         boolean isNotRequestToYourself = mentorshipRequestDto.getRequesterId() != mentorshipRequestDto.getReceiverId();
 
-        if (!isMoreThanThreeMonths && !isRecieverExists && !isRequesterExists && !isNotRequestToYourself) {
-            throw new IllegalArgumentException("Error validation");
+        if (!isMoreThanThreeMonths) {
+            throw new IllegalArgumentException("Less than 3 months have passed since last request");
+        } else if (!isRecieverExists) {
+            throw new IllegalArgumentException("There are no this receiver in data base");
+        } else if (!isRequesterExists) {
+            throw new IllegalArgumentException("There are no this requester in data base");
+        } else if (!isNotRequestToYourself) {
+            throw new IllegalArgumentException("You can not send a request to yourself");
         }
 
         mentorshipRequestRepository.create(mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId(), mentorshipRequestDto.getDescription());

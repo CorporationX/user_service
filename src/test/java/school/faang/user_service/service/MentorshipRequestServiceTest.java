@@ -2,6 +2,7 @@ package school.faang.user_service.service;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -27,12 +28,16 @@ public class MentorshipRequestServiceTest {
     @InjectMocks
     MentorshipRequestService mentorshipRequestService;
 
+    private long requesterId;
+    private long receiverId;
+    @BeforeEach
+    public void setUp() {
+        long requesterId = 1L;
+        long receiverId = 2L;
+    }
 
     @Test
     public void testIsReceiverExistsIsInvalid() {
-        long requesterId = 1L;
-        long receiverId = 2L;
-
         Mockito.when(userRepository.existsById(receiverId)).thenReturn(false);
         Mockito.when(userRepository.existsById(requesterId)).thenReturn(true);
 
@@ -47,9 +52,6 @@ public class MentorshipRequestServiceTest {
 
     @Test
     public void testIsRequesterExistsIsInvalid() {
-        long requesterId = 1L;
-        long receiverId = 2L;
-
         Mockito.when(userRepository.existsById(requesterId)).thenReturn(false);
         Mockito.when(userRepository.existsById(receiverId)).thenReturn(true);
 
@@ -77,9 +79,6 @@ public class MentorshipRequestServiceTest {
 
     @Test
     public void testIsMoreThanThreeMonthsIsInvalid() {
-        Long requesterId = 1L;
-        Long receiverId = 2L;
-
         Mockito.when(userRepository.existsById(requesterId)).thenReturn(true);
         Mockito.when(userRepository.existsById(receiverId)).thenReturn(true);
 
@@ -95,9 +94,6 @@ public class MentorshipRequestServiceTest {
 
     @Test
     public void testRequestMentorship() {
-        Long requesterId = 1L;
-        Long receiverId = 2L;
-
         Mockito.when(userRepository.existsById(requesterId)).thenReturn(true);
         Mockito.when(userRepository.existsById(receiverId)).thenReturn(true);
 

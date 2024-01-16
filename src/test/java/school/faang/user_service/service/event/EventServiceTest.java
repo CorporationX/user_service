@@ -10,6 +10,7 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
@@ -17,6 +18,8 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EventNotFoundException;
 import school.faang.user_service.exception.UserNotFoundException;
+import school.faang.user_service.filter.event.EventOwnerFilter;
+import school.faang.user_service.filter.event.EventTitleFilter;
 import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.mapper.event.EventMapperImpl;
 import school.faang.user_service.mapper.skill.SkillMapper;
@@ -198,6 +201,35 @@ class EventServiceTest {
         Mockito.when(eventRepository.findParticipatedEventsByUserId(userId)).thenReturn(Arrays.asList(event1, event2));
         List<EventDto> eventDtoList = eventService.getParticipatedEvents(userId);
         assertEquals(expectedEventDtoList, eventDtoList);
+    }
+
+
+    @Test
+    public void filter_ShouldGetEventsByFilter() {
+        Skill skill1 = Skill.builder().id(1L).title("Skill 1").build();
+        Skill skill2 = Skill.builder().id(2L).title("Skill 2").build();
+
+        EventFilterDto eventFilterDto = new EventFilterDto();
+        eventFilterDto.setOwnerId(1L);
+        eventFilterDto.setTitlePattern("tittle 1");
+
+        User user1 = User.builder().id(1L).build();
+        User user2 = User.builder().id(2L).build();
+        User user3 = User.builder().id(3L).build();
+
+        Event event1 = Event.builder().id(1L).owner(user1).title("tittle 1").build();
+        Event event2 = Event.builder().id(2L).owner(user2).title("event 2").build();
+        Event event3 = Event.builder().id(3L).owner(user3).title("event 3").build();
+
+        EventDto eventDto = EventDto.builder().id(1L).ownerId(1L).title("tittle 1").build();
+
+        Mockito.when(eventRepository.findAll()).thenReturn(Arrays.asList(event1, event2, event3));
+
+        eventService = new EventService(eventRepository, userRepository, eventMapper, skillMapper, Arrays.asList(new EventTitleFilter(), new EventOwnerFilter()));
+
+        List<EventDto> eventDtoList = eventService.getEventsByFilter(eventFilterDto);
+
+        assertEquals(Arrays.asList(eventDto), eventDtoList);
     }
 
 

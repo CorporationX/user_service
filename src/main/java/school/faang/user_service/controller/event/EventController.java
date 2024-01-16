@@ -8,6 +8,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.event.validation.ValidationGroups;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventService;
@@ -58,6 +59,12 @@ public class EventController {
     @GetMapping("/participant/{userId}")
     public List<EventDto> getParticipatedEvents(@PathVariable @Positive(message = "id cannot be negative or equals 0") long userId) {
         return eventService.getParticipatedEvents(userId);
+    }
+
+
+    @GetMapping("/filtered")
+    public List<EventDto> getEventsByFilter(EventFilterDto filter) {
+        return eventService.getEventsByFilter(filter);
     }
 
 

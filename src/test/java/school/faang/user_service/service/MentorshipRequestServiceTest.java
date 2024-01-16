@@ -15,6 +15,7 @@ import school.faang.user_service.repository.mentorship.MentorshipRequestReposito
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public class MentorshipRequestServiceTest {
@@ -146,5 +147,63 @@ public class MentorshipRequestServiceTest {
         mentorshipRequestService.rejectRequest(requestId, new RejectionDto("Reason"));
 
         Assert.assertEquals(RequestStatus.REJECTED, mentorshipRequest.getStatus());
+    }
+
+    @Test
+    public void testIsRequestExistsInDbIsInvalid() {
+        long requestId = 1L;
+        Mockito.when(mentorshipRequestRepository.existsById(requestId)).thenReturn(false);
+
+        Assert.assertThrows(IllegalArgumentException.class,
+                () -> mentorshipRequestService.acceptRequest(requestId));
+    }
+
+    @Test
+    public void testRequesterNotContainsMentorIsInvalid() {
+        long requestId = 1L;
+        long requesterId = 1L;
+        long receiverId = 2L;
+        Mockito.when(mentorshipRequestRepository.existsById(requestId)).thenReturn(true);
+        Mockito.when(userRepository.existsById(requesterId)).thenReturn(true);
+        Mockito.when(userRepository.existsById(receiverId)).thenReturn(true);
+
+        boolean condition1 = mentorshipRequestService.getMentorsAndUsers().containsKey(receiverId);
+        boolean condition2 = mentorshipRequestService.getMentorsAndUsers().get(receiverId).contains(requesterId);
+
+        Assert.assertThrows(IllegalArgumentException.class, () -> {
+            if (!condition1 || !condition2) {
+                throw new IllegalArgumentException("The user is already the sender's mentor");
+            }
+        });
+    }
+
+    @Test
+    public void testAddToList() {
+        long requestId = 1L;
+        long requesterId = 1L;
+        long receiverId = 2L;
+        Mockito.when(mentorshipRequestRepository.existsById(requestId)).thenReturn(true);
+        Mockito.when(userRepository.existsById(requesterId)).thenReturn(true);
+        Mockito.when(userRepository.existsById(receiverId)).thenReturn(true);
+
+        mentorshipRequestService.acceptRequest(requestId);
+        Mockito.verify(mentorshipRequestService.getMentorsAndUsers(), Mockito.times(1))
+                .put(List.of(receiverId), List.of(requesterId));
+    }
+
+    @Test
+    public void testStatusChangesToAccepted() {
+        long requestId = 1L;
+
+        Mockito.when(mentorshipRequestRepository.existsById(requestId)).thenReturn(true);
+
+        MentorshipRequest mentorshipRequest = new MentorshipRequest();
+        mentorshipRequest.setId(requestId);
+        mentorshipRequest.setStatus(RequestStatus.PENDING);
+
+        Mockito.when(mentorshipRequestRepository.findById(requestId)).thenReturn(Optional.of(mentorshipRequest));
+        mentorshipRequestService.acceptRequest(requestId);
+
+        Assert.assertEquals(RequestStatus.ACCEPTED, mentorshipRequest.getStatus());
     }
 }

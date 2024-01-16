@@ -1,5 +1,6 @@
 package school.faang.user_service.service.mentorship;
 
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.MentorshipRequestDto;
@@ -11,13 +12,14 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
-
+import java.util.*;
+@Data
 @Component
 public class MentorshipRequestService {
-    MentorshipRequestRepository mentorshipRequestRepository;
-    UserRepository userRepository;
-    MentorshipRequestMapper mentorshipRequestMapper;
+    private MentorshipRequestRepository mentorshipRequestRepository;
+    private UserRepository userRepository;
+    private MentorshipRequestMapper mentorshipRequestMapper;
+    private Map<List<Long>, List<Long>> mentorsAndUsers = new HashMap<>();
     @Autowired
     public MentorshipRequestService(MentorshipRequestRepository mentorshipRequestRepository) {
         this.mentorshipRequestRepository = mentorshipRequestRepository;
@@ -29,8 +31,14 @@ public class MentorshipRequestService {
         boolean isRequesterExists = userRepository.existsById(mentorshipRequestDto.getRequesterId());
         boolean isNotRequestToYourself = mentorshipRequestDto.getRequesterId() != mentorshipRequestDto.getReceiverId();
 
-        if (!isMoreThanThreeMonths && !isRecieverExists && !isRequesterExists && !isNotRequestToYourself) {
-            throw new IllegalArgumentException("Error validation");
+        if (!isMoreThanThreeMonths) {
+            throw new IllegalArgumentException("Less than 3 months have passed since last request");
+        } else if (!isRecieverExists) {
+            throw new IllegalArgumentException("There are no this receiver in data base");
+        } else if (!isRequesterExists) {
+            throw new IllegalArgumentException("There are no this requester in data base");
+        } else if (!isNotRequestToYourself) {
+            throw new IllegalArgumentException("You can not send a request to yourself");
         }
 
         mentorshipRequestRepository.create(mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId(), mentorshipRequestDto.getDescription());
@@ -51,5 +59,21 @@ public class MentorshipRequestService {
         MentorshipRequest mentorshipRequestEntity = mentorshipRequestMapper.RejectionDtoToEntity(rejection);
         mentorshipRequestEntity = mentorshipRequestRepository.save(mentorshipRequestEntity);
         return mentorshipRequestMapper.toRejectionDto(mentorshipRequestEntity);
+    }
+
+    public void acceptRequest(long id) {
+        long mentorId = mentorshipRequestRepository.findById(id).get().getReceiver().getId();
+        long senderId = mentorshipRequestRepository.findById(id).get().getRequester().getId();
+
+        if(!mentorshipRequestRepository.existsById(id)) {
+            throw new IllegalArgumentException("There are no this request in DB");
+        }
+
+        if(mentorsAndUsers.containsKey(mentorId) && mentorsAndUsers.get(mentorId).contains(senderId)){
+            throw new IllegalArgumentException("The user is already the sender's mentor");
+        }
+
+        mentorsAndUsers.put(List.of(mentorId), List.of(senderId));
+        mentorshipRequestRepository.findById(id).get().setStatus(RequestStatus.ACCEPTED);
     }
 }

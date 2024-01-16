@@ -52,7 +52,7 @@ public class GoalControllerTest {
 
     @Test
     void testDeleteGoal() {
-        goalService.deleteGoal(1L);
+        goalController.deleteGoal(1L);
         verify(goalService, times(1)).deleteGoal(1L);
     }
 }

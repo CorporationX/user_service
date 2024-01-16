@@ -31,15 +31,15 @@ public class EventController {
         return eventService.createEvent(eventDto);
     }
 
-    @GetMapping("/{id}")
-    public EventDto getEvent(@PathVariable @Positive(message = "id cannot be negative or equals 0") Long id) {
-        return eventService.getEvent(id);
+    @GetMapping("/{eventId}")
+    public EventDto getEvent(@PathVariable @Positive(message = "id cannot be negative or equals 0") Long eventId) {
+        return eventService.getEvent(eventId);
     }
 
 
-    @DeleteMapping("/{id}")
-    public void deleteEvent(@PathVariable @Positive(message = "id cannot be negative or equals 0") Long id) {
-        eventService.deleteEvent(id);
+    @DeleteMapping("/{eventId}")
+    public void deleteEvent(@PathVariable @Positive(message = "id cannot be negative or equals 0") Long eventId) {
+        eventService.deleteEvent(eventId);
     }
 
     @PutMapping
@@ -53,6 +53,11 @@ public class EventController {
     @GetMapping("/owner/{userId}")
     public List<EventDto> getOwnedEvents(@PathVariable @Positive(message = "id cannot be negative or equals 0") Long userId) {
         return eventService.getOwnedEvents(userId);
+    }
+
+    @GetMapping("/participant/{userId}")
+    public List<EventDto> getParticipatedEvents(@PathVariable @Positive(message = "id cannot be negative or equals 0") long userId) {
+        return eventService.getParticipatedEvents(userId);
     }
 
 

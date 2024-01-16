@@ -184,5 +184,21 @@ class EventServiceTest {
         assertEquals(expectedEventDtoList, eventDtoList);
     }
 
+    @Test
+    public void getList_ShouldGetParticipatedEvents() {
+        Long userId = 1L;
+        Event event1 = Event.builder().id(1L).title("event 1").build();
+        Event event2 = Event.builder().id(2L).title("event 2").build();
+
+        EventDto eventDto1 = EventDto.builder().id(1L).title("event 1").build();
+        EventDto eventDto2 = EventDto.builder().id(2L).title("event 2").build();
+
+        List<EventDto> expectedEventDtoList = Arrays.asList(eventDto1, eventDto2);
+
+        Mockito.when(eventRepository.findParticipatedEventsByUserId(userId)).thenReturn(Arrays.asList(event1, event2));
+        List<EventDto> eventDtoList = eventService.getParticipatedEvents(userId);
+        assertEquals(expectedEventDtoList, eventDtoList);
+    }
+
 
 }

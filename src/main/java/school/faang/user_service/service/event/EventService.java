@@ -59,6 +59,10 @@ public class EventService {
         return eventMapper.toListEventDto(eventRepository.findAllByUserId(userId));
     }
 
+    public List<EventDto> getParticipatedEvents(Long userId) {
+        return eventMapper.toListEventDto(eventRepository.findParticipatedEventsByUserId(userId));
+    }
+
     private void checkUserSkills(EventDto eventDto) {
         User user = userRepository.findById(eventDto.getOwnerId())
                 .orElseThrow(() -> new UserNotFoundException("User by ID: " + eventDto.getOwnerId() + " not found"));

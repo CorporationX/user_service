@@ -11,11 +11,10 @@ import school.faang.user_service.service.goal.GoalService;
 public class GoalController {
 private final GoalService goalService;
 
-    public void updateGoal(Long goalId, GoalDto goal){
-        //Проверить на наличие названия
+    public GoalDto updateGoal(Long goalId, GoalDto goal){
         if (goal.getTitle() == null || goal.getTitle().isEmpty()){
             throw new DataValidationException("Goal title is empty");
         }
-        goalService.updateGoal(goalId, goal);
+        return goalService.updateGoal(goalId, goal);
     }
 }

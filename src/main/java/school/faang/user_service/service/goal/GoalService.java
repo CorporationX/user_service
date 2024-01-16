@@ -18,40 +18,36 @@ public class GoalService {
     private final GoalRepository goalRepository;
     private final SkillService skillService;
     private final GoalMapper goalMapper;
-    public void updateGoal(Long goalId, GoalDto goal){
-        //Получить текущую цель, проверить на наличие
+    public GoalDto updateGoal(Long goalId, GoalDto goal){
+
         Optional<Goal> foundGoal = goalRepository.findById(goalId);
         if (foundGoal.isEmpty()){
             throw new DataValidationException("Цель не найдена");
         }
 
-        // Перевести в сущность
         Goal updatedGoal = goalMapper.toEntity(goal);
+        updatedGoal.setId(goalId);
         Goal currentGoal = foundGoal.get();
 
-        // Произвести валидацию
-        //Если завершает - то она не должна быть завершена
         if (currentGoal.getStatus() == GoalStatus.COMPLETED &&
         updatedGoal.getStatus() == GoalStatus.COMPLETED){
             throw new DataValidationException("Цель уже завершена");
         }
-        //Содержит только существующие скиллы
+
         if (!updatedGoal.getSkillsToAchieve().stream()
             .allMatch(skillService::validateSkill)){
-             throw new DataValidationException("Некорректные скиллы");
-            }
-
-
-        // Обновить в БД
-        updatedGoal.setId(goalId);
-        goalRepository.save(updatedGoal);
-
-        //Если цель завершена - присваиваем скиллы всем участникам цели
-        if (updatedGoal.getStatus() == GoalStatus.COMPLETED){
-            updatedGoal.getUsers().forEach(user -> currentGoal.getSkillsToAchieve()
-                            .forEach(skill -> skillService.assignSkillToUser(user.getId(), skill.getId())));
+            throw new DataValidationException("Некорректные скиллы");
         }
 
 
+        if (updatedGoal.getStatus() == GoalStatus.COMPLETED){
+            updatedGoal.getUsers().forEach(user -> currentGoal.getSkillsToAchieve()
+                            .forEach(skill -> skillService.assignSkillToUser(user.getId(), skill.getId())));
+
+        }
+
+
+
+        return goalMapper.toDto(goalRepository.save(updatedGoal));
     }
 }

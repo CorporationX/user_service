@@ -6,9 +6,7 @@ import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.entity.goal.GoalInvitation;
 
 import java.util.List;
 
@@ -16,28 +14,16 @@ import java.util.List;
 public interface GoalMapper {
 
     @Mapping(source = "parent.id", target = "parentId")
-    @Mapping(source = "mentor.id", target = "mentorId")
-    @Mapping(source = "invitations", target = "invitationsIds", qualifiedByName = "mapToInvitationsIds")
-    @Mapping(source = "users", target = "userIds", qualifiedByName = "mapToUserIds")
+    @Mapping(source = "skillsToAchieve", target = "skillIds", qualifiedByName = "toSkillIds")
     GoalDto toDto(Goal goal);
 
-    @Mapping(target = "mentor", ignore = true)
-    @Mapping(target = "invitations", ignore = true)
-    @Mapping(target = "users", ignore = true)
+
+    @Mapping(target = "parent", ignore = true)
+    @Mapping(target = "skillsToAchieve", ignore = true)
     Goal toEntity(GoalDto goalDto);
 
-
-
-    @Named("mapToUserIds")
-    default List<Long> mapToUserIds(List<User> users){
-        return users.stream().map(User::getId).toList();
-    }
-    @Named("mapToInvitationsIds")
-    default List<Long> mapToInvitationsIds(List<GoalInvitation> invitations){
-        return invitations.stream().map(GoalInvitation::getId).toList();
-    }
-    @Named("mapToSkillsToAchieveIds")
-    default List<Long> mapToSkillsToAchieveIds(List<Skill> skills) {
+    @Named("toSkillIds")
+    default List<Long> toSkillIds(List<Skill> skills) {
         return skills.stream().map(Skill::getId).toList();
     }
 }

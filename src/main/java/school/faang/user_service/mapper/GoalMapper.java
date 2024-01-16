@@ -19,13 +19,13 @@ public interface GoalMapper {
     @Mapping(source = "mentor.id", target = "mentorId")
     @Mapping(source = "invitations", target = "invitationsIds", qualifiedByName = "mapToInvitationsIds")
     @Mapping(source = "users", target = "userIds", qualifiedByName = "mapToUserIds")
-    @Mapping(source = "skillsToAchieve", target = "skillsToAchieveIds", qualifiedByName = "mapToSkillsToAchieveIds")
     GoalDto toDto(Goal goal);
 
+    @Mapping(target = "mentor", ignore = true)
     @Mapping(target = "invitations", ignore = true)
     @Mapping(target = "users", ignore = true)
-    @Mapping(target = "skillsToAchieve", ignore = true)
     Goal toEntity(GoalDto goalDto);
+
 
 
     @Named("mapToUserIds")

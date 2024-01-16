@@ -10,13 +10,13 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-private final UserRepository userRepository;
+    private final UserRepository userRepository;
 
-public Optional<User> findUserById(long id) {
-    return userRepository.findById(id);
-}
+    public Optional<User> findUserById(long id) {
+        return userRepository.findById(id);
+    }
 
-public void saveUser(User user) {
-    userRepository.save(user);
-}
+    public void saveUser(User user) {
+        userRepository.save(user);
+    }
 }

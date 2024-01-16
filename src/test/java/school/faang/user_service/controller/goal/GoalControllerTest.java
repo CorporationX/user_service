@@ -6,8 +6,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.goal.GoalService;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class GoalControllerTest {
@@ -18,35 +22,38 @@ class GoalControllerTest {
     private GoalController goalController;
 
     private Long userId;
-    private Goal goal;
+    private GoalDto goalDto;
 
 
     @Test
-    void blankTitleTest() {
+    void blankTitleExceptionTest() {
         userId = 1L;
-        goal = new Goal();
-        goal.setTitle("");
+        goalDto = new GoalDto();
+        goalDto.setTitle("");
 
-        goalController.createGoal(userId, goal);
-        Mockito.verify(goalService, Mockito.never()).createGoal(userId, goal);
+        DataValidationException dataValidationException = assertThrows(DataValidationException.class,
+                () -> goalController.createGoal(userId, goalDto));
+        assertEquals("Название цели не должно быть пустым", dataValidationException.getMessage());
     }
 
     @Test
     void nullTitleTest() {
         userId = 1L;
-        goal = new Goal();
+        goalDto = new GoalDto();
+        goalDto.setTitle(null);
 
-        goalController.createGoal(userId, goal);
-        Mockito.verify(goalService, Mockito.never()).createGoal(userId, goal);
+        DataValidationException dataValidationException = assertThrows(DataValidationException.class,
+                () -> goalController.createGoal(userId, goalDto));
+        assertEquals("Название цели не должно быть пустым", dataValidationException.getMessage());
     }
 
     @Test
     void shouldCreateGoal() {
         userId = 1L;
-        goal = new Goal();
-        goal.setTitle("Title");
+        goalDto = new GoalDto();
+        goalDto.setTitle("Title");
 
-        goalController.createGoal(userId, goal);
-        Mockito.verify(goalService, Mockito.times(1)).createGoal(userId, goal);
+        goalController.createGoal(userId, goalDto);
+        Mockito.verify(goalService, Mockito.times(1)).createGoal(userId, goalDto);
     }
 }

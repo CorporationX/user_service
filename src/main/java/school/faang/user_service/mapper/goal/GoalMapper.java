@@ -23,7 +23,7 @@ public interface GoalMapper {
     Goal toEntity(GoalDto goalDto);
 
     @Named("toSkillIds")
-    private List<Long> toSkillIds(List<Skill> skills) {
+    default List<Long> toSkillIds(List<Skill> skills) {
         return skills.stream().map(Skill::getId).toList();
     }
 }

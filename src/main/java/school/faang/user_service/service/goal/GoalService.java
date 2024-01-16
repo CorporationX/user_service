@@ -1,7 +1,6 @@
 package school.faang.user_service.service.goal;
 
 import lombok.RequiredArgsConstructor;
-import org.hibernate.query.sql.internal.ParameterRecognizerImpl;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.User;
@@ -22,7 +21,6 @@ public class GoalService {
     private final int MAX_GOALS_PER_USER = 3;
 
 
-
     public GoalDto createGoal(long userId, GoalDto goalDto) {
         if (goalRepository.countActiveGoalsPerUser(userId) == MAX_GOALS_PER_USER) {
             throw new DataValidationException("Достигнуто максимальное количество целей");
@@ -31,10 +29,11 @@ public class GoalService {
             throw new DataValidationException("Некорректные скиллы");
         }
         Goal goalToSave = goalMapper.toEntity(goalDto);
-        if (goalRepository.existsById(goalDto.getParentId())){
+        if (goalRepository.existsById(goalDto.getParentId())) {
             goalToSave.setParent(goalRepository.findById(goalDto.getParentId()).get());
         }
         goalToSave.setSkillsToAchieve(skillService.findSkillsByGoalId(goalDto.getId()));
+        skillService.saveSkills(goalToSave.getSkillsToAchieve());
 
         User userToUpdate = userService.findUserById(userId).get();
         userToUpdate.getGoals().add(goalToSave);

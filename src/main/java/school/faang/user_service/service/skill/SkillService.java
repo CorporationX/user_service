@@ -14,20 +14,23 @@ public class SkillService {
     private final SkillRepository skillRepository;
 
 
-    public boolean validateSkill(Skill skill){
+    public boolean validateSkill(Skill skill) {
         return skillRepository.existsByTitle(skill.getTitle());
     }
-    public boolean validateSkillById(long id){
+
+    public boolean validateSkillById(long id) {
         return skillRepository.existsById(id);
     }
 
-    public void saveSkill(Skill skill){
+    public void saveSkill(Skill skill) {
         skillRepository.save(skill);
     }
-    public void saveSkills(List<Skill> skills){
+
+    public void saveSkills(List<Skill> skills) {
         skillRepository.saveAll(skills);
     }
-    public List<Skill> findSkillsByGoalId(long goalId){
+
+    public List<Skill> findSkillsByGoalId(long goalId) {
         return skillRepository.findSkillsByGoalId(goalId);
     }
 }

@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
@@ -103,5 +104,27 @@ public class GoalServiceTest {
     void testDeleteGoal() {
         goalService.deleteGoal(1L);
         verify(goalRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    void testGetGoalsByUser() {
+        Long userId = 1L;
+        GoalFilterDto filter = new GoalFilterDto("Some title",GoalStatus.ACTIVE);
+        GoalDto goldDtoExpected = new GoalDto();
+        goldDtoExpected.
+//        goldDtoExpected.setSkillIds(List.of(1L));
+        List<GoalDto> expectedList = List.of(goldDtoExpected);
+        Goal goal1 = new Goal();
+        goal1.setTitle("Title1");
+        goal1.setStatus(GoalStatus.ACTIVE);
+        Goal goal2 = new Goal();
+        goal2.setTitle("Some title");
+        goal2.setStatus(GoalStatus.ACTIVE);
+
+        when(goalService.findGoalsByUserId(userId)).thenReturn(List.of(goal1,goal2));
+        when(goalMapper.toDto(goal2)).thenReturn(goldDtoExpected);
+
+        getGoalsByUser(userId, filter)
+
     }
 }

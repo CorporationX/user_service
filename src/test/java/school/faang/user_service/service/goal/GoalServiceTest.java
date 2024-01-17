@@ -15,7 +15,6 @@ import school.faang.user_service.validator.GoalValidator;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -51,12 +50,12 @@ public class GoalServiceTest {
         Long userId = 1L;
 
         when(goalValidator.isValidateByActiveGoals(userId)).thenReturn(true);
-        when(goalValidator.isValidateByExistingSkills(userId, goal)).thenReturn(true);
+        when(goalValidator.isValidateByExistingSkills(userId, goalDto)).thenReturn(true);
         when(goalMapper.toEntity(goalDto)).thenReturn(goal);
 
         goalService.createGoal(userId, goalDto);
 
         verify(goalRepository, times(1)).create(goal.getTitle(), goal.getDescription(), userId);
-        verify(goalRepository, times(4)).addSkillToGoal(anyLong(), anyLong());
+        verify(goalRepository, times(2)).addSkillToGoal(anyLong(), anyLong());
     }
 }

@@ -6,12 +6,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
-import school.faang.user_service.entity.Skill;
+import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.skill.SkillService;
 import school.faang.user_service.validator.GoalValidator;
 
 import java.util.List;
@@ -29,7 +28,7 @@ public class GoalValidatorTest {
     @Mock
     private GoalRepository goalRepository;
     @Mock
-    private SkillRepository skillRepository;
+    private SkillService skillService;
     @InjectMocks
     private GoalValidator goalValidator;
 
@@ -57,35 +56,28 @@ public class GoalValidatorTest {
 
     @Test
     void testisValidateByExistingSkillsShouldSuccess() {
-        User user = new User();
-        user.setId(1L);
-        Goal goal = new Goal();
-        Skill skill_1 = new Skill();
-        skill_1.setId(1L);
-        Skill skill_2 = new Skill();
-        skill_2.setId(2L);
-        goal.setSkillsToAchieve(List.of(skill_1));
+        Long userId = 1L;
+        GoalDto goalDto = new GoalDto();
+        goalDto.setSkillIds(List.of(1L));
+        SkillDto skillDto_1 = SkillDto.builder().id(1L).build();
+        SkillDto skillDto_2 = SkillDto.builder().id(2L).build();
 
-        when(skillRepository.findAllByUserId(user.getId())).thenReturn(List.of(skill_1, skill_2));
+        when(skillService.getUserSkills(userId)).thenReturn(List.of(skillDto_1, skillDto_2));
 
-        assertEquals(goalValidator.isValidateByExistingSkills(1L, goal), true);
+        assertEquals(goalValidator.isValidateByExistingSkills(userId, goalDto), true);
     }
 
     @Test
     void testisValidateByExistingSkillsShouldException() {
-        User user = new User();
-        user.setId(1L);
-        Goal goal = new Goal();
-        Skill skill_1 = new Skill();
-        skill_1.setId(1L);
-        Skill skill_2 = new Skill();
-        skill_2.setId(2L);
-        goal.setSkillsToAchieve(List.of(skill_1));
+        Long userId = 1L;
+        GoalDto goalDto = new GoalDto();
+        goalDto.setSkillIds(List.of(1L));
+        SkillDto skillDto = SkillDto.builder().id(2L).build();
 
-        when(skillRepository.findAllByUserId(user.getId())).thenReturn(List.of(skill_2));
+        when(skillService.getUserSkills(userId)).thenReturn(List.of(skillDto));
 
         DataValidationException dataValidationException = assertThrows(DataValidationException.class,
-                () -> goalValidator.isValidateByExistingSkills(1L, goal));
+                () -> goalValidator.isValidateByExistingSkills(1L, goalDto));
 
         assertEquals(dataValidationException.getMessage(), "Not enough skills for the goal!");
     }

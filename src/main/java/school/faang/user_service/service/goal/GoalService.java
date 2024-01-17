@@ -21,10 +21,8 @@ public class GoalService {
     private final GoalMapper goalMapper;
 
     public void createGoal(Long userId, GoalDto goalDto) {
-        Goal goal = goalMapper.toEntity(goalDto);
-        goalDto.getSkillIds().forEach(s -> goalRepository.addSkillToGoal(s,goal.getId()));
-
-        if (goalValidator.isValidateByActiveGoals(userId) && goalValidator.isValidateByExistingSkills(userId, goal)) {
+        if (goalValidator.isValidateByActiveGoals(userId) && goalValidator.isValidateByExistingSkills(userId, goalDto)) {
+            Goal goal = goalMapper.toEntity(goalDto);
             goalRepository.create(goal.getTitle(), goal.getDescription(), userId);
             goal.getSkillsToAchieve().forEach(s -> goalRepository.addSkillToGoal(s.getId(), goal.getId()));
         }

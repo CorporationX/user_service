@@ -3,10 +3,10 @@ name: CI
 on:
   pull_request:
     branches:
-      - feature/pipeline-BC-BJS2-1627
+      - basilisk-master-bc2
   push:
     branches:
-      - feature/pipeline-BC-BJS2-1627
+      - basilisk-master-bc2
 
 jobs:
   build_and_run_tests:

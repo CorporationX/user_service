@@ -56,7 +56,7 @@ public class SubscriptionController {
     }
 
     @Operation(
-            summary = "Получение тех на кого подписался пользователь"
+            summary = "Получение подписок"
     )
     @PostMapping("/users/{id}/followees")
     public List<UserDto> getFollowing(@PathVariable("id") long followerId, @RequestBody UserFilterDto filter) {
@@ -64,7 +64,7 @@ public class SubscriptionController {
     }
 
     @Operation(
-            summary = "Получение количества подписчиков пользователя"
+            summary = "Получение количества подписчиков"
     )
     @GetMapping("/users/{id}/followers/count")
     public long getFollowersCount(@PathVariable("id") long followeeId) {
@@ -72,7 +72,7 @@ public class SubscriptionController {
     }
 
     @Operation(
-            summary = "Получение количества тех на кого подписался пользователь"
+            summary = "Получение количества подписок"
     )
     @GetMapping("/users/{id}/followees/count")
     public long getFollowingCount(@PathVariable("id") long followerId){

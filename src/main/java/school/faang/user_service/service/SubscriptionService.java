@@ -26,6 +26,8 @@ public class SubscriptionService {
 
     @Transactional
     public void followUser(long followerId, long followeeId) {
+        validateExitsUsers(followerId, followeeId);
+
         if (subscriptionValidator.validateSubscription(followerId, followeeId)){
             throw new DataValidationException("Такая подписка уже есть");
         }
@@ -35,6 +37,8 @@ public class SubscriptionService {
 
     @Transactional
     public void unfollowUser(long followerId, long followeeId) {
+        validateExitsUsers(followerId, followeeId);
+
         if (!subscriptionValidator.validateSubscription(followerId, followeeId)){
             throw new DataValidationException("Такой подписки нет");
         }

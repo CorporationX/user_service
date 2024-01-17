@@ -11,11 +11,8 @@ import school.faang.user_service.service.SubscriptionService;
 @RequiredArgsConstructor
 public class SubscriptionValidator {
     private final SubscriptionRepository subscriptionRepository;
-    private final SubscriptionService subscriptionService;
 
     public void validateUserIds(long followerId, long followeeId) {
-        subscriptionService.validateExitsUsers(followerId, followeeId);
-
         if (followerId == followeeId) {
             throw new DataValidationException("FollowerId и followeeId не могут совпадать");
         }

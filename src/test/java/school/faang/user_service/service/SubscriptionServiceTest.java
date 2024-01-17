@@ -42,7 +42,7 @@ class SubscriptionServiceTest {
 
     @BeforeEach
     void setUp() {
-        subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, userFilters, subscriptionValidator,userRepository);
+        subscriptionService = spy(new SubscriptionService(subscriptionRepository, userMapper, userFilters, subscriptionValidator,userRepository));
     }
 
     @Test
@@ -50,6 +50,7 @@ class SubscriptionServiceTest {
         long followerId = 1;
         long followeeId = 2;
 
+        doNothing().when(subscriptionService).validateExitsUsers(followerId, followeeId);
         when(subscriptionValidator.validateSubscription(followerId, followeeId)).thenReturn(false);
         subscriptionService.followUser(followerId, followeeId);
 
@@ -62,6 +63,7 @@ class SubscriptionServiceTest {
         long followerId = 1;
         long followeeId = 2;
 
+        doNothing().when(subscriptionService).validateExitsUsers(followerId, followeeId);
         when(subscriptionValidator.validateSubscription(followerId, followeeId)).thenReturn(true);
         subscriptionService.unfollowUser(followerId, followeeId);
 

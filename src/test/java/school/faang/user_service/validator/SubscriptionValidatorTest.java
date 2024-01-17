@@ -1,6 +1,5 @@
 package school.faang.user_service.validator;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -8,11 +7,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.SubscriptionService;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -20,9 +16,6 @@ public class SubscriptionValidatorTest {
 
     @Mock
     private SubscriptionRepository subscriptionRepository;
-
-    @Mock
-    private SubscriptionService subscriptionService;
 
     @InjectMocks
     private SubscriptionValidator subscriptionValidator;
@@ -37,16 +30,6 @@ public class SubscriptionValidatorTest {
     @Test
     public void validateUserIds_whenIdsDifferent_DoesNotThrowsException() {
         assertDoesNotThrow(() -> subscriptionValidator.validateUserIds(1L, 2L));
-    }
-
-    @Test
-    public void validateSubscription_whenUserDoesNotExist_ThrowsException() {
-        doThrow(new DataValidationException("Нет пользователя с таким айди"))
-                .when(subscriptionService).validateExitsUsers(1, 2);
-
-        DataValidationException dataValidationException = assertThrows(DataValidationException.class, () -> subscriptionValidator.validateUserIds(1L, 2L));
-
-        assertEquals("Нет пользователя с таким айди", dataValidationException.getMessage());
     }
 
     @Test

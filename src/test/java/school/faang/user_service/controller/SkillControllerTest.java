@@ -33,7 +33,7 @@ class SkillControllerTest {
     void testCreate_DataValidationException() {
         SkillDto skillDto = SkillDto.builder().title(null).build();
         Assertions.assertThrows(DataValidationException.class, () -> skillController.create(skillDto));
-  }
+    }
 
     @Test
     void testCreate_Create() {

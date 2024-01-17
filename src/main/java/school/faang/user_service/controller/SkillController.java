@@ -25,4 +25,8 @@ public class SkillController {
         }
         return valid;
     }
+
+    public void getUserSkills(Long userId) {
+        skillService.getUserSkills(userId);
+    }
 }

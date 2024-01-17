@@ -10,4 +10,10 @@ class UserServiceTest {
     void getUsers() {
         assertTrue(true);
     }
+
+    @Test
+    public void incompleteTest() {
+        fail("Not yet implemented");
+    }
+
 }

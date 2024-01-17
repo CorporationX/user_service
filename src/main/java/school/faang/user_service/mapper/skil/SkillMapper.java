@@ -4,12 +4,10 @@ import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import org.mapstruct.factory.Mappers;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Mapper(componentModel = "spring",
@@ -19,17 +17,17 @@ import java.util.List;
 public interface SkillMapper {
 
     @Mapping(target = "users", ignore = true)
-    Skill toEntity(SkillDto skillDto);
+    Skill toEntity (SkillDto skillDto);
 
     @Mapping(target = "userIds", source = "users", qualifiedByName = "usersToIds")
-    SkillDto toDto(Skill skill);
+    SkillDto toDto (Skill skill);
 
-    List<Skill> listToEntity(List<SkillDto> skillDtoList);
+    List<Skill> listToEntity (List<SkillDto> skillDtoList);
 
-    List<SkillDto> listToDto(List<Skill> skillList);
+    List<SkillDto> listToDto (List<Skill> skillList);
 
     @Named("usersToIds")
-    default List<Long> convertUsersToIds(List<User> users) {
+    default List<Long> convertUsersToIds (List<User> users) {
         return users.stream().map(User::getId).toList();
     }
 }

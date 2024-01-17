@@ -13,7 +13,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.skil.SkillMapper;
-import school.faang.user_service.mapper.SkillMapperImpl;
+import school.faang.user_service.mapper.skil.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.skill.SkillService;
@@ -91,7 +91,7 @@ public class SkillServiceTest {
     @Test
     public void testGetUserSkills () {
 
-       List<Skill> skillEntityList = user.getSkills();
+        List<Skill> skillEntityList = user.getSkills();
 
         Mockito.when(skillRepository.findAllByUserId(1L)).thenReturn(skillEntityList);
 

@@ -19,7 +19,7 @@ import school.faang.user_service.mapper.PremiumMapperImpl;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.premium.PremiumRepository;
-import school.faang.user_service.validator.ValidatorPremium;
+import school.faang.user_service.validator.PremiumValidator;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class PremiumServiceTest {
     @Mock
-    private ValidatorPremium validatorPremium;
+    private PremiumValidator premiumValidator;
 
     @Mock
     private PremiumRepository premiumRepository;
@@ -51,7 +51,7 @@ class PremiumServiceTest {
     void buyPremium_whenUserNotHavePremium_thenCreatePremium() {
         long userId = 1L;
         PremiumPeriod premiumPeriod = PremiumPeriod.ONE_MONTH;
-        doNothing().when(validatorPremium).validateUserId(userId);
+        doNothing().when(premiumValidator).validateUserId(userId);
 
         PaymentResponse paymentResponse = new PaymentResponse(PaymentStatus.SUCCESS, 1, 1, null, null, null);
         when(paymentServiceClient.sendPayment(any(PaymentRequest.class))).thenReturn(paymentResponse);
@@ -66,7 +66,7 @@ class PremiumServiceTest {
     void buyPremium_whenUserAlreadyHavePremium_thenThrowException() {
         long userId = 1L;
         doThrow(new DataValidationException("Пользователь уже имеет премиум подписку"))
-                .when(validatorPremium).validateUserId(userId);
+                .when(premiumValidator).validateUserId(userId);
 
         DataValidationException dataValidationException = assertThrows(DataValidationException.class, () -> premiumService.buyPremium(userId, PremiumPeriod.ONE_MONTH));
 
@@ -76,13 +76,13 @@ class PremiumServiceTest {
     @Test
     void buyPremium_whenPaymentFailed_thenThrowException() {
         long userId = 1L;
-        doNothing().when(validatorPremium).validateUserId(userId);
+        doNothing().when(premiumValidator).validateUserId(userId);
 
         PaymentResponse paymentResponse = new PaymentResponse(PaymentStatus.FAILURE, 1, 1, null, null, null);
         when(paymentServiceClient.sendPayment(any(PaymentRequest.class))).thenReturn(paymentResponse);
 
         doThrow(new DataValidationException("Ошибка платежа"))
-                .when(validatorPremium).validateResponseStatus(paymentResponse);
+                .when(premiumValidator).validateResponseStatus(paymentResponse);
 
 
         DataValidationException dataValidationException = assertThrows(DataValidationException.class, () -> premiumService.buyPremium(userId, PremiumPeriod.ONE_MONTH));

@@ -12,7 +12,7 @@ import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.premium.PremiumRepository;
-import school.faang.user_service.validator.ValidatorPremium;
+import school.faang.user_service.validator.PremiumValidator;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -25,19 +25,19 @@ public class PremiumService {
     private final PaymentServiceClient paymentServiceClient;
     private final UserService userService;
     private final UserMapper userMapper;
-    private final ValidatorPremium validatorPremium;
+    private final PremiumValidator premiumValidator;
 
     private static long paymentNumber;
 
     public PremiumDto buyPremium(long userId, PremiumPeriod premiumPeriod) {
-        validatorPremium.validateUserId(userId);
+        premiumValidator.validateUserId(userId);
 
         //Нужно сделать нормальную генерацию номера платежа
         PaymentRequest paymentRequest = new PaymentRequest(++paymentNumber, BigDecimal.valueOf(premiumPeriod.getPrice()), Currency.USD);
 
         PaymentResponse paymentResponse = paymentServiceClient.sendPayment(paymentRequest);
 
-        validatorPremium.validateResponseStatus(paymentResponse);
+        premiumValidator.validateResponseStatus(paymentResponse);
 
         Premium premium = new Premium();
         premium.setUser(userMapper.toEntity(userService.getUser(userId)));

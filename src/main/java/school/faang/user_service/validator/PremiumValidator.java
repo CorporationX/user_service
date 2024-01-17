@@ -9,7 +9,7 @@ import school.faang.user_service.repository.premium.PremiumRepository;
 
 @Service
 @RequiredArgsConstructor
-public class ValidatorPremium {
+public class PremiumValidator {
     private final PremiumRepository premiumRepository;
 
     public void validateUserId(long userId) {

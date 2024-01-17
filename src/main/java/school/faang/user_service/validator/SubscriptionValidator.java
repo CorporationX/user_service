@@ -11,19 +11,17 @@ import school.faang.user_service.service.SubscriptionService;
 @RequiredArgsConstructor
 public class SubscriptionValidator {
     private final SubscriptionRepository subscriptionRepository;
-    private final UserRepository userRepository;
+    private final SubscriptionService subscriptionService;
 
     public void validateUserIds(long followerId, long followeeId) {
+        subscriptionService.validateExitsUsers(followerId, followeeId);
+
         if (followerId == followeeId) {
             throw new DataValidationException("FollowerId и followeeId не могут совпадать");
         }
     }
 
     public boolean validateSubscription(long followerId, long followeeId) {
-        if (!userRepository.existsById(followerId) || !userRepository.existsById(followeeId)) {
-            throw new DataValidationException("Нет пользователя с таким айди");
-        }
-
         return subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
     }
 }

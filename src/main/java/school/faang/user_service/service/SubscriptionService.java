@@ -22,12 +22,14 @@ public class SubscriptionService {
     private final UserMapper userMapper;
     private final List<UserFilter> userFilters;
     private final SubscriptionValidator subscriptionValidator;
+    private final UserRepository userRepository;
 
     @Transactional
     public void followUser(long followerId, long followeeId) {
         if (subscriptionValidator.validateSubscription(followerId, followeeId)){
             throw new DataValidationException("Такая подписка уже есть");
         }
+
         subscriptionRepository.followUser(followerId, followeeId);
     }
 
@@ -36,6 +38,7 @@ public class SubscriptionService {
         if (!subscriptionValidator.validateSubscription(followerId, followeeId)){
             throw new DataValidationException("Такой подписки нет");
         }
+
         subscriptionRepository.unfollowUser(followerId, followeeId);
     }
 
@@ -52,10 +55,6 @@ public class SubscriptionService {
         return userMapper.toDto(followers);
     }
 
-    public long getFollowersCount(long followeeId) {
-        return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
-    }
-
     @Transactional(readOnly = true)
     public List<UserDto> getFollowing(long followeeId, UserFilterDto filters) {
         List<User> following = subscriptionRepository.findByFollowerId(followeeId).toList();
@@ -69,7 +68,19 @@ public class SubscriptionService {
         return userMapper.toDto(following);
     }
 
+    @Transactional(readOnly = true)
+    public long getFollowersCount(long followeeId) {
+        return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
+    }
+
+    @Transactional(readOnly = true)
     public long getFollowingCount(long followerId){
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
+    }
+
+    public void validateExitsUsers(long followerId, long followeeId) {
+        if (!userRepository.existsById(followerId) || !userRepository.existsById(followeeId)) {
+            throw new DataValidationException("Нет пользователя с таким айди");
+        }
     }
 }

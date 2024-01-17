@@ -9,8 +9,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.SubscriptionService;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -20,7 +22,7 @@ public class SubscriptionValidatorTest {
     private SubscriptionRepository subscriptionRepository;
 
     @Mock
-    private UserRepository userRepository;
+    private SubscriptionService subscriptionService;
 
     @InjectMocks
     private SubscriptionValidator subscriptionValidator;
@@ -39,17 +41,16 @@ public class SubscriptionValidatorTest {
 
     @Test
     public void validateSubscription_whenUserDoesNotExist_ThrowsException() {
-        when(userRepository.existsById(1L)).thenReturn(false);
+        doThrow(new DataValidationException("Нет пользователя с таким айди"))
+                .when(subscriptionService).validateExitsUsers(1, 2);
 
-        DataValidationException dataValidationException = assertThrows(DataValidationException.class, () -> subscriptionValidator.validateSubscription(1L, 2L));
+        DataValidationException dataValidationException = assertThrows(DataValidationException.class, () -> subscriptionValidator.validateUserIds(1L, 2L));
 
         assertEquals("Нет пользователя с таким айди", dataValidationException.getMessage());
     }
 
     @Test
     public void validateSubscription_whenSubscriptionExists_ReturnsTrue() {
-        when(userRepository.existsById(1L)).thenReturn(true);
-        when(userRepository.existsById(2L)).thenReturn(true);
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(1L, 2L)).thenReturn(true);
 
         assertTrue(subscriptionValidator.validateSubscription(1L, 2L));
@@ -57,8 +58,6 @@ public class SubscriptionValidatorTest {
 
     @Test
     public void validateSubscription_whenSubscriptionDoesNotExists_ReturnsFalse() {
-        when(userRepository.existsById(1L)).thenReturn(true);
-        when(userRepository.existsById(2L)).thenReturn(true);
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(1L, 2L)).thenReturn(false);
 
         assertFalse(subscriptionValidator.validateSubscription(1L, 2L));

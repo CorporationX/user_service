@@ -16,7 +16,6 @@ import school.faang.user_service.validator.SubscriptionValidator;
 import java.util.List;
 
 @Tag(name = "Контролер подписок")
-@RequestMapping("/api")
 @RestController
 @RequiredArgsConstructor
 public class SubscriptionController {
@@ -40,7 +39,7 @@ public class SubscriptionController {
             description = "Позволяет отписаться от пользователя",
             parameters = {@Parameter(in = ParameterIn.HEADER, name = "x-user-id", description = "id пользователя", required = true)}
     )
-    @DeleteMapping("/unfollow{id}")
+    @DeleteMapping("/unfollow/{id}")
     public void unfollowUser(@PathVariable("id") long followeeId) {
         long followerId = userContext.getUserId();
         subscriptionValidator.validateUserIds(followerId, followeeId);
@@ -50,7 +49,7 @@ public class SubscriptionController {
     @Operation(
             summary = "Получение подписчиков"
     )
-    @PostMapping("/users/{id}/followers")
+    @PostMapping("/user/{id}/followers")
     public List<UserDto> getFollowers(@PathVariable("id") long followeeId, @RequestBody UserFilterDto filters) {
         return subscriptionService.getFollowers(followeeId, filters);
     }
@@ -58,7 +57,7 @@ public class SubscriptionController {
     @Operation(
             summary = "Получение подписок"
     )
-    @PostMapping("/users/{id}/followees")
+    @PostMapping("/user/{id}/followees")
     public List<UserDto> getFollowing(@PathVariable("id") long followerId, @RequestBody UserFilterDto filter) {
         return subscriptionService.getFollowing(followerId, filter);
     }
@@ -66,7 +65,7 @@ public class SubscriptionController {
     @Operation(
             summary = "Получение количества подписчиков"
     )
-    @GetMapping("/users/{id}/followers/count")
+    @GetMapping("/user/{id}/followers/count")
     public long getFollowersCount(@PathVariable("id") long followeeId) {
         return subscriptionService.getFollowersCount(followeeId);
     }
@@ -74,7 +73,7 @@ public class SubscriptionController {
     @Operation(
             summary = "Получение количества подписок"
     )
-    @GetMapping("/users/{id}/followees/count")
+    @GetMapping("/user/{id}/followees/count")
     public long getFollowingCount(@PathVariable("id") long followerId){
         return subscriptionService.getFollowingCount(followerId);
     }

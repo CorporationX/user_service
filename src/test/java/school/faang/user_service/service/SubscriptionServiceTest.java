@@ -14,6 +14,7 @@ import school.faang.user_service.filter.user.UserNameFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.SubscriptionRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.validator.SubscriptionValidator;
 
 import java.util.List;
@@ -28,6 +29,9 @@ class SubscriptionServiceTest {
     private SubscriptionRepository subscriptionRepository;
 
     @Mock
+    private UserRepository userRepository;
+
+    @Mock
     private SubscriptionValidator subscriptionValidator;
 
     private final UserMapper userMapper = new UserMapperImpl();
@@ -38,7 +42,7 @@ class SubscriptionServiceTest {
 
     @BeforeEach
     void setUp() {
-        subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, userFilters, subscriptionValidator);
+        subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, userFilters, subscriptionValidator,userRepository);
     }
 
     @Test

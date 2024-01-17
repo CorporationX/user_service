@@ -9,23 +9,27 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Mapper(componentModel = "spring",
         unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE,
-        injectionStrategy = InjectionStrategy.CONSTRUCTOR
+        injectionStrategy = InjectionStrategy.FIELD
 )
 public interface SkillMapper {
-    public static final SkillMapper INSTANCE = Mappers.getMapper(SkillMapper.class);
 
-//    @Mapping(target = "users", source = "userIds", qualifiedByName = "UsersToIds")
+    @Mapping(target = "users", ignore = true)
     Skill toEntity(SkillDto skillDto);
 
-//    @Mapping(target = "userIds", source = "users", qualifiedByName = "UsersToIds")
+    @Mapping(target = "userIds", source = "users", qualifiedByName = "usersToIds")
     SkillDto toDto(Skill skill);
 
-//    @Named("UsersToIds")
-//    public static List<Long> convertUsersToIds(List<User> users) {
-//        return users.stream().map(User::getId).toList();
-//    }
+    List<Skill> listToEntity(List<SkillDto> skillDtoList);
+
+    List<SkillDto> listToDto(List<Skill> skillList);
+
+    @Named("usersToIds")
+    default List<Long> convertUsersToIds(List<User> users) {
+        return users.stream().map(User::getId).toList();
+    }
 }

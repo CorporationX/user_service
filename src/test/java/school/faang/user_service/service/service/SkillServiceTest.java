@@ -13,7 +13,9 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
+import school.faang.user_service.mapper.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.SkillService;
 
 import java.util.List;
@@ -27,9 +29,12 @@ public class SkillServiceTest {
     private SkillService skillService;
 
     @Spy
-    private SkillMapper skillMapper;
+    private SkillMapper skillMapper = new SkillMapperImpl();
     @Mock
     private SkillRepository skillRepository;
+    @Mock
+    private UserRepository userRepository;
+
     private Skill skill;
     private Skill skill2;
     private User user;
@@ -39,6 +44,7 @@ public class SkillServiceTest {
     public void init () {
         skill = new Skill();
         skillDto = new SkillDto();
+        user = new User();
 
         skill.setId(1L);
         skill.setTitle("Spring");
@@ -49,6 +55,10 @@ public class SkillServiceTest {
 
         skillDto.setId(1L);
         skillDto.setTitle("Java");
+
+        user.setUsername("David");
+        user.setId(1L);
+        user.setSkills(List.of(skill, skill2));
     }
 
     @Test
@@ -64,31 +74,32 @@ public class SkillServiceTest {
 
     @Test
     public void testCreate () {
+        skill.setUsers(List.of(user));
 
-        SkillDto dto = new SkillDto();
-        dto.setTitle("asdasd");
-        dto.setId(22L);
+        skillService.create(skillDto);
 
-        skillService.create(dto);
+        Skill skillEntity = skillMapper.toEntity(skillDto);
+        skillEntity.setUsers(userRepository.findAllById(skillDto.getUserIds()));
 
         Mockito.verify(
                         skillRepository,
                         Mockito.times(1)
                 )
-                .save(skillMapper.toEntity(dto));
+                .save(skillEntity);
     }
 
     @Test
     public void testGetUserSkills () {
-        user = new User();
-        user.setId(1L);
-        user.setSkills(List.of(skill, skill2));
 
        List<Skill> skillEntityList = user.getSkills();
-       List<SkillDto> skillDtoList = skillEntityList.stream().map(skillMapper::toDto).toList();
 
         Mockito.when(skillRepository.findAllByUserId(1L)).thenReturn(skillEntityList);
 
+        for (Skill skillEntity : skillEntityList) {
+            skillEntity.setUsers(userRepository.findAllById(skillDto.getUserIds()));
+        }
+
+        List<SkillDto> skillDtoList = skillMapper.listToDto(skillEntityList);
         List<SkillDto> serviceResult = skillService.getUserSkills(1L);
 
         assertEquals(skillDtoList, serviceResult);

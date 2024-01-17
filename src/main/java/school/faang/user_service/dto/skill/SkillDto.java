@@ -13,4 +13,7 @@ import java.util.List;
 public class SkillDto {
     private Long id;
     private String title;
+    private List<Long> userIds;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

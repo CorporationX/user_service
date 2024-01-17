@@ -69,7 +69,7 @@ class EventServiceTest {
 
         Mockito.when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.empty());
         UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> eventService.createEvent(eventDto));
-        assertEquals("User with ID: " + eventDto.getOwnerId() + " not found", exception.getMessage());
+        assertEquals("User by ID: " + eventDto.getOwnerId() + " not found", exception.getMessage());
     }
 
 
@@ -87,7 +87,7 @@ class EventServiceTest {
 
         Mockito.when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(user));
         DataValidationException exception = assertThrows(DataValidationException.class, () -> eventService.createEvent(eventDto));
-        assertEquals("User with ID: " + eventDto.getOwnerId() + " does not possess all required skills for this event", exception.getMessage());
+        assertEquals("User by ID: " + eventDto.getOwnerId() + " does not possess all required skills for this event", exception.getMessage());
     }
 
 
@@ -122,7 +122,7 @@ class EventServiceTest {
         Long eventId = 1L;
         Mockito.when(eventRepository.findById(eventId)).thenReturn(Optional.empty());
         EventNotFoundException exception = assertThrows(EventNotFoundException.class, () -> eventService.getEvent(eventId));
-        assertEquals("Event with ID: " + eventId + " not found", exception.getMessage());
+        assertEquals("Event by ID: " + eventId + " not found", exception.getMessage());
     }
 
     @Test

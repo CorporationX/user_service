@@ -26,6 +26,8 @@ public class SubscriptionService {
 
     @Transactional
     public void followUser(long followerId, long followeeId) {
+        validateExistsUsers(followerId, followeeId);
+
         if (subscriptionValidator.validateSubscription(followerId, followeeId)){
             throw new DataValidationException("Такая подписка уже есть");
         }
@@ -35,6 +37,8 @@ public class SubscriptionService {
 
     @Transactional
     public void unfollowUser(long followerId, long followeeId) {
+        validateExistsUsers(followerId, followeeId);
+
         if (!subscriptionValidator.validateSubscription(followerId, followeeId)){
             throw new DataValidationException("Такой подписки нет");
         }
@@ -78,7 +82,7 @@ public class SubscriptionService {
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
     }
 
-    public void validateExitsUsers(long followerId, long followeeId) {
+    public void validateExistsUsers(long followerId, long followeeId) {
         if (!userRepository.existsById(followerId) || !userRepository.existsById(followeeId)) {
             throw new DataValidationException("Нет пользователя с таким айди");
         }

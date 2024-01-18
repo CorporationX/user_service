@@ -10,9 +10,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class SkillService {
-private final SkillRepository skillRepository;
+    private final SkillRepository skillRepository;
 
-public List<Skill> findSkillsByGoalId(long goalId){
-    return skillRepository.findSkillsByGoalId(goalId);
-}
+    public List<Skill> findSkillsByGoalId(long goalId) {
+        return skillRepository.findSkillsByGoalId(goalId);
+    }
 }

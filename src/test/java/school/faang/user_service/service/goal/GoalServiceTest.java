@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class GoalServiceTest {
@@ -43,7 +45,6 @@ class GoalServiceTest {
 
     List<Skill> foundedSkills;
     long goalId = 1L;
-
 
     @BeforeEach
     void setUp() {
@@ -80,12 +81,12 @@ class GoalServiceTest {
     @Test
     void findByParentAndFilterTest() {
         filter.setTitle("Correct");
-        Mockito.when(goalRepository.findByParent(goalId))
+        when(goalRepository.findByParent(goalId))
                 .thenReturn(goalStream);
-        Mockito.when(skillService.findSkillsByGoalId(Mockito.anyLong()))
+        when(skillService.findSkillsByGoalId(Mockito.anyLong()))
                 .thenReturn(foundedSkills);
         goalService.findSubtasksByGoalId(goalId, filter);
 
-        Mockito.verify(goalMapper, Mockito.times(1)).toDto(correctGoal);
+        verify(goalMapper, Mockito.times(1)).toDto(correctGoal);
     }
 }

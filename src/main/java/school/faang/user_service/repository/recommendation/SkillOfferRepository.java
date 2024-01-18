@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SkillOfferRepository extends CrudRepository<SkillOffer, Long> {
@@ -35,4 +36,6 @@ public interface SkillOfferRepository extends CrudRepository<SkillOffer, Long> {
             WHERE r.receiver.id = :userId
             """)
     List<SkillOffer> findAllByUserId(long userId);
+
+    Optional<SkillOffer> findSkillOfferByUserId(long userId);
 }

@@ -1,7 +1,8 @@
 package school.faang.user_service.validator;
 
+import org.springframework.stereotype.Component;
 import school.faang.user_service.exception.DataValidationException;
-
+@Component
 public class MentorshipValidator {
     public void validationForIdsNotEqual(Long mentorId, Long menteeId) {
         if (mentorId.equals(menteeId)) {

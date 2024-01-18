@@ -11,11 +11,9 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapperImpl;
-import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -27,7 +25,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class MentorshipServiceTest {
     @Mock
-    private MentorshipRepository mentorshipRepository;
+    private UserService userService;
     @Spy
     private UserMapperImpl userMapper;
     @InjectMocks
@@ -55,60 +53,63 @@ class MentorshipServiceTest {
 
     @Test
     void testGetMentees_ShouldThrowsException() {
+        when(userService.getUserById(1L)).thenThrow(DataValidationException.class);
         assertThrows(DataValidationException.class,
                 () -> mentorshipService.getMentees(1L));
     }
 
     @Test
     void testGetMentees_ShouldReturnsListOfMenteesDto() {
-        when(mentorshipRepository.findById(2L))
-                .thenReturn(Optional.of(user2));
+        when(userService.getUserById(2L))
+                .thenReturn(user2);
         assertEquals(users2, mentorshipService.getMentees(2L));
     }
 
     @Test
     void testGetMentees_ShouldReturnsEmptyList() {
-        when(mentorshipRepository.findById(1L))
-                .thenReturn(Optional.of(user1));
+        when(userService.getUserById(1L)).thenReturn(user1);
         assertEquals(usersDto, mentorshipService.getMentees(1L));
     }
 
     @Test
     void testGetMentors_ShouldThrowsException() {
+        when(userService.getUserById(1L)).thenThrow(DataValidationException.class);
         assertThrows(DataValidationException.class,
                 () -> mentorshipService.getMentors(1L));
     }
 
     @Test
     void testGetMentors_ShouldReturnsListOfMentorsDto() {
-        when(mentorshipRepository.findById(3L))
-                .thenReturn(Optional.of(user3));
+        when(userService.getUserById(3L))
+                .thenReturn(user3);
         assertEquals(users2, mentorshipService.getMentors(3L));
     }
 
     @Test
     void testGetMentors_ShouldReturnsEmptyList() {
-        when(mentorshipRepository.findById(1L))
-                .thenReturn(Optional.of(user1));
+        when(userService.getUserById(1L))
+                .thenReturn(user1);
         assertEquals(usersDto, mentorshipService.getMentors(1L));
     }
 
     @Test
     void testRemoveMentorsMentee_ShouldThrowsException() {
+        when(userService.getUserById(1L)).thenThrow(DataValidationException.class);
         assertThrows(DataValidationException.class,
                 () -> mentorshipService.removeMentorsMentee(1L, 2L));
     }
 
     @Test
     void testRemoveMentorOfMentee_ShouldThrowsException() {
+        when(userService.getUserById(1L)).thenThrow(DataValidationException.class);
         assertThrows(DataValidationException.class,
                 () -> mentorshipService.removeMentorOfMentee(1L, 2L));
     }
 
     @Test
     void testGetMentors_ShouldCallsRepositoryMethod() {
-        when(mentorshipRepository.findById(1L)).thenReturn(Optional.of(user1));
+        when(userService.getUserById(1L)).thenReturn(user1);
         mentorshipService.getMentors(user1.getId());
-        verify(mentorshipRepository, times(1)).findById(user1.getId());
+        verify(userService, times(1)).getUserById(user1.getId());
     }
 }

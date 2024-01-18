@@ -16,7 +16,7 @@ public class RecommendationRequestController {
     }
 
     public RecommendationRequestDto requestRecommendation(RecommendationRequestDto recommendationRequest) {
-        if (!(recommendationRequest.getMessage() != null) && !recommendationRequest.getMessage().isBlank() && !recommendationRequest.getMessage().isEmpty())
+        if (!(recommendationRequest.getMessage() != null) || !recommendationRequest.getMessage().isBlank() || !recommendationRequest.getMessage().isEmpty())
             throw new IllegalArgumentException("Incorrect user's message");
         return recommendationRequestService.create(recommendationRequest);
     }

@@ -1,12 +1,13 @@
 package school.faang.user_service.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
+@AllArgsConstructor
 public class RecommendationRequestDto {
 
     private Long id;

@@ -13,6 +13,7 @@ import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.filter.user.UserNameFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.mapper.UserMapperImpl;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.validator.SubscriptionValidator;
@@ -40,9 +41,12 @@ class SubscriptionServiceTest {
 
     private SubscriptionService subscriptionService;
 
+    @Mock
+    private FollowerEventPublisher followerEventPublisher;
+
     @BeforeEach
     void setUp() {
-        subscriptionService = spy(new SubscriptionService(subscriptionRepository, userMapper, userFilters, subscriptionValidator,userRepository));
+        subscriptionService = spy(new SubscriptionService(subscriptionRepository, userMapper, userFilters, subscriptionValidator, userRepository, followerEventPublisher));
     }
 
     @Test

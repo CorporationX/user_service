@@ -13,7 +13,7 @@ import school.faang.user_service.service.PremiumService;
 
 @Tag(name = "Премиум контролер")
 @RestController
-@RequestMapping("/api/premium")
+@RequestMapping("/premium")
 @RequiredArgsConstructor
 public class PremiumController {
     private final PremiumService premiumService;

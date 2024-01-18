@@ -44,7 +44,7 @@ class PremiumControllerTest {
         when(premiumService.buyPremium(1L, PremiumPeriod.ONE_MONTH)).thenReturn(premiumDto);
         when(userContext.getUserId()).thenReturn(1L);
 
-        mockMvc.perform(post("/api/premium/buy")
+        mockMvc.perform(post("/premium/buy")
                         .header("id", 1)
                         .param("day", "30"))
                 .andExpect(status().isOk())

@@ -11,6 +11,7 @@ import school.faang.user_service.dto.payment.PaymentRequest;
 import school.faang.user_service.dto.payment.PaymentResponse;
 import school.faang.user_service.dto.payment.PaymentStatus;
 import school.faang.user_service.dto.premium.PremiumDto;
+import school.faang.user_service.dto.premium.PremiumEvent;
 import school.faang.user_service.dto.premium.PremiumPeriod;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.exception.DataValidationException;
@@ -18,6 +19,7 @@ import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.mapper.PremiumMapperImpl;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.mapper.UserMapperImpl;
+import school.faang.user_service.publisher.PremiumEventPublisher;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.validator.PremiumValidator;
 
@@ -44,6 +46,9 @@ class PremiumServiceTest {
     @Spy
     private UserMapper userMapper = new UserMapperImpl();
 
+    @Mock
+    private PremiumEventPublisher premiumEventPublisher;
+
     @InjectMocks
     private PremiumService premiumService;
 
@@ -60,6 +65,7 @@ class PremiumServiceTest {
 
         assertNotNull(result);
         verify(premiumRepository).save(any(Premium.class));
+        verify(premiumEventPublisher).publish(any(PremiumEvent.class));
     }
 
     @Test
@@ -83,7 +89,6 @@ class PremiumServiceTest {
 
         doThrow(new DataValidationException("Ошибка платежа"))
                 .when(premiumValidator).validateResponseStatus(paymentResponse);
-
 
         DataValidationException dataValidationException = assertThrows(DataValidationException.class, () -> premiumService.buyPremium(userId, PremiumPeriod.ONE_MONTH));
 

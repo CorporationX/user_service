@@ -3,16 +3,19 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.FollowerEvent;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.validator.SubscriptionValidator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -23,6 +26,7 @@ public class SubscriptionService {
     private final List<UserFilter> userFilters;
     private final SubscriptionValidator subscriptionValidator;
     private final UserRepository userRepository;
+    private final FollowerEventPublisher followerEventPublisher;
 
     @Transactional
     public void followUser(long followerId, long followeeId) {
@@ -33,6 +37,7 @@ public class SubscriptionService {
         }
 
         subscriptionRepository.followUser(followerId, followeeId);
+        followerEventPublisher.publish(new FollowerEvent(followerId, followeeId, LocalDateTime.now()));
     }
 
     @Transactional

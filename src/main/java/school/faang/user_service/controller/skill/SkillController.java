@@ -3,6 +3,7 @@ package school.faang.user_service.controller.skill;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.skill.SkillService;
@@ -23,6 +24,10 @@ public class SkillController {
 
     public List<SkillDto> getUserSkills (long userId) {
         return skillService.getUserSkills(userId);
+    }
+
+    public List<SkillCandidateDto> getOfferedSkills (Long userId) {
+        return skillService.getOfferedSkills(userId);
     }
 
     private void validateSkill (SkillDto skill) {

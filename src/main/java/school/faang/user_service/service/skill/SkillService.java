@@ -2,6 +2,7 @@ package school.faang.user_service.service.skill;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
@@ -11,6 +12,8 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -51,5 +54,22 @@ public class SkillService {
         }
 
         return skillMapper.listToDto(skillEntityList);
+    }
+
+    public List<SkillCandidateDto> getOfferedSkills (long userId) {
+        List<Skill> offeredSkills = skillRepository.findSkillsOfferedToUser(userId);
+        List<SkillDto> offeredSkillDtos = skillMapper.listToDto(offeredSkills);
+
+        Map<SkillDto, Long> offeredSkillDtosMap = offeredSkillDtos
+                .stream()
+                .collect(Collectors.groupingBy(skillDto -> skillDto, Collectors.counting()));
+
+        List<SkillCandidateDto> offeredSkillCandidateDtos = offeredSkillDtosMap
+                .entrySet()
+                .stream()
+                .map(item -> new SkillCandidateDto(item.getKey(), item.getValue()))
+                .toList();
+
+        return offeredSkillCandidateDtos;
     }
 }

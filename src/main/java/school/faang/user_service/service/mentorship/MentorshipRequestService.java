@@ -1,29 +1,32 @@
 package school.faang.user_service.service.mentorship;
 
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.RejectionDto;
+import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.filter.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Stream;
+
 @Data
 @Component
+@RequiredArgsConstructor
 public class MentorshipRequestService {
-    private MentorshipRequestRepository mentorshipRequestRepository;
+    private final MentorshipRequestRepository mentorshipRequestRepository;
     private UserRepository userRepository;
     private MentorshipRequestMapper mentorshipRequestMapper;
     private Map<List<Long>, List<Long>> mentorsAndUsers = new HashMap<>();
-    @Autowired
-    public MentorshipRequestService(MentorshipRequestRepository mentorshipRequestRepository) {
-        this.mentorshipRequestRepository = mentorshipRequestRepository;
-    }
+    private final List<MentorshipRequestFilter> mentorshipRequestFilters;
 
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         boolean isMoreThanThreeMonths = LocalDateTime.now().isAfter(mentorshipRequestRepository.findLatestRequest(mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId()).get().getUpdatedAt().plusMonths(3));
@@ -75,5 +78,13 @@ public class MentorshipRequestService {
 
         mentorsAndUsers.put(List.of(mentorId), List.of(senderId));
         mentorshipRequestRepository.findById(id).get().setStatus(RequestStatus.ACCEPTED);
+    }
+
+    public List<RequestFilterDto> getRequests(RequestFilterDto requestFilterDto) {
+        Stream<MentorshipRequest> requestStream = mentorshipRequestRepository.findAll().stream();
+        mentorshipRequestFilters.stream()
+                .filter(mentorshipRequestFilter -> mentorshipRequestFilter.isApplicable(requestFilterDto))
+                .forEach(mentorshipRequestFilter -> mentorshipRequestFilter.apply(requestStream, requestFilterDto));
+        return mentorshipRequestMapper.toRequestFilterDtoList(requestStream.toList());
     }
 }

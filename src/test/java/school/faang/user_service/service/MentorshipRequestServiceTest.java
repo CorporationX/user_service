@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.RejectionDto;
+import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
@@ -205,5 +206,22 @@ public class MentorshipRequestServiceTest {
         mentorshipRequestService.acceptRequest(requestId);
 
         Assert.assertEquals(RequestStatus.ACCEPTED, mentorshipRequest.getStatus());
+    }
+
+    @Test
+    public void testGetRequests() {
+        MentorshipRequest mentorshipRequest1 = new MentorshipRequest();
+        MentorshipRequest mentorshipRequest2 = new MentorshipRequest();
+        mentorshipRequest1.getRequester().setId(1L);
+        mentorshipRequest2.getReceiver().setId(10L);
+        List<MentorshipRequest> mentorshipRequestList = List.of(mentorshipRequest1, mentorshipRequest2);
+
+        Mockito.when(mentorshipRequestRepository.findAll()).thenReturn(mentorshipRequestList);
+
+        List<RequestFilterDto> expectedResults = List.of(new RequestFilterDto(null, 1L, null, null));
+        List<RequestFilterDto> result = mentorshipRequestService.getRequests(new RequestFilterDto(null, 1L, null, null));
+
+        Assert.assertEquals(result, expectedResults);
+
     }
 }

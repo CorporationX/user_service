@@ -5,7 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.RejectionDto;
+import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
+
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class MentorshipRequestController {
@@ -21,5 +25,9 @@ public class MentorshipRequestController {
 
     public void acceptRequest(long id) {
         mentorshipRequestService.acceptRequest(id);
+    }
+
+    public List<RequestFilterDto> getRequests(RequestFilterDto filter) {
+        return mentorshipRequestService.getRequests(filter);
     }
 }

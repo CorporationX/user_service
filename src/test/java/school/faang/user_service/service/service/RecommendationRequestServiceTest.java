@@ -4,9 +4,13 @@ import org.junit.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.SkillRequestDto;
+import school.faang.user_service.exception.RequestTimeOutException;
+import school.faang.user_service.exception.SkillsNotFoundException;
+import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
@@ -27,7 +31,7 @@ public class RecommendationRequestServiceTest {
     SkillRequestRepository skillRequestRepository;
     @Mock
     UserRepository userRepository;
-    @Mock
+    @Spy
     RecommendationRequestMapper recommendationRequestMapper;
     @InjectMocks
     RecommendationRequestService recommendationRequestService;
@@ -39,7 +43,7 @@ public class RecommendationRequestServiceTest {
 
         try {
             recommendationRequestService.create(recommendationRequestDto);
-        } catch (NullPointerException e) {
+        } catch (UserNotFoundException e) {
             exception = true;
         }
 
@@ -53,7 +57,7 @@ public class RecommendationRequestServiceTest {
 
         try {
             recommendationRequestService.create(recommendationRequestDto);
-        } catch (NullPointerException e) {
+        } catch (UserNotFoundException e) {
             exception = true;
         }
 
@@ -67,7 +71,7 @@ public class RecommendationRequestServiceTest {
 
         try {
             recommendationRequestService.create(recommendationRequestDto);
-        } catch (IllegalArgumentException e) {
+        } catch (RequestTimeOutException e) {
             exception = false;
         }
 
@@ -81,7 +85,7 @@ public class RecommendationRequestServiceTest {
 
         try {
             recommendationRequestService.create(recommendationRequestDto);
-        } catch (IllegalArgumentException e) {
+        } catch (RequestTimeOutException e) {
             exception = true;
         }
 
@@ -95,7 +99,7 @@ public class RecommendationRequestServiceTest {
 
         try {
             recommendationRequestService.create(recommendationRequestDto);
-        } catch (NullPointerException e) {
+        } catch (SkillsNotFoundException e) {
             exception = true;
         }
 

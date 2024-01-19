@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.controller.recommendation.RecommendationRequestController;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.SkillRequestDto;
+import school.faang.user_service.exception.MessageRequestException;
 import school.faang.user_service.service.RecommendationRequestService;
 
 import java.time.LocalDateTime;
@@ -31,7 +32,7 @@ public class RecommendationRequestControllerTest {
 
         try {
             recommendationRequestController.requestRecommendation(recommendationRequestDto);
-        } catch (IllegalArgumentException e) {
+        } catch (MessageRequestException e) {
             exception = true;
         }
 
@@ -45,7 +46,7 @@ public class RecommendationRequestControllerTest {
 
         try {
             recommendationRequestController.requestRecommendation(recommendationRequestDto);
-        } catch (IllegalArgumentException e) {
+        } catch (MessageRequestException e) {
             exception = true;
         }
 
@@ -59,7 +60,7 @@ public class RecommendationRequestControllerTest {
 
         try {
             recommendationRequestController.requestRecommendation(recommendationRequestDto);
-        } catch (IllegalArgumentException e) {
+        } catch (MessageRequestException e) {
             exception = true;
         }
 

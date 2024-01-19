@@ -59,7 +59,6 @@ class GoalServiceTest {
     GoalDto goalDto4;
     GoalDto goalDto5;
 
-
     @BeforeEach
     void init() {
         Skill skill1 = Skill.builder()
@@ -140,7 +139,6 @@ class GoalServiceTest {
                 .id(4L)
                 .goals(Arrays.asList(goal4, goal5))
                 .build();
-
     }
 
     @Test

@@ -11,7 +11,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
-import school.faang.user_service.exception.skill.DataValidationException;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.skill.SkillCandidateMapper;
 import school.faang.user_service.mapper.skill.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
@@ -45,6 +45,8 @@ class SkillServiceTest {
     private SkillOfferRepository skillOfferRepository;
     @Mock
     private SkillValidation skillValidation;
+    @Mock
+    private UserService userService;
 
     @InjectMocks
     private SkillService skillService;
@@ -100,8 +102,7 @@ class SkillServiceTest {
         // Assert
         assertAll(
                 () -> verify(skillRepository, times(1)).findAllByUserId(userId),
-                () -> verify(skillMapper, times(skillList.size())).toDto(any()),
-                () -> verify(skillValidation, times(1)).validateUserId(userId)
+                () -> verify(skillMapper, times(skillList.size())).toDto(any())
         );
     }
 
@@ -126,8 +127,7 @@ class SkillServiceTest {
         // Assert
         assertAll(
                 () -> verify(skillRepository, times(1)).findSkillsOfferedToUser(userId),
-                () -> verify(skillCandidateMapper, times(uniqueSKillsCount)).toDto(any()),
-                () -> verify(skillValidation, times(1)).validateUserId(userId)
+                () -> verify(skillCandidateMapper, times(uniqueSKillsCount)).toDto(any())
         );
     }
 
@@ -135,12 +135,15 @@ class SkillServiceTest {
     public void acquireSkillFromOffers_whenUserIdAndSkillIdIsExist_thenReturnSkillDto() {
         // Arrange
         Skill skill = new Skill();
+        User user = User.builder().id(userId).build();
         List<SkillOffer> skillOffers = List.of(
                 new SkillOffer(1, skill, Recommendation.builder().author(User.builder().id(3).build()).build()),
                 new SkillOffer(2, skill, Recommendation.builder().author(User.builder().id(4).build()).build()),
                 new SkillOffer(3, skill, Recommendation.builder().author(User.builder().id(5).build()).build()));
         when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.empty());
         when(skillOfferRepository.findAllOffersOfSkill(skillId, userId)).thenReturn(skillOffers);
+        when(userService.getUserById(userId)).thenReturn(user);
+        when(skillRepository.findById(skillId)).thenReturn(Optional.of(skill));
 
         // Act
         skillService.acquireSkillFromOffers(skillId, userId);
@@ -148,11 +151,10 @@ class SkillServiceTest {
         // Assert
         assertAll(
                 () -> verify(skillMapper, times(1)).toDto(any()),
+                () -> verify(userService, times(1)).getUserById(userId),
                 () -> verify(skillOfferRepository, times(1)).findAllOffersOfSkill(skillId, userId),
                 () -> verify(skillRepository, times(1)).assignSkillToUser(skillId, userId),
-                () -> verify(userSkillGuaranteeRepository, times(skillOffers.size())).save(any()),
-                () -> verify(skillValidation, times(1)).validateUserId(userId),
-                () -> verify(skillValidation, times(1)).validateSkillId(skillId)
+                () -> verify(userSkillGuaranteeRepository, times(skillOffers.size())).save(any())
         );
     }
 }

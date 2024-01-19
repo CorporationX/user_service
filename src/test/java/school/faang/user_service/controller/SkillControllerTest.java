@@ -43,28 +43,20 @@ class SkillControllerTest {
 
     @Test
     public void getUserSkills_whenUserIdIsCorrect_thenRunService() {
-
         // Act
         skillController.getUserSkills(userId);
 
         // Assert
-        assertAll(
-                () -> verify(skillService, times(1)).getUserSkills(userId),
-                () -> verify(skillValidation, times(1)).validateNullUserId(userId)
-        );
+        verify(skillService, times(1)).getUserSkills(userId);
     }
 
     @Test
     public void getOfferedSkills_whenUserIdIsCorrect_thenRunService() {
-
         // Act
         skillController.getOfferedSkills(userId);
 
         // Assert
-        assertAll(
-                () -> verify(skillService, times(1)).getOfferedSkills(userId),
-                () -> verify(skillValidation, times(1)).validateNullUserId(userId)
-        );
+        verify(skillService, times(1)).getOfferedSkills(userId);
     }
 
     @Test
@@ -73,10 +65,6 @@ class SkillControllerTest {
         skillController.acquireSkillFromOffers(skillId, userId);
 
         // Assert
-        assertAll(
-                () -> verify(skillService, times(1)).acquireSkillFromOffers(skillId, userId),
-                () -> verify(skillValidation, times(1)).validateNullUserId(userId),
-                () -> verify(skillValidation, times(1)).validateNullSkillId(skillId)
-        );
+        verify(skillService, times(1)).acquireSkillFromOffers(skillId, userId);
     }
 }

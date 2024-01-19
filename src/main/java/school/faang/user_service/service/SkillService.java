@@ -8,16 +8,17 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.SkillOffer;
-import school.faang.user_service.exception.skill.DataValidationException;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.skill.SkillCandidateMapper;
 import school.faang.user_service.mapper.skill.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.validate.skill.SkillValidation;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,8 +29,7 @@ public class SkillService {
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final SkillMapper skillMapper;
     private final SkillCandidateMapper skillCandidateMapper;
-    private final UserRepository userRepository;
-    private final SkillValidation skillValidation;
+    private final UserService userService;
     private static final long MIN_SKILL_OFFERS = 3;
 
     public SkillDto create(SkillDto skill) {
@@ -43,8 +43,6 @@ public class SkillService {
 
     public List<SkillDto> getUserSkills(long userId) {
 
-        skillValidation.validateUserId(userId);
-
         List<Skill> skillsByUserId = skillRepository.findAllByUserId(userId);
         return skillsByUserId.stream()
                 .map(skillMapper::toDto)
@@ -53,42 +51,46 @@ public class SkillService {
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
 
-        skillValidation.validateUserId(userId);
-
         List<Skill> skillsOfferedToUser = skillRepository.findSkillsOfferedToUser(userId);
+
+        Map<Long, Long> skillCountMap = skillsOfferedToUser.stream()
+                .collect(Collectors.groupingBy(Skill::getId, Collectors.counting()));
 
         return skillsOfferedToUser.stream()
                 .distinct()
                 .map(skillCandidateMapper::toDto)
                 .peek((skillCandidateDto -> {
-                    long countSkill = skillsOfferedToUser.stream()
-                            .filter((skill) -> skillCandidateDto.getSkillDto().getId().equals(skill.getId()))
-                            .count();
+                    long countSkill = skillCountMap.get(skillCandidateDto.getSkillDto().getId());
                     skillCandidateDto.setOffersAmount(countSkill);
                 }))
                 .toList();
     }
 
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
-        skillValidation.validateUserId(userId);
-        skillValidation.validateSkillId(skillId);
 
-        Skill skill = Skill.builder().id(skillId).build();
+        Skill skill = getSkillById(skillId);
         SkillDto skillDto = skillMapper.toDto(skill);
+        User user = userService.getUserById(userId);
 
         if (skillRepository.findUserSkill(skillId, userId).isEmpty()) {
             List<SkillOffer> allOffersOfSkill = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
 
             if (allOffersOfSkill.size() >= MIN_SKILL_OFFERS) {
                 skillRepository.assignSkillToUser(skillId, userId);
-                User user = User.builder().id(userId).build();
                 allOffersOfSkill.forEach((offer) -> {
                     User guarantor = new User();
                     guarantor.setId(offer.getRecommendation().getAuthor().getId());
-                    userSkillGuaranteeRepository.save(new UserSkillGuarantee(null, user, skill, guarantor));
+                    userSkillGuaranteeRepository.save(UserSkillGuarantee.builder()
+                            .user(user)
+                            .guarantor(guarantor)
+                            .skill(skill).build());
                 });
             }
         }
         return skillDto;
+    }
+
+    public Skill getSkillById(long skillId) {
+        return skillRepository.findById(skillId).orElseThrow(() -> new EntityNotFoundException("Такого навыка не существует"));
     }
 }

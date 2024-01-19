@@ -6,11 +6,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.exception.skill.DataValidationException;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.UserRepository;
-
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -18,41 +16,20 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class SkillValidationTest {
     @Mock
-    private UserRepository userRepository;
-    @Mock
     private SkillRepository skillRepository;
-    long userId = 1L;
     long skillId = 1L;
 
     @InjectMocks
     private SkillValidation skillValidation;
 
-    @Test
-    void validateNullUserId() {
-        assertThrows(DataValidationException.class, () -> skillValidation.validateNullUserId(0));
-    }
 
     @Test
-    void validateNullSkillId() {
-        assertThrows(DataValidationException.class, () -> skillValidation.validateNullSkillId(0));
-    }
-
-    @Test
-    void validateUserId() {
-        // Arrange
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
-
-        // Act & Assert
-        assertThrows(DataValidationException.class, () -> skillValidation.validateUserId(userId));
-    }
-
-    @Test
-    void validateSkillId() {
+    void validateSkillId_whenSkillIdIsNotExist_thenThrowEntityNotFoundException() {
         // Arrange
         when(skillRepository.existsById(skillId)).thenReturn(false);
 
         // Act & Assert
-        assertThrows(DataValidationException.class, () -> skillValidation.validateSkillId(skillId));
+        assertThrows(EntityNotFoundException.class, () -> skillValidation.validateSkillId(skillId));
     }
 
     @Test

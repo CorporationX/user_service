@@ -22,18 +22,14 @@ public class SkillController {
     }
 
     public List<SkillDto> getUserSkills(long userId) {
-        skillValidation.validateNullUserId(userId);
         return skillService.getUserSkills(userId);
     }
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
-        skillValidation.validateNullUserId(userId);
         return skillService.getOfferedSkills(userId);
     }
 
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
-        skillValidation.validateNullSkillId(skillId);
-        skillValidation.validateNullUserId(userId);
         return skillService.acquireSkillFromOffers(skillId, userId);
     }
 }

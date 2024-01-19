@@ -10,8 +10,6 @@ import school.faang.user_service.repository.goal.GoalRepository;
 @RequiredArgsConstructor
 public class GoalService {
     private final GoalRepository goalRepository;
-    private final UserRepository userRepository;
-
 
     public void deleteGoal(long goalID) {
         goalRepository.deleteById(goalID);

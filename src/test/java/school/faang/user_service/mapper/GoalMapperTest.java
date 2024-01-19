@@ -1,5 +1,6 @@
 package school.faang.user_service.mapper;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,8 +13,6 @@ import school.faang.user_service.entity.goal.GoalStatus;
 
 import java.util.Collections;
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 class GoalMapperTest {
@@ -50,6 +49,6 @@ class GoalMapperTest {
     @Test
     public void toDto() {
         GoalDto resultDto2 = goalMapper.toDto(goal);
-        assertEquals(goalDto, resultDto2);
+        Assertions.assertEquals(goalDto, resultDto2);
     }
 }

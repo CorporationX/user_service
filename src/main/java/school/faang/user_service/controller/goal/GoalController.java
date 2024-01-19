@@ -23,7 +23,7 @@ public class GoalController {
     }
 
     public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter) {
-        if (userId == null || userId < 0) {
+        if (userId == null || userId <= 0) {
             throw new IllegalArgumentException("incorrect data");
         }
         return goalService.getGoalsByUser(userId, filter);

@@ -37,6 +37,7 @@ class GoalServiceTest {
 
     private GoalDto goalDto;
     private final Long goalId = 1L;
+    private final Goal goal = new Goal();
 
     @BeforeEach
     void setUp() {
@@ -50,39 +51,34 @@ class GoalServiceTest {
     @Test
     void goalNotFoundTest() {
         Mockito.when(goalRepository.findById(Mockito.any())).thenReturn(Optional.empty());
-        DataValidationException dataValidationException = assertThrows(DataValidationException.class, () -> {
-            goalService.updateGoal(goalId, goalDto);
-        });
+        DataValidationException dataValidationException = assertThrows(DataValidationException.class,
+                () -> goalService.updateGoal(goalId, goalDto));
         assertEquals("Цель не найдена", dataValidationException.getMessage());
     }
 
     @Test
     void goalIsAlreadyCompletedTest() {
         goalDto.setStatus(GoalStatus.COMPLETED);
-        Goal goal = new Goal();
         goal.setStatus(GoalStatus.COMPLETED);
 
         Mockito.when(goalRepository.findById(Mockito.any())).thenReturn(Optional.of(goal));
         Mockito.when(goalMapper.toEntity(goalDto)).thenReturn(goal);
-        DataValidationException dataValidationException = assertThrows(DataValidationException.class, () -> {
-            goalService.updateGoal(goalId, goalDto);
-        });
+        DataValidationException dataValidationException = assertThrows(DataValidationException.class,
+                () -> goalService.updateGoal(goalId, goalDto));
         assertEquals("Цель уже завершена", dataValidationException.getMessage());
     }
 
     @Test
     void incorrectSkillsTest() {
         goalDto.setStatus(GoalStatus.ACTIVE);
-        Goal goal = new Goal();
         goal.setStatus(GoalStatus.ACTIVE);
         goal.setSkillsToAchieve(Collections.singletonList(new Skill()));
 
         Mockito.when(goalRepository.findById(Mockito.any())).thenReturn(Optional.of(goal));
         Mockito.when(goalMapper.toEntity(goalDto)).thenReturn(goal);
         Mockito.when(skillService.validateSkill(Mockito.any())).thenReturn(false);
-        DataValidationException dataValidationException = assertThrows(DataValidationException.class, () -> {
-            goalService.updateGoal(goalId, goalDto);
-        });
+        DataValidationException dataValidationException = assertThrows(DataValidationException.class,
+                () -> goalService.updateGoal(goalId, goalDto));
         assertEquals("Некорректные скиллы", dataValidationException.getMessage());
     }
 
@@ -108,5 +104,6 @@ class GoalServiceTest {
         goalService.updateGoal(goalId, goalDto);
 
         Mockito.verify(skillService).assignSkillToUser(Mockito.anyLong(), Mockito.anyLong());
+        Mockito.verify(goalRepository).save(goal);
     }
 }

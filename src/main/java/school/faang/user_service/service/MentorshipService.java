@@ -33,14 +33,12 @@ public class MentorshipService {
     public void removeMentorsMentee(Long mentorId, Long menteeId) {
         User mentor = userService.getUserById(mentorId);
         User mentee = userService.getUserById(menteeId);
-        int index = mentor.getMentees().indexOf(mentee);
-        mentor.getMentees().remove(index);
+        mentor.getMentees().remove(mentee);
     }
 
     public void removeMentorOfMentee(Long mentorId, Long menteeId) {
         User mentor = userService.getUserById(mentorId);
         User mentee = userService.getUserById(menteeId);
-        int index = mentee.getMentors().indexOf(mentor);
-        mentee.getMentors().remove(index);
+        mentee.getMentors().remove(mentor);
     }
 }

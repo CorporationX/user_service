@@ -6,13 +6,13 @@ import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.filter.GoalFilter;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validator.GoalValidator;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * @author Ilia Chuvatkin
@@ -58,15 +58,14 @@ public class GoalService {
     }
 
     public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter) {
-        Stream<Goal> userGoals = findGoalsByUserId(userId).stream();
+        List<Goal> userGoals = getGoalsByUserId(userId);
         goalFilters.stream()
                 .filter(f -> f.isApplicable(filter))
                 .forEach(f -> f.apply(userGoals, filter));
-
-        return userGoals.map(goalMapper::toDto).toList();
+        return userGoals.stream().map(goalMapper::toDto).toList();
     }
 
-    public List<Goal> findGoalsByUserId(Long userId) {
+    public List<Goal> getGoalsByUserId(Long userId) {
         return goalRepository.findGoalsByUserId(userId)
                 .filter(g -> !skillRepository.findSkillsByGoalId(g.getId()).isEmpty())
                 .peek(g -> skillRepository.findSkillsByGoalId(g.getId())

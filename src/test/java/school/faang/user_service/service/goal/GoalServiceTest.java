@@ -11,6 +11,8 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.filter.GoalFilter;
+import school.faang.user_service.filter.impl.goal.GoalStatusFilter;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -18,8 +20,11 @@ import school.faang.user_service.validator.GoalValidator;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -108,23 +113,34 @@ public class GoalServiceTest {
 
     @Test
     void testGetGoalsByUser() {
+
         Long userId = 1L;
         GoalFilterDto filter = new GoalFilterDto("Some title",GoalStatus.ACTIVE);
+
         GoalDto goldDtoExpected = new GoalDto();
-        goldDtoExpected.
-//        goldDtoExpected.setSkillIds(List.of(1L));
+        goldDtoExpected.setTitle("Some title");
+        goldDtoExpected.setStatus(GoalStatus.ACTIVE);
         List<GoalDto> expectedList = List.of(goldDtoExpected);
+
         Goal goal1 = new Goal();
         goal1.setTitle("Title1");
+        goal1.setId(1L);
         goal1.setStatus(GoalStatus.ACTIVE);
         Goal goal2 = new Goal();
+        goal2.setId(2L);
         goal2.setTitle("Some title");
         goal2.setStatus(GoalStatus.ACTIVE);
 
-        when(goalService.findGoalsByUserId(userId)).thenReturn(List.of(goal1,goal2));
+        List<GoalFilter> goalFilter = List.of(new GoalStatusFilter());
+//        goalService = new GoalService(goalValidator,goalRepository,skillRepository,goalMapper,goalFilter);
+
+        when(goalService.getGoalsByUserId(userId)).thenReturn(List.of(goal1,goal2));
+//        doReturn(List.of(goal1,goal2)).when(goalService).getGoalsByUserId(userId);
         when(goalMapper.toDto(goal2)).thenReturn(goldDtoExpected);
 
-        getGoalsByUser(userId, filter)
+
+
+        assertEquals(expectedList, goalService.getGoalsByUser(userId, filter));
 
     }
 }

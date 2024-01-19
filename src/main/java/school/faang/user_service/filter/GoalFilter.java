@@ -1,8 +1,9 @@
-package school.faang.user_service.service.goal;
+package school.faang.user_service.filter;
 
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 /**
@@ -13,5 +14,5 @@ public interface GoalFilter {
 
     boolean isApplicable(GoalFilterDto filter);
 
-    void apply(Stream<Goal> goals, GoalFilterDto filter);
+    List<Goal> apply(List<Goal> goals, GoalFilterDto filter);
 }

@@ -17,7 +17,8 @@ public class GoalController {
     private final GoalValidator goalValidator;
 
     public void createGoal(Long userId, GoalDto goal) {
-        if (goalValidator.isValidateByEmptyTitle(goal)) {
+        goalValidator.validateTitle(goal);
+        if (userId != null) {
             goalService.createGoal(userId, goal);
         }
     }

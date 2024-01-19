@@ -31,8 +31,6 @@ public class GoalControllerTest {
         GoalDto goalDto = new GoalDto();
         Long userId = 1L;
 
-        when(goalValidator.isValidateByEmptyTitle(goalDto)).thenReturn(true);
-
         goalController.createGoal(userId,goalDto);
 
         verify(goalService,times(1)).createGoal(userId,goalDto);

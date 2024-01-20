@@ -14,9 +14,9 @@ import java.util.List;
 public class SkillController {
     private final SkillService skillService;
 
-    @PostMapping(value = "/skill")
+    @PostMapping("/skill")
     public SkillDto create (SkillDto skill) throws DataValidationException {
-        validateSkill(skill);
+        validateSkill(skill.getTitle());
 
         return skillService.create(skill);
     }
@@ -25,8 +25,8 @@ public class SkillController {
         return skillService.getUserSkills(userId);
     }
 
-    private void validateSkill (SkillDto skill) {
-        if (skill.getTitle() == null || skill.getTitle().isBlank()) {
+    private void validateSkill (String skillTitle) {
+        if (skillTitle == null || skillTitle.isBlank()) {
             throw new DataValidationException("Invalid skill name.");
         }
     }

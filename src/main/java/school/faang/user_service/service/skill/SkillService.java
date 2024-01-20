@@ -21,11 +21,8 @@ public class SkillService {
     private final UserRepository userRepository;
 
     public SkillDto create (SkillDto skill) {
-        boolean skillExistsInDB = skillRepository.existsByTitle(skill.getTitle());
 
-        if (skillExistsInDB) {
-            throw new DataValidationException("Skill with name " + skill.getTitle() + " already exists in database.");
-        }
+        getSkillFromDB(skill.getTitle());
 
         Skill skillEntity = skillMapper.toEntity(skill);
         List<User> users = userRepository.findAllById(skill.getUserIds());
@@ -51,5 +48,11 @@ public class SkillService {
         }
 
         return skillMapper.listToDto(skillEntityList);
+    }
+
+    public void getSkillFromDB (String skillTitle) {
+        if (skillRepository.existsByTitle(skillTitle)) {
+            throw new DataValidationException("Skill with name " + skillTitle + " already exists in database.");
+        }
     }
 }

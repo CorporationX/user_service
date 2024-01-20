@@ -9,4 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RecommendationDto {
     private long receiverId;
+    private long authorId;
+    private String content;
 }

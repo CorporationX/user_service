@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
@@ -19,7 +20,6 @@ import school.faang.user_service.repository.SkillRepository;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -37,6 +37,9 @@ class SkillServiceTest {
     private SkillDto skillDto;
     private Skill skill;
     private List<User> user;
+    private SkillCandidateDto candidateDto;
+    private List<SkillCandidateDto> skillCandidateDto;
+    private List<Skill> skills;
 
     @BeforeEach
     void setUp() {
@@ -70,5 +73,41 @@ class SkillServiceTest {
         when(skillMapper.toDto(skill)).thenReturn(skillDto);
         List<SkillDto> skillDtoList = skillService.getUserSkills(1L);
         assertTrue(skillDtoList.contains(skillDto));
+    }
+
+    @Test
+    void testGetOfferedSkills() {
+        Skill skill1 = Skill.builder()
+                .id(1L)
+                .title("test1")
+                .users(user)
+                .build();
+        Skill skill2 = Skill.builder()
+                .id(1L)
+                .title("test1")
+                .users(user)
+                .build();
+        Skill skill3 = Skill.builder()
+                .id(1L)
+                .title("test1")
+                .users(user)
+                .build();
+        Skill skill4 = Skill.builder()
+                .id(2L)
+                .title("test2")
+                .users(user)
+                .build();
+
+        skills = List.of(skill1, skill2, skill3, skill4);
+
+        candidateDto = new SkillCandidateDto(
+                skillMapper.toDto(skill1),
+                3L);
+        List<SkillCandidateDto> listCandidateDto = new ArrayList<>();
+        listCandidateDto.add(candidateDto);
+
+        Mockito.when(skillRepository.findSkillsOfferedToUser(1L)).thenReturn(skills);
+        skillCandidateDto = skillService.getOfferedSkills(1L);
+        assertEquals(listCandidateDto, skillCandidateDto);
     }
 }

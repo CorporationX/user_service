@@ -49,6 +49,8 @@ public class GoalService {
     }
 
     public void deleteGoal(Long goalId) {
-        goalRepository.deleteById(goalId);
+        if (goalId != null){
+            goalRepository.deleteById(goalId);
+        }
     }
 }

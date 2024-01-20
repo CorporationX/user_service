@@ -104,4 +104,10 @@ public class GoalServiceTest {
         goalService.deleteGoal(1L);
         verify(goalRepository, times(1)).deleteById(1L);
     }
+
+    @Test
+    void testDeleteGoalIfNull() {
+        goalService.deleteGoal(null);
+        verify(goalRepository, times(0)).deleteById(null);
+    }
 }

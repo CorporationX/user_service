@@ -25,7 +25,7 @@ public class RecommendationControllerTest {
 
     @Test
     public void testDeleteRecommendation() {
-        Long id = 1L;
+        long id = 1L;
 
         recommendationController.deleteRecommendation(id);
 

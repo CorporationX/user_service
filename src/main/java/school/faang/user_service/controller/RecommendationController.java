@@ -9,7 +9,7 @@ import school.faang.user_service.service.RecommendationService;
 public class RecommendationController {
     private final RecommendationService recommendationService;
 
-    public void deleteRecommendation(Long id) {
+    public void deleteRecommendation(long id) {
         recommendationService.delete(id);
     }
 }

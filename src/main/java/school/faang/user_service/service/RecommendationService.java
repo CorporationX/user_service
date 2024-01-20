@@ -8,6 +8,7 @@ import school.faang.user_service.repository.recommendation.RecommendationReposit
 @RequiredArgsConstructor
 public class RecommendationService {
     private final RecommendationRepository recommendationRepository;
+
     public void delete(long id) {
         recommendationRepository.deleteById(id);
     }

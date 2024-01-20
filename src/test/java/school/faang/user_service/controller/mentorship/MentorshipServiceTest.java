@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -25,16 +26,16 @@ class MentorshipServiceTest {
     @Mock
     private UserRepository userRepository;
     @Spy
-    private UserMapper userMapper = new UserMapperImpl();
+    private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
     @InjectMocks
     private MentorshipService mentorshipService;
     private User user;
     private User userMentee;
     private User userMentor;
-    private UserDTO userDTOMentee;
-    private UserDTO userDTOMentor;
-    private List<UserDTO> listOfMentee = new ArrayList<>();
-    private List<UserDTO> listOfMentors = new ArrayList<>();
+    private UserDto userDtoMentee;
+    private UserDto userDtoMentor;
+    private final List<UserDto> mentees = new ArrayList<>();
+    private final List<UserDto> mentors = new ArrayList<>();
 
     @BeforeEach
     public void init() {
@@ -58,38 +59,38 @@ class MentorshipServiceTest {
                 .mentors(mentorsOfUser)
                 .build();
 
-        userDTOMentee = UserDTO.builder()
+        userDtoMentee = UserDto.builder()
                 .id(100)
                 .username("Vasiliy")
                 .build();
 
-        userDTOMentor = UserDTO.builder()
+        userDtoMentor = UserDto.builder()
                 .id(10)
                 .username("Alex")
                 .build();
 
-        listOfMentee.add(userDTOMentee);
-        listOfMentors.add(userDTOMentor);
+        mentees.add(userDtoMentee);
+        mentors.add(userDtoMentor);
     }
 
     @Test
-    public void testMentorshipService_GoodId() {
-        when(userMapper.toUserDTO(userMentee)).thenReturn(userDTOMentee);
+    public void testGetMenteesSuccessful() {
+        when(userMapper.toUserDto(userMentee)).thenReturn(userDtoMentee);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        assertEquals(listOfMentee.get(0), mentorshipService.getMenteesOfUser(1).get(0));
+        assertEquals(mentees.size(), mentorshipService.getMentees(1).size());
         Mockito.verify(userRepository).findById(1L);
     }
 
     @Test
-    public void testMentorshipService_getMentorsOfUser() {
-        when(userMapper.toUserDTO(userMentor)).thenReturn(userDTOMentor);
+    public void testGetMentorsSuccessful() {
+        when(userMapper.toUserDto(userMentor)).thenReturn(userDtoMentor);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        assertEquals(listOfMentors.get(0), mentorshipService.getMentorsOfUser(1).get(0));
+        assertEquals(mentors.size(), mentorshipService.getMentors(1).size());
         Mockito.verify(userRepository).findById(1L);
     }
 
     @Test
-    public void testDeleteMentee_shouldNewListOfMenteeByMentor() {
+    public void testDeleteMenteeSuccessful() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(userRepository.findById(100L)).thenReturn(Optional.of(userMentee));
         mentorshipService.deleteMentee(100, 1);
@@ -100,7 +101,7 @@ class MentorshipServiceTest {
     }
 
     @Test
-    public void testDeleteMentor_shouldNewListOfMentorsByMentee(){
+    public void testDeleteMentorSuccessful(){
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(userRepository.findById(10L)).thenReturn(Optional.of(userMentor));
         mentorshipService.deleteMentor(1, 10);
@@ -111,18 +112,18 @@ class MentorshipServiceTest {
     }
 
     @Test
-    public void testGetUserById_shouldEntityNotFoundException() {
+    public void testGetUserByIdShouldException() {
         long id = -1;
-        assertThrows(EntityNotFoundException.class,
-                () -> mentorshipService.getUserById(id));
+        assertThrows(IllegalArgumentException.class,
+                () -> mentorshipService.getUser(id));
     }
 
     @Test
-    void whenEntityNotFoundException() {
+    void testIllegalArgumentException() {
         Throwable exception = assertThrows(
-                EntityNotFoundException.class,
+                IllegalArgumentException.class,
                 () -> {
-                    throw new EntityNotFoundException("User with id not found");
+                    throw new IllegalArgumentException("User with id not found");
                 }
         );
         assertEquals("User with id not found", exception.getMessage());

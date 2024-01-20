@@ -1,12 +1,7 @@
 package school.faang.user_service.controller.mentorship;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
-import school.faang.user_service.entity.User;
 
 import java.util.List;
 
@@ -15,14 +10,14 @@ import java.util.List;
 public class MentorshipController {
     private final MentorshipService mentorshipService;
 
-    public List<UserDTO> getMentees(Long mentorId) {
-        validationOfInputData(mentorId);
-        return mentorshipService.getMenteesOfUser(mentorId);
+    public List<UserDto> getMentees(long userId) {
+        validationOfInputData(userId);
+        return mentorshipService.getMentees(userId);
     }
 
-    public List<UserDTO> getMentors(Long menteeId) {
-        validationOfInputData(menteeId);
-        return mentorshipService.getMentorsOfUser(menteeId);
+    public List<UserDto> getMentors(long userId) {
+        validationOfInputData(userId);
+        return mentorshipService.getMentors(userId);
     }
 
     public void deleteMentee(long menteeId, long mentorId){
@@ -37,9 +32,9 @@ public class MentorshipController {
         mentorshipService.deleteMentor(menteeId, mentorId);
     }
 
-    public void validationOfInputData(Long id){
-        if (id == null || id < 1) {
-            throw new EntityNotFoundException("Incorrect id entered");
+    public void validationOfInputData(long id){
+        if (id < 1) {
+            throw new IllegalArgumentException("Incorrect id entered");
         }
     }
 }

@@ -13,6 +13,7 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.filter.GoalFilter;
 import school.faang.user_service.filter.impl.goal.GoalStatusFilter;
+import school.faang.user_service.filter.impl.goal.GoalTitleFilter;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -24,7 +25,6 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -117,10 +117,11 @@ public class GoalServiceTest {
         Long userId = 1L;
         GoalFilterDto filter = new GoalFilterDto("Some title",GoalStatus.ACTIVE);
 
-        GoalDto goldDtoExpected = new GoalDto();
-        goldDtoExpected.setTitle("Some title");
-        goldDtoExpected.setStatus(GoalStatus.ACTIVE);
-        List<GoalDto> expectedList = List.of(goldDtoExpected);
+        GoalDto goalDtoExpected = new GoalDto();
+        goalDtoExpected.setId(2L);
+        goalDtoExpected.setTitle("Some title");
+        goalDtoExpected.setStatus(GoalStatus.ACTIVE);
+        List<GoalDto> expectedList = List.of(goalDtoExpected);
 
         Goal goal1 = new Goal();
         goal1.setTitle("Title1");
@@ -130,17 +131,16 @@ public class GoalServiceTest {
         goal2.setId(2L);
         goal2.setTitle("Some title");
         goal2.setStatus(GoalStatus.ACTIVE);
+        Skill skill_1 = new Skill();
+        skill_1.setId(1L);
 
-        List<GoalFilter> goalFilter = List.of(new GoalStatusFilter());
-//        goalService = new GoalService(goalValidator,goalRepository,skillRepository,goalMapper,goalFilter);
+        List<GoalFilter> goalFilters = List.of(new GoalStatusFilter(),new GoalTitleFilter());
+        goalService = new GoalService(goalValidator,goalRepository,skillRepository,goalMapper,goalFilters);
 
-        when(goalService.getGoalsByUserId(userId)).thenReturn(List.of(goal1,goal2));
-//        doReturn(List.of(goal1,goal2)).when(goalService).getGoalsByUserId(userId);
-        when(goalMapper.toDto(goal2)).thenReturn(goldDtoExpected);
+        when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.of(goal1,goal2));
+        when(skillRepository.findSkillsByGoalId(anyLong())).thenReturn(List.of(skill_1));
+        when(goalMapper.toDto(goal2)).thenReturn(goalDtoExpected);
 
-
-
-        assertEquals(expectedList, goalService.getGoalsByUser(userId, filter));
-
+        assertEquals(expectedList, goalService.findGoalsByUser(userId, filter));
     }
 }

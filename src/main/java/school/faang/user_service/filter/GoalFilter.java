@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 public interface GoalFilter {
 
     boolean isApplicable(GoalFilterDto filter);
-
     List<Goal> apply(List<Goal> goals, GoalFilterDto filter);
+//    List<Goal> apply(List<Goal> goals, GoalFilterDto filter);
 }
+

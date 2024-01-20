@@ -36,6 +36,6 @@ public class GoalController {
     }
 
     public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter) {
-        return goalService.getGoalsByUser(userId, filter);
+        return goalService.findGoalsByUser(userId, filter);
     }
 }

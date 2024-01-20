@@ -62,6 +62,6 @@ public class GoalControllerTest {
         Long userId = 1L;
         GoalFilterDto filter = new GoalFilterDto();
         goalController.getGoalsByUser(userId, filter);
-        verify(goalService, times(1)).getGoalsByUser(userId, filter);
+        verify(goalService, times(1)).findGoalsByUser(userId, filter);
     }
 }

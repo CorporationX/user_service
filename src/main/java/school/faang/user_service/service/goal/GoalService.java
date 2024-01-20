@@ -13,6 +13,7 @@ import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validator.GoalValidator;
 
 import java.util.List;
+import java.util.Collection;
 
 /**
  * @author Ilia Chuvatkin
@@ -57,12 +58,14 @@ public class GoalService {
         goalRepository.deleteById(goalId);
     }
 
-    public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter) {
+    public List<GoalDto> findGoalsByUser(Long userId, GoalFilterDto filter) {
         List<Goal> userGoals = getGoalsByUserId(userId);
-        goalFilters.stream()
+        List<List<Goal>> filteredGoals = goalFilters.stream()
                 .filter(f -> f.isApplicable(filter))
-                .forEach(f -> f.apply(userGoals, filter));
-        return userGoals.stream().map(goalMapper::toDto).toList();
+                .map(f -> f.apply(userGoals, filter))
+                .toList();
+        List<Goal> filteredUserGoals = filteredGoals.stream().flatMap(Collection::stream).toList();
+        return filteredUserGoals.stream().map(goalMapper::toDto).toList();
     }
 
     public List<Goal> getGoalsByUserId(Long userId) {

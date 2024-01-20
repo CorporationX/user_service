@@ -1,4 +1,4 @@
-package school.faang.user_service.service.validator;
+package school.faang.user_service.validator;
 
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.exception.DataValidationException;
@@ -7,7 +7,7 @@ import school.faang.user_service.validator.MentorshipValidator;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MentorshipValidatorTest {
-    private MentorshipValidator mentorshipValidator = new MentorshipValidator();
+    private final MentorshipValidator mentorshipValidator = new MentorshipValidator();
 
     @Test
     void testValidationForIdsNotEqual() {

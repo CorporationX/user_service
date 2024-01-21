@@ -3,10 +3,10 @@ name: Java CI with Gradle (Cerberus)
 on:
   push:
     branches:
-      - pipline-BC-1634
+      - feature/pipline-BC-1634
   pull_request:
     branches:
-      - pipline-BC-1634
+      - feature/pipline-BC-1634
 
 
 jobs:

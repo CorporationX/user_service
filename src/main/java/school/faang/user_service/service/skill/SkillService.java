@@ -58,8 +58,7 @@ public class SkillService {
                 .collect(Collectors.groupingBy(skillDto -> skillDto, Collectors.counting()));
 
         List<SkillCandidateDto> offeredSkillCandidateDtos = offeredSkillDtosMap
-                .entrySet()
-                .stream()
+                .entrySet().stream()
                 .map(item -> new SkillCandidateDto(item.getKey(), item.getValue()))
                 .toList();
 

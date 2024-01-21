@@ -15,6 +15,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     @Transactional
     public void followUser(long followerId, long followeeId) {
+        validateUserIds(followerId, followeeId);
         validateSubscriptionExist(followerId, followeeId);
         subscriptionRepository.followUser(followerId, followeeId);
     }
@@ -22,12 +23,22 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     @Transactional
     public void unfollowUser(long followerId, long followeeId) {
+        validateUserIds(followerId, followeeId);
         subscriptionRepository.unfollowUser(followerId, followeeId);
     }
 
     private void validateSubscriptionExist(long followerId, long followeeId) {
         if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             throw new DataValidationException("This subscription already exists");
+        }
+    }
+
+    private void validateUserIds(long followerId, long followeeId) {
+        if (followerId <= 0 || followeeId <= 0) {
+            throw new DataValidationException("User identifiers must be positive numbers");
+        }
+        if (followerId == followeeId) {
+            throw new DataValidationException("Follower and followee the same user");
         }
     }
 

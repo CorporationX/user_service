@@ -14,9 +14,8 @@ public class UserService {
     private final UserMapper userMapper;
 
     public UserDto getUser(long id) {
-        if (userRepository.findById(id).isEmpty()) {
-            throw new DataValidationException("Пользователя не существует");
-        }
-        return userMapper.toDto(userRepository.findById(id).get());
+        return userRepository.findById(id)
+                .map(userMapper::toDto)
+                .orElseThrow(() -> new DataValidationException("Пользователя не существует"));
     }
 }

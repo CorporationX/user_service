@@ -40,7 +40,7 @@ class PremiumControllerTest {
 
     @Test
     public void buyPremium_whenValidBuyPremium_thenReturnsPremiumDto() throws Exception {
-        PremiumDto premiumDto = new PremiumDto(1L, 1L);
+        PremiumDto premiumDto = new PremiumDto(1L, 1L, 30);
         when(premiumService.buyPremium(1L, PremiumPeriod.ONE_MONTH)).thenReturn(premiumDto);
         when(userContext.getUserId()).thenReturn(1L);
 

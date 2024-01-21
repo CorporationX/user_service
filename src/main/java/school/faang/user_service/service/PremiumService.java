@@ -35,8 +35,7 @@ public class PremiumService {
     public PremiumDto buyPremium(long userId, PremiumPeriod premiumPeriod) {
         premiumValidator.validateUserId(userId);
 
-        //Нужно сделать нормальную генерацию номера платежа
-        PaymentRequest paymentRequest = new PaymentRequest(++paymentNumber, BigDecimal.valueOf(premiumPeriod.getPrice()), Currency.USD);
+        PaymentRequest paymentRequest = createPaymentRequest(premiumPeriod);
 
         PaymentResponse paymentResponse = paymentServiceClient.sendPayment(paymentRequest);
 
@@ -51,5 +50,10 @@ public class PremiumService {
         premiumEventPublisher.publish(new PremiumEvent(userId, premium.getId(),premiumPeriod, LocalDateTime.now()));
 
         return premiumMapper.toDto(premium);
+    }
+
+    //Нужно сделать нормальную генерацию номера платежа
+    public PaymentRequest createPaymentRequest(PremiumPeriod premiumPeriod) {
+        return new PaymentRequest(++paymentNumber, BigDecimal.valueOf(premiumPeriod.getPrice()), Currency.USD);
     }
 }

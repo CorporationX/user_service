@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class PremiumDto {
     Long id;
     Long userId;
+    int days;
 }

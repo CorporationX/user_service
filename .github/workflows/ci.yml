@@ -8,8 +8,6 @@ on:
     branches:
       - pipline-BC-1634
 
-permissions:
-  contents: read
 
 jobs:
   build:
@@ -17,9 +15,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
         with:
-          distribution: 'corretto'
-          java-version: '21'
-      - run: ./gradlew build --no-daemon
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Build Gradle
+        run: ./gradlew build
+
+      - name: Run tests
+        run: ./gradlew test

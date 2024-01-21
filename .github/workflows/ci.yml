@@ -1,11 +1,10 @@
-
 name: Java CI with Gradle (Cerberus)
 
 on:
   push:
-    branches: [ "pipline-BC-1634" ]
+    branches: pipline-BC-1634
   pull_request:
-    branches: [ "pipline-BC-1634" ]
+    branches: pipline-BC-1634
 
 permissions:
   contents: read

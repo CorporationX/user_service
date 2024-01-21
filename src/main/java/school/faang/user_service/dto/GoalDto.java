@@ -19,4 +19,5 @@ public class GoalDto {
     private GoalStatus status;
 
     private List<Long> skillIds;
+
 }

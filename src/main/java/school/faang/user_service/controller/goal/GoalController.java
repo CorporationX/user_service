@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
-import school.faang.user_service.exceptions.DataVatidationException;
+import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.service.goal.GoalService;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public class GoalController {
 
     public void deleteGoal(Long goalId) {
         if (goalId == null || goalId <= 0) {
-            throw new DataVatidationException("Invalid ID: " + goalId);
+            throw new DataValidationException("Invalid ID: " + goalId);
         } else {
             goalService.deleteGoal(goalId);
         }
@@ -25,21 +25,21 @@ public class GoalController {
 
     public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter) {
         if (userId == null || userId <= 0) {
-            throw new DataVatidationException("Incorrect data");
+            throw new DataValidationException("Incorrect data");
         }
         return goalService.getGoalsByUser(userId, filter);
     }
 
     public List<GoalDto> findSubtasksByGoalId(Long goalId) {
         if (goalId == null || goalId <= 0) {
-            throw new DataVatidationException("Incorrect data");
+            throw new DataValidationException("Incorrect data");
         }
         return goalService.findSubtasksByGoalId(goalId);
     }
 
     public List<GoalDto> findSubtasksByGoalId(Long goalId, GoalFilterDto goalFilterDto ) {
         if (goalId == null || goalId <= 0) {
-            throw new DataVatidationException("Incorrect data");
+            throw new DataValidationException("Incorrect data");
         }
         return goalService.findSubtasksByGoalId(goalId, goalFilterDto);
     }

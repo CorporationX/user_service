@@ -35,19 +35,9 @@ public class SkillService {
 
     public List<SkillDto> getUserSkills (long userId) {
 
-        List<Skill> skillEntityList = skillRepository.findAllByUserId(userId);
+        List<Skill> skills = skillRepository.findAllByUserId(userId);
 
-        if (skillEntityList == null) {
-            throw new DataValidationException("No skills found by user id " + userId);
-        }
-
-        for (Skill skill : skillEntityList) {
-            SkillDto skillDto = skillMapper.toDto(skill);
-            List<User> users = userRepository.findAllById(skillDto.getUserIds());
-            skill.setUsers(users);
-        }
-
-        return skillMapper.listToDto(skillEntityList);
+        return skillMapper.listToDto(skills);
     }
 
     public void getSkillFromDB (String skillTitle) {

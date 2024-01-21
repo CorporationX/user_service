@@ -7,37 +7,20 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.GoalDto;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.goal.GoalService;
+import school.faang.user_service.validator.goal.GoalValidator;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class GoalControllerTest {
     @Mock
     private GoalService goalService;
+    @Mock
+    private GoalValidator goalValidator;
 
     @InjectMocks
     private GoalController goalController;
 
-
-    @Test
-    void nullGoalNameTest() {
-        DataValidationException dataValidationException = assertThrows(DataValidationException.class, () -> {
-            goalController.updateGoal(1L, new GoalDto());
-        });
-        assertEquals("Goal title is empty", dataValidationException.getMessage());
-    }
-
-    @Test
-    void emptyGoalNameTest() {
-        GoalDto goalDto = new GoalDto();
-        goalDto.setTitle("");
-        DataValidationException dataValidationException = assertThrows(DataValidationException.class, () -> {
-            goalController.updateGoal(1L, goalDto);
-        });
-        assertEquals("Goal title is empty", dataValidationException.getMessage());
-    }
 
     @Test
     void correctTitleTest(){

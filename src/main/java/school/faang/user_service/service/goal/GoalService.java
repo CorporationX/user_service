@@ -1,5 +1,6 @@
 package school.faang.user_service.service.goal;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.GoalDto;
@@ -10,9 +11,9 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.skill.SkillService;
+import school.faang.user_service.validator.goal.GoalValidator;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,37 +21,37 @@ public class GoalService {
     private final GoalRepository goalRepository;
     private final SkillService skillService;
     private final GoalMapper goalMapper;
+    private final GoalValidator goalValidator;
+
 
     public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
 
-        Optional<Goal> foundGoal = goalRepository.findById(goalId);
-        if (foundGoal.isEmpty()) {
-            throw new DataValidationException("Цель не найдена");
-        }
+        Goal foundGoal = findById(goalId);
 
-        Goal newGoal = goalMapper.toEntity(goalDto);
-        newGoal.setId(goalId);
-        Goal oldGoal = foundGoal.get();
+        Goal goal = goalMapper.toEntity(goalDto);
+        goal.setId(goalId);
 
-        if (oldGoal.getStatus() == GoalStatus.COMPLETED &&
-                newGoal.getStatus() == GoalStatus.COMPLETED) {
+
+        if (foundGoal.getStatus() == GoalStatus.COMPLETED) {
             throw new DataValidationException("Цель уже завершена");
         }
 
-        if (!newGoal.getSkillsToAchieve().stream()
-                .allMatch(skillService::validateSkill)) {
-            throw new DataValidationException("Некорректные скиллы");
-        }
+        goalValidator.validateSkills(goal.getSkillsToAchieve());
 
-        if (newGoal.getStatus() == GoalStatus.COMPLETED) {
-            newGoal.getUsers().forEach(user -> oldGoal.getSkillsToAchieve()
+        if (goal.getStatus() == GoalStatus.COMPLETED) {
+            goal.getUsers().forEach(user -> foundGoal.getSkillsToAchieve()
                     .forEach(skill -> skillService.assignSkillToUser(user.getId(), skill.getId())));
 
         }
 
-        List<Skill> updatedSkills = goalDto.getSkillIds().stream().map(skillService::findById).toList();
-        newGoal.setSkillsToAchieve(updatedSkills);
+        List<Skill> skillsToUpdate = goalDto.getSkillIds().stream().map(skillService::findById).toList();
+        goal.setSkillsToAchieve(skillsToUpdate);
 
-        return goalMapper.toDto(goalRepository.save(newGoal));
+        return goalMapper.toDto(goalRepository.save(goal));
+    }
+
+
+    public Goal findById(long id) {
+        return goalRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Цель не найдена"));
     }
 }

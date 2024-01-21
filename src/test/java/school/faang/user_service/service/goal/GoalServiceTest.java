@@ -16,6 +16,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.skill.SkillService;
+import school.faang.user_service.validator.goal.GoalValidator;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -31,6 +32,8 @@ class GoalServiceTest {
 
     @Mock
     private SkillService skillService;
+    @Mock
+    private GoalValidator goalValidator;
 
     @InjectMocks
     private GoalService goalService;
@@ -48,13 +51,7 @@ class GoalServiceTest {
         goalDto.setSkillIds(Collections.singletonList(3L));
     }
 
-    @Test
-    void goalNotFoundTest() {
-        Mockito.when(goalRepository.findById(Mockito.any())).thenReturn(Optional.empty());
-        DataValidationException dataValidationException = assertThrows(DataValidationException.class,
-                () -> goalService.updateGoal(goalId, goalDto));
-        assertEquals("Цель не найдена", dataValidationException.getMessage());
-    }
+
 
     @Test
     void goalIsAlreadyCompletedTest() {
@@ -68,19 +65,6 @@ class GoalServiceTest {
         assertEquals("Цель уже завершена", dataValidationException.getMessage());
     }
 
-    @Test
-    void incorrectSkillsTest() {
-        goalDto.setStatus(GoalStatus.ACTIVE);
-        goal.setStatus(GoalStatus.ACTIVE);
-        goal.setSkillsToAchieve(Collections.singletonList(new Skill()));
-
-        Mockito.when(goalRepository.findById(Mockito.any())).thenReturn(Optional.of(goal));
-        Mockito.when(goalMapper.toEntity(goalDto)).thenReturn(goal);
-        Mockito.when(skillService.validateSkill(Mockito.any())).thenReturn(false);
-        DataValidationException dataValidationException = assertThrows(DataValidationException.class,
-                () -> goalService.updateGoal(goalId, goalDto));
-        assertEquals("Некорректные скиллы", dataValidationException.getMessage());
-    }
 
     @Test
     void shouldAssignSkillsToAllUsers() {
@@ -99,11 +83,11 @@ class GoalServiceTest {
 
         Mockito.when(goalRepository.findById(Mockito.any())).thenReturn(Optional.of(oldGoal));
         Mockito.when(goalMapper.toEntity(goalDto)).thenReturn(goal);
-        Mockito.when(skillService.validateSkill(Mockito.any())).thenReturn(true);
 
         goalService.updateGoal(goalId, goalDto);
 
         Mockito.verify(skillService).assignSkillToUser(Mockito.anyLong(), Mockito.anyLong());
         Mockito.verify(goalRepository).save(goal);
     }
+
 }

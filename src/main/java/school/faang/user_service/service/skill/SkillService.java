@@ -3,6 +3,7 @@ package school.faang.user_service.service.skill;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.repository.SkillRepository;
 
 @Service
@@ -22,6 +23,6 @@ public class SkillService {
 
 
     public Skill findById(long id) {
-        return skillRepository.findById(id).orElse(null);
+        return skillRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Навык не найден"));
     }
 }

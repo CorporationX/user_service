@@ -16,6 +16,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.skill.SkillService;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -28,7 +29,7 @@ public class GoalService {
     private final GoalMapper goalMapper;
     private final List<GoalFilter> filters;
 
-    private User getUser(Long userId) {
+    private User getUser(long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User is not found"));
     }
@@ -37,7 +38,7 @@ public class GoalService {
         goalRepository.deleteById(goalID);
     }
 
-    public void createGoal(Long userId, Goal goal) {
+    public void createGoal(long userId, Goal goal) {
         User user = getUser(userId);
         boolean isExistingSkill = goal.getSkillsToAchieve().stream()
                 .map(Skill::getId)
@@ -57,11 +58,29 @@ public class GoalService {
         }
     }
 
-    public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto goalFilterDto) {
+    public List<GoalDto> getGoalsByUser(long userId, GoalFilterDto goalFilterDto) {
         Stream<Goal> goals = goalRepository.findGoalsByUserId(userId);
         return filters.stream()
-                .filter(filter -> filter.isApplicable(goalFilterDto))
-                .flatMap(filter -> filter.applyFilter(goals, goalFilterDto))
+                .filter(goalFilter -> goalFilter.isApplicable(goalFilterDto))
+                .flatMap(goalFilter -> goalFilter.applyFilter(goals, goalFilterDto))
+                .map(goalMapper::toDto)
+                .toList();
+    }
+
+    public List<GoalDto> findSubtasksByGoalId(long goalId) {
+        Stream<Goal> goalParents = goalRepository.findByParent(goalId);
+        return goalParents
+                .sorted(Comparator.comparing(Goal::getId))
+                .map(goalMapper::toDto)
+                .toList();
+    }
+
+    public List<GoalDto> findSubtasksByGoalId(long goalId, GoalFilterDto goalFilterDto) {
+        Stream<Goal> goalParents = goalRepository.findByParent(goalId);
+        return filters.stream()
+                .filter(goalFilter -> goalFilter.isApplicable(goalFilterDto))
+                .flatMap(goalFilter -> goalFilter.applyFilter(goalParents, goalFilterDto))
+                .sorted(Comparator.comparing(Goal::getId))
                 .map(goalMapper::toDto)
                 .toList();
     }

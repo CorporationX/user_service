@@ -8,7 +8,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
@@ -23,7 +22,7 @@ class SubscriptionServiceImplTest {
     private SubscriptionServiceImpl subscriptionService;
 
     @Test
-    void should_DeleteSubscription_when_FollowerAndFolloweeIdsAreDifferent() {
+    void shouldDeleteSubscriptionWhenFollowerAndFolloweeIdsAreDifferent() {
         long followerId = 5L;
         long followeeId = 2L;
 
@@ -33,7 +32,7 @@ class SubscriptionServiceImplTest {
     }
 
     @Test
-    void should_CreateSubscription_when_NotExists() {
+    void shouldCreateSubscriptionWhenNotExists() {
         long followerId = 5L;
         long followeeId = 2L;
 
@@ -46,18 +45,69 @@ class SubscriptionServiceImplTest {
     }
 
     @Test
-    void should_ThrowException_when_SubscriptionExists() {
+    void shouldThrowExceptionWhenSubscriptionExists() {
         long followerId = 1L;
         long followeeId = 2L;
 
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId))
                 .thenReturn(Boolean.TRUE);
 
-        DataValidationException exception = assertThrows(
+        assertThrows(
                 DataValidationException.class,
                 () -> subscriptionService.followUser(followerId, followeeId));
 
-        assertEquals("This subscription already exists", exception.getMessage());
+        verify(subscriptionRepository, never()).followUser(anyLong(), anyLong());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUnfollowUserIdsAreInvalid() {
+        long invalidFollowerId = -1L;
+        long invalidFolloweeId = -2L;
+
+        assertThrows(
+                DataValidationException.class,
+                () -> subscriptionService.unfollowUser(invalidFollowerId, 1L));
+        assertThrows(
+                DataValidationException.class,
+                () -> subscriptionService.unfollowUser(1L, invalidFolloweeId));
+
+        verify(subscriptionRepository, never()).unfollowUser(anyLong(), anyLong());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUnfollowUserIdsAreTheSame() {
+        long sameUserId = 1L;
+
+        assertThrows(
+                DataValidationException.class,
+                () -> subscriptionService.unfollowUser(sameUserId, sameUserId));
+
+        verify(subscriptionRepository, never()).unfollowUser(anyLong(), anyLong());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenFollowUserIdsAreInvalid() {
+        long invalidFollowerId = -1L;
+        long invalidFolloweeId = -2L;
+
+        assertThrows(
+                DataValidationException.class,
+                () -> subscriptionService.followUser(invalidFollowerId, 1L));
+        assertThrows(
+                DataValidationException.class,
+                () -> subscriptionService.followUser(1L, invalidFolloweeId));
+
+        verify(subscriptionRepository, never()).followUser(anyLong(), anyLong());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenFollowUserIdsAreTheSame() {
+        long sameUserId = 1L;
+
+        assertThrows(
+                DataValidationException.class,
+                () -> subscriptionService.followUser(sameUserId, sameUserId));
+
         verify(subscriptionRepository, never()).followUser(anyLong(), anyLong());
     }
 

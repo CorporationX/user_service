@@ -38,7 +38,7 @@ class GoalServiceTest {
     @InjectMocks
     private GoalService goalService;
 
-    private long userId;
+    private Long userId;
     private GoalDto goalDto;
     private final User user = new User();
 

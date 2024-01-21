@@ -41,26 +41,39 @@ class GoalValidatorTest {
         Mockito.when(goalService.countActiveGoalsPerUser(userId))
                 .thenReturn(maxGoalsPerUser);
         assertThrows(DataValidationException.class,
-                () -> goalValidator.validate(userId, goalDto, maxGoalsPerUser));
+                () -> goalValidator.validate(userId, goalDto));
 
     }
 
     @Test
     void uncorrectSkillExceptionTest() {
         Mockito.when(goalService.countActiveGoalsPerUser(userId))
-                .thenReturn(maxGoalsPerUser-1);
+                .thenReturn(maxGoalsPerUser - 1);
         Mockito.when(skillService.existsById(1L))
                 .thenReturn(false);
         assertThrows(DataValidationException.class,
-                () -> goalValidator.validate(userId, goalDto, maxGoalsPerUser));
+                () -> goalValidator.validate(userId, goalDto));
+    }
+
+    @Test
+    void nullUserIdExceptionTest() {
+        assertThrows(DataValidationException.class,
+                () -> goalValidator.validateUserId(null));
+    }
+
+    @Test
+    void nullGoalTitleExceptionTest() {
+        goalDto.setTitle(null);
+        assertThrows(DataValidationException.class,
+                () -> goalValidator.validateGoalTitle(goalDto));
     }
 
     @Test
     void allCorrectTest() {
         Mockito.when(goalService.countActiveGoalsPerUser(userId))
-                .thenReturn(maxGoalsPerUser-1);
+                .thenReturn(maxGoalsPerUser - 1);
         Mockito.when(skillService.existsById(1L))
                 .thenReturn(true);
-        assertDoesNotThrow(() -> goalValidator.validate(userId, goalDto, maxGoalsPerUser));
+        assertDoesNotThrow(() -> goalValidator.validate(userId, goalDto));
     }
 }

@@ -7,16 +7,16 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.goal.GoalService;
+import school.faang.user_service.validator.goal.GoalValidator;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class GoalControllerTest {
     @Mock
     private GoalService goalService;
+    @Mock
+    private GoalValidator goalValidator;
 
     @InjectMocks
     private GoalController goalController;
@@ -24,28 +24,6 @@ class GoalControllerTest {
     private Long userId;
     private GoalDto goalDto;
 
-
-    @Test
-    void blankTitleExceptionTest() {
-        userId = 1L;
-        goalDto = new GoalDto();
-        goalDto.setTitle("");
-
-        DataValidationException dataValidationException = assertThrows(DataValidationException.class,
-                () -> goalController.createGoal(userId, goalDto));
-        assertEquals("Название цели не должно быть пустым", dataValidationException.getMessage());
-    }
-
-    @Test
-    void nullTitleTest() {
-        userId = 1L;
-        goalDto = new GoalDto();
-        goalDto.setTitle(null);
-
-        DataValidationException dataValidationException = assertThrows(DataValidationException.class,
-                () -> goalController.createGoal(userId, goalDto));
-        assertEquals("Название цели не должно быть пустым", dataValidationException.getMessage());
-    }
 
     @Test
     void shouldCreateGoal() {

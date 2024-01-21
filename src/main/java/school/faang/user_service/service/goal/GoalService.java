@@ -6,7 +6,7 @@ import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.skill.SkillService;
@@ -24,19 +24,18 @@ public class GoalService {
     private final GoalMapper goalMapper;
     private final UserService userService;
     private final GoalValidator goalValidator;
-    private static final int MAX_GOALS_PER_USER = 3;
 
 
     public GoalDto createGoal(long userId, GoalDto goalDto) {
 
-        goalValidator.validate(userId, goalDto, MAX_GOALS_PER_USER);
+        goalValidator.validate(userId, goalDto);
 
         Goal goalToSave = goalMapper.toEntity(goalDto);
         if (goalDto.getParentId() != null) {
             goalToSave.setParent(findById(goalDto.getParentId()));
         }
 
-        if (goalDto.getSkillIds() != null) {
+        if (!goalDto.getSkillIds().isEmpty()) {
             List<Skill> goalSkills = new ArrayList<>();
             goalDto.getSkillIds().forEach(skillId ->
                     goalSkills.add(skillService.findById(skillId)));
@@ -55,6 +54,6 @@ public class GoalService {
     }
 
     public Goal findById(long id) {
-        return goalRepository.findById(id).orElseThrow(() -> new DataValidationException("Цель не найдена"));
+        return goalRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Цель не найдена"));
     }
 }

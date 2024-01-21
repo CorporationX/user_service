@@ -1,6 +1,8 @@
 package school.faang.user_service.controller.skill;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
@@ -15,14 +17,15 @@ import java.util.List;
 public class SkillController {
     private final SkillService skillService;
 
-    @PostMapping(value = "/skill")
+    @PostMapping("/skill")
     public SkillDto create (SkillDto skill) throws DataValidationException {
-        validateSkill(skill);
+        validateSkill(skill.getTitle());
 
         return skillService.create(skill);
     }
 
-    public List<SkillDto> getUserSkills (long userId) {
+    @GetMapping("/skill/{userId}")
+    public List<SkillDto> getUserSkills (@PathVariable long userId) {
         return skillService.getUserSkills(userId);
     }
 
@@ -30,8 +33,8 @@ public class SkillController {
         return skillService.getOfferedSkills(userId);
     }
 
-    private void validateSkill (SkillDto skill) {
-        if (skill.getTitle() == null || skill.getTitle().isBlank()) {
+    private void validateSkill (String skillTitle) {
+        if (skillTitle == null || skillTitle.isBlank()) {
             throw new DataValidationException("Invalid skill name.");
         }
     }

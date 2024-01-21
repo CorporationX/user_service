@@ -1,6 +1,7 @@
 package school.faang.user_service.filter.event;
 
 import org.springframework.stereotype.Component;
+import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
 
@@ -14,11 +15,11 @@ public class EventDataFilter implements EventFilter {
     }
 
     @Override
-    public Stream<Event> apply(Stream<Event> eventStream, EventFilterDto eventFilterDto) {
-        return eventStream.filter(event ->
-                event.getStartDate() != null
-                        && event.getEndDate() != null
-                        && eventFilterDto.getFromDateTime().isAfter(event.getStartDate())
-                        && eventFilterDto.getToDateTime().isBefore(event.getEndDate()));
+    public Stream<EventDto> apply(Stream<EventDto> eventStream, EventFilterDto eventFilterDto) {
+        return eventStream.filter(eventDto ->
+                eventDto.getStartDate() != null
+                        && eventDto.getEndDate() != null
+                        && eventFilterDto.getFromDateTime().isAfter(eventDto.getStartDate())
+                        && eventFilterDto.getToDateTime().isBefore(eventDto.getEndDate()));
     }
 }

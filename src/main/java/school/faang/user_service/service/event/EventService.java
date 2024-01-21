@@ -70,14 +70,14 @@ public class EventService {
 
 
     public List<EventDto> getEventsByFilter(EventFilterDto eventFilterDto) {
-        Stream<Event> eventStream = eventRepository.findAll().stream();
+        Stream<EventDto> eventStream = eventRepository.findAll().stream().map(event -> eventMapper.toDto(event));
 
         for (EventFilter eventFilter : eventFilters) {
             if (eventFilter.isApplicable(eventFilterDto)) {
                 eventStream = eventFilter.apply(eventStream, eventFilterDto);
             }
         }
-        return eventMapper.toListEventDto(eventStream.toList());
+        return eventStream.toList();
     }
 
 

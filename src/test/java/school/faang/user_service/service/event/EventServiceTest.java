@@ -64,7 +64,7 @@ class EventServiceTest {
 
 
     @Test
-    public void create_ShouldThrowUserNotFoundException() {
+    public void shouldThrowUserNotFoundExceptionCreateEvent() {
         eventDto.setOwnerId(100L);
 
         Mockito.when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.empty());
@@ -74,7 +74,7 @@ class EventServiceTest {
 
 
     @Test
-    public void create_ShouldThrowDataValidationException() {
+    public void shouldThrowDataValidationExceptionCreateEvent() {
         SkillDto skillDto1 = SkillDto.builder().id(1L).title("Skill 1").build();
         SkillDto skillDto2 = SkillDto.builder().id(2L).title("Skill 2").build();
         eventDto.setOwnerId(1L);
@@ -92,7 +92,7 @@ class EventServiceTest {
 
 
     @Test
-    public void create_ShouldCreateEvent() {
+    public void shouldCreateEvent() {
         SkillDto skillDto1 = SkillDto.builder().id(1L).title("Skill 1").build();
         SkillDto skillDto2 = SkillDto.builder().id(2L).title("Skill 2").build();
         eventDto.setId(1L);
@@ -118,7 +118,7 @@ class EventServiceTest {
 
 
     @Test
-    public void get_ShouldThrowDataValidationException() {
+    public void shouldThrowDataValidationExceptionGetEvent() {
         Long eventId = 1L;
         Mockito.when(eventRepository.findById(eventId)).thenReturn(Optional.empty());
         EventNotFoundException exception = assertThrows(EventNotFoundException.class, () -> eventService.getEvent(eventId));
@@ -126,7 +126,7 @@ class EventServiceTest {
     }
 
     @Test
-    public void delete_ShouldThrowEventNotFoundException() {
+    public void shouldThrowEventNotFoundExceptionDeleteEvent() {
         Long eventId = 1L;
         Mockito.when(eventRepository.existsById(eventId)).thenReturn(false);
         EventNotFoundException exception = assertThrows(EventNotFoundException.class, () -> eventService.deleteEvent(eventId));
@@ -135,7 +135,7 @@ class EventServiceTest {
 
 
     @Test
-    public void delete_ShouldDeleteEvent() {
+    public void shouldDeleteEvent() {
         Long eventId = 1L;
         Mockito.when(eventRepository.existsById(eventId)).thenReturn(true);
         eventService.deleteEvent(eventId);
@@ -144,7 +144,7 @@ class EventServiceTest {
 
 
     @Test
-    public void update_ShouldUpdateEvent() {
+    public void shouldUpdateEvent() {
 
         SkillDto skillDto1 = SkillDto.builder().id(1L).title("Skill 1").build();
         SkillDto skillDto2 = SkillDto.builder().id(2L).title("Skill 2").build();
@@ -172,7 +172,7 @@ class EventServiceTest {
 
 
     @Test
-    public void getList_ShouldGetOwnedEvents() {
+    public void shouldGetOwnedEvents() {
         Long userId = 1L;
         Event event1 = Event.builder().id(1L).title("event 1").build();
         Event event2 = Event.builder().id(2L).title("event 2").build();
@@ -188,7 +188,7 @@ class EventServiceTest {
     }
 
     @Test
-    public void getList_ShouldGetParticipatedEvents() {
+    public void shouldGetParticipatedEvents() {
         Long userId = 1L;
         Event event1 = Event.builder().id(1L).title("event 1").build();
         Event event2 = Event.builder().id(2L).title("event 2").build();
@@ -205,7 +205,7 @@ class EventServiceTest {
 
 
     @Test
-    public void filter_ShouldGetEventsByFilter() {
+    public void shouldGetEventsByFilter() {
         Skill skill1 = Skill.builder().id(1L).title("Skill 1").build();
         Skill skill2 = Skill.builder().id(2L).title("Skill 2").build();
 

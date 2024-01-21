@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SkillService {
 
-    private final int MIN_SKILL_OFFERS = 3;
+    private static final int MIN_SKILL_OFFERS = 3;
 
     private final SkillMapper skillMapper;
     private final SkillRepository skillRepository;
@@ -46,6 +46,7 @@ public class SkillService {
     }
 
     public SkillDto acquireSkillFromOffers (long skillId, long userId) {
+
         Skill skill = skillRepository.findUserSkill(skillId, userId).orElse(null);
         List<SkillOffer> offers = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
 
@@ -102,6 +103,7 @@ public class SkillService {
     }
 
     public List<SkillCandidateDto> getOfferedSkills (long userId) {
+
         List<Skill> skills = skillRepository.findSkillsOfferedToUser(userId);
         List<SkillDto> skillDtos = skillMapper.listToDto(skills);
 
@@ -118,6 +120,7 @@ public class SkillService {
     }
 
     public void getSkillFromDB (String skillTitle) {
+
         if (skillRepository.existsByTitle(skillTitle)) {
             throw new DataValidationException("Skill with name " + skillTitle + " already exists in database.");
         }

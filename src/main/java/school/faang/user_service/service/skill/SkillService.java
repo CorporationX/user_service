@@ -102,19 +102,19 @@ public class SkillService {
     }
 
     public List<SkillCandidateDto> getOfferedSkills (long userId) {
-        List<Skill> offeredSkills = skillRepository.findSkillsOfferedToUser(userId);
-        List<SkillDto> offeredSkillDtos = skillMapper.listToDto(offeredSkills);
+        List<Skill> skills = skillRepository.findSkillsOfferedToUser(userId);
+        List<SkillDto> skillDtos = skillMapper.listToDto(skills);
 
-        Map<SkillDto, Long> offeredSkillDtosMap = offeredSkillDtos
+        Map<SkillDto, Long> skillDtosMap = skillDtos
                 .stream()
                 .collect(Collectors.groupingBy(skillDto -> skillDto, Collectors.counting()));
 
-        List<SkillCandidateDto> offeredSkillCandidateDtos = offeredSkillDtosMap
+        List<SkillCandidateDto> skillCandidateDtos = skillDtosMap
                 .entrySet().stream()
                 .map(item -> new SkillCandidateDto(item.getKey(), item.getValue()))
                 .toList();
 
-        return offeredSkillCandidateDtos;
+        return skillCandidateDtos;
     }
 
     public void getSkillFromDB (String skillTitle) {

@@ -32,7 +32,8 @@ public class GoalService {
 
         Goal goalToSave = goalMapper.toEntity(goalDto);
         if (goalDto.getParentId() != null) {
-            goalToSave.setParent(findById(goalDto.getParentId()));
+            Goal parent = findById(goalDto.getParentId());
+            goalToSave.setParent(parent);
         }
 
         if (!goalDto.getSkillIds().isEmpty()) {

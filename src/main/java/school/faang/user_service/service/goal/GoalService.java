@@ -2,6 +2,7 @@ package school.faang.user_service.service.goal;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
@@ -12,9 +13,9 @@ import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.skill.SkillService;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.goal.GoalValidator;
-
 import java.util.ArrayList;
 import java.util.List;
+
 
 @Component
 @RequiredArgsConstructor
@@ -55,6 +56,10 @@ public class GoalService {
     }
 
     public Goal findById(long id) {
-        return goalRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Цель не найдена"));
+        return goalRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Цель не найдена"))};
+
+
+    public void deleteGoal(long goalId) {
+        goalRepository.deleteById(goalId);
     }
 }

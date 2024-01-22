@@ -12,10 +12,12 @@ public class GoalController {
     private final GoalService goalService;
     private final GoalValidator goalValidator;
 
-
     public GoalDto createGoal(Long userId, GoalDto goal) {
         goalValidator.validateUserId(userId);
         goalValidator.validateGoalTitle(goal);
         return goalService.createGoal(userId, goal);
+
+    public void deleteGoal(long goalId) {
+        goalService.deleteGoal(goalId);
     }
 }

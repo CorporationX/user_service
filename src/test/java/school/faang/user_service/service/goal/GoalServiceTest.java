@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
@@ -34,6 +35,7 @@ class GoalServiceTest {
     private UserService userService;
     @Mock
     private GoalValidator goalValidator;
+
 
     @InjectMocks
     private GoalService goalService;
@@ -63,5 +65,11 @@ class GoalServiceTest {
         Mockito.when(goalMapper.toDto(Mockito.any())).thenReturn(new GoalDto());
         goalService.createGoal(userId, goalDto);
         Mockito.verify(goalRepository, Mockito.times(1)).save(goal);
+      
+    @Test
+    void testShouldDelete() {
+        userId = 1;
+        goalService.deleteGoal(userId);
+        Mockito.verify(goalRepository, Mockito.times(1)).deleteById(userId);
     }
 }

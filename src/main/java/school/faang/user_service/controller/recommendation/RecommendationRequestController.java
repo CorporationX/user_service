@@ -13,7 +13,7 @@ public class RecommendationRequestController {
     private RecommendationRequestService recommendationRequestService;
 
     public RecommendationRequestDto requestRecommendation(RecommendationRequestDto recommendationRequest) {
-        if (!(recommendationRequest.getMessage() != null) || !recommendationRequest.getMessage().isBlank() || !recommendationRequest.getMessage().isEmpty())
+        if ((recommendationRequest.getMessage() == null) || recommendationRequest.getMessage().isBlank() || recommendationRequest.getMessage().isEmpty())
             throw new MessageRequestException("Incorrect user's message");
         return recommendationRequestService.create(recommendationRequest);
     }

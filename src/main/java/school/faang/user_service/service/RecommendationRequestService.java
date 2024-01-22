@@ -25,32 +25,26 @@ public class RecommendationRequestService {
     private final RecommendationRequestMapper recommendationRequestMapper;
 
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequest) {
-        Long requesterId = recommendationRequest.getRequesterId();
-        Long receiverId = recommendationRequest.getReceiverId();
-        String message = recommendationRequest.getMessage();
-        Optional<RecommendationRequest> request = recommendationRequestRepository.findLatestPendingRequest(requesterId, receiverId);
-        Optional<User> requester = userRepository.findById(requesterId);
-        Optional<User> receiver = userRepository.findById(receiverId);
 
-        if (!requester.isPresent() && !receiver.isPresent())
+        if (recommendationRequest.getRequesterId() == null || recommendationRequest.getReceiverId() == null)
             throw new UserNotFoundException("User not found");
-        if (request.isPresent()) {
-            if (request.get().getCreatedAt().plusMonths(6).isAfter(recommendationRequest.getCreatedAt())) {
-                throw new RequestTimeOutException("Last request was less than 6 months ago");
-            }
+        if (recommendationRequest.getCreatedAt().plusMonths(6).isAfter(recommendationRequest.getUpdatedAt())) {
+            throw new RequestTimeOutException("Last request was less than 6 months ago");
         }
 
+        try {
+            recommendationRequest.getSkillsId()
+                    .forEach(skillRequestId -> {
+                        skillRequestRepository.existsById(skillRequestId.getSkillId());
+                    });
+        } catch (NullPointerException e) {
+            throw new SkillsNotFoundException("Skills not found");
+        }
         recommendationRequest.getSkillsId()
-                .forEach(skillRequestId -> {
-                    if (!skillRequestRepository.existsById(skillRequestId)) {
-                        throw new SkillsNotFoundException("Skills not found");
-                    }
-                });
-        recommendationRequest.getSkillsId()
-                .forEach(skillRequestId -> skillRequestRepository.create(recommendationRequest.getId(), skillRequestId));
+                .forEach(skillRequestId -> skillRequestRepository.create(skillRequestId.getId(), skillRequestId.getSkillId()));
 
         return recommendationRequestMapper
-                .toDto(recommendationRequestRepository.create(requesterId, receiverId, message));
+                .toDto(recommendationRequestRepository.create(recommendationRequest.getRequesterId(), recommendationRequest.getReceiverId(), recommendationRequest.getMessage()));
     }
 
 }

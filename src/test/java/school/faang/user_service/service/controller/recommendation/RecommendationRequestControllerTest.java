@@ -1,6 +1,7 @@
 package school.faang.user_service.service.controller.recommendation;
 
-import org.junit.Test;
+import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -14,8 +15,6 @@ import school.faang.user_service.service.RecommendationRequestService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 @ExtendWith(MockitoExtension.class)
 public class RecommendationRequestControllerTest {
 
@@ -27,43 +26,16 @@ public class RecommendationRequestControllerTest {
 
     @Test
     void messageNotNullTest() {
-        RecommendationRequestDto recommendationRequestDto = new RecommendationRequestDto(5L, null, "status", new ArrayList<SkillRequestDto>(), 5L, 6L, LocalDateTime.now(), LocalDateTime.now().plusMonths(7));
-        boolean exception = false;
-
-        try {
-            recommendationRequestController.requestRecommendation(recommendationRequestDto);
-        } catch (MessageRequestException e) {
-            exception = true;
-        }
-
-        assertTrue(exception);
+        Assert.assertThrows(MessageRequestException.class, ()-> recommendationRequestController.requestRecommendation(new RecommendationRequestDto(5L, null, "status", new ArrayList<SkillRequestDto>(), 5L, 6L, LocalDateTime.now(), LocalDateTime.now().plusMonths(7))));
     }
 
     @Test
     void messageNotBlankTest() {
-        RecommendationRequestDto recommendationRequestDto = new RecommendationRequestDto(5L, " ", "status", new ArrayList<SkillRequestDto>(), 5L, 6L, LocalDateTime.now(), LocalDateTime.now().plusMonths(7));
-        boolean exception = false;
-
-        try {
-            recommendationRequestController.requestRecommendation(recommendationRequestDto);
-        } catch (MessageRequestException e) {
-            exception = true;
-        }
-
-        assertTrue(exception);
+        Assert.assertThrows(MessageRequestException.class, ()-> recommendationRequestController.requestRecommendation(new RecommendationRequestDto(5L, " ", "status", new ArrayList<SkillRequestDto>(), 5L, 6L, LocalDateTime.now(), LocalDateTime.now().plusMonths(7))));
     }
 
     @Test
     void messageNotEmptyTest() {
-        RecommendationRequestDto recommendationRequestDto = new RecommendationRequestDto(5L, "", "status", new ArrayList<SkillRequestDto>(), 5L, 6L, LocalDateTime.now(), LocalDateTime.now().plusMonths(7));
-        boolean exception = false;
-
-        try {
-            recommendationRequestController.requestRecommendation(recommendationRequestDto);
-        } catch (MessageRequestException e) {
-            exception = true;
-        }
-
-        assertTrue(exception);
+        Assert.assertThrows(MessageRequestException.class, ()-> recommendationRequestController.requestRecommendation(new RecommendationRequestDto(5L, "", "status", new ArrayList<SkillRequestDto>(), 5L, 6L, LocalDateTime.now(), LocalDateTime.now().plusMonths(7))));
     }
 }

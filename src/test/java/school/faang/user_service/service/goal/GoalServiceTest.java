@@ -65,10 +65,11 @@ class GoalServiceTest {
         Mockito.when(goalMapper.toDto(Mockito.any())).thenReturn(new GoalDto());
         goalService.createGoal(userId, goalDto);
         Mockito.verify(goalRepository, Mockito.times(1)).save(goal);
+    }
       
     @Test
     void testShouldDelete() {
-        userId = 1;
+        userId = 1L;
         goalService.deleteGoal(userId);
         Mockito.verify(goalRepository, Mockito.times(1)).deleteById(userId);
     }

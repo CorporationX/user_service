@@ -56,7 +56,7 @@ public class GoalService {
     }
 
     public Goal findById(long id) {
-        return goalRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Цель не найдена"))};
+        return goalRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Цель не найдена"));}
 
 
     public void deleteGoal(long goalId) {

@@ -20,6 +20,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -112,20 +114,12 @@ public class GoalValidatorTest {
     }
 
     @Test
-    void testIsValidateByCompletedShouldSuccess() {
-        Goal goal = new Goal();
-        goal.setStatus(GoalStatus.ACTIVE);
-
-        assertEquals(goalValidator.isValidateByCompleted(goal), true);
-    }
-
-    @Test
     void testIsValidateByCompletedShouldException() {
         Goal goal = new Goal();
         goal.setStatus(GoalStatus.COMPLETED);
 
         DataValidationException dataValidationException = assertThrows(DataValidationException.class,
-                () -> goalValidator.isValidateByCompleted(goal));
+                () -> goalValidator.validateByCompleted(goal));
 
         assertEquals(dataValidationException.getMessage(), "Goal was completed!");
     }
@@ -141,7 +135,9 @@ public class GoalValidatorTest {
 
         when(skillRepository.existsByTitle(anyString())).thenReturn(true);
 
-        assertEquals(goalValidator.isValidateByExistingSkills(goal), true);
+        goalValidator.validateByExistingSkills(goal);
+
+        verify(skillRepository, times(2)).existsByTitle(anyString());
     }
 
     @Test
@@ -157,7 +153,7 @@ public class GoalValidatorTest {
         when(skillRepository.existsByTitle(anyString())).thenReturn(false);
 
         DataValidationException dataValidationException = assertThrows(DataValidationException.class,
-                () -> goalValidator.isValidateByExistingSkills(goal));
+                () -> goalValidator.validateByExistingSkills(goal));
 
         assertEquals(dataValidationException.getMessage(), "Some skills do not exist in database!");
     }

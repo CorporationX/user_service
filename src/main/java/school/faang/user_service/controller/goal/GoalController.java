@@ -23,8 +23,8 @@ public class GoalController {
     }
 
     public void updateGoal(Long goalId, GoalDto goal) {
-        if (goalValidator.isValidateByEmptyTitle(goal)) {
-            goalService.updateGoal(goalId, goal);
-        }
+        goalValidator.validateUserId(goalId);
+        goalValidator.validateTitle(goal);
+        goalService.updateGoal(goalId, goal);
     }
 }

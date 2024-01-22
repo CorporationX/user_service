@@ -87,8 +87,6 @@ public class GoalServiceTest {
 
         when(goalMapper.toEntity(goalDto)).thenReturn(goal);
         when(goalRepository.findById(goalOldId)).thenReturn(Optional.of(goalOld));
-        when(goalValidator.isValidateByCompleted(goalOld)).thenReturn(true);
-        when(goalValidator.isValidateByExistingSkills(goal)).thenReturn(true);
         when(goalRepository.findUsersByGoalId(goal.getId())).thenReturn(List.of(user1, user2));
 
 

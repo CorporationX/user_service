@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -35,16 +36,22 @@ public class GoalService {
     public void updateGoal(Long goalId, GoalDto goalDto) {
         Goal goalNew = goalMapper.toEntity(goalDto);
         goalDto.getSkillIds().forEach(s -> goalRepository.addSkillToGoal(s, goalNew.getId()));
-        Goal goalOld = goalRepository.findById(goalId).orElseThrow();
+        Goal goalOld = getUserById(goalId);
 
-        if (goalValidator.isValidateByCompleted(goalOld) && goalValidator.isValidateByExistingSkills(goalNew)) {
-            goalRepository.save(goalNew);
-        }
+        goalValidator.validateByCompleted(goalOld);
+        goalValidator.validateByExistingSkills(goalNew);
+        goalRepository.save(goalNew);
+
         if (goalNew.getStatus() == GoalStatus.COMPLETED) {
             goalRepository.findUsersByGoalId(goalNew.getId())
                     .forEach(user -> goalNew.getSkillsToAchieve().stream()
                             .filter((s1) -> !user.getSkills().contains(s1))
                             .forEach(s1 -> skillRepository.assignSkillToUser(s1.getId(), user.getId())));
         }
+    }
+
+    public Goal getUserById(long id) {
+        return goalRepository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("Goal with id " + id + " is not exists"));
     }
 }

@@ -113,9 +113,8 @@ public class GoalServiceTest {
 
     @Test
     void testGetGoalsByUser() {
-
         Long userId = 1L;
-        GoalFilterDto filter = new GoalFilterDto("Some title",GoalStatus.ACTIVE);
+        GoalFilterDto filter = new GoalFilterDto("Some title", GoalStatus.ACTIVE);
 
         GoalDto goalDtoExpected = new GoalDto();
         goalDtoExpected.setId(2L);
@@ -134,10 +133,10 @@ public class GoalServiceTest {
         Skill skill_1 = new Skill();
         skill_1.setId(1L);
 
-        List<GoalFilter> goalFilters = List.of(new GoalStatusFilter(),new GoalTitleFilter());
-        goalService = new GoalService(goalValidator,goalRepository,skillRepository,goalMapper,goalFilters);
+        List<GoalFilter> goalFilters = List.of(new GoalStatusFilter(), new GoalTitleFilter());
+        goalService = new GoalService(goalValidator, goalRepository, skillRepository, goalMapper, goalFilters);
 
-        when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.of(goal1,goal2));
+        when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.of(goal1, goal2));
         when(skillRepository.findSkillsByGoalId(anyLong())).thenReturn(List.of(skill_1));
         when(goalMapper.toDto(goal2)).thenReturn(goalDtoExpected);
 

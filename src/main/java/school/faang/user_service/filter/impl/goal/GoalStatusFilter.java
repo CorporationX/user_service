@@ -6,7 +6,6 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.filter.GoalFilter;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * @author Ilia Chuvatkin
@@ -20,7 +19,7 @@ public class GoalStatusFilter implements GoalFilter {
     }
 
     @Override
-    public List<Goal> apply(List<Goal> goals, GoalFilterDto filter) {
-        return goals.stream().filter(g -> g.getStatus() == filter.getStatus()).toList();
+    public void apply(List<Goal> goals, GoalFilterDto filter) {
+        goals.removeIf(g -> g.getStatus() != filter.getStatus());
     }
 }

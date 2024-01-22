@@ -6,7 +6,9 @@ import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 /**
@@ -19,7 +21,7 @@ public class GoalValidator {
     private static final int MAX_ACTIVE_GOALS = 3;
     private final GoalRepository goalRepository;
     private final SkillRepository skillRepository;
-
+    private final UserRepository userRepository;
 
     public Boolean isValidateByActiveGoals(Long userId) {
         if (goalRepository.countActiveGoalsPerUser(userId) <= MAX_ACTIVE_GOALS) {
@@ -54,5 +56,11 @@ public class GoalValidator {
             return true;
         }
         throw new DataValidationException("Some skills do not exist in database!");
+    }
+
+    public void validateUserId(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new EntityNotFoundException("User with id " + userId + " is not exists");
+        }
     }
 }

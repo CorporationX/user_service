@@ -36,6 +36,7 @@ public class GoalController {
     }
 
     public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter) {
+        goalValidator.validateUserId(userId);
         return goalService.findGoalsByUser(userId, filter);
     }
 }

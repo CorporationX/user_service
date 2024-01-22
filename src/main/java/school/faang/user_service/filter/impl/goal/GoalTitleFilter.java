@@ -20,7 +20,7 @@ public class GoalTitleFilter implements GoalFilter {
     }
 
     @Override
-    public List<Goal> apply(List<Goal> goals, GoalFilterDto filter) {
-        return goals.stream().filter(g -> g.getTitle().contains(filter.getTitle())).toList();
+    public void apply(List<Goal> goals, GoalFilterDto filter) {
+        goals.removeIf(g -> !g.getTitle().contains(filter.getTitle()));
     }
 }

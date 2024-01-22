@@ -9,11 +9,14 @@ import school.faang.user_service.service.subscription.SubscriptionService;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class SubscriptionControllerTest {
+
+    private static final long VALID_FOLLOWER_ID = 5L;
+    private static final long VALID_FOLLOWEE_ID = 2L;
 
     @Mock
     SubscriptionService subscriptionService;
@@ -21,33 +24,26 @@ class SubscriptionControllerTest {
     @InjectMocks
     SubscriptionController subscriptionController;
 
-
     @Test
     void shouldReturnTrueWhenUnfollowIsSuccessful() {
-        long followerId = 5L;
-        long followeeId = 2L;
-
-        Map.Entry<String, Boolean> result = subscriptionController.unfollowUser(followerId, followeeId);
+        Map.Entry<String, Boolean> result = subscriptionController.unfollowUser(VALID_FOLLOWER_ID, VALID_FOLLOWEE_ID);
 
         assertEquals(
                 Map.entry("isUnfollowed", true),
                 result);
 
-        verify(subscriptionService).unfollowUser(followerId, followeeId);
+        verify(subscriptionService).unfollowUser(VALID_FOLLOWER_ID, VALID_FOLLOWEE_ID);
     }
 
     @Test
     void shouldReturnTrueWhenFollowIsSuccessful() {
-        long followerId = 5L;
-        long followeeId = 2L;
-
-        Map.Entry<String, Boolean> result = subscriptionController.followUser(followerId, followeeId);
+        Map.Entry<String, Boolean> result = subscriptionController.followUser(VALID_FOLLOWER_ID, VALID_FOLLOWEE_ID);
 
         assertEquals(
                 Map.entry("isFollowed", true),
                 result);
 
-        verify(subscriptionService).followUser(followerId, followeeId);
+        verify(subscriptionService).followUser(VALID_FOLLOWER_ID, VALID_FOLLOWEE_ID);
     }
 
 }

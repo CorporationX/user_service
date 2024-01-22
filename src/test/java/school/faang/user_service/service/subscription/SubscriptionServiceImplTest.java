@@ -15,6 +15,12 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class SubscriptionServiceImplTest {
 
+    private static final long VALID_FOLLOWER_ID = 5L;
+    private static final long VALID_FOLLOWEE_ID = 2L;
+    private static final long INVALID_FOLLOWER_ID = -1L;
+    private static final long INVALID_FOLLOWEE_ID = -2L;
+    private static final long SAME_USER_ID = 1L;
+
     @Mock
     private SubscriptionRepository subscriptionRepository;
 
@@ -23,90 +29,71 @@ class SubscriptionServiceImplTest {
 
     @Test
     void shouldDeleteSubscriptionWhenFollowerAndFolloweeIdsAreDifferent() {
-        long followerId = 5L;
-        long followeeId = 2L;
+        subscriptionService.unfollowUser(VALID_FOLLOWER_ID, VALID_FOLLOWEE_ID);
 
-        subscriptionService.unfollowUser(followerId, followeeId);
-
-        verify(subscriptionRepository).unfollowUser(followerId, followeeId);
+        verify(subscriptionRepository).unfollowUser(VALID_FOLLOWER_ID, VALID_FOLLOWEE_ID);
     }
 
     @Test
     void shouldCreateSubscriptionWhenNotExists() {
-        long followerId = 5L;
-        long followeeId = 2L;
-
-        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId))
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(VALID_FOLLOWER_ID, VALID_FOLLOWEE_ID))
                 .thenReturn(Boolean.FALSE);
 
-        subscriptionService.followUser(followerId, followeeId);
+        subscriptionService.followUser(VALID_FOLLOWER_ID, VALID_FOLLOWEE_ID);
 
-        verify(subscriptionRepository).followUser(followerId, followeeId);
+        verify(subscriptionRepository).followUser(VALID_FOLLOWER_ID, VALID_FOLLOWEE_ID);
     }
 
     @Test
     void shouldThrowExceptionWhenSubscriptionExists() {
-        long followerId = 1L;
-        long followeeId = 2L;
-
-        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId))
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(VALID_FOLLOWER_ID, VALID_FOLLOWEE_ID))
                 .thenReturn(Boolean.TRUE);
 
         assertThrows(
                 DataValidationException.class,
-                () -> subscriptionService.followUser(followerId, followeeId));
+                () -> subscriptionService.followUser(VALID_FOLLOWER_ID, VALID_FOLLOWEE_ID));
 
         verify(subscriptionRepository, never()).followUser(anyLong(), anyLong());
     }
 
     @Test
     void shouldThrowExceptionWhenUnfollowUserIdsAreInvalid() {
-        long invalidFollowerId = -1L;
-        long invalidFolloweeId = -2L;
-
         assertThrows(
                 DataValidationException.class,
-                () -> subscriptionService.unfollowUser(invalidFollowerId, 1L));
+                () -> subscriptionService.unfollowUser(INVALID_FOLLOWER_ID, 1L));
         assertThrows(
                 DataValidationException.class,
-                () -> subscriptionService.unfollowUser(1L, invalidFolloweeId));
+                () -> subscriptionService.unfollowUser(1L, INVALID_FOLLOWEE_ID));
 
         verify(subscriptionRepository, never()).unfollowUser(anyLong(), anyLong());
     }
 
     @Test
     void shouldThrowExceptionWhenUnfollowUserIdsAreTheSame() {
-        long sameUserId = 1L;
-
         assertThrows(
                 DataValidationException.class,
-                () -> subscriptionService.unfollowUser(sameUserId, sameUserId));
+                () -> subscriptionService.unfollowUser(SAME_USER_ID, SAME_USER_ID));
 
         verify(subscriptionRepository, never()).unfollowUser(anyLong(), anyLong());
     }
 
     @Test
     void shouldThrowExceptionWhenFollowUserIdsAreInvalid() {
-        long invalidFollowerId = -1L;
-        long invalidFolloweeId = -2L;
-
         assertThrows(
                 DataValidationException.class,
-                () -> subscriptionService.followUser(invalidFollowerId, 1L));
+                () -> subscriptionService.followUser(INVALID_FOLLOWER_ID, 1L));
         assertThrows(
                 DataValidationException.class,
-                () -> subscriptionService.followUser(1L, invalidFolloweeId));
+                () -> subscriptionService.followUser(1L, INVALID_FOLLOWEE_ID));
 
         verify(subscriptionRepository, never()).followUser(anyLong(), anyLong());
     }
 
     @Test
     void shouldThrowExceptionWhenFollowUserIdsAreTheSame() {
-        long sameUserId = 1L;
-
         assertThrows(
                 DataValidationException.class,
-                () -> subscriptionService.followUser(sameUserId, sameUserId));
+                () -> subscriptionService.followUser(SAME_USER_ID, SAME_USER_ID));
 
         verify(subscriptionRepository, never()).followUser(anyLong(), anyLong());
     }

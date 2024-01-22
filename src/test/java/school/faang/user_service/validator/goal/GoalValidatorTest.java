@@ -2,9 +2,13 @@ package school.faang.user_service.validator.goal;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.skill.SkillService;
 import school.faang.user_service.validator.GoalValidator;
 
 import java.util.List;
@@ -18,11 +22,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 public class GoalValidatorTest {
-    private final GoalValidator goalValidator;
-
-    GoalValidatorTest() {
-        this.goalValidator = new GoalValidator();
-    }
+    @Mock
+    private GoalRepository goalRepository;
+    @Mock
+    private SkillService skillService;
+    @InjectMocks
+    private GoalValidator goalValidator;
 
     @Test
     void testValidateActiveGoalsShouldException() {
@@ -65,5 +70,15 @@ public class GoalValidatorTest {
                 () -> goalValidator.validateTitle(goalDto));
 
         assertEquals(dataValidationException.getMessage(), "Title is empty!");
+    }
+
+    @Test
+    void testValidateUserIdWithNullShouldException() {
+        Long userId = null;
+
+        DataValidationException dataValidationException = assertThrows(DataValidationException.class,
+                () -> goalValidator.validateUserId(userId));
+
+        assertEquals(dataValidationException.getMessage(), "User ID required!");
     }
 }

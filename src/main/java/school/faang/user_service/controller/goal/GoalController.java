@@ -18,8 +18,7 @@ public class GoalController {
 
     public void createGoal(Long userId, GoalDto goal) {
         goalValidator.validateTitle(goal);
-        if (userId != null) {
-            goalService.createGoal(userId, goal);
-        }
+        goalValidator.validateUserId(userId);
+        goalService.createGoal(userId, goal);
     }
 }

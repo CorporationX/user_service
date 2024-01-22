@@ -2,6 +2,8 @@ package school.faang.user_service.controller.mentorship;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.service.mentorship.MentorshipService;
 
 import java.util.List;
 
@@ -11,30 +13,34 @@ public class MentorshipController {
     private final MentorshipService mentorshipService;
 
     public List<UserDto> getMentees(long userId) {
-        validationOfInputData(userId);
-        return mentorshipService.getMentees(userId);
+        if (isIdValid(userId))
+            return mentorshipService.getMentees(userId);
+        else
+            throw new IllegalArgumentException("Incorrect id entered");
     }
 
     public List<UserDto> getMentors(long userId) {
-        validationOfInputData(userId);
-        return mentorshipService.getMentors(userId);
-    }
-
-    public void deleteMentee(long menteeId, long mentorId){
-        validationOfInputData(menteeId);
-        validationOfInputData(mentorId);
-        mentorshipService.deleteMentee(menteeId, mentorId);
-    }
-
-    public void deleteMentor(long menteeId, long mentorId){
-        validationOfInputData(menteeId);
-        validationOfInputData(mentorId);
-        mentorshipService.deleteMentor(menteeId, mentorId);
-    }
-
-    public void validationOfInputData(long id){
-        if (id < 1) {
+        if (isIdValid(userId))
+            return mentorshipService.getMentors(userId);
+        else
             throw new IllegalArgumentException("Incorrect id entered");
-        }
+    }
+
+    public void deleteMentee(long menteeId, long mentorId) {
+        if (isIdValid(menteeId) && isIdValid(mentorId))
+            mentorshipService.deleteMentee(menteeId, mentorId);
+        else
+            throw new IllegalArgumentException("Incorrect id entered");
+    }
+
+    public void deleteMentor(long menteeId, long mentorId) {
+        if (isIdValid(menteeId) && isIdValid(mentorId))
+            mentorshipService.deleteMentor(menteeId, mentorId);
+        else
+            throw new IllegalArgumentException("Incorrect id entered");
+    }
+
+    public boolean isIdValid(long id) {
+        return id >= 1;
     }
 }

@@ -1,6 +1,5 @@
-package school.faang.user_service.controller.mentorship;
+package school.faang.user_service.service.mentorship;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,8 +9,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.mentorship.MentorshipService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,20 +45,20 @@ class MentorshipServiceTest {
                 .id(100)
                 .username("Vasiliy")
                 .build();
-        List<User> menteesOfUser = new ArrayList<>();
-        menteesOfUser.add(userMentee);
+        List<User> userMentees = new ArrayList<>();
+        userMentees.add(userMentee);
 
         userMentor = User.builder()
                 .id(10)
                 .username("Alex")
                 .build();
-        List<User> mentorsOfUser = new ArrayList<>();
-        mentorsOfUser.add(userMentor);
+        List<User> userMentors = new ArrayList<>();
+        userMentors.add(userMentor);
 
         user = User.builder()
                 .id(1)
-                .mentees(menteesOfUser)
-                .mentors(mentorsOfUser)
+                .mentees(userMentees)
+                .mentors(userMentors)
                 .build();
 
         userDtoMentee = UserDto.builder()
@@ -75,18 +77,18 @@ class MentorshipServiceTest {
 
     @Test
     public void testGetMenteesSuccessful() {
-        when(userMapper.toUserDto(userMentee)).thenReturn(userDtoMentee);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         assertEquals(mentees.size(), mentorshipService.getMentees(1).size());
-        Mockito.verify(userRepository).findById(1L);
+        assertIterableEquals(mentees, mentorshipService.getMentees(1));
+        Mockito.verify(userRepository, Mockito.times(2)).findById(1L);
     }
 
     @Test
     public void testGetMentorsSuccessful() {
-        when(userMapper.toUserDto(userMentor)).thenReturn(userDtoMentor);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         assertEquals(mentors.size(), mentorshipService.getMentors(1).size());
-        Mockito.verify(userRepository).findById(1L);
+        assertIterableEquals(mentors, mentorshipService.getMentors(1));
+        Mockito.verify(userRepository, Mockito.times(2)).findById(1L);
     }
 
     @Test
@@ -101,7 +103,7 @@ class MentorshipServiceTest {
     }
 
     @Test
-    public void testDeleteMentorSuccessful(){
+    public void testDeleteMentorSuccessful() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(userRepository.findById(10L)).thenReturn(Optional.of(userMentor));
         mentorshipService.deleteMentor(1, 10);
@@ -116,16 +118,5 @@ class MentorshipServiceTest {
         long id = -1;
         assertThrows(IllegalArgumentException.class,
                 () -> mentorshipService.getUser(id));
-    }
-
-    @Test
-    void testIllegalArgumentException() {
-        Throwable exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> {
-                    throw new IllegalArgumentException("User with id not found");
-                }
-        );
-        assertEquals("User with id not found", exception.getMessage());
     }
 }

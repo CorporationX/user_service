@@ -4,24 +4,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.Spy;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.mentorship.MentorshipService;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipServiceTest {
@@ -38,6 +33,7 @@ class MentorshipServiceTest {
     private UserDto userDtoMentor;
     private final List<UserDto> mentees = new ArrayList<>();
     private final List<UserDto> mentors = new ArrayList<>();
+    long invalidId;
 
     @BeforeEach
     public void init() {
@@ -73,22 +69,25 @@ class MentorshipServiceTest {
 
         mentees.add(userDtoMentee);
         mentors.add(userDtoMentor);
+        invalidId = -1;
     }
 
     @Test
     public void testGetMenteesSuccessful() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        assertEquals(mentees.size(), mentorshipService.getMentees(1).size());
-        assertIterableEquals(mentees, mentorshipService.getMentees(1));
-        Mockito.verify(userRepository, Mockito.times(2)).findById(1L);
+        List<UserDto> userMentees = mentorshipService.getMentees(1);
+        assertEquals(mentees.size(), userMentees.size());
+        assertTrue(userMentees.containsAll(mentees));
+        Mockito.verify(userRepository).findById(1L);
     }
 
     @Test
     public void testGetMentorsSuccessful() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        assertEquals(mentors.size(), mentorshipService.getMentors(1).size());
-        assertIterableEquals(mentors, mentorshipService.getMentors(1));
-        Mockito.verify(userRepository, Mockito.times(2)).findById(1L);
+        List<UserDto> userMentors = mentorshipService.getMentors(1);
+        assertEquals(mentors.size(), userMentors.size());
+        assertTrue(userMentors.containsAll(mentors));
+        Mockito.verify(userRepository).findById(1L);
     }
 
     @Test
@@ -114,9 +113,33 @@ class MentorshipServiceTest {
     }
 
     @Test
-    public void testGetUserByIdShouldException() {
-        long id = -1;
+    public void testGetMenteesFailure() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
         assertThrows(IllegalArgumentException.class,
-                () -> mentorshipService.getUser(id));
+                () -> mentorshipService.getMentees(anyLong()));
+    }
+
+    @Test
+    public void testGetMentorsFailure() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+        assertThrows(IllegalArgumentException.class,
+                () -> mentorshipService.getMentors(anyLong()));
+    }
+
+    @Test
+    public void testDeleteMenteeFailure() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(userRepository.findById(100L)).thenReturn(Optional.of(userMentee));
+        assertThrows(IllegalArgumentException.class,
+                () -> mentorshipService.deleteMentee(100, anyLong()));
+    }
+
+
+    @Test
+    public void testDeleteMentorFailure() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(userRepository.findById(10L)).thenReturn(Optional.of(userMentor));
+        assertThrows(IllegalArgumentException.class,
+                () -> mentorshipService.deleteMentor(10, anyLong()));
     }
 }

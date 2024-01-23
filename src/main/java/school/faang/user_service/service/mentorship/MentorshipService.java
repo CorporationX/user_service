@@ -41,7 +41,7 @@ public class MentorshipService {
         userRepository.save(mentee);
     }
 
-    public User getUser(long userId) {
+    private User getUser(long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User with id " + userId + " not found"));
     }

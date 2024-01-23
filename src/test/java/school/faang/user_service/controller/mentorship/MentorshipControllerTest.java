@@ -7,14 +7,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipControllerTest {
@@ -22,8 +21,18 @@ class MentorshipControllerTest {
     private MentorshipController mentorshipController;
     @Mock
     private MentorshipService mentorshipService;
-    long idTrue = 1;
-    long idFalse = 0;
+    long idTrue;
+    long idFalse;
+    long menteeId;
+    long mentorId;
+
+    @BeforeEach
+    public void init() {
+        idTrue = 1;
+        idFalse = 0;
+        menteeId = 1;
+        mentorId = 2;
+    }
 
     @Test
     void testGetMenteesSuccessful() {
@@ -33,12 +42,12 @@ class MentorshipControllerTest {
 
         assertNotNull(result);
         assertEquals(mentees.size(), result.size());
-        assertIterableEquals(mentees, result);
+        assertTrue(mentees.containsAll(result));
         verify(mentorshipService).getMentees(idTrue);
     }
 
     @Test
-    void testGetMenteesException() {
+    void testGetMenteesFailure() {
         assertThrows(IllegalArgumentException.class, () -> mentorshipController.getMentees(idFalse));
     }
 
@@ -50,29 +59,36 @@ class MentorshipControllerTest {
 
         assertNotNull(result);
         assertEquals(mentors.size(), result.size());
-        assertIterableEquals(mentors, result);
+        assertTrue(mentors.containsAll(result));
         verify(mentorshipService).getMentors(idTrue);
     }
 
     @Test
-    void testGetMentorsException() {
+    void testGetMentorsFailure() {
         assertThrows(IllegalArgumentException.class, () -> mentorshipController.getMentors(idFalse));
     }
 
+
     @Test
     void testDeleteMenteeSuccessful() {
-        long menteeId = 1;
-        long mentorId = 2;
         mentorshipController.deleteMentee(menteeId, mentorId);
         verify(mentorshipService).deleteMentee(menteeId, mentorId);
     }
 
     @Test
+    void testDeleteMenteeFailure() {
+        assertThrows(IllegalArgumentException.class, () -> mentorshipController.deleteMentee(idFalse, idTrue));
+    }
+
+    @Test
     void testDeleteMentorSuccessful() {
-        long menteeId = 1;
-        long mentorId = 2;
         mentorshipController.deleteMentor(menteeId, mentorId);
         verify(mentorshipService).deleteMentor(menteeId, mentorId);
+    }
+
+    @Test
+    void testDeleteMentorFailure() {
+        assertThrows(IllegalArgumentException.class, () -> mentorshipController.deleteMentor(idFalse, idTrue));
     }
 
     @Test

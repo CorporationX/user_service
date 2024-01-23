@@ -10,26 +10,24 @@ import school.faang.user_service.exception.mentorship.MentorshipRequestException
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
-import java.util.Optional;
-
 
 @Component
 @RequiredArgsConstructor
 public class MentorshipRequestService {
 
-    private MentorshipRequestRepository mentorshipRequestRepository;
-    private MentorshipRequestMapper mentorshipRequestMapper;
+    private final MentorshipRequestRepository mentorshipRequestRepository;
+    private final MentorshipRequestMapper mentorshipRequestMapper;
 
     public MentorshipRequestDto rejectRequest(long id, RejectionDto rejection) {
-        Optional<MentorshipRequest> byId = mentorshipRequestRepository.findById(id);
-        if (byId.isPresent()) {
-            MentorshipRequest mentorshipRequest = byId.get();
-            mentorshipRequest.setStatus(RequestStatus.REJECTED);
-            mentorshipRequest.setRejectionReason(rejection.getReason());
-            mentorshipRequestRepository.save(mentorshipRequest);
-            return mentorshipRequestMapper.toDTO(mentorshipRequest);
-        } else {
-            throw new MentorshipRequestException("There is no mentorship request with this id");
-        }
+        MentorshipRequest mentorshipRequest = findRequestById(id);
+        mentorshipRequest.setStatus(RequestStatus.REJECTED);
+        mentorshipRequest.setRejectionReason(rejection.getReason());
+        mentorshipRequestRepository.save(mentorshipRequest);
+        return mentorshipRequestMapper.toDTO(mentorshipRequest);
+    }
+
+    private MentorshipRequest findRequestById(long id) {
+        return mentorshipRequestRepository.findById(id)
+                .orElseThrow(() -> new MentorshipRequestException("There is no mentorship request with this id"));
     }
 }

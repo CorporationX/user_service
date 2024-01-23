@@ -1,14 +1,9 @@
 name: Java CI with Gradle (Cerberus)
 
 on:
-  push:
-    branches:
-      - feature/pipline-BC-1634
-      - feature/pipeline-test-BC-1634
   pull_request:
     branches:
-      - feature/pipline-BC-1634
-      - feature/pipeline-test-BC-1634
+      - cerberus-master-bc2
 
 
 jobs:

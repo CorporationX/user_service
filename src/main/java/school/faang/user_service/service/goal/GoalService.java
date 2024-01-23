@@ -9,6 +9,7 @@ import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.skill.SkillService;
 import school.faang.user_service.validator.GoalValidator;
 
 /**
@@ -20,6 +21,7 @@ import school.faang.user_service.validator.GoalValidator;
 public class GoalService {
     private final GoalValidator goalValidator;
     private final GoalRepository goalRepository;
+    private final SkillService skillService;
     private final SkillRepository skillRepository;
     private final GoalMapper goalMapper;
 
@@ -35,7 +37,7 @@ public class GoalService {
 
     public void updateGoal(Long goalId, GoalDto goalDto) {
         Goal goalNew = goalMapper.toEntity(goalDto);
-        goalDto.getSkillIds().forEach(s -> goalRepository.addSkillToGoal(s, goalNew.getId()));
+        goalNew.setSkillsToAchieve(goalDto.getSkillIds().stream().map(skillService::findById).toList());
         Goal goalOld = getUserById(goalId);
 
         goalValidator.validateByCompleted(goalOld);

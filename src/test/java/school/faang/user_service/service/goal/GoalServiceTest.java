@@ -13,6 +13,7 @@ import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.skill.SkillService;
 import school.faang.user_service.validator.GoalValidator;
 
 import java.util.List;
@@ -33,6 +34,8 @@ public class GoalServiceTest {
     private GoalValidator goalValidator;
     @Mock
     private GoalRepository goalRepository;
+    @Mock
+    private SkillService skillService;
     @Mock
     private SkillRepository skillRepository;
     @Mock
@@ -66,7 +69,7 @@ public class GoalServiceTest {
     }
 
     @Test
-    void testUpdateGoal() {
+    void testUpdateGoalWithStatusCompleted() {
         Goal goalOld = new Goal();
         Long goalOldId = 1L;
         Goal goal = new Goal();
@@ -84,16 +87,40 @@ public class GoalServiceTest {
         user1.setSkills(List.of(skill_1));
         User user2 = new User();
         user2.setSkills(List.of(skill_1));
-
         when(goalMapper.toEntity(goalDto)).thenReturn(goal);
         when(goalRepository.findById(goalOldId)).thenReturn(Optional.of(goalOld));
         when(goalRepository.findUsersByGoalId(goal.getId())).thenReturn(List.of(user1, user2));
-
+        when(skillService.findById(1L)).thenReturn(skill_1);
+        when(skillService.findById(2L)).thenReturn(skill_2);
 
         goalService.updateGoal(goalOldId, goalDto);
 
         verify(goalRepository, times(1)).save(goal);
-        verify(goalRepository, times(2)).addSkillToGoal(anyLong(), anyLong());
         verify(skillRepository, times(2)).assignSkillToUser(anyLong(), anyLong());
+    }
+
+    @Test
+    void testUpdateGoalWithStatusActive() {
+        Goal goalOld = new Goal();
+        Long goalOldId = 1L;
+        Skill skill_1 = new Skill();
+        skill_1.setId(1L);
+        Skill skill_2 = new Skill();
+        skill_2.setId(2L);
+        GoalDto goalDto = new GoalDto();
+        goalDto.setId(1L);
+        goalDto.setSkillIds(List.of(1L, 2L));
+        Goal goal = new Goal();
+        goal.setId(1L);
+        goal.setStatus(GoalStatus.ACTIVE);
+
+        when(goalMapper.toEntity(goalDto)).thenReturn(goal);
+        when(skillService.findById(1L)).thenReturn(skill_1);
+        when(skillService.findById(2L)).thenReturn(skill_2);
+        when(goalRepository.findById(goalOldId)).thenReturn(Optional.of(goalOld));
+
+        goalService.updateGoal(goalOldId, goalDto);
+
+        verify(goalRepository, times(1)).save(goal);
     }
 }

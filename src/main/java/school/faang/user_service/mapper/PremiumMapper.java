@@ -8,4 +8,5 @@ import school.faang.user_service.entity.premium.Premium;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface PremiumMapper {
     PremiumDto toDto(Premium premium);
+    Premium toEntity(PremiumDto premiumDto);
 }

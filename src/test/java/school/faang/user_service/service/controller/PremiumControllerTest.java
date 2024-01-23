@@ -49,7 +49,9 @@ public class PremiumControllerTest {
 
     @Test
     public void testValidPremiumReturnsPremiumDto() throws Exception {
-        PremiumDto premiumDto = new PremiumDto(1L, 1L);
+        PremiumDto premiumDto = new PremiumDto();
+        premiumDto.setUserId(1L);
+        premiumDto.setId(1L);
         Mockito.when(premiumService.buyPremium(1L, PremiumPeriod.ONE_MONTH))
                 .thenReturn(premiumDto);
         Mockito.when(userContext.getUserId()).thenReturn(1L);

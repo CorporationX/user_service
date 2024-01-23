@@ -15,17 +15,18 @@ import school.faang.user_service.entity.premium.PremiumPeriod;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.validator.PremiumValidator;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
 public class PremiumService {
 
     private final UserRepository userRepo;
+    private final PremiumRepository premiumRepo;
     private final PaymentServiceClient paymentServiceClient;
     private final PremiumValidator premiumValidator;
     private final PremiumMapper mapper;
@@ -35,21 +36,20 @@ public class PremiumService {
                 -> new IllegalArgumentException("User not found"));
         premiumValidator.validatePremium(userId);
         PaymentRequest paymentRequest = new PaymentRequest(
-                new Random().nextLong(1000),
-                BigDecimal.valueOf(period.getPrice()), Currency.USD);
+                10L, BigDecimal.valueOf(period.getPrice()), Currency.USD);
 
         ResponseEntity<PaymentResponse> paymentResponseEntity =
                 paymentServiceClient.sendPayment(paymentRequest);
 
         PaymentResponse response = paymentResponseEntity.getBody();
         if (response != null && response.status() == PaymentStatus.SUCCESS) {
-            return createPremium(user, period);
+            return savePremium(user, period);
         } else {
             throw new DataValidationException("Payment failed");
         }
     }
 
-    public PremiumDto createPremium(User user, PremiumPeriod period) {
+    public PremiumDto savePremium(User user, PremiumPeriod period) {
         Premium premium = new Premium();
         LocalDateTime startDate = LocalDateTime.now();
         LocalDateTime endDate = startDate.plusDays(period.getDays());
@@ -57,6 +57,8 @@ public class PremiumService {
         premium.setUser(user);
         premium.setStartDate(startDate);
         premium.setEndDate(endDate);
+
+        premiumRepo.save(premium);
 
         return mapper.toDto(premium);
     }

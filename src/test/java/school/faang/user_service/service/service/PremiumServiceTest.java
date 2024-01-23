@@ -8,12 +8,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
 import school.faang.user_service.client.PaymentServiceClient;
 import school.faang.user_service.dto.PremiumDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.premium.Currency;
 import school.faang.user_service.entity.premium.PaymentRequest;
 import school.faang.user_service.entity.premium.PaymentResponse;
 import school.faang.user_service.entity.premium.PaymentStatus;
@@ -21,10 +20,15 @@ import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.premium.PremiumPeriod;
 import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.PremiumService;
 import school.faang.user_service.validator.PremiumValidator;
 
+import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,6 +40,9 @@ public class PremiumServiceTest {
     private UserRepository userRepo;
 
     @Mock
+    private PremiumRepository premiumRepo;
+
+    @Mock
     private PaymentServiceClient paymentServiceClient;
 
     @Mock
@@ -44,20 +51,52 @@ public class PremiumServiceTest {
     @Spy
     private PremiumMapper mapper;
 
-
     @InjectMocks
     private PremiumService premiumService;
 
+    private Premium premium = new Premium();
+    private User user = new User();
+    private PremiumDto premiumDto = new PremiumDto();
+
     @BeforeEach
     public void init() {
+        UserRepository userRepo = Mockito.mock(UserRepository.class);
+        PaymentServiceClient paymentServiceClient = Mockito.mock(PaymentServiceClient.class);
+        PremiumValidator premiumValidator = Mockito.mock(PremiumValidator.class);
+        PremiumMapper mapper = Mockito.mock(PremiumMapper.class);
+        PremiumRepository premiumRepo = Mockito.mock(PremiumRepository.class);
+        PremiumService premiumService = new PremiumService(userRepo, premiumRepo, paymentServiceClient,
+                premiumValidator, mapper);
 
+        Clock clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
+        user.setId(1L);
+        premium.setUser(user);
+        premium.setStartDate(LocalDateTime.now(clock));
+        premium.setEndDate(LocalDateTime.now().plusDays(PremiumPeriod.ONE_MONTH.getDays()));
     }
 
     @Test
-    public void testCreatePremiumSuccess() {
+    public void testBuyPremiumSuccess() {
+        long paymentNum = 10L;
         User user = new User();
         user.setId(1L);
-        PremiumDto premiumDto = new PremiumDto(1L, 2L, null, null);
-        assertEquals(premiumDto, premiumService.createPremium(user, PremiumPeriod.ONE_MONTH));
+        PaymentResponse response = new PaymentResponse(PaymentStatus.SUCCESS, 10, paymentNum,
+                BigDecimal.valueOf(PremiumPeriod.ONE_MONTH.getPrice()), Currency.USD, "Success");
+        PaymentRequest request = new PaymentRequest(paymentNum, BigDecimal.valueOf(PremiumPeriod.ONE_MONTH.getPrice()),
+                Currency.USD);
+        Mockito.when(paymentServiceClient.sendPayment(request)).thenReturn(ResponseEntity.ok(response));
+        Mockito.when(userRepo.findById(1L)).thenReturn(Optional.of(user));
+        premiumService.buyPremium(1L, PremiumPeriod.ONE_MONTH);
+        Mockito.verify(paymentServiceClient, Mockito.times(1)).sendPayment(request);
+    }
+
+    @Test
+    public void testSavePremiumSuccess() {
+        premiumDto.setUserId(1L);
+        Mockito.lenient().when(premiumService.savePremium(user, PremiumPeriod.ONE_MONTH)).thenReturn(premiumDto);
+        Mockito.lenient().when(premiumRepo.save(premium)).thenReturn(premium);
+
+        assertEquals(premium.getId(), premiumDto.getId());
+        assertEquals(premium.getUser().getId(), premiumDto.getUserId());
     }
 }

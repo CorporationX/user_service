@@ -8,11 +8,12 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mentorship.dto.MentorshipRequestDto;
-import school.faang.user_service.mentorship.mapper.MentorshipRequestMapper;
-import school.faang.user_service.mentorship.validator.MentorshipRequestValidator;
+import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
+import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
+import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+import school.faang.user_service.service.mentorship.MentorshipRequestService;
 
 import java.time.LocalDateTime;
 

@@ -1,11 +1,11 @@
-package school.faang.user_service.mentorship.validator;
+package school.faang.user_service.validator.mentorship;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mentorship.dto.MentorshipRequestDto;
-import school.faang.user_service.mentorship.exception.MentorshipRequestException;
+import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
+import school.faang.user_service.exception.mentorship.MentorshipRequestException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 

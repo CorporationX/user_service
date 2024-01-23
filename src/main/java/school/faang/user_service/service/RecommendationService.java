@@ -16,9 +16,16 @@ public class RecommendationService {
     private final RecommendationMapper recommendationMapper;
 
     public List<RecommendationDto> getAllGivenRecommendations(long authorId) {
-    return recommendationRepository.findAllByAuthorId(authorId, Pageable.unpaged())
-            .stream()
-            .map(recommendationMapper::toDto)
-            .toList();
+        return recommendationRepository.findAllByAuthorId(authorId, Pageable.unpaged())
+                .stream()
+                .map(recommendationMapper::toDto)
+                .toList();
+    }
+    public List<RecommendationDto> getAllUserRecommendations(long receiverId){
+        return recommendationRepository.findAllByReceiverId(receiverId, Pageable.unpaged())
+                .stream()
+                .map(recommendationMapper::toDto)
+                .collect(Collectors.toList());
     }
 }
+

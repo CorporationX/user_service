@@ -1,5 +1,6 @@
 package school.faang.user_service.service.mentorship;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.MentorshipRequestDto;
@@ -13,35 +14,37 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Component
+@RequiredArgsConstructor
 public class MentorshipRequestService {
-    private MentorshipRequestRepository mentorshipRequestRepository;
-    private UserRepository userRepository;
-    private MentorshipRequestMapper mentorshipRequestMapper;
-    @Autowired
-    public MentorshipRequestService(MentorshipRequestRepository mentorshipRequestRepository) {
-        this.mentorshipRequestRepository = mentorshipRequestRepository;
-    }
+    private final MentorshipRequestRepository mentorshipRequestRepository;
+    private final UserRepository userRepository;
+    private final MentorshipRequestMapper mentorshipRequestMapper;
 
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
-        boolean isMoreThanThreeMonths = LocalDateTime.now().isAfter(mentorshipRequestRepository.findLatestRequest(mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId()).get().getUpdatedAt().plusMonths(3));
-        boolean isRecieverExists = userRepository.existsById(mentorshipRequestDto.getReceiverId());
-        boolean isRequesterExists = userRepository.existsById(mentorshipRequestDto.getRequesterId());
-        boolean isNotRequestToYourself = mentorshipRequestDto.getRequesterId() != mentorshipRequestDto.getReceiverId();
-
-        if (!isMoreThanThreeMonths) {
-            throw new IllegalArgumentException("Less than 3 months have passed since last request");
-        } else if (!isRecieverExists) {
-            throw new IllegalArgumentException("There are no this receiver in data base");
-        } else if (!isRequesterExists) {
-            throw new IllegalArgumentException("There are no this requester in data base");
-        } else if (!isNotRequestToYourself) {
-            throw new IllegalArgumentException("You can not send a request to yourself");
-        }
+        validateRequestMentorship(mentorshipRequestDto);
 
         mentorshipRequestRepository.create(mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId(), mentorshipRequestDto.getDescription());
 
         MentorshipRequest mentorshipRequestEntity = mentorshipRequestMapper.MentorshipRequestToEntity(mentorshipRequestDto);
         mentorshipRequestEntity = mentorshipRequestRepository.save(mentorshipRequestEntity);
         return mentorshipRequestMapper.toMentorshipRequestDto(mentorshipRequestEntity);
+    }
+
+    private void validateRequestMentorship(MentorshipRequestDto mentorshipRequestDto) {
+        if (!isMoreThanThreeMonths(mentorshipRequestDto)) {
+            throw new IllegalArgumentException("Less than 3 months have passed since last request");
+        } else if (!userRepository.existsById(mentorshipRequestDto.getReceiverId())) {
+            throw new IllegalArgumentException("There are no this receiver in data base");
+        } else if (!userRepository.existsById(mentorshipRequestDto.getRequesterId())) {
+            throw new IllegalArgumentException("There are no this requester in data base");
+        } else if (!mentorshipRequestDto.getRequesterId().equals(mentorshipRequestDto.getReceiverId())) {
+            throw new IllegalArgumentException("You can not send a request to yourself");
+        }
+    }
+
+    private boolean isMoreThanThreeMonths(MentorshipRequestDto mentorshipRequestDto) {
+        return mentorshipRequestRepository.findLatestRequest(mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId())
+                .map(mentorshipRequest -> LocalDateTime.now().isAfter(mentorshipRequest.getUpdatedAt().plusMonths(3)))
+                .orElseThrow(() -> new IllegalArgumentException("There are not find request"));
     }
 }

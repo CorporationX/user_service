@@ -28,40 +28,33 @@ public class MentorshipRequestServiceTest {
     @InjectMocks
     MentorshipRequestService mentorshipRequestService;
 
-    private long requesterId;
-    private long receiverId;
-    @BeforeEach
-    public void setUp() {
-        long requesterId = 1L;
-        long receiverId = 2L;
-    }
 
     @Test
     public void testIsReceiverExistsIsInvalid() {
-        Mockito.when(userRepository.existsById(receiverId)).thenReturn(false);
-        Mockito.when(userRepository.existsById(requesterId)).thenReturn(true);
+        Mockito.when(userRepository.existsById(Mockito.anyLong())).thenReturn(false);
+        Mockito.when(userRepository.existsById(Mockito.anyLong())).thenReturn(true);
 
         Assert.assertThrows(
                 IllegalArgumentException.class,
-                () -> mentorshipRequestService.requestMentorship(new MentorshipRequestDto(requesterId, receiverId, "String")
+                () -> mentorshipRequestService.requestMentorship(new MentorshipRequestDto(Mockito.anyLong(), Mockito.anyLong(), "String")
                 ));
 
         Mockito.verify(userRepository, Mockito.times(1))
-                .existsById(receiverId);
+                .existsById(Mockito.anyLong());
     }
 
     @Test
     public void testIsRequesterExistsIsInvalid() {
-        Mockito.when(userRepository.existsById(requesterId)).thenReturn(false);
-        Mockito.when(userRepository.existsById(receiverId)).thenReturn(true);
+        Mockito.when(userRepository.existsById(Mockito.anyLong())).thenReturn(false);
+        Mockito.when(userRepository.existsById(Mockito.anyLong())).thenReturn(true);
 
         Assert.assertThrows(
                 IllegalArgumentException.class,
-                () -> mentorshipRequestService.requestMentorship(new MentorshipRequestDto(requesterId, receiverId, "String")
+                () -> mentorshipRequestService.requestMentorship(new MentorshipRequestDto(Mockito.anyLong(), Mockito.anyLong(), "String")
                 ));
 
         Mockito.verify(userRepository, Mockito.times(1))
-                .existsById(requesterId);
+                .existsById(Mockito.anyLong());
     }
 
     @Test
@@ -79,26 +72,26 @@ public class MentorshipRequestServiceTest {
 
     @Test
     public void testIsMoreThanThreeMonthsIsInvalid() {
-        Mockito.when(userRepository.existsById(requesterId)).thenReturn(true);
-        Mockito.when(userRepository.existsById(receiverId)).thenReturn(true);
+        Mockito.when(userRepository.existsById(Mockito.anyLong())).thenReturn(true);
+        Mockito.when(userRepository.existsById(Mockito.anyLong())).thenReturn(true);
 
         MentorshipRequest request = new MentorshipRequest();
         request.setUpdatedAt(LocalDateTime.now().minusMonths(2));
-        Mockito.when(mentorshipRequestRepository.findLatestRequest(requesterId, receiverId)).thenReturn(Optional.of(request));
+        Mockito.when(mentorshipRequestRepository.findLatestRequest(Mockito.anyLong(), Mockito.anyLong())).thenReturn(Optional.of(request));
 
         Assert.assertThrows(
                 IllegalArgumentException.class,
-                () -> mentorshipRequestService.requestMentorship(new MentorshipRequestDto(requesterId, receiverId, "description"))
+                () -> mentorshipRequestService.requestMentorship(new MentorshipRequestDto(Mockito.anyLong(), Mockito.anyLong(), "description"))
         );
     }
 
     @Test
     public void testRequestMentorship() {
-        Mockito.when(userRepository.existsById(requesterId)).thenReturn(true);
-        Mockito.when(userRepository.existsById(receiverId)).thenReturn(true);
+        Mockito.when(userRepository.existsById(Mockito.anyLong())).thenReturn(true);
+        Mockito.when(userRepository.existsById(Mockito.anyLong())).thenReturn(true);
 
-        mentorshipRequestService.requestMentorship(new MentorshipRequestDto(requesterId, receiverId, "description"));
+        mentorshipRequestService.requestMentorship(new MentorshipRequestDto(Mockito.anyLong(), Mockito.anyLong(), "description"));
         Mockito.verify(mentorshipRequestRepository, Mockito.times(1))
-                .create(requesterId, receiverId, "description");
+                .create(Mockito.anyLong(), Mockito.anyLong(), "description");
     }
 }

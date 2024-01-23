@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
@@ -96,6 +97,26 @@ class SubscriptionServiceImplTest {
                 () -> subscriptionService.followUser(SAME_USER_ID, SAME_USER_ID));
 
         verify(subscriptionRepository, never()).followUser(anyLong(), anyLong());
+    }
+
+    @Test
+    void shouldReturnFollowersCountWhenFollowerIdIsValid() {
+        when(subscriptionRepository.findFolloweesAmountByFollowerId(VALID_FOLLOWER_ID))
+                .thenReturn(5);
+
+        int followersCount = subscriptionService.getFollowersCount(VALID_FOLLOWER_ID);
+
+        assertEquals(5, followersCount);
+        verify(subscriptionRepository).findFolloweesAmountByFollowerId(VALID_FOLLOWER_ID);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenFollowerIdIsInvalid() {
+        assertThrows(
+                DataValidationException.class,
+                () -> subscriptionService.getFollowersCount(INVALID_FOLLOWER_ID));
+
+        verify(subscriptionRepository, never()).findFolloweesAmountByFollowerId(anyLong());
     }
 
 }

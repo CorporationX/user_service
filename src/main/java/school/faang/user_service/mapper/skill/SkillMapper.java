@@ -22,10 +22,6 @@ public interface SkillMapper {
     @Mapping(target = "userIds", source = "users", qualifiedByName = "usersToIds")
     SkillDto toDto (Skill skill);
 
-    List<Skill> listToEntity (List<SkillDto> skillDtoList);
-
-    List<SkillDto> listToDto (List<Skill> skillList);
-
     @Named("usersToIds")
     default List<Long> convertUsersToIds (List<User> users) {
         return users.stream().map(User::getId).toList();

@@ -63,4 +63,10 @@ public class GoalValidator {
             throw new EntityNotFoundException("User with id " + userId + " is not exists");
         }
     }
+
+    public void validateGoalId(long goalId) {
+        if (!goalRepository.existsById(goalId)) {
+            throw new EntityNotFoundException("Goal with id = " + goalId + " is not exists");
+        }
+    }
 }

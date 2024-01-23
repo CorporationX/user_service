@@ -142,4 +142,33 @@ public class GoalServiceTest {
 
         assertEquals(expectedList, goalService.findGoalsByUser(userId, filter));
     }
+
+    @Test
+    void testFindSubtasksByGoalId() {
+        long goalId = 1L;
+        GoalFilterDto filter = new GoalFilterDto("Some title", GoalStatus.ACTIVE);
+
+        GoalDto goalDtoExpected = new GoalDto();
+        goalDtoExpected.setId(2L);
+        goalDtoExpected.setTitle("Some title");
+        goalDtoExpected.setStatus(GoalStatus.ACTIVE);
+        List<GoalDto> expectedList = List.of(goalDtoExpected);
+
+        Goal goal1 = new Goal();
+        goal1.setTitle("Title1");
+        goal1.setId(1L);
+        goal1.setStatus(GoalStatus.ACTIVE);
+        Goal goal2 = new Goal();
+        goal2.setId(2L);
+        goal2.setTitle("Some title");
+        goal2.setStatus(GoalStatus.ACTIVE);
+
+        List<GoalFilter> goalFilters = List.of(new GoalStatusFilter(), new GoalTitleFilter());
+        goalService = new GoalService(goalValidator, goalRepository, skillRepository, goalMapper, goalFilters);
+
+        when(goalRepository.findByParent(goalId)).thenReturn(Stream.of(goal1, goal2));
+        when(goalMapper.toDto(goal2)).thenReturn(goalDtoExpected);
+
+        assertEquals(expectedList, goalService.findSubtasksByGoalId(goalId, filter));
+    }
 }

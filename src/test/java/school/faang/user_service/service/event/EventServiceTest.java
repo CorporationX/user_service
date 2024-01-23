@@ -41,10 +41,10 @@ class EventServiceTest {
     private EventRepository eventRepository;
 
     @Spy
-    private EventMapper eventMapper = new EventMapperImpl();
+    private EventMapperImpl eventMapper;
 
     @Spy
-    private SkillMapper skillMapper = new SkillMapperImpl();
+    private SkillMapperImpl skillMapper;
 
     @Mock
     private UserRepository userRepository;
@@ -53,59 +53,117 @@ class EventServiceTest {
     private EventService eventService;
 
     private EventDto eventDto;
+    private EventDto eventDto1;
+    private EventDto eventDto2;
+
     private User user;
+
+    private SkillDto skillDto1;
+    private SkillDto skillDto2;
+
+    private Skill skill1;
+    private Skill skill2;
+
+    private Event event;
+    private Event event1;
+    private Event event2;
 
 
     @BeforeEach
     public void setUp() {
-        eventDto = new EventDto();
-        user = new User();
+
+        skillDto1 = SkillDto.builder()
+                .id(1L)
+                .title("Skill 1")
+                .build();
+
+        skillDto2 = SkillDto.builder()
+                .id(2L)
+                .title("Skill 2")
+                .build();
+
+
+        skill1 = Skill.builder()
+                .id(3L)
+                .title("Skill 3")
+                .build();
+
+        skill2 = Skill.builder()
+                .id(4L)
+                .title("Skill 4")
+                .build();
+
+
+        eventDto = EventDto.builder()
+                .id(1L)
+                .ownerId(1L)
+                .relatedSkills(Arrays.asList(skillDto1, skillDto2))
+                .build();
+
+
+        user = User.builder()
+                .id(1L)
+                .skills(Arrays.asList(skill1, skill2))
+                .build();
+
+
+        event = Event.builder()
+                .id(1L)
+                .owner(user)
+                .relatedSkills(Arrays.asList(skill1, skill2))
+                .build();
+
+
+        event1 = Event.builder()
+                .id(1L)
+                .title("event 1")
+                .build();
+
+        event2 = Event.builder()
+                .id(2L)
+                .title("event 2")
+                .build();
+
+        eventDto1 = EventDto.builder()
+                .id(1L)
+                .title("event 1")
+                .build();
+
+        eventDto2 = EventDto.builder()
+                .id(2L)
+                .title("event 2")
+                .build();
+
+
     }
 
 
     @Test
     public void shouldThrowUserNotFoundExceptionCreateEvent() {
         eventDto.setOwnerId(100L);
-
         Mockito.when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.empty());
         UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> eventService.createEvent(eventDto));
-        assertEquals("User with ID: " + eventDto.getOwnerId() + " not found", exception.getMessage());
+        assertEquals("User by ID: " + eventDto.getOwnerId() + " not found", exception.getMessage());
     }
 
 
     @Test
     public void shouldThrowDataValidationExceptionCreateEvent() {
-        SkillDto skillDto1 = SkillDto.builder().id(1L).title("Skill 1").build();
-        SkillDto skillDto2 = SkillDto.builder().id(2L).title("Skill 2").build();
-        eventDto.setOwnerId(1L);
-        eventDto.setRelatedSkills(Arrays.asList(skillDto1, skillDto2));
-
-        Skill skill1 = Skill.builder().id(3L).title("Skill 3").build();
-        Skill skill2 = Skill.builder().id(4L).title("Skill 4").build();
-        user.setId(1L);
-        user.setSkills(Arrays.asList(skill1, skill2));
-
         Mockito.when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(user));
         DataValidationException exception = assertThrows(DataValidationException.class, () -> eventService.createEvent(eventDto));
-        assertEquals("User with ID: " + eventDto.getOwnerId() + " does not possess all required skills for this event", exception.getMessage());
+        assertEquals("User by ID: " + eventDto.getOwnerId() + " does not possess all required skills for this event", exception.getMessage());
     }
 
 
     @Test
     public void shouldCreateEvent() {
-        SkillDto skillDto1 = SkillDto.builder().id(1L).title("Skill 1").build();
-        SkillDto skillDto2 = SkillDto.builder().id(2L).title("Skill 2").build();
-        eventDto.setId(1L);
-        eventDto.setOwnerId(1L);
-        eventDto.setRelatedSkills(Arrays.asList(skillDto1, skillDto2));
 
-
-        Skill skill1 = Skill.builder().id(1L).title("Skill 1").build();
-        Skill skill2 = Skill.builder().id(2L).title("Skill 2").build();
-        user.setId(1L);
+        skill1.setId(1L);
+        skill1.setTitle("Skill 1");
+        skill2.setId(2L);
+        skill2.setTitle("Skill 2");
         user.setSkills(Arrays.asList(skill1, skill2));
 
-        Event event = Event.builder().id(1L).owner(user).relatedSkills(Arrays.asList(skill1, skill2)).build();
 
         Mockito.when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(user));
         Mockito.when(eventRepository.save(eventMapper.toEntity(eventDto))).thenReturn(event);
@@ -118,11 +176,32 @@ class EventServiceTest {
 
 
     @Test
+    public void shouldUpdateEvent() {
+
+        skill1.setId(1L);
+        skill1.setTitle("Skill 1");
+        skill2.setId(2L);
+        skill2.setTitle("Skill 2");
+        user.setSkills(Arrays.asList(skill1, skill2));
+
+
+        Mockito.when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(user));
+        Mockito.when(eventRepository.save(eventMapper.toEntity(eventDto))).thenReturn(event);
+
+        EventDto eventDto1 = assertDoesNotThrow(() -> eventService.updateEvent(eventDto));
+
+        Mockito.verify(eventRepository).save(eventMapper.toEntity(eventDto));
+        assertEquals(eventDto1, eventDto);
+
+    }
+
+
+    @Test
     public void shouldThrowDataValidationExceptionGetEvent() {
         Long eventId = 1L;
         Mockito.when(eventRepository.findById(eventId)).thenReturn(Optional.empty());
         EventNotFoundException exception = assertThrows(EventNotFoundException.class, () -> eventService.getEvent(eventId));
-        assertEquals("Event with ID: " + eventId + " not found", exception.getMessage());
+        assertEquals("Event by ID: " + eventId + " not found", exception.getMessage());
     }
 
     @Test
@@ -144,42 +223,8 @@ class EventServiceTest {
 
 
     @Test
-    public void shouldUpdateEvent() {
-
-        SkillDto skillDto1 = SkillDto.builder().id(1L).title("Skill 1").build();
-        SkillDto skillDto2 = SkillDto.builder().id(2L).title("Skill 2").build();
-        eventDto.setId(1L);
-        eventDto.setOwnerId(1L);
-        eventDto.setRelatedSkills(Arrays.asList(skillDto1, skillDto2));
-
-
-        Skill skill1 = Skill.builder().id(1L).title("Skill 1").build();
-        Skill skill2 = Skill.builder().id(2L).title("Skill 2").build();
-        user.setId(1L);
-        user.setSkills(Arrays.asList(skill1, skill2));
-
-        Event event = Event.builder().id(1L).owner(user).relatedSkills(Arrays.asList(skill1, skill2)).build();
-
-        Mockito.when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(user));
-        Mockito.when(eventRepository.save(eventMapper.toEntity(eventDto))).thenReturn(event);
-
-        EventDto eventDto1 = assertDoesNotThrow(() -> eventService.updateEvent(eventDto));
-
-        Mockito.verify(eventRepository).save(eventMapper.toEntity(eventDto));
-        assertEquals(eventDto1, eventDto);
-
-    }
-
-
-    @Test
     public void shouldGetOwnedEvents() {
         Long userId = 1L;
-        Event event1 = Event.builder().id(1L).title("event 1").build();
-        Event event2 = Event.builder().id(2L).title("event 2").build();
-
-        EventDto eventDto1 = EventDto.builder().id(1L).title("event 1").build();
-        EventDto eventDto2 = EventDto.builder().id(2L).title("event 2").build();
-
         List<EventDto> expectedEventDtoList = Arrays.asList(eventDto1, eventDto2);
 
         Mockito.when(eventRepository.findAllByUserId(userId)).thenReturn(Arrays.asList(event1, event2));
@@ -190,12 +235,6 @@ class EventServiceTest {
     @Test
     public void shouldGetParticipatedEvents() {
         Long userId = 1L;
-        Event event1 = Event.builder().id(1L).title("event 1").build();
-        Event event2 = Event.builder().id(2L).title("event 2").build();
-
-        EventDto eventDto1 = EventDto.builder().id(1L).title("event 1").build();
-        EventDto eventDto2 = EventDto.builder().id(2L).title("event 2").build();
-
         List<EventDto> expectedEventDtoList = Arrays.asList(eventDto1, eventDto2);
 
         Mockito.when(eventRepository.findParticipatedEventsByUserId(userId)).thenReturn(Arrays.asList(event1, event2));
@@ -206,8 +245,10 @@ class EventServiceTest {
 
     @Test
     public void shouldGetEventsByFilter() {
-        Skill skill1 = Skill.builder().id(1L).title("Skill 1").build();
-        Skill skill2 = Skill.builder().id(2L).title("Skill 2").build();
+        skill1.setId(1L);
+        skill1.setTitle("Skill 1");
+        skill2.setId(2L);
+        skill2.setTitle("Skill 2");
 
         EventFilterDto eventFilterDto = new EventFilterDto();
         eventFilterDto.setOwnerId(1L);
@@ -221,7 +262,8 @@ class EventServiceTest {
         Event event2 = Event.builder().id(2L).owner(user2).title("event 2").build();
         Event event3 = Event.builder().id(3L).owner(user3).title("event 3").build();
 
-        EventDto eventDto = EventDto.builder().id(1L).ownerId(1L).title("tittle 1").build();
+        eventDto.setTitle("tittle 1");
+        eventDto.setRelatedSkills(null);
 
         Mockito.when(eventRepository.findAll()).thenReturn(Arrays.asList(event1, event2, event3));
 

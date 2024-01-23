@@ -12,8 +12,4 @@ class UserServiceTest {
         assertTrue(true);
     }
 
-    @Test
-    void shouldFailTest(){
-        Assertions.fail();
-    }
 }

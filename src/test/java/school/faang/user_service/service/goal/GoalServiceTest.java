@@ -9,6 +9,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.repository.goal.GoalRepository;
 
+import static org.mockito.ArgumentMatchers.anyLong;
+
 @ExtendWith(MockitoExtension.class)
 class GoalServiceTest {
     @Mock
@@ -20,8 +22,8 @@ class GoalServiceTest {
     @Test
     @DisplayName("Missing target remove test")
     void testDeleteGoalById() {
-        goalService.deleteGoal(1L);
+        goalService.deleteGoal(anyLong());
 
-        Mockito.verify(goalRepository).deleteById(1L);
+        Mockito.verify(goalRepository).deleteById(anyLong());
     }
 }

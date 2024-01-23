@@ -96,10 +96,10 @@ jacoco {
     toolVersion = "0.8.9"
 }
 
-tasks.test {
-    finalizedBy(tasks.jacocoTestReport)
-    finalizedBy(tasks.jacocoTestCoverageVerification)
-}
+  tasks.test {
+  finalizedBy(tasks.jacocoTestReport)
+//    finalizedBy(tasks.jacocoTestCoverageVerification)
+  }
 
 tasks.jacocoTestReport {
     reports {

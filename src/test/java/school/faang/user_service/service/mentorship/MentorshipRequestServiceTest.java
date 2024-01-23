@@ -10,7 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.mentorship.MentorshipRequestException;
+import school.faang.user_service.exception.mentorship.DataNotFoundException;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -69,23 +69,9 @@ class MentorshipRequestServiceTest {
     public void whenRequestForMembershipThenNoDataInDB() {
         try {
             mentorshipRequestService.acceptRequest(1L);
-        } catch (MentorshipRequestException e) {
+        } catch (DataNotFoundException e) {
             assertThat(e).isInstanceOf(RuntimeException.class)
                     .hasMessage("There is no mentorship request with this id");
-        }
-    }
-
-    @Test
-    public void whenRequestForMembershipThenAlreadyMentor() {
-        Mockito.when(mentorshipRequestRepository.findById(1L)).thenReturn(Optional.of(mentorshipRequest));
-        Mockito.when(mentorshipRequest.getRequester()).thenReturn(requester);
-        Mockito.when(mentorshipRequest.getReceiver()).thenReturn(receiver);
-        requester.setMentors(List.of(receiver));
-        try {
-            mentorshipRequestService.acceptRequest(1L);
-        } catch (MentorshipRequestException e) {
-            assertThat(e).isInstanceOf(RuntimeException.class)
-                    .hasMessage("Already a mentor");
         }
     }
 

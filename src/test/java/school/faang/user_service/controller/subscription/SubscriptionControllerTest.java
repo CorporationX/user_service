@@ -11,6 +11,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class SubscriptionControllerTest {
@@ -44,6 +45,20 @@ class SubscriptionControllerTest {
                 result);
 
         verify(subscriptionService).followUser(VALID_FOLLOWER_ID, VALID_FOLLOWEE_ID);
+    }
+
+    @Test
+    void shouldReturnFollowersCountWhenFollowerIdIsValid() {
+        when(subscriptionService.getFollowersCount(VALID_FOLLOWER_ID))
+                .thenReturn(5);
+
+        Map.Entry<String, Integer> result = subscriptionController.getFollowersCount(VALID_FOLLOWER_ID);
+
+        assertEquals(
+                Map.entry("followeesCount", 5),
+                result);
+
+        verify(subscriptionService).getFollowersCount(VALID_FOLLOWER_ID);
     }
 
 }

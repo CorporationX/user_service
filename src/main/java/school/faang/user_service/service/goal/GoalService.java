@@ -38,14 +38,14 @@ public class GoalService {
 
         goalValidator.validateSkills(goal.getSkillsToAchieve());
 
-        if (goal.getStatus() == GoalStatus.COMPLETED) {
-            goal.getUsers().forEach(user -> foundGoal.getSkillsToAchieve()
-                    .forEach(skill -> skillService.assignSkillToUser(user.getId(), skill.getId())));
-
-        }
-
         List<Skill> skillsToUpdate = goalDto.getSkillIds().stream().map(skillService::findById).toList();
         goal.setSkillsToAchieve(skillsToUpdate);
+
+        if (goal.getStatus() == GoalStatus.COMPLETED) {
+            goal.getUsers().forEach(user -> skillsToUpdate
+                    .forEach(skill -> skillService.assignSkillToUser(user.getId(), skill.getId())));
+        }
+
 
         return goalMapper.toDto(goalRepository.save(goal));
     }

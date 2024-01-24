@@ -83,6 +83,7 @@ class GoalServiceTest {
 
         Mockito.when(goalRepository.findById(Mockito.any())).thenReturn(Optional.of(oldGoal));
         Mockito.when(goalMapper.toEntity(goalDto)).thenReturn(goal);
+        Mockito.when(skillService.findById(Mockito.anyLong())).thenReturn(skill);
 
         goalService.updateGoal(goalId, goalDto);
 

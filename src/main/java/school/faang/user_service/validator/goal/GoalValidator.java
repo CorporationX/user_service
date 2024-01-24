@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
+
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.skill.SkillService;
@@ -15,6 +16,18 @@ import java.util.List;
 public class GoalValidator {
     private final GoalService goalService;
     private final SkillService skillService;
+
+    private static final int MAX_GOALS_PER_USER = 3;
+
+    public void validate(long userId, GoalDto goalDto) {
+        if (goalService.countActiveGoalsPerUser(userId) == MAX_GOALS_PER_USER) {
+            throw new DataValidationException("Достигнуто максимальное количество целей");
+        }
+        if (!goalDto.getSkillIds().stream().allMatch(skillService::existsById)) {
+            throw new DataValidationException("Некорректные скиллы");
+        }
+    }
+
 
     public void validateUserId(Long userId) {
         if (userId == null) {

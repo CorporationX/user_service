@@ -15,12 +15,15 @@ import school.faang.user_service.validator.goal.GoalValidator;
 class GoalControllerTest {
     @Mock
     private GoalService goalService;
+
     @Mock
     private GoalValidator goalValidator;
 
     @InjectMocks
     private GoalController goalController;
-
+  
+    private Long userId;
+    private GoalDto goalDto;
 
     @Test
     void correctTitleTest(){
@@ -28,5 +31,27 @@ class GoalControllerTest {
         goalDto.setTitle("Test");
         goalController.updateGoal(1L, goalDto);
         Mockito.verify(goalService, Mockito.times(1)).updateGoal(1L, goalDto);
+
+  
+
+
+
+
+    @Test
+    void shouldCreateGoal() {
+        userId = 1L;
+        goalDto = new GoalDto();
+        goalDto.setTitle("Title");
+
+        goalController.createGoal(userId, goalDto);
+        Mockito.verify(goalService, Mockito.times(1)).createGoal(userId, goalDto);
+    }
+
+    @Test
+    void testShouldDeleteFromService() {
+        userId = 1L;
+        goalController.deleteGoal(userId);
+        Mockito.verify(goalService, Mockito.times(1)).deleteGoal(userId);
+
     }
 }

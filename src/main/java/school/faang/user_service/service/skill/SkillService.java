@@ -22,6 +22,11 @@ public class SkillService {
     }
 
 
+    public boolean existsById(long id) {
+        return skillRepository.existsById(id);
+    }
+
+
     public Skill findById(long id) {
         return skillRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Навык не найден"));
     }

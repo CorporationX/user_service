@@ -19,6 +19,7 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validator.GoalValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -97,7 +98,6 @@ public class GoalServiceTest {
         when(goalValidator.isValidateByExistingSkills(goal)).thenReturn(true);
         when(goalRepository.findUsersByGoalId(goal.getId())).thenReturn(List.of(user1, user2));
 
-
         goalService.updateGoal(goalOldId, goalDto);
 
         verify(goalRepository, times(1)).save(goal);
@@ -112,7 +112,7 @@ public class GoalServiceTest {
     }
 
     @Test
-    void testGetGoalsByUser() {
+    void testFindGoalsWithTwoFilledFilter() {
         Long userId = 1L;
         GoalFilterDto filter = new GoalFilterDto("Some title", GoalStatus.ACTIVE);
 
@@ -137,8 +137,145 @@ public class GoalServiceTest {
         goalService = new GoalService(goalValidator, goalRepository, skillRepository, goalMapper, goalFilters);
 
         when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.of(goal1, goal2));
-        when(skillRepository.findSkillsByGoalId(anyLong())).thenReturn(List.of(skill_1));
         when(goalMapper.toDto(goal2)).thenReturn(goalDtoExpected);
+
+        assertEquals(expectedList, goalService.findGoalsByUser(userId, filter));
+    }
+
+    @Test
+    void testFindGoalsWithTwoUnfilledFilter() {
+        Long userId = 1L;
+        GoalFilterDto filter = new GoalFilterDto();
+
+        GoalDto goalDtoExpected = new GoalDto();
+        goalDtoExpected.setId(2L);
+        goalDtoExpected.setTitle("Some title");
+        goalDtoExpected.setStatus(GoalStatus.ACTIVE);
+        GoalDto goalDtoExpected1 = new GoalDto();
+        goalDtoExpected1.setId(1L);
+        goalDtoExpected1.setTitle("Title1");
+        goalDtoExpected1.setStatus(GoalStatus.ACTIVE);
+        List<GoalDto> expectedList = List.of(goalDtoExpected1, goalDtoExpected);
+
+        Goal goal1 = new Goal();
+        goal1.setTitle("Title1");
+        goal1.setId(1L);
+        goal1.setStatus(GoalStatus.ACTIVE);
+        Goal goal2 = new Goal();
+        goal2.setId(2L);
+        goal2.setTitle("Some title");
+        goal2.setStatus(GoalStatus.ACTIVE);
+        Skill skill_1 = new Skill();
+        skill_1.setId(1L);
+
+        List<GoalFilter> goalFilters = List.of(new GoalStatusFilter(), new GoalTitleFilter());
+        goalService = new GoalService(goalValidator, goalRepository, skillRepository, goalMapper, goalFilters);
+
+        when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.of(goal1, goal2));
+        when(goalMapper.toDto(goal1)).thenReturn(goalDtoExpected1);
+        when(goalMapper.toDto(goal2)).thenReturn(goalDtoExpected);
+
+        assertEquals(expectedList, goalService.findGoalsByUser(userId, filter));
+    }
+
+    @Test
+    void testFindGoalsWhenFilterIsNull() {
+        Long userId = 1L;
+        GoalFilterDto filter = null;
+
+        GoalDto goalDtoExpected = new GoalDto();
+        goalDtoExpected.setId(2L);
+        goalDtoExpected.setTitle("Some title");
+        goalDtoExpected.setStatus(GoalStatus.ACTIVE);
+        List<GoalDto> expectedList = List.of(goalDtoExpected);
+
+        Goal goal2 = new Goal();
+        goal2.setId(2L);
+        goal2.setTitle("Some title");
+        goal2.setStatus(GoalStatus.ACTIVE);
+        Skill skill_1 = new Skill();
+        skill_1.setId(1L);
+
+        when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.of(goal2));
+        when(goalMapper.toDto(goal2)).thenReturn(goalDtoExpected);
+
+        assertEquals(expectedList, goalService.findGoalsByUser(userId, filter));
+    }
+
+    @Test
+    void testFindGoalsWhenGoalsIsNull() {
+        Long userId = 1L;
+        GoalFilterDto filter = new GoalFilterDto();
+        List<GoalDto> expectedList = new ArrayList<>();
+
+        when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.of());
+
+        assertEquals(expectedList, goalService.findGoalsByUser(userId, filter));
+    }
+
+    @Test
+    void testFindGoalsWithOneFilledTitleFilter() {
+        Long userId = 1L;
+        GoalFilterDto filter = new GoalFilterDto("Some title", null);
+
+        GoalDto goalDtoExpected = new GoalDto();
+        goalDtoExpected.setId(2L);
+        goalDtoExpected.setTitle("Some title");
+        goalDtoExpected.setStatus(GoalStatus.ACTIVE);
+        List<GoalDto> expectedList = List.of(goalDtoExpected);
+
+        Goal goal1 = new Goal();
+        goal1.setTitle("Title1");
+        goal1.setId(1L);
+        goal1.setStatus(GoalStatus.ACTIVE);
+        Goal goal2 = new Goal();
+        goal2.setId(2L);
+        goal2.setTitle("Some title");
+        goal2.setStatus(GoalStatus.ACTIVE);
+        Skill skill_1 = new Skill();
+        skill_1.setId(1L);
+
+        List<GoalFilter> goalFilters = List.of(new GoalStatusFilter(), new GoalTitleFilter());
+        goalService = new GoalService(goalValidator, goalRepository, skillRepository, goalMapper, goalFilters);
+
+        when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.of(goal1, goal2));
+        when(goalMapper.toDto(goal2)).thenReturn(goalDtoExpected);
+
+        assertEquals(expectedList, goalService.findGoalsByUser(userId, filter));
+    }
+
+    @Test
+    void testFindGoalsWithOneFilledStatusFilter() {
+        Long userId = 1L;
+        GoalFilterDto filter = new GoalFilterDto(null, GoalStatus.ACTIVE);
+
+        GoalDto goalDtoExpected = new GoalDto();
+        goalDtoExpected.setId(2L);
+        goalDtoExpected.setTitle("Some title");
+        goalDtoExpected.setStatus(GoalStatus.ACTIVE);
+        GoalDto goalDtoExpected1 = new GoalDto();
+        goalDtoExpected1.setId(2L);
+        goalDtoExpected1.setTitle("Title1");
+        goalDtoExpected1.setStatus(GoalStatus.ACTIVE);
+        List<GoalDto> expectedList = List.of(goalDtoExpected1, goalDtoExpected);
+
+        Goal goal1 = new Goal();
+        goal1.setTitle("Title1");
+        goal1.setId(1L);
+        goal1.setStatus(GoalStatus.ACTIVE);
+        Goal goal2 = new Goal();
+        goal2.setId(2L);
+        goal2.setTitle("Some title");
+        goal2.setStatus(GoalStatus.ACTIVE);
+        Skill skill_1 = new Skill();
+        skill_1.setId(1L);
+
+        List<GoalFilter> goalFilters = List.of(new GoalStatusFilter(), new GoalTitleFilter());
+        goalService = new GoalService(goalValidator, goalRepository, skillRepository, goalMapper, goalFilters);
+
+        when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.of(goal1, goal2));
+        when(goalMapper.toDto(goal2)).thenReturn(goalDtoExpected);
+        when(goalMapper.toDto(goal1)).thenReturn(goalDtoExpected1);
 
         assertEquals(expectedList, goalService.findGoalsByUser(userId, filter));
     }

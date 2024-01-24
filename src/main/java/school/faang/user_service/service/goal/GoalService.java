@@ -12,6 +12,7 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validator.GoalValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,6 +61,14 @@ public class GoalService {
 
     public List<GoalDto> findGoalsByUser(Long userId, GoalFilterDto filter) {
         List<Goal> userGoals = getGoalsByUserId(userId);
+
+        if (userGoals.isEmpty()) {
+            return new ArrayList<GoalDto>();
+        }
+        if (filter == null) {
+            return userGoals.stream().map(goalMapper::toDto).toList();
+        }
+
         goalFilters.stream()
                 .filter(f -> f.isApplicable(filter))
                 .forEach(f -> f.apply(userGoals, filter));
@@ -67,10 +76,6 @@ public class GoalService {
     }
 
     public List<Goal> getGoalsByUserId(Long userId) {
-        return goalRepository.findGoalsByUserId(userId)
-                .filter(g -> !skillRepository.findSkillsByGoalId(g.getId()).isEmpty())
-                .peek(g -> skillRepository.findSkillsByGoalId(g.getId())
-                        .forEach(s -> goalRepository.addSkillToGoal(s.getId(), g.getId())))
-                .collect(Collectors.toList());
+        return goalRepository.findGoalsByUserId(userId).collect(Collectors.toList());
     }
 }

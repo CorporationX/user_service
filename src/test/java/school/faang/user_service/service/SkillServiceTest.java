@@ -20,6 +20,7 @@ import school.faang.user_service.service.skill.UserService;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -109,6 +110,14 @@ public class SkillServiceTest {
         List<SkillDto> result = skillService.getUserSkills(user.getId());
 
         assertEquals(skillDtos, result);
+    }
+
+    @Test
+    public void shouldReturnEmptyListOfUserSkills () {
+        User user = User.builder().id(1L).username("David").build();
+        List<SkillDto> dtos = skillService.getUserSkills(user.getId());
+
+        assertNotNull(dtos);
     }
 
     private SkillDto setSkillDto (boolean existsByTitle) {

@@ -28,11 +28,16 @@ public class SubscriptionController {
         return Map.entry("isUnfollowed", true);
     }
 
-    @GetMapping("/count/{followerId}")
+    @GetMapping("/count/followings/{followerId}")
     public Map.Entry<String, Integer> getFollowingCount(@PathVariable("followerId") long followerId) {
         int followingCount = subscriptionService.getFollowingCount(followerId);
         return Map.entry("followingCount", followingCount);
     }
 
+    @GetMapping("/count/followers/{followeeId}")
+    public Map.Entry<String, Integer> getFollowersCount(@PathVariable("followeeId") long followeeId) {
+        int followersCount = subscriptionService.getFollowersCount(followeeId);
+        return Map.entry("followersCount", followersCount);
+    }
 
 }

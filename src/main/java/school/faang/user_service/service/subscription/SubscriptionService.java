@@ -8,4 +8,6 @@ public interface SubscriptionService {
 
     int getFollowingCount(long followerId);
 
+    int getFollowersCount(long followeeId);
+
 }

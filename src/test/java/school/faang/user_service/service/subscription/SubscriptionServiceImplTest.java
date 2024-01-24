@@ -119,4 +119,24 @@ class SubscriptionServiceImplTest {
         verify(subscriptionRepository, never()).findFolloweesAmountByFollowerId(anyLong());
     }
 
+    @Test
+    void shouldReturnFollowersCountWhenFolloweeIdIsValid() {
+        when(subscriptionRepository.findFollowersAmountByFolloweeId(VALID_FOLLOWEE_ID))
+                .thenReturn(5);
+
+        int followersCount = subscriptionService.getFollowersCount(VALID_FOLLOWEE_ID);
+
+        assertEquals(5, followersCount);
+        verify(subscriptionRepository).findFollowersAmountByFolloweeId(VALID_FOLLOWEE_ID);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenFolloweeIdIsInvalid() {
+        assertThrows(
+                DataValidationException.class,
+                () -> subscriptionService.getFollowersCount(INVALID_FOLLOWEE_ID));
+
+        verify(subscriptionRepository, never()).findFollowersAmountByFolloweeId(anyLong());
+    }
+
 }

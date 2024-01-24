@@ -33,6 +33,12 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
     }
 
+    @Override
+    public int getFollowersCount(long followeeId) {
+        validateUserIdIsPositive(followeeId);
+        return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
+    }
+
     private void validateSubscriptionExist(long followerId, long followeeId) {
         if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             throw new DataValidationException("This subscription already exists");

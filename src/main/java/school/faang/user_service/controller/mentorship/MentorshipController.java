@@ -2,6 +2,9 @@ package school.faang.user_service.controller.mentorship;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.MentorshipService;
 import school.faang.user_service.validator.MentorshipValidator;
@@ -14,24 +17,28 @@ public class MentorshipController {
     private final MentorshipService mentorshipService;
     private final MentorshipValidator mentorshipValidator;
 
-    public List<UserDto> getMentees(Long userId) {
+    @GetMapping("/users/mentees")
+    public List<UserDto> getMentees(@PathVariable Long userId) {
         mentorshipValidator.validationForNullOrLessThenOneUserId(userId);
         return mentorshipService.getMentees(userId);
     }
 
-    public List<UserDto> getMentors(Long userId) {
+    @GetMapping("/users/mentors")
+    public List<UserDto> getMentors(@PathVariable Long userId) {
         mentorshipValidator.validationForNullOrLessThenOneUserId(userId);
         return mentorshipService.getMentors(userId);
     }
 
-    public void removeMentorsMentee(Long mentorId, Long menteeId) {
+    @DeleteMapping("/users/mentors/{mentorId}/mentees/{menteeId}")
+    public void removeMentorsMentee(@PathVariable Long mentorId, @PathVariable Long menteeId) {
         mentorshipValidator.validationForNullOrLessThenOneUserId(mentorId);
         mentorshipValidator.validationForNullOrLessThenOneUserId(menteeId);
         mentorshipValidator.validationForIdsNotEqual(mentorId, menteeId);
-        mentorshipService.removeMentorsMentee(mentorId, menteeId);
+        mentorshipService.removeMenteeOfMentor(mentorId, menteeId);
     }
 
-    public void removeMentorOfMentee(Long mentorId, Long menteeId) {
+    @DeleteMapping("/users/mentors/{mentorId}/mentees/{menteeId}")
+    public void removeMentorOfMentee(@PathVariable Long mentorId, @PathVariable Long menteeId) {
         mentorshipValidator.validationForNullOrLessThenOneUserId(mentorId);
         mentorshipValidator.validationForNullOrLessThenOneUserId(menteeId);
         mentorshipValidator.validationForIdsNotEqual(mentorId, menteeId);

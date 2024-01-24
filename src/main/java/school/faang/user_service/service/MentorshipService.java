@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import ch.qos.logback.core.joran.sanity.Pair;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
@@ -30,15 +31,20 @@ public class MentorshipService {
                 .toList();
     }
 
-    public void removeMentorsMentee(Long mentorId, Long menteeId) {
-        User mentor = userService.getUserById(mentorId);
-        User mentee = userService.getUserById(menteeId);
-        mentor.getMentees().remove(mentee);
+    public void removeMenteeOfMentor(Long mentorId, Long menteeId) {
+        List<User> users = getMentorAndMentee(mentorId,menteeId);
+        users.get(0).getMentees().remove(users.get(1));
     }
 
     public void removeMentorOfMentee(Long mentorId, Long menteeId) {
+        List<User> users = getMentorAndMentee(mentorId,menteeId);
+        users.get(1).getMentors().remove(users.get(0));
+    }
+
+     private List<User> getMentorAndMentee(Long mentorId, Long menteeId) {
         User mentor = userService.getUserById(mentorId);
         User mentee = userService.getUserById(menteeId);
-        mentee.getMentors().remove(mentor);
+         return List.of(mentor, mentee);
+
     }
 }

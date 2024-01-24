@@ -57,7 +57,7 @@ public class MentorshipControllerTest {
     @Test
     void testRemoveMentorsMentee_ShouldCallServiceMethod() {
         mentorshipController.removeMentorsMentee(user.getId(), user2.getId());
-        verify(mentorshipService, times(1)).removeMentorsMentee(user.getId(), user2.getId());
+        verify(mentorshipService, times(1)).removeMenteeOfMentor(user.getId(), user2.getId());
     }
 
     @Test

@@ -37,7 +37,7 @@ public class MentorshipController {
         mentorshipService.removeMenteeOfMentor(mentorId, menteeId);
     }
 
-    @DeleteMapping("/users/mentors/{mentorId}/mentees/{menteeId}")
+    @DeleteMapping("/users/mentees/{menteeId}/mentors/{mentorId}")
     public void removeMentorOfMentee(@PathVariable Long mentorId, @PathVariable Long menteeId) {
         mentorshipValidator.validationForNullOrLessThenOneUserId(mentorId);
         mentorshipValidator.validationForNullOrLessThenOneUserId(menteeId);

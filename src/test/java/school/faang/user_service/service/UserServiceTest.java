@@ -7,11 +7,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -39,4 +41,10 @@ class UserServiceTest {
         assertEquals(user.getId(), userId);
     }
 
+    @Test
+    void testGetUserById_whenUserIdNotExist_thenThrowEntityNotFoundException() {
+        long userId = 1;
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        assertThrows(EntityNotFoundException.class, () -> userService.getUserById(userId));
+    }
 }

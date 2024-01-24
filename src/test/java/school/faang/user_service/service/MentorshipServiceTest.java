@@ -120,7 +120,7 @@ class MentorshipServiceTest {
         whenGetUserByIdThenReturnUser(id2, user2);
         whenGetUserByIdThenReturnUser(id, user1);
 
-        mentorshipService.removeMenteeOfMentor(id2, id);
+        mentorshipService.removeMentorOfMentee(id2, id);
 
         verify(userService, times(1)).getUserById(id2);
         verify(userService, times(1)).getUserById(id);

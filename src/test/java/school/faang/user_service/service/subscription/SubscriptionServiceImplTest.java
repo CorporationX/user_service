@@ -100,13 +100,13 @@ class SubscriptionServiceImplTest {
     }
 
     @Test
-    void shouldReturnFollowersCountWhenFollowerIdIsValid() {
+    void shouldReturnFollowingCountWhenFollowerIdIsValid() {
         when(subscriptionRepository.findFolloweesAmountByFollowerId(VALID_FOLLOWER_ID))
                 .thenReturn(5);
 
-        int followersCount = subscriptionService.getFollowersCount(VALID_FOLLOWER_ID);
+        int followingCount = subscriptionService.getFollowingCount(VALID_FOLLOWER_ID);
 
-        assertEquals(5, followersCount);
+        assertEquals(5, followingCount);
         verify(subscriptionRepository).findFolloweesAmountByFollowerId(VALID_FOLLOWER_ID);
     }
 
@@ -114,7 +114,7 @@ class SubscriptionServiceImplTest {
     void shouldThrowExceptionWhenFollowerIdIsInvalid() {
         assertThrows(
                 DataValidationException.class,
-                () -> subscriptionService.getFollowersCount(INVALID_FOLLOWER_ID));
+                () -> subscriptionService.getFollowingCount(INVALID_FOLLOWER_ID));
 
         verify(subscriptionRepository, never()).findFolloweesAmountByFollowerId(anyLong());
     }

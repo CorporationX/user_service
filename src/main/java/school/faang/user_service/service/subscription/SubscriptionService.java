@@ -6,6 +6,6 @@ public interface SubscriptionService {
 
     void unfollowUser(long followerId, long followeeId);
 
-    int getFollowersCount(long followerId);
+    int getFollowingCount(long followerId);
 
 }

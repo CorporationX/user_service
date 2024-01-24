@@ -48,17 +48,17 @@ class SubscriptionControllerTest {
     }
 
     @Test
-    void shouldReturnFollowersCountWhenFollowerIdIsValid() {
-        when(subscriptionService.getFollowersCount(VALID_FOLLOWER_ID))
+    void shouldReturnFollowingCountWhenFollowerIdIsValid() {
+        when(subscriptionService.getFollowingCount(VALID_FOLLOWER_ID))
                 .thenReturn(5);
 
-        Map.Entry<String, Integer> result = subscriptionController.getFollowersCount(VALID_FOLLOWER_ID);
+        Map.Entry<String, Integer> result = subscriptionController.getFollowingCount(VALID_FOLLOWER_ID);
 
         assertEquals(
-                Map.entry("followeesCount", 5),
+                Map.entry("followingCount", 5),
                 result);
 
-        verify(subscriptionService).getFollowersCount(VALID_FOLLOWER_ID);
+        verify(subscriptionService).getFollowingCount(VALID_FOLLOWER_ID);
     }
 
 }

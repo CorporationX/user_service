@@ -9,18 +9,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
-
 import school.faang.user_service.entity.Skill;
-
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.skill.SkillService;
-
 import java.util.Collections;
 import java.util.List;
-
 import java.util.ArrayList;
-import java.util.Collections;
 
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,6 +32,10 @@ class GoalValidatorTest {
 
     @InjectMocks
     private GoalValidator goalValidator;
+
+    private final long userId = 1L;
+    private final GoalDto goalDto = new GoalDto();
+    private final int maxGoalsPerUser = 3;
 
 
     @Test
@@ -57,15 +56,14 @@ class GoalValidatorTest {
         goalDto.setTitle("");
         assertThrows(DataValidationException.class, () -> goalValidator.validateGoalTitle(goalDto));
     }
+
     @Test
     void incorrectSkillsTest() {
         List<Skill> skills = Collections.singletonList(new Skill());
         Mockito.when(skillService.validateSkill(Mockito.any())).thenReturn(false);
         assertThrows(DataValidationException.class, () -> goalValidator.validateSkills(skills));
+    }
 
-    private final long userId = 1L;
-    private final GoalDto goalDto = new GoalDto();
-    private final int maxGoalsPerUser = 3;
 
     @BeforeEach
     public void init() {

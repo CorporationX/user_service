@@ -1,17 +1,20 @@
 package school.faang.user_service.service.goal;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.skill.SkillService;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.goal.GoalValidator;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +26,6 @@ public class GoalService {
     private final GoalMapper goalMapper;
     private final GoalValidator goalValidator;
     private final UserService userService;
-
 
 
     public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
@@ -55,6 +57,7 @@ public class GoalService {
 
     public Goal findById(long id) {
         return goalRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Цель не найдена"));
+    }
 
 
     public GoalDto createGoal(long userId, GoalDto goalDto) {

@@ -21,20 +21,17 @@ class GoalControllerTest {
 
     @InjectMocks
     private GoalController goalController;
-  
+
     private Long userId;
     private GoalDto goalDto;
 
     @Test
-    void correctTitleTest(){
+    void correctTitleTest() {
         GoalDto goalDto = new GoalDto();
         goalDto.setTitle("Test");
         goalController.updateGoal(1L, goalDto);
         Mockito.verify(goalService, Mockito.times(1)).updateGoal(1L, goalDto);
-
-  
-
-
+    }
 
 
     @Test

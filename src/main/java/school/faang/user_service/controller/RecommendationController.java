@@ -15,12 +15,7 @@ public class RecommendationController {
     private final RecommendationService recommendationService;
 
 
-    @GetMapping("/recommendations/user/{authorId}")
+    @GetMapping("/recommendation/given/{authorId}")
     public List<RecommendationDto> getAllGivenRecommendations(@PathVariable long authorId) {
         return recommendationService.getAllGivenRecommendations(authorId);
-
-    @GetMapping("/recommendations/user/{receiverId}")
-    public List<RecommendationDto> getAllUserRecommendations(@PathVariable long receiverId){
-        return recommendationService.getAllUserRecommendations(receiverId);
-    }
 }

@@ -1,10 +1,9 @@
 package school.faang.user_service.service.mentorship;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.MentorshipRequestDto;
-import school.faang.user_service.dto.RejectionDto;
+import school.faang.user_service.dto.MentorshipRejectDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
@@ -12,7 +11,6 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -49,7 +47,7 @@ public class MentorshipRequestService {
                 .orElseThrow(() -> new IllegalArgumentException("There are not find request"));
     }
 
-    public RejectionDto rejectRequest(long id, RejectionDto rejection) {
+    public MentorshipRejectDto rejectRequest(long id, MentorshipRejectDto rejection) {
         if(!(mentorshipRequestRepository.existsById(id))){
             throw new IllegalArgumentException("There is no request in db with this ID");
         }

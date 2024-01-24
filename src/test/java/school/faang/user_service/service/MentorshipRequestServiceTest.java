@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import school.faang.user_service.dto.MentorshipRequestDto;
-import school.faang.user_service.dto.RejectionDto;
+import school.faang.user_service.dto.MentorshipRejectDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
@@ -111,7 +111,7 @@ public class MentorshipRequestServiceTest {
 
         Assert.assertThrows(
                 IllegalArgumentException.class,
-                () -> mentorshipRequestService.rejectRequest(requestId, new RejectionDto("Reason"))
+                () -> mentorshipRequestService.rejectRequest(requestId, new MentorshipRejectDto("Reason"))
         );
 
         Mockito.verify(mentorshipRequestRepository, Mockito.never()).save(Mockito.any());
@@ -126,7 +126,7 @@ public class MentorshipRequestServiceTest {
 
         Assert.assertThrows(
                 IllegalArgumentException.class,
-                () -> mentorshipRequestService.rejectRequest(requestId, new RejectionDto("Reason"))
+                () -> mentorshipRequestService.rejectRequest(requestId, new MentorshipRejectDto("Reason"))
         );
 
         Mockito.verify(mentorshipRequestRepository, Mockito.never()).save(Mockito.any());
@@ -142,7 +142,7 @@ public class MentorshipRequestServiceTest {
 
         MentorshipRequest mentorshipRequest = mentorshipRequestRepository.findById(requestId).orElseThrow();
 
-        mentorshipRequestService.rejectRequest(requestId, new RejectionDto(reason));
+        mentorshipRequestService.rejectRequest(requestId, new MentorshipRejectDto(reason));
         Mockito.verify(mentorshipRequest, Mockito.times(1))
                 .setRejectionReason(reason);
     }
@@ -158,7 +158,7 @@ public class MentorshipRequestServiceTest {
         mentorshipRequest.setStatus(RequestStatus.PENDING);
 
         Mockito.when(mentorshipRequestRepository.findById(requestId)).thenReturn(Optional.of(mentorshipRequest));
-        mentorshipRequestService.rejectRequest(requestId, new RejectionDto("Reason"));
+        mentorshipRequestService.rejectRequest(requestId, new MentorshipRejectDto("Reason"));
 
         Assert.assertEquals(RequestStatus.REJECTED, mentorshipRequest.getStatus());
 

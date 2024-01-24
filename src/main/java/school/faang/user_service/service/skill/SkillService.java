@@ -25,8 +25,7 @@ public class SkillService {
         List<User> users = userService.getUsersByIds(skill.getUserIds());
 
         skillEntity.setUsers(users);
-        skillEntity = skillRepository.save(skillEntity);
-
+        skillRepository.save(skillEntity);
         return skillMapper.toDto(skillEntity);
     }
 

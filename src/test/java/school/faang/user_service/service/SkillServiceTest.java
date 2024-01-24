@@ -90,7 +90,25 @@ public class SkillServiceTest {
         assertEquals(dto.getTitle(), skill.getTitle());
         assertEquals(dto.getUserIds(), skillUserIds);
         assertEquals(dto.getTitle(), result.getTitle());
+    }
 
+    @Test
+    public void shouldReturnUserSkills () {
+        Skill firstSkill = Skill.builder().id(1L).title("java").build();
+        Skill secondSkill = Skill.builder().id(2L).title("spring").build();
+        List<Skill> skills = List.of(firstSkill, secondSkill);
+        SkillDto firstSkillDto = SkillDto.builder().id(1L).title("java").userIds(List.of(1L)).build();
+        SkillDto secondSkillDto = SkillDto.builder().id(2L).title("spring").userIds(List.of(1L)).build();
+        List<SkillDto> skillDtos = List.of(firstSkillDto, secondSkillDto);
+        User user = User.builder().id(1L).username("David").skills(skills).build();
+        firstSkill.setUsers(List.of(user));
+        secondSkill.setUsers(List.of(user));
+
+        when(skillRepository.findAllByUserId(user.getId())).thenReturn(skills);
+
+        List<SkillDto> result = skillService.getUserSkills(user.getId());
+
+        assertEquals(skillDtos, result);
     }
 
     private SkillDto setSkillDto (boolean existsByTitle) {
@@ -99,22 +117,5 @@ public class SkillServiceTest {
         when(skillRepository.existsByTitle(dto.getTitle())).thenReturn(existsByTitle);
 
         return dto;
-    }
-
-    @Test
-    public void testGetUserSkills () {
-
-        List<Skill> skillEntityList = user.getSkills();
-
-        Mockito.when(skillRepository.findAllByUserId(1L)).thenReturn(skillEntityList);
-
-        for (Skill skillEntity : skillEntityList) {
-            skillEntity.setUsers(userRepository.findAllById(skillDto.getUserIds()));
-        }
-
-        List<SkillDto> skillDtoList = skillMapper.listToDto(skillEntityList);
-        List<SkillDto> serviceResult = skillService.getUserSkills(1L);
-
-        assertEquals(skillDtoList, serviceResult);
     }
 }

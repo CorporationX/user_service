@@ -1,29 +1,29 @@
 package school.faang.user_service.controller.mentorship;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.MentorshipService;
 import school.faang.user_service.validator.MentorshipValidator;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class MentorshipController {
     private final MentorshipService mentorshipService;
     private final MentorshipValidator mentorshipValidator;
 
-    @GetMapping("/users/mentees")
+    @GetMapping("/users/{userId}/mentees")
     public List<UserDto> getMentees(@PathVariable Long userId) {
         mentorshipValidator.validationForNullOrLessThenOneUserId(userId);
         return mentorshipService.getMentees(userId);
     }
 
-    @GetMapping("/users/mentors")
+    @GetMapping("/users/{userId}/mentors")
     public List<UserDto> getMentors(@PathVariable Long userId) {
         mentorshipValidator.validationForNullOrLessThenOneUserId(userId);
         return mentorshipService.getMentors(userId);

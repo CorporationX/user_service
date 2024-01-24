@@ -21,7 +21,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-
 @ExtendWith(MockitoExtension.class)
 class MentorshipServiceTest {
     @Mock
@@ -36,7 +35,6 @@ class MentorshipServiceTest {
     private UserDto userDto;
     private List<User> users;
     private List<User> mentees;
-    private List<User> mentors;
     private List<UserDto> users2;
     private List<UserDto> usersDto;
     private Long id;
@@ -55,7 +53,6 @@ class MentorshipServiceTest {
         users2 = List.of(userDto);
         mentees = new ArrayList<>();
         mentees.add(user1);
-        //mentors= List.of(user2);
         user2 = User.builder().id(id2).mentees(mentees).build();
         user3 = User.builder().id(id3).mentors(mentees).build();
 
@@ -68,8 +65,6 @@ class MentorshipServiceTest {
                 () -> mentorshipService.getMentees(id));
     }
 
-
-
     @Test
     void testGetMentees_ShouldReturnsListOfMenteesDto() {
         whenGetUserByIdThenReturnUser(id2, user2);
@@ -81,8 +76,6 @@ class MentorshipServiceTest {
         whenGetUserByIdThenReturnUser(id, user1);
         assertEquals(usersDto, mentorshipService.getMentees(id));
     }
-
-
 
     @Test
     void testGetMentors_ShouldThrowsException() {

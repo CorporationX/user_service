@@ -21,8 +21,8 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class MentorshipControllerTest {
-    @Spy
-    private final MentorshipValidator mentorshipValidator = new MentorshipValidator();
+    @Mock
+    private MentorshipValidator mentorshipValidator;
     @Mock
     private MentorshipService mentorshipService;
     @InjectMocks

@@ -12,5 +12,4 @@ public interface MentorshipRequestMapper {
     MentorshipRequest MentorshipRequestToEntity(MentorshipRequestDto mentorshipRequestDto);
 
     RejectionDto toRejectionDto(MentorshipRequest mentorshipRequest);
-    MentorshipRequest RejectionDtoToEntity(RejectionDto rejectionDto);
 }

@@ -96,19 +96,16 @@ public class MentorshipRequestServiceTest {
 
     @Test
     public void testRequestMentorship() {
-        Long requesterId = 1L;
-        Long receiverId = 2L;
+        Mockito.when(userRepository.existsById(Mockito.anyLong())).thenReturn(true);
+        Mockito.when(userRepository.existsById(Mockito.anyLong())).thenReturn(true);
 
-        Mockito.when(userRepository.existsById(requesterId)).thenReturn(true);
-        Mockito.when(userRepository.existsById(receiverId)).thenReturn(true);
-
-        mentorshipRequestService.requestMentorship(new MentorshipRequestDto(requesterId, receiverId, "description"));
+        mentorshipRequestService.requestMentorship(new MentorshipRequestDto(Mockito.anyLong(), Mockito.anyLong(), "description"));
         Mockito.verify(mentorshipRequestRepository, Mockito.times(1))
-                .create(requesterId, receiverId, "description");
+                .create(Mockito.anyLong(), Mockito.anyLong(), "description");
     }
 
     @Test
-    public void testRequestExistsIsInvalid() {
+    public void testRejectRequest_ExistsIsInvalid() {
         long requestId = 1L;
         Mockito.when(mentorshipRequestRepository.existsById(requestId)).thenReturn(false);
 
@@ -116,10 +113,28 @@ public class MentorshipRequestServiceTest {
                 IllegalArgumentException.class,
                 () -> mentorshipRequestService.rejectRequest(requestId, new RejectionDto("Reason"))
         );
+
+        Mockito.verify(mentorshipRequestRepository, Mockito.never()).save(Mockito.any());
+        Mockito.verify(mentorshipRequestMapper, Mockito.never()).toRejectionDto(Mockito.any());
     }
 
     @Test
-    public void testReasonIsGiven() {
+    public void testRejectRequest_BlankRequest() {
+        long requestId = 1L;
+        Mockito.when(mentorshipRequestRepository.existsById(requestId)).thenReturn(false);
+        Mockito.when(mentorshipRequestRepository.findById(requestId)).thenReturn(Optional.empty());
+
+        Assert.assertThrows(
+                IllegalArgumentException.class,
+                () -> mentorshipRequestService.rejectRequest(requestId, new RejectionDto("Reason"))
+        );
+
+        Mockito.verify(mentorshipRequestRepository, Mockito.never()).save(Mockito.any());
+        Mockito.verify(mentorshipRequestMapper, Mockito.never()).toRejectionDto(Mockito.any());
+    }
+
+    @Test
+    public void testRejectRequest_ReasonIsGiven() {
         long requestId = 1L;
         String reason = "Reason";
 
@@ -133,7 +148,7 @@ public class MentorshipRequestServiceTest {
     }
 
     @Test
-    public void testStatusChanged() {
+    public void testRejectRequest_StatusChanged() {
         long requestId = 1L;
 
         Mockito.when(mentorshipRequestRepository.existsById(requestId)).thenReturn(true);
@@ -146,5 +161,10 @@ public class MentorshipRequestServiceTest {
         mentorshipRequestService.rejectRequest(requestId, new RejectionDto("Reason"));
 
         Assert.assertEquals(RequestStatus.REJECTED, mentorshipRequest.getStatus());
+
+        Mockito.verify(mentorshipRequestRepository, Mockito.times(1))
+                .save(mentorshipRequest);
+        Mockito.verify(mentorshipRequestMapper, Mockito.times(1))
+                .toRejectionDto(mentorshipRequest);
     }
 }

@@ -8,7 +8,6 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.skill.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.UserRepository;
 
 import java.util.List;
 
@@ -18,23 +17,20 @@ public class SkillService {
 
     private final SkillMapper skillMapper;
     private final SkillRepository skillRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
-    public SkillDto create (SkillDto skill) {
-
+    public SkillDto create (SkillDto skill) throws DataValidationException {
         getSkillFromDB(skill.getTitle());
 
         Skill skillEntity = skillMapper.toEntity(skill);
-        List<User> users = userRepository.findAllById(skill.getUserIds());
+        List<User> users = userService.getUsersByIds(skill.getUserIds());
+
         skillEntity.setUsers(users);
-
-        skillEntity = skillRepository.save(skillEntity);
-
+        skillRepository.save(skillEntity);
         return skillMapper.toDto(skillEntity);
     }
 
     public List<SkillDto> getUserSkills (long userId) {
-
         List<Skill> skills = skillRepository.findAllByUserId(userId);
 
         return skillMapper.listToDto(skills);

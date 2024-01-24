@@ -3,8 +3,6 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.RecommendationRequestDto;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.exception.RequestTimeOutException;
 import school.faang.user_service.exception.SkillsNotFoundException;
 import school.faang.user_service.exception.UserNotFoundException;
@@ -12,8 +10,6 @@ import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

@@ -1,6 +1,5 @@
 package school.faang.user_service.controller;
 
-
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +30,6 @@ class RecommendationControllerTest {
     @InjectMocks
     private RecommendationController recommendationController;
   
-  
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -51,9 +49,7 @@ class RecommendationControllerTest {
                 new RecommendationDto(receiverId),
                 new RecommendationDto(receiverId)
         );
-
         when(recommendationService.getAllUserRecommendations(receiverId)).thenReturn(recommendations);
-
         mockMvc.perform(get("/recommendations/user/{receiverId}", receiverId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))

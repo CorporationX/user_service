@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDro;
 import school.faang.user_service.entity.Mentorship;
 import school.faang.user_service.entity.MentorshipRequest;
@@ -73,6 +74,15 @@ public class MentorshipRequestService {
 
         mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
         mentorshipRequestRepository.save(mentorshipRequest);
+    }
+
+    @Transactional
+    public void rejectRequest(long id, RejectionDto rejection) {
+        MentorshipRequest mentorshipRequest = mentorshipRequestRepository.findById(id)
+                .orElseThrow(() -> new DataValidationException("Такого реквеста не существует"));
+
+        mentorshipRequest.setStatus(RequestStatus.REJECTED);
+        mentorshipRequest.setRejectionReason(rejection.getReason());
     }
 
     public void validateExistsUsers(long requesterId, long receiverId) {

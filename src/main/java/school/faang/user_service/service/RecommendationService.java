@@ -21,12 +21,5 @@ public class RecommendationService {
                 .map(recommendationMapper::toDto)
                 .toList();
     }
-    
-    public List<RecommendationDto> getAllUserRecommendations(long receiverId){
-        return recommendationRepository.findAllByReceiverId(receiverId, Pageable.unpaged())
-                .stream()
-                .map(recommendationMapper::toDto)
-                .collect(Collectors.toList());
-    }
 }
 

@@ -1,9 +1,7 @@
 package school.faang.user_service.controller.mentorship;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.RequestFilterDro;
 import school.faang.user_service.service.MentorshipRequestService;
@@ -27,5 +25,10 @@ public class MentorshipRequestController {
     @PostMapping("/requests")
     public List<MentorshipRequestDto> getRequests(RequestFilterDro filters) {
         return mentorshipRequestService.getRequests(filters);
+    }
+
+    @PutMapping("/request/{id}/accept")
+    public void acceptRequest(@PathVariable long id) {
+        mentorshipRequestService.acceptRequest(id);
     }
 }

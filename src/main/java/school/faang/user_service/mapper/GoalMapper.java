@@ -1,4 +1,4 @@
-package school.faang.user_service.mapper.goal;
+package school.faang.user_service.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -13,15 +13,14 @@ import java.util.List;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface GoalMapper {
 
-
-    @Mapping(target = "parent", ignore = true)
-    @Mapping(target = "skillsToAchieve", ignore = true)
-    Goal toEntity(GoalDto goalDto);
-
     @Mapping(source = "parent.id", target = "parentId")
     @Mapping(source = "skillsToAchieve", target = "skillIds", qualifiedByName = "toSkillIds")
     GoalDto toDto(Goal goal);
 
+
+    @Mapping(target = "parent", ignore = true)
+    @Mapping(target = "skillsToAchieve", ignore = true)
+    Goal toEntity(GoalDto goalDto);
 
     @Named("toSkillIds")
     default List<Long> toSkillIds(List<Skill> skills) {

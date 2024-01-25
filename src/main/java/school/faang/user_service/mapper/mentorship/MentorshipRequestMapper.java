@@ -18,10 +18,4 @@ public interface MentorshipRequestMapper {
     @Mapping(target = "requester", ignore = true)
     @Mapping(target = "receiver", ignore = true)
     MentorshipRequest toEntity(MentorshipRequestDto mentorshipDTO);
-
-    @Named("idToUser")
-    static User idToUser(long id) {
-//        return userRepository.findById(id).orElse(null);
-        return new User();
-    }
 }

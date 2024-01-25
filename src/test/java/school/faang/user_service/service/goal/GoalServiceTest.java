@@ -1,10 +1,12 @@
 package school.faang.user_service.service.goal;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
@@ -15,6 +17,7 @@ import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.filter.goal.GoalStatusFilter;
 import school.faang.user_service.filter.goal.GoalTitleFilter;
 import school.faang.user_service.mapper.goal.GoalMapper;
+import school.faang.user_service.mapper.goal.GoalMapperImpl;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.skill.SkillService;
 
@@ -29,8 +32,8 @@ class GoalServiceTest {
     @Mock
     GoalRepository goalRepository;
 
-    @Mock
-    private GoalMapper goalMapper;
+    @Spy
+    private GoalMapper goalMapper = new GoalMapperImpl();
     @Mock
     SkillService skillService;
     private final List<GoalFilter> goalFilters = List.of(new GoalStatusFilter(), new GoalTitleFilter());
@@ -79,16 +82,16 @@ class GoalServiceTest {
     }
 
     @Test
-    void shouldFilterByTitleAndStatusTest() {
+    void shouldReturnAllGoalDTOs() {
         Mockito.when(goalRepository.findGoalsByUserId(userId))
                 .thenReturn(goalStream);
         Mockito.when(skillService.findSkillsByGoalId(correctGoal.getId()))
                 .thenReturn(foundedSkills);
-        Mockito.when(goalMapper.toDto(correctGoal))
-                .thenReturn(new GoalDto());
 
-        goalService.getGoalsByUser(userId, filter);
+        List<GoalDto> result = goalService.getGoalsByUser(userId, filter);
 
-        Mockito.verify(goalMapper).toDto(correctGoal);
+        Assertions.assertEquals(2, result.size());
+        assertEquals(goalMapper.toDto(correctGoal), result.get(0));
+        assertEquals(goalMapper.toDto(uncorrectGoal), result.get(1));
     }
 }

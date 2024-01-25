@@ -16,34 +16,28 @@ public class GoalController {
     private final GoalService goalService;
 
     public void deleteGoal(Long goalId) {
-        if (isValidId(goalId)) {
-            throw new DataValidationException("Invalid ID: " + goalId);
-        }
+        isValidId(goalId);
         goalService.deleteGoal(goalId);
     }
 
     public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter) {
-        if (isValidId(userId)) {
-            throw new DataValidationException("Incorrect data");
-        }
+        isValidId(userId);
         return goalService.getGoalsByUser(userId, filter);
     }
 
     public List<GoalDto> findSubtasksByGoalId(Long goalId) {
-        if (isValidId(goalId)) {
-            throw new DataValidationException("Incorrect data");
-        }
+        isValidId(goalId);
         return goalService.findSubtasksByGoalId(goalId);
     }
 
     public List<GoalDto> findSubtasksByGoalId(Long goalId, GoalFilterDto goalFilterDto) {
-        if (isValidId(goalId)) {
-            throw new DataValidationException("Incorrect data");
-        }
+        isValidId(goalId);
         return goalService.findSubtasksByGoalId(goalId, goalFilterDto);
     }
 
-    private boolean isValidId(Long id) {
-        return id == null || id <= 0;
+    private void isValidId(Long id) {
+        if (id == null || id <= 0) {
+            throw new DataValidationException("Invalid ID: " + id);
+        }
     }
 }

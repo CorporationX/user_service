@@ -12,6 +12,13 @@ public class GoalController {
     private final GoalService goalService;
     private final GoalValidator goalValidator;
 
+
+    public GoalDto updateGoal(Long goalId, GoalDto goal) {
+        goalValidator.validateUserId(goalId);
+        goalValidator.validateGoalTitle(goal);
+        return goalService.updateGoal(goalId, goal);
+    }
+
     public GoalDto createGoal(Long userId, GoalDto goal) {
         goalValidator.validateUserId(userId);
         goalValidator.validateGoalTitle(goal);
@@ -22,3 +29,4 @@ public class GoalController {
         goalService.deleteGoal(goalId);
     }
 }
+

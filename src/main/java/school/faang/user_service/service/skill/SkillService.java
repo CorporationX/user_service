@@ -1,21 +1,31 @@
 package school.faang.user_service.service.skill;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.repository.SkillRepository;
 
-
-@Component
+@Service
 @RequiredArgsConstructor
 public class SkillService {
-
     private final SkillRepository skillRepository;
+
+
+    public boolean validateSkill(Skill skill) {
+        return skillRepository.existsByTitle(skill.getTitle());
+    }
+
+
+    public void assignSkillToUser(long userId, long skillId) {
+        skillRepository.assignSkillToUser(skillId, userId);
+    }
+
 
     public boolean existsById(long id) {
         return skillRepository.existsById(id);
     }
+
 
     public Skill findById(long id) {
         return skillRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Навык не найден"));

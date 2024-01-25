@@ -208,7 +208,7 @@ class GoalServiceTest {
 
     @Test
     @DisplayName("Test remove correct id")
-    void testDeleteGoalById() {
+    void testSuccessfullyDeleteGoalById() {
         goalService.deleteGoal(goal.getId());
 
         verify(goalRepository).deleteById(goal.getId());
@@ -224,7 +224,7 @@ class GoalServiceTest {
 
     @Test
     @DisplayName("Test throwing an exception GoalOverflowException")
-    public void testGoalOverflowException() {
+    public void testFindByIdThrowingGoalOverflowException() {
         when(userRepository.findById(user3.getId())).thenReturn(Optional.of(user3));
 
         assertThrows(GoalOverflowException.class, () -> goalService.createGoal(user3.getId(), goal));
@@ -240,8 +240,8 @@ class GoalServiceTest {
     }
 
     @Test
-    @DisplayName("Test successful save skill and goal")
-    public void testSaveIsActiveSkillAndSaveGoal() {
+    @DisplayName("Test successfully save skill and goal")
+    public void testSuccessfullySaveIsActiveSkillAndSaveGoal() {
         when(skillService.checkActiveSkill(anyLong())).thenReturn(true);
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
 
@@ -253,8 +253,8 @@ class GoalServiceTest {
     }
 
     @Test
-    @DisplayName("Test successful for obtaining a list of goals from a user using a filter")
-    public void testGetListOfGoalsByUserFromFilters() {
+    @DisplayName("Test successfully for obtaining a list of goals from a user using a filter")
+    public void testSuccessfullyGetListOfGoalsByUserFromFilters() {
         goalFilterDto = GoalFilterDto.builder()
                 .title("Java")
                 .build();
@@ -277,8 +277,8 @@ class GoalServiceTest {
     }
 
     @Test
-    @DisplayName("Test return subtasks goal by user id")
-    void testReturnSubtasksByGoalId() {
+    @DisplayName("Test successfully return subtasks goal by user id")
+    void testSuccessfullyReturnSubtasksByGoalId() {
         goals1 = Stream.of(goal2);
         when(goalRepository.findByParent(anyLong())).thenReturn(goals1);
 
@@ -298,8 +298,8 @@ class GoalServiceTest {
     }
 
     @Test
-    @DisplayName("Test return subtasks goal by user id and filters")
-    public void testReturnSubtasksByGoalIdAndFilters() {
+    @DisplayName("Test Successfully return subtasks goal by user id and filters")
+    public void testSuccessfullyReturnSubtasksByGoalIdAndFilters() {
         goals2 = Stream.of(goal4);
         when(filters.stream()).thenReturn(filterStream);
         when(goalRepository.findByParent(user6.getId())).thenReturn(goals2);

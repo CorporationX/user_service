@@ -33,7 +33,7 @@ public class PremiumService {
     private static long paymentNumber;
 
     public PremiumDto buyPremium(long userId, PremiumPeriod premiumPeriod) {
-        premiumValidator.validateUserId(userId);
+        premiumValidator.validateUserDoesNotHavePremium(userId);
 
         PaymentRequest paymentRequest = createPaymentRequest(premiumPeriod);
 
@@ -41,19 +41,25 @@ public class PremiumService {
 
         premiumValidator.validateResponseStatus(paymentResponse);
 
-        Premium premium = new Premium();
-        premium.setUser(userMapper.toEntity(userService.getUser(userId)));
-        premium.setStartDate(LocalDateTime.now());
-        premium.setEndDate(LocalDateTime.now().plusDays(premiumPeriod.getDays()));
+        Premium premium = createPremium(userId, premiumPeriod);
+        PremiumEvent premiumEvent = new PremiumEvent(userId, premium.getId(), premiumPeriod, LocalDateTime.now());
 
         premiumRepository.save(premium);
-        premiumEventPublisher.publish(new PremiumEvent(userId, premium.getId(),premiumPeriod, LocalDateTime.now()));
+        premiumEventPublisher.publish(premiumEvent);
 
         return premiumMapper.toDto(premium);
     }
 
+    private Premium createPremium(long userId, PremiumPeriod premiumPeriod) {
+        Premium premium = new Premium();
+        premium.setUser(userMapper.toEntity(userService.getUser(userId)));
+        premium.setStartDate(LocalDateTime.now());
+        premium.setEndDate(LocalDateTime.now().plusDays(premiumPeriod.getDays()));
+        return premium;
+    }
+
     //Нужно сделать нормальную генерацию номера платежа
-    public PaymentRequest createPaymentRequest(PremiumPeriod premiumPeriod) {
+    private PaymentRequest createPaymentRequest(PremiumPeriod premiumPeriod) {
         return new PaymentRequest(++paymentNumber, BigDecimal.valueOf(premiumPeriod.getPrice()), Currency.USD);
     }
 }

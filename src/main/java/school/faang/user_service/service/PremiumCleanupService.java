@@ -18,6 +18,5 @@ public class PremiumCleanupService {
     public void cleanExpiredPremiums() {
         List<Premium> expiredPremiums = premiumRepository.findAllByEndDateBefore(LocalDateTime.now());
         premiumRepository.deleteAll(expiredPremiums);
-        System.out.println("Истекшие премиумы удалены");
     }
 }

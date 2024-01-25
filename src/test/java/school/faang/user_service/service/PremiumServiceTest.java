@@ -56,7 +56,7 @@ class PremiumServiceTest {
     void buyPremium_whenUserNotHavePremium_thenCreatePremium() {
         long userId = 1L;
         PremiumPeriod premiumPeriod = PremiumPeriod.ONE_MONTH;
-        doNothing().when(premiumValidator).validateUserId(userId);
+        doNothing().when(premiumValidator).validateUserDoesNotHavePremium(userId);
 
         PaymentResponse paymentResponse = new PaymentResponse(PaymentStatus.SUCCESS, 1, 1, null, null, null);
         when(paymentServiceClient.sendPayment(any(PaymentRequest.class))).thenReturn(paymentResponse);
@@ -72,7 +72,7 @@ class PremiumServiceTest {
     void buyPremium_whenUserAlreadyHavePremium_thenThrowException() {
         long userId = 1L;
         doThrow(new DataValidationException("Пользователь уже имеет премиум подписку"))
-                .when(premiumValidator).validateUserId(userId);
+                .when(premiumValidator).validateUserDoesNotHavePremium(userId);
 
         DataValidationException dataValidationException = assertThrows(DataValidationException.class, () -> premiumService.buyPremium(userId, PremiumPeriod.ONE_MONTH));
 
@@ -82,7 +82,7 @@ class PremiumServiceTest {
     @Test
     void buyPremium_whenPaymentFailed_thenThrowException() {
         long userId = 1L;
-        doNothing().when(premiumValidator).validateUserId(userId);
+        doNothing().when(premiumValidator).validateUserDoesNotHavePremium(userId);
 
         PaymentResponse paymentResponse = new PaymentResponse(PaymentStatus.FAILURE, 1, 1, null, null, null);
         when(paymentServiceClient.sendPayment(any(PaymentRequest.class))).thenReturn(paymentResponse);

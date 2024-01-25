@@ -1,44 +1,46 @@
 package school.faang.user_service.validator;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.payment.PaymentResponse;
 import school.faang.user_service.dto.payment.PaymentStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.premium.PremiumRepository;
+import school.faang.user_service.service.UserService;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static reactor.core.publisher.Mono.when;
 
+@ExtendWith(MockitoExtension.class)
 class PremiumValidatorTest {
 
     @Mock
     private PremiumRepository premiumRepository;
 
+    @Mock
+    private UserService userService;
+
+    @InjectMocks
     private PremiumValidator premiumValidator;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-        premiumValidator = new PremiumValidator(premiumRepository);
+
+    @Test
+    void validateUserDoesNotHavePremium_whenUserDoesNotHavePremium_thenDoNothing() {
+        long userId = 1L;
+
+        assertDoesNotThrow(() -> premiumValidator.validateUserDoesNotHavePremium(userId));
     }
 
     @Test
-    void validateUserId_whenUserDoesNotHavePremium_thenDoNothing() {
+    void validateUserDoesNotHavePremium_whenUserAlreadyHasPremium_thenThrowException() {
         long userId = 1L;
-        when(premiumRepository.existsByUserId(userId)).thenReturn(false);
+        Mockito.doThrow(new DataValidationException("Пользователь уже имеет премиум подписку")).when(userService).validateUserDoesNotHavePremium(userId);
 
-        assertDoesNotThrow(() -> premiumValidator.validateUserId(userId));
-    }
-
-    @Test
-    void validateUserId_whenUserAlreadyHasPremium_thenThrowException() {
-        long userId = 1L;
-        when(premiumRepository.existsByUserId(userId)).thenReturn(true);
-
-        DataValidationException dataValidationException = assertThrows(DataValidationException.class, () -> premiumValidator.validateUserId(userId));
+        DataValidationException dataValidationException = assertThrows(DataValidationException.class, () -> premiumValidator.validateUserDoesNotHavePremium(userId));
 
         assertEquals("Пользователь уже имеет премиум подписку", dataValidationException.getMessage());
     }

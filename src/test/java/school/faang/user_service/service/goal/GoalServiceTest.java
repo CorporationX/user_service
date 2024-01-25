@@ -6,9 +6,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
@@ -18,8 +18,11 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exceptions.GoalOverflowException;
+import school.faang.user_service.exceptions.SkillNotFoundException;
 import school.faang.user_service.filter.goal.GoalFilter;
-import school.faang.user_service.mapper.GoalMapperImpl;
+import school.faang.user_service.filter.goal.GoalStatusFilter;
+import school.faang.user_service.filter.goal.GoalTitleFilter;
+import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.skill.SkillService;
@@ -28,6 +31,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -40,9 +44,9 @@ class GoalServiceTest {
     @Mock
     private SkillService skillService;
     @Spy
-    private GoalFilterDto goalFilterDto;
-    @Spy
-    private GoalMapperImpl goalMapper;
+    private GoalMapper goalMapper = Mappers.getMapper(GoalMapper.class);
+    @Mock
+    private List<GoalFilter> filters;
 
     @InjectMocks
     private GoalService goalService;
@@ -58,6 +62,10 @@ class GoalServiceTest {
     User user4;
     GoalDto goalDto4;
     GoalDto goalDto5;
+    GoalFilterDto goalFilterDto;
+    Stream<Goal> goals;
+    Stream<GoalFilter> goalFilters;
+
 
     @BeforeEach
     void init() {
@@ -89,8 +97,8 @@ class GoalServiceTest {
 
         goal3 = Goal.builder()
                 .id(1L)
-                .title("t")
-                .description("d")
+                .title("titles")
+                .description("desription")
                 .parent(goal2)
                 .skillsToAchieve(Collections.singletonList(skill1))
                 .build();
@@ -139,54 +147,68 @@ class GoalServiceTest {
                 .id(4L)
                 .goals(Arrays.asList(goal4, goal5))
                 .build();
+
+        goalFilterDto = GoalFilterDto.builder()
+                .title("Java")
+                .build();
+
+        goals = Stream.of(goal4, goal5);
+
+        goalFilters = Stream.of(new GoalStatusFilter(), new GoalTitleFilter());
     }
 
     @Test
     @DisplayName("Missing target remove test")
     void testDeleteGoalById() {
         goalService.deleteGoal(goal.getId());
+
         verify(goalRepository).deleteById(goal.getId());
     }
 
     @Test
-    @DisplayName("Test create goal and ")
+    @DisplayName("Test createGoal, for throwing an exception EntityNotFoundException")
     void testCreateGoal() {
-        when(userRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundException.class, () -> goalService.createGoal(1L, goal));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> goalService.createGoal(anyLong(), goal));
     }
 
     @Test
-    @DisplayName("Test throwing an exception Goal Overflow Exception")
+    @DisplayName("Test throwing an exception GoalOverflowException")
     public void shouldGoalOverflowException() {
         when(userRepository.findById(user3.getId())).thenReturn(Optional.of(user3));
+
         assertThrows(GoalOverflowException.class, () -> goalService.createGoal(1L, goal));
+    }
+
+    @Test
+    @DisplayName("Test throwing an exception SkillNotFoundException")
+    public void shouldSkillNotFoundException() {
+        when(skillService.checkActiveSkill(anyLong())).thenReturn(false);
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        assertThrows(SkillNotFoundException.class, () -> goalService.createGoal(user.getId(), goal));
     }
 
     @Test
     @DisplayName("Test save skill and goal")
     public void shouldSaveIsActiveSkillAndSaveGoal() {
-        when(skillService.checkActiveSkill(1L)).thenReturn(true);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(skillService.checkActiveSkill(anyLong())).thenReturn(true);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
 
         goalService.createGoal(user.getId(), goal3);
         skillService.saveAll(goal2.getSkillsToAchieve());
 
-        verify(goalRepository).create("t", "d", goal2.getId());
+        verify(goalRepository).create("titles", "desription", goal2.getId());
         verify(skillService).saveAll(goal3.getSkillsToAchieve());
     }
 
     @Test
     @DisplayName("Test for obtaining a list of goals from a user using a filter")
     public void shouldGetListOfGoalsByUserFromFilters() {
-        Stream<Goal> goalStream = Stream.of(goal4, goal5);
+        when(goalRepository.findGoalsByUserId(user4.getId())).thenReturn(goals);
+        when(filters.stream()).thenReturn(goalFilters);
 
-        GoalFilter goalFilterMock = Mockito.mock(GoalFilter.class);
-        List<GoalFilter> filtersMock = Collections.singletonList(goalFilterMock);
-        goalService = new GoalService(goalRepository, userRepository, skillService, goalMapper, filtersMock);
-
-        when(goalRepository.findGoalsByUserId(user4.getId())).thenReturn(goalStream);
-        when(goalFilterMock.isApplicable(goalFilterDto)).thenReturn(true);
-        when(goalFilterMock.applyFilter(goalStream, goalFilterDto)).thenReturn(Stream.of(goal4));
         List<GoalDto> actualGoals = goalService.getGoalsByUser(user4.getId(), goalFilterDto);
         List<GoalDto> expectedGoals = Collections.singletonList(goalDto4);
 
@@ -196,14 +218,6 @@ class GoalServiceTest {
     @Test
     @DisplayName("Test returning an empty goal list when no applicable filters are found")
     public void shouldReturnEmptyListOfGoalsWhenNoApplicableFiltersFound() {
-        Stream<Goal> goalStream = Stream.of(goal4, goal5);
-
-        GoalFilter goalFilterMock = Mockito.mock(GoalFilter.class);
-        List<GoalFilter> filtersMock = Collections.singletonList(goalFilterMock);
-        goalService = new GoalService(goalRepository, userRepository, skillService, goalMapper, filtersMock);
-
-        when(goalRepository.findGoalsByUserId(user4.getId())).thenReturn(goalStream);
-        when(goalFilterMock.isApplicable(goalFilterDto)).thenReturn(false);
         List<GoalDto> actualGoals = goalService.getGoalsByUser(user4.getId(), goalFilterDto);
 
         Assertions.assertTrue(actualGoals.isEmpty());

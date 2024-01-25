@@ -8,9 +8,10 @@ import school.faang.user_service.entity.goal.Goal;
 import java.util.Collections;
 import java.util.List;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        injectionStrategy = InjectionStrategy.FIELD)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface GoalMapper {
+    @Mapping(source = "parentId", target = "parent.id")
+    @Mapping(source = "skillIds", target = "skillsToAchieve", qualifiedByName = "mapToSkillLong")
     Goal toEntity(GoalDto goalDto);
 
     @Mapping(source = "parent.id", target = "parentId")
@@ -22,6 +23,20 @@ public interface GoalMapper {
         if (skills != null) {
             return skills.stream()
                     .map(Skill::getId)
+                    .toList();
+        }
+        return Collections.emptyList();
+    }
+
+    @Named("mapToSkillLong")
+    default List<Skill> mapToSkillLong(List<Long> skillId) {
+        if (skillId != null) {
+            return skillId.stream()
+                    .map(id -> {
+                        Skill skill = new Skill();
+                        skill.setId(id);
+                        return skill;
+                    })
                     .toList();
         }
         return Collections.emptyList();

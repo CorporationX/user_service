@@ -65,8 +65,9 @@ class GoalTitleFilterTest {
                         .build()
         );
 
-        Stream<Goal> actualGoals = goalTitleFilter.applyFilter(goals.stream(), filterDto);
+        Stream<Goal> tempGoals = goalTitleFilter.applyFilter(goals.stream(), filterDto);
+        List<Goal> actualGoals = tempGoals.toList();
 
-        Assertions.assertEquals(expectedGoals, actualGoals.toList());
+        Assertions.assertTrue(expectedGoals.size() == actualGoals.size() && expectedGoals.containsAll(actualGoals));
     }
 }

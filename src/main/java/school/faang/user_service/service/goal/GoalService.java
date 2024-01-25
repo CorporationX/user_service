@@ -9,7 +9,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exceptions.GoalOverflowException;
-import school.faang.user_service.exceptions.SkillNotFound;
+import school.faang.user_service.exceptions.SkillNotFoundException;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.UserRepository;
@@ -28,10 +28,6 @@ public class GoalService {
     private final GoalMapper goalMapper;
     private final List<GoalFilter> filters;
 
-    private User getUser(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User is not found"));
-    }
 
     public void deleteGoal(long goalID) {
         goalRepository.deleteById(goalID);
@@ -39,9 +35,7 @@ public class GoalService {
 
     public void createGoal(Long userId, Goal goal) {
         User user = getUser(userId);
-        boolean isExistingSkill = goal.getSkillsToAchieve().stream()
-                .map(Skill::getId)
-                .allMatch(skillService::checkActiveSkill);
+        boolean isExistingSkill = checkExistingSkill(goal);
 
         if (user.getGoals().size() < 3 && isExistingSkill) {
             goalRepository.create(goal.getTitle(), goal.getDescription(), goal.getParent().getId());
@@ -53,7 +47,7 @@ public class GoalService {
         } else if (user.getGoals().size() >= 3) {
             throw new GoalOverflowException("Maximum goal limit exceeded. Only 3 goals are allowed.");
         } else {
-            throw new SkillNotFound("Skill not exist");
+            throw new SkillNotFoundException("Skill not exist");
         }
     }
 
@@ -64,5 +58,16 @@ public class GoalService {
                 .flatMap(filter -> filter.applyFilter(goals, goalFilterDto))
                 .map(goalMapper::toDto)
                 .toList();
+    }
+
+    private boolean checkExistingSkill(Goal goal) {
+        return goal.getSkillsToAchieve().stream()
+                .map(Skill::getId)
+                .allMatch(skillService::checkActiveSkill);
+    }
+
+    private User getUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User is not found"));
     }
 }

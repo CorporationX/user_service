@@ -60,8 +60,9 @@ class GoalStatusFilterTest {
                         .build()
         );
 
-        Stream<Goal> actualGoals = goalStatusFilter.applyFilter(goals.stream(), filterDto);
+        Stream<Goal> tempGoals = goalStatusFilter.applyFilter(goals.stream(), filterDto);
+        List <Goal> actualGoals = tempGoals.toList();
 
-        Assertions.assertEquals(expectedGoals, actualGoals.toList());
+        Assertions.assertTrue(expectedGoals.size() == actualGoals.size() && expectedGoals.containsAll(actualGoals));
     }
 }

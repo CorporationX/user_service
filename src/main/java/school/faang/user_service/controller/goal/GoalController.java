@@ -16,17 +16,20 @@ public class GoalController {
     private final GoalService goalService;
 
     public void deleteGoal(Long goalId) {
-        if (goalId == null || goalId <= 0) {
-            throw new DataValidationException("Invalid ID: " + goalId);
-        } else {
-            goalService.deleteGoal(goalId);
+        if (isValidId(goalId)) {
+            throw new DataValidationException("Incorrect data");
         }
+        goalService.deleteGoal(goalId);
     }
 
     public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter) {
-        if (userId == null || userId <= 0) {
+        if (isValidId(userId)) {
             throw new DataValidationException("Incorrect data");
         }
         return goalService.getGoalsByUser(userId, filter);
+    }
+
+    private boolean isValidId(Long id) {
+        return id == null || id <= 0;
     }
 }

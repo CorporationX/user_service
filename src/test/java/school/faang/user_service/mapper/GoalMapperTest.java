@@ -47,8 +47,14 @@ class GoalMapperTest {
     }
 
     @Test
-    public void toDto() {
+    public void testCorrectlyMapEntityToGoalDto() {
         GoalDto resultDto2 = goalMapper.toDto(goal);
         Assertions.assertEquals(goalDto, resultDto2);
+    }
+
+    @Test
+    public void toCorrectlyMapGoalDtoToEntity() {
+        Goal resultGoal = goalMapper.toEntity(goalDto);
+        Assertions.assertEquals(goal, resultGoal);
     }
 }

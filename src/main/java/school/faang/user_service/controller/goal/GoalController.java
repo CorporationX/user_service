@@ -6,7 +6,6 @@ import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.validator.goal.GoalValidator;
 import school.faang.user_service.dto.goal.GoalFilterDto;
-import school.faang.user_service.service.goal.GoalService;
 
 import java.util.List;
 
@@ -32,7 +31,6 @@ public class GoalController {
     public void deleteGoal(long goalId) {
         goalService.deleteGoal(goalId);
     }
-}
 
 
     public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter) {

@@ -5,10 +5,13 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.skill.SkillService;
+import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.goal.GoalValidator;
 
 import java.util.List;
@@ -19,7 +22,6 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.GoalStatus;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +31,7 @@ public class GoalService {
     private final List<GoalFilter> goalFilters;
     private final SkillService skillService;
     private final GoalValidator goalValidator;
+    private final UserService userService;
 
     public List<GoalDto> getGoalsByUser(long userId, GoalFilterDto filter) {
         Stream<Goal> foundGoals = goalRepository.findGoalsByUserId(userId);

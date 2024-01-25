@@ -14,6 +14,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.filter.goal.GoalStatusFilter;
 import school.faang.user_service.filter.goal.GoalTitleFilter;
@@ -21,10 +22,13 @@ import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.mapper.goal.GoalMapperImpl;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.skill.SkillService;
+import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.validator.goal.GoalValidator;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -40,6 +44,12 @@ class GoalServiceTest {
     @Mock
     SkillService skillService;
     private final List<GoalFilter> goalFilters = List.of(new GoalStatusFilter(), new GoalTitleFilter());
+
+    @Mock
+    private GoalValidator goalValidator;
+
+    @Mock
+    private UserService userService;
 
     GoalService goalService;
     Stream<Goal> goalStream;
@@ -59,7 +69,7 @@ class GoalServiceTest {
 
     @BeforeEach
     void setUp() {
-        goalService = new GoalService(goalRepository, goalMapper, goalFilters, skillService);
+        goalService = new GoalService(goalRepository, goalMapper, goalFilters, skillService, goalValidator, userService);
 
         correctGoal.setTitle("Correct");
         correctGoal.setStatus(GoalStatus.ACTIVE);
@@ -171,6 +181,7 @@ class GoalServiceTest {
         Mockito.verify(goalRepository, Mockito.times(1)).deleteById(userId);
     }
 
+    @Test
     void shouldReturnAllGoalDTOs() {
         Mockito.when(goalRepository.findGoalsByUserId(userId))
                 .thenReturn(goalStream);

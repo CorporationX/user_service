@@ -15,7 +15,7 @@ public class MentorshipRequestController {
 
     private MentorshipRequestDto rejectRequest(long id, RejectionDto rejection) {
         MentorshipRequestDto mentorshipRequestDto = mentorshipRequestService.rejectRequest(id, rejection);
-        if (mentorshipRequestDto.getDescription() != null) {
+        if (mentorshipRequestDto.getRejectionReason() != null) {
             return mentorshipRequestDto;
         } else {
             throw new DataNotFoundException("There is no description in RejectionDto");

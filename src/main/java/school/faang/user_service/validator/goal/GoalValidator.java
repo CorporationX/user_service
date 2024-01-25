@@ -3,6 +3,7 @@ package school.faang.user_service.validator.goal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
 
 import school.faang.user_service.exception.DataValidationException;
@@ -45,6 +46,18 @@ public class GoalValidator {
         if (!skills.stream()
                 .allMatch(skillService::validateSkill)) {
             throw new DataValidationException("Некорректные скиллы");
+        }
+    }
+
+    public void validateFilter(GoalFilterDto filter) {
+        if (filter == null) {
+            throw new DataValidationException("Filter cannot be null");
+        }
+    }
+
+    public void validateGoalId(long goalId) {
+        if (goalId == 0) {
+            throw new DataValidationException("Введите корректный ID");
         }
     }
 }

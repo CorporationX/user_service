@@ -36,4 +36,9 @@ public class GoalController {
     public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter) {
         return goalService.getGoalsByUser(userId, filter);
     }
+    public List<GoalDto> findSubtasksByGoalId(long goalId, GoalFilterDto filter) {
+        goalValidator.validateFilter(filter);
+        return goalService.findSubtasksByGoalId(goalId, filter);
+    }
+
 }

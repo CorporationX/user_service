@@ -35,6 +35,7 @@ public class GoalService {
 
     public List<GoalDto> getGoalsByUser(long userId, GoalFilterDto filter) {
         Stream<Goal> foundGoals = goalRepository.findGoalsByUserId(userId);
+
         List<Goal> filteredGoals = filterGoals(foundGoals, filter).toList();
 
         for (Goal goal : filteredGoals) {
@@ -51,6 +52,17 @@ public class GoalService {
             }
         }
         return goals;
+    }
+
+    public List<GoalDto> findSubtasksByGoalId(long goalId, GoalFilterDto filter) {
+        Stream<Goal> foundGoals = goalRepository.findByParent(goalId);
+        List<Goal> filteredGoals = filterGoals(foundGoals, filter).toList();
+
+        for (Goal goal : filteredGoals) {
+            goal.setSkillsToAchieve(skillService.findSkillsByGoalId(goal.getId()));
+        }
+
+        return filteredGoals.stream().map(goalMapper::toDto).toList();
     }
 
 

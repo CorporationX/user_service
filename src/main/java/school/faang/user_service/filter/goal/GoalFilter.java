@@ -8,4 +8,6 @@ import java.util.stream.Stream;
 public interface GoalFilter {
     boolean isApplicable(GoalFilterDto filterDto);
     Stream<Goal> filter(Stream<Goal> goals, GoalFilterDto filterDto);
+
 }
+

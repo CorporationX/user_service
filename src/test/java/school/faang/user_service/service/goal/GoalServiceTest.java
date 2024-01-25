@@ -15,6 +15,8 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.filter.goal.GoalStatusFilter;
 import school.faang.user_service.filter.goal.GoalTitleFilter;
@@ -32,6 +34,16 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
+import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.skill.SkillService;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class GoalServiceTest {
@@ -189,6 +201,32 @@ class GoalServiceTest {
                 .thenReturn(foundedSkills);
 
         List<GoalDto> result = goalService.getGoalsByUser(userId, filter);
+
+        Assertions.assertEquals(2, result.size());
+        assertEquals(goalMapper.toDto(correctGoal), result.get(0));
+        assertEquals(goalMapper.toDto(uncorrectGoal), result.get(1));
+    }
+
+    @Test
+    void findByParentAndFilterTest() {
+        filter.setTitle("Correct");
+        when(goalRepository.findByParent(goalId))
+                .thenReturn(goalStream);
+        when(skillService.findSkillsByGoalId(Mockito.anyLong()))
+                .thenReturn(foundedSkills);
+        goalService.findSubtasksByGoalId(goalId, filter);
+
+        verify(goalMapper, Mockito.times(1)).toDto(correctGoal);
+    }
+
+    @Test
+    void shouldReturnAllSubtasksDTOs() {
+        Mockito.when(goalRepository.findByParent(goalId))
+                .thenReturn(goalStream);
+        Mockito.when(skillService.findSkillsByGoalId(correctGoal.getId()))
+                .thenReturn(foundedSkills);
+
+        List<GoalDto> result = goalService.findSubtasksByGoalId(goalId, filter);
 
         Assertions.assertEquals(2, result.size());
         assertEquals(goalMapper.toDto(correctGoal), result.get(0));

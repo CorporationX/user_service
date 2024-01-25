@@ -14,6 +14,7 @@ import java.util.List;
 public interface GoalMapper {
 
 
+
     @Mapping(target = "parent", ignore = true)
     @Mapping(target = "skillsToAchieve", ignore = true)
     Goal toEntity(GoalDto goalDto);

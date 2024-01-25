@@ -11,6 +11,11 @@ import java.util.List;
 public interface EventRepository extends CrudRepository<Event, Long> {
 
     @Query(nativeQuery = true, value = """
+                    SELECT e.* FROM event e
+            """)
+    List<Event> findAllEvent();
+
+    @Query(nativeQuery = true, value = """
             SELECT e.* FROM event e
             WHERE e.user_id = :userId
             """)

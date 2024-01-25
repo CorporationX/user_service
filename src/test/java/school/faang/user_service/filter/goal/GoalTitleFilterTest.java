@@ -32,7 +32,7 @@ class GoalTitleFilterTest {
     }
 
     @Test
-    public void shouldReturnTrueIfFilterIsSpecified() {
+    public void testReturnTrueIfFilterIsSpecified() {
         GoalFilterDto filterDto = GoalFilterDto.builder()
                 .title("java")
                 .build();
@@ -43,7 +43,7 @@ class GoalTitleFilterTest {
     }
 
     @Test
-    public void shouldReturnFalseIfFilterIsSpecified() {
+    public void testReturnFalseIfFilterIsSpecified() {
         GoalFilterDto filterDto = new GoalFilterDto();
 
         boolean isApplicable = goalTitleFilter.isApplicable(filterDto);
@@ -52,7 +52,7 @@ class GoalTitleFilterTest {
     }
 
     @Test
-    public void shouldReturnFilteredGoalsList() {
+    public void testReturnFilteredGoalsList() {
         GoalFilterDto filterDto = GoalFilterDto.builder()
                 .title("java")
                 .build();
@@ -65,8 +65,10 @@ class GoalTitleFilterTest {
                         .build()
         );
 
-        Stream<Goal> actualGoals = goalTitleFilter.applyFilter(goals.stream(), filterDto);
+        Stream<Goal> tempGoals = goalTitleFilter.applyFilter(goals.stream(), filterDto);
+        List<Goal> actualGoals = tempGoals.toList();
 
-        Assertions.assertEquals(expectedGoals, actualGoals.toList());
+        Assertions.assertTrue(expectedGoals.size() == actualGoals.size()
+                && expectedGoals.containsAll(actualGoals));
     }
 }

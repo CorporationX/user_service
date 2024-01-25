@@ -16,31 +16,34 @@ public class GoalController {
     private final GoalService goalService;
 
     public void deleteGoal(Long goalId) {
-        if (goalId == null || goalId <= 0) {
+        if (isValidId(goalId)) {
             throw new DataValidationException("Invalid ID: " + goalId);
-        } else {
-            goalService.deleteGoal(goalId);
         }
+        goalService.deleteGoal(goalId);
     }
 
     public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter) {
-        if (userId == null || userId <= 0) {
+        if (isValidId(userId)) {
             throw new DataValidationException("Incorrect data");
         }
         return goalService.getGoalsByUser(userId, filter);
     }
 
     public List<GoalDto> findSubtasksByGoalId(Long goalId) {
-        if (goalId == null || goalId <= 0) {
+        if (isValidId(goalId)) {
             throw new DataValidationException("Incorrect data");
         }
         return goalService.findSubtasksByGoalId(goalId);
     }
 
-    public List<GoalDto> findSubtasksByGoalId(Long goalId, GoalFilterDto goalFilterDto ) {
-        if (goalId == null || goalId <= 0) {
+    public List<GoalDto> findSubtasksByGoalId(Long goalId, GoalFilterDto goalFilterDto) {
+        if (isValidId(goalId)) {
             throw new DataValidationException("Incorrect data");
         }
         return goalService.findSubtasksByGoalId(goalId, goalFilterDto);
+    }
+
+    private boolean isValidId(Long id) {
+        return id == null || id <= 0;
     }
 }

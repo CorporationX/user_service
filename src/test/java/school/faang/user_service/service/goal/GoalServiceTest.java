@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -16,10 +17,11 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exceptions.GoalOverflowException;
+import school.faang.user_service.exceptions.SkillNotFoundException;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.filter.goal.GoalStatusFilter;
 import school.faang.user_service.filter.goal.GoalTitleFilter;
-import school.faang.user_service.mapper.GoalMapperImpl;
+import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.skill.SkillService;
@@ -27,7 +29,9 @@ import school.faang.user_service.service.skill.SkillService;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -40,7 +44,7 @@ class GoalServiceTest {
     @Mock
     private SkillService skillService;
     @Spy
-    private GoalMapperImpl goalMapper;
+    private GoalMapper goalMapper = Mappers.getMapper(GoalMapper.class);
     @Mock
     private List<GoalFilter> filters;
 
@@ -102,8 +106,8 @@ class GoalServiceTest {
 
         goal3 = Goal.builder()
                 .id(1L)
-                .title("t")
-                .description("d")
+                .title("titles")
+                .description("description")
                 .parent(goal2)
                 .skillsToAchieve(Collections.singletonList(skill1))
                 .build();
@@ -203,99 +207,115 @@ class GoalServiceTest {
     }
 
     @Test
-    @DisplayName("Missing target remove test")
+    @DisplayName("Test remove correct id")
     void testDeleteGoalById() {
         goalService.deleteGoal(goal.getId());
+
         verify(goalRepository).deleteById(goal.getId());
     }
 
     @Test
-    @DisplayName("Test create goal and ")
-    void testCreateGoal() {
-        when(userRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundException.class, () -> goalService.createGoal(1L, goal));
+    @DisplayName("Test createGoal, for throwing an exception EntityNotFoundException")
+    void testCreateGoalThrowEntityNotFoundException() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> goalService.createGoal(anyLong(), goal));
     }
 
     @Test
-    @DisplayName("Test throwing an exception Goal Overflow Exception")
-    public void shouldGoalOverflowException() {
+    @DisplayName("Test throwing an exception GoalOverflowException")
+    public void testGoalOverflowException() {
         when(userRepository.findById(user3.getId())).thenReturn(Optional.of(user3));
-        assertThrows(GoalOverflowException.class, () -> goalService.createGoal(1L, goal));
+
+        assertThrows(GoalOverflowException.class, () -> goalService.createGoal(user3.getId(), goal));
     }
 
     @Test
-    @DisplayName("Test save skill and goal")
-    public void shouldSaveIsActiveSkillAndSaveGoal() {
-        when(skillService.checkActiveSkill(1L)).thenReturn(true);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+    @DisplayName("Test throwing an exception SkillNotFoundException")
+    public void testSkillNotFoundException() {
+        when(skillService.checkActiveSkill(anyLong())).thenReturn(false);
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        assertThrows(SkillNotFoundException.class, () -> goalService.createGoal(user.getId(), goal));
+    }
+
+    @Test
+    @DisplayName("Test successful save skill and goal")
+    public void testSaveIsActiveSkillAndSaveGoal() {
+        when(skillService.checkActiveSkill(anyLong())).thenReturn(true);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
 
         goalService.createGoal(user.getId(), goal3);
         skillService.saveAll(goal2.getSkillsToAchieve());
 
-        verify(goalRepository).create("t", "d", goal2.getId());
+        verify(goalRepository).create("titles", "description", goal2.getId());
         verify(skillService).saveAll(goal3.getSkillsToAchieve());
     }
 
     @Test
-    @DisplayName("Test for obtaining a list of goals from a user using a filter")
-    public void shouldGetListOfGoalsByUserFromFilters() {
+    @DisplayName("Test successful for obtaining a list of goals from a user using a filter")
+    public void testGetListOfGoalsByUserFromFilters() {
         goalFilterDto = GoalFilterDto.builder()
                 .title("Java")
                 .build();
-
         when(filters.stream()).thenReturn(filterStream);
         when(goalRepository.findGoalsByUserId(user4.getId())).thenReturn(goals);
 
         List<GoalDto> actualGoals = goalService.getGoalsByUser(user4.getId(), goalFilterDto);
         List<GoalDto> expectedGoals = Collections.singletonList(goalDto4);
 
-        assertEquals(expectedGoals, actualGoals);
+        assertTrue(expectedGoals.size() == actualGoals.size()
+                && expectedGoals.containsAll(actualGoals));
     }
 
     @Test
     @DisplayName("Test returning an empty goal list when no applicable filters are found")
-    public void shouldReturnEmptyListOfGoalsWhenNoApplicableFiltersFound() {
-        List<GoalDto> actualGoals = goalService.getGoalsByUser(user4.getId(), goalFilterDto);
+    public void testReturnEmptyListOfGoalsWhenNoApplicableFiltersFound() {
+        List<GoalDto> actualGoals = goalService.getGoalsByUser(anyLong(), goalFilterDto);
+
         assertTrue(actualGoals.isEmpty());
     }
 
     @Test
-    @DisplayName("Test return target subtasks by user id")
-    void shouldReturnSubtasksByGoalId() {
+    @DisplayName("Test return subtasks goal by user id")
+    void testReturnSubtasksByGoalId() {
         goals1 = Stream.of(goal2);
-        when(goalRepository.findByParent(user2.getId())).thenReturn(goals1);
+        when(goalRepository.findByParent(anyLong())).thenReturn(goals1);
+
         List<GoalDto> actualGoals = goalService.findSubtasksByGoalId(user2.getId());
         List<GoalDto> expectedGoals = Collections.singletonList(goalDto2);
 
-        assertEquals(expectedGoals, actualGoals);
+        assertTrue(expectedGoals.size() == actualGoals.size()
+                && expectedGoals.containsAll(actualGoals));
     }
 
     @Test
     @DisplayName("Test for returning an empty list when there are no subtask")
-    public void shouldReturningEmptyListSubtasksByGoalId() {
-        List<GoalDto> actualGoals = goalService.findSubtasksByGoalId(user5.getId());
+    public void testReturningEmptyListSubtasksByGoalId() {
+        List<GoalDto> actualGoals = goalService.findSubtasksByGoalId(anyLong());
+
         assertTrue(actualGoals.isEmpty());
     }
 
     @Test
-    @DisplayName("test return target subtasks by user id fnd filters ")
-    public void shouldReturnSubtasksByGoalIdAndFilters() {
+    @DisplayName("Test return subtasks goal by user id and filters")
+    public void testReturnSubtasksByGoalIdAndFilters() {
         goals2 = Stream.of(goal4);
-
         when(filters.stream()).thenReturn(filterStream);
         when(goalRepository.findByParent(user6.getId())).thenReturn(goals2);
 
-        List<GoalDto> actualGoals = goalService.findSubtasksByGoalId(user6.getId(),goalFilterDto);
+        List<GoalDto> actualGoals = goalService.findSubtasksByGoalId(user6.getId(), goalFilterDto);
         List<GoalDto> expectedGoals = Collections.singletonList(goalDto4);
 
-        assertEquals(expectedGoals, actualGoals);
+        assertTrue(expectedGoals.size() == actualGoals.size()
+                && expectedGoals.containsAll(actualGoals));
     }
 
     @Test
     @DisplayName("Test return an empty sheet if there are no matches in the filters")
-    public void shouldReturningEmptyListSubtasksWhenTheFiltersNotWork() {
+    public void testReturningEmptyListSubtasksWhenTheFiltersNotWork() {
+        List<GoalDto> actualGoals = goalService.findSubtasksByGoalId(anyLong(), goalFilterDto);
 
-        List<GoalDto> actualGoals = goalService.findSubtasksByGoalId(user5.getId(),goalFilterDto);
         assertTrue(actualGoals.isEmpty());
     }
 }

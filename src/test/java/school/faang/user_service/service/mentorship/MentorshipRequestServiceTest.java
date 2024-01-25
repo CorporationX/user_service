@@ -9,7 +9,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
-import school.faang.user_service.exception.mentorship.MentorshipRequestException;
+import school.faang.user_service.exception.mentorship.DataNotFoundException;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
@@ -37,7 +37,7 @@ class MentorshipRequestServiceTest {
     public void whenRequestForMembershipThenNoDataInDB() {
         try {
             mentorshipRequestService.rejectRequest(1L, new RejectionDto(StringUtils.EMPTY));
-        } catch (MentorshipRequestException e) {
+        } catch (DataNotFoundException e) {
             assertThat(e).isInstanceOf(RuntimeException.class)
                     .hasMessage("There is no mentorship request with this id");
         }

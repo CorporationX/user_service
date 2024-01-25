@@ -6,7 +6,7 @@ import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.exception.mentorship.MentorshipRequestException;
+import school.faang.user_service.exception.mentorship.DataNotFoundException;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
@@ -28,6 +28,6 @@ public class MentorshipRequestService {
 
     private MentorshipRequest findRequestById(long id) {
         return mentorshipRequestRepository.findById(id)
-                .orElseThrow(() -> new MentorshipRequestException("There is no mentorship request with this id"));
+                .orElseThrow(() -> new DataNotFoundException("There is no mentorship request with this id"));
     }
 }

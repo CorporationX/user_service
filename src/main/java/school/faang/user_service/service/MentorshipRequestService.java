@@ -28,11 +28,12 @@ import java.util.List;
 public class MentorshipRequestService {
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final UserRepository userRepository;
+    private final MentorshipRepository mentorshipRepository;
     private final MentorshipRequestValidator mentorshipRequestValidator;
     private final MentorshipValidator mentorshipValidator;
     private final List<MentorshipRequestFilter> mentorshipRequestFilters;
     private final MentorshipRequestMapper mentorshipRequestMapper;
-    private final MentorshipRepository mentorshipRepository;
+
 
     @Transactional
     public void requestMentorship(MentorshipRequestDto requestDto) {

@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.controller.mentorship.MentorshipController;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.service.MentorshipService;
 import school.faang.user_service.validator.MentorshipValidator;
 
@@ -21,8 +22,10 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class MentorshipControllerTest {
+    @Mock
+    private MentorshipRepository mentorshipRepository;
     @Spy
-    private final MentorshipValidator mentorshipValidator = new MentorshipValidator();
+    private final MentorshipValidator mentorshipValidator = new MentorshipValidator(mentorshipRepository);
     @Mock
     private MentorshipService mentorshipService;
     @InjectMocks

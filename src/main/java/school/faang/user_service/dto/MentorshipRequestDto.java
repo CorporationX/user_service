@@ -15,4 +15,10 @@ public class MentorshipRequestDto {
     private String description;
     private long requesterId;
     private long receiverId;
+
+    public MentorshipRequestDto(long requesterId, long receiverId, String description) {
+        this.requesterId = requesterId;
+        this.receiverId = receiverId;
+        this.description = description;
+    }
 }

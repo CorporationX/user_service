@@ -96,10 +96,10 @@ jacoco {
     toolVersion = "0.8.9"
 }
 
-  tasks.test {
-  finalizedBy(tasks.jacocoTestReport)
-//    finalizedBy(tasks.jacocoTestCoverageVerification)
-  }
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+    finalizedBy(tasks.jacocoTestCoverageVerification)
+}
 
 tasks.jacocoTestReport {
     reports {
@@ -118,8 +118,8 @@ tasks.jacocoTestCoverageVerification {
                     "school.faang.user_service.mapper.*",
                     "school.faang.user_service.controller.*",
                     "school.faang.user_service.validator.*")
-            limit{
-                minimum = "0.5".toBigDecimal()
+            limit {
+                minimum = "0.75".toBigDecimal()
             }
         }
     }

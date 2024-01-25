@@ -44,7 +44,7 @@ public class MentorshipRequestController {
             description = "Позволяет стать ментором пользователя"
     )
     @PutMapping("/request/{id}/accept")
-    public void acceptRequest(@PathVariable long id) {
+    public void acceptRequest(@PathVariable("id") long id) {
         mentorshipRequestService.acceptRequest(id);
     }
 
@@ -53,7 +53,7 @@ public class MentorshipRequestController {
             description = "Позволяет отказать в менторстве с укзанием причины"
     )
     @PutMapping("/request/{id}/reject")
-    public void rejectRequest(@PathVariable long id, @RequestBody RejectionDto rejection) {
+    public void rejectRequest(@PathVariable("id") long id, @RequestBody RejectionDto rejection) {
         mentorshipRequestService.rejectRequest(id, rejection);
     }
 }

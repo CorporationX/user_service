@@ -23,7 +23,7 @@ public class MentorshipValidator {
 
     public void validationMentorship(long receiverId, long requesterId) {
         if (mentorshipRepository.existsByMentorIdAndMenteeId(receiverId, requesterId)) {
-            throw new DataValidationException("Пользователь уже является ментором отправителя");
+            throw new DataValidationException("The user is already a mentor of the sender.");
         }
     }
 }

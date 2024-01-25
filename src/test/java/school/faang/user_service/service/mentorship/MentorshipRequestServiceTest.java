@@ -1,4 +1,4 @@
-package school.faang.user_service.mentorship.service;
+package school.faang.user_service.service.mentorship;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,13 +10,14 @@ import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
+import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-import school.faang.user_service.service.mentorship.MentorshipRequestService;
 
 import java.time.LocalDateTime;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 
 
@@ -43,6 +44,9 @@ class MentorshipRequestServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private UserService userService;
 
     private User user;
 
@@ -73,7 +77,7 @@ class MentorshipRequestServiceTest {
         Mockito.verify(mentorshipRequestMapper, times(1))
                 .toEntity(mentorshipRequestDto);
         Mockito.verify(mentorshipRequestValidator, times(1))
-                .mainMentorshipRequestValidation(mentorshipRequestDto);
+                .sameUserValidation(any(), any());
         Assertions.assertEquals(mentorshipRequestService.requestMentorship(mentorshipRequestDto)
                 , mentorshipRequestDto);
     }

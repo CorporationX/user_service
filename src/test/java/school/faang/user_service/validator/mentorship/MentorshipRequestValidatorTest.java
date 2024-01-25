@@ -1,4 +1,4 @@
-package school.faang.user_service.mentorship.validator;
+package school.faang.user_service.validator.mentorship;
 
 
 import org.junit.Assert;
@@ -12,15 +12,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
-import school.faang.user_service.exception.mentorship.MentorshipRequestException;
+import school.faang.user_service.exception.mentorship.DataNotFoundException;
+import school.faang.user_service.exception.mentorship.DataValidationException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.fail;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipRequestValidatorTest {
@@ -43,6 +43,8 @@ class MentorshipRequestValidatorTest {
 
     private User receiver;
 
+    private User sameUser;
+
     @BeforeEach
     public void init() {
         mentorshipRequestDto = new MentorshipRequestDto();
@@ -57,39 +59,43 @@ class MentorshipRequestValidatorTest {
         receiver = new User();
         receiver.setId(2L);
         receiver.setUsername("Mike");
+        sameUser = new User();
+        sameUser.setId(2L);
+        sameUser.setUsername("Mike");
     }
 
     @Test
     public void testExceptionForEmptyData() {
-        Assert.assertThrows(MentorshipRequestException.class, () ->
-                mentorshipRequestValidator.mainMentorshipRequestValidation(mentorshipRequestDto));
+        Assert.assertThrows(DataNotFoundException.class, () ->
+                mentorshipRequestValidator.sameUserValidation(new User(), new User()));
     }
 
     @Test
     public void testExceptionWhenSameUser() {
-        Mockito.when(userRepository.findById(any())).thenReturn(Optional.of(requester));
-        Assert.assertThrows(MentorshipRequestException.class, () ->
-                mentorshipRequestValidator.mainMentorshipRequestValidation(mentorshipRequestDto));
+        Assert.assertThrows(DataNotFoundException.class, () ->
+                mentorshipRequestValidator.sameUserValidation(receiver, sameUser));
     }
 
     @Test
     public void testSecondRequestInLast90Days() {
-        Mockito.when(userRepository.findById(mentorshipRequestDto.getRequester())).thenReturn(Optional.of(requester));
-        Mockito.when(userRepository.findById(mentorshipRequestDto.getReceiver())).thenReturn(Optional.of(receiver));
         Mockito.when(mentorshipRequestRepository
                 .findLatestRequest(requester.getId(), receiver.getId())).thenReturn(Optional.of(mentorshipRequest));
         mentorshipRequest.setCreatedAt(LocalDateTime.now().minusMonths(1));
-        Assert.assertThrows(MentorshipRequestException.class, () ->
-                mentorshipRequestValidator.mainMentorshipRequestValidation(mentorshipRequestDto));
+        Assert.assertThrows(DataValidationException.class, () ->
+                mentorshipRequestValidator.dateCheckValidation(receiver, requester));
     }
 
     @Test
     public void testCorrectData() {
-        Mockito.when(userRepository.findById(mentorshipRequestDto.getRequester())).thenReturn(Optional.of(requester));
-        Mockito.when(userRepository.findById(mentorshipRequestDto.getReceiver())).thenReturn(Optional.of(receiver));
-        Mockito.when(mentorshipRequestRepository
-                .findLatestRequest(requester.getId(), receiver.getId())).thenReturn(Optional.of(mentorshipRequest));
-        mentorshipRequest.setCreatedAt(LocalDateTime.now().minusMonths(4));
-        mentorshipRequestValidator.mainMentorshipRequestValidation(mentorshipRequestDto);
+        try {
+            mentorshipRequestValidator.sameUserValidation(receiver, requester);
+        } catch (DataNotFoundException e) {
+            fail("Should not have thrown any exception");
+        }
+        try {
+            mentorshipRequestValidator.dateCheckValidation(receiver, requester);
+        } catch (DataValidationException e) {
+            fail("Should not have thrown any exception");
+        }
     }
 }

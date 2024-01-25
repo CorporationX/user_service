@@ -10,7 +10,7 @@ import school.faang.user_service.service.mentorship.MentorshipRequestService;
 @RequiredArgsConstructor
 public class MentorshipRequestController {
 
-    private MentorshipRequestService mentorshipRequestService;
+    private final MentorshipRequestService mentorshipRequestService;
 
     private void requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         mentorshipRequestService.requestMentorship(mentorshipRequestDto);

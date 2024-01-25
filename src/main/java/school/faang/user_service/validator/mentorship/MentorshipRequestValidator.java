@@ -4,9 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
-import school.faang.user_service.exception.mentorship.MentorshipRequestException;
-import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.exception.mentorship.DataNotFoundException;
+import school.faang.user_service.exception.mentorship.DataValidationException;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 import java.time.LocalDateTime;
@@ -19,30 +18,22 @@ import static java.time.temporal.ChronoUnit.DAYS;
 @RequiredArgsConstructor
 public class MentorshipRequestValidator {
 
-    private MentorshipRequestRepository mentorshipRequestRepository;
-    private UserRepository userRepository;
+    private final MentorshipRequestRepository mentorshipRequestRepository;
 
-    public void mainMentorshipRequestValidation(MentorshipRequestDto mentorshipRequestDto) {
-        Optional<User> requester = userRepository.findById(mentorshipRequestDto.getRequester());
-        Optional<User> receiver = userRepository.findById(mentorshipRequestDto.getReceiver());
-
-        if (requester.isEmpty() || receiver.isEmpty()) {
-            throw new MentorshipRequestException("Requester or receiver don't exist in the database");
+    public void sameUserValidation(User receiver, User requester) {
+        if (requester.getId() == receiver.getId()) {
+            throw new DataNotFoundException("Requester and receiver the same user");
         }
+    }
 
-        long requesterId = requester.get().getId();
-        long receiverId = receiver.get().getId();
-
-        if (requesterId == receiverId) {
-            throw new MentorshipRequestException("Requester and receiver the same user");
-        }
-
+    public void dateCheckValidation(User receiver, User requester) {
         Optional<MentorshipRequest> latestRequest = mentorshipRequestRepository
-                .findLatestRequest(requesterId, receiverId);
+                .findLatestRequest(requester.getId(), receiver.getId());
         if (latestRequest.isPresent()) {
             if (DAYS.between(latestRequest.get().getCreatedAt(), LocalDateTime.now()) < 90) {
-                throw new MentorshipRequestException("You can't apply for a mentorship more than once every 90 days.");
+                throw new DataValidationException("You can't apply for a mentorship more than once every 90 days.");
             }
         }
     }
+
 }

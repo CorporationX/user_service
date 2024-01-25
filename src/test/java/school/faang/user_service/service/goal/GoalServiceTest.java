@@ -21,6 +21,7 @@ import school.faang.user_service.mapper.goal.GoalMapperImpl;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.skill.SkillService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -75,11 +76,19 @@ class GoalServiceTest {
     }
 
     @Test
+    void filterByNonExistTitleTest() {
+        filter.setTitle("NonExist");
+        List<Goal> result = new ArrayList<>();
+        assertEquals(result, goalService.filterGoals(goalStream, filter).toList());
+    }
+
+    @Test
     void shouldFilterByStatusTest() {
         filter.setStatus(GoalStatus.ACTIVE);
         List<Goal> result = List.of(correctGoal);
         assertEquals(result, goalService.filterGoals(goalStream, filter).toList());
     }
+
 
     @Test
     void shouldReturnAllGoalDTOs() {

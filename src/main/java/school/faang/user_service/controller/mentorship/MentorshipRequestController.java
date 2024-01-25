@@ -1,16 +1,16 @@
-package school.faang.user_service.mentorship.controller;
+package school.faang.user_service.controller.mentorship;
 
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.mentorship.filter.RequestFilterDto;
-import school.faang.user_service.mentorship.service.MentorshipRequestService;
+import school.faang.user_service.filter.mentorship.RequestFilterDto;
+import school.faang.user_service.service.mentorship.MentorshipRequestService;
 
 @Component
 @RequiredArgsConstructor
 public class MentorshipRequestController {
 
-    private MentorshipRequestService mentorshipRequestService;
+    private final MentorshipRequestService mentorshipRequestService;
 
     private void getRequests(RequestFilterDto filter) {
         mentorshipRequestService.getRequests(filter);

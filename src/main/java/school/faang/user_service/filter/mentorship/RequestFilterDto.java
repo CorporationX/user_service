@@ -1,4 +1,4 @@
-package school.faang.user_service.mentorship.filter;
+package school.faang.user_service.filter.mentorship;
 
 import lombok.Data;
 import school.faang.user_service.entity.RequestStatus;

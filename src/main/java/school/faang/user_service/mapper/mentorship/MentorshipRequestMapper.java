@@ -1,12 +1,10 @@
-package school.faang.user_service.mentorship.mapper;
+package school.faang.user_service.mapper.mentorship;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.entity.MentorshipRequest;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.mentorship.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 
 import java.util.List;
 
@@ -24,10 +22,4 @@ public interface MentorshipRequestMapper {
     @Mapping(target = "requester", ignore = true)
     @Mapping(target = "receiver", ignore = true)
     MentorshipRequest toEntity(MentorshipRequestDto mentorshipDTO);
-
-    @Named("idToUser")
-    static User idToUser(long id) {
-//        return userRepository.findById(id).orElse(null);
-        return new User();
-    }
 }

@@ -1,11 +1,13 @@
 package school.faang.user_service.service.goal;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
@@ -17,6 +19,7 @@ import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.skill.SkillService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -72,6 +75,13 @@ class GoalServiceTest {
     }
 
     @Test
+    void filterByNonExistTitleTest() {
+        filter.setTitle("NonExist");
+        List<Goal> result = new ArrayList<>();
+        assertEquals(result, goalService.filterGoals(goalStream, filter).toList());
+    }
+
+    @Test
     void shouldFilterByStatusTest() {
         filter.setStatus(GoalStatus.ACTIVE);
         List<Goal> result = List.of(correctGoal);
@@ -88,5 +98,19 @@ class GoalServiceTest {
         goalService.findSubtasksByGoalId(goalId, filter);
 
         verify(goalMapper, Mockito.times(1)).toDto(correctGoal);
+    }
+
+    @Test
+    void shouldReturnAllSubtasksDTOs() {
+        Mockito.when(goalRepository.findByParent(goalId))
+                .thenReturn(goalStream);
+        Mockito.when(skillService.findSkillsByGoalId(correctGoal.getId()))
+                .thenReturn(foundedSkills);
+
+        List<GoalDto> result = goalService.findSubtasksByGoalId(goalId, filter);
+
+        Assertions.assertEquals(2, result.size());
+        assertEquals(goalMapper.toDto(correctGoal), result.get(0));
+        assertEquals(goalMapper.toDto(uncorrectGoal), result.get(1));
     }
 }

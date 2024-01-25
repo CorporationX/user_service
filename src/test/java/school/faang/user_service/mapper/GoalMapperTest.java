@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
@@ -17,7 +18,7 @@ import java.util.List;
 @ExtendWith(MockitoExtension.class)
 class GoalMapperTest {
     @Spy
-    private GoalMapperImpl goalMapper;
+    private GoalMapper goalMapper = Mappers.getMapper(GoalMapper.class);
     private Goal goal;
     private GoalDto goalDto;
 

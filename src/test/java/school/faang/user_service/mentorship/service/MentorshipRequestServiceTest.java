@@ -11,12 +11,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
-import school.faang.user_service.filter.mentorship.RequestFilterDto;
+import school.faang.user_service.dto.mentorship.filter.RequestFilterDto;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Mockito.times;
@@ -55,14 +56,14 @@ class MentorshipRequestServiceTest {
         mentorshipRequestDto.setCreatedAt(LocalDateTime.now());
         requestFilterDto = new RequestFilterDto();
         requestFilterDto.setDescriptionFilter("Description filter");
-        Mockito.when(mentorshipRequestMapper.toDtoList(List.of(mentorshipRequest)))
-                .thenReturn(List.of(mentorshipRequestDto));
-        Mockito.when(mentorshipRequestRepository.findAll())
-                .thenReturn(List.of(mentorshipRequest));
     }
 
     @Test
     public void testReturnAllMentorshipRequests() {
+        Mockito.when(mentorshipRequestMapper.toDtoList(List.of(mentorshipRequest)))
+                .thenReturn(List.of(mentorshipRequestDto));
+        Mockito.when(mentorshipRequestRepository.findAll())
+                .thenReturn(List.of(mentorshipRequest));
         List<MentorshipRequestDto> requests = mentorshipRequestService.getRequests(requestFilterDto);
         Mockito.verify(mentorshipRequestRepository, times(1))
                 .findAll();
@@ -71,4 +72,21 @@ class MentorshipRequestServiceTest {
         Assertions.assertNotNull(requests);
         Assertions.assertEquals(requests.size(), 1);
     }
+
+    @Test
+    public void testReturnNothingWhenRequest() {
+        Mockito.when(mentorshipRequestMapper.toDtoList(Collections.emptyList()))
+                .thenReturn(Collections.emptyList());
+        Mockito.when(mentorshipRequestRepository.findAll())
+                .thenReturn(Collections.emptyList());
+        List<MentorshipRequestDto> requests = mentorshipRequestService.getRequests(requestFilterDto);
+        Mockito.verify(mentorshipRequestRepository, times(1))
+                .findAll();
+        Mockito.verify(mentorshipRequestMapper, times(1))
+                .toDtoList(Collections.emptyList());
+        Assertions.assertNotNull(requests);
+        Assertions.assertEquals(requests.size(), 0);
+    }
+
+
 }

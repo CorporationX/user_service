@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.mentorship.filter.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
@@ -26,7 +27,7 @@ class MentorshipRequestFilterTest {
 
     private RequestFilterDto requestFilterDto = new RequestFilterDto();
 
-    List<MentorshipRequest> mentorshipRequests = new ArrayList<>();
+    private List<MentorshipRequest> mentorshipRequests;
 
     private User user = new User();
 
@@ -40,11 +41,14 @@ class MentorshipRequestFilterTest {
         mentorshipRequestFilters.add(new MentorshipRequesterFilter());
         mentorshipRequestFilters.add(new MentorshipStatusFilter());
         mentorshipRequests = new ArrayList<>(List.of(mentorshipRequest));
+        mentorshipRequest.setReceiver(user);
+        mentorshipRequest.setRequester(user);
+        mentorshipRequest.setDescription("One TWO THREE FOUR");
+        mentorshipRequest.setStatus(RequestStatus.PENDING);
     }
 
     @Test
     void whenIncorrectDescription() {
-        mentorshipRequest.setDescription("One TWO THREE FOUR");
         requestFilterDto.setDescriptionFilter("TW45O");
         mentorshipRequestFilters.stream()
                 .filter(userFilter -> userFilter.isApplicable(requestFilterDto))
@@ -54,7 +58,6 @@ class MentorshipRequestFilterTest {
 
     @Test
     void whenCorrectDescription() {
-        mentorshipRequest.setDescription("One TWO THREE FOUR");
         requestFilterDto.setDescriptionFilter("TWO");
         mentorshipRequestFilters.stream()
                 .filter(userFilter -> userFilter.isApplicable(requestFilterDto))
@@ -64,7 +67,6 @@ class MentorshipRequestFilterTest {
 
     @Test
     void whenIncorrectReceiver() {
-        mentorshipRequest.setReceiver(user);
         requestFilterDto.setReceiverFilter(3L);
         mentorshipRequestFilters.stream()
                 .filter(userFilter -> userFilter.isApplicable(requestFilterDto))
@@ -74,7 +76,6 @@ class MentorshipRequestFilterTest {
 
     @Test
     void whenCorrectReceiver() {
-        mentorshipRequest.setReceiver(user);
         requestFilterDto.setReceiverFilter(2L);
         mentorshipRequestFilters.stream()
                 .filter(userFilter -> userFilter.isApplicable(requestFilterDto))
@@ -84,7 +85,6 @@ class MentorshipRequestFilterTest {
 
     @Test
     void whenIncorrectRequester() {
-        mentorshipRequest.setRequester(user);
         requestFilterDto.setRequesterFilter(4L);
         mentorshipRequestFilters.stream()
                 .filter(userFilter -> userFilter.isApplicable(requestFilterDto))
@@ -94,7 +94,6 @@ class MentorshipRequestFilterTest {
 
     @Test
     void whenCorrectRequester() {
-        mentorshipRequest.setRequester(user);
         requestFilterDto.setRequesterFilter(2L);
         mentorshipRequestFilters.stream()
                 .filter(userFilter -> userFilter.isApplicable(requestFilterDto))
@@ -104,7 +103,6 @@ class MentorshipRequestFilterTest {
 
     @Test
     void whenIncorrectStatus() {
-        mentorshipRequest.setStatus(RequestStatus.PENDING);
         requestFilterDto.setStatusFilter(RequestStatus.ACCEPTED);
         mentorshipRequestFilters.stream()
                 .filter(userFilter -> userFilter.isApplicable(requestFilterDto))
@@ -114,7 +112,6 @@ class MentorshipRequestFilterTest {
 
     @Test
     void whenCorrectStatus() {
-        mentorshipRequest.setStatus(RequestStatus.PENDING);
         requestFilterDto.setStatusFilter(RequestStatus.PENDING);
         mentorshipRequestFilters.stream()
                 .filter(userFilter -> userFilter.isApplicable(requestFilterDto))

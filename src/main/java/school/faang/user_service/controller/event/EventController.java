@@ -1,6 +1,5 @@
 package school.faang.user_service.controller.event;
 
-
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,9 +11,7 @@ import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.event.validation.ValidationGroups;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventService;
-
 import java.util.List;
-
 import static school.faang.user_service.util.Utils.getErrMsgBindingRes;
 
 @RestController
@@ -37,7 +34,6 @@ public class EventController {
         return eventService.getEvent(eventId);
     }
 
-
     @DeleteMapping("/{eventId}")
     public void deleteEvent(@PathVariable @Positive(message = "id cannot be negative or equals 0") Long eventId) {
         eventService.deleteEvent(eventId);
@@ -50,7 +46,6 @@ public class EventController {
 
     }
 
-
     @GetMapping("/owner/{userId}")
     public List<EventDto> getOwnedEvents(@PathVariable @Positive(message = "id cannot be negative or equals 0") Long userId) {
         return eventService.getOwnedEvents(userId);
@@ -61,16 +56,12 @@ public class EventController {
         return eventService.getParticipatedEvents(userId);
     }
 
-
     @GetMapping("/filtered")
     public List<EventDto> getEventsByFilter(EventFilterDto filter) {
         return eventService.getEventsByFilter(filter);
     }
 
-
     private void validateBindingResult(BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new DataValidationException(getErrMsgBindingRes(bindingResult));
     }
-
-
 }

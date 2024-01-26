@@ -1,7 +1,6 @@
 package school.faang.user_service.util;
 
 import org.springframework.validation.BindingResult;
-
 import java.util.stream.Collectors;
 
 public class Utils {

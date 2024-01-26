@@ -18,6 +18,7 @@ import school.faang.user_service.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -62,6 +63,15 @@ public class UserServiceTest {
         List<UserDto> actual = userService.getPremiumUsers(userFilterDto);
         assertEquals(expected, actual, "Метод getPremiumUsers должен возвращать список премиум пользователей.");
 
+    }
+
+
+    @Test
+    public void testShouldGetUserById() {
+        Long userId = 1L;
+        when(userRepository.findById(userId)).thenReturn(Optional.of(new User()));
+        when(userMapper.toUserDto(any(User.class))).thenReturn(userDto1);
+        userService.getUserById(userId);
     }
 
 

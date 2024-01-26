@@ -1,6 +1,5 @@
 package school.faang.user_service.service.user;
 
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.user.UserDto;
@@ -10,7 +9,6 @@ import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
-
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -19,11 +17,8 @@ import java.util.stream.Stream;
 public class UserService {
 
     private final UserRepository userRepository;
-
     private final UserMapper userMapper;
-
     private final List<UserFilter> userFilters;
-
 
     public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
         Stream<UserDto> userDtoStream = userRepository.findPremiumUsers().map(user -> userMapper.toUserDto(user));
@@ -40,6 +35,4 @@ public class UserService {
                 .filter(userFilter -> userFilter.isApplicable(userFilterDto))
                 .flatMap(userFilter -> userFilter.apply(userDtoStream, userFilterDto));
     }
-
-
 }

@@ -20,9 +20,7 @@ import school.faang.user_service.exception.EventNotFoundException;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.filter.event.EventOwnerFilter;
 import school.faang.user_service.filter.event.EventTitleFilter;
-import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.mapper.event.EventMapperImpl;
-import school.faang.user_service.mapper.skill.SkillMapper;
 import school.faang.user_service.mapper.skill.SkillMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -157,13 +155,11 @@ class EventServiceTest {
 
     @Test
     public void shouldCreateEvent() {
-
         skill1.setId(1L);
         skill1.setTitle("Skill 1");
         skill2.setId(2L);
         skill2.setTitle("Skill 2");
         user.setSkills(Arrays.asList(skill1, skill2));
-
 
         Mockito.when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(user));
         Mockito.when(eventRepository.save(eventMapper.toEntity(eventDto))).thenReturn(event);
@@ -177,7 +173,6 @@ class EventServiceTest {
 
     @Test
     public void shouldUpdateEvent() {
-
         skill1.setId(1L);
         skill1.setTitle("Skill 1");
         skill2.setId(2L);

@@ -6,6 +6,5 @@ public class ValidationGroups {
     public interface Create extends Default {
     }
     public interface Update extends Default {
-
     }
 }

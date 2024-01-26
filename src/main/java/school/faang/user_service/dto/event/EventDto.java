@@ -12,7 +12,6 @@ import school.faang.user_service.dto.event.validation.ValidationGroups;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.event.EventType;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -40,5 +39,4 @@ public class EventDto {
     private EventType type;
     @NotNull(message = "Status cannot be null")
     private EventStatus status;
-
 }

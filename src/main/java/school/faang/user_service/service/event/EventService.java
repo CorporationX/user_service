@@ -24,21 +24,16 @@ import java.util.stream.Stream;
 public class EventService {
 
     private final EventRepository eventRepository;
-
     private final UserRepository userRepository;
-
     private final EventMapper eventMapper;
-
     private final SkillMapper skillMapper;
-
     private final List<EventFilter> eventFilters;
 
     public EventDto createEvent(EventDto eventDto) {
-        checkUserSkills(eventDto);
+        checkUserSkills(eventDto.getOwnerId(), eventDto.getRelatedSkills());
         Event event = eventRepository.save(eventMapper.toEntity(eventDto));
         return eventMapper.toDto(event);
     }
-
 
     public EventDto getEvent(Long eventId) {
         Event event = eventRepository.findById(eventId)
@@ -53,9 +48,8 @@ public class EventService {
         eventRepository.deleteById(eventId);
     }
 
-
     public EventDto updateEvent(EventDto eventDto) {
-        checkUserSkills(eventDto);
+        checkUserSkills(eventDto.getOwnerId(), eventDto.getRelatedSkills());
         Event event = eventRepository.save(eventMapper.toEntity(eventDto));
         return eventMapper.toDto(event);
     }
@@ -68,10 +62,8 @@ public class EventService {
         return eventMapper.toListEventDto(eventRepository.findParticipatedEventsByUserId(userId));
     }
 
-
     public List<EventDto> getEventsByFilter(EventFilterDto eventFilterDto) {
         Stream<EventDto> eventStream = eventRepository.findAll().stream().map(event -> eventMapper.toDto(event));
-
         for (EventFilter eventFilter : eventFilters) {
             if (eventFilter.isApplicable(eventFilterDto)) {
                 eventStream = eventFilter.apply(eventStream, eventFilterDto);
@@ -80,19 +72,14 @@ public class EventService {
         return eventStream.toList();
     }
 
-
-    private void checkUserSkills(EventDto eventDto) {
-        User user = userRepository.findById(eventDto.getOwnerId())
-                .orElseThrow(() -> new UserNotFoundException("User by ID: " + eventDto.getOwnerId() + " not found"));
-
+    private void checkUserSkills(Long userId, List<SkillDto> skills) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User by ID: " + userId + " not found"));
         List<SkillDto> userSkills = skillMapper.toListSkillDto(user.getSkills());
-
-        if (!userSkills.containsAll(eventDto.getRelatedSkills())) {
-            throw new DataValidationException("User by ID: " + eventDto.getOwnerId() + " does not possess all required skills for this event");
+        if (!userSkills.containsAll(skills)) {
+            throw new DataValidationException("User by ID: " + userId + " does not possess all required skills for this event");
         }
     }
-
-
 }
 
 

@@ -1,10 +1,8 @@
 package school.faang.user_service.dto.user;
 
 
-import lombok.Builder;
 import lombok.Data;
 import school.faang.user_service.dto.skill.SkillDto;
-
 import java.util.List;
 
 @Data
@@ -18,5 +16,4 @@ public class UserDto {
     private String city;
     private Integer experience;
     private List<SkillDto> skills;
-
 }

@@ -32,9 +32,8 @@ public class SkillService {
         if (skillRepository.existsByTitle(skillDto.getTitle())) {
             throw new DataValidationException("Такой навык уже есть");
         }
-        Skill skillEntity = skillMapper.toEntity(skillDto);
-
-        return skillMapper.toDto(skillRepository.save(skillEntity));
+        Skill skillEntity = skillRepository.save(skillMapper.toEntity(skillDto));
+        return skillMapper.toDto(skillEntity);
     }
 
     public List<SkillDto> getUserSkills(Long userId) {

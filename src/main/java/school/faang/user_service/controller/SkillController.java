@@ -22,11 +22,7 @@ public class SkillController {
     }
 
     public boolean validateSkill(SkillDto skillDto) {
-        boolean valid = true;
-        if (skillDto.getTitle() == null || skillDto.getTitle().isBlank()) {
-            valid = false;
-        }
-        return valid;
+        return skillDto.getTitle() != null || !skillDto.getTitle().isBlank();
     }
 
     public void getUserSkills(Long userId) {

@@ -35,13 +35,13 @@ class SkillMapperTest {
     }
 
     @Test
-    void toDto() {
+    void testToDto() {
         SkillDto skillDto1 = skillMapper.toDto(skill);
         assertEquals(skillDto, skillDto1);
     }
 
     @Test
-    void toEntity() {
+    void testToEntity() {
         Skill skill2 =  skill = Skill.builder()
                 .title("test")
                 .build();

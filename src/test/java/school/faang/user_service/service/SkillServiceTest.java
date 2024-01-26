@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -14,6 +15,7 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.mapper.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 
@@ -33,7 +35,7 @@ class SkillServiceTest {
     @Mock
     private SkillRepository skillRepository;
     @Spy
-    private SkillMapperImpl skillMapper;
+    private SkillMapper skillMapper = Mappers.getMapper(SkillMapper.class);
     private SkillDto skillDto;
     private Skill skill;
     private List<User> user;
@@ -56,19 +58,20 @@ class SkillServiceTest {
     }
 
     @Test
-    void testCreate_DataValidationException() {
+    void testCreateDataValidationException() {
         when(skillRepository.existsByTitle(skillDto.getTitle())).thenReturn(true);
         Assertions.assertThrows(DataValidationException.class, () -> skillService.create(skillDto));
     }
 
     @Test
-    void testCreate_Save() {
+    void testCreateSaveSuccessful() {
+        //добавь проверку на то, что возвращаемая SkillEntity валидна
         skillService.create(skillDto);
         verify(skillRepository).save(skill);
     }
 
     @Test
-    void testGetUserSkills() {
+    void testGetUserSkillsSuccessful() {
         when(skillRepository.findAllByUserId(1L)).thenReturn(Collections.singletonList(skill));
         when(skillMapper.toDto(skill)).thenReturn(skillDto);
         List<SkillDto> skillDtoList = skillService.getUserSkills(1L);

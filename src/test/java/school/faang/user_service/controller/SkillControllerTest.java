@@ -30,20 +30,20 @@ class SkillControllerTest {
     private SkillService skillService;
 
     @Test
-    void testCreate_DataValidationException() {
+    void testCreateDataValidationException() {
         SkillDto skillDto = SkillDto.builder().title(null).build();
         Assertions.assertThrows(DataValidationException.class, () -> skillController.create(skillDto));
     }
 
     @Test
-    void testCreate_Create() {
+    void testCreateSuccessful() {
         SkillDto skillDto = SkillDto.builder().title("test").build();
         skillController.create(skillDto);
         verify(skillService).create(skillDto);
     }
 
     @Test
-    void testValidateSkill_Valid() {
+    void testValidateSkillSuccessful() {
         SkillDto skillDto1 = SkillDto.builder().title("test").build();
         SkillDto skillDto2 = SkillDto.builder().build();
         SkillDto skillDto3 = SkillDto.builder().title(" ").build();
@@ -52,6 +52,7 @@ class SkillControllerTest {
         boolean valid2 = skillController.validateSkill(skillDto2);
         boolean valid3 = skillController.validateSkill(skillDto3);
         boolean valid4 = skillController.validateSkill(skillDto4);
+        // поменять на assertTrue(valid1)
         assertEquals(valid1, true);
         assertEquals(valid2, false);
         assertEquals(valid3, false);

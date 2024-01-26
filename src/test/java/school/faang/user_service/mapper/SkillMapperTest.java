@@ -3,13 +3,10 @@ package school.faang.user_service.mapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.User;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -17,19 +14,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class SkillMapperTest {
     private Skill skill;
     private SkillDto skillDto;
-    private List<User> user;
-    private SkillMapperImpl skillMapper = new SkillMapperImpl();
+    private SkillMapper skillMapper = Mappers.getMapper(SkillMapper.class);
 
     @BeforeEach
     void setUp() {
-        user = new ArrayList<>();
         skill = Skill.builder()
                 .title("test")
-                .users(user)
                 .build();
         skillDto = SkillDto.builder()
                 .id(0L)
-                .userIds(List.of())
                 .title("test")
                 .build();
     }

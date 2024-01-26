@@ -1,5 +1,6 @@
 package school.faang.user_service.controller;
 
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
@@ -21,8 +22,8 @@ public class SkillController {
         return skillService.create(skillDto);
     }
 
-    public boolean validateSkill(SkillDto skillDto) {
-        return skillDto.getTitle() != null || !skillDto.getTitle().isBlank();
+    private boolean validateSkill(SkillDto skillDto) {
+        return (skillDto.getTitle() != null && !skillDto.getTitle().isBlank());
     }
 
     public void getUserSkills(Long userId) {

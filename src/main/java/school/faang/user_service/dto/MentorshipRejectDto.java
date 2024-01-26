@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class RejectionDto {
+public class MentorshipRejectDto {
     private String reason;
 }

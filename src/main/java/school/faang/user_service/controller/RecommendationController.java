@@ -17,4 +17,5 @@ public class RecommendationController {
     @GetMapping("/recommendation/given/{authorId}")
     public List<RecommendationDto> getAllGivenRecommendations(@PathVariable long authorId) {
         return recommendationService.getAllGivenRecommendations(authorId);
+    }
 }

@@ -16,7 +16,7 @@ public class RecommendationService {
     private final RecommendationMapper recommendationMapper;
 
     public List<RecommendationDto> getAllGivenRecommendations(long authorId) {
-        return recommendationRepository.findAllByAuthorId(authorId, Pageable.unpaged())
+        return recommendationRepository.findAllByAuthorId(authorId)
                 .stream()
                 .map(recommendationMapper::toDto)
                 .toList();

@@ -37,10 +37,8 @@ class MentorshipRequestServiceTest {
     @InjectMocks
     private MentorshipRequestService mentorshipRequestService;
 
-    @InjectMocks
     private MentorshipRequestDto mentorshipRequestDto;
 
-    @InjectMocks
     private MentorshipRequest mentorshipRequest;
 
     private RequestFilterDto requestFilterDto;
@@ -56,6 +54,7 @@ class MentorshipRequestServiceTest {
         mentorshipRequestDto.setCreatedAt(LocalDateTime.now());
         requestFilterDto = new RequestFilterDto();
         requestFilterDto.setDescriptionFilter("Description filter");
+        mentorshipRequest = new MentorshipRequest();
     }
 
     @Test

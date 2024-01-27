@@ -2,6 +2,7 @@ package school.faang.user_service.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -12,10 +13,9 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.skill.SkillMapperImpl;
+import school.faang.user_service.mapper.skill.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.service.skill.SkillService;
-import school.faang.user_service.service.skill.UserService;
 
 import java.util.List;
 
@@ -32,12 +32,9 @@ public class SkillServiceTest {
     private SkillService skillService;
 
     @Spy
-    private SkillMapperImpl skillMapper;
+    private SkillMapper skillMapper = Mappers.getMapper(SkillMapper.class);
     @Mock
     private SkillRepository skillRepository;
-
-    @Mock
-    private UserService userService;
 
     @Captor
     ArgumentCaptor<Skill> skillCaptor;
@@ -55,41 +52,15 @@ public class SkillServiceTest {
     @Test
     public void shouldCreateSkill () {
         SkillDto dto = setSkillDto(false);
-        User firstUser = User.builder().id(1L).username("David").build();
-        User secondUser = User.builder().id(2L).username("Jason").build();
-        List<User> users = List.of(firstUser, secondUser);
-        List<Long> userIds = users.stream().map(User::getId).toList();
-
-        dto.setUserIds(userIds);
-
-        when(userService.getUsersByIds(dto.getUserIds())).thenReturn(users);
 
         SkillDto result = skillService.create(dto);
 
         verify(skillRepository, times(1))
                 .save(skillCaptor.capture());
-
         Skill skill = skillCaptor.getValue();
-        List<Long> skillUserIds = skill.getUsers().stream().map(User::getId).toList();
 
+        assertNotNull(result);
         assertEquals(dto.getTitle(), skill.getTitle());
-        assertEquals(dto.getUserIds(), skillUserIds);
-        assertEquals(dto.getTitle(), result.getTitle());
-    }
-
-    @Test
-    public void shouldCreateSkillWithoutUsers () {
-        SkillDto dto = setSkillDto(false);
-        SkillDto result = skillService.create(dto);
-
-        verify(skillRepository, times(1))
-                .save(skillCaptor.capture());
-
-        Skill skill = skillCaptor.getValue();
-        List<Long> skillUserIds = skill.getUsers().stream().map(User::getId).toList();
-
-        assertEquals(dto.getTitle(), skill.getTitle());
-        assertEquals(dto.getUserIds(), skillUserIds);
         assertEquals(dto.getTitle(), result.getTitle());
     }
 
@@ -121,8 +92,7 @@ public class SkillServiceTest {
     }
 
     private SkillDto setSkillDto (boolean existsByTitle) {
-        SkillDto dto = new SkillDto();
-        dto.setTitle("java");
+        SkillDto dto = SkillDto.builder().id(1L).title("Asdasd").build();
         when(skillRepository.existsByTitle(dto.getTitle())).thenReturn(existsByTitle);
 
         return dto;

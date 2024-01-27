@@ -14,7 +14,7 @@ import java.util.List;
 public class PremiumCleanupService {
     private final PremiumRepository premiumRepository;
 
-    @Scheduled(cron = "0 0 0 * * *", zone = "Europe/Moscow")
+    @Scheduled(cron = "${premium_cleanup.time}", zone = "${premium_cleanup.zone}")
     public void cleanExpiredPremiums() {
         List<Premium> expiredPremiums = premiumRepository.findAllByEndDateBefore(LocalDateTime.now());
         premiumRepository.deleteAll(expiredPremiums);

@@ -51,3 +51,7 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
+
+premium_cleanup:
+  time: 0 0 0 * * *
+  zone: Europe/Moscow

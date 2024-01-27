@@ -2,10 +2,9 @@ package school.faang.user_service.service.mentorship;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.MentorshipRequestDto;
-import school.faang.user_service.dto.RejectionDto;
+import school.faang.user_service.dto.MentorshipRejectDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
@@ -23,26 +22,13 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class MentorshipRequestService {
     private final MentorshipRequestRepository mentorshipRequestRepository;
-    private UserRepository userRepository;
-    private MentorshipRequestMapper mentorshipRequestMapper;
-    private Map<List<Long>, List<Long>> mentorsAndUsers = new HashMap<>();
+    private final UserRepository userRepository;
+    private final MentorshipRequestMapper mentorshipRequestMapper;
+    private final Map<List<Long>, List<Long>> mentorsAndUsers = new HashMap<>();
     private final List<MentorshipRequestFilter> mentorshipRequestFilters;
 
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
-        boolean isMoreThanThreeMonths = LocalDateTime.now().isAfter(mentorshipRequestRepository.findLatestRequest(mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId()).get().getUpdatedAt().plusMonths(3));
-        boolean isRecieverExists = userRepository.existsById(mentorshipRequestDto.getReceiverId());
-        boolean isRequesterExists = userRepository.existsById(mentorshipRequestDto.getRequesterId());
-        boolean isNotRequestToYourself = mentorshipRequestDto.getRequesterId() != mentorshipRequestDto.getReceiverId();
-
-        if (!isMoreThanThreeMonths) {
-            throw new IllegalArgumentException("Less than 3 months have passed since last request");
-        } else if (!isRecieverExists) {
-            throw new IllegalArgumentException("There are no this receiver in data base");
-        } else if (!isRequesterExists) {
-            throw new IllegalArgumentException("There are no this requester in data base");
-        } else if (!isNotRequestToYourself) {
-            throw new IllegalArgumentException("You can not send a request to yourself");
-        }
+        validateRequestMentorship(mentorshipRequestDto);
 
         mentorshipRequestRepository.create(mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId(), mentorshipRequestDto.getDescription());
 
@@ -51,40 +37,65 @@ public class MentorshipRequestService {
         return mentorshipRequestMapper.toMentorshipRequestDto(mentorshipRequestEntity);
     }
 
-    public RejectionDto rejectRequest(long id, RejectionDto rejection) {
+    private void validateRequestMentorship(MentorshipRequestDto mentorshipRequestDto) {
+        if (!isMoreThanThreeMonths(mentorshipRequestDto)) {
+            throw new IllegalArgumentException("Less than 3 months have passed since last request");
+        } else if (!userRepository.existsById(mentorshipRequestDto.getReceiverId())) {
+            throw new IllegalArgumentException("There are no this receiver in data base");
+        } else if (!userRepository.existsById(mentorshipRequestDto.getRequesterId())) {
+            throw new IllegalArgumentException("There are no this requester in data base");
+        } else if (!mentorshipRequestDto.getRequesterId().equals(mentorshipRequestDto.getReceiverId())) {
+            throw new IllegalArgumentException("You can not send a request to yourself");
+        }
+    }
+
+    private boolean isMoreThanThreeMonths(MentorshipRequestDto mentorshipRequestDto) {
+        return mentorshipRequestRepository.findLatestRequest(mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId())
+                .map(mentorshipRequest -> LocalDateTime.now().isAfter(mentorshipRequest.getUpdatedAt().plusMonths(3)))
+                .orElseThrow(() -> new IllegalArgumentException("There are not find request"));
+    }
+
+    public MentorshipRejectDto rejectRequest(long id, MentorshipRejectDto rejection) {
         if(!(mentorshipRequestRepository.existsById(id))){
             throw new IllegalArgumentException("There is no request in db with this ID");
         }
 
-        mentorshipRequestRepository.findById(id).get().setStatus(RequestStatus.REJECTED);
-        mentorshipRequestRepository.findById(id).get().setRejectionReason(rejection.getReason());
+        MentorshipRequest mentorshipRequest = mentorshipRequestRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("There is blank request"));
 
-        MentorshipRequest mentorshipRequestEntity = mentorshipRequestMapper.RejectionDtoToEntity(rejection);
-        mentorshipRequestEntity = mentorshipRequestRepository.save(mentorshipRequestEntity);
-        return mentorshipRequestMapper.toRejectionDto(mentorshipRequestEntity);
+        mentorshipRequest.setStatus(RequestStatus.REJECTED);
+        mentorshipRequest.setRejectionReason(rejection.getReason());
+        mentorshipRequestRepository.save(mentorshipRequest);
+
+        return mentorshipRequestMapper.toRejectionDto(mentorshipRequest);
     }
 
     public void acceptRequest(long id) {
-        long mentorId = mentorshipRequestRepository.findById(id).get().getReceiver().getId();
-        long senderId = mentorshipRequestRepository.findById(id).get().getRequester().getId();
+        MentorshipRequest mentorshipRequest = mentorshipRequestRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("There is no request in DB with this ID"));
 
-        if(!mentorshipRequestRepository.existsById(id)) {
-            throw new IllegalArgumentException("There are no this request in DB");
+        long mentorId = mentorshipRequest.getReceiver().getId();
+        long senderId = mentorshipRequest.getRequester().getId();
+        List<Long> mentorList = List.of(mentorId);
+
+        if (mentorsAndUsers.containsKey(mentorList) && mentorsAndUsers.get(mentorList).contains(senderId)) {
+            throw new IllegalArgumentException("The mentor is already the sender's mentor");
         }
 
-        if(mentorsAndUsers.containsKey(mentorId) && mentorsAndUsers.get(mentorId).contains(senderId)){
-            throw new IllegalArgumentException("The user is already the sender's mentor");
-        }
+        List<Long> senderList = mentorsAndUsers.getOrDefault(mentorList, new ArrayList<>());
+        senderList.add(senderId);
+        mentorsAndUsers.put(mentorList, senderList);
 
-        mentorsAndUsers.put(List.of(mentorId), List.of(senderId));
-        mentorshipRequestRepository.findById(id).get().setStatus(RequestStatus.ACCEPTED);
+        mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
+        mentorshipRequestRepository.save(mentorshipRequest);
     }
 
     public List<RequestFilterDto> getRequests(RequestFilterDto requestFilterDto) {
         Stream<MentorshipRequest> requestStream = mentorshipRequestRepository.findAll().stream();
-        mentorshipRequestFilters.stream()
+        Stream<MentorshipRequest> filteredRequests = mentorshipRequestFilters.stream()
                 .filter(mentorshipRequestFilter -> mentorshipRequestFilter.isApplicable(requestFilterDto))
-                .forEach(mentorshipRequestFilter -> mentorshipRequestFilter.apply(requestStream, requestFilterDto));
-        return mentorshipRequestMapper.toRequestFilterDtoList(requestStream.toList());
+                .flatMap(filter -> requestStream.flatMap(request -> filter.apply(Stream.of(request), requestFilterDto)));
+
+        return mentorshipRequestMapper.toRequestFilterDtoList(filteredRequests.toList());
     }
 }

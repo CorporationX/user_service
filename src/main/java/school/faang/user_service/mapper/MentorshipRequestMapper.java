@@ -3,8 +3,9 @@ package school.faang.user_service.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
+import org.mapstruct.factory.Mappers;
 import school.faang.user_service.dto.MentorshipRequestDto;
-import school.faang.user_service.dto.RejectionDto;
+import school.faang.user_service.dto.MentorshipRejectDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 
@@ -15,23 +16,12 @@ public interface MentorshipRequestMapper {
     MentorshipRequestDto toMentorshipRequestDto(MentorshipRequest mentorshipRequest);
     MentorshipRequest MentorshipRequestToEntity(MentorshipRequestDto mentorshipRequestDto);
 
-    RejectionDto toRejectionDto(MentorshipRequest mentorshipRequest);
-    MentorshipRequest RejectionDtoToEntity(RejectionDto rejectionDto);
+    MentorshipRejectDto toRejectionDto(MentorshipRequest mentorshipRequest);
 
-    @Mapping(source = "requester.id", target = "requesterId")
-    @Mapping(source = "receiver.id", target = "receiverId")
-    @Mapping(source = "status", target = "status")
-    RequestFilterDto toRequestFilterDto(MentorshipRequest mentorshipRequest);
+    MentorshipRequestMapper INSTANCE = Mappers.getMapper(MentorshipRequestMapper.class);
     @Mapping(source = "requester.id", target = "requesterId")
     @Mapping(source = "receiver.id", target = "receiverId")
     @Mapping(source = "status", target = "status")
     List<RequestFilterDto> toRequestFilterDtoList(List<MentorshipRequest> mentorshipRequestList);
-    @Mapping(target = "requester", ignore = true)
-    @Mapping(target = "receiver", ignore = true)
-    MentorshipRequest RequestFilterDtoToEntity(MentorshipRequestDto mentorshipRequestDto);
-
-
-
-
 
 }

@@ -3,14 +3,19 @@ package school.faang.user_service.filter.goal;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 
 import java.util.List;
 import java.util.stream.Stream;
 
+@ExtendWith(MockitoExtension.class)
 class GoalTitleFilterTest {
-    private final GoalTitleFilter goalTitleFilter = new GoalTitleFilter();
+    @InjectMocks
+    private GoalTitleFilter goalTitleFilter;
     private List<Goal> goals;
 
     @BeforeEach

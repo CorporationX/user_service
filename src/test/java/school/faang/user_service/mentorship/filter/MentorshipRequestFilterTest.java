@@ -29,20 +29,23 @@ class MentorshipRequestFilterTest {
 
     private List<MentorshipRequest> mentorshipRequests;
 
-    private User user = new User();
+    private User receiver = new User();
+    private User requester = new User();
 
 
     @BeforeEach
     public void init() {
-        user.setId(2L);
-        user.setUsername("IVAN");
+        receiver.setId(2L);
+        receiver.setUsername("IVAN");
+        requester.setId(3L);
+        requester.setUsername("Mark");
         mentorshipRequestFilters.add(new MentorshipDescriptionFilter());
         mentorshipRequestFilters.add(new MentorshipReceiverFilter());
         mentorshipRequestFilters.add(new MentorshipRequesterFilter());
         mentorshipRequestFilters.add(new MentorshipStatusFilter());
         mentorshipRequests = new ArrayList<>(List.of(mentorshipRequest));
-        mentorshipRequest.setReceiver(user);
-        mentorshipRequest.setRequester(user);
+        mentorshipRequest.setReceiver(receiver);
+        mentorshipRequest.setRequester(requester);
         mentorshipRequest.setDescription("One TWO THREE FOUR");
         mentorshipRequest.setStatus(RequestStatus.PENDING);
     }
@@ -50,6 +53,37 @@ class MentorshipRequestFilterTest {
     @Test
     void whenIncorrectDescription() {
         requestFilterDto.setDescriptionFilter("TW45O");
+        mentorshipRequestFilters.stream()
+                .filter(userFilter -> userFilter.isApplicable(requestFilterDto))
+                .forEach(userFilter -> userFilter.apply(mentorshipRequests, requestFilterDto));
+        Assertions.assertEquals(0, mentorshipRequests.size());
+    }
+
+    @Test
+    void whenCorrectMultipleParameters() {
+        requestFilterDto.setDescriptionFilter("TWO");
+        requestFilterDto.setStatusFilter(RequestStatus.PENDING);
+        mentorshipRequestFilters.stream()
+                .filter(userFilter -> userFilter.isApplicable(requestFilterDto))
+                .forEach(userFilter -> userFilter.apply(mentorshipRequests, requestFilterDto));
+        Assertions.assertEquals(1, mentorshipRequests.size());
+    }
+
+    @Test
+    void whenCorrectMultipleParametersTwo() {
+        requestFilterDto.setRequesterFilter(3L);
+        requestFilterDto.setReceiverFilter(2L);
+        mentorshipRequestFilters.stream()
+                .filter(userFilter -> userFilter.isApplicable(requestFilterDto))
+                .forEach(userFilter -> userFilter.apply(mentorshipRequests, requestFilterDto));
+        Assertions.assertEquals(1, mentorshipRequests.size());
+    }
+
+    @Test
+    void whenIncorrectMultipleParameters() {
+        requestFilterDto.setDescriptionFilter("Incorrect");
+        requestFilterDto.setStatusFilter(RequestStatus.ACCEPTED);
+        requestFilterDto.setRequesterFilter(4L);
         mentorshipRequestFilters.stream()
                 .filter(userFilter -> userFilter.isApplicable(requestFilterDto))
                 .forEach(userFilter -> userFilter.apply(mentorshipRequests, requestFilterDto));
@@ -94,7 +128,7 @@ class MentorshipRequestFilterTest {
 
     @Test
     void whenCorrectRequester() {
-        requestFilterDto.setRequesterFilter(2L);
+        requestFilterDto.setRequesterFilter(3L);
         mentorshipRequestFilters.stream()
                 .filter(userFilter -> userFilter.isApplicable(requestFilterDto))
                 .forEach(userFilter -> userFilter.apply(mentorshipRequests, requestFilterDto));

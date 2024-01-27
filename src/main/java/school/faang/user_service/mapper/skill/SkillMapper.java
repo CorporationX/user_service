@@ -23,6 +23,8 @@ public interface SkillMapper {
     @Mapping(target = "userIds", source = "users", qualifiedByName = "usersToIds")
     SkillDto toDto (Skill skill);
 
+    List<SkillDto> listToDto(List<Skill> skills);
+
     @Named("usersToIds")
     default List<Long> convertUsersToIds (List<User> users) {
         return users == null

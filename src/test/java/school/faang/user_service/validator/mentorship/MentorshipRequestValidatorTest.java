@@ -49,6 +49,7 @@ class MentorshipRequestValidatorTest {
     public void init() {
         mentorshipRequestDto = new MentorshipRequestDto();
         mentorshipRequestDto.setRequester(1L);
+        mentorshipRequestDto.setId(3L);
         mentorshipRequestDto.setDescription("Description");
         mentorshipRequestDto.setRequester(88L);
         mentorshipRequestDto.setReceiver(77L);
@@ -68,6 +69,15 @@ class MentorshipRequestValidatorTest {
     public void testExceptionForEmptyData() {
         Assert.assertThrows(DataNotFoundException.class, () ->
                 mentorshipRequestValidator.validateUserData(new User(), new User()));
+    }
+
+    @Test
+    public void testCommonCheck() {
+        try {
+            mentorshipRequestValidator.commonCheck(mentorshipRequestDto);
+        } catch (DataNotFoundException e) {
+            fail("Should not have thrown any exception");
+        }
     }
 
     @Test

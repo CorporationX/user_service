@@ -2,6 +2,7 @@ package school.faang.user_service.validator.mentorship;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.mentorship.DataNotFoundException;
@@ -20,13 +21,10 @@ public class MentorshipRequestValidator {
 
     private final MentorshipRequestRepository mentorshipRequestRepository;
 
-    public void sameUserValidation(User receiver, User requester) {
+    public void validateUserData(User receiver, User requester) {
         if (requester.getId() == receiver.getId()) {
             throw new DataNotFoundException("Requester and receiver the same user");
         }
-    }
-
-    public void dateCheckValidation(User receiver, User requester) {
         Optional<MentorshipRequest> latestRequest = mentorshipRequestRepository
                 .findLatestRequest(requester.getId(), receiver.getId());
         if (latestRequest.isPresent()) {
@@ -36,4 +34,10 @@ public class MentorshipRequestValidator {
         }
     }
 
+    public void commonCheck(MentorshipRequestDto mentorshipRequestDto) {
+        if (mentorshipRequestDto.getId() == null || mentorshipRequestDto.getRequester() == null
+                || mentorshipRequestDto.getReceiver() == null || mentorshipRequestDto.getDescription() == null) {
+            throw new DataValidationException("Incorrect data in mentorshipRequestDto");
+        }
+    }
 }

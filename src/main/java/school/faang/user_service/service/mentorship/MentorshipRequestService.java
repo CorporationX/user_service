@@ -26,8 +26,7 @@ public class MentorshipRequestService {
         User receiver = userService.findUserById(mentorshipRequestDto.getReceiver());
         User requester = userService.findUserById(mentorshipRequestDto.getRequester());
 
-        mentorshipRequestValidator.sameUserValidation(receiver, requester);
-        mentorshipRequestValidator.dateCheckValidation(receiver, requester);
+        mentorshipRequestValidator.validateUserData(receiver, requester);
 
         mentorshipRequest.setReceiver(receiver);
         mentorshipRequest.setRequester(requester);

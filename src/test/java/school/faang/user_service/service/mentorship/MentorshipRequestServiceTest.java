@@ -4,7 +4,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
@@ -77,7 +79,7 @@ class MentorshipRequestServiceTest {
         Mockito.verify(mentorshipRequestMapper, times(1))
                 .toEntity(mentorshipRequestDto);
         Mockito.verify(mentorshipRequestValidator, times(1))
-                .sameUserValidation(any(), any());
+                .validateUserData(any(), any());
         Assertions.assertEquals(mentorshipRequestService.requestMentorship(mentorshipRequestDto)
                 , mentorshipRequestDto);
     }

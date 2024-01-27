@@ -67,13 +67,13 @@ class MentorshipRequestValidatorTest {
     @Test
     public void testExceptionForEmptyData() {
         Assert.assertThrows(DataNotFoundException.class, () ->
-                mentorshipRequestValidator.sameUserValidation(new User(), new User()));
+                mentorshipRequestValidator.validateUserData(new User(), new User()));
     }
 
     @Test
     public void testExceptionWhenSameUser() {
         Assert.assertThrows(DataNotFoundException.class, () ->
-                mentorshipRequestValidator.sameUserValidation(receiver, sameUser));
+                mentorshipRequestValidator.validateUserData(receiver, sameUser));
     }
 
     @Test
@@ -82,19 +82,14 @@ class MentorshipRequestValidatorTest {
                 .findLatestRequest(requester.getId(), receiver.getId())).thenReturn(Optional.of(mentorshipRequest));
         mentorshipRequest.setCreatedAt(LocalDateTime.now().minusMonths(1));
         Assert.assertThrows(DataValidationException.class, () ->
-                mentorshipRequestValidator.dateCheckValidation(receiver, requester));
+                mentorshipRequestValidator.validateUserData(receiver, requester));
     }
 
     @Test
     public void testCorrectData() {
         try {
-            mentorshipRequestValidator.sameUserValidation(receiver, requester);
+            mentorshipRequestValidator.validateUserData(receiver, requester);
         } catch (DataNotFoundException e) {
-            fail("Should not have thrown any exception");
-        }
-        try {
-            mentorshipRequestValidator.dateCheckValidation(receiver, requester);
-        } catch (DataValidationException e) {
             fail("Should not have thrown any exception");
         }
     }

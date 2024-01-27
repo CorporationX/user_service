@@ -29,7 +29,9 @@ spring:
         follower_channel:
           name: follower_channel
         profile_view_channel:
-            name: profile_view_channel
+          name: profile_view_channel
+        premium_channel:
+          name: premium_channel
 
 server:
   port: 8080
@@ -55,3 +57,7 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
+
+premium_cleanup:
+  time: 0 0 0 * * *
+  zone: Europe/Moscow

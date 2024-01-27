@@ -8,6 +8,7 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 
+import java.util.Collections;
 import java.util.List;
 
 @Mapper(componentModel = "spring",
@@ -22,10 +23,12 @@ public interface SkillMapper {
     @Mapping(target = "userIds", source = "users", qualifiedByName = "usersToIds")
     SkillDto toDto (Skill skill);
 
-    List<SkillDto> listToDto (List<Skill> skillList);
+    List<SkillDto> listToDto(List<Skill> skills);
 
     @Named("usersToIds")
     default List<Long> convertUsersToIds (List<User> users) {
-        return users.stream().map(User::getId).toList();
+        return users == null
+                ? Collections.emptyList()
+                : users.stream().map(User::getId).toList();
     }
 }

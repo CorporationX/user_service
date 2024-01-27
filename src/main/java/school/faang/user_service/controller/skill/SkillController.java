@@ -18,7 +18,7 @@ public class SkillController {
     private final SkillService skillService;
 
     @PostMapping("/skill")
-    public SkillDto create (SkillDto skill) throws DataValidationException {
+    public SkillDto create (SkillDto skill) {
         validateSkill(skill.getTitle());
 
         return skillService.create(skill);

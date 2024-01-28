@@ -3,9 +3,11 @@ package school.faang.user_service.controller.recommendation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.RecommendationRequestDto;
-import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.exception.MessageRequestException;
 import school.faang.user_service.service.RecommendationRequestService;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -21,6 +23,10 @@ public class RecommendationRequestController {
 
     public RecommendationRequestDto getRecommendationRequest(long id) {
         return recommendationRequestService.getRequest(id);
+    }
+
+    public List<RecommendationRequestDto> getRecommendationRequest(RequestFilterDto filter) {
+        return recommendationRequestService.getRequest(filter);
     }
 
 }

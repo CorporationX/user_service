@@ -13,8 +13,11 @@ import java.util.List;
 public interface UserMapper {
 
 
-    @Mapping(source = "country.id", target = "countryId")
-    UserDto toUserDto(User user);
+    @Mapping(target = "countryId" ,source = "country.id")
+    UserDto toDto(User user);
+
+    @Mapping(target = "country.id" ,source = "countryId")
+    User toEntity(UserDto userDto);
 
     List<UserDto> toUserDtoList(List<User> users);
 

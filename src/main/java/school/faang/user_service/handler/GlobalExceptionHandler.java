@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EventNotFoundException;
+import school.faang.user_service.exception.PaymentProcessingException;
 import school.faang.user_service.exception.UserNotFoundException;
 import java.time.LocalDateTime;
 
@@ -35,6 +36,13 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleRuntimeException(RuntimeException exception, HttpServletRequest request) {
         log.error("Error: {}", exception);
         return getErrorResponse(request.getRequestURI(), HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
+    }
+
+    @ExceptionHandler(PaymentProcessingException.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public ErrorResponse handleRuntimeException(PaymentProcessingException exception, HttpServletRequest request) {
+        log.error("Error: {}", exception);
+        return getErrorResponse(request.getRequestURI(), HttpStatus.SERVICE_UNAVAILABLE, exception.getMessage());
     }
 
     private ErrorResponse getErrorResponse(String url, HttpStatus status, String message) {

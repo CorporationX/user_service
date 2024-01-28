@@ -19,7 +19,6 @@ public class UserController {
 
     private final UserService userService;
 
-
     @GetMapping("/filtered")
     public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
         return userService.getPremiumUsers(userFilterDto);
@@ -29,6 +28,4 @@ public class UserController {
     public UserDto getUserById(@PathVariable long userId) {
         return userService.getUserById(userId);
     }
-
-
 }

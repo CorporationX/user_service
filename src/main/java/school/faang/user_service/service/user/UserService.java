@@ -21,13 +21,13 @@ public class UserService {
     private final List<UserFilter> userFilters;
 
     public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
-        Stream<UserDto> userDtoStream = userRepository.findPremiumUsers().map(user -> userMapper.toUserDto(user));
+        Stream<UserDto> userDtoStream = userRepository.findPremiumUsers().map(user -> userMapper.toDto(user));
         return userFilter(userDtoStream, userFilterDto).toList();
     }
 
     public UserDto getUserById(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User by id: " + userId + " not found"));
-        return userMapper.toUserDto(user);
+        return userMapper.toDto(user);
     }
 
     private Stream<UserDto> userFilter(Stream<UserDto> userDtoStream, UserFilterDto userFilterDto) {

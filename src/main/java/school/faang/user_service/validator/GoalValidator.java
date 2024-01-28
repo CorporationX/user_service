@@ -3,10 +3,10 @@ package school.faang.user_service.validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -58,9 +58,12 @@ public class GoalValidator {
         throw new DataValidationException("Some skills do not exist in database!");
     }
 
-    public void validateUserId(Long userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new EntityNotFoundException("User with id " + userId + " is not exists");
+    public void validateUserIdAndFilter(Long userId, GoalFilterDto filter) {
+        if (userId == null) {
+            throw new DataValidationException("User ID is null!");
+        }
+        if (filter == null) {
+            throw new DataValidationException("Filter is null!");
         }
     }
 }

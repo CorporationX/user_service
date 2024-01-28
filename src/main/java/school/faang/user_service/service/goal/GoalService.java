@@ -62,13 +62,6 @@ public class GoalService {
     public List<GoalDto> findGoalsByUser(Long userId, GoalFilterDto filter) {
         List<Goal> userGoals = getGoalsByUserId(userId);
 
-        if (userGoals.isEmpty()) {
-            return new ArrayList<GoalDto>();
-        }
-        if (filter == null) {
-            return userGoals.stream().map(goalMapper::toDto).toList();
-        }
-
         goalFilters.stream()
                 .filter(f -> f.isApplicable(filter))
                 .forEach(f -> f.apply(userGoals, filter));

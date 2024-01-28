@@ -207,6 +207,8 @@ public class GoalServiceTest {
         Long userId = 1L;
         GoalFilterDto filter = new GoalFilterDto();
         List<GoalDto> expectedList = new ArrayList<>();
+        List<GoalFilter> goalFilters = List.of(new GoalStatusFilter(), new GoalTitleFilter());
+        goalService = new GoalService(goalValidator, goalRepository, skillRepository, goalMapper, goalFilters);
 
         when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.of());
 

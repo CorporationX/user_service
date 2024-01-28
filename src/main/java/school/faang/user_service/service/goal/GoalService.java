@@ -39,10 +39,8 @@ public class GoalService {
         Goal goalNew = goalMapper.toEntity(goalDto);
         goalNew.setSkillsToAchieve(goalDto.getSkillIds().stream().map(skillService::findById).toList());
         Goal goalOld = getGoalById(goalId);
-
         goalValidator.validateByCompleted(goalOld);
         goalValidator.validateByExistingSkills(goalNew);
-        goalRepository.save(goalNew);
 
         if (goalNew.getStatus() == GoalStatus.COMPLETED) {
             goalRepository.findUsersByGoalId(goalNew.getId())
@@ -50,7 +48,8 @@ public class GoalService {
                             .filter(skill -> !user.getSkills().contains(skill))
                             .forEach(skill -> skillRepository.assignSkillToUser(skill.getId(), user.getId())));
         }
-        return goalDto; // либо забрать сущность от save и через mapper вернуть
+        Goal goalResult = goalRepository.save(goalNew);
+        return goalMapper.toDto(goalResult);
     }
 
     public Goal getGoalById(long id) {

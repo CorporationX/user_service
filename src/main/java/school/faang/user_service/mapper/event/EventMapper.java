@@ -25,4 +25,5 @@ public interface EventMapper {
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
+
 }

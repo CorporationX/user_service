@@ -114,6 +114,30 @@ public class GoalValidatorTest {
     }
 
     @Test
+    void testValidateTitleAndGoalIdWhenTitleEmptyShouldException() {
+        GoalDto goalDto = new GoalDto();
+        goalDto.setTitle(" ");
+        Long goalId = 1L;
+
+        DataValidationException dataValidationException = assertThrows(DataValidationException.class,
+                () -> goalValidator.validateTitleAndGoalId(goalId, goalDto));
+
+        assertEquals(dataValidationException.getMessage(), "Title is empty!");
+    }
+
+    @Test
+    void testValidateTitleAndGoalIdWhenGoalIdNullShouldException() {
+        GoalDto goalDto = new GoalDto();
+        goalDto.setTitle("Title");
+        Long goalId = null;
+
+        DataValidationException dataValidationException = assertThrows(DataValidationException.class,
+                () -> goalValidator.validateTitleAndGoalId(goalId, goalDto));
+
+        assertEquals(dataValidationException.getMessage(), "Goal ID is null!");
+    }
+
+    @Test
     void testIsValidateByCompletedShouldException() {
         Goal goal = new Goal();
         goal.setStatus(GoalStatus.COMPLETED);

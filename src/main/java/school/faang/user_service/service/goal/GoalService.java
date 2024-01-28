@@ -35,10 +35,10 @@ public class GoalService {
         }
     }
 
-    public void updateGoal(Long goalId, GoalDto goalDto) {
+    public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
         Goal goalNew = goalMapper.toEntity(goalDto);
         goalNew.setSkillsToAchieve(goalDto.getSkillIds().stream().map(skillService::findById).toList());
-        Goal goalOld = getUserById(goalId);
+        Goal goalOld = getGoalById(goalId);
 
         goalValidator.validateByCompleted(goalOld);
         goalValidator.validateByExistingSkills(goalNew);
@@ -47,12 +47,13 @@ public class GoalService {
         if (goalNew.getStatus() == GoalStatus.COMPLETED) {
             goalRepository.findUsersByGoalId(goalNew.getId())
                     .forEach(user -> goalNew.getSkillsToAchieve().stream()
-                            .filter((s1) -> !user.getSkills().contains(s1))
-                            .forEach(s1 -> skillRepository.assignSkillToUser(s1.getId(), user.getId())));
+                            .filter(skill -> !user.getSkills().contains(skill))
+                            .forEach(skill -> skillRepository.assignSkillToUser(skill.getId(), user.getId())));
         }
+        return goalDto; // либо забрать сущность от save и через mapper вернуть
     }
 
-    public Goal getUserById(long id) {
+    public Goal getGoalById(long id) {
         return goalRepository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("Goal with id " + id + " is not exists"));
     }

@@ -22,9 +22,8 @@ public class GoalController {
         }
     }
 
-    public void updateGoal(Long goalId, GoalDto goal) {
-        goalValidator.validateUserId(goalId);
-        goalValidator.validateTitle(goal);
-        goalService.updateGoal(goalId, goal);
+    public GoalDto updateGoal(Long goalId, GoalDto goal) {
+        goalValidator.validateTitleAndGoalId(goalId, goal);
+        return goalService.updateGoal(goalId, goal);
     }
 }

@@ -11,9 +11,9 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.skill.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
+import school.faang.user_service.validation.SkillValidator;
 
 import java.util.List;
 import java.util.Map;
@@ -22,58 +22,58 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class SkillService {
-
-    private static final int MIN_SKILL_OFFERS = 3;
-
     private final SkillMapper skillMapper;
     private final SkillRepository skillRepository;
     private final SkillOfferRepository skillOfferRepository;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
-    private final UserRepository userRepository;
+    private final SkillValidator skillValidator;
 
-    public SkillDto create (SkillDto skill) throws DataValidationException {
-        checkIfSkillExists(skill.getTitle());
+    public SkillDto create(SkillDto skill) throws DataValidationException {
+        skillValidator.checkIfSkillExists(skill.getTitle());
 
         Skill skillEntity = skillMapper.toEntity(skill);
         skillRepository.save(skillEntity);
         return skillMapper.toDto(skillEntity);
     }
 
-    public SkillDto acquireSkillFromOffers (long skillId, long userId) {
-
+    public SkillDto acquireSkillFromOffers(long skillId, long userId) {
         Skill skill = skillRepository.findUserSkill(skillId, userId).orElse(null);
         List<SkillOffer> offers = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
 
-        if (skill == null && offers.size() >= MIN_SKILL_OFFERS) {
-            skill = skillRepository.findById(skillId).orElseThrow(
-                    () -> new DataValidationException("Skill doesn't exist!")
-            );
+        skillValidator.validateSkillOffersSize(offers);
 
-            skillRepository.assignSkillToUser(skillId, userId);
-
-            for (SkillOffer offer : offers) {
-                User receiver = offer.getRecommendation().getReceiver();
-                User author = offer.getRecommendation().getAuthor();
-
-                UserSkillGuarantee guarantor = UserSkillGuarantee.builder()
-                        .id(userId)
-                        .user(receiver)
-                        .skill(skill)
-                        .guarantor(author)
-                        .build();
-
-                userSkillGuaranteeRepository.save(guarantor);
-                setSkillGuarantees(offers, skill, userId);
-            }
-        } else {
-            throw new DataValidationException("Not enough offers");
+        if (skill == null) {
+            skill = getSkillIfExists(skillId);
         }
+
+        skillRepository.assignSkillToUser(skillId, userId);
+        setSkillGuarantees(offers, skill, userId);
 
         return skillMapper.toDto(skill);
     }
 
-    private void setSkillGuarantees(List<SkillOffer> offers, Skill skill, long userId) {
+    public List<SkillCandidateDto> getOfferedSkills(long userId) {
+        List<Skill> skills = skillRepository.findSkillsOfferedToUser(userId);
 
+        Map<Skill, Long> skillsMap = skills
+                .stream()
+                .collect(Collectors.groupingBy(skillDto -> skillDto, Collectors.counting()));
+
+        List<SkillCandidateDto> skillCandidateDtos = skillsMap
+                .entrySet().stream()
+                .map(item -> new SkillCandidateDto(skillMapper.toDto(item.getKey()), item.getValue()))
+                .toList();
+
+        return skillCandidateDtos;
+    }
+
+    public List<SkillDto> getUserSkills(long userId) {
+        List<Skill> skills = skillRepository.findAllByUserId(userId);
+
+        return skillMapper.listToDto(skills);
+    }
+
+    private void setSkillGuarantees(List<SkillOffer> offers, Skill skill, long userId) {
         for (SkillOffer offer : offers) {
             User receiver = offer.getRecommendation().getReceiver();
             User author = offer.getRecommendation().getAuthor();
@@ -89,30 +89,9 @@ public class SkillService {
         }
     }
 
-    public List<SkillDto> getUserSkills (long userId) {
-        List<Skill> skills = skillRepository.findAllByUserId(userId);
-
-        return skillMapper.listToDto(skills);
-    }
-
-    private void checkIfSkillExists (String skillTitle) throws DataValidationException {
-        if (skillRepository.existsByTitle(skillTitle)) {
-            throw new DataValidationException("Skill with name " + skillTitle + " already exists in database.");
-        }
-    }
-
-    public List<SkillCandidateDto> getOfferedSkills (long userId) {
-        List<Skill> skills = skillRepository.findSkillsOfferedToUser(userId);
-
-        Map<Skill, Long> skillsMap = skills
-                .stream()
-                .collect(Collectors.groupingBy(skillDto -> skillDto, Collectors.counting()));
-
-        List<SkillCandidateDto> skillCandidateDtos = skillsMap
-                .entrySet().stream()
-                .map(item -> new SkillCandidateDto(skillMapper.toDto(item.getKey()), item.getValue()))
-                .toList();
-
-        return skillCandidateDtos;
+    private Skill getSkillIfExists(Long skillId) {
+        return skillRepository.findById(skillId).orElseThrow(
+                () -> new DataValidationException("Skill doesn't exist!")
+        );
     }
 }

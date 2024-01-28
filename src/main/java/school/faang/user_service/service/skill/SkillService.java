@@ -55,13 +55,13 @@ public class SkillService {
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
         List<Skill> skills = skillRepository.findSkillsOfferedToUser(userId);
 
-        Map<Skill, Long> skillsMap = skills
+        Map<SkillDto, Long> skillsMap = skills
                 .stream()
-                .collect(Collectors.groupingBy(skillDto -> skillDto, Collectors.counting()));
+                .collect(Collectors.groupingBy(skillMapper::toDto, Collectors.counting()));
 
         List<SkillCandidateDto> skillCandidateDtos = skillsMap
                 .entrySet().stream()
-                .map(item -> new SkillCandidateDto(skillMapper.toDto(item.getKey()), item.getValue()))
+                .map(item -> new SkillCandidateDto(item.getKey(), item.getValue()))
                 .toList();
 
         return skillCandidateDtos;

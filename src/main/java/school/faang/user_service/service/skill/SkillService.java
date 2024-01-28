@@ -43,7 +43,7 @@ public class SkillService {
         skillValidator.validateSkillOffersSize(offers);
 
         if (skill == null) {
-            skill = getSkillIfExists(skillId);
+            skill = skillValidator.getSkillIfExists(skillId);
         }
 
         skillRepository.assignSkillToUser(skillId, userId);
@@ -87,11 +87,5 @@ public class SkillService {
 
             userSkillGuaranteeRepository.save(guarantor);
         }
-    }
-
-    private Skill getSkillIfExists(Long skillId) {
-        return skillRepository.findById(skillId).orElseThrow(
-                () -> new DataValidationException("Skill doesn't exist!")
-        );
     }
 }

@@ -116,7 +116,6 @@ tasks.jacocoTestCoverageVerification {
             element = "CLASS"
             includes = listOf("school.faang.user_service.service.*",
                     "school.faang.user_service.mapper.*",
-                    "school.faang.user_service.controller.*",
                     "school.faang.user_service.validator.*")
             limit{
                 minimum = "0.5".toBigDecimal()

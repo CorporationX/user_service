@@ -20,8 +20,7 @@ public class SkillService {
         checkIfSkillExists(skill.getTitle());
 
         Skill skillEntity = skillMapper.toEntity(skill);
-        skillRepository.save(skillEntity);
-        return skillMapper.toDto(skillEntity);
+        return skillMapper.toDto(skillRepository.save(skillEntity));
     }
 
     public List<SkillDto> getUserSkills (long userId) {

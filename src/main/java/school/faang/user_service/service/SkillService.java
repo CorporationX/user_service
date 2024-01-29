@@ -25,8 +25,8 @@ public class SkillService {
     private static final int MIN_SKILL_OFFERS = 3;
     private final SkillRepository skillRepository;
     private final SkillMapper skillMapper;
-    private SkillOfferRepository skillOfferRepository;
-    private UserRepository userRepository;
+    private final SkillOfferRepository skillOfferRepository;
+    private final UserRepository userRepository;
 
     public SkillDto create(SkillDto skillDto) {
         if (skillRepository.existsByTitle(skillDto.getTitle())) {
@@ -61,15 +61,16 @@ public class SkillService {
         if (skill.isPresent()) {
             throw new IllegalStateException("Скилл уже есть");
         }
-        List<SkillOffer> offers = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
+        List<SkillOffer> offers = skillOfferRepository
+                .findAllOffersOfSkill(skillId, userId);
         if (offers.size() >= MIN_SKILL_OFFERS) {
             skillRepository.assignSkillToUser(skillId, userId);
-            List<Recommendation> authorsRecommendation = new ArrayList<>();
+            List<Recommendation> recommendationList = new ArrayList<>();
             for (SkillOffer offer : offers) {
-                authorsRecommendation.add(offer.getRecommendation());
+                recommendationList.add(offer.getRecommendation());
             }
             User user = userRepository.findUser(userId);
-            user.setRecommendationsReceived(authorsRecommendation);
+            user.setRecommendationsReceived(recommendationList);
             return skillMapper.toDto(offers.get(0).getSkill());
         }
         throw new IllegalArgumentException("Рекомендаций меньше 3");

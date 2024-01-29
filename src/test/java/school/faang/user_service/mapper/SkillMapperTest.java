@@ -22,7 +22,6 @@ class SkillMapperTest {
                 .title("test")
                 .build();
         skillDto = SkillDto.builder()
-                .id(0L)
                 .title("test")
                 .build();
     }
@@ -35,10 +34,7 @@ class SkillMapperTest {
 
     @Test
     void testToEntity() {
-        Skill skill2 =  skill = Skill.builder()
-                .title("test")
-                .build();
         Skill skill1 = skillMapper.toEntity(skillDto);
-        assertEquals(skill2, skill1);
+        assertEquals(skill, skill1);
     }
 }

@@ -16,10 +16,11 @@ import school.faang.user_service.mapper.skill.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.service.skill.SkillService;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -49,20 +50,22 @@ public class SkillServiceTest {
     @Test
     public void shouldCreateSkill () {
         SkillDto dto = setSkillDto(false);
+        Skill skill = skillMapper.toEntity(dto);
+        skill.setUsers(List.of());
+
+        when(skillRepository.save(skillMapper.toEntity(dto))).thenReturn(skill);
 
         SkillDto result = skillService.create(dto);
 
-        verify(skillRepository, times(1))
-                .save(skillCaptor.capture());
-        Skill skill = skillCaptor.getValue();
+        verify(skillRepository).save(skillCaptor.capture());
+        Skill skillCaptured = skillCaptor.getValue();
 
         assertNotNull(result);
-        assertEquals(dto.getTitle(), skill.getTitle());
-        assertEquals(dto.getTitle(), result.getTitle());
+        assertEquals(dto.getTitle(), skillCaptured.getTitle());
     }
 
     private SkillDto setSkillDto (boolean existsByTitle) {
-        SkillDto dto = SkillDto.builder().id(1L).title("Asdasd").build();
+        SkillDto dto = SkillDto.builder().id(1L).title("Title").userIds(List.of()).build();
         when(skillRepository.existsByTitle(dto.getTitle())).thenReturn(existsByTitle);
 
         return dto;

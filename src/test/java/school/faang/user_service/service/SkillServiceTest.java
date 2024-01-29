@@ -32,7 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -149,7 +148,7 @@ public class SkillServiceTest {
     }
 
     @Test
-    public void shouldGetSkillFromOffers() {
+    public void shouldGetSkillFromOffers () {
         Recommendation firstRec = Recommendation.builder()
                 .id(1L)
                 .author(firstUser)
@@ -182,7 +181,7 @@ public class SkillServiceTest {
     }
 
     @Test
-    public void shouldThrowExceptionOnInvalidSkillOffersSize() {
+    public void shouldThrowExceptionOnInvalidSkillOffersSize () {
         doThrow(DataValidationException.class)
                 .when(skillValidator)
                 .validateSkillOffersSize(List.of());
@@ -194,7 +193,7 @@ public class SkillServiceTest {
     }
 
     @Test
-    public void shouldThrowExceptionIfSkillNotExist() {
+    public void shouldThrowExceptionIfSkillNotExist () {
         doThrow(DataValidationException.class)
                 .when(skillValidator)
                 .getSkillIfExists(1L);
@@ -205,7 +204,7 @@ public class SkillServiceTest {
         );
     }
 
-    private SkillDto setSkillDto(boolean existsByTitle) {
+    private SkillDto setSkillDto (boolean existsByTitle) {
         SkillDto dto = SkillDto.builder().id(1L).title("Title").build();
 
         if (!existsByTitle) {
@@ -218,5 +217,5 @@ public class SkillServiceTest {
                     .checkIfSkillExists(dto.getTitle());
         }
         return dto;
-        }
+    }
 }

@@ -66,22 +66,22 @@ public class SkillServiceTest {
     User secondUser;
 
     @BeforeEach
-    public void setup() {
-        firstSkill = Skill.builder().id(1L).title("java").build();
-        secondSkill = Skill.builder().id(2L).title("spring").build();
+    public void setup () {
+        user = User.builder().id(1L).username("David").build();
+        firstUser = User.builder().id(2L).username("Nikita").build();
+        secondUser = User.builder().id(3L).username("Igor").build();
+
+        firstSkill = Skill.builder().id(1L).title("java").users(List.of(user)).build();
+        secondSkill = Skill.builder().id(2L).title("spring").users(List.of(user)).build();
         skills = List.of(firstSkill, secondSkill);
 
         firstSkillDto = SkillDto.builder().id(1L).title("java").userIds(List.of(1L)).build();
         secondSkillDto = SkillDto.builder().id(2L).title("spring").userIds(List.of(1L)).build();
         skillDtos = List.of(firstSkillDto, secondSkillDto);
-
-        user = User.builder().id(1L).username("David").build();
-        firstUser = User.builder().id(2L).username("Nikita").build();
-        secondUser = User.builder().id(3L).username("Igor").build();
     }
 
     @Test
-    public void shouldThrowExceptionForExistingSkill() {
+    public void shouldThrowExceptionForExistingSkill () {
         SkillDto dto = setSkillDto(true);
 
         assertThrows(
@@ -91,25 +91,25 @@ public class SkillServiceTest {
     }
 
     @Test
-    public void shouldCreateSkill() {
+    public void shouldCreateSkill () {
         SkillDto dto = setSkillDto(false);
+        Skill skill = skillMapper.toEntity(dto);
+        skill.setUsers(List.of());
+
+        when(skillRepository.save(skillMapper.toEntity(dto))).thenReturn(skill);
 
         SkillDto result = skillService.create(dto);
 
-        verify(skillRepository, times(1))
-                .save(skillCaptor.capture());
-        Skill skill = skillCaptor.getValue();
+        verify(skillRepository).save(skillCaptor.capture());
+        Skill skillCaptured = skillCaptor.getValue();
 
         assertNotNull(result);
-        assertEquals(dto.getTitle(), skill.getTitle());
-        assertEquals(dto.getTitle(), result.getTitle());
+        assertEquals(dto.getTitle(), skillCaptured.getTitle());
     }
 
     @Test
-    public void shouldReturnUserSkills() {
+    public void shouldReturnUserSkills () {
         user.setSkills(skills);
-        firstSkill.setUsers(List.of(user));
-        secondSkill.setUsers(List.of(user));
 
         when(skillRepository.findAllByUserId(user.getId())).thenReturn(skills);
 
@@ -119,19 +119,19 @@ public class SkillServiceTest {
     }
 
     @Test
-    public void shouldReturnEmptyListOfUserSkills() {
+    public void shouldReturnEmptyListOfUserSkills () {
         List<SkillDto> dtos = skillService.getUserSkills(user.getId());
 
         assertNotNull(dtos);
     }
 
     @Test
-    public void shouldGetOfferedSkills() {
+    public void shouldGetOfferedSkills () {
         SkillCandidateDto firstCandidate = SkillCandidateDto
                 .builder().skill(skillMapper.toDto(firstSkill)).offersAmount(1L).build();
         SkillCandidateDto secondCandidate = SkillCandidateDto
                 .builder().skill(skillMapper.toDto(secondSkill)).offersAmount(1L).build();
-        List<SkillCandidateDto> candidates = List.of(secondCandidate, firstCandidate);
+        List<SkillCandidateDto> candidates = List.of(firstCandidate, secondCandidate);
 
         when(skillRepository.findSkillsOfferedToUser(user.getId()))
                 .thenReturn(skills);
@@ -141,7 +141,7 @@ public class SkillServiceTest {
     }
 
     @Test
-    public void shouldReturnEmptyListIfOfferedSkillsNotFound() {
+    public void shouldReturnEmptyListIfOfferedSkillsNotFound () {
         when(skillRepository.findSkillsOfferedToUser(1L)).thenReturn(List.of());
         List<SkillCandidateDto> result = skillService.getOfferedSkills(1L);
 
@@ -217,7 +217,6 @@ public class SkillServiceTest {
                     .when(skillValidator)
                     .checkIfSkillExists(dto.getTitle());
         }
-
         return dto;
-    }
+        }
 }

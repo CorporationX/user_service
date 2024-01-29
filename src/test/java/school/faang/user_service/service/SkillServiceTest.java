@@ -11,6 +11,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.skill.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
@@ -62,6 +63,33 @@ public class SkillServiceTest {
 
         assertNotNull(result);
         assertEquals(dto.getTitle(), skillCaptured.getTitle());
+    }
+
+    @Test
+    public void shouldReturnUserSkills () {
+        Skill firstSkill = Skill.builder().id(1L).title("java").build();
+        Skill secondSkill = Skill.builder().id(2L).title("spring").build();
+        List<Skill> skills = List.of(firstSkill, secondSkill);
+        SkillDto firstSkillDto = SkillDto.builder().id(1L).title("java").userIds(List.of(1L)).build();
+        SkillDto secondSkillDto = SkillDto.builder().id(2L).title("spring").userIds(List.of(1L)).build();
+        List<SkillDto> skillDtos = List.of(firstSkillDto, secondSkillDto);
+        User user = User.builder().id(1L).username("David").skills(skills).build();
+        firstSkill.setUsers(List.of(user));
+        secondSkill.setUsers(List.of(user));
+
+        when(skillRepository.findAllByUserId(user.getId())).thenReturn(skills);
+
+        List<SkillDto> result = skillService.getUserSkills(user.getId());
+
+        assertEquals(skillDtos, result);
+    }
+
+    @Test
+    public void shouldReturnEmptyListOfUserSkills () {
+        User user = User.builder().id(1L).username("David").build();
+        List<SkillDto> dtos = skillService.getUserSkills(user.getId());
+
+        assertNotNull(dtos);
     }
 
     private SkillDto setSkillDto (boolean existsByTitle) {

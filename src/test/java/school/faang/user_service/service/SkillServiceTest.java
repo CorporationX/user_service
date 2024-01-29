@@ -50,15 +50,15 @@ public class SkillServiceTest {
 
     @BeforeEach
     public void setup () {
-        firstSkill = Skill.builder().id(1L).title("java").build();
-        secondSkill = Skill.builder().id(2L).title("spring").build();
+        user = User.builder().id(1L).username("David").build();
+
+        firstSkill = Skill.builder().id(1L).title("java").users(List.of(user)).build();
+        secondSkill = Skill.builder().id(2L).title("spring").users(List.of(user)).build();
         skills = List.of(firstSkill, secondSkill);
 
         firstSkillDto = SkillDto.builder().id(1L).title("java").userIds(List.of(1L)).build();
         secondSkillDto = SkillDto.builder().id(2L).title("spring").userIds(List.of(1L)).build();
         skillDtos = List.of(firstSkillDto, secondSkillDto);
-
-        user = User.builder().id(1L).username("David").build();
     }
 
     @Test
@@ -91,8 +91,6 @@ public class SkillServiceTest {
     @Test
     public void shouldReturnUserSkills () {
         user.setSkills(skills);
-        firstSkill.setUsers(List.of(user));
-        secondSkill.setUsers(List.of(user));
 
         when(skillRepository.findAllByUserId(user.getId())).thenReturn(skills);
 
@@ -114,7 +112,7 @@ public class SkillServiceTest {
                 .builder().skill(skillMapper.toDto(firstSkill)).offersAmount(1L).build();
         SkillCandidateDto secondCandidate = SkillCandidateDto
                 .builder().skill(skillMapper.toDto(secondSkill)).offersAmount(1L).build();
-        List<SkillCandidateDto> candidates = List.of(secondCandidate, firstCandidate);
+        List<SkillCandidateDto> candidates = List.of(firstCandidate, secondCandidate);
 
         when(skillRepository.findSkillsOfferedToUser(user.getId()))
                 .thenReturn(skills);

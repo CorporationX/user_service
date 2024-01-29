@@ -30,7 +30,7 @@ public class SkillMapperTest {
 
     @Test
     public void shouldConvertEntityToDto () {
-        Skill skill = Skill.builder().id(1L).title("skill").build();
+        Skill skill = Skill.builder().id(1L).title("skill").users(List.of()).build();
         SkillDto dto = skillMapper.toDto(skill);
 
         assertNotNull(dto);
@@ -53,8 +53,8 @@ public class SkillMapperTest {
 
     @Test
     public void shouldConvertEntityListToDtoList () {
-        Skill firstSkill = Skill.builder().id(1L).title("java").build();
-        Skill secondSkill = Skill.builder().id(2L).title("spring").build();
+        Skill firstSkill = Skill.builder().id(1L).title("java").users(List.of(User.builder().username("david").id(1L).build())).build();
+        Skill secondSkill = Skill.builder().id(2L).title("spring").users(List.of(User.builder().username("mark").id(2L).build())).build();
         List<Skill> skills = List.of(firstSkill, secondSkill);
         List<SkillDto> dtos = skillMapper.listToDto(skills);
 

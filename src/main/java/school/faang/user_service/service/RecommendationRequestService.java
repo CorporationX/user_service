@@ -28,7 +28,6 @@ public class RecommendationRequestService {
     private final List<FilterRecommendationRequest> filterRecommendationRequestList;
 
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequest) {
-
         if (recommendationRequest.getRequesterId() == null || recommendationRequest.getReceiverId() == null)
             throw new UserNotFoundException("User not found");
         if (recommendationRequest.getCreatedAt().plusMonths(6).isAfter(recommendationRequest.getUpdatedAt())) {
@@ -58,9 +57,12 @@ public class RecommendationRequestService {
     public List<RecommendationRequestDto> getRequest(RequestFilterDto filter) {
         Stream<RecommendationRequest> recommendationRequests = recommendationRequestRepository.findAll().stream();
         filterRecommendationRequestList.stream()
-                .filter(filterRecommendationRequest -> filterRecommendationRequest.isApplicable(filter))
-                .forEach(filterRecommendationRequest -> filterRecommendationRequest.apply(recommendationRequests, filter));
+                .forEach(filterRecommendationRequest -> {
+                    if (filterRecommendationRequest.isApplicable(filter))
+                        filterRecommendationRequest.apply(recommendationRequests, filter);
+                });
         return recommendationRequestMapper.toDto(recommendationRequests.toList());
     }
 
 }
+

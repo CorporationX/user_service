@@ -16,7 +16,7 @@ import school.faang.user_service.validator.mentorship.MentorshipValidator;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/v1/mentorship")
+@RequestMapping("${endpoint_base.path}/mentorship")
 @RequiredArgsConstructor
 @Validated
 public class MentorshipController {

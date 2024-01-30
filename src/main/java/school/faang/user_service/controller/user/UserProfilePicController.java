@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.service.user.UserProfilePicService;
 
 @RestController
 @RequestMapping("/user")
@@ -15,8 +17,12 @@ import org.springframework.web.multipart.MultipartFile;
 @MultipartConfig(maxFileSize = 1024 * 1024 * 5)
 public class UserProfilePicController {
 
+    private final UserProfilePicService userProfilePicService;
+    private final UserContext userContext;
+
     @PostMapping("/upload-profile-pic")
     public ResponseEntity<String> uploadProfilePic(@RequestParam("file") MultipartFile file) {
+        userProfilePicService.uploadProfilePic(file, userContext.getUserId());
         return ResponseEntity.ok("Users profile picture uploaded successfully");
     }
 }

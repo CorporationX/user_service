@@ -1,4 +1,4 @@
-package school.faang.user_service.controller.mentorship;
+package school.faang.user_service.dto;
 
 import lombok.*;
 
@@ -6,7 +6,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDTO {
+public class UserDto {
     private long id;
     private String username;
 }

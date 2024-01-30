@@ -11,6 +11,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validator.GoalValidator;
@@ -180,5 +181,16 @@ public class GoalValidatorTest {
                 () -> goalValidator.validateByExistingSkills(goal));
 
         assertEquals(dataValidationException.getMessage(), "Some skills do not exist in database!");
+    }
+
+    @Test
+    void testValidateGoalId() {
+        long goalId = 1L;
+        when(goalRepository.existsById(goalId)).thenReturn(false);
+
+        EntityNotFoundException entityNotFoundException = assertThrows(EntityNotFoundException.class,
+                () -> goalValidator.validateGoalId(goalId));
+
+        assertEquals(entityNotFoundException.getMessage(), "Goal with id = 1 is not exists");
     }
 }

@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.validator.GoalValidator;
 
@@ -48,5 +49,27 @@ public class GoalControllerTest {
         goalController.updateGoal(goalId, goalDto);
 
         verify(goalService, times(1)).updateGoal(goalId, goalDto);
+    }
+
+    @Test
+    void testDeleteGoal() {
+        goalController.deleteGoal(1L);
+        verify(goalService, times(1)).deleteGoal(1L);
+    }
+
+    @Test
+    void testGetGoalsByUser() {
+        Long userId = 1L;
+        GoalFilterDto filter = new GoalFilterDto();
+        goalController.getGoalsByUser(userId, filter);
+        verify(goalService, times(1)).findGoalsByUser(userId, filter);
+    }
+
+    @Test
+    void testFindSubtasksByGoalId() {
+        long goalId = 1L;
+        GoalFilterDto filter = new GoalFilterDto();
+        goalController.findSubtasksByGoalId(goalId, filter);
+        verify(goalService, times(1)).findSubtasksByGoalId(goalId, filter);
     }
 }

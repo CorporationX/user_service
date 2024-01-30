@@ -3,6 +3,7 @@ package school.faang.user_service.validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
@@ -21,7 +22,7 @@ public class GoalValidator {
     private static final int MAX_ACTIVE_GOALS = 3;
     private final GoalRepository goalRepository;
     private final SkillRepository skillRepository;
-
+    private final UserRepository userRepository;
 
     public Boolean isValidateByActiveGoals(Long userId) {
         if (goalRepository.countActiveGoalsPerUser(userId) <= MAX_ACTIVE_GOALS) {
@@ -63,6 +64,21 @@ public class GoalValidator {
     public void validateByCompleted(Goal goal) {
         if (goal.getStatus() == GoalStatus.COMPLETED) {
             throw new DataValidationException("Goal was completed!");
+        }
+    }
+
+    public void validateUserIdAndFilter(Long userId, GoalFilterDto filter) {
+        if (userId == null) {
+            throw new DataValidationException("User ID is null!");
+        }
+        if (filter == null) {
+            throw new DataValidationException("Filter is null!");
+        }
+    }
+
+    public void validateGoalId(long goalId) {
+        if (!goalRepository.existsById(goalId)) {
+            throw new EntityNotFoundException("Goal with id = " + goalId + " is not exists");
         }
     }
 }

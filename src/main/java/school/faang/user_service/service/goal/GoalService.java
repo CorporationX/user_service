@@ -71,4 +71,13 @@ public class GoalService {
     public List<Goal> getGoalsByUserId(Long userId) {
         return goalRepository.findGoalsByUserId(userId).collect(Collectors.toList());
     }
+
+    public List<GoalDto> findSubtasksByGoalId(long goalId, GoalFilterDto filter) {
+        List<Goal> goals = goalRepository.findByParent(goalId).collect(Collectors.toList());
+
+        goalFilters.stream()
+                .filter(f -> f.isApplicable(filter))
+                .forEach(f -> f.apply(goals, filter));
+        return goals.stream().map(goalMapper::toDto).toList();
+    }
 }

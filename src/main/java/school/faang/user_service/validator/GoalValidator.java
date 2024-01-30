@@ -66,4 +66,10 @@ public class GoalValidator {
             throw new DataValidationException("Filter is null!");
         }
     }
+
+    public void validateGoalId(long goalId) {
+        if (!goalRepository.existsById(goalId)) {
+            throw new EntityNotFoundException("Goal with id = " + goalId + " is not exists");
+        }
+    }
 }

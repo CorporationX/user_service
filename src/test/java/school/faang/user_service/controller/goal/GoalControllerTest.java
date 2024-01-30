@@ -64,4 +64,12 @@ public class GoalControllerTest {
         goalController.getGoalsByUser(userId, filter);
         verify(goalService, times(1)).findGoalsByUser(userId, filter);
     }
+
+    @Test
+    void testFindSubtasksByGoalId() {
+        long goalId = 1L;
+        GoalFilterDto filter = new GoalFilterDto();
+        goalController.findSubtasksByGoalId(goalId, filter);
+        verify(goalService, times(1)).findSubtasksByGoalId(goalId, filter);
+    }
 }

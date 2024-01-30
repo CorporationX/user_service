@@ -4,7 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.skill.SkillDto;
+import school.faang.user_service.dto.goal.GoalFilterDto;
+import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
+import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.skill.SkillService;
 
@@ -51,5 +57,41 @@ public class GoalValidator {
         long countActiveGoals = goalRepository.countActiveGoalsPerUser(userId);
         validateExistingSkills(userSkillsIds, goalDto);
         validateActiveGoals(countActiveGoals);
+    }
+    public void validateTitleAndGoalId(Long goalId, GoalDto goal) {
+        String title = goal.getTitle();
+        if (title == null || title.isBlank()) {
+            throw new DataValidationException("Title is empty!");
+        }
+        if (goalId == null) {
+            throw new DataValidationException("Goal ID is null!");
+        }
+    }
+
+    public void validateByExistingSkills(Goal goal) {
+        if (!goal.getSkillsToAchieve().stream().allMatch(s -> skillRepository.existsByTitle(s.getTitle()))) {
+            throw new DataValidationException("Some skills do not exist in database!");
+        }
+    }
+
+    public void validateByCompleted(Goal goal) {
+        if (goal.getStatus() == GoalStatus.COMPLETED) {
+            throw new DataValidationException("Goal was completed!");
+        }
+    }
+
+    public void validateUserIdAndFilter(Long userId, GoalFilterDto filter) {
+        if (userId == null) {
+            throw new DataValidationException("User ID is null!");
+        }
+        if (filter == null) {
+            throw new DataValidationException("Filter is null!");
+        }
+    }
+
+    public void validateGoalId(long goalId) {
+        if (!goalRepository.existsById(goalId)) {
+            throw new EntityNotFoundException("Goal with id = " + goalId + " is not exists");
+        }
     }
 }

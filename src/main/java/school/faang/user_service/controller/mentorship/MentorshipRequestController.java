@@ -14,8 +14,8 @@ public class MentorshipRequestController {
     private final MentorshipRequestService mentorshipRequestService;
     private final MentorshipRequestValidator mentorshipRequestValidator;
 
-    private void requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
+    private MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         mentorshipRequestValidator.commonCheck(mentorshipRequestDto);
-        mentorshipRequestService.requestMentorship(mentorshipRequestDto);
+        return mentorshipRequestService.requestMentorship(mentorshipRequestDto);
     }
 }

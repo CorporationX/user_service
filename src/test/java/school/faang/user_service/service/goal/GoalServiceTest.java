@@ -16,6 +16,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.exceptions.GoalOverflowException;
 import school.faang.user_service.exceptions.SkillNotFoundException;
 import school.faang.user_service.filter.goal.GoalFilter;
@@ -58,6 +59,8 @@ class GoalServiceTest {
     Goal goal4;
     Goal goal5;
     Goal goal6;
+    Goal goalUp;
+    Goal goalUp1;
     User user;
     User user2;
     User user3;
@@ -70,6 +73,8 @@ class GoalServiceTest {
     GoalDto goalDto4;
     GoalDto goalDto5;
     GoalDto goalDto6;
+    GoalDto goalUpDto;
+    GoalDto goalUpDto1;
     GoalFilterDto goalFilterDto;
     Stream<Goal> goals;
     Stream<Goal> goals1;
@@ -129,7 +134,32 @@ class GoalServiceTest {
                 .parent(goal4)
                 .title("Java")
                 .build();
-
+        goalUp = Goal.builder()
+                .id(111L)
+                .status(GoalStatus.COMPLETED)
+                .title("Hibernate")
+                .description("Optional")
+                .skillsToAchieve(Arrays.asList(skill1, skill2, skill3))
+                .build();
+        goalUp1 = Goal.builder()
+                .id(222L)
+                .status(GoalStatus.ACTIVE)
+                .title("Hibernate")
+                .description("Optional")
+                .skillsToAchieve(Arrays.asList(skill1, skill2, skill3))
+                .build();
+        goalUpDto = GoalDto.builder()
+                .id(111L)
+                .status(GoalStatus.COMPLETED)
+                .title("Hibernate")
+                .description("Optional")
+                .build();
+        goalUpDto1 = GoalDto.builder()
+                .id(222L)
+                .status(GoalStatus.COMPLETED)
+                .title("Hibernate")
+                .description("Optional")
+                .build();
         goalDto1 = GoalDto.builder()
                 .id(1L)
                 .title("title")
@@ -145,8 +175,8 @@ class GoalServiceTest {
 
         goalDto3 = GoalDto.builder()
                 .id(3L)
-                .title("t")
-                .description("d")
+                .title("terqqe")
+                .description("deork")
                 .parentId(1L)
                 .build();
 
@@ -304,7 +334,7 @@ class GoalServiceTest {
         when(filters.stream()).thenReturn(filterStream);
         when(goalRepository.findByParent(user6.getId())).thenReturn(goals2);
 
-        List<GoalDto> actualGoals = goalService.findSubtasksByGoalId(user6.getId(), goalFilterDto);
+        List<GoalDto> actualGoals = goalService.retrieveFilteredSubtasksForGoal(user6.getId(), goalFilterDto);
         List<GoalDto> expectedGoals = Collections.singletonList(goalDto4);
 
         assertTrue(expectedGoals.size() == actualGoals.size()
@@ -314,8 +344,20 @@ class GoalServiceTest {
     @Test
     @DisplayName("Test return an empty sheet if there are no matches in the filters")
     public void testReturningEmptyListSubtasksWhenTheFiltersNotWork() {
-        List<GoalDto> actualGoals = goalService.findSubtasksByGoalId(anyLong(), goalFilterDto);
+        List<GoalDto> actualGoals = goalService.retrieveFilteredSubtasksForGoal(anyLong(), goalFilterDto);
 
         assertTrue(actualGoals.isEmpty());
+    }
+
+    @Test
+    public void testUpdateCompletedGoalThrowsDataValidationException() {
+        when(goalRepository.findGoalById(anyLong())).thenReturn(Optional.of(goalUp));
+        assertThrows(DataValidationException.class, () -> goalService.updateGoal(goalUp.getId(), goalUpDto));
+    }
+
+    @Test
+    public void testThrowExceptionWhenCompletingGoalWithInactiveSkills() {
+        when(goalRepository.findGoalById(anyLong())).thenReturn(Optional.of(goalUp1));
+        assertThrows(DataValidationException.class, () -> goalService.updateGoal(goalUp1.getId(), goalUpDto1));
     }
 }

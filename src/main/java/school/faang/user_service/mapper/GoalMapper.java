@@ -31,7 +31,7 @@ public interface GoalMapper {
 
     @Named("mapToSkillLong")
     default List<Skill> mapToSkillLong(List<Long> skillId) {
-        if(skillId!= null){
+        if (skillId != null) {
             return skillId.stream()
                     .map(id -> {
                         Skill skill = new Skill();
@@ -42,4 +42,6 @@ public interface GoalMapper {
         }
         return Collections.emptyList();
     }
+
+    void updateFromDto (GoalDto dto, @MappingTarget Goal entity);
 }

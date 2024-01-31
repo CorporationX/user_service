@@ -61,7 +61,8 @@ class GoalControllerTest {
 
     @Test
     public void testGoalsByUserThrowsDataValidationException() {
-        assertThrows(DataValidationException.class, () -> goalController.getGoalsByUser(null, goalFilterDto));
+        assertThrows(DataValidationException.class,
+                () -> goalController.getGoalsByUser(null, goalFilterDto));
     }
 
     @Test
@@ -74,19 +75,21 @@ class GoalControllerTest {
 
     @Test
     public void testFindSubtasksByGoalIdThrowsDataValidationException() {
-        assertThrows(DataValidationException.class, () -> goalController.findSubtasksByGoalId(null, goalFilterDto));
+        assertThrows(DataValidationException.class,
+                () -> goalController.retrieveFilteredSubtasksForGoal(null, goalFilterDto));
     }
 
     @Test
     public void testSuccessfullyFindSubtasksByGoalIdAndFilters() {
-        when(goalController.findSubtasksByGoalId(1L, goalFilterDto)).thenReturn(goalsDto);
-        goalController.findSubtasksByGoalId(1L, goalFilterDto);
+        when(goalController.retrieveFilteredSubtasksForGoal(1L, goalFilterDto)).thenReturn(goalsDto);
+        goalController.retrieveFilteredSubtasksForGoal(1L, goalFilterDto);
 
-        verify(goalService, times(1)).findSubtasksByGoalId(1L, goalFilterDto);
+        verify(goalService, times(1)).retrieveFilteredSubtasksForGoal(1L, goalFilterDto);
     }
 
     @Test
     public void testFindSubtasksByGoalIdAndFiltersThrowsDataValidationException() {
-        assertThrows(DataValidationException.class, () -> goalController.findSubtasksByGoalId(null, goalFilterDto));
+        assertThrows(DataValidationException.class,
+                () -> goalController.retrieveFilteredSubtasksForGoal(null, goalFilterDto));
     }
 }

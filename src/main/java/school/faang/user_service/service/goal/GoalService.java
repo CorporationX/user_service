@@ -8,6 +8,8 @@ import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.exceptions.GoalOverflowException;
 import school.faang.user_service.exceptions.SkillNotFoundException;
 import school.faang.user_service.filter.goal.GoalFilter;
@@ -23,6 +25,8 @@ import java.util.stream.Stream;
 @Service
 @RequiredArgsConstructor
 public class GoalService {
+    private final int MAX_ACTIVE_GOALS = 3;
+
     private final GoalRepository goalRepository;
     private final UserRepository userRepository;
     private final SkillService skillService;
@@ -35,24 +39,9 @@ public class GoalService {
 
     public void createGoal(long userId, Goal goal) {
         User user = getUser(userId);
-        boolean isExistingSkill = checkExistingSkill(goal);
-
-        if (user.getGoals().size() < 3 && isExistingSkill) {
-            goalRepository.create(goal.getTitle(), goal.getDescription(), goal.getParent().getId());
-            List<Skill> skills = goal.getSkillsToAchieve().stream()
-                    .peek(skill -> skill.getGoals().add(goal))
-                    .toList();
-            skillService.saveAll(skills);
-        } else if (user.getGoals().size() >= 3) {
-            throw new GoalOverflowException("Maximum goal limit exceeded. Only 3 goals are allowed.");
-        } else {
-            throw new SkillNotFoundException("Skill not exist");
-        }
-    }
-
-    public List<GoalDto> getGoalsByUser(long userId, GoalFilterDto goalFilterDto) {
-        Stream<Goal> goals = goalRepository.findGoalsByUserId(userId);
-        return applyFilterAndMapToDto(goalFilterDto, goals);
+        validateGoalCreation(user, goal);
+        goalRepository.create(goal.getTitle(), goal.getDescription(), goal.getParent().getId());
+        saveGoalSkills(goal);
     }
 
     public List<GoalDto> findSubtasksByGoalId(long goalId) {
@@ -63,9 +52,43 @@ public class GoalService {
                 .toList();
     }
 
-    public List<GoalDto> findSubtasksByGoalId(long goalId, GoalFilterDto goalFilterDto) {
+    public List<GoalDto> retrieveFilteredSubtasksForGoal(long goalId, GoalFilterDto goalFilterDto) {
         Stream<Goal> goalParents = goalRepository.findByParent(goalId);
         return applyFiltersToGoalsAndSort(goalFilterDto, goalParents);
+    }
+
+    public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
+        Goal goalToUpdate = goalRepository.findGoalById(goalId)
+                .orElseThrow(() -> new EntityNotFoundException("Goal not found with id: " + goalId));
+
+        if (goalToUpdate.getStatus().equals(GoalStatus.COMPLETED)) {
+            throw new DataValidationException("The goal was completed earlier");
+        }
+
+        if (goalDto.getStatus().equals(GoalStatus.COMPLETED) && !allGoalSkillsActive(goalToUpdate)) {
+            throw new DataValidationException("The goal cannot be completed, the goal has inactive skills");
+        }
+
+        if (goalDto.getStatus().equals(GoalStatus.COMPLETED)) {
+            List<Skill> skills = skillService.findSkillsByGoalId(goalToUpdate.getId());
+            updateOfSkills(goalToUpdate, skills);
+            List<User> users = goalRepository.findUsersByGoalId(goalToUpdate.getId());
+        }
+        goalMapper.updateFromDto(goalDto, goalToUpdate);
+        goalRepository.save(goalToUpdate);
+        return goalDto = goalMapper.toDto(goalToUpdate);
+    }
+
+    public List<GoalDto> getGoalsByUser(long userId, GoalFilterDto goalFilterDto) {
+        Stream<Goal> goals = goalRepository.findGoalsByUserId(userId);
+        return applyFilterAndMapToDto(goalFilterDto, goals);
+    }
+
+    private void updateOfSkills(Goal goal, List<Skill> skills) {
+        skillService.deleteAllSkills(goal.getSkillsToAchieve());
+        goal.setSkillsToAchieve(skills);
+        goal.getUsers().forEach(user -> user.setSkills(skills));
+        goal.setSkillsToAchieve(skills);
     }
 
     private User getUser(long userId) {
@@ -73,7 +96,16 @@ public class GoalService {
                 .orElseThrow(() -> new EntityNotFoundException("User is not found"));
     }
 
-    private boolean checkExistingSkill(Goal goal) {
+    private void validateGoalCreation(User user, Goal goal) {
+        if (user.getGoals().size() >= MAX_ACTIVE_GOALS) {
+            throw new GoalOverflowException("Maximum goal limit exceeded. Only " + MAX_ACTIVE_GOALS + " goals are allowed.");
+        }
+        if (!allGoalSkillsActive(goal)) {
+            throw new SkillNotFoundException("Skill not exist");
+        }
+    }
+
+    private boolean allGoalSkillsActive(Goal goal) {
         return goal.getSkillsToAchieve().stream()
                 .map(Skill::getId)
                 .allMatch(skillService::checkActiveSkill);
@@ -94,5 +126,12 @@ public class GoalService {
                 .flatMap(goalFilter -> goalFilter.applyFilter(goals, goalFilterDto))
                 .map(goalMapper::toDto)
                 .toList();
+    }
+
+    private void saveGoalSkills(Goal goal) {
+        List<Skill> skills = goal.getSkillsToAchieve().stream()
+                .peek(skill -> skill.getGoals().add(goal))
+                .toList();
+        skillService.saveAll(skills);
     }
 }

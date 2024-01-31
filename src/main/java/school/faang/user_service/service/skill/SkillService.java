@@ -20,4 +20,12 @@ public class SkillService {
     public void saveAll(List<Skill> list) {
         skillRepository.saveAll(list);
     }
+
+    public List<Skill> findSkillsByGoalId(long goalId) {
+         return skillRepository.findSkillsByGoalId(goalId);
+    }
+
+    public void deleteAllSkills(List<Skill> skills) {
+        skillRepository.deleteAll(skills);
+    }
 }

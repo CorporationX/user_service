@@ -92,4 +92,11 @@ class GoalControllerTest {
         assertThrows(DataValidationException.class,
                 () -> goalController.retrieveFilteredSubtasksForGoal(null, goalFilterDto));
     }
+
+    @Test
+    public void testUpdateByGoalIdAndFiltersThrowsDataValidationException() {
+        GoalDto goalDto = new GoalDto();
+        assertThrows(DataValidationException.class,
+                () -> goalController.updateGoal(1L, goalDto));
+    }
 }

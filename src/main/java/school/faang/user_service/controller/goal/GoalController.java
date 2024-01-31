@@ -22,7 +22,7 @@ public class GoalController {
 
     public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter) {
         validateId(userId);
-        return goalService. getGoalsByUser(userId, filter);
+        return goalService.getGoalsByUser(userId, filter);
     }
 
     public List<GoalDto> findSubtasksByGoalId(Long goalId) {
@@ -33,14 +33,18 @@ public class GoalController {
     public List<GoalDto> retrieveFilteredSubtasksForGoal(Long goalId, GoalFilterDto goalFilterDto) {
         validateId(goalId);
         return goalService.retrieveFilteredSubtasksForGoal(goalId, goalFilterDto);
-    }//retrieveFilteredSubtasksForGoal        ПЕРЕИМЕНННОВАТЬ
+    }
 
     public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
         validateId(goalId);
-        if(goalDto.getTitle() == null || goalDto.getTitle().isBlank()){
+        validateTitle(goalDto);
+        return goalService.updateGoal(goalId, goalDto);
+    }
+
+    private void validateTitle(GoalDto goalDto) {
+        if (goalDto.getTitle() == null || goalDto.getTitle().isBlank()) {
             throw new DataValidationException("Invalid title: " + goalDto.getTitle());
         }
-       return  goalService.updateGoal(goalId,goalDto);
     }
 
     private void validateId(Long id) {

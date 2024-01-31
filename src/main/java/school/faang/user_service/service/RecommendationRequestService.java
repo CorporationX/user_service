@@ -14,6 +14,7 @@ import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -56,12 +57,15 @@ public class RecommendationRequestService {
 
     public List<RecommendationRequestDto> getRequest(RequestFilterDto filter) {
         Stream<RecommendationRequest> recommendationRequests = recommendationRequestRepository.findAll().stream();
-        filterRecommendationRequestList.stream()
-                .forEach(filterRecommendationRequest -> {
-                    if (filterRecommendationRequest.isApplicable(filter))
-                        filterRecommendationRequest.apply(recommendationRequests, filter);
-                });
-        return recommendationRequestMapper.toDto(recommendationRequests.toList());
+        for (FilterRecommendationRequest filterRecommendationRequest : filterRecommendationRequestList) {
+            if (filterRecommendationRequest.isApplicable(filter))
+                recommendationRequests = filterRecommendationRequest.apply(recommendationRequests, filter);
+        }
+        List<RecommendationRequestDto> recommendationRequestDtos = new ArrayList<>();
+        for (RecommendationRequest requests : recommendationRequests.toList()) {
+            recommendationRequestDtos.add(recommendationRequestMapper.toDto(requests));
+        }
+        return recommendationRequestDtos;
     }
 
 }

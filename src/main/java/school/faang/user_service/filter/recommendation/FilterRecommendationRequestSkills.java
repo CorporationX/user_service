@@ -11,11 +11,11 @@ import java.util.stream.Stream;
 public class FilterRecommendationRequestSkills implements FilterRecommendationRequest {
     @Override
     public boolean isApplicable(RequestFilterDto requestFilterDto) {
-        return requestFilterDto.getSkills()!= null;
+        return requestFilterDto.getSkills() != null;
     }
 
     @Override
-    public void apply(Stream<RecommendationRequest> recommendationRequestStream, RequestFilterDto filterDto) {
-        recommendationRequestStream.filter(request -> request.getSkills().equals(filterDto.getSkills()));
+    public Stream<RecommendationRequest> apply(Stream<RecommendationRequest> recommendationRequestStream, RequestFilterDto filterDto) {
+        return recommendationRequestStream.filter(request -> request.getSkills().equals(filterDto.getSkills()));
     }
 }

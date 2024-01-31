@@ -25,17 +25,17 @@ public class RecommendationRequestControllerTest {
     private RecommendationRequestController recommendationRequestController;
 
     @Test
-    void messageNotNullTest() {
+    void testMessageNotNull() {
         Assert.assertThrows(MessageRequestException.class, ()-> recommendationRequestController.requestRecommendation(new RecommendationRequestDto(5L, null, "status", new ArrayList<SkillRequestDto>(), 5L, 6L, LocalDateTime.now(), LocalDateTime.now().plusMonths(7))));
     }
 
     @Test
-    void messageNotBlankTest() {
+    void testMessageNotBlank() {
         Assert.assertThrows(MessageRequestException.class, ()-> recommendationRequestController.requestRecommendation(new RecommendationRequestDto(5L, " ", "status", new ArrayList<SkillRequestDto>(), 5L, 6L, LocalDateTime.now(), LocalDateTime.now().plusMonths(7))));
     }
 
     @Test
-    void messageNotEmptyTest() {
+    void testMessageNotEmpty() {
         Assert.assertThrows(MessageRequestException.class, ()-> recommendationRequestController.requestRecommendation(new RecommendationRequestDto(5L, "", "status", new ArrayList<SkillRequestDto>(), 5L, 6L, LocalDateTime.now(), LocalDateTime.now().plusMonths(7))));
     }
 }

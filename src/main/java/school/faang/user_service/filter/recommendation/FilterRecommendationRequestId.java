@@ -15,7 +15,7 @@ public class FilterRecommendationRequestId implements FilterRecommendationReques
     }
 
     @Override
-    public void apply(Stream<RecommendationRequest> recommendationRequestStream, RequestFilterDto filterDto) {
-        recommendationRequestStream.filter(request -> request.getId() == filterDto.getId());
+    public Stream<RecommendationRequest> apply(Stream<RecommendationRequest> recommendationRequestStream, RequestFilterDto filterDto) {
+        return recommendationRequestStream.filter(request -> request.getId() == filterDto.getId());
     }
 }

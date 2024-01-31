@@ -15,7 +15,7 @@ public class FilterRecommendationRequestMessage implements FilterRecommendationR
     }
 
     @Override
-    public void apply(Stream<RecommendationRequest> recommendationRequestStream, RequestFilterDto filterDto) {
-        recommendationRequestStream.filter(request -> request.getMessage().equals(filterDto.getMessage()));
+    public Stream<RecommendationRequest> apply(Stream<RecommendationRequest> recommendationRequestStream, RequestFilterDto filterDto) {
+        return recommendationRequestStream.filter(request -> request.getMessage().equals(filterDto.getMessage()));
     }
 }

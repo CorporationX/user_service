@@ -169,10 +169,9 @@ public class SkillServiceTest {
                 .skill(secondSkill)
                 .recommendation(secondRec)
                 .build();
-        List<SkillOffer> offers = List.of(firstOffer, secondOffer);
+        List<SkillOffer> offers = List.of(firstOffer, secondOffer, firstOffer);
 
-        when(skillRepository.findUserSkill(1L, 1L))
-                .thenReturn(Optional.of(firstSkill));
+        when(skillRepository.findById(1L)).thenReturn(Optional.of(firstSkill));
         when(skillOfferRepository.findAllOffersOfSkill(1L, 1L))
                 .thenReturn(offers);
 
@@ -181,11 +180,20 @@ public class SkillServiceTest {
     }
 
     @Test
-    public void shouldThrowExceptionOnInvalidSkillOffersSize () {
-        doThrow(DataValidationException.class)
-                .when(skillValidator)
-                .validateSkillOffersSize(List.of());
+    public void shouldThrowExceptionIfUserHasSkill () {
+        firstUser.setSkills(skills);
 
+        when(skillRepository.findUserSkill(firstSkill.getId(), firstUser.getId()))
+                .thenReturn(Optional.of(firstSkill));
+
+        assertThrows(
+                DataValidationException.class,
+                () -> skillService.acquireSkillFromOffers(firstSkill.getId(), firstUser.getId())
+        );
+    }
+
+    @Test
+    public void shouldThrowExceptionOnInvalidSkillOffersSize () {
         assertThrows(
                 DataValidationException.class,
                 () -> skillService.acquireSkillFromOffers(1L, 1L)
@@ -195,8 +203,8 @@ public class SkillServiceTest {
     @Test
     public void shouldThrowExceptionIfSkillNotExist () {
         doThrow(DataValidationException.class)
-                .when(skillValidator)
-                .getSkillIfExists(1L);
+                .when(skillRepository)
+                .findById(1L);
 
         assertThrows(
                 DataValidationException.class,

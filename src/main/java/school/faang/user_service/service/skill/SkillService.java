@@ -39,11 +39,13 @@ public class SkillService {
         Skill skill = skillRepository.findUserSkill(skillId, userId).orElse(null);
         List<SkillOffer> offers = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
 
-        skillValidator.validateSkillOffersSize(offers);
-
-        if (skill == null) {
-            skill = skillValidator.getSkillIfExists(skillId);
+        if (skill != null) {
+            throw new DataValidationException("User already has this skill");
+        } else {
+            skill = getSkillIfExists(skillId);
         }
+
+        skillValidator.validateSkillOffersSize(offers);
 
         skillRepository.assignSkillToUser(skillId, userId);
         setSkillGuarantees(offers, skill, userId);
@@ -86,5 +88,11 @@ public class SkillService {
 
             userSkillGuaranteeRepository.save(guarantor);
         }
+    }
+
+    private Skill getSkillIfExists(Long skillId) {
+        return skillRepository.findById(skillId).orElseThrow(
+                () -> new DataValidationException("Skill doesn't exist!")
+        );
     }
 }

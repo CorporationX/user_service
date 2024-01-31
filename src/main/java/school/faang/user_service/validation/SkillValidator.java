@@ -2,7 +2,6 @@ package school.faang.user_service.validation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
@@ -25,11 +24,5 @@ public class SkillValidator {
         if (offers.size() < MIN_SKILL_OFFERS) {
             throw new DataValidationException("Not enough offers");
         }
-    }
-
-    public Skill getSkillIfExists(Long skillId) {
-        return skillRepository.findById(skillId).orElseThrow(
-                () -> new DataValidationException("Skill doesn't exist!")
-        );
     }
 }

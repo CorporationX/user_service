@@ -6,7 +6,6 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.filter.GoalFilter;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * @author Ilia Chuvatkin

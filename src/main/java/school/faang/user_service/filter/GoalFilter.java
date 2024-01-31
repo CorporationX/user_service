@@ -4,7 +4,6 @@ import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * @author Ilia Chuvatkin

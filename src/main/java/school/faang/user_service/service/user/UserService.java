@@ -18,9 +18,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     @Value("${dicebear.pic-base-url}")
-    private final String avatarBaseUrl;
+    private String avatarBaseUrl;
     @Value("${dicebear.pic-base-url-small}")
-    private final String smallAvatarBaseUrl;
+    private String smallAvatarBaseUrl;
 
     public UserDto createUser(UserDto userDto) {
         //some actions

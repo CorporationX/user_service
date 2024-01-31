@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.skill.SkillService;
@@ -26,6 +27,11 @@ public class SkillController {
     @GetMapping("/skill/{userId}")
     public List<SkillDto> getUserSkills (@PathVariable long userId) {
         return skillService.getUserSkills(userId);
+    }
+
+    @GetMapping("/skill/{userId}/offered")
+    public List<SkillCandidateDto> getOfferedSkills (@PathVariable long userId) {
+        return skillService.getOfferedSkills(userId);
     }
 
     private void validateSkill (String skillTitle) {

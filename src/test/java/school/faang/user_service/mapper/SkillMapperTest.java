@@ -1,12 +1,8 @@
 package school.faang.user_service.mapper;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mapstruct.factory.Mappers;
+import org.mockito.Spy;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
@@ -17,16 +13,9 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@ContextConfiguration(classes = SkillMapperTest.SkillMapperTestConfig.class)
-@ExtendWith(SpringExtension.class)
 public class SkillMapperTest {
-
-    @Configuration
-    @ComponentScan(basePackageClasses = SkillMapperTest.class)
-    public static class SkillMapperTestConfig {}
-
-    @Autowired
-    private SkillMapper skillMapper;
+    @Spy
+    private SkillMapper skillMapper = Mappers.getMapper(SkillMapper.class);
 
     @Test
     public void shouldConvertEntityToDto () {

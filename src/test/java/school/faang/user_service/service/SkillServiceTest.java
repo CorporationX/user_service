@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -9,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
@@ -37,6 +39,27 @@ public class SkillServiceTest {
 
     @Captor
     ArgumentCaptor<Skill> skillCaptor;
+
+    Skill firstSkill;
+    Skill secondSkill;
+    List<Skill> skills;
+    SkillDto firstSkillDto;
+    SkillDto secondSkillDto;
+    List<SkillDto> skillDtos;
+    User user;
+
+    @BeforeEach
+    public void setup () {
+        user = User.builder().id(1L).username("David").build();
+
+        firstSkill = Skill.builder().id(1L).title("java").users(List.of(user)).build();
+        secondSkill = Skill.builder().id(2L).title("spring").users(List.of(user)).build();
+        skills = List.of(firstSkill, secondSkill);
+
+        firstSkillDto = SkillDto.builder().id(1L).title("java").userIds(List.of(1L)).build();
+        secondSkillDto = SkillDto.builder().id(2L).title("spring").userIds(List.of(1L)).build();
+        skillDtos = List.of(firstSkillDto, secondSkillDto);
+    }
 
     @Test
     public void shouldThrowExceptionForExistingSkill () {
@@ -67,15 +90,7 @@ public class SkillServiceTest {
 
     @Test
     public void shouldReturnUserSkills () {
-        Skill firstSkill = Skill.builder().id(1L).title("java").build();
-        Skill secondSkill = Skill.builder().id(2L).title("spring").build();
-        List<Skill> skills = List.of(firstSkill, secondSkill);
-        SkillDto firstSkillDto = SkillDto.builder().id(1L).title("java").userIds(List.of(1L)).build();
-        SkillDto secondSkillDto = SkillDto.builder().id(2L).title("spring").userIds(List.of(1L)).build();
-        List<SkillDto> skillDtos = List.of(firstSkillDto, secondSkillDto);
-        User user = User.builder().id(1L).username("David").skills(skills).build();
-        firstSkill.setUsers(List.of(user));
-        secondSkill.setUsers(List.of(user));
+        user.setSkills(skills);
 
         when(skillRepository.findAllByUserId(user.getId())).thenReturn(skills);
 
@@ -86,10 +101,32 @@ public class SkillServiceTest {
 
     @Test
     public void shouldReturnEmptyListOfUserSkills () {
-        User user = User.builder().id(1L).username("David").build();
         List<SkillDto> dtos = skillService.getUserSkills(user.getId());
 
         assertNotNull(dtos);
+    }
+
+    @Test
+    public void shouldGetOfferedSkills () {
+        SkillCandidateDto firstCandidate = SkillCandidateDto
+                .builder().skill(skillMapper.toDto(firstSkill)).offersAmount(1L).build();
+        SkillCandidateDto secondCandidate = SkillCandidateDto
+                .builder().skill(skillMapper.toDto(secondSkill)).offersAmount(1L).build();
+        List<SkillCandidateDto> candidates = List.of(firstCandidate, secondCandidate);
+
+        when(skillRepository.findSkillsOfferedToUser(user.getId()))
+                .thenReturn(skills);
+
+        List<SkillCandidateDto> result = skillService.getOfferedSkills(user.getId());
+        assertEquals(candidates, result);
+    }
+
+    @Test
+    public void shouldReturnEmptyListIfOfferedSkillsNotFound () {
+        when(skillRepository.findSkillsOfferedToUser(1L)).thenReturn(List.of());
+        List<SkillCandidateDto> result = skillService.getOfferedSkills(1L);
+
+        assertEquals(List.of(), result);
     }
 
     private SkillDto setSkillDto (boolean existsByTitle) {

@@ -8,11 +8,15 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.dto.SkillRequestDto;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.exception.RejectFailException;
 import school.faang.user_service.exception.RequestNotFoundException;
 import school.faang.user_service.exception.RequestTimeOutException;
 import school.faang.user_service.exception.SkillsNotFoundException;
@@ -31,6 +35,7 @@ import school.faang.user_service.service.RecommendationRequestService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -62,6 +67,8 @@ public class RecommendationRequestServiceTest {
     private LocalDateTime localDateTime2;
     private List<RecommendationRequest> recommendationRequests;
     private List<FilterRecommendationRequest> filterRecommendationRequests;
+    private RejectionDto rejectionDto;
+    RecommendationRequest requestForRejected;
 
     @BeforeEach
     void setUp() {
@@ -84,6 +91,9 @@ public class RecommendationRequestServiceTest {
         secondRecommendationRequest.setUpdatedAt(LocalDateTime.now().plusMonths(7));
 
         recommendationRequests = List.of(firstRecommendationRequest, secondRecommendationRequest);
+
+        rejectionDto = new RejectionDto("text reject");
+        requestForRejected = new RecommendationRequest();
     }
 
     @Test
@@ -156,5 +166,21 @@ public class RecommendationRequestServiceTest {
         recommendationRequestService.getRequest(requestFilterDto);
         verify(recommendationRequestMapper, times(1)).toDto(captor.capture());
         assertEquals(expected.getUpdatedAt(), captor.getValue().getUpdatedAt());
+    }
+
+    @Test
+    void testRejectFail() {
+        requestForRejected.setStatus(RequestStatus.REJECTED);
+        when(recommendationRequestRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(requestForRejected));
+        Assert.assertThrows(RejectFailException.class, () -> recommendationRequestService.rejectRequest(7L, rejectionDto));
+    }
+
+    @Test
+    void testRejectCompleted() {
+        requestForRejected.setStatus(RequestStatus.PENDING);
+        when(recommendationRequestRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(requestForRejected));
+        recommendationRequestService.rejectRequest(7L, rejectionDto);
+        verify(recommendationRequestMapper, times(1)).toDto(captor.capture());
+        assertEquals(RequestStatus.REJECTED, captor.getValue().getStatus());
     }
 }

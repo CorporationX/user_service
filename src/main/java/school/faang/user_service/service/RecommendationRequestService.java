@@ -3,8 +3,11 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.exception.RejectFailException;
 import school.faang.user_service.exception.RequestNotFoundException;
 import school.faang.user_service.exception.RequestTimeOutException;
 import school.faang.user_service.exception.SkillsNotFoundException;
@@ -51,8 +54,9 @@ public class RecommendationRequestService {
     }
 
     public RecommendationRequestDto getRequest(long id) {
-        Optional<RecommendationRequest> request = recommendationRequestRepository.findById(id);
-        return recommendationRequestMapper.toDto(request.orElseThrow(() -> new RequestNotFoundException("Request not found by id: " + id)));
+        return recommendationRequestMapper
+                .toDto(findRequestById(id)
+                        .orElseThrow(() -> new RequestNotFoundException("Request not found by id: " + id)));
     }
 
     public List<RecommendationRequestDto> getRequest(RequestFilterDto filter) {
@@ -66,6 +70,21 @@ public class RecommendationRequestService {
             recommendationRequestDtos.add(recommendationRequestMapper.toDto(requests));
         }
         return recommendationRequestDtos;
+    }
+
+    public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
+        RecommendationRequest request = findRequestById(id).orElseThrow(() -> new RequestNotFoundException("Request not found by id: " + id));
+        if (request.getStatus().equals(RequestStatus.PENDING)) {
+            request.setRejectionReason(rejection.getReason());
+            request.setStatus(RequestStatus.REJECTED);
+        } else {
+            throw new RejectFailException("Request is accepted or rejected");
+        }
+        return recommendationRequestMapper.toDto(request);
+    }
+
+    private Optional<RecommendationRequest> findRequestById(long id) {
+        return recommendationRequestRepository.findById(id);
     }
 
 }

@@ -3,28 +3,18 @@ package school.faang.user_service.validator.goal;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
-import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.exception.EntityNotFoundException;
-import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.skill.SkillService;
 import school.faang.user_service.validator.GoalValidator;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Ilia Chuvatkin
@@ -32,10 +22,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class GoalValidatorTest {
-    @Mock
-    private GoalRepository goalRepository;
-    @Mock
-    private SkillService skillService;
     @InjectMocks
     private GoalValidator goalValidator;
 
@@ -61,33 +47,38 @@ public class GoalValidatorTest {
     }
 
     @Test
-    void testValidateEmptyTitleWithBlankShouldException() {
+    void testValidateTitleAndUserIdWhenTitleIsBlankShouldException() {
         GoalDto goalDto = new GoalDto();
         goalDto.setTitle(" ");
+        Long userId = 1L;
 
         DataValidationException dataValidationException = assertThrows(DataValidationException.class,
-                () -> goalValidator.validateTitle(goalDto));
+                () -> goalValidator.validateTitleAndUserId(goalDto, userId));
 
         assertEquals(dataValidationException.getMessage(), "Title is empty!");
     }
 
     @Test
-    void testValidateEmptyTitleWithNullShouldException() {
+    void testValidateTitleAndUserIdWhenEmptyTitleShouldException() {
         GoalDto goalDto = new GoalDto();
         goalDto.setTitle(null);
+        Long userId = 1L;
 
         DataValidationException dataValidationException = assertThrows(DataValidationException.class,
-                () -> goalValidator.validateTitle(goalDto));
+                () -> goalValidator.validateTitleAndUserId(goalDto, userId));
 
         assertEquals(dataValidationException.getMessage(), "Title is empty!");
     }
 
     @Test
-    void testValidateUserIdWithNullShouldException() {
+    void testValidateTitleAndUserIdWhenUserIdNullShouldException() {
         Long userId = null;
+        GoalDto goalDto = new GoalDto();
+        goalDto.setTitle("Title");
+
 
         DataValidationException dataValidationException = assertThrows(DataValidationException.class,
-                () -> goalValidator.validateUserId(userId));
+                () -> goalValidator.validateTitleAndUserId(goalDto, userId));
 
         assertEquals(dataValidationException.getMessage(), "User ID required!");
     }
@@ -117,7 +108,17 @@ public class GoalValidatorTest {
     }
 
     @Test
-    void testIsValidateByCompletedShouldException() {
+    void testValidateGoalIdWhenGoalIdNull() {
+        Long goalId = null;
+
+        DataValidationException dataValidationException = assertThrows(DataValidationException.class,
+                () -> goalValidator.validateGoalId(goalId));
+
+        assertEquals(dataValidationException.getMessage(), "Goal ID is null!");
+    }
+
+    @Test
+    void testValidateByCompletedShouldException() {
         Goal goal = new Goal();
         goal.setStatus(GoalStatus.COMPLETED);
 
@@ -128,47 +129,46 @@ public class GoalValidatorTest {
     }
 
     @Test
-    void testIsValidateByExistingSkillsShouldSuccess() {
-        Goal goal = new Goal();
-        Skill skill_1 = new Skill();
-        skill_1.setTitle("Skill_1");
-        Skill skill_2 = new Skill();
-        skill_2.setTitle("Skill_2");
-        goal.setSkillsToAchieve(List.of(skill_1, skill_2));
-
-        when(skillRepository.existsByTitle(anyString())).thenReturn(true);
-
-        goalValidator.validateByExistingSkills(goal);
-
-        verify(skillRepository, times(2)).existsByTitle(anyString());
-    }
-
-    @Test
-    void testIsValidateByExistingSkillsShouldException() {
-        Goal goal = new Goal();
-        Skill skill_1 = new Skill();
-        skill_1.setTitle("Skill_1");
-        Skill skill_2 = new Skill();
-        skill_2.setTitle("Skill_2");
-        goal.setSkillsToAchieve(List.of(skill_1, skill_2));
-
-
-        when(skillRepository.existsByTitle(anyString())).thenReturn(false);
+    void testValidateGoalIdAndFilterWhenGoalIdEqual0() {
+        long goalId = 0;
+        GoalFilterDto filter = new GoalFilterDto();
 
         DataValidationException dataValidationException = assertThrows(DataValidationException.class,
-                () -> goalValidator.validateByExistingSkills(goal));
+                () -> goalValidator.validateGoalIdAndFilter(goalId, filter));
 
-        assertEquals(dataValidationException.getMessage(), "Some skills do not exist in database!");
+        assertEquals(dataValidationException.getMessage(), "Goal ID is 0!");
     }
 
     @Test
-    void testValidateGoalId() {
+    void testValidateGoalIdAndFilterWhenFilterNull() {
         long goalId = 1L;
-        when(goalRepository.existsById(goalId)).thenReturn(false);
+        GoalFilterDto filter = null;
 
-        EntityNotFoundException entityNotFoundException = assertThrows(EntityNotFoundException.class,
-                () -> goalValidator.validateGoalId(goalId));
+        DataValidationException dataValidationException = assertThrows(DataValidationException.class,
+                () -> goalValidator.validateGoalIdAndFilter(goalId, filter));
 
-        assertEquals(entityNotFoundException.getMessage(), "Goal with id = 1 is not exists");
+        assertEquals(dataValidationException.getMessage(), "Filter is null!");
+    }
+
+    @Test
+    void testValidateUserIdAndFilterWhenUserIdNull() {
+        Long userId = null;
+        GoalFilterDto filter = new GoalFilterDto();
+
+        DataValidationException dataValidationException = assertThrows(DataValidationException.class,
+                () -> goalValidator.validateUserIdAndFilter(userId, filter));
+
+        assertEquals(dataValidationException.getMessage(), "User ID is null!");
+    }
+
+    @Test
+    void testValidateUserIdAndFilterWhenFilterNull() {
+        long goalId = 1L;
+        GoalFilterDto filter = null;
+
+        DataValidationException dataValidationException = assertThrows(DataValidationException.class,
+                () -> goalValidator.validateUserIdAndFilter(goalId, filter));
+
+        assertEquals(dataValidationException.getMessage(), "Filter is null!");
     }
 }

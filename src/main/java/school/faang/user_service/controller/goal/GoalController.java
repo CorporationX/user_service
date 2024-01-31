@@ -20,8 +20,7 @@ public class GoalController {
     private final GoalValidator goalValidator;
 
     public void createGoal(Long userId, GoalDto goal) {
-        goalValidator.validateTitle(goal);
-        goalValidator.validateUserId(userId);
+        goalValidator.validateTitleAndUserId(goal, userId);
         goalService.createGoal(userId, goal);
     }
 
@@ -31,6 +30,7 @@ public class GoalController {
     }
 
     public void deleteGoal(Long goalId) {
+        goalValidator.validateGoalId(goalId);
         goalService.deleteGoal(goalId);
     }
 
@@ -40,7 +40,7 @@ public class GoalController {
     }
 
     public List<GoalDto> findSubtasksByGoalId(long goalId, GoalFilterDto filter) {
-        goalValidator.validateGoalId(goalId);
+        goalValidator.validateGoalIdAndFilter(goalId, filter);
         return goalService.findSubtasksByGoalId(goalId, filter);
     }
 }

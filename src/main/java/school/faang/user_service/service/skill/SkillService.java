@@ -15,7 +15,6 @@ import java.util.List;
 public class SkillService {
     private final SkillRepository skillRepository;
 
-
     public List<SkillDto> getUserSkills(long userId) {
         return new ArrayList<SkillDto>();
     }

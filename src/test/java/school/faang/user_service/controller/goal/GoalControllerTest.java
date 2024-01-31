@@ -12,7 +12,6 @@ import school.faang.user_service.validator.GoalValidator;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Ilia Chuvatkin
@@ -41,8 +40,6 @@ public class GoalControllerTest {
     void testUpdateGoal() {
         GoalDto goalDto = new GoalDto();
         Long goalId = 1L;
-
-        when(goalValidator.isValidateByEmptyTitle(goalDto)).thenReturn(true);
 
         goalController.updateGoal(goalId, goalDto);
 

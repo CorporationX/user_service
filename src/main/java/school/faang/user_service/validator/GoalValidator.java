@@ -8,9 +8,7 @@ import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.skill.SkillService;
 
@@ -25,6 +23,7 @@ import java.util.List;
 public class GoalValidator {
     private static final int MAX_ACTIVE_GOALS = 3;
     private final GoalRepository goalRepository;
+    private final SkillRepository skillRepository;
     private final SkillService skillService;
 
     public void validateActiveGoals(long countActiveGoals) {
@@ -39,14 +38,11 @@ public class GoalValidator {
         }
     }
 
-    public void validateTitle(GoalDto goal) {
+    public void validateTitleAndUserId(GoalDto goal, Long userId) {
         String title = goal.getTitle();
         if (title == null || title.isBlank()) {
             throw new DataValidationException("Title is empty!");
         }
-    }
-
-    public void validateUserId(Long userId) {
         if (userId == null) {
             throw new DataValidationException("User ID required!");
         }
@@ -58,6 +54,7 @@ public class GoalValidator {
         validateExistingSkills(userSkillsIds, goalDto);
         validateActiveGoals(countActiveGoals);
     }
+
     public void validateTitleAndGoalId(Long goalId, GoalDto goal) {
         String title = goal.getTitle();
         if (title == null || title.isBlank()) {
@@ -89,9 +86,18 @@ public class GoalValidator {
         }
     }
 
-    public void validateGoalId(long goalId) {
-        if (!goalRepository.existsById(goalId)) {
-            throw new EntityNotFoundException("Goal with id = " + goalId + " is not exists");
+    public void validateGoalIdAndFilter(long goalId, GoalFilterDto filter) {
+        if (goalId == 0) {
+            throw new DataValidationException("Goal ID is 0!");
+        }
+        if (filter == null) {
+            throw new DataValidationException("Filter is null!");
+        }
+    }
+
+    public void validateGoalId(Long goalId) {
+        if (goalId == null) {
+            throw new DataValidationException("Goal ID is null!");
         }
     }
 }

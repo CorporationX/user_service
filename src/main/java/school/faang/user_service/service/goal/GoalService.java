@@ -15,7 +15,6 @@ import school.faang.user_service.service.skill.SkillService;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.GoalValidator;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,7 +28,6 @@ public class GoalService {
     private final GoalValidator goalValidator;
     private final GoalRepository goalRepository;
     private final UserService userService;
-    private final SkillService skillService;
     private final SkillService skillService;
     private final SkillRepository skillRepository;
     private final GoalMapper goalMapper;
@@ -66,7 +64,7 @@ public class GoalService {
     }
 
     public void deleteGoal(Long goalId) {
-        if (goalId != null){
+        if (goalId != null) {
             goalRepository.deleteById(goalId);
         }
     }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.UUID;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
     @Value("${dicebear.pic-base-url}")
     private final String avatarBaseUrl;
     @Value("${dicebear.pic-base-url-small}")
@@ -26,6 +28,10 @@ public class UserService {
         savedUser.setUserProfilePic(generateUserProfilePic());
         //some actions
         return userDto;
+    }
+
+    public UserDto getUser(long id) {
+        return userMapper.toDto(getExistingUserById(id));
     }
 
     public User getExistingUserById(long id) {

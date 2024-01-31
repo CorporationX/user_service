@@ -26,7 +26,9 @@ spring:
           name: follower_channel
         profile_view_channel:
             name: profile_view_channel
-
+  mvc:
+    servlet:
+      path: /api/v1
 server:
   port: 8080
 
@@ -51,9 +53,6 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
-
-endpoint_base:
-  path: /api/v1
 
 dicebear:
   pic-base-url-small: https://api.dicebear.com/7.x/bottts/svg?size=64&seed=

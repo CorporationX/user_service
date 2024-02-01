@@ -35,20 +35,15 @@ public class MentorshipService {
 
     @Transactional
     public void removeMenteeOfMentor(Long mentorId, Long menteeId) {
-        List<User> users = getMentorAndMentee(mentorId, menteeId);
-        users.get(0).getMentees().remove(users.get(1));
+        User mentor = userService.getUserById(mentorId);
+        User mentee = userService.getUserById(menteeId);
+        mentor.getMentees().remove(mentee);
     }
 
     @Transactional
     public void removeMentorOfMentee(Long mentorId, Long menteeId) {
-        List<User> users = getMentorAndMentee(mentorId, menteeId);
-        users.get(1).getMentors().remove(users.get(0));
-    }
-
-    private List<User> getMentorAndMentee(Long mentorId, Long menteeId) {
         User mentor = userService.getUserById(mentorId);
         User mentee = userService.getUserById(menteeId);
-        return List.of(mentor, mentee);
-
+        mentee.getMentors().remove(mentor);
     }
 }

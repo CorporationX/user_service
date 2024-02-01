@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import school.faang.user_service.controller.RecommendationController;
+import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.service.RecommendationService;
 
 
@@ -24,11 +25,14 @@ public class RecommendationControllerTest {
     private RecommendationController recommendationController;
 
     @Test
-    public void testDeleteRecommendation() {
+    public void deleteRecommendationTest() {
         long id = 1L;
+        RecommendationDto expectedDto = new RecommendationDto();
+        when(recommendationService.delete(id)).thenReturn(expectedDto);
 
-        recommendationController.deleteRecommendation(id);
+        RecommendationDto actualDto = recommendationController.deleteRecommendation(id);
 
-        verify(recommendationService, times(1)).delete(id);
+        verify(recommendationService).delete(id);
+        assertEquals(expectedDto, actualDto);
     }
 }

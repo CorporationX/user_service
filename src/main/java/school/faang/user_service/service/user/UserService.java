@@ -35,7 +35,6 @@ public class UserService {
     }
 
     public User getExistingUserById(long id) {
-        User user = new User();
         return userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User with id = " + id + " is not found in database"));
     }

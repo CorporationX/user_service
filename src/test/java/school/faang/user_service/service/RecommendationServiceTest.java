@@ -6,21 +6,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
-import school.faang.user_service.mapper.RecommendationMapper;
+import school.faang.user_service.mapper.RecommendationMapperImpl;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 
 
@@ -28,19 +24,25 @@ import static org.mockito.Mockito.when;
 public class RecommendationServiceTest {
     @Mock
     private RecommendationRepository recommendationRepository;
+    @Spy
+    private RecommendationMapperImpl recommendationMapper;
 
     @InjectMocks
     private RecommendationService recommendationService;
+    private Recommendation recommendation;
+    private RecommendationDto recommendationDto;
 
     @BeforeEach
     public void init() {
-        Recommendation recommendation = new Recommendation();
-    }
+        recommendation = new Recommendation();
+        recommendationDto = new RecommendationDto();
+        }
+
     @Test
     public void testGetAllGivenRecommendations() {
-        /*when(recommendationRepository.findAllByAuthorId(1L))
-              .thenReturn();
+        when(recommendationRepository.findAllByAuthorId(1L)).thenReturn(Arrays.asList(recommendation));
         List<RecommendationDto> recommendationDtos = recommendationService.getAllGivenRecommendations(1L);
-        assertEquals(1, recommendationDtos.size());*/
+        assertEquals(1, recommendationDtos.size());
+        assertEquals(recommendationDto, recommendationDtos.get(0));
     }
 }

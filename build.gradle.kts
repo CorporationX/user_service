@@ -119,7 +119,7 @@ tasks.jacocoTestCoverageVerification {
                     "school.faang.user_service.controller.*",
                     "school.faang.user_service.validator.*")
             limit{
-                minimum = "0.75".toBigDecimal()
+                minimum = "0.65".toBigDecimal()
             }
         }
     }

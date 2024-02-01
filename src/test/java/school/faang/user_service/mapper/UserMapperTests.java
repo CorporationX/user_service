@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
@@ -19,8 +19,9 @@ public class UserMapperTests {
     private UserDto userDto;
     private List<User> users;
     private List<UserDto> userDtos;
+
     @BeforeEach
-    void setUp(){
+    void setUp() {
         user = User.builder().build();
         userDto = userMapper.toDto(user);
         users = List.of(user);

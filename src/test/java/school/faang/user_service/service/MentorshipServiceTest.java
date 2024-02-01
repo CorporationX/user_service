@@ -105,7 +105,7 @@ class MentorshipServiceTest {
 
         verify(userService, times(1)).getUserById(id2);
         verify(userService, times(1)).getUserById(id);
-        assertEquals(user2.getMentees(),user1.getMentors());
+        assertEquals(user2.getMentees(), user1.getMentors());
     }
 
     @Test
@@ -117,7 +117,7 @@ class MentorshipServiceTest {
 
         verify(userService, times(1)).getUserById(id2);
         verify(userService, times(1)).getUserById(id);
-        assertEquals(user1.getMentors(),user1.getMentees());
+        assertEquals(user1.getMentors(), user1.getMentees());
     }
 
     @Test

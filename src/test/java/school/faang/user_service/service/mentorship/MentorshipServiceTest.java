@@ -6,9 +6,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.ArrayList;
@@ -58,12 +58,12 @@ class MentorshipServiceTest {
                 .build();
 
         userDtoMentee = UserDto.builder()
-                .id(100)
+                .id(100L)
                 .username("Vasiliy")
                 .build();
 
         userDtoMentor = UserDto.builder()
-                .id(10)
+                .id(10L)
                 .username("Alex")
                 .build();
 

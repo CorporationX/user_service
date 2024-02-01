@@ -15,7 +15,8 @@ public interface UserMapper {
 
     @Mapping(source = "country.id", target = "countryId")
     UserDto toUserDto(User user);
-
+    @Mapping(source = "countryId", target = "country.id")
+    User toEntity(UserDto userDTO);
     List<UserDto> toUserDtoList(List<User> users);
 
 }

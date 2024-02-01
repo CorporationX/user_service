@@ -29,13 +29,13 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public int getFollowingCount(long followerId) {
-        validateUserIdIsPositive(followerId);
+        validateUserId(followerId);
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
     }
 
     @Override
     public int getFollowersCount(long followeeId) {
-        validateUserIdIsPositive(followeeId);
+        validateUserId(followeeId);
         return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
     }
 
@@ -46,14 +46,14 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     private void validateUserIds(long followerId, long followeeId) {
-        validateUserIdIsPositive(followerId);
-        validateUserIdIsPositive(followeeId);
+        validateUserId(followerId);
+        validateUserId(followeeId);
         if (followerId == followeeId) {
             throw new DataValidationException("Follower and followee the same user");
         }
     }
 
-    private void validateUserIdIsPositive(long userId) {
+    private void validateUserId(long userId) {
         if (userId <= 0) {
             throw new DataValidationException("User identifiers must be positive numbers");
         }

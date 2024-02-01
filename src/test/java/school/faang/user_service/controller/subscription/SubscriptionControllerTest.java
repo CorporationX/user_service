@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.subscription;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,8 +17,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class SubscriptionControllerTest {
 
-    private static final long VALID_FOLLOWER_ID = 5L;
-    private static final long VALID_FOLLOWEE_ID = 2L;
+    private long validFollowerId;
+    private long validFolloweeId;
 
     @Mock
     SubscriptionService subscriptionService;
@@ -25,40 +26,61 @@ class SubscriptionControllerTest {
     @InjectMocks
     SubscriptionController subscriptionController;
 
+    @BeforeEach
+    void init() {
+        validFollowerId = 5L;
+        validFolloweeId = 2L;
+    }
+
     @Test
     void shouldReturnTrueWhenUnfollowIsSuccessful() {
-        Map.Entry<String, Boolean> result = subscriptionController.unfollowUser(VALID_FOLLOWER_ID, VALID_FOLLOWEE_ID);
+        Map.Entry<String, Boolean> result = subscriptionController.unfollowUser(validFollowerId, validFolloweeId);
 
         assertEquals(
                 Map.entry("isUnfollowed", true),
                 result);
 
-        verify(subscriptionService).unfollowUser(VALID_FOLLOWER_ID, VALID_FOLLOWEE_ID);
+        verify(subscriptionService).unfollowUser(validFollowerId, validFolloweeId);
     }
 
     @Test
     void shouldReturnTrueWhenFollowIsSuccessful() {
-        Map.Entry<String, Boolean> result = subscriptionController.followUser(VALID_FOLLOWER_ID, VALID_FOLLOWEE_ID);
+        Map.Entry<String, Boolean> result = subscriptionController.followUser(validFollowerId, validFolloweeId);
 
         assertEquals(
                 Map.entry("isFollowed", true),
                 result);
 
-        verify(subscriptionService).followUser(VALID_FOLLOWER_ID, VALID_FOLLOWEE_ID);
+        verify(subscriptionService).followUser(validFollowerId, validFolloweeId);
     }
 
     @Test
     void shouldReturnFollowingCountWhenFollowerIdIsValid() {
-        when(subscriptionService.getFollowingCount(VALID_FOLLOWER_ID))
+        when(subscriptionService.getFollowingCount(validFollowerId))
                 .thenReturn(5);
 
-        Map.Entry<String, Integer> result = subscriptionController.getFollowingCount(VALID_FOLLOWER_ID);
+        Map.Entry<String, Integer> result = subscriptionController.getFollowingCount(validFollowerId);
 
         assertEquals(
                 Map.entry("followingCount", 5),
                 result);
 
-        verify(subscriptionService).getFollowingCount(VALID_FOLLOWER_ID);
+        verify(subscriptionService).getFollowingCount(validFollowerId);
     }
+
+    @Test
+    void shouldReturnFollowersCountWhenFolloweeIdIsValid() {
+        when(subscriptionService.getFollowersCount(validFolloweeId))
+                .thenReturn(5);
+
+        Map.Entry<String, Integer> result = subscriptionController.getFollowersCount(validFolloweeId);
+
+        assertEquals(
+                Map.entry("followersCount", 5),
+                result);
+
+        verify(subscriptionService).getFollowersCount(validFolloweeId);
+    }
+
 
 }

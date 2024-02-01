@@ -1,16 +1,26 @@
 package school.faang.user_service.service.subscription;
 
 import lombok.RequiredArgsConstructor;
+import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.entity.UserDto;
+import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
+import school.faang.user_service.service.filter.UserInMemoryFilterService;
+
+import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
 public class SubscriptionServiceImpl implements SubscriptionService {
 
     private final SubscriptionRepository subscriptionRepository;
+    private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
+    private final UserInMemoryFilterService userFilter;
 
     @Override
     @Transactional
@@ -28,9 +38,35 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public int getFollowersCount(long followerId) {
-        validateUserIdIsPositive(followerId);
+    @Transactional
+    public int getFollowingCount(long followerId) {
+        validateUserId(followerId);
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
+    }
+
+    @Override
+    @Transactional
+    public int getFollowersCount(long followeeId) {
+        validateUserId(followeeId);
+        return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
+    }
+
+    @Override
+    @Transactional
+    public List<UserDto> getFollowing(long followerId, UserFilterDto filterDto) {
+        validateUserId(followerId);
+        Stream<UserDto> userDtoStream = subscriptionRepository.findByFollowerId(followerId)
+                .map(userMapper::toUserDto);
+        return userFilter.applyFilters(userDtoStream, filterDto).toList();
+    }
+
+    @Override
+    @Transactional
+    public List<UserDto> getFollowers(long followeeId, UserFilterDto filterDto) {
+        validateUserId(followeeId);
+        Stream<UserDto> userDtoStream = subscriptionRepository.findByFolloweeId(followeeId)
+                .map(userMapper::toUserDto);
+        return userFilter.applyFilters(userDtoStream, filterDto).toList();
     }
 
     private void validateSubscriptionExist(long followerId, long followeeId) {
@@ -40,14 +76,14 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     private void validateUserIds(long followerId, long followeeId) {
-        validateUserIdIsPositive(followerId);
-        validateUserIdIsPositive(followeeId);
+        validateUserId(followerId);
+        validateUserId(followeeId);
         if (followerId == followeeId) {
             throw new DataValidationException("Follower and followee the same user");
         }
     }
 
-    private void validateUserIdIsPositive(long userId) {
+    private void validateUserId(long userId) {
         if (userId <= 0) {
             throw new DataValidationException("User identifiers must be positive numbers");
         }

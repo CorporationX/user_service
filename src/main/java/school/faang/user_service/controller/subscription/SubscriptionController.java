@@ -3,8 +3,11 @@ package school.faang.user_service.controller.subscription;
 import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import school.faang.user_service.dto.entity.UserDto;
+import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.service.subscription.SubscriptionService;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -28,11 +31,30 @@ public class SubscriptionController {
         return Map.entry("isUnfollowed", true);
     }
 
-    @GetMapping("/count/{followerId}")
-    public Map.Entry<String, Integer> getFollowersCount(@PathVariable("followerId") long followerId) {
-        int followeesCount = subscriptionService.getFollowersCount(followerId);
-        return Map.entry("followeesCount", followeesCount);
+    @GetMapping("/count/followings/{followerId}")
+    public Map.Entry<String, Integer> getFollowingCount(@PathVariable("followerId") long followerId) {
+        int followingCount = subscriptionService.getFollowingCount(followerId);
+        return Map.entry("followingCount", followingCount);
     }
 
+    @GetMapping("/count/followers/{followeeId}")
+    public Map.Entry<String, Integer> getFollowersCount(@PathVariable("followeeId") long followeeId) {
+        int followersCount = subscriptionService.getFollowersCount(followeeId);
+        return Map.entry("followersCount", followersCount);
+    }
+
+    @PostMapping("/followings/{followerId}")
+    public Map.Entry<String, List<UserDto>> getFollowings(@PathVariable("followerId") long followerId,
+                                                          @RequestBody UserFilterDto filterDto) {
+        List<UserDto> users = subscriptionService.getFollowing(followerId, filterDto);
+        return Map.entry("following", users);
+    }
+
+    @PostMapping("/followers/{followeeId}")
+    public Map.Entry<String, List<UserDto>> getFollowers(@PathVariable("followeeId") long followeeId,
+                                                         @RequestBody(required = false) UserFilterDto filterDto) {
+        List<UserDto> users = subscriptionService.getFollowers(followeeId, filterDto);
+        return Map.entry("followers", users);
+    }
 
 }

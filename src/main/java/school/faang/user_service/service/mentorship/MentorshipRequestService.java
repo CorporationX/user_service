@@ -22,11 +22,7 @@ public class MentorshipRequestService {
 
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         validateRequestMentorship(mentorshipRequestDto);
-
-        mentorshipRequestRepository.create(mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId(), mentorshipRequestDto.getDescription());
-
-        MentorshipRequest mentorshipRequestEntity = mentorshipRequestMapper.MentorshipRequestToEntity(mentorshipRequestDto);
-        mentorshipRequestEntity = mentorshipRequestRepository.save(mentorshipRequestEntity);
+        MentorshipRequest mentorshipRequestEntity = mentorshipRequestRepository.create(mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId(), mentorshipRequestDto.getDescription());
         return mentorshipRequestMapper.toMentorshipRequestDto(mentorshipRequestEntity);
     }
 

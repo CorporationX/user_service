@@ -27,12 +27,7 @@ public class RecommendationControllerTest {
     @Test
     public void deleteRecommendationTest() {
         long id = 1L;
-        RecommendationDto expectedDto = new RecommendationDto();
-        when(recommendationService.delete(id)).thenReturn(expectedDto);
-
-        RecommendationDto actualDto = recommendationController.deleteRecommendation(id);
-
-        verify(recommendationService).delete(id);
-        assertEquals(expectedDto, actualDto);
+        recommendationController.deleteRecommendation(id);
+        verify(recommendationService, times(1)).delete(id);
     }
 }

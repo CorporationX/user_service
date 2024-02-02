@@ -12,8 +12,7 @@ import java.util.List;
 public class RecommendationService {
     private final RecommendationRepository recommendationRepository;
 
-    public RecommendationDto delete(long id) {
+    public void delete(long id) {
         recommendationRepository.deleteById(id);
-        return new RecommendationDto();
     }
 }

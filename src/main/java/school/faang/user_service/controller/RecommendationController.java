@@ -15,7 +15,7 @@ public class RecommendationController {
     private final RecommendationService recommendationService;
 
     @DeleteMapping("/recommendations/{id}")
-    public RecommendationDto deleteRecommendation(@PathVariable long id) {
-        return recommendationService.delete(id);
+    public void deleteRecommendation(@PathVariable long id) {
+        recommendationService.delete(id);
     }
 }

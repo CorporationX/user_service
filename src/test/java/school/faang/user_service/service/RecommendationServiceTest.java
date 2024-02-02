@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -41,6 +42,7 @@ class RecommendationServiceTest {
 
         Recommendation recommendationEntity1 = new Recommendation();
         Recommendation recommendationEntity2 = new Recommendation();
+        RecommendationDto result = RecommendationDto.builder().receiverId(receiverId).build();
         List<Recommendation> recommendationEntities = Arrays.asList(recommendationEntity1, recommendationEntity2);
 
         Page<Recommendation> recommendationPage = new PageImpl<>(recommendationEntities);
@@ -49,13 +51,20 @@ class RecommendationServiceTest {
                 .thenReturn(recommendationPage);
 
         when(recommendationMapper.toDto(any(Recommendation.class)))
-                .thenReturn(new RecommendationDto(receiverId));
+                .thenReturn(result);
 
-        List<RecommendationDto> result = recommendationService.getAllUserRecommendations(receiverId);
+        List<RecommendationDto> resultRecs = recommendationService.getAllUserRecommendations(receiverId);
 
-        assertEquals(recommendationEntities.size(), result.size());
+        assertEquals(recommendationEntities.size(), resultRecs.size());
 
         verify(recommendationMapper, times(recommendationEntities.size())).toDto(any(Recommendation.class));
 
+    }
+
+    @Test
+    public void testDeleteRecommendation() {
+        long id = 1L;
+        recommendationService.delete(id);
+        Mockito.verify(recommendationRepository, Mockito.times(1)).deleteById(id);
     }
 }

@@ -13,12 +13,18 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class RecommendationService {
+
     private final RecommendationRepository recommendationRepository;
     private final RecommendationMapper recommendationMapper;
+
     public List<RecommendationDto> getAllUserRecommendations(long receiverId){
         return recommendationRepository.findAllByReceiverId(receiverId, Pageable.unpaged())
                 .stream()
                 .map(recommendationMapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    public void delete(long id) {
+        recommendationRepository.deleteById(id);
     }
 }

@@ -1,11 +1,16 @@
 package school.faang.user_service.service;
 
-import org.junit.Assert;
-import org.junit.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
+
 import org.junit.jupiter.api.BeforeEach;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
+import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
@@ -16,82 +21,106 @@ import school.faang.user_service.service.mentorship.MentorshipRequestService;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-
+@ExtendWith(MockitoExtension.class)
 public class MentorshipRequestServiceTest {
     @Mock
     private MentorshipRequestRepository mentorshipRequestRepository;
     @Mock
     private UserRepository userRepository;
-    @Mock
-    private MentorshipRequestMapper mentorshipRequestMapper;
+    @Spy
+    private MentorshipRequestMapper mentorshipRequestMapper = Mappers.getMapper(MentorshipRequestMapper.class);
 
     @InjectMocks
     MentorshipRequestService mentorshipRequestService;
 
-
     @Test
-    public void testIsReceiverExistsIsInvalid() {
-        Mockito.when(userRepository.existsById(Mockito.anyLong())).thenReturn(false);
-        Mockito.when(userRepository.existsById(Mockito.anyLong())).thenReturn(true);
+    public void testMentorshipRequestReceiverExistsIsInvalid() {
+        MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto();
+        mentorshipRequestDto.setReceiverId(1L);
 
-        Assert.assertThrows(
-                IllegalArgumentException.class,
-                () -> mentorshipRequestService.requestMentorship(new MentorshipRequestDto(Mockito.anyLong(), Mockito.anyLong(), "String")
-                ));
+        when(userRepository.existsById(1L)).thenReturn(false);
 
-        Mockito.verify(userRepository, Mockito.times(1))
-                .existsById(Mockito.anyLong());
+        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
+                () -> mentorshipRequestService.requestMentorship(mentorshipRequestDto));
+
+        assertEquals("There are no this receiver in data base", illegalArgumentException.getMessage());
     }
 
     @Test
-    public void testIsRequesterExistsIsInvalid() {
-        Mockito.when(userRepository.existsById(Mockito.anyLong())).thenReturn(false);
-        Mockito.when(userRepository.existsById(Mockito.anyLong())).thenReturn(true);
+    public void testMentorshipRequestRequesterExistsIsInvalid() {
+        MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto();
+        mentorshipRequestDto.setRequesterId(1L);
+        mentorshipRequestDto.setReceiverId(2L);
 
-        Assert.assertThrows(
-                IllegalArgumentException.class,
-                () -> mentorshipRequestService.requestMentorship(new MentorshipRequestDto(Mockito.anyLong(), Mockito.anyLong(), "String")
-                ));
+        when(userRepository.existsById(1L)).thenReturn(false);
+        when(userRepository.existsById(2L)).thenReturn(true);
 
-        Mockito.verify(userRepository, Mockito.times(1))
-                .existsById(Mockito.anyLong());
+        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
+                () -> mentorshipRequestService.requestMentorship(mentorshipRequestDto));
+
+        assertEquals("There are no this requester in data base", illegalArgumentException.getMessage());
     }
 
     @Test
-    public void testIsNotRequestToYourselfIsInvalid() {
-        Mockito.when(userRepository.existsById(1L)).thenReturn(true);
+    public void testMentorshipRequestToYourselfIsInvalid() {
+        MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto();
+        mentorshipRequestDto.setReceiverId(1L);
+        mentorshipRequestDto.setRequesterId(1L);
+        when(userRepository.existsById(1L)).thenReturn(true);
 
-        Assert.assertThrows(
-                IllegalArgumentException.class,
-                () -> mentorshipRequestService.requestMentorship(new MentorshipRequestDto(1L, 1L, "description"))
-        );
-
-        Mockito.verify(userRepository, Mockito.times(1))
-                .existsById(1L);
+        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
+                () -> mentorshipRequestService.requestMentorship(mentorshipRequestDto));
+        assertEquals(illegalArgumentException.getMessage(), "You can not send a request to yourself");
     }
 
     @Test
-    public void testIsMoreThanThreeMonthsIsInvalid() {
-        Mockito.when(userRepository.existsById(Mockito.anyLong())).thenReturn(true);
-        Mockito.when(userRepository.existsById(Mockito.anyLong())).thenReturn(true);
+    public void testRequestMentorshipExistsIsInvalid() {
+        MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto();
+        mentorshipRequestDto.setReceiverId(1L);
+        mentorshipRequestDto.setRequesterId(2L);
+        when(userRepository.existsById(1L)).thenReturn(true);
+        when(userRepository.existsById(2L)).thenReturn(true);
 
-        MentorshipRequest request = new MentorshipRequest();
-        request.setUpdatedAt(LocalDateTime.now().minusMonths(2));
-        Mockito.when(mentorshipRequestRepository.findLatestRequest(Mockito.anyLong(), Mockito.anyLong())).thenReturn(Optional.of(request));
+        when(mentorshipRequestRepository.findLatestRequest(anyLong(), anyLong())).thenReturn(Optional.empty());
 
-        Assert.assertThrows(
-                IllegalArgumentException.class,
-                () -> mentorshipRequestService.requestMentorship(new MentorshipRequestDto(Mockito.anyLong(), Mockito.anyLong(), "description"))
-        );
+        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
+                () -> mentorshipRequestService.requestMentorship(mentorshipRequestDto));
+
+        assertEquals(illegalArgumentException.getMessage(), "There are not find request");
     }
 
     @Test
-    public void testRequestMentorship() {
-        Mockito.when(userRepository.existsById(Mockito.anyLong())).thenReturn(true);
-        Mockito.when(userRepository.existsById(Mockito.anyLong())).thenReturn(true);
+    public void testRequestMentorshipMoreThanThreeMonthsIsInvalid() {
+        MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto();
+        mentorshipRequestDto.setReceiverId(1L);
+        mentorshipRequestDto.setRequesterId(2L);
+        when(userRepository.existsById(1L)).thenReturn(true);
+        when(userRepository.existsById(2L)).thenReturn(true);
 
-        mentorshipRequestService.requestMentorship(new MentorshipRequestDto(Mockito.anyLong(), Mockito.anyLong(), "description"));
-        Mockito.verify(mentorshipRequestRepository, Mockito.times(1))
-                .create(Mockito.anyLong(), Mockito.anyLong(), "description");
+        MentorshipRequest mentorshipRequest = new MentorshipRequest();
+        mentorshipRequest.setUpdatedAt(LocalDateTime.now().minusMonths(2));
+        when(mentorshipRequestRepository.findLatestRequest(anyLong(), anyLong())).thenReturn(Optional.of(mentorshipRequest));
+
+        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
+                () -> mentorshipRequestService.requestMentorship(mentorshipRequestDto));
+
+        assertEquals(illegalArgumentException.getMessage(), "Less than 3 months have passed since last request");
+    }
+
+    @Test
+    public void testRequestMentorshipIsCreated() {
+        MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto();
+        mentorshipRequestDto.setReceiverId(1L);
+        mentorshipRequestDto.setRequesterId(2L);
+        mentorshipRequestDto.setDescription("description");
+        when(userRepository.existsById(1L)).thenReturn(true);
+        when(userRepository.existsById(2L)).thenReturn(true);
+
+        MentorshipRequest mentorshipRequest = new MentorshipRequest();
+        mentorshipRequest.setUpdatedAt(LocalDateTime.now().minusMonths(4));
+        when(mentorshipRequestRepository.findLatestRequest(anyLong(), anyLong())).thenReturn(Optional.of(mentorshipRequest));
+
+        mentorshipRequestService.requestMentorship(mentorshipRequestDto);
+        verify(mentorshipRequestRepository, times(1)).create(2L, 1L, "description");
     }
 }

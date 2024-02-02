@@ -2,6 +2,7 @@ package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
@@ -13,6 +14,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RecommendationController {
     private final RecommendationService recommendationService;
+
+    @GetMapping("/recommendations/user/{receiverId}")
+    public List<RecommendationDto> getAllUserRecommendations(@PathVariable long receiverId){
+        return recommendationService.getAllUserRecommendations(receiverId);
+    }
 
     @DeleteMapping("/recommendations/{id}")
     public void deleteRecommendation(@PathVariable long id) {

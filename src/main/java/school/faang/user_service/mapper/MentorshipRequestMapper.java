@@ -9,7 +9,5 @@ import school.faang.user_service.entity.MentorshipRequest;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface MentorshipRequestMapper {
     MentorshipRequestDto toMentorshipRequestDto(MentorshipRequest mentorshipRequest);
-    MentorshipRequest MentorshipRequestToEntity(MentorshipRequestDto mentorshipRequestDto);
-
     MentorshipRejectDto toRejectionDto(MentorshipRequest mentorshipRequest);
 }

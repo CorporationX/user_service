@@ -1,5 +1,7 @@
 package school.faang.user_service.service;
 
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
@@ -9,6 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.util.ImageService;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 
@@ -22,23 +29,22 @@ public class AmazonS3Service {
     @Value("${services.s3.bucket-name}")
     private String bucketName;
 
-    public void uploadProfilePic(MultipartFile file, String folder, long userId) {
+    public void uploadProfilePic(MultipartFile file, long userId) {
+        byte[] big = imageService.resize(file, true);
+        uploadFile(big, file, userId, "big");
 
-        InputStream bigImage = imageService.resizeImage(file, true);
-        InputStream smallImage = imageService.resizeImage(file, false);
+        byte[] small = imageService.resize(file, false);
+        uploadFile(small, file, userId, "small");
+    }
 
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentType(file.getContentType());
-//        objectMetadata.setContentLength(file.getSize());
-        String key = "User/" + userId + "/" + folder + "/" + file.getOriginalFilename();
+    public void uploadFile(byte[] image, MultipartFile file, long userId, String imageSize) {
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(image);
 
-        try {
-            PutObjectRequest requestBigImage = new PutObjectRequest(bucketName, key + " big image", bigImage, objectMetadata);
-            amazonS3.putObject(requestBigImage);
-            PutObjectRequest requestSmallImage = new PutObjectRequest(bucketName, key + " small image", smallImage, objectMetadata);
-            amazonS3.putObject(requestSmallImage);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentType(file.getContentType());
+        metadata.setContentLength(inputStream.available());
+
+        String key = "u" + userId + "_" + imageSize + "_" + file.getOriginalFilename();
+        amazonS3.putObject(bucketName, key, inputStream, metadata);
     }
 }

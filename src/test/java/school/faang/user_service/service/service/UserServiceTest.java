@@ -24,17 +24,17 @@ public class UserServiceTest {
     private UserService userService;
 
     @Test
-    public void testFindUserByIdFailed() {
+    public void testGetUserByIdFailed() {
         Mockito.when(userRepo.findById(1L)).thenReturn(Optional.empty());
         Assertions.assertThrows(EntityNotFoundException.class,
-                () -> userService.findUserById(1L));
+                () -> userService.getUserById(1L));
     }
 
     @Test
-    public void testFindUserByIdSuccess() {
+    public void testGetUserByIdSuccess() {
         User user = new User();
         user.setId(1L);
         Mockito.lenient().when(userRepo.findById(1L)).thenReturn(Optional.of(user));
-        Assertions.assertEquals(user, userService.findUserById(1L));
+        Assertions.assertEquals(user, userService.getUserById(1L));
     }
 }

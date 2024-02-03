@@ -32,7 +32,7 @@ public class PremiumService {
     private final UserService userService;
 
     public PremiumDto buyPremium(Long userId, PremiumPeriod period) {
-        User user = userService.findUserById(userId);
+        User user = userService.getUserById(userId);
         premiumValidator.validatePremium(userId);
         PaymentRequest paymentRequest = new PaymentRequest(
                 10L, BigDecimal.valueOf(period.getPrice()), Currency.USD);

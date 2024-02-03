@@ -1,4 +1,4 @@
-package school.faang.user_service.service.service;
+package school.faang.user_service.service.service.premium;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -84,7 +84,7 @@ public class PremiumServiceTest {
         PaymentRequest request = new PaymentRequest(paymentNum, BigDecimal.valueOf(PremiumPeriod.ONE_MONTH.getPrice()),
                 Currency.USD);
         Mockito.when(paymentServiceClient.sendPayment(request)).thenReturn(ResponseEntity.ok(response));
-        Mockito.when(userService.findUserById(1L)).thenReturn(user);
+        Mockito.when(userService.getUserById(1L)).thenReturn(user);
         premiumService.buyPremium(1L, PremiumPeriod.ONE_MONTH);
         Mockito.verify(paymentServiceClient, Mockito.times(1)).sendPayment(request);
     }

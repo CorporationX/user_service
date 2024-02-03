@@ -10,10 +10,10 @@ import school.faang.user_service.repository.UserRepository;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepository userRepo;
+    private final UserRepository userRepository;
 
-    public User findUserById(long userId) {
-        return userRepo.findById(userId).orElseThrow(()
-                -> new EntityNotFoundException("User not found"));
+    public User getUserById(long id) {
+        return userRepository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("User with id " + id + " is not exists"));
     }
 }

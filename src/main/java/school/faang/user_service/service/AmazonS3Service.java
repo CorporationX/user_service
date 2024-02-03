@@ -7,6 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.util.ImageService;
+
+import java.io.InputStream;
 
 
 @Service
@@ -14,22 +17,28 @@ import org.springframework.web.multipart.MultipartFile;
 public class AmazonS3Service {
 
     private final AmazonS3 amazonS3;
+    private final ImageService imageService;
 
     @Value("${services.s3.bucket-name}")
     private String bucketName;
 
-    public String uploadProfilePic(MultipartFile file, String folder, long userId) {
+    public void uploadProfilePic(MultipartFile file, String folder, long userId) {
+
+        InputStream bigImage = imageService.resizeImage(file, true);
+        InputStream smallImage = imageService.resizeImage(file, false);
+
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentType(file.getContentType());
-        objectMetadata.setContentLength(file.getSize());
+//        objectMetadata.setContentLength(file.getSize());
         String key = "User/" + userId + "/" + folder + "/" + file.getOriginalFilename();
 
         try {
-            PutObjectRequest request = new PutObjectRequest(bucketName, key, file.getInputStream(), objectMetadata);
-            amazonS3.putObject(request);
+            PutObjectRequest requestBigImage = new PutObjectRequest(bucketName, key + " big image", bigImage, objectMetadata);
+            amazonS3.putObject(requestBigImage);
+            PutObjectRequest requestSmallImage = new PutObjectRequest(bucketName, key + " small image", smallImage, objectMetadata);
+            amazonS3.putObject(requestSmallImage);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return key;
     }
 }

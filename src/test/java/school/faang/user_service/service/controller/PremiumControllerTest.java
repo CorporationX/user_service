@@ -14,7 +14,7 @@ import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.controller.PremiumController;
 import school.faang.user_service.dto.PremiumDto;
 import school.faang.user_service.entity.premium.PremiumPeriod;
-import school.faang.user_service.service.PremiumService;
+import school.faang.user_service.service.premium.PremiumService;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;

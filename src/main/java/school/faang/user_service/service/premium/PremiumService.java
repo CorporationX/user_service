@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.premium;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,8 +14,8 @@ import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.premium.PremiumPeriod;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.PremiumMapper;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
+import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.PremiumValidator;
 
 import java.math.BigDecimal;
@@ -25,15 +25,14 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class PremiumService {
 
-    private final UserRepository userRepo;
     private final PremiumRepository premiumRepo;
     private final PaymentServiceClient paymentServiceClient;
     private final PremiumValidator premiumValidator;
     private final PremiumMapper mapper;
+    private final UserService userService;
 
     public PremiumDto buyPremium(Long userId, PremiumPeriod period) {
-        User user = userRepo.findById(userId).orElseThrow(()
-                -> new IllegalArgumentException("User not found"));
+        User user = userService.findUserById(userId);
         premiumValidator.validatePremium(userId);
         PaymentRequest paymentRequest = new PaymentRequest(
                 10L, BigDecimal.valueOf(period.getPrice()), Currency.USD);

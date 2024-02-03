@@ -19,9 +19,9 @@ import school.faang.user_service.entity.premium.PaymentStatus;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.premium.PremiumPeriod;
 import school.faang.user_service.mapper.PremiumMapper;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
-import school.faang.user_service.service.PremiumService;
+import school.faang.user_service.service.premium.PremiumService;
+import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.PremiumValidator;
 
 import java.math.BigDecimal;
@@ -29,7 +29,6 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -37,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class PremiumServiceTest {
 
     @Mock
-    private UserRepository userRepo;
+    private UserService userService;
 
     @Mock
     private PremiumRepository premiumRepo;
@@ -60,13 +59,13 @@ public class PremiumServiceTest {
 
     @BeforeEach
     public void init() {
-        UserRepository userRepo = Mockito.mock(UserRepository.class);
+        UserService userService = Mockito.mock(UserService.class);
         PaymentServiceClient paymentServiceClient = Mockito.mock(PaymentServiceClient.class);
         PremiumValidator premiumValidator = Mockito.mock(PremiumValidator.class);
         PremiumMapper mapper = Mockito.mock(PremiumMapper.class);
         PremiumRepository premiumRepo = Mockito.mock(PremiumRepository.class);
-        PremiumService premiumService = new PremiumService(userRepo, premiumRepo, paymentServiceClient,
-                premiumValidator, mapper);
+        PremiumService premiumService = new PremiumService(premiumRepo, paymentServiceClient,
+                premiumValidator, mapper, userService);
 
         Clock clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
         user.setId(1L);
@@ -85,7 +84,7 @@ public class PremiumServiceTest {
         PaymentRequest request = new PaymentRequest(paymentNum, BigDecimal.valueOf(PremiumPeriod.ONE_MONTH.getPrice()),
                 Currency.USD);
         Mockito.when(paymentServiceClient.sendPayment(request)).thenReturn(ResponseEntity.ok(response));
-        Mockito.when(userRepo.findById(1L)).thenReturn(Optional.of(user));
+        Mockito.when(userService.findUserById(1L)).thenReturn(user);
         premiumService.buyPremium(1L, PremiumPeriod.ONE_MONTH);
         Mockito.verify(paymentServiceClient, Mockito.times(1)).sendPayment(request);
     }

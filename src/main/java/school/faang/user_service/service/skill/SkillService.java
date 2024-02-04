@@ -39,15 +39,12 @@ public class SkillService {
         Skill skill = skillRepository.findUserSkill(skillId, userId).orElse(null);
         List<SkillOffer> offers = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
 
-        if (skill != null) {
-            throw new DataValidationException("User already has this skill");
-        } else {
+        if (skill == null) {
             skill = getSkillIfExists(skillId);
+            skillValidator.validateSkillOffersSize(offers);
+            skillRepository.assignSkillToUser(skillId, userId);
         }
 
-        skillValidator.validateSkillOffersSize(offers);
-
-        skillRepository.assignSkillToUser(skillId, userId);
         setSkillGuarantees(offers, skill, userId);
 
         return skillMapper.toDto(skill);

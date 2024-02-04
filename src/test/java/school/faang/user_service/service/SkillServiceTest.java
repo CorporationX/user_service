@@ -180,16 +180,16 @@ public class SkillServiceTest {
     }
 
     @Test
-    public void shouldThrowExceptionIfUserHasSkill () {
+    public void shouldReturnSkillDtoIfUserHasSkill () {
         firstUser.setSkills(skills);
 
         when(skillRepository.findUserSkill(firstSkill.getId(), firstUser.getId()))
                 .thenReturn(Optional.of(firstSkill));
 
-        assertThrows(
-                DataValidationException.class,
-                () -> skillService.acquireSkillFromOffers(firstSkill.getId(), firstUser.getId())
-        );
+        SkillDto result = skillService.acquireSkillFromOffers(firstSkill.getId(), firstUser.getId());
+
+        assertEquals(result.getTitle(), firstSkillDto.getTitle());
+        assertEquals(result.getId(), firstSkillDto.getId());
     }
 
     @Test

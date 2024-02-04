@@ -25,7 +25,9 @@ public class UserService {
     public UserDto createUser(UserDto userDto) {
         //some actions
         User savedUser = new User();
-        savedUser.setUserProfilePic(generateUserProfilePic());
+        if (savedUser.getUserProfilePic() == null) {
+            savedUser.setUserProfilePic(generateUserProfilePic());
+        }
         //some actions
         return userDto;
     }
@@ -40,10 +42,10 @@ public class UserService {
     }
 
     private UserProfilePic generateUserProfilePic() {
-        UUID randomUUID = UUID.randomUUID();
+        String seed = UUID.randomUUID().toString();
         return new UserProfilePic(
-                avatarBaseUrl + randomUUID,
-                smallAvatarBaseUrl + randomUUID
+                avatarBaseUrl + seed,
+                smallAvatarBaseUrl + seed
         );
     }
 }

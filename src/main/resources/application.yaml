@@ -26,7 +26,9 @@ spring:
           name: follower_channel
         profile_view_channel:
             name: profile_view_channel
-
+  mvc:
+    servlet:
+      path: /api/v1
 server:
   port: 8080
 

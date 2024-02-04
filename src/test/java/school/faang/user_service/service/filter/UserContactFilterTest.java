@@ -2,7 +2,7 @@ package school.faang.user_service.service.filter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.contact.Contact;
 import school.faang.user_service.entity.contact.ContactType;

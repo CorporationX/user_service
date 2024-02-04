@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RequestFilterDto {
     private String description;
-    private Long requesterId;
-    private Long receiverId;
+    private long requesterId;
+    private long receiverId;
     private String status;
 }

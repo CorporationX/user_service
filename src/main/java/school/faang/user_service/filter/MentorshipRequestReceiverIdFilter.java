@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 public class MentorshipRequestReceiverIdFilter implements MentorshipRequestFilter{
     @Override
     public boolean isApplicable(RequestFilterDto requestFilterDto) {
-        return requestFilterDto.getReceiverId() != null;
+        return requestFilterDto.getReceiverId() != 0;
     }
 
     @Override

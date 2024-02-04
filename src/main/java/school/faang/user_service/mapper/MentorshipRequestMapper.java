@@ -14,11 +14,8 @@ import java.util.List;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface MentorshipRequestMapper {
     MentorshipRequestDto toMentorshipRequestDto(MentorshipRequest mentorshipRequest);
-    MentorshipRequest MentorshipRequestToEntity(MentorshipRequestDto mentorshipRequestDto);
-
     MentorshipRejectDto toRejectionDto(MentorshipRequest mentorshipRequest);
 
-    MentorshipRequestMapper INSTANCE = Mappers.getMapper(MentorshipRequestMapper.class);
     @Mapping(source = "requester.id", target = "requesterId")
     @Mapping(source = "receiver.id", target = "receiverId")
     @Mapping(source = "status", target = "status")

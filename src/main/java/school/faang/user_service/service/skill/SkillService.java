@@ -87,10 +87,6 @@ public class SkillService {
         }
     }
 
-    public List<Skill> getRelatedSkills(List<Long> relatedSkillIds) {
-        return skillRepository.findAllById(relatedSkillIds);
-    }
-
     private Skill getSkillIfExists(Long skillId) {
         return skillRepository.findById(skillId).orElseThrow(
                 () -> new DataValidationException("Skill doesn't exist!")

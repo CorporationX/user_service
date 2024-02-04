@@ -10,17 +10,10 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.mentorship.DataNotFoundException;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.dto.mentorship.filter.RequestFilterDto;
-
 import java.util.List;
 import java.util.stream.StreamSupport;
-import school.faang.user_service.entity.MentorshipRequest;
-import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
-import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
 
@@ -30,6 +23,7 @@ import school.faang.user_service.validator.mentorship.MentorshipRequestValidator
 public class MentorshipRequestService {
 
     private final MentorshipRequestRepository mentorshipRequestRepository;
+    private final MentorshipRequestValidator mentorshipRequestValidator;
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final List<MentorshipRequestFilter> mentorshipRequestFilters;
     private final UserService userService;

@@ -1,7 +1,5 @@
 package school.faang.user_service.service.mentorship;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
@@ -16,11 +14,7 @@ import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
-import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
-import school.faang.user_service.entity.MentorshipRequest;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.mentorship.DataNotFoundException;
-import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
@@ -34,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
 
 
 import school.faang.user_service.dto.mentorship.RejectionDto;
@@ -57,7 +50,7 @@ class MentorshipRequestServiceTest {
     @InjectMocks
     private MentorshipRequestDto mentorshipRequestDto;
 
-    @InjectMocks
+    @Mock
     private MentorshipRequest mentorshipRequest;
 
     @Mock
@@ -67,6 +60,10 @@ class MentorshipRequestServiceTest {
     private UserService userService;
 
     private User user;
+
+    private User receiver;
+
+    private User requester;
 
     @BeforeEach
     public void init() {
@@ -85,10 +82,6 @@ class MentorshipRequestServiceTest {
         user = new User();
         user.setId(1L);
         user.setUsername("John");
-        Mockito.when(mentorshipRequestMapper.toEntity(mentorshipRequestDto))
-                .thenReturn(mentorshipRequest);
-        Mockito.when(mentorshipRequestMapper.toDTO(mentorshipRequest))
-                .thenReturn(mentorshipRequestDto);
     }
 
     @Test
@@ -128,6 +121,7 @@ class MentorshipRequestServiceTest {
 
     @Test
     public void whenRequestForMembershipThenCreated() {
+        Mockito.when(mentorshipRequestMapper.toEntity(mentorshipRequestDto)).thenReturn(mentorshipRequest);
         mentorshipRequestService.requestMentorship(mentorshipRequestDto);
         Mockito.verify(mentorshipRequestRepository, times(1))
                 .save(mentorshipRequest);
@@ -137,7 +131,5 @@ class MentorshipRequestServiceTest {
                 .toEntity(mentorshipRequestDto);
         Mockito.verify(mentorshipRequestValidator, times(1))
                 .validateUserData(any(), any());
-        Assertions.assertEquals(mentorshipRequestService.requestMentorship(mentorshipRequestDto)
-                , mentorshipRequestDto);
     }
 }

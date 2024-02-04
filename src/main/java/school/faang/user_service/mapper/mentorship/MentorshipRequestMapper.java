@@ -5,8 +5,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
-import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
-import school.faang.user_service.entity.MentorshipRequest;
 
 import java.util.List;
 

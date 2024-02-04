@@ -34,6 +34,11 @@ public class SkillController {
         return skillService.getOfferedSkills(userId);
     }
 
+    @PostMapping("/skill/{userId}/offered/{skillId}")
+    public SkillDto acquireSkillFromOffers(@PathVariable long skillId, @PathVariable long userId) {
+        return skillService.acquireSkillFromOffers(skillId, userId);
+    }
+
     private void validateSkill (String skillTitle) {
         if (skillTitle == null || skillTitle.isBlank()) {
             throw new DataValidationException("Invalid skill name.");

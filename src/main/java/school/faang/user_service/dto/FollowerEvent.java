@@ -1,16 +1,16 @@
 package school.faang.user_service.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Builder
+import java.time.LocalDateTime;
+
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
-public class UserDto {
-    private Long id;
-    private String username;
-    private String email;
+public class FollowerEvent {
+    private long followerId;
+    private long followeeId;
+    private LocalDateTime timestamp;
 }

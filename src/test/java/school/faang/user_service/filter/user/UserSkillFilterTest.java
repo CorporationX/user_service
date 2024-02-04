@@ -2,7 +2,7 @@ package school.faang.user_service.filter.user;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 

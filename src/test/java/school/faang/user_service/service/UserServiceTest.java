@@ -1,8 +1,10 @@
 package school.faang.user_service.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -20,7 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -32,7 +34,7 @@ class UserServiceTest {
     private UserMapperImpl userMapper = new UserMapperImpl();
 
     @Mock
-    private  PremiumRepository premiumRepository;
+    private PremiumRepository premiumRepository;
 
     private List<UserFilter> userFilters = List.of(new UserNameFilter());
 
@@ -67,6 +69,20 @@ class UserServiceTest {
         assertEquals("Пользователя не существует", dataValidationException.getMessage());
     }
 
+    void getUserById_whenUserIdExist_thenReturnUser() {
+        // Arrange
+        long userId = 1;
+        User user = User.builder().id(userId).build();
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        // Act
+        userService.getUserById(userId);
+
+        // Assert
+        verify(userRepository, times(1)).findById(userId);
+        assertEquals(user.getId(), userId);
+    }
+
     @Test
     void getPremiumUsers_WhenCalled_ShouldApplyFilters() {
         UserFilterDto filters = new UserFilterDto();
@@ -94,5 +110,12 @@ class UserServiceTest {
         assertEquals("ivan@example.com", actualDtos.get(0).getEmail());
         assertEquals("ivan@example.com", actualDtos.get(1).getEmail());
     }
-}
 
+
+    @Test
+    void testGetUserById_whenUserIdNotExist_thenThrowEntityNotFoundException() {
+        long userId = 1;
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        assertThrows(EntityNotFoundException.class, () -> userService.getUserById(userId));
+    }
+}

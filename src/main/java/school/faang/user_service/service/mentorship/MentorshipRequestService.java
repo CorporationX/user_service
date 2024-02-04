@@ -13,6 +13,15 @@ import school.faang.user_service.exception.mentorship.DataNotFoundException;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
+import school.faang.user_service.entity.MentorshipRequest;
+import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
+import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
+import school.faang.user_service.dto.mentorship.filter.RequestFilterDto;
+import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
+import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+
+import java.util.List;
+import java.util.stream.StreamSupport;
 
 @Component
 @RequiredArgsConstructor
@@ -20,6 +29,7 @@ public class MentorshipRequestService {
 
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final MentorshipRequestMapper mentorshipRequestMapper;
+    private final List<MentorshipRequestFilter> mentorshipRequestFilters;
 
     public MentorshipRequestDto acceptRequest(long id) {
         MentorshipRequest mentorshipRequest = findByRequestId(id);
@@ -32,11 +42,20 @@ public class MentorshipRequestService {
     }
 
     public MentorshipRequestDto rejectRequest(long id, RejectionDto rejection) {
-        MentorshipRequest mentorshipRequest = findRequestById(id);
+        MentorshipRequest mentorshipRequest = findByRequestId(id);
         mentorshipRequest.setStatus(RequestStatus.REJECTED);
         mentorshipRequest.setRejectionReason(rejection.getReason());
         mentorshipRequestRepository.save(mentorshipRequest);
         return mentorshipRequestMapper.toDTO(mentorshipRequest);
+    }
+
+    public List<MentorshipRequestDto> getRequests(RequestFilterDto filters) {
+        List<MentorshipRequest> mentorshipRequest = StreamSupport.stream(
+                mentorshipRequestRepository.findAll().spliterator(), false).toList();
+        mentorshipRequestFilters.stream()
+                .filter(filter -> filter.isApplicable(filters))
+                .forEach(filter -> filter.apply(mentorshipRequest, filters));
+        return mentorshipRequestMapper.toDtoList(mentorshipRequest);
     }
 
     private MentorshipRequest findByRequestId(long id) {

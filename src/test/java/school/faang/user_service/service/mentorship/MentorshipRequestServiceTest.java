@@ -18,7 +18,6 @@ import school.faang.user_service.repository.mentorship.MentorshipRequestReposito
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,15 +25,6 @@ import static org.mockito.Mockito.times;
 
 
 import school.faang.user_service.dto.mentorship.RejectionDto;
-import school.faang.user_service.entity.MentorshipRequest;
-import school.faang.user_service.exception.mentorship.DataNotFoundException;
-import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
-import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipRequestServiceTest {
@@ -106,9 +96,9 @@ class MentorshipRequestServiceTest {
         Mockito.verify(mentorshipRequestMapper, times(1))
                 .toDTO(mentorshipRequest);
         mentorshipRequestService.rejectRequest(1L, new RejectionDto(StringUtils.EMPTY));
-        Mockito.verify(mentorshipRequestRepository, times(1))
+        Mockito.verify(mentorshipRequestRepository, times(2))
                 .save(mentorshipRequest);
-        Mockito.verify(mentorshipRequestMapper, times(1))
+        Mockito.verify(mentorshipRequestMapper, times(2))
                 .toDTO(mentorshipRequest);
     }
 }

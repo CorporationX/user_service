@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RecommendationRequestController {
 
-    private RecommendationRequestService recommendationRequestService;
+    private final RecommendationRequestService recommendationRequestService;
 
     public RecommendationRequestDto requestRecommendation(RecommendationRequestDto recommendationRequest) {
         if ((recommendationRequest.getMessage() == null) || recommendationRequest.getMessage().isBlank() || recommendationRequest.getMessage().isEmpty())

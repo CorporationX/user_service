@@ -71,8 +71,7 @@ public class GoalService {
 
         if (goalDto.getStatus().equals(GoalStatus.COMPLETED)) {
             List<Skill> skills = skillService.findSkillsByGoalId(goalToUpdate.getId());
-            updateOfSkills(goalToUpdate, skills);
-            List<User> users = goalRepository.findUsersByGoalId(goalToUpdate.getId());
+            updateSkills(goalToUpdate, skills);
         }
         goalMapper.updateFromDto(goalDto, goalToUpdate);
         goalRepository.save(goalToUpdate);
@@ -84,7 +83,7 @@ public class GoalService {
         return applyFilterAndMapToDto(goalFilterDto, goals);
     }
 
-    private void updateOfSkills(Goal goal, List<Skill> skills) {
+    private void updateSkills(Goal goal, List<Skill> skills) {
         skillService.deleteAllSkills(goal.getSkillsToAchieve());
         goal.setSkillsToAchieve(skills);
         goal.getUsers().forEach(user -> user.setSkills(skills));

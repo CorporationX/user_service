@@ -2,10 +2,7 @@ package school.faang.user_service.controller.subscription;
 
 import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.service.subscription.SubscriptionService;
 
 import java.util.Map;
@@ -29,6 +26,18 @@ public class SubscriptionController {
                                                    @PathParam("followeeId") long followeeId) {
         subscriptionService.unfollowUser(followerId, followeeId);
         return Map.entry("isUnfollowed", true);
+    }
+
+    @GetMapping("/count/followings/{followerId}")
+    public Map.Entry<String, Integer> getFollowingCount(@PathVariable("followerId") long followerId) {
+        int followingCount = subscriptionService.getFollowingCount(followerId);
+        return Map.entry("followingCount", followingCount);
+    }
+
+    @GetMapping("/count/followers/{followeeId}")
+    public Map.Entry<String, Integer> getFollowersCount(@PathVariable("followeeId") long followeeId) {
+        int followersCount = subscriptionService.getFollowersCount(followeeId);
+        return Map.entry("followersCount", followersCount);
     }
 
 }

@@ -7,11 +7,10 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.entity.UserDto;
 import school.faang.user_service.dto.filter.UserFilterDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.filter.UserInMemoryFilterService;
 
@@ -35,8 +34,6 @@ class SubscriptionServiceImplTest {
 
     @Mock
     private SubscriptionRepository subscriptionRepository;
-    @Mock
-    private UserMapperImpl userMapper;
     @Mock
     private UserInMemoryFilterService userFilter;
 
@@ -166,15 +163,15 @@ class SubscriptionServiceImplTest {
     @Test
     void shouldReturnFilteredFollowingsWhenGetValidIdAndFilter() {
         Stream<User> userStream = getTestUsers().stream();
-        UserFilterDto filterDto = UserFilterDto.builder().id(1L).username("user1").build();
-        Stream<UserDto> filteredDtosStream = Stream.of(UserDto.builder().id(1L).username("user1").build());
+        UserFilterDto filterDto = getTestFilterDto();
+        Stream<UserDto> filteredDtosStream = getTestUserDtoStream();
 
         when(subscriptionRepository.findByFollowerId(validFollowerId))
                 .thenReturn(userStream);
         when(userFilter.applyFilters(any(), eq(filterDto)))
                 .thenReturn(filteredDtosStream);
 
-        List<UserDto> following = subscriptionService.getFollowing(validFollowerId, filterDto);
+        List<UserDto> following = subscriptionService.getFollowings(validFollowerId, filterDto);
 
         InOrder inOrder = inOrder(subscriptionRepository, userFilter);
         inOrder.verify(subscriptionRepository).findByFollowerId(validFollowerId);
@@ -185,8 +182,8 @@ class SubscriptionServiceImplTest {
     @Test
     void shouldReturnFilteredFollowersWhenGetValidIdAndFilter() {
         Stream<User> userStream = getTestUsers().stream();
-        UserFilterDto filterDto = UserFilterDto.builder().id(1L).username("user1").build();
-        Stream<UserDto> filteredDtosStream = Stream.of(UserDto.builder().id(1L).username("user1").build());
+        UserFilterDto filterDto = getTestFilterDto();
+        Stream<UserDto> filteredDtosStream = getTestUserDtoStream();
 
         when(subscriptionRepository.findByFolloweeId(validFollowerId))
                 .thenReturn(userStream);
@@ -201,11 +198,12 @@ class SubscriptionServiceImplTest {
         assertEquals(1, following.size());
     }
 
+
     @Test
     void shouldThrowExceptionWhenFollowerIdIsInvalidInGetFollowings() {
         assertThrows(
                 DataValidationException.class,
-                () -> subscriptionService.getFollowing(invalidFollowerId, null));
+                () -> subscriptionService.getFollowings(invalidFollowerId, null));
 
         verify(subscriptionRepository, never()).findByFollowerId(anyLong());
         verify(userFilter, never()).applyFilters(any(), any());
@@ -219,6 +217,14 @@ class SubscriptionServiceImplTest {
 
         verify(subscriptionRepository, never()).findByFolloweeId(anyLong());
         verify(userFilter, never()).applyFilters(any(), any());
+    }
+
+    private Stream<UserDto> getTestUserDtoStream() {
+        return Stream.of(UserDto.builder().id(1L).username("user1").build());
+    }
+
+    private UserFilterDto getTestFilterDto() {
+        return UserFilterDto.builder().id(1L).username("user1").build();
     }
 
     List<User> getTestUsers() {

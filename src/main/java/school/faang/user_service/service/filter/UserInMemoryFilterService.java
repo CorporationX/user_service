@@ -2,7 +2,7 @@ package school.faang.user_service.service.filter;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.entity.UserDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.filter.memory.user.UserInMemoryFilter;
 

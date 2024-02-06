@@ -3,8 +3,8 @@ package school.faang.user_service.controller.subscription;
 import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import school.faang.user_service.dto.entity.UserDto;
 import school.faang.user_service.dto.filter.UserFilterDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.subscription.SubscriptionService;
 
 import java.util.List;
@@ -46,7 +46,7 @@ public class SubscriptionController {
     @PostMapping("/followings/{followerId}")
     public Map.Entry<String, List<UserDto>> getFollowings(@PathVariable("followerId") long followerId,
                                                           @RequestBody UserFilterDto filterDto) {
-        List<UserDto> users = subscriptionService.getFollowing(followerId, filterDto);
+        List<UserDto> users = subscriptionService.getFollowings(followerId, filterDto);
         return Map.entry("following", users);
     }
 

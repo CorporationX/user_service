@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.dto.entity.UserDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.filter.UserInMemoryFilterService;
 
@@ -53,7 +53,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     @Transactional
-    public List<UserDto> getFollowing(long followerId, UserFilterDto filterDto) {
+    public List<UserDto> getFollowings(long followerId, UserFilterDto filterDto) {
         validateUserId(followerId);
         Stream<UserDto> userDtoStream = subscriptionRepository.findByFollowerId(followerId)
                 .map(userMapper::toUserDto);

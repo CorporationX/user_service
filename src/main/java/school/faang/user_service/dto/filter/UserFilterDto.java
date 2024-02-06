@@ -1,24 +1,23 @@
-package school.faang.user_service.dto.user;
+package school.faang.user_service.dto.filter;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
-import school.faang.user_service.dto.skill.SkillDto;
-import java.util.List;
-import school.faang.user_service.dto.entity.EntityDto;
 
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class UserDto extends EntityDto {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class UserFilterDto extends FilterDto {
     private Long id;
     private String username;
     private String email;
     private String phone;
+    private String password;
+    private Boolean active;
     private String aboutMe;
     private Long countryId;
     private String city;
-    private Integer experience;
-    private List<SkillDto> skills;
 
 }

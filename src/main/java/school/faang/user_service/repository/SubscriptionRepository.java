@@ -41,4 +41,6 @@ public interface SubscriptionRepository extends JpaRepository<User, Long> {
 
     @Query(nativeQuery = true, value = "select count(id) from subscription where follower_id = :followerId")
     int findFolloweesAmountByFollowerId(long followerId);
+
+
 }

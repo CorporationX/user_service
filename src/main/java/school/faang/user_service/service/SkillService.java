@@ -49,7 +49,6 @@ public class SkillService {
                 .collect(Collectors.groupingBy(e -> e, Collectors.counting()))
                 .entrySet()
                 .stream()
-                .filter(skill -> skill.getValue() >= 3)
                 .map(entry -> new SkillCandidateDto(
                         skillMapper.toDto(entry.getKey()),
                         entry.getValue()))
@@ -63,16 +62,17 @@ public class SkillService {
         }
         List<SkillOffer> offers = skillOfferRepository
                 .findAllOffersOfSkill(skillId, userId);
-        if (offers.size() >= MIN_SKILL_OFFERS) {
-            skillRepository.assignSkillToUser(skillId, userId);
-            List<Recommendation> recommendationList = new ArrayList<>();
-            for (SkillOffer offer : offers) {
-                recommendationList.add(offer.getRecommendation());
-            }
-            User user = userRepository.findUser(userId);
-            user.setRecommendationsReceived(recommendationList);
-            return skillMapper.toDto(offers.get(0).getSkill());
+        if (offers.size() < MIN_SKILL_OFFERS) {
+            throw new IllegalArgumentException("Рекомендаций меньше 3");
         }
-        throw new IllegalArgumentException("Рекомендаций меньше 3");
+        skillRepository.assignSkillToUser(skillId, userId);
+        List<Recommendation> recommendationList = new ArrayList<>();
+        for (SkillOffer offer : offers) {
+            recommendationList.add(offer.getRecommendation());
+        }
+        User user = userRepository.findUser(userId);
+        user.setRecommendationsReceived(recommendationList);
+        userRepository.save(user);
+        return skillMapper.toDto(offers.get(0).getSkill());
     }
 }

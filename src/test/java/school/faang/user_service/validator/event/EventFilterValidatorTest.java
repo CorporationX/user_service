@@ -1,4 +1,4 @@
-package school.faang.user_service.validator.eventFilter;
+package school.faang.user_service.validator.event;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.validator.eventFilter.EventFilterValidator;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

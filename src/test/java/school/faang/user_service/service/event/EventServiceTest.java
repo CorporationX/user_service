@@ -1,5 +1,6 @@
 package school.faang.user_service.service.event;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +16,6 @@ import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.filter.event.EventOwnerIdPattern;
 import school.faang.user_service.filter.event.EventStartDatePattern;
@@ -33,7 +33,9 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class EventServiceTest {
@@ -126,7 +128,7 @@ public class EventServiceTest {
                 .build();
         Event eventEntity = eventMapper.toEntity(eventDtoExpected);
         when(eventRepository.findById(eventDtoExpected.getId())).thenReturn(Optional.ofNullable(eventEntity));
-        when(userService.findUserById(eventDtoExpected.getOwnerId())).thenReturn(owner);
+        when(userService.getUserById(eventDtoExpected.getOwnerId())).thenReturn(owner);
         eventEntity.setRelatedSkills(skills);
         when(eventRepository.save(eventEntity)).thenReturn(eventEntity);
 
@@ -143,7 +145,7 @@ public class EventServiceTest {
                 .title("EventFirst")
                 .build();
 
-        assertThrows(DataValidationException.class,
+        assertThrows(EntityNotFoundException.class,
                 () -> eventService.updateEvent(eventDto));
     }
 
@@ -152,7 +154,7 @@ public class EventServiceTest {
         EventDto eventDto = EventDto.builder()
                 .id(1L)
                 .build();
-        assertThrows(DataValidationException.class,
+        assertThrows(EntityNotFoundException.class,
                 () -> eventService.updateEvent(eventDto));
     }
 
@@ -218,7 +220,7 @@ public class EventServiceTest {
         long wrongId = 11L;
         when(eventRepository.findById(wrongId)).thenReturn(Optional.empty());
 
-        assertThrows(DataValidationException.class, () -> eventService.getEvent(wrongId));
+        assertThrows(EntityNotFoundException.class, () -> eventService.getEvent(wrongId));
     }
 
     @Test

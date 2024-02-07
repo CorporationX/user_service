@@ -1,5 +1,6 @@
 package school.faang.user_service.service.event;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
@@ -29,7 +30,7 @@ public class EventService {
     public EventDto updateEvent(EventDto eventDto) {
         Event event = getEvent(eventDto.getId());
         eventValidator.validateEventToUpdate(eventDto);
-        User owner = userService.findUserById(eventDto.getOwnerId());
+        User owner = userService.getUserById(eventDto.getOwnerId());
         event.setOwner(owner);
         event.setStartDate(eventDto.getStartDate());
 
@@ -54,7 +55,7 @@ public class EventService {
 
     public Event getEvent(long eventId) {
         return eventRepository.findById(eventId)
-                .orElseThrow(() -> new DataValidationException("Not found event by Id - " + eventId));
+                .orElseThrow(() -> new EntityNotFoundException("Not found event by Id - " + eventId));
     }
 
     public EventDto getEventDto(long eventId) {

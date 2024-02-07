@@ -55,6 +55,6 @@ public class UserServiceTest {
 
         verify(userRepository, times(1)).save(user);
 
-        assertTrue(userService.existsUserById(user.getId()));
+        assertTrue(userService.isOwnerExistById(user.getId()));
     }
 }

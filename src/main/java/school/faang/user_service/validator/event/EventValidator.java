@@ -27,7 +27,7 @@ public class EventValidator {
 
     public void validateEventToUpdate(EventDto eventDto) {
         checkIfEventNotStarted(eventDto.getStartDate());
-        userService.checkIfOwnerExists(eventDto.getOwnerId());
+        checkIfOwnerExistsById(eventDto.getOwnerId());
         checkIfOwnerHasSkillsRequired(eventDto);
     }
 
@@ -63,7 +63,7 @@ public class EventValidator {
     }
 
     public void checkIfOwnerExistsById(long id) {
-        if (!userService.checkIfOwnerExistsById(id)) {
+        if (!userService.isOwnerExistById(id)) {
             throw new DataValidationException("Owner does not exist");
         }
     }

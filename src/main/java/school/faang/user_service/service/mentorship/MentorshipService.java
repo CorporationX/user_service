@@ -18,26 +18,26 @@ public class MentorshipService {
     private final UserMapper userMapper;
 
     public List<UserDto> getMentors(long id) {
-        User user = userService.getExistingUserById(id);
+        User user = userService.getUserById(id);
         return userMapper.listToDto(user.getMentors());
     }
 
     public List<UserDto> getMentees(long id) {
-        User user = userService.getExistingUserById(id);
+        User user = userService.getUserById(id);
         return userMapper.listToDto(user.getMentees());
     }
 
     public void deleteMentor(long menteeId, long mentorId) {
-        User mentee = userService.getExistingUserById(menteeId);
-        User mentor = userService.getExistingUserById(mentorId);
+        User mentee = userService.getUserById(menteeId);
+        User mentor = userService.getUserById(mentorId);
         if (mentee.getMentors().remove(mentor)) {
             mentorshipRepository.save(mentee);
         }
     }
 
     public void deleteMentee(long mentorId, long menteeId) {
-        User mentor = userService.getExistingUserById(mentorId);
-        User mentee = userService.getExistingUserById(menteeId);
+        User mentor = userService.getUserById(mentorId);
+        User mentee = userService.getUserById(menteeId);
         if (mentor.getMentees().remove(mentee)) {
             mentorshipRepository.save(mentor);
         }

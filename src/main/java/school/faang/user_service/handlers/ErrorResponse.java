@@ -1,4 +1,4 @@
-package school.faang.user_service.exception.goal;
+package school.faang.user_service.handlers;
 
 import lombok.Getter;
 import lombok.Setter;

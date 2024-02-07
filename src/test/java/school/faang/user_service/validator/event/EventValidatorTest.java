@@ -1,5 +1,6 @@
 package school.faang.user_service.validator.event;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -13,7 +14,6 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.user1.UserService;
-import school.faang.user_service.validator.event.EventValidator;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -54,6 +54,7 @@ class EventValidatorTest {
                 .build();
 
         Mockito.when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(owner));
+        Mockito.when(userService.isOwnerExistById(owner.getId())).thenReturn(true);
         eventValidator.validateEventToUpdate(eventDto);
     }
 
@@ -139,7 +140,7 @@ class EventValidatorTest {
                 .build();
         Mockito.when(userService.isOwnerExistById(user.getId())).thenReturn(false);
 
-        assertThrows(DataValidationException.class, () -> eventValidator.checkIfOwnerExistsById(user.getId()));
+        assertThrows(EntityNotFoundException.class, () -> eventValidator.checkIfOwnerExistsById(user.getId()));
     }
 
 

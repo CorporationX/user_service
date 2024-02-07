@@ -21,6 +21,7 @@ import java.util.List;
 @Validated
 public class MentorshipController {
     private final MentorshipService mentorshipService;
+    private final MentorshipValidator mentorshipValidator;
 
     @GetMapping("/mentors/{id}")
     public List<UserDto> getMentors(@PathVariable @Min(1) long id) {
@@ -34,13 +35,13 @@ public class MentorshipController {
 
     @DeleteMapping("/mentors")
     public void deleteMentor(@RequestParam @Min(1) long menteeId, @RequestParam @Min(1) long mentorId) {
-        MentorshipValidator.validateMentorshipIds(mentorId, menteeId);
+        mentorshipValidator.validateMentorshipIds(mentorId, menteeId);
         mentorshipService.deleteMentor(menteeId, mentorId);
     }
 
     @DeleteMapping("/mentees")
     public void deleteMentee(@RequestParam @Min(1) long mentorId, @RequestParam @Min(1) long menteeId) {
-        MentorshipValidator.validateMentorshipIds(mentorId, menteeId);
+        mentorshipValidator.validateMentorshipIds(mentorId, menteeId);
         mentorshipService.deleteMentee(mentorId, menteeId);
     }
 }

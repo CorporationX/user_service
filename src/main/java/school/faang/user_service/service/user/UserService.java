@@ -17,7 +17,7 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final CsvToPersonParser csvToPersonParser;
+    private final CsvOfPeopleToUserParser csvParser;
 
     public User getExistingUserById(long id) {
         return userRepository.findById(id)
@@ -25,7 +25,7 @@ public class UserService {
     }
 
     public List<UserDto> generateUsersFromCsv(MultipartFile csvFile) throws IOException {
-        List<User> savedUsers = csvToPersonParser.parseUsers(csvFile);
+        List<User> savedUsers = csvParser.parse(csvFile);
         userRepository.saveAll(savedUsers);
         return userMapper.listToDto(savedUsers);
     }

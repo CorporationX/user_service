@@ -26,7 +26,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 @RequiredArgsConstructor
 @Component
-public class CsvToPersonParser {
+public class CsvOfPeopleToUserParser {
     private static final int THREAD_NUM = 5;
     private static final long MAX_FILE_CHUNK_SIZE = 13_000L;
     private static final long EXPECTED_CHUNK_SIZE = 1_300L;
@@ -35,7 +35,7 @@ public class CsvToPersonParser {
     private final Lock lock = new ReentrantLock();
     private final ExecutorService executor = Executors.newFixedThreadPool(THREAD_NUM);
 
-    public List<User> parseUsers(MultipartFile csvFile) throws IOException {
+    public List<User> parse(MultipartFile csvFile) throws IOException {
         List<User> users = new ArrayList<>();
         InputStream inputStream = BOMInputStream.builder()
                 .setInputStream(csvFile.getInputStream())
@@ -91,7 +91,7 @@ public class CsvToPersonParser {
                 () -> {
                     try {
                         Thread.sleep(5000);
-                        parseCsvToUser(csvStrBuilderFile.toString().getBytes(), users);
+                        parseCsvToPeopleAndMapToUser(csvStrBuilderFile.toString().getBytes(), users);
                         System.out.println(Thread.currentThread());
                     } catch (IOException | InterruptedException e) {
                         throw new RuntimeException(e);
@@ -101,10 +101,10 @@ public class CsvToPersonParser {
     }
 
     private void linealParse(InputStream inputStream, List<User> users) throws IOException {
-        parseCsvToUser(inputStream.readAllBytes(), users);
+        parseCsvToPeopleAndMapToUser(inputStream.readAllBytes(), users);
     }
 
-    private void parseCsvToUser(byte[] bytes, List<User> users) throws IOException {
+    private void parseCsvToPeopleAndMapToUser(byte[] bytes, List<User> users) throws IOException {
         MappingIterator<Person> mappingIterator = csvPersonMapper
                 .readerFor(Person.class)
                 .with(CsvSchema.emptySchema().withHeader())

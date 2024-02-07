@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.config.async.AsyncConfig;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.Skill;
@@ -25,7 +26,9 @@ import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.event.EventValidator;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -48,6 +51,8 @@ public class EventServiceTest {
     private UserService userService;
     @Mock
     private EventValidator eventValidator;
+    @Mock
+    private AsyncConfig asyncConfig;
 
     private List<EventFilter> eventFilters = new ArrayList<>();
     private LocalDateTime startDate;
@@ -65,7 +70,7 @@ public class EventServiceTest {
         eventFilters.add(new EventTitlePattern());
         eventFilters.add(new EventStartDatePattern());
 
-        eventService = new EventService(eventRepository, eventMapper, eventValidator, userService, eventFilters);
+        eventService = new EventService(eventRepository, eventMapper, eventValidator, userService, eventFilters, asyncConfig);
 
         startDate = LocalDateTime.now().plusDays(1L);
         owner = User.builder().id(1L).active(true).build();
@@ -283,6 +288,30 @@ public class EventServiceTest {
         Mockito.when(eventRepository.findAll()).thenReturn(List.of(eventFirst, eventSecond));
         List<EventDto> resultToFilterByStartDate = eventService.getEventsByFilter(eventFilterDtoStartDate);
         assertEquals(1, resultToFilterByStartDate.size());
+    }
+
+    @Test
+    public void deletePastEventSuccess() {
+        Event event1 = Event.builder()
+                .id(1L)
+                .title("First event")
+                .endDate(LocalDateTime.of(2000, 1, 1, 0, 0))
+                .build();
+        Event event2 = Event.builder()
+                .id(1L)
+                .title("Second event")
+                .endDate(LocalDateTime.of(2000, 1, 1, 0, 0))
+                .build();
+        Event event3 = Event.builder()
+                .id(1L)
+                .title("Third event")
+                .endDate(LocalDateTime.of(2025, 1, 1, 0, 0))
+                .build();
+        when(eventRepository.findAll()).thenReturn(List.of(event1, event2, event3));
+        
+
+
+
     }
 
 }

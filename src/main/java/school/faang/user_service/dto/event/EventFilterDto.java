@@ -15,4 +15,5 @@ public class EventFilterDto {
     public String titlePattern;
     public Long ownerPattern;
     public LocalDateTime startDatePattern;
+    public LocalDateTime endDatePattern;
 }

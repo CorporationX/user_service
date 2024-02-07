@@ -31,4 +31,10 @@ public interface EventMapper {
                 .collect(Collectors.toList());
     }
 
+    default List<Event> toListEntity(List<EventDto> events) {
+        return events.stream()
+                .map(this::toEntity)
+                .collect(Collectors.toList());
+    }
+
 }

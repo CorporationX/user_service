@@ -28,7 +28,7 @@ spring:
             name: profile_view_channel
 
 server:
-  port: 8080
+  port: 8085
 
 logging:
   level:
@@ -51,3 +51,9 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
+
+delete_events:
+  cron: 0 0 * * * *
+
+scheduler:
+  batchSize: 10

@@ -33,6 +33,11 @@ dependencies {
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
 	/**
+	 * Commons-io
+	 */
+	implementation("commons-io:commons-io:2.15.1")
+
+	/**
 	 * Database
 	 */
 	implementation("org.liquibase:liquibase-core")
@@ -75,12 +80,12 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
-jsonSchema2Pojo {
+/*jsonSchema2Pojo {
 	setSource(files("src/main/resources/json"))
 	targetDirectory = file("${project.buildDir}/generated-sources/js2p")
 	targetPackage = "com.json.student"
 	setSourceType("jsonschema")
-}
+}*/
 
 tasks.withType<Test> {
 	useJUnitPlatform()

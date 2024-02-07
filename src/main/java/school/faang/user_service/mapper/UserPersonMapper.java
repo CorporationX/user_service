@@ -1,12 +1,11 @@
 package school.faang.user_service.mapper;
 
-import com.json.student.Person;
-import lombok.RequiredArgsConstructor;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
 import school.faang.user_service.entity.Country;
+import school.faang.user_service.entity.student.Person;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.CountryRepository;
 
@@ -24,7 +23,7 @@ public abstract class UserPersonMapper {
     @Mapping(target = "aboutMe", expression = "java(getAboutMe(person))")
     public abstract User toUser(Person person);
 
-    protected String createAboutMe(Person person) {
+    protected String getAboutMe(Person person) {
         String state = person.getContactInfo().getAddress().getState();
         String faculty = person.getEducation().getFaculty();
         String major = person.getEducation().getMajor();

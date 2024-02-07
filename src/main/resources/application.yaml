@@ -52,8 +52,6 @@ services:
     bucket-name: user_backet
     isMocked: true
 
-delete_events:
-  cron: 0 0 * * * *
-
 scheduler:
   batchSize: 10
+  deleteEventsCron: 0 0 * * * *

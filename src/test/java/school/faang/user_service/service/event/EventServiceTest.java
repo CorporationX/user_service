@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import school.faang.user_service.config.async.AsyncConfig;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
@@ -26,9 +27,7 @@ import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.event.EventValidator;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Month;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -36,7 +35,10 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class EventServiceTest {
@@ -292,26 +294,41 @@ public class EventServiceTest {
 
     @Test
     public void deletePastEventSuccess() {
+        int batch = 10;
         Event event1 = Event.builder()
                 .id(1L)
                 .title("First event")
                 .endDate(LocalDateTime.of(2000, 1, 1, 0, 0))
+                .relatedSkills(List.of(Skill.builder()
+                        .id(1L)
+                        .build()))
                 .build();
         Event event2 = Event.builder()
                 .id(1L)
                 .title("Second event")
                 .endDate(LocalDateTime.of(2000, 1, 1, 0, 0))
+                .relatedSkills(List.of(Skill.builder()
+                        .id(1L)
+                        .build()))
                 .build();
         Event event3 = Event.builder()
                 .id(1L)
                 .title("Third event")
                 .endDate(LocalDateTime.of(2025, 1, 1, 0, 0))
+                .relatedSkills(List.of(Skill.builder()
+                        .id(1L)
+                        .build()))
                 .build();
-        when(eventRepository.findAll()).thenReturn(List.of(event1, event2, event3));
-        
+        List<Event> events = List.of(event1, event2, event3);
+        when(eventRepository.findAll()).thenReturn(events);
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.initialize();
+        when(asyncConfig.getAsyncExecutor()).thenReturn(executor);
+        eventService.deletePastEvents(batch);
 
-
-
+        verify(eventRepository, times(1)).findAll();
+        verify(eventRepository, times(1)).deleteAll(anyList());
+        verify(asyncConfig, times(1)).getAsyncExecutor();
     }
 
 }

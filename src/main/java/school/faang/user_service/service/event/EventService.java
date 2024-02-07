@@ -96,7 +96,9 @@ public class EventService {
 
         List<List<Event>> partitions = ListUtils.partition(pastEvents, batchSize);
         for (List<Event> sublist : partitions) {
-            executor.execute(() -> eventRepository.deleteAll(sublist));
+            if (executor != null) {
+                executor.execute(() -> eventRepository.deleteAll(sublist));
+            }
         }
     }
 

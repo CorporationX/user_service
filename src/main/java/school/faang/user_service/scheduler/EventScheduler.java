@@ -15,6 +15,7 @@ public class EventScheduler {
     @Value("${scheduler.batchSize}")
     private int batchSize;
 
+    // @Scheduled(cron = "${scheduler.deleteEventsCron}" если брать значение из yaml, то выдает ошибку
     @Scheduled(cron = "0 0 * * * *")
     public void clearEvents() {
         eventService.deletePastEvents(batchSize);

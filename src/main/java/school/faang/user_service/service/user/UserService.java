@@ -2,15 +2,28 @@ package school.faang.user_service.service.user;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.event.EventService;
+import school.faang.user_service.service.goal.GoalService;
+import school.faang.user_service.service.mentorship.MentorshipService;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
+    @Setter
+    private EventService eventService;
+    @Setter
+    private MentorshipService mentorshipService;
     private final UserRepository userRepository;
+    private final GoalService goalService;
 
     public User getExistingUserById(long id) {
         return userRepository.findById(id)
@@ -46,4 +59,42 @@ public class UserService {
     public boolean existsUserById(long id) {
         return userRepository.existsById(id);
     }
+
+    public void deactivationUserById(long userId) {
+        User user = getUserById(userId);
+        //before deActivation
+        stoppedGoalsAndDeleteEvents(user);
+        user.setActive(false);
+        saveUser(user);
+
+        //after deActivation
+        List<User> mentees = user.getMentees();
+        for (User mentee : mentees) {
+            mentorshipService.deleteMentor(mentee.getId(), user.getId());
+        }
+
+        //TODO дописать логику удаления через 3 месяца
+        //здесь использовать Scheduling Tasks?
+        deleteUserById(userId);
+    }
+
+    public void deleteUserById(long userId) {
+        userRepository.deleteById(userId);
+    }
+
+    private void stoppedGoalsAndDeleteEvents(User user) {
+        List<Goal> goals = user.getGoals();
+        for (Goal goal : goals) {
+            if (goal.getUsers().size() == 1 &&
+                    goal.getUsers().contains(user)) {
+                goalService.deleteGoalById(goal.getId());
+            }
+        }
+
+        List<Event> events = user.getOwnedEvents();
+        for (Event event : events) {
+            eventService.deleteEventById(event.getId());
+        }
+    }
+
 }

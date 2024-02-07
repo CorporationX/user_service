@@ -24,4 +24,8 @@ public class GoalService {
             throw new EntityNotFoundException("Goal not found");
         }
     }
+
+    public void deleteGoalById(Long goalId) {
+        goalRepository.deleteById(goalId);
+    }
 }

@@ -1,10 +1,11 @@
-package school.faang.user_service.service.filter;
+package school.faang.user_service.filter.user;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.filter.user.UserEmailFilter;
+import school.faang.user_service.filter.user.UserSkillFilter;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -13,20 +14,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class UserEmailFilterTest {
+public class UserSkillFilterTest {
 
     private UserFilterDto dto;
-    private UserEmailFilter filter;
+    private UserSkillFilter filter;
 
     @BeforeEach
     public void init() {
         dto = new UserFilterDto();
-        filter = new UserEmailFilter();
+        filter = new UserSkillFilter();
     }
 
     @Test
     void testIsApplicable() {
-        dto.setEmailPattern("@gmail.com");
+        dto.setSkillPattern("SQL");
         assertTrue(filter.isApplicable(dto));
     }
 
@@ -37,12 +38,15 @@ public class UserEmailFilterTest {
 
     @Test
     void testApplyFilter() {
-        dto.setEmailPattern("@gmail.com");
+        dto.setSkillPattern("SQL");
 
         List<User> createdUsers = List.of(
-                User.builder().email("r123467@gmail.com").build(),
-                User.builder().email("k2jsd@mail.ru").build(),
-                User.builder().email("dsjfzn22222@yandex.ru").build()
+                User.builder().skills(List.of(
+                        new Skill(1L, "SQL", null, null, null, null, null, null))).build(),
+                User.builder().skills(List.of(
+                        new Skill(12L, "Kafka", null, null, null, null, null, null))).build(),
+                User.builder().skills(List.of(
+                        new Skill(1432L, "RabbitMQ", null, null, null, null, null, null))).build()
         );
 
         Stream<User> users = createdUsers.stream();

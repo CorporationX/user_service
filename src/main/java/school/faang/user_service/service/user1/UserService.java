@@ -1,4 +1,4 @@
-package school.faang.user_service.service.user;
+package school.faang.user_service.service.user1;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,6 @@ public class UserService {
         return userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("User with ID %d not found", id)));
     }
-
     public boolean isOwnerExistById(Long id) {
         return userRepository.existsById(id);
     }

@@ -1,4 +1,4 @@
-package school.faang.user_service.service.controller;
+package school.faang.user_service.controller.subscription;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

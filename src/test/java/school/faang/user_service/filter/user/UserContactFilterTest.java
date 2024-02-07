@@ -1,10 +1,12 @@
-package school.faang.user_service.service.filter;
+package school.faang.user_service.filter.user;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.filter.user.UserPhoneFilter;
+import school.faang.user_service.entity.contact.Contact;
+import school.faang.user_service.entity.contact.ContactType;
+import school.faang.user_service.filter.user.UserContactFilter;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -13,20 +15,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class UserPhoneFilterTest {
+public class UserContactFilterTest {
 
     private UserFilterDto dto;
-    private UserPhoneFilter filter;
+    private UserContactFilter filter;
 
     @BeforeEach
     public void init() {
         dto = new UserFilterDto();
-        filter = new UserPhoneFilter();
+        filter = new UserContactFilter();
     }
 
     @Test
     void testIsApplicable() {
-        dto.setPhonePattern("+7");
+        dto.setContactPattern("@a");
         assertTrue(filter.isApplicable(dto));
     }
 
@@ -37,12 +39,15 @@ public class UserPhoneFilterTest {
 
     @Test
     void testApplyFilter() {
-        dto.setPhonePattern("+7");
+        dto.setContactPattern("VK");
 
         List<User> createdUsers = List.of(
-                User.builder().phone("+79992002020").build(),
-                User.builder().phone("+342398423").build(),
-                User.builder().phone("+79119111111").build()
+                User.builder().contacts(List.of(
+                        new Contact(1L, new User(), "@artem23", ContactType.VK))).build(),
+                User.builder().contacts(List.of(
+                        new Contact(11L, new User(), "@aaakss2", ContactType.TELEGRAM))).build(),
+                User.builder().contacts(List.of(
+                        new Contact(12L, new User(), "@bob1997", ContactType.VK))).build()
         );
 
         Stream<User> users = createdUsers.stream();

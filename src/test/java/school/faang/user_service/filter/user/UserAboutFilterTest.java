@@ -1,10 +1,10 @@
-package school.faang.user_service.service.filter;
+package school.faang.user_service.filter.user;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.filter.user.UserExperienceFilter;
+import school.faang.user_service.filter.user.UserAboutFilter;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -13,21 +13,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class UserExperienceFilterTest {
+public class UserAboutFilterTest {
 
     private UserFilterDto dto;
-    private UserExperienceFilter filter;
+    private UserAboutFilter filter;
 
     @BeforeEach
     public void init() {
         dto = new UserFilterDto();
-        filter = new UserExperienceFilter();
+        filter = new UserAboutFilter();
     }
 
     @Test
     void testIsApplicable() {
-        dto.setExperienceMax(10);
-        dto.setExperienceMin(5);
+        dto.setAboutPattern("Engineer");
         assertTrue(filter.isApplicable(dto));
     }
 
@@ -38,19 +37,18 @@ public class UserExperienceFilterTest {
 
     @Test
     void testApplyFilter() {
-        dto.setExperienceMax(10);
-        dto.setExperienceMin(5);
+        dto.setAboutPattern("Engineer");
 
         List<User> createdUsers = List.of(
-                User.builder().experience(7).build(),
-                User.builder().experience(17).build(),
-                User.builder().experience(2).build()
+                User.builder().aboutMe("IT Engineer").build(),
+                User.builder().aboutMe("Doctor").build(),
+                User.builder().aboutMe("Petroleum Engineer").build()
         );
 
         Stream<User> users = createdUsers.stream();
         List<User> filteredUsers = filter.apply(users, dto).toList();
 
-        assertEquals(1, filteredUsers.size());
+        assertEquals(2, filteredUsers.size());
         assertTrue(filteredUsers.contains(filteredUsers.get(0)));
     }
 }

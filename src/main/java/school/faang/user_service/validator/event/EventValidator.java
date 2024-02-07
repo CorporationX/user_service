@@ -7,7 +7,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.service.user1.UserService;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;

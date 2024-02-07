@@ -1,10 +1,10 @@
-package school.faang.user_service.service.filter;
+package school.faang.user_service.filter.user;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.filter.user.UserAboutFilter;
+import school.faang.user_service.filter.user.UserNameFilter;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -13,20 +13,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class UserAboutFilterTest {
+class UserNameFilterTest {
 
     private UserFilterDto dto;
-    private UserAboutFilter filter;
+    private UserNameFilter filter;
 
     @BeforeEach
     public void init() {
         dto = new UserFilterDto();
-        filter = new UserAboutFilter();
+        filter = new UserNameFilter();
     }
 
     @Test
     void testIsApplicable() {
-        dto.setAboutPattern("Engineer");
+        dto.setNamePattern("R");
         assertTrue(filter.isApplicable(dto));
     }
 
@@ -37,12 +37,12 @@ public class UserAboutFilterTest {
 
     @Test
     void testApplyFilter() {
-        dto.setAboutPattern("Engineer");
+        dto.setNamePattern("R");
 
         List<User> createdUsers = List.of(
-                User.builder().aboutMe("IT Engineer").build(),
-                User.builder().aboutMe("Doctor").build(),
-                User.builder().aboutMe("Petroleum Engineer").build()
+                User.builder().username("Ruslan").build(),
+                User.builder().username("Oleg").build(),
+                User.builder().username("Roman").build()
         );
 
         Stream<User> users = createdUsers.stream();

@@ -1,4 +1,4 @@
-package school.faang.user_service.service.service.premium;
+package school.faang.user_service.service.premium;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ import school.faang.user_service.entity.premium.PremiumPeriod;
 import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.premium.PremiumService;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.service.user1.UserService;
 import school.faang.user_service.validator.PremiumValidator;
 
 import java.math.BigDecimal;

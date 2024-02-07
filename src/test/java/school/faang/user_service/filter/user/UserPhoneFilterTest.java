@@ -1,11 +1,10 @@
-package school.faang.user_service.service.filter;
+package school.faang.user_service.filter.user;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.user.UserFilterDto;
-import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.filter.user.UserCountryFilter;
+import school.faang.user_service.filter.user.UserPhoneFilter;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -14,20 +13,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class UserCountryFilterTest {
+public class UserPhoneFilterTest {
 
     private UserFilterDto dto;
-    private UserCountryFilter filter;
+    private UserPhoneFilter filter;
 
     @BeforeEach
     public void init() {
         dto = new UserFilterDto();
-        filter = new UserCountryFilter();
+        filter = new UserPhoneFilter();
     }
 
     @Test
     void testIsApplicable() {
-        dto.setCountryPattern("R");
+        dto.setPhonePattern("+7");
         assertTrue(filter.isApplicable(dto));
     }
 
@@ -38,12 +37,12 @@ public class UserCountryFilterTest {
 
     @Test
     void testApplyFilter() {
-        dto.setCountryPattern("R");
+        dto.setPhonePattern("+7");
 
         List<User> createdUsers = List.of(
-                User.builder().country(new Country(1L, "Russia", null)).build(),
-                User.builder().country(new Country(2L, "Romania", null)).build(),
-                User.builder().country(new Country(3L, "Spain", null)).build()
+                User.builder().phone("+79992002020").build(),
+                User.builder().phone("+342398423").build(),
+                User.builder().phone("+79119111111").build()
         );
 
         Stream<User> users = createdUsers.stream();

@@ -22,7 +22,8 @@ import school.faang.user_service.filter.event.EventStartDatePattern;
 import school.faang.user_service.filter.event.EventTitlePattern;
 import school.faang.user_service.mapper.event.EventMapperImpl;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.service.event.EventService;
+import school.faang.user_service.service.user1.UserService;
 import school.faang.user_service.validator.event.EventValidator;
 
 import java.time.LocalDateTime;

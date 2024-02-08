@@ -84,13 +84,13 @@ public class MentorshipServiceTest {
         List<UserDto> resultMentorsDtos = List.of(new UserDto());
 
         Mockito.when(userService.getUserById(EXISTENT_USER_ID)).thenReturn(user);
-        Mockito.when(userMapper.listToDto(usersMentors)).thenReturn(resultMentorsDtos);
+        Mockito.when(userMapper.toDtoList(usersMentors)).thenReturn(resultMentorsDtos);
 
         List<UserDto> result = mentorshipService.getMentors(EXISTENT_USER_ID);
 
         assertEquals(resultMentorsDtos, result);
         Mockito.verify(userService, Mockito.times(1)).getUserById(EXISTENT_USER_ID);
-        Mockito.verify(userMapper, Mockito.times(1)).listToDto(usersMentors);
+        Mockito.verify(userMapper, Mockito.times(1)).toDtoList(usersMentors);
     }
 
     @Test
@@ -104,13 +104,13 @@ public class MentorshipServiceTest {
         List<UserDto> resultMenteeDtos = List.of(new UserDto());
 
         Mockito.when(userService.getUserById(EXISTENT_USER_ID)).thenReturn(user);
-        Mockito.when(userMapper.listToDto(userMentees)).thenReturn(resultMenteeDtos);
+        Mockito.when(userMapper.toDtoList(userMentees)).thenReturn(resultMenteeDtos);
 
         List<UserDto> result = mentorshipService.getMentees(EXISTENT_USER_ID);
 
         assertEquals(resultMenteeDtos, result);
         Mockito.verify(userService, Mockito.times(1)).getUserById(EXISTENT_USER_ID);
-        Mockito.verify(userMapper, Mockito.times(1)).listToDto(userMentees);
+        Mockito.verify(userMapper, Mockito.times(1)).toDtoList(userMentees);
     }
 
     @Test
@@ -124,7 +124,7 @@ public class MentorshipServiceTest {
 
         assertEquals(0, result.size());
         Mockito.verify(userService, Mockito.times(1)).getUserById(EXISTENT_USER_ID);
-        Mockito.verify(userMapper, Mockito.times(1)).listToDto(user.getMentors());
+        Mockito.verify(userMapper, Mockito.times(1)).toDtoList(user.getMentors());
     }
 
     @Test
@@ -138,7 +138,7 @@ public class MentorshipServiceTest {
 
         assertEquals(0, result.size());
         Mockito.verify(userService, Mockito.times(1)).getUserById(EXISTENT_USER_ID);
-        Mockito.verify(userMapper, Mockito.times(1)).listToDto(user.getMentees());
+        Mockito.verify(userMapper, Mockito.times(1)).toDtoList(user.getMentees());
     }
 
     @Test

@@ -91,4 +91,10 @@ public class GoalService {
                 .forEach(f -> f.apply(goals, filter));
         return goals.stream().map(goalMapper::toDto).toList();
     }
+
+    public void existsGoalById(long id) {
+        if (!goalRepository.existsById(id)) {
+            throw new EntityNotFoundException("Goal not found");
+        }
+    }
 }

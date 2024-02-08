@@ -50,7 +50,6 @@ public class CSVFileParserService {
         batchProcess(persons);
     }
 
-
     private void batchProcess(List<PersonSchemaV2> persons) {
         List<PersonSchemaV2> batch = new ArrayList<>();
         List<CompletableFuture<Void>> futures = new ArrayList<>();
@@ -67,7 +66,6 @@ public class CSVFileParserService {
         CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).join();
     }
 
-
     private CompletableFuture<Void> runBatchProcess(List<PersonSchemaV2> persons) {
         return CompletableFuture.runAsync(() -> {
             List<User> users = persons.stream()
@@ -80,7 +78,6 @@ public class CSVFileParserService {
             userDAO.saveUsersUsingBatchUpdate(users);
         }, executor);
     }
-
 
     private void randomUserPayload(User user) {
         ThreadLocalRandom threadLocalRandom = ThreadLocalRandom.current();

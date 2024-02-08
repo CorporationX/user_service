@@ -15,12 +15,16 @@ import java.util.List;
 public class SkillService {
     private final SkillRepository skillRepository;
 
+    public Skill findById(Long skillId) {
+        return skillRepository.findById(skillId).orElseThrow(() ->
+                new EntityNotFoundException("Skill with id = " + skillId + " is not exists"));
+    }
+
     public List<SkillDto> getUserSkills(long userId) {
         return new ArrayList<SkillDto>();
     }
 
-    public Skill findById(Long skillId) {
-        return skillRepository.findById(skillId).orElseThrow(() ->
-                new EntityNotFoundException("Skill with id = " + skillId + " is not exists"));
+    public List<Skill> getRelatedSkills(List<Long> relatedSkillIds) {
+        return skillRepository.findAllById(relatedSkillIds);
     }
 }

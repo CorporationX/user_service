@@ -1,6 +1,7 @@
 package school.faang.user_service.validator.mentorship;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,7 +22,7 @@ public class MentorshipValidatorTest {
         long firstUserId = 1L;
         long secondUserId = 1L;
         assertThrows(
-                DataValidationException.class,
+                ValidationException.class,
                 () -> mentorshipValidator.validateMentorshipIds(firstUserId, secondUserId)
         );
     }

@@ -11,6 +11,7 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.s3.S3Service;
@@ -18,20 +19,15 @@ import school.faang.user_service.service.s3.S3Service;
 import java.util.Optional;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
     @Spy
     private UserMapperImpl userMapper = new UserMapperImpl();
     @Mock
@@ -81,6 +77,12 @@ class UserServiceTest {
         assertEquals(user.getId(), userId);
     }
 
+    @Test
+    void testGetUserById_whenUserIdNotExist_thenThrowEntityNotFoundException() {
+        long userId = 1;
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        assertThrows(EntityNotFoundException.class, () -> userService.getUserById(userId));
+    }
     @Test
     void createUser_saveUserinBd() {
         // Arrange

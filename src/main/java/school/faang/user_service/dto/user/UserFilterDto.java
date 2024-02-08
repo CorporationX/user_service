@@ -1,5 +1,6 @@
 package school.faang.user_service.dto.user;
 
+import jakarta.validation.constraints.Email;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 public class UserFilterDto {
     private String namePattern;
     private String aboutPattern;
+    @Email(message = "Некорректный email")
     private String emailPattern;
     private String contactPattern;
     private String countryPattern;

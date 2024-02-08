@@ -42,7 +42,7 @@ public class GoalInvitationService {
 
         User inviter = userService.getUserById(invitation.getInviterId());
         User invited = userService.getUserById(invitation.getInvitedUserId());
-        Goal goal = goalService.getGoalBbyId(invitation.getGoalId());
+        Goal goal = goalService.getGoalById(invitation.getGoalId());
 
         GoalInvitation goalInvitation = goalInvitationMapper.toEntity(invitation);
         goalInvitation.setInviter(inviter);

@@ -61,7 +61,11 @@ public class UserService {
 
     private UserProfilePic saveAvatar(String userName) {
         byte[] avatar = getAvatar(userName);
-        return s3Service.uploadFile(avatar, userName);
+        if (avatar != null) {
+            return s3Service.uploadFile(avatar, userName);
+        } else {
+            throw new RuntimeException("Аватар не заполнен и не сохранен для User = " + userName);
+        }
     }
 
     private byte[] getAvatar(String userName) {

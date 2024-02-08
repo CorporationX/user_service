@@ -7,7 +7,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.UserService;
-import school.faang.user_service.validator.UserValidator;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -17,8 +16,6 @@ class UserControllerTest {
 
     @Mock
     private UserService userService;
-    @Mock
-    private UserValidator userValidator;
     @InjectMocks
     private UserController userController;
 
@@ -27,7 +24,7 @@ class UserControllerTest {
         // Arrange
         UserDto userDto = UserDto.builder()
                 .username("Elvis")
-                .email("email")
+                .email("email@gmail.com")
                 .password("password")
                 .phone("12345")
                 .countryId(4L).build();
@@ -35,6 +32,5 @@ class UserControllerTest {
         userController.createUser(userDto);
         // Assert
         verify(userService, times(1)).createUser(userDto);
-        verify(userValidator, times(1)).validateCreateUser(userDto);
     }
 }

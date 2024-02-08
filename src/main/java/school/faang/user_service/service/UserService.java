@@ -32,4 +32,8 @@ public class UserService {
         return userRepository.findById(userId).orElseThrow(() ->
                 new EntityNotFoundException("User with id " + userId + " has not found"));
     }
+
+    public boolean isUserExists(long id) {
+        return userRepository.existsById(id);
+    }
 }

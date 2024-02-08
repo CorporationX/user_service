@@ -4,12 +4,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.SubscriptionService;
 import school.faang.user_service.validator.SubscriptionValidator;
 
@@ -50,7 +50,7 @@ public class SubscriptionController {
             summary = "Получение подписчиков"
     )
     @PostMapping("/user/{id}/followers")
-    public List<UserDto> getFollowers(@PathVariable("id") long followeeId, @RequestBody UserFilterDto filters) {
+    public List<UserDto> getFollowers(@PathVariable("id") long followeeId, @RequestBody @Valid UserFilterDto filters) {
         return subscriptionService.getFollowers(followeeId, filters);
     }
 
@@ -58,7 +58,7 @@ public class SubscriptionController {
             summary = "Получение подписок"
     )
     @PostMapping("/user/{id}/followees")
-    public List<UserDto> getFollowing(@PathVariable("id") long followerId, @RequestBody UserFilterDto filter) {
+    public List<UserDto> getFollowing(@PathVariable("id") long followerId, @RequestBody @Valid UserFilterDto filter) {
         return subscriptionService.getFollowing(followerId, filter);
     }
 

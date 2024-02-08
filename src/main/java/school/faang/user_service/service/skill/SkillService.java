@@ -4,21 +4,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
-import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.skill.SkillMapper;
-import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.validation.SkillValidator;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -75,6 +71,16 @@ public class SkillService {
         return skillMapper.listToDto(skills);
     }
 
+    public Skill getSkillIfExists(Long skillId) {
+        return skillRepository.findById(skillId).orElseThrow(
+                () -> new DataValidationException("Skill doesn't exist!")
+        );
+    }
+
+    public List<Skill> getRelatedSkills(List<Long> relatedSkillIds) {
+        return skillRepository.findAllById(relatedSkillIds);
+    }
+
     private void setSkillGuarantees(List<SkillOffer> offers, Skill skill, long userId) {
         for (SkillOffer offer : offers) {
             User receiver = offer.getRecommendation().getReceiver();
@@ -89,23 +95,5 @@ public class SkillService {
 
             userSkillGuaranteeRepository.save(guarantor);
         }
-    }
-
-    private Skill getSkillIfExists(Long skillId) {
-        return skillRepository.findById(skillId).orElseThrow(
-                () -> new DataValidationException("Skill doesn't exist!")
-        );
-    }
-    public Skill findById(Long skillId) {
-        return skillRepository.findById(skillId).orElseThrow(() ->
-                new EntityNotFoundException("Skill with id = " + skillId + " is not exists"));
-    }
-
-    public List<SkillDto> getUserSkills(long userId) {
-        return new ArrayList<SkillDto>();
-    }
-
-    public List<Skill> getRelatedSkills(List<Long> relatedSkillIds) {
-        return skillRepository.findAllById(relatedSkillIds);
     }
 }

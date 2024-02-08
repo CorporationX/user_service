@@ -8,7 +8,7 @@ import school.faang.user_service.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserDService {
     private final UserRepository userRepository;
 
     public User findById(Long userId) {

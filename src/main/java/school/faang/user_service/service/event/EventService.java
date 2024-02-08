@@ -55,11 +55,11 @@ public class EventService {
     }
 
     public List<EventDto> getOwnedEvents(Long userId) {
-        return eventMapper.toListEventDto(eventRepository.findAllByUserId(userId));
+        return eventMapper.toEventDtoList(eventRepository.findAllByUserId(userId));
     }
 
     public List<EventDto> getParticipatedEvents(Long userId) {
-        return eventMapper.toListEventDto(eventRepository.findParticipatedEventsByUserId(userId));
+        return eventMapper.toEventDtoList(eventRepository.findParticipatedEventsByUserId(userId));
     }
 
     public List<EventDto> getEventsByFilter(EventFilterDto eventFilterDto) {
@@ -75,7 +75,7 @@ public class EventService {
     private void checkUserSkills(Long userId, List<SkillDto> skills) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User by ID: " + userId + " not found"));
-        List<SkillDto> userSkills = skillMapper.toListSkillDto(user.getSkills());
+        List<SkillDto> userSkills = skillMapper.toSkillDtoList(user.getSkills());
         if (!userSkills.containsAll(skills)) {
             throw new DataValidationException("User by ID: " + userId + " does not possess all required skills for this event");
         }

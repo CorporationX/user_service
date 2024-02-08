@@ -17,13 +17,13 @@ public class MentorshipService {
 
     public List<UserDto> getMentees(long userId) {
         return getUser(userId).getMentees().stream()
-                .map(userMapper::toUserDto)
+                .map(userMapper::toDto)
                 .toList();
     }
 
     public List<UserDto> getMentors(long userId) {
         return getUser(userId).getMentors().stream()
-                .map(userMapper::toUserDto)
+                .map(userMapper::toDto)
                 .toList();
     }
 

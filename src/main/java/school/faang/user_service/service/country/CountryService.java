@@ -14,9 +14,7 @@ import static school.faang.user_service.storage.CountryStorage.countryCache;
 @Service
 @RequiredArgsConstructor
 public class CountryService {
-
     private final CountryRepository countryRepository;
-
     @PostConstruct
     public void fillCountryStorage() {
         List<Country> countryList = countryRepository.findAll();
@@ -24,7 +22,6 @@ public class CountryService {
             countryCache.put(country.getTitle(), country);
         });
     }
-
     public Country getCountryFromCache(User user) {
         return countryCache.computeIfAbsent(user.getCountry().getTitle(), key -> countryRepository.save(user.getCountry()));
     }

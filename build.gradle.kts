@@ -84,10 +84,43 @@ jsonSchema2Pojo {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+	finalizedBy(tasks.jacocoTestReport)
 }
 
 val test by tasks.getting(Test::class) { testLogging.showStandardStreams = true }
 
 tasks.bootJar {
 	archiveFileName.set("service.jar")
+}
+
+jacoco {
+	toolVersion = "0.8.11"
+}
+
+tasks.jacocoTestReport {
+	dependsOn(tasks.test)
+	reports {
+		xml.required.set(false)
+		html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+	}
+	finalizedBy(tasks.jacocoTestCoverageVerification)
+	executionData(fileTree(project.rootDir.absolutePath).include("**/build/jacocoHtml/index.xml"))
+}
+
+tasks.jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			limit {
+				isEnabled = false
+				minimum = "0.5".toBigDecimal()
+			}
+		}
+
+		rule {
+			isEnabled = true
+			element = "CLASS"
+			includes = listOf("school.faang.user_service.controller.mentorship.*")
+
+		}
+	}
 }

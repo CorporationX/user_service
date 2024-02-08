@@ -27,7 +27,7 @@ public class GoalValidatorTest {
 
     @Test
     void testValidateActiveGoalsShouldException() {
-        long countActiveGoals = 4L;
+        long countActiveGoals = 3L;
 
         DataValidationException dataValidationException = assertThrows(DataValidationException.class,
                 () -> goalValidator.validateActiveGoals(countActiveGoals));
@@ -80,7 +80,7 @@ public class GoalValidatorTest {
         DataValidationException dataValidationException = assertThrows(DataValidationException.class,
                 () -> goalValidator.validateTitleAndUserId(goalDto, userId));
 
-        assertEquals(dataValidationException.getMessage(), "User ID required!");
+        assertEquals(dataValidationException.getMessage(), "User ID is null!");
     }
 
     @Test
@@ -125,7 +125,7 @@ public class GoalValidatorTest {
         DataValidationException dataValidationException = assertThrows(DataValidationException.class,
                 () -> goalValidator.validateByCompleted(goal));
 
-        assertEquals(dataValidationException.getMessage(), "Goal was completed!");
+        assertEquals(dataValidationException.getMessage(), "You can't update completed goal!");
     }
 
     @Test

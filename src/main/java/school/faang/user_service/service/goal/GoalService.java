@@ -34,16 +34,20 @@ public class GoalService {
     private final List<GoalFilter> goalFilters;
 
     public void createGoal(Long userId, GoalDto goalDto) {
-        goalValidator.validateForCreate(userId, goalDto);
+        goalValidator.validateForSkillsAndActiveGoals(userId, goalDto);
         Goal goal = goalMapper.toEntity(goalDto);
         goal.setUsers(List.of(userService.findById(userId)));
-        goal.setSkillsToAchieve(goalDto.getSkillIds().stream().map(skillService::findById).toList());
+        setSetSkillsToAchieve(goalDto, goal);
         goalRepository.save(goal);
+    }
+
+    public void setSetSkillsToAchieve(GoalDto goalDto, Goal goal) {
+        goal.setSkillsToAchieve(goalDto.getSkillIds().stream().map(skillService::findById).toList());
     }
 
     public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
         Goal goalNew = goalMapper.toEntity(goalDto);
-        goalNew.setSkillsToAchieve(goalDto.getSkillIds().stream().map(skillService::findById).toList());
+        setSetSkillsToAchieve(goalDto, goalNew);
         Goal goalOld = getGoalById(goalId);
         goalValidator.validateByCompleted(goalOld);
         goalValidator.validateByExistingSkills(goalNew);
@@ -64,18 +68,12 @@ public class GoalService {
     }
 
     public void deleteGoal(Long goalId) {
-        if (goalId != null) {
-            goalRepository.deleteById(goalId);
-        }
+        goalRepository.deleteById(goalId);
     }
 
     public List<GoalDto> findGoalsByUser(Long userId, GoalFilterDto filter) {
         List<Goal> userGoals = getGoalsByUserId(userId);
-
-        goalFilters.stream()
-                .filter(f -> f.isApplicable(filter))
-                .forEach(f -> f.apply(userGoals, filter));
-        return userGoals.stream().map(goalMapper::toDto).toList();
+        return getGoalsByFilter(userGoals, filter);
     }
 
     public List<Goal> getGoalsByUserId(Long userId) {
@@ -84,7 +82,10 @@ public class GoalService {
 
     public List<GoalDto> findSubtasksByGoalId(long goalId, GoalFilterDto filter) {
         List<Goal> goals = goalRepository.findByParent(goalId).collect(Collectors.toList());
+        return getGoalsByFilter(goals, filter);
+    }
 
+    private List<GoalDto> getGoalsByFilter(List<Goal> goals, GoalFilterDto filter) {
         goalFilters.stream()
                 .filter(f -> f.isApplicable(filter))
                 .forEach(f -> f.apply(goals, filter));

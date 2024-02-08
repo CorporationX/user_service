@@ -119,12 +119,6 @@ public class GoalServiceTest {
     }
 
     @Test
-    void testDeleteGoalIfNull() {
-        goalService.deleteGoal(null);
-        verify(goalRepository, times(0)).deleteById(null);
-    }
-
-    @Test
     void testFindGoalsWithTwoFilledFilter() {
         Long userId = 1L;
         Long goalId = 1L;

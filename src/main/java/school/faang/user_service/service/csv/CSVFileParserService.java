@@ -65,7 +65,7 @@ public class CSVFileParserService {
         }
         CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).join();
     }
-
+  
     private CompletableFuture<Void> runBatchProcess(List<PersonSchemaV2> persons) {
         return CompletableFuture.runAsync(() -> {
             List<User> users = persons.stream()

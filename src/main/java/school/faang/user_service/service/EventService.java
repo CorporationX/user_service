@@ -1,4 +1,4 @@
-package school.faang.user_service.service.event;
+package school.faang.user_service.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +10,6 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.service.user1.UserService;
 import school.faang.user_service.validator.event.EventValidator;
 
 import java.util.List;

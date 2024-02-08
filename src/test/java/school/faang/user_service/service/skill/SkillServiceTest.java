@@ -8,6 +8,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.service.SkillService;
 
 import java.util.List;
 

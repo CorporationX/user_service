@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
-import school.faang.user_service.service.event.EventService;
+import school.faang.user_service.service.EventService;
 import school.faang.user_service.validator.event.EventValidator;
-import school.faang.user_service.validator.eventFilter.EventFilterValidator;
+import school.faang.user_service.validator.event.EventFilterValidator;
 
 import java.util.List;
 

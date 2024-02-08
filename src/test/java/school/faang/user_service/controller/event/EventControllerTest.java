@@ -14,9 +14,9 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.event.EventMapperImpl;
-import school.faang.user_service.service.event.EventService;
+import school.faang.user_service.service.EventService;
 import school.faang.user_service.validator.event.EventValidator;
-import school.faang.user_service.validator.eventFilter.EventFilterValidator;
+import school.faang.user_service.validator.event.EventFilterValidator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

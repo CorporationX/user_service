@@ -1,4 +1,4 @@
-package school.faang.user_service.service.premium;
+package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +15,6 @@ import school.faang.user_service.entity.premium.PremiumPeriod;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.repository.premium.PremiumRepository;
-import school.faang.user_service.service.user1.UserService;
 import school.faang.user_service.validator.PremiumValidator;
 
 import java.math.BigDecimal;

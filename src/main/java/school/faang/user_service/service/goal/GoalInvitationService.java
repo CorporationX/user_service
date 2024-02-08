@@ -1,5 +1,6 @@
 package school.faang.user_service.service.goal;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
@@ -8,11 +9,10 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
-import school.faang.user_service.exception.goal.EntityNotFoundException;
 import school.faang.user_service.filter.Filter;
 import school.faang.user_service.mapper.goal.GoalInvitationMapper;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.service.UserService;
 import school.faang.user_service.validator.goal.GoalInvitationValidator;
 
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public class GoalInvitationService {
 
         User inviter = userService.getUserById(invitation.getInviterId());
         User invited = userService.getUserById(invitation.getInvitedUserId());
-        Goal goal = goalService.getGoalBbyId(invitation.getGoalId());
+        Goal goal = goalService.getGoalById(invitation.getGoalId());
 
         GoalInvitation goalInvitation = goalInvitationMapper.toEntity(invitation);
         goalInvitation.setInviter(inviter);

@@ -1,11 +1,11 @@
 package school.faang.user_service.validator.goal;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.GoalInvitation;
-import school.faang.user_service.exception.goal.DataValidationException;
-import school.faang.user_service.exception.goal.EntityNotFoundException;
+import school.faang.user_service.exception.DataValidationException;
 
 /**
  * @author Alexander Bulgakov

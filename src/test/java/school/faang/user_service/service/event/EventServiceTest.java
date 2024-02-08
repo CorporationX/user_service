@@ -1,6 +1,8 @@
 package school.faang.user_service.service.event;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,13 +12,18 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.filter.event.EventFilter;
+import school.faang.user_service.filter.event.EventOwnerIdPattern;
+import school.faang.user_service.filter.event.EventStartDatePattern;
+import school.faang.user_service.filter.event.EventTitlePattern;
 import school.faang.user_service.mapper.event.EventMapperImpl;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.service.EventService;
+import school.faang.user_service.service.UserService;
 import school.faang.user_service.validator.event.EventValidator;
 
 import java.time.LocalDateTime;
@@ -27,7 +34,9 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class EventServiceTest {
@@ -42,6 +51,56 @@ public class EventServiceTest {
     private UserService userService;
     @Mock
     private EventValidator eventValidator;
+
+    private List<EventFilter> eventFilters = new ArrayList<>();
+    private LocalDateTime startDate;
+    private User owner;
+    private Skill skill;
+    private Event eventFirst;
+    private Event eventSecond;
+    private EventFilterDto eventFilterDtoId;
+    private EventFilterDto eventFilterDtoTitle;
+    private EventFilterDto eventFilterDtoStartDate;
+
+    @BeforeEach
+    void setUp() {
+        eventFilters.add(new EventOwnerIdPattern());
+        eventFilters.add(new EventTitlePattern());
+        eventFilters.add(new EventStartDatePattern());
+
+        eventService = new EventService(eventRepository, eventMapper, eventValidator, userService, eventFilters);
+
+        startDate = LocalDateTime.now().plusDays(1L);
+        owner = User.builder().id(1L).active(true).build();
+        skill = Skill.builder().id(1L).build();
+
+        eventFirst = Event.builder()
+                .id(1L)
+                .title("EventFirst")
+                .maxAttendees(2)
+                .owner(owner)
+                .relatedSkills(List.of(skill))
+                .startDate(LocalDateTime.now())
+                .build();
+        eventSecond = Event.builder()
+                .id(1L)
+                .title("EventSecond")
+                .maxAttendees(2)
+                .owner(owner)
+                .relatedSkills(List.of(skill))
+                .startDate(startDate)
+                .build();
+
+        eventFilterDtoId = EventFilterDto.builder()
+                .ownerPattern(1L)
+                .build();
+        eventFilterDtoTitle = EventFilterDto.builder()
+                .titlePattern("EventSecond")
+                .build();
+        eventFilterDtoStartDate = EventFilterDto.builder()
+                .startDatePattern(startDate)
+                .build();
+    }
 
     @Test
     public void successUpdateEventWhenAllConditionsValid() {
@@ -70,7 +129,7 @@ public class EventServiceTest {
                 .build();
         Event eventEntity = eventMapper.toEntity(eventDtoExpected);
         when(eventRepository.findById(eventDtoExpected.getId())).thenReturn(Optional.ofNullable(eventEntity));
-        when(userService.findUserById(eventDtoExpected.getOwnerId())).thenReturn(owner);
+        when(userService.getUserById(eventDtoExpected.getOwnerId())).thenReturn(owner);
         eventEntity.setRelatedSkills(skills);
         when(eventRepository.save(eventEntity)).thenReturn(eventEntity);
 
@@ -87,7 +146,7 @@ public class EventServiceTest {
                 .title("EventFirst")
                 .build();
 
-        assertThrows(DataValidationException.class,
+        assertThrows(EntityNotFoundException.class,
                 () -> eventService.updateEvent(eventDto));
     }
 
@@ -96,7 +155,7 @@ public class EventServiceTest {
         EventDto eventDto = EventDto.builder()
                 .id(1L)
                 .build();
-        assertThrows(DataValidationException.class,
+        assertThrows(EntityNotFoundException.class,
                 () -> eventService.updateEvent(eventDto));
     }
 
@@ -162,7 +221,7 @@ public class EventServiceTest {
         long wrongId = 11L;
         when(eventRepository.findById(wrongId)).thenReturn(Optional.empty());
 
-        assertThrows(DataValidationException.class, () -> eventService.getEvent(wrongId));
+        assertThrows(EntityNotFoundException.class, () -> eventService.getEvent(wrongId));
     }
 
     @Test
@@ -206,6 +265,27 @@ public class EventServiceTest {
         long wrongId = 15L;
 
         verify(eventRepository, Mockito.never()).deleteById(wrongId);
+    }
+
+    @Test
+    public void successGetEvents_ByIdFilter() {
+        Mockito.when(eventRepository.findAll()).thenReturn(List.of(eventFirst, eventSecond));
+        List<EventDto> resultToFilterById = eventService.getEventsByFilter(eventFilterDtoId);
+        assertEquals(2, resultToFilterById.size());
+    }
+
+    @Test
+    public void successGetEvents_ByTitleFilter() {
+        Mockito.when(eventRepository.findAll()).thenReturn(List.of(eventFirst, eventSecond));
+        List<EventDto> resultToFilterByTitle = eventService.getEventsByFilter(eventFilterDtoTitle);
+        assertEquals(1, resultToFilterByTitle.size());
+    }
+
+    @Test
+    public void successGetEvents_ByStartDateFilter() {
+        Mockito.when(eventRepository.findAll()).thenReturn(List.of(eventFirst, eventSecond));
+        List<EventDto> resultToFilterByStartDate = eventService.getEventsByFilter(eventFilterDtoStartDate);
+        assertEquals(1, resultToFilterByStartDate.size());
     }
 
 }

@@ -40,5 +40,4 @@ class EventMapperTest {
     void successMappingToEntity() {
         assertEquals(event, eventMapper.toEntity(eventDto));
     }
-
 }

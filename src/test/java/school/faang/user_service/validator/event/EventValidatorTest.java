@@ -1,5 +1,6 @@
 package school.faang.user_service.validator.event;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,7 +13,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -53,6 +54,7 @@ class EventValidatorTest {
                 .build();
 
         Mockito.when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(owner));
+        Mockito.when(userService.isOwnerExistById(owner.getId())).thenReturn(true);
         eventValidator.validateEventToUpdate(eventDto);
     }
 
@@ -125,9 +127,9 @@ class EventValidatorTest {
                 .id(1L)
                 .active(true)
                 .build();
-        when(userService.checkIfOwnerExistsById(user.getId())).thenReturn(true);
+        when(userService.isOwnerExistById(user.getId())).thenReturn(true);
         eventValidator.checkIfOwnerExistsById(user.getId());
-        Mockito.verify(userService, times(1)).checkIfOwnerExistsById(user.getId());
+        Mockito.verify(userService, times(1)).isOwnerExistById(user.getId());
     }
 
     @Test
@@ -136,9 +138,9 @@ class EventValidatorTest {
                 .id(1L)
                 .active(true)
                 .build();
-        Mockito.when(userService.checkIfOwnerExistsById(user.getId())).thenReturn(false);
+        Mockito.when(userService.isOwnerExistById(user.getId())).thenReturn(false);
 
-        assertThrows(DataValidationException.class, () -> eventValidator.checkIfOwnerExistsById(user.getId()));
+        assertThrows(EntityNotFoundException.class, () -> eventValidator.checkIfOwnerExistsById(user.getId()));
     }
 
 

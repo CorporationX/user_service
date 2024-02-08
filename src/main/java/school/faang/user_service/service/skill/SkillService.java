@@ -23,4 +23,8 @@ public class SkillService {
         return skillRepository.findById(skillId).orElseThrow(() ->
                 new EntityNotFoundException("Skill with id = " + skillId + " is not exists"));
     }
+
+    public List<Skill> getRelatedSkills(List<Long> relatedSkillIds) {
+        return skillRepository.findAllById(relatedSkillIds);
+    }
 }

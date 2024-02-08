@@ -19,6 +19,11 @@ public class UserService {
         return userRepository.existsById(id);
     }
 
+    public User findById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() ->
+                new school.faang.user_service.exception.EntityNotFoundException("User with id = " + userId + " is not exists"));
+    }
+
     public void saveUser(User savedUser) {
         if (isOwnerExistById(savedUser.getId())) {
             userRepository.save(savedUser);

@@ -28,8 +28,7 @@ public class UserService {
                 .orElseThrow(() -> new DataValidationException("Пользователя не существует"));
     }
 
-    public User getUserById(long userId) {
-        return userRepository.findById(userId).orElseThrow(() ->
-                new EntityNotFoundException("User with id " + userId + " has not found"));
+    public boolean isUserExists(long id) {
+        return userRepository.existsById(id);
     }
 }

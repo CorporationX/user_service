@@ -3,6 +3,7 @@ package school.faang.user_service.service.user;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
@@ -13,6 +14,7 @@ import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -24,6 +26,7 @@ public class UserService {
     private MentorshipService mentorshipService;
     private final UserRepository userRepository;
     private final GoalService goalService;
+    private final static long MOTHS_TO_DELETE_USER = 3;
 
     public User getExistingUserById(long id) {
         return userRepository.findById(id)
@@ -51,9 +54,7 @@ public class UserService {
     }
 
     public void saveUser(User savedUser) {
-        if (existsUserById(savedUser.getId())) {
-            userRepository.save(savedUser);
-        }
+        userRepository.save(savedUser);
     }
 
     public boolean existsUserById(long id) {
@@ -62,31 +63,25 @@ public class UserService {
 
     public void deactivationUserById(long userId) {
         User user = getUserById(userId);
-        //before deActivation
-        stoppedGoalsAndDeleteEvents(user);
+        stopGoalsAndDeleteEventsAndDeleteMentor(user);
         user.setActive(false);
-        saveUser(user);
-
-        //after deActivation
-        List<User> mentees = user.getMentees();
-        for (User mentee : mentees) {
-            mentorshipService.deleteMentor(mentee.getId(), user.getId());
+        try {
+            saveUser(user);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        //TODO дописать логику удаления через 3 месяца
-        //здесь использовать Scheduling Tasks?
-        deleteUserById(userId);
     }
 
-    public void deleteUserById(long userId) {
-        userRepository.deleteById(userId);
+    @Scheduled(cron = "${my.schedule.cron}")
+    public void deleteNonActiveUsers() {
+        LocalDateTime timeToDelete = LocalDateTime.now().minusMonths(MOTHS_TO_DELETE_USER);
+        userRepository.deleteAllInactiveUsersAndUpdatedAtOverMonths(timeToDelete);
     }
 
-    private void stoppedGoalsAndDeleteEvents(User user) {
+    private void stopGoalsAndDeleteEventsAndDeleteMentor(User user) {
         List<Goal> goals = user.getGoals();
         for (Goal goal : goals) {
-            if (goal.getUsers().size() == 1 &&
-                    goal.getUsers().contains(user)) {
+            if (goal.getUsers().size() == 1) {
                 goalService.deleteGoalById(goal.getId());
             }
         }
@@ -94,6 +89,11 @@ public class UserService {
         List<Event> events = user.getOwnedEvents();
         for (Event event : events) {
             eventService.deleteEventById(event.getId());
+        }
+
+        List<User> mentees = user.getMentees();
+        for (User mentee : mentees) {
+            mentorshipService.deleteMentor(mentee.getId(), user.getId());
         }
     }
 

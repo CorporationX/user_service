@@ -1,36 +1,31 @@
 package school.faang.user_service.service.mentorship;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
-import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
-import school.faang.user_service.service.user.UserService;
-import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
 import school.faang.user_service.exception.mentorship.DataNotFoundException;
+import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
 
 import java.time.LocalDateTime;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-
-
 import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-
-import school.faang.user_service.dto.mentorship.RejectionDto;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipRequestServiceTest {
@@ -59,8 +54,6 @@ class MentorshipRequestServiceTest {
     @Mock
     private UserService userService;
 
-    private User user;
-
     private User receiver;
 
     private User requester;
@@ -79,9 +72,6 @@ class MentorshipRequestServiceTest {
         requester = new User();
         requester.setId(1L);
         requester.setUsername("John");
-        user = new User();
-        user.setId(1L);
-        user.setUsername("John");
     }
 
     @Test

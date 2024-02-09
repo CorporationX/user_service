@@ -64,12 +64,9 @@ public class UserService {
     public void deactivationUserById(long userId) {
         User user = getUserById(userId);
         stopGoalsAndDeleteEventsAndDeleteMentor(user);
+
         user.setActive(false);
-        try {
-            saveUser(user);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        saveUser(user);
     }
 
     @Scheduled(cron = "${my.schedule.cron}")

@@ -1,7 +1,10 @@
 package school.faang.user_service.service.user;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.user.UserCreateDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
@@ -9,9 +12,12 @@ import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.avatar.AvatarService;
+
 import java.util.List;
 import java.util.stream.Stream;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -19,6 +25,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final List<UserFilter> userFilters;
+    private final AvatarService avatarService;
+
 
     public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
         Stream<UserDto> userDtoStream = userRepository.findPremiumUsers().map(user -> userMapper.toUserDto(user));
@@ -34,5 +42,13 @@ public class UserService {
         return userFilters.stream()
                 .filter(userFilter -> userFilter.isApplicable(userFilterDto))
                 .flatMap(userFilter -> userFilter.apply(userDtoStream, userFilterDto));
+    }
+
+    @Transactional
+    public UserCreateDto createUser(UserCreateDto userCreateDto) {
+        User user = userMapper.toEntity(userCreateDto);
+        user.setActive(true);
+        avatarService.generateAndSaveAvatar(user).ifPresent(user::setUserProfilePic);
+        return userMapper.toUserCreateDto(userRepository.save(user));
     }
 }

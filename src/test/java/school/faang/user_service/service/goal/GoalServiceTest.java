@@ -71,7 +71,7 @@ public class GoalServiceTest {
         user.setId(1L);
 
         when(goalMapper.toEntity(goalDto)).thenReturn(goal);
-        when(userService.findById(userId)).thenReturn(user);
+        when(userService.getUserById(userId)).thenReturn(user);
         when(skillService.findById(1L)).thenReturn(skill_1);
         when(skillService.findById(2L)).thenReturn(skill_2);
 

@@ -16,11 +16,6 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException(String.format("User with ID %d not found", id)));
     }
 
-    public User findById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(() ->
-                new school.faang.user_service.exception.EntityNotFoundException("User with id = " + userId + " is not exists"));
-    }
-
     public boolean isOwnerExistById(Long id) {
         return userRepository.existsById(id);
     }

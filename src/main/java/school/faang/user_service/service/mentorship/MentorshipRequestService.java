@@ -16,7 +16,7 @@ import school.faang.user_service.dto.mentorship.filter.RequestFilterDto;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.service.UserService;
 import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
 
 
@@ -59,8 +59,8 @@ public class MentorshipRequestService {
 
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         MentorshipRequest mentorshipRequest = mentorshipRequestMapper.toEntity(mentorshipRequestDto);
-        User receiver = userService.findUserById(mentorshipRequestDto.getReceiver());
-        User requester = userService.findUserById(mentorshipRequestDto.getRequester());
+        User receiver = userService.getUserById(mentorshipRequestDto.getReceiver());
+        User requester = userService.getUserById(mentorshipRequestDto.getRequester());
 
         mentorshipRequestValidator.validateUserData(receiver, requester);
 

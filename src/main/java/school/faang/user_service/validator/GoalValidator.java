@@ -10,7 +10,7 @@ import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.skill.SkillDService;
+import school.faang.user_service.service.skill.SkillService;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ public class GoalValidator {
     private static final int MAX_ACTIVE_GOALS = 3;
     private final GoalRepository goalRepository;
     private final SkillRepository skillRepository;
-    private final SkillDService skillDService;
+    private final SkillService skillDService;
 
     public void validateActiveGoals(long countActiveGoals) {
         if (countActiveGoals == MAX_ACTIVE_GOALS) {

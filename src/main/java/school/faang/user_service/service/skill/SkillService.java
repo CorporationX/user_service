@@ -12,7 +12,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class SkillDService {
+public class SkillService {
     private final SkillRepository skillRepository;
 
     public Skill findById(Long skillId) {

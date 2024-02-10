@@ -18,12 +18,12 @@ public class MentorshipService {
 
     public List<UserDto> getMentors(long id) {
         User user = userService.getUserById(id);
-        return userMapper.listToDto(user.getMentors());
+        return userMapper.toDtoList(user.getMentors());
     }
 
     public List<UserDto> getMentees(long id) {
         User user = userService.getUserById(id);
-        return userMapper.listToDto(user.getMentees());
+        return userMapper.toDtoList(user.getMentees());
     }
 
     public void deleteMentor(long menteeId, long mentorId) {

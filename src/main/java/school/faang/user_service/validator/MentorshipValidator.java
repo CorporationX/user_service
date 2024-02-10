@@ -1,13 +1,13 @@
 package school.faang.user_service.validator;
 
+import jakarta.validation.ValidationException;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.exception.DataValidationException;
 
 @Component
 public class MentorshipValidator {
     public void validateMentorshipIds(long mentorId, long menteeId) {
         if (mentorId == menteeId) {
-            throw new DataValidationException("MentorId and MenteeId cannot be the same");
+            throw new ValidationException("MentorId and MenteeId cannot be the same");
         }
     }
 }

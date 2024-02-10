@@ -11,8 +11,8 @@ import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.skill.SkillService;
 import school.faang.user_service.service.UserService;
+import school.faang.user_service.service.skill.SkillService;
 import school.faang.user_service.validator.GoalValidator;
 
 import java.util.List;
@@ -36,7 +36,7 @@ public class GoalService {
     public void createGoal(Long userId, GoalDto goalDto) {
         goalValidator.validateForSkillsAndActiveGoals(userId, goalDto);
         Goal goal = goalMapper.toEntity(goalDto);
-        goal.setUsers(List.of(userService.findById(userId)));
+        goal.setUsers(List.of(userService.getUserById(userId)));
         setSetSkillsToAchieve(goalDto, goal);
         goalRepository.save(goal);
     }

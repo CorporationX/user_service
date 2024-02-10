@@ -24,7 +24,7 @@ public class GoalValidator {
     private static final int MAX_ACTIVE_GOALS = 3;
     private final GoalRepository goalRepository;
     private final SkillRepository skillRepository;
-    private final SkillService skillService;
+    private final SkillService skillDService;
 
     public void validateActiveGoals(long countActiveGoals) {
         if (countActiveGoals == MAX_ACTIVE_GOALS) {
@@ -51,7 +51,7 @@ public class GoalValidator {
     }
 
     public void validateForSkillsAndActiveGoals(Long userId, GoalDto goalDto) {
-        List<Long> userSkillsIds = skillService.getUserSkills(userId).stream().map(SkillDto::getId).toList();
+        List<Long> userSkillsIds = skillDService.getUserSkills(userId).stream().map(SkillDto::getId).toList();
         long countActiveGoals = goalRepository.countActiveGoalsPerUser(userId);
         validateExistingSkills(userSkillsIds, goalDto);
         validateActiveGoals(countActiveGoals);

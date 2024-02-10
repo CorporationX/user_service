@@ -27,9 +27,7 @@ public class S3Service {
     private String bucketName;
 
     public String uploadFile(@NotNull byte[] fileContent, String fileName) {
-        if (fileContent == null || fileContent.length == 0) {
-            throw new DataValidationException("Содержимое файла не должно быть пустым.");
-        }
+        validateFileContentNotEmpty(fileContent);
 
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(fileContent.length);
@@ -52,6 +50,12 @@ public class S3Service {
             log.error("Ошибка при загрузке файла с именем: {}. Status: {}. Message: {}",
                     fileName, e.getStatusCode(), e.getMessage(), e);
             throw e;
+        }
+    }
+
+    private void validateFileContentNotEmpty(@NotNull byte[] fileContent) {
+        if (fileContent == null || fileContent.length == 0) {
+            throw new DataValidationException("Содержимое файла не должно быть пустым.");
         }
     }
 }

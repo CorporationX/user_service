@@ -51,3 +51,10 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
+
+scheduler:
+  clearEvents:
+    cronExpression: "0 0 0 * * ?" # Каждый день в полночь
+
+batchSize:
+  eventDeletion: 1000

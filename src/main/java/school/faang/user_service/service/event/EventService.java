@@ -1,6 +1,7 @@
 package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,7 @@ import java.util.stream.StreamSupport;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Setter
 public class EventService {
     private final EventRepository eventRepository;
     private final ThreadPoolExecutor threadPoolExecutor;
@@ -49,22 +51,6 @@ public class EventService {
             });
         }
 
-    }
-
-    private void shutdownThreadPool(ThreadPoolExecutor threadPoolExecutor) {
-        threadPoolExecutor.shutdown();
-        try {
-            if (!threadPoolExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS)) {
-                threadPoolExecutor.shutdownNow();
-                log.warn("ThreadPoolExecutor was shut down forcefully");
-            } else {
-                log.info("ThreadPoolExecutor was shut down gracefully");
-            }
-        } catch (InterruptedException e) {
-            threadPoolExecutor.shutdownNow();
-            log.error("Thread interrupted while waiting for ThreadPoolExecutor to terminate", e);
-            Thread.currentThread().interrupt();
-        }
     }
 
     @Bean

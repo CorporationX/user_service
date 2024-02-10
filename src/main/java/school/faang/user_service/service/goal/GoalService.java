@@ -75,7 +75,7 @@ public class GoalService {
         }
         goalMapper.updateFromDto(goalDto, goalToUpdate);
         goalRepository.save(goalToUpdate);
-        return goalDto = goalMapper.toDto(goalToUpdate);
+        return goalMapper.toDto(goalToUpdate);
     }
 
     public List<GoalDto> getGoalsByUser(long userId, GoalFilterDto goalFilterDto) {

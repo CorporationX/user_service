@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
@@ -13,7 +12,6 @@ import school.faang.user_service.repository.event.EventRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
-import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +29,7 @@ public class EventService {
                 .filter(event -> event.getStatus().equals(EventStatus.COMPLETED) || event.getStatus().equals(EventStatus.CANCELED))
                 .map(Event::getId).toList();
 
-        if (ids.isEmpty() || allEvents.isEmpty()) {
+        if (ids.isEmpty()) {
             throw new IllegalArgumentException("There are no completed events in DB");
         }
 
@@ -50,11 +48,5 @@ public class EventService {
                 }
             });
         }
-
-    }
-
-    @Bean
-    public ThreadPoolExecutor threadPoolExecutor() {
-        return new ThreadPoolExecutor(4, 8, 1L, TimeUnit.MINUTES, new LinkedBlockingQueue<>(1000));
     }
 }

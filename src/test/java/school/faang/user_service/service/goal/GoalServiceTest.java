@@ -17,8 +17,8 @@ import school.faang.user_service.filter.impl.goal.GoalTitleFilter;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.skill.SkillService;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.service.skill.SkillDService;
+import school.faang.user_service.service.user.UserDService;
 import school.faang.user_service.validator.GoalValidator;
 
 import java.util.ArrayList;
@@ -39,11 +39,11 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class GoalServiceTest {
     @Mock
-    private UserService userService;
+    private UserDService userDService;
     @Mock
     private GoalValidator goalValidator;
     @Mock
-    private SkillService skillService;
+    private SkillDService skillDService;
     @Mock
     private GoalRepository goalRepository;
     @Mock
@@ -71,9 +71,9 @@ public class GoalServiceTest {
         user.setId(1L);
 
         when(goalMapper.toEntity(goalDto)).thenReturn(goal);
-        when(userService.findById(userId)).thenReturn(user);
-        when(skillService.findById(1L)).thenReturn(skill_1);
-        when(skillService.findById(2L)).thenReturn(skill_2);
+        when(userDService.findById(userId)).thenReturn(user);
+        when(skillDService.findById(1L)).thenReturn(skill_1);
+        when(skillDService.findById(2L)).thenReturn(skill_2);
 
         goalService.createGoal(userId, goalDto);
 
@@ -103,8 +103,8 @@ public class GoalServiceTest {
         when(goalRepository.findById(goalOldId)).thenReturn(Optional.of(goalOld));
         when(goalRepository.findUsersByGoalId(goal.getId())).thenReturn(List.of(user1, user2));
 
-        when(skillService.findById(1L)).thenReturn(skill_1);
-        when(skillService.findById(2L)).thenReturn(skill_2);
+        when(skillDService.findById(1L)).thenReturn(skill_1);
+        when(skillDService.findById(2L)).thenReturn(skill_2);
 
         goalService.updateGoal(goalOldId, goalDto);
 
@@ -142,7 +142,7 @@ public class GoalServiceTest {
         skill_1.setId(1L);
 
         List<GoalFilter> goalFilters = List.of(new GoalStatusFilter(), new GoalTitleFilter());
-        goalService = new GoalService(goalValidator, goalRepository, userService, skillService, skillRepository, goalMapper, goalFilters);
+        goalService = new GoalService(goalValidator, goalRepository, userDService, skillDService, skillRepository, goalMapper, goalFilters);
 
         when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.of(goal1, goal2));
         when(goalRepository.findByParent(goalId)).thenReturn(Stream.of(goal1, goal2));
@@ -180,7 +180,7 @@ public class GoalServiceTest {
         skill_1.setId(1L);
 
         List<GoalFilter> goalFilters = List.of(new GoalStatusFilter(), new GoalTitleFilter());
-        goalService = new GoalService(goalValidator, goalRepository, userService, skillService, skillRepository, goalMapper, goalFilters);
+        goalService = new GoalService(goalValidator, goalRepository, userDService, skillDService, skillRepository, goalMapper, goalFilters);
 
         when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.of(goal1, goal2));
         when(goalRepository.findByParent(goalId)).thenReturn(Stream.of(goal1, goal2));
@@ -198,7 +198,7 @@ public class GoalServiceTest {
         GoalFilterDto filter = new GoalFilterDto();
         List<GoalDto> expectedList = new ArrayList<>();
         List<GoalFilter> goalFilters = List.of(new GoalStatusFilter(), new GoalTitleFilter());
-        goalService = new GoalService(goalValidator, goalRepository, userService, skillService, skillRepository, goalMapper, goalFilters);
+        goalService = new GoalService(goalValidator, goalRepository, userDService, skillDService, skillRepository, goalMapper, goalFilters);
 
         when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.of());
         when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.of());
@@ -231,7 +231,7 @@ public class GoalServiceTest {
         skill_1.setId(1L);
 
         List<GoalFilter> goalFilters = List.of(new GoalStatusFilter(), new GoalTitleFilter());
-        goalService = new GoalService(goalValidator, goalRepository, userService, skillService, skillRepository, goalMapper, goalFilters);
+        goalService = new GoalService(goalValidator, goalRepository, userDService, skillDService, skillRepository, goalMapper, goalFilters);
 
         when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.of(goal1, goal2));
         when(goalRepository.findByParent(goalId)).thenReturn(Stream.of(goal1, goal2));
@@ -269,7 +269,7 @@ public class GoalServiceTest {
         skill_1.setId(1L);
 
         List<GoalFilter> goalFilters = List.of(new GoalStatusFilter(), new GoalTitleFilter());
-        goalService = new GoalService(goalValidator, goalRepository, userService, skillService, skillRepository, goalMapper, goalFilters);
+        goalService = new GoalService(goalValidator, goalRepository, userDService, skillDService, skillRepository, goalMapper, goalFilters);
 
         when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.of(goal1, goal2));
         when(goalRepository.findByParent(goalId)).thenReturn(Stream.of(goal1, goal2));
@@ -296,8 +296,8 @@ public class GoalServiceTest {
         goal.setStatus(GoalStatus.ACTIVE);
 
         when(goalMapper.toEntity(goalDto)).thenReturn(goal);
-        when(skillService.findById(1L)).thenReturn(skill_1);
-        when(skillService.findById(2L)).thenReturn(skill_2);
+        when(skillDService.findById(1L)).thenReturn(skill_1);
+        when(skillDService.findById(2L)).thenReturn(skill_2);
         when(goalRepository.findById(goalOldId)).thenReturn(Optional.of(goalOld));
 
         goalService.updateGoal(goalOldId, goalDto);

@@ -95,7 +95,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testCreateUserSuscefull() {
+    public void testCreateUserSuccessful() {
         UserCreateDto expectedDto = UserCreateDto.builder()
                 .username("Viktor")
                 .email("email@email.com")

@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<ControllerError> handleConstraintViolationException(ValidationException ex) {
+    public ResponseEntity<ControllerError> handleDataValidationException(ValidationException ex) {
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         return ResponseEntity
                 .status(httpStatus)

@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.service.event.EventParticipationService;
 import school.faang.user_service.entity.User;
@@ -14,28 +13,28 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/event")
+@RequestMapping("api/v1/events")
 public class EventParticipationController {
 
     private final EventParticipationService eventParticipationService;
 
-    @PostMapping("/register")
-    public void registerParticipant(@RequestParam long eventId, @RequestParam long userId) {
+    @PostMapping("/register/{eventId}/{userId}")
+    public void registerParticipant(@PathVariable long eventId, @PathVariable long userId) {
         eventParticipationService.registerParticipant(eventId, userId);
     }
 
-    @PostMapping("/unregister")
-    public void unregisterParticipant(@RequestParam long eventId, @RequestParam long userId) {
+    @PostMapping("/unregister/{eventId}/{userId}")
+    public void unregisterParticipant(@PathVariable long eventId, @PathVariable long userId) {
         eventParticipationService.unregisterParticipant(eventId, userId);
     }
 
-    @GetMapping("/participants")
-    public List<User> getParticipant(@RequestParam long eventId) {
+    @GetMapping("/participants/{eventId}")
+    public List<User> getParticipant(@PathVariable long eventId) {
         return eventParticipationService.getParticipant(eventId);
     }
 
-    @GetMapping("/participants/count")
-    public int getParticipantsCount(@RequestParam long eventId) {
+    @GetMapping("/participants/count/{eventId}")
+    public int getParticipantsCount(@PathVariable long eventId) {
         return eventParticipationService.getParticipantsCount(eventId);
     }
 

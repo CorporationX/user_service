@@ -46,32 +46,46 @@ class EventParticipationServiceTest {
         verify(eventParticipationRepository, never()).register(eventId, userId);
     }
 
-        @Test
-        void testUnregisterParticipant_UserRegistered_SuccessfullyUnregistered() {
-            long eventId = 1;
-            long userId = 123;
-            List<User> userList = new ArrayList<>();
-            User user = User.builder()
-                    .id(userId)
-                    .build();
-            userList.add(user);
-            eventParticipationService.unregisterParticipant(eventId, userId);
-            assertFalse(UserUtils.findUserById(userList, userId));
-        }
+    @Test
+    void testUnregisterParticipant_UserRegistered_SuccessfullyUnregistered() {
+        long eventId = 1;
+        long userId = 1;
 
-        @Test
-        void testUnregisterParticipant_UserNotRegistered_ThrowsException() {
-            long eventId = 1;
-            long userId = 123;
-            List<User> eventUsers = new ArrayList<>();
-            User user = User.builder()
-                    .id(456)
-                    .build();
-            eventUsers.add(user);
-            assertThrows(IllegalArgumentException.class, () -> {
-                eventParticipationService.unregisterParticipant(eventId, userId);
-            });
-        }
+        List<User> listUsersAtEvent = new ArrayList<>();
+        User user1 = User.builder()
+                .id(1)
+                .build();
+        User user2 = User.builder()
+                .id(2)
+                .build();
+        listUsersAtEvent.add(user1);
+        listUsersAtEvent.add(user2);
+
+        when(eventParticipationRepository.findAllParticipantsByEventId(eventId)).thenReturn(listUsersAtEvent);
+        assertDoesNotThrow(() -> eventParticipationService.unregisterParticipant(eventId, userId));
+        verify(eventParticipationRepository, times(1)).unregister(eventId, userId);
+    }
+
+    @Test
+    void testUnregisterParticipant_UserNotRegistered_ThrowsException() {
+        long eventId = 1;
+        long userId = 3;
+
+        List<User> listUsersAtEvent = new ArrayList<>();
+        User user1 = User.builder()
+                .id(1)
+                .build();
+        User user2 = User.builder()
+                .id(2)
+                .build();
+        listUsersAtEvent.add(user1);
+        listUsersAtEvent.add(user2);
+
+        when(eventParticipationRepository.findAllParticipantsByEventId(eventId)).thenReturn(listUsersAtEvent);
+        assertThrows(IllegalArgumentException.class, () -> eventParticipationService.unregisterParticipant(eventId, userId));
+        verify(eventParticipationRepository, never()).unregister(eventId, userId);
+    }
+
 
     @Test
     void testGetParticipant_ExistingEventId_ReturnsListOfParticipants() {

@@ -1,5 +1,6 @@
 package school.faang.user_service.validator.event;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.EventDto;
@@ -7,7 +8,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -27,7 +28,7 @@ public class EventValidator {
 
     public void validateEventToUpdate(EventDto eventDto) {
         checkIfEventNotStarted(eventDto.getStartDate());
-        userService.checkIfOwnerExists(eventDto.getOwnerId());
+        checkIfOwnerExistsById(eventDto.getOwnerId());
         checkIfOwnerHasSkillsRequired(eventDto);
     }
 
@@ -63,8 +64,8 @@ public class EventValidator {
     }
 
     public void checkIfOwnerExistsById(long id) {
-        if (!userService.checkIfOwnerExistsById(id)) {
-            throw new DataValidationException("Owner does not exist");
+        if (!userService.isOwnerExistById(id)) {
+            throw new EntityNotFoundException("Owner does not exist");
         }
     }
 

@@ -34,7 +34,6 @@ class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
-
     @Spy
     private UserMapperImpl userMapper = new UserMapperImpl();
     @Mock

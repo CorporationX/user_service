@@ -33,7 +33,8 @@ class UserControllerTest {
         userController.createUser(userDto);
         // Assert
         verify(userService, times(1)).createUser(userDto);
-}
+    }
+
     @Test
     void getUser() {
         long userId = 1L;
@@ -41,5 +42,5 @@ class UserControllerTest {
         when(userService.getUser(userId)).thenReturn(userDto);
         userController.getUser(userId);
         verify(userService, times(1)).getUser(userId);
-}
+    }
 }

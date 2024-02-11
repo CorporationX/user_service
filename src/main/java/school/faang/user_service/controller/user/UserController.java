@@ -2,8 +2,8 @@ package school.faang.user_service.controller.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.UserFilterDto;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.service.UserService;
 
 @Component
 @RequiredArgsConstructor

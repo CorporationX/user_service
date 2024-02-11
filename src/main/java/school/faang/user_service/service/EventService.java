@@ -61,7 +61,7 @@ public class EventService {
         return eventMapper.toDto(event);
     }
 
-    public void deleteEvent(long eventId) {
+    public void deleteEventById(long eventId) {
         eventRepository.deleteById(eventId);
     }
 

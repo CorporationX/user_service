@@ -233,7 +233,7 @@ public class EventServiceTest {
                 .build();
         long eventId = eventDelete.getId();
 
-        eventService.deleteEvent(eventId);
+        eventService.deleteEventById(eventId);
         verify(eventRepository, times(1)).deleteById(eventId);
     }
 

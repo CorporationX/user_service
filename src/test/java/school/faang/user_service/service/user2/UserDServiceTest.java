@@ -9,16 +9,16 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.UserService;
-import school.faang.user_service.service.event.EventService;
+import school.faang.user_service.service.EventService;
 import school.faang.user_service.service.goal.GoalService;
-import school.faang.user_service.service.mentorship.MentorshipService;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.service.MentorshipService;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.controller.UserController;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.service.UserService;
 
 @ExtendWith(MockitoExtension.class)
 public class UserControllerTest {

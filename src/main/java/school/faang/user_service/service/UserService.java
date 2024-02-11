@@ -46,6 +46,10 @@ public class UserService {
                 new EntityNotFoundException("User with id " + userId + " has not found"));
     }
 
+    public boolean isUserExists(long id) {
+        return userRepository.existsById(id);
+    }
+
     @Transactional
     public UserDto createUser(UserDto userDto) {
         User entity = userMapper.toEntity(userDto);

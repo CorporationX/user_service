@@ -10,6 +10,7 @@ import school.faang.user_service.service.UserService;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
@@ -32,5 +33,13 @@ class UserControllerTest {
         userController.createUser(userDto);
         // Assert
         verify(userService, times(1)).createUser(userDto);
-    }
+}
+    @Test
+    void getUser() {
+        long userId = 1L;
+        UserDto userDto = new UserDto();
+        when(userService.getUser(userId)).thenReturn(userDto);
+        userController.getUser(userId);
+        verify(userService, times(1)).getUser(userId);
+}
 }

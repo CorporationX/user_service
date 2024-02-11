@@ -168,6 +168,6 @@ public class EventControllerTest {
     public void successDeleteEvent() {
         long eventId = 1L;
         eventController.deleteEvent(eventId);
-        Mockito.verify(eventService, times(1)).deleteEvent(eventId);
+        Mockito.verify(eventService, times(1)).deleteEventById(eventId);
     }
 }

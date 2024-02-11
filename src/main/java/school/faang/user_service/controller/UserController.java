@@ -28,4 +28,9 @@ public class UserController {
         userService.isOwnerExistById(id);
     }
 
+    @PostMapping("/{userId}/deactivate/")
+    public void deactivationUserById(@PathVariable long userId) {
+        userService.deactivationUserById(userId);
+    }
+
 }

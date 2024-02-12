@@ -26,7 +26,7 @@ public class AmazonS3Config {
     @Value("${services.s3.bucketName}")
     private String bucketName;
 
-    @Bean(name = "clientAmazonS3")
+    @Bean
     public AmazonS3 amazons3() {
         AWSCredentials awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
         AmazonS3 clientAmazonS3 = AmazonS3ClientBuilder.standard()

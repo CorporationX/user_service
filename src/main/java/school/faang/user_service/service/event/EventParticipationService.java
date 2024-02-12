@@ -35,9 +35,6 @@ public class EventParticipationService {
     public void registerParticipant(long eventId, long userId) {
         Optional<UserDto> userById = eventParticipationRepository.findById(userId).map(userMapper::toDto);
         List<UserDto> listUsersAtEvent = getUsersAndConvertToUserDtoList(eventId);
-
-        System.out.println(userById);
-        System.out.println(listUsersAtEvent);
         if (!eventRepository.existsById(eventId)) {
             throw new IllegalArgumentException("Event not found with id: " + eventId);
         }

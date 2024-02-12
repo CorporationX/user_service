@@ -1,6 +1,5 @@
 package school.faang.user_service.repository.event;
 
-import feign.Param;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -16,6 +15,7 @@ public interface EventParticipationRepository extends CrudRepository<User, Long>
     @Query(nativeQuery = true, value = "INSERT INTO user_event (event_id, user_id) VALUES (:eventId, :userId)")
     void register(long eventId, long userId);
 
+    @Modifying
     @Query(nativeQuery = true, value = "DELETE FROM user_event WHERE event_id = :eventId and user_id = :userId")
     void unregister(long eventId, long userId);
 

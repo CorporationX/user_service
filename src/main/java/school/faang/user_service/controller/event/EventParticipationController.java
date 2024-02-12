@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.event.EventParticipationService;
-import school.faang.user_service.entity.User;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ public class EventParticipationController {
     }
 
     @GetMapping("/participants/{eventId}")
-    public List<User> getParticipant(@PathVariable long eventId) {
+    public List<UserDto> getParticipant(@PathVariable long eventId) {
         return eventParticipationService.getParticipant(eventId);
     }
 

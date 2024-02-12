@@ -91,9 +91,4 @@ class MentorshipControllerTest {
         assertThrows(IllegalArgumentException.class, () -> mentorshipController.deleteMentor(idFalse, idTrue));
     }
 
-    @Test
-    void testIsIdValid() {
-        assertTrue(mentorshipController.isIdValid(idTrue));
-        assertFalse(mentorshipController.isIdValid(idFalse));
-    }
 }

@@ -3,9 +3,11 @@ package school.faang.user_service.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.filter.user.UserFilter;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.List;
@@ -17,6 +19,7 @@ import java.util.stream.Stream;
 public class UserService {
     private final UserRepository userRepository;
     private final List<UserFilter> userFilters;
+    private final UserMapper userMapper;
 
 
     public User getUserById(long id) {
@@ -34,11 +37,11 @@ public class UserService {
         }
     }
 
-    public List<User> getPremiumUsers(UserFilterDto userFilterDto) {
+    public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
         Stream<User> premiumUsers = userRepository.findPremiumUsers();
-        Stream<User> userStream = userFilters.stream()
+        List<User> users = userFilters.stream()
                 .filter(filter -> filter.isApplicable(userFilterDto))
-                .flatMap(filter -> filter.apply(premiumUsers, userFilterDto));
-        return userStream.collect(Collectors.toList());
+                .flatMap(filter -> filter.apply(premiumUsers, userFilterDto)).toList();
+        return userMapper.toDtoList(users);
     }
 }

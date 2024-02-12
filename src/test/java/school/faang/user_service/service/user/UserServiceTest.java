@@ -8,12 +8,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.filter.user.UserCityFilter;
 import school.faang.user_service.filter.user.UserEmailFilter;
 import school.faang.user_service.filter.user.UserFilter;
+import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.UserService;
 
@@ -43,13 +46,16 @@ public class UserServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Spy
+    private UserMapperImpl userMapper;
+
     private List<User> users;
 
     private List<UserFilter> filters = new ArrayList<>();
 
     @BeforeEach
     public void init() {
-        userService = new UserService(userRepository, filters);
+        userService = new UserService(userRepository, filters, userMapper);
     }
 
     @Test
@@ -79,7 +85,7 @@ public class UserServiceTest {
         dtoFilter.setEmailPattern("mail");
         filters.add(userEmailFilter);
         Mockito.when(userRepository.findPremiumUsers()).thenReturn(users.stream());
-        List<User> premiumUsers = userService.getPremiumUsers(dtoFilter);
+        List<UserDto> premiumUsers = userService.getPremiumUsers(dtoFilter);
         Assertions.assertEquals(2, premiumUsers.size());
         Assertions.assertEquals(premiumUsers.get(0).getEmail(), "r123467@gmail.com");
         Assertions.assertEquals(premiumUsers.get(1).getEmail(), "k2jsd@mail.ru");
@@ -96,9 +102,8 @@ public class UserServiceTest {
         dtoFilter.setCityPattern("Moscow");
         filters.add(userCityFilter);
         Mockito.when(userRepository.findPremiumUsers()).thenReturn(users.stream());
-        List<User> premiumUsers = userService.getPremiumUsers(dtoFilter);
+        List<UserDto> premiumUsers = userService.getPremiumUsers(dtoFilter);
         Assertions.assertEquals(1, premiumUsers.size());
-        Assertions.assertEquals(premiumUsers.get(0).getCity(), "Moscow");
     }
 
     @Test

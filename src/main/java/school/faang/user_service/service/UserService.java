@@ -18,6 +18,8 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+    private final static long MOTHS_TO_DELETE_USER = 3;
+
     private final UserRepository userRepository;
     @Setter
     private EventService eventService;
@@ -25,7 +27,6 @@ public class UserService {
     private MentorshipService mentorshipService;
     @Setter
     private GoalService goalService;
-    private final static long MOTHS_TO_DELETE_USER = 3;
 
     public void deactivationUserById(long userId) {
         User user = getUserById(userId);
@@ -38,7 +39,7 @@ public class UserService {
     @Scheduled(cron = "${my.schedule.cron}")
     public void deleteNonActiveUsers() {
         LocalDateTime timeToDelete = LocalDateTime.now().minusMonths(MOTHS_TO_DELETE_USER);
-        userRepository.deleteAllInactiveUsersAndUpdatedAtOverMonths(timeToDelete);
+        //userRepository.deleteAllInactiveUsersAndUpdatedAtOverMonths(timeToDelete);
     }
 
     public boolean isOwnerExistById(Long id) {

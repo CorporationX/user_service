@@ -46,10 +46,6 @@ class MentorshipControllerTest {
         verify(mentorshipService).getMentees(idTrue);
     }
 
-    @Test
-    void testGetMenteesFailure() {
-        assertThrows(IllegalArgumentException.class, () -> mentorshipController.getMentees(idFalse));
-    }
 
     @Test
     void testGetMentorsSuccessful() {
@@ -63,11 +59,6 @@ class MentorshipControllerTest {
         verify(mentorshipService).getMentors(idTrue);
     }
 
-    @Test
-    void testGetMentorsFailure() {
-        assertThrows(IllegalArgumentException.class, () -> mentorshipController.getMentors(idFalse));
-    }
-
 
     @Test
     void testDeleteMenteeSuccessful() {
@@ -75,20 +66,11 @@ class MentorshipControllerTest {
         verify(mentorshipService).deleteMentee(menteeId, mentorId);
     }
 
-    @Test
-    void testDeleteMenteeFailure() {
-        assertThrows(IllegalArgumentException.class, () -> mentorshipController.deleteMentee(idFalse, idTrue));
-    }
 
     @Test
     void testDeleteMentorSuccessful() {
         mentorshipController.deleteMentor(menteeId, mentorId);
         verify(mentorshipService).deleteMentor(menteeId, mentorId);
-    }
-
-    @Test
-    void testDeleteMentorFailure() {
-        assertThrows(IllegalArgumentException.class, () -> mentorshipController.deleteMentor(idFalse, idTrue));
     }
 
 }

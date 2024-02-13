@@ -11,8 +11,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.goal.GoalService;
-import school.faang.user_service.service.skill.SkillService;
+import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.SkillService;
+import school.faang.user_service.service.GoalService;
+import school.faang.user_service.validator.GoalValidator;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
@@ -29,6 +32,8 @@ class GoalValidatorTest {
 
     @Mock
     private SkillService skillService;
+    @Mock
+    private GoalRepository goalRepository;
 
     @InjectMocks
     private GoalValidator goalValidator;
@@ -72,7 +77,7 @@ class GoalValidatorTest {
 
     @Test
     void maxGoalsPerUserExceptionTest() {
-        Mockito.when(goalService.countActiveGoalsPerUser(userId))
+        Mockito.when(goalRepository.countActiveGoalsPerUser(userId))
                 .thenReturn(maxGoalsPerUser);
         assertThrows(DataValidationException.class,
                 () -> goalValidator.validate(userId, goalDto));
@@ -81,7 +86,7 @@ class GoalValidatorTest {
 
     @Test
     void uncorrectSkillExceptionTest() {
-        Mockito.when(goalService.countActiveGoalsPerUser(userId))
+        Mockito.when(goalRepository.countActiveGoalsPerUser(userId))
                 .thenReturn(maxGoalsPerUser - 1);
         Mockito.when(skillService.existsById(1L))
                 .thenReturn(false);
@@ -104,7 +109,7 @@ class GoalValidatorTest {
 
     @Test
     void allCorrectTest() {
-        Mockito.when(goalService.countActiveGoalsPerUser(userId))
+        Mockito.when(goalRepository.countActiveGoalsPerUser(userId))
                 .thenReturn(maxGoalsPerUser - 1);
         Mockito.when(skillService.existsById(1L))
                 .thenReturn(true);

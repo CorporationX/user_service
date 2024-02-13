@@ -3,8 +3,8 @@ package school.faang.user_service.controller.goal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.goal.GoalDto;
-import school.faang.user_service.service.goal.GoalService;
-import school.faang.user_service.validator.goal.GoalValidator;
+import school.faang.user_service.service.GoalService;
+import school.faang.user_service.validator.GoalValidator;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 
 import java.util.List;
@@ -36,6 +36,7 @@ public class GoalController {
     public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter) {
         return goalService.getGoalsByUser(userId, filter);
     }
+
     public List<GoalDto> findSubtasksByGoalId(long goalId, GoalFilterDto filter) {
         goalValidator.validateFilter(filter);
         return goalService.findSubtasksByGoalId(goalId, filter);

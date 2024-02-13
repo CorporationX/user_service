@@ -1,4 +1,4 @@
-package school.faang.user_service.service.goal;
+package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,9 +10,7 @@ import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.skill.SkillService;
-import school.faang.user_service.service.user.UserService;
-import school.faang.user_service.validator.goal.GoalValidator;
+import school.faang.user_service.validator.GoalValidator;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -80,7 +78,7 @@ public class GoalService {
 
         goalValidator.validateSkills(goal.getSkillsToAchieve());
 
-        List<Skill> skillsToUpdate = goalDto.getSkillIds().stream().map(skillService::findById).toList();
+        List<Skill> skillsToUpdate = goalDto.getSkillIds().stream().map(skillService::getSkillById).toList();
         goal.setSkillsToAchieve(skillsToUpdate);
 
         if (goal.getStatus() == GoalStatus.COMPLETED) {
@@ -111,7 +109,7 @@ public class GoalService {
         if (!goalDto.getSkillIds().isEmpty()) {
             List<Skill> goalSkills = new ArrayList<>();
             goalDto.getSkillIds().forEach(skillId ->
-                    goalSkills.add(skillService.findById(skillId)));
+                    goalSkills.add(skillService.getSkillById(skillId)));
             goalToSave.setSkillsToAchieve(goalSkills);
         }
 

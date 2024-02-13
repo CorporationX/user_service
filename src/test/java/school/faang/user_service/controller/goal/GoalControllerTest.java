@@ -7,8 +7,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
-import school.faang.user_service.service.goal.GoalService;
-import school.faang.user_service.validator.goal.GoalValidator;
+import school.faang.user_service.service.GoalService;
+import school.faang.user_service.validator.GoalValidator;
 
 
 @ExtendWith(MockitoExtension.class)

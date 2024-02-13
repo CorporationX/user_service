@@ -76,4 +76,12 @@ public class UserService {
         String urlUser = url + userName;
         return restTemplate.getForObject(urlUser, byte[].class);
     }
+
+    public User findById(long id) {
+        return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
+    }
+
+    public void saveUser(User user) {
+        userRepository.save(user);
+    }
 }

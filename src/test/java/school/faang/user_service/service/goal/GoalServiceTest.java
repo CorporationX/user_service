@@ -15,17 +15,16 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.filter.goal.GoalStatusFilter;
 import school.faang.user_service.filter.goal.GoalTitleFilter;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.mapper.goal.GoalMapperImpl;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.skill.SkillService;
-import school.faang.user_service.service.user.UserService;
-import school.faang.user_service.validator.goal.GoalValidator;
+import school.faang.user_service.service.GoalService;
+import school.faang.user_service.service.SkillService;
+import school.faang.user_service.service.UserService;
+import school.faang.user_service.validator.GoalValidator;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,14 +33,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
-import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.skill.SkillService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -157,7 +149,7 @@ class GoalServiceTest {
 
         Mockito.when(goalRepository.findById(Mockito.any())).thenReturn(Optional.of(oldGoal));
         Mockito.when(goalMapper.toEntity(goalDto)).thenReturn(goal);
-        Mockito.when(skillService.findById(Mockito.anyLong())).thenReturn(skill);
+        Mockito.when(skillService.getSkillById(Mockito.anyLong())).thenReturn(skill);
 
         goalService.updateGoal(goalId, goalDto);
 
@@ -179,7 +171,7 @@ class GoalServiceTest {
 
         Mockito.when(goalMapper.toEntity(goalDto)).thenReturn(goal);
         Mockito.when(goalRepository.findById(1L)).thenReturn(Optional.of(parentGoal));
-        Mockito.when(skillService.findById(1L)).thenReturn(new Skill());
+        Mockito.when(skillService.getSkillById(1L)).thenReturn(new Skill());
         Mockito.when(userService.findById(1L)).thenReturn(user);
         Mockito.when(goalMapper.toDto(Mockito.any())).thenReturn(new GoalDto());
         goalService.createGoal(userId, goalDto);

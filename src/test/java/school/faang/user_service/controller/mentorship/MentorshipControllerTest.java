@@ -7,10 +7,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.controller.MentorshipController;
 import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.service.MentorshipService;
-import school.faang.user_service.validator.MentorshipValidator;
+import school.faang.user_service.service.mentorship.MentorshipService;
+import school.faang.user_service.validator.mentorship.MentorshipValidator;
 
 import java.util.ArrayList;
 import java.util.Collections;

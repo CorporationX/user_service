@@ -12,8 +12,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
-import school.faang.user_service.exception.mentorship.DataNotFoundException;
-import school.faang.user_service.exception.mentorship.DataValidationException;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
@@ -67,7 +67,7 @@ class MentorshipRequestValidatorTest {
 
     @Test
     public void testExceptionForEmptyData() {
-        Assert.assertThrows(DataNotFoundException.class, () ->
+        Assert.assertThrows(EntityNotFoundException.class, () ->
                 mentorshipRequestValidator.validateUserData(new User(), new User()));
     }
 
@@ -75,14 +75,14 @@ class MentorshipRequestValidatorTest {
     public void testCommonCheck() {
         try {
             mentorshipRequestValidator.commonCheck(mentorshipRequestDto);
-        } catch (DataNotFoundException e) {
+        } catch (EntityNotFoundException e) {
             fail("Should not have thrown any exception");
         }
     }
 
     @Test
     public void testExceptionWhenSameUser() {
-        Assert.assertThrows(DataNotFoundException.class, () ->
+        Assert.assertThrows(EntityNotFoundException.class, () ->
                 mentorshipRequestValidator.validateUserData(receiver, sameUser));
     }
 
@@ -99,7 +99,7 @@ class MentorshipRequestValidatorTest {
     public void testCorrectData() {
         try {
             mentorshipRequestValidator.validateUserData(receiver, requester);
-        } catch (DataNotFoundException e) {
+        } catch (EntityNotFoundException e) {
             fail("Should not have thrown any exception");
         }
     }

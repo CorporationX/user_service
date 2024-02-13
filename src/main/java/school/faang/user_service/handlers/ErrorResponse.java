@@ -23,9 +23,8 @@ public class ErrorResponse {
         this.statusCode = statusCode;
     }
 
-    public ErrorResponse(String url, int statusCode, String message) {
+    public ErrorResponse(int statusCode, String message) {
         this(statusCode);
-        this.url = url;
         this.message = message;
     }
 }

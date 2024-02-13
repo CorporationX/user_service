@@ -32,7 +32,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Transactional
     @Modifying
     @Query(nativeQuery = true, value = """
-            DELETE FROM users u 
+            DELETE FROM users u
             WHERE u.active = false AND u.updatedAt < ?1
             """)
     void deleteAllInactiveUsersAndUpdatedAtOverMonths(LocalDateTime time);

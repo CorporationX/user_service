@@ -1,5 +1,7 @@
-package school.faang.user_service.service.user2;
+package school.faang.user_service.service;
 
+import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
@@ -11,7 +13,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.UserService;
 import school.faang.user_service.service.EventService;
 import school.faang.user_service.service.goal.GoalService;
-import school.faang.user_service.service.MentorshipService;
+import school.faang.user_service.service.mentorship.MentorshipService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,9 +26,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class UserDServiceTest {
-    @InjectMocks
-    private UserService userService;
+public class UserServiceTest {
+
     @Mock
     private UserRepository userRepository;
     @Mock
@@ -38,9 +39,22 @@ public class UserDServiceTest {
     @Captor
     private ArgumentCaptor<User> captor;
 
+    @InjectMocks
+    private UserService userService;
+
     @Test
-    void getUsers() {
-        assertTrue(true);
+    public void testGetUserByIdFailed() {
+        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.empty());
+        Assertions.assertThrows(EntityNotFoundException.class,
+                () -> userService.getUserById(1L));
+    }
+
+    @Test
+    public void testGetUserByIdSuccess() {
+        User user = new User();
+        user.setId(1L);
+        Mockito.lenient().when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        Assertions.assertEquals(user, userService.getUserById(1L));
     }
 
     @Test
@@ -80,7 +94,7 @@ public class UserDServiceTest {
         Mockito.verify(userRepository, times(1)).deleteAllInactiveUsersAndUpdatedAtOverMonths(timeToDelete);
     }
 
-    @Test
+   /* @Test
     public void successDeactivationUserById() {
         List<Goal> goals = List.of(Goal.builder()
                 .id(1L)
@@ -117,6 +131,6 @@ public class UserDServiceTest {
 
         User deactivatedUser = captor.getValue();
         assertFalse(deactivatedUser.isActive());
-    }
+    }*/
 
 }

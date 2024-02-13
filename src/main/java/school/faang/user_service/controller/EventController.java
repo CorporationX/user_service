@@ -5,8 +5,7 @@ import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.service.EventService;
-import school.faang.user_service.validator.event.EventValidator;
-import school.faang.user_service.validator.event.EventFilterValidator;
+import school.faang.user_service.validator.EventValidator;
 
 import java.util.List;
 
@@ -14,11 +13,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EventController {
     private final EventService eventService;
-    private final EventFilterValidator eventFilterValidator;
     private final EventValidator eventValidator;
 
     public List<EventDto> getEventsByFilter(EventFilterDto filterDto) {
-        eventFilterValidator.checkFilterNotNull(filterDto);
+        eventValidator.checkFilterNotNull(filterDto);
         return eventService.getEventsByFilter(filterDto);
     }
 

@@ -5,8 +5,8 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.mentorship.DataNotFoundException;
-import school.faang.user_service.exception.mentorship.DataValidationException;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 import java.time.LocalDateTime;
@@ -23,7 +23,7 @@ public class MentorshipRequestValidator {
 
     public void validateUserData(User receiver, User requester) {
         if (requester.getId() == receiver.getId()) {
-            throw new DataNotFoundException("Requester and receiver the same user");
+            throw new EntityNotFoundException("Requester and receiver the same user");
         }
         Optional<MentorshipRequest> latestRequest = mentorshipRequestRepository
                 .findLatestRequest(requester.getId(), receiver.getId());

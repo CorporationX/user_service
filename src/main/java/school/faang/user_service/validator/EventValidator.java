@@ -1,9 +1,10 @@
-package school.faang.user_service.validator.event;
+package school.faang.user_service.validator;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
@@ -72,6 +73,12 @@ public class EventValidator {
     public void checkIfEventNotStarted(LocalDateTime startDate) {
         if (startDate.isBefore(LocalDateTime.now())) {
             throw new DataValidationException("Event were started");
+        }
+    }
+
+    public void checkFilterNotNull(EventFilterDto filterDto) {
+        if (filterDto == null) {
+            throw new DataValidationException("Filter cannot be null");
         }
     }
 

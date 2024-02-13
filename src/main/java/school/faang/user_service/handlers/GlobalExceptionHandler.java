@@ -10,26 +10,26 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler
-    public ResponseEntity<ControllerError> handleIllegalArgumentException(IllegalArgumentException ex) {
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         return ResponseEntity
                 .status(httpStatus)
-                .body(new ControllerError(httpStatus.value(), ex.getMessage()));
+                .body(new ErrorResponse(httpStatus.value(), ex.getMessage()));
     }
 
     @ExceptionHandler
-    public ResponseEntity<ControllerError> handleEntityNotFoundException(EntityNotFoundException ex) {
+    public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException ex) {
         HttpStatus httpStatus = HttpStatus.NOT_FOUND;
         return ResponseEntity
                 .status(httpStatus)
-                .body(new ControllerError(httpStatus.value(), ex.getMessage()));
+                .body(new ErrorResponse(httpStatus.value(), ex.getMessage()));
     }
 
     @ExceptionHandler
-    public ResponseEntity<ControllerError> handleDataValidationException(ValidationException ex) {
+    public ResponseEntity<ErrorResponse> handleDataValidationException(ValidationException ex) {
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         return ResponseEntity
                 .status(httpStatus)
-                .body(new ControllerError(httpStatus.value(), ex.getMessage()));
+                .body(new ErrorResponse(httpStatus.value(), ex.getMessage()));
     }
 }

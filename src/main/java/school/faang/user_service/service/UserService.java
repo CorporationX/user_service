@@ -10,6 +10,7 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.goal.GoalService;
+import school.faang.user_service.service.mentorship.MentorshipService;
 
 import java.time.LocalDateTime;
 import java.util.List;

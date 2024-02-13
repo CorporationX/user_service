@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.entity.User;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -35,5 +35,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
             DELETE FROM users u
             WHERE u.active = false AND u.updatedAt < ?1
             """)
-    void deleteAllInactiveUsersAndUpdatedAtOverMonths(LocalDateTime time);
+    void deleteAllInactiveUsersAndUpdatedAtOverMonths(LocalDate time);
 }

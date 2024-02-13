@@ -8,7 +8,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.repository.UserRepository;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import static org.mockito.Mockito.times;
 
@@ -19,11 +19,11 @@ public class ScheduledUserServiceTest {
     @Mock
     private UserRepository userRepository;
 
-        @Test
-    public void successDeleteNonActiveUser() {
+    @Test
+    public void successDeleteNonActiveUsers() {
         long months = 3L;
-        LocalDateTime timeToDelete = LocalDateTime.now().minusMonths(months);
+        LocalDate localDate = LocalDate.now().minusMonths(months);
         scheduledUserService.deleteNonActiveUsers();
-        Mockito.verify(userRepository, times(1)).deleteAllInactiveUsersAndUpdatedAtOverMonths(timeToDelete);
+        Mockito.verify(userRepository, times(1)).deleteAllInactiveUsersAndUpdatedAtOverMonths(localDate);
     }
 }

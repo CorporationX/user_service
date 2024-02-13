@@ -5,7 +5,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.repository.UserRepository;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -15,7 +15,7 @@ public class ScheduledUserService {
 
     @Scheduled(cron = "${my.schedule.cron}")
     public void deleteNonActiveUsers() {
-        LocalDateTime timeToDelete = LocalDateTime.now().minusMonths(MOTHS_TO_DELETE_USER);
+        LocalDate timeToDelete = LocalDate.now().minusMonths(MOTHS_TO_DELETE_USER);
         userRepository.deleteAllInactiveUsersAndUpdatedAtOverMonths(timeToDelete);
     }
 }

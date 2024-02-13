@@ -55,8 +55,13 @@ aws:
 
 services:
   s3:
-    bucket-name: user_backet
-    isMocked: true
+    endpoint: http://127.0.0.1:9000
+    accessKey: user
+    secretKey: password
+    bucketName: userbucket
+  random_avatar:
+    url: https://api.dicebear.com/7.x/adventurer/svg?seed=
+
 
 premium_cleanup:
   time: 0 0 0 * * 0

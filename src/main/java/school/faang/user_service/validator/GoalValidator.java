@@ -24,7 +24,7 @@ public class GoalValidator {
         if (goalRepository.countActiveGoalsPerUser(userId) == MAX_GOALS_PER_USER) {
             throw new DataValidationException("Достигнуто максимальное количество целей");
         }
-        if (!goalDto.getSkillIds().stream().allMatch(skillService::existsById)) {
+        if (goalDto.getSkillIds() != null && !goalDto.getSkillIds().stream().allMatch(skillService::existsById)) {
             throw new DataValidationException("Некорректные скиллы");
         }
     }
@@ -53,5 +53,12 @@ public class GoalValidator {
         if (filter == null) {
             throw new DataValidationException("Filter cannot be null");
         }
+    }
+
+    public void validateDescription(GoalDto goal) {
+        if (goal.getDescription() == null || goal.getDescription().isBlank()) {
+            throw new DataValidationException("Описание цели не должно быть пустым");
+        }
+
     }
 }

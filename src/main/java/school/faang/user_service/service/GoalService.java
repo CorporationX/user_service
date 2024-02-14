@@ -2,6 +2,7 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
@@ -95,7 +96,7 @@ public class GoalService {
         return goalRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Цель не найдена"));
     }
 
-
+    @Transactional
     public GoalDto createGoal(long userId, GoalDto goalDto) {
 
         goalValidator.validate(userId, goalDto);
@@ -106,7 +107,7 @@ public class GoalService {
             goalToSave.setParent(parent);
         }
 
-        if (!goalDto.getSkillIds().isEmpty()) {
+        if (goalDto.getSkillIds() != null && !goalDto.getSkillIds().isEmpty()) {
             List<Skill> goalSkills = new ArrayList<>();
             goalDto.getSkillIds().forEach(skillId ->
                     goalSkills.add(skillService.getSkillById(skillId)));
@@ -116,6 +117,7 @@ public class GoalService {
         User userToUpdate = userService.findById(userId);
         userToUpdate.getGoals().add(goalToSave);
         userService.saveUser(userToUpdate);
+        goalToSave.setUsers(List.of(userToUpdate));
 
         return goalMapper.toDto(goalRepository.save(goalToSave));
     }

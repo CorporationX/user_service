@@ -1,4 +1,4 @@
-package school.faang.user_service.validator.mentorship;
+package school.faang.user_service.validator;
 
 public class MentorshipValidator {
     public static void validateMentorshipIds(long mentorId, long menteeId) {

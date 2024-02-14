@@ -32,6 +32,8 @@ spring:
           name: profile_view_channel
         premium_channel:
           name: premium_channel
+        goal_channel:
+          name: goal_channel
 
 server:
   port: 8080

@@ -16,7 +16,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
-import school.faang.user_service.exceptions.DataValidationException;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.GoalOverflowException;
 import school.faang.user_service.exception.SkillNotFoundException;
 import school.faang.user_service.filter.goal.GoalFilter;

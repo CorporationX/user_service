@@ -27,8 +27,6 @@ spring:
         profile_view_channel:
           name: profile_view_channel
 
-cron:
-
 server:
   port: 8080
 
@@ -56,4 +54,4 @@ services:
 
 my:
   schedule:
-    cron: "0 0 0 * * ?"
+    cron: "*/30 * * * * *"

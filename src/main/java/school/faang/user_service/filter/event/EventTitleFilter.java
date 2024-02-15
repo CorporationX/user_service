@@ -7,11 +7,11 @@ import school.faang.user_service.entity.event.Event;
 import java.util.stream.Stream;
 
 @Component
-public class EventTitleFilter implements EventFilter{
+public class EventTitleFilter implements EventFilter {
 
     @Override
     public boolean isApplicable(EventFilterDto filters) {
-        return filters.getTitlePattern()!=null;
+        return filters.getTitlePattern() != null;
     }
 
     @Override

@@ -7,15 +7,15 @@ import school.faang.user_service.entity.event.Event;
 import java.util.stream.Stream;
 
 @Component
-public class EventMaxAttendeesFilter implements EventFilter{
+public class EventMaxAttendeesFilter implements EventFilter {
 
     @Override
     public boolean isApplicable(EventFilterDto filters) {
-        return filters.getMaxAttendeesPattern()!=0;
+        return filters.getMaxAttendeesPattern() != 0;
     }
 
     @Override
     public Stream<Event> apply(Stream<Event> events, EventFilterDto eventFilterDto) {
-        return events.filter(event -> event.getMaxAttendees()==eventFilterDto.getMaxAttendeesPattern());
+        return events.filter(event -> event.getMaxAttendees() == eventFilterDto.getMaxAttendeesPattern());
     }
 }

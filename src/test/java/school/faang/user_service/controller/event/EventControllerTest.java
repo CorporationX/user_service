@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
+import school.faang.user_service.dto.event.EventUpdateDto;
 import school.faang.user_service.exception.event.EventValidator;
 import school.faang.user_service.service.event.EventService;
 
@@ -38,6 +39,13 @@ class EventControllerTest {
     }
 
     @Test
+    void shouldgetEventsByFilterEventController() {
+        EventFilterDto eventFilterDto = new EventFilterDto();
+        eventController.getEventsByFilter(eventFilterDto);
+        verify(eventService, times(1)).getEventsByFilter(eventFilterDto);
+    }
+
+    @Test
     void shouldDeleteEventController() {
         long eventId = 1;
         eventController.deleteEvent(eventId);
@@ -46,25 +54,26 @@ class EventControllerTest {
 
     @Test
     void shouldUpdateEventController() {
-        EventDto eventDto = new EventDto();
-        eventController.updateEvent(eventDto);
-        verify(eventService, times(1)).updateEvent(eventDto);
-        verify(eventValidator, times(1)).validate(eventDto);
+        EventUpdateDto eventUpdateDto = new EventUpdateDto();
+        Long eventId = 1l;
+        eventController.updateEvent(eventId, eventUpdateDto);
+        verify(eventService, times(1)).updateEvent(eventId, eventUpdateDto);
+        verify(eventValidator, times(1)).validate(eventUpdateDto);
     }
 
     @Test
     void shouldGetOwnedEventsEventController() {
         EventFilterDto eventFilterDto = new EventFilterDto();
-        long eventId = 1;
-        eventController.getOwnedEvents(eventId, eventFilterDto);
-        verify(eventService, times(1)).getOwnedEvents(eventId, eventFilterDto);
+        long userId = 1;
+        eventController.getOwnedEvents(userId, eventFilterDto);
+        verify(eventService, times(1)).getOwnedEvents(userId, eventFilterDto);
     }
 
     @Test
     void shouldGetParticipatedEventsController() {
         EventFilterDto eventFilterDto = new EventFilterDto();
-        long eventId = 1;
-        eventController.getParticipatedEvents(eventId, eventFilterDto);
-        verify(eventService, times(1)).getParticipatedEvents(eventId, eventFilterDto);
+        long userId = 1;
+        eventController.getParticipatedEvents(userId, eventFilterDto);
+        verify(eventService, times(1)).getParticipatedEvents(userId, eventFilterDto);
     }
 }

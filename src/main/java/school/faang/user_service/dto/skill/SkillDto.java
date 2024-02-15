@@ -2,9 +2,7 @@ package school.faang.user_service.dto.skill;
 
 import lombok.Data;
 import school.faang.user_service.dto.event.EventDto;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
-import school.faang.user_service.entity.goal.Goal;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,10 +11,10 @@ import java.util.List;
 public class SkillDto {
     private long id;
     private String title;
-    private List<User> users;
+    private List<Long> users;
     private List<UserSkillGuarantee> guarantees;
     private List<EventDto> events;
-    private List<Goal> goals;
+    private List<Long> goals;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

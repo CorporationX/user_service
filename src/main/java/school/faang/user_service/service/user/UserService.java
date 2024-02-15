@@ -38,17 +38,17 @@ public class UserService {
         return userMapper.toUserDto(user);
     }
 
-    private Stream<UserDto> userFilter(Stream<UserDto> userDtoStream, UserFilterDto userFilterDto) {
-        return userFilters.stream()
-                .filter(userFilter -> userFilter.isApplicable(userFilterDto))
-                .flatMap(userFilter -> userFilter.apply(userDtoStream, userFilterDto));
-    }
-
     @Transactional
     public UserCreateDto createUser(UserCreateDto userCreateDto) {
         User user = userMapper.toEntity(userCreateDto);
         user.setActive(true);
         avatarService.generateAndSaveAvatar(user).ifPresent(user::setUserProfilePic);
         return userMapper.toUserCreateDto(userRepository.save(user));
+    }
+
+    private Stream<UserDto> userFilter(Stream<UserDto> userDtoStream, UserFilterDto userFilterDto) {
+        return userFilters.stream()
+                .filter(userFilter -> userFilter.isApplicable(userFilterDto))
+                .flatMap(userFilter -> userFilter.apply(userDtoStream, userFilterDto));
     }
 }

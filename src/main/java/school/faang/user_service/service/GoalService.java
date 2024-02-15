@@ -3,6 +3,7 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.goal.GoalCompletedEvent;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.dto.goal.GoalSetEvent;
@@ -11,6 +12,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.goal.GoalMapper;
+import school.faang.user_service.publisher.GoalCompletedEventPublisher;
 import school.faang.user_service.publisher.GoalEventPublisher;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validator.GoalValidator;
@@ -35,6 +37,7 @@ public class GoalService {
     private final GoalValidator goalValidator;
     private final UserService userService;
     private final GoalEventPublisher goalEventPublisher;
+    private final GoalCompletedEventPublisher goalCompletedEventPublisher;
 
     public List<GoalDto> getGoalsByUser(long userId, GoalFilterDto filter) {
         Stream<Goal> foundGoals = goalRepository.findGoalsByUserId(userId);
@@ -87,6 +90,8 @@ public class GoalService {
         goal.setSkillsToAchieve(skillsToUpdate);
 
         if (goal.getStatus() == GoalStatus.COMPLETED) {
+            goal.getUsers().forEach(user -> goalCompletedEventPublisher.publish(new GoalCompletedEvent(user.getId(), goalId, LocalDateTime.now())));
+
             goal.getUsers().forEach(user -> skillsToUpdate
                     .forEach(skill -> skillService.assignSkillToUser(user.getId(), skill.getId())));
         }

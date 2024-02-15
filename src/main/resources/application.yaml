@@ -34,6 +34,8 @@ spring:
           name: premium_channel
         goal_channel:
           name: goal_channel
+        goal_completed_channel:
+          name: goal_completed_channel
 
 server:
   port: 8080

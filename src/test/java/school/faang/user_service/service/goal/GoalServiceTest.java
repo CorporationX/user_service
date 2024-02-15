@@ -20,6 +20,7 @@ import school.faang.user_service.filter.goal.GoalStatusFilter;
 import school.faang.user_service.filter.goal.GoalTitleFilter;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.mapper.goal.GoalMapperImpl;
+import school.faang.user_service.publisher.GoalCompletedEventPublisher;
 import school.faang.user_service.publisher.GoalEventPublisher;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.GoalService;
@@ -60,6 +61,10 @@ class GoalServiceTest {
     @Mock
     private GoalEventPublisher goalEventPublisher;
 
+    @Mock
+    private GoalCompletedEventPublisher goalCompletedEventPublisher;
+
+
     GoalService goalService;
     Stream<Goal> goalStream;
     Goal correctGoal = new Goal();
@@ -78,7 +83,7 @@ class GoalServiceTest {
 
     @BeforeEach
     void setUp() {
-        goalService = new GoalService(goalRepository, goalMapper, goalFilters, skillService, goalValidator, userService, goalEventPublisher);
+        goalService = new GoalService(goalRepository, goalMapper, goalFilters, skillService, goalValidator, userService, goalEventPublisher, goalCompletedEventPublisher);
 
         correctGoal.setTitle("Correct");
         correctGoal.setStatus(GoalStatus.ACTIVE);

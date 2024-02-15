@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,14 +23,14 @@ public class GoalController {
     private final GoalValidator goalValidator;
     private final UserContext userContext;
 
-
-    public GoalDto updateGoal(Long goalId, GoalDto goal) {
+    @PostMapping("/goals/{goalId}")
+    public GoalDto updateGoal(@PathVariable Long goalId, @RequestBody GoalDto goal) {
         goalValidator.validateUserId(goalId);
         goalValidator.validateGoalTitle(goal);
         return goalService.updateGoal(goalId, goal);
     }
 
-    @Operation(summary = "Покупка премиума", parameters = {@Parameter(in = ParameterIn.HEADER, name = "x-user-id", description = "id пользователя", required = true)})
+    @Operation(summary = "Создание цели", parameters = {@Parameter(in = ParameterIn.HEADER, name = "x-user-id", description = "id пользователя", required = true)})
     @PostMapping("/goals")
     public GoalDto createGoal(@RequestBody GoalDto goal) {
         long userId = userContext.getUserId();

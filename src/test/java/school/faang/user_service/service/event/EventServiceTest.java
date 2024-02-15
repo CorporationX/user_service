@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.config.async.AsyncConfig;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.Skill;
@@ -61,6 +62,7 @@ public class EventServiceTest {
     private EventFilterDto eventFilterDtoId;
     private EventFilterDto eventFilterDtoTitle;
     private EventFilterDto eventFilterDtoStartDate;
+    private AsyncConfig asyncConfig;
 
     @BeforeEach
     void setUp() {
@@ -68,7 +70,7 @@ public class EventServiceTest {
         eventFilters.add(new EventTitlePattern());
         eventFilters.add(new EventStartDatePattern());
 
-        eventService = new EventService(eventRepository, eventMapper, eventValidator, userService, eventFilters);
+        eventService = new EventService(eventRepository, eventMapper, eventValidator, userService, eventFilters, asyncConfig);
 
         startDate = LocalDateTime.now().plusDays(1L);
         owner = User.builder().id(1L).active(true).build();

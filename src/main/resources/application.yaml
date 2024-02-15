@@ -28,7 +28,7 @@ spring:
             name: profile_view_channel
 
 server:
-  port: 8085
+  port: 8080
 
 logging:
   level:
@@ -54,4 +54,4 @@ services:
 
 scheduler:
   batchSize: 10
-  deleteEventsCron: 0 0 * * * *
+  deleteEventsCron: "0 0 * * * *"

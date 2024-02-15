@@ -8,6 +8,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.dto.GoalCompletedEvent;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
@@ -20,6 +22,7 @@ import school.faang.user_service.filter.goal.GoalStatusFilter;
 import school.faang.user_service.filter.goal.GoalTitleFilter;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.mapper.goal.GoalMapperImpl;
+import school.faang.user_service.publisher.GoalCompletedEventPublisher;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.GoalService;
 import school.faang.user_service.service.SkillService;
@@ -54,6 +57,12 @@ class GoalServiceTest {
 
     @Mock
     private UserService userService;
+    @Mock
+    private GoalCompletedEventPublisher goalCompletedEventPublisher;
+    @Mock
+    private GoalCompletedEvent goalCompletedEvent;
+    @Mock
+    private UserContext userContext;
 
     GoalService goalService;
     Stream<Goal> goalStream;
@@ -73,7 +82,8 @@ class GoalServiceTest {
 
     @BeforeEach
     void setUp() {
-        goalService = new GoalService(goalRepository, goalMapper, goalFilters, skillService, goalValidator, userService);
+        goalService = new GoalService(goalRepository, goalMapper, goalFilters, skillService, goalValidator, userService,
+                goalCompletedEventPublisher, goalCompletedEvent, userContext);
 
         correctGoal.setTitle("Correct");
         correctGoal.setStatus(GoalStatus.ACTIVE);
@@ -155,6 +165,7 @@ class GoalServiceTest {
 
         Mockito.verify(skillService).assignSkillToUser(Mockito.anyLong(), Mockito.anyLong());
         Mockito.verify(goalRepository).save(goal);
+        verify(goalCompletedEventPublisher).publish(goalCompletedEvent);
     }
 
 

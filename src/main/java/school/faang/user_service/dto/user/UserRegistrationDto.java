@@ -30,8 +30,6 @@ public class UserRegistrationDto {
     private String phone;
     @NotBlank
     String country;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
     private String profilePicFileId;
     private String profilePicSmallFileId;
 }

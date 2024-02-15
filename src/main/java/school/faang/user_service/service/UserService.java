@@ -21,7 +21,7 @@ public class UserService {
     private final UserMapper userMapper;
     private final UserProfilePic generatedUserProfilePic;
 
-    public UserDto createUser(UserRegistrationDto userDto) {
+    public UserRegistrationDto createUser(UserRegistrationDto userDto) {
         User user = userMapper.toEntity(userDto);
 
         if (user.getUserProfilePic() == null) {
@@ -31,7 +31,7 @@ public class UserService {
         user.setCountry(country);
 
         User savedUser = userRepository.save(user);
-        return userMapper.toDto(savedUser);
+        return userMapper.toRegDto(savedUser);
     }
 
     public UserDto getUserDtoById(long id) {

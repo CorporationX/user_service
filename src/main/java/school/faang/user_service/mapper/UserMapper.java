@@ -26,6 +26,10 @@ public abstract class UserMapper {
     @Mapping(target = "userProfilePic", expression = "java(getUserProfilePic(userDto))")
     @Mapping(target = "country", ignore = true)
     public abstract User toEntity(UserRegistrationDto userDto);
+    @Mapping(target = "country", source = "country.title")
+    @Mapping(target = "profilePicFileId", source = "userProfilePic.fileId")
+    @Mapping(target = "profilePicSmallFileId", source = "userProfilePic.smallFileId")
+    public abstract UserRegistrationDto toRegDto (User user);
 
     protected UserProfilePic getUserProfilePic(UserRegistrationDto userDto) {
         String fileId = userDto.getProfilePicFileId();

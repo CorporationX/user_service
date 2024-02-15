@@ -10,12 +10,14 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.validator.UserValidator;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final CountryService countryService;
+    private final UserValidator userValidator;
     private final UserMapper userMapper;
     private final UserProfilePic generatedUserProfilePic;
 
@@ -33,6 +35,7 @@ public class UserService {
     }
 
     public UserDto getUserDtoById(long id) {
+        userValidator.validateAccessToUser(id);
         return userMapper.toDto(getUserById(id));
     }
 
@@ -42,6 +45,7 @@ public class UserService {
     }
 
     public UserProfilePic getUserPicUrlById(long id) {
+        userValidator.validateAccessToUser(id);
         return getUserById(id).getUserProfilePic();
     }
 }

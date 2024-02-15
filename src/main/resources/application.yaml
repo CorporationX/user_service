@@ -32,6 +32,8 @@ spring:
           name: profile_view_channel
         premium_channel:
           name: premium_channel
+        mentorship_offered_channel:
+          name: mentorship_offered_channel
 
 server:
   port: 8080

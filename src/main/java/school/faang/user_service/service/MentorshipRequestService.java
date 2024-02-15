@@ -3,17 +3,17 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.MentorshipOfferedEvent;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDro;
 import school.faang.user_service.entity.Mentorship;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.mentorship_request.MentorshipRequestFilter;
-import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipOfferedEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -33,6 +33,8 @@ public class MentorshipRequestService {
     private final MentorshipValidator mentorshipValidator;
     private final List<MentorshipRequestFilter> mentorshipRequestFilters;
     private final MentorshipRequestMapper mentorshipRequestMapper;
+    private final MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
+    private final MentorshipOfferedEvent event;
 
 
     @Transactional
@@ -45,6 +47,8 @@ public class MentorshipRequestService {
         mentorshipRequestValidator.validateRequestTime(requesterId, receiverId);
 
         mentorshipRequestRepository.create(requesterId, receiverId, requestDto.getDescription());
+
+        mentorshipOfferedEventPublisher.publish(event);
     }
 
     @Transactional(readOnly = true)

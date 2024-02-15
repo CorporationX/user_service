@@ -29,7 +29,7 @@ public class GoalController {
         return goalService.updateGoal(goalId, goal);
     }
 
-    @Operation(summary = "Покупка премиума", parameters = {@Parameter(in = ParameterIn.HEADER, name = "x-user-id", description = "id пользователя", required = true)})
+    @Operation(summary = "Создание цели", parameters = {@Parameter(in = ParameterIn.HEADER, name = "x-user-id", description = "id пользователя", required = true)})
     @PostMapping("/goals")
     public GoalDto createGoal(@RequestBody GoalDto goal) {
         long userId = userContext.getUserId();

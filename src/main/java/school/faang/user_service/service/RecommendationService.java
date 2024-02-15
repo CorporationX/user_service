@@ -11,8 +11,7 @@ public class RecommendationService {
     private final RecommendationRepository recommendationRepository;
 
     @Transactional
-    public void delete(long id)
-    {
+    public void delete(long id) {
         recommendationRepository.deleteById(id);
     }
 }

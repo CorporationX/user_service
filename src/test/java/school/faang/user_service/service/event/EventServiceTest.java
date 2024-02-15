@@ -1,5 +1,6 @@
 package school.faang.user_service.service.event;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -10,21 +11,19 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import school.faang.user_service.config.async.AsyncConfig;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.filter.event.EventOwnerIdPattern;
 import school.faang.user_service.filter.event.EventStartDatePattern;
 import school.faang.user_service.filter.event.EventTitlePattern;
 import school.faang.user_service.mapper.event.EventMapperImpl;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.service.EventService;
+import school.faang.user_service.service.UserService;
 import school.faang.user_service.validator.event.EventValidator;
 
 import java.time.LocalDateTime;
@@ -35,7 +34,6 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -53,8 +51,6 @@ public class EventServiceTest {
     private UserService userService;
     @Mock
     private EventValidator eventValidator;
-    @Mock
-    private AsyncConfig asyncConfig;
 
     private List<EventFilter> eventFilters = new ArrayList<>();
     private LocalDateTime startDate;
@@ -72,7 +68,7 @@ public class EventServiceTest {
         eventFilters.add(new EventTitlePattern());
         eventFilters.add(new EventStartDatePattern());
 
-        eventService = new EventService(eventRepository, eventMapper, eventValidator, userService, eventFilters, asyncConfig);
+        eventService = new EventService(eventRepository, eventMapper, eventValidator, userService, eventFilters);
 
         startDate = LocalDateTime.now().plusDays(1L);
         owner = User.builder().id(1L).active(true).build();
@@ -133,7 +129,7 @@ public class EventServiceTest {
                 .build();
         Event eventEntity = eventMapper.toEntity(eventDtoExpected);
         when(eventRepository.findById(eventDtoExpected.getId())).thenReturn(Optional.ofNullable(eventEntity));
-        when(userService.findUserById(eventDtoExpected.getOwnerId())).thenReturn(owner);
+        when(userService.getUserById(eventDtoExpected.getOwnerId())).thenReturn(owner);
         eventEntity.setRelatedSkills(skills);
         when(eventRepository.save(eventEntity)).thenReturn(eventEntity);
 
@@ -150,7 +146,7 @@ public class EventServiceTest {
                 .title("EventFirst")
                 .build();
 
-        assertThrows(DataValidationException.class,
+        assertThrows(EntityNotFoundException.class,
                 () -> eventService.updateEvent(eventDto));
     }
 
@@ -159,7 +155,7 @@ public class EventServiceTest {
         EventDto eventDto = EventDto.builder()
                 .id(1L)
                 .build();
-        assertThrows(DataValidationException.class,
+        assertThrows(EntityNotFoundException.class,
                 () -> eventService.updateEvent(eventDto));
     }
 
@@ -225,7 +221,7 @@ public class EventServiceTest {
         long wrongId = 11L;
         when(eventRepository.findById(wrongId)).thenReturn(Optional.empty());
 
-        assertThrows(DataValidationException.class, () -> eventService.getEvent(wrongId));
+        assertThrows(EntityNotFoundException.class, () -> eventService.getEvent(wrongId));
     }
 
     @Test
@@ -290,45 +286,6 @@ public class EventServiceTest {
         Mockito.when(eventRepository.findAll()).thenReturn(List.of(eventFirst, eventSecond));
         List<EventDto> resultToFilterByStartDate = eventService.getEventsByFilter(eventFilterDtoStartDate);
         assertEquals(1, resultToFilterByStartDate.size());
-    }
-
-    @Test
-    public void deletePastEventSuccess() {
-        int batch = 10;
-        Event event1 = Event.builder()
-                .id(1L)
-                .title("First event")
-                .endDate(LocalDateTime.of(2000, 1, 1, 0, 0))
-                .relatedSkills(List.of(Skill.builder()
-                        .id(1L)
-                        .build()))
-                .build();
-        Event event2 = Event.builder()
-                .id(1L)
-                .title("Second event")
-                .endDate(LocalDateTime.of(2000, 1, 1, 0, 0))
-                .relatedSkills(List.of(Skill.builder()
-                        .id(1L)
-                        .build()))
-                .build();
-        Event event3 = Event.builder()
-                .id(1L)
-                .title("Third event")
-                .endDate(LocalDateTime.of(2025, 1, 1, 0, 0))
-                .relatedSkills(List.of(Skill.builder()
-                        .id(1L)
-                        .build()))
-                .build();
-        List<Event> events = List.of(event1, event2, event3);
-        when(eventRepository.findAll()).thenReturn(events);
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.initialize();
-        when(asyncConfig.getAsyncExecutor()).thenReturn(executor);
-        eventService.deletePastEvents(batch);
-
-        verify(eventRepository, times(1)).findAll();
-        verify(eventRepository, times(1)).deleteAll(anyList());
-        verify(asyncConfig, times(1)).getAsyncExecutor();
     }
 
 }

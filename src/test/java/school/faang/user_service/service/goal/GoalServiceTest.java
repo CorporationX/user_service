@@ -177,6 +177,7 @@ class GoalServiceTest {
         goalDto.setSkillIds(new ArrayList<>(Collections.singleton(1L)));
         goalDto.setParentId(1L);
         goalDto.setId(1L);
+        goal.setId(1L);
         user.setGoals(new ArrayList<>());
 
         Mockito.when(goalMapper.toEntity(goalDto)).thenReturn(goal);
@@ -184,6 +185,7 @@ class GoalServiceTest {
         Mockito.when(skillService.getSkillById(1L)).thenReturn(new Skill());
         Mockito.when(userService.findById(1L)).thenReturn(user);
         Mockito.when(goalMapper.toDto(Mockito.any())).thenReturn(new GoalDto());
+        when(goalRepository.save(goal)).thenReturn(goal);
         goalService.createGoal(userId, goalDto);
         Mockito.verify(goalRepository, Mockito.times(1)).save(goal);
     }

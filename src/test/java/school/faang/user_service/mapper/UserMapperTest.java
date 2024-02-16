@@ -2,7 +2,7 @@ package school.faang.user_service.mapper;
 
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
-import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserCreateDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 
@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class UserMapperTest {
 
     private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
+    private CreateUserMapper createUserMapper = Mappers.getMapper(CreateUserMapper.class);
 
     @Test
     void toDto_returnDTO() {
@@ -21,7 +22,7 @@ class UserMapperTest {
         user.setPhone("123456789");
         user.setCountry(Country.builder().id(4L).build());
 
-        UserDto userDto = userMapper.toDto(user);
+        UserCreateDto userDto = createUserMapper.toDto(user);
 
         assertEquals(user.getId(), userDto.getId());
         assertEquals(user.getUsername(), userDto.getUsername());
@@ -32,14 +33,14 @@ class UserMapperTest {
 
     @Test
     void toEntity_returnEntity() {
-        UserDto userDto = new UserDto();
+        UserCreateDto userDto = new UserCreateDto();
         userDto.setId(1L);
         userDto.setUsername("User");
         userDto.setEmail("test@example.com");
         userDto.setPhone("123456789");
         userDto.setCountryId(4L);
 
-        User user = userMapper.toEntity(userDto);
+        User user = createUserMapper.toEntity(userDto);
 
         assertEquals(userDto.getId(), user.getId());
         assertEquals(userDto.getUsername(), user.getUsername());

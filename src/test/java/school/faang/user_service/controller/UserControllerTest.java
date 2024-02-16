@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.user.UserCreateDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.UserService;
 
@@ -23,7 +24,7 @@ class UserControllerTest {
     @Test
     void createUser_whenUserIsCorrect_thenRunService() {
         // Arrange
-        UserDto userDto = UserDto.builder()
+        UserCreateDto userDto = UserCreateDto.builder()
                 .username("Elvis")
                 .email("email@gmail.com")
                 .password("password")

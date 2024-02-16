@@ -7,11 +7,13 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestTemplate;
+import school.faang.user_service.dto.user.UserCreateDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
+import school.faang.user_service.mapper.CreateUserMapperImpl;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.s3.S3Service;
@@ -36,6 +38,8 @@ class UserServiceTest {
     private UserRepository userRepository;
     @Spy
     private UserMapperImpl userMapper = new UserMapperImpl();
+    @Spy
+    private CreateUserMapperImpl createUserMapper = new CreateUserMapperImpl();
     @Mock
     private S3Service s3Service;
     @Mock
@@ -107,7 +111,7 @@ class UserServiceTest {
     @Test
     void createUser_saveUserinBd() {
         // Arrange
-        UserDto userDto = UserDto.builder()
+        UserCreateDto userDto = UserCreateDto.builder()
                 .username("Elvis")
                 .email("email")
                 .password("password")
@@ -122,7 +126,7 @@ class UserServiceTest {
 
         // Assert
         assertAll(
-                () -> verify(userMapper, times(1)).toEntity(userDto),
+                () -> verify(createUserMapper, times(1)).toEntity(userDto),
                 () -> verify(s3Service, times(1)).uploadFile(any(), any()),
                 () -> verify(userMapper, times(1)).toDto((User) any()),
                 () -> verify(userRepository, times(1)).save((User) any())

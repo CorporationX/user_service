@@ -10,6 +10,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
+import school.faang.user_service.dto.goal.GoalSetEvent;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
@@ -27,6 +28,7 @@ import school.faang.user_service.service.SkillService;
 import school.faang.user_service.service.UserService;
 import school.faang.user_service.validator.GoalValidator;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,9 +36,8 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
-
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.springframework.boot.availability.AvailabilityChangeEvent.publish;
 
 @ExtendWith(MockitoExtension.class)
 class GoalServiceTest {
@@ -172,6 +173,7 @@ class GoalServiceTest {
         goalDto.setSkillIds(new ArrayList<>(Collections.singleton(1L)));
         goalDto.setParentId(1L);
         goalDto.setId(1L);
+        goal.setId(1L);
         user.setGoals(new ArrayList<>());
 
         Mockito.when(goalMapper.toEntity(goalDto)).thenReturn(goal);
@@ -179,6 +181,7 @@ class GoalServiceTest {
         Mockito.when(skillService.getSkillById(1L)).thenReturn(new Skill());
         Mockito.when(userService.findById(1L)).thenReturn(user);
         Mockito.when(goalMapper.toDto(Mockito.any())).thenReturn(new GoalDto());
+        when(goalRepository.save(goal)).thenReturn(goal);
         goalService.createGoal(userId, goalDto);
         Mockito.verify(goalRepository, Mockito.times(1)).save(goal);
     }

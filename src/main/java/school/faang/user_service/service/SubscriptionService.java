@@ -32,9 +32,9 @@ public class SubscriptionService {
     public void followUser(long followerId, long followeeId) {
         validateExistsUsers(followerId, followeeId);
 
-        if (subscriptionValidator.validateSubscription(followerId, followeeId)){
-            throw new DataValidationException("Такая подписка уже есть");
-        }
+//        if (subscriptionValidator.validateSubscription(followerId, followeeId)){
+//            throw new DataValidationException("Такая подписка уже есть");
+//        }     убрать после проверки
 
         subscriptionRepository.followUser(followerId, followeeId);
         followerEventPublisher.publish(new FollowerEvent(followerId, followeeId, LocalDateTime.now()));

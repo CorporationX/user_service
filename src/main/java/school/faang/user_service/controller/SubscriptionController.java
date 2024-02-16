@@ -30,7 +30,7 @@ public class SubscriptionController {
     @PutMapping("/follow/{id}")
     public void followUser(@PathVariable("id") long followeeId) {
         long followerId = userContext.getUserId();
-        subscriptionValidator.validateUserIds(followerId, followeeId);
+//        subscriptionValidator.validateUserIds(followerId, followeeId);   //убрать после проверки
         subscriptionService.followUser(followerId, followeeId);
     }
 

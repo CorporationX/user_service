@@ -1,5 +1,6 @@
 package school.faang.user_service.util;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,35 +14,17 @@ import java.io.InputStream;
 @Service
 public class ImageService {
 
-//    public InputStream resizeImage(MultipartFile file, boolean isBigImage) {
-//        try {
-//            BufferedImage originImage = ImageIO.read(file.getInputStream());
-//            int width = originImage.getWidth();
-//            int height = originImage.getHeight();
-//            changeSize(originImage, width, height, isBigImage);
-//
-//            Image resizedImage = originImage
-//                    .getScaledInstance(width, height, Image.SCALE_SMOOTH);
-//            BufferedImage scaledImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-//            scaledImage.getGraphics().drawImage(resizedImage, 0, 0, null);
-//
-//            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//            ImageIO.write(scaledImage, "jpg", baos);
-//
-//            return new ByteArrayInputStream(baos.toByteArray());
-//        } catch (IOException e) {
-//            throw new RuntimeException("Resize error: " + e.getMessage());
-//        }
-//    }
+    @Value("${image.pixels.bigSize}")
+    private int pixelsBigSize;
+    @Value("${image.pixels.smallSize}")
+    private int pixelsSmallSize;
 
     public byte[] resize(MultipartFile file, boolean isBigImage) {
         try {
             InputStream fileInputStream = file.getInputStream();
             BufferedImage originImage = ImageIO.read(fileInputStream);
 
-            int width = originImage.getWidth();
-            int height = originImage.getHeight();
-            int[] widthHeightArray = changeSize(originImage, width, height, isBigImage);
+            int[] widthHeightArray = changeSize(originImage, isBigImage);
 
             BufferedImage resizedImage = new BufferedImage(widthHeightArray[0], widthHeightArray[1], BufferedImage.TYPE_INT_RGB);
             Graphics2D g2 = resizedImage.createGraphics();
@@ -57,15 +40,15 @@ public class ImageService {
         }
     }
 
-    public int[] changeSize(BufferedImage bufferedImage, int width, int height, boolean isBigImage) {
+    public int[] changeSize(BufferedImage bufferedImage, boolean isBigImage) {
 
         int[] array = new int[2];
         int pixels;
 
         if (isBigImage) {
-            pixels = 1080;
+            pixels = pixelsBigSize;
         } else {
-            pixels = 170;
+            pixels = pixelsSmallSize;
         }
 
         double scale;
@@ -75,8 +58,8 @@ public class ImageService {
             scale = (double) bufferedImage.getWidth() / pixels;
         }
 
-        height = (int) (bufferedImage.getHeight() / scale);
-        width = (int) (bufferedImage.getWidth() / scale);
+        int height = (int) (bufferedImage.getHeight() / scale);
+        int width = (int) (bufferedImage.getWidth() / scale);
 
         array[0] = width;
         array[1] = height;

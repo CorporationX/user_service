@@ -25,12 +25,10 @@ spring:
         follower_channel:
           name: follower_channel
         profile_view_channel:
-          name: profile_view_channel
-  mvc:
-    servlet:
-      path: /api/v1
-
-cron:
+            name: profile_view_channel
+  servlet:
+    multipart:
+      max-file-size: 5MB
 
 server:
   port: 8085
@@ -50,12 +48,17 @@ payment-service:
 aws:
   accessKey: user
   secretKey: password
-  region: http://127.0.0.1:9000/
+  region: http://127.0.0.1:9000
 
 services:
   s3:
     bucket-name: user-service-bucket
     isMocked: true
+
+image:
+  pixels:
+    bigSize: 1024
+    smallSize: 170
 
 my:
   schedule:

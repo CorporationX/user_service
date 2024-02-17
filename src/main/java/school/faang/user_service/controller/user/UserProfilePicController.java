@@ -14,7 +14,6 @@ import school.faang.user_service.service.user.UserProfilePicService;
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
-@MultipartConfig(maxFileSize = 1024 * 1024 * 5)
 public class UserProfilePicController {
 
     private final UserProfilePicService userProfilePicService;

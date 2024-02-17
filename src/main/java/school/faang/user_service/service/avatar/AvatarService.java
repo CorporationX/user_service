@@ -23,7 +23,7 @@ public class AvatarService {
 
     public Optional<UserProfilePic> generateAndSaveAvatar(User user) {
         try {
-            String AvatarUrl = generateAvatarUrl(user.getUsername());
+            generateAvatarUrl(user.getUsername());
             byte[] avatarImage = downloadAvatarImage(avatarServiceUrl);
             String s3FileUrl = uploadAvatarImage(avatarImage, user.getUsername());
             UserProfilePic userProfilePic = new UserProfilePic();

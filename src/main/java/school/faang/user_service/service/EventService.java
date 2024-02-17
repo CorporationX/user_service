@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
@@ -25,6 +26,7 @@ public class EventService {
     private final UserService userService;
     private final List<EventFilter> eventFilters;
 
+    @Transactional
     public EventDto updateEvent(EventDto eventDto) {
         Event event = getEvent(eventDto.getId());
         eventValidator.validateEventToUpdate(eventDto);
@@ -35,10 +37,12 @@ public class EventService {
         return eventMapper.toDto(eventRepository.save(event));
     }
 
+    @Transactional
     public List<EventDto> getOwnedEvents(long userId) {
         return eventMapper.toListDto(eventRepository.findAllByUserId(userId));
     }
 
+    @Transactional
     public EventDto create(EventDto eventDto) {
         eventValidator.checkIfOwnerExistsById(eventDto.getOwnerId());
         eventValidator.checkIfOwnerHasSkillsRequired(eventDto);
@@ -46,6 +50,7 @@ public class EventService {
         return eventMapper.toDto(eventRepository.save(eventEntity));
     }
 
+    @Transactional
     public List<EventDto> getParticipatedEventsByUserId(long userId) {
         List<Event> participatedEventsByUserId = eventRepository.findParticipatedEventsByUserId(userId);
         return eventMapper.toListDto(participatedEventsByUserId);
@@ -61,10 +66,12 @@ public class EventService {
         return eventMapper.toDto(event);
     }
 
+    @Transactional
     public void deleteEventById(long eventId) {
         eventRepository.deleteById(eventId);
     }
 
+    @Transactional
     public List<EventDto> getEventsByFilter(EventFilterDto filterDto) {
         Stream<Event> events = eventRepository.findAll().stream();
 

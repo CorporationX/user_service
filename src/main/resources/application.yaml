@@ -64,7 +64,14 @@ aws:
 
 services:
   s3:
-    bucket-name: user_backet
+    endpoint: <http://localhost:9000>
+    accessKey: user
+    secretKey: password
+    region: bucket_region
+    bucketName: user_bucket
+    maxSizeMb: 5242880
+    smallSize: 170
+    largeSize: 1080
     isMocked: true
 
 

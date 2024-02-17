@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,10 +49,10 @@ public class EventServiceTest {
         List<Event> events = new ArrayList<>(List.of(event1, event2));
 
         Mockito.when(eventRepository.findAllByUserId(userId)).thenReturn(events);
-
         eventService.getParticipatedEventsByUserId(userId);
-
         Mockito.verify(eventRepository, times(1)).findAllByUserId(userId);
+
+//        assertEquals(events, eventService.getParticipatedEventsByUserId(userId));
     }
 
     @Test
@@ -63,7 +64,7 @@ public class EventServiceTest {
 
         eventService.getParticipatedEventsByUserId(userId);
 
-        Mockito.verify(eventRepository, times(1)).findAllByUserId(userId);
+        Mockito.verify(eventRepository, Mockito.never()).findAllByUserId(userId);
     }
 
 }

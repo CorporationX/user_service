@@ -2,6 +2,10 @@ package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.service.EventService;
@@ -9,8 +13,9 @@ import school.faang.user_service.validator.EventValidator;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("/events")
 public class EventController {
     private final EventService eventService;
     private final EventValidator eventValidator;
@@ -20,7 +25,8 @@ public class EventController {
         return eventService.getEventsByFilter(filterDto);
     }
 
-    public EventDto create(EventDto eventDto) {
+    @PostMapping("/create")
+    public EventDto create(@RequestBody EventDto eventDto) {
         eventValidator.validateEventInController(eventDto);
         return eventService.create(eventDto);
     }

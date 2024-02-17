@@ -13,23 +13,9 @@ import java.util.TimeZone;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EventCalendarDto {
-    private List<Integer> participantsIds;
-
-    @NotNull
-    private Long authorId;
-
-    @NotNull
-    private String summary;
-
-    @NotNull
+    private String title;
     private String location;
-
-    @NotNull
     private String description;
-
     private DateTime startDateTime;
-
     private DateTime endDateTime;
-
-    private TimeZone timeZone;
 }

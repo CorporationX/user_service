@@ -14,6 +14,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.filter.user.UserNameFilter;
 import school.faang.user_service.mapper.UserMapperImpl;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.SubscriptionService;
 import school.faang.user_service.validator.SubscriptionValidator;
@@ -32,6 +33,9 @@ public class SubscriptionServiceTest {
     @Spy
     private UserMapperImpl userMapper;
 
+    @Mock
+    private FollowerEventPublisher followerEventPublisher;
+
     @InjectMocks
     private SubscriptionService subscriptionService;
 
@@ -48,7 +52,7 @@ public class SubscriptionServiceTest {
         UserNameFilter userNameFilter = Mockito.mock(UserNameFilter.class);
         List<UserFilter> filters = List.of(userNameFilter);
         subscriptionService = new SubscriptionService(subscriptionRepo, subscriptionValidator,
-                filters, userMapper);
+                filters, userMapper, followerEventPublisher);
         dtoFilter = new UserFilterDto();
         dtoFilter.setNamePattern("R");
     }

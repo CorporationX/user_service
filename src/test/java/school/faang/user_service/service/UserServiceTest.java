@@ -25,7 +25,9 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -38,6 +40,7 @@ public class UserServiceTest {
     private MentorshipRepository mentorshipRepository;
     @Mock
     private GoalRepository goalRepository;
+
     @InjectMocks
     private UserService userService;
 
@@ -85,36 +88,36 @@ public class UserServiceTest {
         assertTrue(userService.isOwnerExistById(user.getId()));
     }
 
-//    @Test
-//    void successDeactivationUserById() {
-//        List<Goal> goals = List.of(Goal.builder()
-//                .id(1L)
-//                .users(List.of(User.builder()
-//                        .id(10L)
-//                        .active(true)
-//                        .build()))
-//                .build());
-//        List<Event> events = List.of(Event.builder()
-//                .id(1L)
-//                .maxAttendees(2)
-//                .build());
-//        List<User> mentees = List.of(User.builder()
-//                .id(2L)
-//                .active(true)
-//                .mentors(new ArrayList<>(List.of(User.builder().id(15L).active(true).build())))
-//                .build());
-//        User user = User.builder()
-//                .id(1L)
-//                .active(true)
-//                .goals(goals)
-//                .ownedEvents(events)
-//                .mentees(mentees)
-//                .build();
-//        long userId = user.getId();
-//
-//        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-//        userService.deactivationUserById(userId);
-//
-//        assertFalse(user.isActive());
-//    }
+    @Test
+    void successDeactivationUserById() {
+        List<Goal> goals = List.of(Goal.builder()
+                .id(1L)
+                .users(List.of(User.builder()
+                        .id(10L)
+                        .active(true)
+                        .build()))
+                .build());
+        List<Event> events = List.of(Event.builder()
+                .id(1L)
+                .maxAttendees(2)
+                .build());
+        List<User> mentees = List.of(User.builder()
+                .id(2L)
+                .active(true)
+                .mentors(new ArrayList<>(List.of(User.builder().id(15L).active(true).build())))
+                .build());
+        User user = User.builder()
+                .id(1L)
+                .active(true)
+                .goals(goals)
+                .ownedEvents(events)
+                .mentees(mentees)
+                .build();
+        long userId = user.getId();
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        userService.deactivationUserById(userId);
+
+        assertFalse(user.isActive());
+    }
 }

@@ -29,7 +29,7 @@ public class EventController {
         return eventService.getEventsByFilter(filterDto);
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public EventDto create(@RequestBody EventDto eventDto) {
         eventValidator.validateEventInController(eventDto);
         return eventService.create(eventDto);
@@ -56,7 +56,7 @@ public class EventController {
         return eventService.getEventDto(eventId);
     }
 
-    @DeleteMapping("/delete/{eventId}")
+    @DeleteMapping("/{eventId}")
     public void deleteEvent(@PathVariable long eventId) {
         eventService.deleteEventById(eventId);
     }

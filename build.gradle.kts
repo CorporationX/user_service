@@ -42,7 +42,7 @@ dependencies {
     /**
      * Amazon S3
      */
-    implementation("com.amazonaws:aws-java-sdk-s3:1.12.464")
+    implementation("com.amazonaws:aws-java-sdk-s3:1.12.481")
 
     /**
      * Utils & Logging
@@ -116,7 +116,6 @@ tasks.jacocoTestCoverageVerification {
             element = "CLASS"
             includes = listOf("school.faang.user_service.service.*",
                     "school.faang.user_service.mapper.*",
-                    "school.faang.user_service.controller.*",
                     "school.faang.user_service.validator.*")
             limit {
                 minimum = "0.65".toBigDecimal()

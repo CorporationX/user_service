@@ -93,4 +93,23 @@ public class SkillService {
     public Skill getSkillById(long skillId) {
         return skillRepository.findById(skillId).orElseThrow(() -> new EntityNotFoundException("Такого навыка не существует"));
     }
+
+    public List<Skill> findSkillsByGoalId(long goalId) {
+        return skillRepository.findSkillsByGoalId(goalId);
+    }
+
+    public boolean validateSkill(Skill skill) {
+        return skillRepository.existsByTitle(skill.getTitle());
+    }
+
+
+    public void assignSkillToUser(long userId, long skillId) {
+        skillRepository.assignSkillToUser(skillId, userId);
+    }
+
+
+    public boolean existsById(long id) {
+        return skillRepository.existsById(id);
+    }
+
 }

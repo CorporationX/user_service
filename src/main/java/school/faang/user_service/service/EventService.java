@@ -2,7 +2,12 @@ package school.faang.user_service.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.ListUtils;
+import org.springframework.cglib.core.Local;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.config.async.AsyncConfig;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.User;
@@ -12,7 +17,9 @@ import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.validator.EventValidator;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -24,6 +31,7 @@ public class EventService {
     private final EventValidator eventValidator;
     private final UserService userService;
     private final List<EventFilter> eventFilters;
+    private final AsyncConfig asyncConfig;
 
     public EventDto updateEvent(EventDto eventDto) {
         Event event = getEvent(eventDto.getId());
@@ -74,6 +82,23 @@ public class EventService {
             }
         }
         return eventMapper.toListDto(events.collect(Collectors.toList()));
+    }
+
+    @Async
+    public void deletePastEvents(int batchSize) {
+        EventFilterDto filters = EventFilterDto.builder()
+                .endDatePattern(LocalDateTime.now())
+                .build();
+        List<Event> pastEvents = eventMapper.toListEntity(getEventsByFilter(filters));
+
+        Executor executor = asyncConfig.getAsyncExecutor();
+
+        List<List<Event>> partitions = ListUtils.partition(pastEvents, batchSize);
+        for (List<Event> sublist : partitions) {
+            if (executor != null) {
+                executor.execute(() -> eventRepository.deleteAll(sublist));
+            }
+        }
     }
 
 }

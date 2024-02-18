@@ -1,4 +1,4 @@
-package school.faang.user_service.service.event;
+package school.faang.user_service.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
@@ -21,11 +21,11 @@ import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.filter.event.EventOwnerIdPattern;
 import school.faang.user_service.filter.event.EventStartDatePattern;
 import school.faang.user_service.filter.event.EventTitlePattern;
-import school.faang.user_service.mapper.event.EventMapperImpl;
+import school.faang.user_service.mapper.EventMapperImpl;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.EventService;
 import school.faang.user_service.service.UserService;
-import school.faang.user_service.validator.event.EventValidator;
+import school.faang.user_service.validator.EventValidator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -235,7 +235,7 @@ public class EventServiceTest {
                 .build();
         long eventId = eventDelete.getId();
 
-        eventService.deleteEvent(eventId);
+        eventService.deleteEventById(eventId);
         verify(eventRepository, times(1)).deleteById(eventId);
     }
 

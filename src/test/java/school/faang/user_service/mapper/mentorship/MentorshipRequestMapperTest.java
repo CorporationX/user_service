@@ -8,6 +8,8 @@ import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.mapper.MentorshipRequestMapperImpl;
 
 import java.time.LocalDateTime;
 
@@ -16,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(MockitoExtension.class)
 class MentorshipRequestMapperTest {
 
-    private MentorshipRequestMapper mentorshipRequestMapper = new MentorshipRequestMapperImpl();
+    private final MentorshipRequestMapper mentorshipRequestMapper = new MentorshipRequestMapperImpl();
 
     private MentorshipRequest mentorshipRequest;
 

@@ -25,7 +25,10 @@ spring:
         follower_channel:
           name: follower_channel
         profile_view_channel:
-            name: profile_view_channel
+          name: profile_view_channel
+  mvc:
+    servlet:
+      path: /api/v1
 
 server:
   port: 8080
@@ -52,6 +55,9 @@ services:
     bucket-name: user_backet
     isMocked: true
 
+my:
+  schedule:
+    cron: "*/30 * * * * *"
 scheduler:
   batchSize: 10
   deleteEventsCron: "0 0 * * * *"

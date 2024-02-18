@@ -13,7 +13,6 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
-import school.faang.user_service.service.MentorshipService;
 import school.faang.user_service.service.UserService;
 
 import java.util.ArrayList;

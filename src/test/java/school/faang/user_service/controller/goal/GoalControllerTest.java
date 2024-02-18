@@ -8,7 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.service.goal.GoalService;
-import school.faang.user_service.validator.GoalValidator;
+import school.faang.user_service.validator.goal.GoalValidator;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;

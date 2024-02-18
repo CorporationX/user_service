@@ -1,4 +1,4 @@
-package school.faang.user_service.validator.event;
+package school.faang.user_service.validator;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
@@ -8,12 +8,14 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.UserService;
+import school.faang.user_service.validator.EventValidator;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -219,6 +221,13 @@ class EventValidatorTest {
                 .build();
         assertThrows(DataValidationException.class,
                 () -> eventValidator.checkIfOwnerHasSkillsRequired(eventDto));
+    }
+
+    @Test
+    public void shouldFailedCheckFilterNotNullWhenFilterIsNull() {
+        EventFilterDto nullFilter = null;
+        assertThrows(DataValidationException.class,
+                () -> eventValidator.checkFilterNotNull(nullFilter));
     }
 
 }

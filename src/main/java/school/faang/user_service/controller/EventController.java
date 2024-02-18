@@ -40,7 +40,7 @@ public class EventController {
         return eventService.getOwnedEvents(userId);
     }
 
-    @PutMapping("/update")
+    @PutMapping
     public EventDto updateEvent(@RequestBody EventDto eventDto) {
         eventValidator.validateEventInController(eventDto);
         return eventService.updateEvent(eventDto);

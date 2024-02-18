@@ -16,8 +16,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final static long MOTHS_TO_DELETE_USER = 3;
-
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
     private final MentorshipRepository mentorshipRepository;

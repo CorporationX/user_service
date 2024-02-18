@@ -120,5 +120,4 @@ public class UserServiceTest {
 
         assertFalse(user.isActive());
     }
-
 }

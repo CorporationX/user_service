@@ -30,8 +30,6 @@ spring:
     servlet:
       path: /api/v1
 
-cron:
-
 server:
   port: 8080
 
@@ -59,4 +57,4 @@ services:
 
 my:
   schedule:
-    cron: "0 0 0 * * ?"
+    cron: "*/30 * * * * *"

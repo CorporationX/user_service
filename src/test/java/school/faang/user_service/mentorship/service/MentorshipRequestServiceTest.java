@@ -12,7 +12,7 @@ import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.dto.mentorship.filter.RequestFilterDto;
-import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
+import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
 

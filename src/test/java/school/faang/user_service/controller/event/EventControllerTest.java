@@ -13,10 +13,9 @@ import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.event.EventMapperImpl;
+import school.faang.user_service.mapper.EventMapperImpl;
 import school.faang.user_service.service.EventService;
-import school.faang.user_service.validator.event.EventValidator;
-import school.faang.user_service.validator.event.EventFilterValidator;
+import school.faang.user_service.validator.EventValidator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -36,8 +35,6 @@ public class EventControllerTest {
     private EventValidator eventValidator;
     @Mock
     private EventService eventService;
-    @Mock
-    private EventFilterValidator eventFilterValidator;
 
     @Test
     public void successGetOwnedEvents() {
@@ -106,7 +103,7 @@ public class EventControllerTest {
                 .ownerPattern(1L)
                 .build();
 
-        eventFilterValidator.checkFilterNotNull(eventFilterDto);
+        eventValidator.checkFilterNotNull(eventFilterDto);
         Mockito.when(eventService.getEventsByFilter(eventFilterDto)).thenReturn(eventDtos);
         List<EventDto> resultEvents = eventController.getEventsByFilter(eventFilterDto);
         assertEquals(eventDtos, resultEvents);
@@ -168,6 +165,6 @@ public class EventControllerTest {
     public void successDeleteEvent() {
         long eventId = 1L;
         eventController.deleteEvent(eventId);
-        Mockito.verify(eventService, times(1)).deleteEvent(eventId);
+        Mockito.verify(eventService, times(1)).deleteEventById(eventId);
     }
 }

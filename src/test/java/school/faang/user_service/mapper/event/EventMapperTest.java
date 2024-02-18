@@ -7,6 +7,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.mapper.EventMapperImpl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

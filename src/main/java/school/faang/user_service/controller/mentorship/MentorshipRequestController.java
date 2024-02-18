@@ -5,8 +5,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
-import school.faang.user_service.exception.mentorship.DataNotFoundException;
 import school.faang.user_service.dto.mentorship.filter.RequestFilterDto;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
 
 import java.util.List;
@@ -30,7 +30,7 @@ public class MentorshipRequestController {
 
     private MentorshipRequestDto rejectRequest(long id, RejectionDto rejection) {
         if (StringUtils.isEmpty(rejection.getReason())) {
-            throw new DataNotFoundException("There is no description in RejectionDto");
+            throw new EntityNotFoundException("There is no description in RejectionDto");
         }
         return mentorshipRequestService.rejectRequest(id, rejection);
     }

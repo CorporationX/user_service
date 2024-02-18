@@ -12,8 +12,8 @@ import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.mentorship.DataNotFoundException;
-import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
+import school.faang.user_service.exception.EntityNotFoundException;
+import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.UserService;
@@ -78,13 +78,13 @@ class MentorshipRequestServiceTest {
     public void whenRequestForMembershipThenNoDataInDB() {
         try {
             mentorshipRequestService.acceptRequest(1L);
-        } catch (DataNotFoundException e) {
+        } catch (EntityNotFoundException e) {
             assertThat(e).isInstanceOf(RuntimeException.class)
                     .hasMessage("There is no mentorship request with this id");
         }
         try {
             mentorshipRequestService.rejectRequest(1L, new RejectionDto(StringUtils.EMPTY));
-        } catch (DataNotFoundException e) {
+        } catch (EntityNotFoundException e) {
             assertThat(e).isInstanceOf(RuntimeException.class)
                     .hasMessage("There is no mentorship request with this id");
         }

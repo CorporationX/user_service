@@ -23,9 +23,13 @@ public class UserController {
         return userMapper.toDto(userService.getUserById(id));
     }
 
-    @PostMapping("/exists/{id}")
-    private void existsUserById(@PathVariable long id) {
-        userService.isOwnerExistById(id);
+    @GetMapping("/exists/{id}")
+    private boolean existsUserById(@PathVariable long id) {
+        return userService.isOwnerExistById(id);
     }
 
+    @PostMapping("/{userId}/deactivate/")
+    public void deactivationUserById(@PathVariable long userId) {
+        userService.deactivationUserById(userId);
+    }
 }

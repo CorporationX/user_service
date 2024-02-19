@@ -3,7 +3,6 @@ package school.faang.user_service.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
@@ -22,6 +21,7 @@ import school.faang.user_service.filter.mentorship_request.RequestReceiverFilter
 import school.faang.user_service.filter.mentorship_request.RequestStatusFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.mapper.MentorshipRequestMapperImpl;
+import school.faang.user_service.publisher.MentorshipEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -51,6 +51,9 @@ class MentorshipRequestServiceTest {
 
     @Mock
     private MentorshipValidator mentorshipValidator;
+    @Mock
+    private MentorshipEventPublisher mentorshipEventPublisher;
+
 
     @Spy
     private MentorshipRequestMapper mentorshipRequestMapper = new MentorshipRequestMapperImpl();
@@ -63,7 +66,8 @@ class MentorshipRequestServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new MentorshipRequestService(requestRepository, userRepository, mentorshipRepository,requestValidator, mentorshipValidator, mentorshipRequestFilters, mentorshipRequestMapper);
+        service = new MentorshipRequestService(requestRepository, userRepository, mentorshipRepository,requestValidator,
+                mentorshipValidator, mentorshipRequestFilters, mentorshipRequestMapper, mentorshipEventPublisher);
     }
 
 

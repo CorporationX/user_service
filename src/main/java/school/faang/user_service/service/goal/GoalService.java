@@ -1,6 +1,7 @@
 package school.faang.user_service.service.goal;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalDto;
@@ -33,10 +34,12 @@ public class GoalService {
     private final GoalMapper goalMapper;
     private final List<GoalFilter> filters;
 
+    @Transactional
     public void deleteGoal(long goalID) {
         goalRepository.deleteById(goalID);
     }
 
+    @Transactional
     public void createGoal(long userId, Goal goal) {
         User user = getUser(userId);
         validateGoalCreation(user, goal);
@@ -44,6 +47,7 @@ public class GoalService {
         saveGoalSkills(goal);
     }
 
+    @Transactional
     public List<GoalDto> findSubtasksByGoalId(long goalId) {
         Stream<Goal> goalParents = goalRepository.findByParent(goalId);
         return goalParents
@@ -52,11 +56,13 @@ public class GoalService {
                 .toList();
     }
 
+    @Transactional
     public List<GoalDto> retrieveFilteredSubtasksForGoal(long goalId, GoalFilterDto goalFilterDto) {
         Stream<Goal> goalParents = goalRepository.findByParent(goalId);
         return applyFiltersToGoalsAndSort(goalFilterDto, goalParents);
     }
 
+    @Transactional
     public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
         Goal goalToUpdate = goalRepository.findGoalById(goalId)
                 .orElseThrow(() -> new EntityNotFoundException("Goal not found with id: " + goalId));
@@ -78,6 +84,7 @@ public class GoalService {
         return goalDto = goalMapper.toDto(goalToUpdate);
     }
 
+    @Transactional
     public List<GoalDto> getGoalsByUser(long userId, GoalFilterDto goalFilterDto) {
         Stream<Goal> goals = goalRepository.findGoalsByUserId(userId);
         return applyFilterAndMapToDto(goalFilterDto, goals);

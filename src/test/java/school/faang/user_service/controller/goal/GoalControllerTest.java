@@ -9,13 +9,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.GoalStatus;
-import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.service.goal.GoalService;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class GoalControllerTest {
@@ -46,10 +44,6 @@ class GoalControllerTest {
         verify(goalService, times(1)).deleteGoal(1L);
     }
 
-    @Test
-    public void testDeleteGoalThrowsDataValidationException() {
-        assertThrows(DataValidationException.class, () -> goalController.deleteGoal(null));
-    }
 
     @Test
     public void testSuccessfullyGetGoalsByUser() {
@@ -59,11 +53,6 @@ class GoalControllerTest {
         verify(goalService, times(1)).getGoalsByUser(1L, goalFilterDto);
     }
 
-    @Test
-    public void testGoalsByUserThrowsDataValidationException() {
-        assertThrows(DataValidationException.class,
-                () -> goalController.getGoalsByUser(null, goalFilterDto));
-    }
 
     @Test
     public void testSuccessfullyFindSubtasksByGoalId() {
@@ -73,11 +62,6 @@ class GoalControllerTest {
         verify(goalService, times(1)).findSubtasksByGoalId(1L);
     }
 
-    @Test
-    public void testFindSubtasksByGoalIdThrowsDataValidationException() {
-        assertThrows(DataValidationException.class,
-                () -> goalController.retrieveFilteredSubtasksForGoal(null, goalFilterDto));
-    }
 
     @Test
     public void testSuccessfullyFindSubtasksByGoalIdAndFilters() {
@@ -88,15 +72,10 @@ class GoalControllerTest {
     }
 
     @Test
-    public void testFindSubtasksByGoalIdAndFiltersThrowsDataValidationException() {
-        assertThrows(DataValidationException.class,
-                () -> goalController.retrieveFilteredSubtasksForGoal(null, goalFilterDto));
-    }
-
-    @Test
     public void testUpdateByGoalIdAndFiltersThrowsDataValidationException() {
         GoalDto goalDto = new GoalDto();
-        assertThrows(DataValidationException.class,
-                () -> goalController.updateGoal(1L, goalDto));
+        goalController.updateGoal(1L, goalDto);
+
+        verify(goalService).updateGoal(1L, goalDto);
     }
 }

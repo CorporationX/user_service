@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.MentorshipOfferedEvent;
@@ -24,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class MentorshipRequestService {
     private final MentorshipRequestRepository mentorshipRequestRepository;
@@ -47,8 +49,10 @@ public class MentorshipRequestService {
         mentorshipRequestValidator.validateRequestTime(requesterId, receiverId);
 
         mentorshipRequestRepository.create(requesterId, receiverId, requestDto.getDescription());
-
+        event.setAuthorId(requestDto.getRequesterId());
+        event.setMentorId(requestDto.getReceiverId());
         mentorshipOfferedEventPublisher.publish(event);
+        log.info("Mentorship event published");
     }
 
     @Transactional(readOnly = true)

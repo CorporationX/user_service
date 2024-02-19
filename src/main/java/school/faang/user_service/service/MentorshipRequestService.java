@@ -7,6 +7,7 @@ import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.MentorshipStartEvent;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDro;
+import school.faang.user_service.entity.Mentorship;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.exception.DataValidationException;
@@ -62,24 +63,22 @@ public class MentorshipRequestService {
 
     @Transactional
     public void acceptRequest(long id) {
-//        MentorshipRequest mentorshipRequest = mentorshipRequestRepository.findById(id)
-//                .orElseThrow(() -> new DataValidationException("Такого реквеста не существует"));
-//
-//        long requesterId = mentorshipRequest.getRequester().getId();
-//        long receiverId = mentorshipRequest.getReceiver().getId();
-//
-//
-//        mentorshipValidator.validationMentorship(receiverId, requesterId);
-//
-//        Mentorship mentorship = new Mentorship(receiverId, requesterId, LocalDateTime.now(), LocalDateTime.now());
-//        mentorshipRepository.save(mentorship);
-//
-//        mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
-//        mentorshipRequestRepository.save(mentorshipRequest);
+        MentorshipRequest mentorshipRequest = mentorshipRequestRepository.findById(id)
+                .orElseThrow(() -> new DataValidationException("Такого реквеста не существует"));
 
-        long requesterId = 1;
-        long receiverId = 1;
-        mentorshipEventPublisher.publish(new MentorshipStartEvent(receiverId, requesterId, LocalDateTime.now()));
+        long requesterId = mentorshipRequest.getRequester().getId();
+        long receiverId = mentorshipRequest.getReceiver().getId();
+
+
+        mentorshipValidator.validationMentorship(receiverId, requesterId);
+
+        Mentorship mentorship = new Mentorship(receiverId, requesterId, LocalDateTime.now(), LocalDateTime.now());
+        mentorshipRepository.save(mentorship);
+
+        mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
+        mentorshipRequestRepository.save(mentorshipRequest);
+
+        mentorshipEventPublisher.publish(new MentorshipStartEvent(requesterId, receiverId, LocalDateTime.now()));
     }
 
     @Transactional

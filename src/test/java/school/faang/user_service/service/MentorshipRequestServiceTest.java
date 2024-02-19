@@ -8,6 +8,7 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.MentorshipStartEvent;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDro;
 import school.faang.user_service.entity.Mentorship;
@@ -157,6 +158,7 @@ class MentorshipRequestServiceTest {
         verify(requestRepository).save(foundRequest);
         assertEquals(RequestStatus.ACCEPTED, foundRequest.getStatus());
         verify(mentorshipRepository).save(any(Mentorship.class));
+        verify(mentorshipEventPublisher).publish(any(MentorshipStartEvent.class));
     }
 
     @Test

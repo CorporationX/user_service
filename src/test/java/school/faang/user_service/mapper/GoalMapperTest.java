@@ -1,10 +1,11 @@
-package school.faang.user_service.mapper.goal;
+package school.faang.user_service.mapper;
 
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.mapper.GoalMapper;
 
 import java.util.Collections;
 import java.util.List;

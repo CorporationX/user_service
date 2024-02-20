@@ -1,0 +1,9 @@
+services:
+  elasticsearch:
+    image: elasticsearch:8.11.3
+    container_name: elasticsearch
+    ports:
+      - 9200:9200
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false

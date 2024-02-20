@@ -88,6 +88,10 @@ tasks.withType<Test> {
 	finalizedBy(tasks.jacocoTestReport)
 }
 
+tasks.withType<JavaCompile> {
+	options.compilerArgs.add("-Xlint:unchecked")
+}
+
 val test by tasks.getting(Test::class) { testLogging.showStandardStreams = true }
 
 tasks.bootJar {

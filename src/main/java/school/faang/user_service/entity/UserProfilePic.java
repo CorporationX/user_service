@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Embeddable
 @AllArgsConstructor
+@NoArgsConstructor
 public class UserProfilePic {
     private String fileId;
     private String smallFileId;

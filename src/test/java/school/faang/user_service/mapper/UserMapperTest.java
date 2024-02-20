@@ -1,4 +1,4 @@
-package school.faang.user_service.mapper.mentorship;
+package school.faang.user_service.mapper;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,12 +64,6 @@ public class UserMapperTest {
     }
 
     @Test
-    public void testToEntity_userDtoNotNull_returnsUser() {
-        User entity = userMapper.toEntity(userDto);
-        assertEquals(userEntity, entity);
-    }
-
-    @Test
     public void testToDto_userNull_returnsNull() {
         UserDto dto = userMapper.toDto(null);
         assertNull(dto);
@@ -88,20 +82,8 @@ public class UserMapperTest {
     }
 
     @Test
-    public void testToEntityList_userDtosNotNull_returnsUsers() {
-        List<User> entities = userMapper.toEntityList(userDtos);
-        assertEquals(userEntities, entities);
-    }
-
-    @Test
     public void testToDtoList_usersNull_returnsNull () {
         List<UserDto> dtos = userMapper.toDtoList(null);
         assertNull(dtos);
-    }
-
-    @Test
-    public void testToEntityList_userDtosNull_returnsNull () {
-        List<User> entities = userMapper.toEntityList(null);
-        assertNull(entities);
     }
 }

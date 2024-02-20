@@ -25,13 +25,17 @@ spring:
         follower_channel:
           name: follower_channel
         profile_view_channel:
-            name: profile_view_channel
-  servlet:
-    multipart:
-      max-file-size: 5MB
+          name: profile_view_channel
+  mvc:
+    servlet:
+      path: /api/v1
+      multipart:
+        max-file-size: 5MB
+
+cron:
 
 server:
-  port: 8085
+  port: 8080
 
 logging:
   level:
@@ -55,11 +59,16 @@ services:
     bucket-name: user-service-bucket
     isMocked: true
 
+scheduler:
+  batchSize: 10
+  deleteEventsCron: "0 0 * * * *"
+  deleteUsersCron: "0 0 * * * *"
+
+dicebear:
+  pic-base-url-small: https://api.dicebear.com/7.x/bottts/svg?size=64&seed=
+  pic-base-url: https://api.dicebear.com/7.x/bottts/svg?size=256&seed=
+
 image:
   pixels:
     bigSize: 1024
     smallSize: 170
-
-my:
-  schedule:
-    cron: "0 0 0 * * ?"

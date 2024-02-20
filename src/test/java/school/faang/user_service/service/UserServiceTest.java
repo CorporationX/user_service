@@ -10,12 +10,16 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.service.UserService;
 import school.faang.user_service.service.EventService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,13 +35,11 @@ public class UserServiceTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    private EventService eventService;
+    private EventRepository eventRepository;
     @Mock
-    private MentorshipService mentorshipService;
+    private MentorshipRepository mentorshipRepository;
     @Mock
-    private GoalService goalService;
-    @Captor
-    private ArgumentCaptor<User> captor;
+    private GoalRepository goalRepository;
 
     @InjectMocks
     private UserService userService;
@@ -86,17 +88,8 @@ public class UserServiceTest {
         assertTrue(userService.isOwnerExistById(user.getId()));
     }
 
-//    @Test
-//    public void successDeleteNonActiveUser() {
-//        long months = 3L;
-//        LocalDateTime timeToDelete = LocalDateTime.now().minusMonths(months);
-//        userService.deleteNonActiveUsers();
-//        Mockito.verify(userRepository, times(1))
-//                .deleteAllInactiveUsersAndUpdatedAtOverMonths(timeToDelete);
-//    }
-
-   /* @Test
-    public void successDeactivationUserById() {
+    @Test
+    void successDeactivationUserById() {
         List<Goal> goals = List.of(Goal.builder()
                 .id(1L)
                 .users(List.of(User.builder()
@@ -111,6 +104,7 @@ public class UserServiceTest {
         List<User> mentees = List.of(User.builder()
                 .id(2L)
                 .active(true)
+                .mentors(new ArrayList<>(List.of(User.builder().id(15L).active(true).build())))
                 .build());
         User user = User.builder()
                 .id(1L)
@@ -121,17 +115,9 @@ public class UserServiceTest {
                 .build();
         long userId = user.getId();
 
-        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userRepository.save(any(User.class))).thenReturn(user);
-
-        userService.setEventService(eventService);
-        userService.setMentorshipService(mentorshipService);
-
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         userService.deactivationUserById(userId);
-        verify(userRepository).save(captor.capture());
 
-        User deactivatedUser = captor.getValue();
-        assertFalse(deactivatedUser.isActive());
-    }*/
-
+        assertFalse(user.isActive());
+    }
 }

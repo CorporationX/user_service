@@ -1,4 +1,4 @@
-package school.faang.user_service.controller.user;
+package school.faang.user_service.controller;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,7 +20,7 @@ public class UserControllerTest {
     @Test
     public void successDeactivationUserById() {
         long userId = 1L;
-        userController.deactivationUserById(userId);
+        userController.deactivateUserById(userId);
         Mockito.verify(userService).deactivationUserById(userId);
     }
 

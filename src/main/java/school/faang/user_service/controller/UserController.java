@@ -1,6 +1,13 @@
 package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.mapper.UserMapper;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,5 +40,15 @@ public class UserController {
     @GetMapping("/{userId}")
     UserDto getUser(@PathVariable long userId) {
         return userService.getUserDtoById(userId);
+    }
+
+    @GetMapping("/exists/{id}")
+    private boolean existsUserById(@PathVariable long id) {
+        return userService.isOwnerExistById(id);
+    }
+
+    @PostMapping("/{userId}/deactivate/")
+    public void deactivationUserById(@PathVariable long userId) {
+        userService.deactivationUserById(userId);
     }
 }

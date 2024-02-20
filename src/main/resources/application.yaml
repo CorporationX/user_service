@@ -54,6 +54,11 @@ services:
     bucket-name: user_backet
     isMocked: true
 
+scheduler:
+  batchSize: 10
+  deleteEventsCron: "0 0 * * * *"
+  deleteUsersCron: "0 0 * * * *"
+
 dicebear:
   pic-base-url-small: https://api.dicebear.com/7.x/bottts/svg?size=64&seed=
   pic-base-url: https://api.dicebear.com/7.x/bottts/svg?size=256&seed=

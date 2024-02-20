@@ -25,7 +25,7 @@ import school.faang.user_service.filter.goal.GoalTitleFilter;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.skill.SkillService;
+import school.faang.user_service.service.skill.SkillServiceImpl;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -43,7 +43,7 @@ class GoalServiceTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    private SkillService skillService;
+    private SkillServiceImpl skillService;
     @Spy
     private GoalMapper goalMapper = Mappers.getMapper(GoalMapper.class);
     @Mock

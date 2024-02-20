@@ -5,9 +5,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.follower.FollowerEventDto;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -25,6 +33,8 @@ class SubscriptionServiceImplTest {
 
     @Mock
     private SubscriptionRepository subscriptionRepository;
+    @Mock
+    private FollowerEventPublisher followerEventPublisher;
 
     @InjectMocks
     private SubscriptionServiceImpl subscriptionService;
@@ -53,6 +63,7 @@ class SubscriptionServiceImplTest {
         subscriptionService.followUser(validFollowerId, validFolloweeId);
 
         verify(subscriptionRepository).followUser(validFollowerId, validFolloweeId);
+        verify(followerEventPublisher, times(1)).publish(any(FollowerEventDto.class));
     }
 
     @Test

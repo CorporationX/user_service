@@ -3,14 +3,19 @@ package school.faang.user_service.service.subscription;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.follower.FollowerEventDto;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class SubscriptionServiceImpl implements SubscriptionService {
 
     private final SubscriptionRepository subscriptionRepository;
+    private final FollowerEventPublisher followerEventPublisher;
 
     @Override
     @Transactional
@@ -18,6 +23,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         validateUserIds(followerId, followeeId);
         validateSubscriptionExist(followerId, followeeId);
         subscriptionRepository.followUser(followerId, followeeId);
+        publishFollowerEvent(followerId, followeeId);
     }
 
     @Override
@@ -57,6 +63,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         if (userId <= 0) {
             throw new DataValidationException("User identifiers must be positive numbers");
         }
+    }
+
+    private void publishFollowerEvent(long followerId, long followeeId) {
+        FollowerEventDto followerEventDto = new FollowerEventDto(followerId, followeeId, LocalDateTime.now());
+        followerEventPublisher.publish(followerEventDto);
     }
 
 }

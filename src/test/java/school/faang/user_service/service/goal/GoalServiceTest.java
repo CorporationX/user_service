@@ -49,9 +49,8 @@ class GoalServiceTest {
     @Mock
     private List<GoalFilter> filters;
 
-
     @InjectMocks
-    private GoalService goalService;
+    private GoalServiceImpl goalService;
 
     Goal goal;
     Goal goal2;

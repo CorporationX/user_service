@@ -1,5 +1,5 @@
 spring:
-  mvs:
+  mvc:
     servlet:
       path: /api
   datasource:

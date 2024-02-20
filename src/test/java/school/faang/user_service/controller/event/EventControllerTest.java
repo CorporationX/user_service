@@ -8,7 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.event.EventUpdateDto;
-import school.faang.user_service.exception.event.EventValidator;
+import school.faang.user_service.validator.event.EventValidator;
 import school.faang.user_service.service.event.EventService;
 
 
@@ -28,7 +28,7 @@ class EventControllerTest {
         EventDto eventDto = new EventDto();
         eventController.create(eventDto);
         verify(eventService, times(1)).create(eventDto);
-        verify(eventValidator, times(1)).validate(eventDto);
+        verify(eventValidator, times(1)).validate(eventDto.getTitle(), eventDto.getStartDate(), eventDto.getOwnerId());
     }
 
     @Test
@@ -58,7 +58,7 @@ class EventControllerTest {
         Long eventId = 1l;
         eventController.updateEvent(eventId, eventUpdateDto);
         verify(eventService, times(1)).updateEvent(eventId, eventUpdateDto);
-        verify(eventValidator, times(1)).validate(eventUpdateDto);
+        verify(eventValidator, times(1)).validate(eventUpdateDto.getTitle(), eventUpdateDto.getStartDate(), eventUpdateDto.getOwnerId());
     }
 
     @Test

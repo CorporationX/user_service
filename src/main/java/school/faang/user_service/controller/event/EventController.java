@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.event.EventUpdateDto;
-import school.faang.user_service.exception.event.EventValidator;
+import school.faang.user_service.validator.event.EventValidator;
 import school.faang.user_service.service.event.EventService;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public class EventController {
 
     @PostMapping("/create")
     public EventDto create(@RequestBody EventDto event) {
-        eventValidator.validate(event);
+        eventValidator.validate(event.getTitle(), event.getStartDate(), event.getOwnerId());
         return eventService.create(event);
     }
 
@@ -40,7 +40,7 @@ public class EventController {
 
     @PutMapping("/{eventId}")
     public EventDto updateEvent(@PathVariable("eventId") long eventId, @RequestBody EventUpdateDto eventUpdateDto) {
-        eventValidator.validate(eventUpdateDto);
+        eventValidator.validate(eventUpdateDto.getTitle(), eventUpdateDto.getStartDate(), eventUpdateDto.getOwnerId());
         return eventService.updateEvent(eventId, eventUpdateDto);
     }
 

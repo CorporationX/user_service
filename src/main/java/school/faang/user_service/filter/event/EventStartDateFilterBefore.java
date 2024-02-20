@@ -7,15 +7,15 @@ import school.faang.user_service.entity.event.Event;
 import java.util.stream.Stream;
 
 @Component
-public class EventEndDateFilter implements EventFilter {
+public class EventStartDateFilterBefore implements EventFilter {
 
     @Override
     public boolean isApplicable(EventFilterDto filters) {
-        return filters.getEndDatePattern() != null;
+        return filters.getStartDatePatternBefore() != null;
     }
 
     @Override
     public Stream<Event> apply(Stream<Event> events, EventFilterDto eventFilterDto) {
-        return events.filter(event -> event.getEndDate().equals(eventFilterDto.getEndDatePattern()));
+        return events.filter(event -> event.getStartDate().isBefore(eventFilterDto.getStartDatePatternBefore()));
     }
 }

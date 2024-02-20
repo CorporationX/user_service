@@ -22,12 +22,12 @@ public interface EventMapper {
     Event toUpdateDto(EventUpdateDto eventUpdateDto);
 
     @Named("skillToIdSkill")
-    public static Long skillToIdSkill(Skill skill) {
+    default Long skillToIdSkill(Skill skill) {
         return skill.getId();
     }
 
     @Named("skillIdToSkill")
-    public static Skill skillIdToSkill(Long idSkill) {
+    default Skill skillIdToSkill(Long idSkill) {
         Skill skill = new Skill();
         skill.setId(idSkill);
         return skill;

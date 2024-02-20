@@ -1,4 +1,4 @@
-package school.faang.user_service.handlers;
+package school.faang.user_service.controller;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.error_message.ErrorMessage;
 
 import java.util.Date;
 import java.util.HashMap;

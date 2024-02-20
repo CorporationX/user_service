@@ -1,4 +1,4 @@
-package school.faang.user_service.handlers;
+package school.faang.user_service.error_message;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;

@@ -1,12 +1,12 @@
-package school.faang.user_service.controller;
+package school.faang.user_service.controller.mentorship;
 
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.service.MentorshipService;
-import school.faang.user_service.validator.MentorshipValidator;
+import school.faang.user_service.service.mentorship.MentorshipService;
+import school.faang.user_service.validator.mentorship.MentorshipValidator;
 
 import java.util.List;
 

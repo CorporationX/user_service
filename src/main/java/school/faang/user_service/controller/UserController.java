@@ -7,15 +7,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.mapper.UserMapper;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserRegistrationDto;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.service.UserService;
@@ -48,7 +41,7 @@ public class UserController {
     }
 
     @PostMapping("/{userId}/deactivate/")
-    public void deactivationUserById(@PathVariable long userId) {
+    public void deactivateUserById(@PathVariable long userId) {
         userService.deactivationUserById(userId);
     }
 }

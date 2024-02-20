@@ -21,11 +21,10 @@ public abstract class UserMapper {
 
     public abstract List<UserDto> listToDto(List<User> users);
 
-    public abstract User toEntity(UserDto userDto);
-
     @Mapping(target = "userProfilePic", expression = "java(getUserProfilePic(userDto))")
     @Mapping(target = "country", ignore = true)
     public abstract User toEntity(UserRegistrationDto userDto);
+
     @Mapping(target = "country", source = "country.title")
     @Mapping(target = "profilePicFileId", source = "userProfilePic.fileId")
     @Mapping(target = "profilePicSmallFileId", source = "userProfilePic.smallFileId")

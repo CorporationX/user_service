@@ -1,4 +1,4 @@
-package school.faang.user_service.controller.event;
+package school.faang.user_service.controller;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

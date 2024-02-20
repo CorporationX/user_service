@@ -4,9 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.ListUtils;
-import org.springframework.cglib.core.Local;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.config.async.AsyncConfig;
 import school.faang.user_service.dto.event.EventDto;
@@ -16,6 +14,7 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.EventValidator;
 
 import java.time.LocalDateTime;

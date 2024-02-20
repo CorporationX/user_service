@@ -20,8 +20,7 @@ import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.premium.PremiumPeriod;
 import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.repository.premium.PremiumRepository;
-import school.faang.user_service.service.PremiumService;
-import school.faang.user_service.service.UserService;
+import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.PremiumValidator;
 
 import java.math.BigDecimal;

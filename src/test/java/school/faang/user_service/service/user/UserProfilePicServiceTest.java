@@ -1,4 +1,4 @@
-package school.faang.user_service.service.service;
+package school.faang.user_service.service.user;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,10 +8,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.service.AmazonS3Service;
-import school.faang.user_service.service.UserService;
-import school.faang.user_service.service.user.UserProfilePicService;
 import school.faang.user_service.util.ImageService;
 
 import static org.mockito.Mockito.when;

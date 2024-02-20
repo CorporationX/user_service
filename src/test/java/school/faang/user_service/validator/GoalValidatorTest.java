@@ -1,4 +1,4 @@
-package school.faang.user_service.validator.goal;
+package school.faang.user_service.validator;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,6 +9,7 @@ import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.validator.goal.GoalValidator;
 
 import java.util.List;
 

@@ -7,7 +7,6 @@ import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.service.AmazonS3Service;
-import school.faang.user_service.service.UserService;
 import school.faang.user_service.util.ImageService;
 
 @Service

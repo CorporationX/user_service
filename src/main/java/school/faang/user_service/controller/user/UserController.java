@@ -1,4 +1,4 @@
-package school.faang.user_service.controller;
+package school.faang.user_service.controller.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,7 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import school.faang.user_service.dto.user.UserRegistrationDto;
 import school.faang.user_service.entity.UserProfilePic;
-import school.faang.user_service.service.UserService;
+import school.faang.user_service.service.user.UserService;
 
 @RestController
 @RequestMapping("/users")

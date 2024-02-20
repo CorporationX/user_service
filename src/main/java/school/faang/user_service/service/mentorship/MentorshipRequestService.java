@@ -16,7 +16,7 @@ import school.faang.user_service.dto.mentorship.filter.RequestFilterDto;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
-import school.faang.user_service.service.UserService;
+import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
 
 

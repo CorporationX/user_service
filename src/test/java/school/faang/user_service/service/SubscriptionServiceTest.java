@@ -28,7 +28,7 @@ public class SubscriptionServiceTest {
     @Test
     public void testFollowerExistsIsInvalid() {
         SubscriptionDto subscriptionDto = new SubscriptionDto(1L, 2L);
-        when(subscriptionRepository.existsById(1L)).thenReturn(false);
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(1L, 2L)).thenReturn(false);
 
         IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
                 () -> subscriptionService.followUser(subscriptionDto));

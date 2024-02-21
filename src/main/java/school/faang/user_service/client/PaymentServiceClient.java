@@ -10,6 +10,6 @@ import school.faang.user_service.entity.premium.PaymentRequest;
 @FeignClient(name = "payment-service",
         url = "${payment-service.host}:${payment-service.port}")
 public interface PaymentServiceClient {
-    @PostMapping("/api/payment")
+    @PostMapping("/payment/api/payment")
     ResponseEntity<PaymentResponse> sendPayment(@RequestBody PaymentRequest request);
 }

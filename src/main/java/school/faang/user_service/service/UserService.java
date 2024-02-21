@@ -36,14 +36,7 @@ public class UserService {
     }
 
     public UserDto getUser(long id) {
-        return userRepository.findById(id)
-                .map(userMapper::toDto)
-                .orElseThrow(() -> new DataValidationException("Пользователя не существует"));
-    }
-
-    public User getUserById(long userId) {
-        return userRepository.findById(userId).orElseThrow(() ->
-                new EntityNotFoundException("User with id " + userId + " has not found"));
+        return userMapper.toDto(findById(id));
     }
 
     public boolean isUserExists(long id) {
@@ -78,7 +71,8 @@ public class UserService {
     }
 
     public User findById(long id) {
-        return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
+        return userRepository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("Пользователь не найден"));
     }
 
     public void saveUser(User user) {

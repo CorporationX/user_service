@@ -30,7 +30,7 @@ public class SubscriptionService {
 
     @Transactional
     public void followUser(long followerId, long followeeId) {
-        validateExistsUsers(followerId, followeeId);
+//        validateExistsUsers(followerId, followeeId);
 
 //        if (subscriptionValidator.validateSubscription(followerId, followeeId)){
 //            throw new DataValidationException("Такая подписка уже есть");

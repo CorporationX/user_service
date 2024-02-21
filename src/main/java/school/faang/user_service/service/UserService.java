@@ -6,13 +6,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-import school.faang.user_service.dto.user.UserCreateDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
-import school.faang.user_service.mapper.CreateUserMapper;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
@@ -24,7 +22,6 @@ import school.faang.user_service.service.s3.S3Service;
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final CreateUserMapper createUserMapper;
     private final PremiumRepository premiumRepository;
     private final S3Service s3Service;
     private final RestTemplate restTemplate;
@@ -47,8 +44,8 @@ public class UserService {
     }
 
     @Transactional
-    public UserDto createUser(UserCreateDto userDto) {
-        User entity = createUserMapper.toEntity(userDto);
+    public UserDto createUser(UserDto userDto) {
+        User entity = userMapper.toEntity(userDto);
         entity.setActive(true);
         try {
             UserProfilePic userProfilePic = saveAvatar(entity.getUsername());

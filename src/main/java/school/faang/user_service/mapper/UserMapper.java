@@ -13,10 +13,12 @@ import java.util.List;
         injectionStrategy = InjectionStrategy.FIELD)
 
 public interface UserMapper {
-    @Mapping(target = "countryId", source = "country.id")
+    @Mapping(source = "country.id", target = "countryId")
+    @Mapping(source = "contactPreference.preference", target = "preference")
     UserDto toDto(User user);
 
-    @Mapping(target = "country.id", source = "countryId")
+@Mapping(source = "countryId", target = "country.id")
+@Mapping(source = "preference", target = "contactPreference.preference")
     User toEntity(UserDto userDto);
 
     List<UserDto> toDto(List<User> users);

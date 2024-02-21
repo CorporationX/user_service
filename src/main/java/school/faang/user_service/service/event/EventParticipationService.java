@@ -8,8 +8,8 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -17,18 +17,18 @@ public class EventParticipationService {
     private final EventParticipationRepository eventParticipationRepository;
     private final UserMapper userMapper;
 
-    public void registerParticipant(Long eventId, Long userId) { //1
+    public void registerParticipant(Long eventId, Long userId) {
         validateEventId(eventId);
         List<User> users = eventParticipationRepository.findAllParticipantsByEventId(eventId);
-        for (User user : users) {
-            if (user.getId() == userId) {
-                throw new DataValidationException("You are registered already!");
-            }
-        }
+        users.stream()
+                .filter(user -> user.getId() == userId)
+                .forEach(user -> {
+            throw new DataValidationException("You are registered already!");
+        });
         eventParticipationRepository.register(eventId, userId);
     }
 
-    public void unregisterParticipant(Long eventId, Long userId) { //2
+    public void unregisterParticipant(Long eventId, Long userId) {
         if (checkThereIsUserInEvent(eventId, userId)) {
             eventParticipationRepository.unregister(eventId, userId);
         } else {
@@ -36,22 +36,20 @@ public class EventParticipationService {
         }
     }
 
-    public boolean checkThereIsUserInEvent(long eventId, long userId) { //2.1
+    public boolean checkThereIsUserInEvent(long eventId, long userId) {
         return eventParticipationRepository.findAllParticipantsByEventId(eventId).stream()
                 .anyMatch(user -> user.getId() == userId);
     }
 
-    public List<UserDto> getListOfParticipant(Long eventId) { //3
+    public List<UserDto> getListOfParticipant(Long eventId) {
         validateEventId(eventId);
         List<User> users = eventParticipationRepository.findAllParticipantsByEventId(eventId);
-        List<UserDto> userDto = new ArrayList<>();
-        for (User user : users) {
-            userDto.add(userMapper.toDto(user));
-        }
-        return userDto;
+        return users.stream()
+                .map(userMapper::toDto)
+                .collect(Collectors.toList());
     }
 
-    public int getCountRegisteredParticipant(Long eventId) { //4
+    public int getCountRegisteredParticipant(Long eventId) {
         validateEventId(eventId);
         return eventParticipationRepository.countParticipants(eventId);
     }

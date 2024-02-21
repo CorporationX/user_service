@@ -142,7 +142,7 @@ class SkillServiceTest {
                 new SkillOffer(3, skill, Recommendation.builder().author(User.builder().id(5).build()).build()));
         when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.empty());
         when(skillOfferRepository.findAllOffersOfSkill(skillId, userId)).thenReturn(skillOffers);
-        when(userService.getUserById(userId)).thenReturn(user);
+        when(userService.findById(userId)).thenReturn(user);
         when(skillRepository.findById(skillId)).thenReturn(Optional.of(skill));
 
         // Act
@@ -151,7 +151,7 @@ class SkillServiceTest {
         // Assert
         assertAll(
                 () -> verify(skillMapper, times(1)).toDto(any()),
-                () -> verify(userService, times(1)).getUserById(userId),
+                () -> verify(userService, times(1)).findById(userId),
                 () -> verify(skillOfferRepository, times(1)).findAllOffersOfSkill(skillId, userId),
                 () -> verify(skillRepository, times(1)).assignSkillToUser(skillId, userId),
                 () -> verify(userSkillGuaranteeRepository, times(skillOffers.size())).save(any())

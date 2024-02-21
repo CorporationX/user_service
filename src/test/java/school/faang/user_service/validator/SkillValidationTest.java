@@ -1,4 +1,4 @@
-package school.faang.user_service.validate.skill;
+package school.faang.user_service.validator;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

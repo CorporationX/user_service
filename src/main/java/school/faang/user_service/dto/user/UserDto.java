@@ -28,5 +28,4 @@ public class UserDto {
     @NotNull
     private long countryId;
     private PreferredContact preference;
-
 }

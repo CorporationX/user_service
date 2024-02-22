@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.dto.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
@@ -14,7 +13,7 @@ import school.faang.user_service.mapper.skill.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.validation.SkillValidator;
+import school.faang.user_service.validator.SkillValidator;
 
 import java.util.List;
 import java.util.Map;

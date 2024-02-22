@@ -1,4 +1,4 @@
-package school.faang.user_service.validation;
+package school.faang.user_service.validator;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -23,6 +23,12 @@ public class SkillValidator {
     public void validateSkillOffersSize(List<SkillOffer> offers) throws DataValidationException {
         if (offers.size() < MIN_SKILL_OFFERS) {
             throw new DataValidationException("Not enough offers");
+        }
+    }
+
+    public void validateSkill (String skillTitle) {
+        if (skillTitle == null || skillTitle.isBlank()) {
+            throw new DataValidationException("Invalid skill name.");
         }
     }
 }

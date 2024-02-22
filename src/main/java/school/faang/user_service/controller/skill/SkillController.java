@@ -11,43 +11,38 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.skill.SkillService;
+import school.faang.user_service.service.SkillService;
+import school.faang.user_service.validator.SkillValidator;
 
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
+@RequestMapping("/skill")
 public class SkillController {
     private final SkillService skillService;
+    private final SkillValidator skillValidator;
 
-    @PostMapping("/skill")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public SkillDto create (@RequestBody SkillDto skill) {
-        validateSkill(skill.getTitle());
+        skillValidator.validateSkill(skill.getTitle());
 
         return skillService.create(skill);
     }
 
-    @GetMapping("/skill/{userId}")
+    @GetMapping("/{userId}")
     public List<SkillDto> getUserSkills (@PathVariable long userId) {
         return skillService.getUserSkills(userId);
     }
 
-    @GetMapping("/skill/{userId}/offered")
+    @GetMapping("/{userId}/offered")
     public List<SkillCandidateDto> getOfferedSkills (@PathVariable long userId) {
         return skillService.getOfferedSkills(userId);
     }
 
-    @PostMapping("/skill/{userId}/offered/{skillId}")
+    @PostMapping("/{userId}/offered/{skillId}")
     public SkillDto acquireSkillFromOffers(@PathVariable long skillId, @PathVariable long userId) {
         return skillService.acquireSkillFromOffers(skillId, userId);
-    }
-
-    private void validateSkill (String skillTitle) {
-        if (skillTitle == null || skillTitle.isBlank()) {
-            throw new DataValidationException("Invalid skill name.");
-        }
     }
 }

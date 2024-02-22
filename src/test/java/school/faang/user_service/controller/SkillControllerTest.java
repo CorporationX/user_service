@@ -16,15 +16,14 @@ import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.skill.SkillService;
+import school.faang.user_service.service.SkillService;
+import school.faang.user_service.validator.SkillValidator;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -40,6 +39,8 @@ public class SkillControllerTest {
 
     @Mock
     SkillService skillService;
+    @Mock
+    SkillValidator skillValidator;
 
     Skill firstSkill;
     Skill secondSkill;
@@ -84,18 +85,6 @@ public class SkillControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.title", is("java")))
                 .andExpect(jsonPath("$.id", is(1)));
-    }
-
-    @Test
-    public void shouldThrowExceptionOnCreateWhenSkillTitleIsEmpty () {
-        firstSkillDto.setTitle("");
-        assertThrows(DataValidationException.class, () -> skillController.create(firstSkillDto));
-    }
-
-    @Test
-    public void shouldThrowExceptionOnCreateWhenSkillTitleIsNull () {
-        firstSkillDto.setTitle(null);
-        assertThrows(DataValidationException.class, () -> skillController.create(firstSkillDto));
     }
 
     @Test

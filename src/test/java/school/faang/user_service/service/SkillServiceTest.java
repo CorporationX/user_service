@@ -21,8 +21,7 @@ import school.faang.user_service.mapper.skill.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.service.skill.SkillService;
-import school.faang.user_service.validation.SkillValidator;
+import school.faang.user_service.validator.SkillValidator;
 
 import java.util.List;
 import java.util.Optional;
@@ -222,7 +221,7 @@ public class SkillServiceTest {
                 Skill.builder()
                         .id(2L)
                         .build());
-        Mockito.when(skillRepository.findAllById(relatedSkillIds)).thenReturn(relatedSkills);
+        when(skillRepository.findAllById(relatedSkillIds)).thenReturn(relatedSkills);
         List<Skill> actualSkills = skillService.getRelatedSkills(relatedSkillIds);
         assertEquals(relatedSkills, actualSkills);
     }

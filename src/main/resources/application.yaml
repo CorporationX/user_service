@@ -36,6 +36,12 @@ logging:
   level:
     root: info
 
+person:
+  parser:
+    max_file_chunk_size: 13000
+    thread_num: 5
+    expected_chunk_size: 1300
+
 project-service:
   host: localhost
   port: 8082

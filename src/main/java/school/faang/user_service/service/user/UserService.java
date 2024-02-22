@@ -2,6 +2,7 @@ package school.faang.user_service.service.user;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.user.UserDto;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
@@ -27,6 +29,7 @@ public class UserService {
     public List<UserDto> generateUsersFromCsv(MultipartFile csvFile) throws IOException {
         List<User> savedUsers = csvParser.parse(csvFile);
         userRepository.saveAll(savedUsers);
+        log.info("People saved from csv file as users. Saved accounts count: {}", savedUsers.size());
         return userMapper.listToDto(savedUsers);
     }
 }

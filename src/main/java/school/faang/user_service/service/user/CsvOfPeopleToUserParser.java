@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.entity.User;
@@ -26,14 +28,18 @@ import java.util.concurrent.locks.ReentrantLock;
 
 @RequiredArgsConstructor
 @Component
+@Slf4j
 public class CsvOfPeopleToUserParser {
-    private static final int THREAD_NUM = 5;
-    private static final long MAX_FILE_CHUNK_SIZE = 13_000L;
-    private static final long EXPECTED_CHUNK_SIZE = 1_300L;
+    @Value("${person.parser.thread_num}")
+    private int threadNum = 5;
+    @Value("${person.parser.max_file_chunk_size}")
+    private long maxFileChunkSize = 13_000L;
+    @Value("${person.parser.expected_chunk_size}")
+    private long expectedChunkSize = 1_300L;
     private final CsvMapper csvPersonMapper;
     private final UserPersonMapper userPersonMapper;
     private final Lock lock = new ReentrantLock();
-    private final ExecutorService executor = Executors.newFixedThreadPool(THREAD_NUM);
+    private final ExecutorService executor = Executors.newFixedThreadPool(threadNum);
 
     public List<User> parse(MultipartFile csvFile) throws IOException {
         List<User> users = new ArrayList<>();
@@ -43,12 +49,16 @@ public class CsvOfPeopleToUserParser {
                 .setInclude(false)
                 .get();
 
-        if (csvFile.getSize() > MAX_FILE_CHUNK_SIZE) {
+        long csvFileSize = csvFile.getSize();
+        if (csvFileSize > maxFileChunkSize) {
+            log.debug("Csv file size is {}. parallel parse started", csvFileSize);
             parallelParse(inputStream, users);
         } else {
+            log.debug("Csv file size is {}. linealParse parse started", csvFileSize);
             linealParse(inputStream, users);
         }
         inputStream.close();
+        log.debug("Csv file parse finished. Parsed users count {}", users.size());
         return users;
     }
 
@@ -69,7 +79,8 @@ public class CsvOfPeopleToUserParser {
                 csvStrBuilderFile.append(line).append("\n");
             }
             count++;
-            if (count == MAX_FILE_CHUNK_SIZE/EXPECTED_CHUNK_SIZE) {
+            if (count == maxFileChunkSize / expectedChunkSize) {
+                log.debug("chunk with amount of lines {} of csv file is ready to parse", count);
                 runAsync(users, completableFutures, csvStrBuilderFile);
                 count = 0;
                 csvStrBuilderFile = new StringBuilder();
@@ -80,6 +91,7 @@ public class CsvOfPeopleToUserParser {
         }
 
         CompletableFuture.allOf(completableFutures.toArray(new CompletableFuture[0])).join();
+        log.debug("parallel parsing finished");
 
         executor.shutdown();
         inputStreamReader.close();
@@ -90,10 +102,10 @@ public class CsvOfPeopleToUserParser {
         completableFutures.add(CompletableFuture.runAsync(
                 () -> {
                     try {
-                        Thread.sleep(5000);
                         parseCsvToPeopleAndMapToUser(csvStrBuilderFile.toString().getBytes(), users);
-                        System.out.println(Thread.currentThread());
-                    } catch (IOException | InterruptedException e) {
+                        log.debug("started thread to parse chunk of csv file");
+                    } catch (IOException e) {
+                        log.debug("IOException trying to parallel parsing");
                         throw new RuntimeException(e);
                     }
                 }
@@ -113,9 +125,11 @@ public class CsvOfPeopleToUserParser {
             Person person = mappingIterator.nextValue();
             User user = userPersonMapper.toUser(person);
             user.setPassword(user.getEmail());
+            log.debug("user with username {} parsed", user.getUsername());
             lock.lock();
             try {
                 users.add(user);
+                log.debug("user with username {} added", user.getUsername());
             } finally {
                 lock.unlock();
             }

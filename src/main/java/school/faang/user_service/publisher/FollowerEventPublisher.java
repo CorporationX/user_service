@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.follower.FollowerEventDto;
+import school.faang.user_service.dto.event.follower.FollowerEventDto;
 
 @Component
 @RequiredArgsConstructor

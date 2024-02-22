@@ -3,7 +3,7 @@ package school.faang.user_service.service.subscription;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.dto.follower.FollowerEventDto;
+import school.faang.user_service.dto.event.follower.FollowerEventDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;

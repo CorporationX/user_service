@@ -212,6 +212,21 @@ public class SkillServiceTest {
         );
     }
 
+    @Test
+    void successGetRelatedSkills() {
+        List<Long> relatedSkillIds = List.of(1L, 2L);
+        List<Skill> relatedSkills = List.of(
+                Skill.builder()
+                        .id(1L)
+                        .build(),
+                Skill.builder()
+                        .id(2L)
+                        .build());
+        Mockito.when(skillRepository.findAllById(relatedSkillIds)).thenReturn(relatedSkills);
+        List<Skill> actualSkills = skillService.getRelatedSkills(relatedSkillIds);
+        assertEquals(relatedSkills, actualSkills);
+    }
+
     private SkillDto setSkillDto (boolean existsByTitle) {
         SkillDto dto = SkillDto.builder().id(1L).title("Title").build();
 

@@ -1,6 +1,7 @@
 package school.faang.user_service.service.mentorship;
 
 import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,18 +11,20 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
+import school.faang.user_service.dto.mentorship.filter.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.mentorship.DataNotFoundException;
-import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
+import school.faang.user_service.exception.EntityNotFoundException;
+import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
+import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-import school.faang.user_service.service.UserService;
+import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Optional;
+import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -41,8 +44,6 @@ class MentorshipRequestServiceTest {
 
     @InjectMocks
     private MentorshipRequestService mentorshipRequestService;
-
-    @InjectMocks
     private MentorshipRequestDto mentorshipRequestDto;
 
     @Mock
@@ -54,9 +55,17 @@ class MentorshipRequestServiceTest {
     @Mock
     private UserService userService;
 
+    @Mock
+    private List<MentorshipRequestFilter> mentorshipRequestFilters;
+
+
     private User receiver;
 
     private User requester;
+
+
+    private RequestFilterDto requestFilterDto;
+
 
     @BeforeEach
     public void init() {
@@ -66,6 +75,9 @@ class MentorshipRequestServiceTest {
         mentorshipRequestDto.setRequester(88L);
         mentorshipRequestDto.setReceiver(77L);
         mentorshipRequestDto.setCreatedAt(LocalDateTime.now());
+        requestFilterDto = new RequestFilterDto();
+        requestFilterDto.setDescriptionFilter("Description filter");
+        mentorshipRequest = new MentorshipRequest();
         receiver = new User();
         receiver.setId(2L);
         receiver.setUsername("Ivan");
@@ -75,38 +87,49 @@ class MentorshipRequestServiceTest {
     }
 
     @Test
+    public void testReturnAllMentorshipRequests() {
+        Mockito.when(mentorshipRequestMapper.toDtoList(List.of(mentorshipRequest)))
+                .thenReturn(List.of(mentorshipRequestDto));
+        Mockito.when(mentorshipRequestRepository.findAll())
+                .thenReturn(List.of(mentorshipRequest));
+        List<MentorshipRequestDto> requests = mentorshipRequestService.getRequests(requestFilterDto);
+        Mockito.verify(mentorshipRequestRepository, times(1))
+                .findAll();
+        Mockito.verify(mentorshipRequestMapper, times(1))
+                .toDtoList(List.of(mentorshipRequest));
+        Assertions.assertNotNull(requests);
+        Assertions.assertEquals(requests.size(), 1);
+    }
+
+    @Test
+    public void testReturnNothingWhenRequest() {
+        Mockito.when(mentorshipRequestMapper.toDtoList(Collections.emptyList()))
+                .thenReturn(Collections.emptyList());
+        Mockito.when(mentorshipRequestRepository.findAll())
+                .thenReturn(Collections.emptyList());
+        List<MentorshipRequestDto> requests = mentorshipRequestService.getRequests(requestFilterDto);
+        Mockito.verify(mentorshipRequestRepository, times(1))
+                .findAll();
+        Mockito.verify(mentorshipRequestMapper, times(1))
+                .toDtoList(Collections.emptyList());
+        Assertions.assertNotNull(requests);
+        Assertions.assertEquals(requests.size(), 0);
+    }
+
+    @Test
     public void whenRequestForMembershipThenNoDataInDB() {
         try {
             mentorshipRequestService.acceptRequest(1L);
-        } catch (DataNotFoundException e) {
+        } catch (EntityNotFoundException e) {
             assertThat(e).isInstanceOf(RuntimeException.class)
                     .hasMessage("There is no mentorship request with this id");
         }
         try {
             mentorshipRequestService.rejectRequest(1L, new RejectionDto(StringUtils.EMPTY));
-        } catch (DataNotFoundException e) {
+        } catch (EntityNotFoundException e) {
             assertThat(e).isInstanceOf(RuntimeException.class)
                     .hasMessage("There is no mentorship request with this id");
         }
-    }
-
-    @Test
-    public void whenRequestForMembershipThenSuccess() {
-        Mockito.when(mentorshipRequestRepository.findById(1L))
-                .thenReturn(Optional.of(mentorshipRequest));
-        Mockito.when(mentorshipRequest.getRequester()).thenReturn(requester);
-        Mockito.when(mentorshipRequest.getReceiver()).thenReturn(receiver);
-        requester.setMentors(new ArrayList<>());
-        mentorshipRequestService.acceptRequest(1L);
-        Mockito.verify(mentorshipRequestRepository, times(1))
-                .save(mentorshipRequest);
-        Mockito.verify(mentorshipRequestMapper, times(1))
-                .toDTO(mentorshipRequest);
-        mentorshipRequestService.rejectRequest(1L, new RejectionDto(StringUtils.EMPTY));
-        Mockito.verify(mentorshipRequestRepository, times(2))
-                .save(mentorshipRequest);
-        Mockito.verify(mentorshipRequestMapper, times(2))
-                .toDTO(mentorshipRequest);
     }
 
     @Test

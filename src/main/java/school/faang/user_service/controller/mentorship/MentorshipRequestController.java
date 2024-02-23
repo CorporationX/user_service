@@ -2,7 +2,10 @@ package school.faang.user_service.controller.mentorship;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.dto.mentorship.filter.RequestFilterDto;
@@ -13,8 +16,9 @@ import java.util.List;
 
 import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
 
-@Component
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("/mentorship/request")
 public class MentorshipRequestController {
 
     private final MentorshipRequestService mentorshipRequestService;
@@ -35,7 +39,8 @@ public class MentorshipRequestController {
         return mentorshipRequestService.rejectRequest(id, rejection);
     }
 
-    private MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
+    @PostMapping()
+    private MentorshipRequestDto requestMentorship(@RequestBody MentorshipRequestDto mentorshipRequestDto) {
         mentorshipRequestValidator.commonCheck(mentorshipRequestDto);
         return mentorshipRequestService.requestMentorship(mentorshipRequestDto);
     }

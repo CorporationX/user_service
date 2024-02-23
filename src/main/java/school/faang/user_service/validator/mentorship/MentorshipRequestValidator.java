@@ -35,8 +35,9 @@ public class MentorshipRequestValidator {
     }
 
     public void commonCheck(MentorshipRequestDto mentorshipRequestDto) {
-        if (mentorshipRequestDto.getId() == null || mentorshipRequestDto.getRequester() == null
-                || mentorshipRequestDto.getReceiver() == null || mentorshipRequestDto.getDescription() == null) {
+        if (mentorshipRequestDto.getRequester() == null
+                || mentorshipRequestDto.getReceiver() == null
+                || mentorshipRequestDto.getDescription() == null) {
             throw new DataValidationException("Incorrect data in mentorshipRequestDto");
         }
     }

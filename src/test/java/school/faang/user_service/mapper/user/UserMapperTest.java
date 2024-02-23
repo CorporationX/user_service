@@ -22,7 +22,7 @@ class UserMapperTest {
     void shouldReturnUserDtoWhenGetValidUserWithNonEmptyFields() {
         User user = getTestUser();
 
-        UserDto userDto = userMapper.toUserDto(user);
+        UserDto userDto = userMapper.toDto(user);
 
         assertEquals(getTestUserDto(), userDto);
     }
@@ -40,7 +40,7 @@ class UserMapperTest {
     void shouldReturnUserDtoWithNullFieldsWhenGetValidUserWithNullFields() {
         User user = getTestNullUser();
 
-        UserDto userDto = userMapper.toUserDto(user);
+        UserDto userDto = userMapper.toDto(user);
 
         assertEquals(getTestNullUserDto(), userDto);
     }

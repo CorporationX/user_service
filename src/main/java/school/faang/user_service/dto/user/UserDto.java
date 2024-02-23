@@ -2,15 +2,15 @@ package school.faang.user_service.dto.user;
 
 import lombok.*;
 import school.faang.user_service.dto.skill.SkillDto;
+
 import java.util.List;
-import school.faang.user_service.dto.entity.EntityDto;
 
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class UserDto extends EntityDto {
+public class UserDto {
     private Long id;
     private String username;
     private String email;

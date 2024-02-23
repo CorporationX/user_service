@@ -14,7 +14,7 @@ import school.faang.user_service.entity.User;
 public interface UserMapper {
 
     @Mapping(source = "country.id", target = "countryId")
-    UserDto toUserDto(User user);
+    UserDto toDto(User user);
 
     @Mapping(source = "countryId", target = "country")
     User toUser(UserDto userDTO);

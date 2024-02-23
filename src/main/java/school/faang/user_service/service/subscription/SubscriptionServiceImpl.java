@@ -5,11 +5,11 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.dto.filter.UserFilterDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.service.filter.UserInMemoryFilterService;
+import school.faang.user_service.service.filter.UserFilterService;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -20,7 +20,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     private final SubscriptionRepository subscriptionRepository;
     private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
-    private final UserInMemoryFilterService userFilter;
+    private final UserFilterService userFilter;
 
     @Override
     @Transactional
@@ -56,7 +56,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     public List<UserDto> getFollowings(long followerId, UserFilterDto filterDto) {
         validateUserId(followerId);
         Stream<UserDto> userDtoStream = subscriptionRepository.findByFollowerId(followerId)
-                .map(userMapper::toUserDto);
+                .map(userMapper::toDto);
         return userFilter.applyFilters(userDtoStream, filterDto).toList();
     }
 
@@ -65,7 +65,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filterDto) {
         validateUserId(followeeId);
         Stream<UserDto> userDtoStream = subscriptionRepository.findByFolloweeId(followeeId)
-                .map(userMapper::toUserDto);
+                .map(userMapper::toDto);
         return userFilter.applyFilters(userDtoStream, filterDto).toList();
     }
 

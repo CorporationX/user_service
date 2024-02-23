@@ -1,13 +1,13 @@
-package school.faang.user_service.filter.memory.user;
+package school.faang.user_service.filter.user;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.dto.filter.UserFilterDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 
 import java.util.stream.Stream;
 
 @Component
-public class PhoneUserInMemoryFilter implements UserInMemoryFilter {
+public class UserPhoneFilter implements UserFilter {
 
     @Override
     public boolean isApplicable(UserFilterDto filterDto) {

@@ -30,7 +30,7 @@ public class PremiumService {
     private final PremiumMapper premiumMapper;
 
     public PremiumDto buyPremiumSubscription(Long userId, int days) {
-        User user = userMapper.toEntity(userService.getUserById(userId));
+        User user = userMapper.toUser(userService.getUserById(userId));
         checkPremiumStatusUser(userId);
         PremiumPeriod premiumPeriod = fromDays(days);
         paymentService.makePayment(premiumPeriod);

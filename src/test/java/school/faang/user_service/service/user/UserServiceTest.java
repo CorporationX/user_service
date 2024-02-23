@@ -47,15 +47,15 @@ public class UserServiceTest {
     public void setUp() {
         filterList.add(filter);
         userFilterDto = new UserFilterDto();
-        userDto1 = new UserDto();
-        userDto2 = new UserDto();
+        userDto1 = UserDto.builder().build();
+        userDto2 = UserDto.builder().build();
     }
 
     @Test
     public void shouldGetPremiumUsers() {
 
         when(userRepository.findPremiumUsers()).thenReturn(Stream.of(new User(), new User()));
-        when(userMapper.toUserDto(any(User.class))).thenReturn(userDto1, userDto2);
+        when(userMapper.toDto(any(User.class))).thenReturn(userDto1, userDto2);
         when(filter.isApplicable(userFilterDto)).thenReturn(true);
         when(filter.apply(any(Stream.class), any(UserFilterDto.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -70,7 +70,7 @@ public class UserServiceTest {
     public void testShouldGetUserById() {
         Long userId = 1L;
         when(userRepository.findById(userId)).thenReturn(Optional.of(new User()));
-        when(userMapper.toUserDto(any(User.class))).thenReturn(userDto1);
+        when(userMapper.toDto(any(User.class))).thenReturn(userDto1);
         userService.getUserById(userId);
     }
 

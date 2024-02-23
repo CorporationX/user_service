@@ -4,6 +4,10 @@ spring:
     url: jdbc:postgresql://localhost:5432/postgres
     username: user
     password: password
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 150MB
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -27,12 +31,20 @@ spring:
         profile_view_channel:
             name: profile_view_channel
 
+  async:
+    core-pool-size: 5
+    max-pool-size: 10
+    queue-capacity: 500
+    thread-name-prefix: StudentThread-
+
+
 server:
   port: 8080
 
 logging:
   level:
     root: info
+    org.springframework.retry: DEBUG
 
 project-service:
   host: localhost
@@ -41,6 +53,9 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+  retry:
+    max-attempts: 5
+    delay-ms: 2000
 
 aws:
   accessKey: access_key
@@ -51,3 +66,9 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
+
+
+scheduling:
+  premium:
+    cron:
+      expression: "0 0 4 * * *"

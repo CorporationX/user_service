@@ -1,8 +1,10 @@
 package school.faang.user_service.mapper.user;
 
 import org.mapstruct.InjectionStrategy;
+import com.json.student.PersonSchemaV2;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.Country;
@@ -24,6 +26,39 @@ public interface UserMapper {
         return Country.builder()
                 .id(id)
                 .build();
+    }
+
+    @Mapping(target = "username", expression = "java(person.getFirstName() + \"_\" + person.getLastName())")
+    @Mapping(target = "aboutMe", source = ".", qualifiedByName = "aboutMe")
+    @Mapping(target = "country.title", source = "country")
+    User personToUser(PersonSchemaV2 person);
+
+
+    @Named("aboutMe")
+    default String getAboutMe(PersonSchemaV2 person) {
+        StringBuilder builder = new StringBuilder();
+        if (person != null) {
+            if (person.getState() != null) {
+                builder.append("State - " + person.getState()).append(", ");
+            }
+            if (person.getFaculty() != null) {
+                builder.append("Faculty - " + person.getFaculty()).append(", ");
+            }
+            if (person.getYearOfStudy() != null) {
+                builder.append("Year of study - " + person.getYearOfStudy()).append(", ");
+            }
+            if (person.getMajor() != null) {
+                builder.append("Major - " + person.getMajor()).append(", ");
+            }
+            if (person.getEmployer() != null) {
+                builder.append("Employer - " + person.getEmployer());
+            }
+            int length = builder.length();
+            if (length > 2 && builder.substring(length - 2, length).equals(", ")) {
+                builder.setLength(length - 2);
+            }
+        }
+        return builder.toString();
     }
 
 }

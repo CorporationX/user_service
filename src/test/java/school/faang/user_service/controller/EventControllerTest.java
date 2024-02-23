@@ -1,4 +1,4 @@
-package school.faang.user_service.service.controller;
+package school.faang.user_service.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +47,6 @@ public class EventControllerTest {
                 .id(1L)
                 .build();
         when(eventService.getEvent(eventId)).thenReturn(eventDto);
-
         mockMvc.perform(get("/api/v1/events/{eventId}", eventId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.UserService;
 
+import java.util.List;
+
 @Tag(name = "Управление пользователями")
 @RestController
 @RequiredArgsConstructor
@@ -24,7 +26,7 @@ public class UserController {
 
     @Operation(summary = "Регистрация пользователя",
             description = "Позволяет зарегистрировать нового пользователя и сгенерировать аватара")
-    @PostMapping()
+    @PostMapping("/create")
     public UserDto createUser(@RequestBody @Valid UserDto user) {
         log.info("Accepted request to create new user " + user);
         return userService.createUser(user);
@@ -39,4 +41,10 @@ public class UserController {
     public boolean isUserExists(@PathVariable long userId) {
         return userService.isUserExists(userId);
     }
+
+    @PostMapping
+    public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
+        return userService.getUsersByIds(ids);
+    }
+
 }

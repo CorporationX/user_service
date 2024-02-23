@@ -30,6 +30,10 @@ spring:
           name: follower_channel
         profile_view_channel:
             name: profile_view_channel
+        recommendation_channel:
+          name: recommendation_channel
+        mentorship_requested_channel:
+          name: mentorship_requested_channel
 
   async:
     core-pool-size: 5

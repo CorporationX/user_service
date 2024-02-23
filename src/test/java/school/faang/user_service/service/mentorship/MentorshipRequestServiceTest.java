@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.mentorship;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;

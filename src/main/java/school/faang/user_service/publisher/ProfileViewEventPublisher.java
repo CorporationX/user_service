@@ -23,10 +23,7 @@ public class ProfileViewEventPublisher {
                                      UserContext userContext) {
         this.userViewTopic = userViewTopic;
         this.userContext = userContext;
-        this.abstractEventPublisher = new AbstractEventPublisher<>(
-                redisTemplate,
-                objectMapper
-        );
+        this.abstractEventPublisher = new AbstractEventPublisher<>(redisTemplate, objectMapper);
     }
 
     public void publish(long userId) {

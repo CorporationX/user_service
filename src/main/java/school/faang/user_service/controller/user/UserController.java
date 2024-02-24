@@ -35,6 +35,11 @@ public class UserController {
         return userService.getUserDtoById(userId);
     }
 
+    @GetMapping("/{userId}/utility")
+    UserDto getUserUtility(@PathVariable long userId) {
+        return userService.getUserDtoByIdUtility(userId);
+    }
+
     @GetMapping("/exists/{id}")
     private boolean existsUserById(@PathVariable long id) {
         return userService.isOwnerExistById(id);

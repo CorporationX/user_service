@@ -51,11 +51,7 @@ public class UserService {
 
     public UserDto getUserDtoById(long id) {
         UserDto userDto = userMapper.toDto(getUserById(id));
-
-        if (userContext.getUserId() != 0) {
-            publisher.publish(id);
-        }
-        //userValidator.validateAccessToUser(id);
+        userValidator.validateAccessToUser(id);
         return userDto;
     }
 
@@ -108,5 +104,10 @@ public class UserService {
                 mentorshipRepository.save(mentee);
             }
         }
+    }
+
+    public UserDto getUserDtoByIdUtility(long userId) {
+        User user = getUserById(userId);
+        return userMapper.toDto(user);
     }
 }

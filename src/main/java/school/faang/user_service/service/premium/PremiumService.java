@@ -3,6 +3,8 @@ package school.faang.user_service.service.premium;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.email.EmailEvent;
 import school.faang.user_service.dto.premium.PremiumDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;
@@ -11,6 +13,7 @@ import school.faang.user_service.exception.PaymentProcessingException;
 import school.faang.user_service.integration.payment.PaymentService;
 import school.faang.user_service.mapper.premium.PremiumMapper;
 import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.publisher.EmailEventPublisher;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.user.UserService;
 
@@ -28,21 +31,28 @@ public class PremiumService {
     private final UserMapper userMapper;
     private final PaymentService paymentService;
     private final PremiumMapper premiumMapper;
+    private final EmailEventPublisher emailEventPublisher;
 
+    @Transactional
     public PremiumDto buyPremiumSubscription(Long userId, int days) {
         User user = userMapper.toEntity(userService.getUserById(userId));
         checkPremiumStatusUser(userId);
         PremiumPeriod premiumPeriod = fromDays(days);
         paymentService.makePayment(premiumPeriod);
-        return premiumMapper.toDto(saveUserPremium(premiumPeriod, user));
+        PremiumDto premiumDto = premiumMapper.toDto(saveUserPremium(premiumPeriod, user));
+        emailEventPublisher.publish(new EmailEvent(userId, LocalDateTime.now()));
+        return premiumDto;
     }
 
+    @Transactional
     public List<Premium> getExpiredPremiumSubscriptions() {
         return premiumRepository.findAllByEndDateBefore(LocalDateTime.now());
     }
 
+    @Transactional
     public void deletePremiumSubscribe(Long premiumId) {
         premiumRepository.deleteById(premiumId);
+
     }
 
     private Premium saveUserPremium(PremiumPeriod premiumPeriod, User user) {

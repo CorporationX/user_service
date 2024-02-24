@@ -17,7 +17,7 @@ public class UserDAO {
     private final JdbcTemplate jdbcTemplate;
 
     public void saveUsersUsingBatchUpdate(List<User> users) {
-        jdbcTemplate.batchUpdate("INSERT INTO users(password, username, email, phone, about_me, city, country_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        jdbcTemplate.batchUpdate("INSERT INTO users(password, username, phone, about_me, city, country_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
                 new BatchPreparedStatementSetter() {
                     @Override
                     public void setValues(PreparedStatement ps, int i) throws SQLException {

@@ -72,7 +72,7 @@ public class PremiumServiceTest {
     @Test
     void testShouldBuyPremium() {
         when(userService.getUserById(user.getId())).thenReturn(userDto);
-        when(userMapper.toEntity(userDto)).thenReturn(user);
+        when(userMapper.toUser(userDto)).thenReturn(user);
         when(premiumRepository.existsByUserId(user.getId())).thenReturn(false);
         doNothing().when(paymentService).makePayment(any(PremiumPeriod.class));
         when(premiumRepository.save(any(Premium.class))).thenReturn(premium);
@@ -84,7 +84,7 @@ public class PremiumServiceTest {
     @Test
     void testShouldThrowPaymentProcessingExceptionWhenUserHasPremiumStatus() {
         when(userService.getUserById(user.getId())).thenReturn(userDto);
-        when(userMapper.toEntity(userDto)).thenReturn(user);
+        when(userMapper.toUser(userDto)).thenReturn(user);
         when(premiumRepository.existsByUserId(user.getId())).thenReturn(true);
         assertThrows(PaymentProcessingException.class, () -> premiumService.buyPremiumSubscription(user.getId(), days));
     }

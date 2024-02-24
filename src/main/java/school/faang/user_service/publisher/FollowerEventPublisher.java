@@ -18,12 +18,12 @@ public class FollowerEventPublisher {
     private final ObjectMapper objectMapper;
 
     @Value("${spring.data.redis.channels.follower_channel.name}")
-    private String follower_topic;
+    private String followerTopic;
 
     public void publish(FollowerEventDto followerEventDto) {
         try {
             String json = objectMapper.writeValueAsString(followerEventDto);
-            redisTemplate.convertAndSend(follower_topic, json);
+            redisTemplate.convertAndSend(followerTopic, json);
             log.info("Отправлено событие подписки пользователя с ID: {}, на пользователя с ID: {}",
                     followerEventDto.getFolloweeId(),
                     followerEventDto.getFollowerId());

@@ -17,7 +17,7 @@ import java.util.Locale;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public abstract class UserMapper {
     @Mapping(target = "preference", source = "contactPreference.preference")
-    @Mapping(target = "locale", expression = "java(getLocale(user.getLocale()))")
+    //@Mapping(target = "locale", expression = "java(getLocale(user.getLocale()))")
     public abstract UserDto toDto(User user);
 
     public abstract List<UserDto> toDtoList(List<User> users);
@@ -46,10 +46,10 @@ public abstract class UserMapper {
         return null;
     }
 
-    protected Locale getLocale(String locale) {
+    /*protected Locale getLocale(String locale) {
         if (locale != null) {
             return Locale.forLanguageTag(locale);
         }
         return Locale.US;
-    }
+    }*/
 }

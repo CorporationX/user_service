@@ -51,7 +51,8 @@ public class UserService {
 
     public UserDto getUserDtoById(long id) {
         UserDto userDto = userMapper.toDto(getUserById(id));
-        userValidator.validateAccessToUser(id);
+        publisher.publish(id);
+        //userValidator.validateAccessToUser(id);
         return userDto;
     }
 

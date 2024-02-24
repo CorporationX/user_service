@@ -158,8 +158,8 @@ public class User {
     @OneToOne(mappedBy = "user")
     private ContactPreference contactPreference;
 
-    @Column(name = "locale")
-    private String locale;
+    /*@Column(name = "locale")
+    private String locale;*/
 
     @OneToOne(mappedBy = "user")
     private Premium premium;

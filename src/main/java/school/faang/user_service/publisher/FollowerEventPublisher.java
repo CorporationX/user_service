@@ -28,6 +28,7 @@ public class FollowerEventPublisher {
                     followerEventDto.getFolloweeId(),
                     followerEventDto.getFollowerId());
         } catch (JsonProcessingException e) {
+            log.error("Ошибка в обработке ", e);
             throw new RuntimeException(e);
         }
     }

@@ -50,9 +50,13 @@ public class UserService {
     }
 
     public UserDto getUserDtoById(long id) {
-        publisher.publish(id, userContext.getUserId());
-        userValidator.validateAccessToUser(id);
-        return userMapper.toDto(getUserById(id));
+        UserDto userDto = userMapper.toDto(getUserById(id));
+
+        if (userContext.getUserId() != 0) {
+            publisher.publish(id);
+        }
+        //userValidator.validateAccessToUser(id);
+        return userDto;
     }
 
     public UserProfilePic getUserPicUrlById(long id) {

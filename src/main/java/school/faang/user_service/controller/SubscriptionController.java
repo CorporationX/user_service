@@ -30,7 +30,7 @@ public class SubscriptionController {
     @PutMapping("/follow/{id}")
     public void followUser(@PathVariable("id") long followeeId) {
         long followerId = userContext.getUserId();
-//        subscriptionValidator.validateUserIds(followerId, followeeId);   //убрать после проверки
+        subscriptionValidator.validateUserIds(followerId, followeeId);
         subscriptionService.followUser(followerId, followeeId);
     }
 
@@ -74,7 +74,7 @@ public class SubscriptionController {
             summary = "Получение количества подписок"
     )
     @GetMapping("/user/{id}/followees/count")
-    public long getFollowingCount(@PathVariable("id") long followerId){
+    public long getFollowingCount(@PathVariable("id") long followerId) {
         return subscriptionService.getFollowingCount(followerId);
     }
 }

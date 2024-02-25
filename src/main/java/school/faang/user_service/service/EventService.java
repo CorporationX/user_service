@@ -1,4 +1,4 @@
-package school.faang.user_service.service.event;
+package school.faang.user_service.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -9,13 +9,11 @@ import school.faang.user_service.dto.event.EventUpdateDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.exception.event.DataValidationException;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.event.EventFilter;
-import school.faang.user_service.service.SkillService;
-import school.faang.user_service.validator.event.EventValidator;
-import school.faang.user_service.mapper.event.EventMapper;
+import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.validator.EventValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +32,7 @@ public class EventService {
 
     @Transactional
     public EventDto create(EventDto eventDto) {
-        User user = userService.getUser(eventDto.getOwnerId());
+        User user = userService.findById(eventDto.getOwnerId());
         List<String> skillList = new ArrayList<>();
         for (Long skillId : eventDto.getRelatedSkills()) {
             Skill skill = skillService.getSkillById(skillId);

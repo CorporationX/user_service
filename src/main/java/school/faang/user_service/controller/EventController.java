@@ -1,12 +1,12 @@
-package school.faang.user_service.controller.event;
+package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.event.EventUpdateDto;
-import school.faang.user_service.validator.event.EventValidator;
-import school.faang.user_service.service.event.EventService;
+import school.faang.user_service.validator.EventValidator;
+import school.faang.user_service.service.EventService;
 
 import java.util.List;
 

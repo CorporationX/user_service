@@ -1,9 +1,9 @@
-package school.faang.user_service.validator.event;
+package school.faang.user_service.validator;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.Skill;
-import school.faang.user_service.exception.event.DataValidationException;
+import school.faang.user_service.exception.DataValidationException;
 
 import java.time.LocalDateTime;
 import java.util.List;

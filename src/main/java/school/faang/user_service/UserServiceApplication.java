@@ -10,11 +10,6 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-
 @SpringBootApplication
 @EnableScheduling
 @EnableFeignClients("school.faang.user_service.client")
@@ -24,10 +19,7 @@ import java.util.List;
                 version = "1.0.0")
 )
 public class UserServiceApplication {
-
     public static void main(String[] args) {
-
-
         SpringApplication.run(UserServiceApplication.class, args);
     }
 

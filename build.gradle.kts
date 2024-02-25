@@ -82,13 +82,6 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
-/*jsonSchema2Pojo {
-	setSource(files("src/main/resources/json"))
-	targetDirectory = file("${project.buildDir}/generated-sources/js2p")
-	targetPackage = "com.json.student"
-	setSourceType("jsonschema")
-}*/
-
 tasks.withType<Test> {
     useJUnitPlatform()
 }

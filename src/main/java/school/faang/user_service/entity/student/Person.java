@@ -28,33 +28,20 @@ import java.util.List;
 @Data
 public class Person {
 
-    @JsonProperty("firstName")
     private String firstName;
-    @JsonProperty("lastName")
     private String lastName;
-    @JsonProperty("yearOfBirth")
     private Integer yearOfBirth;
-    @JsonProperty("group")
     private String group;
-    @JsonProperty("studentID")
     private String studentID;
-    @JsonProperty("education")
     @JsonUnwrapped
     private Education education;
-    @JsonProperty("contactInfo")
     @JsonUnwrapped
     private ContactInfo contactInfo;
-    @JsonProperty("status")
     private String status;
-    @JsonProperty("admissionDate")
     private String admissionDate;
-    @JsonProperty("graduationDate")
     private String graduationDate;
-    @JsonProperty("previousEducation")
     @JsonUnwrapped
     private List<PreviousEducation> previousEducation = new ArrayList<>();
-    @JsonProperty("scholarship")
     private Boolean scholarship;
-    @JsonProperty("employer")
     private String employer;
 }

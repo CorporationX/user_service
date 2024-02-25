@@ -1,7 +1,5 @@
 package school.faang.user_service.service.user;
 
-import com.fasterxml.jackson.dataformat.csv.CsvParser;
-import com.opencsv.CSVParser;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +13,9 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.student.Person;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.UserPersonMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -34,11 +34,12 @@ public class UserService {
     private final CountryService countryService;
     private final UserValidator userValidator;
     private final UserMapper userMapper;
+    private final UserPersonMapper userPersonMapper;
     private final EventRepository eventRepository;
     private final MentorshipRepository mentorshipRepository;
     private final GoalRepository goalRepository;
     private final UserProfilePic generatedUserProfilePic;
-    private final CsvOfPeopleToUserParser csvParser;
+    private final CsvPersonParser csvParser;
 
     public UserRegistrationDto createUser(UserRegistrationDto userDto) {
         User user = userMapper.toEntity(userDto);
@@ -111,7 +112,17 @@ public class UserService {
 
     @Transactional
     public List<UserDto> generateUsersFromCsv(MultipartFile csvFile) throws IOException {
-        List<User> savedUsers = csvParser.parse(csvFile);
+        List<Person> people = csvParser.parse(csvFile);
+        if (people.size() > 10) {
+
+        } else {
+            people.forEach(
+                    person -> {
+                        User user = userPersonMapper.toUser(person);
+                        userRepository.save(user);
+                    }
+            );
+        }
         userRepository.saveAll(savedUsers);
         log.info("People saved from csv file as users. Saved accounts count: {}", savedUsers.size());
         return userMapper.listToDto(savedUsers);

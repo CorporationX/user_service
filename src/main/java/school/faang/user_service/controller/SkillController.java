@@ -1,4 +1,4 @@
-package school.faang.user_service.controller.skill;
+package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

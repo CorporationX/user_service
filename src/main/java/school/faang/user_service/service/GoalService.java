@@ -97,8 +97,6 @@ public class GoalService {
             goalCompletedEvent.setTimestamp(LocalDateTime.now());
             goalCompletedEventPublisher.publish(goalCompletedEvent);
         }
-
-
         return goalMapper.toDto(goalRepository.save(goal));
     }
 

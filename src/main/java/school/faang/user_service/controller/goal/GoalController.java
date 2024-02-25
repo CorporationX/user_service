@@ -20,7 +20,7 @@ public class GoalController {
     @PutMapping("/goals/{goalId}")
     public GoalDto updateGoal(@PathVariable Long goalId, GoalDto goal) {
         goalValidator.validateUserId(goalId);
-        //goalValidator.validateGoalTitle(goal);
+        goalValidator.validateGoalTitle(goal);
         return goalService.updateGoal(goalId, goal);
     }
 

@@ -1,3 +1,5 @@
+import java.math.RoundingMode
+
 plugins {
     java
     jacoco
@@ -31,6 +33,11 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.0.2")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+
+    /**
+     * Commons-io
+     */
+    implementation("commons-io:commons-io:2.15.1")
 
     /**
      * Database

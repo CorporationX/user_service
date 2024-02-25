@@ -31,11 +31,11 @@ import java.util.concurrent.locks.ReentrantLock;
 @Slf4j
 public class CsvOfPeopleToUserParser {
     @Value("${person.parser.thread_num}")
-    private int threadNum = 5;
+    private int threadNum;
     @Value("${person.parser.max_file_chunk_size}")
-    private long maxFileChunkSize = 13_000L;
+    private long maxFileChunkSize;
     @Value("${person.parser.expected_chunk_size}")
-    private long expectedChunkSize = 1_300L;
+    private long expectedChunkSize;
     private final CsvMapper csvPersonMapper;
     private final UserPersonMapper userPersonMapper;
     private final Lock lock = new ReentrantLock();

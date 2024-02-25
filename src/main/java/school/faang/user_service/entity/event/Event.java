@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.scheduling.annotation.Async;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 
@@ -18,6 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Async
 @Table(name = "event")
 public class Event {
 

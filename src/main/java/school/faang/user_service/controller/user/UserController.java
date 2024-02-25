@@ -1,10 +1,10 @@
 package school.faang.user_service.controller.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.user.UserDto;
-import org.springframework.validation.annotation.Validated;
 import school.faang.user_service.dto.user.UserRegistrationDto;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.service.user.UserService;

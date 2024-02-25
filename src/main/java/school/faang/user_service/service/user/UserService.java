@@ -1,5 +1,7 @@
 package school.faang.user_service.service.user;
 
+import com.fasterxml.jackson.dataformat.csv.CsvParser;
+import com.opencsv.CSVParser;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,14 +11,10 @@ import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserRegistrationDto;
 import school.faang.user_service.entity.Country;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -24,9 +22,6 @@ import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.service.CountryService;
 import school.faang.user_service.validator.UserValidator;
-
-import java.io.IOException;
-import java.util.List;
 
 import java.io.IOException;
 import java.util.List;
@@ -43,6 +38,7 @@ public class UserService {
     private final MentorshipRepository mentorshipRepository;
     private final GoalRepository goalRepository;
     private final UserProfilePic generatedUserProfilePic;
+    private final CsvOfPeopleToUserParser csvParser;
 
     public UserRegistrationDto createUser(UserRegistrationDto userDto) {
         User user = userMapper.toEntity(userDto);

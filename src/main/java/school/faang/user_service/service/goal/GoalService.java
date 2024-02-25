@@ -11,9 +11,9 @@ import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.skill.SkillService;
-import school.faang.user_service.service.UserService;
-import school.faang.user_service.validator.GoalValidator;
+import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.service.SkillService;
+import school.faang.user_service.validator.goal.GoalValidator;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,13 +36,13 @@ public class GoalService {
     public void createGoal(Long userId, GoalDto goalDto) {
         goalValidator.validateForSkillsAndActiveGoals(userId, goalDto);
         Goal goal = goalMapper.toEntity(goalDto);
-        goal.setUsers(List.of(userService.findById(userId)));
+        goal.setUsers(List.of(userService.getUserById(userId)));
         setSetSkillsToAchieve(goalDto, goal);
         goalRepository.save(goal);
     }
 
     public void setSetSkillsToAchieve(GoalDto goalDto, Goal goal) {
-        goal.setSkillsToAchieve(goalDto.getSkillIds().stream().map(skillService::findById).toList());
+        goal.setSkillsToAchieve(goalDto.getSkillIds().stream().map(skillService::getSkillIfExists).toList());
     }
 
     public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
@@ -96,5 +96,9 @@ public class GoalService {
         if (!goalRepository.existsById(id)) {
             throw new EntityNotFoundException("Goal not found");
         }
+    }
+
+    public void deleteGoalById(Long goalId) {
+        goalRepository.deleteById(goalId);
     }
 }

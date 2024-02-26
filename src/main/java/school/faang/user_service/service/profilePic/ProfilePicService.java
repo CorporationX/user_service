@@ -3,7 +3,6 @@ package school.faang.user_service.service.profilePic;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.S3Object;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
@@ -19,6 +18,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +32,6 @@ public class ProfilePicService {
     @Value("${services.s3.largeSize}")
     private int largeSize;
 
-    @SneakyThrows
     public UserProfilePic userAddProfilePic(long userId, MultipartFile file) {
         User user = getUser(userId);
         String uniqueSmallPicName = file.getOriginalFilename() + "_small" + System.currentTimeMillis();
@@ -47,7 +46,6 @@ public class ProfilePicService {
         return userProfilePic;
     }
 
-    @SneakyThrows
     private void putProfilePic(MultipartFile file, String uniquePicName, int size) {
         s3Client.putObject(bucketName,
                 uniquePicName,
@@ -55,24 +53,35 @@ public class ProfilePicService {
                 null);
     }
 
-    @SneakyThrows
     private ByteArrayInputStream compressPic(MultipartFile file, int size) {
-        BufferedImage bufferedImage = Thumbnails.of(file.getInputStream())
-                .size(size, size)
-                .asBufferedImage();
+        BufferedImage bufferedImage = null;
+        try {
+            bufferedImage = Thumbnails.of(file.getInputStream())
+                    .size(size, size)
+                    .asBufferedImage();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        ImageIO.write(bufferedImage, "jpg", byteArrayOutputStream);
+        try {
+            ImageIO.write(bufferedImage, "jpg", byteArrayOutputStream);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         byte[] imageBytes = byteArrayOutputStream.toByteArray();
         return new ByteArrayInputStream(imageBytes);
     }
 
-    @SneakyThrows
     public ResponseEntity<InputStreamResource> userGetProfilePic(long userId) {
         S3Object s3Object = s3Client.getObject(bucketName, getUser(userId).getUserProfilePic().getFileId());
-        return ResponseEntity.ok()
-                .body(new InputStreamResource(
-                        new ByteArrayInputStream(s3Object.getObjectContent().readAllBytes())));
+        try {
+            return ResponseEntity.ok()
+                    .body(new InputStreamResource(
+                            new ByteArrayInputStream(s3Object.getObjectContent().readAllBytes())));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public ResponseEntity<String> userDeleteProfilePic(long userId) {

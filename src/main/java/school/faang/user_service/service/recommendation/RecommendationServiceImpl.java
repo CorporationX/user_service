@@ -2,12 +2,14 @@ package school.faang.user_service.service.recommendation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recomendation.RecommendationDto;
+import school.faang.user_service.entity.recommendation.Recommendation;
+import school.faang.user_service.mapper.recommendation.RecommendationMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -16,6 +18,7 @@ public class RecommendationServiceImpl implements RecommendationService {
 
     private final RecommendationRepository recommendationRepository;
     private final SkillOfferRepository skillOfferRepository;
+    private final RecommendationMapper recommendationMapper;
 
     public void create(RecommendationDto recommendation) {
 //         authorId = recommendation.getAuthorId();
@@ -28,9 +31,13 @@ public class RecommendationServiceImpl implements RecommendationService {
 
     }
 
-    public List<RecommendationDto> getAllUserRecommendations(long receiverId) {
+    public Page<RecommendationDto> getAllUserRecommendations(long receiverId, int page, int pageSize) {
         log.info("Запрос всех рекомендаций пользователя с ID: {}", receiverId);
-        recommendationRepository.findAllByReceiverId(receiverId,  );
+        Page<Recommendation> recommendations = recommendationRepository
+                .findAllByReceiverId(receiverId, PageRequest.of(page, pageSize));
+        return recommendations.map(recommendationMapper::toDto);
     }
+
+
 
 }

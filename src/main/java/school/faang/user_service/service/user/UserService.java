@@ -4,12 +4,14 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.dto.user.UserRegistrationDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -19,6 +21,7 @@ import school.faang.user_service.service.CountryService;
 import school.faang.user_service.validator.UserValidator;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +34,7 @@ public class UserService {
     private final MentorshipRepository mentorshipRepository;
     private final GoalRepository goalRepository;
     private final UserProfilePic generatedUserProfilePic;
+    private final List<UserFilter> userFilters;
 
     public UserRegistrationDto createUser(UserRegistrationDto userDto) {
         User user = userMapper.toEntity(userDto);
@@ -76,6 +80,14 @@ public class UserService {
     public User getUserById(long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("User with ID %d not found", id)));
+    }
+
+    public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
+        Stream<User> premiumUsers = userRepository.findPremiumUsers();
+        List<User> users = userFilters.stream()
+                .filter(filter -> filter.isApplicable(userFilterDto))
+                .flatMap(filter -> filter.apply(premiumUsers, userFilterDto)).toList();
+        return userMapper.toDtoList(users);
     }
 
     private void stopGoalsAndDeleteEventsAndDeleteMentor(User user) {

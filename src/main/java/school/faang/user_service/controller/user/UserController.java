@@ -9,9 +9,12 @@ import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.user.UserDto;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.dto.user.UserRegistrationDto;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.service.user.UserService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -43,5 +46,10 @@ public class UserController {
     @PostMapping("/{userId}/deactivate/")
     public void deactivateUserById(@PathVariable long userId) {
         userService.deactivationUserById(userId);
+    }
+
+    @GetMapping("/premium/filter")
+    private List<UserDto> getPremiumUsers(@RequestBody UserFilterDto userFilterDto) {
+        return userService.getPremiumUsers(userFilterDto);
     }
 }

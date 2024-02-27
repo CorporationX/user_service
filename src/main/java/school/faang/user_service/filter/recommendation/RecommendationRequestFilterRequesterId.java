@@ -3,19 +3,19 @@ package school.faang.user_service.filter.recommendation;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.filter.FilterRecommendationRequest;
+import school.faang.user_service.filter.RecommendationRequestFilter;
 
 import java.util.stream.Stream;
 
 @Component
-public class FilterRecommendationRequestSkills implements FilterRecommendationRequest {
+public class RecommendationRequestFilterRequesterId implements RecommendationRequestFilter {
     @Override
     public boolean isApplicable(RequestFilterDto requestFilterDto) {
-        return requestFilterDto.getSkills() != null;
+        return requestFilterDto.getRequesterId() != null;
     }
 
     @Override
     public Stream<RecommendationRequest> apply(Stream<RecommendationRequest> recommendationRequestStream, RequestFilterDto filterDto) {
-        return recommendationRequestStream.filter(request -> request.getSkills().equals(filterDto.getSkills()));
+        return recommendationRequestStream.filter(request -> request.getRequester().getId() == filterDto.getRequesterId());
     }
 }

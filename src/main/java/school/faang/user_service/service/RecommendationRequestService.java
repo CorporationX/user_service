@@ -11,15 +11,16 @@ import school.faang.user_service.exception.RejectFailException;
 import school.faang.user_service.exception.RequestNotFoundException;
 import school.faang.user_service.exception.RequestTimeOutException;
 import school.faang.user_service.exception.SkillsNotFoundException;
-import school.faang.user_service.exception.UserNotFoundException;
-import school.faang.user_service.filter.FilterRecommendationRequest;
+import school.faang.user_service.filter.RecommendationRequestFilter;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 @Service
@@ -28,29 +29,32 @@ public class RecommendationRequestService {
 
     private final RecommendationRequestRepository recommendationRequestRepository;
     private final SkillRequestRepository skillRequestRepository;
+    private final UserRepository userRepository;
     private final RecommendationRequestMapper recommendationRequestMapper;
-    private final List<FilterRecommendationRequest> filterRecommendationRequestList;
+    private final List<RecommendationRequestFilter> recommendationRequestFilterList;
 
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequest) {
-        if (recommendationRequest.getRequesterId() == null || recommendationRequest.getReceiverId() == null)
-            throw new UserNotFoundException("User not found");
-        if (recommendationRequest.getCreatedAt().plusMonths(6).isAfter(recommendationRequest.getUpdatedAt())) {
-            throw new RequestTimeOutException("Last request was less than 6 months ago");
-        }
+        validate(recommendationRequest);
 
-        try {
-            recommendationRequest.getSkills()
-                    .forEach(skillRequestId -> {
-                        skillRequestRepository.existsById(skillRequestId.getSkillId());
-                    });
-        } catch (NullPointerException e) {
+        AtomicInteger skillsCheck = new AtomicInteger();
+
+        recommendationRequest.getSkills()
+                .forEach(skillRequestId -> {
+                    if (!skillRequestRepository.existsById(skillRequestId.getSkillId()))
+                        skillsCheck.getAndIncrement();
+                });
+
+        if (skillsCheck.longValue() > 0)
             throw new SkillsNotFoundException("Skills not found");
-        }
+
         recommendationRequest.getSkills()
                 .forEach(skillRequestId -> skillRequestRepository.create(skillRequestId.getId(), skillRequestId.getSkillId()));
 
+        RecommendationRequest request = recommendationRequestRepository
+                .create(recommendationRequest.getRequesterId(), recommendationRequest.getReceiverId(), recommendationRequest.getMessage());
+
         return recommendationRequestMapper
-                .toDto(recommendationRequestRepository.create(recommendationRequest.getRequesterId(), recommendationRequest.getReceiverId(), recommendationRequest.getMessage()));
+                .toDto(request);
     }
 
     public RecommendationRequestDto getRequest(long id) {
@@ -61,9 +65,9 @@ public class RecommendationRequestService {
 
     public List<RecommendationRequestDto> getRequest(RequestFilterDto filter) {
         Stream<RecommendationRequest> recommendationRequests = recommendationRequestRepository.findAll().stream();
-        for (FilterRecommendationRequest filterRecommendationRequest : filterRecommendationRequestList) {
-            if (filterRecommendationRequest.isApplicable(filter))
-                recommendationRequests = filterRecommendationRequest.apply(recommendationRequests, filter);
+        for (RecommendationRequestFilter recommendationRequestFilter : recommendationRequestFilterList) {
+            if (recommendationRequestFilter.isApplicable(filter))
+                recommendationRequests = recommendationRequestFilter.apply(recommendationRequests, filter);
         }
         List<RecommendationRequestDto> recommendationRequestDtos = new ArrayList<>();
         for (RecommendationRequest requests : recommendationRequests.toList()) {
@@ -85,6 +89,14 @@ public class RecommendationRequestService {
 
     private Optional<RecommendationRequest> findRequestById(long id) {
         return recommendationRequestRepository.findById(id);
+    }
+
+    private void validate(RecommendationRequestDto recommendationRequest) {
+        if (userRepository.existsById((recommendationRequest.getRequesterId())) || userRepository.existsById(recommendationRequest.getReceiverId()))
+            throw new IllegalArgumentException("User not found");
+        if (recommendationRequest.getCreatedAt().plusMonths(6).isAfter(recommendationRequest.getUpdatedAt())) {
+            throw new RequestTimeOutException("Last request was less than 6 months ago");
+        }
     }
 
 }

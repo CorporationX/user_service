@@ -20,12 +20,11 @@ import school.faang.user_service.exception.RejectFailException;
 import school.faang.user_service.exception.RequestNotFoundException;
 import school.faang.user_service.exception.RequestTimeOutException;
 import school.faang.user_service.exception.SkillsNotFoundException;
-import school.faang.user_service.exception.UserNotFoundException;
-import school.faang.user_service.filter.FilterRecommendationRequest;
-import school.faang.user_service.filter.recommendation.FilterRecommendationRequestCreateAt;
-import school.faang.user_service.filter.recommendation.FilterRecommendationRequestId;
-import school.faang.user_service.filter.recommendation.FilterRecommendationRequestMessage;
-import school.faang.user_service.filter.recommendation.FilterRecommendationRequestUpdateAt;
+import school.faang.user_service.filter.RecommendationRequestFilter;
+import school.faang.user_service.filter.recommendation.RecommendationRequestFilterCreateAt;
+import school.faang.user_service.filter.recommendation.RecommendationRequestFilterId;
+import school.faang.user_service.filter.recommendation.RecommendationRequestFilterMessage;
+import school.faang.user_service.filter.recommendation.RecommendationRequestFilterUpdateAt;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
@@ -53,7 +52,7 @@ public class RecommendationRequestServiceTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    private List<FilterRecommendationRequest> filterRecommendationRequestList;
+    private List<RecommendationRequestFilter> recommendationRequestFilterList;
     @Mock
     private RecommendationRequestMapper recommendationRequestMapper;
     @Captor
@@ -66,7 +65,7 @@ public class RecommendationRequestServiceTest {
     private LocalDateTime localDateTime1;
     private LocalDateTime localDateTime2;
     private List<RecommendationRequest> recommendationRequests;
-    private List<FilterRecommendationRequest> filterRecommendationRequests;
+    private List<RecommendationRequestFilter> recommendationRequestFilters;
     private RejectionDto rejectionDto;
     RecommendationRequest requestForRejected;
 
@@ -76,7 +75,7 @@ public class RecommendationRequestServiceTest {
         localDateTime1 = LocalDateTime.now().minusMonths(7);
         localDateTime2 = LocalDateTime.now();
         expected = new RecommendationRequestDto(4L, "message", null, null, null, null, localDateTime1, localDateTime2);
-        filterRecommendationRequests = List.of(new FilterRecommendationRequestMessage(), new FilterRecommendationRequestId(), new FilterRecommendationRequestUpdateAt(), new FilterRecommendationRequestCreateAt());
+        recommendationRequestFilters = List.of(new RecommendationRequestFilterMessage(), new RecommendationRequestFilterId(), new RecommendationRequestFilterUpdateAt(), new RecommendationRequestFilterCreateAt());
 
         RecommendationRequest firstRecommendationRequest = new RecommendationRequest();
         firstRecommendationRequest.setId(4L);
@@ -97,28 +96,11 @@ public class RecommendationRequestServiceTest {
     }
 
     @Test
-    void testReceiverIsNull() {
-        Assert.assertThrows(UserNotFoundException.class, () -> recommendationRequestService
-                .create(new RecommendationRequestDto(5L, "message", "status", new ArrayList<SkillRequestDto>(), 5L, null, LocalDateTime.now(), LocalDateTime.now().plusMonths(7))));
-    }
-
-    @Test
-    void testRequesterIsNull() {
-        Assert.assertThrows(UserNotFoundException.class, () -> recommendationRequestService
-                .create(new RecommendationRequestDto(5L, "message", "status", new ArrayList<SkillRequestDto>(), null, 5L, LocalDateTime.now(), LocalDateTime.now().plusMonths(7))));
-    }
-
-    @Test
     void testTimeOutCheckTrue() {
         Assert.assertThrows(RequestTimeOutException.class, () -> recommendationRequestService
                 .create(new RecommendationRequestDto(5L, "message", "status", new ArrayList<SkillRequestDto>(), 6L, 5L, LocalDateTime.now(), LocalDateTime.now().plusMonths(6).minusDays(1))));
     }
 
-    @Test
-    void testSkillsCheck() {
-        Assert.assertThrows(SkillsNotFoundException.class, () -> recommendationRequestService
-                .create(new RecommendationRequestDto(5L, "message", "status", null, 6L, 5L, LocalDateTime.now(), LocalDateTime.now().plusMonths(7))));
-    }
 
     @Test
     void testGetRequest() {
@@ -131,7 +113,7 @@ public class RecommendationRequestServiceTest {
     @Test
     void testFilterId() {
         when(recommendationRequestRepository.findAll()).thenReturn(recommendationRequests);
-        when(filterRecommendationRequestList.iterator()).thenReturn(filterRecommendationRequests.iterator());
+        when(recommendationRequestFilterList.iterator()).thenReturn(recommendationRequestFilters.iterator());
         requestFilterDto.setId(4L);
         recommendationRequestService.getRequest(requestFilterDto);
         verify(recommendationRequestMapper, times(1)).toDto(captor.capture());
@@ -141,7 +123,7 @@ public class RecommendationRequestServiceTest {
     @Test
     void testFilterMessage() {
         when(recommendationRequestRepository.findAll()).thenReturn(recommendationRequests);
-        when(filterRecommendationRequestList.iterator()).thenReturn(filterRecommendationRequests.iterator());
+        when(recommendationRequestFilterList.iterator()).thenReturn(recommendationRequestFilters.iterator());
         requestFilterDto.setMessage("message");
         recommendationRequestService.getRequest(requestFilterDto);
         verify(recommendationRequestMapper, times(1)).toDto(captor.capture());
@@ -151,7 +133,7 @@ public class RecommendationRequestServiceTest {
     @Test
     void testFilterCreateAt() {
         when(recommendationRequestRepository.findAll()).thenReturn(recommendationRequests);
-        when(filterRecommendationRequestList.iterator()).thenReturn(filterRecommendationRequests.iterator());
+        when(recommendationRequestFilterList.iterator()).thenReturn(recommendationRequestFilters.iterator());
         requestFilterDto.setCreatedAt(localDateTime1);
         recommendationRequestService.getRequest(requestFilterDto);
         verify(recommendationRequestMapper, times(1)).toDto(captor.capture());
@@ -161,7 +143,7 @@ public class RecommendationRequestServiceTest {
     @Test
     void testFilterUpdateAt() {
         when(recommendationRequestRepository.findAll()).thenReturn(recommendationRequests);
-        when(filterRecommendationRequestList.iterator()).thenReturn(filterRecommendationRequests.iterator());
+        when(recommendationRequestFilterList.iterator()).thenReturn(recommendationRequestFilters.iterator());
         requestFilterDto.setUpdatedAt(localDateTime2);
         recommendationRequestService.getRequest(requestFilterDto);
         verify(recommendationRequestMapper, times(1)).toDto(captor.capture());

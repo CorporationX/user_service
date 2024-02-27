@@ -5,7 +5,7 @@ import school.faang.user_service.entity.recommendation.RecommendationRequest;
 
 import java.util.stream.Stream;
 
-public interface FilterRecommendationRequest {
+public interface RecommendationRequestFilter {
 
     boolean isApplicable(RequestFilterDto requestFilterDto);
 

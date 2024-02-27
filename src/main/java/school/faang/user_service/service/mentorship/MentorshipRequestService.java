@@ -2,7 +2,6 @@ package school.faang.user_service.service.mentorship;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.mentorship.MentorshipOfferedEventDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.dto.mentorship.filter.RequestFilterDto;
@@ -70,18 +69,8 @@ public class MentorshipRequestService {
         mentorshipRequest.setRequester(requester);
         mentorshipRequest.setStatus(RequestStatus.PENDING);
         mentorshipRequestRepository.save(mentorshipRequest);
-        publishMentorshipOffered(mentorshipRequestDto);
+        mentorshipOfferedPublisher.publish(mentorshipRequestDto);
         return mentorshipRequestMapper.toDTO(mentorshipRequest);
-    }
-
-    private void publishMentorshipOffered(MentorshipRequestDto mentorshipRequestDto) {
-        MentorshipOfferedEventDto mentorshipOfferedEventDto =
-                MentorshipOfferedEventDto.builder()
-                        .id(mentorshipRequestDto.getId())
-                        .requesterId(mentorshipRequestDto.getRequester())
-                        .receiverId(mentorshipRequestDto.getReceiver())
-                        .build();
-        mentorshipOfferedPublisher.publish(mentorshipOfferedEventDto);
     }
 
     private MentorshipRequest findByRequestId(long id) {

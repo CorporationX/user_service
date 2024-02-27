@@ -3,16 +3,16 @@ package school.faang.user_service.publisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.mentorship.MentorshipOfferedEventDto;
+import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 
 @Component
 @RequiredArgsConstructor
-public class MentorshipOfferedPublisher extends EventPublisher<MentorshipOfferedEventDto> {
+public class MentorshipOfferedPublisher extends EventPublisher<MentorshipRequestDto> {
 
     private final ChannelTopic mentorshipOfferedTopic;
 
-    public void publish(MentorshipOfferedEventDto mentorshipOfferedEventDto) {
-        convertAndSend(mentorshipOfferedEventDto, mentorshipOfferedTopic.getTopic());
+    public void publish(MentorshipRequestDto mentorshipRequestDto) {
+        convertAndSend(mentorshipRequestDto, mentorshipOfferedTopic.getTopic());
     }
 
 }

@@ -1,14 +1,10 @@
 package school.faang.user_service.validator.mentorship;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.validator.MentorshipValidator;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

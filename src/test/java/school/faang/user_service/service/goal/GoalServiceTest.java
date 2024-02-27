@@ -16,9 +16,9 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
-import school.faang.user_service.exceptions.DataValidationException;
-import school.faang.user_service.exceptions.GoalOverflowException;
-import school.faang.user_service.exceptions.SkillNotFoundException;
+import school.faang.user_service.exception.ParseFIleException;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.GoalOverflowException;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.filter.goal.GoalStatusFilter;
 import school.faang.user_service.filter.goal.GoalTitleFilter;
@@ -266,7 +266,7 @@ class GoalServiceTest {
         when(skillService.checkActiveSkill(anyLong())).thenReturn(false);
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
-        assertThrows(SkillNotFoundException.class, () -> goalService.createGoal(user.getId(), goal));
+        assertThrows(ParseFIleException.SkillNotFoundException.class, () -> goalService.createGoal(user.getId(), goal));
     }
 
     @Test

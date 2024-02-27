@@ -17,6 +17,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipOfferedPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.user.UserService;
@@ -32,6 +33,8 @@ import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipRequestServiceTest {
+    @Mock
+    private MentorshipOfferedPublisher mentorshipOfferedPublisher;
 
     @Mock
     private MentorshipRequestRepository mentorshipRequestRepository;

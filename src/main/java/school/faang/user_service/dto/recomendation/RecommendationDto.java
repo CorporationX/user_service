@@ -1,6 +1,7 @@
 package school.faang.user_service.dto.recomendation;
 
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,8 +15,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RecommendationDto {
+    @Positive(message = "Id должно быть положительным число")
     private Long id;
+    @Positive(message = "authorId должно быть положительным число")
     private Long authorId;
+    @Positive(message = "receivedId должно быть положительным число")
     private Long receiverId;
     @NotEmpty(message = "Content не может быть пустым")
     private String content;

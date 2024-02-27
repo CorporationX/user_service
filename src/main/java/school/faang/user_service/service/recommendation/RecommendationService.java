@@ -9,4 +9,8 @@ public interface RecommendationService {
     void delete(long id);
 
     Page<RecommendationDto> getAllUserRecommendations(long receiverId, int page, int pageSize);
+
+    Page<RecommendationDto> getAllGivenRecommendations(long authorId, int page, int pageSize);
+
+    Long update(RecommendationDto updated);
 }

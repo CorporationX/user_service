@@ -25,6 +25,10 @@ public class RecommendationServiceImpl implements RecommendationService {
 
     }
 
+    public Long update(RecommendationDto updated) {
+
+    }
+
     public void delete(long id) {
         log.info("Удаляем рекомендацию с ID: {}", id);
         recommendationRepository.deleteById(id);
@@ -38,6 +42,12 @@ public class RecommendationServiceImpl implements RecommendationService {
         return recommendations.map(recommendationMapper::toDto);
     }
 
+    public Page<RecommendationDto> getAllGivenRecommendations(long authorId, int page, int pageSize) {
+        log.info("Запрос на получение всех реомендаций автора с ID: {}", authorId);
+        Page<Recommendation> recommendations = recommendationRepository
+                .findAllByAuthorId(authorId, PageRequest.of(page, pageSize));
+        return recommendations.map(recommendationMapper::toDto);
+    }
 
 
 }

@@ -25,6 +25,13 @@ public class RecommendationController {
         recommendationService.create(recommendation); /// доделать
     }
 
+    @PutMapping()
+    public Long updateRecommendation(RecommendationDto updated){
+        log.info("Получили запрос на обновление от пользователя с ID: {}", updated.getAuthorId());
+        return recommendationService.update(updated);
+    }
+
+
     @DeleteMapping("/{id}")
     public void deleteRecommendation(@PathVariable
                                      @Positive(message = "ID должно быть положительным число") long id) {
@@ -42,9 +49,21 @@ public class RecommendationController {
                                                              @RequestParam(value = "pageSize", defaultValue = "10")
                                                              @Min(value = 1, message = "PageSize должно быть > 0")
                                                              int pageSize) {
-        log.info("Получили запрос на получение всех рекомендаций, пользователя с ID: {}", recieverId);
+        log.info("Получили запрос на получение, пользователя с ID: {}", recieverId);
         return recommendationService.getAllUserRecommendations(recieverId, page, pageSize);
+    }
 
-
+    @GetMapping("/{authorId}")
+    public Page<RecommendationDto> getAllGivenRecommendations(@PathVariable
+                                                              @Positive(message = "ID должно быть положительным число")
+                                                              long authorId,
+                                                              @RequestParam(value = "page", defaultValue = "0")
+                                                              @Min(value = 0, message = "Page не может быть меньше 0")
+                                                              int page,
+                                                              @RequestParam(value = "pageSize", defaultValue = "10")
+                                                              @Min(value = 1, message = "PageSize должно быть > 0")
+                                                              int pageSize) {
+        log.info("Получили запрос на все рекомендаций пользователя с ID", authorId);
+        return recommendationService.getAllGivenRecommendations(authorId, page, pageSize);
     }
 }

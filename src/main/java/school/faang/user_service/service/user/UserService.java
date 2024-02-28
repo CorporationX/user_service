@@ -16,6 +16,7 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.student.Person;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.mapper.UserPersonMapper;
+import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -36,10 +37,12 @@ public class UserService {
     private final UserMapper userMapper;
     private final UserPersonMapper userPersonMapper;
     private final EventRepository eventRepository;
+    private final CountryRepository countryRepository;
     private final MentorshipRepository mentorshipRepository;
     private final GoalRepository goalRepository;
+    private final CsvPersonParser csvPersonParser;
     private final UserProfilePic generatedUserProfilePic;
-    private final CsvPersonParser csvParser;
+    private final String generatedPassword;
 
     public UserRegistrationDto createUser(UserRegistrationDto userDto) {
         User user = userMapper.toEntity(userDto);
@@ -112,20 +115,29 @@ public class UserService {
 
     @Transactional
     public List<UserDto> generateUsersFromCsv(MultipartFile csvFile) throws IOException {
-        List<Person> people = csvParser.parse(csvFile);
-        if (people.size() > 10) {
-
-        } else {
-            people.forEach(
-                    person -> {
-                        User user = userPersonMapper.toUser(person);
-                        userRepository.save(user);
-                    }
-            );
-        }
+        List<Person> people = csvPersonParser.parse(csvFile);
+        savePeople(people);
+        people.forEach(
+                person -> {
+                    User user = userPersonMapper.toUser(person);
+                    user.setPassword(generatedPassword);
+                    userRepository.save(user);
+                }
+        );
         userRepository.saveAll(savedUsers);
         log.info("People saved from csv file as users. Saved accounts count: {}", savedUsers.size());
         return userMapper.listToDto(savedUsers);
+    }
+
+    private void savePeople(List<Person> people) {
+        people.forEach(person -> {
+                    User user = userPersonMapper.toUser(person);
+                    user.setPassword(generatedPassword);
+                    user.setCountry(
+                            person.ge
+                    );
+                }
+                );
     }
 
     @Transactional(readOnly = true)

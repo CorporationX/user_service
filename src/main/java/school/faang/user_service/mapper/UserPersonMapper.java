@@ -11,7 +11,6 @@ import school.faang.user_service.repository.CountryRepository;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public abstract class UserPersonMapper {
-
     @Autowired
     protected CountryRepository countryRepository;
 

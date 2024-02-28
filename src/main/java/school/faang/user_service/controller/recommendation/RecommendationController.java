@@ -21,14 +21,14 @@ public class RecommendationController {
     private final RecommendationService recommendationService;
 
     @PutMapping
-    public void giveRecommendation(RecommendationDto recommendation) {
-        log.info("Получили запрос на получение рекомендаций.");
-        recommendationService.create(recommendation); /// доделать
+    public RecommendationDto giveRecommendation(RecommendationDto recommendation) {
+        log.info("Получен запрос на получение рекомендаций от пользователя с ID: {}.", recommendation.getAuthorId());
+        return recommendationService.create(recommendation);
     }
 
     @PutMapping()
-    public Long updateRecommendation(RecommendationDto recommendation) {
-        log.info("Получили запрос на обновление от пользователя с ID: {}", recommendation.getAuthorId());
+    public RecommendationDto updateRecommendation(RecommendationDto recommendation) {
+        log.info("Получен запрос на обновление от пользователя с ID: {}", recommendation.getAuthorId());
         return recommendationService.update(recommendation);
     }
 
@@ -36,23 +36,23 @@ public class RecommendationController {
     @DeleteMapping("/{id}")
     public void deleteRecommendation(@PathVariable
                                      @Positive(message = "ID должно быть положительным число") long id) {
-        log.info("Получили запрос на удаление рекомендации с ID: {}", id);
+        log.info("Получен запрос на удаление рекомендации с ID: {}", id);
         recommendationService.delete(id);
     }
 
     @GetMapping("/{receiverId}")
     public Page<RecommendationDto> getAllUserRecommendations(
-                        @PathVariable @Positive(message = "ID должно быть положительным число") long receiverId,
-                        @Valid @ModelAttribute PageDto page) {
-        log.info("Получили запрос на получение, пользователя с ID: {}", receiverId);
+            @PathVariable @Positive(message = "ID должно быть положительным число") long receiverId,
+            @Valid @ModelAttribute PageDto page) {
+        log.info("Получен запрос на получение, пользователя с ID: {}", receiverId);
         return recommendationService.getAllUserRecommendations(receiverId, page);
     }
 
     @GetMapping("/{authorId}")
     public Page<RecommendationDto> getAllGivenRecommendations(
-                        @PathVariable @Positive(message = "ID должно быть положительным число") long authorId,
-                        @Valid @ModelAttribute PageDto page) {
-        log.info("Получили запрос на все рекомендаций пользователя с ID", authorId);
+            @PathVariable @Positive(message = "ID должно быть положительным число") long authorId,
+            @Valid @ModelAttribute PageDto page) {
+        log.info("Получен запрос на все рекомендаций пользователя с ID", authorId);
         return recommendationService.getAllGivenRecommendations(authorId, page);
     }
 }

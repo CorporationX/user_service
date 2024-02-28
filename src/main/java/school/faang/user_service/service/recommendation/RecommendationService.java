@@ -5,13 +5,13 @@ import school.faang.user_service.dto.recomendation.PageDto;
 import school.faang.user_service.dto.recomendation.RecommendationDto;
 
 public interface RecommendationService {
-    void create(RecommendationDto recommendationDto);
+    RecommendationDto create(RecommendationDto recommendationDto);
+
+    RecommendationDto update(RecommendationDto updated);
 
     void delete(long id);
 
     Page<RecommendationDto> getAllUserRecommendations(long receiverId, PageDto pageDto);
 
     Page<RecommendationDto> getAllGivenRecommendations(long authorId, PageDto pageDto);
-
-    Long update(RecommendationDto updated);
 }

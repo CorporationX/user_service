@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
-    private final UserRepository userRepository;
     private final FollowerEventPublisher followerEventPublisher;
 
     public void followUser(SubscriptionDto subscriptionDto) {

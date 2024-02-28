@@ -33,14 +33,12 @@ public class SubscriptionServiceTest {
         IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
                 () -> subscriptionService.followUser(subscriptionDto));
         assertEquals("Non-existent user id", illegalArgumentException.getMessage());
-
     }
 
     @Test
     public void testFollowerAndFolloweeExists() {
         SubscriptionDto subscriptionDto = new SubscriptionDto(1L, 1L);
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(1L, 1L)).thenReturn(true);
-
 
         IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
                 () -> subscriptionService.followUser(subscriptionDto));

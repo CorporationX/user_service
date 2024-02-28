@@ -1,12 +1,13 @@
 package school.faang.user_service.controller.recommendation;
 
-import jakarta.validation.constraints.Min;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import school.faang.user_service.dto.recomendation.PageDto;
 import school.faang.user_service.dto.recomendation.RecommendationDto;
 import school.faang.user_service.service.recommendation.RecommendationService;
 
@@ -26,9 +27,9 @@ public class RecommendationController {
     }
 
     @PutMapping()
-    public Long updateRecommendation(RecommendationDto updated){
-        log.info("Получили запрос на обновление от пользователя с ID: {}", updated.getAuthorId());
-        return recommendationService.update(updated);
+    public Long updateRecommendation(RecommendationDto recommendation) {
+        log.info("Получили запрос на обновление от пользователя с ID: {}", recommendation.getAuthorId());
+        return recommendationService.update(recommendation);
     }
 
 
@@ -39,31 +40,19 @@ public class RecommendationController {
         recommendationService.delete(id);
     }
 
-    @GetMapping("/{recieverId}")
-    public Page<RecommendationDto> getAllUserRecommendations(@PathVariable
-                                                             @Positive(message = "ID должно быть положительным число")
-                                                             long recieverId,
-                                                             @RequestParam(value = "page", defaultValue = "0")
-                                                             @Min(value = 0, message = "Page не может быть меньше 0")
-                                                             int page,
-                                                             @RequestParam(value = "pageSize", defaultValue = "10")
-                                                             @Min(value = 1, message = "PageSize должно быть > 0")
-                                                             int pageSize) {
-        log.info("Получили запрос на получение, пользователя с ID: {}", recieverId);
-        return recommendationService.getAllUserRecommendations(recieverId, page, pageSize);
+    @GetMapping("/{receiverId}")
+    public Page<RecommendationDto> getAllUserRecommendations(
+                        @PathVariable @Positive(message = "ID должно быть положительным число") long receiverId,
+                        @Valid @ModelAttribute PageDto page) {
+        log.info("Получили запрос на получение, пользователя с ID: {}", receiverId);
+        return recommendationService.getAllUserRecommendations(receiverId, page);
     }
 
     @GetMapping("/{authorId}")
-    public Page<RecommendationDto> getAllGivenRecommendations(@PathVariable
-                                                              @Positive(message = "ID должно быть положительным число")
-                                                              long authorId,
-                                                              @RequestParam(value = "page", defaultValue = "0")
-                                                              @Min(value = 0, message = "Page не может быть меньше 0")
-                                                              int page,
-                                                              @RequestParam(value = "pageSize", defaultValue = "10")
-                                                              @Min(value = 1, message = "PageSize должно быть > 0")
-                                                              int pageSize) {
+    public Page<RecommendationDto> getAllGivenRecommendations(
+                        @PathVariable @Positive(message = "ID должно быть положительным число") long authorId,
+                        @Valid @ModelAttribute PageDto page) {
         log.info("Получили запрос на все рекомендаций пользователя с ID", authorId);
-        return recommendationService.getAllGivenRecommendations(authorId, page, pageSize);
+        return recommendationService.getAllGivenRecommendations(authorId, page);
     }
 }

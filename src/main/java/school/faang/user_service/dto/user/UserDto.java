@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import school.faang.user_service.entity.contact.PreferredContact;
 
 @Builder
 @NoArgsConstructor
@@ -27,8 +28,4 @@ public class UserDto {
     @NotNull
     private Long countryId;
     private PreferredContact preference;
-
-    public enum PreferredContact {
-        EMAIL, SMS, TELEGRAM
-    }
 }

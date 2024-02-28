@@ -36,8 +36,6 @@ public class MentorshipRequestService {
     private final List<MentorshipRequestFilter> mentorshipRequestFilters;
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
-    private final MentorshipOfferedEvent event;
-
 
     @Transactional
     public void requestMentorship(MentorshipRequestDto requestDto) {
@@ -49,6 +47,7 @@ public class MentorshipRequestService {
         mentorshipRequestValidator.validateRequestTime(requesterId, receiverId);
 
         mentorshipRequestRepository.create(requesterId, receiverId, requestDto.getDescription());
+        MentorshipOfferedEvent event = new MentorshipOfferedEvent();
         event.setAuthorId(requestDto.getRequesterId());
         event.setMentorId(requestDto.getReceiverId());
         mentorshipOfferedEventPublisher.publish(event);

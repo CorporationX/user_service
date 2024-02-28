@@ -56,9 +56,6 @@ class MentorshipRequestServiceTest {
     @Mock
     private MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
 
-    @Mock
-    private MentorshipOfferedEvent event;
-
     @Spy
     private MentorshipRequestMapper mentorshipRequestMapper = new MentorshipRequestMapperImpl();
 
@@ -71,7 +68,7 @@ class MentorshipRequestServiceTest {
     @BeforeEach
     void setUp() {
         service = new MentorshipRequestService(requestRepository, userRepository, mentorshipRepository, requestValidator, mentorshipValidator, mentorshipRequestFilters, mentorshipRequestMapper,
-                mentorshipOfferedEventPublisher, event);
+                mentorshipOfferedEventPublisher);
     }
 
 
@@ -81,6 +78,9 @@ class MentorshipRequestServiceTest {
         long requesterId = 1L;
         long receiverId = 2L;
         MentorshipRequestDto requestDto = new MentorshipRequestDto(1L, 2L, "Description");
+        MentorshipOfferedEvent event = new MentorshipOfferedEvent();
+        event.setAuthorId(1);
+        event.setMentorId(2);
 
         when(userRepository.existsById(requesterId)).thenReturn(true);
         when(userRepository.existsById(receiverId)).thenReturn(true);

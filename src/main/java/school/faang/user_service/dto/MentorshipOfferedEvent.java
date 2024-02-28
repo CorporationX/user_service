@@ -7,7 +7,6 @@ import java.awt.*;
 
 
 @Data
-@Component
 public class MentorshipOfferedEvent {
     private long authorId;
     private long mentorId;

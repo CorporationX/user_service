@@ -4,13 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.FollowerEvent;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.filter.UserFilterService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -21,6 +24,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
     private final UserFilterService userFilter;
+    private final FollowerEventPublisher followerEventPublisher;
 
     @Override
     @Transactional
@@ -28,6 +32,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         validateUserIds(followerId, followeeId);
         validateSubscriptionExist(followerId, followeeId);
         subscriptionRepository.followUser(followerId, followeeId);
+        followerEventPublisher.publish(
+                new FollowerEvent(followerId, followeeId, LocalDateTime.now()));
     }
 
     @Override

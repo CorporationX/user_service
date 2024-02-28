@@ -21,8 +21,6 @@ public class SubscriptionServiceTest {
     @Mock
     private SubscriptionRepository subscriptionRepository;
     @Mock
-    private UserRepository userRepository;
-    @Mock
     private FollowerEventPublisher followerEventPublisher;
 
     @Test

@@ -4,22 +4,44 @@ import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectReader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.input.BOMInputStream;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.student.Person;
 import school.faang.user_service.mapper.UserPersonMapper;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 @RequiredArgsConstructor
 @Component
 @Slf4j
-public class CsvPersonParser {
+public class CsvOfPeopleToUserParser {
+    @Value("${person.parser.thread_num}")
+    private int threadNum;
+    @Value("${person.parser.max_file_chunk_size}")
+    private long maxFileChunkSize;
+    @Value("${person.parser.expected_chunk_size}")
+    private long expectedChunkSize;
     private final ObjectReader csvOpenReader;
+    private final InputStream csvInputStreamBuilder;
     private final UserPersonMapper userPersonMapper;
+    private final Lock lock = new ReentrantLock();
+    private final ExecutorService executor = Executors.newFixedThreadPool(threadNum);
 
-    /*public List<User> parse(MultipartFile csvFile) throws IOException {
+    public List<User> parse(MultipartFile csvFile) throws IOException {
         List<User> users = new ArrayList<>();
 
         long csvFileSize = csvFile.getSize();
@@ -88,11 +110,25 @@ public class CsvPersonParser {
 
     private void linealParse(InputStream inputStream, List<User> users) throws IOException {
         parseCsvToPeopleAndMapToUser(inputStream.readAllBytes(), users);
-    }*/
+    }
 
-    public List<Person> parse(MultipartFile csvFile) throws IOException {
-        MappingIterator<Person> mappingIterator = csvOpenReader.readValues(csvFile.getInputStream());
+    private void parseCsvToPeopleAndMapToUser(byte[] bytes, List<User> users) throws IOException {
+        MappingIterator<Person> mappingIterator = csvOpenReader.readValues(bytes);
 
-        return mappingIterator.readAll();
+        while (mappingIterator.hasNextValue()) {
+            Person person = mappingIterator.nextValue();
+            User user = userPersonMapper.toUser(person);
+            user.setPassword(user.getEmail());
+            log.debug("user with username {} parsed", user.getUsername());
+            lock.lock();
+            try {
+                users.add(user);
+                log.debug("user with username {} added", user.getUsername());
+            } finally {
+                lock.unlock();
+            }
+        }
+
+        mappingIterator.close();
     }
 }

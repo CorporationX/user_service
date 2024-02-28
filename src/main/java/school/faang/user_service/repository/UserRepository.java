@@ -29,5 +29,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Stream<User> findPremiumUsers();
 
     @Query("SELECT u.id FROM User u")
-    Page<Long> findUserIds(Pageable pageable);
+    List<Long> findUserIds();
 }

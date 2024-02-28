@@ -88,8 +88,7 @@ public class UserService {
         return userMapper.toDto(userRepository.findAllById(ids));
     }
 
-    public Page<Long> getUserIds(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return userRepository.findUserIds(pageable);
+    public List<Long> getUserIds() {
+        return userRepository.findUserIds();
     }
 }

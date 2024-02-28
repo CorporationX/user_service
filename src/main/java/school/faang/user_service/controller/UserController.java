@@ -44,9 +44,7 @@ public class UserController {
     }
 
     @GetMapping("/ids")
-    public Page<Long> getUserIds(
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "1000") int size) {
-        return userService.getUserIds(page, size);
+    public List<Long> getUserIds() {
+        return userService.getUserIds();
     }
 }

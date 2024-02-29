@@ -27,7 +27,6 @@ public class RecommendationDto {
     private Long receiverId;
     @NotEmpty(message = "Content не может быть пустым")
     private String content;
-
     private List<SkillOfferDto> skillOffers;
     private LocalDateTime createdAt;
 }

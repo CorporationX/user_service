@@ -23,7 +23,6 @@ import school.faang.user_service.repository.recommendation.RecommendationReposit
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.service.user.UserService;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -93,34 +92,35 @@ public class RecommendationServiceImpl implements RecommendationService {
     }
 
     private void validateRecommendationBeforeCreatingAndUpdating(RecommendationDto recommendation) {
-        validateLastRecommendationTime(recommendation);
+//        validateLastRecommendationTime(recommendation);
         validateSkillExistence(recommendation);
         validateSkillOffersExistence(recommendation);
     }
 
-    private void validateLastRecommendationTime(RecommendationDto recommendation) {
-        log.info("Старт  validateLastRecommendationTime, recommendationDto с ID: {}", recommendation.getId());
-        recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(
-                recommendation.getAuthorId(),
-                recommendation.getReceiverId()
-        ).ifPresent(foundRecommendation -> {
-            if (foundRecommendation.getCreatedAt().isBefore(LocalDateTime.now().minusMonths(6))) {
-                log.error("Рекомендация от автора с ID: {}, к получателю с ID: {},не возможна, с момента последней " +
-                                "рекомендаций от {}, не прошло 6 месяцев!",
-                        recommendation.getAuthorId(),
-                        recommendation.getReceiverId(),
-                        recommendation.getCreatedAt().toString());
-                throw new DataValidationException("Не прошло 6 месяцев с момента последней рекомендации!");
-            }
-
-        });
-    }
+//    private void validateLastRecommendationTime(RecommendationDto recommendation) {
+//        log.info("Старт  validateLastRecommendationTime, recommendationDto с ID: {}", recommendation.getId());
+//        recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(
+//                recommendation.getAuthorId(),
+//                recommendation.getReceiverId()
+//        ).ifPresent(foundRecommendation -> {
+//            if (foundRecommendation.getCreatedAt().isBefore(LocalDateTime.now().minusMonths(6))) {
+//                log.error("Рекомендация от автора с ID: {}, к получателю с ID: {},не возможна, с момента последней " +
+//                                "рекомендаций от {}, не прошло 6 месяцев!",
+//                        recommendation.getAuthorId(),
+//                        recommendation.getReceiverId(),
+//                        recommendation.getCreatedAt().toString());
+//                throw new DataValidationException("Не прошло 6 месяцев с момента последней рекомендации!");
+//            }
+//        });
+//    }
 
     private void validateSkillExistence(RecommendationDto recommendation) {
         log.info("Старт  validateSkillExistence, recommendationDto с ID: {}", recommendation.getId());
         List<SkillOfferDto> skillOfferDtos = recommendation.getSkillOffers();
-        skillOfferDtos.forEach(skillOfferDto -> skillOfferRepository.findById(skillOfferDto.getSkillId())
-                .orElseThrow(() -> new DataValidationException("Навык не существуют в системе")));
+        if (skillOfferDtos != null) {
+            skillOfferDtos.stream().forEach(skillOfferDto -> skillOfferRepository.findById(skillOfferDto.getSkillId())
+                    .orElseThrow(() -> new DataValidationException("Навык не существуют в системе")));
+        }
     }
 
     private void validateSkillOffersExistence(RecommendationDto recommendation) {

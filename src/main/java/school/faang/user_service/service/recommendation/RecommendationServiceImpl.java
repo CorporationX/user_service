@@ -50,14 +50,7 @@ public class RecommendationServiceImpl implements RecommendationService {
         createSkillOffer(recommendation);
         existsUserSkill(recommendation);
 
-        Recommendation creaating = new Recommendation();
-        creaating.setAuthor(recommendation.getAuthorId());
-        creaating.setReceiver(recommendation.getReceiverId());
-        creaating.s
-                recommendationRepository.update(recommendation.getAuthorId(),
-                        recommendation.getReceiverId(),
-                        recommendation.getContent());
-
+        recommendationRepository.create(recommendation.getAuthorId(), recommendation.getReceiverId(), recommendation.getContent())
         return recommendation;
     }
 

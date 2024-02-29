@@ -14,35 +14,35 @@ import java.util.List;
 @Tag(name = "Управление пользователями")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/users")
+@RequestMapping
 @Slf4j
 public class UserController {
     private final UserService userService;
 
     @Operation(summary = "Регистрация пользователя",
             description = "Позволяет зарегистрировать нового пользователя и сгенерировать аватара")
-    @PostMapping("/create")
+    @PostMapping
     public UserDto createUser(@RequestBody @Valid UserDto user) {
         log.info("Accepted request to create new user " + user);
         return userService.createUser(user);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/user/{id}")
     public UserDto getUser(@PathVariable long id) {
         return userService.getUser(id);
     }
 
-    @GetMapping("/exists/{userId}")
+    @GetMapping("/user/exists/{userId}")
     public boolean isUserExists(@PathVariable long userId) {
         return userService.isUserExists(userId);
     }
 
-    @PostMapping
+    @PostMapping("/users")
     public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);
     }
 
-    @GetMapping("/ids")
+    @GetMapping("/users/ids")
     public List<Long> getUserIds() {
         return userService.getUserIds();
     }

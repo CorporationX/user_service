@@ -52,7 +52,7 @@ public class RecommendationController {
     public Page<RecommendationDto> getAllGivenRecommendations(
             @PathVariable @Positive(message = "ID должно быть положительным число") long authorId,
             @Valid @ModelAttribute PageDto page) {
-        log.info("Получен запрос на все рекомендаций пользователя с ID", authorId);
+        log.info("Получен запрос на получение всех рекомендаций пользователя с ID", authorId);
         return recommendationService.getAllGivenRecommendations(authorId, page);
     }
 }

@@ -160,7 +160,7 @@ public class RecommendationServiceImpl implements RecommendationService {
                 .stream()
                 .map(SkillOffer::getId)
                 .distinct()
-                .toList();
+                .collect(Collectors.toList());
 
         List<Long> skillOfferDtos = recommendation.getSkillOffers()
                 .stream()

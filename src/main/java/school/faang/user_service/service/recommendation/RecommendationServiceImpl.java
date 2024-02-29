@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.recomendation.PageDto;
 import school.faang.user_service.dto.recomendation.RecommendationDto;
 import school.faang.user_service.dto.recomendation.SkillOfferDto;
@@ -39,6 +40,7 @@ public class RecommendationServiceImpl implements RecommendationService {
     private final UserService userService;
     private final UserMapper userMapper;
 
+    @Transactional
     public RecommendationDto create(RecommendationDto recommendation) {
         log.info("Запрос на добавление рекомендации пользователю с ID: {}, от пользователя с ID: {}",
                 recommendation.getReceiverId(), recommendation.getAuthorId());
@@ -54,6 +56,7 @@ public class RecommendationServiceImpl implements RecommendationService {
         );
     }
 
+    @Transactional
     public RecommendationDto update(RecommendationDto recommendation) {
         log.info("Запрос на обновление рекомендации пользователю с ID: {}, от пользователя с ID: {}",
                 recommendation.getReceiverId(), recommendation.getAuthorId());
@@ -70,6 +73,7 @@ public class RecommendationServiceImpl implements RecommendationService {
         );
     }
 
+    @Transactional
     public void delete(long id) {
         log.info("Удаляем рекомендацию с ID: {}", id);
         recommendationRepository.deleteById(id);
@@ -121,9 +125,10 @@ public class RecommendationServiceImpl implements RecommendationService {
 
     private void validateSkillOffersExistence(RecommendationDto recommendation) {
         log.info("Старт  validateSkillOffersExistence, recommendation с ID: {}", recommendation.getId());
+
         List<SkillOfferDto> skillOfferDtos = recommendation.getSkillOffers();
         if (skillOfferDtos == null || skillOfferDtos.isEmpty()) {
-            log.error("Нет предложенных навыков, в рекомендации с ID: {}", recommendation.getId());
+            log.error("Отсутствуют навыки в рекомендации с ID: {}", recommendation.getId());
             throw new DataValidationException("В рекомендации нет предложений по навыкам");
         }
 

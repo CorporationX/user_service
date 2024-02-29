@@ -27,9 +27,7 @@ public class RecommendationController {
     }
 
     @PutMapping("/{id}")
-    public RecommendationDto updateRecommendation(
-            @PathVariable @Positive(message ="Id пользователя должно быть положительным число") Long id,
-            @RequestBody RecommendationDto recommendation) {
+    public RecommendationDto updateRecommendation(@RequestBody RecommendationDto recommendation) {
         log.info("Получен запрос на обновление от пользователя с ID: {}", recommendation.getAuthorId());
         return recommendationService.update(recommendation);
     }

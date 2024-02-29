@@ -18,7 +18,7 @@ import java.util.List;
 public class RecommendationDto {
     @Positive(message = "Id должно быть положительным число")
     private Long id;
-    @NotNull
+    @NotNull(message = "authorId не может быть пустым")
     @Positive(message = "authorId должно быть положительным число")
     private Long authorId;
     @NotNull(message = "receiverId не может быть пустым")

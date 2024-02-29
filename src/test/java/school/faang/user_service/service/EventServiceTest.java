@@ -22,6 +22,7 @@ import school.faang.user_service.filter.event.EventOwnerIdPattern;
 import school.faang.user_service.filter.event.EventStartDatePattern;
 import school.faang.user_service.filter.event.EventTitlePattern;
 import school.faang.user_service.mapper.EventMapperImpl;
+import school.faang.user_service.publisher.EventStartEventPublisher;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.EventValidator;
@@ -45,6 +46,8 @@ public class EventServiceTest {
     private EventService eventService;
     @Mock
     private EventRepository eventRepository;
+    @Mock
+    private EventStartEventPublisher eventPublisher;
     @Spy
     private EventMapperImpl eventMapper;
     @Mock
@@ -69,7 +72,8 @@ public class EventServiceTest {
         eventFilters.add(new EventTitlePattern());
         eventFilters.add(new EventStartDatePattern());
 
-        eventService = new EventService(eventRepository, eventMapper, eventValidator, userService, eventFilters, asyncConfig);
+        eventService = new EventService(eventRepository, eventMapper, eventValidator
+                , userService, eventFilters, asyncConfig, eventPublisher);
 
         startDate = LocalDateTime.now().plusDays(1L);
         owner = User.builder().id(1L).active(true).build();

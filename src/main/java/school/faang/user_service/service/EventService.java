@@ -9,16 +9,22 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.config.async.AsyncConfig;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
+import school.faang.user_service.dto.event.EventStartEventDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.mapper.EventMapper;
+import school.faang.user_service.publisher.EventStartEventPublisher;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.EventValidator;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -32,6 +38,7 @@ public class EventService {
     private final UserService userService;
     private final List<EventFilter> eventFilters;
     private final AsyncConfig asyncConfig;
+    private final EventStartEventPublisher eventStartEventPublisher;
 
     @Transactional
     public EventDto updateEvent(EventDto eventDto) {
@@ -54,7 +61,9 @@ public class EventService {
         eventValidator.checkIfOwnerExistsById(eventDto.getOwnerId());
         eventValidator.checkIfOwnerHasSkillsRequired(eventDto);
         Event eventEntity = eventMapper.toEntity(eventDto);
-        return eventMapper.toDto(eventRepository.save(eventEntity));
+        Event createdEvent = eventRepository.save(eventEntity);
+        publishEventStartEvent(createdEvent);
+        return eventMapper.toDto(createdEvent);
     }
 
     @Transactional
@@ -107,4 +116,24 @@ public class EventService {
         }
     }
 
+    private void publishEventStartEvent(Event createdEvent) {
+        EventStartEventDto eventDto = EventStartEventDto.builder()
+                .eventId(createdEvent.getId())
+                .attendeesId(createdEvent.getAttendees().stream().map(User::getId).toList())
+                .build();
+
+        Date startDate = toDate(createdEvent.getStartDate());
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                eventStartEventPublisher.publish(eventDto);
+            }
+        }, startDate);
+    }
+
+    public static Date toDate(LocalDateTime localDateTime) {
+        ZoneId zoneId = ZoneId.systemDefault();
+        return Date.from(localDateTime.atZone(zoneId).toInstant());
+    }
 }

@@ -72,9 +72,3 @@ image:
   pixels:
     bigSize: 1024
     smallSize: 170
-
-springdoc:
-  version: "1.0.0"
-  swagger-ui:
-    url: /api-docs.yaml
-    filter: true

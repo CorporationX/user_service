@@ -1,14 +1,10 @@
 package school.faang.user_service.controller.user;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import school.faang.user_service.dto.user.UserDto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.dto.user.UserRegistrationDto;
 import school.faang.user_service.entity.UserProfilePic;
@@ -18,9 +14,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users")
-@RequiredArgsConstructor
 @Validated
+@RequiredArgsConstructor
 public class UserController {
+
     private final UserService userService;
 
     @PostMapping()
@@ -34,12 +31,12 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    UserDto getUser(@PathVariable long userId) {
+    public UserDto getUser(@PathVariable long userId) {
         return userService.getUserDtoById(userId);
     }
 
     @GetMapping("/exists/{id}")
-    private boolean existsUserById(@PathVariable long id) {
+    public boolean existsUserById(@PathVariable long id) {
         return userService.isOwnerExistById(id);
     }
 
@@ -49,7 +46,7 @@ public class UserController {
     }
 
     @GetMapping("/premium/filter")
-    private List<UserDto> getPremiumUsers(@RequestBody UserFilterDto userFilterDto) {
+    public List<UserDto> getPremiumUsers(@RequestBody UserFilterDto userFilterDto) {
         return userService.getPremiumUsers(userFilterDto);
     }
 }

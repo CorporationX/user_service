@@ -12,7 +12,7 @@ import school.faang.user_service.dto.recomendation.RecommendationDto;
 import school.faang.user_service.service.recommendation.RecommendationService;
 
 @RestController
-@RequestMapping("api/v1/recommendation")
+@RequestMapping("/api/v1/recommendation")
 @RequiredArgsConstructor
 @Slf4j
 @Validated
@@ -21,7 +21,7 @@ public class RecommendationController {
     private final RecommendationService recommendationService;
 
     @PutMapping
-    public RecommendationDto giveRecommendation(RecommendationDto recommendation) {
+    public RecommendationDto giveRecommendation(@RequestBody RecommendationDto recommendation) {
         log.info("Получен запрос на получение рекомендаций от пользователя с ID: {}.", recommendation.getAuthorId());
         return recommendationService.create(recommendation);
     }

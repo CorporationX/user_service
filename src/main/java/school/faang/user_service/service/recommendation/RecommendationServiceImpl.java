@@ -157,8 +157,10 @@ public class RecommendationServiceImpl implements RecommendationService {
                 .toList();
 
         skillsIds.retainAll(skillOfferDtos);
-        skillsIds.forEach(skillId -> addUserSkillGuarantee(recommendation.getAuthorId(),
-                recommendation.getReceiverId(), skillId));
+        skillsIds.forEach(skillId -> addUserSkillGuarantee(
+                recommendation.getAuthorId(),
+                recommendation.getReceiverId(),
+                skillId));
     }
 
     private void addUserSkillGuarantee(Long authorId, Long receiverId, Long skillId) {

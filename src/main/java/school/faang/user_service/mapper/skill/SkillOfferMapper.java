@@ -21,6 +21,7 @@ public interface SkillOfferMapper {
     @Named("toSkillOfferDtos")
     default List<SkillOfferDto> toSkillOfferDtos(List<SkillOffer> skills) {
         return skills.stream()
-                .map(this::toDto).toList();
+                .map(this::toDto)
+                .toList();
     }
 }

@@ -123,7 +123,8 @@ public class RecommendationServiceImpl implements RecommendationService {
     }
 
     private void validateSkillOffersExistence(RecommendationDto recommendationDto) {
-        if (recommendationDto.getSkillOffers() != null && !allSkillsExistInSystem(recommendationDto.getSkillOffers())) {
+        if (recommendationDto.getSkillOffers() != null &&
+                !allSkillsExistInSystem(recommendationDto.getSkillOffers())) {
             log.error("Ошибка валидации: Навыки отсутствуют в нашей системе");
             throw new DataValidationException("Навыки отсутствуют в нашей системе");
         }

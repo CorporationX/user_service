@@ -48,8 +48,10 @@ public class RecommendationServiceImpl implements RecommendationService {
 
         createSkillOffer(recommendation);
         existsUserSkill(recommendation);
-        recommendationRepository.create(recommendation.getAuthorId(),
-                recommendation.getReceiverId(), recommendation.getContent());
+        recommendationRepository.create(
+                recommendation.getAuthorId(),
+                recommendation.getReceiverId(),
+                recommendation.getContent());
         return recommendation;
     }
 
@@ -67,7 +69,6 @@ public class RecommendationServiceImpl implements RecommendationService {
                 recommendation.getAuthorId(),
                 recommendation.getReceiverId(),
                 recommendation.getContent());
-
         return recommendation;
     }
 

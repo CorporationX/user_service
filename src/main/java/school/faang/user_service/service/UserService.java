@@ -16,6 +16,8 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.s3.S3Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -77,5 +79,15 @@ public class UserService {
 
     public void saveUser(User user) {
         userRepository.save(user);
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserDto> getUsersByIds(List<Long> ids) {
+        return userMapper.toDto(userRepository.findAllById(ids));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Long> getUserIds() {
+        return userRepository.findUserIds();
     }
 }

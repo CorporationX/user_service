@@ -23,9 +23,9 @@ import school.faang.user_service.repository.recommendation.RecommendationReposit
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.service.user.UserService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +44,7 @@ public class RecommendationServiceImpl implements RecommendationService {
     public RecommendationDto create(RecommendationDto recommendation) {
         log.info("Запрос на добавление рекомендации пользователю с ID: {}, от пользователя с ID: {}",
                 recommendation.getReceiverId(), recommendation.getAuthorId());
-        validateRecommendationBeforeCreatingAndUpdating(recommendation);
+        validateRecommendation(recommendation);
 
         createSkillOffer(recommendation);
         existsUserSkill(recommendation);
@@ -57,7 +57,7 @@ public class RecommendationServiceImpl implements RecommendationService {
     public RecommendationDto update(RecommendationDto recommendation) {
         log.info("Запрос на обновление рекомендации пользователю с ID: {}, от пользователя с ID: {}",
                 recommendation.getReceiverId(), recommendation.getAuthorId());
-        validateRecommendationBeforeCreatingAndUpdating(recommendation);
+        validateRecommendation(recommendation);
 
         skillOfferRepository.deleteAllByRecommendationId(recommendation.getId());
         createSkillOffer(recommendation);
@@ -91,67 +91,54 @@ public class RecommendationServiceImpl implements RecommendationService {
         return recommendations.map(recommendationMapper::toDto);
     }
 
-    private void validateRecommendationBeforeCreatingAndUpdating(RecommendationDto recommendation) {
-//        validateLastRecommendationTime(recommendation);
-        validateSkillExistence(recommendation);
-        validateSkillOffersExistence(recommendation);
+    private boolean allSkillsExistInSystem(List<SkillOfferDto> skillOffers) {
+        return skillOffers.stream()
+                .allMatch(skill -> skillRepository.existsById(skill.getSkillId()));
     }
 
-//    private void validateLastRecommendationTime(RecommendationDto recommendation) {
-//        log.info("Старт  validateLastRecommendationTime, recommendationDto с ID: {}", recommendation.getId());
-//        recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(
-//                recommendation.getAuthorId(),
-//                recommendation.getReceiverId()
-//        ).ifPresent(foundRecommendation -> {
-//            if (foundRecommendation.getCreatedAt().isBefore(LocalDateTime.now().minusMonths(6))) {
-//                log.error("Рекомендация от автора с ID: {}, к получателю с ID: {},не возможна, с момента последней " +
-//                                "рекомендаций от {}, не прошло 6 месяцев!",
-//                        recommendation.getAuthorId(),
-//                        recommendation.getReceiverId(),
-//                        recommendation.getCreatedAt().toString());
-//                throw new DataValidationException("Не прошло 6 месяцев с момента последней рекомендации!");
-//            }
-//        });
-//    }
+    private void validateRecommendation(RecommendationDto recommendationDto) {
+        validateAuthorIsNotReceiver(recommendationDto);
+        validateLastRecommendationTime(recommendationDto);
+        validateSkillOffersExistence(recommendationDto);
+    }
 
-    private void validateSkillExistence(RecommendationDto recommendation) {
-        log.info("Старт  validateSkillExistence, recommendationDto с ID: {}", recommendation.getId());
-        List<SkillOfferDto> skillOfferDtos = recommendation.getSkillOffers();
-        if (skillOfferDtos != null) {
-            skillOfferDtos.stream().forEach(skillOfferDto -> skillOfferRepository.findById(skillOfferDto.getSkillId())
-                    .orElseThrow(() -> new DataValidationException("Навык не существуют в системе")));
+    private void validateAuthorIsNotReceiver(RecommendationDto recommendationDto) {
+        if (recommendationDto.getAuthorId().equals(recommendationDto.getReceiverId())) {
+            log.error("Ошибка валидации: author автор не может быть и receiver");
+            throw new DataValidationException("author автор не может быть и receiver");
         }
     }
 
-    private void validateSkillOffersExistence(RecommendationDto recommendation) {
-        log.info("Старт  validateSkillOffersExistence, recommendation с ID: {}", recommendation.getId());
+    private void validateLastRecommendationTime(RecommendationDto recommendationDto) {
+        recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(
+                        recommendationDto.getAuthorId(),
+                        recommendationDto.getReceiverId())
+                .ifPresent(recommendation -> {
+                    if (recommendation.getCreatedAt().isAfter(LocalDateTime.now().minusMonths(6))) {
+                        log.error("Ошибка валидации: Не прошло 6 месяцев с момента последней рекомендации!");
+                        throw new DataValidationException("Не прошло 6 месяцев с момента последней рекомендации!");
+                    }
+                });
+    }
 
-        List<SkillOfferDto> skillOfferDtos = recommendation.getSkillOffers();
-        if (skillOfferDtos == null || skillOfferDtos.isEmpty()) {
-            log.error("Отсутствуют навыки в рекомендации с ID: {}", recommendation.getId());
-            throw new DataValidationException("В рекомендации нет предложений по навыкам");
-        }
-
-        List<Long> skillIds = skillOfferDtos.stream()
-                .map(SkillOfferDto::getSkillId)
-                .distinct()
-                .collect(Collectors.toList());
-
-        List<Long> existingSkillIds = StreamSupport.stream(skillRepository.findAllById(skillIds)
-                        .spliterator(), false)
-                .map(Skill::getId)
-                .distinct()
-                .toList();
-
-        skillIds.removeAll(existingSkillIds);
-        if (!skillIds.isEmpty()) {
-            throw new DataValidationException("Навыки которые отсутствуют в системе: " + skillIds);
+    private void validateSkillOffersExistence(RecommendationDto recommendationDto) {
+        if (recommendationDto.getSkillOffers() != null && !allSkillsExistInSystem(recommendationDto.getSkillOffers())) {
+            log.error("Ошибка валидации: Навыки отсутствуют в нашей системе");
+            throw new DataValidationException("Навыки отсутствуют в нашей системе");
         }
     }
 
     private void createSkillOffer(RecommendationDto recommendation) {
-        recommendation.getSkillOffers()
-                .forEach(skillOffer -> skillOfferRepository.create(skillOffer.getSkillId(), recommendation.getId()));
+        if (recommendation.getSkillOffers() != null) {
+            recommendation.getSkillOffers().forEach(skillOffer -> {
+                if (skillOffer != null && skillOffer.getSkillId() != null) {
+                    skillOfferRepository.create(skillOffer.getSkillId(), recommendation.getId());
+                } else {
+                    log.error("Ошибка при создании предложенного навыка: skillOffer или skillId == null");
+                    throw new DataValidationException("Навык или его ID не может быть null");
+                }
+            });
+        }
     }
 
     private void existsUserSkill(RecommendationDto recommendation) {
@@ -165,7 +152,7 @@ public class RecommendationServiceImpl implements RecommendationService {
                 .stream()
                 .map(SkillOfferDto::getSkillId)
                 .distinct()
-                .collect(Collectors.toList());
+                .toList();
 
         skillsIds.retainAll(skillOfferDtos);
         skillsIds.forEach(skillId -> addUserSkillGuarantee(recommendation.getAuthorId(),

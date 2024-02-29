@@ -25,6 +25,7 @@ import school.faang.user_service.service.user.UserService;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -135,7 +136,7 @@ public class RecommendationServiceImpl implements RecommendationService {
         List<Long> skillIds = skillOfferDtos.stream()
                 .map(SkillOfferDto::getSkillId)
                 .distinct()
-                .toList();
+                .collect(Collectors.toList());
 
         List<Long> existingSkillIds = StreamSupport.stream(skillRepository.findAllById(skillIds)
                         .spliterator(), false)

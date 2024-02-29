@@ -111,14 +111,14 @@ public class RecommendationServiceImpl implements RecommendationService {
 
     private void validateLastRecommendationTime(RecommendationDto recommendationDto) {
         recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(
-                        recommendationDto.getAuthorId(),
-                        recommendationDto.getReceiverId())
-                .ifPresent(recommendation -> {
-                    if (recommendation.getCreatedAt().isAfter(LocalDateTime.now().minusMonths(6))) {
-                        log.error("Ошибка валидации: Не прошло 6 месяцев с момента последней рекомендации!");
-                        throw new DataValidationException("Не прошло 6 месяцев с момента последней рекомендации!");
-                    }
-                });
+                recommendationDto.getAuthorId(),
+                recommendationDto.getReceiverId()
+        ).ifPresent(recommendation -> {
+            if (recommendation.getCreatedAt().isAfter(LocalDateTime.now().minusMonths(6))) {
+                log.error("Ошибка валидации: Не прошло 6 месяцев с момента последней рекомендации!");
+                throw new DataValidationException("Не прошло 6 месяцев с момента последней рекомендации!");
+            }
+        });
     }
 
     private void validateSkillOffersExistence(RecommendationDto recommendationDto) {
@@ -138,6 +138,8 @@ public class RecommendationServiceImpl implements RecommendationService {
                     throw new DataValidationException("Навык или его ID не может быть null");
                 }
             });
+        } else {
+            log.info("Список skillOffers пуст и будет пропущен при создании рекомендации.");
         }
     }
 

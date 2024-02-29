@@ -44,8 +44,8 @@ public class UserController {
         userService.deactivationUserById(userId);
     }
 
-    @PostMapping("/csv")
-    public List<UserDto> registerStudents(@RequestParam MultipartFile csvFile) throws IOException {
-        return userService.generateUsersFromCsv(csvFile);
+    @PostMapping("/students")
+    public void registerStudents(@RequestParam MultipartFile csvFile) throws IOException {
+        userService.saveStudents(csvFile);
     }
 }

@@ -15,8 +15,6 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.student.Person;
 import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.mapper.UserPersonMapper;
-import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -32,17 +30,15 @@ import java.util.List;
 @Slf4j
 public class UserService {
     private final UserRepository userRepository;
-    private final CountryService countryService;
-    private final UserValidator userValidator;
-    private final UserMapper userMapper;
-    private final UserPersonMapper userPersonMapper;
     private final EventRepository eventRepository;
-    private final CountryRepository countryRepository;
     private final MentorshipRepository mentorshipRepository;
     private final GoalRepository goalRepository;
+    private final CountryService countryService;
+    private final PersonService personService;
+    private final UserValidator userValidator;
+    private final UserMapper userMapper;
     private final CsvPersonParser csvPersonParser;
     private final UserProfilePic generatedUserProfilePic;
-    private final String generatedPassword;
 
     public UserRegistrationDto createUser(UserRegistrationDto userDto) {
         User user = userMapper.toEntity(userDto);
@@ -75,6 +71,7 @@ public class UserService {
         saveUser(user);
     }
 
+    @Transactional(readOnly = true)
     public boolean isOwnerExistById(Long id) {
         return userRepository.existsById(id);
     }
@@ -85,6 +82,7 @@ public class UserService {
         }
     }
 
+    @Transactional(readOnly = true)
     public User getUserById(long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("User with ID %d not found", id)));
@@ -113,36 +111,9 @@ public class UserService {
         }
     }
 
-    @Transactional
-    public List<UserDto> generateUsersFromCsv(MultipartFile csvFile) throws IOException {
+    public void saveStudents(MultipartFile csvFile) throws IOException {
         List<Person> people = csvPersonParser.parse(csvFile);
-        savePeople(people);
-        people.forEach(
-                person -> {
-                    User user = userPersonMapper.toUser(person);
-                    user.setPassword(generatedPassword);
-                    userRepository.save(user);
-                }
-        );
-        userRepository.saveAll(savedUsers);
-        log.info("People saved from csv file as users. Saved accounts count: {}", savedUsers.size());
-        return userMapper.listToDto(savedUsers);
-    }
-
-    private void savePeople(List<Person> people) {
-        people.forEach(person -> {
-                    User user = userPersonMapper.toUser(person);
-                    user.setPassword(generatedPassword);
-                    user.setCountry(
-                            person.ge
-                    );
-                }
-                );
-    }
-
-    @Transactional(readOnly = true)
-    public User getExistingUserById(long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User with id = " + id + " is not found in database"));
+        personService.savePeopleAsUsers(people);
+        log.info("Students saved from csv file as users. Saved accounts count: {}", people.size());
     }
 }

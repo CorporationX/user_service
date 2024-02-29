@@ -20,6 +20,7 @@ public class CsvPersonParser {
                 .readerFor(Person.class)
                 .with(CsvSchema.emptySchema().withHeader());
         MappingIterator<Person> mappingIterator = csvOpenReader.readValues(csvFile.getInputStream());
+
         List<Person> people = mappingIterator.readAll();
         log.info("csv file {} parsed successfully. Person amount {}", csvFile.getName(), people.size());
         return people;

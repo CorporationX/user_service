@@ -50,11 +50,15 @@ public class RecommendationServiceImpl implements RecommendationService {
         createSkillOffer(recommendation);
         existsUserSkill(recommendation);
 
-        return recommendationMapper.toDto(recommendationRepository.update(
-                recommendation.getAuthorId(),
-                recommendation.getReceiverId(),
-                recommendation.getContent())
-        );
+        Recommendation creaating = new Recommendation();
+        creaating.setAuthor(recommendation.getAuthorId());
+        creaating.setReceiver(recommendation.getReceiverId());
+        creaating.s
+                recommendationRepository.update(recommendation.getAuthorId(),
+                        recommendation.getReceiverId(),
+                        recommendation.getContent());
+
+        return recommendation;
     }
 
     @Transactional
@@ -67,11 +71,12 @@ public class RecommendationServiceImpl implements RecommendationService {
         createSkillOffer(recommendation);
         existsUserSkill(recommendation);
 
-        return recommendationMapper.toDto(recommendationRepository.update(
+        recommendationRepository.update(
                 recommendation.getAuthorId(),
                 recommendation.getReceiverId(),
-                recommendation.getContent())
-        );
+                recommendation.getContent());
+
+        return recommendation;
     }
 
     @Transactional

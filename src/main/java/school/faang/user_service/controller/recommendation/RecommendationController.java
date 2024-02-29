@@ -26,7 +26,7 @@ public class RecommendationController {
         return recommendationService.create(recommendation);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update")
     public RecommendationDto updateRecommendation(@RequestBody RecommendationDto recommendation) {
         log.info("Получен запрос на обновление от пользователя с ID: {}", recommendation.getAuthorId());
         return recommendationService.update(recommendation);

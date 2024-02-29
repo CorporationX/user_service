@@ -1,8 +1,7 @@
 package school.faang.user_service.service.user;
 
 import jakarta.persistence.EntityNotFoundException;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Component;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
@@ -24,21 +23,9 @@ import school.faang.user_service.validator.UserValidator;
 import java.util.List;
 import java.util.stream.Stream;
 
-@Component
+@Service
+@RequiredArgsConstructor
 public class UserService {
-
-    public UserService(UserRepository userRepository, CountryService countryService, UserValidator userValidator, UserMapper userMapper, EventRepository eventRepository, MentorshipRepository mentorshipRepository, GoalRepository goalRepository, UserProfilePic generatedUserProfilePic, List<UserFilter> userFilters) {
-        this.userRepository = userRepository;
-        this.countryService = countryService;
-        this.userValidator = userValidator;
-        this.userMapper = userMapper;
-        this.eventRepository = eventRepository;
-        this.mentorshipRepository = mentorshipRepository;
-        this.goalRepository = goalRepository;
-        this.generatedUserProfilePic = generatedUserProfilePic;
-        this.userFilters = userFilters;
-    }
-
     private final UserRepository userRepository;
     private final CountryService countryService;
     private final UserValidator userValidator;

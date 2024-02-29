@@ -2,12 +2,14 @@ package school.faang.user_service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.BootstrapWith;
+
+
 @SpringBootTest
-@ContextConfiguration
+@BootstrapWith
 class UserServiceApplicationTest {
 
     @Test
-    public void contextLoads() {
+    void contextLoads() {
     }
 }

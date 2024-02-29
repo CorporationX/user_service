@@ -111,8 +111,13 @@ public class UserService {
         }
     }
 
-    public void saveStudents(MultipartFile csvFile) throws IOException {
-        List<Person> people = csvPersonParser.parse(csvFile);
+    public void saveStudents(MultipartFile csvFile) {
+        List<Person> people;
+        try {
+            people = csvPersonParser.parse(csvFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         personService.savePeopleAsUsers(people);
         log.info("Students saved from csv file as users. Saved accounts count: {}", people.size());
     }

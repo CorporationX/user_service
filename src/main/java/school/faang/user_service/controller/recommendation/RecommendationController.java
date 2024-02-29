@@ -40,7 +40,7 @@ public class RecommendationController {
         recommendationService.delete(id);
     }
 
-    @GetMapping("/{receiverId}")
+    @GetMapping("/receiver/{receiverId}")
     public Page<RecommendationDto> getAllUserRecommendations(
             @PathVariable @Positive(message = "ID должно быть положительным число") long receiverId,
             @Valid @ModelAttribute PageDto page) {
@@ -48,7 +48,7 @@ public class RecommendationController {
         return recommendationService.getAllUserRecommendations(receiverId, page);
     }
 
-    @GetMapping("/{authorId}")
+    @GetMapping("/author/{authorId}")
     public Page<RecommendationDto> getAllGivenRecommendations(
             @PathVariable @Positive(message = "ID должно быть положительным число") long authorId,
             @Valid @ModelAttribute PageDto page) {

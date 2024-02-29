@@ -1,5 +1,6 @@
 package school.faang.user_service.dto.recomendation;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -7,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import school.faang.user_service.dto.skill.SkillOfferDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,6 +28,7 @@ public class RecommendationDto {
     private Long receiverId;
     @NotEmpty(message = "Content не может быть пустым")
     private String content;
+    @JsonIgnore
     private List<SkillOfferDto> skillOffers;
     private LocalDateTime createdAt;
 }

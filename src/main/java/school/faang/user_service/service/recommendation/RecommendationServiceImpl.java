@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.recomendation.PageDto;
 import school.faang.user_service.dto.recomendation.RecommendationDto;
-import school.faang.user_service.dto.recomendation.SkillOfferDto;
+import school.faang.user_service.dto.skill.SkillOfferDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
@@ -107,13 +107,14 @@ public class RecommendationServiceImpl implements RecommendationService {
                 recommendation.getReceiverId()
         ).ifPresent(foundRecommendation -> {
             if (foundRecommendation.getCreatedAt().isBefore(LocalDateTime.now().minusMonths(6))) {
-                log.error("Рекомендация от автора с ID: {}, к получателю с ID: {},не возможна т.к.с момента последней" +
+                log.error("Рекомендация от автора с ID: {}, к получателю с ID: {},не возможна, с момента последней " +
                                 "рекомендаций от {}, не прошло 6 месяцев!",
                         recommendation.getAuthorId(),
                         recommendation.getReceiverId(),
                         recommendation.getCreatedAt().toString());
                 throw new DataValidationException("Не прошло 6 месяцев с момента последней рекомендации!");
             }
+
         });
     }
 
@@ -121,7 +122,7 @@ public class RecommendationServiceImpl implements RecommendationService {
         log.info("Старт  validateSkillExistence, recommendationDto с ID: {}", recommendation.getId());
         List<SkillOfferDto> skillOfferDtos = recommendation.getSkillOffers();
         skillOfferDtos.forEach(skillOfferDto -> skillOfferRepository.findById(skillOfferDto.getSkillId())
-                .orElseThrow(() -> new DataValidationException("Навык c ID, " + skillOfferDto.getSkillId() + " не существуют в системе")));
+                .orElseThrow(() -> new DataValidationException("Навык не существуют в системе")));
     }
 
     private void validateSkillOffersExistence(RecommendationDto recommendation) {
@@ -166,7 +167,7 @@ public class RecommendationServiceImpl implements RecommendationService {
                 .stream()
                 .map(SkillOfferDto::getSkillId)
                 .distinct()
-                .toList();
+                .collect(Collectors.toList());
 
         skillsIds.retainAll(skillOfferDtos);
         skillsIds.forEach(skillId -> addUserSkillGuarantee(recommendation.getAuthorId(),

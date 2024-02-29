@@ -1,4 +1,4 @@
-package school.faang.user_service.dto.recomendation;
+package school.faang.user_service.dto.skill;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+
 public class SkillOfferDto {
     private Long skillId;
     private Long recommendationId;

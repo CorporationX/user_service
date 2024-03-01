@@ -33,6 +33,18 @@ spring:
         premium_channel:
           name: premium_channel
 
+  cassandra:
+    contact-points: localhost
+    schema-action: CREATE_IF_NOT_EXISTS
+    request:
+      timeout: 10s
+    connection:
+      connect-timeout: 10s
+      init-query-timeout: 10s
+    local-datacenter: datacenter1
+    keyspace-name: analytics_space
+    port: 9042
+
 server:
   port: 8080
 

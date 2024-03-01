@@ -24,5 +24,5 @@ public interface RecommendationRequestRepository extends JpaRepository<Recommend
                 VALUES (:requesterId, :receiverId, :message, 0, now(), now())
             """)
     @Modifying
-    RecommendationRequest create(long requesterId, long receiverId, String message);
+    void create(long requesterId, long receiverId, String message);
 }

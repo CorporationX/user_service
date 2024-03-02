@@ -27,7 +27,7 @@ public class UserService {
     private final List<UserFilter> userFilters;
     private final AvatarService avatarService;
 
-
+    @Transactional
     public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
         Stream<UserDto> userDtoStream = userRepository.findPremiumUsers().map(user -> userMapper.toUserDto(user));
         return userFilter(userDtoStream, userFilterDto).toList();
@@ -35,7 +35,7 @@ public class UserService {
 
     public UserDto getUserById(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User by id: " + userId + " not found"));
-        return userMapper.toUserDto(user);
+        return userMapper.toDto(user);
     }
 
     @Transactional

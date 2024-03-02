@@ -57,8 +57,8 @@ public class SubscriptionService {
 
     @Transactional
     public void followUser(long followerId, long followeeId) {
-        subscriptionValidator.validateUser(followerId, followeeId);
-        subscriptionValidator.validateExistsSubscription(followerId, followeeId);
+//        subscriptionValidator.validateUser(followerId, followeeId);
+//        subscriptionValidator.validateExistsSubscription(followerId, followeeId);
         subscriptionRepo.followUser(followerId, followeeId);
         FollowerEvent userFollowDto = buildUserFollowDto(followerId, followeeId);
         followerEventPublisher.publish(userFollowDto);

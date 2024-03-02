@@ -2,15 +2,14 @@ package school.faang.user_service.mapper.user;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.Spy;
-import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserCreateDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class UserMapperTest {
@@ -132,52 +131,6 @@ class UserMapperTest {
                 .phone(null)
                 .aboutMe(null)
                 .countryId(null)
-                .build();
-    }
-
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-@ExtendWith(MockitoExtension.class)
-class UserMapperTest {
-
-    @Spy
-    private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
-    private UserCreateDto userCreateDto;
-    private UserDto userDto;
-    private User user;
-
-    @BeforeEach
-    void setUp() {
-        userCreateDto = UserCreateDto.builder()
-                .id(1L)
-                .username("Alex")
-                .email("mail@mail.com")
-                .phone("123456789")
-                .password("qwerty")
-                .countryId(4L)
-                .build();
-
-        userDto = UserDto.builder()
-                .id(1L)
-                .username("Alex")
-                .email("mail@mail.com")
-                .phone("123456789")
-                .aboutMe("about")
-                .countryId(4L)
-                .city("LA")
-                .experience(1)
-                .build();
-
-        user = User.builder()
-                .id(1L)
-                .username("Alex")
-                .email("mail@mail.com")
-                .phone("123456789")
-                .password("qwerty")
-                .country(Country.builder()
-                        .id(4L)
-                        .build())
                 .build();
     }
 

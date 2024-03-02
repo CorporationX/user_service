@@ -29,7 +29,7 @@ public class UserService {
 
     @Transactional
     public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
-        Stream<UserDto> userDtoStream = userRepository.findPremiumUsers().map(user -> userMapper.toUserDto(user));
+        Stream<UserDto> userDtoStream = userRepository.findPremiumUsers().map(userMapper::toDto);
         return userFilter(userDtoStream, userFilterDto).toList();
     }
 

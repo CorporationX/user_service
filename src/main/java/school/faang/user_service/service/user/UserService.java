@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserRegistrationDto;
-import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.event.Event;
@@ -46,8 +45,7 @@ public class UserService {
         if (user.getUserProfilePic() == null) {
             user.setUserProfilePic(generatedUserProfilePic);
         }
-        Country country = countryService.getCountryByTitle(userDto.getCountry());
-        user.setCountry(country);
+        user.setCountry(countryService.getSavedCountry(user.getCountry()));
 
         User savedUser = userRepository.save(user);
         return userMapper.toRegDto(savedUser);

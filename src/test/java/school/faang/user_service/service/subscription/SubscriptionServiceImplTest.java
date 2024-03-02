@@ -7,13 +7,16 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.FollowerEvent;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.filter.UserFilterService;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -36,6 +39,8 @@ class SubscriptionServiceImplTest {
     private SubscriptionRepository subscriptionRepository;
     @Mock
     private UserFilterService userFilter;
+    @Mock
+    private FollowerEventPublisher followerEventPublisher;
 
     @InjectMocks
     private SubscriptionServiceImpl subscriptionService;
@@ -58,12 +63,14 @@ class SubscriptionServiceImplTest {
 
     @Test
     void shouldCreateSubscriptionWhenNotExists() {
+        FollowerEvent followerEvent = new FollowerEvent(validFollowerId, validFolloweeId, LocalDateTime.now());
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(validFollowerId, validFolloweeId))
                 .thenReturn(Boolean.FALSE);
 
         subscriptionService.followUser(validFollowerId, validFolloweeId);
 
         verify(subscriptionRepository).followUser(validFollowerId, validFolloweeId);
+        verify(followerEventPublisher).publish(any());
     }
 
     @Test

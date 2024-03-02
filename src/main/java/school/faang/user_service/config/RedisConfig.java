@@ -13,21 +13,21 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RedisConfig {
 
     @Value("${spring.data.redis.host}")
-    private String host;
+    private String redisHost;
     @Value("${spring.data.redis.port}")
-    private int port;
+    private int redisPort;
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
-        System.out.println(port);
-        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
+        System.out.println(redisPort);
+        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(redisHost, redisPort);
         return new JedisConnectionFactory(config);
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+    public RedisTemplate<String, Object> redisTemplate(JedisConnectionFactory jedisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        redisTemplate.setConnectionFactory(jedisConnectionFactory);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new StringRedisSerializer());
         return redisTemplate;

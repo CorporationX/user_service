@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class FollowerEventPublisher extends AbstractEventPublisher<FollowerEventDto> {
 
     @Value("${spring.data.redis.channel.follower_channel}")
-    private String channelTopicName = "follower_channel";
+    private String channelTopicName;
 
     public FollowerEventPublisher(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper) {
         super(objectMapper, redisTemplate);

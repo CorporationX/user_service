@@ -18,7 +18,7 @@ public class GoalController {
     private final UserContext userContext;
 
     @PutMapping("/goals/{goalId}")
-    public GoalDto updateGoal(@PathVariable Long goalId, GoalDto goal) {
+    public GoalDto updateGoal(@PathVariable Long goalId, @RequestBody GoalDto goal) {
         goalValidator.validateUserId(goalId);
         goalValidator.validateGoalTitle(goal);
         return goalService.updateGoal(goalId, goal);

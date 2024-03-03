@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
+import org.mapstruct.factory.Mappers;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
@@ -14,16 +15,21 @@ import java.util.List;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface GoalMapper {
 
-
-
     @Mapping(target = "parent", ignore = true)
-    @Mapping(target = "skillsToAchieve", ignore = true)
+    //@Mapping(target = "skillsToAchieve", ignore = true)
+    @Mapping(source = "skillIds", target = "skillsToAchieve", qualifiedByName = "toSkills")
     Goal toEntity(GoalDto goalDto);
 
     @Mapping(source = "parent.id", target = "parentId")
     @Mapping(source = "skillsToAchieve", target = "skillIds", qualifiedByName = "toSkillIds")
     GoalDto toDto(Goal goal);
-
+    @Mapping(source = "goalDto.skillIds", target = "skillsToAchieve", qualifiedByName = "toSkills")
+    @Mapping(target = "goal.parent", ignore = true)
+    @Mapping(target = "id", source = "goal.id")
+    @Mapping(target = "title", source = "goalDto.title")
+    @Mapping(target = "description", source = "goalDto.description")
+    @Mapping(target = "status", source = "goalDto.status")
+    Goal updateGoal(Goal goal, GoalDto goalDto);
 
     @Named("toSkillIds")
     default List<Long> toSkillIds(List<Skill> skills) {
@@ -31,5 +37,13 @@ public interface GoalMapper {
             return new ArrayList<>();
         }
         return skills.stream().map(Skill::getId).toList();
+    }
+
+    @Named("toSkills")
+    default List<Skill> toSkills(List<Long> skillIds) {
+        if (skillIds == null) {
+            return new ArrayList<>();
+        }
+        return skillIds.stream().map(aLong -> Skill.builder().id(aLong).build()).toList();
     }
 }

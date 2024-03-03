@@ -12,19 +12,20 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GoalMapperTest {
-
     private final GoalMapper goalMapper = new GoalMapperImpl();
 
     @Test
     void toEntity() {
         GoalDto goalDto = new GoalDto(1L, "test", 1L, "test", GoalStatus.ACTIVE, List.of(1L, 2L));
+        List<Skill> skills = List.of(Skill.builder().id(1L).build(), Skill.builder().id(2L).build());
         Goal goal = goalMapper.toEntity(goalDto);
 
         assertAll(
                 () -> assertEquals(goalDto.getId(), goal.getId()),
                 () -> assertEquals(goalDto.getDescription(), goal.getDescription()),
                 () -> assertEquals(goalDto.getTitle(), goal.getTitle()),
-                () -> assertEquals(goalDto.getStatus(), goal.getStatus())
+                () -> assertEquals(goalDto.getStatus(), goal.getStatus()),
+                () -> assertEquals(skills, goal.getSkillsToAchieve())
         );
     }
 
@@ -44,7 +45,8 @@ class GoalMapperTest {
                 () -> assertEquals(goalDto.getId(), goal.getId()),
                 () -> assertEquals(goalDto.getDescription(), goal.getDescription()),
                 () -> assertEquals(goalDto.getTitle(), goal.getTitle()),
-                () -> assertEquals(goalDto.getStatus(), goal.getStatus())
+                () -> assertEquals(goalDto.getStatus(), goal.getStatus()),
+                () -> assertEquals(Collections.singletonList(1L), goalDto.getSkillIds())
         );
     }
 

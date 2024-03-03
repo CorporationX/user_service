@@ -36,7 +36,6 @@ public class GoalService {
     private final GoalValidator goalValidator;
     private final UserService userService;
     private final GoalCompletedEventPublisher goalCompletedEventPublisher;
-    private final GoalCompletedEvent goalCompletedEvent;
     private final UserContext userContext;
 
     public List<GoalDto> getGoalsByUser(long userId, GoalFilterDto filter) {
@@ -71,35 +70,27 @@ public class GoalService {
         return filteredGoals.stream().map(goalMapper::toDto).toList();
     }
 
-
+    @Transactional
     public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
-
-        Goal foundGoal = findById(goalId);
-
-        Goal goal = goalMapper.toEntity(goalDto);
-        goal.setId(goalId);
-
-
-        if (foundGoal.getStatus() == GoalStatus.COMPLETED) {
+        Goal goalToUpdate = findById(goalId);
+        if (goalToUpdate.getStatus() == GoalStatus.COMPLETED) {
             throw new DataValidationException("Цель уже завершена");
         }
-
-        goalValidator.validateSkills(goal.getSkillsToAchieve());
-
-        List<Skill> skillsToUpdate = goalDto.getSkillIds().stream().map(skillService::getSkillById).toList();
-        goal.setSkillsToAchieve(skillsToUpdate);
-
-        if (goal.getStatus() == GoalStatus.COMPLETED) {
-            goal.getUsers().forEach(user -> skillsToUpdate
+        Goal updatedGoal = goalMapper.updateGoal(goalToUpdate, goalDto);
+        goalValidator.validateSkills(updatedGoal.getSkillsToAchieve());
+        Goal savedGoal = goalRepository.save(updatedGoal);
+        if(updatedGoal.getStatus() == GoalStatus.COMPLETED) {
+            updatedGoal.getUsers().forEach(user -> updatedGoal.getSkillsToAchieve()
                     .forEach(skill -> skillService.assignSkillToUser(user.getId(), skill.getId())));
-            goalCompletedEvent.setUserId(userContext.getUserId());
-            goalCompletedEvent.setGoalId(goalId);
-            goalCompletedEvent.setTimestamp(LocalDateTime.now());
+            GoalCompletedEvent goalCompletedEvent = GoalCompletedEvent.builder()
+                    .userId(userContext.getUserId())
+                    .goalId(goalId)
+                    .goalCompletedAt(savedGoal.getUpdatedAt())
+                    .build();
             goalCompletedEventPublisher.publish(goalCompletedEvent);
         }
-        return goalMapper.toDto(goalRepository.save(goal));
+        return goalMapper.toDto(savedGoal);
     }
-
 
     public Goal findById(long id) {
         return goalRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Цель не найдена"));
@@ -134,7 +125,6 @@ public class GoalService {
     public int countActiveGoalsPerUser(long userId) {
         return goalRepository.countActiveGoalsPerUser(userId);
     }
-
 
     public void deleteGoal(long goalId) {
         goalRepository.deleteById(goalId);

@@ -60,8 +60,6 @@ class GoalServiceTest {
     @Mock
     private GoalCompletedEventPublisher goalCompletedEventPublisher;
     @Mock
-    private GoalCompletedEvent goalCompletedEvent;
-    @Mock
     private UserContext userContext;
 
     GoalService goalService;
@@ -83,7 +81,7 @@ class GoalServiceTest {
     @BeforeEach
     void setUp() {
         goalService = new GoalService(goalRepository, goalMapper, goalFilters, skillService, goalValidator, userService,
-                goalCompletedEventPublisher, goalCompletedEvent, userContext);
+                goalCompletedEventPublisher, userContext);
 
         correctGoal.setTitle("Correct");
         correctGoal.setStatus(GoalStatus.ACTIVE);
@@ -135,7 +133,6 @@ class GoalServiceTest {
         goal.setStatus(GoalStatus.COMPLETED);
 
         Mockito.when(goalRepository.findById(Mockito.any())).thenReturn(Optional.of(goal));
-        Mockito.when(goalMapper.toEntity(goalDto)).thenReturn(goal);
         DataValidationException dataValidationException = assertThrows(DataValidationException.class,
                 () -> goalService.updateGoal(goalId, goalDto));
         assertEquals("Цель уже завершена", dataValidationException.getMessage());
@@ -153,13 +150,16 @@ class GoalServiceTest {
         goal.setStatus(GoalStatus.COMPLETED);
         goal.setUsers(Collections.singletonList(user));
         goal.setSkillsToAchieve(Collections.singletonList(skill));
+        GoalCompletedEvent goalCompletedEvent = GoalCompletedEvent.builder().goalId(1L).build();
 
         Goal oldGoal = new Goal();
         oldGoal.setSkillsToAchieve(Collections.singletonList(skill));
+        oldGoal.setStatus(GoalStatus.ACTIVE);
+        oldGoal.setUsers(Collections.singletonList(user));
 
+        Mockito.when(goalRepository.save(goal)).thenReturn(goal);
         Mockito.when(goalRepository.findById(Mockito.any())).thenReturn(Optional.of(oldGoal));
-        Mockito.when(goalMapper.toEntity(goalDto)).thenReturn(goal);
-        Mockito.when(skillService.getSkillById(Mockito.anyLong())).thenReturn(skill);
+        Mockito.when(goalMapper.updateGoal(oldGoal, goalDto)).thenReturn(goal);
 
         goalService.updateGoal(goalId, goalDto);
 

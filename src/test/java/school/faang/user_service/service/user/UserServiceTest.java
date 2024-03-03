@@ -61,9 +61,9 @@ public class UserServiceTest {
 
     private static final UserCityFilter userCityFilter = new UserCityFilter();
 
-    private static UserFilterDto dtoFilter = new UserFilterDto();
+    private static final UserFilterDto dtoFilter = new UserFilterDto();
 
-    private List<UserFilter> filters = new ArrayList<>();
+    private final List<UserFilter> filters = new ArrayList<>();
 
     private List<User> users;
 
@@ -182,5 +182,16 @@ public class UserServiceTest {
         Mockito.when(userRepository.findPremiumUsers()).thenReturn(users.stream());
         List<UserDto> premiumUsers = userService.getPremiumUsers(dtoFilter);
         Assertions.assertEquals(1, premiumUsers.size());
+    }
+
+    @Test
+    void banUserById () {
+        long userId = 1L;
+        User user = User.builder().id(userId).build();
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        userService.banUserById(userId);
+
+        assertTrue(user.isBanned());
     }
 }

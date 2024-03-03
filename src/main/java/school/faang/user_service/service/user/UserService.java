@@ -2,7 +2,9 @@ package school.faang.user_service.service.user;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.dto.user.UserRegistrationDto;
@@ -25,6 +27,7 @@ import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
     private final UserRepository userRepository;
     private final CountryService countryService;
@@ -111,5 +114,11 @@ public class UserService {
                 mentorshipRepository.save(mentee);
             }
         }
+    }
+
+    @Transactional
+    public void banUserById(long userId) {
+        getUserById(userId).setBanned(true);
+        log.info("user with id = {} is banned", userId);
     }
 }

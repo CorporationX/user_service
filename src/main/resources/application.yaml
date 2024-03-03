@@ -21,11 +21,13 @@ spring:
     redis:
       port: 6379
       host: localhost
-      channels:
-        follower_channel:
-          name: follower_channel
-        profile_view_channel:
-          name: profile_view_channel
+      channel:
+        user_ban:
+          user_ban_channel: user_ban_channel
+        follower:
+          follower_channel: follower_channel
+        profile_view:
+          profile_view_channel: profile_view_channel
   mvc:
     servlet:
       path: /api/v1

@@ -3,15 +3,15 @@ package school.faang.user_service.service.event;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.repository.event.EventRepository;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +19,7 @@ import java.util.concurrent.*;
 @Setter
 public class EventService {
     private final EventRepository eventRepository;
-    private final ThreadPoolExecutor threadPoolExecutor;
+
     @Value("${batchSize.eventDeletion}")
     private int batchSize;
 
@@ -30,23 +30,18 @@ public class EventService {
                 .map(Event::getId).toList();
 
         if (ids.isEmpty()) {
-            throw new IllegalArgumentException("There are no completed events in DB");
+            return;
         }
 
-        List<List<Long>> partitions = new ArrayList<>();
-
-        for (int i = 0; i < ids.size(); i += batchSize) {
-            partitions.add(ids.subList(i, Math.min(i + batchSize, ids.size())));
-        }
+        List<List<Long>> partitions = ListUtils.partition(ids, batchSize);
 
         for (List<Long> partition : partitions) {
-            threadPoolExecutor.execute(() -> {
-                try {
-                    eventRepository.deleteAllById(partition);
-                } catch (Exception e) {
-                    log.error("An error occurred during event deletion", e);
-                }
-            });
+            clearEventsAsync(partition);
         }
+    }
+
+    @Async("threadPoolExecutor")
+    public void clearEventsAsync(List<Long> partition) {
+        eventRepository.deleteAllById(partition);
     }
 }

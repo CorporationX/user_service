@@ -6,9 +6,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -16,6 +18,7 @@ import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.service.user.UserService;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,6 +39,9 @@ public class UserServiceTest {
     private MentorshipRepository mentorshipRepository;
     @Mock
     private GoalRepository goalRepository;
+
+    @Mock
+    private UserMapper userMapper;
 
     @InjectMocks
     private UserService userService;
@@ -115,5 +121,27 @@ public class UserServiceTest {
         userService.deactivationUserById(userId);
 
         assertFalse(user.isActive());
+    }
+
+    @Test
+    public void testGetAllUser() {
+        List<User> mockUsers = List.of(new User(), new User(), new User());
+        when(userRepository.findAll()).thenReturn(mockUsers);
+        List<UserDto> mockUserDtos = List.of(new UserDto(), new UserDto(), new UserDto());
+        when(userMapper.toDtoList(mockUsers)).thenReturn(mockUserDtos);
+
+        List<UserDto> result = userService.getAllUser();
+
+        assertEquals(mockUserDtos.size(), result.size());
+    }
+
+    @Test
+    public void testGetAllUserWithEmptyList() {
+        List<User> emptyList = Collections.emptyList();
+        when(userRepository.findAll()).thenReturn(emptyList);
+
+        List<UserDto> result = userService.getAllUser();
+
+        assertTrue(result.isEmpty());
     }
 }

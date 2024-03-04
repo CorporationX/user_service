@@ -100,4 +100,9 @@ public class UserService {
             }
         }
     }
+
+    public List<UserDto> getAllUser() {
+        List<User> users = userRepository.findAll();
+        return userMapper.toDtoList(users);
+    }
 }

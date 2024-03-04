@@ -16,8 +16,8 @@ public interface RecommendationMapper {
     @Mapping(source = "skillOffers", target = "skillOfferDtoList")
     RecommendationDto toDto(Recommendation recommendation);
 
-//    @Mapping(source = "authorId", target = "author")
-//    @Mapping(source = "receiverId", target = "receiver")
+    @Mapping(source = "authorId", target = "author")
+    @Mapping(source = "receiverId", target = "receiver")
     @Mapping(source = "skillOfferDtoList", target = "skillOffers")
     Recommendation toEntity(RecommendationDto recommendationDto);
 }

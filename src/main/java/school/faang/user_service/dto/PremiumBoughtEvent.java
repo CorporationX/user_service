@@ -7,8 +7,8 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class PremiumBoughtEventDto {
-    private Long receiverId;
+public class PremiumBoughtEvent {
+    private long receiverId;
     private int amountPayment;
     private int daysSubscription;
     private LocalDateTime receivedAt;

@@ -5,15 +5,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.client.PaymentServiceClient;
-import school.faang.user_service.dto.PremiumBoughtEventDto;
+import school.faang.user_service.dto.PremiumBoughtEvent;
 import school.faang.user_service.dto.PremiumDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.premium.Currency;
-import school.faang.user_service.entity.premium.PaymentRequest;
-import school.faang.user_service.entity.premium.PaymentResponse;
-import school.faang.user_service.entity.premium.PaymentStatus;
-import school.faang.user_service.entity.premium.Premium;
-import school.faang.user_service.entity.premium.PremiumPeriod;
+import school.faang.user_service.entity.premium.*;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.publisher.PremiumBoughtEventPublisher;
@@ -47,15 +42,16 @@ public class PremiumService {
 
         PaymentResponse response = paymentResponseEntity.getBody();
         if (response != null && response.status() == PaymentStatus.SUCCESS) {
+            PremiumDto savedPremium = savePremium(user, period);
             publishPremiumBought(userId, period);
-            return savePremium(user, period);
+            return savedPremium;
         } else {
             throw new DataValidationException("Payment failed");
         }
     }
 
     private void publishPremiumBought(long userId, PremiumPeriod period) {
-        PremiumBoughtEventDto eventDto = PremiumBoughtEventDto.builder()
+        PremiumBoughtEvent eventDto = PremiumBoughtEvent.builder()
                 .receiverId(userId)
                 .amountPayment(period.getPrice())
                 .daysSubscription(period.getDays())

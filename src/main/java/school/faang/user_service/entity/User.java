@@ -1,7 +1,10 @@
 package school.faang.user_service.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import school.faang.user_service.entity.contact.Contact;
@@ -46,7 +49,6 @@ public class User {
     @Column(name = "about_me", length = 4096)
     private String aboutMe;
 
-    @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "country_id", nullable = false)
     private Country country;

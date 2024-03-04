@@ -7,7 +7,10 @@ import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.GoalCompletedEvent;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
+import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filter.goal.GoalFilter;
@@ -16,15 +19,9 @@ import school.faang.user_service.publisher.GoalCompletedEventPublisher;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validator.GoalValidator;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
-
-import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.goal.GoalStatus;
-
-import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
@@ -77,10 +74,13 @@ public class GoalService {
             throw new DataValidationException("Цель уже завершена");
         }
         Goal updatedGoal = goalMapper.updateGoal(goalToUpdate, goalDto);
-        goalValidator.validateSkills(updatedGoal.getSkillsToAchieve());
+        List<Skill> skills = goalDto.getSkillIds().stream().
+                map(skillService::getSkillById)
+                .toList();
+        updatedGoal.setSkillsToAchieve(skills);
         Goal savedGoal = goalRepository.save(updatedGoal);
-        if(updatedGoal.getStatus() == GoalStatus.COMPLETED) {
-            updatedGoal.getUsers().forEach(user -> updatedGoal.getSkillsToAchieve()
+        if (savedGoal.getStatus() == GoalStatus.COMPLETED) {
+            savedGoal.getUsers().forEach(user -> savedGoal.getSkillsToAchieve()
                     .forEach(skill -> skillService.assignSkillToUser(user.getId(), skill.getId())));
             GoalCompletedEvent goalCompletedEvent = GoalCompletedEvent.builder()
                     .userId(userContext.getUserId())

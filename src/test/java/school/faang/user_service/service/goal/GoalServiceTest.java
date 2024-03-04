@@ -37,6 +37,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -157,6 +158,7 @@ class GoalServiceTest {
         oldGoal.setStatus(GoalStatus.ACTIVE);
         oldGoal.setUsers(Collections.singletonList(user));
 
+        Mockito.when(skillService.getSkillById(anyLong())).thenReturn(skill);
         Mockito.when(goalRepository.save(goal)).thenReturn(goal);
         Mockito.when(goalRepository.findById(Mockito.any())).thenReturn(Optional.of(oldGoal));
         Mockito.when(goalMapper.updateGoal(oldGoal, goalDto)).thenReturn(goal);

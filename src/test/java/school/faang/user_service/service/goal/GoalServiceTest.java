@@ -12,9 +12,9 @@ import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validation.goal.GoalValidator;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -40,19 +40,36 @@ public class GoalServiceTest {
         Goal goal = getGoal();
         when(goalRepository.create(expectedDto.getTitle(), expectedDto.getDescription(), expectedDto.getParentId()))
                 .thenReturn(goal);
+        when(goalRepository.save(goal)).thenReturn(goal);
         when(goalMapper.toDto(goal)).thenReturn(expectedDto);
 
         GoalDto actualDto = goalService.createGoal(userId, expectedDto);
 
-        verify(goalValidator, times(1)).validateGoal(expectedDto.getId(), expectedDto, 3);
+        verify(goalValidator, times(1)).validateGoalCreation(expectedDto.getId(), expectedDto, 3);
         verify(goalRepository, times(1)).assignGoalToUser(goal.getId(), userId);
-        verify(skillRepository, times(expectedDto.getSkillIds().size())).assignSkillToGoal(anyLong(), anyLong());
+        assertEquals(expectedDto, actualDto);
+    }
+
+    @Test
+    public void updateGoalIsUpdating() {
+        long goalId = 1L;
+        GoalDto expectedDto = getGoalDto();
+        Goal goal = getGoal();
+        when(goalRepository.findById(goalId)).thenReturn(Optional.ofNullable(goal));
+        when(goalRepository.save(goal)).thenReturn(goal);
+        when(goalMapper.toDto(goal)).thenReturn(expectedDto);
+
+        GoalDto actualDto = goalService.updateGoal(goalId, expectedDto);
+
+        verify(goalValidator, times(1)).validateGoalUpdate(goalId, expectedDto);
+        verify(goalValidator, times(1)).validateGoalExists(expectedDto.getParentId());
         assertEquals(expectedDto, actualDto);
     }
 
     private GoalDto getGoalDto() {
         return GoalDto.builder()
                 .id(1L)
+                .parentId(1L)
                 .title("Title")
                 .description("Description")
                 .skillIds(List.of(1L, 2L, 3L))
@@ -62,6 +79,7 @@ public class GoalServiceTest {
     private Goal getGoal() {
         return Goal.builder()
                 .id(1L)
+                .parent(new Goal())
                 .title("Title")
                 .description("Description")
                 .build();

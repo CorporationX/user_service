@@ -3,8 +3,11 @@ package school.faang.user_service.validation.goal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.EntityNotFoundException;
-import school.faang.user_service.exception.goal.GoalFieldsException;
+import school.faang.user_service.exception.EntityFieldsException;
+import school.faang.user_service.exception.EntityUpdateException;
 import school.faang.user_service.exception.goal.UserReachedMaxGoalsException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -18,23 +21,51 @@ public class GoalValidator {
     private final SkillRepository skillRepository;
     private final GoalRepository goalRepository;
 
-    public void validateGoal(Long userId, GoalDto goalDto, int maxUserActiveGoals) {
-        if (goalDto.getTitle() == null) {
-            throw new GoalFieldsException("Goal title can't be null");
-        }
-        if (goalDto.getTitle().isEmpty()) {
-            throw new GoalFieldsException("Goal title can't be empty");
-        }
+    public void validateGoalCreation(Long userId, GoalDto goalDto, int maxUserActiveGoals) {
+        validateTitle(goalDto.getTitle());
         int countActiveGoals = goalRepository.countActiveGoalsPerUser(userId);
+        validateUserGoalsCount(countActiveGoals, maxUserActiveGoals);
+        validateSkills(goalDto.getSkillIds());
+    }
+
+    public void validateGoalUpdate(Long goalId, GoalDto goalDto) {
+        validateTitle(goalDto.getTitle());
+        validateGoalExists(goalId);
+        validateGoalStatus(goalId);
+        validateSkills(goalDto.getSkillIds());
+    }
+
+    public void validateGoalExists(Long goalId) {
+        if (!goalRepository.existsById(goalId)) {
+            throw new EntityNotFoundException("Goal does not exist");
+        }
+    }
+
+    private void validateGoalStatus(Long goalId) {
+        Goal foundedGoal = goalRepository.findById(goalId).get();
+        if (foundedGoal.getStatus().equals(GoalStatus.COMPLETED)) {
+            throw new EntityUpdateException("Completed goals can't be updated");
+        }
+    }
+
+    private void validateUserGoalsCount(int countActiveGoals, int maxUserActiveGoals) {
         if (countActiveGoals >= maxUserActiveGoals) {
             throw new UserReachedMaxGoalsException("User can't have more than 3 active goals");
         }
-        validateSkills(goalDto.getSkillIds());
+    }
+
+    private void validateTitle(String title) {
+        if (title == null) {
+            throw new EntityFieldsException("Goal title can't be null");
+        }
+        if (title.isEmpty()) {
+            throw new EntityFieldsException("Goal title can't be empty");
+        }
     }
 
     private void validateSkills(List<Long> skillIds) {
         if (skillIds == null || skillIds.isEmpty()) {
-            throw new GoalFieldsException("Goal must have at least one skill");
+            throw new EntityFieldsException("Goal must have at least one skill");
         }
         skillIds.forEach(this::validateSkill);
     }

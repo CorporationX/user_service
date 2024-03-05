@@ -16,10 +16,11 @@ public class EventController {
     }
 
     public EventDto create(EventDto eventDto) throws DataValidationException {
-        return eventService.create(validateEventDto(eventDto));
+        validateEventDto(eventDto);
+        return eventService.create(eventDto);
     }
 
-    private EventDto validateEventDto(EventDto eventDto) throws DataValidationException {
+    private void validateEventDto(EventDto eventDto) throws DataValidationException {
         if (eventDto.getTitle() == null || eventDto.getTitle().isEmpty() || eventDto.getTitle().trim().isEmpty()) {
             throw new DataValidationException("Event title can't be empty");
         }
@@ -29,6 +30,5 @@ public class EventController {
         if (eventDto.getOwnerId() == null) {
             throw new DataValidationException("Enter the owner of the event");
         }
-        return eventDto;
     }
 }

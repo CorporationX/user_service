@@ -21,10 +21,12 @@ public class EventService {
     private final EventMapper eventMapper;
 
     public EventDto create(EventDto eventDto) {
-        return eventMapper.toDto(eventRepository.save(eventMapper.toEntity(userHasRequiredSkillsValidation(eventDto))));
+        userHasRequiredSkillsValidation(eventDto);
+        eventRepository.save(eventMapper.toEntity(eventDto));
+        return eventDto;
     }
 
-    private EventDto userHasRequiredSkillsValidation(EventDto eventDto) {
+    private void userHasRequiredSkillsValidation(EventDto eventDto) {
         List<Skill> userSkills = skillRepository.findAllByUserId(eventDto.getOwnerId());
         List<Skill> requiredSkills = eventDto.getRelatedSkills().stream()
                 .map(skillMapper::toEntity)
@@ -32,6 +34,5 @@ public class EventService {
         if (!userSkills.containsAll(requiredSkills)) {
             throw new DataValidationException("User hasn't got required skills for this event");
         }
-        return eventDto;
     }
 }

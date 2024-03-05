@@ -17,6 +17,6 @@ public class FollowerEventPublisher extends AbstractEventPublisher<FollowerEvent
     }
 
     public void publish(FollowerEvent followerEvent) {
-        convert(followerEvent, followerChannel);
+        convertAndSend(followerEvent, followerChannel);
     }
 }

@@ -21,7 +21,7 @@ public class RecommendationService {
     private final RecommendationRepository recommendationRepository;
 
     public RecommendationDto create(RecommendationDto recommendationDto) {
-        validationToCreateRecommendation(recommendationDto);
+        validateAuthorAndReceiver(recommendationDto);
         Recommendation entity = recommendationMapper.toEntity(recommendationDto);
         entity = recommendationRepository.save(entity);
         long entityId = recommendationRepository.create(recommendationDto.getAuthorId(), recommendationDto.getReceiverId(), recommendationDto.getContent());
@@ -32,17 +32,13 @@ public class RecommendationService {
         return recommendationMapper.toDto(entity);
     }
 
-    private void validationToCreateRecommendation(RecommendationDto recommendationDto) {
+    private void validateAuthorAndReceiver(RecommendationDto recommendationDto) {
         if (!userRepository.existsById(recommendationDto.getAuthorId())) {
             throw new IllegalArgumentException("There are no author id in data base");
         }
 
         if (!userRepository.existsById(recommendationDto.getReceiverId())) {
             throw new IllegalArgumentException("There are no receiver id in data base");
-        }
-
-        if (recommendationDto.getContent().isBlank() || recommendationDto.getContent() == null) {
-            throw new IllegalArgumentException("There are no content");
         }
 
         if (recommendationDto.getAuthorId() == recommendationDto.getReceiverId()) {

@@ -16,6 +16,6 @@ public class RecommendationEventPublisher extends AbstractEventPublisher<Recomme
     }
 
     public void publish(RecommendationEvent recommendationEvent) {
-        convert(recommendationEvent, recommendationChannel);
+        convertAndSend(recommendationEvent, recommendationChannel);
     }
 }

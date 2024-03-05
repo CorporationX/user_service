@@ -62,17 +62,6 @@ public class RecommendationServiceTest {
     }
 
     @Test
-    void testContentIsEmpty() {
-        when(userRepository.existsById(2L)).thenReturn(true);
-        when(userRepository.existsById(3L)).thenReturn(true);
-        recommendationDto.setContent("");
-
-        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
-                () -> recommendationService.create(recommendationDto));
-        assertEquals("There are no content", illegalArgumentException.getMessage());
-    }
-
-    @Test
     void testRecommendationToYourselfIsInvalid() {
         when(userRepository.existsById(2L)).thenReturn(true);
         recommendationDto.setReceiverId(2L);

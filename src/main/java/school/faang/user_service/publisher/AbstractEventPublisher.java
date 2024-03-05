@@ -12,7 +12,7 @@ public abstract class AbstractEventPublisher<T> {
     private final ObjectMapper objectMapper;
     private final RedisTemplate<String, Object> redisTemplate;
 
-    public void convert(T event, String channelTopic) {
+    public void convertAndSend(T event, String channelTopic) {
         try {
             String json = objectMapper.writeValueAsString(event);
             redisTemplate.convertAndSend(channelTopic, json);
@@ -21,4 +21,6 @@ public abstract class AbstractEventPublisher<T> {
             throw new RuntimeException("Json processing exception");
         }
     }
+
+    public abstract void publish(T event);
 }

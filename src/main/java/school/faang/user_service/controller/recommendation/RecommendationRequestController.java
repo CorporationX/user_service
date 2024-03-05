@@ -20,20 +20,20 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/recommendationRequest")
+@RequestMapping("/api/v1/recommendations")
 public class RecommendationRequestController {
 
     private final RecommendationRequestService recommendationRequestService;
 
-    @PostMapping("/create")
+    @PostMapping
     public RecommendationRequestDto requestRecommendation(@RequestBody RecommendationRequestDto recommendationRequest) {
         if ((recommendationRequest.getMessage() == null) || recommendationRequest.getMessage().isBlank())
             throw new MessageRequestException("Incorrect user's message");
         return recommendationRequestService.create(recommendationRequest);
     }
 
-    @GetMapping("/{recommendationRequestId}")
-    public RecommendationRequestDto getRecommendationRequest(@PathVariable("recommendationRequestId") long id) {
+    @GetMapping("/{id}")
+    public RecommendationRequestDto getRecommendationRequest(@PathVariable("id") long id) {
         return recommendationRequestService.getRequest(id);
     }
 
@@ -42,8 +42,8 @@ public class RecommendationRequestController {
         return recommendationRequestService.getRequest(filter);
     }
 
-    @DeleteMapping("/reject/{requestId}")
-    public RecommendationRequestDto rejectRequest(@PathVariable("requestId") long id, @RequestBody RejectionDto rejection) {
+    @DeleteMapping("/{id}")
+    public RecommendationRequestDto rejectRequest(@PathVariable("id") long id, @RequestBody RejectionDto rejection) {
         return recommendationRequestService.rejectRequest(id, rejection);
     }
 

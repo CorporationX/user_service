@@ -6,6 +6,7 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -14,6 +15,7 @@ import school.faang.user_service.validation.goal.GoalValidator;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -66,11 +68,21 @@ public class GoalServiceTest {
         assertEquals(expectedDto, actualDto);
     }
 
+    @Test
+    public void deleteIsDeleting() {
+        long goalId = 1L;
+
+        assertDoesNotThrow(() -> goalService.deleteGoal(goalId));
+        verify(goalValidator, times(1)).validateGoalExists(goalId);
+        verify(goalRepository, times(1)).deleteById(goalId);
+    }
+
     private GoalDto getGoalDto() {
         return GoalDto.builder()
                 .id(1L)
                 .parentId(1L)
                 .title("Title")
+                .status(GoalStatus.ACTIVE)
                 .description("Description")
                 .skillIds(List.of(1L, 2L, 3L))
                 .build();
@@ -80,6 +92,7 @@ public class GoalServiceTest {
         return Goal.builder()
                 .id(1L)
                 .parent(new Goal())
+                .status(GoalStatus.ACTIVE)
                 .title("Title")
                 .description("Description")
                 .build();

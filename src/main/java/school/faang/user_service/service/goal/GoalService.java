@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -44,16 +46,33 @@ public class GoalService {
         return goalMapper.toDto(goalRepository.save(goal));
     }
 
+    @Transactional
+    public void deleteGoal(Long goalId) {
+        goalValidator.validateGoalExists(goalId);
+        goalRepository.deleteById(goalId);
+    }
+
     private void updateGoalFields(Goal goal, GoalDto goalDto) {
         if (goalDto.getParentId() != null) {
             Long parentId = goalDto.getParentId();
             goalValidator.validateGoalExists(parentId);
             goal.setParent(goalRepository.findById(parentId).get());
         }
+        if (goalDto.getStatus().equals(GoalStatus.COMPLETED)) {
+            goal.getUsers().forEach(user -> addSkillsToUser(user, goal));
+        }
         goal.setTitle(goalDto.getTitle());
         goal.setStatus(goalDto.getStatus());
         goal.setDescription(goalDto.getDescription());
         goal.setSkillsToAchieve(skillIdsToSkills(goalDto.getSkillIds()));
+    }
+
+    private void addSkillsToUser(User user, Goal goal) {
+        goal.getSkillsToAchieve().forEach(skill -> {
+            if (!user.getSkills().contains(skill)) {
+                skillRepository.assignSkillToUser(skill.getId(), user.getId());
+            }
+        });
     }
 
     private List<Skill> skillIdsToSkills(List<Long> skillIds) {

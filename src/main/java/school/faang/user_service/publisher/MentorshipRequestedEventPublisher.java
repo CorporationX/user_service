@@ -16,6 +16,6 @@ public class MentorshipRequestedEventPublisher extends AbstractEventPublisher<Me
     }
 
     public void publish(MentorshipRequestedEvent mentorshipRequestedEvent) {
-        convert(mentorshipRequestedEvent, mentorshipRequestedChannelName);
+        convertAndSend(mentorshipRequestedEvent, mentorshipRequestedChannelName);
     }
 }

@@ -15,7 +15,7 @@ public class EventController {
         this.eventService = eventService;
     }
 
-    public EventDto create(EventDto eventDto) throws DataValidationException {
+    public EventDto create(EventDto eventDto) {
         validateEventDto(eventDto);
         return eventService.create(eventDto);
     }

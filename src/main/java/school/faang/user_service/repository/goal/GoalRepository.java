@@ -1,5 +1,6 @@
 package school.faang.user_service.repository.goal;
 
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -21,7 +22,8 @@ public interface GoalRepository extends CrudRepository<Goal, Long> {
 
     @Query(nativeQuery = true, value = """
             INSERT INTO goal (title, description, parent_goal_id, status, created_at, updated_at)
-            VALUES (?1, ?2, ?3, 0, NOW(), NOW()) returning goal
+            VALUES (?1, ?2, ?3, 0, NOW(), NOW()) 
+            returning id, title, description, parent_goal_id, status, deadline, created_at, updated_at, mentor_id;
             """)
     Goal create(String title, String description, Long parent);
 
@@ -49,4 +51,8 @@ public interface GoalRepository extends CrudRepository<Goal, Long> {
             WHERE ug.goal_id = :goalId
             """)
     List<User> findUsersByGoalId(long goalId);
+
+    @Query(nativeQuery = true, value = "INSERT INTO user_goal (goal_id, user_id) VALUES (:goalId, :userId)")
+    @Modifying
+    void assignGoalToUser(long goalId, long userId);
 }

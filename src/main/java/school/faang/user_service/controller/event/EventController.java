@@ -20,7 +20,7 @@ public class EventController {
     }
 
     private EventDto validateEventDto(EventDto eventDto) throws DataValidationException {
-        if (eventDto.getTitle() == null || eventDto.getTitle().isEmpty()) {
+        if (eventDto.getTitle() == null || eventDto.getTitle().isEmpty() || eventDto.getTitle().trim().isEmpty()) {
             throw new DataValidationException("Event title can't be empty");
         }
         if (eventDto.getStartDate() == null) {

@@ -50,7 +50,4 @@ public interface GoalRepository extends CrudRepository<Goal, Long> {
             WHERE ug.goal_id = :goalId
             """)
     List<User> findUsersByGoalId(long goalId);
-    @Query(nativeQuery = true, value = "INSERT INTO user_goal (user_id, goal_id) VALUES (:userId, :goalId)")
-    @Modifying
-    void assignGoalToUser(long userId, long goalId);
 }

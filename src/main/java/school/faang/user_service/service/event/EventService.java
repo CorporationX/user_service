@@ -21,10 +21,10 @@ public class EventService {
     private final EventMapper eventMapper;
 
     public EventDto create(EventDto eventDto) {
-        return eventMapper.toDto(eventRepository.save(eventMapper.toEntity(userHasRequiredSkills(eventDto))));
+        return eventMapper.toDto(eventRepository.save(eventMapper.toEntity(userHasRequiredSkillsValidation(eventDto))));
     }
 
-    private EventDto userHasRequiredSkills(EventDto eventDto) {
+    private EventDto userHasRequiredSkillsValidation(EventDto eventDto) {
         List<Skill> userSkills = skillRepository.findAllByUserId(eventDto.getOwnerId());
         List<Skill> requiredSkills = eventDto.getRelatedSkills().stream()
                 .map(skillMapper::toEntity)

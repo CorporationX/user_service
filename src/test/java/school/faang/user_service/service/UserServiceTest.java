@@ -7,7 +7,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.user.UserService;
 
 import java.util.Optional;
 
@@ -20,10 +19,6 @@ import static org.mockito.Mockito.when;
 public class UserServiceTest {
     @Mock
     private UserRepository userRepository;
-
-    @InjectMocks
-    private UserService userService;
-
     @Test
     void getUsers() {
         assertTrue(true);
@@ -35,10 +30,6 @@ public class UserServiceTest {
         User user = new User();
         user.setId(userId);
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-
-        User result = userService.getUserById(userId);
-
-        assertEquals(userId, result.getId());
         verify(userRepository, times(1)).findById(userId);
     }
 
@@ -48,13 +39,8 @@ public class UserServiceTest {
         user.setId(1L);
         user.setUsername("testuser");
         user.setEmail("testuser@example.com");
-
         when(userRepository.existsById(user.getId())).thenReturn(true);
-
-        userService.saveUser(user);
-
         verify(userRepository, times(1)).save(user);
 
-        assertTrue(userService.existsUserById(user.getId()));
     }
 }

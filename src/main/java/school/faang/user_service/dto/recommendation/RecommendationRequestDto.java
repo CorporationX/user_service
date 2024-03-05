@@ -7,15 +7,14 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import lombok.NonNull;
 import school.faang.user_service.entity.RequestStatus;
 
 @Data
 public class RecommendationRequestDto {
     private Long id;
-    @NotNull
     @NotBlank(message = "Message is blank")
     private String message;
+    @NotNull
     private RequestStatus status;
     private List<Long> skillIds;
     @NotNull(message = "Requester can't be null")

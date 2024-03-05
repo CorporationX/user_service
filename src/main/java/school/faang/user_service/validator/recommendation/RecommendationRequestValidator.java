@@ -1,21 +1,22 @@
 package school.faang.user_service.validator.recommendation;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
+import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.handler.exception.EntityExistException;
+import school.faang.user_service.handler.exception.EntityNotFoundException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
-import school.faang.user_service.util.recommendation.exception.RequestRecommendationException;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class RecommendationRequestValidator {
     private final SkillRequestRepository skillRequestRepository;
@@ -23,28 +24,20 @@ public class RecommendationRequestValidator {
     private final UserRepository userRepository;
 
     public void validateSkills(List<Long> skillIds) {
-        if (skillIds != null) {
+        if (skillIds != null && !skillIds.isEmpty()) {
             skillIds.forEach(skillId -> {
                 if (!skillRequestRepository.existsById(skillId)) {
-                    throw new RequestRecommendationException("Skill id not found" + skillId);
+                    throw new EntityNotFoundException("Skill id not found" + skillId);
                 }
             });
         }
     }
 
-    public void validateRequester(long requesterId) {
-        Optional<User> requester = userRepository.findById(requesterId);
+    public void validateUser(long userId) {
+        Optional<User> user = userRepository.findById(userId);
 
-        if (requester.isEmpty()) {
-            throw new RequestRecommendationException("Requester not found");
-        }
-    }
-
-    public void validateReceiver(long receiverId) {
-        Optional<User> receiver = userRepository.findById(receiverId);
-
-        if (receiver.isEmpty()) {
-            throw new RequestRecommendationException("Receiver not found");
+        if (user.isEmpty()) {
+            throw new EntityNotFoundException("User not found");
         }
     }
 
@@ -53,7 +46,7 @@ public class RecommendationRequestValidator {
 
         recommendationRequest.ifPresent(request -> {
             if (request.getCreatedAt().plusMonths(6).isAfter(LocalDateTime.now())) {
-                throw new RequestRecommendationException("Запрос рекомендации от одного и того же пользователя к другому можно отправлять не чаще, чем один раз в 6 месяцев");
+                throw new EntityExistException("Запрос рекомендации от одного и того же пользователя к другому можно отправлять не чаще, чем один раз в 6 месяцев");
             }
         });
     }
@@ -61,8 +54,9 @@ public class RecommendationRequestValidator {
     public void validate(RecommendationRequestDto recommendationRequestDto) {
         long requesterId = recommendationRequestDto.getRequesterId();
         long receiverId = recommendationRequestDto.getReceiverId();
-        validateRequester(requesterId);
-        validateReceiver(receiverId);
+
+        validateUser(requesterId);
+        validateUser(receiverId);
         validateRequestFrequency(requesterId, receiverId);
         validateSkills(recommendationRequestDto.getSkillIds());
     }

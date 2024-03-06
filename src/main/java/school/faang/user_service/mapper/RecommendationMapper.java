@@ -12,6 +12,7 @@ public interface RecommendationMapper {
     @Mapping(target = "authorId", source = "author.id")
     @Mapping(target = "receiverId", source = "receiver.id")
     RecommendationDto toDto(Recommendation recommendation);
+
     @Mapping(source = "authorId", target = "author.id")
     @Mapping(source = "receiverId", target = "receiver.id")
     Recommendation toEntity(RecommendationDto recommendationDto);

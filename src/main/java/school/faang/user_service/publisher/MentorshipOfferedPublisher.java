@@ -7,7 +7,7 @@ import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 
 @Component
 @RequiredArgsConstructor
-public class MentorshipOfferedPublisher extends EventPublisher<MentorshipRequestDto> {
+public class MentorshipOfferedPublisher extends AbstractEventPublisher<MentorshipRequestDto> {
 
     private final ChannelTopic mentorshipOfferedTopic;
 

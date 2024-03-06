@@ -8,7 +8,7 @@ import java.util.List;
 public class GoalDto {
     private Long id;
     private String description;
-    private Long parentId; // у любой цели может быть цель-родителя
+    private Long parentId;
     private String title;
     private GoalStatus status;
     private List<Long> skillIds;

@@ -1,20 +1,17 @@
 package school.faang.user_service.service.goal;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exceptions.DataValidationException;
+import school.faang.user_service.exceptions.EntityFieldsException;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,38 +23,57 @@ public class GoalService {
 
     public GoalDto createGoal(Long userId, GoalDto goalDto) {
         validateGoal(userId, goalDto);
-        Goal goalEntity = initGoalEntity(goalDto);
-        checkSkillsOnExistence(goalEntity);
-        goalRepository.create(goalEntity.getTitle(), goalEntity.getDescription(), goalEntity.getParent().getId());
-        return goalMapper.toDto(goalRepository.save(goalEntity));
+        checkSkillsOnExistence(goalDto);
+        Goal createdGoal = goalRepository.create(goalDto.getTitle(), goalDto.getDescription(), goalDto.getParentId());
+        createdGoal.setSkillsToAchieve(skillIdsToSkills(goalDto.getSkillIds()));
+        return goalMapper.toDto(goalRepository.save(createdGoal));
     }
 
     private void validateGoal(Long userId, GoalDto goalDto) {
+        checkMaximumGoalsPerUser(userId);
+        checkExistingTitleGoal(userId, goalDto);
+    }
+
+    private void validateTitle(String title) {
+        if (title == null) {
+            throw new EntityFieldsException("Goal title can't be null");
+        }
+        if (title.isEmpty()) {
+            throw new EntityFieldsException("Goal title can't be empty");
+        }
+    }
+
+    private void checkSkillsOnExistence(GoalDto goalDto) {
+        List<Long> existingSkills = getIdSkillFromRepository();
+        List<Long> idSkillsGoal = goalDto.getSkillIds();
+        existingSkills.forEach(skill -> {
+            if (!idSkillsGoal.contains(skill)) {
+                throw new DataValidationException("Скилла нету в списке доступных скиллов");
+            }
+        });
+    }
+
+    private void checkMaximumGoalsPerUser(Long userId) {
         if (goalRepository.countActiveGoalsPerUser(userId) == MAX_COUNT_GOALS) { // Можно создать свой Exception
             throw new DataValidationException("Достигнуто максимальное количество целей у пользователя");
         }
+    }
+
+    private void checkExistingTitleGoal(Long userId, GoalDto goalDto) {
+        validateTitle(goalDto.getTitle());
         goalRepository.findGoalsByUserId(userId).forEach(goalFromData -> {
-            if(goalDto.getTitle().equalsIgnoreCase(goalFromData.getTitle())){
+            if (goalDto.getTitle().equalsIgnoreCase(goalFromData.getTitle())) {
                 throw new DataValidationException("Название такой цели уже есть");
             }
         });
     }
 
-    private void checkSkillsOnExistence(Goal goal) {
-        List<Skill> existingSkills = skillRepository.findAll();
-        List<Long> idSkillsGoal = goal.getSkillsToAchieve().stream().map(Skill::getId).toList();
-        existingSkills.forEach(skill -> {
-            if (idSkillsGoal.contains(skill.getId())) {
-                throw new DataValidationException("Недопустимые скиллы");
-            }
-        });
+    private List<Long> getIdSkillFromRepository() {
+        return skillRepository.findAll().stream()
+                .map(Skill::getId).toList();
     }
 
-    private Goal initGoalEntity(GoalDto goalDto) {
-        Goal goalEntity = goalMapper.toEntity(goalDto);
-        List<Long> skillIdGoal = goalDto.getSkillIds();
-        List<Skill> goalSkill = skillRepository.findAllById(skillIdGoal);
-        goalEntity.setSkillsToAchieve(goalSkill);
-        return goalEntity;
+    private List<Skill> skillIdsToSkills(List<Long> skillIds) {
+        return skillRepository.findAllById(skillIds);
     }
 }

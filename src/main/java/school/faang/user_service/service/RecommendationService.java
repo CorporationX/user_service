@@ -8,7 +8,6 @@ import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -18,13 +17,20 @@ public class RecommendationService {
     private final RecommendationMapper recommendationMapper;
 
     public List<RecommendationDto> getAllUserRecommendations(long receiverId){
-        return recommendationRepository.findAllByReceiverId(receiverId, Pageable.unpaged())
+        return recommendationRepository.findAllByReceiverId(receiverId)
                 .stream()
                 .map(recommendationMapper::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public void delete(long id) {
         recommendationRepository.deleteById(id);
+    }
+
+    public List<RecommendationDto> getAllGivenRecommendations(long authorId) {
+        return recommendationRepository.findAllByAuthorId(authorId)
+                .stream()
+                .map(recommendationMapper::toDto)
+                .toList();
     }
 }

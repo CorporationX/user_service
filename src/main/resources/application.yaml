@@ -29,14 +29,15 @@ spring:
         follower_channel:
           name: follower_channel
         profile_view_channel:
-          name: profile_view_channel
+            name: profile_view_channel
+        recommendation_channel:
+            name: recommendation_channel
 
   async:
     core-pool-size: 5
     max-pool-size: 10
     queue-capacity: 500
     thread-name-prefix: StudentThread-
-
 
 server:
   port: 8080

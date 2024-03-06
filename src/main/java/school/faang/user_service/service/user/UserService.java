@@ -46,6 +46,10 @@ public class UserService {
         return userMapper.toUserCreateDto(userRepository.save(user));
     }
 
+   public boolean existById(long id){
+        return userRepository.existsById(id);
+   }
+
     private Stream<UserDto> userFilter(Stream<UserDto> userDtoStream, UserFilterDto userFilterDto) {
         return userFilters.stream()
                 .filter(userFilter -> userFilter.isApplicable(userFilterDto))

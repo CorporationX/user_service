@@ -12,5 +12,5 @@ import java.time.LocalDateTime;
 public class GoalSetEvent {
     private long userId;
     private long goalId;
-    private LocalDateTime timestamp;
+    private LocalDateTime createAt;
 }

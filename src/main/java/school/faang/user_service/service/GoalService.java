@@ -90,12 +90,11 @@ public class GoalService {
         goal.setSkillsToAchieve(skillsToUpdate);
 
         if (goal.getStatus() == GoalStatus.COMPLETED) {
-            goal.getUsers().forEach(user -> goalCompletedEventPublisher.publish(new GoalCompletedEvent(user.getId(), goalId, LocalDateTime.now())));
-
             goal.getUsers().forEach(user -> skillsToUpdate
                     .forEach(skill -> skillService.assignSkillToUser(user.getId(), skill.getId())));
-        }
 
+            goal.getUsers().forEach(user -> goalCompletedEventPublisher.publish(new GoalCompletedEvent(user.getId(), goalId, LocalDateTime.now())));
+        }
 
         return goalMapper.toDto(goalRepository.save(goal));
     }
@@ -133,9 +132,9 @@ public class GoalService {
         userService.saveUser(userToUpdate);
         goalToSave.setUsers(List.of(userToUpdate));
 
-        Goal save = goalRepository.save(goalToSave);
-        goalEventPublisher.publish(new GoalSetEvent(userId, save.getId(), LocalDateTime.now()));
-        return goalMapper.toDto(save);
+        Goal goal = goalRepository.save(goalToSave);
+        goalEventPublisher.publish(new GoalSetEvent(userId, goal.getId(), goal.getCreatedAt()));
+        return goalMapper.toDto(goal);
     }
 
     public int countActiveGoalsPerUser(long userId) {

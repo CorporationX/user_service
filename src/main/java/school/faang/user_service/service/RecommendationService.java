@@ -17,10 +17,10 @@ public class RecommendationService {
     private final RecommendationMapper recommendationMapper;
 
     public List<RecommendationDto> getAllUserRecommendations(long receiverId){
-        return recommendationRepository.findAllByReceiverId(receiverId, Pageable.unpaged())
+        return recommendationRepository.findAllByReceiverId(receiverId)
                 .stream()
                 .map(recommendationMapper::toDto)
-                .toList());
+                .toList();
     }
 
     public void delete(long id) {

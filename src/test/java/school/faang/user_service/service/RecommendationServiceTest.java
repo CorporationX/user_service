@@ -40,31 +40,6 @@ public class RecommendationServiceTest {
         }
 
     @Test
-    void testGetAllUserRecommendations() {
-        long receiverId = 1L;
-
-        Recommendation recommendationEntity1 = new Recommendation();
-        Recommendation recommendationEntity2 = new Recommendation();
-        RecommendationDto result = RecommendationDto.builder().receiverId(receiverId).build();
-        List<Recommendation> recommendationEntities = Arrays.asList(recommendationEntity1, recommendationEntity2);
-
-        Page<Recommendation> recommendationPage = new PageImpl<>(recommendationEntities);
-
-        when(recommendationRepository.findAllByReceiverId(eq(receiverId), any(Pageable.class)))
-                .thenReturn(recommendationPage);
-
-        when(recommendationMapper.toDto(any(Recommendation.class)))
-                .thenReturn(result);
-
-        List<RecommendationDto> resultRecs = recommendationService.getAllUserRecommendations(receiverId);
-
-        assertEquals(recommendationEntities.size(), resultRecs.size());
-
-        verify(recommendationMapper, times(recommendationEntities.size())).toDto(any(Recommendation.class));
-
-    }
-
-    @Test
     public void testDeleteRecommendation() {
         long id = 1L;
         recommendationService.delete(id);

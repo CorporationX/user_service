@@ -7,9 +7,9 @@ import school.faang.user_service.dto.MentorshipOfferedEvent;
 @Component
 public class MentorshipOfferedEventPublisher extends AbstractEventPublisher<MentorshipOfferedEvent> {
     @Value("${spring.data.redis.channels.mentorship_offered_channel.name}")
-    private String MentorshipOfferedChannelName;
+    private String mentorshipOfferedChannelName;
 
     public void publish(MentorshipOfferedEvent event) {
-        publish(event, MentorshipOfferedChannelName);
+        publish(event, mentorshipOfferedChannelName);
     }
 }

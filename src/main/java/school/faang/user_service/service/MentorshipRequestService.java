@@ -50,6 +50,7 @@ public class MentorshipRequestService {
         MentorshipOfferedEvent event = new MentorshipOfferedEvent();
         event.setAuthorId(requestDto.getRequesterId());
         event.setMentorId(requestDto.getReceiverId());
+        event.setReceivedAt(LocalDateTime.now());
         mentorshipOfferedEventPublisher.publish(event);
         log.info("Mentorship event published");
     }

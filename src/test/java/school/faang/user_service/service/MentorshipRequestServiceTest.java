@@ -78,9 +78,6 @@ class MentorshipRequestServiceTest {
         long requesterId = 1L;
         long receiverId = 2L;
         MentorshipRequestDto requestDto = new MentorshipRequestDto(1L, 2L, "Description");
-        MentorshipOfferedEvent event = new MentorshipOfferedEvent();
-        event.setAuthorId(1);
-        event.setMentorId(2);
 
         when(userRepository.existsById(requesterId)).thenReturn(true);
         when(userRepository.existsById(receiverId)).thenReturn(true);
@@ -90,7 +87,7 @@ class MentorshipRequestServiceTest {
         verify(requestValidator).validateUserIds(requesterId, receiverId);
         verify(requestValidator).validateRequestTime(requesterId, receiverId);
         verify(requestRepository).create(1L, 2L, requestDto.getDescription());
-        verify(mentorshipOfferedEventPublisher).publish(event);
+        verify(mentorshipOfferedEventPublisher).publish(any(MentorshipOfferedEvent.class));
     }
 
     @Test

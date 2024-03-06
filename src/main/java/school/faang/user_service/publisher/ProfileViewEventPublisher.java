@@ -2,8 +2,8 @@ package school.faang.user_service.publisher;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.ProfileViewEvent;
@@ -12,18 +12,17 @@ import java.time.LocalDateTime;
 
 @Component
 @Slf4j
-public class ProfileViewEventPublisher {
-    private final ChannelTopic userViewTopic;
-    private final UserContext userContext;
-    private final AbstractEventPublisher<ProfileViewEvent> abstractEventPublisher;
+public class ProfileViewEventPublisher extends AbstractEventPublisher<ProfileViewEvent> {
 
-    public ProfileViewEventPublisher(ChannelTopic userViewTopic,
-                                     RedisTemplate<String, Object> redisTemplate,
+    @Value("${spring.data.redis.channels.profile_view_channel.name}")
+    private String profileViewChannelName;
+    private final UserContext userContext;
+
+    public ProfileViewEventPublisher(RedisTemplate<String, Object> redisTemplate,
                                      ObjectMapper objectMapper,
                                      UserContext userContext) {
-        this.userViewTopic = userViewTopic;
+        super(redisTemplate, objectMapper);
         this.userContext = userContext;
-        this.abstractEventPublisher = new AbstractEventPublisher<>(redisTemplate, objectMapper);
     }
 
     public void publish(long userId) {
@@ -33,6 +32,6 @@ public class ProfileViewEventPublisher {
                 .receivedAt(LocalDateTime.now())
                 .build();
 
-        abstractEventPublisher.send(userViewTopic.getTopic(), event);
+        send(profileViewChannelName, event);
     }
 }

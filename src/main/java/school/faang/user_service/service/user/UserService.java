@@ -3,7 +3,6 @@ package school.faang.user_service.service.user;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserRegistrationDto;
 import school.faang.user_service.entity.Country;
@@ -34,7 +33,6 @@ public class UserService {
     private final GoalRepository goalRepository;
     private final UserProfilePic generatedUserProfilePic;
     private final ProfileViewEventPublisher publisher;
-    private final UserContext userContext;
 
     public UserRegistrationDto createUser(UserRegistrationDto userDto) {
         User user = userMapper.toEntity(userDto);
@@ -52,7 +50,7 @@ public class UserService {
     public UserDto getUserDtoById(long id) {
         UserDto userDto = userMapper.toDto(getUserById(id));
         publisher.publish(id);
-        //userValidator.validateAccessToUser(id);
+        userValidator.validateAccessToUser(id);
         return userDto;
     }
 

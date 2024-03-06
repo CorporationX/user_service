@@ -60,8 +60,8 @@ public class MentorshipRequestService {
 
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         MentorshipRequest mentorshipRequest = mentorshipRequestMapper.toEntity(mentorshipRequestDto);
-        User receiver = userService.getUserById(mentorshipRequestDto.getReceiver());
-        User requester = userService.getUserById(mentorshipRequestDto.getRequester());
+        User receiver = userService.getUserById(mentorshipRequestDto.getReceiverId());
+        User requester = userService.getUserById(mentorshipRequestDto.getRequesterId());
 
         mentorshipRequestValidator.validateUserData(receiver, requester);
 
@@ -69,7 +69,7 @@ public class MentorshipRequestService {
         mentorshipRequest.setRequester(requester);
         mentorshipRequest.setStatus(RequestStatus.PENDING);
         mentorshipRequestRepository.save(mentorshipRequest);
-        mentorshipOfferedPublisher.publish(mentorshipRequestDto);
+        mentorshipOfferedPublisher.publish(mentorshipRequestMapper.toEvent(mentorshipRequestDto));
         return mentorshipRequestMapper.toDTO(mentorshipRequest);
     }
 

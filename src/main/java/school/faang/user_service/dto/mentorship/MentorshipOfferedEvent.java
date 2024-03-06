@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class MentorshipOfferedEvent {
 
     private Long id;
-    private long requester;
-    private long receiver;
+    private long requesterId;
+    private long receiverId;
 
 }

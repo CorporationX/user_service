@@ -19,7 +19,7 @@ public abstract class AbstractEventPublisher<T> {
         try {
             String json = objectMapper.writeValueAsString(eventDto);
             redisTemplate.convertAndSend(topicName, json);
-            log.info("Event was send to topic : {}", topicName);
+            log.info("Event send to topic : {}", topicName);
         } catch (JsonProcessingException e) {
             log.error("Failed attempt convert to json");
             throw new RuntimeException(e.getMessage());

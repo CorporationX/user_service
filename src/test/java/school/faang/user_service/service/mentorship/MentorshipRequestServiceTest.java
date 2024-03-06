@@ -73,10 +73,10 @@ class MentorshipRequestServiceTest {
     @BeforeEach
     public void init() {
         mentorshipRequestDto = new MentorshipRequestDto();
-        mentorshipRequestDto.setRequester(1L);
+        mentorshipRequestDto.setRequesterId(1L);
         mentorshipRequestDto.setDescription("Description");
-        mentorshipRequestDto.setRequester(88L);
-        mentorshipRequestDto.setReceiver(77L);
+        mentorshipRequestDto.setRequesterId(88L);
+        mentorshipRequestDto.setReceiverId(77L);
         mentorshipRequestDto.setCreatedAt(LocalDateTime.now());
         requestFilterDto = new RequestFilterDto();
         requestFilterDto.setDescriptionFilter("Description filter");

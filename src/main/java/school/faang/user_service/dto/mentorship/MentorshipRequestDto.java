@@ -18,9 +18,9 @@ public class MentorshipRequestDto {
 
     private String description;
 
-    private Long requester;
+    private Long requesterId;
 
-    private Long receiver;
+    private Long receiverId;
 
     private RequestStatus status;
 

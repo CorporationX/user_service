@@ -2,12 +2,8 @@ package school.faang.user_service.controller.mentorship;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.service.mentorship.MentorshipService;
 
 import java.util.List;
 
@@ -15,9 +11,18 @@ import java.util.List;
 public class MentorshipController {
     @Autowired
     private MentorshipService mentorshipService;
-    @PostMapping("/mentors/{mentorId}/mentees")
-    @ResponseBody
-    public List<User> getMentees(@PathVariable Long mentorId){
-        return mentorshipService.getMentees(mentorId);
+
+    public List<User> getMentees(long userId){
+
+        return mentorshipService.getMentees(userId);
+    }
+
+    public List<User> getMentors(long userId){
+
+        return mentorshipService.getMentors(userId);
+    }
+
+    public void deleteMentee(long menteeId, long mentorId) {
+        mentorshipService.deleteMentee(menteeId, mentorId);
     }
 }

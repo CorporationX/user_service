@@ -25,76 +25,76 @@ public class EventControllerTest {
 
     @Test
     public void testValidEvent() {
-        EventDto testEvent = EventDto.builder()
+        EventDto event = EventDto.builder()
                 .title("Valid title")
                 .startDate(LocalDateTime.now())
                 .ownerId(1L)
                 .build();
 
-        eventController.create(testEvent);
+        eventController.create(event);
         verify(eventService, times(1))
-                .create(testEvent);
+                .create(event);
     }
 
     @Test
     public void testNullTitleIsInvalid() {
         assertThrows(DataValidationException.class, () -> {
-            EventDto testEvent = EventDto.builder()
+            EventDto event = EventDto.builder()
                     .startDate(LocalDateTime.now())
                     .ownerId(1L)
                     .build();
 
-            eventController.create(testEvent);
+            eventController.create(event);
         });
     }
 
     @Test
     public void testEmptyTitleIsInvalid() {
         assertThrows(DataValidationException.class, () -> {
-            EventDto testEvent = EventDto.builder()
+            EventDto event = EventDto.builder()
                     .title("")
                     .startDate(LocalDateTime.now())
                     .ownerId(1L)
                     .build();
 
-            eventController.create(testEvent);
+            eventController.create(event);
         });
     }
 
     @Test
     public void testSpacesTitleIsInvalid() {
         assertThrows(DataValidationException.class, () -> {
-            EventDto testEvent = EventDto.builder()
+            EventDto event = EventDto.builder()
                     .title("   ")
                     .startDate(LocalDateTime.now())
                     .ownerId(1L)
                     .build();
 
-            eventController.create(testEvent);
+            eventController.create(event);
         });
     }
 
     @Test
     public void testNullStartDateIsInvalid() {
         assertThrows(DataValidationException.class, () -> {
-            EventDto testEvent = EventDto.builder()
+            EventDto event = EventDto.builder()
                     .title("Valid title")
                     .ownerId(1L)
                     .build();
 
-            eventController.create(testEvent);
+            eventController.create(event);
         });
     }
 
     @Test
     public void testNullOwnerIdIsInvalid() {
         assertThrows(DataValidationException.class, () -> {
-            EventDto testEvent = EventDto.builder()
+            EventDto event = EventDto.builder()
                     .title("Valid title")
                     .startDate(LocalDateTime.now())
                     .build();
 
-            eventController.create(testEvent);
+            eventController.create(event);
         });
     }
 }

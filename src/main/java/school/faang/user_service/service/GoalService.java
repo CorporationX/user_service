@@ -105,6 +105,11 @@ public class GoalService {
         return goalRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Цель не найдена"));
     }
 
+    public GoalDto findDtoById(long id) {
+        Goal goal = goalRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Цель не найдена"));
+        return goalMapper.toDto(goal);
+    }
+
     @Transactional
     public GoalDto createGoal(long userId, GoalDto goalDto) {
 

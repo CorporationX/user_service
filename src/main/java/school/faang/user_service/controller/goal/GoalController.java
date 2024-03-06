@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,10 +41,14 @@ public class GoalController {
         return goalService.createGoal(userId, goal);
     }
 
+    @GetMapping("/goals/{goalId}")
+    public GoalDto getGoalById(@PathVariable Long goalId) {
+        return goalService.findDtoById(goalId);
+    }
+
     public void deleteGoal(long goalId) {
         goalService.deleteGoal(goalId);
     }
-
 
     public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter) {
         return goalService.getGoalsByUser(userId, filter);

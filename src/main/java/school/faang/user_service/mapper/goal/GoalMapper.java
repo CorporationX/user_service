@@ -21,6 +21,8 @@ public interface GoalMapper {
     @Mapping(target = "parent.id", source = "parentId")
     Goal toEntity(GoalDto goalDto);
 
+    List<GoalDto> toDto(List<Goal> goals);
+
     @Named("skillsToSkillIds")
     default List<Long> skillsToSkillIds(List<Skill> skills) {
         return skills.stream()

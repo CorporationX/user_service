@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.util.HashSet;
 import java.util.List;
@@ -14,8 +13,6 @@ import java.util.Set;
 @Component
 @RequiredArgsConstructor
 public class GoalSkillsFilter implements GoalFilter {
-
-    private final GoalRepository goalRepository;
 
     @Override
     public boolean isApplicable(GoalFilterDto filters) {

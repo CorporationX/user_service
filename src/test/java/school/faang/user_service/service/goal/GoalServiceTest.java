@@ -93,6 +93,16 @@ public class GoalServiceTest {
         verify(goalMapper, times(1)).toDto(anyList());
     }
 
+    @Test
+    public void getGoalsByUserTest() {
+        long userId = 1L;
+        GoalFilterDto goalFilterDto = new GoalFilterDto();
+
+        goalService.getGoalsByUser(userId, goalFilterDto);
+        verify(goalRepository, times(1)).findGoalsByUserId(userId);
+        verify(goalMapper, times(1)).toDto(anyList());
+    }
+
     private GoalDto getGoalDto() {
         return GoalDto.builder()
                 .id(1L)
@@ -112,25 +122,5 @@ public class GoalServiceTest {
                 .title("Title")
                 .description("Description")
                 .build();
-    }
-
-    private List<Goal> getGoals() {
-        Goal goal1 = Goal.builder()
-                .id(1L)
-                .build();
-        Goal goal2 = Goal.builder()
-                .id(1L)
-                .build();
-        return List.of(goal1, goal2);
-    }
-
-    private List<GoalDto> getGoalDtos() {
-        GoalDto goal1 = GoalDto.builder()
-                .id(1L)
-                .build();
-        GoalDto goal2 = GoalDto.builder()
-                .id(1L)
-                .build();
-        return List.of(goal1, goal2);
     }
 }

@@ -23,24 +23,29 @@ public class GoalController {
 
     private final GoalService goalService;
 
-    @PostMapping("/{id}")
-    public ResponseEntity<GoalDto> createGoal(@PathVariable Long id, @RequestBody GoalDto goalDto) {
-        return new ResponseEntity<>(goalService.createGoal(id, goalDto), HttpStatus.CREATED);
+    @PostMapping("/{userId}")
+    public ResponseEntity<GoalDto> createGoal(@PathVariable Long userId, @RequestBody GoalDto goalDto) {
+        return new ResponseEntity<>(goalService.createGoal(userId, goalDto), HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
-    public GoalDto updateGoal(@PathVariable Long id, @RequestBody GoalDto goalDto) {
-        return goalService.updateGoal(id, goalDto);
+    @PutMapping("/{goalId}")
+    public GoalDto updateGoal(@PathVariable Long goalId, @RequestBody GoalDto goalDto) {
+        return goalService.updateGoal(goalId, goalDto);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteGoal(@PathVariable Long id) {
-        goalService.deleteGoal(id);
+    @DeleteMapping("/{goalId}")
+    public ResponseEntity<HttpStatus> deleteGoal(@PathVariable Long goalId) {
+        goalService.deleteGoal(goalId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping("/{id}/subtasks")
-    public List<GoalDto> findSubtasksByGoalId(@PathVariable Long id, @RequestBody GoalFilterDto filters) {
-        return goalService.findSubtasksByGoalId(id, filters);
+    @PostMapping("/{goalId}/subtasks")
+    public List<GoalDto> findSubtasksByGoalId(@PathVariable Long goalId, @RequestBody GoalFilterDto filters) {
+        return goalService.findSubtasksByGoalId(goalId, filters);
+    }
+
+    @PostMapping("/{userId}/goals")
+    public List<GoalDto> getGoalsByUser(@PathVariable Long userId, @RequestBody GoalFilterDto filters) {
+        return goalService.getGoalsByUser(userId, filters);
     }
 }

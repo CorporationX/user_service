@@ -61,11 +61,24 @@ public class GoalService {
         goalValidator.validateGoalExists(goalId);
         List<Goal> goals = goalRepository.findByParent(goalId)
                 .collect(Collectors.toList());
+        applyFilters(goals, filters);
+
+        return goalMapper.toDto(goals);
+    }
+
+    @Transactional
+    public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filters) {
+        List<Goal> goals = goalRepository.findGoalsByUserId(userId)
+                .collect(Collectors.toList());
+        applyFilters(goals, filters);
+
+        return goalMapper.toDto(goals);
+    }
+
+    private void applyFilters(List<Goal> goals, GoalFilterDto filters) {
         goalFilters.stream()
                 .filter(goalFilter -> goalFilter.isApplicable(filters))
                 .forEach(goalFilter -> goalFilter.apply(goals, filters));
-
-        return goalMapper.toDto(goals);
     }
 
     private void updateGoalFields(Goal goal, GoalDto goalDto) {

@@ -33,7 +33,7 @@ public class GoalValidatorTest {
     private GoalValidator goalValidator;
 
     @Test
-    public void validateGoalCreation_NullTitle_ThrowsException() {
+    void validateGoalCreation_NullTitle_ThrowsException() {
         Long userId = 1L;
         int maxCountActiveGoalsPerUser = 3;
         assertThrows(EntityFieldsException.class, ()
@@ -41,7 +41,7 @@ public class GoalValidatorTest {
     }
 
     @Test
-    public void validateGoalCreation_EmptyTitle_ThrowsException() {
+    void validateGoalCreation_EmptyTitle_ThrowsException() {
         Long userId = 1L;
         int maxCountActiveGoalsPerUser = 3;
         assertThrows(EntityFieldsException.class, ()
@@ -49,7 +49,7 @@ public class GoalValidatorTest {
     }
 
     @Test
-    public void validateGoalCreation_NullSkills_ThrowsException() {
+    void validateGoalCreation_NullSkills_ThrowsException() {
         Long userId = 1L;
         int maxCountActiveGoalsPerUser = 3;
         assertThrows(EntityFieldsException.class, ()
@@ -57,7 +57,7 @@ public class GoalValidatorTest {
     }
 
     @Test
-    public void validateGoalCreation_EmptySkills_ThrowsException() {
+    void validateGoalCreation_EmptySkills_ThrowsException() {
         Long userId = 1L;
         int maxCountActiveGoalsPerUser = 3;
         assertThrows(EntityFieldsException.class, ()
@@ -65,7 +65,7 @@ public class GoalValidatorTest {
     }
 
     @Test
-    public void validateGoalCreation_MaxGoals_ThrowsException() {
+    void validateGoalCreation_MaxGoals_ThrowsException() {
         Long userId = 1L;
         int maxCountActiveGoalsPerUser = 3;
         when(goalRepository.countActiveGoalsPerUser(anyLong())).thenReturn(maxCountActiveGoalsPerUser);
@@ -75,7 +75,7 @@ public class GoalValidatorTest {
     }
 
     @Test
-    public void validateGoalCreation_SkillNotExist_ThrowsException() {
+    void validateGoalCreation_SkillNotExist_ThrowsException() {
         Long userId = 1L;
         int maxCountActiveGoalsPerUser = 3;
         when(goalRepository.countActiveGoalsPerUser(anyLong())).thenReturn(maxCountActiveGoalsPerUser - 1);
@@ -86,7 +86,7 @@ public class GoalValidatorTest {
     }
 
     @Test
-    public void validateGoalCreation_ValidParams_DoesNotThrows() {
+    void validateGoalCreation_ValidParams_DoesNotThrows() {
         Long userId = 1L;
         int maxCountActiveGoalsPerUser = 3;
         when(goalRepository.countActiveGoalsPerUser(anyLong())).thenReturn(maxCountActiveGoalsPerUser - 1);
@@ -97,21 +97,21 @@ public class GoalValidatorTest {
     }
 
     @Test
-    public void validateGoalUpdate_NullTitle_ThrowsException() {
+    void validateGoalUpdate_NullTitle_ThrowsException() {
         Long goalId = 1L;
         assertThrows(EntityFieldsException.class, ()
                 -> goalValidator.validateGoalUpdate(goalId, getGoalDtoNullTitle()));
     }
 
     @Test
-    public void validateGoalUpdate_EmptyTitle_ThrowsException() {
+    void validateGoalUpdate_EmptyTitle_ThrowsException() {
         Long goalId = 1L;
         assertThrows(EntityFieldsException.class, ()
                 -> goalValidator.validateGoalUpdate(goalId, getGoalDtoEmptyTitle()));
     }
 
     @Test
-    public void validateGoalUpdate_NotExists_ThrowsException() {
+    void validateGoalUpdate_NotExists_ThrowsException() {
         Long goalId = 1L;
         when(goalRepository.existsById(goalId)).thenReturn(false);
 
@@ -120,7 +120,7 @@ public class GoalValidatorTest {
     }
 
     @Test
-    public void validateGoalUpdate_InvalidStatus_ThrowsException() {
+    void validateGoalUpdate_InvalidStatus_ThrowsException() {
         Long goalId = 1L;
         when(goalRepository.existsById(goalId)).thenReturn(true);
         when(goalRepository.findById(goalId)).thenReturn(Optional.ofNullable(getGoalToUpdateInvalidStatus()));
@@ -130,7 +130,7 @@ public class GoalValidatorTest {
     }
 
     @Test
-    public void validateGoalUpdate_NullSkills_ThrowsException() {
+    void validateGoalUpdate_NullSkills_ThrowsException() {
         Long goalId = 1L;
         when(goalRepository.existsById(goalId)).thenReturn(true);
         when(goalRepository.findById(goalId)).thenReturn(Optional.ofNullable(getGoalToUpdateValidStatus()));
@@ -140,7 +140,7 @@ public class GoalValidatorTest {
     }
 
     @Test
-    public void validateGoalUpdate_EmptySkills_ThrowsException() {
+    void validateGoalUpdate_EmptySkills_ThrowsException() {
         Long goalId = 1L;
         when(goalRepository.existsById(goalId)).thenReturn(true);
         when(goalRepository.findById(goalId)).thenReturn(Optional.ofNullable(getGoalToUpdateValidStatus()));
@@ -150,7 +150,7 @@ public class GoalValidatorTest {
     }
 
     @Test
-    public void validateGoalUpdate_SkillNotExists_ThrowsException() {
+    void validateGoalUpdate_SkillNotExists_ThrowsException() {
         Long goalId = 1L;
         when(goalRepository.existsById(goalId)).thenReturn(true);
         when(goalRepository.findById(goalId)).thenReturn(Optional.ofNullable(getGoalToUpdateValidStatus()));
@@ -161,7 +161,7 @@ public class GoalValidatorTest {
     }
 
     @Test
-    public void validateGoalExists_NotExists_ThrowsException() {
+    void validateGoalExists_NotExists_ThrowsException() {
         Long goalId = 1L;
         when(goalRepository.existsById(goalId)).thenReturn(false);
         assertThrows(EntityNotFoundException.class, ()

@@ -41,7 +41,7 @@ public class GoalServiceTest {
     private GoalService goalService;
 
     @Test
-    public void create_GoalIsValid_GoalIsCreating() {
+    void create_GoalIsValid_GoalIsCreating() {
         long userId = 1L;
         GoalDto expectedDto = getGoalDto();
         Goal goal = getGoal();
@@ -58,7 +58,7 @@ public class GoalServiceTest {
     }
 
     @Test
-    public void update_GoalIsValid_GoalIsUpdating() {
+    void update_GoalIsValid_GoalIsUpdating() {
         long goalId = 1L;
         GoalDto expectedDto = getGoalDto();
         Goal goal = getGoal();
@@ -74,7 +74,7 @@ public class GoalServiceTest {
     }
 
     @Test
-    public void delete_GoalIdIsValid_IsDeleting() {
+    void delete_GoalIdIsValid_IsDeleting() {
         long goalId = 1L;
 
         assertDoesNotThrow(() -> goalService.deleteGoal(goalId));
@@ -83,7 +83,7 @@ public class GoalServiceTest {
     }
 
     @Test
-    public void findSubtasksByGoalId_GoalIdIsValid_DoesNotThrows() {
+    void findSubtasksByGoalId_GoalIdIsValid_DoesNotThrows() {
         long goalId = 1L;
         GoalFilterDto filters = new GoalFilterDto();
 
@@ -94,7 +94,7 @@ public class GoalServiceTest {
     }
 
     @Test
-    public void getGoalsByUserTest() {
+    void getGoalsByUserTest() {
         long userId = 1L;
         GoalFilterDto goalFilterDto = new GoalFilterDto();
 

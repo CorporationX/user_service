@@ -14,8 +14,6 @@ import java.util.List;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface GoalMapper {
 
-
-
     @Mapping(target = "parent", ignore = true)
     @Mapping(target = "skillsToAchieve", ignore = true)
     Goal toEntity(GoalDto goalDto);
@@ -24,6 +22,13 @@ public interface GoalMapper {
     @Mapping(source = "skillsToAchieve", target = "skillIds", qualifiedByName = "toSkillIds")
     GoalDto toDto(Goal goal);
 
+    @Mapping(target = "goal.skillsToAchieve", ignore = true)
+    @Mapping(target = "goal.parent", ignore = true)
+    @Mapping(target = "id", source = "goal.id")
+    @Mapping(target = "title", source = "goalDto.title")
+    @Mapping(target = "description", source = "goalDto.description")
+    @Mapping(target = "status", source = "goalDto.status")
+    Goal updateGoal(Goal goal, GoalDto goalDto);
 
     @Named("toSkillIds")
     default List<Long> toSkillIds(List<Skill> skills) {

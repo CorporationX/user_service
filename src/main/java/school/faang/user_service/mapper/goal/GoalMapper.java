@@ -1,4 +1,4 @@
-package school.faang.user_service.mapper;
+package school.faang.user_service.mapper.goal;
 
 import org.mapstruct.*;
 import school.faang.user_service.dto.goal.GoalDto;
@@ -8,8 +8,7 @@ import school.faang.user_service.entity.goal.Goal;
 import java.util.Collections;
 import java.util.List;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        injectionStrategy = InjectionStrategy.FIELD)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface GoalMapper {
     @Mapping(source = "parentId", target = "parent.id")
     @Mapping(source = "skillIds", target = "skillsToAchieve", qualifiedByName = "mapToSkillLong")

@@ -1,17 +1,15 @@
 package school.faang.user_service.dto.user;
 
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import school.faang.user_service.dto.skill.SkillDto;
+
 import java.util.List;
 
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class UserDto {
     private Long id;
     private String username;
@@ -22,4 +20,5 @@ public class UserDto {
     private String city;
     private Integer experience;
     private List<SkillDto> skills;
+
 }

@@ -1,46 +1,56 @@
 package school.faang.user_service.controller.mentorship;
 
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("api/v1/mentorship")
 public class MentorshipController {
     private final MentorshipService mentorshipService;
 
-    public List<UserDto> getMentees(long userId) {
-        if (isIdValid(userId))
-            return mentorshipService.getMentees(userId);
-        else
-            throw new IllegalArgumentException("Incorrect id entered");
+
+    @Operation(
+            summary = "Get Mentees",
+            description = "Get list of mentees by user identifier"
+    )
+    @GetMapping("/mentor/{id}")
+    public List<UserDto> getMentees(@PathVariable @Positive(message = "Id должен быть положительным") long id) {
+        return mentorshipService.getMentees(id);
     }
 
-    public List<UserDto> getMentors(long userId) {
-        if (isIdValid(userId))
-            return mentorshipService.getMentors(userId);
-        else
-            throw new IllegalArgumentException("Incorrect id entered");
+    @Operation(
+            summary = "Get Mentors",
+            description = "Get list of mentors by user identifier"
+    )
+    @GetMapping("/mentee/{id}")
+    public List<UserDto> getMentors(@PathVariable @Positive(message = "Id должен быть положительным") long id) {
+        return mentorshipService.getMentors(id);
     }
 
-    public void deleteMentee(long menteeId, long mentorId) {
-        if (isIdValid(menteeId) && isIdValid(mentorId))
-            mentorshipService.deleteMentee(menteeId, mentorId);
-        else
-            throw new IllegalArgumentException("Incorrect id entered");
+    @Operation(
+            summary = "Delete Mentee",
+            description = "Delete mentee by mentor's and mentee's identifier"
+    )
+    @DeleteMapping("/mentor/{mentorId}/mentee/{menteeId}")
+    public void deleteMentee(@PathVariable @Positive(message = "Id должен быть положительным") long menteeId,
+                             @PathVariable @Positive(message = "Id должен быть положительным") long mentorId) {
+        mentorshipService.deleteMentee(menteeId, mentorId);
     }
 
-    public void deleteMentor(long menteeId, long mentorId) {
-        if (isIdValid(menteeId) && isIdValid(mentorId))
-            mentorshipService.deleteMentor(menteeId, mentorId);
-        else
-            throw new IllegalArgumentException("Incorrect id entered");
-    }
-
-    public boolean isIdValid(long id) {
-        return id >= 1;
+    @Operation(
+            summary = "Delete Mentor",
+            description = "Delete mentor by mentor's and mentee's identifier"
+    )
+    @DeleteMapping("/mentee/{menteeId}/mentor/{mentorId}")
+    public void deleteMentor(@PathVariable @Positive(message = "Id должен быть положительным") long menteeId,
+                             @PathVariable @Positive(message = "Id должен быть положительным") long mentorId) {
+        mentorshipService.deleteMentor(menteeId, mentorId);
     }
 }

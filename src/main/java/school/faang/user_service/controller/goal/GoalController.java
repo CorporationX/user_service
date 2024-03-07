@@ -1,54 +1,49 @@
 package school.faang.user_service.controller.goal;
 
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
-import school.faang.user_service.exceptions.DataValidationException;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.goal.GoalService;
 import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("api/v1/goal")
+@Validated
 public class GoalController {
 
     private final GoalService goalService;
 
-    public void deleteGoal(Long goalId) {
-        validateId(goalId);
+    @DeleteMapping("/{goalId}")
+    public void deleteGoal(@PathVariable @Positive(message = "Id должен быть положительным и больше 0") Long goalId) {
         goalService.deleteGoal(goalId);
     }
 
-    public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter) {
-        validateId(userId);
+    @PostMapping("/{userId}")
+    public List<GoalDto> getGoalsByUser(@PathVariable @Positive(message = "Id должен быть положительным и больше 0") Long userId,
+                                        @RequestBody @Validated GoalFilterDto filter) {
         return goalService.getGoalsByUser(userId, filter);
     }
 
-    public List<GoalDto> findSubtasksByGoalId(Long goalId) {
-        validateId(goalId);
+    @GetMapping("/{goalId}/subtasks")
+    public List<GoalDto> findSubtasksByGoalId(@PathVariable @Positive(message = "Id должен быть положительным и больше 0") Long goalId) {
         return goalService.findSubtasksByGoalId(goalId);
     }
 
-    public List<GoalDto> retrieveFilteredSubtasksForGoal(Long goalId, GoalFilterDto goalFilterDto) {
-        validateId(goalId);
+    @PostMapping("/{goalId}/subtasks/filter")
+    public List<GoalDto> retrieveFilteredSubtasksForGoal(@PathVariable @Positive(message = "Id должен быть положительным и больше 0") Long goalId,
+                                                         @RequestBody @Validated GoalFilterDto goalFilterDto) {
         return goalService.retrieveFilteredSubtasksForGoal(goalId, goalFilterDto);
     }
 
-    public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
-        validateId(goalId);
-        validateTitle(goalDto);
+    @PutMapping("/{goalId}")
+    public GoalDto updateGoal(@PathVariable @Positive(message = "Id должен быть положительным и больше 0") Long goalId,
+                              @RequestBody @Validated GoalDto goalDto) {
         return goalService.updateGoal(goalId, goalDto);
-    }
-
-    private void validateTitle(GoalDto goalDto) {
-        if (goalDto.getTitle() == null || goalDto.getTitle().isBlank()) {
-            throw new DataValidationException("Invalid title: " + goalDto.getTitle());
-        }
-    }
-
-    private void validateId(Long id) {
-        if (id == null || id <= 0) {
-            throw new DataValidationException("Invalid ID: " + id);
-        }
     }
 }

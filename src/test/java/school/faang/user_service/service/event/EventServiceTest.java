@@ -1,5 +1,6 @@
 package school.faang.user_service.service.event;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -10,175 +11,141 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.service.event.filters.EventFilter;
+import school.faang.user_service.service.event.filter.EventFilter;
+import school.faang.user_service.validation.event.EventValidator;
 
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.junit.Assert.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-public class EventServiceTest {
+class EventServiceTest {
 
     @Mock
     private EventRepository eventRepository;
-
     @Mock
     private SkillRepository skillRepository;
-
     @Mock
     private UserRepository userRepository;
-
+    @Mock
+    private EventValidator eventValidator;
     @Mock
     private SkillMapper skillMapper;
-
     @Mock
     private EventMapper eventMapper;
-
     @Mock
     private List<EventFilter> eventFilters;
-
     @InjectMocks
     private EventService eventService;
 
-    @Test
-    public void create_UserHasRequiredSkills_thenSavedToDb() {
-        EventDto eventDto = EventDto.builder()
-                .ownerId(1L)
-                .relatedSkills(List.of(new SkillDto()))
-                .build();
+    private Event event;
+    private EventDto eventDto;
+    private Skill requiredSkill;
+    private SkillDto requiredSkillDto;
+    private Skill userSkill;
+    private SkillDto userSkillDto;
+    private User user;
 
-        when(skillRepository.findAllByUserId(1L)).thenReturn(List.of(new Skill()));
-        when(skillMapper.toEntity(any(SkillDto.class))).thenReturn(new Skill());
-        when(eventMapper.toEntity(any(EventDto.class))).thenReturn(new Event());
-
-        Event event = eventMapper.toEntity(eventDto);
-        EventDto returnedDtoIfNoException = eventService.create(eventDto);
-
-        verify(eventRepository, times(1)).save(event);
-        assertEquals(eventDto, returnedDtoIfNoException);
-    }
-
-    @Test
-    public void create_UserDoesntHaveRequiredSkills_ShouldThrowDataValidationException() {
-        SkillDto requiredSkillDto = SkillDto.builder()
+    @BeforeEach
+    void setUp() {
+        requiredSkill = Skill.builder()
+                .id(1)
                 .title("Required skill")
                 .build();
-        Skill requiredSkill = Skill.builder()
-                .title(requiredSkillDto.getTitle())
+        requiredSkillDto = SkillDto.builder()
+                .id(requiredSkill.getId())
+                .title(requiredSkill.getTitle())
                 .build();
-        Skill userSkill = Skill.builder()
+        userSkill = Skill.builder()
+                .id(2)
                 .title("User's skill")
                 .build();
-        EventDto eventDto = EventDto.builder()
-                .ownerId(1L)
-                .relatedSkills(List.of(requiredSkillDto))
+        userSkillDto = SkillDto.builder()
+                .id(userSkill.getId())
+                .title(userSkill.getTitle())
                 .build();
-
-        when(skillRepository.findAllByUserId(anyLong())).thenReturn(List.of(userSkill));
-        when(skillMapper.toEntity(any(SkillDto.class))).thenReturn(requiredSkill);
-
-        assertThrows(DataValidationException.class, () -> eventService.create(eventDto));
-    }
-
-    @Test
-    public void create_UserDoesntHaveAnySkills_ShouldThrowDataValidationException() {
-        SkillDto requiredSkillDto = SkillDto.builder()
-                .title("Required skill")
+        user = User.builder()
+                .id(3)
+                .username("Valid username")
+                .skills(List.of(userSkill))
                 .build();
-        Skill requiredSkill = Skill.builder()
-                .title(requiredSkillDto.getTitle())
+        event = Event.builder()
+                .id(4)
+                .title("Valid event title")
+                .description("Valid description")
+                .startDate(LocalDateTime.of(2024, Month.JANUARY, 2, 12, 0))
+                .endDate(LocalDateTime.now().plusYears(5))
+                .location("Valid location")
+                .maxAttendees(50)
+                .owner(user)
+                .relatedSkills(List.of(requiredSkill))
                 .build();
-        EventDto eventDto = EventDto.builder()
-                .ownerId(1L)
-                .relatedSkills(List.of(requiredSkillDto))
-                .build();
-
-        when(skillRepository.findAllByUserId(anyLong())).thenReturn(null);
-        when(skillMapper.toEntity(any(SkillDto.class))).thenReturn(requiredSkill);
-
-        assertThrows(DataValidationException.class, () -> eventService.create(eventDto));
-    }
-
-    @Test
-    public void getEvent_EventIsFound_IsValid() {
-        long id = 1;
-        Event event = Event.builder()
-                .id(id)
-                .build();
-        EventDto eventDto = EventDto.builder()
+        eventDto = EventDto.builder()
                 .id(event.getId())
+                .title(event.getTitle())
+                .startDate(event.getStartDate())
+                .endDate(event.getEndDate())
+                .ownerId(event.getOwner().getId())
+                .description(event.getDescription())
+                .relatedSkills(List.of(requiredSkillDto))
+                .location(event.getLocation())
+                .maxAttendees(event.getMaxAttendees())
                 .build();
-
-        when(eventRepository.findById(id)).thenReturn(Optional.of(event));
-        when(eventMapper.toDto(event)).thenReturn(eventDto);
-
-        assertEquals(eventDto, eventService.getEvent(id));
     }
 
     @Test
-    public void getEvent_EventIsNotFound_ShouldThrowNoSuchElementException() {
-        long invalidId = 1;
-        Event event = Event.builder()
-                .id(2)
-                .build();
-        EventDto eventDto = EventDto.builder()
-                .id(event.getId())
-                .build();
-
-        when(eventRepository.findById(invalidId)).thenReturn(Optional.ofNullable(null));
-        when(eventMapper.toDto(event)).thenReturn(eventDto);
-
-        assertThrows(NoSuchElementException.class, () ->
-                eventService.getEvent(invalidId));
+    void create_userSavedToDb_isValid() {
+        doNothing().when(eventValidator).validateUserHasRequiredSkills(eventDto);
+        eventService.create(eventDto);
+        verify(eventRepository, times(1)).save(eventMapper.toEntity(eventDto));
     }
 
     @Test
-    public void deleteEvent_EventIsDeleted_IsValid() {
-        long idOfEventToDelete = 1;
-        when(eventRepository.existsById(idOfEventToDelete)).thenReturn(true);
+    void getEvent_EventIsFound_isValid() {
+        doNothing().when(eventValidator).validateEventExistsById(anyLong());
+        when(eventRepository.findById(anyLong())).thenReturn(Optional.ofNullable(event));
 
-        eventService.deleteEvent(idOfEventToDelete);
-
-        verify(eventRepository, times(1)).deleteById(idOfEventToDelete);
+        eventService.getEvent(anyLong());
+        verify(eventMapper, times(1)).toDto(any(Event.class));
     }
 
     @Test
-    public void deleteEvent_EventIsNotFound_ShouldThrowNoSuchElementException() {
-        long idOfEventToDelete = 1;
-        when(eventRepository.existsById(idOfEventToDelete)).thenReturn(false);
+    void deleteEvent_EventIsDeleted_IsValid() {
+        doNothing().when(eventValidator).validateEventExistsById(anyLong());
 
-        assertThrows(NoSuchElementException.class, () ->
-                eventService.deleteEvent(idOfEventToDelete));
-
+        eventService.deleteEvent(1);
+        verify(eventRepository, times(1)).deleteById(anyLong());
     }
 
     @Test
-    public void updateEvent_EventUpdated_ThenSavedToDb() {
+    void updateEvent_EventFoundAndUpdated_ThenSavedToDb() {
+        doNothing().when(eventValidator).validateUserHasRequiredSkills(any(EventDto.class));
+        when(eventRepository.findById(anyLong())).thenReturn(Optional.of(event));
+        doNothing().when(eventValidator).validateUserIsOwnerOfEvent(any(User.class), any(EventDto.class));
+        when(eventRepository.save(any(Event.class))).thenReturn(event);
 
+        eventService.updateEvent(eventDto);
+
+        verify(eventRepository, times(1)).save(any(Event.class));
+        verify(eventMapper, times(1)).toDto(any(Event.class));
     }
 
     @Test
-    public void updateEvent_UserIsNotOwner_ShouldThrowIllegalStateException() {
-
-    }
-
-    @Test
-    public void getEventsByFilter_FiltersByTitle_IsValid() {
+    void getEventsByFilter_FiltersByTitle_IsValid() {
         EventFilterDto filters = new EventFilterDto();
 
         eventService.getEventsByFilter(filters);

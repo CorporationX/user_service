@@ -1,4 +1,4 @@
-package school.faang.user_service.service.event.filters;
+package school.faang.user_service.service.event.filter;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.EventFilterDto;

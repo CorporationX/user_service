@@ -1,5 +1,6 @@
 package school.faang.user_service.mapper;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -13,29 +14,39 @@ import school.faang.user_service.entity.event.Event;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
-public class EventMapperTest {
+class EventMapperTest {
 
     @Mock
-    private SkillMapper skillMapper = new SkillMapperImpl();
-
+    private SkillMapper skillMapper;
     @InjectMocks
-    private EventMapper eventMapper = new EventMapperImpl();
+    private EventMapperImpl eventMapper;
 
-    @Test
-    public void toDtoTest() {
-        User user = User.builder()
+    private User user;
+    private Skill skill;
+    private SkillDto skillDto;
+    private Event event;
+    private EventDto eventDto;
+
+    @BeforeEach
+    void setUp() {
+        user = User.builder()
                 .id(1L)
                 .build();
-
-        Skill skill = Skill.builder()
+        skill = Skill.builder()
                 .id(1L)
                 .title("Skill")
                 .build();
-
-        Event event = Event.builder()
+        skillDto = SkillDto.builder()
+                .id(skill.getId())
+                .title(skill.getTitle())
+                .build();
+        event = Event.builder()
                 .id(1L)
                 .title("Title")
                 .startDate(LocalDateTime.now())
@@ -46,30 +57,7 @@ public class EventMapperTest {
                 .location("Location")
                 .maxAttendees(10)
                 .build();
-
-        EventDto eventDto = eventMapper.toDto(event);
-
-        assertEquals(eventDto.getId(), event.getId());
-        assertEquals(eventDto.getTitle(), event.getTitle());
-        assertEquals(eventDto.getStartDate(), event.getStartDate());
-        assertEquals(eventDto.getEndDate(), event.getEndDate());
-        assertEquals(eventDto.getOwnerId(), event.getOwner().getId());
-        assertEquals(eventDto.getDescription(), event.getDescription());
-        assertEquals(eventDto.getRelatedSkills(), event.getRelatedSkills().stream()
-                .map(skillMapper::toDto)
-                .toList());
-        assertEquals(eventDto.getLocation(), event.getLocation());
-        assertEquals(eventDto.getMaxAttendees(), event.getMaxAttendees());
-    }
-
-    @Test
-    public void toEntityTest() {
-        SkillDto skillDto = SkillDto.builder()
-                .id(1L)
-                .title("Title")
-                .build();
-
-        EventDto eventDto = EventDto.builder()
+        eventDto = EventDto.builder()
                 .id(1L)
                 .title("Title")
                 .startDate(LocalDateTime.now())
@@ -80,19 +68,43 @@ public class EventMapperTest {
                 .location("Location")
                 .maxAttendees(10)
                 .build();
+    }
+
+    @Test
+    void toDtoTest() {
+        when(skillMapper.toDto(anyList())).thenReturn(List.of(skillDto));
+
+        EventDto eventDto = eventMapper.toDto(event);
+
+        assertAll(
+                () -> assertEquals(eventDto.getId(), event.getId()),
+                () -> assertEquals(eventDto.getTitle(), event.getTitle()),
+                () -> assertEquals(eventDto.getStartDate(), event.getStartDate()),
+                () -> assertEquals(eventDto.getEndDate(), event.getEndDate()),
+                () -> assertEquals(eventDto.getOwnerId(), event.getOwner().getId()),
+                () -> assertEquals(eventDto.getDescription(), event.getDescription()),
+                () -> assertEquals(eventDto.getRelatedSkills(), skillMapper.toDto(event.getRelatedSkills())),
+                () -> assertEquals(eventDto.getLocation(), event.getLocation()),
+                () -> assertEquals(eventDto.getMaxAttendees(), event.getMaxAttendees())
+        );
+    }
+
+    @Test
+    void toEntityTest() {
+        when(skillMapper.toEntity(anyList())).thenReturn(List.of(skill));
 
         Event event = eventMapper.toEntity(eventDto);
 
-        assertEquals(event.getId(), eventDto.getId());
-        assertEquals(event.getTitle(), eventDto.getTitle());
-        assertEquals(event.getStartDate(), eventDto.getStartDate());
-        assertEquals(event.getEndDate(), eventDto.getEndDate());
-        assertEquals(event.getOwner().getId(), eventDto.getOwnerId());
-        assertEquals(event.getDescription(), eventDto.getDescription());
-        assertEquals(event.getRelatedSkills(), eventDto.getRelatedSkills().stream()
-                .map(skillMapper::toEntity)
-                .toList());
-        assertEquals(eventDto.getLocation(), event.getLocation());
-        assertEquals(eventDto.getMaxAttendees(), event.getMaxAttendees());
+        assertAll(
+                () -> assertEquals(event.getId(), eventDto.getId()),
+                () -> assertEquals(event.getTitle(), eventDto.getTitle()),
+                () -> assertEquals(event.getStartDate(), eventDto.getStartDate()),
+                () -> assertEquals(event.getEndDate(), eventDto.getEndDate()),
+                () -> assertEquals(event.getOwner().getId(), eventDto.getOwnerId()),
+                () -> assertEquals(event.getDescription(), eventDto.getDescription()),
+                () -> assertEquals(event.getRelatedSkills(), skillMapper.toEntity(eventDto.getRelatedSkills())),
+                () -> assertEquals(event.getLocation(), eventDto.getLocation()),
+                () -> assertEquals(event.getMaxAttendees(), eventDto.getMaxAttendees())
+        );
     }
 }

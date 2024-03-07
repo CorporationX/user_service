@@ -3,9 +3,9 @@ package school.faang.user_service.controller.event;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.event.EventDto;
-import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.dto.event.EventFilterDto;
+import school.faang.user_service.service.event.EventService;
+import school.faang.user_service.validation.event.EventValidator;
 
 import java.util.List;
 
@@ -13,9 +13,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EventController {
     private final EventService eventService;
+    private final EventValidator eventValidator;
 
     public EventDto create(EventDto eventDto) {
-        validateEventDto(eventDto);
+        eventValidator.validateEventDtoFields(eventDto);
         return eventService.create(eventDto);
     }
 
@@ -27,24 +28,12 @@ public class EventController {
         return eventService.getEventsByFilter(filters);
     }
 
-    public void deleteEvent(long eventId){
+    public void deleteEvent(long eventId) {
         eventService.deleteEvent(eventId);
     }
 
     public void updateEvent(EventDto eventDto) {
-        validateEventDto(eventDto);
+        eventValidator.validateEventDtoFields(eventDto);
         eventService.updateEvent(eventDto);
-    }
-
-    private void validateEventDto(EventDto eventDto) throws DataValidationException {
-        if (eventDto.getTitle() == null || eventDto.getTitle().isEmpty() || eventDto.getTitle().trim().isEmpty()) {
-            throw new DataValidationException("Event title can't be empty");
-        }
-        if (eventDto.getStartDate() == null) {
-            throw new DataValidationException("Specify the start date of the event");
-        }
-        if (eventDto.getOwnerId() == null) {
-            throw new DataValidationException("Enter the owner of the event");
-        }
     }
 }

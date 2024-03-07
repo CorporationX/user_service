@@ -1,35 +1,25 @@
 package school.faang.user_service.publisher;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.follower.FollowerEventDto;
-
-@Component
-@RequiredArgsConstructor
 @Slf4j
-public class FollowerEventPublisher {
-
-    private final RedisTemplate<String, Object> redisTemplate;
-    private final ObjectMapper objectMapper;
+@Component
+public class FollowerEventPublisher extends AbstractEventPublisher<FollowerEventDto>{
 
     @Value("${spring.data.redis.channels.follower_channel.name}")
-    private String followerTopic;
+    private String followerEventChannel;
 
-    public void publish(FollowerEventDto followerEventDto) {
-        try {
-            String json = objectMapper.writeValueAsString(followerEventDto);
-            redisTemplate.convertAndSend(followerTopic, json);
-            log.info("Отправлено событие подписки пользователя с ID: {}, на пользователя с ID: {}",
-                    followerEventDto.getFolloweeId(),
-                    followerEventDto.getFollowerId());
-        } catch (JsonProcessingException e) {
-            log.error("Ошибка в обработке ", e);
-            throw new RuntimeException(e);
-        }
+    public FollowerEventPublisher(ObjectMapper objectMapper, RedisTemplate<String, Object> redisTemplate) {
+        super(objectMapper, redisTemplate);
     }
+
+    @Override
+    public void publish(FollowerEventDto event) {
+        convertAndSend(event, followerEventChannel);
+    }
+
 }

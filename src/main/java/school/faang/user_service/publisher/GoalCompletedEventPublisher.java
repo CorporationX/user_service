@@ -8,8 +8,10 @@ import school.faang.user_service.dto.GoalCompletedEvent;
 @Component
 @Slf4j
 public class GoalCompletedEventPublisher extends AbstractEventPublisher<GoalCompletedEvent> {
+
     @Value("${spring.data.redis.channels.goal_completed_channel.name}")
     private String goalCompletedChannelName;
+
     public void publish(GoalCompletedEvent event) {
         publish(event, goalCompletedChannelName);
         log.info("Publishing event: {}", event);

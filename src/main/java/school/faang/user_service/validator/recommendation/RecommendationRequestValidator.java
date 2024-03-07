@@ -51,6 +51,12 @@ public class RecommendationRequestValidator {
         });
     }
 
+    public void validateRequestForExist(Optional<RecommendationRequest> recommendationRequest) {
+        if (recommendationRequest.isEmpty()) {
+            throw new EntityNotFoundException("Request not found");
+        }
+    }
+
     public void validate(RecommendationRequestDto recommendationRequestDto) {
         long requesterId = recommendationRequestDto.getRequesterId();
         long receiverId = recommendationRequestDto.getReceiverId();

@@ -37,7 +37,7 @@ public class RecommendationRequestController {
     }
 
     @GetMapping("/{id}")
-    public RecommendationRequestDto getRecommendationRequest(@PathVariable("id") Long id) {
+    public RecommendationRequestDto getRecommendationRequest(@PathVariable("id") long id) {
         return recommendationRequestService.getRequest(id);
     }
 

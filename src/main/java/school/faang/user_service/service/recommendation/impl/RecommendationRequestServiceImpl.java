@@ -63,13 +63,11 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
 
     @Override
     public RecommendationRequestDto getRequest(long id) {
-        System.out.println(id);
-        Optional<RecommendationRequest> recommendationRequests = recommendationRequestRepository.findById(id);
+        Optional<RecommendationRequest> recommendationRequest = recommendationRequestRepository.findById(id);
 
-        return recommendationRequestMapper.toDto(
-                recommendationRequests
-                        .orElseThrow(() -> new EntityNotFoundException("Request not found " + id))
-        );
+        recommendationRequestValidator.validateRequestForExist(recommendationRequest);
+
+        return recommendationRequestMapper.toDto(recommendationRequest.orElse(null));
     }
 
     @Override

@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.service.SkillService;
-import school.faang.user_service.validate.skill.SkillValidation;
+import school.faang.user_service.validator.SkillValidation;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.times;

@@ -14,6 +14,7 @@ import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filter.goal.GoalFilter;
+import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.publisher.GoalCompletedEventPublisher;
 import school.faang.user_service.repository.goal.GoalRepository;

@@ -42,9 +42,9 @@ public class PremiumService {
         premiumValidator.validateResponseStatus(paymentResponse);
 
         Premium premium = createPremium(userId, premiumPeriod);
-        PremiumEvent premiumEvent = new PremiumEvent(userId, premium.getId(), premiumPeriod, LocalDateTime.now());
+        Premium save = premiumRepository.save(premium);
 
-        premiumRepository.save(premium);
+        PremiumEvent premiumEvent = new PremiumEvent(userId, save.getId(), premiumPeriod, LocalDateTime.now());
         premiumEventPublisher.publish(premiumEvent);
 
         return premiumMapper.toDto(premium);

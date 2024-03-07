@@ -32,8 +32,16 @@ public class EventController {
         eventService.deleteEvent(eventId);
     }
 
-    public void updateEvent(EventDto eventDto) {
+    public EventDto updateEvent(EventDto eventDto) {
         eventValidator.validateEventDtoFields(eventDto);
-        eventService.updateEvent(eventDto);
+        return eventService.updateEvent(eventDto);
+    }
+
+    public List<EventDto> getOwnedEvents(long userId) {
+        return eventService.getOwnedEvents(userId);
+    }
+
+    public List<EventDto> getParticipatedEvents(long userId) {
+        return eventService.getParticipatedEvents(userId);
     }
 }

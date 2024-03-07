@@ -10,6 +10,7 @@ import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.filter.EventFilter;
 import school.faang.user_service.validation.event.EventValidator;
+import school.faang.user_service.validation.user.UserValidator;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class EventService {
     private final EventMapper eventMapper;
     private final List<EventFilter> eventFilters;
     private final EventValidator eventValidator;
+    private final UserValidator userValidator;
 
     public EventDto create(EventDto eventDto) {
         eventValidator.validateUserHasRequiredSkills(eventDto);
@@ -56,6 +58,18 @@ public class EventService {
         Event updatedEvent = setUpdatedInformation(eventToUpdate, eventDto);
         Event updatedAndSavedEvent = eventRepository.save(updatedEvent);
         return eventMapper.toDto(updatedAndSavedEvent);
+    }
+
+    public List<EventDto> getOwnedEvents(long userId) {
+        userValidator.validateUserExistsById(userId);
+        List<Event> userOwnedEvents = eventRepository.findAllByUserId(userId);
+        return eventMapper.toDto(userOwnedEvents);
+    }
+
+    public List<EventDto> getParticipatedEvents(long userId) {
+        userValidator.validateUserExistsById(userId);
+        List<Event> userParticipatedEvents = eventRepository.findParticipatedEventsByUserId(userId);
+        return eventMapper.toDto(userParticipatedEvents);
     }
 
     private Event setUpdatedInformation(Event eventToUpdate, EventDto eventDto) {

@@ -16,6 +16,7 @@ import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.filter.EventFilter;
 import school.faang.user_service.validation.event.EventValidator;
+import school.faang.user_service.validation.user.UserValidator;
 
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -43,6 +44,8 @@ class EventServiceTest {
     private List<EventFilter> eventFilters;
     @Mock
     private EventValidator eventValidator;
+    @Mock
+    private UserValidator userValidator;
     @InjectMocks
     private EventService eventService;
 
@@ -147,5 +150,25 @@ class EventServiceTest {
 
         verify(eventRepository, times(1)).findAll();
         verify(eventMapper, times(1)).toDto(anyList());
+    }
+
+    @Test
+    void getOwnedEvents_OwnedEventsReturned_IsValid() {
+        doNothing().when(userValidator).validateUserExistsById(anyLong());
+        when(eventRepository.findAllByUserId(anyLong())).thenReturn(List.of(event));
+        when(eventMapper.toDto(anyList())).thenReturn(List.of(eventDto));
+
+        eventService.getOwnedEvents(1L);
+        verify(eventMapper, times(1)).toDto(List.of(event));
+    }
+
+    @Test
+    void getParticipatedEvents_ParticipatedEventsReturned_IsValid() {
+        doNothing().when(userValidator).validateUserExistsById(anyLong());
+        when(eventRepository.findParticipatedEventsByUserId(anyLong())).thenReturn(List.of(event));
+        when(eventMapper.toDto(anyList())).thenReturn(List.of(eventDto));
+
+        eventService.getParticipatedEvents(1L);
+        verify(eventMapper, times(1)).toDto(List.of(event));
     }
 }

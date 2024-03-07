@@ -13,8 +13,6 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.mapper.SkillMapper;
-import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.filter.EventFilter;
 import school.faang.user_service.validation.event.EventValidator;
@@ -130,6 +128,7 @@ class EventServiceTest {
     @Test
     void updateEvent_EventFoundAndUpdated_ThenSavedToDb() {
         doNothing().when(eventValidator).validateUserHasRequiredSkills(any(EventDto.class));
+        doNothing().when(eventValidator).validateEventExistsById(anyLong());
         when(eventRepository.findById(anyLong())).thenReturn(Optional.of(event));
         doNothing().when(eventValidator).validateUserIsOwnerOfEvent(any(User.class), any(EventDto.class));
         when(eventRepository.save(any(Event.class))).thenReturn(event);

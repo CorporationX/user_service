@@ -14,7 +14,6 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -105,7 +104,7 @@ class EventValidatorTest {
     @ParameterizedTest
     @NullSource
     @ValueSource(strings = {"", "   "})
-    void validateEventDtoFields_NullTitle_ShouldThrowDataValidationException(String title) {
+    void validateEventDtoFields_InvalidTitle_ShouldThrowDataValidationException(String title) {
         eventDto.setTitle(title);
 
         assertThrows(DataValidationException.class, () ->

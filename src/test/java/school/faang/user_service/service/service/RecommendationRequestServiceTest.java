@@ -16,10 +16,8 @@ import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.dto.SkillRequestDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.RejectFailException;
-import school.faang.user_service.exception.RequestNotFoundException;
-import school.faang.user_service.exception.RequestTimeOutException;
-import school.faang.user_service.exception.SkillsNotFoundException;
 import school.faang.user_service.filter.RecommendationRequestFilter;
 import school.faang.user_service.filter.recommendation.RecommendationRequestFilterCreateAt;
 import school.faang.user_service.filter.recommendation.RecommendationRequestFilterId;
@@ -97,15 +95,23 @@ public class RecommendationRequestServiceTest {
 
     @Test
     void testTimeOutCheckTrue() {
-        Assert.assertThrows(RequestTimeOutException.class, () -> recommendationRequestService
-                .create(new RecommendationRequestDto(5L, "message", "status", new ArrayList<SkillRequestDto>(), 6L, 5L, LocalDateTime.now(), LocalDateTime.now().plusMonths(6).minusDays(1))));
+        Assert.assertThrows(DataValidationException.class, () -> recommendationRequestService
+                .create(new RecommendationRequestDto(
+                        5L,
+                        "message",
+                        RequestStatus.PENDING,
+                        new ArrayList<SkillRequestDto>(),
+                        6L,
+                        5L,
+                        LocalDateTime.now(),
+                        LocalDateTime.now().plusMonths(6).minusDays(1))));
     }
 
 
     @Test
     void testGetRequest() {
         long id = -5L;
-        Assert.assertThrows(RequestNotFoundException.class, () -> {
+        Assert.assertThrows(DataValidationException.class, () -> {
             recommendationRequestService.getRequest(id);
         });
     }

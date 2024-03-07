@@ -9,9 +9,8 @@ import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.RejectFailException;
-import school.faang.user_service.exception.RequestNotFoundException;
-import school.faang.user_service.exception.SkillsNotFoundException;
 import school.faang.user_service.filter.RecommendationRequestFilter;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.mapper.SkillRequestMapper;
@@ -50,7 +49,7 @@ public class RecommendationRequestService {
                 });
 
         if (skillsCheck.longValue() > 0)
-            throw new SkillsNotFoundException("Skills not found");
+            throw new DataValidationException("Skills not found");
 
         recommendationRequest.getSkills()
                 .forEach(skillRequestId -> skillRequestRepository.create(skillRequestId.getId(), skillRequestId.getSkillId()));
@@ -64,7 +63,7 @@ public class RecommendationRequestService {
     public RecommendationRequestDto getRequest(long id) {
         return recommendationRequestMapper
                 .toDto(findRequestById(id)
-                        .orElseThrow(() -> new RequestNotFoundException("Request not found by id: " + id)));
+                        .orElseThrow(() -> new DataValidationException("Request not found by id: " + id)));
     }
 
     public List<RecommendationRequestDto> getRequest(RequestFilterDto filter) {
@@ -81,7 +80,7 @@ public class RecommendationRequestService {
     }
 
     public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
-        RecommendationRequest request = findRequestById(id).orElseThrow(() -> new RequestNotFoundException("Request not found by id: " + id));
+        RecommendationRequest request = findRequestById(id).orElseThrow(() -> new DataValidationException("Request not found by id: " + id));
         if (request.getStatus().equals(RequestStatus.PENDING)) {
             request.setRejectionReason(rejection.getReason());
             request.setStatus(RequestStatus.REJECTED);
@@ -98,10 +97,9 @@ public class RecommendationRequestService {
 
     private void validate(RecommendationRequestDto recommendationRequest) {
         if (!userRepository.existsById((recommendationRequest.getRequesterId())) || !userRepository.existsById(recommendationRequest.getReceiverId()))
-            throw new IllegalArgumentException("User not found");
+            throw new DataValidationException("User not found");
         if (recommendationRequest.getSkills() == null)
-            throw new IllegalArgumentException("skills is null");
+            throw new DataValidationException("skills is null");
     }
-
 }
 

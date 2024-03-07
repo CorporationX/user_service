@@ -9,7 +9,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.controller.recommendation.RecommendationRequestController;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.SkillRequestDto;
-import school.faang.user_service.exception.MessageRequestException;
+import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.RecommendationRequestService;
 
 import java.time.LocalDateTime;
@@ -26,16 +27,46 @@ public class RecommendationRequestControllerTest {
 
     @Test
     void testMessageNotNull() {
-        Assert.assertThrows(MessageRequestException.class, ()-> recommendationRequestController.requestRecommendation(new RecommendationRequestDto(5L, null, "status", new ArrayList<SkillRequestDto>(), 5L, 6L, LocalDateTime.now(), LocalDateTime.now().plusMonths(7))));
+        Assert.assertThrows(DataValidationException.class,
+                () -> recommendationRequestController.requestRecommendation(
+                        new RecommendationRequestDto(
+                                5L,
+                                null,
+                                RequestStatus.PENDING,
+                                new ArrayList<SkillRequestDto>(),
+                                5L,
+                                6L,
+                                LocalDateTime.now(),
+                                LocalDateTime.now().plusMonths(7))));
     }
 
     @Test
     void testMessageNotBlank() {
-        Assert.assertThrows(MessageRequestException.class, ()-> recommendationRequestController.requestRecommendation(new RecommendationRequestDto(5L, " ", "status", new ArrayList<SkillRequestDto>(), 5L, 6L, LocalDateTime.now(), LocalDateTime.now().plusMonths(7))));
+        Assert.assertThrows(DataValidationException.class,
+                () -> recommendationRequestController.requestRecommendation(
+                        new RecommendationRequestDto(
+                                5L,
+                                " ",
+                                RequestStatus.PENDING,
+                                new ArrayList<SkillRequestDto>(),
+                                5L,
+                                6L,
+                                LocalDateTime.now(),
+                                LocalDateTime.now().plusMonths(7))));
     }
 
     @Test
     void testMessageNotEmpty() {
-        Assert.assertThrows(MessageRequestException.class, ()-> recommendationRequestController.requestRecommendation(new RecommendationRequestDto(5L, "", "status", new ArrayList<SkillRequestDto>(), 5L, 6L, LocalDateTime.now(), LocalDateTime.now().plusMonths(7))));
+        Assert.assertThrows(DataValidationException.class,
+                () -> recommendationRequestController.requestRecommendation(
+                        new RecommendationRequestDto(
+                                5L,
+                                "",
+                                RequestStatus.PENDING,
+                                new ArrayList<SkillRequestDto>(),
+                                5L,
+                                6L,
+                                LocalDateTime.now(),
+                                LocalDateTime.now().plusMonths(7))));
     }
 }

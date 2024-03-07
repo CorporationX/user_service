@@ -23,6 +23,8 @@ public interface RecommendationRequestMapper {
     @Mapping(target = "skills", ignore = true)
     RecommendationRequest toEntity(RecommendationRequestDto recommendationRequestDto);
 
+    List<RecommendationRequestDto> toDto(List<RecommendationRequest> recommendationRequests);
+    
     @Named("mapSkills")
     default List<Long> mapSkills(List<SkillRequest> skills) {
         if (skills == null) {

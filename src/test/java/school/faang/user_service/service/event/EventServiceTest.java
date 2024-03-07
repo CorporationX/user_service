@@ -38,17 +38,13 @@ class EventServiceTest {
     @Mock
     private EventRepository eventRepository;
     @Mock
-    private SkillRepository skillRepository;
-    @Mock
-    private UserRepository userRepository;
-    @Mock
-    private EventValidator eventValidator;
-    @Mock
     private SkillMapper skillMapper;
     @Mock
     private EventMapper eventMapper;
     @Mock
     private List<EventFilter> eventFilters;
+    @Mock
+    private EventValidator eventValidator;
     @InjectMocks
     private EventService eventService;
 

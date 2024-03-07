@@ -33,13 +33,11 @@ import static org.mockito.Mockito.when;
 class EventValidatorTest {
 
     @Mock
-    private EventRepository eventRepository;
-    @Mock
     private SkillRepository skillRepository;
     @Mock
-    private SkillMapper skillMapper;
+    private EventRepository eventRepository;
     @Mock
-    private EventMapper eventMapper;
+    private SkillMapper skillMapper;
     @InjectMocks
     private EventValidator eventValidator;
 

@@ -7,8 +7,6 @@ import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.mapper.SkillMapper;
-import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.filter.EventFilter;
 import school.faang.user_service.validation.event.EventValidator;
@@ -19,8 +17,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EventService {
     private final EventRepository eventRepository;
-    private final SkillRepository skillRepository;
-    private final UserRepository userRepository;
     private final SkillMapper skillMapper;
     private final EventMapper eventMapper;
     private final List<EventFilter> eventFilters;

@@ -9,15 +9,13 @@ import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.UserRepository;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Fail.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @SpringBootTest
 public class MentorshipServiceTest {
     @Mock
@@ -66,6 +64,7 @@ public class MentorshipServiceTest {
         List<User> actualMentors = mentorshipService.getMentors(userId);
         assertTrue(actualMentors.isEmpty());
     }
+
     @Test
     public void testDeleteMentee() {
         User mentor = User.builder()
@@ -75,6 +74,7 @@ public class MentorshipServiceTest {
         Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(mentor));
         mentorshipService.deleteMentee(2L, 1L);
     }
+
     @Test
     public void testDeleteMentor() {
         User mentee = User.builder()

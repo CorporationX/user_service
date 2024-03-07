@@ -12,12 +12,12 @@ public class MentorshipController {
     @Autowired
     private MentorshipService mentorshipService;
 
-    public List<User> getMentees(long userId){
+    public List<User> getMentees(long userId) {
 
         return mentorshipService.getMentees(userId);
     }
 
-    public List<User> getMentors(long userId){
+    public List<User> getMentors(long userId) {
 
         return mentorshipService.getMentors(userId);
     }
@@ -26,6 +26,7 @@ public class MentorshipController {
 
         mentorshipService.deleteMentee(menteeId, mentorId);
     }
+
     public void deleteMentor(long menteeId, long mentorId) {
 
         mentorshipService.deleteMentor(menteeId, mentorId);

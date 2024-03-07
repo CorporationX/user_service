@@ -1,11 +1,9 @@
 package school.faang.user_service.service.UserMapperTest;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import school.faang.user_service.UserDto.UserDto;
 import school.faang.user_service.UserMapper.UserMapper;
 import school.faang.user_service.UserMapper.UserMapperImpl;
@@ -15,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
 @SpringBootTest
 public class UserMapperTest {
     @Mock

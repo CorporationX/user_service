@@ -34,9 +34,9 @@ public class MentorshipService {
     }
 
     public void deleteMentee(long menteeId, long mentorId) {
-        if (menteeId == 0 || mentorId == 0){
+        if (menteeId == 0 || mentorId == 0) {
             throw new IllegalArgumentException("Id is null");
-        }else {
+        } else {
             Optional<User> mentorOptional = userRepository.findById(mentorId);
             mentorOptional.ifPresent(mentor -> {
                 List<User> modifiableMentees = new ArrayList<>(mentor.getMentees());
@@ -46,10 +46,11 @@ public class MentorshipService {
             mentorOptional.ifPresent(userRepository::save);
         }
     }
+
     public void deleteMentor(long menteeId, long mentorId) {
-        if (menteeId == 0 || mentorId == 0){
+        if (menteeId == 0 || mentorId == 0) {
             throw new IllegalArgumentException("Id is null");
-        }else {
+        } else {
             Optional<User> menteeOptional = userRepository.findById(menteeId);
             menteeOptional.ifPresent(mentee -> {
                 List<User> modifiableMentors = new ArrayList<>(mentee.getMentors());

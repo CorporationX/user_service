@@ -16,6 +16,7 @@ import java.util.List;
 public interface UserMapper {
 
     @Mapping(source = "country.id", target = "countryId")
+
     UserDto toDto(User user);
 
     @Mapping(source = "country.id", target = "countryId")

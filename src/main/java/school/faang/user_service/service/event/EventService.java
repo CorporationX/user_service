@@ -1,11 +1,17 @@
 package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.ListUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EventNotFoundException;
@@ -19,6 +25,8 @@ import school.faang.user_service.repository.event.EventRepository;
 import java.util.List;
 import java.util.stream.Stream;
 
+@Slf4j
+@Setter
 @Service
 @RequiredArgsConstructor
 public class EventService {
@@ -28,6 +36,14 @@ public class EventService {
     private final EventMapper eventMapper;
     private final SkillMapper skillMapper;
     private final List<EventFilter> eventFilters;
+  
+    @Value("${batchSize.eventDeletion}")
+    private int batchSize;
+
+    @Async("threadPoolExecutor")
+    public void clearEventsAsync(List<Long> partition) {
+        eventRepository.deleteAllById(partition);
+    }
 
     public EventDto createEvent(EventDto eventDto) {
         checkUserSkills(eventDto.getOwnerId(), eventDto.getRelatedSkills());
@@ -71,6 +87,28 @@ public class EventService {
         }
         return eventStream.toList();
     }
+  
+    public void clearEvents() {
+        List<Event> allEvents = eventRepository.findAll();
+        List<Long> ids = allEvents.stream()
+                .filter(event -> event.getStatus().equals(EventStatus.COMPLETED) || event.getStatus().equals(EventStatus.CANCELED))
+                .map(Event::getId).toList();
+
+        if (ids.isEmpty()) {
+            return;
+        }
+
+        List<List<Long>> partitions = ListUtils.partition(ids, batchSize);
+
+        for (List<Long> partition : partitions) {
+            clearEventsAsync(partition);
+        }
+    }
+  
+    @Async("threadPoolExecutor")
+    public void clearEventsAsync(List<Long> partition) {
+        eventRepository.deleteAllById(partition);
+    }
 
     private void checkUserSkills(Long userId, List<SkillDto> skills) {
         User user = userRepository.findById(userId)
@@ -81,6 +119,3 @@ public class EventService {
         }
     }
 }
-
-
-

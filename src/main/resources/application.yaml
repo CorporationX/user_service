@@ -65,12 +65,21 @@ aws:
 
 services:
   s3:
-    endpoint: http://127.0.0.1:9000
-    accessKey: user
-    secretKey: password
-    bucketName: corpbucket
-    random-avatar:
-      url: "https://api.dicebear.com/7.x/pixel-art/svg?seed="
+    bucket-name: user_backet
+    isMocked: true
+
+scheduler:
+  clearEvents:
+    cronExpression: "0 0 0 * * ?" # Каждый день в полночь
+
+batchSize:
+  eventDeletion: 1000
+  endpoint: http://127.0.0.1:9000
+  accessKey: user
+  secretKey: password
+  bucketName: corpbucket
+  random-avatar:
+    url: "https://api.dicebear.com/7.x/pixel-art/svg?seed="
 scheduling:
   premium:
     cron:

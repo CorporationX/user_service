@@ -55,11 +55,8 @@ public class GoalValidator {
     }
 
     private void validateTitle(String title) {
-        if (title == null) {
-            throw new EntityFieldsException("Goal title can't be null");
-        }
-        if (title.isEmpty()) {
-            throw new EntityFieldsException("Goal title can't be empty");
+        if (title == null || title.isEmpty() || title.isBlank()) {
+            throw new EntityFieldsException("Goal must have title");
         }
     }
 

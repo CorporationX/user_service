@@ -32,6 +32,8 @@ spring:
           name: profile_view_channel
         premium_channel:
           name: premium_channel
+        goal_completed_channel:
+          name: goal_completed_channel
         mentorship_topic:
           name: mentorship_topic
 

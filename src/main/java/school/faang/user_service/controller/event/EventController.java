@@ -27,6 +27,15 @@ public class EventController {
         return eventService.getEventsByFilter(filters);
     }
 
+    public void deleteEvent(long eventId){
+        eventService.deleteEvent(eventId);
+    }
+
+    public void updateEvent(EventDto eventDto) {
+        validateEventDto(eventDto);
+        eventService.updateEvent(eventDto);
+    }
+
     private void validateEventDto(EventDto eventDto) throws DataValidationException {
         if (eventDto.getTitle() == null || eventDto.getTitle().isEmpty() || eventDto.getTitle().trim().isEmpty()) {
             throw new DataValidationException("Event title can't be empty");

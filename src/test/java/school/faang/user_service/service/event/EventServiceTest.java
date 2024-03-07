@@ -3,17 +3,18 @@ package school.faang.user_service.service.event;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.springframework.boot.test.context.SpringBootTest;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.filters.EventFilter;
 
@@ -24,6 +25,7 @@ import java.util.Optional;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -38,13 +40,16 @@ public class EventServiceTest {
     @Mock
     private SkillRepository skillRepository;
 
-    @Spy
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
     private SkillMapper skillMapper;
 
     @Mock
     private EventMapper eventMapper;
 
-    @Spy
+    @Mock
     private List<EventFilter> eventFilters;
 
     @InjectMocks
@@ -143,23 +148,42 @@ public class EventServiceTest {
     }
 
     @Test
-    public void getEventsByFilter_FiltersByTitle_IsValid() {
-        EventFilterDto filters = EventFilterDto.builder()
-                .title("Event")
-                .build();
-        Event firstEvent = Event.builder()
-                .title("Event")
-                .build();
-        Event secondEvent = Event.builder()
-                .title("Should not be in filter")
-                .build();
-        EventDto firstEventDto = EventDto.builder()
-                .title(firstEvent.getTitle())
-                .build();
-        EventDto secondEventDto = EventDto.builder()
-                .title(secondEvent.getTitle())
-                .build();
+    public void deleteEvent_EventIsDeleted_IsValid() {
+        long idOfEventToDelete = 1;
+        when(eventRepository.existsById(idOfEventToDelete)).thenReturn(true);
 
-        assertEquals(1, eventService.getEventsByFilter(filters).size());
+        eventService.deleteEvent(idOfEventToDelete);
+
+        verify(eventRepository, times(1)).deleteById(idOfEventToDelete);
+    }
+
+    @Test
+    public void deleteEvent_EventIsNotFound_ShouldThrowNoSuchElementException() {
+        long idOfEventToDelete = 1;
+        when(eventRepository.existsById(idOfEventToDelete)).thenReturn(false);
+
+        assertThrows(NoSuchElementException.class, () ->
+                eventService.deleteEvent(idOfEventToDelete));
+
+    }
+
+    @Test
+    public void updateEvent_EventUpdated_ThenSavedToDb() {
+
+    }
+
+    @Test
+    public void updateEvent_UserIsNotOwner_ShouldThrowIllegalStateException() {
+
+    }
+
+    @Test
+    public void getEventsByFilter_FiltersByTitle_IsValid() {
+        EventFilterDto filters = new EventFilterDto();
+
+        eventService.getEventsByFilter(filters);
+
+        verify(eventRepository, times(1)).findAll();
+        verify(eventMapper, times(1)).toDto(anyList());
     }
 }

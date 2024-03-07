@@ -20,8 +20,6 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.RejectFailException;
 import school.faang.user_service.filter.RecommendationRequestFilter;
 import school.faang.user_service.filter.recommendation.RecommendationRequestFilterCreateAt;
-import school.faang.user_service.filter.recommendation.RecommendationRequestFilterId;
-import school.faang.user_service.filter.recommendation.RecommendationRequestFilterMessage;
 import school.faang.user_service.filter.recommendation.RecommendationRequestFilterUpdateAt;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.UserRepository;
@@ -73,7 +71,7 @@ public class RecommendationRequestServiceTest {
         localDateTime1 = LocalDateTime.now().minusMonths(7);
         localDateTime2 = LocalDateTime.now();
         expected = new RecommendationRequestDto(4L, "message", null, null, null, null, localDateTime1, localDateTime2);
-        recommendationRequestFilters = List.of(new RecommendationRequestFilterMessage(), new RecommendationRequestFilterId(), new RecommendationRequestFilterUpdateAt(), new RecommendationRequestFilterCreateAt());
+        recommendationRequestFilters = List.of(new RecommendationRequestFilterUpdateAt(), new RecommendationRequestFilterCreateAt());
 
         RecommendationRequest firstRecommendationRequest = new RecommendationRequest();
         firstRecommendationRequest.setId(4L);

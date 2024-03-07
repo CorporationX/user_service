@@ -15,11 +15,11 @@ public class RecommendationRequestDto {
 
     private Long id;
     private String message;
-    private RequestStatus status = RequestStatus.PENDING;
+    private RequestStatus status;
     private List<SkillRequestDto> skills;
     private Long requesterId;
     private Long receiverId;
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
 }

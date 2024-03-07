@@ -9,11 +9,13 @@ import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.UserRepository;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Fail.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest
@@ -24,7 +26,7 @@ public class MentorshipServiceTest {
     private MentorshipService mentorshipService;
 
     @Test
-    public void testGetMentees_whenUserExists_returnsMentees() {
+    public void testGetMentees1() {
         User mentees = User.builder()
                 .id(1L)
                 .mentees(Collections.singletonList(new User()))
@@ -36,7 +38,7 @@ public class MentorshipServiceTest {
     }
 
     @Test
-    public void testGetMentees_whenUserDoesNotExist_returnsEmptyList() {
+    public void testGetMentees2() {
         long userId = 1L;
         Mockito.when(userRepository.findById(userId))
                 .thenReturn(Optional.empty());
@@ -45,7 +47,7 @@ public class MentorshipServiceTest {
     }
 
     @Test
-    public void testGetMentors_whenUserExists_returnsMentors() {
+    public void testGetMentors1() {
         User mentor = User.builder()
                 .id(1L)
                 .mentors(Collections.singletonList(new User()))
@@ -57,7 +59,7 @@ public class MentorshipServiceTest {
     }
 
     @Test
-    public void testGetMentors_whenUserDoesNotExist_returnsEmptyList() {
+    public void testGetMentors2() {
         long userId = 1L;
         Mockito.when(userRepository.findById(userId))
                 .thenReturn(Optional.empty());
@@ -65,14 +67,21 @@ public class MentorshipServiceTest {
         assertTrue(actualMentors.isEmpty());
     }
     @Test
-    public void testDeleteMentee_whenUserExists_shouldRemoveUserFromMenteesList() {
-        long menteeId = 2L;
-        long mentorId = 1L;
+    public void testDeleteMentee() {
         User mentor = User.builder()
                 .id(1L)
                 .mentees(Collections.singletonList(new User()))
                 .build();
         Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(mentor));
         mentorshipService.deleteMentee(2L, 1L);
+    }
+    @Test
+    public void testDeleteMentor() {
+        User mentee = User.builder()
+                .id(1L)
+                .mentors(Collections.singletonList(new User()))
+                .build();
+        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(mentee));
+        mentorshipService.deleteMentor(2L, 1L);
     }
 }

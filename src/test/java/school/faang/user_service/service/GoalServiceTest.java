@@ -22,8 +22,6 @@ import school.faang.user_service.filter.goal.GoalStatusFilter;
 import school.faang.user_service.filter.goal.GoalTitleFilter;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.mapper.GoalMapperImpl;
-import school.faang.user_service.mapper.goal.GoalMapper;
-import school.faang.user_service.mapper.goal.GoalMapperImpl;
 import school.faang.user_service.publisher.GoalCompletedEventPublisher;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validator.GoalValidator;

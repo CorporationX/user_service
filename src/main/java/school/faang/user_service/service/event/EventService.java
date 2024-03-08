@@ -11,8 +11,8 @@ import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EventNotFoundException;
 import school.faang.user_service.exception.UserNotFoundException;
@@ -36,14 +36,10 @@ public class EventService {
     private final EventMapper eventMapper;
     private final SkillMapper skillMapper;
     private final List<EventFilter> eventFilters;
-  
+
     @Value("${batchSize.eventDeletion}")
     private int batchSize;
 
-    @Async("threadPoolExecutor")
-    public void clearEventsAsync(List<Long> partition) {
-        eventRepository.deleteAllById(partition);
-    }
 
     public EventDto createEvent(EventDto eventDto) {
         checkUserSkills(eventDto.getOwnerId(), eventDto.getRelatedSkills());
@@ -79,7 +75,7 @@ public class EventService {
     }
 
     public List<EventDto> getEventsByFilter(EventFilterDto eventFilterDto) {
-        Stream<EventDto> eventStream = eventRepository.findAll().stream().map(event -> eventMapper.toDto(event));
+        Stream<EventDto> eventStream = eventRepository.findAll().stream().map(eventMapper::toDto);
         for (EventFilter eventFilter : eventFilters) {
             if (eventFilter.isApplicable(eventFilterDto)) {
                 eventStream = eventFilter.apply(eventStream, eventFilterDto);
@@ -87,7 +83,7 @@ public class EventService {
         }
         return eventStream.toList();
     }
-  
+
     public void clearEvents() {
         List<Event> allEvents = eventRepository.findAll();
         List<Long> ids = allEvents.stream()
@@ -99,14 +95,13 @@ public class EventService {
         }
 
         List<List<Long>> partitions = ListUtils.partition(ids, batchSize);
-
         for (List<Long> partition : partitions) {
             clearEventsAsync(partition);
         }
     }
-  
+
     @Async("threadPoolExecutor")
-    public void clearEventsAsync(List<Long> partition) {
+    void clearEventsAsync(List<Long> partition) {
         eventRepository.deleteAllById(partition);
     }
 

@@ -22,8 +22,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
                 title = "User Service",
                 version = "1.0.0")
 )
-
-@EnableScheduling
 public class UserServiceApplication implements CommandLineRunner {
 
     public static void main(String[] args) {

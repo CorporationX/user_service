@@ -29,9 +29,9 @@ spring:
         follower_channel:
           name: follower_channel
         profile_view_channel:
-            name: profile_view_channel
+          name: profile_view_channel
         recommendation_channel:
-            name: recommendation_channel
+          name: recommendation_channel
 
   async:
     core-pool-size: 5
@@ -65,8 +65,12 @@ aws:
 
 services:
   s3:
-    bucket-name: user_backet
-    isMocked: true
+    endpoint: http://127.0.0.1:9000
+    accessKey: user
+    secretKey: password
+    bucketName: corpbucket
+    random-avatar:
+      url: "https://api.dicebear.com/7.x/pixel-art/svg?seed="
 
 scheduler:
   clearEvents:
@@ -74,12 +78,7 @@ scheduler:
 
 batchSize:
   eventDeletion: 1000
-  endpoint: http://127.0.0.1:9000
-  accessKey: user
-  secretKey: password
-  bucketName: corpbucket
-  random-avatar:
-    url: "https://api.dicebear.com/7.x/pixel-art/svg?seed="
+
 scheduling:
   premium:
     cron:

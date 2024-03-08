@@ -6,8 +6,8 @@ import school.faang.user_service.entity.contact.PreferredContact;
 
 import java.util.List;
 
-@Builder
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)

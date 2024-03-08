@@ -17,6 +17,8 @@ public class RedisConfig {
     private String host;
     @Value("${spring.data.redis.port}")
     private int port;
+    @Value("${spring.data.redis.channels.follower_channel.name}")
+    private String followerChannelName;
     @Value("${spring.data.redis.channels.mentorship_requested_channel.name}")
     private String mentorshipRequestedChannelName;
     @Value("${spring.data.redis.channels.recommendation_channel.name}")
@@ -38,6 +40,11 @@ public class RedisConfig {
         return redisTemplate;
     }
 
+    @Bean
+    ChannelTopic followerTopic() {
+        return new ChannelTopic(followerChannelName);
+    }
+  
     @Bean
     public ChannelTopic mentorshipRequestedTopic() {
         return new ChannelTopic(mentorshipRequestedChannelName);

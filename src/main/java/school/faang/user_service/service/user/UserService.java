@@ -41,9 +41,7 @@ public class UserService {
                 userDtoStream = userFilter.apply(userDtoStream, userFilterDto);
             }
         }
-        return userDtoStream.toList();
-        Stream<UserDto> userDtoStream = userRepository.findPremiumUsers().map(userMapper::toDto);
-        return userFilter(userDtoStream, userFilterDto).toList();
+       return userDtoStream.toList();
     }
 
     public UserDto getUserById(Long userId) {

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.dto.TgContactDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.service.csv.CSVFileParserService;
@@ -33,5 +34,10 @@ public class UserController {
     @PostMapping(value = "/upload-csv-file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void parseCSV(@RequestParam MultipartFile file) {
         csvFileParserService.parseFile(file);
+    }
+
+    @GetMapping("/tgContact/{userId}")
+    public TgContactDto getTgContact(@PathVariable long userId) {
+        return userService.getTgContact(userId);
     }
 }

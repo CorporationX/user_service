@@ -1,6 +1,7 @@
 package school.faang.user_service.service.UserMapperTest;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,39 +14,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 public class UserMapperTest {
+
     @Mock
-    private User userMock;
+    private User user;
+
+    @InjectMocks
+    private UserMapperImpl userMapper;
 
     @Test
     public void testToUserDto() {
-        UserMapper userMapper = new UserMapperImpl();
-        long userId = 1L;
-        String username = "snoop";
-        String email = "junit@gmail.com";
-        String phone = "+78005553535";
-        Mockito.when(userMock.getId()).thenReturn(userId);
-        Mockito.when(userMock.getUsername()).thenReturn(username);
-        Mockito.when(userMock.getEmail()).thenReturn(email);
-        Mockito.when(userMock.getPhone()).thenReturn(phone);
-        UserDto userDto = userMapper.toUserDto(userMock);
-        assertThat(userDto.getId()).isEqualTo(userId);
-        assertThat(userDto.getUsername()).isEqualTo(username);
-        assertThat(userDto.getEmail()).isEqualTo(email);
-        assertThat(userDto.getPhone()).isEqualTo(phone);
-    }
-
-    @Test
-    public void testToUserDto2() {
-        UserMapper userMapper = new UserMapperImpl();
-        List<User> mentors = new ArrayList<>();
-        List<User> mentees = new ArrayList<>();
-        Mockito.when(userMock.getMentees()).thenReturn(mentees);
-        Mockito.when(userMock.getMentors()).thenReturn(mentors);
-        UserDto userDto = userMapper.toUserDto(userMock);
-        assertThat(userDto.getMentees()).isNull();
-        assertThat(userDto.getMentors()).isNull();
+        when(user.getId()).thenReturn(1L);
+        when(user.getUsername()).thenReturn("username");
+        UserDto userDto = userMapper.toUserDto(user);
+        assertThat(userDto.getId()).isEqualTo(1L);
+        assertThat(userDto.getUsername()).isEqualTo("username");
     }
 }

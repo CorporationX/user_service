@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.FollowerEvent;
 import school.faang.user_service.dto.SubscriptionDto;
+import school.faang.user_service.dto.event.follower.FollowerEventDto;
 import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.repository.UserRepository;
 
 import java.time.LocalDateTime;
 
@@ -22,7 +22,7 @@ public class SubscriptionService {
 
         validationSubscription(followerId, followeeId);
         subscriptionRepository.followUser(followerId, followeeId);
-        followerEventPublisher.publish(new FollowerEvent(followerId, followeeId, LocalDateTime.now()));
+        followerEventPublisher.publish(new FollowerEventDto(followerId, followeeId, LocalDateTime.now()));
     }
 
     private void validationSubscription(long followerId, long followeeId) {

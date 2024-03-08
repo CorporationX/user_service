@@ -12,7 +12,6 @@ import school.faang.user_service.service.event.filter.EventFilter;
 import school.faang.user_service.validation.event.EventValidator;
 import school.faang.user_service.validation.user.UserValidator;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

@@ -63,7 +63,7 @@ public class ProfilePicServiceTest {
         ReflectionTestUtils.setField(profilePicService, "smallSize", 170);
         ReflectionTestUtils.setField(profilePicService, "largeSize", 1080);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        UserProfilePic userProfile = profilePicService.userAddProfilePic(1L, file);
+        UserProfilePic userProfile = profilePicService.addProfilePic(1L, file);
 
         verify(s3Client, times(2)).putObject(any(), any(), any(), any());
         assertNotNull(userProfile);

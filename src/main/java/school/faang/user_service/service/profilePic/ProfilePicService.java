@@ -32,7 +32,7 @@ public class ProfilePicService {
     @Value("${services.s3.largeSize}")
     private int largeSize;
 
-    public UserProfilePic userAddProfilePic(long userId, MultipartFile file) {
+    public UserProfilePic addProfilePic(long userId, MultipartFile file) {
         User user = getUser(userId);
         String uniqueSmallPicName = file.getOriginalFilename() + "_small" + System.currentTimeMillis();
         String uniqueLargePicName = file.getOriginalFilename() + "_large" + System.currentTimeMillis();
@@ -73,7 +73,7 @@ public class ProfilePicService {
         return new ByteArrayInputStream(imageBytes);
     }
 
-    public ResponseEntity<InputStreamResource> userGetProfilePic(long userId) {
+    public ResponseEntity<InputStreamResource> getProfilePic(long userId) {
         S3Object s3Object = s3Client.getObject(bucketName, getUser(userId).getUserProfilePic().getFileId());
         try {
             return ResponseEntity.ok()
@@ -84,7 +84,7 @@ public class ProfilePicService {
         }
     }
 
-    public ResponseEntity<String> userDeleteProfilePic(long userId) {
+    public ResponseEntity<String> deleteProfilePic(long userId) {
         User user = getUser(userId);
         s3Client.deleteObject(bucketName, user.getUserProfilePic().getFileId());
         s3Client.deleteObject(bucketName, user.getUserProfilePic().getSmallFileId());

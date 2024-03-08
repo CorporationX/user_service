@@ -26,21 +26,21 @@ public class ProfilePicController {
     private int maxSize;
 
     @PostMapping("/pic/{userId}")
-    public UserProfilePic userAddProfilePic(@PathVariable long userId,
+    public UserProfilePic addProfilePic(@PathVariable long userId,
                                             @RequestPart("file") MultipartFile file) {
         if (file.getSize() > maxSize) {
             throw new DataValidationException("Размер файла не должен превышать 5 Мб");
         }
-        return profilePicService.userAddProfilePic(userId, file);
+        return profilePicService.addProfilePic(userId, file);
     }
 
     @GetMapping("/pic/{userId}")
-    public ResponseEntity<InputStreamResource> userGetProfilePic(@PathVariable long userId) {
-        return profilePicService.userGetProfilePic(userId);
+    public ResponseEntity<InputStreamResource> getProfilePic(@PathVariable long userId) {
+        return profilePicService.getProfilePic(userId);
     }
 
     @DeleteMapping("/pic/{userId}")
-    public ResponseEntity<String> userDeleteProfilePic(@PathVariable long userId) {
-        return profilePicService.userDeleteProfilePic(userId);
+    public ResponseEntity<String> deleteProfilePic(@PathVariable long userId) {
+        return profilePicService.deleteProfilePic(userId);
     }
 }

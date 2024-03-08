@@ -41,7 +41,6 @@ spring:
     queue-capacity: 500
     thread-name-prefix: StudentThread-
 
-
 server:
   port: 8080
 
@@ -68,9 +67,19 @@ aws:
 
 services:
   s3:
-    bucket-name: user_backet
-    isMocked: true
+    endpoint: http://127.0.0.1:9000
+    accessKey: user
+    secretKey: password
+    bucketName: corpbucket
+    random-avatar:
+      url: "https://api.dicebear.com/7.x/pixel-art/svg?seed="
 
+scheduler:
+  clearEvents:
+    cronExpression: "0 0 0 * * ?" # Каждый день в полночь
+
+batchSize:
+  eventDeletion: 1000
 
 scheduling:
   premium:

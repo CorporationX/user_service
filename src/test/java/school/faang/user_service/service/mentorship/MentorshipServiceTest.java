@@ -38,21 +38,21 @@ class MentorshipServiceTest {
     @BeforeEach
     public void init() {
         userMentee = User.builder()
-                .id(100)
+                .id(100L)
                 .username("Vasiliy")
                 .build();
         List<User> userMentees = new ArrayList<>();
         userMentees.add(userMentee);
 
         userMentor = User.builder()
-                .id(10)
+                .id(10L)
                 .username("Alex")
                 .build();
         List<User> userMentors = new ArrayList<>();
         userMentors.add(userMentor);
 
         user = User.builder()
-                .id(1)
+                .id(1L)
                 .mentees(userMentees)
                 .mentors(userMentors)
                 .build();

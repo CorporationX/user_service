@@ -1,26 +1,45 @@
 package school.faang.user_service.mapper.user;
 
-
+import org.mapstruct.InjectionStrategy;
 import com.json.student.PersonSchemaV2;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
+import school.faang.user_service.dto.user.UserCreateDto;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
-
 import java.util.List;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.FIELD, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper {
 
-    @Mapping(target = "countryId", source = "country.id")
+    @Mapping(source = "country.id", target = "countryId")
     UserDto toDto(User user);
 
-    @Mapping(target = "country.id", source = "countryId")
-    User toEntity(UserDto userDto);
+    @Mapping(source = "country.id", target = "countryId")
+    @Mapping(source = "userProfilePic.fileId", target = "userProfilePic")
+    UserCreateDto toUserCreateDto(User user);
+
+
+    @Mapping(source = "countryId", target = "country.id")
+    @Mapping(source = "userProfilePic", target = "userProfilePic.fileId")
+    User toEntity(UserCreateDto userCreateDto);
 
     List<UserDto> toUserDtoList(List<User> users);
+
+    @Mapping(source = "countryId", target = "country")
+    User toUser(UserDto userDTO);
+
+    default Country mapIdToCountry(Long id) {
+        if (id == null) {
+            return null;
+        }
+        return Country.builder()
+                .id(id)
+                .build();
+    }
 
     @Mapping(target = "username", expression = "java(person.getFirstName() + \"_\" + person.getLastName())")
     @Mapping(target = "aboutMe", source = ".", qualifiedByName = "aboutMe")
@@ -54,5 +73,4 @@ public interface UserMapper {
         }
         return builder.toString();
     }
-
 }

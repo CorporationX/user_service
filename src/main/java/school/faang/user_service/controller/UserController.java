@@ -14,7 +14,7 @@ import java.util.List;
 @Tag(name = "Управление пользователями")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping
+@RequestMapping("/users")
 @Slf4j
 public class UserController {
     private final UserService userService;
@@ -27,23 +27,29 @@ public class UserController {
         return userService.createUser(user);
     }
 
-    @GetMapping("/user/{id}")
+    @GetMapping("{id}")
     public UserDto getUser(@PathVariable long id) {
         return userService.getUser(id);
     }
 
-    @GetMapping("/user/exists/{userId}")
+    @GetMapping("/exists/{userId}")
     public boolean isUserExists(@PathVariable long userId) {
         return userService.isUserExists(userId);
     }
 
-    @PostMapping("/users")
+    @GetMapping
     public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);
     }
 
-    @GetMapping("/users/ids")
+    @GetMapping("/ids")
     public List<Long> getUserIds() {
         return userService.getUserIds();
     }
+
+    @PutMapping("{userId}")
+    public void deactivateProfile(@PathVariable long userId){
+        userService.deactivateProfile(userId);
+    }
+
 }

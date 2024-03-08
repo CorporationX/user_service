@@ -1,7 +1,9 @@
 package school.faang.user_service.repository.event;
 
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.User;
 
@@ -28,4 +30,8 @@ public interface EventParticipationRepository extends CrudRepository<User, Long>
             WHERE ue.event_id = :eventId
             """)
     int countParticipants(long eventId);
+
+    @Modifying
+    @Query(value = "DELETE FROM user_event WHERE user_id = :id", nativeQuery = true)
+    void deleteAllParticipatedEventsByUserId(@Param("id") long id);
 }

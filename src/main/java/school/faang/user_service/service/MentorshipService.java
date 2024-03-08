@@ -16,30 +16,42 @@ public class MentorshipService {
     private final UserMapper userMapper;
 
     @Transactional(readOnly = true)
-    public List<UserDto> getMentees(Long userId) {
-        User user = userService.findById(userId);
-        List<User> mentees = user.getMentees();
+    public List<UserDto> getMentees(Long mentorId) {
+        User mentor = getUserById(mentorId);
+        List<User> mentees = mentor.getMentees();
         return userMapper.toDto(mentees);
     }
 
     @Transactional(readOnly = true)
-    public List<UserDto> getMentors(Long userId) {
-        User user = userService.findById(userId);
-        List<User> mentors = user.getMentors();
+    public List<UserDto> getMentors(Long menteeId) {
+        User mentee = getUserById(menteeId);
+        List<User> mentors = mentee.getMentors();
         return userMapper.toDto(mentors);
     }
 
     @Transactional
     public void removeMenteeOfMentor(Long mentorId, Long menteeId) {
-        User mentor = userService.findById(mentorId);
-        User mentee = userService.findById(menteeId);
+        User mentor = getUserById(mentorId);
+        User mentee = getUserById(menteeId);
         mentor.getMentees().remove(mentee);
     }
 
     @Transactional
     public void removeMentorOfMentee(Long mentorId, Long menteeId) {
-        User mentor = userService.findById(mentorId);
-        User mentee = userService.findById(menteeId);
+        User mentor = getUserById(mentorId);
+        User mentee = getUserById(menteeId);
         mentee.getMentors().remove(mentor);
+    }
+
+    public void stopMentoring(User mentor, User mentee) {
+        List<User> mentors = mentee.getMentors();
+        mentors.remove(mentor);
+        mentee.getReceivedGoalInvitations().stream()
+                .filter(goalInvitation -> goalInvitation.getInviter() == mentor)
+                .forEach(goalInvitation -> goalInvitation.setInviter(mentee));
+    }
+
+    private User getUserById(long userId) {
+        return userService.findById(userId);
     }
 }

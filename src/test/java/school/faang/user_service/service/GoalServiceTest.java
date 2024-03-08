@@ -45,7 +45,7 @@ class GoalServiceTest {
     GoalRepository goalRepository;
 
     @Spy
-    private GoalMapper goalMapper = new GoalMapperImpl();
+    private GoalMapperImpl goalMapper;
     @Mock
     SkillService skillService;
     private final List<GoalFilter> goalFilters = List.of(new GoalStatusFilter(), new GoalTitleFilter());

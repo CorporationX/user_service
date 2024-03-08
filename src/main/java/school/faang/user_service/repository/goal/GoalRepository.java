@@ -49,4 +49,11 @@ public interface GoalRepository extends CrudRepository<Goal, Long> {
             WHERE ug.goal_id = :goalId
             """)
     List<User> findUsersByGoalId(long goalId);
+
+    @Query(nativeQuery = true, value = """
+            SELECT COUNT(ug.user_id) FROM user_goal ug
+            JOIN users u ON u.id = ug.user_id
+            WHERE ug.goal_id = :goalId
+            """)
+    int countingUsersCompletingGoal(long goalId);
 }

@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.FollowerEvent;
+import school.faang.user_service.dto.event.follower.FollowerEventDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
@@ -70,7 +71,7 @@ class SubscriptionServiceImplTest {
         subscriptionService.followUser(validFollowerId, validFolloweeId);
 
         verify(subscriptionRepository).followUser(validFollowerId, validFolloweeId);
-        verify(followerEventPublisher).publish(any());
+        verify(followerEventPublisher, times(1)).publish(any(FollowerEventDto.class));
     }
 
     @Test

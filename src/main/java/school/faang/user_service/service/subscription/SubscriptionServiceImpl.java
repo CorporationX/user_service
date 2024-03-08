@@ -5,6 +5,7 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.FollowerEvent;
+import school.faang.user_service.dto.event.follower.FollowerEventDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
@@ -32,8 +33,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         validateUserIds(followerId, followeeId);
         validateSubscriptionExist(followerId, followeeId);
         subscriptionRepository.followUser(followerId, followeeId);
-        followerEventPublisher.publish(
-                new FollowerEvent(followerId, followeeId, LocalDateTime.now()));
+        publishFollowerEvent(followerId, followeeId);
     }
 
     @Override
@@ -93,6 +93,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         if (userId <= 0) {
             throw new DataValidationException("User identifiers must be positive numbers");
         }
+    }
+
+    private void publishFollowerEvent(long followerId, long followeeId) {
+        FollowerEventDto followerEventDto = new FollowerEventDto(followerId, followeeId, LocalDateTime.now());
+        followerEventPublisher.publish(followerEventDto);
     }
 
 }

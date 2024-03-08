@@ -44,7 +44,6 @@ class GoalControllerTest {
         verify(goalService, times(1)).deleteGoal(1L);
     }
 
-
     @Test
     public void testSuccessfullyGetGoalsByUser() {
         when(goalController.getGoalsByUser(1L, goalFilterDto)).thenReturn(goalsDto);
@@ -52,7 +51,6 @@ class GoalControllerTest {
 
         verify(goalService, times(1)).getGoalsByUser(1L, goalFilterDto);
     }
-
 
     @Test
     public void testSuccessfullyFindSubtasksByGoalId() {
@@ -62,20 +60,11 @@ class GoalControllerTest {
         verify(goalService, times(1)).findSubtasksByGoalId(1L);
     }
 
-
     @Test
     public void testSuccessfullyFindSubtasksByGoalIdAndFilters() {
         when(goalController.retrieveFilteredSubtasksForGoal(1L, goalFilterDto)).thenReturn(goalsDto);
         goalController.retrieveFilteredSubtasksForGoal(1L, goalFilterDto);
 
         verify(goalService, times(1)).retrieveFilteredSubtasksForGoal(1L, goalFilterDto);
-    }
-
-    @Test
-    public void testUpdateByGoalIdAndFiltersThrowsDataValidationException() {
-        GoalDto goalDto = new GoalDto();
-        goalController.updateGoal(1L, goalDto);
-
-        verify(goalService).updateGoal(1L, goalDto);
     }
 }

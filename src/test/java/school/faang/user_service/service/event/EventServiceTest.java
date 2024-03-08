@@ -105,14 +105,18 @@ class EventServiceTest {
     }
 
     @Test
-    void create_userSavedToDb_isValid() {
+    void create_userSavedToDb_ThenReturnedAsDto() {
         doNothing().when(eventValidator).validateUserHasRequiredSkills(eventDto);
+        when(eventMapper.toEntity(eventDto)).thenReturn(event);
+        when(eventRepository.save(any(Event.class))).thenReturn(event);
+
         eventService.create(eventDto);
-        verify(eventRepository, times(1)).save(eventMapper.toEntity(eventDto));
+
+        verify(eventMapper, times(1)).toDto(event);
     }
 
     @Test
-    void getEvent_EventIsFound_isValid() {
+    void getEvent_EventIsFound_ThenReturnedAsDto() {
         doNothing().when(eventValidator).validateEventExistsById(anyLong());
         when(eventRepository.findById(anyLong())).thenReturn(Optional.ofNullable(event));
 
@@ -143,7 +147,7 @@ class EventServiceTest {
     }
 
     @Test
-    void getEventsByFilter_FiltersByTitle_IsValid() {
+    void getEventsByFilter_EventFilteredByTitle_ThenReturnedAsDto() {
         EventFilterDto filters = new EventFilterDto();
 
         eventService.getEventsByFilter(filters);
@@ -153,7 +157,7 @@ class EventServiceTest {
     }
 
     @Test
-    void getOwnedEvents_OwnedEventsReturned_IsValid() {
+    void getOwnedEvents_OwnedEventsFound_ThenReturnedAsDto() {
         doNothing().when(userValidator).validateUserExistsById(anyLong());
         when(eventRepository.findAllByUserId(anyLong())).thenReturn(List.of(event));
         when(eventMapper.toDto(anyList())).thenReturn(List.of(eventDto));
@@ -163,7 +167,7 @@ class EventServiceTest {
     }
 
     @Test
-    void getParticipatedEvents_ParticipatedEventsReturned_IsValid() {
+    void getParticipatedEvents_ParticipatedEventsFound_ThenReturnedAsDto() {
         doNothing().when(userValidator).validateUserExistsById(anyLong());
         when(eventRepository.findParticipatedEventsByUserId(anyLong())).thenReturn(List.of(event));
         when(eventMapper.toDto(anyList())).thenReturn(List.of(eventDto));

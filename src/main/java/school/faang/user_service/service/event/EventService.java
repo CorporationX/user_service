@@ -12,6 +12,7 @@ import school.faang.user_service.service.event.filter.EventFilter;
 import school.faang.user_service.validation.event.EventValidator;
 import school.faang.user_service.validation.user.UserValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,8 +27,8 @@ public class EventService {
 
     public EventDto create(EventDto eventDto) {
         eventValidator.validateUserHasRequiredSkills(eventDto);
-        eventRepository.save(eventMapper.toEntity(eventDto));
-        return eventDto;
+        Event savedEvent = eventRepository.save(eventMapper.toEntity(eventDto));
+        return eventMapper.toDto(savedEvent);
     }
 
     public EventDto getEvent(long eventId) {
@@ -52,11 +53,11 @@ public class EventService {
     public EventDto updateEvent(EventDto eventDto) {
         eventValidator.validateUserHasRequiredSkills(eventDto);
         eventValidator.validateEventExistsById(eventDto.getId());
-        Event eventToUpdate = eventRepository.findById(eventDto.getId()).get(); //validateEventExistsById выкинет ошибку, если там null
-        eventValidator.validateUserIsOwnerOfEvent(eventToUpdate.getOwner(), eventDto);
+        Event event = eventRepository.findById(eventDto.getId()).get(); //validateEventExistsById выкинет ошибку, если там null
+        eventValidator.validateUserIsOwnerOfEvent(event.getOwner(), eventDto);
 
-        Event updatedEvent = setUpdatedInformation(eventToUpdate, eventDto);
-        Event updatedAndSavedEvent = eventRepository.save(updatedEvent);
+        setUpdatedInformation(event, eventDto);
+        Event updatedAndSavedEvent = eventRepository.save(event);
         return eventMapper.toDto(updatedAndSavedEvent);
     }
 
@@ -72,7 +73,7 @@ public class EventService {
         return eventMapper.toDto(userParticipatedEvents);
     }
 
-    private Event setUpdatedInformation(Event eventToUpdate, EventDto eventDto) {
+    private void setUpdatedInformation(Event eventToUpdate, EventDto eventDto) {
         eventToUpdate.setId(eventDto.getId());
         eventToUpdate.setTitle(eventDto.getTitle());
         eventToUpdate.setStartDate(eventDto.getStartDate());
@@ -81,6 +82,5 @@ public class EventService {
         eventToUpdate.setRelatedSkills(skillMapper.toEntity(eventDto.getRelatedSkills()));
         eventToUpdate.setLocation(eventDto.getLocation());
         eventToUpdate.setMaxAttendees(eventDto.getMaxAttendees());
-        return eventToUpdate;
     }
 }

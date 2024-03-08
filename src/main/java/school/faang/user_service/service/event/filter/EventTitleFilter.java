@@ -15,6 +15,6 @@ public class EventTitleFilter implements EventFilter {
 
     @Override
     public void apply(List<Event> events, EventFilterDto filters) {
-        events.removeIf(event -> event.getTitle().contains(filters.getTitle()));
+        events.removeIf(event -> !event.getTitle().contains(filters.getTitle()));
     }
 }

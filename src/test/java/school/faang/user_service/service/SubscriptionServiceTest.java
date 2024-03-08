@@ -1,18 +1,21 @@
 package school.faang.user_service.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.FollowerEvent;
 import school.faang.user_service.dto.SubscriptionDto;
+import school.faang.user_service.dto.event.follower.FollowerEventDto;
 import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.repository.UserRepository;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class SubscriptionServiceTest {
@@ -46,11 +49,11 @@ public class SubscriptionServiceTest {
     @Test
     public void testFollowUser() {
         SubscriptionDto subscriptionDto = new SubscriptionDto(1L, 2L);
-        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(1L ,2L)).thenReturn(true);
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(1L, 2L)).thenReturn(true);
 
         subscriptionService.followUser(subscriptionDto);
-        verify(subscriptionRepository, times(1)).followUser(1L ,2L);
-        verify(followerEventPublisher, times(1)).publish(new FollowerEvent(1L, 2L, any()));
+        verify(subscriptionRepository, times(1)).followUser(1L, 2L);
+        verify(followerEventPublisher, times(1)).publish(new FollowerEventDto(1L, 2L, any()));
     }
 
 }

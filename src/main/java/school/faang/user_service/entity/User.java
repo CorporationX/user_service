@@ -29,7 +29,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(name = "username", length = 64, nullable = false, unique = true)
     private String username;
@@ -44,7 +44,7 @@ public class User {
     private String password;
 
     @Column(name = "active", nullable = false)
-    private boolean active;
+    private Boolean active;
 
     @Column(name = "about_me", length = 4096)
     private String aboutMe;
@@ -142,4 +142,13 @@ public class User {
 
     @OneToOne(mappedBy = "user")
     private Premium premium;
+
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                '}';
+    }
 }

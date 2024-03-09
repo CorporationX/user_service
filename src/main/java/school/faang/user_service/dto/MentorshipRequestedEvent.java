@@ -12,5 +12,5 @@ import java.time.LocalDateTime;
 public class MentorshipRequestedEvent {
     private long requesterId;
     private long receiverId;
-    private LocalDateTime timestamp;
+    private LocalDateTime requestedAt;
 }

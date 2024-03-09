@@ -7,15 +7,21 @@
         </encoder>
     </appender>
 
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
     <!-- Профили различных сред -->
-    <springProfile name="local">
+    <springProfiles active="local">
         <!-- Задаем уровень логирования для локальной среды: DEBUG -->
-        <root level="DEBUG"/>
-    </springProfile>
+        <root level="DEBUG">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfiles>
 
-    <springProfile name="!local">
+    <springProfiles active="!local">
         <!-- Для остальных сред, уровень логирования: INFO -->
-        <root level="INFO"/>
-    </springProfile>
-
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfiles>
 </configuration>

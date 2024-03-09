@@ -3,23 +3,19 @@ package school.faang.user_service.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapperImpl;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipServiceTest {
@@ -27,6 +23,8 @@ class MentorshipServiceTest {
     private UserService userService;
     @Spy
     private UserMapperImpl userMapper;
+    @Captor
+    private ArgumentCaptor<User> inviterCaptor;
     @InjectMocks
     private MentorshipService mentorshipService;
     private User user1;
@@ -125,6 +123,36 @@ class MentorshipServiceTest {
         whenGetUserByIdThenReturnUser(id, user1);
         mentorshipService.getMentors(user1.getId());
         verify(userService, times(1)).findById(user1.getId());
+    }
+
+    @Test
+    void testStopMentoring() {
+        User mentor = mock(User.class);
+        User mentee = mock(User.class);
+        GoalInvitation goalInvitation1 = mock(GoalInvitation.class);
+        GoalInvitation goalInvitation2 = mock(GoalInvitation.class);
+
+        List<User> mentors = new ArrayList<>();
+        mentors.add(mentor);
+
+        List<GoalInvitation> receivedGoalInvitations = new ArrayList<>();
+        receivedGoalInvitations.add(goalInvitation1);
+        receivedGoalInvitations.add(goalInvitation2);
+
+        when(mentee.getMentors()).thenReturn(mentors);
+        when(mentee.getReceivedGoalInvitations()).thenReturn(receivedGoalInvitations);
+        when(goalInvitation1.getInviter()).thenReturn(mentor);
+        when(goalInvitation2.getInviter()).thenReturn(mentor);
+
+        mentorshipService.stopMentoring(mentor, mentee);
+        // Проверка
+        assertFalse(mentors.contains(mentor));
+        // Проверяем, что setInviter был вызван с mentee для каждого приглашения
+        verify(goalInvitation1).setInviter(inviterCaptor.capture());
+        verify(goalInvitation2).setInviter(inviterCaptor.capture());
+        List<User> capturedInviters = inviterCaptor.getAllValues();
+
+        assertTrue(capturedInviters.stream().allMatch(inviter -> inviter.equals(mentee)));
     }
 
     private void whenGetUserByIdThenThrowException() {

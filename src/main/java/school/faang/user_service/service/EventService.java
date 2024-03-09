@@ -11,8 +11,8 @@ public class EventService {
     private final EventParticipationRepository eventParticipationRepository;
     private final EventRepository eventRepository;
 
-    public void deleteAllParticipatedEventsByUserId(long id) {
-        eventParticipationRepository.deleteAllParticipatedEventsByUserId(id);
+    public void deleteAllParticipatedEventsByUserId(long userId) {
+        eventParticipationRepository.deleteAllParticipatedEventsByUserId(userId);
     }
 
     public void deleteALLEventByUserId(long userId) {

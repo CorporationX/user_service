@@ -10,24 +10,19 @@ import org.springframework.web.client.RestTemplate;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.s3.S3Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -128,5 +123,38 @@ class UserServiceTest {
                 () -> verify(userMapper, times(1)).toDto((User) any()),
                 () -> verify(userRepository, times(1)).save((User) any())
         );
+    }
+
+    @Test
+    void testDeactivateProfile() {
+        GoalService goalServiceMock = mock(GoalService.class);
+        MentorshipService mentorshipService1 = mock(MentorshipService.class);
+        userService.setGoalService(goalServiceMock); // не знаю, почему, но через аннотацию не работало. Наверное из-за способа внедрения
+        userService.setMentorshipService(mentorshipService1);
+        long userId = 1;
+        List<Goal> goals = new ArrayList<>();
+        List<User> mentors = new ArrayList<>();
+        List<User> mentees = new ArrayList<>();
+        User user = User.builder().mentees(mentees).goals(goals).build();
+        User mentee = User.builder().mentors(mentors).build();
+        mentors.add(user);
+        mentees.add(mentee);
+
+
+        Goal goal = mock(Goal.class);
+        Goal goal11 = mock(Goal.class);
+
+        goals.add(goal);
+        goals.add(goal11);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(goalServiceMock.countingUsersCompletingGoal(anyLong())).thenReturn(1);
+
+        userService.deactivateProfile(userId);
+
+        verify(goalServiceMock, times(2)).countingUsersCompletingGoal(anyLong());
+        verify(goalServiceMock, times(2)).deleteGoal(anyLong());
+        assertFalse(user.isActive());
+        verify(mentorshipService1, times(1)).stopMentoring(user, mentee);
     }
 }

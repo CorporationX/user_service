@@ -48,8 +48,7 @@ public class UserController {
     }
 
     @PutMapping("{userId}")
-    public void deactivateProfile(@PathVariable long userId){
+    public void deactivateProfile(@PathVariable long userId) {
         userService.deactivateProfile(userId);
     }
-
 }

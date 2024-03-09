@@ -20,7 +20,6 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.filter.goal.GoalStatusFilter;
 import school.faang.user_service.filter.goal.GoalTitleFilter;
-import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.mapper.GoalMapperImpl;
 import school.faang.user_service.publisher.GoalCompletedEventPublisher;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -32,11 +31,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class GoalServiceTest {
@@ -233,5 +231,12 @@ class GoalServiceTest {
         Assertions.assertEquals(2, result.size());
         assertEquals(goalMapper.toDto(correctGoal), result.get(0));
         assertEquals(goalMapper.toDto(uncorrectGoal), result.get(1));
+    }
+
+    @Test
+    void testCountingUsersCompletedGoal() {
+        long goalId = 1;
+        goalService.countingUsersCompletingGoal(goalId);
+        verify(goalRepository, times(1)).countingUsersCompletingGoal(goalId);
     }
 }

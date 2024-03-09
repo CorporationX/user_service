@@ -111,13 +111,13 @@ public class UserService {
         User user = findById(userId);
         eventService.deleteAllParticipatedEventsByUserId(userId);
         eventService.deleteALLEventByUserId(userId);
-                user.getGoals().stream()
-                .filter(goal -> goalService.countingUsersCompletingGoal(goal.getId()) == 1 || goal.getInvitations()==null)
+        user.getGoals().stream()
+                .filter(goal -> goalService.countingUsersCompletingGoal(goal.getId()) == 1 || goal.getInvitations() == null)
                 .forEach(goal -> goalService.deleteGoal(goal.getId()));
         user.setActive(false);
         List<User> mentees = user.getMentees();
         if (!mentees.isEmpty()) {
             mentees.forEach(mentee -> mentorshipService.stopMentoring(user, mentee));
-    }
+        }
     }
 }

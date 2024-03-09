@@ -43,4 +43,11 @@ class UserControllerTest {
         userController.getUser(userId);
         verify(userService, times(1)).getUser(userId);
     }
+
+    @Test
+    void  testDeactivateProfile(){
+        long userId = 1;
+        userController.deactivateProfile(userId);
+        verify(userService,times(1)).deactivateProfile(userId);
+    }
 }

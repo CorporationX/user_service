@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -49,17 +51,14 @@ public class SkillService {
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
         List<Skill> skillsOfferedToUser = skillRepository.findSkillsOfferedToUser(userId);
-        Map<SkillDto, Long> map = new HashMap<>();
-        for (Skill skill : skillsOfferedToUser) {
-            SkillDto dtoSkill = skillMapper.toDtoSkill(skill);
-            if (map.containsKey(dtoSkill)) {
-                map.put(dtoSkill, map.get(dtoSkill) + 1);
-            } else {
-                map.put(dtoSkill, 1L);
-            }
-        }
+
+        Map<SkillDto, Long> skillCounts = skillsOfferedToUser.stream()
+                .map(skill -> skillMapper.toDtoSkill(skill))
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
         List<SkillCandidateDto> skillCandidateDtos = new ArrayList<>();
-        for (Map.Entry<SkillDto, Long> entry : map.entrySet()) {
+
+        for (Map.Entry<SkillDto, Long> entry : skillCounts.entrySet()) {
             SkillCandidateDto skillCandidateDto = new SkillCandidateDto();
             skillCandidateDto.setSkill(entry.getKey());
             skillCandidateDto.setOffersAmount(entry.getValue());

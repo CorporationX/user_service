@@ -32,6 +32,7 @@ public class GoalService {
         goalValidation.validateGoalCreate(userId, goalDto, MAX_COUNT_GOALS);
         Goal createdGoal = goalRepository.create(goalDto.getTitle(), goalDto.getDescription(), goalDto.getParentId());
         createdGoal.setSkillsToAchieve(skillIdsToSkills(goalDto.getSkillIds()));
+        createdGoal.setUsers(goalRepository.findUsersByGoalId(goalDto.getId()));
         return goalMapper.toDto(goalRepository.save(createdGoal));
     }
 
@@ -62,8 +63,7 @@ public class GoalService {
         return goalsToDto(goals);
     }
 
-    @Transactional
-    private void updateFields(Goal goal, GoalDto goalDto) { // Обновляет поля у Цели для сохранения в БД
+    private void updateFields(Goal goal, GoalDto goalDto) {
         if (goalDto.getParentId() != null) {
             Long parentId = goalDto.getParentId();
             goalValidation.validateExistGoal(parentId);
@@ -78,8 +78,7 @@ public class GoalService {
         goal.setSkillsToAchieve(skillIdsToSkills(goalDto.getSkillIds()));
     }
 
-    @Transactional
-    private void addSkillsToUser(User user, Goal goal) {  // Добавляет скиллы пользователю
+    private void addSkillsToUser(User user, Goal goal) {
         goal.getSkillsToAchieve().forEach(skill -> {
             if (!user.getSkills().contains(skill)) {
                 skillRepository.assignSkillToUser(skill.getId(), user.getId());
@@ -87,7 +86,7 @@ public class GoalService {
         });
     }
 
-    private List<Skill> skillIdsToSkills(List<Long> skillIds) { // из листа id скиллов делает лист скиллов
+    private List<Skill> skillIdsToSkills(List<Long> skillIds) {
         return skillRepository.findAllById(skillIds);
     }
 

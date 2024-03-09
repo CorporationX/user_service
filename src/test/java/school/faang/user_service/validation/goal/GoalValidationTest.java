@@ -8,7 +8,6 @@ import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exceptions.DataValidationException;
-import school.faang.user_service.exceptions.EntityFieldsException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
@@ -33,6 +32,7 @@ public class GoalValidationTest {
         Long userId = 1L;
         int maximumGoalUser = 3;
         GoalDto goalDto = new GoalDto();
+
         when(goalRepository.countActiveGoalsPerUser(userId)).thenReturn(maximumGoalUser);
 
         assertThrows(DataValidationException.class,
@@ -48,7 +48,7 @@ public class GoalValidationTest {
 
         when(goalRepository.countActiveGoalsPerUser(userId)).thenReturn(maximumGoalUser - 1);
 
-        assertThrows(EntityFieldsException.class,
+        assertThrows(DataValidationException.class,
                 () -> goalValidation.validateGoalCreate(userId, goalDto, maximumGoalUser));
     }
 
@@ -61,7 +61,7 @@ public class GoalValidationTest {
 
         when(goalRepository.countActiveGoalsPerUser(userId)).thenReturn(maximumGoalUser - 1);
 
-        assertThrows(EntityFieldsException.class,
+        assertThrows(DataValidationException.class,
                 () -> goalValidation.validateGoalCreate(userId, goalDto, maximumGoalUser));
     }
 
@@ -75,7 +75,7 @@ public class GoalValidationTest {
 
         when(goalRepository.countActiveGoalsPerUser(userId)).thenReturn(maximumGoalUser - 1);
 
-        assertThrows(EntityFieldsException.class,
+        assertThrows(DataValidationException.class,
                 () -> goalValidation.validateGoalCreate(userId, goalDto, maximumGoalUser));
     }
 
@@ -87,7 +87,7 @@ public class GoalValidationTest {
         goalDto.setTitle("Title");
         goalDto.setSkillIds(List.of());
 
-        assertThrows(EntityFieldsException.class,
+        assertThrows(DataValidationException.class,
                 () -> goalValidation.validateGoalCreate(userId, goalDto, maximumGoalUser));
     }
 
@@ -111,7 +111,7 @@ public class GoalValidationTest {
         GoalDto goalDto = new GoalDto();
         goalDto.setTitle(null);
 
-        assertThrows(EntityFieldsException.class,
+        assertThrows(DataValidationException.class,
                 () -> goalValidation.validateGoalUpdate(goalId, goalDto));
     }
 
@@ -121,7 +121,7 @@ public class GoalValidationTest {
         GoalDto goalDto = new GoalDto();
         goalDto.setTitle(null);
 
-        assertThrows(EntityFieldsException.class,
+        assertThrows(DataValidationException.class,
                 () -> goalValidation.validateGoalUpdate(goalId, goalDto));
     }
 
@@ -148,7 +148,6 @@ public class GoalValidationTest {
         when(goalRepository.existsById(goalId)).thenReturn(true);
         when(goalRepository.findById(goalId)).thenReturn(Optional.of(goalFromRepository));
 
-
         assertThrows(DataValidationException.class,
                 () -> goalValidation.validateGoalUpdate(goalId, goalDto));
     }
@@ -165,8 +164,7 @@ public class GoalValidationTest {
         when(goalRepository.existsById(goalId)).thenReturn(true);
         when(goalRepository.findById(goalId)).thenReturn(Optional.of(goalFromRepository));
 
-
-        assertThrows(EntityFieldsException.class,
+        assertThrows(DataValidationException.class,
                 () -> goalValidation.validateGoalUpdate(goalId, goalDto));
     }
 
@@ -182,8 +180,7 @@ public class GoalValidationTest {
         when(goalRepository.existsById(goalId)).thenReturn(true);
         when(goalRepository.findById(goalId)).thenReturn(Optional.of(goalFromRepository));
 
-
-        assertThrows(EntityFieldsException.class,
+        assertThrows(DataValidationException.class,
                 () -> goalValidation.validateGoalUpdate(goalId, goalDto));
     }
 
@@ -200,7 +197,6 @@ public class GoalValidationTest {
         when(goalRepository.existsById(goalId)).thenReturn(true);
         when(goalRepository.findById(goalId)).thenReturn(Optional.of(goalFromRepository));
         when(skillRepository.existsById(anyLong())).thenReturn(false);
-
 
         assertThrows(DataValidationException.class,
                 () -> goalValidation.validateGoalUpdate(goalId, goalDto));

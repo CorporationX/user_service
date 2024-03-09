@@ -1,14 +1,11 @@
 package school.faang.user_service.validation.goal;
 
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.GoalDto;
-import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exceptions.DataValidationException;
-import school.faang.user_service.exceptions.EntityFieldsException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
@@ -48,16 +45,16 @@ public class GoalValidation {
 
     private void validateTitle(String title) {
         if (title == null) {
-            throw new EntityFieldsException("Goal title can't be null");
+            throw new DataValidationException("Goal title can't be null");
         }
         if (title.isBlank()) {
-            throw new EntityFieldsException("Goal title can't be empty");
+            throw new DataValidationException("Goal title can't be empty");
         }
     }
 
     private void validateSkills(List<Long> skillsId) {
         if (skillsId == null || skillsId.isEmpty()) {
-            throw new EntityFieldsException("Goal must have skill");
+            throw new DataValidationException("Goal must have skill");
         }
         skillsId.forEach(this::validateSkill);
     }

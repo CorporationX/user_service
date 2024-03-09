@@ -10,8 +10,8 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
 public interface UserMapper {
-    @Mapping(source = "mentees", target = "menteesIds", qualifiedByName = "map")
-    @Mapping(source = "mentors", target = "mentorsIds", qualifiedByName = "map")
+    @Mapping(source = "mentees", target = "menteesIds", qualifiedByName = "mapToIds")
+    @Mapping(source = "mentors", target = "mentorsIds", qualifiedByName = "mapToIds")
     UserDto toDto(User user);
     List<UserDto> toDto (List<User> users);
 
@@ -20,8 +20,8 @@ public interface UserMapper {
     User toEntity(UserDto userDto);
 
 
-    @Named("map")
-    default List<Long> map(List<User> users){
+    @Named("mapToIds")
+    default List<Long> mapToIds(List<User> users){
         return users.stream().map(User::getId).toList();
     }
 

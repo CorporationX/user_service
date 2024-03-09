@@ -2,13 +2,13 @@ package school.faang.user_service.controller;
 
 import lombok.Data;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.MentorshipService;
 
 import java.util.List;
 
-@Data
-@Controller
+@RestController
 public class MentorshipController {
     MentorshipService mentorshipService;
 
@@ -20,6 +20,7 @@ public class MentorshipController {
     public List<UserDto> getMentors(long menteeId) {
         return mentorshipService.getMentors(menteeId);
     }
+
     public List<UserDto> deleteMentee(long mentorId, long menteeId) {
         return mentorshipService.deleteMentee(mentorId, menteeId);
     }

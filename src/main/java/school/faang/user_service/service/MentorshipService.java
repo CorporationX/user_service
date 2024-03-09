@@ -2,6 +2,7 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
@@ -10,7 +11,7 @@ import school.faang.user_service.service.exceptions.UserNotFoundException;
 import school.faang.user_service.service.exceptions.messageerror.MessageError;
 import java.util.List;
 
-@Component
+@Service
 @RequiredArgsConstructor//or I can use @AutoWired and constructor with required fields instead
 public class MentorshipService {
     private final UserMapper userMapper;

@@ -2,12 +2,13 @@ package school.faang.user_service.validation.event;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
@@ -21,14 +22,13 @@ import school.faang.user_service.repository.event.EventRepository;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class EventValidatorTest {
 
     @Mock
@@ -145,7 +145,7 @@ class EventValidatorTest {
     }
 
     @Test
-    void validateUserSkills_UserDoesntHaveAnySkills_ShouldThrowDataValidationException() {
+    void validateUserHasRequiredSkills_UserDoesntHaveAnySkills_ShouldThrowDataValidationException() {
         when(skillRepository.findAllByUserId(anyLong())).thenReturn(null);
 
         assertThrows(DataValidationException.class, () ->
@@ -162,7 +162,7 @@ class EventValidatorTest {
     void validateUserIsOwnerOfEvent_UserDoesntOwnEvent_ShouldThrowIllegalStateException() {
         eventDto.setOwnerId(19L);
 
-        assertThrows(IllegalStateException.class, () ->
+        assertThrows(DataValidationException.class, () ->
                 eventValidator.validateUserIsOwnerOfEvent(user, eventDto));
     }
 
@@ -178,7 +178,7 @@ class EventValidatorTest {
     void validateEventExistsById_EventDoesntExist_ShouldThrowNoSuchElementException() {
         when(eventRepository.existsById(anyLong())).thenReturn(false);
 
-        assertThrows(NoSuchElementException.class, () ->
+        assertThrows(DataValidationException.class, () ->
                 eventValidator.validateEventExistsById(10L));
     }
 }

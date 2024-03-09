@@ -1,19 +1,20 @@
 package school.faang.user_service.mapper;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class SkillMapperTest {
 
-    @Autowired
-    private SkillMapper skillMapper;
+    @InjectMocks
+    private SkillMapperImpl skillMapper;
 
     @Test
     void toDtoTest() {

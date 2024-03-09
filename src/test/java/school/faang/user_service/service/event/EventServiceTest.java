@@ -2,9 +2,10 @@ package school.faang.user_service.service.event;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
@@ -31,7 +32,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class EventServiceTest {
 
     @Mock
@@ -126,8 +127,6 @@ class EventServiceTest {
 
     @Test
     void deleteEvent_EventIsDeleted_IsValid() {
-        doNothing().when(eventValidator).validateEventExistsById(anyLong());
-
         eventService.deleteEvent(1);
         verify(eventRepository, times(1)).deleteById(anyLong());
     }

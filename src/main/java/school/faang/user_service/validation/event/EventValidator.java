@@ -12,7 +12,6 @@ import school.faang.user_service.repository.event.EventRepository;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Component
 @RequiredArgsConstructor
@@ -22,7 +21,7 @@ public class EventValidator {
     private final SkillMapper skillMapper;
 
     public void validateEventDtoFields(EventDto eventDto) {
-        if (eventDto.getTitle() == null || eventDto.getTitle().isEmpty() || eventDto.getTitle().isBlank()) {
+        if (eventDto.getTitle() == null || eventDto.getTitle().isBlank()) {
             throw new DataValidationException("Event must have a title");
         }
         if (eventDto.getStartDate() == null) {
@@ -47,13 +46,13 @@ public class EventValidator {
 
     public void validateUserIsOwnerOfEvent(User user, EventDto eventDto) {
         if (user.getId() != eventDto.getOwnerId()) {
-            throw new IllegalStateException("User is not an owner of the Event");
+            throw new DataValidationException("User is not an owner of the Event");
         }
     }
 
     public void validateEventExistsById(long eventId) {
         if (!eventRepository.existsById(eventId)) {
-            throw new NoSuchElementException("There is no event with id " + eventId);
+            throw new DataValidationException("There is no event with id " + eventId);
         }
     }
 }

@@ -45,7 +45,6 @@ public class EventService {
     }
 
     public void deleteEvent(long eventId) {
-        eventValidator.validateEventExistsById(eventId);
         eventRepository.deleteById(eventId);
     }
 
@@ -55,7 +54,6 @@ public class EventService {
         Event event = eventRepository.findById(eventDto.getId()).get(); //validateEventExistsById выкинет ошибку, если там null
         eventValidator.validateUserIsOwnerOfEvent(event.getOwner(), eventDto);
 
-        setUpdatedInformation(event, eventDto);
         Event updatedAndSavedEvent = eventRepository.save(event);
         return eventMapper.toDto(updatedAndSavedEvent);
     }
@@ -70,16 +68,5 @@ public class EventService {
         userValidator.validateUserExistsById(userId);
         List<Event> userParticipatedEvents = eventRepository.findParticipatedEventsByUserId(userId);
         return eventMapper.toDto(userParticipatedEvents);
-    }
-
-    private void setUpdatedInformation(Event eventToUpdate, EventDto eventDto) {
-        eventToUpdate.setId(eventDto.getId());
-        eventToUpdate.setTitle(eventDto.getTitle());
-        eventToUpdate.setStartDate(eventDto.getStartDate());
-        eventToUpdate.setEndDate(eventDto.getEndDate());
-        eventToUpdate.setDescription(eventDto.getDescription());
-        eventToUpdate.setRelatedSkills(skillMapper.toEntity(eventDto.getRelatedSkills()));
-        eventToUpdate.setLocation(eventDto.getLocation());
-        eventToUpdate.setMaxAttendees(eventDto.getMaxAttendees());
     }
 }

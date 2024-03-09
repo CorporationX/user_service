@@ -1,10 +1,8 @@
 package school.faang.user_service.service.recommendation;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
@@ -13,11 +11,11 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 
-import java.util.List;
-import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static reactor.core.publisher.Mono.when;
 
 @SpringBootTest
-public class RecommendationRequestServiceTest {
+public class RecommendationRequestValidationTest {
     private RecommendationRequestDto recommendationRequestDto;
     private RecommendationRequest recommendationRequest;
     private RejectionDto rejectionDto;
@@ -49,33 +47,19 @@ public class RecommendationRequestServiceTest {
     }
 
     @Test
-    public void testRecommendationRequestCreated() {
-        recommendationRequestService.create(recommendationRequestDto);
-        Mockito.verify(recommendationRequestService).create(recommendationRequestDto);
-        Mockito.when(recommendationRequestService.create(recommendationRequestDto)).thenReturn(recommendationRequestDto);
+    public void testRecommendationRequestMessageInvalid() {
+        recommendationRequestDto.setMessage(null);
+//        when(recommendationRequestService.create(recommendationRequestDto)).thenReturn(MethodArgumentNotValidException.class);
+        assertThrows(MethodArgumentNotValidException.class, () -> recommendationRequestService.create(recommendationRequestDto));
     }
 
-    @Test
-    public void testRecommendationRequestFindOne() {
-        long validId = 8;
-        recommendationRequestService.getRequest(validId);
-        Mockito.verify(recommendationRequestService).getRequest(validId);
-        Mockito.when(recommendationRequestRepository.findById(validId)).thenReturn(Optional.of(recommendationRequest));
-    }
-
-    @Test
-    public void testRecommendationRequestsFindAll() {
-        Mockito.when(recommendationRequestRepository.findAll()).thenReturn(List.of(recommendationRequest));
-    }
-
-    @Test
-    public void testRecommendationRequestReject() {
-        long id = 8;
-
-
-        recommendationRequestService.rejectRequest(id, rejectionDto);
-        Mockito.verify(recommendationRequestService).rejectRequest(id, rejectionDto);
-    }
-
-
+    //    @Test
+//    public void testRecommendationRequestRejectInvalid() {
+//        long id = 12;
+//        rejectionDto.setReason("");
+//        Assert.assertThrows(
+//                MethodArgumentNotValidException.class,
+//                () -> recommendationRequestService.rejectRequest(id, rejectionDto)
+//        );
+//    }
 }

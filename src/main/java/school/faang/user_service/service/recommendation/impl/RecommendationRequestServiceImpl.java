@@ -1,16 +1,14 @@
 package school.faang.user_service.service.recommendation.impl;
 
 import jakarta.transaction.Transactional;
-
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.stereotype.Service;
-
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.dto.recommendation.RequestFilterDto;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.handler.exception.EntityNotFoundException;
+import school.faang.user_service.handler.exception.EntityExistException;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
@@ -20,7 +18,6 @@ import school.faang.user_service.validator.recommendation.RecommendationRequestV
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -72,6 +69,18 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
 
     @Override
     public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
-        return null;
+        Optional<RecommendationRequest> recommendationRequest = recommendationRequestRepository.findById(id);
+
+        recommendationRequest.ifPresent(request -> {
+            if (request.getStatus().equals(RequestStatus.REJECTED) || request.getStatus().equals(RequestStatus.ACCEPTED)) {
+                throw new EntityExistException("Искомый запрос рекомендации уже принят или отклонен");
+            }
+
+            request.setStatus(RequestStatus.REJECTED);
+            request.setRejectionReason(rejection.getReason());
+            recommendationRequestRepository.save(request);
+        });
+
+        return recommendationRequestMapper.toDto(recommendationRequest.orElse(null));
     }
 }

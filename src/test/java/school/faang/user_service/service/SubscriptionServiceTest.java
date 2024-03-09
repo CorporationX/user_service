@@ -1,18 +1,18 @@
 package school.faang.user_service.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.FollowerEvent;
 import school.faang.user_service.dto.SubscriptionDto;
+import school.faang.user_service.dto.event.follower.FollowerEventDto;
 import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.repository.UserRepository;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class SubscriptionServiceTest {
@@ -50,7 +50,7 @@ public class SubscriptionServiceTest {
 
         subscriptionService.followUser(subscriptionDto);
         verify(subscriptionRepository, times(1)).followUser(1L ,2L);
-        verify(followerEventPublisher, times(1)).publish(new FollowerEvent(1L, 2L, any()));
+        verify(followerEventPublisher, times(1)).publish(new FollowerEventDto(1L, 2L, any()));
     }
 
 }

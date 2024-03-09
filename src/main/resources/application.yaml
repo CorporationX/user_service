@@ -70,4 +70,3 @@ services:
 premium_cleanup:
   time: 0 0 0 * * *
   zone: Europe/Moscow
-

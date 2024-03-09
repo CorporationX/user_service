@@ -13,11 +13,19 @@ public class MentorshipController {
     MentorshipService mentorshipService;
 
 
-
-    public List<UserDto> getMentees(long mentorId){
+    public List<UserDto> getMentees(long mentorId) {
         return mentorshipService.getMentees(mentorId);
     }
-    public List<UserDto> getMentors(long menteeId){
+
+    public List<UserDto> getMentors(long menteeId) {
         return mentorshipService.getMentors(menteeId);
+    }
+
+    public List<UserDto> deleteMentee(long mentorId, long menteeId) {
+        return mentorshipService.deleteMentee(mentorId, menteeId);
+    }
+
+    public List<UserDto> deleteMentor(long menteeId, long mentorId) {
+        return mentorshipService.deleteMentor(menteeId, mentorId);
     }
 }

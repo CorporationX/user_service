@@ -13,7 +13,7 @@ public interface UserMapper {
     @Mapping(source = "mentees", target = "menteesIds", qualifiedByName = "map")
     @Mapping(source = "mentors", target = "mentorsIds", qualifiedByName = "map")
     UserDto toDto(User user);
-//    List<UserDto> toDto (List<User> users);
+    List<UserDto> toDto (List<User> users);
 
     @Mapping(target = "mentees", ignore = true)
     @Mapping(target = "mentors", ignore = true)
@@ -25,10 +25,6 @@ public interface UserMapper {
         return users.stream().map(User::getId).toList();
     }
 
-
-    default List<Long> mapMentorsToIds(User user){
-        return user.getMentors().stream().map(User::getId).toList();
-    }
 
     //Not sure should you I send a request to db, if yes than why
 //    default List<User> mapMentorsIdsToEntity(UserDto userDto){

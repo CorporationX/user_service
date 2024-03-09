@@ -35,6 +35,8 @@ class UserServiceTest {
     private S3Service s3Service;
     @Mock
     private RestTemplate restTemplate;
+    @Mock
+    private EventService eventService;
 
     @InjectMocks
     private UserService userService;

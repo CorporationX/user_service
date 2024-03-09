@@ -10,8 +10,10 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.goal.filter.GoalFilter;
@@ -23,6 +25,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
@@ -34,6 +37,7 @@ public class GoalServiceTest {
     private GoalValidation goalValidation;
     private GoalFilter goalFilter;
     private List<GoalFilter> goalFilters;
+    private UserRepository userRepository;
     private GoalService goalService;
 
 
@@ -44,9 +48,23 @@ public class GoalServiceTest {
         skillRepository = mock(SkillRepository.class);
         goalValidation = mock(GoalValidation.class);
         goalFilter = mock(GoalFilter.class);
+        userRepository = mock(UserRepository.class);
         goalFilters = List.of(goalFilter);
-        goalService = new GoalService(goalRepository, goalMapper, skillRepository, goalValidation, goalFilters);
+        goalService = new GoalService(goalRepository, goalMapper, skillRepository, goalValidation, userRepository, goalFilters);
 
+    }
+
+    @Test
+    void testCreateGoal_UserDoesntExist(){
+        Long userId = 1L;
+        GoalDto goalDto = getGoalDto();
+        Goal goalCreated = getGoal();
+
+        when(goalRepository.create(goalDto.getTitle(), goalDto.getDescription(), goalDto.getParentId()))
+                .thenReturn(goalCreated);
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThrows(DataValidationException.class, () -> goalService.createGoal(userId, goalDto));
     }
 
     @Test
@@ -54,9 +72,11 @@ public class GoalServiceTest {
         Long userId = 1L;
         GoalDto goalDto = getGoalDto();
         Goal goalCreated = getGoal();
+        User user = new User();
 
         when(goalRepository.create(goalDto.getTitle(), goalDto.getDescription(), goalDto.getParentId()))
                 .thenReturn(goalCreated);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(goalRepository.save(goalCreated)).thenReturn(goalCreated);
         when(goalMapper.toDto(goalCreated)).thenReturn(goalDto);
 
@@ -68,6 +88,7 @@ public class GoalServiceTest {
                 .create(goalDto.getTitle(), goalDto.getDescription(), goalDto.getParentId());
         verify(skillRepository, times(1))
                 .findAllById(goalDto.getSkillIds());
+        verify(userRepository, times(1)).findById(userId);
 
         assertEquals(goalDto, goalDtoCreated);
     }

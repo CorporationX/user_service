@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.follower.FollowerEventDto;
 @Slf4j
@@ -17,9 +18,9 @@ public class FollowerEventPublisher extends AbstractEventPublisher<FollowerEvent
         super(objectMapper, redisTemplate);
     }
 
-    @Override
+    @Async("taskExecutor")
     public void publish(FollowerEventDto event) {
         convertAndSend(event, followerEventChannel);
     }
-  
+
 }

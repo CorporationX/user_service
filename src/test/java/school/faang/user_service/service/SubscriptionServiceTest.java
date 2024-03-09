@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.FollowerEvent;
 import school.faang.user_service.dto.SubscriptionDto;
+import school.faang.user_service.dto.event.follower.FollowerEventDto;
 import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -50,7 +51,7 @@ public class SubscriptionServiceTest {
 
         subscriptionService.followUser(subscriptionDto);
         verify(subscriptionRepository, times(1)).followUser(1L ,2L);
-        verify(followerEventPublisher, times(1)).publish(new FollowerEvent(1L, 2L, any()));
+        verify(followerEventPublisher, times(1)).publish(new FollowerEventDto(1L, 2L, any()));
     }
 
 }

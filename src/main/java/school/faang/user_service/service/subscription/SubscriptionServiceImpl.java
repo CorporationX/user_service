@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.FollowerEvent;
 import school.faang.user_service.dto.event.follower.FollowerEventDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
@@ -22,9 +23,9 @@ import java.util.stream.Stream;
 public class SubscriptionServiceImpl implements SubscriptionService {
 
     private final SubscriptionRepository subscriptionRepository;
-    private final FollowerEventPublisher followerEventPublisher;
     private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
     private final UserFilterService userFilter;
+    private final FollowerEventPublisher followerEventPublisher;
 
     @Override
     @Transactional

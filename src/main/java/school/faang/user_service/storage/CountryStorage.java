@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class CountryStorage {
 
-    public static ConcurrentHashMap<String, Country> countryCache = new ConcurrentHashMap();
+    public static ConcurrentHashMap<String, Country> countryCache = new ConcurrentHashMap<>();
 
     private final CountryService countryService;
     @PostConstruct

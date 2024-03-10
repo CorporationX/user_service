@@ -5,11 +5,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.dto.GoalFilterDto;
-import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
-import school.faang.user_service.exceptions.DataValidationException;
+import school.faang.user_service.exceptions.EntityNotFoundException;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -19,7 +18,6 @@ import school.faang.user_service.validation.goal.GoalValidation;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,7 +35,7 @@ public class GoalService {
     public GoalDto createGoal(Long userId, GoalDto goalDto) {
         goalValidation.validateGoalCreate(userId, goalDto, MAX_COUNT_GOALS);
         Goal createdGoal = goalRepository.create(goalDto.getTitle(), goalDto.getDescription(), goalDto.getParentId());
-        createdGoal.setSkillsToAchieve(skillIdsToSkills(goalDto.getSkillIds()));
+        createdGoal.setSkillsToAchieve(skillRepository.findAllById(goalDto.getSkillIds()));
         createdGoal.setUsers(Arrays.asList(getUser(userId)));
         return goalMapper.toDto(goalRepository.save(createdGoal));
     }
@@ -45,12 +43,12 @@ public class GoalService {
     @Transactional
     public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
         goalValidation.validateGoalUpdate(goalId, goalDto);
-        Goal createdGoal = goalRepository.findById(goalId).get();
+        Goal createdGoal = goalRepository.findById(goalId)
+                .orElseThrow(() -> new EntityNotFoundException("Entity not found in database"));
         updateFields(createdGoal, goalDto);
         return goalMapper.toDto(goalRepository.save(createdGoal));
     }
 
-    @Transactional
     public void deleteGoal(Long goalId) {
         goalValidation.validateExistGoal(goalId);
         goalRepository.deleteById(goalId);
@@ -60,36 +58,34 @@ public class GoalService {
         goalValidation.validateExistGoal(goalId);
         List<Goal> goals = goalRepository.findByParent(goalId).collect(Collectors.toList());
         applyFilters(goals, filterGoalDto);
-        return goalsToDto(goals);
+        return goalMapper.toDto(goals);
     }
 
     public List<GoalDto> findGoalsByUserId(Long userId, GoalFilterDto filterGoalDto) {
         List<Goal> goals = goalRepository.findGoalsByUserId(userId).collect(Collectors.toList());
         applyFilters(goals, filterGoalDto);
-        return goalsToDto(goals);
+        return goalMapper.toDto(goals);
     }
 
     private User getUser(Long userId) {
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
-            throw new DataValidationException("User doesnt exist in database");
-        }
-        return user.get();
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Entity not found in database"));
     }
 
     private void updateFields(Goal goal, GoalDto goalDto) {
         if (goalDto.getParentId() != null) {
             Long parentId = goalDto.getParentId();
             goalValidation.validateExistGoal(parentId);
-            goal.setParent(goalRepository.findById(parentId).get());
+            goal.setParent(goalRepository.findById(parentId)
+                    .orElseThrow(() -> new EntityNotFoundException("Entity not found in database")));
         }
-        if (goalDto.getStatus().equals(GoalStatus.COMPLETED)) {
+        if (GoalStatus.COMPLETED.equals(goalDto.getStatus())) {
             goal.getUsers().forEach(user -> addSkillsToUser(user, goal));
         }
         goal.setTitle(goalDto.getTitle());
         goal.setStatus(goalDto.getStatus());
         goal.setDescription(goalDto.getDescription());
-        goal.setSkillsToAchieve(skillIdsToSkills(goalDto.getSkillIds()));
+        goal.setSkillsToAchieve(skillRepository.findAllById(goalDto.getSkillIds()));
     }
 
     private void addSkillsToUser(User user, Goal goal) {
@@ -100,19 +96,9 @@ public class GoalService {
         });
     }
 
-    private List<Skill> skillIdsToSkills(List<Long> skillIds) {
-        return skillRepository.findAllById(skillIds);
-    }
-
     private void applyFilters(List<Goal> goals, GoalFilterDto filterGoalDto) {
         filters.stream()
                 .filter(filter -> filter.isApplicable(filterGoalDto))
                 .forEach(filter -> filter.apply(goals, filterGoalDto));
-    }
-
-    private List<GoalDto> goalsToDto(List<Goal> goals) {
-        return goals.stream()
-                .map(goalMapper::toDto)
-                .toList();
     }
 }

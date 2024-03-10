@@ -1,6 +1,5 @@
 package school.faang.user_service.mapper;
 
-import lombok.RequiredArgsConstructor;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -8,7 +7,6 @@ import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.util.List;
 
@@ -17,6 +15,10 @@ public interface GoalMapper {
     @Mapping(source = "skillsToAchieve", target = "skillIds", qualifiedByName = "getIdSkills")
     @Mapping(source = "parent.id", target = "parentId")
     GoalDto toDto(Goal goal);
+
+    @Mapping(source = "skillsToAchieve", target = "skillIds", qualifiedByName = "getIdSkills")
+    @Mapping(source = "parent.id", target = "parentId")
+    List<GoalDto> toDto(List<Goal> goals);
 
     @Mapping(target = "skillsToAchieve", ignore = true)
     @Mapping(target = "parent", ignore = true)

@@ -10,7 +10,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
-import school.faang.user_service.exceptions.DataValidationException;
+import school.faang.user_service.exceptions.EntityNotFoundException;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -63,7 +63,7 @@ public class GoalServiceTest {
                 .thenReturn(goalCreated);
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        assertThrows(DataValidationException.class, () -> goalService.createGoal(userId, goalDto));
+        assertThrows(EntityNotFoundException.class, () -> goalService.createGoal(userId, goalDto));
     }
 
     @Test
@@ -114,11 +114,10 @@ public class GoalServiceTest {
     void testDeleteGoalFromRepository() {
         long goalId = 1L;
 
-        goalService.deleteGoal(goalId);
+        assertDoesNotThrow(() -> goalService.deleteGoal(goalId));
 
         verify(goalValidation, times(1)).validateExistGoal(goalId);
         verify(goalRepository, times(1)).deleteById(goalId);
-        assertDoesNotThrow(() -> goalService.deleteGoal(goalId));
     }
 
     @Test
@@ -137,6 +136,7 @@ public class GoalServiceTest {
         verify(goalRepository, times(1)).findByParent(goalId);
         verify(goalFilter).isApplicable(filters);
         verify(goalFilter).apply(anyList(), any(GoalFilterDto.class));
+        verify(goalMapper).toDto(anyList());
     }
 
     @Test

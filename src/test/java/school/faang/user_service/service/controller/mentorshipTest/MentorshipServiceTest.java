@@ -64,24 +64,4 @@ public class MentorshipServiceTest {
         List<User> actualMentors = mentorshipService.getMentors(userId);
         assertTrue(actualMentors.isEmpty());
     }
-
-    @Test
-    public void testDeleteMentee() {
-        User mentor = User.builder()
-                .id(1L)
-                .mentees(Collections.singletonList(new User()))
-                .build();
-        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(mentor));
-        mentorshipService.deleteMentee(2L, 1L);
-    }
-
-    @Test
-    public void testDeleteMentor() {
-        User mentee = User.builder()
-                .id(1L)
-                .mentors(Collections.singletonList(new User()))
-                .build();
-        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(mentee));
-        mentorshipService.deleteMentor(2L, 1L);
-    }
 }

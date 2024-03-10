@@ -1,7 +1,7 @@
-package school.faang.user_service.UserMapper;
+package school.faang.user_service.userMapper;
 
 import org.mapstruct.Mapper;
-import school.faang.user_service.UserDto.UserDto;
+import school.faang.user_service.userDto.UserDto;
 import school.faang.user_service.entity.User;
 
 @Mapper(componentModel = "spring")

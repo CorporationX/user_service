@@ -39,7 +39,6 @@ public class EventControllerTest {
         objectMapper = new ObjectMapper();
     }
 
-
     @Test
     void getEventSuccess() throws Exception {
         Long eventId = 1L;
@@ -52,6 +51,5 @@ public class EventControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(eventId));
     }
-
 
 }

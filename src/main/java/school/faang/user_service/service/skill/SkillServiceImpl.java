@@ -12,7 +12,6 @@ import java.util.List;
 public class SkillServiceImpl implements SkillService{
     private final SkillRepository skillRepository;
 
-
     public boolean checkActiveSkill(Long id) {
         return skillRepository.existsById(id);
     }

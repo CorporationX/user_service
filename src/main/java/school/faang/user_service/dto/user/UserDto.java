@@ -2,11 +2,12 @@ package school.faang.user_service.dto.user;
 
 import lombok.*;
 import school.faang.user_service.dto.skill.SkillDto;
+import school.faang.user_service.entity.contact.PreferredContact;
 
 import java.util.List;
 
-@Builder
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
@@ -20,5 +21,6 @@ public class UserDto {
     private String city;
     private Integer experience;
     private List<SkillDto> skills;
+    private PreferredContact preference;
 
 }

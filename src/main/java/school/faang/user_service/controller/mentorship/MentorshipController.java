@@ -15,7 +15,6 @@ import java.util.List;
 public class MentorshipController {
     private final MentorshipService mentorshipService;
 
-
     @Operation(
             summary = "Get Mentees",
             description = "Get list of mentees by user identifier"

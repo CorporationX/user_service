@@ -5,7 +5,7 @@ on:
     branches:
     - unicorn-master-bc3
     - dev
-    - pipeline-BC-BJS2-3443"
+    - feature/pipeline-BC-BJS2-3443
 
 jobs:
   run_tests:

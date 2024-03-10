@@ -6,11 +6,13 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.MentorshipRejectDto;
 import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.dto.event.MentorshipRequestedEvent;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.filter.*;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipRequestedEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
@@ -26,10 +28,15 @@ public class MentorshipRequestService {
     private final UserRepository userRepository;
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final List<MentorshipRequestFilter> mentorshipRequestFilters = List.of(new MentorshipRequestDescriptionFilter(), new MentorshipRequestReceiverIdFilter(), new MentorshipRequestRequesterIdFilter(), new MentorshipRequestStatusFilter());
+    private final MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
 
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         validateRequestMentorship(mentorshipRequestDto);
         MentorshipRequest mentorshipRequestEntity = mentorshipRequestRepository.create(mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId(), mentorshipRequestDto.getDescription());
+
+        MentorshipRequestedEvent mentorshipRequestedEvent = new MentorshipRequestedEvent(mentorshipRequestDto.getRequesterId(), mentorshipRequestDto.getReceiverId(), LocalDateTime.now());
+        mentorshipRequestedEventPublisher.publish(mentorshipRequestedEvent);
+
         return mentorshipRequestMapper.toMentorshipRequestDto(mentorshipRequestEntity);
     }
 

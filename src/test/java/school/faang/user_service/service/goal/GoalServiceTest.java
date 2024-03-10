@@ -16,16 +16,16 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
-import school.faang.user_service.exceptions.DataValidationException;
-import school.faang.user_service.exceptions.GoalOverflowException;
-import school.faang.user_service.exceptions.SkillNotFoundException;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.GoalOverflowException;
+import school.faang.user_service.exception.SkillNotFoundException;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.filter.goal.GoalStatusFilter;
 import school.faang.user_service.filter.goal.GoalTitleFilter;
-import school.faang.user_service.mapper.GoalMapper;
+import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.skill.SkillService;
+import school.faang.user_service.service.skill.SkillServiceImpl;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -43,15 +43,14 @@ class GoalServiceTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    private SkillService skillService;
+    private SkillServiceImpl skillService;
     @Spy
     private GoalMapper goalMapper = Mappers.getMapper(GoalMapper.class);
     @Mock
     private List<GoalFilter> filters;
 
-
     @InjectMocks
-    private GoalService goalService;
+    private GoalServiceImpl goalService;
 
     Goal goal;
     Goal goal2;

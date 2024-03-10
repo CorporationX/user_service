@@ -31,12 +31,12 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    UserDto getUser(@PathVariable long userId) {
+    public UserDto getUser(@PathVariable long userId) {
         return userService.getUserDtoById(userId);
     }
 
     @GetMapping("/exists/{id}")
-    private boolean existsUserById(@PathVariable long id) {
+    public boolean existsUserById(@PathVariable long id) {
         return userService.isOwnerExistById(id);
     }
 

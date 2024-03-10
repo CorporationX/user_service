@@ -142,7 +142,6 @@ class UserServiceTest {
         mentors.add(user);
         mentees.add(mentee);
 
-
         Goal goal = mock(Goal.class);
         Goal goal11 = mock(Goal.class);
 

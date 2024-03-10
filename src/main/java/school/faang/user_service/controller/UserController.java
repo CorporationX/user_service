@@ -3,8 +3,10 @@ package school.faang.user_service.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.UserService;
@@ -16,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/users")
 @Slf4j
+@Validated
 public class UserController {
     private final UserService userService;
 
@@ -48,7 +51,7 @@ public class UserController {
     }
 
     @PutMapping("{userId}")
-    public void deactivateProfile(@PathVariable long userId) {
+    public void deactivateProfile(@PathVariable @Min(1) long userId) {
         userService.deactivateProfile(userId);
     }
 }

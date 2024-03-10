@@ -17,8 +17,6 @@ public class RedisConfig {
     private String host;
     @Value("${spring.data.redis.port}")
     private int port;
-    @Value("${spring.data.redis.channels.mentorship_request_channel.name}")
-    private String mentorshipRequestChannelName;
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
@@ -34,10 +32,5 @@ public class RedisConfig {
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new StringRedisSerializer());
         return redisTemplate;
-    }
-
-    @Bean
-    ChannelTopic mentorshipRequestTopic() {
-        return new ChannelTopic(mentorshipRequestChannelName);
     }
 }

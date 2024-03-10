@@ -60,7 +60,7 @@ class PremiumServiceTest {
 
         PaymentResponse paymentResponse = new PaymentResponse(PaymentStatus.SUCCESS, 1, 1, null, null, null);
         when(paymentServiceClient.sendPayment(any(PaymentRequest.class))).thenReturn(paymentResponse);
-
+        when(premiumRepository.save(any(Premium.class))).thenReturn(new Premium());
         PremiumDto result = premiumService.buyPremium(userId, premiumPeriod);
 
         assertNotNull(result);

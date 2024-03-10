@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.controller.GoalController;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.service.GoalService;
 import school.faang.user_service.validator.GoalValidator;
@@ -19,6 +19,8 @@ class GoalControllerTest {
 
     @Mock
     private GoalValidator goalValidator;
+    @Mock
+    private UserContext userContext;
 
     @InjectMocks
     private GoalController goalController;
@@ -30,6 +32,7 @@ class GoalControllerTest {
     void correctTitleTest() {
         GoalDto goalDto = new GoalDto();
         goalDto.setTitle("Test");
+
         goalController.updateGoal(1L, goalDto);
         Mockito.verify(goalService, Mockito.times(1)).updateGoal(1L, goalDto);
     }
@@ -40,6 +43,7 @@ class GoalControllerTest {
         userId = 1L;
         goalDto = new GoalDto();
         goalDto.setTitle("Title");
+        Mockito.when(userContext.getUserId()).thenReturn(userId);
 
         goalController.createGoal(userId, goalDto);
         Mockito.verify(goalService, Mockito.times(1)).createGoal(userId, goalDto);

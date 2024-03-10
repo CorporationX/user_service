@@ -8,6 +8,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
@@ -15,6 +17,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @EnableAsync
 @EnableFeignClients("school.faang.user_service.client")
+@EnableElasticsearchRepositories(basePackages = "school.faang.user_service.elasticsearch_repository")
+@EnableJpaRepositories(basePackages = "school.faang.user_service.repository")
 @OpenAPIDefinition(
         info = @Info(
                 title = "User Service",

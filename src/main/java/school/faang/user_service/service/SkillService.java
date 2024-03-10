@@ -70,7 +70,7 @@ public class SkillService {
 
         Skill skill = getSkillById(skillId);
         SkillDto skillDto = skillMapper.toDto(skill);
-        User user = userService.getUserById(userId);
+        User user = userService.findById(userId);
 
         if (skillRepository.findUserSkill(skillId, userId).isEmpty()) {
             List<SkillOffer> allOffersOfSkill = skillOfferRepository.findAllOffersOfSkill(skillId, userId);

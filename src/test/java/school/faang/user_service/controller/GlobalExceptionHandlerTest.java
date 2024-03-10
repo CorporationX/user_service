@@ -2,39 +2,36 @@ package school.faang.user_service.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.service.SubscriptionService;
 import school.faang.user_service.validator.SubscriptionValidator;
 
-import static org.hamcrest.core.StringContains.containsString;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = SubscriptionController.class)
+@ExtendWith(MockitoExtension.class)
 public class GlobalExceptionHandlerTest {
 
     private MockMvc mockMvc;
 
-    @MockBean
+    @Mock
     private SubscriptionService subscriptionService;
 
-    @MockBean
+    @Mock
     private SubscriptionValidator subscriptionValidator;
 
-    @MockBean
+    @Mock
     private UserContext userContext;
 
     @InjectMocks

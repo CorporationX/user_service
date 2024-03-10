@@ -1,7 +1,8 @@
 package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.service.GoalService;
 import school.faang.user_service.validator.GoalValidator;
@@ -9,22 +10,26 @@ import school.faang.user_service.dto.goal.GoalFilterDto;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class GoalController {
     private final GoalService goalService;
     private final GoalValidator goalValidator;
+    private final UserContext userContext;
 
-
-    public GoalDto updateGoal(Long goalId, GoalDto goal) {
+    @PutMapping("/goals/{goalId}")
+    public GoalDto updateGoal(@PathVariable Long goalId, @RequestBody GoalDto goal) {
         goalValidator.validateUserId(goalId);
         goalValidator.validateGoalTitle(goal);
         return goalService.updateGoal(goalId, goal);
     }
 
-    public GoalDto createGoal(Long userId, GoalDto goal) {
+    @PostMapping("/goals")
+    public GoalDto createGoal(@RequestBody GoalDto goal) {
+        long userId = userContext.getUserId();
         goalValidator.validateUserId(userId);
         goalValidator.validateGoalTitle(goal);
+        goalValidator.validateDescription(goal);
         return goalService.createGoal(userId, goal);
     }
 

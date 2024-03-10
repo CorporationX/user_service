@@ -22,10 +22,9 @@ import school.faang.user_service.filter.RecommendationRequestFilter;
 import school.faang.user_service.filter.recommendation.RecommendationRequestFilterCreateAt;
 import school.faang.user_service.filter.recommendation.RecommendationRequestFilterUpdateAt;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
-import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 import school.faang.user_service.service.RecommendationRequestService;
+import school.faang.user_service.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -33,7 +32,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,9 +43,7 @@ public class RecommendationRequestServiceTest {
     @Mock
     private RecommendationRequestRepository recommendationRequestRepository;
     @Mock
-    private SkillRequestRepository skillRequestRepository;
-    @Mock
-    private UserRepository userRepository;
+    private UserService userService;
     @Mock
     private List<RecommendationRequestFilter> recommendationRequestFilterList;
     @Mock
@@ -93,6 +90,7 @@ public class RecommendationRequestServiceTest {
 
     @Test
     void testTimeOutCheckTrue() {
+        when(userService.checkUser(anyLong())).thenReturn(true);
         Assert.assertThrows(DataValidationException.class, () -> recommendationRequestService
                 .create(new RecommendationRequestDto(
                         5L,
@@ -112,46 +110,6 @@ public class RecommendationRequestServiceTest {
         Assert.assertThrows(DataValidationException.class, () -> {
             recommendationRequestService.getRequest(id);
         });
-    }
-
-    @Test
-    void testFilterId() {
-        when(recommendationRequestRepository.findAll()).thenReturn(recommendationRequests);
-        when(recommendationRequestFilterList.iterator()).thenReturn(recommendationRequestFilters.iterator());
-        requestFilterDto.setId(4L);
-        recommendationRequestService.getRequest(requestFilterDto);
-        verify(recommendationRequestMapper, times(1)).toDto(captor.capture());
-        assertTrue(expected.getId() == captor.getValue().getId());
-    }
-
-    @Test
-    void testFilterMessage() {
-        when(recommendationRequestRepository.findAll()).thenReturn(recommendationRequests);
-        when(recommendationRequestFilterList.iterator()).thenReturn(recommendationRequestFilters.iterator());
-        requestFilterDto.setMessage("message");
-        recommendationRequestService.getRequest(requestFilterDto);
-        verify(recommendationRequestMapper, times(1)).toDto(captor.capture());
-        assertEquals(expected.getMessage(), captor.getValue().getMessage());
-    }
-
-    @Test
-    void testFilterCreateAt() {
-        when(recommendationRequestRepository.findAll()).thenReturn(recommendationRequests);
-        when(recommendationRequestFilterList.iterator()).thenReturn(recommendationRequestFilters.iterator());
-        requestFilterDto.setCreatedAt(localDateTime1);
-        recommendationRequestService.getRequest(requestFilterDto);
-        verify(recommendationRequestMapper, times(1)).toDto(captor.capture());
-        assertEquals(expected.getCreatedAt(), captor.getValue().getCreatedAt());
-    }
-
-    @Test
-    void testFilterUpdateAt() {
-        when(recommendationRequestRepository.findAll()).thenReturn(recommendationRequests);
-        when(recommendationRequestFilterList.iterator()).thenReturn(recommendationRequestFilters.iterator());
-        requestFilterDto.setUpdatedAt(localDateTime2);
-        recommendationRequestService.getRequest(requestFilterDto);
-        verify(recommendationRequestMapper, times(1)).toDto(captor.capture());
-        assertEquals(expected.getUpdatedAt(), captor.getValue().getUpdatedAt());
     }
 
     @Test

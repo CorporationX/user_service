@@ -16,6 +16,6 @@ public class RecommendationRequestFilterUpdateAt implements RecommendationReques
 
     @Override
     public Stream<RecommendationRequest> apply(Stream<RecommendationRequest> recommendationRequestStream, RequestFilterDto filterDto) {
-        return recommendationRequestStream.filter(request -> request.getUpdatedAt().equals(filterDto.getUpdatedAt()));
+        return recommendationRequestStream.filter(request -> request.getUpdatedAt().isAfter(filterDto.getUpdatedAt()));
     }
 }

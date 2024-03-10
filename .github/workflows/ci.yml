@@ -2,7 +2,10 @@ name: CI Unicorn BC3
 
 on:
   pull_request:
-    branches: ["unicorn-master-bc3", "dev", "pipeline-BC-BJS2-3443"]
+    branches:
+    - unicorn-master-bc3
+    - dev
+    - pipeline-BC-BJS2-3443"
 
 jobs:
   run_tests:

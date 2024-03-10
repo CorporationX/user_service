@@ -11,11 +11,11 @@ public class GoalStatusFilter implements GoalFilter {
 
     @Override
     public boolean isApplicable(GoalFilterDto filters) {
-        return filters.getStatus() != null;
+        return filters.getStatusPattern() != null;
     }
 
     @Override
     public void apply(List<Goal> goals, GoalFilterDto filters) {
-        goals.removeIf(goal -> !goal.getStatus().equals(filters.getStatus()));
+        goals.removeIf(goal -> !goal.getStatus().equals(filters.getStatusPattern()));
     }
 }

@@ -1,7 +1,6 @@
 package school.faang.user_service.repository.goal;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.User;
@@ -51,8 +50,4 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
             WHERE ug.goal_id = :goalId
             """)
     List<User> findUsersByGoalId(long goalId);
-
-    @Query(nativeQuery = true, value = "INSERT INTO user_goal (goal_id, user_id) VALUES (:goalId, :userId)")
-    @Modifying
-    void assignGoalToUser(long goalId, long userId);
 }

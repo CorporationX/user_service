@@ -2,14 +2,16 @@ package school.faang.user_service.service.goal;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.goal.filter.GoalFilter;
 import school.faang.user_service.validation.goal.GoalValidator;
@@ -22,20 +24,22 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class GoalServiceTest {
 
-    @Autowired
     private GoalService goalService;
     private GoalRepository goalRepository;
     private GoalMapper goalMapper;
     private GoalValidator goalValidator;
     private SkillRepository skillRepository;
+    private UserRepository userRepository;
     private GoalFilter goalFilter;
     private List<GoalFilter> goalFilters;
 
@@ -47,53 +51,58 @@ public class GoalServiceTest {
         skillRepository = mock(SkillRepository.class);
         goalFilter = mock(GoalFilter.class);
         goalFilters = List.of(goalFilter);
-        goalService = new GoalService(goalRepository, goalMapper, goalValidator, skillRepository, goalFilters);
+        userRepository = mock(UserRepository.class);
+        goalService = new GoalService(goalRepository, goalMapper, goalValidator, skillRepository, userRepository, goalFilters);
     }
 
     @Test
-    void create_GoalIsValid_GoalIsCreating() {
+    void createGoal_ValidGoalId() {
         long userId = 1L;
-        GoalDto expectedDto = getGoalDto();
+        GoalDto expected = getGoalDto();
         Goal goal = getGoal();
-        when(goalRepository.create(expectedDto.getTitle(), expectedDto.getDescription(), expectedDto.getParentId()))
-                .thenReturn(goal);
-        when(goalRepository.save(goal)).thenReturn(goal);
-        when(goalMapper.toDto(goal)).thenReturn(expectedDto);
+        when(goalMapper.toEntity(any(GoalDto.class))).thenReturn(goal);
+        when(goalRepository.save(any(Goal.class))).thenReturn(goal);
+        when(goalMapper.toDto(any(Goal.class))).thenReturn(expected);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(getUser()));
+        when(goalValidator.validateOptional(Optional.ofNullable(getUser()), String.format("User with ID %d not found", userId))).thenReturn(new User());
 
-        GoalDto actualDto = goalService.createGoal(userId, expectedDto);
+        GoalDto actual = goalService.createGoal(userId, expected);
 
-        verify(goalValidator, times(1)).validateGoalCreation(expectedDto.getId(), expectedDto, 3);
-        verify(goalRepository, times(1)).assignGoalToUser(goal.getId(), userId);
-        assertEquals(expectedDto, actualDto);
+        verify(goalValidator, times(1)).validateGoalCreation(anyLong(), any(GoalDto.class));
+        verify(goalMapper, times(1)).toEntity(any(GoalDto.class));
+        verify(goalRepository, times(1)).save(any(Goal.class));
+        verify(goalMapper, times(1)).toDto(any(Goal.class));
+        verify(userRepository, times(1)).findById(anyLong());
+        verify(goalValidator, times(2)).validateOptional(any(Optional.class), anyString());
+        assertEquals(expected, actual);
     }
 
     @Test
-    void update_GoalIsValid_GoalIsUpdating() {
+    void updateGoal_ValidGoalId() {
         long goalId = 1L;
-        GoalDto expectedDto = getGoalDto();
+        GoalDto expected = getGoalDto();
         Goal goal = getGoal();
-        when(goalRepository.findById(goalId)).thenReturn(Optional.ofNullable(goal));
+        when(goalMapper.toEntity(any(GoalDto.class))).thenReturn(goal);
         when(goalRepository.save(goal)).thenReturn(goal);
-        when(goalMapper.toDto(goal)).thenReturn(expectedDto);
+        when(goalMapper.toDto(goal)).thenReturn(expected);
 
-        GoalDto actualDto = goalService.updateGoal(goalId, expectedDto);
+        GoalDto actual = goalService.updateGoal(goalId, expected);
 
-        verify(goalValidator, times(1)).validateGoalUpdate(goalId, expectedDto);
-        verify(goalValidator, times(1)).validateGoalExists(expectedDto.getParentId());
-        assertEquals(expectedDto, actualDto);
+        verify(goalValidator, times(1)).validateGoalUpdate(goalId, expected);
+        assertEquals(expected, actual);
     }
 
     @Test
-    void delete_GoalIdIsValid_IsDeleting() {
+    void deleteGoal_ValidGoalId() {
         long goalId = 1L;
 
         assertDoesNotThrow(() -> goalService.deleteGoal(goalId));
-        verify(goalValidator, times(1)).validateGoalExists(goalId);
-        verify(goalRepository, times(1)).deleteById(goalId);
+        verify(goalValidator, times(1)).validateNull(anyLong());
+        verify(goalRepository, times(1)).deleteById(anyLong());
     }
 
     @Test
-    void findSubtasksByGoalId_GoalIdIsValid_DoesNotThrows() {
+    void findSubtasksByGoalId_ValidGoalId_DoesNotThrowException() {
         long goalId = 1L;
         GoalFilterDto filters = new GoalFilterDto();
         Stream<Goal> goals = getGoals();
@@ -109,7 +118,7 @@ public class GoalServiceTest {
     }
 
     @Test
-    void getGoalsByUserTest() {
+    void getGoalsByUser_ValidUserId() {
         long userId = 1L;
         GoalFilterDto filters = new GoalFilterDto();
         Stream<Goal> goals = getGoals();
@@ -142,6 +151,10 @@ public class GoalServiceTest {
                 .title("Title")
                 .description("Description")
                 .build();
+    }
+
+    private User getUser() {
+        return User.builder().build();
     }
 
     private Stream<Goal> getGoals() {

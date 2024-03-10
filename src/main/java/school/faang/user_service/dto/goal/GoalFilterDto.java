@@ -15,7 +15,7 @@ import java.util.List;
 public class GoalFilterDto {
 
     private String titlePattern;
-    private GoalStatus status;
+    private GoalStatus statusPattern;
     private String descriptionPattern;
     private List<Long> skillIds;
 }

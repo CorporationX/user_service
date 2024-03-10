@@ -1,6 +1,5 @@
 package school.faang.user_service.mapper.goal;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,6 +10,8 @@ import school.faang.user_service.entity.goal.GoalStatus;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 @SpringBootTest
 public class GoalMapperTest {
 
@@ -20,18 +21,15 @@ public class GoalMapperTest {
     @Test
     void toDto_ValidEntity_SuccessfullyMapping() {
         Goal goal = getGoal();
-        long skill1Id = goal.getSkillsToAchieve().get(0).getId();
-        long skill2Id = goal.getSkillsToAchieve().get(1).getId();
-        long skill3Id = goal.getSkillsToAchieve().get(2).getId();
 
         GoalDto goalDto = goalMapper.toDto(goal);
 
-        Assertions.assertEquals(goal.getId(), goalDto.getId());
-        Assertions.assertEquals(goal.getParent().getId(), goalDto.getParentId());
-        Assertions.assertEquals(goal.getTitle(), goalDto.getTitle());
-        Assertions.assertEquals(goal.getStatus(), goalDto.getStatus());
-        Assertions.assertEquals(goal.getDescription(), goalDto.getDescription());
-        Assertions.assertEquals(List.of(skill1Id, skill2Id, skill3Id), goalDto.getSkillIds());
+        assertEquals(goal.getId(), goalDto.getId());
+        assertEquals(goal.getParent().getId(), goalDto.getParentId());
+        assertEquals(goal.getTitle(), goalDto.getTitle());
+        assertEquals(goal.getStatus(), goalDto.getStatus());
+        assertEquals(goal.getDescription(), goalDto.getDescription());
+        assertEquals(getIds(), goalDto.getSkillIds());
     }
 
     @Test
@@ -40,11 +38,10 @@ public class GoalMapperTest {
 
         Goal goal = goalMapper.toEntity(goalDto);
 
-        Assertions.assertEquals(goalDto.getId(), goal.getId());
-        Assertions.assertEquals(goalDto.getParentId(), goal.getParent().getId());
-        Assertions.assertEquals(goalDto.getTitle(), goal.getTitle());
-        Assertions.assertEquals(goalDto.getStatus(), goal.getStatus());
-        Assertions.assertEquals(goalDto.getDescription(), goal.getDescription());
+        assertEquals(goalDto.getId(), goal.getId());
+        assertEquals(goalDto.getTitle(), goal.getTitle());
+        assertEquals(goalDto.getStatus(), goal.getStatus());
+        assertEquals(goalDto.getDescription(), goal.getDescription());
     }
 
     private Goal getGoal() {

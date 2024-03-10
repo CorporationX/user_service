@@ -45,7 +45,7 @@ class GoalControllerTest {
         goalDto.setTitle("Title");
         Mockito.when(userContext.getUserId()).thenReturn(userId);
 
-        goalController.createGoal(userId, goalDto);
+        goalController.createGoal(goalDto);
         Mockito.verify(goalService, Mockito.times(1)).createGoal(userId, goalDto);
     }
 

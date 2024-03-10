@@ -22,9 +22,9 @@ public class SkillController {
         this.skillService = skillService;
 
     }
-    @PostMapping(value = "/create")
+   @PostMapping(value = "/create")
     public SkillDto create(@RequestBody SkillDto skill) {
-        validateSkill( skill );
+        validateSkill( skill ); //TODO: мне кажется отсюда нужно убрать validateSkill() так как он же внутри сервиса валидирует
         return skillService.create( skill );
     }
 

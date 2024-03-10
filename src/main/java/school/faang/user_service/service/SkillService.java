@@ -40,18 +40,14 @@ public class SkillService {
     }
 
     public SkillDto create(SkillDto skillDto) {
-        if (skillRepository.existsByTitle( skillDto.getTitle() )) {
-            throw new DataValidationException( "Skill with such name already exist!" );
-        }
+        if(skillDto.getTitle().isBlank()) throw new DataValidationException( "Provide not blank title" );
+        if (skillRepository.existsByTitle( skillDto.getTitle() )) throw new DataValidationException( "Skill with such name already exist!" );
         Skill newSkill = skillRepository.save( skillMapper.toSkill( skillDto ) );
         return skillMapper.toSkillDto( newSkill );
     }
 
     public List<SkillDto> getUserSkills(long userId) {
         List<Skill> skills = skillRepository.findAllByUserId( userId );
-        if (skills == null) {
-            throw new DataValidationException( "Skill list is null" );
-        }
         return skills.stream()
                 .map( skillMapper::toSkillDto )
                 .toList();
@@ -60,9 +56,6 @@ public class SkillService {
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
         List<Skill> offeredSkillsToUser = skillRepository.findSkillsOfferedToUser( userId );
 
-        if (offeredSkillsToUser == null) {
-            throw new DataValidationException( "Offered skills list is null" );
-        }
         Map<Long, Long> skillCountMap = offeredSkillsToUser.stream()
                 .collect( Collectors.groupingBy( Skill::getId, Collectors.counting() ) );
 

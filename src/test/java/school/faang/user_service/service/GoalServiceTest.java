@@ -1,4 +1,4 @@
-package school.faang.user_service.service.goal;
+package school.faang.user_service.service;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,12 +18,9 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.filter.goal.GoalStatusFilter;
 import school.faang.user_service.filter.goal.GoalTitleFilter;
-import school.faang.user_service.mapper.goal.GoalMapper;
-import school.faang.user_service.mapper.goal.GoalMapperImpl;
+import school.faang.user_service.mapper.GoalMapper;
+import school.faang.user_service.mapper.GoalMapperImpl;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.GoalService;
-import school.faang.user_service.service.SkillService;
-import school.faang.user_service.service.UserService;
 import school.faang.user_service.validator.GoalValidator;
 
 import java.util.ArrayList;
@@ -32,8 +29,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 

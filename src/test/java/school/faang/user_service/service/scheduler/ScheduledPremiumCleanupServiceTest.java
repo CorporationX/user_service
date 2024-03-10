@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.repository.premium.PremiumRepository;
+import school.faang.user_service.scheduler.ScheduledPremiumCleanupService;
 import school.faang.user_service.service.AsyncPremiumCleanupService;
 
 import static org.mockito.Mockito.*;

@@ -1,4 +1,4 @@
-package school.faang.user_service.service.scheduler;
+package school.faang.user_service.scheduler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

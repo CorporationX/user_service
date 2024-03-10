@@ -1,4 +1,4 @@
-package school.faang.user_service.controller.goal;
+package school.faang.user_service.controller;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.controller.GoalController;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.service.GoalService;
 import school.faang.user_service.validator.GoalValidator;

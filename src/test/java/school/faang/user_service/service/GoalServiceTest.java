@@ -19,6 +19,7 @@ import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.goal.filter.GoalFilter;
 import school.faang.user_service.validation.goal.GoalValidation;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -70,14 +71,18 @@ public class GoalServiceTest {
     void testCreateGoalSaveRepository() {
         Long userId = 1L;
         GoalDto goalDto = getGoalDto();
+        List<Long> skillsId = List.of(1L, 2L);
+        goalDto.setSkillIds(skillsId);
         Goal goalCreated = getGoal();
         User user = new User();
+        List<Skill> skills = getSkills();
 
         when(goalRepository.create(goalDto.getTitle(), goalDto.getDescription(), goalDto.getParentId()))
                 .thenReturn(goalCreated);
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(goalRepository.save(goalCreated)).thenReturn(goalCreated);
         when(goalMapper.toDto(goalCreated)).thenReturn(goalDto);
+        when(skillRepository.findAllById(skillsId)).thenReturn(skills);
 
         GoalDto goalDtoCreated = goalService.createGoal(userId, goalDto);
 
@@ -183,5 +188,10 @@ public class GoalServiceTest {
                 Goal.builder().id(2L).status(GoalStatus.ACTIVE).title("Title2").build(),
                 Goal.builder().id(3L).status(GoalStatus.ACTIVE).title("Title3").build()
         );
+    }
+
+    private List<Skill> getSkills(){
+        return new ArrayList<>(List.of(Skill.builder().id(1L).build(),
+                Skill.builder().id(2L).build()));
     }
 }

@@ -42,7 +42,7 @@ public class Goal {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_goal_id", nullable = true)
+    @JoinColumn(name = "parent_goal_id")
     private Goal parent;
 
     @Column(name = "title", length = 64, nullable = false, unique = true)

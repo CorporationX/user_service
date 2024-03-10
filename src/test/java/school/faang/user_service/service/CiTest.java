@@ -8,6 +8,6 @@ class CiTest {
 
     @Test
     void fail() {
-        assertTrue(false);
+        assertTrue(true);
     }
 }

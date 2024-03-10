@@ -15,7 +15,7 @@ import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.publisher.RecommendationEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
-import school.faang.user_service.service.RecommendationService;
+import school.faang.user_service.service.recomendation.RecommendationService;
 
 @ExtendWith(MockitoExtension.class)
 public class RecommendationServiceTest {

@@ -1,4 +1,4 @@
-package school.faang.user_service.controller;
+package school.faang.user_service.controller.recommendation;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.RecommendationDto;
-import school.faang.user_service.service.RecommendationService;
+import school.faang.user_service.service.recomendation.RecommendationService;
 
 @RestController
 @Validated

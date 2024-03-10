@@ -16,6 +16,6 @@ public class SpringContextTest {
     @Test
     void contextLoads() {
         // Проверяем, что контекст не null, тем самым подтверждая, что он успешно поднялся
-        assertNotNull(applicationContext);
+       assertNotNull(applicationContext);
     }
 }

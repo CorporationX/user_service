@@ -5,8 +5,9 @@ import school.faang.user_service.dto.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 
 import java.util.List;
+
 @Component
-public class GoalStatusFilter implements GoalFilter {
+public class GoalFilterStatus implements GoalFilter {
     @Override
     public boolean isApplicable(GoalFilterDto goalFilterDto) {
         return goalFilterDto.getGoalStatus() != null;

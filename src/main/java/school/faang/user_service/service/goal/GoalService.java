@@ -18,10 +18,9 @@ import school.faang.user_service.service.goal.filter.GoalFilter;
 import school.faang.user_service.validation.goal.GoalValidation;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -59,13 +58,13 @@ public class GoalService {
 
     public List<GoalDto> findSubtasksByGoalId(Long goalId, GoalFilterDto filterGoalDto) {
         goalValidation.validateExistGoal(goalId);
-        List<Goal> goals = goalRepository.findByParent(goalId).toList();
+        List<Goal> goals = goalRepository.findByParent(goalId).collect(Collectors.toList());
         applyFilters(goals, filterGoalDto);
         return goalsToDto(goals);
     }
 
     public List<GoalDto> findGoalsByUserId(Long userId, GoalFilterDto filterGoalDto) {
-        List<Goal> goals = goalRepository.findGoalsByUserId(userId).toList();
+        List<Goal> goals = goalRepository.findGoalsByUserId(userId).collect(Collectors.toList());
         applyFilters(goals, filterGoalDto);
         return goalsToDto(goals);
     }

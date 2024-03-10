@@ -5,6 +5,7 @@ import school.faang.user_service.dto.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 
 import java.util.List;
+
 @Component
 public class GoalFilterId implements GoalFilter {
     @Override

@@ -8,7 +8,6 @@ import java.util.List;
 
 @Component
 public class GoalTitleFilter implements GoalFilter {
-
     @Override
     public boolean isApplicable(GoalFilterDto goalFilterDto) {
         return goalFilterDto.getTitlePattern() != null;

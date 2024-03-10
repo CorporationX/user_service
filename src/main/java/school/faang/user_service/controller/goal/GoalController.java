@@ -23,7 +23,6 @@ public class GoalController {
 
     public void deleteGoal(Long goalId) {
         goalService.deleteGoal(goalId);
-
     }
 
     public List<GoalDto> findSubtasksByGoalId(Long goalId, GoalFilterDto filteredGoalDto) {

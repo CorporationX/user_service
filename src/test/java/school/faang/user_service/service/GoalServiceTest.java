@@ -51,11 +51,10 @@ public class GoalServiceTest {
         userRepository = mock(UserRepository.class);
         goalFilters = List.of(goalFilter);
         goalService = new GoalService(goalRepository, goalMapper, skillRepository, goalValidation, userRepository, goalFilters);
-
     }
 
     @Test
-    void testCreateGoal_UserDoesntExist(){
+    void testCreateGoal_UserDoesntExist() {
         Long userId = 1L;
         GoalDto goalDto = getGoalDto();
         Goal goalCreated = getGoal();

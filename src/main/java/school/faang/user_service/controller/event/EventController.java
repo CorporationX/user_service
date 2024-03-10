@@ -43,7 +43,6 @@ public class EventController {
     public EventDto updateEvent(@RequestBody @Validated(ValidationGroups.Update.class) EventDto eventDto, BindingResult bindingResult) {
         validateBindingResult(bindingResult);
         return eventService.updateEvent(eventDto);
-
     }
 
     @GetMapping("/owner/{userId}")

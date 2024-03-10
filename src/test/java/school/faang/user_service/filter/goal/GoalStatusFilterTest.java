@@ -35,7 +35,7 @@ class GoalStatusFilterTest {
     }
 
     @Test
-    public void testReturnIsTrueIfFilterIsSpecified() {
+    void testReturnIsTrueIfFilterIsSpecified() {
         GoalFilterDto filterDto = GoalFilterDto.builder()
                 .goalStatus(GoalStatus.ACTIVE)
                 .build();
@@ -46,7 +46,7 @@ class GoalStatusFilterTest {
     }
 
     @Test
-    public void testReturnIsFalseIfFilterIsSpecified() {
+    void testReturnIsFalseIfFilterIsSpecified() {
         GoalFilterDto filterDto = new GoalFilterDto();
 
         boolean isApplicable = goalStatusFilter.isApplicable(filterDto);
@@ -54,7 +54,7 @@ class GoalStatusFilterTest {
     }
 
     @Test
-    public void testReturnFilteredGoalsList() {
+    void testReturnFilteredGoalsList() {
         GoalFilterDto filterDto = GoalFilterDto.builder()
                 .goalStatus(GoalStatus.COMPLETED)
                 .build();
@@ -71,4 +71,5 @@ class GoalStatusFilterTest {
         Assertions.assertTrue(expectedGoals.size() == actualGoals.size()
                 && expectedGoals.containsAll(actualGoals));
     }
+
 }

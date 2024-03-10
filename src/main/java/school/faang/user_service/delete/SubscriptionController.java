@@ -1,5 +1,5 @@
 //package school.faang.user_service.delete;
-
+//
 //@RestController
 //@RequiredArgsConstructor
 //@RequestMapping("api/v1/subscriptions")

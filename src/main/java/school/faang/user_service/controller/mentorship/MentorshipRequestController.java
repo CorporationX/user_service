@@ -1,10 +1,9 @@
 package school.faang.user_service.controller.mentorship;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.MentorshipRejectDto;
+import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
 

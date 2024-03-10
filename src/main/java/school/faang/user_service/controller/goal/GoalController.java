@@ -4,11 +4,10 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.RequestMapping;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.goal.GoalService;
+
 import java.util.List;
 
 @RestController

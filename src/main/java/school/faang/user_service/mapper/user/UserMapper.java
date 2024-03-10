@@ -23,7 +23,6 @@ public interface UserMapper {
     @Mapping(source = "userProfilePic.fileId", target = "userProfilePic")
     UserCreateDto toUserCreateDto(User user);
 
-
     @Mapping(source = "countryId", target = "country.id")
     @Mapping(source = "userProfilePic", target = "userProfilePic.fileId")
     User toEntity(UserCreateDto userCreateDto);
@@ -46,7 +45,6 @@ public interface UserMapper {
     @Mapping(target = "aboutMe", source = ".", qualifiedByName = "aboutMe")
     @Mapping(target = "country.title", source = "country")
     User personToUser(PersonSchemaV2 person);
-
 
     @Named("aboutMe")
     default String getAboutMe(PersonSchemaV2 person) {

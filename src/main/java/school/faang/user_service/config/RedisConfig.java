@@ -17,12 +17,13 @@ public class RedisConfig {
     private String host;
     @Value("${spring.data.redis.port}")
     private int port;
+    @Value("${spring.data.redis.channels.premium_bought_channel.name}")
+    private String premiumBoughtChannelName;
     @Value("${spring.data.redis.channels.mentorship_offered_channel.name}")
     private String mentorshipOfferedTopic;
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
-        System.out.println(port);
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
         return new JedisConnectionFactory(config);
     }

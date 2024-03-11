@@ -7,9 +7,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.controller.RecommendationController;
+import school.faang.user_service.controller.recommendation.RecommendationController;
 import school.faang.user_service.dto.RecommendationDto;
-import school.faang.user_service.service.RecommendationService;
+import school.faang.user_service.service.recomendation.RecommendationService;
 
 @ExtendWith(MockitoExtension.class)
 public class RecommendationControllerTest {

@@ -4,13 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.event.follower.FollowerEventDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.filter.UserFilterService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -19,6 +22,7 @@ import java.util.stream.Stream;
 public class SubscriptionServiceImpl implements SubscriptionService {
 
     private final SubscriptionRepository subscriptionRepository;
+    private final FollowerEventPublisher followerEventPublisher;
     private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
     private final UserFilterService userFilter;
 
@@ -28,6 +32,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         validateUserIds(followerId, followeeId);
         validateSubscriptionExist(followerId, followeeId);
         subscriptionRepository.followUser(followerId, followeeId);
+        publishFollowerEvent(followerId, followeeId);
     }
 
     @Override
@@ -87,6 +92,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         if (userId <= 0) {
             throw new DataValidationException("User identifiers must be positive numbers");
         }
+    }
+
+    private void publishFollowerEvent(long followerId, long followeeId) {
+        FollowerEventDto followerEventDto = new FollowerEventDto(followerId, followeeId, LocalDateTime.now());
+        followerEventPublisher.publish(followerEventDto);
     }
 
 }

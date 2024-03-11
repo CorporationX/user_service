@@ -24,6 +24,8 @@ dependencies {
 	/**
 	 * Spring boot starters
 	 */
+
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2") //swagger
 	implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-data-redis")
@@ -42,7 +44,8 @@ dependencies {
 	/**
 	 * Amazon S3
 	 */
-	implementation("com.amazonaws:aws-java-sdk-s3:1.12.464")
+	implementation("com.amazonaws:aws-java-sdk-s3:1.12.595")
+    implementation ("net.coobird:thumbnailator:0.4.20")
 
 	/**
 	 * Utils & Logging
@@ -85,6 +88,10 @@ jsonSchema2Pojo {
 tasks.withType<Test> {
 	useJUnitPlatform()
 	finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.withType<JavaCompile> {
+	options.compilerArgs.add("-Xlint:unchecked")
 }
 
 val test by tasks.getting(Test::class) { testLogging.showStandardStreams = true }

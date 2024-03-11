@@ -54,4 +54,8 @@ public class RecommendationController {
         log.info("Получен запрос на получение рекомендаций пользователя с ID {}", authorId);
         return recommendationService.getAllGivenRecommendations(authorId, page);
     }
+    @PostMapping()
+    public RecommendationDto create(@RequestBody RecommendationDto recommendationDto) {
+        return recommendationService.create(recommendationDto);
+    }
 }

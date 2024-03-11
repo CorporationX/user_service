@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class TgContactDto {
-
     private long userId;
     private long chatId;
 }

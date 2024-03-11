@@ -34,7 +34,6 @@ public class UserService {
 
     @Transactional
     public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
-
         Stream<UserDto> userDtoStream = userRepository.findPremiumUsers().map(userMapper::toDto);
         for (UserFilter userFilter : userFilters) {
             if (userFilter.isApplicable(userFilterDto)) {

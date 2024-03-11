@@ -123,9 +123,9 @@ public class GoalService {
         userService.saveUser(userToUpdate);
         goalToSave.setUsers(List.of(userToUpdate));
 
-        Goal save = goalRepository.save(goalToSave);
-        goalEventPublisher.publish(new GoalSetEvent(userId, save.getId(), LocalDateTime.now()));
-        return goalMapper.toDto(save);
+        Goal savedGoal = goalRepository.save(goalToSave);
+        goalEventPublisher.publish(new GoalSetEvent(userId, savedGoal.getId(), savedGoal.getUpdatedAt()));
+        return goalMapper.toDto(savedGoal);
     }
 
     public int countActiveGoalsPerUser(long userId) {

@@ -1,12 +1,10 @@
 package school.faang.user_service.service.recommendation;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.entity.User;
@@ -72,10 +70,7 @@ public class RecommendationRequestServiceTest {
     public void testRecommendationRequestReject() {
         long id = 8;
 
-
         recommendationRequestService.rejectRequest(id, rejectionDto);
         Mockito.verify(recommendationRequestService).rejectRequest(id, rejectionDto);
     }
-
-
 }

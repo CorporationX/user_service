@@ -1,20 +1,27 @@
 package school.faang.user_service.service.recommendation;
 
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.handler.exception.EntityNotFoundException;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
+import school.faang.user_service.repository.recommendation.SkillRequestRepository;
+import school.faang.user_service.validator.recommendation.RecommendationRequestValidator;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static reactor.core.publisher.Mono.when;
+import java.util.List;
+import java.util.Optional;
 
-@SpringBootTest
+
+@ExtendWith(MockitoExtension.class)
 public class RecommendationRequestValidationTest {
     private RecommendationRequestDto recommendationRequestDto;
     private RecommendationRequest recommendationRequest;
@@ -23,7 +30,16 @@ public class RecommendationRequestValidationTest {
     @Mock
     private RecommendationRequestRepository recommendationRequestRepository;
     @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private SkillRequestRepository skillRequestRepository;
+
+    @Mock
     private RecommendationRequestService recommendationRequestService;
+
+    @InjectMocks
+    private RecommendationRequestValidator recommendationRequestValidator;
 
     @BeforeEach
     void setUp() {
@@ -45,21 +61,20 @@ public class RecommendationRequestValidationTest {
                 .reason("message")
                 .build();
     }
-
     @Test
-    public void testRecommendationRequestMessageInvalid() {
-        recommendationRequestDto.setMessage(null);
-//        when(recommendationRequestService.create(recommendationRequestDto)).thenReturn(MethodArgumentNotValidException.class);
-        assertThrows(MethodArgumentNotValidException.class, () -> recommendationRequestService.create(recommendationRequestDto));
+    public void testRecommendationRequestValidatorUserNotFound() {
+        long invalidId = 1555;
+        Assert.assertThrows(EntityNotFoundException.class, () -> recommendationRequestValidator.validateUser(invalidId));
     }
 
-    //    @Test
-//    public void testRecommendationRequestRejectInvalid() {
-//        long id = 12;
-//        rejectionDto.setReason("");
-//        Assert.assertThrows(
-//                MethodArgumentNotValidException.class,
-//                () -> recommendationRequestService.rejectRequest(id, rejectionDto)
-//        );
-//    }
+    @Test
+    public void testRecommendationRequestValidatorSkills() {
+        List<Long> invalidSkillsIds = List.of(111L, 112L, 113L);
+        Assert.assertThrows(EntityNotFoundException.class, () -> recommendationRequestValidator.validateSkills(invalidSkillsIds));
+    }
+
+    @Test
+    public void testRecommendationRequestExist() {
+        Assert.assertThrows(EntityNotFoundException.class, () -> recommendationRequestValidator.validateRequestForExist(Optional.empty()));
+    }
 }

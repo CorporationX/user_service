@@ -1,8 +1,6 @@
 package school.faang.user_service.handler;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -10,8 +8,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
 import school.faang.user_service.handler.exception.EntityExistException;
+import school.faang.user_service.handler.exception.EntityNotFoundException;
 import school.faang.user_service.handler.exception.ExceptionMessage;
 import school.faang.user_service.handler.exception.ManyExceptionMessage;
 
@@ -21,7 +19,7 @@ import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class AppExceptionHandler {
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Object> handleNotFoundException(EntityNotFoundException e, HttpServletRequest request) {
         HttpStatus httpStatus = HttpStatus.NOT_FOUND;

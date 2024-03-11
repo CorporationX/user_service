@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
@@ -22,23 +23,15 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class SkillService {
-    private static final long MIN_SKILL_OFFERS = 3;
 
+    private static final long MIN_SKILL_OFFERS = 3;
     private final SkillRepository skillRepository;
     private final SkillDtoSkillMapper skillMapper;
     private final SkillOfferRepository skillOfferRepository;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final UserRepository userRepository;
-
-    public SkillService(SkillRepository skillRepository, SkillDtoSkillMapper skillMapper, SkillOfferRepository skillOfferRepository, UserSkillGuaranteeRepository userSkillGuaranteeRepository,
-                        UserRepository userRepository) {
-        this.skillRepository = skillRepository;
-        this.skillMapper = skillMapper;
-        this.skillOfferRepository = skillOfferRepository;
-        this.userSkillGuaranteeRepository = userSkillGuaranteeRepository;
-        this.userRepository = userRepository;
-    }
 
     public SkillDto create(SkillDto skillDto) {
         Optional.ofNullable( skillDto ).orElseThrow( () -> new DataValidationException( "SkillDto is null" ) );

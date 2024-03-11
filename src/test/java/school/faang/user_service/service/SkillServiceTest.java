@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static reactor.core.publisher.Mono.when;
 
 @SpringBootTest
 public class SkillServiceTest {
@@ -161,6 +160,7 @@ public class SkillServiceTest {
 
         SkillDto result = skillService.acquireSkillFromOffers(skillId, userId);
 
+        Mockito.verify(skillRepository, Mockito.times(1)).findById(skillId);
         Mockito.verify(skillRepository, Mockito.times(1)).findUserSkill(skillId, userId);
         Mockito.verify(skillOfferRepository, Mockito.times(1)).findAllOffersOfSkill(skillId, userId);
         Mockito.verify(skillMapper, Mockito.times(1)).toDtoSkill(skill);

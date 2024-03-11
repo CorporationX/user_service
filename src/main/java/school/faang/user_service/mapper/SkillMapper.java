@@ -13,5 +13,4 @@ public interface SkillMapper {
     SkillDto toDtoSkill(Skill skill);
     Skill toEntitySkill(SkillDto skillDto);
     List<SkillDto> toDtoSkill(List<Skill> skill);
-   // SkillCandidateDto toSkillCandidate(Skill skill);
 }

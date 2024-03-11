@@ -12,7 +12,6 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -45,8 +44,7 @@ public class SkillService {
 
     public List<SkillDto> getUserSkills(long userId) {
         List<Skill> allSkillEntityByUserId = skillRepository.findAllByUserId(userId);
-        List<SkillDto> dtoSkill = skillMapper.toDtoSkill(allSkillEntityByUserId);
-        return dtoSkill;
+        return skillMapper.toDtoSkill(allSkillEntityByUserId);
     }
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {

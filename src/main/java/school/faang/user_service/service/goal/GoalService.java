@@ -14,6 +14,7 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.goal.filter.GoalFilter;
+import school.faang.user_service.validation.goal.GoalConstraints;
 import school.faang.user_service.validation.goal.GoalValidation;
 
 import java.util.Arrays;
@@ -44,7 +45,7 @@ public class GoalService {
     public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
         goalValidation.validateGoalUpdate(goalId, goalDto);
         Goal createdGoal = goalRepository.findById(goalId)
-                .orElseThrow(() -> new EntityNotFoundException("Entity not found in database"));
+                .orElseThrow(() -> new EntityNotFoundException(GoalConstraints.ENTITY_NOT_FOUND.getMessage()));
         updateFields(createdGoal, goalDto);
         return goalMapper.toDto(goalRepository.save(createdGoal));
     }
@@ -69,7 +70,7 @@ public class GoalService {
 
     private User getUser(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("Entity not found in database"));
+                .orElseThrow(() -> new EntityNotFoundException(GoalConstraints.ENTITY_NOT_FOUND.getMessage()));
     }
 
     private void updateFields(Goal goal, GoalDto goalDto) {
@@ -77,7 +78,7 @@ public class GoalService {
             Long parentId = goalDto.getParentId();
             goalValidation.validateExistGoal(parentId);
             goal.setParent(goalRepository.findById(parentId)
-                    .orElseThrow(() -> new EntityNotFoundException("Entity not found in database")));
+                    .orElseThrow(() -> new EntityNotFoundException(GoalConstraints.ENTITY_NOT_FOUND.getMessage())));
         }
         if (GoalStatus.COMPLETED.equals(goalDto.getStatus())) {
             goal.getUsers().forEach(user -> addSkillsToUser(user, goal));

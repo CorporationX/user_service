@@ -32,42 +32,42 @@ public class GoalValidation {
 
     private void validateStatus(Long goalId) {
         Goal foundedGoal = goalRepository.findById(goalId).get();
-        if (foundedGoal.getStatus().equals(GoalStatus.COMPLETED)) {
-            throw new DataValidationException("Status goal is already: \"Completed\"");
+        if (GoalStatus.COMPLETED.equals(foundedGoal.getStatus())) {
+            throw new DataValidationException(GoalConstraints.GOAL_STATUS_COMPLETED.getMessage());
         }
     }
 
     public void validateExistGoal(Long goalId) {
         if (!goalRepository.existsById(goalId)) {
-            throw new DataValidationException("Goal does not exist");
+            throw new DataValidationException(GoalConstraints.GOAL_NOT_FOUND.getMessage());
         }
     }
 
     private void validateTitle(String title) {
         if (title == null) {
-            throw new DataValidationException("Goal title can't be null");
+            throw new DataValidationException(GoalConstraints.GOAL_TITLE_NULL.getMessage());
         }
         if (title.isBlank()) {
-            throw new DataValidationException("Goal title can't be empty");
+            throw new DataValidationException(GoalConstraints.GOAL_TITLE_EMPTY.getMessage());
         }
     }
 
     private void validateSkills(List<Long> skillsId) {
         if (skillsId == null || skillsId.isEmpty()) {
-            throw new DataValidationException("Goal must have skill");
+            throw new DataValidationException(GoalConstraints.GOAL_NOT_HAVING_SKILL.getMessage());
         }
         skillsId.forEach(this::validateSkill);
     }
 
     private void validateSkill(Long skillId) {
         if (!skillRepository.existsById(skillId)) {
-            throw new DataValidationException(String.format("Skill with id \"%s\" does not exist", skillId));
+            throw new DataValidationException(String.format(GoalConstraints.SKILL_NOT_FOUND.getMessage(), skillId));
         }
     }
 
     private void validateMaximumGoalsPerUser(Long userId, int maxUserActiveGoal) {
         if (goalRepository.countActiveGoalsPerUser(userId) >= maxUserActiveGoal) {
-            throw new DataValidationException("Maximum number of user goals reached");
+            throw new DataValidationException(GoalConstraints.GOAL_MAXIMUM_PER_USER.getMessage());
         }
     }
 }

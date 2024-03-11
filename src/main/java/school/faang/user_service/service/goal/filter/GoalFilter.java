@@ -4,7 +4,6 @@ import school.faang.user_service.dto.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 
 import java.util.List;
-
 public interface GoalFilter {
     boolean isApplicable(GoalFilterDto goalFilterDto);
 

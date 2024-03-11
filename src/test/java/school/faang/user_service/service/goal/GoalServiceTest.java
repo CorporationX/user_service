@@ -266,7 +266,7 @@ class GoalServiceTest {
         when(skillService.checkActiveSkill(anyLong())).thenReturn(false);
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
-        assertThrows(ParseFIleException.SkillNotFoundException.class, () -> goalService.createGoal(user.getId(), goal));
+        assertThrows(ParseFIleException.class, () -> goalService.createGoal(user.getId(), goal));
     }
 
     @Test

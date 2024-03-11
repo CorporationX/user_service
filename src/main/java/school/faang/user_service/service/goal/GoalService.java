@@ -107,7 +107,7 @@ public class GoalService {
             throw new GoalOverflowException("Maximum goal limit exceeded. Only " + MAX_ACTIVE_GOALS + " goals are allowed.");
         }
         if (!allGoalSkillsActive(goal)) {
-            throw new ParseFIleException.SkillNotFoundException("Skill not exist");
+            throw new ParseFIleException("Skill not exist");
         }
     }
 

@@ -15,6 +15,7 @@ import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.SkillNotFoundException;
 import school.faang.user_service.mapper.recommendation.RecommendationMapper;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.SkillRepository;
@@ -47,7 +48,7 @@ public class RecommendationServiceImpl implements RecommendationService {
         validateRecommendation(recommendation);
 
         createSkillOffer(recommendation);
-        existsUserSkill(recommendation);
+        addSkillsAsGuaranteedIfExists(recommendation);
         recommendationRepository.create(
                 recommendation.getAuthorId(),
                 recommendation.getReceiverId(),
@@ -63,7 +64,7 @@ public class RecommendationServiceImpl implements RecommendationService {
 
         skillOfferRepository.deleteAllByRecommendationId(recommendation.getId());
         createSkillOffer(recommendation);
-        existsUserSkill(recommendation);
+        addSkillsAsGuaranteedIfExists(recommendation);
 
         recommendationRepository.update(
                 recommendation.getAuthorId(),
@@ -126,7 +127,7 @@ public class RecommendationServiceImpl implements RecommendationService {
         if (recommendationDto.getSkillOffers() != null &&
                 !allSkillsExistInSystem(recommendationDto.getSkillOffers())) {
             log.error("Ошибка валидации: Навыки отсутствуют в нашей системе");
-            throw new DataValidationException("Навыки отсутствуют в нашей системе");
+            throw new SkillNotFoundException("Навыки отсутствуют в нашей системе");
         }
     }
 
@@ -137,7 +138,7 @@ public class RecommendationServiceImpl implements RecommendationService {
                     skillOfferRepository.create(skillOffer.getSkillId(), recommendation.getId());
                 } else {
                     log.error("Ошибка при создании предложенного навыка: skillOffer или skillId == null");
-                    throw new DataValidationException("Навык или его ID не может быть null");
+                    throw new SkillNotFoundException("Навык или его ID не может быть null");
                 }
             });
         } else {
@@ -145,7 +146,7 @@ public class RecommendationServiceImpl implements RecommendationService {
         }
     }
 
-    private void existsUserSkill(RecommendationDto recommendation) {
+    private void addSkillsAsGuaranteedIfExists(RecommendationDto recommendation) {
         List<Long> skillsIds = skillOfferRepository.findAllByUserId(recommendation.getReceiverId())
                 .stream()
                 .map(SkillOffer::getId)
@@ -169,7 +170,12 @@ public class RecommendationServiceImpl implements RecommendationService {
         User author = userMapper.toUser(userService.getUserById(authorId));
         User receiver = userMapper.toUser(userService.getUserById(receiverId));
         Skill skill = skillRepository.findById(skillId)
-                .orElseThrow(() -> new DataValidationException("Навык не найден"));
-        userSkillGuaranteeRepository.save(new UserSkillGuarantee(null, receiver, skill, author));
+                .orElseThrow(() -> new SkillNotFoundException("Навык не найден"));
+        userSkillGuaranteeRepository.save(UserSkillGuarantee.builder()
+                .user(receiver)
+                .skill(skill)
+                .guarantor(author)
+                .build()
+        );
     }
 }

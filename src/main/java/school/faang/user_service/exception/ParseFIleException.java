@@ -5,9 +5,4 @@ public class ParseFIleException extends RuntimeException {
         super(msg);
     }
 
-    public static class SkillNotFoundException extends RuntimeException {
-        public SkillNotFoundException(String message) {
-            super(message);
-        }
-    }
 }

@@ -26,7 +26,7 @@ public class GoalController {
 
     @Operation(summary = "Create user's goal by user id")
     @PostMapping("/goal")
-    public GoalDto createGoal(@RequestHeader Long userId, @RequestBody GoalDto goalDto) {
+    public GoalDto createGoal(@RequestHeader("userId") Long userId, @RequestBody GoalDto goalDto) {
         return goalService.createGoal(userId, goalDto);
     }
 
@@ -44,14 +44,14 @@ public class GoalController {
     }
 
     @Operation(summary = "Get goal subtasks by goal id and filters")
-    @PostMapping("/{goalId}/subtasks")
+    @PostMapping("/goal/{goalId}/subtasks")
     public List<GoalDto> findSubtasksByGoalId(@PathVariable Long goalId, @RequestBody GoalFilterDto filters) {
         return goalService.findSubtasksByGoalId(goalId, filters);
     }
 
     @Operation(summary = "Get user's goals by user id and filters")
     @PostMapping("/goals")
-    public List<GoalDto> getGoalsByUser(@RequestHeader Long userId, @RequestBody GoalFilterDto filters) {
+    public List<GoalDto> getGoalsByUser(@RequestHeader("userId") Long userId, @RequestBody GoalFilterDto filters) {
         return goalService.getGoalsByUser(userId, filters);
     }
 }

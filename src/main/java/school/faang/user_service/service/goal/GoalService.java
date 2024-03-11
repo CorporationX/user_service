@@ -16,7 +16,6 @@ import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.goal.filter.GoalFilter;
 import school.faang.user_service.validation.goal.GoalValidator;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,7 +43,6 @@ public class GoalService {
         goalValidator.validateGoalUpdate(goalId, goalDto);
         Goal goal = goalMapper.toEntity(goalDto);
         goal.setSkillsToAchieve(skillIdsToSkills(goalDto.getSkillIds()));
-        goal.setUpdatedAt(LocalDateTime.now());
         return goalMapper.toDto(goalRepository.save(goal));
     }
 
@@ -72,10 +70,11 @@ public class GoalService {
     }
 
     private void applyFilters(List<Goal> goals, GoalFilterDto filters) {
-        goalValidator.validateNull(filters);
-        goalFilters.stream()
-                .filter(goalFilter -> goalFilter.isApplicable(filters))
-                .forEach(goalFilter -> goalFilter.apply(goals, filters));
+        if (!goalFilters.isEmpty()) {
+            goalFilters.stream()
+                    .filter(goalFilter -> goalFilter.isApplicable(filters))
+                    .forEach(goalFilter -> goalFilter.apply(goals, filters));
+        }
     }
 
     private void setUpGoalFields(Goal goal, GoalDto goalDto, long userId) {
@@ -88,8 +87,6 @@ public class GoalService {
         goal.setStatus(GoalStatus.ACTIVE);
         goal.setSkillsToAchieve(skillIdsToSkills(goalDto.getSkillIds()));
         goal.setUsers(List.of(user));
-        goal.setCreatedAt(LocalDateTime.now());
-        goal.setUpdatedAt(LocalDateTime.now());
     }
 
     private List<Skill> skillIdsToSkills(List<Long> skillIds) {

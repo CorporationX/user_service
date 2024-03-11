@@ -1,24 +1,25 @@
 package school.faang.user_service.service.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.RecommendationDto;
 import school.faang.user_service.dto.RecommendationEvent;
-import school.faang.user_service.mapper.RecommendationMapper;
+import school.faang.user_service.dto.recomendation.RecommendationDto;
+import school.faang.user_service.mapper.recommendation.RecommendationMapper;
 import school.faang.user_service.publisher.RecommendationEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.service.recomendation.RecommendationService;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
+
 @ExtendWith(MockitoExtension.class)
-public class RecommendationServiceTest {
+class RecommendationServiceTest {
     @InjectMocks
     RecommendationService recommendationService;
 
@@ -86,7 +87,5 @@ public class RecommendationServiceTest {
         recommendationService.create(recommendationDto);
         verify(recommendationEventPublisher, times(1)).publish(any(RecommendationEvent.class));
     }
-
-    
 
 }

@@ -131,14 +131,8 @@ public class MentorshipServiceTest {
     public void testDeleteMentee_MenteeIsDeleted() {
         when(userRepository.findById(thirdUser.getId())).thenReturn(Optional.of(thirdUser));
 
-        List<UserDto> actual = mentorshipService.deleteMentee(thirdUser.getId(), firstUser.getId());
-
+        mentorshipService.deleteMentee(thirdUser.getId(), firstUser.getId());
         verify(userRepository, times(1)).save(thirdUser);
-        verify(userMapper, times(1)).toDto(thirdUser.getMentees());
-
-        List<UserDto> expected = userMapper.toDto(thirdUser.getMentees());
-
-        Assert.assertEquals(expected, actual);
     }
 
     @Test
@@ -165,14 +159,8 @@ public class MentorshipServiceTest {
     public void testDeleteMentor_MentorIsDeleted() {
         when(userRepository.findById(thirdUser.getId())).thenReturn(Optional.of(thirdUser));
 
-        List<UserDto> actual = mentorshipService.deleteMentor(thirdUser.getId(), firstUser.getId());
-
+        mentorshipService.deleteMentor(thirdUser.getId(), firstUser.getId());
         verify(userRepository, times(1)).save(thirdUser);
-        verify(userMapper, times(1)).toDto(thirdUser.getMentors());
-
-        List<UserDto> expected = userMapper.toDto(thirdUser.getMentors());
-
-        Assert.assertEquals(expected, actual);
     }
 
 }

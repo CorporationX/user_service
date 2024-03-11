@@ -1,7 +1,6 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
@@ -31,7 +30,7 @@ public class MentorshipService {
         return userMapper.toDto(mentors);
     }
 
-    public List<UserDto> deleteMentee(long mentorId, long menteeId) {
+    public void deleteMentee(long mentorId, long menteeId) {
         //check if Repository has MentorId otherwise throw custom exception
         User mentor = userRepository.findById(mentorId)
                 .orElseThrow(() -> new UserNotFoundException(MessageError.USER_NOT_FOUND_EXCEPTION));
@@ -47,12 +46,9 @@ public class MentorshipService {
 
         //update the mentor in repository (because I have updated the list of this user (mentor))
         userRepository.save(mentor);
-
-        //return the list of mentor's mentees (like UserDto) without the mentee we have deleted
-        return userMapper.toDto(mentor.getMentees());
     }
 
-    public List<UserDto> deleteMentor(long menteeId, long mentorId) {
+    public void deleteMentor(long menteeId, long mentorId) {
         //check if Repository has menteeId otherwise throw custom exception
 
         User mentee = userRepository.findById(menteeId)
@@ -69,9 +65,6 @@ public class MentorshipService {
 
         //update the mentor in repository (because I have updated the list of this user (mentor))
         userRepository.save(mentee);
-
-        //return the list of mentor's mentees (like UserDto) without the mentee we have deleted
-        return userMapper.toDto(mentee.getMentors());
     }
 
 }

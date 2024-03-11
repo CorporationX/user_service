@@ -11,7 +11,7 @@ import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.SkillRequestDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.RecommendationRequestService;
+import school.faang.user_service.service.recomendation.RecommendationRequestService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

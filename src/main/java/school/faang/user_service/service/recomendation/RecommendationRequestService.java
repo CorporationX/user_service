@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.recomendation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +15,7 @@ import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
+import school.faang.user_service.service.user.UserService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -88,7 +89,7 @@ public class RecommendationRequestService {
     }
 
     private void validate(RecommendationRequestDto recommendationRequest) {
-        if (!userService.checkUser((recommendationRequest.getRequesterId())) || !userService.checkUser(recommendationRequest.getReceiverId()))
+        if (!userService.existById((recommendationRequest.getRequesterId())) || !userService.existById(recommendationRequest.getReceiverId()))
             throw new DataValidationException("User not found");
         if (recommendationRequest.getSkills() == null)
             throw new DataValidationException("skills is null");

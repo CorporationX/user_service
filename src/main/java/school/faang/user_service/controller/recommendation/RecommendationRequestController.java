@@ -11,7 +11,7 @@ import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.RecommendationRequestService;
+import school.faang.user_service.service.recomendation.RecommendationRequestService;
 
 import java.util.List;
 

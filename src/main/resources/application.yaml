@@ -4,6 +4,10 @@ spring:
     url: jdbc:postgresql://localhost:5432/postgres
     username: user
     password: password
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 150MB
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -26,6 +30,16 @@ spring:
           name: follower_channel
         profile_view_channel:
             name: profile_view_channel
+        recommendation_channel:
+          name: recommendation_channel
+        mentorship_requested_channel:
+          name: mentorship_requested_channel
+
+  async:
+    core-pool-size: 5
+    max-pool-size: 10
+    queue-capacity: 500
+    thread-name-prefix: StudentThread-
 
 server:
   port: 8080
@@ -33,6 +47,7 @@ server:
 logging:
   level:
     root: info
+    org.springframework.retry: DEBUG
 
 project-service:
   host: localhost
@@ -41,6 +56,9 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+  retry:
+    max-attempts: 5
+    delay-ms: 2000
 
 aws:
   accessKey: access_key
@@ -49,5 +67,26 @@ aws:
 
 services:
   s3:
-    bucket-name: user_backet
+    endpoint: http://localhost:9000
+    accessKey: user
+    secretKey: password
+    region: bucket_region
+    bucketName: user-bucket
+    maxSizeMb: 5242880
+    smallSize: 170
+    largeSize: 1080
     isMocked: true
+    random-avatar:
+      url: "https://api.dicebear.com/7.x/pixel-art/svg?seed="
+
+scheduler:
+  clearEvents:
+    cronExpression: "0 0 0 * * ?" # Каждый день в полночь
+
+batchSize:
+  eventDeletion: 1000
+
+scheduling:
+  premium:
+    cron:
+      expression: "0 0 4 * * *"

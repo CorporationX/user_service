@@ -23,8 +23,8 @@ import school.faang.user_service.filter.recommendation.RecommendationRequestFilt
 import school.faang.user_service.filter.recommendation.RecommendationRequestFilterUpdateAt;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
-import school.faang.user_service.service.RecommendationRequestService;
-import school.faang.user_service.service.UserService;
+import school.faang.user_service.service.recomendation.RecommendationRequestService;
+import school.faang.user_service.service.user.UserService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -90,7 +90,7 @@ public class RecommendationRequestServiceTest {
 
     @Test
     void testTimeOutCheckTrue() {
-        when(userService.checkUser(anyLong())).thenReturn(true);
+        when(userService.existById(anyLong())).thenReturn(true);
         Assert.assertThrows(DataValidationException.class, () -> recommendationRequestService
                 .create(new RecommendationRequestDto(
                         5L,

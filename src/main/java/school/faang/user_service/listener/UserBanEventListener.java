@@ -4,12 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.user.UserBanEvent;
+import school.faang.user_service.dto.user.UserBanEventDto;
 import school.faang.user_service.service.user.UserService;
 
 @Component
 @Slf4j
-public class UserBanEventListener extends AbstractEventListener<UserBanEvent> {
+public class UserBanEventListener extends AbstractEventListener<UserBanEventDto> {
     private final UserService userService;
 
     public UserBanEventListener(UserService userService, ObjectMapper objectMapper) {
@@ -22,7 +22,7 @@ public class UserBanEventListener extends AbstractEventListener<UserBanEvent> {
         processEvent(
                 message,
                 (event) -> userService.banUserById(event.getUserId()),
-                UserBanEvent.class
+                UserBanEventDto.class
         );
     }
 }

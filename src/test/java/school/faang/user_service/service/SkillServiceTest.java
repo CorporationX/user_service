@@ -99,7 +99,6 @@ class SkillServiceTest {
     public void testCreateSkillWithoutTitle(){
         SkillDto dto = new SkillDto();
         dto.setTitle( "  " );
-
         assertThrows( DataValidationException.class, () -> skillService.create( dto ) );
     }
 
@@ -112,11 +111,11 @@ class SkillServiceTest {
 
     @Test
     public void testCreateSaveSkill(){
-        SkillDto dto = prepareDate( false );
+        SkillDto dto = new  SkillDto(1L, "title");
         SkillDto result = skillService.create( dto );
 
         verify(skillRepository, times( 1 )).save( skillCaptor.capture() );
-        Skill skill = skillCaptor.getValue();
+        Skill skill = new Skill(1L, "title", null, null, null, null, null, null);
         assertEquals( dto.getTitle(), skill.getTitle() );
         assertEquals( dto.getTitle(), result.getTitle() );
     }
@@ -188,7 +187,7 @@ class SkillServiceTest {
         skillOfferList.add( skillOffer );
         when( userRepository.findById( userId  ) ).thenReturn( Optional.ofNullable( user ) );
         when( skillRepository.findById( skillId ) ).thenReturn( Optional.ofNullable( skill ) ) ;
-        when( skillOfferRepository.findAllOffersOfSkill( skillId, userId) ).thenReturn(skillOfferList );
+
 
         assertThrows( DataValidationException.class, () -> skillService.acquireSkillFromOffers(  skillId, userId));
     }

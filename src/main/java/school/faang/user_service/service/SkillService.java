@@ -18,6 +18,7 @@ import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,10 +41,14 @@ public class SkillService {
     }
 
     public SkillDto create(SkillDto skillDto) {
-        if(skillDto.getTitle().isBlank()) throw new DataValidationException( "Provide not blank title" );
-        if (skillRepository.existsByTitle( skillDto.getTitle() )) throw new DataValidationException( "Skill with such name already exist!" );
-        Skill newSkill = skillRepository.save( skillMapper.toSkill( skillDto ) );
-        return skillMapper.toSkillDto( newSkill );
+        Optional.ofNullable( skillDto ).orElseThrow( () -> new DataValidationException( "SkillDto is null" ) );
+        String title = skillDto.getTitle();
+        Optional.ofNullable( title ).filter( t -> !t.isBlank() ).orElseThrow( () -> new DataValidationException( "Fill in the title of skill!" ) );
+        if (skillRepository.existsByTitle( skillDto.getTitle() )) {
+            throw new DataValidationException( "Skill with such name already exist!" );
+        }
+        skillRepository.save( skillMapper.toSkill( skillDto ) );
+        return skillDto;
     }
 
     public List<SkillDto> getUserSkills(long userId) {

@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FollowerEvent {
+public class FollowerEventDto {
     private long followerId;
     private long followeeId;
-
 }

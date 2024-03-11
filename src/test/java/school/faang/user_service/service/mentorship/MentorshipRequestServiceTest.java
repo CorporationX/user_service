@@ -284,7 +284,8 @@ public class MentorshipRequestServiceTest {
         List<MentorshipRequest> mentorshipRequestList = List.of(mentorshipRequest1, mentorshipRequest2);
         when(mentorshipRequestRepository.findAll()).thenReturn(mentorshipRequestList);
 
-        RequestFilterDto requestFilterDto = new RequestFilterDto(null, 1L, 0, null);
+//        RequestFilterDto requestFilterDto = new RequestFilterDto(null, 1L, 0, null);
+        RequestFilterDto requestFilterDto = RequestFilterDto.builder().requesterId(1L).receiverId(0L).build();
         List<RequestFilterDto> result = mentorshipRequestService.getRequests(requestFilterDto);
 
         assertNotNull(result);

@@ -41,7 +41,7 @@ public class EventValidator {
             requiredSkills.add(skillToAdd);
         });
 
-        if (userSkills == null) {
+        if (userSkills == null || userSkills.isEmpty()) {
             throw new DataValidationException("User hasn't got any skills");
         }
         if (!(new HashSet<>(userSkills).containsAll(requiredSkills))) {

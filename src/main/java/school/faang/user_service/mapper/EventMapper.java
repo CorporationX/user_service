@@ -23,7 +23,7 @@ public interface EventMapper {
     List<EventDto> toDto(List<Event> events);
 
     @Named("skillsToIds")
-    default List<Long> map(List<Skill> skills){
+    default List<Long> map(List<Skill> skills) {
         return skills.stream()
                 .map(Skill::getId)
                 .toList();

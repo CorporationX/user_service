@@ -14,7 +14,6 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
@@ -36,8 +35,6 @@ class EventValidatorTest {
     private SkillRepository skillRepository;
     @Mock
     private EventRepository eventRepository;
-    @Mock
-    private SkillMapper skillMapper;
     @InjectMocks
     private EventValidator eventValidator;
 

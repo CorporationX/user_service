@@ -18,4 +18,12 @@ public interface RecommendationRequestRepository extends CrudRepository<Recommen
             LIMIT 1
             """)
     Optional<RecommendationRequest> findLatestPendingRequest(long requesterId, long receiverId);
+
+    @Modifying
+    @Query(value = "INSERT INTO recommendation_request (requester_id, receiver_id, status) VALUES (?1, ?2, 'pending')", nativeQuery = true)
+    void createRequest(Long requesterId, Long receiverId);
+
+    boolean existsByRequesterIdAndReceiverId(Long requesterId, Long receiverId);
+
+    boolean existsSkillByName(String skillName);
 }

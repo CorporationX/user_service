@@ -21,7 +21,10 @@ public class SubscriptionService {
     private final List<UserFilter> userFilters;
 
     public void followUser(long followerId, long followeeId) {
-        if (!subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
+        if (followerId == followeeId) {
+            throw new DataValidationException("You can not follow yourself!");
+        }
+        if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             throw new DataValidationException("This subscription already exists!");
         }
         subscriptionRepository.followUser(followerId, followeeId);
@@ -29,6 +32,9 @@ public class SubscriptionService {
     }
 
     public void unfollowUser(long followerId, long followeeId) {
+        if (followerId == followeeId) {
+            throw new DataValidationException("You can not unfollow yourself!");
+        }
         subscriptionRepository.unfollowUser(followerId, followeeId);
 
     }

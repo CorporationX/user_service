@@ -10,7 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
-import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
@@ -21,7 +20,9 @@ import school.faang.user_service.repository.event.EventRepository;
 
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -43,9 +44,7 @@ class EventValidatorTest {
     private Event event;
     private EventDto eventDto;
     private Skill requiredSkill;
-    private SkillDto requiredSkillDto;
     private Skill userSkill;
-    private SkillDto userSkillDto;
     private User user;
 
     @BeforeEach
@@ -54,17 +53,9 @@ class EventValidatorTest {
                 .id(1)
                 .title("Required skill")
                 .build();
-        requiredSkillDto = SkillDto.builder()
-                .id(requiredSkill.getId())
-                .title(requiredSkill.getTitle())
-                .build();
         userSkill = Skill.builder()
                 .id(2)
                 .title("User's skill")
-                .build();
-        userSkillDto = SkillDto.builder()
-                .id(userSkill.getId())
-                .title(userSkill.getTitle())
                 .build();
         user = User.builder()
                 .id(3)
@@ -89,7 +80,7 @@ class EventValidatorTest {
                 .endDate(event.getEndDate())
                 .ownerId(event.getOwner().getId())
                 .description(event.getDescription())
-                .relatedSkills(List.of(requiredSkillDto))
+                .relatedSkillsIds(List.of(requiredSkill.getId()))
                 .location(event.getLocation())
                 .maxAttendees(event.getMaxAttendees())
                 .build();
@@ -130,6 +121,7 @@ class EventValidatorTest {
     @Test
     void validateUserHasRequiredSkills_UserHasRequiredSkills_ShouldNotThrow() {
         when(skillRepository.findAllByUserId(anyLong())).thenReturn(List.of(requiredSkill));
+        when(skillRepository.findById(anyLong())).thenReturn(Optional.ofNullable(requiredSkill));
 
         assertDoesNotThrow(() ->
                 eventValidator.validateUserHasRequiredSkills(eventDto));
@@ -138,7 +130,7 @@ class EventValidatorTest {
     @Test
     void validateUserHasRequiredSkills_UserDoesntHaveRequiredSkills_ShouldThrowDataValidationException() {
         when(skillRepository.findAllByUserId(anyLong())).thenReturn(List.of(userSkill));
-        when(skillMapper.toEntity(eventDto.getRelatedSkills())).thenReturn(List.of((requiredSkill)));
+        when(skillRepository.findById(anyLong())).thenReturn(Optional.ofNullable(requiredSkill));
 
         assertThrows(DataValidationException.class, () ->
                 eventValidator.validateUserHasRequiredSkills(eventDto));
@@ -146,7 +138,8 @@ class EventValidatorTest {
 
     @Test
     void validateUserHasRequiredSkills_UserDoesntHaveAnySkills_ShouldThrowDataValidationException() {
-        when(skillRepository.findAllByUserId(anyLong())).thenReturn(null);
+        when(skillRepository.findAllByUserId(anyLong())).thenReturn(Collections.emptyList());
+        when(skillRepository.findById(anyLong())).thenReturn(Optional.ofNullable(requiredSkill));
 
         assertThrows(DataValidationException.class, () ->
                 eventValidator.validateUserHasRequiredSkills(eventDto));

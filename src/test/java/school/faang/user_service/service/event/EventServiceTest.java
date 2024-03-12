@@ -38,8 +38,6 @@ class EventServiceTest {
     @Mock
     private EventRepository eventRepository;
     @Mock
-    private SkillMapper skillMapper;
-    @Mock
     private EventMapper eventMapper;
     @Mock
     private List<EventFilter> eventFilters;
@@ -53,9 +51,7 @@ class EventServiceTest {
     private Event event;
     private EventDto eventDto;
     private Skill requiredSkill;
-    private SkillDto requiredSkillDto;
     private Skill userSkill;
-    private SkillDto userSkillDto;
     private User user;
 
     @BeforeEach
@@ -64,17 +60,9 @@ class EventServiceTest {
                 .id(1)
                 .title("Required skill")
                 .build();
-        requiredSkillDto = SkillDto.builder()
-                .id(requiredSkill.getId())
-                .title(requiredSkill.getTitle())
-                .build();
         userSkill = Skill.builder()
                 .id(2)
                 .title("User's skill")
-                .build();
-        userSkillDto = SkillDto.builder()
-                .id(userSkill.getId())
-                .title(userSkill.getTitle())
                 .build();
         user = User.builder()
                 .id(3)
@@ -99,7 +87,7 @@ class EventServiceTest {
                 .endDate(event.getEndDate())
                 .ownerId(event.getOwner().getId())
                 .description(event.getDescription())
-                .relatedSkills(List.of(requiredSkillDto))
+                .relatedSkillsIds(List.of(requiredSkill.getId()))
                 .location(event.getLocation())
                 .maxAttendees(event.getMaxAttendees())
                 .build();

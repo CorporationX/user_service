@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.skill.SkillDto;
@@ -17,20 +16,15 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class EventMapperTest {
 
-    @Mock
-    private SkillMapper skillMapper;
     @InjectMocks
     private EventMapperImpl eventMapper;
 
     private User user;
     private Skill skill;
-    private SkillDto skillDto;
     private Event event;
     private EventDto eventDto;
 
@@ -42,10 +36,6 @@ class EventMapperTest {
         skill = Skill.builder()
                 .id(1L)
                 .title("Skill")
-                .build();
-        skillDto = SkillDto.builder()
-                .id(skill.getId())
-                .title(skill.getTitle())
                 .build();
         event = Event.builder()
                 .id(1L)
@@ -65,7 +55,7 @@ class EventMapperTest {
                 .endDate(LocalDateTime.now().plusDays(15))
                 .ownerId(1L)
                 .description("Description")
-                .relatedSkills(List.of(skillDto))
+                .relatedSkillsIds(List.of(skill.getId()))
                 .location("Location")
                 .maxAttendees(10)
                 .build();
@@ -73,8 +63,6 @@ class EventMapperTest {
 
     @Test
     void toDtoTest() {
-        when(skillMapper.toDto(anyList())).thenReturn(List.of(skillDto));
-
         EventDto eventDto = eventMapper.toDto(event);
 
         assertAll(
@@ -84,7 +72,7 @@ class EventMapperTest {
                 () -> assertEquals(eventDto.getEndDate(), event.getEndDate()),
                 () -> assertEquals(eventDto.getOwnerId(), event.getOwner().getId()),
                 () -> assertEquals(eventDto.getDescription(), event.getDescription()),
-                () -> assertEquals(eventDto.getRelatedSkills(), skillMapper.toDto(event.getRelatedSkills())),
+                () -> assertEquals(eventDto.getRelatedSkillsIds().get(0), event.getRelatedSkills().get(0).getId()),
                 () -> assertEquals(eventDto.getLocation(), event.getLocation()),
                 () -> assertEquals(eventDto.getMaxAttendees(), event.getMaxAttendees())
         );
@@ -92,8 +80,6 @@ class EventMapperTest {
 
     @Test
     void toEntityTest() {
-        when(skillMapper.toEntity(anyList())).thenReturn(List.of(skill));
-
         Event event = eventMapper.toEntity(eventDto);
 
         assertAll(
@@ -103,7 +89,6 @@ class EventMapperTest {
                 () -> assertEquals(event.getEndDate(), eventDto.getEndDate()),
                 () -> assertEquals(event.getOwner().getId(), eventDto.getOwnerId()),
                 () -> assertEquals(event.getDescription(), eventDto.getDescription()),
-                () -> assertEquals(event.getRelatedSkills(), skillMapper.toEntity(eventDto.getRelatedSkills())),
                 () -> assertEquals(event.getLocation(), eventDto.getLocation()),
                 () -> assertEquals(event.getMaxAttendees(), eventDto.getMaxAttendees())
         );

@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import school.faang.user_service.dto.skill.SkillDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,7 +18,7 @@ public class EventFilterDto {
     private LocalDateTime endDate;
     private Long ownerId;
     private String description;
-    private List<SkillDto> relatedSkills;
+    private List<Long> relatedSkillsIds;
     private String location;
     private int maxAttendees;
 }

@@ -34,11 +34,10 @@ public class SkillService {
     private final UserRepository userRepository;
 
     public SkillDto create(SkillDto skillDto) {
-        Optional.ofNullable( skillDto ).orElseThrow( () -> new DataValidationException( "SkillDto is null" ) );
         String title = skillDto.getTitle();
         Optional.ofNullable( title ).filter( t -> !t.isBlank() ).orElseThrow( () -> new DataValidationException( "Fill in the title of skill!" ) );
         if (skillRepository.existsByTitle( skillDto.getTitle() )) {
-            throw new DataValidationException( "Skill with such name already exist!" );
+            throw new DataValidationException( "Skill with such name " + title + " already exist!" );
         }
         skillRepository.save( skillMapper.toSkill( skillDto ) );
         return skillDto;
@@ -46,9 +45,7 @@ public class SkillService {
 
     public List<SkillDto> getUserSkills(long userId) {
         List<Skill> skills = skillRepository.findAllByUserId( userId );
-        return skills.stream()
-                .map( skillMapper::toSkillDto )
-                .toList();
+        return skillMapper.toSkillDtoList( skills );
     }
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
@@ -69,7 +66,7 @@ public class SkillService {
 
     @Transactional
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
-        User user = getUserById( userId );
+        getUserById( userId );
         Skill skill = getSkillById( skillId );
         validateUserSkillNotExist( skillId, userId );
         validateSkillOffersCount( skillId, userId );
@@ -91,7 +88,7 @@ public class SkillService {
     private void validateUserSkillNotExist(long skillId, long userId) {
         skillRepository.findUserSkill( skillId, userId )
                 .ifPresent( skill -> {
-                    throw new DataValidationException( "User already has that skill" );
+                    throw new DataValidationException( "User with id " + userId + " already has skill with id " + skillId );
                 } );
     }
 

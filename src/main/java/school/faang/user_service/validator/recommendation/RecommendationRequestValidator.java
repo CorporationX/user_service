@@ -1,7 +1,6 @@
 package school.faang.user_service.validator.recommendation;
 
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.entity.User;
@@ -37,7 +36,7 @@ public class RecommendationRequestValidator {
         Optional<User> user = userRepository.findById(userId);
 
         if (user.isEmpty()) {
-            throw new EntityNotFoundException("User not found");
+            throw new EntityNotFoundException("User by id " + userId + " not found");
         }
     }
 
@@ -49,12 +48,6 @@ public class RecommendationRequestValidator {
                 throw new EntityExistException("Запрос рекомендации от одного и того же пользователя к другому можно отправлять не чаще, чем один раз в 6 месяцев");
             }
         });
-    }
-
-    public void validateRequestForExist(Optional<RecommendationRequest> recommendationRequest) {
-        if (recommendationRequest.isEmpty()) {
-            throw new EntityNotFoundException("Request not found");
-        }
     }
 
     public void validate(RecommendationRequestDto recommendationRequestDto) {

@@ -9,6 +9,7 @@ import school.faang.user_service.dto.recommendation.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.handler.exception.EntityExistException;
+import school.faang.user_service.handler.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
@@ -29,6 +30,7 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
     private final RecommendationRequestMapper recommendationRequestMapper;
     private final List<RecommendationRequestFilter> recommendationRequestFilters;
 
+    @Transactional
     @Override
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
         recommendationRequestValidator.validate(recommendationRequestDto);
@@ -62,9 +64,7 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
     public RecommendationRequestDto getRequest(long id) {
         Optional<RecommendationRequest> recommendationRequest = recommendationRequestRepository.findById(id);
 
-        recommendationRequestValidator.validateRequestForExist(recommendationRequest);
-
-        return recommendationRequestMapper.toDto(recommendationRequest.orElse(null));
+        return recommendationRequestMapper.toDto(recommendationRequest.orElseThrow(() -> new EntityNotFoundException("Request not found")));
     }
 
     @Override
@@ -72,7 +72,7 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
         Optional<RecommendationRequest> recommendationRequest = recommendationRequestRepository.findById(id);
 
         recommendationRequest.ifPresent(request -> {
-            if (request.getStatus().equals(RequestStatus.REJECTED) || request.getStatus().equals(RequestStatus.ACCEPTED)) {
+            if (RequestStatus.REJECTED.equals(request.getStatus()) || RequestStatus.ACCEPTED.equals(request.getStatus())) {
                 throw new EntityExistException("Искомый запрос рекомендации уже принят или отклонен");
             }
 

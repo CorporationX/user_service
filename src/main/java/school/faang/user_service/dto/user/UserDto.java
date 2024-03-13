@@ -15,7 +15,7 @@ import school.faang.user_service.entity.contact.PreferredContact;
 @AllArgsConstructor
 @Data
 public class UserDto {
-    private long id;
+    private Long id;
     @NotBlank
     private String username;
     @NotBlank
@@ -26,6 +26,6 @@ public class UserDto {
     private String password;
     private String phone;
     @NotNull
-    private long countryId;
+    private Long countryId;
     private PreferredContact preference;
 }

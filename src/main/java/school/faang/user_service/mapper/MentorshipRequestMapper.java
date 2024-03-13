@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.event.MentorshipAcceptedEventDto;
 import school.faang.user_service.entity.MentorshipRequest;
 
 import java.util.List;
@@ -19,4 +20,8 @@ public interface MentorshipRequestMapper {
     MentorshipRequestDto toDto(MentorshipRequest entity);
 
     List<MentorshipRequestDto> toDto(List<MentorshipRequest> entities);
+
+    @Mapping(source = "requester.id", target = "requesterId")
+    @Mapping(source = "receiver.id", target = "receiverId")
+    MentorshipAcceptedEventDto toEventDto(MentorshipRequest entity);
 }

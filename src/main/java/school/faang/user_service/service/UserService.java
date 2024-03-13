@@ -9,12 +9,16 @@ import org.springframework.web.client.RestTemplate;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.entity.contact.ContactPreference;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.contact.ContactPreferenceRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.s3.S3Service;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -25,6 +29,7 @@ public class UserService {
     private final PremiumRepository premiumRepository;
     private final S3Service s3Service;
     private final RestTemplate restTemplate;
+    private final ContactPreferenceRepository contactPreferenceRepository;
 
     @Value("${services.random_avatar.url}")
     private String url;
@@ -53,6 +58,7 @@ public class UserService {
         } catch (Exception e) {
             log.error("Ошибка генерации аватара", e);
         }
+        entity.getContactPreference().setUser(entity);
         return userMapper.toDto(userRepository.save(entity));
     }
 
@@ -77,5 +83,15 @@ public class UserService {
 
     public void saveUser(User user) {
         userRepository.save(user);
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserDto> getUsersByIds(List<Long> ids) {
+        return userMapper.toDto(userRepository.findAllById(ids));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Long> getUserIds() {
+        return userRepository.findUserIds();
     }
 }

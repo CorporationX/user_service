@@ -87,6 +87,11 @@ public class SubscriptionService {
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
     }
 
+    @Transactional
+    public List<Long> getFollowerIds(long followeeId) {
+        return subscriptionRepository.findFollowerIdsByFolloweeId(followeeId);
+    }
+
     public void validateExistsUsers(long followerId, long followeeId) {
         if (!userRepository.existsById(followerId) || !userRepository.existsById(followeeId)) {
             throw new DataValidationException("Нет пользователя с таким айди");

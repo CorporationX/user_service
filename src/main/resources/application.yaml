@@ -32,8 +32,12 @@ spring:
           name: profile_view_channel
         premium_channel:
           name: premium_channel
+        goal_completed_channel:
+          name: goal_completed_channel
         mentorship_topic:
           name: mentorship_topic
+        mentorship_accepted_channel:
+          name: mentorship_accepted_channel
 
 server:
   port: 8080
@@ -66,6 +70,6 @@ services:
 
 
 premium_cleanup:
-  time: 0 0 0 * * *
+  time: 0 0 0 * * 0
   zone: Europe/Moscow
-
+  premium_batch_size: 100

@@ -19,7 +19,7 @@ configurations {
 }
 
 repositories {
-    mavenCentral()
+	mavenCentral()
 }
 
 dependencies {
@@ -33,6 +33,11 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.0.2")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+
+    /**
+     * Commons-io
+     */
+    implementation("commons-io:commons-io:2.15.1")
 
     /**
      * Database
@@ -75,13 +80,6 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.2")
     testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-}
-
-jsonSchema2Pojo {
-    setSource(files("src/main/resources/json"))
-    targetDirectory = file("${project.buildDir}/generated-sources/js2p")
-    targetPackage = "com.json.student"
-    setSourceType("jsonschema")
 }
 
 tasks.withType<Test> {

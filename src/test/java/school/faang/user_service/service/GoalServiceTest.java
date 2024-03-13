@@ -72,8 +72,8 @@ public class GoalServiceTest {
 
         when(goalMapper.toEntity(goalDto)).thenReturn(goal);
         when(userService.getUserById(userId)).thenReturn(user);
-        when(skillService.findById(1L)).thenReturn(skill_1);
-        when(skillService.findById(2L)).thenReturn(skill_2);
+        when(skillService.getSkillIfExists(1L)).thenReturn(skill_1);
+        when(skillService.getSkillIfExists(2L)).thenReturn(skill_2);
 
         goalService.createGoal(userId, goalDto);
 
@@ -103,8 +103,8 @@ public class GoalServiceTest {
         when(goalRepository.findById(goalOldId)).thenReturn(Optional.of(goalOld));
         when(goalRepository.findUsersByGoalId(goal.getId())).thenReturn(List.of(user1, user2));
 
-        when(skillService.findById(1L)).thenReturn(skill_1);
-        when(skillService.findById(2L)).thenReturn(skill_2);
+        when(skillService.getSkillIfExists(1L)).thenReturn(skill_1);
+        when(skillService.getSkillIfExists(2L)).thenReturn(skill_2);
 
         goalService.updateGoal(goalOldId, goalDto);
 
@@ -296,8 +296,8 @@ public class GoalServiceTest {
         goal.setStatus(GoalStatus.ACTIVE);
 
         when(goalMapper.toEntity(goalDto)).thenReturn(goal);
-        when(skillService.findById(1L)).thenReturn(skill_1);
-        when(skillService.findById(2L)).thenReturn(skill_2);
+        when(skillService.getSkillIfExists(1L)).thenReturn(skill_1);
+        when(skillService.getSkillIfExists(2L)).thenReturn(skill_2);
         when(goalRepository.findById(goalOldId)).thenReturn(Optional.of(goalOld));
 
         goalService.updateGoal(goalOldId, goalDto);

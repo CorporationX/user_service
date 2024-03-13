@@ -29,6 +29,7 @@ import school.faang.user_service.repository.mentorship.MentorshipRequestReposito
 import school.faang.user_service.validator.MentorshipRequestValidator;
 import school.faang.user_service.validator.MentorshipValidator;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -67,7 +68,7 @@ class MentorshipRequestServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new MentorshipRequestService(requestRepository, userRepository, mentorshipRepository,requestValidator,
+        service = new MentorshipRequestService(requestRepository, userRepository, mentorshipRepository, requestValidator,
                 mentorshipValidator, mentorshipRequestFilters, mentorshipRequestMapper, mentorshipEventPublisher);
     }
 
@@ -150,8 +151,10 @@ class MentorshipRequestServiceTest {
         MentorshipRequest foundRequest = new MentorshipRequest();
         foundRequest.setRequester(requester);
         foundRequest.setReceiver(receiver);
+        foundRequest.setUpdatedAt(LocalDateTime.now());
 
         when(requestRepository.findById(requestId)).thenReturn(Optional.of(foundRequest));
+        when(requestRepository.save(any(MentorshipRequest.class))).thenReturn(foundRequest);
 
         service.acceptRequest(requestId);
 

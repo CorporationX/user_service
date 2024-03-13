@@ -76,9 +76,9 @@ public class MentorshipRequestService {
         mentorshipRepository.save(mentorship);
 
         mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
-        mentorshipRequestRepository.save(mentorshipRequest);
+        mentorshipRequest = mentorshipRequestRepository.save(mentorshipRequest);
 
-        mentorshipEventPublisher.publish(new MentorshipStartEvent(requesterId, receiverId, LocalDateTime.now()));
+        mentorshipEventPublisher.publish(new MentorshipStartEvent(requesterId, receiverId, mentorshipRequest.getUpdatedAt()));
     }
 
     @Transactional

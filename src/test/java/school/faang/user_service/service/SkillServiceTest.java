@@ -17,8 +17,9 @@ import school.faang.user_service.mapper.skill.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.validate.skill.SkillValidation;
+import school.faang.user_service.validator.SkillValidation;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -142,7 +143,7 @@ class SkillServiceTest {
                 new SkillOffer(3, skill, Recommendation.builder().author(User.builder().id(5).build()).build()));
         when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.empty());
         when(skillOfferRepository.findAllOffersOfSkill(skillId, userId)).thenReturn(skillOffers);
-        when(userService.getUserById(userId)).thenReturn(user);
+        when(userService.findById(userId)).thenReturn(user);
         when(skillRepository.findById(skillId)).thenReturn(Optional.of(skill));
 
         // Act
@@ -151,10 +152,19 @@ class SkillServiceTest {
         // Assert
         assertAll(
                 () -> verify(skillMapper, times(1)).toDto(any()),
-                () -> verify(userService, times(1)).getUserById(userId),
+                () -> verify(userService, times(1)).findById(userId),
                 () -> verify(skillOfferRepository, times(1)).findAllOffersOfSkill(skillId, userId),
                 () -> verify(skillRepository, times(1)).assignSkillToUser(skillId, userId),
                 () -> verify(userSkillGuaranteeRepository, times(skillOffers.size())).save(any())
         );
+    }
+
+    @Test
+    void incorrectIdTest() {
+        long goalId = 1L;
+        when(skillRepository.findSkillsByGoalId(goalId))
+                .thenReturn(new ArrayList<>());
+        skillService.findSkillsByGoalId(goalId);
+        verify(skillRepository, times(1)).findSkillsByGoalId(goalId);
     }
 }

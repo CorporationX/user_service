@@ -3,12 +3,12 @@ package school.faang.user_service.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.MentorshipRequestedEvent;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDro;
 import school.faang.user_service.entity.Mentorship;
@@ -22,6 +22,7 @@ import school.faang.user_service.filter.mentorship_request.RequestReceiverFilter
 import school.faang.user_service.filter.mentorship_request.RequestStatusFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.mapper.MentorshipRequestMapperImpl;
+import school.faang.user_service.publisher.MentorshipRequestedEventPublisher;
 import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
@@ -51,6 +52,8 @@ class MentorshipRequestServiceTest {
     @Spy
     private MentorshipRequestMapper mentorshipRequestMapper = new MentorshipRequestMapperImpl();
     @Mock
+    private MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
+    @Mock
     private MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher;
 
     private List<MentorshipRequestFilter> mentorshipRequestFilters = new ArrayList<>(List.of(
@@ -61,8 +64,9 @@ class MentorshipRequestServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new MentorshipRequestService(requestRepository, userRepository, mentorshipRepository,requestValidator,
-                mentorshipValidator, mentorshipRequestFilters, mentorshipRequestMapper, mentorshipAcceptedEventPublisher);
+        service = new MentorshipRequestService(requestRepository, userRepository, mentorshipRepository, requestValidator,
+                mentorshipValidator, mentorshipRequestFilters, mentorshipRequestMapper, mentorshipRequestedEventPublisher,
+                mentorshipAcceptedEventPublisher);
     }
 
 
@@ -81,6 +85,7 @@ class MentorshipRequestServiceTest {
         verify(requestValidator).validateUserIds(requesterId, receiverId);
         verify(requestValidator).validateRequestTime(requesterId, receiverId);
         verify(requestRepository).create(1L, 2L, requestDto.getDescription());
+        verify(mentorshipRequestedEventPublisher).publish(Mockito.any(MentorshipRequestedEvent.class));
     }
 
     @Test

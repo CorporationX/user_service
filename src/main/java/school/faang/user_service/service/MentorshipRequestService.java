@@ -4,17 +4,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.MentorshipRequestedEvent;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDro;
 import school.faang.user_service.dto.event.MentorshipAcceptedEventDto;
 import school.faang.user_service.entity.Mentorship;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.mentorship_request.MentorshipRequestFilter;
-import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipRequestedEventPublisher;
 import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
@@ -35,6 +35,7 @@ public class MentorshipRequestService {
     private final MentorshipValidator mentorshipValidator;
     private final List<MentorshipRequestFilter> mentorshipRequestFilters;
     private final MentorshipRequestMapper mentorshipRequestMapper;
+    private final MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
     private final MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher;
 
 
@@ -48,6 +49,7 @@ public class MentorshipRequestService {
         mentorshipRequestValidator.validateRequestTime(requesterId, receiverId);
 
         mentorshipRequestRepository.create(requesterId, receiverId, requestDto.getDescription());
+        mentorshipRequestedEventPublisher.publish(new MentorshipRequestedEvent(requesterId, receiverId, LocalDateTime.now()));
     }
 
     @Transactional(readOnly = true)

@@ -44,7 +44,7 @@ public class GoalValidator {
 
     public void validateSkills(List<Skill> skills) {
         if (!skills.stream()
-                .allMatch(skillService::validateSkill)) {
+                .allMatch(skill -> skillService.existsById(skill.getId()))) {
             throw new DataValidationException("Некорректные скиллы");
         }
     }

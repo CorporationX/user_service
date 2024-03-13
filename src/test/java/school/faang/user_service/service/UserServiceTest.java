@@ -63,9 +63,10 @@ class UserServiceTest {
         long userId = 1L;
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        DataValidationException dataValidationException = assertThrows(DataValidationException.class, () -> userService.getUser(userId));
+        EntityNotFoundException entityNotFoundException = assertThrows(EntityNotFoundException.class, () ->
+                userService.findById(userId));
 
-        assertEquals("Пользователя не существует", dataValidationException.getMessage());
+        assertEquals("Пользователь не найден", entityNotFoundException.getMessage());
     }
 
     @Test
@@ -76,7 +77,7 @@ class UserServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
         // Act
-        userService.getUserById(userId);
+        userService.findById(userId);
 
         // Assert
         verify(userRepository, times(1)).findById(userId);
@@ -87,7 +88,7 @@ class UserServiceTest {
     void testGetUserById_whenUserIdNotExist_thenThrowEntityNotFoundException() {
         long userId = 1;
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundException.class, () -> userService.getUserById(userId));
+        assertThrows(EntityNotFoundException.class, () -> userService.findById(userId));
     }
 
     @Test

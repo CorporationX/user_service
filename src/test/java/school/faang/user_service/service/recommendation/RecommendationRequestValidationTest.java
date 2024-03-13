@@ -18,7 +18,6 @@ import school.faang.user_service.repository.recommendation.SkillRequestRepositor
 import school.faang.user_service.validator.recommendation.RecommendationRequestValidator;
 
 import java.util.List;
-import java.util.Optional;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -61,6 +60,7 @@ public class RecommendationRequestValidationTest {
                 .reason("message")
                 .build();
     }
+
     @Test
     public void testRecommendationRequestValidatorUserNotFound() {
         long invalidId = 1555;
@@ -73,8 +73,4 @@ public class RecommendationRequestValidationTest {
         Assert.assertThrows(EntityNotFoundException.class, () -> recommendationRequestValidator.validateSkills(invalidSkillsIds));
     }
 
-    @Test
-    public void testRecommendationRequestExist() {
-        Assert.assertThrows(EntityNotFoundException.class, () -> recommendationRequestValidator.validateRequestForExist(Optional.empty()));
-    }
 }

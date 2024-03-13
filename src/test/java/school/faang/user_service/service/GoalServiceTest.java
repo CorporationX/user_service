@@ -32,7 +32,6 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class GoalServiceTest {
-    @Autowired
     private GoalRepository goalRepository;
     private GoalMapper goalMapper;
     private SkillRepository skillRepository;

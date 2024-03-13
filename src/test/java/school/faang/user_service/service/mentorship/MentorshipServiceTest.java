@@ -9,11 +9,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import school.faang.user_service.handlers.ErrorResponse;
+import school.faang.user_service.handlers.GlobalExceptionHandler;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
-import school.faang.user_service.service.UserService;
+import school.faang.user_service.service.user.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +36,7 @@ public class MentorshipServiceTest {
     private UserMapper userMapper;
     @InjectMocks
     private MentorshipService mentorshipService;
+    private final GlobalExceptionHandler exceptionHandler = new GlobalExceptionHandler();
     private static final long EXISTENT_USER_ID = 1L;
     private static final long NON_EXISTENT_USER_ID = 100_000L;
     private static final long EXISTENT_MENTEE_ID = 1L;
@@ -50,10 +55,11 @@ public class MentorshipServiceTest {
     }
 
     @Test
-    public void testGetMentors_userNotExist_throwsEntityNotFoundException() {
+    public void testGetMentors_UserNotExist_ThrowsEntityNotFoundException() {
         Mockito.when(userService.getUserById(NON_EXISTENT_USER_ID)).thenThrow(EntityNotFoundException.class);
 
-        assertThrowsEntityNotFoundException(
+        assertThrows(
+                EntityNotFoundException.class,
                 () -> mentorshipService.getMentors(NON_EXISTENT_USER_ID)
         );
 
@@ -61,10 +67,10 @@ public class MentorshipServiceTest {
     }
 
     @Test
-    public void testGetMentees_userNotExist_throwsEntityNotFoundException() {
+    public void testGetMentees_UserNotExist_ThrowsEntityNotFoundException() {
         Mockito.when(userService.getUserById(NON_EXISTENT_USER_ID)).thenThrow(EntityNotFoundException.class);
 
-        assertThrowsEntityNotFoundException(
+        assertEntityNotFoundExceptionAndNotFoundResponse(
                 () -> mentorshipService.getMentees(NON_EXISTENT_USER_ID)
         );
 
@@ -72,7 +78,7 @@ public class MentorshipServiceTest {
     }
 
     @Test
-    public void testGetMentors_userExistsWithMentors_returnsMentors() {
+    public void testGetMentors_UserExistsWithMentors_ReturnsMentors() {
         User mentor = new User();
         List<User> usersMentors = List.of(mentor);
 
@@ -83,17 +89,17 @@ public class MentorshipServiceTest {
         List<UserDto> resultMentorsDtos = List.of(new UserDto());
 
         Mockito.when(userService.getUserById(EXISTENT_USER_ID)).thenReturn(user);
-        Mockito.when(userMapper.toDtoList(usersMentors)).thenReturn(resultMentorsDtos);
+        Mockito.when(userMapper.listToDto(usersMentors)).thenReturn(resultMentorsDtos);
 
         List<UserDto> result = mentorshipService.getMentors(EXISTENT_USER_ID);
 
         assertEquals(resultMentorsDtos, result);
         Mockito.verify(userService, Mockito.times(1)).getUserById(EXISTENT_USER_ID);
-        Mockito.verify(userMapper, Mockito.times(1)).toDtoList(usersMentors);
+        Mockito.verify(userMapper, Mockito.times(1)).listToDto(usersMentors);
     }
 
     @Test
-    public void testGetMentees_userExistsWithMentees_returnsMentees() {
+    public void testGetMentees_UserExistsWithMentees_ReturnsMentees() {
         List<User> userMentees = List.of(new User());
 
         User user = new User();
@@ -103,17 +109,17 @@ public class MentorshipServiceTest {
         List<UserDto> resultMenteeDtos = List.of(new UserDto());
 
         Mockito.when(userService.getUserById(EXISTENT_USER_ID)).thenReturn(user);
-        Mockito.when(userMapper.toDtoList(userMentees)).thenReturn(resultMenteeDtos);
+        Mockito.when(userMapper.listToDto(userMentees)).thenReturn(resultMenteeDtos);
 
         List<UserDto> result = mentorshipService.getMentees(EXISTENT_USER_ID);
 
         assertEquals(resultMenteeDtos, result);
         Mockito.verify(userService, Mockito.times(1)).getUserById(EXISTENT_USER_ID);
-        Mockito.verify(userMapper, Mockito.times(1)).toDtoList(userMentees);
+        Mockito.verify(userMapper, Mockito.times(1)).listToDto(userMentees);
     }
 
     @Test
-    public void testGetMentors_userExistsWithNoMentors_returnsEmptyList() {
+    public void testGetMentors_UserExistsWithNoMentors_ReturnsEmptyList() {
         User user = new User();
         user.setId(EXISTENT_USER_ID);
         user.setMentors(new ArrayList<>());//no mentors
@@ -123,11 +129,11 @@ public class MentorshipServiceTest {
 
         assertEquals(0, result.size());
         Mockito.verify(userService, Mockito.times(1)).getUserById(EXISTENT_USER_ID);
-        Mockito.verify(userMapper, Mockito.times(1)).toDtoList(user.getMentors());
+        Mockito.verify(userMapper, Mockito.times(1)).listToDto(user.getMentors());
     }
 
     @Test
-    public void testGetMentees_userExistsWithNoMentees_returnsEmptyList() {
+    public void testGetMentees_UserExistsWithNoMentees_ReturnsEmptyList() {
         User user = new User();
         user.setId(EXISTENT_USER_ID);
         user.setMentees(new ArrayList<>());//no mentees
@@ -137,21 +143,21 @@ public class MentorshipServiceTest {
 
         assertEquals(0, result.size());
         Mockito.verify(userService, Mockito.times(1)).getUserById(EXISTENT_USER_ID);
-        Mockito.verify(userMapper, Mockito.times(1)).toDtoList(user.getMentees());
+        Mockito.verify(userMapper, Mockito.times(1)).listToDto(user.getMentees());
     }
 
     @Test
-    public void testDeleteMentor_anyUserNotExist_throwsEntityNotFoundException() {
+    public void testDeleteMentor_AnyUserNotExist_EntityNotFoundException() {
         Mockito.when(userService.getUserById(NON_EXISTENT_USER_ID)).thenThrow(EntityNotFoundException.class);
         Mockito.when(userService.getUserById(EXISTENT_USER_ID)).thenReturn(new User());
 
-        assertThrowsEntityNotFoundException(
+        assertEntityNotFoundExceptionAndNotFoundResponse(
                 () -> mentorshipService.deleteMentee(NON_EXISTENT_USER_ID, NON_EXISTENT_USER_ID)
         );
-        assertThrowsEntityNotFoundException(
+        assertEntityNotFoundExceptionAndNotFoundResponse(
                 () -> mentorshipService.deleteMentee(EXISTENT_USER_ID, NON_EXISTENT_USER_ID)
         );
-        assertThrowsEntityNotFoundException(
+        assertEntityNotFoundExceptionAndNotFoundResponse(
                 () -> mentorshipService.deleteMentee(NON_EXISTENT_USER_ID, EXISTENT_USER_ID)
         );
 
@@ -163,13 +169,13 @@ public class MentorshipServiceTest {
         Mockito.when(userService.getUserById(NON_EXISTENT_USER_ID)).thenThrow(EntityNotFoundException.class);
         Mockito.when(userService.getUserById(EXISTENT_USER_ID)).thenReturn(new User());
 
-        assertThrowsEntityNotFoundException(
+        assertEntityNotFoundExceptionAndNotFoundResponse(
                 () -> mentorshipService.deleteMentee(NON_EXISTENT_USER_ID, NON_EXISTENT_USER_ID)
         );
-        assertThrowsEntityNotFoundException(
+        assertEntityNotFoundExceptionAndNotFoundResponse(
                 () -> mentorshipService.deleteMentee(EXISTENT_USER_ID, NON_EXISTENT_USER_ID)
         );
-        assertThrowsEntityNotFoundException(
+        assertEntityNotFoundExceptionAndNotFoundResponse(
                 () -> mentorshipService.deleteMentee(NON_EXISTENT_USER_ID, EXISTENT_USER_ID)
         );
 
@@ -267,10 +273,13 @@ public class MentorshipServiceTest {
         Mockito.verify(mentorshipRepository, Mockito.never()).save(mentor);
     }
 
-    private void assertThrowsEntityNotFoundException (Executable method) {
-        assertThrows(
+    private void assertEntityNotFoundExceptionAndNotFoundResponse(Executable method) {
+        GlobalExceptionHandler exceptionHandler = new GlobalExceptionHandler();
+        EntityNotFoundException ex = assertThrows(
                 EntityNotFoundException.class,
                 method
         );
+        ErrorResponse responseEntity = exceptionHandler.handleEntityNotFoundException(ex);
+        assertEquals(HttpStatus.NOT_FOUND.value(), responseEntity.getStatus());
     }
 }

@@ -19,9 +19,9 @@ import school.faang.user_service.entity.premium.PaymentStatus;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.premium.PremiumPeriod;
 import school.faang.user_service.mapper.PremiumMapper;
+import school.faang.user_service.publisher.PremiumBoughtEventPublisher;
 import school.faang.user_service.repository.premium.PremiumRepository;
-import school.faang.user_service.service.PremiumService;
-import school.faang.user_service.service.UserService;
+import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.PremiumValidator;
 
 import java.math.BigDecimal;
@@ -46,7 +46,8 @@ public class PremiumServiceTest {
 
     @Mock
     private PremiumValidator premiumValidator;
-
+    @Mock
+    private PremiumBoughtEventPublisher premiumBoughtEventPublisher;
     @Spy
     private PremiumMapper mapper;
 
@@ -64,8 +65,9 @@ public class PremiumServiceTest {
         PremiumValidator premiumValidator = Mockito.mock(PremiumValidator.class);
         PremiumMapper mapper = Mockito.mock(PremiumMapper.class);
         PremiumRepository premiumRepo = Mockito.mock(PremiumRepository.class);
+        PremiumBoughtEventPublisher premiumBoughtEventPublisher = Mockito.mock(PremiumBoughtEventPublisher.class);
         PremiumService premiumService = new PremiumService(premiumRepo, paymentServiceClient,
-                premiumValidator, mapper, userService);
+                premiumValidator, mapper, userService, premiumBoughtEventPublisher);
 
         Clock clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
         user.setId(1L);

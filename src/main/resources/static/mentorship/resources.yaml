@@ -1,0 +1,30 @@
+components:
+  schemas:
+    UserDto:
+      type: object
+      required:
+        - id
+        - username
+        - email
+        - phone
+      properties:
+        id:
+          $ref: '#/components/parameters/id'
+        username:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        createdAt:
+          $ref: '#/components/parameters/date'
+        updatedAt:
+          $ref: '#/components/parameters/date'
+  parameters:
+    id:
+      minimum: 1
+      type: integer
+      format: int64
+    date:
+      type: string
+      format: date-time

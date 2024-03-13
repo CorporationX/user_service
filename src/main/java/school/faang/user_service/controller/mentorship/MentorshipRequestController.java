@@ -1,8 +1,12 @@
 package school.faang.user_service.controller.mentorship;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.dto.mentorship.filter.RequestFilterDto;
@@ -11,14 +15,12 @@ import school.faang.user_service.service.mentorship.MentorshipRequestService;
 
 import java.util.List;
 
-import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
-
-@Component
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("/mentorship/request")
 public class MentorshipRequestController {
 
     private final MentorshipRequestService mentorshipRequestService;
-    private final MentorshipRequestValidator mentorshipRequestValidator;
 
     private List<MentorshipRequestDto> getRequests(RequestFilterDto filter) {
         return mentorshipRequestService.getRequests(filter);
@@ -35,8 +37,8 @@ public class MentorshipRequestController {
         return mentorshipRequestService.rejectRequest(id, rejection);
     }
 
-    private MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
-        mentorshipRequestValidator.commonCheck(mentorshipRequestDto);
+    @PostMapping()
+    private MentorshipRequestDto requestMentorship(@RequestBody @Valid MentorshipRequestDto mentorshipRequestDto) {
         return mentorshipRequestService.requestMentorship(mentorshipRequestDto);
     }
 }

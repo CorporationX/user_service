@@ -17,8 +17,7 @@ import school.faang.user_service.filter.impl.goal.GoalTitleFilter;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.SkillService;
-import school.faang.user_service.service.UserService;
+import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.validator.goal.GoalValidator;
 
@@ -73,8 +72,8 @@ public class GoalServiceTest {
 
         when(goalMapper.toEntity(goalDto)).thenReturn(goal);
         when(userService.getUserById(userId)).thenReturn(user);
-        when(skillService.findById(1L)).thenReturn(skill_1);
-        when(skillService.findById(2L)).thenReturn(skill_2);
+        when(skillService.getSkillIfExists(1L)).thenReturn(skill_1);
+        when(skillService.getSkillIfExists(2L)).thenReturn(skill_2);
 
         goalService.createGoal(userId, goalDto);
 
@@ -104,8 +103,8 @@ public class GoalServiceTest {
         when(goalRepository.findById(goalOldId)).thenReturn(Optional.of(goalOld));
         when(goalRepository.findUsersByGoalId(goal.getId())).thenReturn(List.of(user1, user2));
 
-        when(skillService.findById(1L)).thenReturn(skill_1);
-        when(skillService.findById(2L)).thenReturn(skill_2);
+        when(skillService.getSkillIfExists(1L)).thenReturn(skill_1);
+        when(skillService.getSkillIfExists(2L)).thenReturn(skill_2);
 
         goalService.updateGoal(goalOldId, goalDto);
 
@@ -297,8 +296,8 @@ public class GoalServiceTest {
         goal.setStatus(GoalStatus.ACTIVE);
 
         when(goalMapper.toEntity(goalDto)).thenReturn(goal);
-        when(skillService.findById(1L)).thenReturn(skill_1);
-        when(skillService.findById(2L)).thenReturn(skill_2);
+        when(skillService.getSkillIfExists(1L)).thenReturn(skill_1);
+        when(skillService.getSkillIfExists(2L)).thenReturn(skill_2);
         when(goalRepository.findById(goalOldId)).thenReturn(Optional.of(goalOld));
 
         goalService.updateGoal(goalOldId, goalDto);

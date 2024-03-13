@@ -12,15 +12,15 @@ import java.time.LocalDateTime;
 @Component
 public class FollowerEventPublisher extends AbstractEventPublisher<FollowerEventDto> {
 
-    @Value("${spring.data.redis.channel.follower_channel}")
+    @Value("${spring.data.redis.channels.follower_channel.name}")
     private String channelTopicName;
 
     public FollowerEventPublisher(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper) {
-        super(objectMapper, redisTemplate);
+        super(redisTemplate, objectMapper);
     }
 
     public void publish(FollowerEventDto followerEventDto) {
         followerEventDto.setReceivedAt(LocalDateTime.now());
-        publishInTopic(followerEventDto, channelTopicName);
+        convertAndSend(followerEventDto, channelTopicName);
     }
 }

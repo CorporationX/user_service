@@ -6,11 +6,3 @@ public class DataValidationException extends RuntimeException {
         super(message);
     }
 }
-=======
-public class DataValidationException extends RuntimeException {
-
-    public DataValidationException(String message) {
-        super(message);
-    }
-}
->>>>>>> unicorn-master-bc3

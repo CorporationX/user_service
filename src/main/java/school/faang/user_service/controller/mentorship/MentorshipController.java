@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.service.mentorship.MentorshipService;
+import school.faang.user_service.userDto.UserDto;
+import school.faang.user_service.userMapper.UserMapper;
 import school.faang.user_service.userService.UserService;
 
 import java.util.List;
@@ -14,20 +16,21 @@ import java.util.List;
 public class MentorshipController {
     private final MentorshipService mentorshipService;
     private final UserService userService;
+    private final UserMapper userMapper;
 
-    public List<User> getMentees(long userId) {
+    public List<UserDto> getMentees(long userId) {
         return mentorshipService.getMentees(userId);
     }
 
-    public List<User> getMentors(long userId) {
+    public List<UserDto> getMentors(long userId) {
         return mentorshipService.getMentors(userId);
     }
 
     public void deleteMentee(long menteeId, long mentorId) {
-        userService.deleteMentee(menteeId, mentorId);
+        mentorshipService.deleteMentee(menteeId, mentorId);
     }
 
     public void deleteMentor(long menteeId, long mentorId) {
-        userService.deleteMentor(menteeId, mentorId);
+        mentorshipService.deleteMentor(menteeId, mentorId);
     }
 }

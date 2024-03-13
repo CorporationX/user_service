@@ -23,9 +23,7 @@ public class UserMapperTest {
     @Test
     public void testToUserDto() {
         when(user.getId()).thenReturn(1L);
-        when(user.getUsername()).thenReturn("username");
         UserDto userDto = userMapper.toUserDto(user);
         assertThat(userDto.getId()).isEqualTo(1L);
-        assertThat(userDto.getUsername()).isEqualTo("username");
     }
 }

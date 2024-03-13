@@ -25,25 +25,40 @@ public class UserServiceTest {
     @Mock
     private UserRepository userRepository;
     @InjectMocks
+    private MentorshipService mentorshipService;
     private UserService userService;
 
     @Test
-    public void testDeleteMentee() {
-        User mentor = User.builder()
+    public void findUserByIdTest() {
+        User testUser = User.builder()
                 .id(1L)
-                .mentees(Collections.singletonList(new User()))
                 .build();
-        Mockito.when(userRepository.findById(anyLong())).thenReturn(Optional.of(mentor));
-        userService.deleteMentee(2L, 1L);
+        userRepository.save(testUser);
+        User foundUser = userService.findUserById(testUser.getId());
+        assertEquals(testUser, foundUser);
+        assertThrows(IllegalArgumentException.class, () -> userService.findUserById(0L));
+    }
+    @Test
+    public void testFindMenteeById_Found() {
+        User testMentee = User.builder()
+                .id(2L)
+                .build();
+        when(userRepository.findById(testMentee.getId())).thenReturn(Optional.of(testMentee));
+        User foundMentee = userService.findMenteeById(testMentee.getId());
+        assertEquals(testMentee, foundMentee);
     }
 
     @Test
-    public void testDeleteMentor() {
-        User mentee = User.builder()
-                .id(1L)
-                .mentors(Collections.singletonList(new User()))
-                .build();
-        Mockito.when(userRepository.findById(anyLong())).thenReturn(Optional.of(mentee));
-        userService.deleteMentor(3L, 1L);
+    public void testFindMenteeById_InvalidId() {
+        assertThrows(IllegalArgumentException.class, () -> userService.findMenteeById(0L));
     }
+
+    @Test
+    public void testFindMenteeById_NotFound() {
+        Long menteeId = 123L;
+        when(userRepository.findById(menteeId)).thenReturn(Optional.empty());
+        User foundMentee = userService.findMenteeById(menteeId);
+        assertNull(foundMentee);
+    }
+
 }

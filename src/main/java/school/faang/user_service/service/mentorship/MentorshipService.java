@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.userDto.UserDto;
+import school.faang.user_service.userMapper.UserMapper;
+import school.faang.user_service.userService.UserService;
 
 import java.util.Collections;
 import java.util.List;
@@ -12,23 +15,35 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MentorshipService {
     private final UserRepository userRepository;
+    private final UserService userService;
+    private final UserMapper userMapper;
 
-    public List<User> getMentees(long userId) {
-        User user = userRepository.findById(userId).orElse(null);
-        if (user == null) {
+    public List<UserDto> getMentees(long userId) {
+        User user = userService.findUserById(userId);
+        if (user.getMentees().isEmpty()) {
             return Collections.emptyList();
         }
-        return user.getMentees();
+        return user.getMentees().stream().map(userMapper::toUserDto).toList();
     }
 
-    public List<User> getMentors(long userId) {
-        User user = userRepository.findById(userId).orElse(null);
-        if (user == null) {
+    public List<UserDto> getMentors(long userId) {
+        User user = userService.findUserById(userId);
+        if (user.getMentors().isEmpty()) {
             return Collections.emptyList();
         }
-        return user.getMentors();
-
+        return user.getMentees().stream().map(userMapper::toUserDto).toList();
     }
 
+    public void deleteMentee(long menteeId, long mentorId) {
+        User mentor = userService.findMentorById(mentorId);
+        mentor.getMentees().remove(menteeId);
+        userRepository.save(mentor);
+    }
+
+    public void deleteMentor(long menteeId, long mentorId) {
+        User mentee = userService.findMenteeById(menteeId);
+        mentee.getMentors().remove(mentorId);
+        userRepository.save(mentee);
+    }
 }
 

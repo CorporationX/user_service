@@ -15,15 +15,12 @@ import school.faang.user_service.service.mentorship.MentorshipRequestService;
 
 import java.util.List;
 
-import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/mentorship/request")
 public class MentorshipRequestController {
 
     private final MentorshipRequestService mentorshipRequestService;
-    private final MentorshipRequestValidator mentorshipRequestValidator;
 
     private List<MentorshipRequestDto> getRequests(RequestFilterDto filter) {
         return mentorshipRequestService.getRequests(filter);

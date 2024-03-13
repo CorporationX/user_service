@@ -23,6 +23,8 @@ public class RedisConfig {
     private String mentorshipRequestedChannelName;
     @Value("${spring.data.redis.channels.recommendation_channel.name}")
     private String recommendationChannelName;
+    @Value("${spring.data.redis.channels.premium_bought_channel.name}")
+    private String premiumChannel;
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
@@ -53,5 +55,10 @@ public class RedisConfig {
     @Bean
     public ChannelTopic recommendationTopic() {
         return new ChannelTopic(recommendationChannelName);
+    }
+
+    @Bean
+    public ChannelTopic premiumBounceTopic() {
+        return new ChannelTopic(premiumChannel);
     }
 }

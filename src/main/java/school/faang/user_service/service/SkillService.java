@@ -8,7 +8,7 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.SkillOffer;
-import school.faang.user_service.mapper.SkillMapper;
+import school.faang.user_service.mapper.skill.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
@@ -62,7 +62,7 @@ public class SkillService {
         if (skillOffers.size() >= MIN_SKILL_OFFERS) {
             skillRepository.assignSkillToUser(skillId,userId);
             addUserSkillGuarantee(skillUser, skillOffers);
-            return skillMapper.ToDtoSkillUser(skillUser);
+            return skillMapper.toDto(skillUser);
         } else {
             throw new ValidationException("you need at least 3 recommendations, at the moment you have:" + skillOffers.size());
         }

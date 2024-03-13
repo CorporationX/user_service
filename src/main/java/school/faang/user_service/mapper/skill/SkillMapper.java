@@ -2,6 +2,7 @@ package school.faang.user_service.mapper.skill;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
+import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 
@@ -17,4 +18,6 @@ public interface SkillMapper {
     List<SkillDto> toDto(List<Skill> skills);
 
     List<Skill> toEntity(List<SkillDto> skillsDto);
+
+    SkillCandidateDto toSkillCandidateDto(Skill skill, long offersAmount);
 }

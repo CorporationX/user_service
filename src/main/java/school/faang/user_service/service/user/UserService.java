@@ -20,9 +20,11 @@ public class UserService {
 
     public List<UserDto> getPremiumUsers(UserFilterDto filters) {
         List<User> premiumUsers = userRepository.findPremiumUsers().toList();
-        userFilters.stream()
-                .filter(userFilter -> userFilter.isApplicable(filters))
-                .forEach(userFilter -> userFilter.apply(premiumUsers, filters));
+        if (!userFilters.isEmpty()) {
+            userFilters.stream()
+                    .filter(userFilter -> userFilter.isApplicable(filters))
+                    .forEach(userFilter -> userFilter.apply(premiumUsers, filters));
+        }
         return userMapper.toDto(premiumUsers);
     }
 }

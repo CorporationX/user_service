@@ -9,6 +9,7 @@ import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.mapper.event.EventMapperImpl;
 
 import java.time.LocalDateTime;
 import java.util.List;

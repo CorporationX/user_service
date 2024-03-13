@@ -19,6 +19,9 @@ import school.faang.user_service.validation.goal.GoalValidator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static school.faang.user_service.Utils.ValidatorUtil.validateNull;
+import static school.faang.user_service.Utils.ValidatorUtil.validateOptional;
+
 @Service
 @RequiredArgsConstructor
 public class GoalService {
@@ -48,7 +51,7 @@ public class GoalService {
 
     @Transactional
     public void deleteGoal(Long goalId) {
-        goalValidator.validateNull(goalId);
+        validateNull(goalId);
         goalRepository.deleteById(goalId);
     }
 
@@ -78,10 +81,10 @@ public class GoalService {
     }
 
     private void setUpGoalFields(Goal goal, GoalDto goalDto, long userId) {
-        User user = goalValidator.validateOptional(userRepository.findById(userId), String.format("User with ID %d not found", userId));
+        User user = validateOptional(userRepository.findById(userId), String.format("User with ID %d not found", userId));
         Long parentId = goalDto.getParentId();
         if (parentId != null) {
-            Goal parent = goalValidator.validateOptional(goalRepository.findById(parentId), String.format("Parent goal with ID %d not found", parentId));
+            Goal parent = validateOptional(goalRepository.findById(parentId), String.format("Parent goal with ID %d not found", parentId));
             goal.setParent(parent);
         }
         goal.setStatus(GoalStatus.ACTIVE);

@@ -166,29 +166,6 @@ public class GoalValidatorTest {
                 -> goalValidator.validateGoalExists(goalId));
     }
 
-    @Test
-    void validateNull_NullValue_ThrowsException() {
-        assertThrows(DataValidationException.class, ()
-                -> goalValidator.validateNull(null));
-    }
-
-    @Test
-    void validateNull_NotNullValue_DoesNotThrowException() {
-        assertDoesNotThrow(() -> goalValidator.validateNull(getValidGoalDto()));
-    }
-
-    @Test
-    void validateOptional_NullValue_ThrowsException() {
-        assertThrows(EntityNotFoundException.class, ()
-                -> goalValidator.validateOptional(Optional.ofNullable(null), "Entity not found"));
-    }
-
-    @Test
-    void validateOptional_NotNullValue_DoesNotThrowException() {
-        assertDoesNotThrow(()
-                -> goalValidator.validateOptional(Optional.ofNullable(getValidGoalDto()), "Entity not found"));
-    }
-
     private GoalDto getValidGoalDto() {
         return GoalDto.builder()
                 .title("title")

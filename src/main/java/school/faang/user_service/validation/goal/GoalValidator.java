@@ -11,7 +11,8 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.util.List;
-import java.util.Optional;
+
+import static school.faang.user_service.Utils.ValidatorUtil.validateOptional;
 
 @Component
 @RequiredArgsConstructor
@@ -39,16 +40,6 @@ public class GoalValidator {
         if (!goalRepository.existsById(goalId)) {
             throw new EntityNotFoundException("Goal does not exist");
         }
-    }
-
-    public <T> void validateNull(T val) {
-        if (val == null) {
-            throw new DataValidationException("Value can't be null");
-        }
-    }
-
-    public <T> T validateOptional(Optional<T> optional, String exceptionMsg) {
-        return optional.orElseThrow(() -> new EntityNotFoundException(exceptionMsg));
     }
 
     private void validateGoalStatus(Long goalId) {

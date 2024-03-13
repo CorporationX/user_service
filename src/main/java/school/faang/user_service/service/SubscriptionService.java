@@ -3,11 +3,13 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.FollowerEventDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.validator.SubscriptionValidator;
 
@@ -22,6 +24,7 @@ public class SubscriptionService {
     private final SubscriptionValidator subscriptionValidator;
     private final List<UserFilter> filters;
     private final UserMapper userMapper;
+    private final FollowerEventPublisher followerEventPublisher;
 
     @Transactional(readOnly = true)
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filter) {
@@ -57,6 +60,11 @@ public class SubscriptionService {
         subscriptionValidator.validateUser(followerId, followeeId);
         subscriptionValidator.validateExistsSubscription(followerId, followeeId);
         subscriptionRepo.followUser(followerId, followeeId);
+        followerEventPublisher.publish(FollowerEventDto
+                .builder()
+                .followerId(followerId)
+                .followeeId(followeeId)
+                .build());
     }
 
     public int getFollowersCount(long followeeId) {

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.events.MentorshipRequestedEventDto;
 
 @Component
-public class MentorshipRequestedEventPublisher extends EventPublisher<MentorshipRequestedEventDto> {
+public class MentorshipRequestedEventPublisher extends AbstractEventPublisher<MentorshipRequestedEventDto> {
 
     @Value("${spring.data.redis.channels.mentorship_request_channel.name}")
     private String mentorshipRequestChannelName;

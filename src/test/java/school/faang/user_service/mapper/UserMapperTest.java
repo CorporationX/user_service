@@ -5,6 +5,8 @@ import org.mapstruct.factory.Mappers;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.contact.ContactPreference;
+import school.faang.user_service.entity.contact.PreferredContact;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -20,6 +22,9 @@ class UserMapperTest {
         user.setEmail("test@example.com");
         user.setPhone("123456789");
         user.setCountry(Country.builder().id(4L).build());
+        ContactPreference contactPreference = new ContactPreference();
+        contactPreference.setPreference(PreferredContact.EMAIL);
+        user.setContactPreference(contactPreference);
 
         UserDto userDto = userMapper.toDto(user);
 
@@ -28,6 +33,7 @@ class UserMapperTest {
         assertEquals(user.getEmail(), userDto.getEmail());
         assertEquals(user.getPhone(), userDto.getPhone());
         assertEquals(user.getCountry().getId(), userDto.getCountryId());
+        assertEquals(user.getContactPreference().getPreference(), userDto.getPreference());
     }
 
     @Test
@@ -38,6 +44,7 @@ class UserMapperTest {
         userDto.setEmail("test@example.com");
         userDto.setPhone("123456789");
         userDto.setCountryId(4L);
+        userDto.setPreference(PreferredContact.EMAIL);
 
         User user = userMapper.toEntity(userDto);
 
@@ -46,5 +53,6 @@ class UserMapperTest {
         assertEquals(userDto.getEmail(), user.getEmail());
         assertEquals(userDto.getPhone(), user.getPhone());
         assertEquals(userDto.getCountryId(), user.getCountry().getId());
+        assertEquals(userDto.getPreference(), user.getContactPreference().getPreference());
     }
 }

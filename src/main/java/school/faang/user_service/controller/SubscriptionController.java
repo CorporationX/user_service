@@ -66,7 +66,7 @@ public class SubscriptionController {
 
     @Operation(summary = "Получение количества подписок")
     @GetMapping("/user/{id}/followees/count")
-    public long getFollowingCount(@PathVariable("id") long followerId){
+    public long getFollowingCount(@PathVariable("id") long followerId) {
         return subscriptionService.getFollowingCount(followerId);
     }
 

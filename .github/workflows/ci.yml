@@ -20,5 +20,10 @@ jobs:
           java-version: '17'
           distribution: 'zulu'
 
-      - name: Build gradle and run tests
-        run: ./gradlew build
+      - name: Setup gradle
+        run: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: current
+
+      - name: Run tests
+        run: ./gradle test

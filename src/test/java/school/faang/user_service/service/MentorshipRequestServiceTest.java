@@ -23,6 +23,7 @@ import school.faang.user_service.filter.mentorship_request.RequestStatusFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.mapper.MentorshipRequestMapperImpl;
 import school.faang.user_service.publisher.MentorshipRequestedEventPublisher;
+import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -40,23 +41,20 @@ class MentorshipRequestServiceTest {
 
     @Mock
     private MentorshipRequestRepository requestRepository;
-
     @Mock
     private UserRepository userRepository;
-
     @Mock
     private MentorshipRepository mentorshipRepository;
-
     @Mock
     private MentorshipRequestValidator requestValidator;
-
     @Mock
     private MentorshipValidator mentorshipValidator;
-
     @Spy
     private MentorshipRequestMapper mentorshipRequestMapper = new MentorshipRequestMapperImpl();
     @Mock
     private MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
+    @Mock
+    private MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher;
 
     private List<MentorshipRequestFilter> mentorshipRequestFilters = new ArrayList<>(List.of(
             new RequestReceiverFilter(),
@@ -67,7 +65,8 @@ class MentorshipRequestServiceTest {
     @BeforeEach
     void setUp() {
         service = new MentorshipRequestService(requestRepository, userRepository, mentorshipRepository, requestValidator,
-                mentorshipValidator, mentorshipRequestFilters, mentorshipRequestMapper, mentorshipRequestedEventPublisher);
+                mentorshipValidator, mentorshipRequestFilters, mentorshipRequestMapper, mentorshipRequestedEventPublisher,
+                mentorshipAcceptedEventPublisher);
     }
 
 
@@ -158,6 +157,7 @@ class MentorshipRequestServiceTest {
         verify(requestRepository).save(foundRequest);
         assertEquals(RequestStatus.ACCEPTED, foundRequest.getStatus());
         verify(mentorshipRepository).save(any(Mentorship.class));
+        verify(mentorshipAcceptedEventPublisher, times(1)).publish(any());
     }
 
     @Test

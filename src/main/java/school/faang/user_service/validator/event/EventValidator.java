@@ -1,6 +1,6 @@
 package school.faang.user_service.validator.event;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.User;
@@ -11,15 +11,10 @@ import school.faang.user_service.repository.event.EventRepository;
 import java.util.Optional;
 
 @Component
+@RequiredArgsConstructor
 public class EventValidator {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
-
-    @Autowired
-    public EventValidator(EventRepository eventRepository, UserRepository userRepository) {
-        this.eventRepository = eventRepository;
-        this.userRepository = userRepository;
-    }
 
     public void validateEventInController(EventDto eventDto) {
         validateTitle(eventDto);
@@ -29,7 +24,7 @@ public class EventValidator {
 
     public void validateEventInService(EventDto eventDto) {
         Optional<User> optionalOwner = userRepository.findById(eventDto.getOwnerId());
-        if (optionalOwner.isEmpty()){
+        if (optionalOwner.isEmpty()) {
             throw new DataValidationException("Invalid ownerId");
         }
     }

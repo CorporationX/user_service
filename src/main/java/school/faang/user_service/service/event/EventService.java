@@ -35,13 +35,12 @@ public class EventService {
 
     public List<EventDto> getEventsByFilter(EventFilterDto eventFilterDto) {
         Stream<Event> eventStream = eventRepository.findAll().stream();
-//        eventFilters.stream().filter(filter -> filter.isApplicable(eventFilterDto)).forEach(eventFilter -> eventFilter.apply(eventStream, eventFilterDto));
         for (EventFilter eventFilter : eventFilters) {
             if (eventFilter.isApplicable(eventFilterDto)) {
                 eventStream = eventFilter.apply(eventStream, eventFilterDto);
             }
         }
-        return eventStream.map(eventMapper::toDto).toList();
+        return eventMapper.toDto(eventStream.toList());
     }
 
     public void deleteEvent(Long eventId) {

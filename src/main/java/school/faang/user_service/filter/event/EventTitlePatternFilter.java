@@ -8,7 +8,6 @@ import java.util.stream.Stream;
 
 @Component
 public class EventTitlePatternFilter implements EventFilter {
-
     @Override
     public boolean isApplicable(EventFilterDto eventFilterDto) {
         return eventFilterDto.getTitlePattern() != null && !eventFilterDto.getTitlePattern().isBlank();

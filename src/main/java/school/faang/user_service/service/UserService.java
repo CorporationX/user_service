@@ -9,12 +9,10 @@ import org.springframework.web.client.RestTemplate;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
-import school.faang.user_service.entity.contact.ContactPreference;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.contact.ContactPreferenceRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.s3.S3Service;
 
@@ -29,7 +27,6 @@ public class UserService {
     private final PremiumRepository premiumRepository;
     private final S3Service s3Service;
     private final RestTemplate restTemplate;
-    private final ContactPreferenceRepository contactPreferenceRepository;
 
     @Value("${services.random_avatar.url}")
     private String url;

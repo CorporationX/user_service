@@ -26,4 +26,4 @@ jobs:
           gradle-version: current
 
       - name: Run tests
-        run: ./gradle test
+        run: /gradle test

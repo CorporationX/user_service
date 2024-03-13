@@ -1,6 +1,9 @@
 name: CI
 
 on:
+  push:
+    branches:
+      - unicorn-master-bc3
   pull_request:
     branches:
       - unicorn-master-bc3
@@ -9,6 +12,21 @@ jobs:
   run_tests:
 
     runs-on: ubuntu-latest
+    services:
+      database:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: postgres_database
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 8s
+          --health-timeout 3s
+          --health-retries 3
+
 
     steps:
       - name: Checkout sources
@@ -20,10 +38,8 @@ jobs:
           java-version: '17'
           distribution: 'zulu'
 
-      - name: Setup gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-version: current
+      - name: Build Gradle
+        run: ./gradlew build
 
-      - name: Run tests
+      - name: Run Gradle tests
         run: ./gradlew test

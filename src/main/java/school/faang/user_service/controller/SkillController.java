@@ -5,7 +5,7 @@ import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.service.SkillService;
-import school.faang.user_service.validate.skill.SkillValidation;
+import school.faang.user_service.validator.SkillValidation;
 
 import java.util.List;
 

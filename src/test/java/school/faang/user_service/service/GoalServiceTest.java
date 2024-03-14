@@ -1,4 +1,4 @@
-package school.faang.user_service.service.goal;
+package school.faang.user_service.service;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,6 +8,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.dto.GoalCompletedEvent;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.dto.goal.GoalSetEvent;
@@ -19,13 +21,15 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.filter.goal.GoalStatusFilter;
 import school.faang.user_service.filter.goal.GoalTitleFilter;
+import school.faang.user_service.mapper.GoalMapper;
+import school.faang.user_service.mapper.GoalMapperImpl;
+import school.faang.user_service.publisher.GoalCompletedEventPublisher;
+import school.faang.user_service.mapper.GoalMapper;
+import school.faang.user_service.mapper.GoalMapperImpl;
 import school.faang.user_service.mapper.goal.GoalMapper;
 import school.faang.user_service.mapper.goal.GoalMapperImpl;
 import school.faang.user_service.publisher.GoalEventPublisher;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.GoalService;
-import school.faang.user_service.service.SkillService;
-import school.faang.user_service.service.UserService;
 import school.faang.user_service.validator.GoalValidator;
 
 import java.time.LocalDateTime;
@@ -36,6 +40,12 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.*;
 import static org.springframework.boot.availability.AvailabilityChangeEvent.publish;
 
@@ -57,6 +67,10 @@ class GoalServiceTest {
 
     @Mock
     private UserService userService;
+    @Mock
+    private GoalCompletedEventPublisher goalCompletedEventPublisher;
+    @Mock
+    private UserContext userContext;
 
     @Mock
     private GoalEventPublisher goalEventPublisher;
@@ -79,7 +93,8 @@ class GoalServiceTest {
 
     @BeforeEach
     void setUp() {
-        goalService = new GoalService(goalRepository, goalMapper, goalFilters, skillService, goalValidator, userService, goalEventPublisher);
+        goalService = new GoalService(goalRepository, goalMapper, goalFilters, skillService, goalValidator, userService,
+                goalCompletedEventPublisher, userContext, goalEventPublisher);
 
         correctGoal.setTitle("Correct");
         correctGoal.setStatus(GoalStatus.ACTIVE);
@@ -131,7 +146,6 @@ class GoalServiceTest {
         goal.setStatus(GoalStatus.COMPLETED);
 
         Mockito.when(goalRepository.findById(Mockito.any())).thenReturn(Optional.of(goal));
-        Mockito.when(goalMapper.toEntity(goalDto)).thenReturn(goal);
         DataValidationException dataValidationException = assertThrows(DataValidationException.class,
                 () -> goalService.updateGoal(goalId, goalDto));
         assertEquals("Цель уже завершена", dataValidationException.getMessage());
@@ -149,18 +163,23 @@ class GoalServiceTest {
         goal.setStatus(GoalStatus.COMPLETED);
         goal.setUsers(Collections.singletonList(user));
         goal.setSkillsToAchieve(Collections.singletonList(skill));
+        GoalCompletedEvent goalCompletedEvent = GoalCompletedEvent.builder().goalId(1L).build();
 
         Goal oldGoal = new Goal();
         oldGoal.setSkillsToAchieve(Collections.singletonList(skill));
+        oldGoal.setStatus(GoalStatus.ACTIVE);
+        oldGoal.setUsers(Collections.singletonList(user));
 
+        Mockito.when(skillService.getSkillById(anyLong())).thenReturn(skill);
+        Mockito.when(goalRepository.save(goal)).thenReturn(goal);
         Mockito.when(goalRepository.findById(Mockito.any())).thenReturn(Optional.of(oldGoal));
-        Mockito.when(goalMapper.toEntity(goalDto)).thenReturn(goal);
-        Mockito.when(skillService.getSkillById(Mockito.anyLong())).thenReturn(skill);
+        Mockito.when(goalMapper.updateGoal(oldGoal, goalDto)).thenReturn(goal);
 
         goalService.updateGoal(goalId, goalDto);
 
         Mockito.verify(skillService).assignSkillToUser(Mockito.anyLong(), Mockito.anyLong());
         Mockito.verify(goalRepository).save(goal);
+        verify(goalCompletedEventPublisher).publish(goalCompletedEvent);
     }
 
 

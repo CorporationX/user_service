@@ -46,35 +46,33 @@ public class SubscriptionController {
         subscriptionService.unfollowUser(followerId, followeeId);
     }
 
-    @Operation(
-            summary = "Получение подписчиков"
-    )
+    @Operation(summary = "Получение подписчиков")
     @PostMapping("/user/{id}/followers")
     public List<UserDto> getFollowers(@PathVariable("id") long followeeId, @RequestBody @Valid UserFilterDto filters) {
         return subscriptionService.getFollowers(followeeId, filters);
     }
 
-    @Operation(
-            summary = "Получение подписок"
-    )
+    @Operation(summary = "Получение подписок")
     @PostMapping("/user/{id}/followees")
     public List<UserDto> getFollowing(@PathVariable("id") long followerId, @RequestBody @Valid UserFilterDto filter) {
         return subscriptionService.getFollowing(followerId, filter);
     }
 
-    @Operation(
-            summary = "Получение количества подписчиков"
-    )
+    @Operation(summary = "Получение количества подписчиков")
     @GetMapping("/user/{id}/followers/count")
     public long getFollowersCount(@PathVariable("id") long followeeId) {
         return subscriptionService.getFollowersCount(followeeId);
     }
 
-    @Operation(
-            summary = "Получение количества подписок"
-    )
+    @Operation(summary = "Получение количества подписок")
     @GetMapping("/user/{id}/followees/count")
-    public long getFollowingCount(@PathVariable("id") long followerId){
+    public long getFollowingCount(@PathVariable("id") long followerId) {
         return subscriptionService.getFollowingCount(followerId);
+    }
+
+    @Operation(summary = "Получение ID подписчиков")
+    @PostMapping("/user/{id}/followersIds")
+    public List<Long> getFollowers(@PathVariable("id") long followeeId) {
+        return subscriptionService.getFollowerIds(followeeId);
     }
 }

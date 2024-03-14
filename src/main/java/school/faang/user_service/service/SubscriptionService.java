@@ -32,7 +32,7 @@ public class SubscriptionService {
     public void followUser(long followerId, long followeeId) {
         validateExistsUsers(followerId, followeeId);
 
-        if (subscriptionValidator.validateSubscription(followerId, followeeId)){
+        if (subscriptionValidator.validateSubscription(followerId, followeeId)) {
             throw new DataValidationException("Такая подписка уже есть");
         }
 
@@ -44,7 +44,7 @@ public class SubscriptionService {
     public void unfollowUser(long followerId, long followeeId) {
         validateExistsUsers(followerId, followeeId);
 
-        if (!subscriptionValidator.validateSubscription(followerId, followeeId)){
+        if (!subscriptionValidator.validateSubscription(followerId, followeeId)) {
             throw new DataValidationException("Такой подписки нет");
         }
 
@@ -83,8 +83,13 @@ public class SubscriptionService {
     }
 
     @Transactional(readOnly = true)
-    public long getFollowingCount(long followerId){
+    public long getFollowingCount(long followerId) {
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
+    }
+
+    @Transactional
+    public List<Long> getFollowerIds(long followeeId) {
+        return subscriptionRepository.findFollowerIdsByFolloweeId(followeeId);
     }
 
     public void validateExistsUsers(long followerId, long followeeId) {

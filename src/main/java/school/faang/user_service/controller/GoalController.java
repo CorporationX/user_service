@@ -1,9 +1,10 @@
 package school.faang.user_service.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.service.GoalService;
@@ -19,13 +20,14 @@ public class GoalController {
     private final GoalValidator goalValidator;
     private final UserContext userContext;
 
-
-    public GoalDto updateGoal(Long goalId, GoalDto goal) {
+    @PutMapping("/goals/{goalId}")
+    public GoalDto updateGoal(@PathVariable Long goalId, @RequestBody GoalDto goal) {
         goalValidator.validateUserId(goalId);
         goalValidator.validateGoalTitle(goal);
         return goalService.updateGoal(goalId, goal);
     }
 
+    @Operation(summary = "Создание цели", parameters = {@Parameter(in = ParameterIn.HEADER, name = "x-user-id", description = "id пользователя", required = true)})
     @PostMapping("/goals")
     public GoalDto createGoal(@RequestBody GoalDto goal) {
         long userId = userContext.getUserId();
@@ -33,6 +35,11 @@ public class GoalController {
         goalValidator.validateGoalTitle(goal);
         goalValidator.validateDescription(goal);
         return goalService.createGoal(userId, goal);
+    }
+
+    @GetMapping("/goals/{goalId}")
+    public GoalDto getGoalById(@PathVariable Long goalId) {
+        return goalService.findDtoById(goalId);
     }
 
     public void deleteGoal(long goalId) {

@@ -9,6 +9,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.MentorshipOfferedEvent;
 import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.MentorshipRequestedEvent;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDro;
 import school.faang.user_service.entity.Mentorship;
@@ -22,6 +23,8 @@ import school.faang.user_service.filter.mentorship_request.RequestReceiverFilter
 import school.faang.user_service.filter.mentorship_request.RequestStatusFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.mapper.MentorshipRequestMapperImpl;
+import school.faang.user_service.publisher.MentorshipRequestedEventPublisher;
+import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.publisher.MentorshipOfferedEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
@@ -29,6 +32,7 @@ import school.faang.user_service.repository.mentorship.MentorshipRequestReposito
 import school.faang.user_service.validator.MentorshipRequestValidator;
 import school.faang.user_service.validator.MentorshipValidator;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -58,6 +62,10 @@ class MentorshipRequestServiceTest {
 
     @Spy
     private MentorshipRequestMapper mentorshipRequestMapper = new MentorshipRequestMapperImpl();
+    @Mock
+    private MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
+    @Mock
+    private MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher;
 
     private List<MentorshipRequestFilter> mentorshipRequestFilters = new ArrayList<>(List.of(
             new RequestReceiverFilter(),
@@ -67,12 +75,11 @@ class MentorshipRequestServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new MentorshipRequestService(requestRepository, userRepository, mentorshipRepository, requestValidator, mentorshipValidator, mentorshipRequestFilters, mentorshipRequestMapper,
-                mentorshipOfferedEventPublisher);
+        service = new MentorshipRequestService(requestRepository, userRepository, mentorshipRepository, requestValidator,
+                mentorshipValidator, mentorshipRequestFilters, mentorshipRequestMapper, mentorshipRequestedEventPublisher,
+                mentorshipAcceptedEventPublisher, mentorshipOfferedEventPublisher);
     }
 
-
-    // Тесты для requestMentorship
     @Test
     void requestMentorship_Successful() {
         long requesterId = 1L;
@@ -87,6 +94,7 @@ class MentorshipRequestServiceTest {
         verify(requestValidator).validateUserIds(requesterId, receiverId);
         verify(requestValidator).validateRequestTime(requesterId, receiverId);
         verify(requestRepository).create(1L, 2L, requestDto.getDescription());
+        verify(mentorshipRequestedEventPublisher).publish(Mockito.any(MentorshipRequestedEvent.class));
         verify(mentorshipOfferedEventPublisher).publish(any(MentorshipOfferedEvent.class));
     }
 
@@ -139,7 +147,6 @@ class MentorshipRequestServiceTest {
         assertTrue(result.isEmpty());
     }
 
-    // Тесты для acceptRequest
     @Test
     void acceptRequest_Successful() {
         long requestId = 1L;
@@ -151,14 +158,16 @@ class MentorshipRequestServiceTest {
         MentorshipRequest foundRequest = new MentorshipRequest();
         foundRequest.setRequester(requester);
         foundRequest.setReceiver(receiver);
+        foundRequest.setUpdatedAt(LocalDateTime.now());
 
         when(requestRepository.findById(requestId)).thenReturn(Optional.of(foundRequest));
+        when(requestRepository.save(any(MentorshipRequest.class))).thenReturn(foundRequest);
 
         service.acceptRequest(requestId);
 
         verify(requestRepository).save(foundRequest);
         assertEquals(RequestStatus.ACCEPTED, foundRequest.getStatus());
-        verify(mentorshipRepository).save(any(Mentorship.class));
+        verify(mentorshipAcceptedEventPublisher, times(1)).publish(any());
     }
 
     @Test

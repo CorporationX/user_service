@@ -19,6 +19,7 @@ import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.validator.SkillValidation;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -156,5 +157,14 @@ class SkillServiceTest {
                 () -> verify(skillRepository, times(1)).assignSkillToUser(skillId, userId),
                 () -> verify(userSkillGuaranteeRepository, times(skillOffers.size())).save(any())
         );
+    }
+
+    @Test
+    void incorrectIdTest() {
+        long goalId = 1L;
+        when(skillRepository.findSkillsByGoalId(goalId))
+                .thenReturn(new ArrayList<>());
+        skillService.findSkillsByGoalId(goalId);
+        verify(skillRepository, times(1)).findSkillsByGoalId(goalId);
     }
 }

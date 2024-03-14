@@ -6,6 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -26,4 +27,10 @@ public interface RecommendationRequestRepository extends CrudRepository<Recommen
     boolean existsByRequesterIdAndReceiverId(Long requesterId, Long receiverId);
 
     boolean existsSkillByName(String skillName);
+
+    List<RecommendationRequest> findAllByRequesterIdAndReceiverId(Long requesterId, Long receiverId);
+
+    List<RecommendationRequest> findAllByRequesterId(Long requesterId);
+
+    List<RecommendationRequest> findAllByReceiverId(Long receiverId);
 }

@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.GoalCompletedEvent;
-import school.faang.user_service.dto.goal.GoalCompletedEvent;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
@@ -19,9 +18,6 @@ import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.publisher.GoalCompletedEventPublisher;
 import school.faang.user_service.publisher.GoalCreateEventPublisher;
-import school.faang.user_service.mapper.goal.GoalMapper;
-import school.faang.user_service.publisher.GoalCompletedEventPublisher;
-import school.faang.user_service.publisher.GoalEventPublisher;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validator.GoalValidator;
 
@@ -41,8 +37,6 @@ public class GoalService {
     private final GoalCompletedEventPublisher goalCompletedEventPublisher;
     private final UserContext userContext;
     private final GoalCreateEventPublisher goalCreateEventPublisher;
-    private final GoalEventPublisher goalEventPublisher;
-    private final GoalCompletedEventPublisher goalCompletedEventPublisher;
 
     public List<GoalDto> getGoalsByUser(long userId, GoalFilterDto filter) {
         Stream<Goal> foundGoals = goalRepository.findGoalsByUserId(userId);
@@ -106,8 +100,7 @@ public class GoalService {
     }
 
     public GoalDto findDtoById(long id) {
-        findById(id);
-        return goalMapper.toDto(goal);
+        return goalMapper.toDto(findById(id));
     }
 
     @Transactional

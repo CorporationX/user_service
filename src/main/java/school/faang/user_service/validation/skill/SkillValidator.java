@@ -1,4 +1,4 @@
-package school.faang.user_service.validate;
+package school.faang.user_service.validation.skill;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -8,13 +8,11 @@ import school.faang.user_service.repository.SkillRepository;
 
 @Component
 @RequiredArgsConstructor
-public class SkillValidate {
+public class SkillValidator {
+
     private final SkillRepository skillRepository;
 
     public void validatorSkills(SkillDto skillDto) {
-        if (skillDto.getTitle().isBlank()) {
-            throw new DataValidationException("The skill already exists");
-        }
 
         if (skillRepository.existsByTitle(skillDto.getTitle())) {
             throw new DataValidationException("Skill with title" + skillDto.getTitle() + "already exists");

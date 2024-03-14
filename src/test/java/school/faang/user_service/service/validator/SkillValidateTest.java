@@ -8,7 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.validate.SkillValidate;
+import school.faang.user_service.validation.skill.SkillValidator;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -17,17 +17,16 @@ import static org.mockito.Mockito.when;
 public class SkillValidateTest {
 
     @InjectMocks
-    private SkillValidate skillValidate;
+    private SkillValidator skillValidator;
 
     @Mock
     private SkillRepository skillRepository;
-
 
     @Test
     public void testCreateWithBlankTitle() {
         SkillDto skillDto = prepareData(" ");
 
-        assertThrows(DataValidationException.class, () -> skillValidate.validatorSkills(skillDto));
+        assertThrows(DataValidationException.class, () -> skillValidator.validatorSkillsTitle(skillDto));
     }
 
     @Test
@@ -36,8 +35,7 @@ public class SkillValidateTest {
         when(skillRepository.existsByTitle(skillDto.getTitle()))
                 .thenReturn(true);
 
-
-        assertThrows(DataValidationException.class, () -> skillValidate.validatorSkills(skillDto));
+        assertThrows(DataValidationException.class, () -> skillValidator.validatorSkills(skillDto));
     }
 
     private SkillDto prepareData(String title) {

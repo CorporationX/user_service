@@ -8,9 +8,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
-import school.faang.user_service.exceptions.DataValidationException;
+import school.faang.user_service.handler.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.validator.goal.GoalValidation;
 
 import java.util.List;
 import java.util.Optional;

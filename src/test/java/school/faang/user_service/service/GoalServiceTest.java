@@ -10,14 +10,14 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
-import school.faang.user_service.exceptions.EntityNotFoundException;
+import school.faang.user_service.handler.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.goal.filter.GoalFilter;
-import school.faang.user_service.validation.goal.GoalValidation;
+import school.faang.user_service.validator.goal.GoalValidation;
 
 import java.util.ArrayList;
 import java.util.List;

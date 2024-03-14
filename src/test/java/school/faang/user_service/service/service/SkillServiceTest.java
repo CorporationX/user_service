@@ -53,7 +53,7 @@ public class SkillServiceTest {
 
     @Test
     public void testCreateSaveSkill() {
-        SkillDto skillDto = prepareData(false, "test");
+        SkillDto skillDto = prepareData( "test");
 
         skillService.create(skillDto);
 
@@ -80,7 +80,7 @@ public class SkillServiceTest {
 //
 //}
 
-    private SkillDto prepareData(boolean existsByTitle, String title) {
+    private SkillDto prepareData(String title) {
         SkillDto skillDto = new SkillDto();
         skillDto.setTitle(title);
         return skillDto;

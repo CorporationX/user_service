@@ -57,7 +57,7 @@ public class SkillService {
 
         List<SkillOffer> skillOffers = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
 
-        if (skillOffers.size() >= MIN_SKILL_OFFERS) {
+        if (skillOffers.size() < MIN_SKILL_OFFERS) {
             throw new DataValidationException("you need at least 3 recommendations, at the moment you have:"
                     + skillOffers.size());
         }

@@ -12,5 +12,6 @@ public interface PremiumMapper {
     @Mapping(target = "userId", source = "user.id")
     PremiumDto toDto(Premium premium);
 
+    @Mapping(target = "user.id", source = "userId")
     Premium toEntity(PremiumDto premiumDto);
 }

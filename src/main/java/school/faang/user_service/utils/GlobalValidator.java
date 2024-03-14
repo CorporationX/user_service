@@ -1,13 +1,13 @@
-package school.faang.user_service.Utils;
+package school.faang.user_service.utils;
 
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 
 import java.util.Optional;
 
-public class ValidatorUtil {
+public class GlobalValidator {
 
-    private ValidatorUtil() {
+    private GlobalValidator() {
 
     }
 

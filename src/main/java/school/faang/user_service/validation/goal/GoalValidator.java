@@ -12,7 +12,7 @@ import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.util.List;
 
-import static school.faang.user_service.Utils.ValidatorUtil.validateOptional;
+import static school.faang.user_service.utils.GlobalValidator.validateOptional;
 
 @Component
 @RequiredArgsConstructor
@@ -25,7 +25,7 @@ public class GoalValidator {
     public void validateGoalCreation(Long userId, GoalDto goalDto) {
         validateTitle(goalDto.getTitle());
         int countActiveGoals = goalRepository.countActiveGoalsPerUser(userId);
-        validateUserGoalsCount(countActiveGoals, MAX_USER_ACTIVE_GOALS);
+        validateUserGoalsCount(countActiveGoals);
         validateSkills(goalDto.getSkillIds());
     }
 
@@ -49,8 +49,8 @@ public class GoalValidator {
         }
     }
 
-    private void validateUserGoalsCount(int countActiveGoals, int maxUserActiveGoals) {
-        if (countActiveGoals >= maxUserActiveGoals) {
+    private void validateUserGoalsCount(int countActiveGoals) {
+        if (countActiveGoals >= MAX_USER_ACTIVE_GOALS) {
             throw new DataValidationException("User can't have more than 3 active goals");
         }
     }

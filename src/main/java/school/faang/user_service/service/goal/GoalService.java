@@ -19,8 +19,8 @@ import school.faang.user_service.validation.goal.GoalValidator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static school.faang.user_service.Utils.ValidatorUtil.validateNull;
-import static school.faang.user_service.Utils.ValidatorUtil.validateOptional;
+import static school.faang.user_service.utils.GlobalValidator.validateNull;
+import static school.faang.user_service.utils.GlobalValidator.validateOptional;
 
 @Service
 @RequiredArgsConstructor

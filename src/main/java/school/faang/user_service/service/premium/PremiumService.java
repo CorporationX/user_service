@@ -18,7 +18,7 @@ import school.faang.user_service.validation.premium.PremiumValidator;
 
 import java.time.LocalDateTime;
 
-import static school.faang.user_service.Utils.ValidatorUtil.validateOptional;
+import static school.faang.user_service.utils.GlobalValidator.validateOptional;
 
 @Service
 @RequiredArgsConstructor

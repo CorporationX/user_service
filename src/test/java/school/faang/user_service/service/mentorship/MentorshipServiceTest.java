@@ -60,9 +60,9 @@ class MentorshipServiceTest {
 
         mentorshipService.deleteMentorForAllHisMentees(mentor.getId(), List.of(mentee.getId()));
 
-        verify(userRepository, times(1)).findById(mentee.getId());
-        verify(mentorshipRepository, times(1)).saveAll(List.of(mentee));
         assertAll(
+                () -> verify(userRepository, times(1)).findById(mentee.getId()),
+                () -> verify(mentorshipRepository, times(1)).saveAll(List.of(mentee)),
                 () -> assertEquals(Collections.emptyList(), mentee.getMentors()),
                 () -> assertEquals(mentee.getGoals().get(0).getMentor(), mentee)
         );

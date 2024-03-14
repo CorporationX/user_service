@@ -12,7 +12,6 @@ import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.GoalCompletedEvent;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
-import school.faang.user_service.dto.goal.GoalSetEvent;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
@@ -24,30 +23,21 @@ import school.faang.user_service.filter.goal.GoalTitleFilter;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.mapper.GoalMapperImpl;
 import school.faang.user_service.publisher.GoalCompletedEventPublisher;
-import school.faang.user_service.mapper.GoalMapper;
-import school.faang.user_service.mapper.GoalMapperImpl;
-import school.faang.user_service.mapper.goal.GoalMapper;
-import school.faang.user_service.mapper.goal.GoalMapperImpl;
-import school.faang.user_service.publisher.GoalEventPublisher;
+import school.faang.user_service.publisher.GoalCreateEventPublisher;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validator.GoalValidator;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.*;
-import static org.springframework.boot.availability.AvailabilityChangeEvent.publish;
 
 @ExtendWith(MockitoExtension.class)
 class GoalServiceTest {
@@ -73,7 +63,7 @@ class GoalServiceTest {
     private UserContext userContext;
 
     @Mock
-    private GoalEventPublisher goalEventPublisher;
+    private GoalCreateEventPublisher goalCreateEventPublisher;
 
     GoalService goalService;
     Stream<Goal> goalStream;
@@ -94,7 +84,7 @@ class GoalServiceTest {
     @BeforeEach
     void setUp() {
         goalService = new GoalService(goalRepository, goalMapper, goalFilters, skillService, goalValidator, userService,
-                goalCompletedEventPublisher, userContext, goalEventPublisher);
+                goalCompletedEventPublisher, userContext, goalCreateEventPublisher);
 
         correctGoal.setTitle("Correct");
         correctGoal.setStatus(GoalStatus.ACTIVE);

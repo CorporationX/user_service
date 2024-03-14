@@ -17,14 +17,11 @@ import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.publisher.GoalCompletedEventPublisher;
-import school.faang.user_service.mapper.GoalMapper;
-import school.faang.user_service.mapper.goal.GoalMapper;
-import school.faang.user_service.publisher.GoalEventPublisher;
+import school.faang.user_service.publisher.GoalCreateEventPublisher;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validator.GoalValidator;
 
 import java.util.ArrayList;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -39,7 +36,7 @@ public class GoalService {
     private final UserService userService;
     private final GoalCompletedEventPublisher goalCompletedEventPublisher;
     private final UserContext userContext;
-    private final GoalEventPublisher goalEventPublisher;
+    private final GoalCreateEventPublisher goalCreateEventPublisher;
 
     public List<GoalDto> getGoalsByUser(long userId, GoalFilterDto filter) {
         Stream<Goal> foundGoals = goalRepository.findGoalsByUserId(userId);
@@ -126,7 +123,7 @@ public class GoalService {
         goalToSave.setUsers(List.of(userToUpdate));
 
         Goal savedGoal = goalRepository.save(goalToSave);
-        goalEventPublisher.publish(new GoalSetEvent(userId, savedGoal.getId(), savedGoal.getUpdatedAt()));
+        goalCreateEventPublisher.publish(new GoalSetEvent(userId, savedGoal.getId(), savedGoal.getUpdatedAt()));
         return goalMapper.toDto(savedGoal);
     }
 

@@ -12,6 +12,7 @@ import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -30,6 +31,7 @@ public class UserService {
             List<Long> userMenteesIds = userToDeactivate.getMentees().stream()
                     .map(User::getId)
                     .toList();
+            userToDeactivate.setMentees(Collections.emptyList());
             mentorshipService.deleteMentorForAllHisMentees(userToDeactivateId, userMenteesIds);
         }
 
@@ -40,6 +42,7 @@ public class UserService {
                     .filter(goal -> goal.getUsers().isEmpty())
                     .map(Goal::getId)
                     .toList();
+            userToDeactivate.setGoals(Collections.emptyList());
             goalsToDeleteIds.forEach(goalService::deleteGoal);
         }
 
@@ -48,6 +51,7 @@ public class UserService {
                     .filter(event -> EventStatus.PLANNED.equals(event.getStatus()))
                     .map(Event::getId)
                     .toList();
+            userToDeactivate.setOwnedEvents(Collections.emptyList());
             eventsToDeleteIds.forEach(eventService::deleteEvent);
         }
         userToDeactivate.setActive(false);

@@ -88,7 +88,10 @@ class UserServiceTest {
                 () -> verify(eventService, times(1)).deleteEvent(event.getId()),
                 () -> verify(userRepository, times(1)).save(user),
                 () -> assertFalse(user.isActive()),
-                () -> assertEquals(Collections.emptyList(), goal.getUsers())
+                () -> assertEquals(Collections.emptyList(), goal.getUsers()),
+                () -> assertEquals(Collections.emptyList(), user.getMentees()),
+                () -> assertEquals(Collections.emptyList(), user.getGoals()),
+                () -> assertEquals(Collections.emptyList(), user.getOwnedEvents())
         );
     }
 }

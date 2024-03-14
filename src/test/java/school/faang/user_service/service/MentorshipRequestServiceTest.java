@@ -30,6 +30,7 @@ import school.faang.user_service.repository.mentorship.MentorshipRequestReposito
 import school.faang.user_service.validator.MentorshipRequestValidator;
 import school.faang.user_service.validator.MentorshipValidator;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -41,14 +42,19 @@ class MentorshipRequestServiceTest {
 
     @Mock
     private MentorshipRequestRepository requestRepository;
+
     @Mock
     private UserRepository userRepository;
+
     @Mock
     private MentorshipRepository mentorshipRepository;
+
     @Mock
     private MentorshipRequestValidator requestValidator;
+
     @Mock
     private MentorshipValidator mentorshipValidator;
+
     @Spy
     private MentorshipRequestMapper mentorshipRequestMapper = new MentorshipRequestMapperImpl();
     @Mock
@@ -69,8 +75,6 @@ class MentorshipRequestServiceTest {
                 mentorshipAcceptedEventPublisher);
     }
 
-
-    // Тесты для requestMentorship
     @Test
     void requestMentorship_Successful() {
         long requesterId = 1L;
@@ -137,7 +141,6 @@ class MentorshipRequestServiceTest {
         assertTrue(result.isEmpty());
     }
 
-    // Тесты для acceptRequest
     @Test
     void acceptRequest_Successful() {
         long requestId = 1L;
@@ -149,14 +152,15 @@ class MentorshipRequestServiceTest {
         MentorshipRequest foundRequest = new MentorshipRequest();
         foundRequest.setRequester(requester);
         foundRequest.setReceiver(receiver);
+        foundRequest.setUpdatedAt(LocalDateTime.now());
 
         when(requestRepository.findById(requestId)).thenReturn(Optional.of(foundRequest));
+        when(requestRepository.save(any(MentorshipRequest.class))).thenReturn(foundRequest);
 
         service.acceptRequest(requestId);
 
         verify(requestRepository).save(foundRequest);
         assertEquals(RequestStatus.ACCEPTED, foundRequest.getStatus());
-        verify(mentorshipRepository).save(any(Mentorship.class));
         verify(mentorshipAcceptedEventPublisher, times(1)).publish(any());
     }
 

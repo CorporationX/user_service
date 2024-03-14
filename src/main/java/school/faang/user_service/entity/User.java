@@ -154,7 +154,6 @@ public class User {
     })
     private UserProfilePic userProfilePic;
 
-
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private ContactPreference contactPreference;
 

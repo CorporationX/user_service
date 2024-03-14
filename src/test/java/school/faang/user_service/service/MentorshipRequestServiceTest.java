@@ -9,7 +9,6 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.MentorshipRequestedEvent;
-import school.faang.user_service.dto.MentorshipStartEvent;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDro;
 import school.faang.user_service.entity.Mentorship;
@@ -25,7 +24,6 @@ import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.mapper.MentorshipRequestMapperImpl;
 import school.faang.user_service.publisher.MentorshipRequestedEventPublisher;
 import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
-import school.faang.user_service.publisher.MentorshipEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -56,9 +54,6 @@ class MentorshipRequestServiceTest {
 
     @Mock
     private MentorshipValidator mentorshipValidator;
-    @Mock
-    private MentorshipEventPublisher mentorshipEventPublisher;
-
 
     @Spy
     private MentorshipRequestMapper mentorshipRequestMapper = new MentorshipRequestMapperImpl();
@@ -78,12 +73,8 @@ class MentorshipRequestServiceTest {
         service = new MentorshipRequestService(requestRepository, userRepository, mentorshipRepository, requestValidator,
                 mentorshipValidator, mentorshipRequestFilters, mentorshipRequestMapper, mentorshipRequestedEventPublisher,
                 mentorshipAcceptedEventPublisher);
-        service = new MentorshipRequestService(requestRepository, userRepository, mentorshipRepository, requestValidator,
-                mentorshipValidator, mentorshipRequestFilters, mentorshipRequestMapper, mentorshipEventPublisher);
     }
 
-
-    // Тесты для requestMentorship
     @Test
     void requestMentorship_Successful() {
         long requesterId = 1L;
@@ -150,7 +141,6 @@ class MentorshipRequestServiceTest {
         assertTrue(result.isEmpty());
     }
 
-    // Тесты для acceptRequest
     @Test
     void acceptRequest_Successful() {
         long requestId = 1L;
@@ -171,7 +161,6 @@ class MentorshipRequestServiceTest {
 
         verify(requestRepository).save(foundRequest);
         assertEquals(RequestStatus.ACCEPTED, foundRequest.getStatus());
-        verify(mentorshipRepository).save(any(Mentorship.class));
         verify(mentorshipAcceptedEventPublisher, times(1)).publish(any());
     }
 

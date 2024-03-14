@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -78,6 +79,7 @@ public class MentorshipServiceTest {
     @Test
     public void testDeleteMentee() {
         when(mentorshipRepository.findById(1L)).thenReturn(Optional.of(firstMentor));
+        when(mentorshipRepository.findById(10L)).thenReturn(Optional.of(secondMentee));
         mentorshipService.deleteMentee(10L, 1L);
 
         verify(mentorshipRepository, times(1)).save(firstMentor);
@@ -86,6 +88,7 @@ public class MentorshipServiceTest {
     @Test
     public void testDeleteMentor() {
         when(mentorshipRepository.findById(13L)).thenReturn(Optional.of(thirdMentee));
+        when(mentorshipRepository.findById(2L)).thenReturn(Optional.of(secondMentor));
         mentorshipService.deleteMentor(13L, 2L);
 
         verify(mentorshipRepository, times(1)).save(thirdMentee);
@@ -103,5 +106,19 @@ public class MentorshipServiceTest {
         when(mentorshipRepository.findById(13L)).thenReturn(Optional.of(thirdMentee));
 
         assertThrows(IllegalArgumentException.class, () -> mentorshipService.deleteMentor(13L, 5L));
+    }
+
+    @Test
+    public void testDeleteMenteeNotValidIdMentor() {
+        lenient().when(mentorshipRepository.findById(1L)).thenReturn(Optional.of(firstMentor));
+
+        assertThrows(EntityNotFoundException.class, () -> mentorshipService.deleteMentee(10L, 2L));
+    }
+
+    @Test
+    public void testDeleteMentorNotValidIdMentee() {
+        lenient().when(mentorshipRepository.findById(13L)).thenReturn(Optional.of(thirdMentee));
+
+        assertThrows(EntityNotFoundException.class, () -> mentorshipService.deleteMentor(16L, 1L));
     }
 }

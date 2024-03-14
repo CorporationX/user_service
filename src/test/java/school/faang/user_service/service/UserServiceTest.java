@@ -10,7 +10,6 @@ import org.springframework.web.client.RestTemplate;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
@@ -63,9 +62,10 @@ class UserServiceTest {
         long userId = 1L;
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        DataValidationException dataValidationException = assertThrows(DataValidationException.class, () -> userService.getUser(userId));
+        EntityNotFoundException entityNotFoundException = assertThrows(EntityNotFoundException.class, () ->
+                userService.findById(userId));
 
-        assertEquals("Пользователя не существует", dataValidationException.getMessage());
+        assertEquals("Пользователь не найден", entityNotFoundException.getMessage());
     }
 
     @Test
@@ -76,7 +76,7 @@ class UserServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
         // Act
-        userService.getUserById(userId);
+        userService.findById(userId);
 
         // Assert
         verify(userRepository, times(1)).findById(userId);
@@ -87,7 +87,7 @@ class UserServiceTest {
     void testGetUserById_whenUserIdNotExist_thenThrowEntityNotFoundException() {
         long userId = 1;
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundException.class, () -> userService.getUserById(userId));
+        assertThrows(EntityNotFoundException.class, () -> userService.findById(userId));
     }
 
     @Test

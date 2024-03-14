@@ -1,4 +1,4 @@
-package school.faang.user_service.controller.goal;
+package school.faang.user_service.controller;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,7 +44,8 @@ class GoalControllerTest {
         goalDto = new GoalDto();
         goalDto.setTitle("Title");
         Mockito.when(userContext.getUserId()).thenReturn(userId);
-        goalController.createGoal( goalDto);
+
+        goalController.createGoal(goalDto);
         Mockito.verify(goalService, Mockito.times(1)).createGoal(userId, goalDto);
     }
 

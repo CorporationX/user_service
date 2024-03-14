@@ -27,7 +27,7 @@ class UserValidatorTest {
         when(userRepository.existsById(anyLong())).thenReturn(true);
 
         assertDoesNotThrow(() ->
-                userValidator.validateUserExistsById(5L));
+                userValidator.validateIfUserExistsById(5L));
     }
 
     @Test
@@ -35,6 +35,6 @@ class UserValidatorTest {
         when(userRepository.existsById(anyLong())).thenReturn(false);
 
         assertThrows(NoSuchElementException.class, () ->
-                userValidator.validateUserExistsById(666L));
+                userValidator.validateIfUserExistsById(666L));
     }
 }

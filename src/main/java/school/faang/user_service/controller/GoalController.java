@@ -37,6 +37,11 @@ public class GoalController {
         return goalService.createGoal(userId, goal);
     }
 
+    @GetMapping("/goals/{goalId}")
+    public GoalDto getGoalById(@PathVariable Long goalId) {
+        return goalService.findDtoById(goalId);
+    }
+
     public void deleteGoal(long goalId) {
         goalService.deleteGoal(goalId);
     }

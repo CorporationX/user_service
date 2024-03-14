@@ -23,8 +23,7 @@ import school.faang.user_service.filter.goal.GoalTitleFilter;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.mapper.GoalMapperImpl;
 import school.faang.user_service.publisher.GoalCompletedEventPublisher;
-import school.faang.user_service.mapper.GoalMapper;
-import school.faang.user_service.mapper.GoalMapperImpl;
+import school.faang.user_service.publisher.GoalCreateEventPublisher;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validator.GoalValidator;
 
@@ -33,8 +32,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -50,6 +47,7 @@ class GoalServiceTest {
 
     @Spy
     private GoalMapper goalMapper = new GoalMapperImpl();
+
     @Mock
     SkillService skillService;
     private final List<GoalFilter> goalFilters = List.of(new GoalStatusFilter(), new GoalTitleFilter());
@@ -63,6 +61,9 @@ class GoalServiceTest {
     private GoalCompletedEventPublisher goalCompletedEventPublisher;
     @Mock
     private UserContext userContext;
+
+    @Mock
+    private GoalCreateEventPublisher goalCreateEventPublisher;
 
     GoalService goalService;
     Stream<Goal> goalStream;
@@ -83,7 +84,7 @@ class GoalServiceTest {
     @BeforeEach
     void setUp() {
         goalService = new GoalService(goalRepository, goalMapper, goalFilters, skillService, goalValidator, userService,
-                goalCompletedEventPublisher, userContext);
+                goalCompletedEventPublisher, userContext, goalCreateEventPublisher);
 
         correctGoal.setTitle("Correct");
         correctGoal.setStatus(GoalStatus.ACTIVE);
@@ -181,6 +182,7 @@ class GoalServiceTest {
         goalDto.setSkillIds(new ArrayList<>(Collections.singleton(1L)));
         goalDto.setParentId(1L);
         goalDto.setId(1L);
+        goal.setId(1L);
         user.setGoals(new ArrayList<>());
 
         Mockito.when(goalMapper.toEntity(goalDto)).thenReturn(goal);
@@ -188,6 +190,7 @@ class GoalServiceTest {
         Mockito.when(skillService.getSkillById(1L)).thenReturn(new Skill());
         Mockito.when(userService.findById(1L)).thenReturn(user);
         Mockito.when(goalMapper.toDto(Mockito.any())).thenReturn(new GoalDto());
+        when(goalRepository.save(goal)).thenReturn(goal);
         goalService.createGoal(userId, goalDto);
         Mockito.verify(goalRepository, Mockito.times(1)).save(goal);
     }

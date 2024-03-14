@@ -38,6 +38,8 @@ spring:
           name: mentorship_channel
         mentorship_accepted_channel:
           name: mentorship_accepted_channel
+        goal_created_channel:
+          name: goal_created_channel
 
 server:
   port: 8080

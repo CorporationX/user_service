@@ -1,5 +1,8 @@
 package school.faang.user_service.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.config.context.UserContext;
@@ -24,6 +27,7 @@ public class GoalController {
         return goalService.updateGoal(goalId, goal);
     }
 
+    @Operation(summary = "Создание цели", parameters = {@Parameter(in = ParameterIn.HEADER, name = "x-user-id", description = "id пользователя", required = true)})
     @PostMapping("/goals")
     public GoalDto createGoal(@RequestBody GoalDto goal) {
         long userId = userContext.getUserId();

@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import com.amazonaws.services.kms.model.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +32,7 @@ class RecommendationRequestServiceTest {
     private SkillRequestRepository skillRequestRepository;
 
     @Mock
-    private StringToLongMapper stringToLongMapper;
+    private StringToLongMapper stringToLongMapper; // Инициализация маппера
 
     @InjectMocks
     private RecommendationRequestService recommendationRequestService;
@@ -45,19 +44,24 @@ class RecommendationRequestServiceTest {
 
     @Test
     void testGetRequests_All() {
+        // Создание ожидаемого списка запросов
         List<RecommendationRequest> expectedRequests = Arrays.asList(
                 new RecommendationRequest(),
                 new RecommendationRequest()
         );
+        // Мокирование метода findAll репозитория
         when(recommendationRequestRepository.findAll()).thenReturn(expectedRequests);
 
+        // Вызов тестируемого метода
         List<RecommendationRequest> actualRequests = recommendationRequestService.getRequests(new RequestFilterDto());
 
+        // Проверка результатов
         assertEquals(expectedRequests, actualRequests);
     }
 
     @Test
     void testCreate_WithValidData() {
+        // Подготовка данных для теста
         Long requesterId = 1L;
         Long receiverId = 2L;
         List<String> skills = Arrays.asList("1", "2", "3");
@@ -65,10 +69,13 @@ class RecommendationRequestServiceTest {
         RecommendationRequestDto requestDto = new RecommendationRequestDto();
         requestDto.setSkills(skills);
 
+        // Мокирование метода stringToLong маппера
         when(stringToLongMapper.stringToLong(skills)).thenReturn(Arrays.asList(1L, 2L, 3L));
 
+        // Вызов тестируемого метода
         recommendationRequestService.create(requesterId, receiverId, requestDto);
 
+        // Проверка вызовов методов репозитория
         verify(recommendationRequestRepository).existsByRequesterIdAndReceiverId(requesterId, receiverId);
         verify(recommendationRequestRepository).createRequest(requesterId, receiverId);
         for (String skill : skills) {
@@ -77,8 +84,10 @@ class RecommendationRequestServiceTest {
         }
     }
 
+    // Тест для случая существующего запроса
     @Test
     void testCreate_WithExistingRequest() {
+        // Подготовка данных для теста
         Long requesterId = 1L;
         Long receiverId = 2L;
         List<String> skills = Arrays.asList("1", "2", "3");
@@ -86,6 +95,7 @@ class RecommendationRequestServiceTest {
 
         RecommendationRequestDto requestDto = new RecommendationRequestDto();
 
+        // Вызов тестируемого метода и проверка исключения
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> recommendationRequestService.create(requesterId, receiverId, requestDto));
         assertEquals("Запрос на рекомендацию уже отправлен и еще не закрыт", exception.getMessage());
@@ -95,26 +105,28 @@ class RecommendationRequestServiceTest {
 
     @Test
     void testGetRequest_Found() {
+        // Подготовка данных для теста
         Long requestId = 1L;
         RecommendationRequest expectedRequest = new RecommendationRequest();
         when(recommendationRequestRepository.findById(requestId)).thenReturn(Optional.of(expectedRequest));
 
+        // Вызов тестируемого метода
         RecommendationRequest actualRequest = recommendationRequestService.getRequest(requestId);
 
+        // Проверка результатов
         assertEquals(expectedRequest, actualRequest);
     }
 
     @Test
     void testRejectRequest_Valid() {
-        // Создаем заглушку для объекта RejectionDto
+        // Подготовка данных для теста
         RejectionDto rejectionDto = new RejectionDto();
         rejectionDto.setReason("Причина отклонения");
 
-        // Создаем заглушку для объекта RecommendationRequest
         RecommendationRequest recommendationRequest = new RecommendationRequest();
         recommendationRequest.setStatus(RequestStatus.PENDING); // Устанавливаем статус PENDING
 
-        // Мокируем вызовы методов в репозитории
+        // Мокирование вызовов методов в репозитории
         when(recommendationRequestRepository.findById(anyLong())).thenReturn(Optional.of(recommendationRequest));
         when(recommendationRequestRepository.save(recommendationRequest)).thenReturn(recommendationRequest);
 

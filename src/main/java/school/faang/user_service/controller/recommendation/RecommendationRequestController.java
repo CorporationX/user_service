@@ -30,31 +30,38 @@ public class RecommendationRequestController {
         this.recommendationRequestService = recommendationRequestService;
     }
 
+    // Метод для отправки запроса на рекомендацию
     public RecommendationRequestDto requestRecommendation(RecommendationRequestDto recommendationRequestDto) {
+        // Проверка на пустое сообщение
         if (recommendationRequestDto.getMessage() == null || recommendationRequestDto.getMessage().isEmpty()) {
             throw new IllegalArgumentException("Сообщение не может быть пустым");
         }
 
+        // Извлечение данных из DTO запроса
         Long requesterId = recommendationRequestDto.getRequesterId();
         Long receiverId = recommendationRequestDto.getReceiverId();
         List<String> skills = recommendationRequestDto.getSkills();
 
+        // Создание нового DTO и вызов метода создания запроса в сервисе
         RecommendationRequestDto dto = new RecommendationRequestDto();
         dto.setSkills(skills);
-
         recommendationRequestService.create(requesterId, receiverId, dto);
 
         return recommendationRequestDto;
     }
 
+    // Метод для получения списка запросов на рекомендацию
     public List<RecommendationRequestDto> getRecommendationRequests(RequestFilterDto filter) {
+        // Получение списка запросов и их преобразование в DTO
         return recommendationRequestService.getRequests(filter)
                 .stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
 
+    // Приватный вспомогательный метод для преобразования сущности запроса в DTO
     private RecommendationRequestDto mapToDto(RecommendationRequest recommendationRequest) {
+        // Создание нового DTO и заполнение его данными из сущности запроса
         RecommendationRequestDto dto = new RecommendationRequestDto();
         dto.setId(recommendationRequest.getId());
         dto.setRequesterId(recommendationRequest.getRequester().getId());
@@ -62,6 +69,7 @@ public class RecommendationRequestController {
         dto.setMessage(recommendationRequest.getMessage());
         dto.setStatus(recommendationRequest.getStatus().toString());
 
+        // Преобразование дат создания и обновления
         LocalDateTime createdAt = recommendationRequest.getCreatedAt();
         Date createdAtDate = Date.from(createdAt.atZone(ZoneId.systemDefault()).toInstant());
         dto.setCreatedAt(createdAtDate);
@@ -73,8 +81,10 @@ public class RecommendationRequestController {
         return dto;
     }
 
+    // Метод для получения конкретного запроса на рекомендацию
     @GetMapping("/{id}")
     public ResponseEntity<RecommendationRequestDto> getRecommendationRequest(@PathVariable long id) {
+        // Получение запроса по идентификатору и преобразование его в DTO
         RecommendationRequest recommendationRequest = recommendationRequestService.getRequest(id);
         if (recommendationRequest == null) {
             return ResponseEntity.notFound().build();
@@ -84,8 +94,10 @@ public class RecommendationRequestController {
         return ResponseEntity.ok(dto);
     }
 
+    // Метод для отклонения запроса на рекомендацию
     @PostMapping("/{id}/reject")
     public ResponseEntity<RecommendationRequestDto> rejectRequest(@PathVariable long id, @RequestBody RejectionDto rejection) {
+        // Отклонение запроса по идентификатору и преобразование его в DTO
         RecommendationRequest rejectedRequest = recommendationRequestService.rejectRequest(id, rejection);
         if (rejectedRequest == null) {
             return ResponseEntity.notFound().build();

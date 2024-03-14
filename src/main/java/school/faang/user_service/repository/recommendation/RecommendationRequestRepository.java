@@ -26,8 +26,6 @@ public interface RecommendationRequestRepository extends CrudRepository<Recommen
 
     boolean existsByRequesterIdAndReceiverId(Long requesterId, Long receiverId);
 
-    boolean existsSkillByName(String skillName);
-
     List<RecommendationRequest> findAllByRequesterIdAndReceiverId(Long requesterId, Long receiverId);
 
     List<RecommendationRequest> findAllByRequesterId(Long requesterId);

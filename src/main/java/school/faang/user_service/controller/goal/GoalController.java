@@ -1,7 +1,9 @@
 package school.faang.user_service.controller.goal;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.dto.GoalFilterDto;
 import school.faang.user_service.service.goal.GoalService;
@@ -10,26 +12,38 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/goal")
+@Tag(name = "Endpoint controller Goal")
 public class GoalController {
     private final GoalService goalService;
 
-    public GoalDto createGoal(Long userId, GoalDto goalDto) {
+    @PostMapping("/create/{userId}")
+    @ApiOperation("Create goal in database")
+    public GoalDto createGoal(@PathVariable("userId") Long userId, @RequestBody GoalDto goalDto) {
         return goalService.createGoal(userId, goalDto);
     }
 
-    public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
+    @PutMapping("/update/{goalId}")
+    @ApiOperation("Update goal in database")
+    public GoalDto updateGoal(@PathVariable("goalId") Long goalId, @RequestBody GoalDto goalDto) {
         return goalService.updateGoal(goalId, goalDto);
     }
 
-    public void deleteGoal(Long goalId) {
+    @DeleteMapping("/delete/{goalId}")
+    @ApiOperation("Delete goal from database")
+    public void deleteGoal(@PathVariable("goalId") Long goalId) {
         goalService.deleteGoal(goalId);
     }
 
-    public List<GoalDto> findSubtasksByGoalId(Long goalId, GoalFilterDto filteredGoalDto) {
+    @GetMapping("/subtask/{goalId}")
+    @ApiOperation("Get a list of subtasks by task id")
+    public List<GoalDto> findSubtasksByGoalId(@PathVariable("goalId") Long goalId, @RequestBody GoalFilterDto filteredGoalDto) {
         return goalService.findSubtasksByGoalId(goalId, filteredGoalDto);
     }
 
-    public List<GoalDto> findGoalsByUserId(Long userId, GoalFilterDto filterGoalDto) {
+    @GetMapping("/{userId}")
+    @ApiOperation("Get list goal by user id")
+    public List<GoalDto> findGoalsByUserId(@PathVariable("userId") Long userId, @RequestBody GoalFilterDto filterGoalDto) {
         return goalService.findGoalsByUserId(userId, filterGoalDto);
     }
 }

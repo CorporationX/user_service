@@ -76,4 +76,4 @@ services:
 premium_cleanup:
   time: 0 0 0 * * *
   zone: Europe/Moscow
-
+  premium_batch_size: 100

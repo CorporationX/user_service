@@ -12,7 +12,6 @@ import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.MentorshipRequestedEvent;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDro;
-import school.faang.user_service.entity.Mentorship;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
@@ -25,7 +24,6 @@ import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.mapper.MentorshipRequestMapperImpl;
 import school.faang.user_service.publisher.MentorshipRequestedEventPublisher;
 import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
-import school.faang.user_service.publisher.MentorshipOfferedEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -57,9 +55,6 @@ class MentorshipRequestServiceTest {
     @Mock
     private MentorshipValidator mentorshipValidator;
 
-    @Mock
-    private MentorshipOfferedEventPublisher mentorshipOfferedEventPublisher;
-
     @Spy
     private MentorshipRequestMapper mentorshipRequestMapper = new MentorshipRequestMapperImpl();
     @Mock
@@ -75,9 +70,9 @@ class MentorshipRequestServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new MentorshipRequestService(requestRepository, userRepository, mentorshipRepository, requestValidator,
+        service = new MentorshipRequestService(requestRepository, userRepository, requestValidator,
                 mentorshipValidator, mentorshipRequestFilters, mentorshipRequestMapper, mentorshipRequestedEventPublisher,
-                mentorshipAcceptedEventPublisher, mentorshipOfferedEventPublisher);
+                mentorshipAcceptedEventPublisher);
     }
 
     @Test
@@ -95,7 +90,6 @@ class MentorshipRequestServiceTest {
         verify(requestValidator).validateRequestTime(requesterId, receiverId);
         verify(requestRepository).create(1L, 2L, requestDto.getDescription());
         verify(mentorshipRequestedEventPublisher).publish(Mockito.any(MentorshipRequestedEvent.class));
-        verify(mentorshipOfferedEventPublisher).publish(any(MentorshipOfferedEvent.class));
     }
 
     @Test

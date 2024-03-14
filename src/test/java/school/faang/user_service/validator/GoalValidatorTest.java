@@ -1,4 +1,4 @@
-package school.faang.user_service.validator.goal;
+package school.faang.user_service.validator;
 
 
 import org.junit.jupiter.api.BeforeEach;
@@ -65,7 +65,7 @@ class GoalValidatorTest {
     @Test
     void incorrectSkillsTest() {
         List<Skill> skills = Collections.singletonList(new Skill());
-        Mockito.when(skillService.validateSkill(Mockito.any())).thenReturn(false);
+        Mockito.when(skillService.existsById(Mockito.anyLong())).thenReturn(false);
         assertThrows(DataValidationException.class, () -> goalValidator.validateSkills(skills));
     }
 

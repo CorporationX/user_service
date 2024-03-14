@@ -17,29 +17,29 @@ public class MentorshipService {
 
     @Transactional(readOnly = true)
     public List<UserDto> getMentees(Long userId) {
-        User user = userService.getUserById(userId);
+        User user = userService.findById(userId);
         List<User> mentees = user.getMentees();
         return userMapper.toDto(mentees);
     }
 
     @Transactional(readOnly = true)
     public List<UserDto> getMentors(Long userId) {
-        User user = userService.getUserById(userId);
+        User user = userService.findById(userId);
         List<User> mentors = user.getMentors();
         return userMapper.toDto(mentors);
     }
 
     @Transactional
     public void removeMenteeOfMentor(Long mentorId, Long menteeId) {
-        User mentor = userService.getUserById(mentorId);
-        User mentee = userService.getUserById(menteeId);
+        User mentor = userService.findById(mentorId);
+        User mentee = userService.findById(menteeId);
         mentor.getMentees().remove(mentee);
     }
 
     @Transactional
     public void removeMentorOfMentee(Long mentorId, Long menteeId) {
-        User mentor = userService.getUserById(mentorId);
-        User mentee = userService.getUserById(menteeId);
+        User mentor = userService.findById(mentorId);
+        User mentee = userService.findById(menteeId);
         mentee.getMentors().remove(mentor);
     }
 }

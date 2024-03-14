@@ -5,38 +5,45 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.UserService;
+
+import java.util.List;
 
 @Tag(name = "Управление пользователями")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/users")
+@RequestMapping
 @Slf4j
 public class UserController {
     private final UserService userService;
 
     @Operation(summary = "Регистрация пользователя",
             description = "Позволяет зарегистрировать нового пользователя и сгенерировать аватара")
-    @PostMapping()
+    @PostMapping
     public UserDto createUser(@RequestBody @Valid UserDto user) {
         log.info("Accepted request to create new user " + user);
         return userService.createUser(user);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/user/{id}")
     public UserDto getUser(@PathVariable long id) {
         return userService.getUser(id);
     }
 
-    @GetMapping("/exists/{userId}")
+    @GetMapping("/user/exists/{userId}")
     public boolean isUserExists(@PathVariable long userId) {
         return userService.isUserExists(userId);
+    }
+
+    @PostMapping("/users")
+    public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
+        return userService.getUsersByIds(ids);
+    }
+
+    @GetMapping("/users/ids")
+    public List<Long> getUserIds() {
+        return userService.getUserIds();
     }
 }

@@ -103,8 +103,8 @@ class MentorshipServiceTest {
 
         mentorshipService.removeMenteeOfMentor(id2, id);
 
-        verify(userService, times(1)).getUserById(id2);
-        verify(userService, times(1)).getUserById(id);
+        verify(userService, times(1)).findById(id2);
+        verify(userService, times(1)).findById(id);
         assertEquals(user2.getMentees(), user1.getMentors());
     }
 
@@ -115,8 +115,8 @@ class MentorshipServiceTest {
 
         mentorshipService.removeMentorOfMentee(id2, id);
 
-        verify(userService, times(1)).getUserById(id2);
-        verify(userService, times(1)).getUserById(id);
+        verify(userService, times(1)).findById(id2);
+        verify(userService, times(1)).findById(id);
         assertEquals(user1.getMentors(), user1.getMentees());
     }
 
@@ -124,14 +124,14 @@ class MentorshipServiceTest {
     void testGetMentors_ShouldCallsRepositoryMethod() {
         whenGetUserByIdThenReturnUser(id, user1);
         mentorshipService.getMentors(user1.getId());
-        verify(userService, times(1)).getUserById(user1.getId());
+        verify(userService, times(1)).findById(user1.getId());
     }
 
     private void whenGetUserByIdThenThrowException() {
-        when(userService.getUserById(id)).thenThrow(DataValidationException.class);
+        when(userService.findById(id)).thenThrow(DataValidationException.class);
     }
 
     private void whenGetUserByIdThenReturnUser(Long id, User user1) {
-        when(userService.getUserById(id)).thenReturn(user1);
+        when(userService.findById(id)).thenReturn(user1);
     }
 }

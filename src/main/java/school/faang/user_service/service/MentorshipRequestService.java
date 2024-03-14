@@ -1,13 +1,13 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.MentorshipRequestedEvent;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDro;
-import school.faang.user_service.entity.Mentorship;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.exception.DataValidationException;
@@ -15,29 +15,27 @@ import school.faang.user_service.filter.mentorship_request.MentorshipRequestFilt
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.publisher.MentorshipRequestedEventPublisher;
 import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
-import school.faang.user_service.repository.mentorship.MentorshipRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.validator.MentorshipRequestValidator;
 import school.faang.user_service.validator.MentorshipValidator;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class MentorshipRequestService {
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final UserRepository userRepository;
-    private final MentorshipRepository mentorshipRepository;
     private final MentorshipRequestValidator mentorshipRequestValidator;
     private final MentorshipValidator mentorshipValidator;
     private final List<MentorshipRequestFilter> mentorshipRequestFilters;
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
     private final MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher;
-
 
     @Transactional
     public void requestMentorship(MentorshipRequestDto requestDto) {
@@ -50,6 +48,7 @@ public class MentorshipRequestService {
 
         mentorshipRequestRepository.create(requesterId, receiverId, requestDto.getDescription());
         mentorshipRequestedEventPublisher.publish(new MentorshipRequestedEvent(requesterId, receiverId, LocalDateTime.now()));
+        log.info("Mentorship event published");
     }
 
     @Transactional(readOnly = true)

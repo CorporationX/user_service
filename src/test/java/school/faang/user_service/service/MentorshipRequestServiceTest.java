@@ -7,11 +7,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.MentorshipOfferedEvent;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.MentorshipRequestedEvent;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDro;
-import school.faang.user_service.entity.Mentorship;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
@@ -70,7 +70,7 @@ class MentorshipRequestServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new MentorshipRequestService(requestRepository, userRepository, mentorshipRepository, requestValidator,
+        service = new MentorshipRequestService(requestRepository, userRepository, requestValidator,
                 mentorshipValidator, mentorshipRequestFilters, mentorshipRequestMapper, mentorshipRequestedEventPublisher,
                 mentorshipAcceptedEventPublisher);
     }

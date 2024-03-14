@@ -40,6 +40,8 @@ spring:
           name: mentorship_accepted_channel
         goal_created_channel:
           name: goal_created_channel
+        mentorship_offered_channel:
+          name: mentorship_offered_channel
 
 server:
   port: 8080
@@ -72,6 +74,6 @@ services:
 
 
 premium_cleanup:
-  time: 0 0 0 * * 0
+  time: 0 0 0 * * *
   zone: Europe/Moscow
   premium_batch_size: 100

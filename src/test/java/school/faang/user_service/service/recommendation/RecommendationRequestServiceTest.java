@@ -9,6 +9,7 @@ import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.handler.exception.EntityNotFoundException;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 
 import java.util.List;
@@ -72,5 +73,13 @@ public class RecommendationRequestServiceTest {
 
         recommendationRequestService.rejectRequest(id, rejectionDto);
         Mockito.verify(recommendationRequestService).rejectRequest(id, rejectionDto);
+    }
+
+    @Test
+    public void testGetRequestThrowEntityNotFound() {
+        long requestId = 1L;
+
+        Mockito.when(recommendationRequestRepository.findById(requestId)).thenReturn(Optional.empty());
+        Mockito.when(recommendationRequestService.getRequest(requestId)).thenThrow(EntityNotFoundException.class);
     }
 }

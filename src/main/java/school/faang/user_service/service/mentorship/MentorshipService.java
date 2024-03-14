@@ -24,7 +24,7 @@ public class MentorshipService {
             mentee.getMentors().removeIf(mentor -> mentor.getId() == mentorId);
             mentee.getGoals().stream()
                     .filter(goal -> goal.getMentor().getId() == mentorId)
-                    .forEach(goal -> goal.setMentor(userRepository.findById(mentee.getId()).get()));
+                    .forEach(goal -> goal.setMentor(mentee));
         });
         mentorshipRepository.saveAll(mentees);
     }

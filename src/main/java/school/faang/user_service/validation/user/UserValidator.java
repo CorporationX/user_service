@@ -18,7 +18,7 @@ public class UserValidator {
         }
     }
 
-    private void validateIfUserIsActive(long userId) {
+    public void validateIfUserIsActive(long userId) {
         validateIfUserExistsById(userId);
         if (!userRepository.findById(userId).get().isActive()) {
             throw new DataValidationException(String.format("User with id %d is deactivated", userId));

@@ -41,23 +41,23 @@ public class SubscriptionService {
 
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filter) {
         Stream<User> users = subscriptionRepository.findByFolloweeId(followeeId);
-        return filterUser(users, filter);
+        return filterUsers(users, filter);
     }
 
     public int getFollowersCount(long followeeId) {
         return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
     }
 
-    public List<UserDto> getFollowing(long followerId, UserFilterDto filter) {
-        Stream<User> users = subscriptionRepository.findByFolloweeId(followerId);
-        return filterUser(users, filter);
+    public List<UserDto> getFollowing(long followeeId, UserFilterDto filter) {
+        Stream<User> users = subscriptionRepository.findByFolloweeId(followeeId);
+        return filterUsers(users, filter);
     }
 
     public int getFollowingCount(long followerId) {
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
     }
 
-    private List<UserDto> filterUser(Stream<User> users, UserFilterDto filters) {
+    private List<UserDto> filterUsers(Stream<User> users, UserFilterDto filters) {
         userFilters.stream()
                 .filter(filter -> filter.isApplicable(filters))
                 .forEach(filter -> filter.apply(users, filters));

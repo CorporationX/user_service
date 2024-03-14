@@ -43,7 +43,7 @@ public class UserService {
             goalsToDeleteIds.forEach(goalService::deleteGoal);
         }
 
-        if (userToDeactivate.getOwnedEvents() != null && !userToDeactivate.getOwnedEvents().isEmpty()){
+        if (userToDeactivate.getOwnedEvents() != null && !userToDeactivate.getOwnedEvents().isEmpty()) {
             List<Long> eventsToDeleteIds = userToDeactivate.getOwnedEvents().stream()
                     .filter(event -> EventStatus.PLANNED.equals(event.getStatus()))
                     .map(Event::getId)

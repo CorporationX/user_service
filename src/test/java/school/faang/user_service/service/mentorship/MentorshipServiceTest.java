@@ -8,28 +8,22 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipServiceTest {
 
     @Mock
     MentorshipRepository mentorshipRepository;
-    @Mock
-    UserRepository userRepository;
     @InjectMocks
     MentorshipService mentorshipService;
 
@@ -56,8 +50,6 @@ class MentorshipServiceTest {
 
     @Test
     void deleteMentorForAllHisMentees_MentorDeletedMenteesUpdated_ThenMenteesSavedToDb() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(mentee));
-
         mentorshipService.deleteMentorForAllHisMentees(mentor.getId(), List.of(mentee));
 
         assertAll(

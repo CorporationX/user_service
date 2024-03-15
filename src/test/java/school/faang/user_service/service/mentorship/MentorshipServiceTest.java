@@ -58,10 +58,9 @@ class MentorshipServiceTest {
     void deleteMentorForAllHisMentees_MentorDeletedMenteesUpdated_ThenMenteesSavedToDb() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(mentee));
 
-        mentorshipService.deleteMentorForAllHisMentees(mentor.getId(), List.of(mentee.getId()));
+        mentorshipService.deleteMentorForAllHisMentees(mentor.getId(), List.of(mentee));
 
         assertAll(
-                () -> verify(userRepository, times(1)).findById(mentee.getId()),
                 () -> verify(mentorshipRepository, times(1)).saveAll(List.of(mentee)),
                 () -> assertEquals(Collections.emptyList(), mentee.getMentors()),
                 () -> assertEquals(mentee.getGoals().get(0).getMentor(), mentee)

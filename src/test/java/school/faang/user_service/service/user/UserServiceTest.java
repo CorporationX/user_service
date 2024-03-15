@@ -83,7 +83,7 @@ class UserServiceTest {
 
         assertAll(
                 () -> verify(mentorshipService, times(1)).
-                        deleteMentorForAllHisMentees(user.getId(), List.of(mentee.getId())),
+                        deleteMentorForAllHisMentees(user.getId(), List.of(mentee)),
                 () -> verify(goalService, times(1)).deleteGoal(goal.getId()),
                 () -> verify(eventService, times(1)).deleteEvent(event.getId()),
                 () -> verify(userRepository, times(1)).save(user),

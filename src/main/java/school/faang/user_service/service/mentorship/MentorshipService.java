@@ -3,10 +3,11 @@ package school.faang.user_service.service.mentorship;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.User;
+
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.userDto.UserDto;
-import school.faang.user_service.userMapper.UserMapper;
-import school.faang.user_service.userService.UserService;
+import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.service.user.UserService;
 
 import java.util.Collections;
 import java.util.List;
@@ -14,16 +15,16 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class MentorshipService {
-    private final UserRepository userRepository;
     private final UserService userService;
     private final UserMapper userMapper;
+    private final UserRepository userRepository;
 
     public List<UserDto> getMentees(long userId) {
         User user = userService.findUserById(userId);
         if (user.getMentees().isEmpty()) {
             return Collections.emptyList();
         }
-        return user.getMentees().stream().map(userMapper::toUserDto).toList();
+        return userMapper.toUserDtoList(user.getMentees());
     }
 
     public List<UserDto> getMentors(long userId) {
@@ -31,19 +32,26 @@ public class MentorshipService {
         if (user.getMentors().isEmpty()) {
             return Collections.emptyList();
         }
-        return user.getMentees().stream().map(userMapper::toUserDto).toList();
+        return userMapper.toUserDtoList(user.getMentors());
     }
-
     public void deleteMentee(long menteeId, long mentorId) {
-        User mentor = userService.findMentorById(mentorId);
-        mentor.getMentees().remove(menteeId);
-        userRepository.save(mentor);
+        User mentor = userService.findUserById(mentorId);
+        User mentee = userService.findUserById(menteeId);
+        if (mentor.getId() == mentee.getId()) {
+            throw new IllegalArgumentException("Incorrect data");
+        }
+        mentee.getMentors().remove(mentor);
+        userRepository.save(mentee);
     }
 
     public void deleteMentor(long menteeId, long mentorId) {
-        User mentee = userService.findMenteeById(menteeId);
-        mentee.getMentors().remove(mentorId);
-        userRepository.save(mentee);
+        User mentor = userService.findUserById(mentorId);
+        User mentee = userService.findUserById(menteeId);
+        if (mentor.getId() == mentee.getId()) {
+            throw new IllegalArgumentException("Incorrect data");
+        }
+        mentee.getMentors().remove(mentee);
+        userRepository.save(mentor);
     }
 }
 

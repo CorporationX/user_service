@@ -1,7 +1,7 @@
 package school.faang.user_service.repository.goal;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @Repository
-public interface GoalRepository extends CrudRepository<Goal, Long> {
+public interface GoalRepository extends JpaRepository<Goal, Long> {
 
     @Query(nativeQuery = true, value = """
-            SELECT * FROM goal g
+            SELECT g.* FROM goal g
             JOIN user_goal ug ON g.id = ug.goal_id
             WHERE ug.user_id = ?1
             """)
@@ -21,7 +21,8 @@ public interface GoalRepository extends CrudRepository<Goal, Long> {
 
     @Query(nativeQuery = true, value = """
             INSERT INTO goal (title, description, parent_goal_id, status, created_at, updated_at)
-            VALUES (?1, ?2, ?3, 0, NOW(), NOW()) returning goal
+            VALUES (?1, ?2, ?3, 0, NOW(), NOW()) 
+            returning id, title, description, parent_goal_id, status, deadline, created_at, updated_at, mentor_id;
             """)
     Goal create(String title, String description, Long parent);
 
@@ -37,7 +38,7 @@ public interface GoalRepository extends CrudRepository<Goal, Long> {
             SELECT * FROM goal WHERE id = :goalId
             UNION
             SELECT g.* FROM goal g
-            JOIN subtasks st ON st.id = g.parent_id
+            JOIN subtasks st ON st.id = g.parent_goal_id
             )
             SELECT * FROM subtasks WHERE id != :goalId
             """)

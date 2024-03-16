@@ -3,8 +3,6 @@ package school.faang.user_service.service.user;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
@@ -35,7 +33,6 @@ import static org.mockito.Mockito.*;
 class UserServiceTest {
 
     private UserService userService;
-
     private UserRepository userRepository;
     private UserMapper userMapper;
     private UserFilter userFilter;
@@ -89,9 +86,13 @@ class UserServiceTest {
                 .isPremium(true)
                 .build();
         userRepository = mock(UserRepository.class);
+        mentorshipService = mock(MentorshipService.class);
+        eventService = mock(EventService.class);
+        goalService = mock(GoalService.class);
         userMapper = mock(UserMapper.class);
         userFilter = mock(UserFilter.class);
-        userService = new UserService(userMapper, userRepository, List.of(userFilter));
+        userService = new UserService(userRepository, mentorshipService, eventService, goalService,
+                userMapper, List.of(userFilter));
     }
 
     @Test
@@ -110,7 +111,6 @@ class UserServiceTest {
     @Test
     void deactivateUser_UserIsDeactivatedAndSavedToDb_GoalsAndEventsAlsoDeleted() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
-
 
         userService.deactivateUser(user.getId());
 

@@ -3,15 +3,19 @@ package school.faang.user_service.service.user;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.mentorship.MentorshipService;
+import school.faang.user_service.service.user.filter.UserFilter;
 
 import java.util.Collections;
 import java.util.List;
@@ -24,6 +28,8 @@ public class UserService {
     private final MentorshipService mentorshipService;
     private final EventService eventService;
     private final GoalService goalService;
+    private final UserMapper userMapper;
+    private final List<UserFilter> userFilters;
 
     public void deactivateUser(long userToDeactivateId) {
         User userToDeactivate = userRepository.findById(userToDeactivateId)
@@ -57,4 +63,15 @@ public class UserService {
         }
         userRepository.save(userToDeactivate);
     }
+
+    public List<UserDto> getPremiumUsers(UserFilterDto filters) {
+        List<User> premiumUsers = userRepository.findPremiumUsers().toList();
+        if (!userFilters.isEmpty()) {
+            userFilters.stream()
+                    .filter(userFilter -> userFilter.isApplicable(filters))
+                    .forEach(userFilter -> userFilter.apply(premiumUsers, filters));
+        }
+        return userMapper.toDto(premiumUsers);
+    }
 }
+

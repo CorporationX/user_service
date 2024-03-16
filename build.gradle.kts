@@ -30,7 +30,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.0.2")
-    implementation("org.springframework.retry:spring-retry:1.3.1")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
     /**
@@ -39,23 +38,12 @@ dependencies {
     implementation("org.liquibase:liquibase-core")
     implementation("redis.clients:jedis:4.3.2")
     runtimeOnly("org.postgresql:postgresql")
-    implementation("org.apache.kafka:kafka-clients:3.5.1")
-    implementation("org.springframework.kafka:spring-kafka:3.0.11")
 
 
     /**
      * Amazon S3
      */
     implementation("com.amazonaws:aws-java-sdk-s3:1.12.464")
-
-    /**
-     * Google integration
-     */
-    implementation("com.google.api-client:google-api-client:2.0.0")
-    implementation("com.google.oauth-client:google-oauth-client-jetty:1.34.1")
-    implementation("com.google.apis:google-api-services-calendar:v3-rev20220715-2.0.0")
-
-
 
     /**
      * Utils & Logging

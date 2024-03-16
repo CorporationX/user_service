@@ -10,10 +10,7 @@ import school.faang.user_service.repository.UserRepository;
 public class UserService {
     private final UserRepository userRepository;
 
-    public User findUserById(Long userId) {
-        if (userId < 1) {
-            throw new IllegalArgumentException("id is incorrect");
-        }
+    public User getUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("id is not found"));
     }
 }

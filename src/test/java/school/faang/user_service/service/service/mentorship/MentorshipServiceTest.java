@@ -1,4 +1,4 @@
-package school.faang.user_service.service.service.mentorshipTest;
+package school.faang.user_service.service.service.mentorship;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,49 +70,49 @@ public class MentorshipServiceTest {
 
     @Test
     void testGetMentees() {
-        Mockito.when(userService.findUserById(userId)).thenReturn(user);
+        Mockito.when(userService.getUserById(userId)).thenReturn(user);
         user.setMentees(Collections.emptyList());
 
         assertEquals(Collections.emptyList(), mentorshipService.getMentees(userId));
-        Mockito.verify(userService).findUserById(userId);
+        Mockito.verify(userService).getUserById(userId);
     }
 
 
     @Test
     void testGetMentors() {
-        Mockito.when(userService.findUserById(userId)).thenReturn(user);
+        Mockito.when(userService.getUserById(userId)).thenReturn(user);
         user.setMentors(Collections.emptyList());
 
         assertEquals(Collections.emptyList(), mentorshipService.getMentors(userId));
-        Mockito.verify(userService).findUserById(userId);
+        Mockito.verify(userService).getUserById(userId);
     }
 
     @Test
     void shouldReturnMentorsAsUserDtoList() {
-        Mockito.when(userService.findUserById(userId)).thenReturn(user);
+        Mockito.when(userService.getUserById(userId)).thenReturn(user);
         user.setMentors(userList);
         Mockito.when(userMapper.toUserDtoList(userList)).thenReturn(userListDto);
 
         assertEquals(userListDto, mentorshipService.getMentors(userId));
-        Mockito.verify(userService).findUserById(userId);
+        Mockito.verify(userService).getUserById(userId);
         Mockito.verify(userMapper).toUserDtoList(userList);
     }
 
 
     @Test
     void testDeleteMentee() {
-        Mockito.when(userService.findUserById(menteeId)).thenReturn(user);
-        Mockito.when(userService.findUserById(mentorId)).thenReturn(user);
+        Mockito.when(userService.getUserById(menteeId)).thenReturn(user);
+        Mockito.when(userService.getUserById(mentorId)).thenReturn(user);
         assertThrows(IllegalArgumentException.class, () -> mentorshipService.deleteMentee(menteeId, mentorId));
-        Mockito.verify(userService, times(2)).findUserById(anyLong());
+        Mockito.verify(userService, times(2)).getUserById(anyLong());
     }
 
     @Test
     void testDeleteMentor() {
-        Mockito.when(userService.findUserById(menteeId)).thenReturn(user);
-        Mockito.when(userService.findUserById(mentorId)).thenReturn(user);
+        Mockito.when(userService.getUserById(menteeId)).thenReturn(user);
+        Mockito.when(userService.getUserById(mentorId)).thenReturn(user);
         assertThrows(IllegalArgumentException.class, () -> mentorshipService.deleteMentor(menteeId, mentorId));
-        Mockito.verify(userService, times(2)).findUserById(anyLong());
+        Mockito.verify(userService, times(2)).getUserById(anyLong());
     }
 
 }

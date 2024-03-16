@@ -1,4 +1,4 @@
-package school.faang.user_service.service.service.userServiseTest;
+package school.faang.user_service.service.service.userServise;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,12 +25,12 @@ class UserServiceTest {
     private UserService userService;
 
     @Test
-    void shouldFindUserById() {
+    void shouldgetUserById() {
         User user = new User();
         long userId = 1L;
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
-        User foundUser = userService.findUserById(userId);
+        User foundUser = userService.getUserById(userId);
 
         assertThat(foundUser).isEqualTo(user);
     }
@@ -38,7 +38,7 @@ class UserServiceTest {
     @Test
     void shouldThrowExceptionForInvalidId() {
         long userId = 0L;
-        assertThrows(IllegalArgumentException.class, () -> userService.findUserById(userId));
+        assertThrows(IllegalArgumentException.class, () -> userService.getUserById(userId));
     }
 
     @Test
@@ -46,6 +46,6 @@ class UserServiceTest {
         long userId = 2L;
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> userService.findUserById(userId));
+        assertThrows(IllegalArgumentException.class, () -> userService.getUserById(userId));
     }
 }

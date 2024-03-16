@@ -20,7 +20,7 @@ public class MentorshipService {
     private final UserRepository userRepository;
 
     public List<UserDto> getMentees(long userId) {
-        User user = userService.findUserById(userId);
+        User user = userService.getUserById(userId);
         if (user.getMentees().isEmpty()) {
             return Collections.emptyList();
         }
@@ -28,15 +28,16 @@ public class MentorshipService {
     }
 
     public List<UserDto> getMentors(long userId) {
-        User user = userService.findUserById(userId);
+        User user = userService.getUserById(userId);
         if (user.getMentors().isEmpty()) {
             return Collections.emptyList();
         }
         return userMapper.toUserDtoList(user.getMentors());
     }
+
     public void deleteMentee(long menteeId, long mentorId) {
-        User mentor = userService.findUserById(mentorId);
-        User mentee = userService.findUserById(menteeId);
+        User mentor = userService.getUserById(mentorId);
+        User mentee = userService.getUserById(menteeId);
         if (mentor.getId() == mentee.getId()) {
             throw new IllegalArgumentException("Incorrect data");
         }
@@ -45,8 +46,8 @@ public class MentorshipService {
     }
 
     public void deleteMentor(long menteeId, long mentorId) {
-        User mentor = userService.findUserById(mentorId);
-        User mentee = userService.findUserById(menteeId);
+        User mentor = userService.getUserById(mentorId);
+        User mentee = userService.getUserById(menteeId);
         if (mentor.getId() == mentee.getId()) {
             throw new IllegalArgumentException("Incorrect data");
         }

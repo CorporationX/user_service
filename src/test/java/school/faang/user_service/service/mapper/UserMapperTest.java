@@ -5,7 +5,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.userDto.UserDto;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.mapper.UserMapperImpl;
 
 import java.util.List;

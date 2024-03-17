@@ -122,7 +122,7 @@ public class UserService {
                     actorId,
                     LocalDateTime.now()
             );
-            eventPublisher.publish(event.toString());
+            eventPublisher.publish(event);
         });
 
         return new ArrayList<>(users.stream()

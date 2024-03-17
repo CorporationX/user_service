@@ -34,6 +34,9 @@ public class SubscriptionServiceTest {
     @Spy
     private UserMapperImpl userMapper;
 
+    @Mock
+    private FollowerEventPublisher followerEventPublisher;
+
     @InjectMocks
     private SubscriptionService subscriptionService;
 

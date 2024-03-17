@@ -1,17 +1,26 @@
 package school.faang.user_service.publisher;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.listener.ChannelTopic;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.user.FollowerEventDto;
+import school.faang.user_service.dto.FollowerEventDto;
+
+import java.time.LocalDateTime;
 
 @Component
-@RequiredArgsConstructor
-public class FollowerEventPublisher extends EventPublisher<FollowerEventDto> {
+public class FollowerEventPublisher extends AbstractEventPublisher<FollowerEventDto> {
 
-    private final ChannelTopic channelTopic;
+    @Value("${spring.data.redis.channels.follower_channel.name}")
+    private String channelTopicName;
 
-    public void publish(FollowerEventDto userFollowDto) {
-        convertAndSend(userFollowDto, channelTopic.getTopic());
+    public FollowerEventPublisher(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper) {
+        super(redisTemplate, objectMapper);
+    }
+
+    public void publish(FollowerEventDto followerEventDto) {
+        followerEventDto.setReceivedAt(LocalDateTime.now());
+        convertAndSend(followerEventDto, channelTopicName);
     }
 }

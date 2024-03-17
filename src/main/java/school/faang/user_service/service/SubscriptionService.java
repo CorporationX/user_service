@@ -3,6 +3,8 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.FollowerEventDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.dto.user.FollowerEventDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
@@ -60,15 +62,11 @@ public class SubscriptionService {
         subscriptionValidator.validateUser(followerId, followeeId);
         subscriptionValidator.validateExistsSubscription(followerId, followeeId);
         subscriptionRepo.followUser(followerId, followeeId);
-        FollowerEventDto userFollowDto = buildUserFollowDto(followerId, followeeId);
-        followerEventPublisher.publish(userFollowDto);
-    }
-
-    private FollowerEventDto buildUserFollowDto(long followerId, long followeeId) {
-        return FollowerEventDto.builder()
+        followerEventPublisher.publish(FollowerEventDto
+                .builder()
                 .followerId(followerId)
                 .followeeId(followeeId)
-                .build();
+                .build());
     }
 
     public int getFollowersCount(long followeeId) {

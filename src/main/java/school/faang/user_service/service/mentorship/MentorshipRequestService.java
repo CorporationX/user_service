@@ -2,6 +2,7 @@ package school.faang.user_service.service.mentorship;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.dto.events.MentorshipRequestedEventDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
@@ -9,10 +10,12 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipRequestedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.dto.mentorship.filter.RequestFilterDto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
@@ -28,6 +31,7 @@ public class MentorshipRequestService {
     private final MentorshipRequestValidator mentorshipRequestValidator;
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final List<MentorshipRequestFilter> mentorshipRequestFilters;
+    private final MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
     private final UserService userService;
 
     public MentorshipRequestDto acceptRequest(long id) {
@@ -68,6 +72,7 @@ public class MentorshipRequestService {
         mentorshipRequest.setRequester(requester);
         mentorshipRequest.setStatus(RequestStatus.PENDING);
         mentorshipRequestRepository.save(mentorshipRequest);
+        publishEvent(mentorshipRequest.getReceiver(), mentorshipRequest.getRequester());
         return mentorshipRequestMapper.toDTO(mentorshipRequest);
     }
 
@@ -76,4 +81,12 @@ public class MentorshipRequestService {
                 .orElseThrow(() -> new EntityNotFoundException("There is no mentorship request with this id"));
     }
 
+    private void publishEvent(User receiver, User requester){
+        MentorshipRequestedEventDto eventDto = MentorshipRequestedEventDto.builder()
+                .requesterId(requester.getId())
+                .receiverId(receiver.getId())
+                .receivedAt(LocalDateTime.now())
+                .build();
+        mentorshipRequestedEventPublisher.publish(eventDto);
+    }
 }

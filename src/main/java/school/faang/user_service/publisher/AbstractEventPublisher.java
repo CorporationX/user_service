@@ -23,5 +23,4 @@ public abstract class AbstractEventPublisher<T> {
             throw new RuntimeException(e.getMessage());
         }
     }
-
 }

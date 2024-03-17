@@ -11,7 +11,6 @@ import school.faang.user_service.service.user.UserService;
 
 import java.util.Collections;
 import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class MentorshipService {

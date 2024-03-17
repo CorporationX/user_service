@@ -1,7 +1,7 @@
 package school.faang.user_service.service.user;
 
 import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
@@ -19,15 +19,23 @@ import school.faang.user_service.service.user.filter.UserFilter;
 
 import java.util.Collections;
 import java.util.List;
-
 @Service
-@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
     private final MentorshipService mentorshipService;
     private final EventService eventService;
     private final GoalService goalService;
+
+    public UserService(UserRepository userRepository,@Lazy MentorshipService mentorshipService, EventService eventService, GoalService goalService, UserMapper userMapper, List<UserFilter> userFilters) {
+        this.userRepository = userRepository;
+        this.mentorshipService = mentorshipService;
+        this.eventService = eventService;
+        this.goalService = goalService;
+        this.userMapper = userMapper;
+        this.userFilters = userFilters;
+    }
+
     private final UserMapper userMapper;
     private final List<UserFilter> userFilters;
 

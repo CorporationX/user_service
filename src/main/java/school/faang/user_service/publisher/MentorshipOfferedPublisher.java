@@ -1,18 +1,17 @@
 package school.faang.user_service.publisher;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.mentorship.MentorshipOfferedEvent;
 
 @Component
-@RequiredArgsConstructor
 public class MentorshipOfferedPublisher extends AbstractEventPublisher<MentorshipOfferedEvent> {
 
-    private final ChannelTopic mentorshipOfferedTopic;
+    @Value("${spring.data.redis.channels.mentorship_offered_channel.name}")
+    private String mentorshipOfferedChannelName;
 
     public void publish(MentorshipOfferedEvent mentorshipOfferedEvent) {
-        convertAndSend(mentorshipOfferedEvent, mentorshipOfferedTopic.getTopic());
+        convertAndSend(mentorshipOfferedEvent, mentorshipOfferedChannelName);
     }
 
 }

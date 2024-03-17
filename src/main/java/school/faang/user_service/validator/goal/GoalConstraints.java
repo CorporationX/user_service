@@ -1,4 +1,4 @@
-package school.faang.user_service.validation.goal;
+package school.faang.user_service.validator.goal;
 
 import lombok.Getter;
 

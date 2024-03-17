@@ -1,4 +1,4 @@
-package school.faang.user_service.dto.events;
+package school.faang.user_service.dto.mentorship;
 
 import lombok.Builder;
 import lombok.Data;

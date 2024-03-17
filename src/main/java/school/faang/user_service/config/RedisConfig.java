@@ -25,15 +25,15 @@ public class RedisConfig {
     String userBanChannelName;
 
     @Bean
-    public JedisConnectionFactory redisConnectionFactory() {
+    public JedisConnectionFactory jedisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
         return new JedisConnectionFactory(config);
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+    public RedisTemplate<String, Object> redisTemplate() {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        redisTemplate.setConnectionFactory(jedisConnectionFactory());
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new StringRedisSerializer());
         return redisTemplate;
@@ -53,7 +53,7 @@ public class RedisConfig {
     RedisMessageListenerContainer redisContainer(MessageListenerAdapter messageListener) {
         RedisMessageListenerContainer container
                 = new RedisMessageListenerContainer();
-        container.setConnectionFactory(redisConnectionFactory());
+        container.setConnectionFactory(jedisConnectionFactory());
         container.addMessageListener(messageListener, userBanTopic());
         return container;
     }

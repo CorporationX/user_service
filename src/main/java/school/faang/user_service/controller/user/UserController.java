@@ -13,6 +13,7 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.validation.user.UserValidator;
 
 import java.util.List;
 
@@ -21,6 +22,14 @@ import java.util.List;
 @Tag(name = "Users", description = "Endpoints for managing users")
 public class UserController {
     private final UserService userService;
+    private final UserValidator userValidator;
+
+    @Operation(summary = "Create new user")
+    @PostMapping("/users/create")
+    public UserDto create(@RequestBody UserDto userDto) {
+        userValidator.validateUserDtoFields(userDto);
+        return userService.create(userDto);
+    }
 
     @Operation(summary = "Get premium users with filters")
     @PostMapping("/users/premium")

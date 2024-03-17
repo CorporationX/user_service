@@ -14,6 +14,7 @@ public class UserDto {
     private String username;
     private String email;
     private String phone;
+    private String password;
     private boolean active;
     private boolean isPremium;
 }

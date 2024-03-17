@@ -16,6 +16,7 @@ import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.service.user.filter.UserFilter;
+import school.faang.user_service.validation.user.UserValidator;
 
 import java.util.Collections;
 import java.util.List;
@@ -30,6 +31,38 @@ public class UserService {
     private final GoalService goalService;
     private final UserMapper userMapper;
     private final List<UserFilter> userFilters;
+    private final UserValidator userValidator;
+
+    public UserDto create(UserDto userDto) {
+        userValidator.validatePassword(userDto);
+        userDto.setActive(true);
+        User createdUser = userRepository.save(userMapper.toEntity(userDto));
+        return userMapper.toDto(createdUser);
+    }
+
+    public UserDto getUser(long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User doesn't exist by ID: " + userId));
+        return userMapper.toDto(user);
+    }
+
+    public List<UserDto> getUsersByIds(List<Long> ids) {
+        List<User> users = userRepository.findAllById(ids);
+        if (users.isEmpty()) {
+            throw new EntityNotFoundException("Users with given IDs don't exist");
+        }
+        return userMapper.toDto(users);
+    }
+
+    public List<UserDto> getPremiumUsers(UserFilterDto filters) {
+        List<User> premiumUsers = userRepository.findPremiumUsers().toList();
+        if (!userFilters.isEmpty()) {
+            userFilters.stream()
+                    .filter(userFilter -> userFilter.isApplicable(filters))
+                    .forEach(userFilter -> userFilter.apply(premiumUsers, filters));
+        }
+        return userMapper.toDto(premiumUsers);
+    }
 
     public UserDto deactivateUser(long userId) {
         User userToDeactivate = userRepository.findById(userId)
@@ -62,30 +95,6 @@ public class UserService {
             userToDeactivate.setMentees(Collections.emptyList());
         }
         return userMapper.toDto(userRepository.save(userToDeactivate));
-    }
-
-    public List<UserDto> getPremiumUsers(UserFilterDto filters) {
-        List<User> premiumUsers = userRepository.findPremiumUsers().toList();
-        if (!userFilters.isEmpty()) {
-            userFilters.stream()
-                    .filter(userFilter -> userFilter.isApplicable(filters))
-                    .forEach(userFilter -> userFilter.apply(premiumUsers, filters));
-        }
-        return userMapper.toDto(premiumUsers);
-    }
-
-    public UserDto getUser(long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User doesn't exist by ID: " + userId));
-        return userMapper.toDto(user);
-    }
-
-    public List<UserDto> getUsersByIds(List<Long> ids) {
-        List<User> users = userRepository.findAllById(ids);
-        if (users.isEmpty()) {
-            throw new EntityNotFoundException("Users with given IDs don't exist");
-        }
-        return userMapper.toDto(users);
     }
 }
 

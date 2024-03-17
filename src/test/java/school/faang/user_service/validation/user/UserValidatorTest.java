@@ -8,9 +8,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.repository.UserRepository;
 
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -38,6 +38,7 @@ class UserValidatorTest {
                 .build();
     }
 
+    // TODO написать валидацию полей
     @Test
     void validateUserExistsById_UserExists_ShouldNotThrow() {
         when(userRepository.existsById(anyLong())).thenReturn(true);
@@ -47,10 +48,10 @@ class UserValidatorTest {
     }
 
     @Test
-    void validateUserExistsById_UserDoesntExist_ShouldThrowNoSuchElementException() {
+    void validateUserExistsById_UserDoesntExist_ShouldThrowEntityNotFoundException() {
         when(userRepository.existsById(anyLong())).thenReturn(false);
 
-        assertThrows(NoSuchElementException.class, () ->
+        assertThrows(EntityNotFoundException.class, () ->
                 userValidator.validateIfUserExistsById(666L));
     }
 

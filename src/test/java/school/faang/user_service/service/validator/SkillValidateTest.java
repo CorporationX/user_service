@@ -36,7 +36,7 @@ public class SkillValidateTest {
     public void testCreateWithBlankTitle() {
         SkillDto skillDto = prepareData(" ");
 
-        assertThrows(DataValidationException.class, () -> skillValidator.validatorSkillsTitle(skillDto));
+        assertThrows(DataValidationException.class, () -> skillValidator.validateSkillTitle(skillDto));
     }
 
     @Test

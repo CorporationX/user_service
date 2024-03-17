@@ -34,9 +34,4 @@ public class RedisConfig {
         redisTemplate.setValueSerializer(new StringRedisSerializer());
         return redisTemplate;
     }
-
-    @Bean
-    ChannelTopic profileViewTopic() {
-        return new ChannelTopic(projectViewChannelName);
-    }
 }

@@ -10,7 +10,6 @@ import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.mapper.base.UserMapperBase;
 
 import java.util.List;
-import java.util.Locale;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper extends UserMapperBase {

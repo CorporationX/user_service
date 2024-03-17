@@ -32,6 +32,6 @@ public class ProfileViewEventPublisher extends AbstractEventPublisher<ProfileVie
                 .receivedAt(LocalDateTime.now())
                 .build();
 
-        send(profileViewChannelName, event);
+        convertAndSend(event, profileViewChannelName);
     }
 }

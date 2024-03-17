@@ -79,7 +79,7 @@ public class UserServiceTest {
     @BeforeEach
     public void init() {
         userService = new UserService(userRepository, eventRepository, mentorshipRepository, goalRepository,
-                countryService, personService, validator, userMapper, csvPersonParser, profilePic, filters);
+                countryService, personService, validator, userMapper, csvPersonParser, profilePic, filters, );
     }
 
     @Test

@@ -143,7 +143,7 @@ class EventServiceTest {
 
     @Test
     void getOwnedEvents_OwnedEventsFound_ThenReturnedAsDto() {
-        doNothing().when(userValidator).validateUserExistsById(anyLong());
+        doNothing().when(userValidator).validateIfUserExistsById(anyLong());
         when(eventRepository.findAllByUserId(anyLong())).thenReturn(List.of(event));
         when(eventMapper.toDto(anyList())).thenReturn(List.of(eventDto));
 
@@ -153,7 +153,7 @@ class EventServiceTest {
 
     @Test
     void getParticipatedEvents_ParticipatedEventsFound_ThenReturnedAsDto() {
-        doNothing().when(userValidator).validateUserExistsById(anyLong());
+        doNothing().when(userValidator).validateIfUserExistsById(anyLong());
         when(eventRepository.findParticipatedEventsByUserId(anyLong())).thenReturn(List.of(event));
         when(eventMapper.toDto(anyList())).thenReturn(List.of(eventDto));
 

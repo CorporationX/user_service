@@ -15,11 +15,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final List<UserFilter> userFilters;
 
     public User getUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("id is not found"));
     }
     public List<UserDto> getPremiumUsers(UserFilterDto filters) {
+
         List<User> premiumUsers = userRepository.findPremiumUsers().toList();
         if (!userFilters.isEmpty()) {
             userFilters.stream()

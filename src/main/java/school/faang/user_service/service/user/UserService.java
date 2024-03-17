@@ -16,6 +16,7 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.entity.student.Person;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -42,6 +43,7 @@ public class UserService {
     private final CsvPersonParser csvPersonParser;
     private final UserProfilePic generatedUserProfilePic;
     private final List<UserFilter> userFilters;
+    private final ProfileViewEventPublisher publisher;
 
     public UserRegistrationDto createUser(UserRegistrationDto userDto) {
         User user = userMapper.toEntity(userDto);
@@ -56,8 +58,10 @@ public class UserService {
     }
 
     public UserDto getUserDtoById(long id) {
+        UserDto userDto = userMapper.toDto(getUserById(id));
+        publisher.publish(id);
         userValidator.validateAccessToUser(id);
-        return userMapper.toDto(getUserById(id));
+        return userDto;
     }
 
     public UserProfilePic getUserPicUrlById(long id) {
@@ -130,5 +134,11 @@ public class UserService {
         }
         personService.savePeopleAsUsers(people);
         log.info("Students saved from csv file as users. Saved accounts count: {}", people.size());
+    }
+
+
+    public UserDto getUserDtoByIdUtility(long userId) {
+        User user = getUserById(userId);
+        return userMapper.toDto(user);
     }
 }

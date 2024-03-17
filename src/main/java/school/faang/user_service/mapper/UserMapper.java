@@ -13,6 +13,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper extends UserMapperBase {
+    @Mapping(target = "preference", source = "contactPreference.preference")
     UserDto toDto(User user);
 
     List<UserDto> toDtoList(List<User> users);
@@ -26,7 +27,7 @@ public interface UserMapper extends UserMapperBase {
     @Mapping(target = "country", source = "country.title")
     @Mapping(target = "profilePicFileId", source = "userProfilePic.fileId")
     @Mapping(target = "profilePicSmallFileId", source = "userProfilePic.smallFileId")
-    UserRegistrationDto toRegDto(User user);
+    public abstract UserRegistrationDto toRegDto (User user);
 
     default UserProfilePic getUserProfilePic(UserRegistrationDto userDto) {
         String fileId = userDto.getProfilePicFileId();

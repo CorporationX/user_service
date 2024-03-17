@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.events.MentorshipRequestedEventDto;
+import school.faang.user_service.dto.mentorship.MentorshipRequestedEventDto;
 
 @Component
 public class MentorshipRequestedEventPublisher extends AbstractEventPublisher<MentorshipRequestedEventDto> {

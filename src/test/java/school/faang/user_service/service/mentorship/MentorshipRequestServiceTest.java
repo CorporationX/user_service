@@ -45,6 +45,9 @@ class MentorshipRequestServiceTest {
     @Mock
     private MentorshipRequestMapper mentorshipRequestMapper;
 
+    @Mock
+    private MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
+
     @InjectMocks
     private MentorshipRequestService mentorshipRequestService;
     private MentorshipRequestDto mentorshipRequestDto;
@@ -73,10 +76,10 @@ class MentorshipRequestServiceTest {
     @BeforeEach
     public void init() {
         mentorshipRequestDto = new MentorshipRequestDto();
-        mentorshipRequestDto.setRequesterId(1L);
+        mentorshipRequestDto.setRequester(1L);
         mentorshipRequestDto.setDescription("Description");
-        mentorshipRequestDto.setRequesterId(88L);
-        mentorshipRequestDto.setReceiverId(77L);
+        mentorshipRequestDto.setRequester(88L);
+        mentorshipRequestDto.setReceiver(77L);
         mentorshipRequestDto.setCreatedAt(LocalDateTime.now());
         requestFilterDto = new RequestFilterDto();
         requestFilterDto.setDescriptionFilter("Description filter");
@@ -138,6 +141,10 @@ class MentorshipRequestServiceTest {
     @Test
     public void whenRequestForMembershipThenCreated() {
         Mockito.when(mentorshipRequestMapper.toEntity(mentorshipRequestDto)).thenReturn(mentorshipRequest);
+        Mockito.when(userService.getUserById(mentorshipRequestDto.getReceiver()))
+                .thenReturn(receiver);
+        Mockito.when(userService.getUserById(mentorshipRequestDto.getRequester()))
+                .thenReturn(requester);
         mentorshipRequestService.requestMentorship(mentorshipRequestDto);
         Mockito.verify(mentorshipRequestRepository, times(1))
                 .save(mentorshipRequest);

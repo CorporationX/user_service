@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.mentorship;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -13,8 +14,8 @@ import school.faang.user_service.validator.mentorship.MentorshipRequestValidator
 import java.util.List;
 
 @RestController
-@RequestMapping("/mentorship")
 @RequiredArgsConstructor
+@RequestMapping("/mentorship/request")
 public class MentorshipRequestController {
 
     private final MentorshipRequestService mentorshipRequestService;
@@ -38,8 +39,8 @@ public class MentorshipRequestController {
         return mentorshipRequestService.rejectRequest(id, rejection);
     }
 
-    @PostMapping("/request")
-    private MentorshipRequestDto requestMentorship(@RequestBody MentorshipRequestDto mentorshipRequestDto) {
+    @PostMapping
+    private MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         mentorshipRequestValidator.commonCheck(mentorshipRequestDto);
         return mentorshipRequestService.requestMentorship(mentorshipRequestDto);
     }

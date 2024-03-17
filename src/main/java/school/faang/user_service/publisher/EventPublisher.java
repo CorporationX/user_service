@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public abstract class AbstractEventPublisher<T> {
+public abstract class EventPublisher<T> {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
     @Autowired
@@ -19,9 +19,9 @@ public abstract class AbstractEventPublisher<T> {
         try {
             String json = objectMapper.writeValueAsString(eventDto);
             redisTemplate.convertAndSend(topicName, json);
-            log.info("Event was send to topic : {}", topicName);
+            log.info("Event was send to topic: {}", topicName);
         } catch (JsonProcessingException e) {
-            log.error("Failed attempt convert to json");
+            log.info("Convert to JSON failed.");
             throw new RuntimeException(e.getMessage());
         }
     }

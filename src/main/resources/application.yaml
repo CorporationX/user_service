@@ -45,6 +45,12 @@ logging:
   level:
     root: info
 
+person:
+  parser:
+    max_file_chunk_size: 13000
+    thread_num: 5
+    expected_chunk_size: 1300
+
 project-service:
   host: localhost
   port: 8082
@@ -76,3 +82,9 @@ image:
   pixels:
     bigSize: 1024
     smallSize: 170
+
+springdoc:
+  version: "1.0.0"
+  swagger-ui:
+    url: /api-docs.yaml
+    filter: true

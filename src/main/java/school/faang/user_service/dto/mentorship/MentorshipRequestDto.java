@@ -1,5 +1,6 @@
 package school.faang.user_service.dto.mentorship;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,12 +16,12 @@ import java.time.LocalDateTime;
 public class MentorshipRequestDto {
 
     private Long id;
-
+    @NotNull
     private String description;
-
-    private Long requesterId;
-
-    private Long receiverId;
+    @NotNull
+    private Long requester;
+    @NotNull
+    private Long receiver;
 
     private RequestStatus status;
 

@@ -1,4 +1,4 @@
-package school.faang.user_service.service.mapper;
+package school.faang.user_service.mapper;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

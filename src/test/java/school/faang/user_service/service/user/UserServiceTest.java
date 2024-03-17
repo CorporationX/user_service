@@ -13,8 +13,11 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.user.filter.UserFilter;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doNothing;
@@ -66,5 +69,28 @@ class UserServiceTest {
 
         verify(userRepository, times(1)).findPremiumUsers();
         verify(userMapper, times(1)).toDto(List.of(premiumUser));
+    }
+    @Test
+    void shouldgetUserById() {
+        User user = new User();
+        long userId = 1L;
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        User foundUser = userService.getUserById(userId);
+
+        assertThat(foundUser).isEqualTo(user);
+    }
+
+    @Test
+    void shouldThrowExceptionForInvalidId() {
+        long userId = 0L;
+        assertThrows(IllegalArgumentException.class, () -> userService.getUserById(userId));
+    }
+    @Test
+    void shouldThrowExceptionIfUserNotFound() {
+        long userId = 2L;
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> userService.getUserById(userId));
     }
 }

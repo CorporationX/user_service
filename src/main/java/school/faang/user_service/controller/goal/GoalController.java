@@ -1,6 +1,6 @@
 package school.faang.user_service.controller.goal;
 
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -18,31 +18,31 @@ public class GoalController {
     private final GoalService goalService;
 
     @PostMapping("/create/{userId}")
-    @ApiOperation("Create goal in database")
+    @Operation(summary = "Create goal in database")
     public GoalDto createGoal(@PathVariable("userId") Long userId, @RequestBody GoalDto goalDto) {
         return goalService.createGoal(userId, goalDto);
     }
 
     @PutMapping("/update/{goalId}")
-    @ApiOperation("Update goal in database")
+    @Operation(summary = "Update goal in database")
     public GoalDto updateGoal(@PathVariable("goalId") Long goalId, @RequestBody GoalDto goalDto) {
         return goalService.updateGoal(goalId, goalDto);
     }
 
     @DeleteMapping("/delete/{goalId}")
-    @ApiOperation("Delete goal from database")
+    @Operation(summary = "Delete goal from database")
     public void deleteGoal(@PathVariable("goalId") Long goalId) {
         goalService.deleteGoal(goalId);
     }
 
     @GetMapping("/subtask/{goalId}")
-    @ApiOperation("Get a list of subtasks by task id")
+    @Operation(summary = "Get a list of subtasks by task id")
     public List<GoalDto> findSubtasksByGoalId(@PathVariable("goalId") Long goalId, @RequestBody GoalFilterDto filteredGoalDto) {
         return goalService.findSubtasksByGoalId(goalId, filteredGoalDto);
     }
 
     @GetMapping("/{userId}")
-    @ApiOperation("Get list goal by user id")
+    @Operation(summary = "Get list goal by user id")
     public List<GoalDto> findGoalsByUserId(@PathVariable("userId") Long userId, @RequestBody GoalFilterDto filterGoalDto) {
         return goalService.findGoalsByUserId(userId, filterGoalDto);
     }

@@ -7,50 +7,64 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.service.user.UserService;
-
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class MentorshipServiceTest {
-
-
+class MentorshipServiceTest {
     @Mock
     private UserService userService;
     @Mock
     private UserMapper userMapper;
-
+    @Mock
+    MentorshipRepository mentorshipRepository;
     @InjectMocks
-    private MentorshipService mentorshipService;
+    MentorshipService mentorshipService;
 
-
+    private User mentor;
+    private User mentee;
+    private Goal goal;
     private Long userId;
     private Long user1 = 3L;
     private Long user2 = 2L;
     private Long menteeId = 1L;
     private Long mentorId = 2L;
     private List<User> userList = new ArrayList<>();
-
     private List<UserDto> userListDto = new ArrayList<>();
 
     private User user;
     private User user4;
 
     @BeforeEach
-    void init() {
+    void setUp() {
+        goal = Goal.builder()
+                .id(3L)
+                .build();
+        mentor = User.builder()
+                .id(1L)
+                .build();
+        mentee = User.builder()
+                .id(2L)
+                .build();
+        goal.setMentor(mentor);
+        mentor.setMentees(new ArrayList<>(List.of(mentee)));
+        mentee.setMentors(new ArrayList<>(List.of(mentor)));
+        mentee.setGoals(new ArrayList<>(List.of(goal)));
         userId = 1L;
         user4 = User.builder()
                 .id(2L)
@@ -68,6 +82,17 @@ public class MentorshipServiceTest {
     }
 
     @Test
+    void deleteMentorForAllHisMentees_MentorDeletedMenteesUpdated_ThenMenteesSavedToDb() {
+        mentorshipService.deleteMentorForAllHisMentees(mentor.getId(), List.of(mentee));
+
+        assertAll(
+                () -> verify(mentorshipRepository, times(1)).saveAll(List.of(mentee)),
+                () -> assertEquals(Collections.emptyList(), mentee.getMentors()),
+                () -> assertEquals(mentee.getGoals().get(0).getMentor(), mentee)
+        );
+    }
+
+    @Test
     void testGetMentees() {
         Mockito.when(userService.getUserById(userId)).thenReturn(user);
         user.setMentees(Collections.emptyList());
@@ -75,7 +100,6 @@ public class MentorshipServiceTest {
         assertEquals(Collections.emptyList(), mentorshipService.getMentees(userId));
         Mockito.verify(userService).getUserById(userId);
     }
-
 
     @Test
     void testGetMentors() {
@@ -97,7 +121,6 @@ public class MentorshipServiceTest {
         Mockito.verify(userMapper).toDto(userList);
     }
 
-
     @Test
     void testDeleteMentee() {
         Mockito.when(userService.getUserById(menteeId)).thenReturn(user);
@@ -113,5 +136,4 @@ public class MentorshipServiceTest {
         assertThrows(IllegalArgumentException.class, () -> mentorshipService.deleteMentor(menteeId, mentorId));
         Mockito.verify(userService, times(2)).getUserById(anyLong());
     }
-
 }

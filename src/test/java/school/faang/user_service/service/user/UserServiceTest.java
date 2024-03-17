@@ -111,6 +111,7 @@ class UserServiceTest {
     @Test
     void deactivateUser_UserIsDeactivatedAndSavedToDb_GoalsAndEventsAlsoDeleted() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
+        when(userRepository.save(user)).thenReturn(user);
 
         userService.deactivateUser(user.getId());
 
@@ -120,6 +121,7 @@ class UserServiceTest {
                 () -> verify(goalService, times(1)).deleteGoal(goal.getId()),
                 () -> verify(eventService, times(1)).deleteEvent(event.getId()),
                 () -> verify(userRepository, times(1)).save(user),
+                () -> verify(userMapper, times(1)).toDto(user),
                 () -> assertFalse(user.isActive()),
                 () -> assertEquals(Collections.emptyList(), goal.getUsers()),
                 () -> assertEquals(Collections.emptyList(), user.getMentees()),

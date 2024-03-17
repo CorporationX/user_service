@@ -3,21 +3,27 @@ package school.faang.user_service.service.user;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.event.SearchAppearanceEventDto;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.dto.user.UserRegistrationDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.filter.Filter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.service.CountryService;
+import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
 import school.faang.user_service.validator.UserValidator;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -31,6 +37,8 @@ public class UserService {
     private final MentorshipRepository mentorshipRepository;
     private final GoalRepository goalRepository;
     private final UserProfilePic generatedUserProfilePic;
+    private final List<Filter<UserFilterDto, User>> filters;
+    private final SearchAppearanceEventPublisher eventPublisher;
 
     public UserRegistrationDto createUser(UserRegistrationDto userDto) {
         User user = userMapper.toEntity(userDto);
@@ -101,8 +109,23 @@ public class UserService {
         }
     }
 
-    public List<UserDto> getAllUser() {
+    public List<UserDto> getUsers(UserFilterDto filter, long actorId) {
         List<User> users = userRepository.findAll();
-        return userMapper.toDtoList(users);
+
+        filters.stream()
+                .filter(f -> f.isApplicable(filter))
+                .forEach(f -> f.apply(users, filter));
+
+        users.forEach(user -> {
+            SearchAppearanceEventDto event = new SearchAppearanceEventDto(
+                    user.getId(),
+                    actorId,
+                    LocalDateTime.now()
+            );
+            eventPublisher.publish(event.toString());
+        });
+
+        return new ArrayList<>(users.stream()
+                .map(userMapper::toDto).toList());
     }
 }

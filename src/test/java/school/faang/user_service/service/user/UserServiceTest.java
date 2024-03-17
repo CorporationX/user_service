@@ -15,7 +15,6 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
-import school.faang.user_service.service.user.UserService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -130,7 +129,7 @@ public class UserServiceTest {
         List<UserDto> mockUserDtos = List.of(new UserDto(), new UserDto(), new UserDto());
         when(userMapper.toDtoList(mockUsers)).thenReturn(mockUserDtos);
 
-        List<UserDto> result = userService.getAllUser();
+        List<UserDto> result = userService.getUsers();
 
         assertEquals(mockUserDtos.size(), result.size());
     }
@@ -140,7 +139,7 @@ public class UserServiceTest {
         List<User> emptyList = Collections.emptyList();
         when(userRepository.findAll()).thenReturn(emptyList);
 
-        List<UserDto> result = userService.getAllUser();
+        List<UserDto> result = userService.getUsers();
 
         assertTrue(result.isEmpty());
     }

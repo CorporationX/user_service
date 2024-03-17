@@ -5,20 +5,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.UserDto;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.dto.user.UserRegistrationDto;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
-import school.faang.user_service.event.SearchAppearanceEvent;
-import school.faang.user_service.service.SearchAppearanceEventPublisher;
 import school.faang.user_service.service.user.UserService;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -28,7 +24,6 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
     private final UserContext userContext;
-    private final SearchAppearanceEventPublisher eventPublisher;
 
     @PostMapping()
     public UserRegistrationDto createUser(@RequestBody UserRegistrationDto userDto) {
@@ -55,20 +50,10 @@ public class UserController {
         userService.deactivationUserById(userId);
     }
 
-    @GetMapping("/users")
-    public List<UserDto> searchUsers() {
-        Long xUserId = userContext.getUserId();
-        List<UserDto> foundUsers = userService.getAllUser();
+    @PostMapping("/users")
+    public List<UserDto> searchUsers(@RequestBody UserFilterDto filter) {
+        long actorId = userContext.getUserId();
 
-        foundUsers.forEach(user -> {
-            SearchAppearanceEvent event = new SearchAppearanceEvent(
-                    user.getId(),
-                    xUserId,
-                    LocalDateTime.now()
-            );
-            eventPublisher.publish(event.toString());
-        });
-
-        return foundUsers;
+        return userService.getUsers(filter, actorId);
     }
 }

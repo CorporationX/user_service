@@ -7,12 +7,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
+import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class SearchAppearanceEventPublisherTest {
+public class SearchAppearanceEventDtoPublisherTest {
 
     @Mock
     private RedisTemplate<String, Object> redisTemplate;

@@ -9,8 +9,6 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import school.faang.user_service.service.MessagePublisher;
-import school.faang.user_service.service.SearchAppearanceEventPublisher;
 
 @Configuration
 public class RedisConfig {
@@ -34,15 +32,5 @@ public class RedisConfig {
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new StringRedisSerializer());
         return redisTemplate;
-    }
-
-    @Bean
-    ChannelTopic topic() {
-        return new ChannelTopic("SearchAppearanceEvent");
-    }
-
-    @Bean
-    public MessagePublisher redisPublisher(RedisTemplate<String, Object> redisTemplate, ChannelTopic topic) {
-        return new SearchAppearanceEventPublisher(redisTemplate, topic());
     }
 }

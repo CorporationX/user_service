@@ -19,6 +19,7 @@ import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.service.user.filter.UserFilter;
+import school.faang.user_service.validation.user.UserValidator;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,6 +50,7 @@ class UserServiceTest {
     private MentorshipService mentorshipService;
     private EventService eventService;
     private GoalService goalService;
+    private UserValidator userValidator;
 
     private User user;
     private UserDto userDto;
@@ -114,7 +116,7 @@ class UserServiceTest {
         userMapper = mock(UserMapper.class);
         userFilter = mock(UserFilter.class);
         userService = new UserService(userRepository, mentorshipService, eventService, goalService,
-                userMapper, List.of(userFilter));
+                userMapper, List.of(userFilter), userValidator);
     }
 
     @Test

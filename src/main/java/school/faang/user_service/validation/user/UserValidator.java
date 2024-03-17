@@ -8,8 +8,6 @@ import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.PasswordValidationException;
 import school.faang.user_service.repository.UserRepository;
 
-import java.util.NoSuchElementException;
-
 @Component
 @RequiredArgsConstructor
 public class UserValidator {
@@ -31,17 +29,19 @@ public class UserValidator {
     }
 
     public void validatePassword(UserDto userDto) {
-        String numbers = "1234567890";
-        String symbols = "!@#$%^&*()_+<,>./,\"']}[{;:№";
-        if (userDto.getPassword().length() <= 8) {
+        String userPassword = userDto.getPassword();
+
+        if (userPassword.length() <= 8) {
             throw new PasswordValidationException("Password must be at least 8 characters long");
         }
-        if (!userDto.getPassword().contains(numbers)) {
+        if (!userPassword.matches(".*[A-Z].*")) {
+            throw new PasswordValidationException("Password must contain at least 1 uppercase letter");
+        }
+        if (!userPassword.matches(".*\\d.*")) {
             throw new PasswordValidationException("Password must contain at least 1 digit");
         }
-        if (!userDto.getPassword().contains(symbols)) {
-            throw new PasswordValidationException(String.format
-                    ("Password must contain at least 1 special symbol \"%s\"", symbols));
+        if (!userPassword.matches(".*[!@#$%^&*()_+<,>./\"'}{;:№].*")) {
+            throw new PasswordValidationException("Password must contain at least 1 special symbol");
         }
     }
 

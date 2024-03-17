@@ -7,40 +7,41 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.SkillOffer;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.skill.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.validation.skill.SkillValidator;
+import school.faang.user_service.validation.user.UserValidator;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
 
 @Service
 @RequiredArgsConstructor
 public class SkillService {
 
-    private static final int MIN_SKILL_OFFERS = 3;
     private final SkillRepository skillRepository;
     private final SkillMapper skillMapper;
     private final SkillValidator skillValidator;
     private final SkillOfferRepository skillOfferRepository;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
+    private final UserValidator userValidator;
 
     public SkillDto create(SkillDto skillDto) {
-        skillValidator.validatorSkills(skillDto);
+        skillValidator.validateSkill(skillDto);
         Skill skillEntity = skillMapper.toEntity(skillDto);
         return skillMapper.toDto(skillRepository.save(skillEntity));
     }
 
     public List<SkillDto> getUserSkills(long userId) {
+        userValidator.validateUserExistsById(userId);
         List<Skill> skills = skillRepository.findAllByUserId(userId);
         return skillMapper.toDto(skills);
     }
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
+        userValidator.validateUserExistsById(userId);
         return skillRepository.findSkillsOfferedToUser(userId)
                 .stream()
                 .collect(Collectors.groupingBy(skill -> skill, Collectors.counting()))
@@ -51,16 +52,11 @@ public class SkillService {
     }
 
     public SkillDto acquireSkillFromOffers(Long skillId, Long userId) {
-
-        Skill skillUser = skillRepository.findUserSkill(skillId, userId)
-                .orElseThrow(() -> new DataValidationException("the user already has the skill"));
+        skillValidator.validateSupplyQuantityCheck(skillId, userId);
 
         List<SkillOffer> skillOffers = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
+        Skill skillUser = skillRepository.findUserSkill(skillId, userId).orElse(null);
 
-        if (skillOffers.size() < MIN_SKILL_OFFERS) {
-            throw new DataValidationException("you need at least 3 recommendations, at the moment you have:"
-                    + skillOffers.size());
-        }
         skillRepository.assignSkillToUser(skillId, userId);
         addUserSkillGuarantee(skillUser, skillOffers);
         return skillMapper.toDto(skillUser);

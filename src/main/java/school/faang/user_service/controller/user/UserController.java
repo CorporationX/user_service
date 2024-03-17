@@ -17,7 +17,7 @@ public class UserController {
         return userService.getPremiumUsers(filters);
     }
 
-    public void deactivateUser(long userId) {
-        userService.deactivateUser(userId);
+    public UserDto deactivateUser(long userId) {
+        return userService.deactivateUser(userId);
     }
 }

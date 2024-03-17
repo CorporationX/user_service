@@ -31,14 +31,14 @@ public class UserService {
     private final UserMapper userMapper;
     private final List<UserFilter> userFilters;
 
-    public void deactivateUser(long userToDeactivateId) {
-        User userToDeactivate = userRepository.findById(userToDeactivateId)
-                .orElseThrow(() -> new EntityNotFoundException("User doesn't exist by id: " + userToDeactivateId));
+    public UserDto deactivateUser(long userId) {
+        User userToDeactivate = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User doesn't exist by id: " + userId));
 
         if (userToDeactivate.getGoals() != null && !userToDeactivate.getGoals().isEmpty()) {
             List<Long> goalsToDeleteIds = userToDeactivate.getGoals().stream()
                     .filter(goal -> !GoalStatus.COMPLETED.equals(goal.getStatus()))
-                    .peek(goal -> goal.getUsers().removeIf(user -> user.getId() == userToDeactivateId))
+                    .peek(goal -> goal.getUsers().removeIf(user -> user.getId() == userId))
                     .filter(goal -> goal.getUsers().isEmpty())
                     .map(Goal::getId)
                     .toList();
@@ -58,10 +58,10 @@ public class UserService {
         userToDeactivate.setActive(false);
 
         if (userToDeactivate.getMentees() != null && !userToDeactivate.getMentees().isEmpty()) {
-            mentorshipService.deleteMentorForAllHisMentees(userToDeactivateId, userToDeactivate.getMentees());
+            mentorshipService.deleteMentorForAllHisMentees(userId, userToDeactivate.getMentees());
             userToDeactivate.setMentees(Collections.emptyList());
         }
-        userRepository.save(userToDeactivate);
+        return userMapper.toDto(userRepository.save(userToDeactivate));
     }
 
     public List<UserDto> getPremiumUsers(UserFilterDto filters) {

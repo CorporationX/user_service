@@ -68,8 +68,8 @@ public class MentorshipRequestService {
         mentorshipRequest.setReceiver(receiver);
         mentorshipRequest.setRequester(requester);
         mentorshipRequest.setStatus(RequestStatus.PENDING);
-        mentorshipRequestRepository.save(mentorshipRequest);
-        mentorshipOfferedPublisher.publish(mentorshipRequestMapper.toEvent(mentorshipRequestDto));
+        MentorshipRequest savedRequest = mentorshipRequestRepository.save(mentorshipRequest);
+        mentorshipOfferedPublisher.publish(mentorshipRequestMapper.toMentorshipOfferedEvent(savedRequest));
         return mentorshipRequestMapper.toDTO(mentorshipRequest);
     }
 

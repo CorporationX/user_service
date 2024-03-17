@@ -12,7 +12,7 @@ public class PageFilter implements UserFilter {
     }
 
     @Override
-    public void apply(Stream<User> users, UserFilterDto filters) {
-        users.skip(filters.getPage() * filters.getPageSize());
+    public void apply(Stream<User> users, UserFilterDto userFilterDto) {
+        users.skip(userFilterDto.getPage() * userFilterDto.getPageSize());
     }
 }

@@ -12,7 +12,7 @@ public class CityPatternFilter implements UserFilter {
     }
 
     @Override
-    public void apply(Stream<User> users, UserFilterDto filters) {
-        users.filter(user -> user.getCity().matches(filters.getCityPattern()));
+    public void apply(Stream<User> users, UserFilterDto userFilterDto) {
+        users.filter(user -> user.getCity().matches(userFilterDto.getCityPattern()));
     }
 }

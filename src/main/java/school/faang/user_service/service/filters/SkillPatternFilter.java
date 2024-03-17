@@ -7,12 +7,12 @@ import java.util.stream.Stream;
 
 public class SkillPatternFilter implements UserFilter {
     @Override
-    public boolean isApplicable(UserFilterDto filters) {
-        return filters.getSkillPattern() != null;
+    public boolean isApplicable(UserFilterDto userFilterDto) {
+        return userFilterDto.getSkillPattern() != null;
     }
 
     @Override
-    public void apply(Stream<User> users, UserFilterDto filters) {
-        users.filter(user -> user.getSkills().contains(filters.getSkillPattern()));
+    public void apply(Stream<User> users, UserFilterDto userFilterDto) {
+        users.filter(user -> user.getSkills().contains(userFilterDto.getSkillPattern()));
     }
 }

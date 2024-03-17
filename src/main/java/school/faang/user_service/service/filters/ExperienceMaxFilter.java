@@ -12,7 +12,7 @@ public class ExperienceMaxFilter implements UserFilter {
     }
 
     @Override
-    public void apply(Stream<User> users, UserFilterDto filters) {
-        users.filter(user -> user.getExperience() <= filters.getExperienceMax());
+    public void apply(Stream<User> users, UserFilterDto userFilterDto) {
+        users.filter(user -> user.getExperience() <= userFilterDto.getExperienceMax());
     }
 }

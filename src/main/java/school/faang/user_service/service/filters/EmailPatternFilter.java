@@ -12,7 +12,7 @@ public class EmailPatternFilter implements UserFilter {
     }
 
     @Override
-    public void apply(Stream<User> users, UserFilterDto filters) {
-        users.filter(user -> user.getEmail().matches(filters.getEmailPattern()));
+    public void apply(Stream<User> users, UserFilterDto userFilterDto) {
+        users.filter(user -> user.getEmail().matches(userFilterDto.getEmailPattern()));
     }
 }

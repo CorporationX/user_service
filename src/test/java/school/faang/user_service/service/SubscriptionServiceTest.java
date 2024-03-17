@@ -14,6 +14,9 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
+import school.faang.user_service.service.filters.CityPatternFilter;
+import school.faang.user_service.service.filters.CountryPatternFilter;
+import school.faang.user_service.service.filters.ExperienceMaxFilter;
 import school.faang.user_service.service.filters.NamePatternFilter;
 import school.faang.user_service.service.filters.UserFilter;
 
@@ -46,7 +49,10 @@ public class SubscriptionServiceTest {
     public void initialize() {
         userId1 = 1000L;
         userId2 = 2000L;
+        userFilters.add(new CityPatternFilter());
+        userFilters.add(new CountryPatternFilter());
         userFilters.add(new NamePatternFilter());
+        userFilters.add(new ExperienceMaxFilter());
         subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, userFilters);
 
     }

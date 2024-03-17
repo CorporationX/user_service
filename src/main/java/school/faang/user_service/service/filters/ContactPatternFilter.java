@@ -12,7 +12,7 @@ public class ContactPatternFilter implements UserFilter {
     }
 
     @Override
-    public void apply(Stream<User> users, UserFilterDto filters) {
-        users.filter(user -> user.getContacts().contains(filters.getContactPattern()));
+    public void apply(Stream<User> users, UserFilterDto userFilterDto) {
+        users.filter(user -> user.getContacts().contains(userFilterDto.getContactPattern()));
     }
 }

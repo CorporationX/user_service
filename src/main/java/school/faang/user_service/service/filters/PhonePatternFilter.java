@@ -7,12 +7,12 @@ import java.util.stream.Stream;
 
 public class PhonePatternFilter implements UserFilter {
     @Override
-    public boolean isApplicable(UserFilterDto filters) {
-        return filters.getPhonePattern() != null;
+    public boolean isApplicable(UserFilterDto userFilterDto) {
+        return userFilterDto.getPhonePattern() != null;
     }
 
     @Override
-    public void apply(Stream<User> users, UserFilterDto filters) {
-        users.filter(user -> user.getPhone().matches(filters.getPhonePattern()));
+    public void apply(Stream<User> users, UserFilterDto userFilterDto) {
+        users.filter(user -> user.getPhone().matches(userFilterDto.getPhonePattern()));
     }
 }

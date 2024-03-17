@@ -12,7 +12,7 @@ public class CountryPatternFilter implements UserFilter {
     }
 
     @Override
-    public void apply(Stream<User> users, UserFilterDto filters) {
-        users.filter(user -> user.getCountry().equals(filters.getCountryPattern()));
+    public void apply(Stream<User> users, UserFilterDto userFilterDto) {
+        users.filter(user -> user.getCountry().equals(userFilterDto.getCountryPattern()));
     }
 }

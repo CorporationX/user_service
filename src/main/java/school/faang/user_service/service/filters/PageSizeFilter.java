@@ -7,12 +7,12 @@ import java.util.stream.Stream;
 
 public class PageSizeFilter implements UserFilter {
     @Override
-    public boolean isApplicable(UserFilterDto filters) {
-        return filters.getPageSize() != 0;
+    public boolean isApplicable(UserFilterDto userFilterDto) {
+        return userFilterDto.getPageSize() != 0;
     }
 
     @Override
-    public void apply(Stream<User> users, UserFilterDto filters) {
-        users.limit(filters.getPageSize());
+    public void apply(Stream<User> users, UserFilterDto userFilterDto) {
+        users.limit(userFilterDto.getPageSize());
     }
 }

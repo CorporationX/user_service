@@ -54,6 +54,12 @@ public class UserServiceTest {
     private UserValidator validator;
     @Mock
     private UserProfilePic profilePic;
+
+    @Mock
+    private CsvPersonParser csvPersonParser;
+
+    @Mock
+    PersonService personService;
     @Spy
     private UserMapperImpl userMapper;
 
@@ -72,8 +78,8 @@ public class UserServiceTest {
 
     @BeforeEach
     public void init() {
-        userService = new UserService(userRepository, countryService, validator, userMapper, eventRepository,
-                mentorshipRepository, goalRepository, profilePic, filters);
+        userService = new UserService(userRepository, eventRepository, mentorshipRepository, goalRepository,
+                countryService, personService, validator, userMapper, csvPersonParser, profilePic, filters);
     }
 
     @Test

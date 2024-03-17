@@ -21,13 +21,17 @@ spring:
     redis:
       port: 6379
       host: localhost
-      channel:
+      channels:
+        follower_channel:
+          name: follower_channel
+        profile_view_channel:
+          name: profile_view_channel
+        premium_bought_channel:
+          name: premium_bought_channel
+        mentorship_request_channel:
+          name: mentorship_request_channel
         user_ban:
-          user_ban_channel: user_ban_channel
-        follower:
-          follower_channel: follower_channel
-        profile_view:
-          profile_view_channel: profile_view_channel
+          name: user_ban_channel
   mvc:
     servlet:
       path: /api/v1
@@ -37,7 +41,7 @@ spring:
 cron:
 
 server:
-  port: 8080
+  port: 8085
 
 logging:
   level:

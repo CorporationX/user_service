@@ -11,7 +11,7 @@ public class PremiumValidator {
 
     private final PremiumRepository premiumRepo;
 
-    public void validatePremium(Long userId) {
+    public void validatePremiumExist(Long userId) {
         if (premiumRepo.existsById(userId)) {
             throw new DataValidationException("User already has a premium");
         }

@@ -8,10 +8,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import school.faang.user_service.service.mentorship.MentorshipService;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.service.user.UserService;
 
 
@@ -91,11 +90,11 @@ public class MentorshipServiceTest {
     void shouldReturnMentorsAsUserDtoList() {
         Mockito.when(userService.getUserById(userId)).thenReturn(user);
         user.setMentors(userList);
-        Mockito.when(userMapper.toUserDtoList(userList)).thenReturn(userListDto);
+        Mockito.when(userMapper.toDto(userList)).thenReturn(userListDto);
 
         assertEquals(userListDto, mentorshipService.getMentors(userId));
         Mockito.verify(userService).getUserById(userId);
-        Mockito.verify(userMapper).toUserDtoList(userList);
+        Mockito.verify(userMapper).toDto(userList);
     }
 
 

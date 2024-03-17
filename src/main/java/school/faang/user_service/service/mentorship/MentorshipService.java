@@ -2,11 +2,11 @@ package school.faang.user_service.service.mentorship;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 
+import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.service.user.UserService;
 
 import java.util.Collections;
@@ -24,7 +24,7 @@ public class MentorshipService {
         if (user.getMentees().isEmpty()) {
             return Collections.emptyList();
         }
-        return userMapper.toUserDtoList(user.getMentees());
+        return userMapper.toDto(user.getMentees());
     }
 
     public List<UserDto> getMentors(long userId) {
@@ -32,7 +32,7 @@ public class MentorshipService {
         if (user.getMentors().isEmpty()) {
             return Collections.emptyList();
         }
-        return userMapper.toUserDtoList(user.getMentors());
+        return userMapper.toDto(user.getMentors());
     }
 
     public void deleteMentee(long menteeId, long mentorId) {

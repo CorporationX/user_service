@@ -4,9 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.mapper.UserMapperImpl;
+import school.faang.user_service.mapper.user.UserMapperImpl;
 
 import java.util.List;
 
@@ -24,19 +24,19 @@ public class UserMapperTest {
     private UserMapperImpl userMapper;
 
     @Test
-    public void testToUserDto() {
+    public void testtoDto() {
         when(user.getId()).thenReturn(1L);
-        UserDto userDto = userMapper.toUserDto(user);
+        UserDto userDto = userMapper.toDto(user);
         assertThat(userDto.getId()).isEqualTo(1L);
     }
 
     @Test
-    void toUserDtoList() {
+    void toDto() {
         List<User> users = List.of(
                 User.builder().id(1L).build()
         );
 
-        List<UserDto> userDtoList = userMapper.toUserDtoList(users);
+        List<UserDto> userDtoList = userMapper.toDto(users);
 
         assertEquals(1, userDtoList.size());
         assertEquals(users.get(0).getId(), userDtoList.get(0).getId());

@@ -21,7 +21,7 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}")
     private int port;
 
-    @Value("${spring.data.redis.channel.user_ban.user_ban_channel}")
+    @Value("${spring.data.redis.channels.user_ban.name}")
     String userBanChannelName;
 
     @Bean

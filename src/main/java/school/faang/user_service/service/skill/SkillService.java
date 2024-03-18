@@ -35,13 +35,13 @@ public class SkillService {
     }
 
     public List<SkillDto> getUserSkills(long userId) {
-        userValidator.validateUserExistsById(userId);
+        userValidator.validateIfUserExistsById(userId);
         List<Skill> skills = skillRepository.findAllByUserId(userId);
         return skillMapper.toDto(skills);
     }
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
-        userValidator.validateUserExistsById(userId);
+        userValidator.validateIfUserExistsById(userId);
         return skillRepository.findSkillsOfferedToUser(userId)
                 .stream()
                 .collect(Collectors.groupingBy(skill -> skill, Collectors.counting()))

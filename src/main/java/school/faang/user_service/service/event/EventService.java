@@ -57,13 +57,13 @@ public class EventService {
     }
 
     public List<EventDto> getOwnedEvents(long userId) {
-        userValidator.validateUserExistsById(userId);
+        userValidator.validateIfUserExistsById(userId);
         List<Event> userOwnedEvents = eventRepository.findAllByUserId(userId);
         return eventMapper.toDto(userOwnedEvents);
     }
 
     public List<EventDto> getParticipatedEvents(long userId) {
-        userValidator.validateUserExistsById(userId);
+        userValidator.validateIfUserExistsById(userId);
         List<Event> userParticipatedEvents = eventRepository.findParticipatedEventsByUserId(userId);
         return eventMapper.toDto(userParticipatedEvents);
     }

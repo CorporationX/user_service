@@ -13,7 +13,6 @@ import school.faang.user_service.service.MentorshipService;
 
 import java.util.List;
 
-
 @RestController
 @RequiredArgsConstructor
 @Validated

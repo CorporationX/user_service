@@ -12,12 +12,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final DeactivationService deactivationService;
 
     public List<UserDto> getPremiumUsers(UserFilterDto filters) {
         return userService.getPremiumUsers(filters);
     }
 
     public UserDto deactivateUser(long userId) {
-        return userService.deactivateUser(userId);
+        return deactivationService.deactivateUser(userId);
     }
 }

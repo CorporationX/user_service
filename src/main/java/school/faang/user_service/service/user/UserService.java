@@ -48,9 +48,6 @@ public class UserService {
 
     public List<UserDto> getUsersByIds(List<Long> ids) {
         List<User> users = userRepository.findAllById(ids);
-        if (users.isEmpty()) {
-            throw new EntityNotFoundException("Users with given IDs don't exist");
-        }
         return userMapper.toDto(users);
     }
 

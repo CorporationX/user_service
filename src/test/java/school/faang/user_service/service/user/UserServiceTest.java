@@ -191,8 +191,15 @@ class UserServiceTest {
     @Test
     void getUsersByIds_UsersNotFound_ShouldThrowEntityNotFoundException() {
         when(userRepository.findAllById(List.of(589123098L))).thenReturn(Collections.emptyList());
+        when(userMapper.toDto(Collections.emptyList())).thenReturn(Collections.emptyList());
 
-        assertThrows(EntityNotFoundException.class, () ->
-                userService.getUsersByIds(List.of(589123098L)));
+        userService.getUsersByIds(List.of(589123098L));
+
+        assertAll(
+                () -> verify(userRepository, times(1)).findAllById(anyList()),
+                () -> verify(userMapper, times(1)).toDto(anyList()),
+                () -> assertEquals(Collections.emptyList(), userService.getUsersByIds(List.of(589123098L)))
+        );
+
     }
 }

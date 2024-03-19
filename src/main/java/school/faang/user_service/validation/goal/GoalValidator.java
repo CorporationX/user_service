@@ -11,7 +11,6 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -24,7 +23,7 @@ public class GoalValidator {
     public void validateGoalCreation(Long userId, GoalDto goalDto) {
         validateTitle(goalDto.getTitle());
         int countActiveGoals = goalRepository.countActiveGoalsPerUser(userId);
-        validateUserGoalsCount(countActiveGoals, MAX_USER_ACTIVE_GOALS);
+        validateUserGoalsCount(countActiveGoals);
         validateSkills(goalDto.getSkillIds());
     }
 
@@ -41,25 +40,16 @@ public class GoalValidator {
         }
     }
 
-    public <T> void validateNull(T val) {
-        if (val == null) {
-            throw new DataValidationException("Value can't be null");
-        }
-    }
-
-    public <T> T validateOptional(Optional<T> optional, String exceptionMsg) {
-        return optional.orElseThrow(() -> new EntityNotFoundException(exceptionMsg));
-    }
-
     private void validateGoalStatus(Long goalId) {
-        Goal foundedGoal = validateOptional(goalRepository.findById(goalId), String.format("Goal with ID %d not found", goalId));
+        Goal foundedGoal = goalRepository.findById(goalId).orElseThrow(()
+                -> new EntityNotFoundException(String.format("Goal with ID %d not found", goalId)));
         if (foundedGoal.getStatus().equals(GoalStatus.COMPLETED)) {
             throw new DataValidationException("Completed goals can't be updated");
         }
     }
 
-    private void validateUserGoalsCount(int countActiveGoals, int maxUserActiveGoals) {
-        if (countActiveGoals >= maxUserActiveGoals) {
+    private void validateUserGoalsCount(int countActiveGoals) {
+        if (countActiveGoals >= MAX_USER_ACTIVE_GOALS) {
             throw new DataValidationException("User can't have more than 3 active goals");
         }
     }

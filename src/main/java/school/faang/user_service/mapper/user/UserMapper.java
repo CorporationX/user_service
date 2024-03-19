@@ -15,9 +15,11 @@ import java.util.List;
 public interface UserMapper {
 
     @Mapping(source = "premium", target = "isPremium", qualifiedByName = "isUserPremium")
+    @Mapping(source = "country.id", target = "countryId")
     UserDto toDto(User user);
 
     @Mapping(target = "premium", ignore = true)
+    @Mapping(source = "countryId", target = "country.id")
     User toEntity(UserDto userDto);
 
     List<UserDto> toDto(List<User> users);

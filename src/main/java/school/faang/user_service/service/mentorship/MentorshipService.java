@@ -8,6 +8,7 @@ import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.validation.mentorship.MentorshipValidator;
 
 import java.util.Collections;
 import java.util.List;
@@ -18,6 +19,7 @@ public class MentorshipService {
     private final UserService userService;
     private final UserMapper userMapper;
     private final UserRepository userRepository;
+    private final MentorshipValidator mentorshipValidator;
 
     public void deleteMentorForAllHisMentees(long mentorId, List<User> mentees) {
         mentees.forEach(mentee -> {
@@ -48,21 +50,18 @@ public class MentorshipService {
     public void deleteMentee(long menteeId, long mentorId) {
         User mentor = userService.getUserById(mentorId);
         User mentee = userService.getUserById(menteeId);
-        if (mentor.getId() == mentee.getId()) {
-            throw new IllegalArgumentException("Incorrect data");
-        }
-        mentee.getMentors().remove(mentor);
-        userRepository.save(mentee);
+        mentorshipValidator.validateMentorMenteeIds(menteeId,mentorId);
+        mentor.getMentees().remove(mentee);
+        userRepository.save(mentor);
     }
 
     public void deleteMentor(long menteeId, long mentorId) {
         User mentor = userService.getUserById(mentorId);
         User mentee = userService.getUserById(menteeId);
-        if (mentor.getId() == mentee.getId()) {
-            throw new IllegalArgumentException("Incorrect data");
-        }
-        mentee.getMentors().remove(mentee);
-        userRepository.save(mentor);
+        mentorshipValidator.validateMentorMenteeIds(menteeId,mentorId);
+        mentee.getMentors().remove(mentor);
+        userRepository.save(mentee);
+
     }
 }
 

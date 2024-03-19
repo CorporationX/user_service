@@ -10,9 +10,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.validation.mentorship.MentorshipValidator;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,7 +35,12 @@ class MentorshipServiceTest {
     @Mock
     private UserMapper userMapper;
     @Mock
-    MentorshipRepository mentorshipRepository;
+    private MentorshipRepository mentorshipRepository;
+    @Mock
+    private MentorshipValidator mentorshipValidator;
+    @Mock
+    private UserRepository userRepository;
+
     @InjectMocks
     MentorshipService mentorshipService;
 
@@ -123,17 +131,27 @@ class MentorshipServiceTest {
 
     @Test
     void testDeleteMentee() {
-        Mockito.when(userService.getUserById(menteeId)).thenReturn(user);
-        Mockito.when(userService.getUserById(mentorId)).thenReturn(user);
-        assertThrows(IllegalArgumentException.class, () -> mentorshipService.deleteMentee(menteeId, mentorId));
-        Mockito.verify(userService, times(2)).getUserById(anyLong());
+        Mockito.when(userService.getUserById(menteeId)).thenReturn(mentee);
+        Mockito.when(userService.getUserById(mentorId)).thenReturn(mentor);
+
+        mentorshipService.deleteMentee(menteeId,mentorId);
+
+        verify(userService, times(2)).getUserById(anyLong());
+        verify(mentorshipValidator, times(1)).validateMentorMenteeIds(menteeId,mentorId);
+        verify(userRepository, times(1)).save(mentor);
+        assertEquals(Collections.emptyList(),mentor.getMentees());
     }
 
     @Test
     void testDeleteMentor() {
-        Mockito.when(userService.getUserById(menteeId)).thenReturn(user);
-        Mockito.when(userService.getUserById(mentorId)).thenReturn(user);
-        assertThrows(IllegalArgumentException.class, () -> mentorshipService.deleteMentor(menteeId, mentorId));
-        Mockito.verify(userService, times(2)).getUserById(anyLong());
+        Mockito.when(userService.getUserById(menteeId)).thenReturn(mentee);
+        Mockito.when(userService.getUserById(mentorId)).thenReturn(mentor);
+
+        mentorshipService.deleteMentor(menteeId,mentorId);
+
+        verify(userService, times(2)).getUserById(anyLong());
+        verify(mentorshipValidator, times(1)).validateMentorMenteeIds(menteeId,mentorId);
+        verify(userRepository, times(1)).save(mentee);
+        assertEquals(Collections.emptyList(),mentee.getMentors());
     }
 }

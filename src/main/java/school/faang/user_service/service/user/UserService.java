@@ -22,6 +22,10 @@ public class UserService {
     private final List<UserFilter> userFilters;
     private final UserValidator userValidator;
 
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("A user with this id: " + userId + "was not found in userRepository"));
+    }
+
     public UserDto create(UserDto userDto) {
         userValidator.validatePassword(userDto);
         userDto.setActive(true);
@@ -41,6 +45,7 @@ public class UserService {
     }
 
     public List<UserDto> getPremiumUsers(UserFilterDto filters) {
+
         List<User> premiumUsers = userRepository.findPremiumUsers().toList();
         if (!userFilters.isEmpty()) {
             userFilters.stream()

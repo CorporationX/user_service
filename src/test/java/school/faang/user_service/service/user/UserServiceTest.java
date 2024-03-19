@@ -15,6 +15,9 @@ import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.event.EventService;
+import school.faang.user_service.service.goal.GoalService;
+import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.service.user.filter.UserFilter;
 import school.faang.user_service.validation.user.UserValidator;
 
@@ -24,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -43,15 +47,18 @@ class UserServiceTest {
     private UserRepository userRepository;
     private UserMapper userMapper;
     private UserFilter userFilter;
-    private UserValidator userValidator;
+    private MentorshipService mentorshipService;
+    private EventService eventService;
+    private GoalService goalService;
 
     private User user;
-    private UserDto userDto;
     private User mentee;
     private Goal goal;
     private Event event;
     private User premiumUser;
     private UserDto premiumUserDto;
+    private UserValidator userValidator;
+    private UserDto userDto;
 
     @BeforeEach
     void setUp() {
@@ -166,5 +173,28 @@ class UserServiceTest {
                 () -> verify(userMapper, times(1)).toDto(anyList()),
                 () -> assertEquals(Collections.emptyList(), userService.getUsersByIds(List.of(589123098L)))
         );
+    }
+    @Test
+    void shouldgetUserById() {
+        User user = new User();
+        long userId = 1L;
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        User foundUser = userService.getUserById(userId);
+
+        assertThat(foundUser).isEqualTo(user);
+    }
+
+    @Test
+    void shouldThrowExceptionForInvalidId() {
+        long userId = 0L;
+        assertThrows(EntityNotFoundException.class, () -> userService.getUserById(userId));
+    }
+    @Test
+    void shouldThrowExceptionIfUserNotFound() {
+        long userId = 2L;
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> userService.getUserById(userId));
     }
 }

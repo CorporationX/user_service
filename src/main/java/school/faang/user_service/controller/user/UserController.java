@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.service.user.DeactivationService;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validation.user.UserValidator;
 
@@ -24,7 +25,7 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
-    private final UserValidator userValidator;
+    private final DeactivationService deactivationService;
 
     @Operation(summary = "Create new user")
     @PostMapping

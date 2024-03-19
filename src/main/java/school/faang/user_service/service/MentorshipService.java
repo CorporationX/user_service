@@ -12,8 +12,6 @@ import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,14 +30,14 @@ public class MentorshipService {
 
     public List<User> getMentors(Long userId) {
         User user = getUser(userId);
-        if (user == null) {
+        if (user.getMentors().isEmpty()) {
             return Collections.emptyList();
         }
         return user.getMentors();
     }
 
     private User getUser(Long userId) {
-        return mentorshipRepository.findById(userId).orElse(null);
+        return mentorshipRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("The sent User_id " + userId + " not found in Database"));
     }
 
     public void deleteMentee(Long menteeId, Long mentorId) {
@@ -47,14 +45,13 @@ public class MentorshipService {
         User mentee = getMentee(menteeId);
 
         List<User> mentees = mentor.getMentees();
+
         if (mentees.contains(mentee)) {
-            mentor.setMentees(mentees.
-                    stream().
-                    filter(user -> !user.equals(mentee)).
-                    collect(Collectors.toList()));
+            mentees.removeIf(pupil -> pupil.equals(mentee));
+            mentor.setMentees(mentees);
             mentorshipRepository.save(mentor);
         } else {
-            throw new IllegalArgumentException("The id sent to the mentee id not in the mentee list for this mentor");
+            throw new IllegalArgumentException("The id: " + menteeId + " sent to the mentee id not in the mentee list for this mentor");
         }
     }
 
@@ -63,13 +60,11 @@ public class MentorshipService {
         User mentor = getMentor(mentorId);
         List<User> mentors = mentee.getMentors();
         if (mentors.contains(mentor)) {
-            mentee.setMentors(mentors.
-                    stream().
-                    filter(user -> !user.equals(mentor)).
-                    collect(Collectors.toList()));
+            mentors.removeIf(pupil -> pupil.equals(mentor));
+            mentee.setMentors(mentors);
             mentorshipRepository.save(mentee);
         } else {
-            throw new IllegalArgumentException("The id sent to the mentor is not in the mentor list for this mentee");
+            throw new IllegalArgumentException("The id: " + mentorId + "sent to the mentor is not in the mentor list for this mentee");
         }
     }
 

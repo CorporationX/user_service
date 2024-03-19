@@ -34,6 +34,8 @@ spring:
           name: recommendation_channel
         mentorship_requested_channel:
           name: mentorship_requested_channel
+        recommendation_requested_channel:
+          name: recommendation_requested_channel
 
   async:
     core-pool-size: 5

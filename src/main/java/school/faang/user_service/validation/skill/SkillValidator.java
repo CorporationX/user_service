@@ -20,20 +20,20 @@ public class SkillValidator {
     public void validateSkill(SkillDto skillDto) {
 
         if (skillRepository.existsByTitle(skillDto.getTitle())) {
-            throw new DataValidationException("Skill title can't be empty. ");
+            throw new DataValidationException("Skill with title" + skillDto.getTitle() + "already exists.");
         }
     }
 
     public void validateSkillTitle(SkillDto skillDto) {
         if (skillDto.getTitle().isBlank()) {
-            throw new DataValidationException("field cannot be empty" + skillDto.getTitle());
+            throw new DataValidationException("Skill title can't be empty.");
         }
     }
 
     public void validateSupplyQuantityCheck(Long skillId, Long userId) {
 
         if (skillRepository.findUserSkill(skillId, userId).isPresent()) {
-            throw new DataValidationException("the user already has the skill");
+            throw new DataValidationException("the user already has the skill.");
         }
         List<SkillOffer> skillOffers = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
 

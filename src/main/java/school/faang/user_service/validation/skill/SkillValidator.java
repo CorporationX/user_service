@@ -20,7 +20,7 @@ public class SkillValidator {
     public void validateSkill(SkillDto skillDto) {
 
         if (skillRepository.existsByTitle(skillDto.getTitle())) {
-            throw new DataValidationException("Skill with title" + skillDto.getTitle() + "already exists");
+            throw new DataValidationException("Skill title can't be empty. ");
         }
     }
 

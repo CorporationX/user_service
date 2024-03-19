@@ -26,7 +26,7 @@ public class SkillValidator {
 
     public void validateSkillTitle(SkillDto skillDto) {
         if (skillDto.getTitle().isBlank()) {
-            throw new DataValidationException("The skill already exists");
+            throw new DataValidationException("field cannot be empty" + skillDto.getTitle());
         }
     }
 

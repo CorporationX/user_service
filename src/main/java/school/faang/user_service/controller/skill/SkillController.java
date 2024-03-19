@@ -35,7 +35,7 @@ public class SkillController {
         return skillService.getUserSkills(userContext.getUserId());
     }
 
-    @Operation(summary = "get Offered Skills")
+    @Operation(summary = "Get offered skills by user id")
     @GetMapping("/offered_skills")
     public List<SkillCandidateDto> getOfferedSkills() {
         return skillService.getOfferedSkills(userContext.getUserId());

@@ -3,14 +3,17 @@ package school.faang.user_service.validation.user;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.repository.UserRepository;
 
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -27,15 +30,40 @@ class UserValidatorTest {
     private UserValidator userValidator;
 
     private User user;
+    private UserDto userDto;
 
     @BeforeEach
     void setUp() {
         user = User.builder()
                 .id(1L)
                 .username("ValidUsername")
+                .email("valid@email.ru")
                 .phone("+79123456789")
+                .password("val1dp@ssworD")
                 .active(true)
                 .build();
+        userDto = UserDto.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .password(user.getPassword())
+                .active(user.isActive())
+                .build();
+    }
+
+    @Test
+    void validatePassword_ValidPassword_ShouldNotThrow() {
+        assertDoesNotThrow(() -> userValidator.validatePassword(userDto));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"invalidpassword", "Invalidpassword", "invp", "12121212", "^sju9poossd", "NONONONONO1111"})
+    void validatePassword_InvalidPassword_ShouldThrowDataValidationException(String invalidPassword) {
+        userDto.setPassword(invalidPassword);
+
+        assertThrows(DataValidationException.class, () ->
+                userValidator.validatePassword(userDto));
     }
 
     @Test
@@ -47,10 +75,10 @@ class UserValidatorTest {
     }
 
     @Test
-    void validateUserExistsById_UserDoesntExist_ShouldThrowNoSuchElementException() {
+    void validateUserExistsById_UserDoesntExist_ShouldThrowEntityNotFoundException() {
         when(userRepository.existsById(anyLong())).thenReturn(false);
 
-        assertThrows(NoSuchElementException.class, () ->
+        assertThrows(EntityNotFoundException.class, () ->
                 userValidator.validateIfUserExistsById(666L));
     }
 

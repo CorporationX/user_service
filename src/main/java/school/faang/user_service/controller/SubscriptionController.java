@@ -1,17 +1,13 @@
 package school.faang.user_service.controller;
 
 import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SubscriptionService;
-
 import java.util.List;
 
-
-@Component
 @RestController
 @AllArgsConstructor
 public class SubscriptionController {

@@ -31,6 +31,6 @@ public class PremiumValidator {
     private boolean isUserPremium(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(()
                 -> new EntityNotFoundException("User doesn't exist"));
-        return user.getPremium() == null;
+        return user.getPremium() != null;
     }
 }

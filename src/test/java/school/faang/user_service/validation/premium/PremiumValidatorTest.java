@@ -61,13 +61,13 @@ public class PremiumValidatorTest {
     private User getUser() {
         return User.builder()
                 .id(1L)
+                .premium(Premium.builder().build())
                 .build();
     }
 
     private User getUserWithoutPremium() {
         return User.builder()
                 .id(1L)
-                .premium(Premium.builder().build())
                 .build();
     }
 

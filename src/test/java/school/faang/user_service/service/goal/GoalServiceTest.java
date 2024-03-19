@@ -25,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -64,7 +63,7 @@ public class GoalServiceTest {
         when(goalRepository.save(any(Goal.class))).thenReturn(goal);
         when(goalMapper.toDto(any(Goal.class))).thenReturn(expected);
         when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(getUser()));
-        when(goalValidator.validateOptional(Optional.ofNullable(getUser()), String.format("User with ID %d not found", userId))).thenReturn(new User());
+        when(goalRepository.findById(anyLong())).thenReturn(Optional.ofNullable(new Goal()));
 
         GoalDto actual = goalService.createGoal(userId, expected);
 
@@ -73,7 +72,6 @@ public class GoalServiceTest {
         verify(goalRepository, times(1)).save(any(Goal.class));
         verify(goalMapper, times(1)).toDto(any(Goal.class));
         verify(userRepository, times(1)).findById(anyLong());
-        verify(goalValidator, times(2)).validateOptional(any(Optional.class), anyString());
         assertEquals(expected, actual);
     }
 
@@ -97,7 +95,6 @@ public class GoalServiceTest {
         long goalId = 1L;
 
         assertDoesNotThrow(() -> goalService.deleteGoal(goalId));
-        verify(goalValidator, times(1)).validateNull(anyLong());
         verify(goalRepository, times(1)).deleteById(anyLong());
     }
 

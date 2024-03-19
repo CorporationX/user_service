@@ -4,17 +4,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.payment.PaymentResponse;
 import school.faang.user_service.dto.payment.PaymentStatus;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.exception.ServiceInteractionException;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.premium.PremiumRepository;
 
 @Component
 @RequiredArgsConstructor
 public class PremiumValidator {
 
     private final UserRepository userRepository;
+    private final PremiumRepository premiumRepository;
 
     public void validatePaymentResponse(PaymentResponse response) {
         if (!PaymentStatus.SUCCESS.equals(response.getStatus())) {
@@ -29,8 +29,6 @@ public class PremiumValidator {
     }
 
     private boolean isUserPremium(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(()
-                -> new EntityNotFoundException("User doesn't exist"));
-        return user.getPremium() != null;
+        return premiumRepository.existsByUserId(userId);
     }
 }

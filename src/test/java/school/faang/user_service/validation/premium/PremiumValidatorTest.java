@@ -8,12 +8,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.payment.PaymentResponse;
 import school.faang.user_service.dto.payment.PaymentStatus;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.ServiceInteractionException;
 import school.faang.user_service.repository.UserRepository;
-
-import java.util.Optional;
+import school.faang.user_service.repository.premium.PremiumRepository;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -25,6 +23,9 @@ public class PremiumValidatorTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private PremiumRepository premiumRepository;
 
     @InjectMocks
     private PremiumValidator premiumValidator;
@@ -44,7 +45,7 @@ public class PremiumValidatorTest {
     void validateBuyPremium_UserHavePremium_ThrowsException() {
         User user = getUser();
         long userId = user.getId();
-        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(getUser()));
+        when(premiumRepository.existsByUserId(anyLong())).thenReturn(true);
 
         assertThrows(DataValidationException.class, ()
                 -> premiumValidator.validateUserPremiumStatus(userId));
@@ -53,19 +54,12 @@ public class PremiumValidatorTest {
     @Test
     void validateBuyPremium_UserDontHavePremium_DoesNotThrowException() {
         long userId = 1L;
-        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(getUserWithoutPremium()));
+        when(premiumRepository.existsByUserId(anyLong())).thenReturn(false);
 
         assertDoesNotThrow(() -> premiumValidator.validateUserPremiumStatus(userId));
     }
 
     private User getUser() {
-        return User.builder()
-                .id(1L)
-                .premium(Premium.builder().build())
-                .build();
-    }
-
-    private User getUserWithoutPremium() {
         return User.builder()
                 .id(1L)
                 .build();

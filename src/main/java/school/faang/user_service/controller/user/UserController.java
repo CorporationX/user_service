@@ -2,6 +2,7 @@ package school.faang.user_service.controller.user;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +16,6 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.service.user.DeactivationService;
 import school.faang.user_service.service.user.UserService;
-import school.faang.user_service.validation.user.UserValidator;
 
 import java.util.List;
 
@@ -29,8 +29,7 @@ public class UserController {
 
     @Operation(summary = "Create new user")
     @PostMapping
-    public UserDto create(@RequestBody UserDto userDto) {
-        userValidator.validateUserDtoFields(userDto);
+    public UserDto create(@Valid @RequestBody UserDto userDto) {
         return userService.create(userDto);
     }
 
@@ -42,7 +41,7 @@ public class UserController {
 
     @Operation(summary = "Get user by id")
     @GetMapping("/{userId}")
-    public UserDto getUser(@PathVariable @Min(value = 1, message = "User's id can't be less than 1") long userId) {
+    public UserDto getUser(@PathVariable @Min(1) long userId) {
         return userService.getUser(userId);
     }
 
@@ -54,7 +53,7 @@ public class UserController {
 
     @Operation(summary = "Deactivate user by id")
     @PutMapping("/{userId}/deactivated")
-    public UserDto deactivateUser(@PathVariable long userId) {
-        return userService.deactivateUser(userId);
+    public UserDto deactivateUser(@PathVariable @Min(1) long userId) {
+        return deactivationService.deactivateUser(userId);
     }
 }

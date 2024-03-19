@@ -19,19 +19,13 @@ import school.faang.user_service.service.user.filter.UserFilter;
 import school.faang.user_service.validation.user.UserValidator;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -49,9 +43,6 @@ class UserServiceTest {
     private UserRepository userRepository;
     private UserMapper userMapper;
     private UserFilter userFilter;
-    private MentorshipService mentorshipService;
-    private EventService eventService;
-    private GoalService goalService;
     private UserValidator userValidator;
 
     private User user;
@@ -113,7 +104,7 @@ class UserServiceTest {
         userRepository = mock(UserRepository.class);
         userMapper = mock(UserMapper.class);
         userFilter = mock(UserFilter.class);
-        userService = new UserService(userRepository, userMapper, List.of(userFilter));
+        userService = new UserService(userRepository, userMapper, List.of(userFilter), userValidator);
     }
 
     @Test
@@ -175,6 +166,5 @@ class UserServiceTest {
                 () -> verify(userMapper, times(1)).toDto(anyList()),
                 () -> assertEquals(Collections.emptyList(), userService.getUsersByIds(List.of(589123098L)))
         );
-
     }
 }

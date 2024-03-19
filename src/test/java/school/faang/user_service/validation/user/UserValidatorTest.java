@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -13,7 +12,6 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
-import school.faang.user_service.exception.PasswordValidationException;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.Optional;
@@ -54,46 +52,6 @@ class UserValidatorTest {
                 .build();
     }
 
-    @ParameterizedTest
-    @NullSource
-    @ValueSource(strings = {"", "  "})
-    void validateUserDtoFields_InvalidUsername_ShouldThrowDataValidationException(String blankUsername) {
-        userDto.setUsername(blankUsername);
-
-        assertThrows(DataValidationException.class, () ->
-                userValidator.validateUserDtoFields(userDto));
-    }
-
-    @ParameterizedTest
-    @NullSource
-    @ValueSource(strings = {"", "  "})
-    void validateUserDtoFields_InvalidEmail_ShouldThrowDataValidationException(String blankEmail) {
-        userDto.setEmail(blankEmail);
-
-        assertThrows(DataValidationException.class, () ->
-                userValidator.validateUserDtoFields(userDto));
-    }
-
-    @ParameterizedTest
-    @NullSource
-    @ValueSource(strings = {"", "  "})
-    void validateUserDtoFields_InvalidPhone_ShouldThrowDataValidationException(String blankPhone) {
-        userDto.setPhone(blankPhone);
-
-        assertThrows(DataValidationException.class, () ->
-                userValidator.validateUserDtoFields(userDto));
-    }
-
-    @ParameterizedTest
-    @NullSource
-    @ValueSource(strings = {"", "  "})
-    void validateUserDtoFields_InvalidFields_ShouldThrowDataValidationException(String blankPassword) {
-        userDto.setPassword(blankPassword);
-
-        assertThrows(DataValidationException.class, () ->
-                userValidator.validateUserDtoFields(userDto));
-    }
-
     @Test
     void validatePassword_ValidPassword_ShouldNotThrow() {
         assertDoesNotThrow(() -> userValidator.validatePassword(userDto));
@@ -101,10 +59,10 @@ class UserValidatorTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"invalidpassword", "Invalidpassword", "invp", "12121212", "^sju9poossd", "NONONONONO1111"})
-    void validatePassword_InvalidPassword_ShouldThrowPasswordValidationException(String invalidPassword) {
+    void validatePassword_InvalidPassword_ShouldThrowDataValidationException(String invalidPassword) {
         userDto.setPassword(invalidPassword);
 
-        assertThrows(PasswordValidationException.class, () ->
+        assertThrows(DataValidationException.class, () ->
                 userValidator.validatePassword(userDto));
     }
 

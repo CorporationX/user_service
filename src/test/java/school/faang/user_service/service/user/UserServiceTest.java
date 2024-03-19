@@ -14,20 +14,19 @@ import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.event.EventService;
-import school.faang.user_service.service.goal.GoalService;
-import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.service.user.filter.UserFilter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -36,9 +35,6 @@ class UserServiceTest {
     private UserRepository userRepository;
     private UserMapper userMapper;
     private UserFilter userFilter;
-    private MentorshipService mentorshipService;
-    private EventService eventService;
-    private GoalService goalService;
 
     private User user;
     private User mentee;
@@ -86,13 +82,9 @@ class UserServiceTest {
                 .isPremium(true)
                 .build();
         userRepository = mock(UserRepository.class);
-        mentorshipService = mock(MentorshipService.class);
-        eventService = mock(EventService.class);
-        goalService = mock(GoalService.class);
         userMapper = mock(UserMapper.class);
         userFilter = mock(UserFilter.class);
-        userService = new UserService(userRepository, mentorshipService, eventService, goalService,
-                userMapper, List.of(userFilter));
+        userService = new UserService(userRepository, userMapper, List.of(userFilter));
     }
 
     @Test
@@ -106,27 +98,5 @@ class UserServiceTest {
 
         verify(userRepository, times(1)).findPremiumUsers();
         verify(userMapper, times(1)).toDto(List.of(premiumUser));
-    }
-
-    @Test
-    void deactivateUser_UserIsDeactivatedAndSavedToDb_GoalsAndEventsAlsoDeleted() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
-        when(userRepository.save(user)).thenReturn(user);
-
-        userService.deactivateUser(user.getId());
-
-        assertAll(
-                () -> verify(mentorshipService, times(1)).
-                        deleteMentorForAllHisMentees(user.getId(), List.of(mentee)),
-                () -> verify(goalService, times(1)).deleteGoal(goal.getId()),
-                () -> verify(eventService, times(1)).deleteEvent(event.getId()),
-                () -> verify(userRepository, times(1)).save(user),
-                () -> verify(userMapper, times(1)).toDto(user),
-                () -> assertFalse(user.isActive()),
-                () -> assertEquals(Collections.emptyList(), goal.getUsers()),
-                () -> assertEquals(Collections.emptyList(), user.getMentees()),
-                () -> assertEquals(Collections.emptyList(), user.getGoals()),
-                () -> assertEquals(Collections.emptyList(), user.getOwnedEvents())
-        );
     }
 }

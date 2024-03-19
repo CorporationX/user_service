@@ -1,5 +1,6 @@
 package school.faang.user_service.service.goal;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,9 +19,6 @@ import school.faang.user_service.validation.goal.GoalValidator;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static school.faang.user_service.utils.GlobalValidator.validateNull;
-import static school.faang.user_service.utils.GlobalValidator.validateOptional;
 
 @Service
 @RequiredArgsConstructor
@@ -51,7 +49,6 @@ public class GoalService {
 
     @Transactional
     public void deleteGoal(Long goalId) {
-        validateNull(goalId);
         goalRepository.deleteById(goalId);
     }
 
@@ -81,10 +78,12 @@ public class GoalService {
     }
 
     private void setUpGoalFields(Goal goal, GoalDto goalDto, long userId) {
-        User user = validateOptional(userRepository.findById(userId), String.format("User with ID %d not found", userId));
+        User user = userRepository.findById(userId).orElseThrow(()
+                -> new EntityNotFoundException(String.format("User with ID %d not found", userId)));
         Long parentId = goalDto.getParentId();
         if (parentId != null) {
-            Goal parent = validateOptional(goalRepository.findById(parentId), String.format("Parent goal with ID %d not found", parentId));
+            Goal parent = goalRepository.findById(parentId).orElseThrow(()
+                    -> new EntityNotFoundException(String.format("Parent with ID %d not found", parentId)));
             goal.setParent(parent);
         }
         goal.setStatus(GoalStatus.ACTIVE);

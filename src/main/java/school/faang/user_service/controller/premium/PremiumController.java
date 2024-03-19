@@ -22,8 +22,7 @@ public class PremiumController {
 
     @Operation(summary = "Buy premium for user with days")
     @PostMapping("/user/premium/{days}")
-    public PremiumDto buyPremium(@RequestHeader("userId") Long userId, @PathVariable Integer days) {
-        userContext.setUserId(userId);
-        return premiumService.buyPremium(userId, PremiumPeriod.fromDays(days));
+    public PremiumDto buyPremium(@RequestHeader("x-user-id") Long userId, @PathVariable Integer days) {
+        return premiumService.buyPremium(userContext.getUserId(), PremiumPeriod.fromDays(days));
     }
 }

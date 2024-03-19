@@ -2,8 +2,8 @@ package school.faang.user_service.controller.goal;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,9 +38,8 @@ public class GoalController {
 
     @Operation(summary = "Delete goal by goal id")
     @DeleteMapping("/goal/{goalId}")
-    public HttpStatus deleteGoal(@PathVariable Long goalId) {
+    public void deleteGoal(@PathVariable @Min(1) Long goalId) {
         goalService.deleteGoal(goalId);
-        return HttpStatus.NO_CONTENT;
     }
 
     @Operation(summary = "Get goal subtasks by goal id and filters")

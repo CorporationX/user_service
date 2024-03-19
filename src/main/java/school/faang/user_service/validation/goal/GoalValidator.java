@@ -12,8 +12,6 @@ import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.util.List;
 
-import static school.faang.user_service.utils.GlobalValidator.validateOptional;
-
 @Component
 @RequiredArgsConstructor
 public class GoalValidator {
@@ -43,7 +41,8 @@ public class GoalValidator {
     }
 
     private void validateGoalStatus(Long goalId) {
-        Goal foundedGoal = validateOptional(goalRepository.findById(goalId), String.format("Goal with ID %d not found", goalId));
+        Goal foundedGoal = goalRepository.findById(goalId).orElseThrow(()
+                -> new EntityNotFoundException(String.format("Goal with ID %d not found", goalId)));
         if (foundedGoal.getStatus().equals(GoalStatus.COMPLETED)) {
             throw new DataValidationException("Completed goals can't be updated");
         }

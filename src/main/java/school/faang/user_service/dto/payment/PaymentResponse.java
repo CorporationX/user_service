@@ -1,4 +1,4 @@
-package school.faang.user_service.dto.client;
+package school.faang.user_service.dto.payment;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,9 +11,12 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PaymentRequest {
+public class PaymentResponse {
 
+    private PaymentStatus status;
+    private int verificationCode;
     private long paymentNumber;
     private BigDecimal amount;
     private Currency currency;
+    private String message;
 }

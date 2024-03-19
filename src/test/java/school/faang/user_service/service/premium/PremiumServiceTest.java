@@ -7,9 +7,9 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.client.PaymentServiceClient;
-import school.faang.user_service.dto.client.PaymentRequest;
-import school.faang.user_service.dto.client.PaymentResponse;
-import school.faang.user_service.dto.client.PaymentStatus;
+import school.faang.user_service.dto.payment.PaymentRequest;
+import school.faang.user_service.dto.payment.PaymentResponse;
+import school.faang.user_service.dto.payment.PaymentStatus;
 import school.faang.user_service.dto.premium.PremiumDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;
@@ -29,7 +29,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class PremiumServiceTest {
+class PremiumServiceTest {
 
     @Mock
     private PaymentServiceClient paymentService;

@@ -5,17 +5,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.client.PaymentResponse;
-import school.faang.user_service.dto.client.PaymentStatus;
+import school.faang.user_service.dto.payment.PaymentResponse;
+import school.faang.user_service.dto.payment.PaymentStatus;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.exception.FailedServiceInteractionException;
+import school.faang.user_service.exception.ServiceInteractionException;
 import school.faang.user_service.repository.UserRepository;
 
-import java.util.stream.Stream;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,7 +31,7 @@ public class PremiumValidatorTest {
 
     @Test
     void validatePaymentStatus_InvalidResponse_ThrowsException() {
-        assertThrows(FailedServiceInteractionException.class, ()
+        assertThrows(ServiceInteractionException.class, ()
                 -> premiumValidator.validatePaymentResponse(getFailedResponse()));
     }
 
@@ -42,7 +44,7 @@ public class PremiumValidatorTest {
     void validateBuyPremium_UserHavePremium_ThrowsException() {
         User user = getUser();
         long userId = user.getId();
-        when(userRepository.findPremiumUsers()).thenReturn(Stream.of(user));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(getUser()));
 
         assertThrows(DataValidationException.class, ()
                 -> premiumValidator.validateUserPremiumStatus(userId));
@@ -51,7 +53,7 @@ public class PremiumValidatorTest {
     @Test
     void validateBuyPremium_UserDontHavePremium_DoesNotThrowException() {
         long userId = 1L;
-        when(userRepository.findPremiumUsers()).thenReturn(Stream.of(new User()));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(getUserWithoutPremium()));
 
         assertDoesNotThrow(() -> premiumValidator.validateUserPremiumStatus(userId));
     }
@@ -59,6 +61,13 @@ public class PremiumValidatorTest {
     private User getUser() {
         return User.builder()
                 .id(1L)
+                .build();
+    }
+
+    private User getUserWithoutPremium() {
+        return User.builder()
+                .id(1L)
+                .premium(Premium.builder().build())
                 .build();
     }
 

@@ -25,7 +25,7 @@ spring:
         follower_channel:
           name: follower_channel
         profile_view_channel:
-            name: profile_view_channel
+          name: profile_view_channel
 
 server:
   port: 8080
@@ -41,6 +41,7 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+  endpoint: /api/payment
 
 aws:
   accessKey: access_key

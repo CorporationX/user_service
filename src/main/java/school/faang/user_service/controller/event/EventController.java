@@ -41,7 +41,7 @@ public class EventController {
 
     @Operation(summary = "Get filtered list of all events")
     @PostMapping("/filtered")
-    public List<EventDto> getEventsByFilter(EventFilterDto filters) {
+    public List<EventDto> getEventsByFilter(@RequestBody EventFilterDto filters) {
         return eventService.getEventsByFilter(filters);
     }
 

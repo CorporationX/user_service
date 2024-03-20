@@ -84,38 +84,6 @@ class EventValidatorTest {
     }
 
     @Test
-    void validateEventDtoFields_ValidEventFields_ShouldNotThrow() {
-        assertDoesNotThrow(() ->
-                eventValidator.validateEventDtoFields(eventDto));
-    }
-
-    @ParameterizedTest
-    @NullSource
-    @ValueSource(strings = {"", "   "})
-    void validateEventDtoFields_InvalidTitle_ShouldThrowDataValidationException(String title) {
-        eventDto.setTitle(title);
-
-        assertThrows(DataValidationException.class, () ->
-                eventValidator.validateEventDtoFields(eventDto));
-    }
-
-    @Test
-    void validateEventDtoFields_NullStartDate_ShouldThrowDataValidationException() {
-        eventDto.setStartDate(null);
-
-        assertThrows(DataValidationException.class, () ->
-                eventValidator.validateEventDtoFields(eventDto));
-    }
-
-    @Test
-    void validateEventDtoFields_NullOwnerId_ShouldThrowDataValidationException() {
-        eventDto.setOwnerId(null);
-
-        assertThrows(DataValidationException.class, () ->
-                eventValidator.validateEventDtoFields(eventDto));
-    }
-
-    @Test
     void validateUserHasRequiredSkills_UserHasRequiredSkills_ShouldNotThrow() {
         when(skillRepository.findAllByUserId(anyLong())).thenReturn(List.of(requiredSkill));
         when(skillRepository.findById(anyLong())).thenReturn(Optional.ofNullable(requiredSkill));

@@ -2,6 +2,7 @@ package school.faang.user_service.controller.event;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.service.event.EventService;
-import school.faang.user_service.validation.event.EventValidator;
 
 import java.util.List;
 
@@ -24,12 +24,10 @@ import java.util.List;
 @RequestMapping("/events")
 public class EventController {
     private final EventService eventService;
-    private final EventValidator eventValidator;
 
     @Operation(summary = "Create an event")
     @PostMapping
-    public EventDto create(@RequestBody EventDto eventDto) {
-        eventValidator.validateEventDtoFields(eventDto);
+    public EventDto create(@Valid @RequestBody EventDto eventDto) {
         return eventService.create(eventDto);
     }
 
@@ -53,8 +51,7 @@ public class EventController {
 
     @Operation(summary = "Update an existing event")
     @PutMapping
-    public EventDto updateEvent(@RequestBody EventDto eventDto) {
-        eventValidator.validateEventDtoFields(eventDto);
+    public EventDto updateEvent(@Valid @RequestBody EventDto eventDto) {
         return eventService.updateEvent(eventDto);
     }
 

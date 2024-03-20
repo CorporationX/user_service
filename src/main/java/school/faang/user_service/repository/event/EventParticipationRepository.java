@@ -30,8 +30,4 @@ public interface EventParticipationRepository extends CrudRepository<User, Long>
             WHERE ue.event_id = :eventId
             """)
     int countParticipants(long eventId);
-
-    @Modifying
-    @Query(value = "DELETE FROM user_event WHERE user_id = :id", nativeQuery = true)
-    void deleteAllParticipatedEventsByUserId(@Param("id") long id);
 }

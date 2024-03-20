@@ -109,10 +109,10 @@ public class UserService {
     @Transactional
     public void deactivateProfile(long userId) {
         User user = findById(userId);
-        eventService.deleteAllParticipatedEventsByUserId(userId);
+        user.getParticipatedEvents().clear();
         eventService.deleteALLEventByUserId(userId);
         user.getGoals().stream()
-                .filter(goal -> goalService.countingUsersCompletingGoal(goal.getId()) == 1 || goal.getInvitations() == null)
+                .filter(goal -> goal.getUsers().size() == 1 || goal.getInvitations().isEmpty())
                 .forEach(goal -> goalService.deleteGoal(goal.getId()));
         user.setActive(false);
         List<User> mentees = user.getMentees();

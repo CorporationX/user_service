@@ -122,10 +122,6 @@ public class GoalService {
         return goalMapper.toDto(goalRepository.save(goalToSave));
     }
 
-    public int countingUsersCompletingGoal(long goalId) {
-        return goalRepository.countingUsersCompletingGoal(goalId);
-    }
-
     public void deleteGoal(long goalId) {
         goalRepository.deleteById(goalId);
     }

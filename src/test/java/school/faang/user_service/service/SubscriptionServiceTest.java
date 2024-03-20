@@ -8,8 +8,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.SubscriptionUserDto;
+import school.faang.user_service.dto.SubscriptionUserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
@@ -89,7 +89,7 @@ public class SubscriptionServiceTest {
         user1.setId(userId1);
         user1.setFollowers(List.of(User.builder().id(userId2).build()));
         when(subscriptionRepository.findByFolloweeId(userId1)).thenReturn(user1.getFollowers().stream());
-        List<UserDto> result = subscriptionService.getFollowers(userId1, new UserFilterDto());
+        List<SubscriptionUserDto> result = subscriptionService.getFollowers(userId1, new SubscriptionUserFilterDto());
         assertEquals(result.get(0).getId(), userId2);
     }
 
@@ -107,7 +107,7 @@ public class SubscriptionServiceTest {
         user1.setId(userId1);
         user1.setFollowees(List.of(User.builder().id(userId2).build()));
         when(subscriptionRepository.findByFolloweeId(userId1)).thenReturn(user1.getFollowees().stream());
-        List<UserDto> result = subscriptionService.getFollowing(userId1, new UserFilterDto());
+        List<SubscriptionUserDto> result = subscriptionService.getFollowing(userId1, new SubscriptionUserFilterDto());
         assertEquals(result.get(0).getId(), userId2);
 
     }

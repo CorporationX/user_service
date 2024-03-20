@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class UserFilterDto {
+public class SubscriptionUserFilterDto {
     private String namePattern;
     private String aboutPattern;
     private String emailPattern;

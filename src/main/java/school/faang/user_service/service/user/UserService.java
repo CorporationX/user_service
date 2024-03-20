@@ -25,7 +25,7 @@ public class UserService {
     private final UserValidator userValidator;
 
     private static final String AVATAR_URL = "https://api.dicebear.com/8.x/lorelei-neutral/svg?seed=";
-    private static final String SMALL_AVATAR_URL = "https://api.dicebear.com/8.x/lorelei-neutral/svg?size=100&?seed=";
+    private static final String SMALL_AVATAR_URL = "https://api.dicebear.com/8.x/lorelei-neutral/svg?size=100&seed=";
 
     public User getUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(()

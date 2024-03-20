@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.config.context.UserContext;
+
 import java.util.List;
 
 @RestController
@@ -24,6 +26,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final UserContext userContext;
 
     @PostMapping()
     public UserRegistrationDto createUser(@RequestBody UserRegistrationDto userDto) {
@@ -58,5 +61,12 @@ public class UserController {
     @PostMapping("/students")
     public void registerStudents(@RequestParam("file") MultipartFile csvFile) {
         userService.saveStudents(csvFile);
+    }
+
+    @PostMapping("/users")
+    public List<UserDto> searchUsers(@RequestBody UserFilterDto filter) {
+        long actorId = userContext.getUserId();
+
+        return userService.getUsers(filter, actorId);
     }
 }

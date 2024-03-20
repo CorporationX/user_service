@@ -19,9 +19,9 @@ public class MentorshipRequestDto {
     @NotNull
     private String description;
     @NotNull
-    private Long requester;
+    private Long requesterId;
     @NotNull
-    private Long receiver;
+    private Long receiverId;
 
     private RequestStatus status;
 

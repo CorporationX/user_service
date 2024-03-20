@@ -6,14 +6,24 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Spy;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.event.SearchAppearanceEventDto;
+import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.UserMapperImpl;
+import school.faang.user_service.filter.Filter;
+import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -27,7 +37,10 @@ import school.faang.user_service.filter.user.UserEmailFilter;
 import school.faang.user_service.service.CountryService;
 import school.faang.user_service.validator.UserValidator;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,11 +56,11 @@ public class UserServiceTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    private EventRepository eventRepository;
-    @Mock
-    private MentorshipRepository mentorshipRepository;
-    @Mock
     private GoalRepository goalRepository;
+    @Mock
+    private EventRepository eventRepository;
+    @Spy
+    private UserMapper userMapper = new UserMapperImpl();
     @Mock
     private CountryService countryService;
     @Mock
@@ -56,20 +69,24 @@ public class UserServiceTest {
     private UserProfilePic profilePic;
 
     @Mock
+    private MentorshipRepository mentorshipRepository;
+
+    @Mock
     private CsvPersonParser csvPersonParser;
 
     @Mock
+    SearchAppearanceEventPublisher eventPublisher;
+
+    @Mock
     PersonService personService;
-    @Spy
-    private UserMapperImpl userMapper;
 
     private static final UserEmailFilter userEmailFilter = new UserEmailFilter();
 
     private static final UserCityFilter userCityFilter = new UserCityFilter();
 
-    private static final UserFilterDto dtoFilter = new UserFilterDto();
+    private static UserFilterDto dtoFilter = new UserFilterDto();
 
-    private final List<UserFilter> filters = new ArrayList<>();
+    private List<UserFilter> filters = new ArrayList<>();
 
     private List<User> users;
 
@@ -79,7 +96,36 @@ public class UserServiceTest {
     @BeforeEach
     public void init() {
         userService = new UserService(userRepository, eventRepository, mentorshipRepository, goalRepository,
-                countryService, personService, validator, userMapper, csvPersonParser, profilePic, filters);
+                countryService, personService, validator, userMapper, csvPersonParser, profilePic, filters,
+                eventPublisher);
+    }
+
+    @Test
+    public void testGetUsersWhenFilterApplicable() {
+        UserFilterDto filter = new UserFilterDto();
+        filter.setNamePattern("Kate");
+
+        User user = new User();
+        user.setId(1L);
+        user.setUsername("Kate");
+
+        UserDto userDto = new UserDto();
+        userDto.setId(1L);
+        userDto.setUsername("Kate");
+
+        SearchAppearanceEventDto searchAppearanceEventDto = new SearchAppearanceEventDto(
+                1L,
+                1L,
+                LocalDateTime.now()
+        );
+
+        when(userRepository.findAll()).thenReturn(Collections.singletonList(user));
+        when(userMapper.toDto(user)).thenReturn(userDto);
+
+        List<UserDto> result = userService.getUsers(filter, 1L);
+
+        assertEquals(1, result.size());
+        assertEquals(userDto, result.get(0));
     }
 
     @Test
@@ -188,6 +234,26 @@ public class UserServiceTest {
         Mockito.when(userRepository.findPremiumUsers()).thenReturn(users.stream());
         List<UserDto> premiumUsers = userService.getPremiumUsers(dtoFilter);
         Assertions.assertEquals(1, premiumUsers.size());
+    }
+
+    @Test
+    public void testGetUsersWhenFilterApplicableAndUserListEmpty() {
+        UserFilterDto filter = new UserFilterDto();
+        when(userRepository.findAll()).thenReturn(Collections.emptyList());
+
+        List<UserDto> result = userService.getUsers(filter, 1L);
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testGetUsersWhenFilterNotApplicable() {
+        UserFilterDto filter = new UserFilterDto();
+        when(userRepository.findAll()).thenReturn(Collections.emptyList());
+
+        List<UserDto> result = userService.getUsers(filter, 1L);
+
+        assertTrue(result.isEmpty());
     }
 
     @Test

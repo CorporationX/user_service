@@ -3,15 +3,13 @@ package school.faang.user_service.controller.mentorship;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.dto.mentorship.filter.RequestFilterDto;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
+import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
 
 import java.util.List;
 
@@ -21,24 +19,29 @@ import java.util.List;
 public class MentorshipRequestController {
 
     private final MentorshipRequestService mentorshipRequestService;
+    private final MentorshipRequestValidator mentorshipRequestValidator;
 
-    private List<MentorshipRequestDto> getRequests(RequestFilterDto filter) {
+    @GetMapping
+    private List<MentorshipRequestDto> getRequests(@RequestBody RequestFilterDto filter) {
         return mentorshipRequestService.getRequests(filter);
     }
 
-    private MentorshipRequestDto acceptRequest(long id) {
+    @PostMapping("/accept/{id}")
+    private MentorshipRequestDto acceptRequest(@PathVariable long id) {
         return mentorshipRequestService.acceptRequest(id);
     }
 
-    private MentorshipRequestDto rejectRequest(long id, RejectionDto rejection) {
+    @PostMapping("/reject")
+    private MentorshipRequestDto rejectRequest(@PathVariable long id, @RequestBody RejectionDto rejection) {
         if (StringUtils.isEmpty(rejection.getReason())) {
             throw new EntityNotFoundException("There is no description in RejectionDto");
         }
         return mentorshipRequestService.rejectRequest(id, rejection);
     }
 
-    @PostMapping()
-    private MentorshipRequestDto requestMentorship(@RequestBody @Valid MentorshipRequestDto mentorshipRequestDto) {
+    @PostMapping
+    private MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
+        mentorshipRequestValidator.commonCheck(mentorshipRequestDto);
         return mentorshipRequestService.requestMentorship(mentorshipRequestDto);
     }
 }

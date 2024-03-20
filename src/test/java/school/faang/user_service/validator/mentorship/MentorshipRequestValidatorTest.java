@@ -48,11 +48,11 @@ class MentorshipRequestValidatorTest {
     @BeforeEach
     public void init() {
         mentorshipRequestDto = new MentorshipRequestDto();
-        mentorshipRequestDto.setRequester(1L);
+        mentorshipRequestDto.setRequesterId(1L);
         mentorshipRequestDto.setId(3L);
         mentorshipRequestDto.setDescription("Description");
-        mentorshipRequestDto.setRequester(88L);
-        mentorshipRequestDto.setReceiver(77L);
+        mentorshipRequestDto.setRequesterId(88L);
+        mentorshipRequestDto.setReceiverId(77L);
         mentorshipRequestDto.setCreatedAt(LocalDateTime.now());
         requester = new User();
         requester.setId(1L);

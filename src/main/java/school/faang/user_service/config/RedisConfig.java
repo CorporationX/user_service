@@ -56,7 +56,6 @@ public class RedisConfig {
         RedisMessageListenerContainer container
                 = new RedisMessageListenerContainer();
         container.setConnectionFactory(redisConnectionFactory());
-
         container.addMessageListener(messageListenerAdapter, userBanTopic());
         return container;
     }

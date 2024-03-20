@@ -39,7 +39,7 @@ public class RedisConfig {
     }
 
     @Bean
-    MessageListenerAdapter messageListenerAdapter(UserBanEventListener userBanEventListener) {
+    MessageListenerAdapter userBanEventListenerAdapter(UserBanEventListener userBanEventListener) {
         return new MessageListenerAdapter(userBanEventListener);
     }
 
@@ -49,11 +49,11 @@ public class RedisConfig {
     }
 
     @Bean
-    RedisMessageListenerContainer redisContainer(MessageListenerAdapter messageListenerAdapter) {
+    RedisMessageListenerContainer redisContainer(MessageListenerAdapter userBanEventListenerAdapter) {
         RedisMessageListenerContainer container
                 = new RedisMessageListenerContainer();
         container.setConnectionFactory(jedisConnectionFactory());
-        container.addMessageListener(messageListenerAdapter, userBanTopic());
+        container.addMessageListener(userBanEventListenerAdapter, userBanTopic());
         return container;
     }
 }

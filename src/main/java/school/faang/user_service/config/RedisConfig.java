@@ -1,5 +1,6 @@
 package school.faang.user_service.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import school.faang.user_service.listener.UserBanEventListener;
 
 @Configuration
+@RequiredArgsConstructor
 public class RedisConfig {
 
     @Value("${spring.data.redis.host}")
@@ -23,6 +25,8 @@ public class RedisConfig {
 
     @Value("${spring.data.redis.channels.user_ban.name}")
     String userBanChannelName;
+
+    private final UserBanEventListener userBanEventListener;
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
@@ -45,16 +49,16 @@ public class RedisConfig {
     }
 
     @Bean
-    MessageListenerAdapter messageListener(UserBanEventListener userBanEventListener) {
+    MessageListenerAdapter messageListener() {
         return new MessageListenerAdapter(userBanEventListener);
     }
 
     @Bean
-    RedisMessageListenerContainer redisContainer(MessageListenerAdapter messageListener) {
+    RedisMessageListenerContainer redisContainer() {
         RedisMessageListenerContainer container
                 = new RedisMessageListenerContainer();
         container.setConnectionFactory(redisConnectionFactory());
-        container.addMessageListener(messageListener, userBanTopic());
+        container.addMessageListener(messageListener(), userBanTopic());
         return container;
     }
 }

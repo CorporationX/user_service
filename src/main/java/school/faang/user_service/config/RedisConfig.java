@@ -26,8 +26,6 @@ public class RedisConfig {
     @Value("${spring.data.redis.channels.user_ban.name}")
     String userBanChannelName;
 
-    private final UserBanEventListener userBanEventListener;
-
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
@@ -49,16 +47,16 @@ public class RedisConfig {
     }
 
     @Bean
-    MessageListenerAdapter messageListener() {
+    MessageListenerAdapter messageListener(UserBanEventListener userBanEventListener) {
         return new MessageListenerAdapter(userBanEventListener);
     }
 
     @Bean
-    RedisMessageListenerContainer redisContainer() {
+    RedisMessageListenerContainer redisContainer(MessageListenerAdapter messageListenerAdapter) {
         RedisMessageListenerContainer container
                 = new RedisMessageListenerContainer();
         container.setConnectionFactory(redisConnectionFactory());
-        container.addMessageListener(messageListener(), userBanTopic());
+        container.addMessageListener(messageListenerAdapter, userBanTopic());
         return container;
     }
 }

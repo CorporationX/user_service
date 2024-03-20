@@ -14,6 +14,7 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.event.SearchAppearanceEventDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.event.Event;
@@ -58,10 +59,8 @@ public class UserServiceTest {
     private GoalRepository goalRepository;
     @Mock
     private EventRepository eventRepository;
-    @Mock
-    private UserMapper userMapper;
-    @Mock
-    private GoalRepository goalRepository;
+    @Spy
+    private UserMapper userMapper = new UserMapperImpl();
     @Mock
     private CountryService countryService;
     @Mock
@@ -70,12 +69,16 @@ public class UserServiceTest {
     private UserProfilePic profilePic;
 
     @Mock
+    private MentorshipRepository mentorshipRepository;
+
+    @Mock
     private CsvPersonParser csvPersonParser;
 
     @Mock
+    SearchAppearanceEventPublisher eventPublisher;
+
+    @Mock
     PersonService personService;
-    @Spy
-    private UserMapperImpl userMapper;
 
     private static final UserEmailFilter userEmailFilter = new UserEmailFilter();
 
@@ -93,7 +96,8 @@ public class UserServiceTest {
     @BeforeEach
     public void init() {
         userService = new UserService(userRepository, eventRepository, mentorshipRepository, goalRepository,
-                countryService, personService, validator, userMapper, csvPersonParser, profilePic, filters);
+                countryService, personService, validator, userMapper, csvPersonParser, profilePic, filters,
+                eventPublisher);
     }
 
     @Test

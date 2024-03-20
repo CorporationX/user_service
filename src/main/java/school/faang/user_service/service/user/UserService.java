@@ -17,6 +17,7 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.entity.student.Person;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -45,7 +46,6 @@ public class UserService {
     private final CsvPersonParser csvPersonParser;
     private final UserProfilePic generatedUserProfilePic;
     private final List<UserFilter> userFilters;
-    private final List<Filter<UserFilterDto, User>> filters;
     private final SearchAppearanceEventPublisher eventPublisher;
 
     public UserRegistrationDto createUser(UserRegistrationDto userDto) {
@@ -140,9 +140,9 @@ public class UserService {
     public List<UserDto> getUsers(UserFilterDto filter, long actorId) {
         List<User> users = userRepository.findAll();
 
-        filters.stream()
+        userFilters.stream()
                 .filter(f -> f.isApplicable(filter))
-                .forEach(f -> f.apply(users, filter));
+                .forEach(f -> f.apply(users.stream(), filter));
 
         users.forEach(user -> {
             SearchAppearanceEventDto event = new SearchAppearanceEventDto(

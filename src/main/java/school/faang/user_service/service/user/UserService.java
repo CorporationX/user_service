@@ -60,6 +60,7 @@ public class UserService {
         return userMapper.toRegDto(savedUser);
     }
 
+    @Transactional
     public UserDto getUserDtoById(long id) {
         userValidator.validateAccessToUser(id);
         return userMapper.toDto(getUserById(id));

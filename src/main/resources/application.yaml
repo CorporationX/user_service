@@ -28,8 +28,8 @@ spring:
           name: profile_view_channel
         premium_bought_channel:
           name: premium_bought_channel
-        mentorship_request_channel:
-          name: mentorship_request_channel
+        mentorship_offered_channel:
+          name: mentorship_offered_channel
         search_appearance_channel:
           name: search_appearance_channel
   mvc:
@@ -41,11 +41,17 @@ spring:
 cron:
 
 server:
-  port: 8085
+  port: 8080
 
 logging:
   level:
     root: info
+
+person:
+  parser:
+    max_file_chunk_size: 13000
+    thread_num: 5
+    expected_chunk_size: 1300
 
 project-service:
   host: localhost

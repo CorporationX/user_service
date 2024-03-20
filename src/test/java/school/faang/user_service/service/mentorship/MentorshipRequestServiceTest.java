@@ -17,7 +17,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
-import school.faang.user_service.publisher.MentorshipRequestedEventPublisher;
+import school.faang.user_service.publisher.MentorshipOfferedPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.user.UserService;
@@ -33,6 +33,8 @@ import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipRequestServiceTest {
+    @Mock
+    private MentorshipOfferedPublisher mentorshipOfferedPublisher;
 
     @Mock
     private MentorshipRequestRepository mentorshipRequestRepository;
@@ -42,13 +44,6 @@ class MentorshipRequestServiceTest {
 
     @Mock
     private MentorshipRequestMapper mentorshipRequestMapper;
-
-    @Mock
-    private MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
-
-    @InjectMocks
-    private MentorshipRequestService mentorshipRequestService;
-    private MentorshipRequestDto mentorshipRequestDto;
 
     @Mock
     private MentorshipRequest mentorshipRequest;
@@ -62,6 +57,10 @@ class MentorshipRequestServiceTest {
     @Mock
     private List<MentorshipRequestFilter> mentorshipRequestFilters;
 
+    @InjectMocks
+    private MentorshipRequestService mentorshipRequestService;
+
+    private MentorshipRequestDto mentorshipRequestDto;
 
     private User receiver;
 
@@ -74,10 +73,10 @@ class MentorshipRequestServiceTest {
     @BeforeEach
     public void init() {
         mentorshipRequestDto = new MentorshipRequestDto();
-        mentorshipRequestDto.setRequester(1L);
+        mentorshipRequestDto.setRequesterId(1L);
         mentorshipRequestDto.setDescription("Description");
-        mentorshipRequestDto.setRequester(88L);
-        mentorshipRequestDto.setReceiver(77L);
+        mentorshipRequestDto.setRequesterId(88L);
+        mentorshipRequestDto.setReceiverId(77L);
         mentorshipRequestDto.setCreatedAt(LocalDateTime.now());
         requestFilterDto = new RequestFilterDto();
         requestFilterDto.setDescriptionFilter("Description filter");
@@ -139,9 +138,9 @@ class MentorshipRequestServiceTest {
     @Test
     public void whenRequestForMembershipThenCreated() {
         Mockito.when(mentorshipRequestMapper.toEntity(mentorshipRequestDto)).thenReturn(mentorshipRequest);
-        Mockito.when(userService.getUserById(mentorshipRequestDto.getReceiver()))
+        Mockito.when(userService.getUserById(mentorshipRequestDto.getReceiverId()))
                 .thenReturn(receiver);
-        Mockito.when(userService.getUserById(mentorshipRequestDto.getRequester()))
+        Mockito.when(userService.getUserById(mentorshipRequestDto.getRequesterId()))
                 .thenReturn(requester);
         mentorshipRequestService.requestMentorship(mentorshipRequestDto);
         Mockito.verify(mentorshipRequestRepository, times(1))

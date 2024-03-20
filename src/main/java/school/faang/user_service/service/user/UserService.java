@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.dto.event.SearchAppearanceEventDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.dto.user.UserRegistrationDto;
@@ -16,6 +17,7 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.entity.student.Person;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -24,6 +26,8 @@ import school.faang.user_service.service.CountryService;
 import school.faang.user_service.validator.UserValidator;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -42,6 +46,7 @@ public class UserService {
     private final CsvPersonParser csvPersonParser;
     private final UserProfilePic generatedUserProfilePic;
     private final List<UserFilter> userFilters;
+    private final SearchAppearanceEventPublisher eventPublisher;
 
     public UserRegistrationDto createUser(UserRegistrationDto userDto) {
         User user = userMapper.toEntity(userDto);
@@ -130,5 +135,25 @@ public class UserService {
         }
         personService.savePeopleAsUsers(people);
         log.info("Students saved from csv file as users. Saved accounts count: {}", people.size());
+    }
+
+    public List<UserDto> getUsers(UserFilterDto filter, long actorId) {
+        List<User> users = userRepository.findAll();
+
+        userFilters.stream()
+                .filter(f -> f.isApplicable(filter))
+                .forEach(f -> f.apply(users.stream(), filter));
+
+        users.forEach(user -> {
+            SearchAppearanceEventDto event = new SearchAppearanceEventDto(
+                    user.getId(),
+                    actorId,
+                    LocalDateTime.now()
+            );
+            eventPublisher.publish(event);
+        });
+
+        return new ArrayList<>(users.stream()
+                .map(userMapper::toDto).toList());
     }
 }

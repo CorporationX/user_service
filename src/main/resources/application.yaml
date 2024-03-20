@@ -30,6 +30,8 @@ spring:
           name: premium_bought_channel
         mentorship_request_channel:
           name: mentorship_request_channel
+        search_appearance_channel:
+          name: search_appearance_channel
   mvc:
     servlet:
       path: /api/v1

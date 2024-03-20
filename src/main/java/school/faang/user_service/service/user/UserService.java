@@ -28,8 +28,8 @@ public class UserService {
     private static final String SMALL_AVATAR_URL = "https://api.dicebear.com/8.x/lorelei-neutral/svg?size=100&seed=";
 
     public User getUserById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(()
-                -> new EntityNotFoundException("A user with this id: " + userId + "was not found in userRepository"));
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("A user with this id: " + userId + "was not found in userRepository"));
     }
 
     public UserDto create(UserDto userDto) {
@@ -41,8 +41,8 @@ public class UserService {
     }
 
     public UserDto getUser(long userId) {
-        User user = userRepository.findById(userId).orElseThrow(()
-                -> new EntityNotFoundException("User doesn't exist by ID: " + userId));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User doesn't exist by ID: " + userId));
         return userMapper.toDto(user);
     }
 

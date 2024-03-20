@@ -26,6 +26,10 @@ spring:
           name: follower_channel
         profile_view_channel:
           name: profile_view_channel
+        premium_bought_channel:
+          name: premium_bought_channel
+        mentorship_request_channel:
+          name: mentorship_request_channel
         search_appearance_channel:
           name: search_appearance_channel
   mvc:
@@ -37,7 +41,7 @@ spring:
 cron:
 
 server:
-  port: 8080
+  port: 8085
 
 logging:
   level:

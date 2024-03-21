@@ -107,7 +107,7 @@ class MentorshipServiceTest {
         when(userService.getUserById(mentee.getId())).thenReturn(mentee);
         when(userService.getUserById(mentor.getId())).thenReturn(mentor);
 
-        mentorshipService.deleteMentor(mentee.getId(), mentor.getId());
+        mentorshipService.deleteMentor(mentor.getId(), mentee.getId());
 
         verify(userService, times(2)).getUserById(anyLong());
         verify(mentorshipValidator, times(1)).validateMentorMenteeIds(mentee.getId(), mentor.getId());

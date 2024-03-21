@@ -40,7 +40,7 @@ public class MentorshipService {
         userRepository.save(mentor);
     }
 
-    public void deleteMentor(long menteeId, long mentorId) {
+    public void deleteMentor(long mentorId, long menteeId) {
         User mentor = userService.getUserById(mentorId);
         User mentee = userService.getUserById(menteeId);
 

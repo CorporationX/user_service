@@ -15,8 +15,7 @@ import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
@@ -32,30 +31,28 @@ public class DeactivationService {
                 .orElseThrow(() -> new EntityNotFoundException("User doesn't exist by id: " + userId));
 
         if (userToDeactivate.getGoals() != null && !userToDeactivate.getGoals().isEmpty()) {
-            List<Long> goalsToDeleteIds = userToDeactivate.getGoals().stream()
+            userToDeactivate.getGoals().stream()
                     .filter(goal -> !GoalStatus.COMPLETED.equals(goal.getStatus()))
                     .peek(goal -> goal.getUsers().removeIf(user -> user.getId() == userId))
                     .filter(goal -> goal.getUsers().isEmpty())
                     .map(Goal::getId)
-                    .toList();
-            userToDeactivate.setGoals(Collections.emptyList());
-            goalsToDeleteIds.forEach(goalService::deleteGoal);
+                    .forEach(goalService::deleteGoal);
+            userToDeactivate.setGoals(new ArrayList<>());
         }
 
         if (userToDeactivate.getOwnedEvents() != null && !userToDeactivate.getOwnedEvents().isEmpty()) {
-            List<Long> eventsToDeleteIds = userToDeactivate.getOwnedEvents().stream()
+            userToDeactivate.getOwnedEvents().stream()
                     .filter(event -> EventStatus.PLANNED.equals(event.getStatus()))
                     .map(Event::getId)
-                    .toList();
-            userToDeactivate.setOwnedEvents(Collections.emptyList());
-            eventsToDeleteIds.forEach(eventService::deleteEvent);
+                    .forEach(eventService::deleteEvent);
+            userToDeactivate.setOwnedEvents(new ArrayList<>());
         }
 
         userToDeactivate.setActive(false);
 
         if (userToDeactivate.getMentees() != null && !userToDeactivate.getMentees().isEmpty()) {
             mentorshipService.deleteMentorForAllHisMentees(userId, userToDeactivate.getMentees());
-            userToDeactivate.setMentees(Collections.emptyList());
+            userToDeactivate.setMentees(new ArrayList<>());
         }
         return userMapper.toDto(userRepository.save(userToDeactivate));
     }

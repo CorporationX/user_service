@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
+
     @Query(nativeQuery = true, value = """
             SELECT COUNT(s.id) FROM users u
             JOIN user_skill us ON us.user_id = u.id

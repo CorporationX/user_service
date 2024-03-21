@@ -17,10 +17,12 @@ import java.util.NoSuchElementException;
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+
     public UserDto getUser(@PathVariable long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException());
         return userMapper.toDto(user);
     }
+
     public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         List users = userRepository.findAllById(ids);
         return userMapper.toDto(users);

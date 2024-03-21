@@ -2,7 +2,9 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -27,6 +29,19 @@ public class UserService {
     private final PremiumRepository premiumRepository;
     private final S3Service s3Service;
     private final RestTemplate restTemplate;
+    private final EventService eventService;
+    private GoalService goalService;
+    private MentorshipService mentorshipService;
+
+    @Autowired
+    public void setGoalService(@Lazy GoalService goalService) {
+        this.goalService = goalService;
+    }
+
+    @Autowired
+    public void setMentorshipService(@Lazy MentorshipService mentorshipService) {
+        this.mentorshipService = mentorshipService;
+    }
 
     @Value("${services.random_avatar.url}")
     private String url;
@@ -90,5 +105,20 @@ public class UserService {
     @Transactional(readOnly = true)
     public List<Long> getUserIds() {
         return userRepository.findUserIds();
+    }
+
+    @Transactional
+    public void deactivateProfile(long userId) {
+        User user = findById(userId);
+        user.getParticipatedEvents().clear();
+        eventService.deleteALLEventByUserId(userId);
+        user.getGoals().stream()
+                .filter(goal -> goal.getUsers().size() == 1 || goal.getInvitations().isEmpty())
+                .forEach(goal -> goalService.deleteGoal(goal.getId()));
+        user.setActive(false);
+        List<User> mentees = user.getMentees();
+        if (!mentees.isEmpty()) {
+            mentees.forEach(mentee -> mentorshipService.stopMentoring(user, mentee));
+        }
     }
 }

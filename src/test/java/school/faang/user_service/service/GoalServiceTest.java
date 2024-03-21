@@ -20,7 +20,6 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.filter.goal.GoalStatusFilter;
 import school.faang.user_service.filter.goal.GoalTitleFilter;
-import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.mapper.GoalMapperImpl;
 import school.faang.user_service.publisher.GoalCompletedEventPublisher;
 import school.faang.user_service.publisher.GoalCreateEventPublisher;
@@ -46,8 +45,7 @@ class GoalServiceTest {
     GoalRepository goalRepository;
 
     @Spy
-    private GoalMapper goalMapper = new GoalMapperImpl();
-
+    private GoalMapperImpl goalMapper;
     @Mock
     SkillService skillService;
     private final List<GoalFilter> goalFilters = List.of(new GoalStatusFilter(), new GoalTitleFilter());

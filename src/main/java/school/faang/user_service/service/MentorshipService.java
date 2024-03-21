@@ -16,16 +16,16 @@ public class MentorshipService {
     private final UserMapper userMapper;
 
     @Transactional(readOnly = true)
-    public List<UserDto> getMentees(Long userId) {
-        User user = userService.findById(userId);
-        List<User> mentees = user.getMentees();
+    public List<UserDto> getMentees(Long mentorId) {
+        User mentor = userService.findById(mentorId);
+        List<User> mentees = mentor.getMentees();
         return userMapper.toDto(mentees);
     }
 
     @Transactional(readOnly = true)
-    public List<UserDto> getMentors(Long userId) {
-        User user = userService.findById(userId);
-        List<User> mentors = user.getMentors();
+    public List<UserDto> getMentors(Long menteeId) {
+        User mentee = userService.findById(menteeId);
+        List<User> mentors = mentee.getMentors();
         return userMapper.toDto(mentors);
     }
 
@@ -41,5 +41,13 @@ public class MentorshipService {
         User mentor = userService.findById(mentorId);
         User mentee = userService.findById(menteeId);
         mentee.getMentors().remove(mentor);
+    }
+
+    public void stopMentoring(User mentor, User mentee) {
+        List<User> mentors = mentee.getMentors();
+        mentors.remove(mentor);
+        mentee.getReceivedGoalInvitations().stream()
+                .filter(goalInvitation -> goalInvitation.getInviter() == mentor)
+                .forEach(goalInvitation -> goalInvitation.setInviter(mentee));
     }
 }

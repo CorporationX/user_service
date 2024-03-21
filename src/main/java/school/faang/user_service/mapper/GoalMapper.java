@@ -9,6 +9,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface GoalMapper {
@@ -27,6 +28,6 @@ public interface GoalMapper {
     @Named("getIdSkills")
     default List<Long> getIdSkills(List<Skill> skills) {
         return skills.stream()
-                .map(Skill::getId).toList();
+                .map(Skill::getId).collect(Collectors.toList());
     }
 }

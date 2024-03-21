@@ -6,14 +6,12 @@ import school.faang.user_service.dto.payment.PaymentResponse;
 import school.faang.user_service.dto.payment.PaymentStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.ServiceInteractionException;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 
 @Component
 @RequiredArgsConstructor
 public class PremiumValidator {
 
-    private final UserRepository userRepository;
     private final PremiumRepository premiumRepository;
 
     public void validatePaymentResponse(PaymentResponse response) {

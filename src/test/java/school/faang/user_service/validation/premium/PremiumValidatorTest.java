@@ -10,7 +10,6 @@ import school.faang.user_service.dto.payment.PaymentStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.ServiceInteractionException;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -19,14 +18,10 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class PremiumValidatorTest {
-
-    @Mock
-    private UserRepository userRepository;
+class PremiumValidatorTest {
 
     @Mock
     private PremiumRepository premiumRepository;
-
     @InjectMocks
     private PremiumValidator premiumValidator;
 

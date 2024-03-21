@@ -1,4 +1,4 @@
-package school.faang.user_service.service.filter;
+package school.faang.user_service.service.goal.filter;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -7,7 +7,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
-import school.faang.user_service.service.goal.filter.GoalTitleFilter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,16 +15,16 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
-public class GoalFilterTitleTest {
+public class GoalFilterIdTest {
     @InjectMocks
-    private GoalTitleFilter goalTitleFilter;
+    private GoalFilterId goalFilterId;
 
     @Test
     void testIsApplicableReturnsTrue() {
         GoalFilterDto goalFilterDto = getGoalFilterDto();
         boolean expected = true;
 
-        boolean actual = goalTitleFilter.isApplicable(goalFilterDto);
+        boolean actual = goalFilterId.isApplicable(goalFilterDto);
 
         assertEquals(expected, actual);
     }
@@ -36,7 +35,7 @@ public class GoalFilterTitleTest {
         List<Goal> goalsActual = getGoals();
         List<Goal> goalsExpected = Arrays.asList(getGoals().get(0));
 
-        goalTitleFilter.apply(goalsActual, goalFilterDto);
+        goalFilterId.apply(goalsActual, goalFilterDto);
 
         assertEquals(goalsActual, goalsExpected);
     }
@@ -52,9 +51,8 @@ public class GoalFilterTitleTest {
     private List<Goal> getGoals() {
         return new ArrayList<>(List.of(
                 Goal.builder().id(1L).title("Title").status(GoalStatus.ACTIVE).build(),
-                Goal.builder().id(2L).title("Actual").status(GoalStatus.ACTIVE).build(),
-                Goal.builder().id(3L).title("Compet").status(GoalStatus.ACTIVE).build()
+                Goal.builder().id(2L).title("Title").status(GoalStatus.ACTIVE).build(),
+                Goal.builder().id(3L).title("Title").status(GoalStatus.ACTIVE).build()
         ));
     }
 }
-

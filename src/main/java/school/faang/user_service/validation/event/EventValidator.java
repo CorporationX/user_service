@@ -20,18 +20,6 @@ public class EventValidator {
     private final SkillRepository skillRepository;
     private final EventRepository eventRepository;
 
-    public void validateEventDtoFields(EventDto eventDto) {
-        if (eventDto.getTitle() == null || eventDto.getTitle().isBlank()) {
-            throw new DataValidationException("Event must have a title");
-        }
-        if (eventDto.getStartDate() == null) {
-            throw new DataValidationException("Event must have a start date");
-        }
-        if (eventDto.getOwnerId() == null) {
-            throw new DataValidationException("Event must have an owner");
-        }
-    }
-
     public void validateUserHasRequiredSkills(EventDto eventDto) {
         List<Skill> userSkills = skillRepository.findAllByUserId(eventDto.getOwnerId());
         List<Skill> requiredSkills = new ArrayList<>();

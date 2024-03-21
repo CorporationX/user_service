@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
@@ -18,33 +19,34 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "Skill", description = "Endpoint for managing skills")
+@RequestMapping("/skills")
+@Tag(name = "Skills", description = "Endpoints for managing skills")
 public class SkillController {
 
     private final SkillService skillService;
     private final UserContext userContext;
 
-    @Operation(summary = "create skills")
-    @PostMapping("/skill")
+    @Operation(summary = "Create a skill")
+    @PostMapping
     public SkillDto create(@RequestBody SkillDto skillDto) {
         return skillService.create(skillDto);
     }
 
     @Operation(summary = "Get user's skills by user id")
-    @GetMapping("/skills")
+    @GetMapping
     public List<SkillDto> getUserSkills() {
         return skillService.getUserSkills(userContext.getUserId());
     }
 
     @Operation(summary = "Get offered skills by user id")
-    @GetMapping("/offered_skills")
+    @GetMapping("/offered")
     public List<SkillCandidateDto> getOfferedSkills() {
         return skillService.getOfferedSkills(userContext.getUserId());
     }
 
-    @Operation(summary = "acquire Skill From Offers")
-    @PutMapping("/skill/{skillId}/offered_skills")
-    public SkillDto acquireSkillFromOffers(@PathVariable Long skillId) {
+    @Operation(summary = "Acquire skill from offers")
+    @PutMapping("/{skillId}/offered")
+    public SkillDto acquireSkillFromOffers(@PathVariable long skillId) {
         return skillService.acquireSkillFromOffers(skillId, userContext.getUserId());
     }
 }

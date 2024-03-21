@@ -54,7 +54,7 @@ class UserValidatorTest {
 
     @Test
     void validatePassword_ValidPassword_ShouldNotThrow() {
-        assertDoesNotThrow(() -> userValidator.validatePassword(userDto));
+        assertDoesNotThrow(() -> userValidator.validatePassword(userDto.getPassword()));
     }
 
     @ParameterizedTest
@@ -63,7 +63,7 @@ class UserValidatorTest {
         userDto.setPassword(invalidPassword);
 
         assertThrows(DataValidationException.class, () ->
-                userValidator.validatePassword(userDto));
+                userValidator.validatePassword(userDto.getPassword()));
     }
 
     @Test

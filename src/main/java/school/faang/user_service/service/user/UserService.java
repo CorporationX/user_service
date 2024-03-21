@@ -23,7 +23,7 @@ public class UserService {
     private final UserValidator userValidator;
 
     public UserDto create(UserDto userDto) {
-        userValidator.validatePassword(userDto);
+        userValidator.validatePassword(userDto.getPassword());
         userDto.setActive(true);
 
         User createdUser = userRepository.save(userMapper.toEntity(userDto));

@@ -39,17 +39,12 @@ public class GoalService {
         return goalMapper.toDto(goalRepository.save(goal));
     }
 
-    @Transactional
-    public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
-        goalValidator.validateGoalUpdate(goalId, goalDto);
-        Goal goal = goalMapper.toEntity(goalDto);
-        goal.setSkillsToAchieve(skillIdsToSkills(goalDto.getSkillIds()));
-        return goalMapper.toDto(goalRepository.save(goal));
-    }
-
-    @Transactional
-    public void deleteGoal(Long goalId) {
-        goalRepository.deleteById(goalId);
+    @Transactional(readOnly = true)
+    public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filters) {
+        List<Goal> goals = goalRepository.findGoalsByUserId(userId)
+                .collect(Collectors.toList());
+        applyFilters(goals, filters);
+        return goalMapper.toDto(goals);
     }
 
     @Transactional(readOnly = true)
@@ -61,12 +56,17 @@ public class GoalService {
         return goalMapper.toDto(goals);
     }
 
-    @Transactional(readOnly = true)
-    public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filters) {
-        List<Goal> goals = goalRepository.findGoalsByUserId(userId)
-                .collect(Collectors.toList());
-        applyFilters(goals, filters);
-        return goalMapper.toDto(goals);
+    @Transactional
+    public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
+        goalValidator.validateGoalUpdate(goalId, goalDto);
+        Goal goal = goalMapper.toEntity(goalDto);
+        goal.setSkillsToAchieve(skillIdsToSkills(goalDto.getSkillIds()));
+        return goalMapper.toDto(goalRepository.save(goal));
+    }
+
+    @Transactional
+    public void deleteGoal(Long goalId) {
+        goalRepository.deleteById(goalId);
     }
 
     private void applyFilters(List<Goal> goals, GoalFilterDto filters) {

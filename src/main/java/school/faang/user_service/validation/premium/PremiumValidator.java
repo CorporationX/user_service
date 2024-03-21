@@ -24,7 +24,7 @@ public class PremiumValidator {
 
     public void validateUserPremiumStatus(Long userId) {
         if (isUserPremium(userId)) {
-            throw new DataValidationException("User already have premium");
+            throw new DataValidationException("User already has premium");
         }
     }
 

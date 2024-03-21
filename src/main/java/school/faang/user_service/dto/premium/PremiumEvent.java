@@ -13,5 +13,5 @@ public class PremiumEvent {
     private long userId;
     private long premiumId;
     private PremiumPeriod premiumPeriod;
-    private LocalDateTime timestamp;
+    private LocalDateTime createAt;
 }

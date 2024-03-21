@@ -14,7 +14,7 @@ abstract class AbstractEventPublisher<T> {
     private RedisTemplate<String, Object> redisTemplate;
     private ObjectMapper objectMapper;
 
-    // через конструткор не вариант, или придется прописывать конструкторы в классах наследниках
+    // через конструктор не вариант, или придется прописывать конструкторы в классах наследниках
     @Autowired
     public void setRedisTemplate(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;

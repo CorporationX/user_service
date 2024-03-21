@@ -1,4 +1,4 @@
-package school.faang.user_service.dto;
+package school.faang.user_service.dto.goal;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FollowerEvent {
-    private long followerId;
-    private long followeeId;
-    private LocalDateTime requestedAt;
+public class GoalCompletedEvent {
+    private long userId;
+    private long goalId;
+    private LocalDateTime createAt;
 }

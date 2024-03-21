@@ -55,6 +55,7 @@ public class UserService {
         } catch (Exception e) {
             log.error("Ошибка генерации аватара", e);
         }
+        entity.getContactPreference().setUser(entity);
         return userMapper.toDto(userRepository.save(entity));
     }
 

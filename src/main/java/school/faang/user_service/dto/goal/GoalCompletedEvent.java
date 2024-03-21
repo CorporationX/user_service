@@ -1,4 +1,4 @@
-package school.faang.user_service.dto.premium;
+package school.faang.user_service.dto.goal;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,9 +9,8 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PremiumEvent {
+public class GoalCompletedEvent {
     private long userId;
-    private long premiumId;
-    private PremiumPeriod premiumPeriod;
+    private long goalId;
     private LocalDateTime createAt;
 }

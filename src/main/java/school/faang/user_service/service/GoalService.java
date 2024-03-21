@@ -8,6 +8,7 @@ import school.faang.user_service.dto.GoalCompletedEvent;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.dto.goal.GoalSetEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
@@ -16,6 +17,7 @@ import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.publisher.GoalCompletedEventPublisher;
+import school.faang.user_service.publisher.GoalCreateEventPublisher;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validator.GoalValidator;
 
@@ -34,6 +36,7 @@ public class GoalService {
     private final UserService userService;
     private final GoalCompletedEventPublisher goalCompletedEventPublisher;
     private final UserContext userContext;
+    private final GoalCreateEventPublisher goalCreateEventPublisher;
 
     public List<GoalDto> getGoalsByUser(long userId, GoalFilterDto filter) {
         Stream<Goal> foundGoals = goalRepository.findGoalsByUserId(userId);
@@ -96,6 +99,10 @@ public class GoalService {
         return goalRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Цель не найдена"));
     }
 
+    public GoalDto findDtoById(long id) {
+        return goalMapper.toDto(findById(id));
+    }
+
     @Transactional
     public GoalDto createGoal(long userId, GoalDto goalDto) {
 
@@ -119,7 +126,9 @@ public class GoalService {
         userService.saveUser(userToUpdate);
         goalToSave.setUsers(List.of(userToUpdate));
 
-        return goalMapper.toDto(goalRepository.save(goalToSave));
+        Goal savedGoal = goalRepository.save(goalToSave);
+        goalCreateEventPublisher.publish(new GoalSetEvent(userId, savedGoal.getId(), savedGoal.getUpdatedAt()));
+        return goalMapper.toDto(savedGoal);
     }
 
     public void deleteGoal(long goalId) {

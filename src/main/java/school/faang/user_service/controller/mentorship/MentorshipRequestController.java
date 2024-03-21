@@ -44,8 +44,8 @@ public class MentorshipRequestController {
             description = "Позволяет стать ментором пользователя"
     )
     @PutMapping("/request/{id}/accept")
-    public void acceptRequest(@PathVariable("id") long id) {
-        mentorshipRequestService.acceptRequest(id);
+    public MentorshipRequestDto acceptRequest(@PathVariable("id") long id) {
+        return mentorshipRequestService.acceptRequest(id);
     }
 
     @Operation(

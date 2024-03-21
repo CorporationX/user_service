@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.service.event.EventService;
@@ -24,6 +25,7 @@ import java.util.List;
 @RequestMapping("/events")
 public class EventController {
     private final EventService eventService;
+    private final UserContext userContext;
 
     @Operation(summary = "Create an event")
     @PostMapping
@@ -56,14 +58,16 @@ public class EventController {
     }
 
     @Operation(summary = "Get events, which user with given ID owns")
-    @GetMapping("/user/{userId}/owned")
-    public List<EventDto> getOwnedEvents(@PathVariable long userId) {
+    @GetMapping("/user/owned")
+    public List<EventDto> getOwnedEvents() {
+        long userId = userContext.getUserId();
         return eventService.getOwnedEvents(userId);
     }
 
     @Operation(summary = "Get events, which user with given ID participates in")
-    @GetMapping("/user/{userId}/participated")
-    public List<EventDto> getParticipatedEvents(@PathVariable long userId) {
+    @GetMapping("/user/participated")
+    public List<EventDto> getParticipatedEvents() {
+        long userId = userContext.getUserId();
         return eventService.getParticipatedEvents(userId);
     }
 }

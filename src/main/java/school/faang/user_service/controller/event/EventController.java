@@ -45,29 +45,29 @@ public class EventController {
         return eventService.getEventsByFilter(filters);
     }
 
-    @Operation(summary = "Delete an event")
-    @DeleteMapping("/{eventId}")
-    public void deleteEvent(@PathVariable long eventId) {
-        eventService.deleteEvent(eventId);
-    }
-
-    @Operation(summary = "Update an existing event")
-    @PutMapping
-    public EventDto updateEvent(@Valid @RequestBody EventDto eventDto) {
-        return eventService.updateEvent(eventDto);
-    }
-
-    @Operation(summary = "Get events, which user with given ID owns")
+    @Operation(summary = "Get events, which user owns")
     @GetMapping("/user/owned")
     public List<EventDto> getOwnedEvents() {
         long userId = userContext.getUserId();
         return eventService.getOwnedEvents(userId);
     }
 
-    @Operation(summary = "Get events, which user with given ID participates in")
+    @Operation(summary = "Get events, which user participates in")
     @GetMapping("/user/participated")
     public List<EventDto> getParticipatedEvents() {
         long userId = userContext.getUserId();
         return eventService.getParticipatedEvents(userId);
+    }
+
+    @Operation(summary = "Update existing event")
+    @PutMapping
+    public EventDto updateEvent(@Valid @RequestBody EventDto eventDto) {
+        return eventService.updateEvent(eventDto);
+    }
+
+    @Operation(summary = "Delete an event")
+    @DeleteMapping("/{eventId}")
+    public void deleteEvent(@PathVariable long eventId) {
+        eventService.deleteEvent(eventId);
     }
 }

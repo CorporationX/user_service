@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
-
 import java.util.List;
 
 @RequiredArgsConstructor

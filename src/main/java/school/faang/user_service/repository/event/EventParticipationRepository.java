@@ -18,7 +18,7 @@ public interface EventParticipationRepository extends CrudRepository<User, Long>
 
     @Query(nativeQuery = true, value = """
             SELECT u.* FROM user u
-            JOIN user_event ue ON u.id = ue.user_id
+            JOIN user_event ue ON ue.user_id = u.id
             WHERE ue.event_id = :eventId
             """)
     List<User> findAllParticipantsByEventId(long eventId);

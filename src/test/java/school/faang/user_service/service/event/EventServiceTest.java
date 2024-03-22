@@ -88,7 +88,7 @@ class EventServiceTest {
     }
 
     @Test
-    void create_userSavedToDb_ThenReturnedAsDto() {
+    void create_EventCreatedAndSavedToDb_ThenReturnedAsDto() {
         when(eventRepository.save(any(Event.class))).thenReturn(event);
 
         EventDto returned = eventService.create(eventDto);

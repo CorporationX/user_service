@@ -29,17 +29,18 @@ public class EventParticipationController {
     @PostMapping("/{eventId}/{userId}")
     public ResponseEntity<String> registerParticipant(@PathVariable long eventId, @PathVariable long userId){
         participationValidator.checkForNull(eventId, userId);
-        return eventParticipationService.registerParticipant( eventId, userId );
+        eventParticipationService.registerParticipant( eventId, userId );
+        return ResponseEntity.ok("User " + userId + " registered");
     }
 
-   @DeleteMapping("/{eventId}/{register}")
+   @DeleteMapping("/{eventId}/{userId}")
     public ResponseEntity<Void> unregisterParticipant(@PathVariable long eventId, @PathVariable long userId){
        participationValidator.checkForNull(eventId, userId);
        return eventParticipationService.unregisterParticipant( eventId, userId );
     }
 
     @GetMapping("/{eventId}")
-    public ResponseEntity<List<User>> getParticipant(long eventId){
+    public ResponseEntity<List<User>> getParticipant(@PathVariable long eventId){
         participationValidator.checkForNull(eventId);
         return eventParticipationService.getParticipant(eventId);
     }

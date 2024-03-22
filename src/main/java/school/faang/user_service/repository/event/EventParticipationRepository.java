@@ -10,11 +10,9 @@ import school.faang.user_service.entity.event.Event;
 import java.util.List;
 
 @Repository
-public interface EventParticipationRepository extends JpaRepository<User, Long> {
+public interface EventParticipationRepository extends CrudRepository<User, Long> {
 
-    @Query(nativeQuery = true, value = """
-    INSERT INTO user_event (event_id, user_id) VALUES (:eventId, :userId)
-    """)
+    @Query(nativeQuery = true, value = "INSERT INTO user_event (event_id, user_id) VALUES (:eventId, :userId)")
     void register(long eventId, long userId);
 
     @Query(nativeQuery = true, value = "DELETE FROM user_event WHERE event_id = :eventId and user_id = :userId")

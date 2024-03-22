@@ -2,6 +2,7 @@ package school.faang.user_service.service.user;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
@@ -20,12 +21,18 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
+
     private final UserMapper userMapper;
+
     private final List<UserFilter> userFilters;
+
     private final UserValidator userValidator;
 
-    private static final String AVATAR_URL = "https://api.dicebear.com/8.x/lorelei-neutral/svg?seed=";
-    private static final String SMALL_AVATAR_URL = "https://api.dicebear.com/8.x/lorelei-neutral/svg?size=100&seed=";
+    @Value("${services.dicebear.avatar}")
+    private String avatar;
+
+    @Value("${services.dicebear.small_avatar}")
+    private String smallAvatar;
 
     public User getUserById(Long userId) {
         return userRepository.findById(userId)
@@ -64,8 +71,8 @@ public class UserService {
     private void setUpAvatar(User user) {
         UUID uuid = UUID.randomUUID();
         user.setUserProfilePic(UserProfilePic.builder()
-                .fileId(AVATAR_URL + uuid)
-                .smallFileId(SMALL_AVATAR_URL + uuid)
+                .fileId(avatar + uuid)
+                .smallFileId(smallAvatar + uuid)
                 .build());
     }
 }

@@ -109,15 +109,14 @@ class EventValidatorTest {
 
     @Test
     void validateUserIsOwnerOfEvent_UserOwnsEvent_ShouldNotThrow() {
-        assertDoesNotThrow(() ->
-                eventValidator.validateUserIsOwnerOfEvent(user, eventDto));
+        assertDoesNotThrow(() -> eventValidator.validateUserIsOwnerOfEvent(user, eventDto));
     }
 
     @Test
     void validateUserIsOwnerOfEvent_UserDoesntOwnEvent_ShouldThrowIllegalStateException() {
         eventDto.setOwnerId(19L);
 
-        assertThrows(DataValidationException.class, () ->
-                eventValidator.validateUserIsOwnerOfEvent(user, eventDto));
+        assertThrows(DataValidationException.class,
+                () -> eventValidator.validateUserIsOwnerOfEvent(user, eventDto));
     }
 }

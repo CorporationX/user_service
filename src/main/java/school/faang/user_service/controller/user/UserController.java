@@ -51,6 +51,12 @@ public class UserController {
         return userService.getUsersByIds(usersIds);
     }
 
+    @Operation(summary = "Get list of user's subscribers by userID")
+    @GetMapping("/{userId}/subscribers")
+    public List<UserDto> getSubscribers(@PathVariable long userId) {
+        return userService.getSubscribers(userId);
+    }
+
     @Operation(summary = "Deactivate user by id")
     @PutMapping("/{userId}/deactivated")
     public UserDto deactivateUser(@PathVariable @Min(1) long userId) {

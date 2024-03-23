@@ -18,6 +18,8 @@ import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.validation.premium.PremiumValidator;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +37,16 @@ public class PremiumService {
         PaymentResponse response = paymentService.sendPayment(getPaymentRequest(userId, period));
         premiumValidator.validatePaymentResponse(response);
         return savePremium(userId, period);
+    }
+
+    @Transactional
+    public void deleteExpiredPremiums() {
+        Stream<User> premiumUsers = userRepository.findPremiumUsers();
+        List<Premium> expiredPremiums = premiumUsers
+                .map(User::getPremium)
+                .filter(premium -> premium.getEndDate().isBefore(LocalDateTime.now()))
+                .toList();
+        premiumRepository.deleteAll(expiredPremiums);
     }
 
     private PremiumDto savePremium(Long userId, PremiumPeriod period) {

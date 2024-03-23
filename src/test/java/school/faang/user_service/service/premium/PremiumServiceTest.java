@@ -19,7 +19,10 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.validation.premium.PremiumValidator;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.any;
@@ -33,14 +36,19 @@ class PremiumServiceTest {
 
     @Mock
     private PaymentServiceClient paymentService;
+
     @Mock
     private PremiumRepository premiumRepository;
+
     @Mock
     private UserRepository userRepository;
+
     @Spy
     private PremiumMapperImpl premiumMapper;
+
     @Mock
     private PremiumValidator premiumValidator;
+
     @InjectMocks
     private PremiumService premiumService;
 
@@ -62,6 +70,38 @@ class PremiumServiceTest {
         verify(premiumRepository, times(1)).save(any(Premium.class));
         verify(premiumMapper, times(1)).toDto(any(Premium.class));
         verify(paymentService, times(1)).sendPayment(any(PaymentRequest.class));
+    }
+
+    @Test
+    void deleteExpiredPremiums() {
+        List<Premium> expected = List.of(getBeforePremium());
+        when(userRepository.findPremiumUsers()).thenReturn(getPremiumUsers());
+
+        premiumService.deleteExpiredPremiums();
+
+        verify(userRepository, times(1)).findPremiumUsers();
+        verify(premiumRepository, times(1)).deleteAll(expected);
+    }
+
+    private Stream<User> getPremiumUsers() {
+        return Stream.of(User.builder()
+                        .premium(getBeforePremium())
+                        .build(),
+                User.builder()
+                        .premium(getAfterPremium())
+                        .build());
+    }
+
+    private Premium getAfterPremium() {
+        return Premium.builder()
+                .endDate(LocalDateTime.now().plusDays(1))
+                .build();
+    }
+
+    private Premium getBeforePremium() {
+        return Premium.builder()
+                .endDate(LocalDateTime.of(1999, 1, 29, 0, 0).minusDays(1))
+                .build();
     }
 
     private User getUser() {

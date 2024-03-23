@@ -1,6 +1,7 @@
 package school.faang.user_service.controller.event;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.service.event.EventParticipationService;
@@ -25,30 +27,32 @@ public class EventParticipationController {
 
     private final EventParticipationService eventParticipationService;
     private final EventParticipationValidator participationValidator;
+    private final UserContext userContext;
 
     @PostMapping("/{eventId}/{userId}")
-    public ResponseEntity<String> registerParticipant(@PathVariable long eventId, @PathVariable long userId){
-        participationValidator.checkForNull(eventId, userId);
+    public ResponseEntity<String> registerParticipant(@PathVariable long eventId) {
+        long userId = userContext.getUserId();
+        participationValidator.checkForNull( eventId, userId );
         eventParticipationService.registerParticipant( eventId, userId );
-        return ResponseEntity.ok("User " + userId + " registered");
+        return eventParticipationService.registerParticipant( eventId, userId );
     }
 
-   @DeleteMapping("/{eventId}/{userId}")
-    public ResponseEntity<Void> unregisterParticipant(@PathVariable long eventId, @PathVariable long userId){
-       participationValidator.checkForNull(eventId, userId);
-       return eventParticipationService.unregisterParticipant( eventId, userId );
+    @DeleteMapping("/{eventId}/{userId}")
+    public ResponseEntity<Void> unregisterParticipant(@PathVariable long eventId, @PathVariable long userId) {
+        participationValidator.checkForNull( eventId, userId );
+        return eventParticipationService.unregisterParticipant( eventId, userId );
     }
 
     @GetMapping("/{eventId}")
-    public ResponseEntity<List<User>> getParticipant(@PathVariable long eventId){
-        participationValidator.checkForNull(eventId);
-        return eventParticipationService.getParticipant(eventId);
+    public ResponseEntity<List<User>> getParticipants(@PathVariable long eventId) {
+        participationValidator.checkForNull( eventId );
+        return eventParticipationService.getParticipants( eventId );
     }
 
     @GetMapping()
-    public int getParticipantsCount(long eventId){
+    public int getParticipantsCount(long eventId) {
         participationValidator.checkForNull( eventId );
-        return eventParticipationService.getParticipantsCount(eventId);
+        return eventParticipationService.getParticipantsCount( eventId );
     }
 
 }

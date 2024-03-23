@@ -26,11 +26,8 @@ public class EventParticipationService {
         if (isParticipant) {
             throw new DataValidationException( "User with id " + userId + " already registered for event with id " + eventId );
         }
-
         eventParticipationRepository.register( eventId, userId );
-
         return ResponseEntity.ok( "User " + userId + " registered" );
-
     }
 
     public ResponseEntity<Void> unregisterParticipant(@PathVariable long eventId, @PathVariable long userId) {
@@ -43,7 +40,7 @@ public class EventParticipationService {
         return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<List<User>> getParticipant(@PathVariable long eventId) {
+    public ResponseEntity<List<User>> getParticipants(@PathVariable long eventId) {
         List<User> participantList = eventParticipationRepository.findAllParticipantsByEventId( eventId );
         return ResponseEntity.status( HttpStatus.OK ).body( participantList );
     }
@@ -56,6 +53,4 @@ public class EventParticipationService {
         List<User> participantList = eventParticipationRepository.findAllParticipantsByEventId( eventId );
         return participantList.stream().anyMatch( user -> user.getId() == userId );
     }
-
-
 }

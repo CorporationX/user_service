@@ -33,9 +33,6 @@ public class EventParticipationServiceTest {
     @Mock
     EventParticipationRepository participationRepository;
 
-    @Mock
-    EventParticipationValidator participationValidator;
-
     @InjectMocks
     EventParticipationService eventParticipationService;
 
@@ -84,7 +81,7 @@ public class EventParticipationServiceTest {
     @Test
     public void testGetParticipant() {
         when(participationRepository.findAllParticipantsByEventId( eventId )).thenReturn( userList );
-        ResponseEntity<List<User>> actual = eventParticipationService.getParticipant( eventId );
+        ResponseEntity<List<User>> actual = eventParticipationService.getParticipants( eventId );
         verify( participationRepository, times(1) ).findAllParticipantsByEventId( eventId );
         assertEquals( userList, actual.getBody() );
     }

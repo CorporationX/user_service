@@ -34,26 +34,26 @@ public class EventParticipationController {
     @PostMapping("/{eventId}")
     public ResponseEntity<String> registerParticipant(@PathVariable long eventId) {
         long userId = userContext.getUserId();
-        participationValidator.checkForNull( eventId, userId );
+        participationValidator.checkEventIdForNull( eventId);
         return eventParticipationService.registerParticipant( eventId, userId );
     }
 
     @DeleteMapping("/{eventId}")
     public ResponseEntity<Void> unregisterParticipant(@PathVariable long eventId) {
         long userId = userContext.getUserId();
-        participationValidator.checkForNull( eventId, userId );
+        participationValidator.checkEventIdForNull( eventId);
         return eventParticipationService.unregisterParticipant( eventId, userId );
     }
 
     @GetMapping("/{eventId}")
     public ResponseEntity<List<User>> getParticipants(@PathVariable long eventId) {
-        participationValidator.checkForNull( eventId );
+        participationValidator.checkEventIdForNull( eventId );
         return eventParticipationService.getParticipants( eventId );
     }
 
     @GetMapping()
     public int getParticipantsCount(long eventId) {
-        participationValidator.checkForNull( eventId );
+        participationValidator.checkEventIdForNull( eventId );
         return eventParticipationService.getParticipantsCount( eventId );
     }
 }

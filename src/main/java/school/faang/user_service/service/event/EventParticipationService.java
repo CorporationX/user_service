@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EventRegistrationConflictException;
 import school.faang.user_service.repository.event.EventParticipationRepository;
+import school.faang.user_service.repository.event.EventRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,11 +22,13 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class EventParticipationService {
     private final EventParticipationRepository eventParticipationRepository;
+    private final EventRepository eventRepository;
 
     public ResponseEntity<String> registerParticipant(long eventId, long userId) {
+        if(!checkEventExists( eventId )) return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( "Event ID " + eventId + " does not exist" );
         boolean isParticipant = checkIfEventParticipant( eventId, userId );
         if (isParticipant) {
-            throw new DataValidationException( "User with id " + userId + " already registered for event with id " + eventId );
+            throw new EventRegistrationConflictException( "User with id " + userId + " already registered for event with id " + eventId );
         }
         eventParticipationRepository.register( eventId, userId );
         return ResponseEntity.ok( "User " + userId + " registered" );
@@ -33,7 +37,7 @@ public class EventParticipationService {
     public ResponseEntity<Void> unregisterParticipant(@PathVariable long eventId, @PathVariable long userId) {
         boolean isParticipant = checkIfEventParticipant( eventId, userId );
         if (!isParticipant) {
-            throw new DataValidationException( "User with id " + userId + " is not registered for event with id " + eventId );
+            throw new EventRegistrationConflictException( "User with id " + userId + " is not registered for event with id " + eventId );
         }
         eventParticipationRepository.unregister( eventId, userId );
 
@@ -53,4 +57,9 @@ public class EventParticipationService {
         List<User> participantList = eventParticipationRepository.findAllParticipantsByEventId( eventId );
         return participantList.stream().anyMatch( user -> user.getId() == userId );
     }
+
+    private boolean checkEventExists(long eventId) {
+        return eventRepository.existsById( eventId );
+    }
+
 }

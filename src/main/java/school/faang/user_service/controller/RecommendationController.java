@@ -1,9 +1,9 @@
 package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.params.shadow.com.univocity.parsers.common.DataValidationException;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
+import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.service.RecommendationService;
 
 @Controller

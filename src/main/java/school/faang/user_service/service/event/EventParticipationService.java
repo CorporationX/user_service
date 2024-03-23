@@ -21,39 +21,41 @@ import java.util.Optional;
 public class EventParticipationService {
     private final EventParticipationRepository eventParticipationRepository;
 
-    public ResponseEntity<String> registerParticipant(long eventId, long userId){
-        boolean isParticipant = checkIfEventParticipant(eventId, userId);
-        if(isParticipant){
-            throw new DataValidationException("User with id " + userId + " already registered for event with id " + eventId );
+    public ResponseEntity<String> registerParticipant(long eventId, long userId) {
+        boolean isParticipant = checkIfEventParticipant( eventId, userId );
+        if (isParticipant) {
+            throw new DataValidationException( "User with id " + userId + " already registered for event with id " + eventId );
         }
+
         eventParticipationRepository.register( eventId, userId );
 
-        return ResponseEntity.ok("User " + userId + " registered");
+        return ResponseEntity.ok( "User " + userId + " registered" );
+
     }
-    public ResponseEntity<Void> unregisterParticipant(@PathVariable long eventId, @PathVariable long userId){
-        boolean isParticipant = checkIfEventParticipant(eventId, userId);
-        if(!isParticipant){
-            throw new DataValidationException("User with id " + userId + " is not registered for event with id " + eventId );
+
+    public ResponseEntity<Void> unregisterParticipant(@PathVariable long eventId, @PathVariable long userId) {
+        boolean isParticipant = checkIfEventParticipant( eventId, userId );
+        if (!isParticipant) {
+            throw new DataValidationException( "User with id " + userId + " is not registered for event with id " + eventId );
         }
         eventParticipationRepository.unregister( eventId, userId );
 
         return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<List<User>> getParticipant(@PathVariable long eventId){
+    public ResponseEntity<List<User>> getParticipant(@PathVariable long eventId) {
         List<User> participantList = eventParticipationRepository.findAllParticipantsByEventId( eventId );
-        return ResponseEntity.status(HttpStatus.OK).body( participantList );
+        return ResponseEntity.status( HttpStatus.OK ).body( participantList );
     }
 
-    public int getParticipantsCount(@PathVariable long eventId){
+    public int getParticipantsCount(@PathVariable long eventId) {
         return eventParticipationRepository.countParticipants( eventId );
     }
 
     private boolean checkIfEventParticipant(long eventId, long userId) {
-        List<User> participantList = eventParticipationRepository.findAllParticipantsByEventId( eventId);
+        List<User> participantList = eventParticipationRepository.findAllParticipantsByEventId( eventId );
         return participantList.stream().anyMatch( user -> user.getId() == userId );
     }
-
 
 
 }

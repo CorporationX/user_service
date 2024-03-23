@@ -22,7 +22,6 @@ import school.faang.user_service.validation.premium.PremiumValidator;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.any;
@@ -74,34 +73,16 @@ class PremiumServiceTest {
 
     @Test
     void deleteExpiredPremiums() {
-        List<Premium> expected = List.of(getBeforePremium());
-        when(userRepository.findPremiumUsers()).thenReturn(getPremiumUsers());
+        when(premiumRepository.findAllByEndDateBefore(any(LocalDateTime.class))).thenReturn(getPremiums());
 
         premiumService.deleteExpiredPremiums();
 
-        verify(userRepository, times(1)).findPremiumUsers();
-        verify(premiumRepository, times(1)).deleteAll(expected);
+        verify(premiumRepository, times(1)).findAllByEndDateBefore(any(LocalDateTime.class));
+        verify(premiumRepository, times(1)).deleteAll(getPremiums());
     }
 
-    private Stream<User> getPremiumUsers() {
-        return Stream.of(User.builder()
-                        .premium(getBeforePremium())
-                        .build(),
-                User.builder()
-                        .premium(getAfterPremium())
-                        .build());
-    }
-
-    private Premium getAfterPremium() {
-        return Premium.builder()
-                .endDate(LocalDateTime.now().plusDays(1))
-                .build();
-    }
-
-    private Premium getBeforePremium() {
-        return Premium.builder()
-                .endDate(LocalDateTime.of(1999, 1, 29, 0, 0))
-                .build();
+    private List<Premium> getPremiums() {
+        return List.of(getPremium());
     }
 
     private User getUser() {

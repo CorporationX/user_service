@@ -100,7 +100,7 @@ class PremiumServiceTest {
 
     private Premium getBeforePremium() {
         return Premium.builder()
-                .endDate(LocalDateTime.of(1999, 1, 29, 0, 0).minusDays(1))
+                .endDate(LocalDateTime.of(1999, 1, 29, 0, 0))
                 .build();
     }
 

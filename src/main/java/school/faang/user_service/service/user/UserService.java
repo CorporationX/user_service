@@ -32,7 +32,7 @@ public class UserService {
     private String smallAvatar;
 
     public UserDto create(UserDto userDto) {
-        userValidator.validatePassword(userDto);
+        userValidator.validatePassword(userDto.getPassword());
         User user = userMapper.toEntity(userDto);
         user.setActive(true);
         setUpAvatar(user);

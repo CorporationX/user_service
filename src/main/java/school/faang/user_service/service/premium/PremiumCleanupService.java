@@ -1,13 +1,12 @@
-package school.faang.user_service.scheduler;
+package school.faang.user_service.service.premium;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-import school.faang.user_service.service.premium.PremiumService;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 @RequiredArgsConstructor
-public class Scheduler {
+public class PremiumCleanupService {
 
     private final PremiumService premiumService;
 

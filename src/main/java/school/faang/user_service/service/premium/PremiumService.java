@@ -19,7 +19,6 @@ import school.faang.user_service.validation.premium.PremiumValidator;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -41,11 +40,7 @@ public class PremiumService {
 
     @Transactional
     public void deleteExpiredPremiums() {
-        Stream<User> premiumUsers = userRepository.findPremiumUsers();
-        List<Premium> expiredPremiums = premiumUsers
-                .map(User::getPremium)
-                .filter(premium -> premium.getEndDate().isBefore(LocalDateTime.now()))
-                .toList();
+        List<Premium> expiredPremiums = premiumRepository.findAllByEndDateBefore(LocalDateTime.now());
         premiumRepository.deleteAll(expiredPremiums);
     }
 

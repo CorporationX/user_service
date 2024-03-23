@@ -26,7 +26,7 @@ public interface EventParticipationRepository extends JpaRepository<User, Long> 
 
     @Query(nativeQuery = true, value = """
             SELECT u.* FROM users u
-            JOIN FETCH user_event ue ON u.id = ue.user_id
+            JOIN  user_event ue ON u.id = ue.user_id
             WHERE ue.event_id = :eventId
             """)
     List<User> findAllParticipantsByEventId(long eventId);

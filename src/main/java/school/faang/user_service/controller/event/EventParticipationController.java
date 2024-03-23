@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventParticipationService;
 import school.faang.user_service.validator.event.EventParticipationValidator;
 
@@ -29,16 +31,16 @@ public class EventParticipationController {
     private final EventParticipationValidator participationValidator;
     private final UserContext userContext;
 
-    @PostMapping("/{eventId}/{userId}")
+    @PostMapping("/{eventId}")
     public ResponseEntity<String> registerParticipant(@PathVariable long eventId) {
         long userId = userContext.getUserId();
         participationValidator.checkForNull( eventId, userId );
-        eventParticipationService.registerParticipant( eventId, userId );
         return eventParticipationService.registerParticipant( eventId, userId );
     }
 
-    @DeleteMapping("/{eventId}/{userId}")
-    public ResponseEntity<Void> unregisterParticipant(@PathVariable long eventId, @PathVariable long userId) {
+    @DeleteMapping("/{eventId}")
+    public ResponseEntity<Void> unregisterParticipant(@PathVariable long eventId) {
+        long userId = userContext.getUserId();
         participationValidator.checkForNull( eventId, userId );
         return eventParticipationService.unregisterParticipant( eventId, userId );
     }
@@ -54,6 +56,5 @@ public class EventParticipationController {
         participationValidator.checkForNull( eventId );
         return eventParticipationService.getParticipantsCount( eventId );
     }
-
 }
 

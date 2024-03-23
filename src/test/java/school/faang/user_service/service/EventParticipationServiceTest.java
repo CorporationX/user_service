@@ -9,21 +9,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.filter.event.EventOwnerIdFilter;
-import school.faang.user_service.filter.event.EventTitlePatternFilter;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.service.event.EventParticipationService;
-import school.faang.user_service.service.event.EventService;
-import school.faang.user_service.validator.event.EventParticipationValidator;
-
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -86,7 +81,7 @@ public class EventParticipationServiceTest {
         assertEquals( userList, actual.getBody() );
     }
     @Test
-    public void testPartcipantCount(){
+    public void testParticipantCount(){
         when( participationRepository.countParticipants(eventId) ).thenReturn( userList.size() );
         int actual = eventParticipationService.getParticipantsCount( eventId );
         verify( participationRepository, times( 1 ) ).countParticipants( eventId );

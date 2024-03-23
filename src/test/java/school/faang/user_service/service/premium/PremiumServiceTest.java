@@ -19,6 +19,8 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.validation.premium.PremiumValidator;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,14 +35,19 @@ class PremiumServiceTest {
 
     @Mock
     private PaymentServiceClient paymentService;
+
     @Mock
     private PremiumRepository premiumRepository;
+
     @Mock
     private UserRepository userRepository;
+
     @Spy
     private PremiumMapperImpl premiumMapper;
+
     @Mock
     private PremiumValidator premiumValidator;
+
     @InjectMocks
     private PremiumService premiumService;
 
@@ -62,6 +69,20 @@ class PremiumServiceTest {
         verify(premiumRepository, times(1)).save(any(Premium.class));
         verify(premiumMapper, times(1)).toDto(any(Premium.class));
         verify(paymentService, times(1)).sendPayment(any(PaymentRequest.class));
+    }
+
+    @Test
+    void deleteExpiredPremiums() {
+        when(premiumRepository.findAllByEndDateBefore(any(LocalDateTime.class))).thenReturn(getPremiums());
+
+        premiumService.deleteExpiredPremiums();
+
+        verify(premiumRepository, times(1)).findAllByEndDateBefore(any(LocalDateTime.class));
+        verify(premiumRepository, times(1)).deleteAll(getPremiums());
+    }
+
+    private List<Premium> getPremiums() {
+        return List.of(getPremium());
     }
 
     private User getUser() {

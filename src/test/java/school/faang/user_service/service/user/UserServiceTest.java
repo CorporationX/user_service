@@ -174,6 +174,36 @@ class UserServiceTest {
                 () -> assertEquals(Collections.emptyList(), userService.getUsersByIds(List.of(589123098L)))
         );
     }
+
+    @Test
+    void getSubscribers_UserFound_SubscribersListReturnedAsDto() {
+        User follower = User.builder()
+                .id(156L)
+                .build();
+        UserDto followerDto = UserDto.builder()
+                .id(follower.getId())
+                .build();
+        user.setFollowers(List.of(follower));
+        when(userRepository.findById(user.getId())).thenReturn(Optional.ofNullable(user));
+        when(userMapper.toDto(List.of(follower))).thenReturn(List.of(followerDto));
+
+        List<UserDto> returned = userService.getSubscribers(user.getId());
+
+        assertAll(
+                () -> verify(userRepository, times(1)).findById(user.getId()),
+                () -> verify(userMapper, times(1)).toDto(List.of(follower)),
+                () -> assertEquals(List.of(followerDto), returned)
+        );
+    }
+
+    @Test
+    void getSubscribers_UserNotFound_ShouldThrowEntityNotFoundException() {
+        when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () ->
+                userService.getSubscribers(user.getId()));
+    }
+
     @Test
     void shouldgetUserById() {
         User user = new User();
@@ -190,6 +220,7 @@ class UserServiceTest {
         long userId = 0L;
         assertThrows(EntityNotFoundException.class, () -> userService.getUserById(userId));
     }
+
     @Test
     void shouldThrowExceptionIfUserNotFound() {
         long userId = 2L;

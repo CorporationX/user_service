@@ -7,10 +7,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.controller.EventController;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.EventMapperImpl;
@@ -23,7 +23,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 public class EventControllerTest {
@@ -48,6 +50,9 @@ public class EventControllerTest {
                                         .id(1L)
                                         .build()
                         ))
+                        .attendees(List.of(
+                                User.builder()
+                                        .id(1L).build()))
                         .build(),
                 Event.builder()
                         .id(2L)
@@ -57,6 +62,9 @@ public class EventControllerTest {
                                         .id(2L)
                                         .build()
                         ))
+                        .attendees(List.of(
+                                User.builder()
+                                        .id(1L).build()))
                         .build()
         );
 
@@ -65,11 +73,13 @@ public class EventControllerTest {
                         .id(1L)
                         .maxAttendees(2)
                         .relatedSkillIds(List.of(1L))
+                        .attendeeIds(List.of(1L))
                         .build(),
                 EventDto.builder()
                         .id(2L)
                         .maxAttendees(2)
                         .relatedSkillIds(List.of(2L))
+                        .attendeeIds(List.of(1L))
                         .build()
         );
 

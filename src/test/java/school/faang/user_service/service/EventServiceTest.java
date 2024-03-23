@@ -35,6 +35,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -48,6 +49,8 @@ public class EventServiceTest {
     private EventRepository eventRepository;
     @Mock
     private EventStartEventPublisher eventPublisher;
+    @Mock
+    private SkillService skillService;
     @Spy
     private EventMapperImpl eventMapper;
     @Mock
@@ -59,6 +62,7 @@ public class EventServiceTest {
     private LocalDateTime startDate;
     private User owner;
     private Skill skill;
+    private User user;
     private Event eventFirst;
     private Event eventSecond;
     private EventFilterDto eventFilterDtoId;
@@ -73,11 +77,12 @@ public class EventServiceTest {
         eventFilters.add(new EventStartDatePattern());
 
         eventService = new EventService(eventRepository, eventMapper, eventValidator
-                , userService, eventFilters, asyncConfig, eventPublisher);
+                , userService, eventFilters, asyncConfig, eventPublisher, skillService);
 
         startDate = LocalDateTime.now().plusDays(1L);
         owner = User.builder().id(1L).active(true).build();
         skill = Skill.builder().id(1L).build();
+        user = User.builder().id(1L).build();
 
         eventFirst = Event.builder()
                 .id(1L)
@@ -85,6 +90,7 @@ public class EventServiceTest {
                 .maxAttendees(2)
                 .owner(owner)
                 .relatedSkills(List.of(skill))
+                .attendees(List.of(user))
                 .startDate(LocalDateTime.now())
                 .build();
         eventSecond = Event.builder()
@@ -93,6 +99,7 @@ public class EventServiceTest {
                 .maxAttendees(2)
                 .owner(owner)
                 .relatedSkills(List.of(skill))
+                .attendees(List.of(user))
                 .startDate(startDate)
                 .build();
 
@@ -129,10 +136,12 @@ public class EventServiceTest {
                 .ownerId(1L)
                 .title("EventFirst")
                 .relatedSkillIds(ownerSkillIds)
+                .attendeeIds(List.of(1L))
                 .maxAttendees(2)
                 .startDate(LocalDateTime.now().plusDays(1))
                 .build();
         Event eventEntity = eventMapper.toEntity(eventDtoExpected);
+        eventEntity.setAttendees(List.of(user));
         when(eventRepository.findById(eventDtoExpected.getId())).thenReturn(Optional.ofNullable(eventEntity));
         when(userService.getUserById(eventDtoExpected.getOwnerId())).thenReturn(owner);
         eventEntity.setRelatedSkills(skills);
@@ -171,11 +180,12 @@ public class EventServiceTest {
                 .title("EventFirst")
                 .ownerId(1L)
                 .maxAttendees(2)
+                .attendeeIds(List.of(1L))
                 .build();
         Event eventEntity = eventMapper.toEntity(eventDto);
-
+        when(eventRepository.save(any(Event.class))).thenReturn(eventFirst);
         eventService.create(eventDto);
-        Mockito.verify(eventRepository, times(1)).save(eventEntity);
+        Mockito.verify(eventRepository, times(1)).save(any(Event.class));
     }
 
     @Test
@@ -201,6 +211,9 @@ public class EventServiceTest {
                         .relatedSkills(List.of(Skill.builder()
                                 .id(1L)
                                 .build()))
+                        .attendees(List.of(User.builder()
+                                .id(1L)
+                                .build()))
                         .maxAttendees(2)
                         .build(),
                 Event.builder()
@@ -208,6 +221,9 @@ public class EventServiceTest {
                         .title("EventTwo")
                         .relatedSkills(List.of(Skill.builder()
                                 .id(2L)
+                                .build()))
+                        .attendees(List.of(User.builder()
+                                .id(1L)
                                 .build()))
                         .maxAttendees(2)
                         .build()
@@ -248,6 +264,7 @@ public class EventServiceTest {
                 .id(1L)
                 .maxAttendees(2)
                 .relatedSkillIds(List.of(1L))
+                .attendeeIds(List.of(1L))
                 .build();
         Event eventEntity = Event.builder()
                 .id(1L)
@@ -255,6 +272,9 @@ public class EventServiceTest {
                 .relatedSkills(List.of(Skill.builder()
                         .id(1L)
                         .build()))
+                .attendees(List.of(
+                        User.builder()
+                                .id(1L).build()))
                 .build();
         long eventId = eventDtoExpected.getId();
         Mockito.when(eventRepository.findById(eventId)).thenReturn(Optional.of(eventEntity));

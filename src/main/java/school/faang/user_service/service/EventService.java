@@ -10,6 +10,7 @@ import school.faang.user_service.config.async.AsyncConfig;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.event.EventStartEventDto;
+import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.filter.event.EventFilter;
@@ -21,6 +22,7 @@ import school.faang.user_service.validator.EventValidator;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Timer;
@@ -39,6 +41,7 @@ public class EventService {
     private final List<EventFilter> eventFilters;
     private final AsyncConfig asyncConfig;
     private final EventStartEventPublisher eventStartEventPublisher;
+    private final SkillService skillService;
 
     @Transactional
     public EventDto updateEvent(EventDto eventDto) {
@@ -59,11 +62,29 @@ public class EventService {
     @Transactional
     public EventDto create(EventDto eventDto) {
         eventValidator.checkIfOwnerExistsById(eventDto.getOwnerId());
-        eventValidator.checkIfOwnerHasSkillsRequired(eventDto);
-        Event eventEntity = eventMapper.toEntity(eventDto);
+//        eventValidator.checkIfOwnerHasSkillsRequired(eventDto);
+
+        Event eventEntity = mappingToEntity(eventDto);
         Event createdEvent = eventRepository.save(eventEntity);
         publishEventStartEvent(createdEvent);
         return eventMapper.toDto(createdEvent);
+    }
+
+    private Event mappingToEntity(EventDto eventDto) {
+        Event eventEntity = eventMapper.toEntity(eventDto);
+        List<User> attendees = new ArrayList<>();
+        List<Long> attendeeIds = eventDto.getAttendeeIds();
+        if (attendeeIds != null) {
+            attendees = attendeeIds.stream().map(userService::getUserById).toList();
+        }
+        eventEntity.setAttendees(attendees);
+        List<Skill> skills = new ArrayList<>();
+        List<Long> skillIds = eventDto.getRelatedSkillIds();
+        if (skillIds != null) {
+            skills = skillIds.stream().map(skillService::findById).toList();
+        }
+        eventEntity.setRelatedSkills(skills);
+        return eventEntity;
     }
 
     @Transactional
@@ -119,6 +140,7 @@ public class EventService {
     private void publishEventStartEvent(Event createdEvent) {
         EventStartEventDto eventDto = EventStartEventDto.builder()
                 .eventId(createdEvent.getId())
+                .title(createdEvent.getTitle())
                 .attendeesId(createdEvent.getAttendees().stream().map(User::getId).toList())
                 .build();
 

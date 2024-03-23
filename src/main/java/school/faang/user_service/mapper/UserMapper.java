@@ -15,6 +15,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public abstract class UserMapper {
+    @Mapping(source = "contactPreference.preference", target = "preference")
     public abstract UserDto toDto(User user);
 
     public abstract List<UserDto> toDtoList(List<User> users);

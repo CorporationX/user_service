@@ -86,7 +86,7 @@ jsonSchema2Pojo {
 }
 
 jacoco {
-    toolVersion = "0.8.9"
+    toolVersion = "0.8.11"
     reportsDirectory.set(layout.buildDirectory.dir("customJacocoReportDir"))
 }
 

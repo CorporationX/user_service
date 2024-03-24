@@ -6,7 +6,7 @@ import school.faang.user_service.dto.SubscriptionUserDto;
 import school.faang.user_service.dto.SubscriptionUserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.SubscriptionUserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.filters.UserFilter;
 
@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
-    private final UserMapper userMapper;
+    private final SubscriptionUserMapper userMapper;
     private final List<UserFilter> userFilters;
 
     public void followUser(long followerId, long followeeId) {

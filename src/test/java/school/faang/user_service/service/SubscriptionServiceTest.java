@@ -12,7 +12,7 @@ import school.faang.user_service.dto.SubscriptionUserDto;
 import school.faang.user_service.dto.SubscriptionUserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.SubscriptionUserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.filters.CityPatternFilter;
 import school.faang.user_service.service.filters.CountryPatternFilter;
@@ -39,7 +39,7 @@ public class SubscriptionServiceTest {
     private SubscriptionRepository subscriptionRepository;
 
     @Spy
-    private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
+    private SubscriptionUserMapper userMapper = Mappers.getMapper(SubscriptionUserMapper.class);
 
     @InjectMocks
     private SubscriptionService subscriptionService;

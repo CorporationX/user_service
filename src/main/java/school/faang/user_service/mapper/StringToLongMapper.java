@@ -6,6 +6,8 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Mapper
 @Component
@@ -16,8 +18,11 @@ public interface StringToLongMapper {
     List<Long> stringToLong(List<String> skills);
 
     default List<Long> convertSkillsToListLong(List<String> skills) {
+        if (Objects.isNull(skills)) {
+            return null;
+        }
         return skills.stream()
                 .map(Long::valueOf)
-                .toList();
+                .collect(Collectors.toList());
     }
 }

@@ -53,11 +53,11 @@ public class UserController {
         return userService.getUsersByIds(usersIds);
     }
 
-    @Operation(summary = "Get list of user's subscribers by userID")
-    @GetMapping("/subscribers")
-    public List<UserDto> getSubscribers() {
+    @Operation(summary = "Get list of user's followers by userID")
+    @GetMapping("/followers")
+    public List<UserDto> getFollowers() {
         long userId = userContext.getUserId();
-        return userService.getSubscribers(userId);
+        return userService.getFollowers(userId);
     }
 
     @Operation(summary = "Deactivate user")

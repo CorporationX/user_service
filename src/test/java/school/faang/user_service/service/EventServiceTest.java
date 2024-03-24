@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.User;
@@ -18,9 +19,11 @@ import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.validator.event.EventValidator;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -35,7 +38,8 @@ public class EventServiceTest {
     private EventValidator eventValidator;
     @Spy
     private EventMapperImpl eventMapper;
-
+    @Mock
+    ExecutorService executorService;
     private final List<EventFilter> eventFilters = new ArrayList<>();
 
 
@@ -46,7 +50,7 @@ public class EventServiceTest {
     void setUp() {
         eventFilters.add(new EventTitlePatternFilter());
         eventFilters.add(new EventOwnerIdFilter());
-        eventService = new EventService(eventRepository, eventValidator, eventMapper, eventFilters);
+        eventService = new EventService(eventRepository, eventValidator, eventMapper, eventFilters, executorService);
     }
 
 
@@ -135,5 +139,21 @@ public class EventServiceTest {
         long ownerId = 1L;
         eventService.getParticipatedEvents(ownerId);
         verify(eventRepository, times(1)).findParticipatedEventsByUserId(ownerId);
+    }
+
+    @Test
+    public void testClearEvents() {
+        List<Event> eventList = new ArrayList<>();
+        for (int i = 0; i < 200; i++) {
+            Event  event = new Event();
+            long day = i % 2 == 0 ? 1 : -1;
+            event.setEndDate(LocalDateTime.now().minusDays(day));
+            eventList.add(event);
+        }
+        Mockito.when(eventRepository.findAll()).thenReturn(eventList);
+        ReflectionTestUtils.setField(eventService, "batchSize", 100);
+        eventService.clearEvents();
+        verify(eventRepository, times(1)).findAll();
+        verify(executorService).execute(any(Runnable.class));
     }
 }

@@ -60,3 +60,10 @@ task:
 
 cleanUpPremiumRepo:
   cron: *daily
+
+clearEvents:
+  cron: "0 0 10 * * *"
+  batchSize: 100
+
+executorConfig:
+  thread-pool-size: 10

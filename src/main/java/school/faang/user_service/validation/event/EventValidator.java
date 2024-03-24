@@ -1,6 +1,5 @@
 package school.faang.user_service.validation.event;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.EventDto;
@@ -8,31 +7,24 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.event.EventRepository;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class EventValidator {
     private final SkillRepository skillRepository;
-    private final EventRepository eventRepository;
 
     public void validateUserHasRequiredSkills(EventDto eventDto) {
-        List<Skill> userSkills = skillRepository.findAllByUserId(eventDto.getOwnerId());
-        List<Skill> requiredSkills = new ArrayList<>();
-        eventDto.getRelatedSkillsIds().forEach(id -> {
-            Skill skillToAdd = skillRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException("Skill doesn't exist by id: " + id));
-            requiredSkills.add(skillToAdd);
-        });
+        Set<Long> userSkillsIds = skillRepository.findAllByUserId(eventDto.getOwnerId()).stream()
+                .map(Skill::getId)
+                .collect(Collectors.toSet());
 
-        if (userSkills == null || userSkills.isEmpty()) {
+        if (userSkillsIds.isEmpty()) {
             throw new DataValidationException("User hasn't got any skills");
         }
-        if (!(new HashSet<>(userSkills).containsAll(requiredSkills))) {
+        if (!userSkillsIds.containsAll(eventDto.getRelatedSkillsIds())) {
             throw new DataValidationException("User hasn't got skills required for this event");
         }
     }
@@ -40,12 +32,6 @@ public class EventValidator {
     public void validateUserIsOwnerOfEvent(User user, EventDto eventDto) {
         if (user.getId() != eventDto.getOwnerId()) {
             throw new DataValidationException("User is not an owner of the Event");
-        }
-    }
-
-    public void validateEventExistsById(long eventId) {
-        if (!eventRepository.existsById(eventId)) {
-            throw new DataValidationException("There is no event with id " + eventId);
         }
     }
 }

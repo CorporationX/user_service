@@ -21,11 +21,8 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
-
     private final UserMapper userMapper;
-
     private final List<UserFilter> userFilters;
-
     private final UserValidator userValidator;
 
     @Value("${services.dicebear.avatar}")
@@ -34,13 +31,8 @@ public class UserService {
     @Value("${services.dicebear.small_avatar}")
     private String smallAvatar;
 
-    public User getUserById(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("A user with this id: " + userId + "was not found in userRepository"));
-    }
-
     public UserDto create(UserDto userDto) {
-        userValidator.validatePassword(userDto);
+        userValidator.validatePassword(userDto.getPassword());
         User user = userMapper.toEntity(userDto);
         user.setActive(true);
         setUpAvatar(user);
@@ -48,9 +40,12 @@ public class UserService {
     }
 
     public UserDto getUser(long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User doesn't exist by ID: " + userId));
+        User user = getUserFromRepository(userId);
         return userMapper.toDto(user);
+    }
+
+    public User getUserById(Long userId) {
+        return getUserFromRepository(userId);
     }
 
     public List<UserDto> getUsersByIds(List<Long> ids) {
@@ -60,12 +55,18 @@ public class UserService {
 
     public List<UserDto> getPremiumUsers(UserFilterDto filters) {
         List<User> premiumUsers = userRepository.findPremiumUsers().toList();
+
         if (!userFilters.isEmpty()) {
             userFilters.stream()
-                    .filter(userFilter -> userFilter.isApplicable(filters))
-                    .forEach(userFilter -> userFilter.apply(premiumUsers, filters));
+                    .filter(filter -> filter.isApplicable(filters))
+                    .forEach(filter -> filter.apply(premiumUsers, filters));
         }
         return userMapper.toDto(premiumUsers);
+    }
+
+    private User getUserFromRepository(long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User doesn't exist by ID: " + userId));
     }
 
     private void setUpAvatar(User user) {

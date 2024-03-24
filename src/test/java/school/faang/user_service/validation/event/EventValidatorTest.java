@@ -3,9 +3,6 @@ package school.faang.user_service.validation.event;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -15,17 +12,17 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.event.EventRepository;
 
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,8 +30,6 @@ class EventValidatorTest {
 
     @Mock
     private SkillRepository skillRepository;
-    @Mock
-    private EventRepository eventRepository;
     @InjectMocks
     private EventValidator eventValidator;
 
@@ -85,58 +80,43 @@ class EventValidatorTest {
 
     @Test
     void validateUserHasRequiredSkills_UserHasRequiredSkills_ShouldNotThrow() {
-        when(skillRepository.findAllByUserId(anyLong())).thenReturn(List.of(requiredSkill));
-        when(skillRepository.findById(anyLong())).thenReturn(Optional.ofNullable(requiredSkill));
+        long userId = eventDto.getOwnerId();
+        when(skillRepository.findAllByUserId(userId)).thenReturn(List.of(requiredSkill));
 
-        assertDoesNotThrow(() ->
-                eventValidator.validateUserHasRequiredSkills(eventDto));
+        eventValidator.validateUserHasRequiredSkills(eventDto);
+
+        assertAll(
+                () -> verify(skillRepository, times(1)).findAllByUserId(userId),
+                () -> assertDoesNotThrow(() -> eventValidator.validateUserHasRequiredSkills(eventDto))
+        );
     }
 
     @Test
     void validateUserHasRequiredSkills_UserDoesntHaveRequiredSkills_ShouldThrowDataValidationException() {
-        when(skillRepository.findAllByUserId(anyLong())).thenReturn(List.of(userSkill));
-        when(skillRepository.findById(anyLong())).thenReturn(Optional.ofNullable(requiredSkill));
+        when(skillRepository.findAllByUserId(eventDto.getOwnerId())).thenReturn(List.of(userSkill));
 
-        assertThrows(DataValidationException.class, () ->
-                eventValidator.validateUserHasRequiredSkills(eventDto));
+        assertThrows(DataValidationException.class,
+                () -> eventValidator.validateUserHasRequiredSkills(eventDto));
     }
 
     @Test
     void validateUserHasRequiredSkills_UserDoesntHaveAnySkills_ShouldThrowDataValidationException() {
-        when(skillRepository.findAllByUserId(anyLong())).thenReturn(Collections.emptyList());
-        when(skillRepository.findById(anyLong())).thenReturn(Optional.ofNullable(requiredSkill));
+        when(skillRepository.findAllByUserId(eventDto.getOwnerId())).thenReturn(Collections.emptyList());
 
-        assertThrows(DataValidationException.class, () ->
-                eventValidator.validateUserHasRequiredSkills(eventDto));
+        assertThrows(DataValidationException.class,
+                () -> eventValidator.validateUserHasRequiredSkills(eventDto));
     }
 
     @Test
     void validateUserIsOwnerOfEvent_UserOwnsEvent_ShouldNotThrow() {
-        assertDoesNotThrow(() ->
-                eventValidator.validateUserIsOwnerOfEvent(user, eventDto));
+        assertDoesNotThrow(() -> eventValidator.validateUserIsOwnerOfEvent(user, eventDto));
     }
 
     @Test
     void validateUserIsOwnerOfEvent_UserDoesntOwnEvent_ShouldThrowIllegalStateException() {
         eventDto.setOwnerId(19L);
 
-        assertThrows(DataValidationException.class, () ->
-                eventValidator.validateUserIsOwnerOfEvent(user, eventDto));
-    }
-
-    @Test
-    void validateEventExistsById_EventExists_ShouldNotThrow() {
-        when(eventRepository.existsById(anyLong())).thenReturn(true);
-
-        assertDoesNotThrow(() ->
-                eventValidator.validateEventExistsById(10L));
-    }
-
-    @Test
-    void validateEventExistsById_EventDoesntExist_ShouldThrowNoSuchElementException() {
-        when(eventRepository.existsById(anyLong())).thenReturn(false);
-
-        assertThrows(DataValidationException.class, () ->
-                eventValidator.validateEventExistsById(10L));
+        assertThrows(DataValidationException.class,
+                () -> eventValidator.validateUserIsOwnerOfEvent(user, eventDto));
     }
 }

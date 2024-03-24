@@ -54,7 +54,7 @@ class UserValidatorTest {
 
     @Test
     void validatePassword_ValidPassword_ShouldNotThrow() {
-        assertDoesNotThrow(() -> userValidator.validatePassword(userDto));
+        assertDoesNotThrow(() -> userValidator.validatePassword(userDto.getPassword()));
     }
 
     @ParameterizedTest
@@ -62,24 +62,24 @@ class UserValidatorTest {
     void validatePassword_InvalidPassword_ShouldThrowDataValidationException(String invalidPassword) {
         userDto.setPassword(invalidPassword);
 
-        assertThrows(DataValidationException.class, () ->
-                userValidator.validatePassword(userDto));
+        assertThrows(DataValidationException.class,
+                () -> userValidator.validatePassword(userDto.getPassword()));
     }
 
     @Test
     void validateUserExistsById_UserExists_ShouldNotThrow() {
         when(userRepository.existsById(anyLong())).thenReturn(true);
 
-        assertDoesNotThrow(() ->
-                userValidator.validateIfUserExistsById(5L));
+        assertDoesNotThrow(
+                () -> userValidator.validateIfUserExistsById(5L));
     }
 
     @Test
     void validateUserExistsById_UserDoesntExist_ShouldThrowEntityNotFoundException() {
         when(userRepository.existsById(anyLong())).thenReturn(false);
 
-        assertThrows(EntityNotFoundException.class, () ->
-                userValidator.validateIfUserExistsById(666L));
+        assertThrows(EntityNotFoundException.class,
+                () -> userValidator.validateIfUserExistsById(666L));
     }
 
     @Test
@@ -87,8 +87,7 @@ class UserValidatorTest {
         when(userRepository.existsById(anyLong())).thenReturn(true);
         when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
 
-        assertDoesNotThrow(() ->
-                userValidator.validateIfUserIsActive(1L));
+        assertDoesNotThrow(() -> userValidator.validateIfUserIsActive(1L));
     }
 
     @Test
@@ -97,7 +96,7 @@ class UserValidatorTest {
         when(userRepository.existsById(anyLong())).thenReturn(true);
         when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
 
-        assertThrows(DataValidationException.class, () ->
-                userValidator.validateIfUserIsActive(1L));
+        assertThrows(DataValidationException.class,
+                () -> userValidator.validateIfUserIsActive(1L));
     }
 }

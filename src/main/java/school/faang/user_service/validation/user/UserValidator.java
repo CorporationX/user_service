@@ -2,7 +2,6 @@ package school.faang.user_service.validation.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.repository.UserRepository;
@@ -12,10 +11,8 @@ import school.faang.user_service.repository.UserRepository;
 public class UserValidator {
     private final UserRepository userRepository;
 
-    public void validatePassword(UserDto userDto) {
-        String userPassword = userDto.getPassword();
-
-        if (userPassword.length() <= 8) {
+    public void validatePassword(String userPassword) {
+        if (userPassword.length() < 8) {
             throw new DataValidationException("Password must be at least 8 characters long");
         }
         if (!userPassword.matches(".*[A-Z].*")) {

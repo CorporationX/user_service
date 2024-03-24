@@ -157,4 +157,10 @@ public class UserService {
         return new ArrayList<>(users.stream()
                 .map(userMapper::toDto).toList());
     }
+
+    @Transactional
+    public void banUserById(long userId) {
+        getUserById(userId).setBanned(true);
+        log.info("user with id = {} is banned", userId);
+    }
 }

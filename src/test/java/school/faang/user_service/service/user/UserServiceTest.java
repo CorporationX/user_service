@@ -255,4 +255,15 @@ public class UserServiceTest {
 
         assertTrue(result.isEmpty());
     }
+
+    @Test
+    void banUserById () {
+        long userId = 1L;
+        User user = User.builder().id(userId).build();
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        userService.banUserById(userId);
+
+        assertTrue(user.isBanned());
+    }
 }

@@ -187,7 +187,7 @@ class UserServiceTest {
         when(userRepository.findById(user.getId())).thenReturn(Optional.ofNullable(user));
         when(userMapper.toDto(List.of(follower))).thenReturn(List.of(followerDto));
 
-        List<UserDto> returned = userService.getSubscribers(user.getId());
+        List<UserDto> returned = userService.getFollowers(user.getId());
 
         assertAll(
                 () -> verify(userRepository, times(1)).findById(user.getId()),
@@ -201,7 +201,7 @@ class UserServiceTest {
         when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () ->
-                userService.getSubscribers(user.getId()));
+                userService.getFollowers(user.getId()));
     }
 
     @Test

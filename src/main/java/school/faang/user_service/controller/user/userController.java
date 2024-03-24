@@ -11,7 +11,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/users")
 public class userController {
+
     private final UserService userService;
+
     @GetMapping("/{userId}")
     public UserDto getUser(@PathVariable long userId) {
         return userService.getUser(userId);

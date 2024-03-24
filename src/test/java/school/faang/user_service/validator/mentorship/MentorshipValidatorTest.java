@@ -18,7 +18,7 @@ public class MentorshipValidatorTest {
         long firstUserId = 1L;
         long secondUserId = 1L;
         assertThrows(
-                IllegalArgumentException.class,
+                ValidationException.class,
                 () -> mentorshipValidator.validateMentorshipIds(firstUserId, secondUserId)
         );
     }

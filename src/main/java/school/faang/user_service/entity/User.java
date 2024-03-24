@@ -158,42 +158,4 @@ public class User {
 
     @OneToOne(mappedBy = "user")
     private Premium premium;
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", email='" + email + '\'' +
-                ", phone='" + phone + '\'' +
-                ", password='" + password + '\'' +
-                ", active=" + active +
-                ", aboutMe='" + aboutMe + '\'' +
-                ", country=" + country.getTitle() +
-                ", city='" + city + '\'' +
-                ", experience=" + experience +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                ", followers=" + followers +
-                ", followees=" + followees +
-                ", ownedEvents=" + ownedEvents +
-                ", mentees=" + mentees +
-                ", mentors=" + mentors +
-                ", receivedMentorshipRequests=" + receivedMentorshipRequests +
-                ", sentMentorshipRequests=" + sentMentorshipRequests +
-                ", sentGoalInvitations=" + sentGoalInvitations +
-                ", receivedGoalInvitations=" + receivedGoalInvitations +
-                ", setGoals=" + setGoals +
-                ", goals=" + goals +
-                ", skills=" + skills +
-                ", participatedEvents=" + participatedEvents +
-                ", recommendationsGiven=" + recommendationsGiven +
-                ", recommendationsReceived=" + recommendationsReceived +
-                ", contacts=" + contacts +
-                ", ratings=" + ratings +
-                ", userProfilePic=" + userProfilePic +
-                ", contactPreference=" + contactPreference +
-                ", premium=" + premium +
-                '}';
-    }
 }

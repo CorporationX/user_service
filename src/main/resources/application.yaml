@@ -26,10 +26,6 @@ spring:
           name: follower_channel
         profile_view_channel:
           name: profile_view_channel
-        premium_bought_channel:
-          name: premium_bought_channel
-        mentorship_request_channel:
-          name: mentorship_request_channel
   mvc:
     servlet:
       path: /api/v1
@@ -39,7 +35,7 @@ spring:
 cron:
 
 server:
-  port: 8085
+  port: 8080
 
 logging:
   level:
@@ -76,9 +72,3 @@ image:
   pixels:
     bigSize: 1024
     smallSize: 170
-
-springdoc:
-  version: "1.0.0"
-  swagger-ui:
-    url: /api-docs.yaml
-    filter: true

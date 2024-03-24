@@ -3,15 +3,17 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.client.PaymentServiceClient;
-import school.faang.user_service.dto.PremiumBoughtEvent;
 import school.faang.user_service.dto.PremiumDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.premium.*;
+import school.faang.user_service.entity.premium.Currency;
+import school.faang.user_service.entity.premium.PaymentRequest;
+import school.faang.user_service.entity.premium.PaymentResponse;
+import school.faang.user_service.entity.premium.PaymentStatus;
+import school.faang.user_service.entity.premium.Premium;
+import school.faang.user_service.entity.premium.PremiumPeriod;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.PremiumMapper;
-import school.faang.user_service.publisher.PremiumBoughtEventPublisher;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.PremiumValidator;
@@ -28,12 +30,10 @@ public class PremiumService {
     private final PremiumValidator premiumValidator;
     private final PremiumMapper mapper;
     private final UserService userService;
-    private final PremiumBoughtEventPublisher premiumBoughtEventPublisher;
 
-    @Transactional
     public PremiumDto buyPremium(Long userId, PremiumPeriod period) {
         User user = userService.getUserById(userId);
-        premiumValidator.validatePremiumExist(userId);
+        premiumValidator.validatePremium(userId);
         PaymentRequest paymentRequest = new PaymentRequest(
                 10L, BigDecimal.valueOf(period.getPrice()), Currency.USD);
 
@@ -42,23 +42,10 @@ public class PremiumService {
 
         PaymentResponse response = paymentResponseEntity.getBody();
         if (response != null && response.status() == PaymentStatus.SUCCESS) {
-            PremiumDto savedPremium = savePremium(user, period);
-            publishPremiumBought(userId, period);
-            return savedPremium;
+            return savePremium(user, period);
         } else {
             throw new DataValidationException("Payment failed");
         }
-    }
-
-    private void publishPremiumBought(long userId, PremiumPeriod period) {
-        PremiumBoughtEvent eventDto = PremiumBoughtEvent.builder()
-                .receiverId(userId)
-                .amountPayment(period.getPrice())
-                .daysSubscription(period.getDays())
-                .receivedAt(LocalDateTime.now())
-                .build();
-
-        premiumBoughtEventPublisher.publish(eventDto);
     }
 
     public PremiumDto savePremium(User user, PremiumPeriod period) {

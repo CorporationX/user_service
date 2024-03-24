@@ -72,6 +72,15 @@ class MentorshipRequestValidatorTest {
     }
 
     @Test
+    public void testCommonCheck() {
+        try {
+            mentorshipRequestValidator.commonCheck(mentorshipRequestDto);
+        } catch (EntityNotFoundException e) {
+            fail("Should not have thrown any exception");
+        }
+    }
+
+    @Test
     public void testExceptionWhenSameUser() {
         Assert.assertThrows(EntityNotFoundException.class, () ->
                 mentorshipRequestValidator.validateUserData(receiver, sameUser));

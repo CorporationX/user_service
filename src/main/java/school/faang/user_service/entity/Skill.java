@@ -23,7 +23,7 @@ public class Skill {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
 
     @Column(name = "title", length = 64, nullable = false, unique = true)
     private String title;

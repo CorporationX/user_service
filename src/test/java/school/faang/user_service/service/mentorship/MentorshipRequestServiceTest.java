@@ -17,7 +17,6 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
-import school.faang.user_service.publisher.MentorshipRequestedEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.user.UserService;
@@ -42,9 +41,6 @@ class MentorshipRequestServiceTest {
 
     @Mock
     private MentorshipRequestMapper mentorshipRequestMapper;
-
-    @Mock
-    private MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
 
     @InjectMocks
     private MentorshipRequestService mentorshipRequestService;
@@ -139,10 +135,6 @@ class MentorshipRequestServiceTest {
     @Test
     public void whenRequestForMembershipThenCreated() {
         Mockito.when(mentorshipRequestMapper.toEntity(mentorshipRequestDto)).thenReturn(mentorshipRequest);
-        Mockito.when(userService.getUserById(mentorshipRequestDto.getReceiver()))
-                .thenReturn(receiver);
-        Mockito.when(userService.getUserById(mentorshipRequestDto.getRequester()))
-                .thenReturn(requester);
         mentorshipRequestService.requestMentorship(mentorshipRequestDto);
         Mockito.verify(mentorshipRequestRepository, times(1))
                 .save(mentorshipRequest);

@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.service.goal.GoalService;
@@ -25,16 +25,19 @@ import java.util.List;
 public class GoalController {
 
     private final GoalService goalService;
+    private final UserContext userContext;
 
-    @Operation(summary = "Create user's goal by user id")
+    @Operation(summary = "Create a goal")
     @PostMapping
-    public GoalDto createGoal(@RequestHeader("x-user-id") Long userId, @RequestBody GoalDto goalDto) {
+    public GoalDto createGoal(@RequestBody GoalDto goalDto) {
+        long userId = userContext.getUserId();
         return goalService.createGoal(userId, goalDto);
     }
 
-    @Operation(summary = "Get user's goals by user id and filters")
+    @Operation(summary = "Get filtered user's goals")
     @PostMapping("/filtered")
-    public List<GoalDto> getGoalsByUser(@RequestHeader("x-user-id") Long userId, @RequestBody GoalFilterDto filters) {
+    public List<GoalDto> getGoalsByUser(@RequestBody GoalFilterDto filters) {
+        long userId = userContext.getUserId();
         return goalService.getGoalsByUser(userId, filters);
     }
 

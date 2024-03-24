@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.service.user.DeactivationService;
@@ -26,6 +27,7 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
     private final DeactivationService deactivationService;
+    private final UserContext userContext;
 
     @Operation(summary = "Create new user")
     @PostMapping
@@ -52,14 +54,16 @@ public class UserController {
     }
 
     @Operation(summary = "Get list of user's subscribers by userID")
-    @GetMapping("/{userId}/subscribers")
-    public List<UserDto> getSubscribers(@PathVariable long userId) {
+    @GetMapping("/subscribers")
+    public List<UserDto> getSubscribers() {
+        long userId = userContext.getUserId();
         return userService.getSubscribers(userId);
     }
 
-    @Operation(summary = "Deactivate user by id")
-    @PutMapping("/{userId}/deactivated")
-    public UserDto deactivateUser(@PathVariable @Min(1) long userId) {
+    @Operation(summary = "Deactivate user")
+    @PutMapping("/deactivated")
+    public UserDto deactivateUser() {
+        long userId = userContext.getUserId();
         return deactivationService.deactivateUser(userId);
     }
 }

@@ -23,7 +23,7 @@ public class EventDto {
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     @NotNull(message = "Event must have an owner")
-    @Positive(message = "Owned id can't be less than 1")
+    @Positive(message = "Owner id can't be less than 1")
     private Long ownerId;
     private String description;
     private List<Long> relatedSkillsIds;

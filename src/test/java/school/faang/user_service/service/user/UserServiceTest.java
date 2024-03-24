@@ -15,9 +15,6 @@ import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.event.EventService;
-import school.faang.user_service.service.goal.GoalService;
-import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.service.user.filter.UserFilter;
 import school.faang.user_service.validation.user.UserValidator;
 
@@ -47,9 +44,6 @@ class UserServiceTest {
     private UserRepository userRepository;
     private UserMapper userMapper;
     private UserFilter userFilter;
-    private MentorshipService mentorshipService;
-    private EventService eventService;
-    private GoalService goalService;
 
     private User user;
     private User mentee;

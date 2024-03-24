@@ -115,34 +115,6 @@ class GoalValidatorTest {
         return List.of(1L, 2L);
     }
 
-    private GoalDto getGoalDtoEmptySkills() {
-        return GoalDto.builder()
-                .title("title")
-                .skillIds(List.of())
-                .build();
-    }
-
-    private GoalDto getGoalDtoNullSkills() {
-        return GoalDto.builder()
-                .title("title")
-                .skillIds(null)
-                .build();
-    }
-
-    private GoalDto getGoalDtoEmptyTitle() {
-        return GoalDto.builder()
-                .title(null)
-                .skillIds(List.of(1L, 2L))
-                .build();
-    }
-
-    private GoalDto getGoalDtoNullTitle() {
-        return GoalDto.builder()
-                .title("")
-                .skillIds(List.of(1L, 2L))
-                .build();
-    }
-
     private Goal getGoalToUpdateInvalidStatus() {
         return Goal.builder()
                 .title("Title")

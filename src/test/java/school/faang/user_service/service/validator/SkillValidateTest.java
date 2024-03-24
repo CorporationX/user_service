@@ -43,8 +43,8 @@ class SkillValidateTest {
 
     @Test
     void testExceptionOfSkill() {
-        Long skillId = 1L;
-        Long userId = 1L;
+        long skillId = 1L;
+        long userId = 1L;
 
         when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.empty());
         assertThrows(DataValidationException.class, () -> skillValidator.validateSupplyQuantityCheck(skillId, userId));
@@ -52,11 +52,11 @@ class SkillValidateTest {
 
     @Test
     void testExceptionNotEnoughOffers() {
-        Long skillId = 3L;
-        Long userId = 3L;
+        long skillId = 3L;
+        long userId = 3L;
         List<SkillOffer> skillOffers = List.of(
-                skillOfferData(1l, skillData(1L, "test"), recommendationData(1L)),
-                skillOfferData(1l, skillData(1L, "test"), recommendationData(2L))
+                skillOfferData(1L, skillData(1L, "test"), recommendationData(1L)),
+                skillOfferData(1L, skillData(1L, "test"), recommendationData(2L))
         );
 
         when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.empty());

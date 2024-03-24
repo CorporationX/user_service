@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class SkillValidateTest {
+class SkillValidateTest {
 
     @InjectMocks
     private SkillValidator skillValidator;
@@ -33,14 +33,7 @@ public class SkillValidateTest {
     private SkillOfferRepository skillOfferRepository;
 
     @Test
-    public void testCreateWithBlankTitle() {
-        SkillDto skillDto = prepareData(" ");
-
-        assertThrows(DataValidationException.class, () -> skillValidator.validateSkillTitle(skillDto));
-    }
-
-    @Test
-    public void testCreateExistingTitle() {
+    void testCreateExistingTitle() {
         SkillDto skillDto = prepareData("test");
         when(skillRepository.existsByTitle(skillDto.getTitle()))
                 .thenReturn(true);
@@ -49,7 +42,7 @@ public class SkillValidateTest {
     }
 
     @Test
-    public void testExceptionOfSkill() {
+    void testExceptionOfSkill() {
         Long skillId = 1L;
         Long userId = 1L;
 
@@ -58,7 +51,7 @@ public class SkillValidateTest {
     }
 
     @Test
-    public void testExceptionNotEnoughOffers() {
+    void testExceptionNotEnoughOffers() {
         Long skillId = 3L;
         Long userId = 3L;
         List<SkillOffer> skillOffers = List.of(

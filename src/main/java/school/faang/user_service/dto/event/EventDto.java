@@ -2,6 +2,7 @@ package school.faang.user_service.dto.event;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,6 +23,7 @@ public class EventDto {
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     @NotNull(message = "Event must have an owner")
+    @Positive(message = "Owned id can't be less than 1")
     private Long ownerId;
     private String description;
     private List<Long> relatedSkillsIds;

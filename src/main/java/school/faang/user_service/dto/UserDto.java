@@ -1,10 +1,17 @@
 package school.faang.user_service.dto;
 
+=======
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Data
 public class UserDto {
-    private Long id;
+    @NotNull
     private String username;
-    private String email;
+    private long id;
+    private List<Long> menteesIds;
+    private List<Long> mentorsIds;
 }

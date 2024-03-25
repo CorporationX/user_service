@@ -1,0 +1,19 @@
+name: CI
+on:
+  push:
+    branches: [ dragon-master-bc3 ]
+  pull_request:
+    branches: [ dragon-master-bc3 ]
+jobs:
+  build-with-setup-java-cache:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'adopt'
+          cache: gradle
+      - name: Build with Gradle
+        run: ./gradlew build --scan --no-daemon

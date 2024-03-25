@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class SchedulerService {
     private final PremiumRepository premiumRepository;
-
     @Scheduled(cron = "${cleanUpPremiumRepo.cron}")
     @Transactional
     public void deleteExpiredPremium() {

@@ -12,9 +12,6 @@ public class UserValidator {
     private final UserRepository userRepository;
 
     public void validatePassword(String userPassword) {
-        if (userPassword.length() < 8) {
-            throw new DataValidationException("Password must be at least 8 characters long");
-        }
         if (!userPassword.matches(".*[A-Z].*")) {
             throw new DataValidationException("Password must contain at least 1 uppercase letter");
         }

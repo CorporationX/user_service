@@ -2,8 +2,10 @@ package school.faang.user_service.controller.mentorship;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +16,7 @@ import school.faang.user_service.service.mentorship.MentorshipService;
 
 import java.util.List;
 
+@Validated
 @RequiredArgsConstructor
 @Controller
 @RequestMapping("/mentorship")
@@ -38,14 +41,14 @@ public class MentorshipController {
 
     @Operation(summary = "Delete mentee from mentor's list of mentees")
     @DeleteMapping("/mentee/{menteeId}")
-    public void deleteMentee(@PathVariable long menteeId) {
+    public void deleteMentee(@PathVariable @Positive(message = "ID can't be less than 1") long menteeId) {
         long mentorId = userContext.getUserId();
         mentorshipService.deleteMentee(menteeId, mentorId);
     }
 
     @Operation(summary = "Delete mentor from mentee's list of mentors")
     @DeleteMapping("/mentor/{mentorId}")
-    public void deleteMentor(@PathVariable long mentorId) {
+    public void deleteMentor(@PathVariable @Positive(message = "ID can't be less than 1") long mentorId) {
         long menteeId = userContext.getUserId();
         mentorshipService.deleteMentor(mentorId, menteeId);
     }

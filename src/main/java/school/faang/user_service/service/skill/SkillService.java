@@ -30,7 +30,6 @@ public class SkillService {
 
     public SkillDto create(SkillDto skillDto) {
         skillValidator.validateSkill(skillDto);
-        skillValidator.validateSkillTitle(skillDto);
         Skill skillEntity = skillMapper.toEntity(skillDto);
         return skillMapper.toDto(skillRepository.save(skillEntity));
     }

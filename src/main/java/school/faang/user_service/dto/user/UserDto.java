@@ -1,9 +1,9 @@
 package school.faang.user_service.dto.user;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -35,6 +35,6 @@ public class UserDto {
 
     private boolean isPremium;
 
-    @Min(value = 1L, message = "CountryId can't be lesser than 1")
+    @Positive(message = "CountryId can't be less than 1")
     private Long countryId;
 }

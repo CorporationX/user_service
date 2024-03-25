@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.event.MentorshipStartEvent;
+import school.faang.user_service.dto.event.MentorshipStartEventDto;
 import school.faang.user_service.dto.mentorship.MentorshipDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.Mentorship;
@@ -29,11 +29,11 @@ public class MentorshipService {
     @Transactional
     public MentorshipDto create(MentorshipDto mentorshipDto) {
         Mentorship mentorship = mentorshipRepository.save(mentorshipMapper.toMentorship(mentorshipDto));
-        MentorshipStartEvent mentorshipStartEvent = MentorshipStartEvent.builder()
+        MentorshipStartEventDto mentorshipStartEventDto = MentorshipStartEventDto.builder()
                 .mentorId(mentorship.getMentor().getId())
                 .menteeId(mentorship.getMentee().getId())
                 .build();
-        mentorshipEventPublisher.publish(mentorshipStartEvent);
+        mentorshipEventPublisher.publish(mentorshipStartEventDto);
         return mentorshipMapper.toDto(mentorship);
     }
 

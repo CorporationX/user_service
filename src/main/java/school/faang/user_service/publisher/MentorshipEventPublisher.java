@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.event.MentorshipStartEvent;
+import school.faang.user_service.dto.event.MentorshipStartEventDto;
 
 @Component
-public class MentorshipEventPublisher extends AbstractEventPublisher<MentorshipStartEvent> {
+public class MentorshipEventPublisher extends AbstractEventPublisher<MentorshipStartEventDto> {
 
     @Value("${spring.data.redis.channels.mentorship_channel.name}")
     private String mentorshipChannel;
@@ -17,7 +17,7 @@ public class MentorshipEventPublisher extends AbstractEventPublisher<MentorshipS
     }
 
     @Override
-    public void publish(MentorshipStartEvent event) {
+    public void publish(MentorshipStartEventDto event) {
         convertAndSend(event, mentorshipChannel);
     }
 

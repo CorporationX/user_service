@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class MentorshipStartEvent {
-
+public class MentorshipStartEventDto {
     private Long mentorId;
     private Long menteeId;
 }

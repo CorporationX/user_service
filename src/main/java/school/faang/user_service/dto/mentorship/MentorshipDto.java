@@ -10,9 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class MentorshipDto {
-
     private Long id;
     private Long mentorId;
     private Long menteeId;
-
 }

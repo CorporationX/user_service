@@ -53,6 +53,12 @@ public class UserService {
         return userMapper.toDto(users);
     }
 
+    public List<UserDto> getFollowers(long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User doesn't exist by ID: " + userId));
+        return userMapper.toDto(user.getFollowers());
+    }
+
     public List<UserDto> getPremiumUsers(UserFilterDto filters) {
         List<User> premiumUsers = userRepository.findPremiumUsers().toList();
 

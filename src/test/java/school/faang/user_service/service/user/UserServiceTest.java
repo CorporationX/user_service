@@ -15,9 +15,6 @@ import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.event.EventService;
-import school.faang.user_service.service.goal.GoalService;
-import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.service.user.filter.UserFilter;
 import school.faang.user_service.validation.user.UserValidator;
 
@@ -47,9 +44,6 @@ class UserServiceTest {
     private UserRepository userRepository;
     private UserMapper userMapper;
     private UserFilter userFilter;
-    private MentorshipService mentorshipService;
-    private EventService eventService;
-    private GoalService goalService;
 
     private User user;
     private User mentee;
@@ -173,6 +167,35 @@ class UserServiceTest {
                 () -> verify(userMapper, times(1)).toDto(anyList()),
                 () -> assertEquals(Collections.emptyList(), userService.getUsersByIds(List.of(589123098L)))
         );
+    }
+
+    @Test
+    void getSubscribers_UserFound_SubscribersListReturnedAsDto() {
+        User follower = User.builder()
+                .id(156L)
+                .build();
+        UserDto followerDto = UserDto.builder()
+                .id(follower.getId())
+                .build();
+        user.setFollowers(List.of(follower));
+        when(userRepository.findById(user.getId())).thenReturn(Optional.ofNullable(user));
+        when(userMapper.toDto(List.of(follower))).thenReturn(List.of(followerDto));
+
+        List<UserDto> returned = userService.getFollowers(user.getId());
+
+        assertAll(
+                () -> verify(userRepository, times(1)).findById(user.getId()),
+                () -> verify(userMapper, times(1)).toDto(List.of(follower)),
+                () -> assertEquals(List.of(followerDto), returned)
+        );
+    }
+
+    @Test
+    void getSubscribers_UserNotFound_ShouldThrowEntityNotFoundException() {
+        when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () ->
+                userService.getFollowers(user.getId()));
     }
     @Test
     void shouldgetUserById() {

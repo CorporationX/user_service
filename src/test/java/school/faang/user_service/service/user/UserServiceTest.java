@@ -1,5 +1,6 @@
 package school.faang.user_service.service.user;
 
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,6 +13,7 @@ import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.mockito.Mockito.times;
@@ -44,6 +46,14 @@ public class UserServiceTest {
                 .build();
         userIds = List.of(firstUser.getId(), firstUser.getId());
         users = List.of(firstUser, secondUser);
+    }
+
+    @Test
+    public void testGetUser_UserDoesNotExist() {
+        Mockito.when(userRepository.findById(firstUser.getId())).thenReturn(Optional.empty());
+
+        NoSuchElementException e = Assert.assertThrows(NoSuchElementException.class, () -> userService.getUser(firstUser.getId()));
+        Assert.assertEquals(e.getMessage(), "User not found!");
     }
 
     @Test

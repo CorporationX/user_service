@@ -2,7 +2,6 @@ package school.faang.user_service.service.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
@@ -20,7 +19,7 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("User not found!"));
         return userMapper.toDto(user);
     }
-    public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
+    public List<UserDto> getUsersByIds(List<Long> ids) {
         List users = userRepository.findAllById(ids);
         return userMapper.toDto(users);
     }

@@ -2,16 +2,19 @@ package school.faang.user_service.entity.goal;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 
 import java.time.LocalDateTime;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity

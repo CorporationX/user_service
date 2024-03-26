@@ -1,9 +1,9 @@
 name: CI
 on:
   push:
-    branches: [ dragon-master-bc3 ]
+    branches: [dragon-master-bc3]
   pull_request:
-    branches: [ dragon-master-bc3 ]
+    branches: [dragon-master-bc3]
 jobs:
   build-with-setup-java-cache:
     runs-on: ubuntu-latest

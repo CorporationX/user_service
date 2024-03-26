@@ -21,21 +21,25 @@ import java.util.Optional;
 public class SkillController {
 
     private final SkillService skillService;
+
     @PostMapping
     public SkillDto create(@RequestBody SkillDto skill) {
-        Optional.ofNullable(skill).orElseThrow(()->new DataValidationException( "Skill is null!" ));
-        return skillService.create( skill );
+        Optional.ofNullable(skill).orElseThrow(() -> new DataValidationException("Skill is null!"));
+        return skillService.create(skill);
     }
+
     @GetMapping
     public List<SkillDto> getUserSkills(@RequestParam long userId) {
-        return skillService.getUserSkills( userId );
+        return skillService.getUserSkills(userId);
     }
-    @GetMapping (value = "/offers")
+
+    @GetMapping(value = "/offers")
     List<SkillCandidateDto> getOfferedSkills(@RequestParam long userId) {
-        return skillService.getOfferedSkills( userId );
+        return skillService.getOfferedSkills(userId);
     }
+
     @PostMapping(value = "/acquire")
     public SkillDto acquireSkillFromOffers(@RequestParam long skillId, @RequestParam long userId) {
-        return skillService.acquireSkillFromOffers( skillId, userId );
+        return skillService.acquireSkillFromOffers(skillId, userId);
     }
 }

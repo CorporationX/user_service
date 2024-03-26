@@ -51,3 +51,10 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
+
+task:
+  scheduling:
+    cron: &daily "0 0 0 * * *"
+
+cleanUpPremiumRepo:
+  cron: *daily

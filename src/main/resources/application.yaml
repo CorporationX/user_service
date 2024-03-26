@@ -50,11 +50,14 @@ aws:
 
 services:
   s3:
-    bucket-name: user_backet
-    isMocked: true
+    endpoint: http://localhost:9000
+    accessKey: user
+    secretKey: password
+    bucket-name: user-service-bucket
+
   dicebear:
     avatar: https://api.dicebear.com/8.x/pixel-art/svg?seed=
     small_avatar: https://api.dicebear.com/8.x/pixel-art/svg?size=100&seed=
 
 scheduler:
-  clear-premiums: @daily
+  clear-premiums: "@daily"

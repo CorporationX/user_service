@@ -6,7 +6,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.client.ExchangeServiceClient;
 import school.faang.user_service.client.PaymentServiceClient;
+import school.faang.user_service.dto.payment.Currency;
+import school.faang.user_service.dto.payment.CurrencyRate;
 import school.faang.user_service.dto.payment.PaymentRequest;
 import school.faang.user_service.dto.payment.PaymentResponse;
 import school.faang.user_service.dto.payment.PaymentStatus;
@@ -19,8 +22,10 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.validation.premium.PremiumValidator;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -48,19 +53,24 @@ class PremiumServiceTest {
     @Mock
     private PremiumValidator premiumValidator;
 
+    @Mock
+    private ExchangeServiceClient exchangeServiceClient;
+
     @InjectMocks
     private PremiumService premiumService;
 
     @Test
     void buyPremium_ValidArgs() {
         User user = getUser();
+        user.setId(1L);
         PremiumPeriod period = PremiumPeriod.THREE_MONTH;
         PremiumDto expected = getPremiumDto();
         when(paymentService.sendPayment(any(PaymentRequest.class))).thenReturn(getResponse());
         when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
         when(premiumRepository.save(any(Premium.class))).thenReturn(getPremium());
+        when(exchangeServiceClient.getCurrencyRate()).thenReturn(getCurrencyRate());
 
-        PremiumDto actual = premiumService.buyPremium(user.getId(), period);
+        PremiumDto actual = premiumService.buyPremium(user.getId(), period, Currency.EUR);
 
         assertEquals(expected, actual);
         verify(premiumValidator, times(1)).validateUserPremiumStatus(anyLong());
@@ -109,5 +119,10 @@ class PremiumServiceTest {
         return PaymentResponse.builder()
                 .status(PaymentStatus.SUCCESS)
                 .build();
+    }
+
+    private CurrencyRate getCurrencyRate() {
+        return CurrencyRate.builder()
+                .rates(Map.of("EUR", BigDecimal.valueOf(0.92279))).build();
     }
 }

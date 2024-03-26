@@ -4,8 +4,10 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.client.ExchangeServiceClient;
 import school.faang.user_service.client.PaymentServiceClient;
 import school.faang.user_service.dto.payment.Currency;
+import school.faang.user_service.dto.payment.CurrencyRate;
 import school.faang.user_service.dto.payment.PaymentRequest;
 import school.faang.user_service.dto.payment.PaymentResponse;
 import school.faang.user_service.dto.premium.PremiumDto;
@@ -17,6 +19,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.validation.premium.PremiumValidator;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -29,11 +32,12 @@ public class PremiumService {
     private final UserRepository userRepository;
     private final PremiumMapper premiumMapper;
     private final PremiumValidator premiumValidator;
+    private final ExchangeServiceClient exchangeServiceClient;
 
     @Transactional
-    public PremiumDto buyPremium(Long userId, PremiumPeriod period) {
+    public PremiumDto buyPremium(Long userId, PremiumPeriod period, Currency currency) {
         premiumValidator.validateUserPremiumStatus(userId);
-        PaymentResponse response = paymentService.sendPayment(getPaymentRequest(userId, period));
+        PaymentResponse response = paymentService.sendPayment(getPaymentRequest(userId, period, currency));
         premiumValidator.validatePaymentResponse(response);
         return savePremium(userId, period);
     }
@@ -61,11 +65,14 @@ public class PremiumService {
                 .build();
     }
 
-    private PaymentRequest getPaymentRequest(Long userId, PremiumPeriod period) {
+    private PaymentRequest getPaymentRequest(Long userId, PremiumPeriod period, Currency currency) {
+        CurrencyRate currencyRate = exchangeServiceClient.getCurrencyRate();
         return PaymentRequest.builder()
                 .paymentNumber(userId)
-                .amount(period.getPrice())
-                .currency(Currency.USD)
+                .amount(currencyRate.getRates().get(currency.toString())
+                        .multiply(period.getPrice())
+                        .multiply(BigDecimal.valueOf(1.01)))
+                .currency(currency)
                 .build();
     }
 }

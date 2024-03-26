@@ -55,6 +55,8 @@ services:
   dicebear:
     avatar: https://api.dicebear.com/8.x/pixel-art/svg?seed=
     small_avatar: https://api.dicebear.com/8.x/pixel-art/svg?size=100&seed=
+  exchange:
+    endpoint: https://openexchangerates.org/api/latest.json?app_id=ca800d6c1f28496a9461bd842d20b919
 
 scheduler:
-  clear-premiums: @daily
+  clear-premiums: "@daily"

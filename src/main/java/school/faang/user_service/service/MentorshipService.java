@@ -12,6 +12,7 @@ import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +23,7 @@ public class MentorshipService {
 
     public List<User> getMentees(Long userId) {
         User user = getUser(userId);
-        if (user == null) {
+        if (user.getMentees()==null) {
             return Collections.emptyList();
         }
         return user.getMentees();
@@ -30,7 +31,7 @@ public class MentorshipService {
 
     public List<User> getMentors(Long userId) {
         User user = getUser(userId);
-        if (user.getMentors().isEmpty()) {
+        if (user.getMentors()==null) {
             return Collections.emptyList();
         }
         return user.getMentors();
@@ -47,8 +48,10 @@ public class MentorshipService {
         List<User> mentees = mentor.getMentees();
 
         if (mentees.contains(mentee)) {
-            mentees.removeIf(pupil -> pupil.equals(mentee));
-            mentor.setMentees(mentees);
+            mentor.setMentees(mentees.
+                    stream().
+                    filter(user -> !user.equals(mentee)).
+                    collect(Collectors.toList()));
             mentorshipRepository.save(mentor);
         } else {
             throw new IllegalArgumentException("The id: " + menteeId + " sent to the mentee id not in the mentee list for this mentor");
@@ -60,8 +63,10 @@ public class MentorshipService {
         User mentor = getMentor(mentorId);
         List<User> mentors = mentee.getMentors();
         if (mentors.contains(mentor)) {
-            mentors.removeIf(pupil -> pupil.equals(mentor));
-            mentee.setMentors(mentors);
+            mentee.setMentors(mentors.
+                    stream().
+                    filter(user -> !user.equals(mentor)).
+                    collect(Collectors.toList()));
             mentorshipRepository.save(mentee);
         } else {
             throw new IllegalArgumentException("The id: " + mentorId + "sent to the mentor is not in the mentor list for this mentee");

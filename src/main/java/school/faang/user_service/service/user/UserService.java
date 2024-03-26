@@ -17,8 +17,8 @@ import java.util.NoSuchElementException;
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    public UserDto getUser(@PathVariable long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException());
+    public UserDto getUser(long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("User not found!"));
         return userMapper.toDto(user);
     }
     public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {

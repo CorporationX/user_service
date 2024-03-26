@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EventRegistrationConflictException;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -32,7 +33,7 @@ public class EventParticipationService {
     public ResponseEntity<Void> unregisterParticipant(@PathVariable long eventId, @PathVariable long userId) {
         boolean isParticipant = checkIfEventParticipant( eventId, userId );
         if (!isParticipant) {
-            throw new EventRegistrationConflictException( "User with id " + userId + " is not registered for event with id " + eventId );
+            throw new DataValidationException( "User with id " + userId + " is not registered for event with id " + eventId );
         }
         eventParticipationRepository.unregister( eventId, userId );
 

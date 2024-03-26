@@ -9,7 +9,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EventRegistrationConflictException;
 import school.faang.user_service.repository.event.EventParticipationRepository;
+import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.EventParticipationService;
 
 import java.util.ArrayList;
@@ -27,6 +29,9 @@ import static org.mockito.Mockito.when;
 public class EventParticipationServiceTest {
     @Mock
     EventParticipationRepository participationRepository;
+
+    @Mock
+    EventRepository eventRepository;
 
     @InjectMocks
     EventParticipationService eventParticipationService;
@@ -47,13 +52,15 @@ public class EventParticipationServiceTest {
     public void testRegisterParticipantAlreadyRegistered(){
         long userId = 2L;
         when( participationRepository.findAllParticipantsByEventId(eventId) ).thenReturn( userList );
-        assertThrows( DataValidationException.class, ()->eventParticipationService.registerParticipant( eventId, userId ));
+        when(eventRepository.existsById( eventId )).thenReturn(true  );
+        assertThrows( EventRegistrationConflictException.class, ()->eventParticipationService.registerParticipant( eventId, userId ));
     }
 
     @Test
     public void testRegisterParticipantNotAlreadyRegistered(){
         long userId = 3L;
         when(participationRepository.findAllParticipantsByEventId(eventId )).thenReturn( userList );
+        when(eventRepository.existsById( eventId )).thenReturn(true  );
         assertDoesNotThrow( ()->eventParticipationService.registerParticipant( eventId, userId ) );
         verify( participationRepository, times( 1 )).register( eventId, userId);
     }

@@ -33,7 +33,7 @@ public class EventValidator {
         if (eventDto.getTitle() == null || eventDto.getTitle().isBlank()) {
             throw new DataValidationException("Invalid title");
         }
-        //TODO: Add validation of an existing title based on the event repository
+
     }
 
     public void validateStartDate(EventDto eventDto) {

@@ -6,6 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -18,4 +19,16 @@ public interface RecommendationRequestRepository extends CrudRepository<Recommen
             LIMIT 1
             """)
     Optional<RecommendationRequest> findLatestPendingRequest(long requesterId, long receiverId);
+
+    @Modifying
+    @Query(value = "INSERT INTO recommendation_request (requester_id, receiver_id, status) VALUES (?1, ?2, 'pending')", nativeQuery = true)
+    void createRequest(Long requesterId, Long receiverId);
+
+    boolean existsByRequesterIdAndReceiverId(Long requesterId, Long receiverId);
+
+    List<RecommendationRequest> findAllByRequesterIdAndReceiverId(Long requesterId, Long receiverId);
+
+    List<RecommendationRequest> findAllByRequesterId(Long requesterId);
+
+    List<RecommendationRequest> findAllByReceiverId(Long receiverId);
 }

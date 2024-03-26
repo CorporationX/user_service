@@ -53,7 +53,7 @@ services:
     endpoint: http://localhost:9000
     accessKey: user
     secretKey: password
-    bucket-name: user-service-bucket
+    bucketName: user-service-bucket
 
   dicebear:
     avatar: https://api.dicebear.com/8.x/pixel-art/svg?seed=

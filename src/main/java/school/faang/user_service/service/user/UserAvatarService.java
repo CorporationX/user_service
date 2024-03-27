@@ -17,7 +17,7 @@ import school.faang.user_service.mapper.resource.ResourceMapper;
 import school.faang.user_service.repository.ResourceRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.resource.ResourceService;
-import school.faang.user_service.service.resource.image.ImageResizer;
+import school.faang.user_service.image.ImageResizer;
 import school.faang.user_service.validation.user.UserAvatarValidator;
 
 import java.io.InputStream;

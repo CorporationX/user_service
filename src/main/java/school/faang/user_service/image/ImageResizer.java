@@ -1,4 +1,4 @@
-package school.faang.user_service.service.resource.image;
+package school.faang.user_service.image;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

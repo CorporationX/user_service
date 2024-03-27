@@ -3,6 +3,9 @@ package school.faang.user_service.service.user;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +22,7 @@ import school.faang.user_service.validation.user.UserAvatarValidator;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -30,6 +34,12 @@ public class UserAvatarService {
     private final UserAvatarValidator userAvatarValidator;
     private final ResourceRepository resourceRepository;
     private final ImageResizer imageResizer;
+
+    @Value("${services.dicebear.avatar}")
+    private String randomAvatar;
+
+    @Value("${services.dicebear.small_avatar}")
+    private String randomAvatarSmall;
 
     @Transactional
     public List<ResourceDto> upload(long userId, MultipartFile avatar) {
@@ -63,11 +73,17 @@ public class UserAvatarService {
     }
 
     @Transactional
-    public void delete(long avatarId) {
-        Resource avatar = getAvatarFromRepository(avatarId);
-        resourceService.deleteFile(avatar.getKey());
-        resourceRepository.delete(avatar);
-        log.info("Avatar (ID: {}) deleted", avatarId);
+    public ResponseEntity<String> delete(long userId) {
+        User user = getUserFromRepository(userId);
+        List<Resource> usersAvatars = resourceRepository.findAllByUserId(userId);
+
+        usersAvatars.forEach(avatar -> resourceService.deleteFile(avatar.getKey()));
+        resourceRepository.deleteAll(usersAvatars);
+        log.info("User's (ID: {}) avatar pictures deleted", userId);
+        setRandomAvatarForUser(user);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(String.format("User's (ID: %d) avatar pictures was successfully deleted", userId));
     }
 
     private User getUserFromRepository(long userId) {
@@ -80,4 +96,11 @@ public class UserAvatarService {
                 .orElseThrow(() -> new EntityNotFoundException("Avatar doesn't exist by ID: " + avatarId));
     }
 
+    private void setRandomAvatarForUser(User user) {
+        UUID uuid = UUID.randomUUID();
+        user.setUserProfilePic(UserProfilePic.builder()
+               .fileId(randomAvatar + uuid)
+               .smallFileId(randomAvatarSmall + uuid)
+               .build());
+    }
 }

@@ -56,8 +56,9 @@ public class UserAvatarController {
     }
 
     @Operation(summary = "Delete user's avatar")
-    @DeleteMapping("/{avatarId}")
-    public void delete(@PathVariable long avatarId) {
-        userAvatarService.delete(avatarId);
+    @DeleteMapping
+    public ResponseEntity<String> delete() {
+        long userId = userContext.getUserId();
+        return userAvatarService.delete(userId);
     }
 }

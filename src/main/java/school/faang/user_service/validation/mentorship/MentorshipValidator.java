@@ -10,7 +10,7 @@ public class MentorshipValidator {
 
     public void validateMentorMenteeIds(long menteeId, long mentorId) {
         if (menteeId == mentorId) {
-            throw new DataValidationException("mentor and mentor ID are the same");
+            throw new DataValidationException("Mentee's and mentor's IDs are the same");
         }
     }
 }

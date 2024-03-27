@@ -3,7 +3,6 @@ package school.faang.user_service.validation.user;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.UserRepository;
 
@@ -12,12 +11,7 @@ import school.faang.user_service.repository.UserRepository;
 public class UserValidator {
     private final UserRepository userRepository;
 
-    public void validatePassword(UserDto userDto) {
-        String userPassword = userDto.getPassword();
-
-        if (userPassword.length() <= 8) {
-            throw new DataValidationException("Password must be at least 8 characters long");
-        }
+    public void validatePassword(String userPassword) {
         if (!userPassword.matches(".*[A-Z].*")) {
             throw new DataValidationException("Password must contain at least 1 uppercase letter");
         }

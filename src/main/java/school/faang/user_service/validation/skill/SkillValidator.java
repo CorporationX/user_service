@@ -18,27 +18,20 @@ public class SkillValidator {
     private final SkillOfferRepository skillOfferRepository;
 
     public void validateSkill(SkillDto skillDto) {
-
         if (skillRepository.existsByTitle(skillDto.getTitle())) {
-            throw new DataValidationException("Skill with title" + skillDto.getTitle() + "already exists.");
-        }
-    }
-
-    public void validateSkillTitle(SkillDto skillDto) {
-        if (skillDto.getTitle().isBlank()) {
-            throw new DataValidationException("Skill title can't be empty.");
+            throw new DataValidationException("Skill with title \"" + skillDto.getTitle() + "\" already exists");
         }
     }
 
     public void validateSupplyQuantityCheck(Long skillId, Long userId) {
-
         if (skillRepository.findUserSkill(skillId, userId).isPresent()) {
-            throw new DataValidationException("the user already has the skill.");
+            throw new DataValidationException("User already has the skill");
         }
+
         List<SkillOffer> skillOffers = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
 
         if (skillOffers.size() < MIN_SKILL_OFFERS) {
-            throw new DataValidationException("you need at least 3 recommendations, at the moment you have:"
+            throw new DataValidationException("You need at least 3 recommendations, at the moment you have: "
                     + skillOffers.size());
         }
     }

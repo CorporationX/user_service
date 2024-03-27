@@ -9,35 +9,73 @@ on:
       - basilisk-master-bc2
 
 jobs:
-  build_and_run_tests:
+  build:
+
     runs-on: ubuntu-latest
+    #использование бд для тестирования в GitHubActions
     services:
       postgres:
-        image: postgres
+        image: postgres:12
         env:
+          POSTGRES_DB: testdb
           POSTGRES_USER: user
           POSTGRES_PASSWORD: password
-          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        # Опции для ожидания запуска PostgreSQL перед началом тестов
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-        ports:
-          - 5432:5432
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Set up Java
-        uses: actions/setup-java@v1.4.4
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
         with:
-          java-version: 17
-          distribution: 'adopt'
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Build Gradle
+        run: ./gradlew build
 
-      - name: Build
-        run: ./gradlew build --no-daemon
+      - name: Run tests
+        env:
+          JDBC_URL: jdbc:postgresql://localhost:5432/testdb
+          JDBC_USER: user
+          JDBC_PASSWORD: password
+        run: ./gradlew test
 
-      - name: Build and Run Tests with Gradle
-        run: ./gradlew test --no-daemon
+#jobs:
+#  build_and_run_tests:
+#    runs-on: ubuntu-latest
+#    services:
+#      postgres:
+#        image: postgres
+#        env:
+#          POSTGRES_USER: user
+#          POSTGRES_PASSWORD: password
+#          POSTGRES_DB: postgres
+#        options: >-
+#          --health-cmd pg_isready
+#          --health-interval 10s
+#          --health-timeout 5s
+#          --health-retries 5
+#        ports:
+#          - 5432:5432
+#
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#
+#      - name: Set up Java
+#        uses: actions/setup-java@v1.4.4
+#        with:
+#          java-version: 17
+#          distribution: 'adopt'
+#
+#      - name: Build
+#        run: ./gradlew build --no-daemon
+#
+#      - name: Build and Run Tests with Gradle
+#        run: ./gradlew test --no-daemon

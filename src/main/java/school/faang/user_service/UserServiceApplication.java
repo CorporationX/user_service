@@ -17,7 +17,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @EnableRetry
 @SpringBootApplication
-@EnableFeignClients("school.faang.user_service.client")
+@EnableFeignClients(basePackages = "school.faang.user_service.client")
 @OpenAPIDefinition(
         info = @Info(
                 title = "User Service",

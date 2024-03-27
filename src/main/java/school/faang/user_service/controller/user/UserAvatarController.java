@@ -43,7 +43,7 @@ public class UserAvatarController {
     @Operation(summary = "Get user's avatar")
     @GetMapping("/{avatarId}")
     public ResponseEntity<byte[]> get(@PathVariable long avatarId) {
-        byte[] avatar = null;
+        byte[] avatar;
         try {
             avatar = userAvatarService.get(avatarId).readAllBytes();
         } catch (IOException exception) {

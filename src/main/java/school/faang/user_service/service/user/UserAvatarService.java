@@ -99,8 +99,8 @@ public class UserAvatarService {
     private void setRandomAvatarForUser(User user) {
         UUID uuid = UUID.randomUUID();
         user.setUserProfilePic(UserProfilePic.builder()
-               .fileId(randomAvatar + uuid)
-               .smallFileId(randomAvatarSmall + uuid)
-               .build());
+                .fileId(randomAvatar + uuid)
+                .smallFileId(randomAvatarSmall + uuid)
+                .build());
     }
 }

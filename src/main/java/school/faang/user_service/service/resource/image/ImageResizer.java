@@ -53,7 +53,6 @@ public class ImageResizer {
                 file.getOriginalFilename(),
                 file.getContentType(),
                 resizedImageInBytes);
-
     }
 
     private MultipartFile newMultipartFile(@NotBlank String name,

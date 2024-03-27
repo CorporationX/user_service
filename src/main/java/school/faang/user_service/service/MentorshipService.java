@@ -75,4 +75,14 @@ public class MentorshipService {
     private User getMentee(long menteeId) {
         return mentorshipRepository.findById(menteeId).orElseThrow(() -> new EntityNotFoundException("The sent Mentee_id " + menteeId + " not found in Database"));
     }
+
+    public void deleteMentorForHisMentees(Long mentorId, List<User> mentees){
+        mentees.stream().forEach(mentee -> {
+            mentee.getMentors().removeIf(mentor -> mentor.getId() == mentorId);
+            mentee.getGoals().stream()
+                    .filter(goal -> goal.getMentor().getId() == mentorId)
+                    .forEach(goal -> goal.setMentor(mentee));
+        });
+        mentorshipRepository.saveAll(mentees);
+    }
 }

@@ -3,6 +3,7 @@ package school.faang.user_service.controller.user;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,11 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.resource.ResourceDto;
+import school.faang.user_service.exception.FileException;
 import school.faang.user_service.service.user.UserAvatarService;
 
 import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users/avatar")
@@ -44,7 +47,8 @@ public class UserAvatarController {
         try {
             avatar = userAvatarService.get(avatarId).readAllBytes();
         } catch (IOException exception) {
-            exception.printStackTrace();
+            log.error(exception.getMessage(), exception);
+            throw new FileException(exception.getMessage());
         }
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);

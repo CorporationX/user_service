@@ -1,6 +1,8 @@
 package school.faang.user_service.service.resource.image;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -54,10 +56,10 @@ public class ImageResizer {
 
     }
 
-    private MultipartFile newMultipartFile(@NotNull String name,
-                                           @NotNull String originalFilename,
-                                           @NotNull String contentType,
-                                           @NotNull byte[] bytes) {
+    private MultipartFile newMultipartFile(@NotBlank String name,
+                                           @NotBlank String originalFilename,
+                                           @NotBlank String contentType,
+                                           @NotNull @Size(min = 1) byte[] bytes) {
         return new MultipartFile() {
             @Override
             public String getName() {
@@ -76,7 +78,7 @@ public class ImageResizer {
 
             @Override
             public boolean isEmpty() {
-                return bytes.length == 0;
+                return false;
             }
 
             @Override
@@ -85,18 +87,17 @@ public class ImageResizer {
             }
 
             @Override
-            public byte[] getBytes() throws IOException {
+            public byte[] getBytes() {
                 return bytes;
             }
 
             @Override
-            public InputStream getInputStream() throws IOException {
+            public InputStream getInputStream() {
                 return new ByteArrayInputStream(bytes);
             }
 
             @Override
-            public void transferTo(File dest) throws IOException, IllegalStateException {
-
+            public void transferTo(File dest) {
             }
         };
     }

@@ -2,13 +2,15 @@ package school.faang.user_service.validation.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.exception.DataValidationException;
 
 @Component
 @RequiredArgsConstructor
 public class UserAvatarValidator {
 
-    //TODO : не забудь валидацию
-    public void validateAvatarSize(long size) {
-
+    public void validateIfAvatarIsImage(String contentType) {
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new DataValidationException("Avatar must be an image");
+        }
     }
 }

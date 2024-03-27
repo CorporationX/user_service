@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +20,7 @@ import school.faang.user_service.dto.resource.ResourceDto;
 import school.faang.user_service.service.user.UserAvatarService;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,7 +32,7 @@ public class UserAvatarController {
 
     @Operation(summary = "Upload an avatar for user")
     @PostMapping
-    public ResourceDto upload(@RequestParam("avatar") MultipartFile avatar) {
+    public List<ResourceDto> upload(@RequestParam("avatar") MultipartFile avatar) {
         long userId = userContext.getUserId();
         return userAvatarService.upload(userId, avatar);
     }
@@ -47,5 +49,11 @@ public class UserAvatarController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);
         return new ResponseEntity<>(avatar, headers, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Delete user's avatar")
+    @DeleteMapping("/{avatarId}")
+    public void delete(@PathVariable long avatarId) {
+        userAvatarService.delete(avatarId);
     }
 }

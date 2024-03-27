@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.entity.resource.Resource;
 import school.faang.user_service.exception.FileException;
-import school.faang.user_service.repository.ResourceRepository;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +22,6 @@ import java.math.BigInteger;
 @RequiredArgsConstructor
 public class ResourceService {
     private final AmazonS3 amazonClient;
-    private final ResourceRepository resourceRepository;
 
     @Value("${services.s3.bucketName}")
     private String bucketName;
@@ -62,8 +60,13 @@ public class ResourceService {
         }
     }
 
+    public void deleteFile(String key) {
+        amazonClient.deleteObject(bucketName, key);
+        log.info("File {} deleted from S3", key.split("/")[1]);
+    }
+
     private String generateKey(MultipartFile file, String folder) {
-        return String.format("%s/%s/%s/%d",
-                folder, file.getOriginalFilename(), file.getContentType(), System.currentTimeMillis());
+        return String.format("%s/%s/%s/%d/%d",
+                folder, file.getOriginalFilename(), file.getContentType(), System.currentTimeMillis(), file.getSize());
     }
 }

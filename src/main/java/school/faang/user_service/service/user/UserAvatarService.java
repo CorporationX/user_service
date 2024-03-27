@@ -4,17 +4,21 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.resource.ResourceDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.resource.Resource;
 import school.faang.user_service.mapper.resource.ResourceMapper;
 import school.faang.user_service.repository.ResourceRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.resource.ResourceService;
+import school.faang.user_service.service.resource.image.ImageResizer;
 import school.faang.user_service.validation.user.UserAvatarValidator;
 
 import java.io.InputStream;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -25,20 +29,45 @@ public class UserAvatarService {
     private final ResourceMapper resourceMapper;
     private final UserAvatarValidator userAvatarValidator;
     private final ResourceRepository resourceRepository;
+    private final ImageResizer imageResizer;
 
-    public ResourceDto upload(long userId, MultipartFile avatar) {
-        //TODO: валидация на размер и что это картинка, и придумать как делать ресайз
-        userAvatarValidator.validateAvatarSize(avatar.getSize());
+    @Transactional
+    public List<ResourceDto> upload(long userId, MultipartFile avatar) {
+        userAvatarValidator.validateIfAvatarIsImage(avatar.getContentType());
         User user = getUserFromRepository(userId);
         String folderName = String.format("users_avatars/%d", userId);
 
-        Resource uploadedResource = resourceService.uploadFile(avatar, folderName);
-        return resourceMapper.toDto(resourceRepository.save(uploadedResource));
+        MultipartFile resizedAvatar = imageResizer.resize(avatar, 1080, 1080);
+        MultipartFile resizedAvatarSmall = imageResizer.resize(avatar, 170, 170);
+        Resource uploadedResource = resourceService.uploadFile(resizedAvatar, folderName);
+        Resource uploadedResourceSmall = resourceService.uploadFile(resizedAvatarSmall, folderName);
+        log.info("Resources resized and uploaded to Minio");
+
+        user.setUserProfilePic(UserProfilePic.builder()
+                .fileId(uploadedResource.getKey())
+                .smallFileId(uploadedResourceSmall.getKey())
+                .build());
+        userRepository.save(user);
+        List<Resource> savedAvatars = resourceRepository.saveAll(List.of(uploadedResource, uploadedResourceSmall));
+        log.info("User's profilePic saved: UserID: {}, Profile pics IDs: [{}, {}]",
+                user.getId(),
+                uploadedResource.getId(),
+                uploadedResourceSmall.getId());
+
+        return resourceMapper.toDto(savedAvatars);
     }
 
     public InputStream get(long avatarId) {
         Resource avatar = getAvatarFromRepository(avatarId);
         return resourceService.getFile(avatar.getKey());
+    }
+
+    @Transactional
+    public void delete(long avatarId) {
+        Resource avatar = getAvatarFromRepository(avatarId);
+        resourceService.deleteFile(avatar.getKey());
+        resourceRepository.delete(avatar);
+        log.info("Avatar (ID: {}) deleted", avatarId);
     }
 
     private User getUserFromRepository(long userId) {
@@ -50,4 +79,5 @@ public class UserAvatarService {
         return resourceRepository.findById(avatarId)
                 .orElseThrow(() -> new EntityNotFoundException("Avatar doesn't exist by ID: " + avatarId));
     }
+
 }

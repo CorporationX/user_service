@@ -5,6 +5,11 @@ spring:
     username: user
     password: password
 
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -46,10 +51,10 @@ aws:
 
 services:
   s3:
-    endpoint: http://localhost:9000
+    endpoint: http://127.0.0.1:9000
     accessKey: user
     secretKey: password
-    bucketName: user-service-bucket
+    bucketName: corpbucket
 
   dicebear:
     avatar: https://api.dicebear.com/8.x/pixel-art/svg?seed=

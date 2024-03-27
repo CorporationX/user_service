@@ -3,14 +3,22 @@ package school.faang.user_service.controller.user;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.resource.ResourceDto;
 import school.faang.user_service.service.user.UserAvatarService;
+
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,8 +30,22 @@ public class UserAvatarController {
 
     @Operation(summary = "Upload an avatar for user")
     @PostMapping
-    public ResourceDto upload(@RequestBody MultipartFile avatar) {
+    public ResourceDto upload(@RequestParam("avatar") MultipartFile avatar) {
         long userId = userContext.getUserId();
         return userAvatarService.upload(userId, avatar);
+    }
+
+    @Operation(summary = "Get user's avatar")
+    @GetMapping("/{avatarId}")
+    public ResponseEntity<byte[]> get(@PathVariable long avatarId) {
+        byte[] avatar = null;
+        try {
+            avatar = userAvatarService.get(avatarId).readAllBytes();
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG);
+        return new ResponseEntity<>(avatar, headers, HttpStatus.OK);
     }
 }

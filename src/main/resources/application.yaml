@@ -47,6 +47,10 @@ aws:
   secretKey: secret_key
   region: bucket_region
 
+dicebear:
+  avatar: https://api.dicebear.com/8.x/thumbs/svg?seed=
+  small_avatar: https://api.dicebear.com/8.x/thumbs/svg?size=100&seed=
+
 services:
   s3:
     bucket-name: user_backet

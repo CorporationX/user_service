@@ -16,8 +16,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    public UserDto getUser(Long userId){
-        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
+    public UserDto getUserById(Long userId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("User with id: %s not found", userId)));
         return userMapper.toDtoUser(user);
     }
 

@@ -43,11 +43,17 @@ payment-service:
   port: 9080
 
 aws:
-  accessKey: access_key
-  secretKey: secret_key
+  accessKey: accessKey
+  secretKey: secretKey
   region: bucket_region
 
 services:
   s3:
-    bucket-name: user_backet
-    isMocked: true
+    endpoint: http://localhost:9000
+    accessKey: user
+    secretKey: password
+    region: bucket_region
+    bucketName: user-service-bucket
+    max_size: 5242880
+    large_photo: 1080
+    small_photo: 170

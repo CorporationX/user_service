@@ -197,6 +197,7 @@ class UserServiceTest {
         assertThrows(EntityNotFoundException.class, () ->
                 userService.getFollowers(user.getId()));
     }
+
     @Test
     void shouldgetUserById() {
         User user = new User();
@@ -213,6 +214,7 @@ class UserServiceTest {
         long userId = 0L;
         assertThrows(EntityNotFoundException.class, () -> userService.getUserById(userId));
     }
+
     @Test
     void shouldThrowExceptionIfUserNotFound() {
         long userId = 2L;

@@ -81,6 +81,7 @@ public class UserAvatarService {
         resourceRepository.deleteAll(usersAvatars);
         log.info("User's (ID: {}) avatar pictures deleted", userId);
         setRandomAvatarForUser(user);
+        userRepository.save(user);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(String.format("User's (ID: %d) avatar pictures was successfully deleted", userId));

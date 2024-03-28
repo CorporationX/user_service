@@ -14,11 +14,14 @@ public interface UserMapper {
     @Mapping(source = "mentors", target = "mentorsIds", qualifiedByName = "mapToIds")
     UserDto toDto(User user);
 
+
     List<UserDto> toDto(List<User> users);
+
 
     @Mapping(target = "mentees", ignore = true)
     @Mapping(target = "mentors", ignore = true)
     User toEntity(UserDto userDto);
+
 
     @Named("mapToIds")
     default List<Long> mapToIds(List<User> users) {

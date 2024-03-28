@@ -7,7 +7,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.resource.ResourceDto;
@@ -128,8 +127,7 @@ class UserAvatarServiceTest {
         when(userRepository.findById(user.getId())).thenReturn(Optional.ofNullable(user));
         when(resourceRepository.findAllByUserId(user.getId())).thenReturn(List.of(avatar, smallAvatar));
 
-        ResponseEntity<String> returned = userAvatarService.delete(user.getId());
-        String expectedBody = String.format("User's (ID: %d) avatar pictures was successfully deleted", user.getId());
+        userAvatarService.delete(user.getId());
 
         assertAll(
                 () -> verify(userRepository, times(1)).findById(user.getId()),
@@ -138,8 +136,6 @@ class UserAvatarServiceTest {
                 () -> verify(resourceService, times(1)).deleteFile(smallAvatar.getKey()),
                 () -> verify(userRepository, times(1)).save(user),
                 () -> verify(resourceRepository, times(1)).deleteAll(List.of(avatar, smallAvatar)),
-                () -> assertEquals(200, returned.getStatusCode().value()),
-                () -> assertEquals(expectedBody, returned.getBody()),
                 () -> assertNotEquals(userProfilePic, user.getUserProfilePic())
         );
     }

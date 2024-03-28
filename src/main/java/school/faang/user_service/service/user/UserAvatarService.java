@@ -4,8 +4,6 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,11 +11,11 @@ import school.faang.user_service.dto.resource.ResourceDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.resource.Resource;
+import school.faang.user_service.image.ImageResizer;
 import school.faang.user_service.mapper.resource.ResourceMapper;
 import school.faang.user_service.repository.ResourceRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.resource.ResourceService;
-import school.faang.user_service.image.ImageResizer;
 import school.faang.user_service.validation.user.UserAvatarValidator;
 
 import java.io.InputStream;
@@ -51,7 +49,7 @@ public class UserAvatarService {
         MultipartFile resizedAvatarSmall = imageResizer.resize(avatar, 170, 170);
         Resource uploadedResource = resourceService.uploadFile(resizedAvatar, folderName);
         Resource uploadedResourceSmall = resourceService.uploadFile(resizedAvatarSmall, folderName);
-        log.info("Resources resized and uploaded to Minio");
+        log.info("Resources resized and uploaded to file storage");
 
         user.setUserProfilePic(UserProfilePic.builder()
                 .fileId(uploadedResource.getKey())
@@ -73,7 +71,7 @@ public class UserAvatarService {
     }
 
     @Transactional
-    public ResponseEntity<String> delete(long userId) {
+    public void delete(long userId) {
         User user = getUserFromRepository(userId);
         List<Resource> usersAvatars = resourceRepository.findAllByUserId(userId);
 
@@ -82,9 +80,6 @@ public class UserAvatarService {
         log.info("User's (ID: {}) avatar pictures deleted", userId);
         setRandomAvatarForUser(user);
         userRepository.save(user);
-
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(String.format("User's (ID: %d) avatar pictures was successfully deleted", userId));
     }
 
     private User getUserFromRepository(long userId) {

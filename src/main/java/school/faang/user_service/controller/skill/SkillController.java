@@ -1,10 +1,10 @@
-package school.faang.user_service.controller;
+package school.faang.user_service.controller.skill;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.SkillCandidateDto;
 import school.faang.user_service.dto.SkillDto;
-import school.faang.user_service.service.SkillService;
+import school.faang.user_service.service.skill.SkillService;
 
 import java.util.List;
 

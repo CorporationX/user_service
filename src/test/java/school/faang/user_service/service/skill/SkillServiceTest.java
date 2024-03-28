@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.skill;
 
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -14,6 +14,7 @@ import school.faang.user_service.handler.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
+import school.faang.user_service.service.skill.SkillService;
 
 import java.util.ArrayList;
 import java.util.Arrays;

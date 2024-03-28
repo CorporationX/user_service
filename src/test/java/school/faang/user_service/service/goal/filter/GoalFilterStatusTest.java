@@ -1,4 +1,4 @@
-package school.faang.user_service.service.filter;
+package school.faang.user_service.service.goal.filter;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -7,7 +7,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
-import school.faang.user_service.service.goal.filter.GoalFilterStatus;
 
 import java.util.ArrayList;
 import java.util.Arrays;

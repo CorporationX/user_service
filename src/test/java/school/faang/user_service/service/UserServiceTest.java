@@ -1,4 +1,4 @@
-package school.faang.user_service.user;
+package school.faang.user_service.service;
 
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;

@@ -14,6 +14,6 @@ public class SpringContextTest {
 
     @Test
     public void springContextLoadSuccess() {
-        //Assertions.assertNotNull(applicationContext);
+        Assertions.assertNotNull(applicationContext);
     }
 }

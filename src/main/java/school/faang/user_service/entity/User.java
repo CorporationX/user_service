@@ -46,6 +46,9 @@ public class User {
     @Column(name = "active", nullable = false)
     private boolean active;
 
+    @Column(name = "banned", nullable = false)
+    private boolean banned;
+
     @Column(name = "about_me", length = 4096)
     private String aboutMe;
 

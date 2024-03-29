@@ -142,4 +142,8 @@ public class User {
 
     @OneToOne(mappedBy = "user")
     private Premium premium;
+
+    public long getId() {
+        return id;
+    }
 }

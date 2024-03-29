@@ -2,6 +2,7 @@ package school.faang.user_service.service;
 
 import com.amazonaws.services.kms.model.NotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
@@ -18,21 +19,12 @@ import school.faang.user_service.repository.recommendation.RecommendationRequest
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 
 @Service
+@RequiredArgsConstructor
 public class RecommendationRequestService {
     private final RecommendationRequestRepository recommendationRequestRepository;
     private final SkillRequestRepository skillRequestRepository;
     private final StringToLongMapper stringToLongMapper;
 
-    @Autowired
-    public RecommendationRequestService(RecommendationRequestRepository recommendationRequestRepository,
-                                        SkillRequestRepository skillRequestRepository,
-                                        StringToLongMapper stringToLongMapper) {
-        this.recommendationRequestRepository = recommendationRequestRepository;
-        this.skillRequestRepository = skillRequestRepository;
-        this.stringToLongMapper = stringToLongMapper;
-    }
-
-    // Метод для создания запроса на рекомендацию
     @Transactional
     public void create(Long requesterId, Long receiverId, RecommendationRequestDto requestDto) {
         // Проверка на существование запроса

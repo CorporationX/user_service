@@ -1,19 +1,43 @@
 name: CI
 on:
   push:
-    branches: [ master ]
+    branches: [ dragon-master-bc3 ]
   pull_request:
-    branches: [ master ]
+    branches: [ dragon-master-bc3 ]
 jobs:
   build-with-setup-java-cache:
     runs-on: ubuntu-latest
+
+    #БД для тестирования в GitHubActions
+    services:
+      postgres:
+        image: postgres:12
+        env:
+          POSTGRES_DB: testdb
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up JDK 17
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           java-version: 17
           distribution: 'adopt'
-          cache: gradle
       - name: Build with Gradle
-        run: ./gradlew build --scan --no-daemon
+        run: ./gradlew build --scan
+
+      - name: Run tests
+        env:
+          JDBC_URL: jdbc:postgresql://postgres:5432/testdb
+          JDBC_USER: user
+          JDBC_PASSWORD: password
+        run: ./gradlew test

@@ -13,4 +13,5 @@ public class UserDto {
     private long id;
     private List<Long> menteesIds;
     private List<Long> mentorsIds;
+    private String email;
 }

@@ -33,7 +33,7 @@ public class UserService {
                     .filter(goal -> goal.getUsers().isEmpty())
                     .map(goal -> goal.getId())
                     .toList();
-            userDeactivate.setSetGoals(Collections.emptyList());
+            userDeactivate.setGoals(Collections.emptyList());
             deleteGoals.forEach(deleteGoal -> goalService.deleteGoal(deleteGoal));
         }
 
@@ -47,7 +47,7 @@ public class UserService {
 
         userDeactivate.setActive(false);
 
-        if (userDeactivate.getMentees() != null && userDeactivate.getMentees().isEmpty()) {
+        if (userDeactivate.getMentees() != null && !userDeactivate.getMentees().isEmpty()) {
             mentorshipService.deleteMentorForHisMentees(userId, userDeactivate.getMentees());
             userDeactivate.setMentees(Collections.emptyList());
         }

@@ -53,7 +53,6 @@ public class UserService {
         }
 
         User userSave = userRepository.save(userDeactivate);
-
         return userMapper.toDto(userSave);
     }
 }

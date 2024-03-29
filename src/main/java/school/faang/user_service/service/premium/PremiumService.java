@@ -32,7 +32,7 @@ public class PremiumService {
     @Transactional
     public PremiumDto buyPremium(long userId, PremiumPeriod premiumPeriod) {
         if (premiumRepository.existsByUserId(userId)) {
-            throw new DataValidationException("The user is already has Premium subscription");
+            throw new DataValidationException("The user"+userId+" is already has Premium subscription");
         }
 
         PaymentRequest paymentRequest = generatePaymentRequest(userId, premiumPeriod);

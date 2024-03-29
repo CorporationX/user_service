@@ -20,6 +20,7 @@ import school.faang.user_service.repository.premium.PremiumRepository;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +33,7 @@ public class PremiumService {
     @Transactional
     public PremiumDto buyPremium(long userId, PremiumPeriod premiumPeriod) {
         if (premiumRepository.existsByUserId(userId)) {
-            throw new DataValidationException("The user"+userId+" is already has Premium subscription");
+            throw new DataValidationException("The user "+userId+" already has Premium subscription");
         }
 
         PaymentRequest paymentRequest = generatePaymentRequest(userId, premiumPeriod);
@@ -50,7 +51,7 @@ public class PremiumService {
 
     private PaymentRequest generatePaymentRequest(Long userId, PremiumPeriod premiumPeriod) {
         return PaymentRequest.builder()
-                .paymentNumber(userId)//how can also generate unique payment number??
+                .paymentNumber(UUID.randomUUID())//how can also generate unique payment number??
                 .amount(premiumPeriod.getCost())
                 .currency(Currency.USD)
                 .build();

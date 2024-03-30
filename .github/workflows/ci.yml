@@ -2,7 +2,7 @@ name: Test Java applications
 on:
   pull_request:
     branches:
-      - feature/pipline-BC-3438
+      - kraken-master-bc3
 
 
 jobs:

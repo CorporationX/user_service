@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 public class TestPipline {
     @Test
     public void testFail(){
-        int result = 3+2;
+        int result = 2+3;
         Assert.assertEquals(5, result);
     }
 }

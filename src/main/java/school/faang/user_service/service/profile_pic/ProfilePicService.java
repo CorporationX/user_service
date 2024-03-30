@@ -1,4 +1,4 @@
-package school.faang.user_service.service.avatar;
+package school.faang.user_service.service.profile_pic;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
@@ -8,15 +8,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.dto.UserProfilePicDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.handler.exception.EntityNotFoundException;
+import school.faang.user_service.handler.exception.FileReadException;
+import school.faang.user_service.handler.exception.FileWriteException;
+import school.faang.user_service.mapper.user_profile_pic.UserProfilePicMapper;
 import school.faang.user_service.repository.UserRepository;
 
 import javax.imageio.ImageIO;
@@ -28,11 +30,13 @@ import java.io.IOException;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AvatarService {
+public class ProfilePicService {
 
     private final UserRepository userRepository;
 
     private final AmazonS3 s3Client;
+
+    private final UserProfilePicMapper userProfilePicMapper;
 
     @Value("${services.s3.large_photo}")
     private int large_photo;
@@ -43,7 +47,7 @@ public class AvatarService {
     @Value("${services.s3.bucketName}")
     private String s3BucketName;
 
-    public UserProfilePic uploadAvatar(Long userId, MultipartFile file) {
+    public UserProfilePicDto uploadAvatar(Long userId, MultipartFile file) {
         User user = getUser(userId);
         String uniqueSmallPicName = file.getOriginalFilename() + "_small" + System.currentTimeMillis();
         String uniqueLargePicName = file.getOriginalFilename() + "_large" + System.currentTimeMillis();
@@ -55,22 +59,19 @@ public class AvatarService {
         user.setUserProfilePic(userProfilePic);
         userRepository.save(user);
         log.info(String.format("User with id %s upload avatar", userId));
-        return userProfilePic;
+        return userProfilePicMapper.toDto(userProfilePic);
     }
 
-    public ResponseEntity<byte[]> getAvatar(Long userId) {
+    public ResponseEntity<byte[]> downloadAvatarLarge(Long userId) {
         User user = getUser(userId);
         S3Object object = s3Client.getObject(s3BucketName, user.getUserProfilePic().getFileId());
-        try(S3ObjectInputStream objectInputStream = object.getObjectContent()) {
-            byte[] arrayBytePhoto = objectInputStream.readAllBytes();
-            log.info(String.format("User with id %s getting avatar", userId));
-            return ResponseEntity.ok()
-                    .contentType(MediaType.IMAGE_JPEG)
-                    .body(arrayBytePhoto);
-        } catch (IOException e) {
-            log.error("Exception on method getAvatar");
-            throw new RuntimeException(e);
-        }
+        return getAvatar(userId, object);
+    }
+
+    public ResponseEntity<byte[]> downloadAvatarSmall(Long userId) {
+        User user = getUser(userId);
+        S3Object object = s3Client.getObject(s3BucketName, user.getUserProfilePic().getSmallFileId());
+        return getAvatar(userId, object);
     }
 
     public void deleteAvatar(Long userId) {
@@ -80,6 +81,19 @@ public class AvatarService {
         UserProfilePic userProfilePic = new UserProfilePic(null, null);
         user.setUserProfilePic(userProfilePic);
         userRepository.save(user);
+    }
+
+    private ResponseEntity<byte[]> getAvatar(Long userId, S3Object object) {
+        try (S3ObjectInputStream objectInputStream = object.getObjectContent()) {
+            byte[] arrayBytePhoto = objectInputStream.readAllBytes();
+            log.info(String.format("User with id %s getting avatar", userId));
+            return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_JPEG)
+                    .body(arrayBytePhoto);
+        } catch (IOException e) {
+            log.error("Exception on method getAvatar");
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -97,14 +111,18 @@ public class AvatarService {
                     .outputQuality(1.0)
                     .asBufferedImage();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            log.error("File read exception on method compressorPhoto");
+            throw new FileReadException("File read exception");
         }
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             ImageIO.write(resizeImage, "jpg", outputStream);
             return new ByteArrayInputStream(outputStream.toByteArray());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            log.error("File write exception on method compressorPhoto");
+            throw new FileWriteException("File write exception");
         }
     }
 

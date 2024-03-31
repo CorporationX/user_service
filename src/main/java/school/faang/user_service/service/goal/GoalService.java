@@ -17,7 +17,9 @@ import school.faang.user_service.service.goal.filter.GoalFilter;
 import school.faang.user_service.validator.goal.GoalConstraints;
 import school.faang.user_service.validator.goal.GoalValidation;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,7 +39,7 @@ public class GoalService {
         goalValidation.validateGoalCreate(userId, goalDto, MAX_COUNT_GOALS);
         Goal createdGoal = goalRepository.create(goalDto.getTitle(), goalDto.getDescription(), goalDto.getParentId());
         createdGoal.setSkillsToAchieve(skillRepository.findAllById(goalDto.getSkillIds()));
-        createdGoal.setUsers(Arrays.asList(getUser(userId)));
+        createdGoal.setUsers(new ArrayList<>(List.of(getUser(userId))));
         return goalMapper.toDto(goalRepository.save(createdGoal));
     }
 

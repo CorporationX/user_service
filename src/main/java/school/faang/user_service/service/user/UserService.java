@@ -11,6 +11,9 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.validator.user.UserValidator;
 
 import java.util.UUID;
+import school.faang.user_service.handler.exception.EntityNotFoundException;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -32,11 +35,19 @@ public class UserService {
         return userMapper.toDto(createdUser);
     }
 
-    private UserProfilePic getRandomAvatar(){
+    private UserProfilePic getRandomAvatar() {
         UUID uuid = UUID.randomUUID();
         return UserProfilePic.builder()
                 .fileId(avatarUrl + uuid)
                 .smallFileId(smallAvatarUrl + uuid)
                 .build();
+        }
+        public UserDto getUserById (Long userId){
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException(String.format("User with id: %s not found", userId)));
+            return userMapper.toDtoUser(user);
+        }
+        public List<UserDto> getUsersByIds (List < Long > ids) {
+        return userMapper.toDtoUser(userRepository.findAllById(ids));
     }
 }

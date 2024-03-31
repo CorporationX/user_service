@@ -14,9 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.user.UserService;
 
-import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequiredArgsConstructor
@@ -44,5 +46,10 @@ public class UserController {
     @Operation(summary = "Get users by ids")
     List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);
+    }
+
+    @GetMapping("/{userId}")
+    public UserDto deactivationUserById(@PathVariable Long userId){
+        return userService.deactivationUserById(userId);
     }
 }

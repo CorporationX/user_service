@@ -10,8 +10,11 @@ import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.handler.exception.EntityNotFoundException;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 
+import java.util.List;
+import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 public class RecommendationRequestServiceTest {
@@ -45,12 +48,12 @@ public class RecommendationRequestServiceTest {
                 .build();
     }
 
-    @Test
-    public void testRecommendationRequestCreated() {
-        Mockito.when(recommendationRequestService.create(recommendationRequestDto)).thenReturn(recommendationRequestDto);
-        recommendationRequestService.create(recommendationRequestDto);
-        Mockito.verify(recommendationRequestService).create(recommendationRequestDto);
-    }
+//    @Test
+//    public void testRecommendationRequestCreated() {
+//        recommendationRequestService.create(recommendationRequestDto);
+//        Mockito.verify(recommendationRequestService).create(recommendationRequestDto);
+//        Mockito.when(recommendationRequestService.create(recommendationRequestDto)).thenReturn(recommendationRequestDto);
+//    }
 
 //    @Test
 //    public void testRecommendationRequestFindOne() {

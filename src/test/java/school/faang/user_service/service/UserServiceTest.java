@@ -61,6 +61,7 @@ class UserServiceTest {
         ment.setMentors(new ArrayList<>(List.of(u)));
 
         Event ev = new Event();
+
         ev.setId(1L);
         ev.setOwner(u);
         ev.setStatus(EventStatus.PLANNED);

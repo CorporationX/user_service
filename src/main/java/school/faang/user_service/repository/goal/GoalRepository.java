@@ -19,7 +19,8 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
 
     @Query(nativeQuery = true, value = """
             INSERT INTO goal (title, description, parent_goal_id, status, created_at, updated_at)
-            VALUES (?1, ?2, ?3, 0, NOW(), NOW()) returning goal
+            VALUES (?1, ?2, ?3, 0, NOW(), NOW()) 
+            returning id, title, description, parent_goal_id, status, deadline, created_at, updated_at, mentor_id;
             """)
     Goal create(String title, String description, Long parent);
 

@@ -1,14 +1,23 @@
 package school.faang.user_service.service.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.validator.user.UserValidator;
+
+import java.util.UUID;
+
+import school.faang.user_service.handler.exception.EntityNotFoundException;
+
+
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.handler.exception.DataValidationException;
-import school.faang.user_service.mapper.user.UserMapper;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.MentorshipService;
 import school.faang.user_service.service.goal.GoalService;
@@ -19,12 +28,43 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final UserValidator userValidator;
+    private final UserRepository userRepository;
     private final MentorshipService mentorshipService;
     private final GoalService goalService;
     private final EventRepository eventRepository;
+    @Value("${dicebear.avatar}")
+    private String avatarUrl;
+    @Value("${dicebear.small_avatar}")
+    private String smallAvatarUrl;
 
+    public UserDto create(UserDto userDto) {
+        userValidator.validatePassword(userDto);
+        User user = userMapper.toEntity(userDto);
+        user.setUserProfilePic(getRandomAvatar());
+        user.setActive(true);
+        User createdUser = userRepository.save(user);
+        return userMapper.toDto(createdUser);
+    }
+
+    private UserProfilePic getRandomAvatar() {
+        UUID uuid = UUID.randomUUID();
+        return UserProfilePic.builder()
+                .fileId(avatarUrl + uuid)
+                .smallFileId(smallAvatarUrl + uuid)
+                .build();
+    }
+
+    public UserDto getUserById(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("User with id: %s not found", userId)));
+        return userMapper.toDto(user);
+    }
+
+    public List<UserDto> getUsersByIds(List<Long> ids) {
+        return userMapper.toDto(userRepository.findAllById(ids));
+    }
     public UserDto deactivationUserById(Long userId) {
         User userDeactivate = userRepository.findById(userId).orElseThrow(() -> new DataValidationException("Пользователь с id: "+ userId+" не найден"));
         if (userDeactivate.getGoals() != null && !userDeactivate.getGoals().isEmpty()) {

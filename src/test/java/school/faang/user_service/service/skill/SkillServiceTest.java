@@ -1,10 +1,12 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.skill;
 
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import school.faang.user_service.dto.SkillCandidateDto;
 import school.faang.user_service.dto.SkillDto;
@@ -14,6 +16,7 @@ import school.faang.user_service.handler.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
+import school.faang.user_service.service.skill.SkillService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class SkillServiceTest {
     @Mock
     private SkillRepository skillRepository;

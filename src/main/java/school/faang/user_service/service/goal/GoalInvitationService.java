@@ -34,6 +34,7 @@ public class GoalInvitationService {
         GoalInvitation invitation = goalInvitationValidator.findInvitation(id);
         goalInvitationValidator.validateGoalExists(invitation);
         goalInvitationValidator.validateAcceptGoalInvitation(invitation);
+        goalInvitationValidator.checkingStatusIsPending(invitation);
 
         User invited = invitation.getInvited();
         Goal goal = invitation.getGoal();
@@ -47,6 +48,7 @@ public class GoalInvitationService {
     public GoalInvitationDto rejectGoalInvitation(long id) {
         GoalInvitation invitation = goalInvitationValidator.findInvitation(id);
         goalInvitationValidator.validateGoalExists(invitation);
+        goalInvitationValidator.checkingStatusIsPending(invitation);
         invitation.setStatus(RequestStatus.REJECTED);
         goalInvitationRepository.save(invitation);
         return goalInvitationMapper.toDto(invitation);

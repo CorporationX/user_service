@@ -8,7 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class GoalInvitedNamePatternFilterTest extends SetUpFiltresTest {
+public class GoalInvitedNamePatternFilterTest extends SetUpFiltersTest {
     @InjectMocks
     GoalInvitedNamePatternFilter goalInvitedNamePatternFilter;
 

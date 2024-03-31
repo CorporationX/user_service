@@ -26,20 +26,20 @@ public class GoalInvitationController {
         return goalInvitationService.createInvitation(invitation);
     }
 
-    @GetMapping("/acceptGoalInvitation/{id}")
+    @GetMapping("/accept-goal-invitation/{id}")
     @Operation(description = "Creating an invitation")
     public GoalInvitationDto acceptGoalInvitation(@PathVariable long id) {
         return goalInvitationService.acceptGoalInvitation(id);
     }
 
 
-    @GetMapping("/rejectGoalInvitation/{id}")
+    @GetMapping("/reject-goal-invitation/{id}")
     @Operation(description = "Decline the invitation")
     public GoalInvitationDto rejectGoalInvitation(@PathVariable long id) {
         return goalInvitationService.rejectGoalInvitation(id);
     }
 
-    @PostMapping("/getInvitations")
+    @PostMapping("/get-invitations")
     @Operation(description = "Filter out invitations")
     public List<GoalInvitationDto> getInvitations(@RequestBody GoalInvitationFilterDto filter) {
         return goalInvitationService.getFilteredInvitations(filter);

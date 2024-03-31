@@ -6,7 +6,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.GoalInvitation;
 
-public class SetUpFiltresTest {
+    public class SetUpFiltersTest {
 
     GoalInvitationFilterDto filterInviterNamePatternDto;
     GoalInvitationFilterDto filterInvitedNamePatternDto;

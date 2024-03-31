@@ -10,6 +10,8 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
+import static school.faang.user_service.entity.RequestStatus.PENDING;
+
 @Component
 @RequiredArgsConstructor
 public class GoalInvitationValidator {
@@ -29,7 +31,7 @@ public class GoalInvitationValidator {
         }
         // Условие: они не один и тот же человек
         if (inviterId.equals(invitedUserId)) {
-            throw new DataValidationException("Cannot specify the same ID for the [inviter] and [invitedUser] fields");
+            throw new DataValidationException("Cannot specify the same ID:"+ invitedUserId +" for the [inviter] and [invitedUser] fields");
         }
 
         checkingUserInDb(inviterId);
@@ -64,6 +66,13 @@ public class GoalInvitationValidator {
         // Условие: такая цель вообще существует?
         if (!goalRepository.existsById(invitation.getGoal().getId())) {
             throw new DataValidationException("There is no such goal");
+        }
+    }
+
+    // Условие: проверяем что статус находится в ожидании - PENDING
+    public void checkingStatusIsPending(GoalInvitation invitation) {
+        if (invitation.getStatus()!= PENDING) {
+            throw new DataValidationException("The status of the invitation must be PENDING");
         }
     }
 }

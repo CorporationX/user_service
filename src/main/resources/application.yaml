@@ -47,6 +47,10 @@ aws:
   secretKey: secretKey
   region: bucket_region
 
+dicebear:
+  avatar: https://api.dicebear.com/8.x/thumbs/svg?seed=
+  small_avatar: https://api.dicebear.com/8.x/thumbs/svg?size=100&seed=
+
 services:
   s3:
     endpoint: http://localhost:9000

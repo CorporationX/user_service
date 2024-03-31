@@ -57,6 +57,7 @@ public class MentorshipServiceTest {
                 id(13L).
                 mentors(List.of(secondMentor, firstMentor)).
                 build();
+
     }
 
     @Test
@@ -68,12 +69,22 @@ public class MentorshipServiceTest {
 
     @Test
     public void testGetMenteesInvalidId() {
-        assertEquals(Collections.emptyList(), mentorshipService.getMentees(1L));
+        assertThrows(EntityNotFoundException.class,() -> mentorshipService.getMentees(1L));
+    }
+    @Test
+    public void testGetMenteesEmptyList(){
+        when(mentorshipRepository.findById(2L)).thenReturn(Optional.of(secondMentor));
+        assertEquals(Collections.emptyList(), mentorshipService.getMentees(2L));
     }
 
     @Test
     public void testGetMentorsInvalidId() {
-        assertEquals(Collections.emptyList(), mentorshipService.getMentors(1L));
+        assertThrows(EntityNotFoundException.class,()-> mentorshipService.getMentors(1L));
+    }
+    @Test
+    public void testGetMentorsEmptyList(){
+        when(mentorshipRepository.findById(10L)).thenReturn(Optional.of(secondMentee));
+        assertEquals(Collections.emptyList(), mentorshipService.getMentors(10L));
     }
 
     @Test
@@ -93,19 +104,33 @@ public class MentorshipServiceTest {
 
         verify(mentorshipRepository, times(1)).save(thirdMentee);
     }
+    @Test
+    public void testDeleteMenteeIsNotOnTheList(){
+        when(mentorshipRepository.findById(1L)).thenReturn(Optional.of(firstMentor));
+        when(mentorshipRepository.findById(16L)).thenReturn(Optional.of(User.builder()
+                .id(16L).build()));
+        assertThrows(IllegalArgumentException.class,() ->mentorshipService.deleteMentee(16L, 1L));
+    }
 
     @Test
     public void testDeleteMenteeNotValidIdMentee() {
         when(mentorshipRepository.findById(1L)).thenReturn(Optional.of(firstMentor));
 
-        assertThrows(IllegalArgumentException.class, () -> mentorshipService.deleteMentee(16L, 1L));
+        assertThrows(EntityNotFoundException.class, () -> mentorshipService.deleteMentee(16L, 1L));
     }
 
     @Test
     public void testDeleteMentorNotValidIdMentor() {
         when(mentorshipRepository.findById(13L)).thenReturn(Optional.of(thirdMentee));
 
-        assertThrows(IllegalArgumentException.class, () -> mentorshipService.deleteMentor(13L, 5L));
+        assertThrows(EntityNotFoundException.class, () -> mentorshipService.deleteMentor(13L, 5L));
+    }
+    @Test
+    public void testDeleteMentorIsNotOnTheList(){
+        when(mentorshipRepository.findById(13L)).thenReturn(Optional.of(thirdMentee));
+        when(mentorshipRepository.findById(5L)).thenReturn(Optional.of(User.builder()
+                .id(5L).build()));
+        assertThrows(IllegalArgumentException.class,() ->mentorshipService.deleteMentor(13L, 5L));
     }
 
     @Test

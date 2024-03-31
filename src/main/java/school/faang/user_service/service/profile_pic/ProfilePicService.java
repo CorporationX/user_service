@@ -27,6 +27,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import static school.faang.user_service.validator.user.UserConstraints.USER_NOT_FOUND;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -65,13 +67,15 @@ public class ProfilePicService {
     public ResponseEntity<byte[]> downloadAvatarLarge(Long userId) {
         User user = getUser(userId);
         S3Object object = s3Client.getObject(s3BucketName, user.getUserProfilePic().getFileId());
-        return getAvatar(userId, object);
+        log.info(String.format("User with id %s download large avatar", userId));
+        return getAvatar(object);
     }
 
     public ResponseEntity<byte[]> downloadAvatarSmall(Long userId) {
         User user = getUser(userId);
         S3Object object = s3Client.getObject(s3BucketName, user.getUserProfilePic().getSmallFileId());
-        return getAvatar(userId, object);
+        log.info(String.format("User with id %s download small avatar", userId));
+        return getAvatar(object);
     }
 
     public void deleteAvatar(Long userId) {
@@ -80,13 +84,13 @@ public class ProfilePicService {
         s3Client.deleteObject(s3BucketName, user.getUserProfilePic().getSmallFileId());
         UserProfilePic userProfilePic = new UserProfilePic(null, null);
         user.setUserProfilePic(userProfilePic);
+        log.info(String.format("User with id %s delete avatar", userId));
         userRepository.save(user);
     }
 
-    private ResponseEntity<byte[]> getAvatar(Long userId, S3Object object) {
+    private ResponseEntity<byte[]> getAvatar(S3Object object) {
         try (S3ObjectInputStream objectInputStream = object.getObjectContent()) {
             byte[] arrayBytePhoto = objectInputStream.readAllBytes();
-            log.info(String.format("User with id %s getting avatar", userId));
             return ResponseEntity.ok()
                     .contentType(MediaType.IMAGE_JPEG)
                     .body(arrayBytePhoto);
@@ -129,6 +133,6 @@ public class ProfilePicService {
 
     private User getUser(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("User with id: %s not found", userId)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format(USER_NOT_FOUND.getMessage(), userId)));
     }
 }

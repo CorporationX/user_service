@@ -20,7 +20,7 @@ public class ProfilePicController {
     @PostMapping("/{userId}/profilePic")
     @Operation(summary = "Upload new avatar user")
     public UserProfilePicDto uploadAvatar(@PathVariable Long userId, @RequestParam("file") MultipartFile file) {
-        if (file.getSize() > maxSize){
+        if (file.getSize() > maxSize) {
             throw new IllegalArgumentException("File weight is more than 5 MB");
         }
         return profilePicService.uploadAvatar(userId, file);

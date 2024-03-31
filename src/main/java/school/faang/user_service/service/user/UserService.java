@@ -11,6 +11,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.validator.user.UserValidator;
 
 import java.util.UUID;
+
 import school.faang.user_service.handler.exception.EntityNotFoundException;
 
 import java.util.List;
@@ -41,13 +42,15 @@ public class UserService {
                 .fileId(avatarUrl + uuid)
                 .smallFileId(smallAvatarUrl + uuid)
                 .build();
-        }
-        public UserDto getUserById (Long userId){
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new EntityNotFoundException(String.format("User with id: %s not found", userId)));
-            return userMapper.toDtoUser(user);
-        }
-        public List<UserDto> getUsersByIds (List < Long > ids) {
-        return userMapper.toDtoUser(userRepository.findAllById(ids));
+    }
+
+    public UserDto getUserById(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("User with id: %s not found", userId)));
+        return userMapper.toDto(user);
+    }
+
+    public List<UserDto> getUsersByIds(List<Long> ids) {
+        return userMapper.toDto(userRepository.findAllById(ids));
     }
 }

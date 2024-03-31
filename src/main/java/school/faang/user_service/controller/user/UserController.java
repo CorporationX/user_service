@@ -14,10 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.user.UserService;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.service.user.UserService;
 
 import java.util.List;
 
@@ -31,10 +28,12 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Created new user",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = UserDto.class) )} )})
+                            schema = @Schema(implementation = UserDto.class))})})
     @PostMapping("/create")
     public UserDto create(@Valid @RequestBody UserDto userDto) {
         return userService.create(userDto);
+    }
+
     @GetMapping("/{userId}")
     @Operation(summary = "Get user by id")
     UserDto getUser(@PathVariable long userId) {

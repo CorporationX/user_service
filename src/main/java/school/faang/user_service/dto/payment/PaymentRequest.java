@@ -5,11 +5,12 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Builder
 public record PaymentRequest(
         @NotNull
-        long paymentNumber,
+        UUID paymentNumber,
 
         @Min(1)
         @NotNull

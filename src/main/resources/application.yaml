@@ -56,3 +56,5 @@ scheduler:
   clear-premiums: "@weekly"
 
 batch: 200
+
+thread-count: 10

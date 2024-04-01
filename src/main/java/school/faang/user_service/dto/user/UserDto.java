@@ -1,5 +1,8 @@
 package school.faang.user_service.dto.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import school.faang.user_service.entity.contact.PreferredContact;
 import lombok.*;
 import school.faang.user_service.dto.skill.SkillDto;
 
@@ -20,5 +23,5 @@ public class UserDto {
     private String city;
     private Integer experience;
     private List<SkillDto> skills;
-
+    private PreferredContact preference;
 }

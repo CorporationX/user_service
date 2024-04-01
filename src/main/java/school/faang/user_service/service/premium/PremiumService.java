@@ -49,11 +49,7 @@ public class PremiumService {
         List<Premium> expiredPremiums = premiumRepository.findAllByEndDateBefore(LocalDateTime.now());
         for (int i = 0; i < expiredPremiums.size(); i += batch) {
             final int innerI = i + 1;
-            executorService.execute(() -> {
-                for (int j = innerI; j < Math.min(innerI + batch + 1, expiredPremiums.size()); j++) {
-                    premiumRepository.delete(expiredPremiums.get(j));
-                }
-            });
+            executorService.execute(() -> premiumRepository.deleteAll(expiredPremiums.subList(innerI, Math.min(innerI + batch + 1, expiredPremiums.size()))));
         }
     }
 

@@ -2,14 +2,14 @@ package school.faang.user_service.controller.user;
 
 
 import jakarta.validation.Valid;
-import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
-import school.faang.user_service.dto.user.UserCreateDto;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.TgContactDto;
+import school.faang.user_service.dto.user.UserCreateDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.service.csv.CSVFileParserService;
@@ -50,5 +50,10 @@ public class UserController {
     @GetMapping("/tgContact/{userId}")
     public TgContactDto getTgContact(@PathVariable long userId) {
         return userService.getTgContact(userId);
+    }
+
+    @GetMapping("/exists/{userId}")
+    public boolean existById(@PathVariable @Positive(message = "Id must be greater than zero") long userId) {
+        return userService.existById(userId);
     }
 }

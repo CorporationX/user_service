@@ -6,12 +6,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class PremiumCleanupService {
+public class PremiumRemover {
 
     private final PremiumService premiumService;
 
     @Scheduled(cron = "${scheduler.clear-premiums}")
-    public void deleteExpiredPremiums() {
+    public void removePremium() {
         premiumService.deleteExpiredPremiums();
     }
 }

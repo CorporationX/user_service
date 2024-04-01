@@ -53,4 +53,6 @@ services:
     small_avatar: https://api.dicebear.com/8.x/pixel-art/svg?size=100&seed=
 
 scheduler:
-  clear-premiums: "@daily"
+  clear-premiums: "@weekly"
+
+batch: 200

@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.mentorship;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -19,6 +19,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.filter.*;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipRequestedEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
@@ -39,7 +40,8 @@ public class MentorshipRequestServiceTest {
     private MentorshipRequestMapper mentorshipRequestMapper = Mappers.getMapper(MentorshipRequestMapper.class);
     @Mock
     private List<MentorshipRequestFilter> mentorshipRequestFilters = List.of(new MentorshipRequestDescriptionFilter(), new MentorshipRequestReceiverIdFilter(), new MentorshipRequestRequesterIdFilter(), new MentorshipRequestStatusFilter());
-
+    @Mock
+    private MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
     @Captor
     private ArgumentCaptor<List<MentorshipRequest>> captor;
 
@@ -282,7 +284,8 @@ public class MentorshipRequestServiceTest {
         List<MentorshipRequest> mentorshipRequestList = List.of(mentorshipRequest1, mentorshipRequest2);
         when(mentorshipRequestRepository.findAll()).thenReturn(mentorshipRequestList);
 
-        RequestFilterDto requestFilterDto = new RequestFilterDto(null, 1L, 0, null);
+//        RequestFilterDto requestFilterDto = new RequestFilterDto(null, 1L, 0, null);
+        RequestFilterDto requestFilterDto = RequestFilterDto.builder().requesterId(1L).receiverId(0L).build();
         List<RequestFilterDto> result = mentorshipRequestService.getRequests(requestFilterDto);
 
         assertNotNull(result);

@@ -8,6 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.FileException;
 import school.faang.user_service.exception.ServiceInteractionException;
@@ -61,6 +62,13 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleFileException(FileException e) {
         log.error("FileException", e);
         return new ErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), LocalDateTime.now());
+    }
+
+    @ResponseStatus(HttpStatus.PAYLOAD_TOO_LARGE)
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ErrorResponse handleMaxUploadSizeExceededException(MaxUploadSizeExceededException e) {
+        log.error("MaxUploadSizeExceededException", e);
+        return new ErrorResponse(e.getMessage(), HttpStatus.PAYLOAD_TOO_LARGE.value(), LocalDateTime.now());
     }
 
     private Map<String, String> getErrorsMap(MethodArgumentNotValidException e) {

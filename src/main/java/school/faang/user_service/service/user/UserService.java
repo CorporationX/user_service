@@ -2,8 +2,11 @@ package school.faang.user_service.service.user;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
@@ -20,6 +23,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserService {
 
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final List<UserFilter> userFilters;
@@ -68,6 +72,13 @@ public class UserService {
                     .forEach(filter -> filter.apply(premiumUsers, filters));
         }
         return userMapper.toDto(premiumUsers);
+    }
+
+    @Transactional
+    public void banUser(Long userId) {
+        User user = getUserFromRepository(userId);
+        user.setBanned(true);
+        log.info("User {} banned", userId);
     }
 
     private User getUserFromRepository(long userId) {

@@ -13,14 +13,16 @@ import java.util.NoSuchElementException;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+
     public UserDto getUser(long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("User not found!"));
         return userMapper.toDto(user);
     }
+
     public List<UserDto> getUsersByIds(List<Long> ids) {
-        List users = userRepository.findAllById(ids);
-        return userMapper.toDto(users);
+        return userMapper.toDto(userRepository.findAllById(ids));
     }
 }

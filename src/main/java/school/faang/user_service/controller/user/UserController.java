@@ -10,8 +10,10 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
-public class userController {
+public class UserController {
+
     private final UserService userService;
+
     @GetMapping("/{userId}")
     public UserDto getUser(@PathVariable long userId) {
         return userService.getUser(userId);

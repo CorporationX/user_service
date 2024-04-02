@@ -12,7 +12,7 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import school.faang.user_service.consumer.BanUserListener;
+import school.faang.user_service.listener.BanUserListener;
 
 @Configuration
 @RequiredArgsConstructor

@@ -61,4 +61,84 @@ public class RecommendationRequest {
     public void addSkillRequest(SkillRequest skillRequest) {
         skills.add(skillRequest);
     }
+
+    public long getId() {
+        return id;
+    }
+
+    public User getRequester() {
+        return requester;
+    }
+
+    public User getReceiver() {
+        return receiver;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public RequestStatus getStatus() {
+        return status;
+    }
+
+    public String getRejectionReason() {
+        return rejectionReason;
+    }
+
+    public Recommendation getRecommendation() {
+        return recommendation;
+    }
+
+    public List<SkillRequest> getSkills() {
+        return skills;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setRequester(User requester) {
+        this.requester = requester;
+    }
+
+    public void setReceiver(User receiver) {
+        this.receiver = receiver;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public void setStatus(RequestStatus status) {
+        this.status = status;
+    }
+
+    public void setRejectionReason(String rejectionReason) {
+        this.rejectionReason = rejectionReason;
+    }
+
+    public void setRecommendation(Recommendation recommendation) {
+        this.recommendation = recommendation;
+    }
+
+    public void setSkills(List<SkillRequest> skills) {
+        this.skills = skills;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }

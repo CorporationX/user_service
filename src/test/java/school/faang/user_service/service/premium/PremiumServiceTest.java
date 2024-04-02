@@ -26,6 +26,7 @@ import school.faang.user_service.repository.premium.PremiumRepository;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
 class PremiumServiceTest {
@@ -55,14 +56,14 @@ class PremiumServiceTest {
         legend = PremiumPeriod.LEGEND;
 
         paymentRequest = PaymentRequest.builder()
-                .paymentNumber(userId)
+                .paymentNumber(UUID.randomUUID())
                 .build();
 
 
         paymentResponse = PaymentResponse.builder()
                 .status(PaymentStatus.SUCCESS)
                 .verificationCode(1)
-                .paymentNumber(1)
+                .paymentNumber(UUID.randomUUID())
                 .amount(BigDecimal.valueOf(10))
                 .currency(Currency.USD)
                 .message("message")
@@ -89,7 +90,7 @@ class PremiumServiceTest {
 
         DataValidationException e = Assert.assertThrows(DataValidationException.class, () -> premiumService.buyPremium(userId, base));
 
-        Assert.assertEquals(e.getMessage(), "The user is already has Premium subscription");
+        Assert.assertEquals(e.getMessage(), "The user " + userId + " already has Premium subscription");
     }
     @Test
     @DisplayName("Internal payment operation exception")

@@ -18,6 +18,7 @@ import school.faang.user_service.validation.goal.GoalInvitationValidator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -75,12 +76,11 @@ public class GoalInvitationServiceTest {
         Goal goal = new Goal();
         goal.setId(1L);
 
-        when(goalInvitationValidator.findInvitation(invitationId)).thenReturn(invitation);
+        when(findInvitation(invitationId)).thenReturn(Optional.ofNullable(invitation));
         when(goalInvitationRepository.save(any(GoalInvitation.class))).thenReturn(invitation);
 
         goalInvitationService.acceptGoalInvitation(invitationId);
 
-        verify(goalInvitationValidator, times(1)).findInvitation(invitationId);
         verify(goalInvitationValidator, times(1)).validateGoalExists(invitation);
         verify(goalInvitationValidator, times(1)).validateAcceptGoalInvitation(invitation);
         verify(goalInvitationRepository, times(1)).save(invitation);
@@ -94,7 +94,7 @@ public class GoalInvitationServiceTest {
         long invitationId = 1L;
         GoalInvitation invitation = getGoalInvitation();
 
-        when(goalInvitationValidator.findInvitation(invitationId)).thenReturn(invitation);
+        when(findInvitation(invitationId)).thenReturn(Optional.ofNullable(invitation));
         when(goalInvitationRepository.save(any(GoalInvitation.class))).thenReturn(invitation);
 
         goalInvitationService.rejectGoalInvitation(invitationId);
@@ -103,6 +103,11 @@ public class GoalInvitationServiceTest {
 
         assertEquals(RequestStatus.REJECTED, invitation.getStatus());
     }
+
+    private Optional<GoalInvitation> findInvitation(long invitationId) {
+        return goalInvitationRepository.findById(invitationId);
+    }
+
 
     private GoalInvitationDto getGoalInvitationDto() {
         return GoalInvitationDto.builder()

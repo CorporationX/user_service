@@ -1,6 +1,5 @@
 package school.faang.user_service.validation;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +20,6 @@ import school.faang.user_service.validation.goal.GoalInvitationValidator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -143,21 +141,6 @@ public class GoalInvitationValidatorTest {
         GoalInvitation goalInvitation = goalInvitationIncelizations(invitedUser, goal);
         assertThrows(DataValidationException.class,
                 () -> goalInvitationValidator.validateAcceptGoalInvitation(goalInvitation));
-    }
-
-    @Test
-    @DisplayName("Checking the existence of an invitation: a positive scenario")
-    public void testFindInvitation_PositiveScenario() {
-        when(goalInvitationRepository.findById(invitationId)).thenReturn(Optional.of(goalInvitation));
-
-        assertDoesNotThrow(() -> goalInvitationValidator.findInvitation(invitationId));
-    }
-
-    @Test
-    @DisplayName("Checking the existence of an invitation: invitation not found")
-    public void testFindInvitation_InvitationNotFound_ThrowsException() {
-        assertThrows(EntityNotFoundException.class,
-                () -> goalInvitationValidator.findInvitation(invitationId));
     }
 
     @Test

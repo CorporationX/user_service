@@ -1,5 +1,6 @@
 package school.faang.user_service.service.goal;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
@@ -31,7 +32,7 @@ public class GoalInvitationService {
     }
 
     public GoalInvitationDto acceptGoalInvitation(long id) {
-        GoalInvitation invitation = goalInvitationValidator.findInvitation(id);
+        GoalInvitation invitation = findInvitation(id);
         goalInvitationValidator.validateGoalExists(invitation);
         goalInvitationValidator.validateAcceptGoalInvitation(invitation);
         goalInvitationValidator.checkingStatusIsPending(invitation);
@@ -46,7 +47,7 @@ public class GoalInvitationService {
     }
 
     public GoalInvitationDto rejectGoalInvitation(long id) {
-        GoalInvitation invitation = goalInvitationValidator.findInvitation(id);
+        GoalInvitation invitation = findInvitation(id);
         goalInvitationValidator.validateGoalExists(invitation);
         goalInvitationValidator.checkingStatusIsPending(invitation);
         invitation.setStatus(RequestStatus.REJECTED);
@@ -67,5 +68,10 @@ public class GoalInvitationService {
                 .map(goalInvitationMapper::toDto)
                 .toList();
         return filteredInvitations;
+    }
+
+    public GoalInvitation findInvitation(long id) {
+        return goalInvitationRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("Invitation with ID: " + id + " does not found"));
     }
 }

@@ -43,20 +43,20 @@ public class RedisConfig {
     }
 
     @Bean
-    public MessageListenerAdapter messageListenerAdapter() {
+    public MessageListenerAdapter banUserListenerAdapter() {
         return new MessageListenerAdapter(banUserListener);
     }
 
     @Bean
-    public RedisMessageListenerContainer redisMessageListenerContainer() {
+    public RedisMessageListenerContainer banUserMessageListenerContainer() {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(redisConnectionFactory());
-        container.addMessageListener(messageListenerAdapter(), userBanTopic());
+        container.addMessageListener(banUserListenerAdapter(), banUserTopic());
         return container;
     }
 
     @Bean
-    ChannelTopic userBanTopic() {
+    ChannelTopic banUserTopic() {
         return new ChannelTopic("user_ban");
     }
 }

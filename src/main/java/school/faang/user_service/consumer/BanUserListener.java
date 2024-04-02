@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SerializationException;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.UserEvent;
 import school.faang.user_service.service.user.UserService;
@@ -22,7 +21,7 @@ public class BanUserListener implements MessageListener {
     private final UserService userService;
 
     @Override
-    public void onMessage(Message message, @Nullable byte[] pattern) {
+    public void onMessage(Message message, byte[] pattern) {
         try {
             UserEvent userEvent = objectMapper.readValue(message.getBody(), UserEvent.class);
             userService.banUser(userEvent.getUserId());

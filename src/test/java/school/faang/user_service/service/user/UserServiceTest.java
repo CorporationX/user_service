@@ -28,6 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -221,5 +222,16 @@ class UserServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> userService.getUserById(userId));
+    }
+
+    @Test
+    void banUser_ValidArgs() {
+        Long userId = 1L;
+        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
+
+        userService.banUser(userId);
+
+        assertTrue(user.isBanned());
+        verify(userRepository, times(1)).findById(anyLong());
     }
 }

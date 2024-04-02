@@ -1,6 +1,5 @@
 package school.faang.user_service.dto;
 
-
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 

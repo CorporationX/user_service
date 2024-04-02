@@ -72,6 +72,7 @@ public class UserServiceTest {
         UserDto userDto = new UserDto();
         User user = new User();
 
+
         when(userMapper.toEntity(userDto)).thenReturn(user);
         when(userRepository.save(user)).thenReturn(user);
         when(userMapper.toDto(user)).thenReturn(userDto);

@@ -10,7 +10,7 @@ public class PremiumRemover {
 
     private final PremiumService premiumService;
 
-    @Scheduled(cron = "${scheduler.clear-premiums}")
+    @Scheduled(cron = "${scheduler.premium-remover}")
     public void removePremium() {
         premiumService.deleteExpiredPremiums();
     }

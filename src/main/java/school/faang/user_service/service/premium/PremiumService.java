@@ -33,7 +33,7 @@ public class PremiumService {
     private final PremiumValidator premiumValidator;
     private final ExecutorService executorService;
 
-    @Value("${batch}")
+    @Value("${premium.expired.delete-batch}")
     private Integer batch;
 
     @Transactional

@@ -53,8 +53,12 @@ services:
     small_avatar: https://api.dicebear.com/8.x/pixel-art/svg?size=100&seed=
 
 scheduler:
-  clear-premiums: "@weekly"
+  premium-remover: "@weekly"
 
-batch: 200
+premium:
+  expired:
+    delete-batch: 200
 
-thread-count: 10
+thread-pool:
+  premium-remover:
+    thread-count: 10

@@ -60,5 +60,4 @@ premium:
     delete-batch: 200
 
 thread-pool:
-  premium-remover:
-    thread-count: 10
+  thread-count: 10

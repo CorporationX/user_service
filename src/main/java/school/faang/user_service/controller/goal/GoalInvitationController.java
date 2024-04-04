@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Validated
-@RequestMapping("/api")
+@RequestMapping("/api/invitations")
 public class GoalInvitationController {
     private final GoalInvitationService goalInvitationService;
 
@@ -29,20 +29,20 @@ public class GoalInvitationController {
         return goalInvitationService.createInvitation(invitation);
     }
 
-    @GetMapping("/invitations/accept/{id}")
+    @GetMapping("/accept/{id}")
     @Operation(description = "Creating an invitation")
     public GoalInvitationDto acceptGoalInvitation(@PathVariable long id) {
         return goalInvitationService.acceptGoalInvitation(id);
     }
 
 
-    @GetMapping("/invitations/reject/{id}")
+    @GetMapping("/reject/{id}")
     @Operation(description = "Decline the invitation")
     public GoalInvitationDto rejectGoalInvitation(@PathVariable long id) {
         return goalInvitationService.rejectGoalInvitation(id);
     }
 
-    @PostMapping("/invitations/get")
+    @PostMapping("/get")
     @Operation(description = "Filter out invitations")
     public List<GoalInvitationDto> getInvitations(@RequestBody GoalInvitationFilterDto filter) {
         return goalInvitationService.getFilteredInvitations(filter);

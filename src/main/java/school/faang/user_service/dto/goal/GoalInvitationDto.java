@@ -11,10 +11,11 @@ import school.faang.user_service.entity.RequestStatus;
 @NoArgsConstructor
 @Data
 @Builder
-@NotNull
 public class GoalInvitationDto {
     private Long id;
+    @NotNull(message = "Field cannot be blank")
     private Long inviterId;
+    @NotNull(message = "Field cannot be blank")
     private Long invitedUserId;
     private Long goalId;
     private RequestStatus status;

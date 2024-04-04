@@ -10,7 +10,7 @@ import java.util.concurrent.Executors;
 @Configuration
 public class ExecutorsConfig {
 
-    @Value("${thread-pool.premium-remover.thread-count}")
+    @Value("${thread-pool.thread-count}")
     private Integer threadCount;
 
     @Bean

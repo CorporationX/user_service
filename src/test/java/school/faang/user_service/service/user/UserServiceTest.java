@@ -169,12 +169,12 @@ class UserServiceTest {
     void getJiraAccountInfo_UserFound_JiraAccountReturnedAsDto() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
 
-        userService.getJiraAccountInfo(user.getId());
+        JiraAccountDto returned = userService.getJiraAccountInfo(user.getId());
 
         assertAll(
                 () -> verify(userRepository, times(1)).findById(user.getId()),
                 () -> verify(jiraAccountMapper, times(1)).toDto(user.getJiraAccount()),
-                () -> assertEquals(jiraAccountDto, userService.getJiraAccountInfo(user.getId()))
+                () -> assertEquals(jiraAccountDto, returned)
         );
     }
 

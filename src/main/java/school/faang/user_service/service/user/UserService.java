@@ -77,6 +77,12 @@ public class UserService {
         return userMapper.toDto(premiumUsers);
     }
 
+    public UserDto saveJiraAccountInfo(long userId, JiraAccountDto jiraAccountDto) {
+        User user = getUserFromRepository(userId);
+        user.setJiraAccount(jiraAccountMapper.toEntity(jiraAccountDto));
+        return userMapper.toDto(userRepository.save(user));
+    }
+
     private User getUserFromRepository(long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User doesn't exist by ID: " + userId));

@@ -70,6 +70,13 @@ public class UserController {
         return userService.getFollowers(userId);
     }
 
+    @Operation(summary = "Save user's Jira account info")
+    @PostMapping("/jira")
+    public UserDto saveJiraAccountInfo(@RequestBody JiraAccountDto jiraAccountDto) {
+        long userId = userContext.getUserId();
+        return userService.saveJiraAccountInfo(userId, jiraAccountDto);
+    }
+
     @Operation(summary = "Deactivate user")
     @PutMapping("/deactivated")
     public UserDto deactivateUser() {

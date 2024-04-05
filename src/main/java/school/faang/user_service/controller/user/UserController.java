@@ -71,7 +71,7 @@ public class UserController {
     }
 
     @Operation(summary = "Save user's Jira account info")
-    @PostMapping("/jira")
+    @PutMapping("/jira")
     public UserDto saveJiraAccountInfo(@RequestBody JiraAccountDto jiraAccountDto) {
         long userId = userContext.getUserId();
         return userService.saveJiraAccountInfo(userId, jiraAccountDto);

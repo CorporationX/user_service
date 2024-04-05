@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.jira.JiraAccountDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
@@ -80,12 +81,13 @@ public class UserService {
         return userMapper.toDto(premiumUsers);
     }
 
+    @Transactional
     public UserDto saveJiraAccountInfo(long userId, JiraAccountDto jiraAccountDto) {
         User user = getUserFromRepository(userId);
         jiraAccountDto.setUserId(userId);
         JiraAccount jiraAccount = jiraAccountRepository.save(jiraAccountMapper.toEntity(jiraAccountDto));
         user.setJiraAccount(jiraAccount);
-        return userMapper.toDto(userRepository.save(user));
+        return userMapper.toDto(user);
     }
 
     private User getUserFromRepository(long userId) {

@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import org.springframework.beans.factory.annotation.Value;
+import school.faang.user_service.repository.UserRepository;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -27,18 +28,23 @@ public class S3ServiceImpl implements S3Service {
 
     private final AmazonS3 amazonS3Client;
     private final String bucketName;
+    private final UserRepository userRepository;
 
     @Autowired
-    public S3ServiceImpl(AmazonS3 amazonS3Client, @Value("${services.s3.bucketName}") String bucketName) {
+    public S3ServiceImpl(AmazonS3 amazonS3Client, @Value("${services.s3.bucketName}") String bucketName, UserRepository userRepository) {
         this.amazonS3Client = amazonS3Client;
         this.bucketName = bucketName;
+        this.userRepository = userRepository;
     }
 
     // Метод загрузки файла в Amazon S3 и связывания его с пользователем
     @Override
-    public User uploadFile(MultipartFile file, String folder) throws IOException {
-        logger.info("Загрузка файла в Amazon S3 в папку: {}", folder);
+    public void uploadFileForUser(MultipartFile file, String folder, Long userId) throws IOException {
+        // Получение пользователя по ID
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Пользователь с ID " + userId + " не найден"));
 
+        // Реализация метода загрузки файла и связывания его с пользователем
         try {
             // Формирование ключа для сохранения файла в S3
             String key = folder + "/" + file.getOriginalFilename();
@@ -49,10 +55,10 @@ public class S3ServiceImpl implements S3Service {
 
             logger.info("Файл успешно загружен в Amazon S3. Ключ: {}", key);
 
-            // Создание объекта User и связывание его с загруженным файлом
-            User user = new User();
-            user.setUserProfilePic(new UserProfilePic(key));
-            return user;
+            // Обновление профиля пользователя с добавлением загруженного файла
+            UserProfilePic userProfilePic = new UserProfilePic(key);
+            user.setUserProfilePic(userProfilePic);
+            userRepository.save(user);
         } catch (Exception e) {
             logger.error("Ошибка при загрузке файла в Amazon S3", e);
             throw new IOException("Произошла ошибка при загрузке файла в Amazon S3", e);

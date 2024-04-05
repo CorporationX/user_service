@@ -8,7 +8,7 @@ import java.io.InputStream;
 
 public interface S3Service {
     // Метод для загрузки файла в Amazon S3 и связывания его с пользователем
-    User uploadFile(MultipartFile file, String folder) throws IOException;
+    // User uploadFile(MultipartFile file, String folder) throws IOException;
 
     // Метод для удаления файла из Amazon S3
     void deleteFile(String folder, String key) throws IOException;
@@ -16,6 +16,9 @@ public interface S3Service {
     // Метод для загрузки файла из Amazon S3
     InputStream downloadFile(String folder, String key) throws IOException;
 
+    // Метод для сохранения изображения разных размеров
     String[] saveResizedImages(MultipartFile file, String folder) throws IOException;
 
+    // Метод для загрузки файла в Amazon S3 и связывания его с пользователем по userId
+    void uploadFileForUser(MultipartFile file, String folder, Long userId) throws IOException;
 }

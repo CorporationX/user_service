@@ -23,68 +23,65 @@ public class UserProfilePicService {
     @Autowired
     private UserRepository userRepository;
 
+    // Метод загрузки изображения профиля пользователя
     public User uploadUserProfilePic(Long userId, MultipartFile file) throws IOException {
-        logger.info("Uploading profile picture for user with ID: {}", userId);
+        logger.info("Загрузка изображения профиля для пользователя с ID: {}", userId);
         String folder = "user-profile-pics";
-        // Сохранить файл в S3 и получить fileId как строку
-        String fileId = saveFileToS3(file, folder);
+        // Сохранение файлов в Amazon S3 и получение их ключей
+        String[] fileKeys = s3Service.saveResizedImages(file, folder);
 
-        // Retrieve user by ID
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        // Получение пользователя по ID
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
-        // Update user profile pic
+        // Обновление изображений профиля пользователя
         UserProfilePic userProfilePic = new UserProfilePic();
-        userProfilePic.setFileId(fileId); // Установить fileId
+        userProfilePic.setFileId(fileKeys[0]); // Установка ключа большого изображения
+        userProfilePic.setSmallFileId(fileKeys[1]); // Установка ключа маленького изображения
         user.setUserProfilePic(userProfilePic);
         userRepository.save(user);
 
         return user;
     }
 
+    // Метод удаления изображения профиля пользователя
     public void deleteUserProfilePic(Long userId) throws IOException {
-        // Retrieve user by ID
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        // Получение пользователя по ID
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
-        // Retrieve fileId from user profile pic
+        // Получение fileId из изображения профиля пользователя
         UserProfilePic userProfilePic = user.getUserProfilePic();
         if (userProfilePic != null) {
             String fileId = userProfilePic.getFileId();
 
-            // Log the fileId before deleting the file
-            logger.info("Deleting profile pic for user with ID {}: fileId={}", userId, fileId);
+            logger.info("Удаление изображения профиля для пользователя с ID {}: fileId={}", userId, fileId);
 
-            // Construct folder and file name using fileId (or any other relevant information)
-            // Assuming fileId represents the filename or key in Amazon S3
+            // Конструирование папки и имени файла с использованием fileId
             String folder = "user-profile-pics";
 
-            // Delete the file from S3
+            // Удаление файла из Amazon S3
             s3Service.deleteFile(folder, fileId);
 
-            // Update user profile to remove the fileId
+            // Обновление профиля пользователя для удаления fileId
             user.setUserProfilePic(null);
             userRepository.save(user);
         }
     }
 
+    // Метод получения изображения профиля пользователя
     public InputStream getUserProfilePic(Long userId) throws IOException {
-        // Retrieve user by ID
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        // Получение пользователя по ID
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
-        // Retrieve fileId from user profile pic
+        // Получение fileId из изображения профиля пользователя
         UserProfilePic userProfilePic = user.getUserProfilePic();
         if (userProfilePic != null) {
             String fileId = userProfilePic.getFileId();
 
-            // Download the file from S3
+            // Загрузка файла из Amazon S3
             String folder = "user-profile-pics";
             return s3Service.downloadFile(folder, fileId);
         } else {
-            throw new RuntimeException("User profile pic not found");
+            throw new RuntimeException("Изображение профиля пользователя не найдено");
         }
-    }
-
-    private String saveFileToS3(MultipartFile file, String folder) throws IOException {
-        UserProfilePic userProfilePic = s3Service.uploadFile(file, folder).getUserProfilePic();
-        return userProfilePic.getFileId();
     }
 }

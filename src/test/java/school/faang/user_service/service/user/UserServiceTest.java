@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.jira.JiraAccountDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
@@ -12,6 +13,7 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.entity.jira.JiraAccount;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.mapper.jira.JiraAccountMapper;
 import school.faang.user_service.mapper.jira.JiraAccountMapperImpl;
@@ -29,6 +31,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -57,6 +60,8 @@ class UserServiceTest {
     private UserDto premiumUserDto;
     private UserValidator userValidator;
     private UserDto userDto;
+    private JiraAccount jiraAccount;
+    private JiraAccountDto jiraAccountDto;
 
     @BeforeEach
     void setUp() {
@@ -106,6 +111,19 @@ class UserServiceTest {
                 .phone(premiumUser.getPhone())
                 .isPremium(true)
                 .build();
+        jiraAccount = JiraAccount.builder()
+                .user(user)
+                .username("Valid username")
+                .password("v@l1dpAssw0rd")
+                .projectUrl("https://faang-school.atlassian.net/")
+                .build();
+        jiraAccountDto = JiraAccountDto.builder()
+                .userId(jiraAccount.getUser().getId())
+                .username(jiraAccount.getUsername())
+                .password(jiraAccount.getPassword())
+                .projectUrl(jiraAccount.getProjectUrl())
+                .build();
+        user.setJiraAccount(jiraAccount);
         userRepository = mock(UserRepository.class);
         userMapper = mock(UserMapper.class);
         userFilter = mock(UserFilter.class);
@@ -145,6 +163,19 @@ class UserServiceTest {
 
         assertThrows(EntityNotFoundException.class, () ->
                 userService.getUser(5L));
+    }
+
+    @Test
+    void getJiraAccountInfo_UserFound_JiraAccountReturnedAsDto() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
+
+        userService.getJiraAccountInfo(user.getId());
+
+        assertAll(
+                () -> verify(userRepository, times(1)).findById(user.getId()),
+                () -> verify(jiraAccountMapper, times(1)).toDto(user.getJiraAccount()),
+                () -> assertEquals(jiraAccountDto, userService.getJiraAccountInfo(user.getId()))
+        );
     }
 
     @Test
@@ -226,5 +257,24 @@ class UserServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> userService.getUserById(userId));
+    }
+
+    @Test
+    void saveJiraAccountInfo_JiraAccountInfoSaved_UserReturnedAsDto() {
+        user.setJiraAccount(null);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
+        when(userRepository.save(user)).thenReturn(user);
+        when(userMapper.toDto(user)).thenReturn(userDto);
+
+        UserDto returned = userService.saveJiraAccountInfo(user.getId(), jiraAccountDto);
+
+        assertAll(
+                () -> verify(userRepository, times(1)).findById(user.getId()),
+                () -> verify(jiraAccountMapper, times(1)).toEntity(jiraAccountDto),
+                () -> verify(userRepository, times(1)).save(user),
+                () -> assertNotNull(user.getJiraAccount()),
+                () -> assertEquals(jiraAccount.getUsername(), user.getJiraAccount().getUsername()),
+                () -> assertEquals(userDto, returned)
+        );
     }
 }

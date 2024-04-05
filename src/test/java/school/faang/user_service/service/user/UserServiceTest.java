@@ -19,6 +19,7 @@ import school.faang.user_service.mapper.jira.JiraAccountMapper;
 import school.faang.user_service.mapper.jira.JiraAccountMapperImpl;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.jira.JiraAccountRepository;
 import school.faang.user_service.service.user.filter.UserFilter;
 import school.faang.user_service.validation.user.UserValidator;
 
@@ -62,6 +63,7 @@ class UserServiceTest {
     private UserDto userDto;
     private JiraAccount jiraAccount;
     private JiraAccountDto jiraAccountDto;
+    private JiraAccountRepository jiraAccountRepository;
 
     @BeforeEach
     void setUp() {
@@ -128,7 +130,9 @@ class UserServiceTest {
         userMapper = mock(UserMapper.class);
         userFilter = mock(UserFilter.class);
         jiraAccountMapper = spy(JiraAccountMapperImpl.class);
-        userService = new UserService(userRepository, userMapper, List.of(userFilter), userValidator, jiraAccountMapper);
+        jiraAccountRepository = mock(JiraAccountRepository.class);
+        userService = new UserService(userRepository, userMapper, List.of(userFilter), userValidator,
+                jiraAccountMapper, jiraAccountRepository);
     }
 
     @Test
@@ -263,6 +267,7 @@ class UserServiceTest {
     void saveJiraAccountInfo_JiraAccountInfoSaved_UserReturnedAsDto() {
         user.setJiraAccount(null);
         when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
+        when(jiraAccountRepository.save(any(JiraAccount.class))).thenReturn(jiraAccount);
         when(userRepository.save(user)).thenReturn(user);
         when(userMapper.toDto(user)).thenReturn(userDto);
 

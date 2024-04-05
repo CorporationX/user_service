@@ -9,9 +9,11 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.entity.jira.JiraAccount;
 import school.faang.user_service.mapper.jira.JiraAccountMapper;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.jira.JiraAccountRepository;
 import school.faang.user_service.service.user.filter.UserFilter;
 import school.faang.user_service.validation.user.UserValidator;
 
@@ -27,6 +29,7 @@ public class UserService {
     private final List<UserFilter> userFilters;
     private final UserValidator userValidator;
     private final JiraAccountMapper jiraAccountMapper;
+    private final JiraAccountRepository jiraAccountRepository;
 
     @Value("${services.dicebear.avatar}")
     private String avatar;
@@ -79,7 +82,9 @@ public class UserService {
 
     public UserDto saveJiraAccountInfo(long userId, JiraAccountDto jiraAccountDto) {
         User user = getUserFromRepository(userId);
-        user.setJiraAccount(jiraAccountMapper.toEntity(jiraAccountDto));
+        jiraAccountDto.setUserId(userId);
+        JiraAccount jiraAccount = jiraAccountRepository.save(jiraAccountMapper.toEntity(jiraAccountDto));
+        user.setJiraAccount(jiraAccount);
         return userMapper.toDto(userRepository.save(user));
     }
 

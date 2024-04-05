@@ -14,4 +14,4 @@ databaseChangeLog:
   - include:
       file: db/changelog/changeset/user_V007__user_premium.sql
   - include:
-      file: jira_acc_V001__initial.sql
+      file: db/changelog/changeset/jira_acc_V001__initial.sql

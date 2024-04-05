@@ -13,6 +13,8 @@ import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.entity.premium.Premium;
+import school.faang.user_service.mapper.jira.JiraAccountMapper;
+import school.faang.user_service.mapper.jira.JiraAccountMapperImpl;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.user.filter.UserFilter;
@@ -33,6 +35,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,6 +47,7 @@ class UserServiceTest {
     private UserRepository userRepository;
     private UserMapper userMapper;
     private UserFilter userFilter;
+    private JiraAccountMapper jiraAccountMapper;
 
     private User user;
     private User mentee;
@@ -105,7 +109,8 @@ class UserServiceTest {
         userRepository = mock(UserRepository.class);
         userMapper = mock(UserMapper.class);
         userFilter = mock(UserFilter.class);
-        userService = new UserService(userRepository, userMapper, List.of(userFilter), userValidator);
+        jiraAccountMapper = spy(JiraAccountMapperImpl.class);
+        userService = new UserService(userRepository, userMapper, List.of(userFilter), userValidator, jiraAccountMapper);
     }
 
     @Test

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.dto.jira.JiraAccountDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.service.user.DeactivationService;
@@ -47,6 +48,13 @@ public class UserController {
     @GetMapping("/{userId}")
     public UserDto getUser(@PathVariable @Positive(message = "ID can't be less than 1") long userId) {
         return userService.getUser(userId);
+    }
+
+    @Operation(summary = "Get user's jira account info")
+    @GetMapping("/jira")
+    public JiraAccountDto getJiraAccountInfo() {
+        long userId = userContext.getUserId();
+        return userService.getJiraAccountInfo(userId);
     }
 
     @Operation(summary = "Get users by their ids")

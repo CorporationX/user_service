@@ -4,10 +4,12 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.jira.JiraAccountDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.mapper.jira.JiraAccountMapper;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.user.filter.UserFilter;
@@ -24,6 +26,7 @@ public class UserService {
     private final UserMapper userMapper;
     private final List<UserFilter> userFilters;
     private final UserValidator userValidator;
+    private final JiraAccountMapper jiraAccountMapper;
 
     @Value("${services.dicebear.avatar}")
     private String avatar;
@@ -44,6 +47,11 @@ public class UserService {
         return userMapper.toDto(user);
     }
 
+    public JiraAccountDto getJiraAccountInfo(long userId) {
+        User user = getUserFromRepository(userId);
+        return jiraAccountMapper.toDto(user.getJiraAccount());
+    }
+
     public User getUserById(Long userId) {
         return getUserFromRepository(userId);
     }
@@ -54,8 +62,7 @@ public class UserService {
     }
 
     public List<UserDto> getFollowers(long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User doesn't exist by ID: " + userId));
+        User user = getUserFromRepository(userId);
         return userMapper.toDto(user.getFollowers());
     }
 

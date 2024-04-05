@@ -146,4 +146,13 @@ public class User {
     public long getId() {
         return id;
     }
+
+    public void setUserProfilePic(UserProfilePic userProfilePic) {
+        this.userProfilePic = userProfilePic;
+    }
+
+    public UserProfilePic getUserProfilePic() {
+        return userProfilePic;
+    }
+
 }

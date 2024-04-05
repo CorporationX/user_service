@@ -268,7 +268,6 @@ class UserServiceTest {
         user.setJiraAccount(null);
         when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
         when(jiraAccountRepository.save(any(JiraAccount.class))).thenReturn(jiraAccount);
-        when(userRepository.save(user)).thenReturn(user);
         when(userMapper.toDto(user)).thenReturn(userDto);
 
         UserDto returned = userService.saveJiraAccountInfo(user.getId(), jiraAccountDto);
@@ -276,7 +275,6 @@ class UserServiceTest {
         assertAll(
                 () -> verify(userRepository, times(1)).findById(user.getId()),
                 () -> verify(jiraAccountMapper, times(1)).toEntity(jiraAccountDto),
-                () -> verify(userRepository, times(1)).save(user),
                 () -> assertNotNull(user.getJiraAccount()),
                 () -> assertEquals(jiraAccount.getUsername(), user.getJiraAccount().getUsername()),
                 () -> assertEquals(userDto, returned)

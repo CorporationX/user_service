@@ -1,9 +1,11 @@
 package school.faang.user_service.service.event;
 
+import jakarta.validation.constraints.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Value;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.User;
@@ -16,12 +18,15 @@ import school.faang.user_service.validation.user.UserValidator;
 
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
@@ -43,6 +48,9 @@ class EventServiceTest {
     private EventFilterDto eventFilterDto;
     private EventFilter eventFilter;
     private Event event;
+    private Event event1;
+    private Event event2;
+    private Event event3;
     private EventDto eventDto;
     private User user;
 
@@ -62,6 +70,15 @@ class EventServiceTest {
                 .maxAttendees(50)
                 .owner(user)
                 .relatedSkills(Collections.emptyList())
+                .build();
+        event1 = Event.builder()
+                .endDate(LocalDateTime.now().minusDays(2))
+                .build();
+        event2 = Event.builder()
+                .endDate(LocalDateTime.now().plusDays(1))
+                .build();
+        event3 = Event.builder()
+                .endDate(LocalDateTime.now().minusDays(3))
                 .build();
         eventDto = EventDto.builder()
                 .id(event.getId())
@@ -85,6 +102,16 @@ class EventServiceTest {
         eventValidator = mock(EventValidator.class);
         userValidator = mock(UserValidator.class);
         eventService = new EventService(eventRepository, eventMapper, eventFilters, eventValidator, userValidator);
+    }
+
+    @Test
+    public void testClearEvent() {
+        when(eventRepository.findAll()).thenReturn(Arrays.asList(event1, event2, event3));
+
+        eventService.clearEvent();
+        assertThrows(ArithmeticException.class,() -> eventService.clearEvent());
+        verify(eventRepository, times(2)).deleteAll(anyList());
+        verify(eventRepository).deleteAll(Arrays.asList(event1, event3));
     }
 
     @Test

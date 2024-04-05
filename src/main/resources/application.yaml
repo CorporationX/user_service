@@ -57,4 +57,16 @@ services:
     small_avatar: https://api.dicebear.com/8.x/pixel-art/svg?size=100&seed=
 
 scheduler:
+  premium-remover: "@weekly"
+  cron-expression-weekly: "0 0 0 * * ?"
+  cron-expression-daily: "0 0 0 * * *"
+
+batch-size: 100
+
+premium:
+  expired:
+    delete-batch: 200
+
+thread-pool:
+  thread-count: 10
   clear-premiums: @daily

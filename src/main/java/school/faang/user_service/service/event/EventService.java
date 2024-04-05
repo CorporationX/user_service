@@ -1,7 +1,11 @@
 package school.faang.user_service.service.event;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
@@ -12,7 +16,9 @@ import school.faang.user_service.service.event.filter.EventFilter;
 import school.faang.user_service.validation.event.EventValidator;
 import school.faang.user_service.validation.user.UserValidator;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +28,27 @@ public class EventService {
     private final List<EventFilter> eventFilters;
     private final EventValidator eventValidator;
     private final UserValidator userValidator;
+    @NotBlank
+    @Value("{$batch-size}")
+    private int batchSize;
+
+    @Async("myPool")
+    public void clearEvent() {
+        List<Event> postEvents = eventRepository.findAll()
+                .stream()
+                .filter(event -> event.getEndDate().isBefore(LocalDateTime.now()))
+                .toList();
+
+        if (!postEvents.isEmpty()) {
+            List<List<Event>> batches = postEvents.stream()
+                    .collect(Collectors.groupingBy(event -> (event.hashCode() / batchSize)))
+                    .values()
+                    .stream()
+                    .map(batch -> batch.subList(0, Math.min(batch.size(), batchSize)))
+                    .toList();
+            batches.parallelStream().forEach(eventRepository::deleteAll);
+        }
+    }
 
     public EventDto create(EventDto eventDto) {
         eventValidator.validateUserHasRequiredSkills(eventDto);

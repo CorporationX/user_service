@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.dto.event.SearchAppearanceEventDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.dto.user.UserRegistrationDto;
@@ -15,7 +16,9 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.entity.student.Person;
-import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.publisher.ProfileViewEventPublisher;
+import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -24,6 +27,8 @@ import school.faang.user_service.service.CountryService;
 import school.faang.user_service.validator.UserValidator;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -45,6 +50,7 @@ public class UserService {
     private final ProfileViewEventPublisher publisher;
     private final SearchAppearanceEventPublisher eventPublisher;
 
+    @Transactional
     public UserRegistrationDto createUser(UserRegistrationDto userDto) {
         User user = userMapper.toEntity(userDto);
 
@@ -57,7 +63,7 @@ public class UserService {
         return userMapper.toRegDto(savedUser);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public UserDto getUserDtoById(long id) {
         UserDto userDto = userMapper.toDto(getUserById(id));
         publisher.publish(id);
@@ -65,11 +71,13 @@ public class UserService {
         return userDto;
     }
 
+    @Transactional(readOnly = true)
     public UserProfilePic getUserPicUrlById(long id) {
         userValidator.validateAccessToUser(id);
         return getUserById(id).getUserProfilePic();
     }
 
+    @Transactional
     public void deactivationUserById(long userId) {
         User user = getUserById(userId);
         stopGoalsAndDeleteEventsAndDeleteMentor(user);
@@ -83,6 +91,7 @@ public class UserService {
         return userRepository.existsById(id);
     }
 
+    @Transactional
     public void saveUser(User savedUser) {
         if (isOwnerExistById(savedUser.getId())) {
             userRepository.save(savedUser);
@@ -95,6 +104,7 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException(String.format("User with ID %d not found", id)));
     }
 
+    @Transactional(readOnly = true)
     public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
         Stream<User> premiumUsers = userRepository.findPremiumUsers();
         List<User> users = userFilters.stream()
@@ -103,6 +113,7 @@ public class UserService {
         return userMapper.toDtoList(users);
     }
 
+    @Transactional
     private void stopGoalsAndDeleteEventsAndDeleteMentor(User user) {
         List<Goal> goals = user.getGoals();
         for (Goal goal : goals) {
@@ -126,11 +137,13 @@ public class UserService {
         }
     }
 
+    @Transactional(readOnly = true)
     public UserDto getUserDtoByIdUtility(long userId) {
         User user = getUserById(userId);
         return userMapper.toDto(user);
     }
 
+    @Transactional
     public void saveStudents(MultipartFile csvFile) {
         List<Person> people;
         try {
@@ -142,6 +155,7 @@ public class UserService {
         log.info("Students saved from csv file as users. Saved accounts count: {}", people.size());
     }
 
+    @Transactional(readOnly = true)
     public List<UserDto> getUsers(UserFilterDto filter, long actorId) {
         List<User> users = userRepository.findAll();
 

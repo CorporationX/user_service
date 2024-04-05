@@ -1,4 +1,4 @@
-package school.faang.user_service.mapper;
+package school.faang.user_service.mapper.user;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -7,7 +7,6 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserRegistrationDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
-import school.faang.user_service.mapper.base.UserMapperBase;
 
 import java.util.List;
 

@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import school.faang.user_service.controller.GlobalExceptionHandler;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.service.user.UserService;
 

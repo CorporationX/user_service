@@ -18,9 +18,7 @@ public class ProfileViewEventPublisher extends AbstractEventPublisher<ProfileVie
     private String profileViewChannelName;
     private final UserContext userContext;
 
-    public ProfileViewEventPublisher(RedisTemplate<String, Object> redisTemplate,
-                                     ObjectMapper objectMapper,
-                                     UserContext userContext) {
+    public ProfileViewEventPublisher(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper, UserContext userContext) {
         super(redisTemplate, objectMapper);
         this.userContext = userContext;
     }
@@ -32,6 +30,6 @@ public class ProfileViewEventPublisher extends AbstractEventPublisher<ProfileVie
                 .receivedAt(LocalDateTime.now())
                 .build();
 
-        send(profileViewChannelName, event);
+        convertAndSend(event, profileViewChannelName);
     }
 }

@@ -13,14 +13,8 @@ import java.util.concurrent.CountedCompleter;
 public class CountryService {
     private final CountryRepository countryRepository;
 
-    public Country getCountryByTitle (String title) {
-        Country country = countryRepository.findByTitle(title);
-        if (country == null) {
-            country = Country.builder()
-                    .title(title)
-                    .build();
-            countryRepository.save(country);
-        }
-        return country;
+    public Country getSavedCountry (Country country) {
+        return countryRepository.findByTitle(country.getTitle())
+                .orElseGet(() -> countryRepository.save(country));
     }
 }

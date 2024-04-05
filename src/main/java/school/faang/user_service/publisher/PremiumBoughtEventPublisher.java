@@ -12,8 +12,7 @@ public class PremiumBoughtEventPublisher extends AbstractEventPublisher<PremiumB
     @Value("${spring.data.redis.channels.premium_bought_channel.name}")
     private String premiumBoughtChannelName;
 
-    public PremiumBoughtEventPublisher(RedisTemplate<String, Object> redisTemplate,
-                                       ObjectMapper objectMapper) {
+    public PremiumBoughtEventPublisher(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper) {
         super(redisTemplate, objectMapper);
     }
 

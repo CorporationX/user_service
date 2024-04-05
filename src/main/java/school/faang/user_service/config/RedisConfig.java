@@ -7,7 +7,6 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
@@ -17,12 +16,13 @@ public class RedisConfig {
     private String host;
     @Value("${spring.data.redis.port}")
     private int port;
+    @Value("${spring.data.redis.channels.user_ban.name}")
+    String userBanChannelName;
     @Value("${spring.data.redis.channels.profile_view_channel.name}")
     String projectViewChannelName;
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
-        System.out.println(port);
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
         return new JedisConnectionFactory(config);
     }
@@ -39,5 +39,24 @@ public class RedisConfig {
     @Bean
     ChannelTopic profileViewTopic() {
         return new ChannelTopic(projectViewChannelName);
+    }
+
+    @Bean
+    MessageListenerAdapter userBanEventListenerAdapter(UserBanEventListener userBanEventListener) {
+        return new MessageListenerAdapter(userBanEventListener);
+    }
+
+    @Bean
+    ChannelTopic userBanTopic() {
+        return new ChannelTopic(userBanChannelName);
+    }
+
+    @Bean
+    RedisMessageListenerContainer redisContainer(MessageListenerAdapter userBanEventListenerAdapter) {
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+
+        container.setConnectionFactory(redisConnectionFactory());
+        container.addMessageListener(userBanEventListenerAdapter, userBanTopic());
+        return container;
     }
 }

@@ -8,8 +8,6 @@ import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.MentorshipRequestMapper;
-import school.faang.user_service.mapper.MentorshipRequestMapperImpl;
 
 import java.time.LocalDateTime;
 
@@ -36,8 +34,8 @@ class MentorshipRequestMapperTest {
         mentorshipRequest = new MentorshipRequest(1L, "Description", requester, receiver, RequestStatus.ACCEPTED, "Reason", now, now.plusMonths(3));
         mentorshipRequestDto = MentorshipRequestDto.builder()
                 .id(1L)
-                .receiver(2L)
-                .requester(1L)
+                .receiverId(2L)
+                .requesterId(1L)
                 .rejectionReason("Reason")
                 .status(RequestStatus.ACCEPTED)
                 .description("Description")

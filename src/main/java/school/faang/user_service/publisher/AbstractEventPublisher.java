@@ -9,17 +9,18 @@ import org.springframework.data.redis.core.RedisTemplate;
 @Slf4j
 @RequiredArgsConstructor
 public abstract class AbstractEventPublisher<T> {
+
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
 
-    protected void send(String channelTopicName, T event) {
+    protected void convertAndSend(T eventDto, String topicName) {
         try {
-            String json = objectMapper.writeValueAsString(event);
-            redisTemplate.convertAndSend(channelTopicName, json);
+            String json = objectMapper.writeValueAsString(eventDto);
+            redisTemplate.convertAndSend(topicName, json);
+            log.info("Event was send to topic : {}", topicName);
         } catch (JsonProcessingException e) {
-            log.warn("JsonProcessingException with event {}", event);
-            throw new RuntimeException("Cannot serialize event to json");
+            log.error("Failed attempt to convert to json");
+            throw new RuntimeException(e.getMessage());
         }
-        log.info("Event was published {}", event);
     }
 }

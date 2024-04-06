@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.event.PremiumBoughtEvent;
 import school.faang.user_service.dto.premium.PremiumDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
@@ -15,12 +16,14 @@ import school.faang.user_service.exception.PaymentProcessingException;
 import school.faang.user_service.integration.payment.PaymentService;
 import school.faang.user_service.mapper.premium.PremiumMapper;
 import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.publisher.PremiumBoughtEventPublisher;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.service.user.UserService;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,6 +39,8 @@ public class PremiumServiceTest {
     private PaymentService paymentService;
     @Mock
     private PremiumMapper premiumMapper;
+    @Mock
+    private PremiumBoughtEventPublisher premiumBoughtEventPublisher;
     @InjectMocks
     private PremiumService premiumService;
 
@@ -78,6 +83,8 @@ public class PremiumServiceTest {
         when(premiumRepository.save(any(Premium.class))).thenReturn(premium);
         when(premiumMapper.toDto(any(Premium.class))).thenReturn(premiumDto);
         premiumService.buyPremiumSubscription(user.getId(), days);
+        verify(premiumBoughtEventPublisher).publish(any(PremiumBoughtEvent.class));
+
     }
 
 

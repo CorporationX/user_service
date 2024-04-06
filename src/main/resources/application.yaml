@@ -61,7 +61,8 @@ scheduler:
   cron-expression-weekly: "0 0 0 * * ?"
   cron-expression-daily: "0 0 0 * * *"
 
-batch-size: 100
+application.properties:
+  batch-size: 1
 
 premium:
   expired:

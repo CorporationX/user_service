@@ -1,11 +1,10 @@
 package school.faang.user_service.service.event;
 
-import jakarta.validation.constraints.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Value;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.User;
@@ -13,6 +12,7 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.mapper.event.EventMapperImpl;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.filter.EventFilter;
+import school.faang.user_service.service.event.filter.PostEventFilter;
 import school.faang.user_service.validation.event.EventValidator;
 import school.faang.user_service.validation.user.UserValidator;
 
@@ -25,8 +25,6 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
@@ -44,6 +42,7 @@ class EventServiceTest {
     private EventValidator eventValidator;
     private UserValidator userValidator;
     private EventService eventService;
+    private PostEventFilter postEventFilter;
 
     private EventFilterDto eventFilterDto;
     private EventFilter eventFilter;
@@ -101,17 +100,30 @@ class EventServiceTest {
         eventFilters = List.of(eventFilter);
         eventValidator = mock(EventValidator.class);
         userValidator = mock(UserValidator.class);
-        eventService = new EventService(eventRepository, eventMapper, eventFilters, eventValidator, userValidator);
+        postEventFilter = mock(PostEventFilter.class);
+        eventService = new EventService(eventRepository, eventMapper, eventFilters, eventValidator, userValidator, postEventFilter);
     }
 
     @Test
     public void testClearEvent() {
-        when(eventRepository.findAll()).thenReturn(Arrays.asList(event1, event2, event3));
+        List<Event> events = Arrays.asList(event1, event2, event3);
+        List<Event> postEvents = Arrays.asList(event1, event3);
+        when(eventRepository.findAll()).thenReturn(events);
+        when(postEventFilter.filterEvents(events)).thenReturn(postEvents);
 
         eventService.clearEvent();
-        assertThrows(ArithmeticException.class,() -> eventService.clearEvent());
+
+        verify(eventRepository, times(1)).findAll();
+        verify(postEventFilter, times(1)).filterEvents(anyList());
         verify(eventRepository, times(2)).deleteAll(anyList());
-        verify(eventRepository).deleteAll(Arrays.asList(event1, event3));
+        ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
+        verify(eventRepository, times(2)).deleteAll(captor.capture());
+        List<List> capturedBatches = captor.getAllValues();
+        assertEquals(2, capturedBatches.size());
+        ArgumentCaptor<List<Event>> captor2 = ArgumentCaptor.forClass(List.class);
+        verify(postEventFilter, times(1)).filterEvents(captor2.capture());
+        List<Event> capturedEvents = captor2.getValue();
+        assertEquals(capturedEvents.size(), 3);
     }
 
     @Test

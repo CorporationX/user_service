@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class PostEventFilter {
-    public List<Event> filterEvents(List<Event> events) {
+    public List<Event> postEventFilter(List<Event> events) {
         return events.stream()
                 .filter(event -> event.getEndDate().isBefore(LocalDateTime.now()))
                 .toList();

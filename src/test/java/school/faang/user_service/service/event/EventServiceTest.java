@@ -109,19 +109,19 @@ class EventServiceTest {
         List<Event> events = Arrays.asList(event1, event2, event3);
         List<Event> postEvents = Arrays.asList(event1, event3);
         when(eventRepository.findAll()).thenReturn(events);
-        when(postEventFilter.filterEvents(events)).thenReturn(postEvents);
+        when(postEventFilter.postEventFilter(events)).thenReturn(postEvents);
 
         eventService.clearEvent();
 
         verify(eventRepository, times(1)).findAll();
-        verify(postEventFilter, times(1)).filterEvents(anyList());
+        verify(postEventFilter, times(1)).postEventFilter(anyList());
         verify(eventRepository, times(2)).deleteAll(anyList());
         ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
         verify(eventRepository, times(2)).deleteAll(captor.capture());
         List<List> capturedBatches = captor.getAllValues();
         assertEquals(2, capturedBatches.size());
         ArgumentCaptor<List<Event>> captor2 = ArgumentCaptor.forClass(List.class);
-        verify(postEventFilter, times(1)).filterEvents(captor2.capture());
+        verify(postEventFilter, times(1)).postEventFilter(captor2.capture());
         List<Event> capturedEvents = captor2.getValue();
         assertEquals(capturedEvents.size(), 3);
     }

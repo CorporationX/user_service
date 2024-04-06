@@ -34,7 +34,7 @@ public class EventService {
     @Async("myPool")
     public void clearEvent() {
         List<Event> events = eventRepository.findAll();
-        List<Event> postEvents = postEventFilter.filterEvents(events);
+        List<Event> postEvents = postEventFilter.postEventFilter(events);
 
         if (!postEvents.isEmpty()) {
             List<List<Event>> batches = postEvents.stream()

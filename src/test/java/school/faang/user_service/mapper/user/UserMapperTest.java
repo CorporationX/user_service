@@ -3,11 +3,13 @@ package school.faang.user_service.mapper.user;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
+import school.faang.user_service.dto.TgContactDto;
 import org.mockito.Spy;
 import school.faang.user_service.dto.user.UserCreateDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.contact.Contact;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -88,6 +90,19 @@ class UserMapperTest {
         User user = userMapper.toUser(userDto);
 
         assertEquals(getTestNullUser(), user);
+    }
+
+    @Test
+    void toTgDtoSuccessful() {
+        Contact contact = Contact.builder()
+                .user(User.builder().id(1L).build())
+                .contact("111")
+                .build();
+
+        TgContactDto tgContactDto = userMapper.toTgDto(contact);
+
+        assertEquals(tgContactDto.getUserId(), contact.getUser().getId());
+        assertEquals(tgContactDto.getChatId(), 111);
     }
 
     private User getTestUser() {

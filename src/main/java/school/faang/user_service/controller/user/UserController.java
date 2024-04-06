@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.dto.TgContactDto;
 import school.faang.user_service.dto.user.UserCreateDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
@@ -18,7 +19,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("api/v1/users")
+@RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -44,6 +45,11 @@ public class UserController {
     @PostMapping(value = "/upload-csv-file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void parseCSV(@RequestParam MultipartFile file) {
         csvFileParserService.parseFile(file);
+    }
+
+    @GetMapping("/tgContact/{userId}")
+    public TgContactDto getTgContact(@PathVariable long userId) {
+        return userService.getTgContact(userId);
     }
 
     @GetMapping("/exists/{userId}")

@@ -7,10 +7,12 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.user.UserCreateDto;
+import school.faang.user_service.dto.TgContactDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import java.util.List;
+import school.faang.user_service.entity.contact.Contact;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.FIELD, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper {
@@ -72,5 +74,16 @@ public interface UserMapper {
             }
         }
         return builder.toString();
+    }
+
+    @Mapping(source = "user", target = "userId")
+    @Mapping(source = "contact", target = "chatId")
+    TgContactDto toTgDto(Contact contact);
+
+    default long toUserId(User user) {
+        return user.getId();
+    }
+    default long toChatId(Contact contact) {
+        return Long.parseLong(contact.getContact());
     }
 }

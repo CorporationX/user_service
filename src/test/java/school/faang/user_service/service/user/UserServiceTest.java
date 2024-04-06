@@ -8,11 +8,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.TgContactDto;
 import school.faang.user_service.dto.user.UserCreateDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.entity.contact.Contact;
+import school.faang.user_service.entity.contact.ContactType;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
@@ -42,9 +45,7 @@ public class UserServiceTest {
     private AvatarService avatarService;
     @InjectMocks
     private UserService userService;
-
     private UserFilterDto userFilterDto;
-
     private UserDto userDto1;
     private UserDto userDto2;
     private UserCreateDto userCreateDto;
@@ -82,9 +83,7 @@ public class UserServiceTest {
         List<UserDto> expected = Arrays.asList(userDto1, userDto2);
         List<UserDto> actual = userService.getPremiumUsers(userFilterDto);
         assertEquals(expected, actual, "Метод getPremiumUsers должен возвращать список премиум пользователей.");
-
     }
-
 
     @Test
     public void testShouldGetUserById() {
@@ -102,7 +101,6 @@ public class UserServiceTest {
                 .phone("123456789")
                 .password("password")
                 .build();
-
         when(userMapper.toEntity(any(UserCreateDto.class))).thenReturn(user);
         UserProfilePic userProfilePic = new UserProfilePic();
         when(avatarService.generateAndSaveAvatar(user)).thenReturn(Optional.of(userProfilePic));
@@ -111,5 +109,28 @@ public class UserServiceTest {
 
         UserCreateDto result = userService.createUser(userCreateDto);
         assertEquals(expectedDto, result);
+    }
+
+    @Test
+    public void testGetTgContactSuccessful() {
+        Contact contact1 = Contact.builder()
+                .id(1)
+                .contact("111")
+                .type(ContactType.TELEGRAM)
+                .build();
+        Contact contact2 = Contact.builder()
+                .id(1)
+                .contact("222")
+                .type(ContactType.VK)
+                .build();
+        User user = User.builder()
+                .id(1L)
+                .contacts(new ArrayList<>(List.of(contact1, contact2)))
+                .build();
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userMapper.toTgDto(contact1)).thenReturn(new TgContactDto(1, 111));
+        TgContactDto tgContactDto = userService.getTgContact(1L);
+        assertEquals(111, tgContactDto.getChatId());
     }
 }

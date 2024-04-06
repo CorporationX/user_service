@@ -45,4 +45,7 @@ public interface SubscriptionRepository extends CrudRepository<User, Long> {
 
     @Query(nativeQuery = true, value = "select s.follower_id from subscription as s where followee_id = :followeeId")
     List<Long> findFollowerIdsByFolloweeId(long followeeId);
+
+    @Query(nativeQuery = true, value = "select s.followee_id from subscription as s where follower_id = :followerId")
+    List<Long> findFolloweeIdsByFollowerId(long followerId);
 }

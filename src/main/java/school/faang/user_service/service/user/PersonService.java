@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.student.Person;
-import school.faang.user_service.mapper.PersonMapper;
+import school.faang.user_service.mapper.user.PersonMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.CountryService;
 

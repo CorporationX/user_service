@@ -1,11 +1,11 @@
-package school.faang.user_service.mapper;
+package school.faang.user_service.mapper.user;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.student.Person;
-import school.faang.user_service.mapper.base.UserMapperBase;
+import school.faang.user_service.mapper.user.UserMapperBase;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface PersonMapper extends UserMapperBase {

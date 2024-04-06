@@ -97,4 +97,9 @@ public class SubscriptionService {
             throw new DataValidationException("Нет пользователя с таким айди");
         }
     }
+
+    @Transactional(readOnly = true)
+    public List<Long> getSubscriptionsIdsByUserId(long followerId) {
+        return subscriptionRepository.findFolloweeIdsByFollowerId(followerId);
+    }
 }

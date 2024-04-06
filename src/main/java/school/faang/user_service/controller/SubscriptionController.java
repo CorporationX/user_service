@@ -75,4 +75,10 @@ public class SubscriptionController {
     public List<Long> getFollowers(@PathVariable("id") long followeeId) {
         return subscriptionService.getFollowerIds(followeeId);
     }
+
+    @Operation(summary = "Получение ID подписок")
+    @PostMapping("/user/{id}/followeesIds")
+    public List<Long> getSubscriptionsIdsByUserId(@PathVariable("id") long followerId) {
+        return subscriptionService.getSubscriptionsIdsByUserId(followerId);
+    }
 }

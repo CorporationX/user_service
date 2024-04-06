@@ -3,7 +3,10 @@ package school.faang.user_service.controller.mentorship;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import school.faang.user_service.dto.mentorship.MentorshipDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
@@ -14,6 +17,11 @@ import java.util.List;
 @RequestMapping("api/v1/mentorship")
 public class MentorshipController {
     private final MentorshipService mentorshipService;
+
+    @PostMapping
+    public ResponseEntity<MentorshipDto> create(@RequestBody MentorshipDto mentorshipDto) {
+        return new ResponseEntity<>(mentorshipService.create(mentorshipDto), HttpStatus.OK);
+    }
 
 
     @Operation(

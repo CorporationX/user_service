@@ -25,10 +25,13 @@ public class RedisConfig {
     private String recommendationChannelName;
     @Value("${spring.data.redis.channels.premium_bought_channel.name}")
     private String premiumChannel;
-
+    @Value("${spring.data.redis.channels.recommendation_requested_channel.name}")
+    private String recommendationRequestedChannelName;
+    @Value("${spring.data.redis.channels.mentorship_channel.name}")
+    private String mentorshipChannel;
+  
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
-        System.out.println(port);
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
         return new JedisConnectionFactory(config);
     }
@@ -43,15 +46,20 @@ public class RedisConfig {
     }
 
     @Bean
-    ChannelTopic followerTopic() {
+    public ChannelTopic mentorshipTopic() {
+        return new ChannelTopic(mentorshipChannel);
+    }
+
+    @Bean
+    public ChannelTopic followerTopic() {
         return new ChannelTopic(followerChannelName);
     }
-  
+
     @Bean
     public ChannelTopic mentorshipRequestedTopic() {
         return new ChannelTopic(mentorshipRequestedChannelName);
     }
-  
+
     @Bean
     public ChannelTopic recommendationTopic() {
         return new ChannelTopic(recommendationChannelName);
@@ -60,5 +68,10 @@ public class RedisConfig {
     @Bean
     public ChannelTopic premiumBounceTopic() {
         return new ChannelTopic(premiumChannel);
+    }
+  
+    @Bean
+    ChannelTopic recommendationRequestedTopic() {
+        return new ChannelTopic(recommendationRequestedChannelName);
     }
 }

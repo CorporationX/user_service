@@ -43,7 +43,7 @@ dependencies {
     /**
      * Amazon S3
      */
-    implementation("com.amazonaws:aws-java-sdk-s3:1.12.464")
+    implementation("com.amazonaws:aws-java-sdk-s3:1.12.481")
 
     /**
      * Utils & Logging
@@ -86,7 +86,7 @@ jsonSchema2Pojo {
 }
 
 jacoco {
-    toolVersion = "0.8.9"
+    toolVersion = "0.8.11"
     reportsDirectory.set(layout.buildDirectory.dir("customJacocoReportDir"))
 }
 

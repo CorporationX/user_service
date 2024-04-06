@@ -3,7 +3,9 @@ package school.faang.user_service.controller.event;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +21,7 @@ import school.faang.user_service.service.event.EventService;
 
 import java.util.List;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "Events", description = "Endpoints for managing events")
@@ -35,7 +38,7 @@ public class EventController {
 
     @Operation(summary = "Get event by id")
     @GetMapping("/{eventId}")
-    public EventDto getEvent(@PathVariable long eventId) {
+    public EventDto getEvent(@PathVariable @Positive(message = "ID can't be less than 1") long eventId) {
         return eventService.getEvent(eventId);
     }
 
@@ -67,7 +70,7 @@ public class EventController {
 
     @Operation(summary = "Delete an event")
     @DeleteMapping("/{eventId}")
-    public void deleteEvent(@PathVariable long eventId) {
+    public void deleteEvent(@PathVariable @Positive(message = "ID can't be less than 1") long eventId) {
         eventService.deleteEvent(eventId);
     }
 }

@@ -13,6 +13,7 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.entity.event.Rating;
+import school.faang.user_service.entity.jira.JiraAccount;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.recommendation.Recommendation;
 
@@ -142,4 +143,7 @@ public class User {
 
     @OneToOne(mappedBy = "user")
     private Premium premium;
+
+    @OneToOne(mappedBy = "user")
+    private JiraAccount jiraAccount;
 }

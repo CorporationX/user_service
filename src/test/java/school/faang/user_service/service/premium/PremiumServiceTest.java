@@ -19,9 +19,11 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.validation.premium.PremiumValidator;
 
+import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.any;
@@ -48,6 +50,9 @@ class PremiumServiceTest {
     @Mock
     private PremiumValidator premiumValidator;
 
+    @Mock
+    private ExecutorService executorService;
+
     @InjectMocks
     private PremiumService premiumService;
 
@@ -72,13 +77,16 @@ class PremiumServiceTest {
     }
 
     @Test
-    void deleteExpiredPremiums() {
+    void deleteExpiredPremiums() throws IllegalAccessException, NoSuchFieldException {
         when(premiumRepository.findAllByEndDateBefore(any(LocalDateTime.class))).thenReturn(getPremiums());
+        Field batch = premiumService.getClass().getDeclaredField("batch");
+        batch.setAccessible(true);
+        batch.set(premiumService, 200);
 
         premiumService.deleteExpiredPremiums();
 
         verify(premiumRepository, times(1)).findAllByEndDateBefore(any(LocalDateTime.class));
-        verify(premiumRepository, times(1)).deleteAll(getPremiums());
+        verify(executorService).execute(any(Runnable.class));
     }
 
     private List<Premium> getPremiums() {

@@ -23,12 +23,6 @@ public class SkillValidator {
         }
     }
 
-    public void validateSkillTitle(SkillDto skillDto) {
-        if (skillDto.getTitle().isBlank()) {
-            throw new DataValidationException("Skill title can't be empty");
-        }
-    }
-
     public void validateSupplyQuantityCheck(Long skillId, Long userId) {
         if (skillRepository.findUserSkill(skillId, userId).isPresent()) {
             throw new DataValidationException("User already has the skill");

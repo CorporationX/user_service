@@ -2,7 +2,10 @@ package school.faang.user_service.controller.skill;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +20,7 @@ import school.faang.user_service.service.skill.SkillService;
 
 import java.util.List;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/skills")
@@ -28,7 +32,7 @@ public class SkillController {
 
     @Operation(summary = "Create a skill")
     @PostMapping
-    public SkillDto create(@RequestBody SkillDto skillDto) {
+    public SkillDto create(@Valid @RequestBody SkillDto skillDto) {
         return skillService.create(skillDto);
     }
 
@@ -46,7 +50,7 @@ public class SkillController {
 
     @Operation(summary = "Acquire skill from offers")
     @PutMapping("/{skillId}/offered")
-    public SkillDto acquireSkillFromOffers(@PathVariable long skillId) {
+    public SkillDto acquireSkillFromOffers(@PathVariable @Positive(message = "ID can't be less than 1") long skillId) {
         return skillService.acquireSkillFromOffers(skillId, userContext.getUserId());
     }
 }

@@ -1,5 +1,6 @@
 package school.faang.user_service.validation.goal;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -9,7 +10,6 @@ import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class GoalValidatorTest {
+class GoalValidatorTest {
 
     @Mock
     private SkillRepository skillRepository;
@@ -32,34 +32,6 @@ public class GoalValidatorTest {
     private GoalRepository goalRepository;
     @InjectMocks
     private GoalValidator goalValidator;
-
-    @Test
-    void validateGoalCreation_NullTitle_ThrowsException() {
-        Long userId = 1L;
-        assertThrows(DataValidationException.class, ()
-                -> goalValidator.validateGoalCreation(userId, getGoalDtoNullTitle()));
-    }
-
-    @Test
-    void validateGoalCreation_EmptyTitle_ThrowsException() {
-        Long userId = 1L;
-        assertThrows(DataValidationException.class, ()
-                -> goalValidator.validateGoalCreation(userId, getGoalDtoEmptyTitle()));
-    }
-
-    @Test
-    void validateGoalCreation_NullSkills_ThrowsException() {
-        Long userId = 1L;
-        assertThrows(DataValidationException.class, ()
-                -> goalValidator.validateGoalCreation(userId, getGoalDtoNullSkills()));
-    }
-
-    @Test
-    void validateGoalCreation_EmptySkills_ThrowsException() {
-        Long userId = 1L;
-        assertThrows(DataValidationException.class, ()
-                -> goalValidator.validateGoalCreation(userId, getGoalDtoEmptySkills()));
-    }
 
     @Test
     void validateGoalCreation_MaxGoals_ThrowsException() {
@@ -94,20 +66,6 @@ public class GoalValidatorTest {
     }
 
     @Test
-    void validateGoalUpdate_NullTitle_ThrowsException() {
-        Long goalId = 1L;
-        assertThrows(DataValidationException.class, ()
-                -> goalValidator.validateGoalUpdate(goalId, getGoalDtoNullTitle()));
-    }
-
-    @Test
-    void validateGoalUpdate_EmptyTitle_ThrowsException() {
-        Long goalId = 1L;
-        assertThrows(DataValidationException.class, ()
-                -> goalValidator.validateGoalUpdate(goalId, getGoalDtoEmptyTitle()));
-    }
-
-    @Test
     void validateGoalUpdate_InvalidGoalId_ThrowsException() {
         Long goalId = 1L;
         when(goalRepository.existsById(goalId)).thenReturn(false);
@@ -124,26 +82,6 @@ public class GoalValidatorTest {
 
         assertThrows(DataValidationException.class, ()
                 -> goalValidator.validateGoalUpdate(goalId, getValidGoalDto()));
-    }
-
-    @Test
-    void validateGoalUpdate_NullSkills_ThrowsException() {
-        Long goalId = 1L;
-        when(goalRepository.existsById(goalId)).thenReturn(true);
-        when(goalRepository.findById(goalId)).thenReturn(Optional.ofNullable(getGoalToUpdateValidStatus()));
-
-        assertThrows(DataValidationException.class, ()
-                -> goalValidator.validateGoalUpdate(goalId, getGoalDtoNullSkills()));
-    }
-
-    @Test
-    void validateGoalUpdate_EmptySkills_ThrowsException() {
-        Long goalId = 1L;
-        when(goalRepository.existsById(goalId)).thenReturn(true);
-        when(goalRepository.findById(goalId)).thenReturn(Optional.ofNullable(getGoalToUpdateValidStatus()));
-
-        assertThrows(DataValidationException.class, ()
-                -> goalValidator.validateGoalUpdate(goalId, getGoalDtoEmptySkills()));
     }
 
     @Test
@@ -175,34 +113,6 @@ public class GoalValidatorTest {
 
     private List<Long> getSkillIds() {
         return List.of(1L, 2L);
-    }
-
-    private GoalDto getGoalDtoEmptySkills() {
-        return GoalDto.builder()
-                .title("title")
-                .skillIds(List.of())
-                .build();
-    }
-
-    private GoalDto getGoalDtoNullSkills() {
-        return GoalDto.builder()
-                .title("title")
-                .skillIds(null)
-                .build();
-    }
-
-    private GoalDto getGoalDtoEmptyTitle() {
-        return GoalDto.builder()
-                .title(null)
-                .skillIds(List.of(1L, 2L))
-                .build();
-    }
-
-    private GoalDto getGoalDtoNullTitle() {
-        return GoalDto.builder()
-                .title("")
-                .skillIds(List.of(1L, 2L))
-                .build();
     }
 
     private Goal getGoalToUpdateInvalidStatus() {

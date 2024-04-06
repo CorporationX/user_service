@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class SkillValidateTest {
+class SkillValidateTest {
 
     @InjectMocks
     private SkillValidator skillValidator;
@@ -33,14 +33,7 @@ public class SkillValidateTest {
     private SkillOfferRepository skillOfferRepository;
 
     @Test
-    public void testCreateWithBlankTitle() {
-        SkillDto skillDto = prepareData(" ");
-
-        assertThrows(DataValidationException.class, () -> skillValidator.validateSkillTitle(skillDto));
-    }
-
-    @Test
-    public void testCreateExistingTitle() {
+    void testCreateExistingTitle() {
         SkillDto skillDto = prepareData("test");
         when(skillRepository.existsByTitle(skillDto.getTitle()))
                 .thenReturn(true);
@@ -49,21 +42,21 @@ public class SkillValidateTest {
     }
 
     @Test
-    public void testExceptionOfSkill() {
-        Long skillId = 1L;
-        Long userId = 1L;
+    void testExceptionOfSkill() {
+        long skillId = 1L;
+        long userId = 1L;
 
         when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.empty());
         assertThrows(DataValidationException.class, () -> skillValidator.validateSupplyQuantityCheck(skillId, userId));
     }
 
     @Test
-    public void testExceptionNotEnoughOffers() {
-        Long skillId = 3L;
-        Long userId = 3L;
+    void testExceptionNotEnoughOffers() {
+        long skillId = 3L;
+        long userId = 3L;
         List<SkillOffer> skillOffers = List.of(
-                skillOfferData(1l, skillData(1L, "test"), recommendationData(1L)),
-                skillOfferData(1l, skillData(1L, "test"), recommendationData(2L))
+                skillOfferData(1L, skillData(1L, "test"), recommendationData(1L)),
+                skillOfferData(1L, skillData(1L, "test"), recommendationData(2L))
         );
 
         when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.empty());

@@ -30,10 +30,6 @@ spring:
 server:
   port: 8080
 
-logging:
-  level:
-    root: info
-
 project-service:
   host: localhost
   port: 8082
@@ -50,8 +46,11 @@ aws:
 
 services:
   s3:
-    bucket-name: user_backet
-    isMocked: true
+    endpoint: http://127.0.0.1:9000
+    accessKey: user
+    secretKey: password
+    bucketName: user-service-bucket
+
   dicebear:
     avatar: https://api.dicebear.com/8.x/pixel-art/svg?seed=
     small_avatar: https://api.dicebear.com/8.x/pixel-art/svg?size=100&seed=

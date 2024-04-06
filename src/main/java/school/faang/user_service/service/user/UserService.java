@@ -2,14 +2,17 @@ package school.faang.user_service.service.user;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.dto.user.UserRegistrationDto;
-import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
@@ -20,19 +23,25 @@ import school.faang.user_service.service.CountryService;
 import school.faang.user_service.validator.UserValidator;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
     private final UserRepository userRepository;
-    private final CountryService countryService;
-    private final UserValidator userValidator;
-    private final UserMapper userMapper;
     private final EventRepository eventRepository;
     private final MentorshipRepository mentorshipRepository;
     private final GoalRepository goalRepository;
+    private final CountryService countryService;
+    private final PersonService personService;
+    private final UserValidator userValidator;
+    private final UserMapper userMapper;
+    private final CsvPersonParser csvPersonParser;
     private final UserProfilePic generatedUserProfilePic;
-    private final ProfileViewEventPublisher publisher;
+    private final List<UserFilter> userFilters;
+    private final SearchAppearanceEventPublisher eventPublisher;
+    private final ProfileViewEventPublisher profileViewEventPublisher;
 
     public UserRegistrationDto createUser(UserRegistrationDto userDto) {
         User user = userMapper.toEntity(userDto);
@@ -40,16 +49,16 @@ public class UserService {
         if (user.getUserProfilePic() == null) {
             user.setUserProfilePic(generatedUserProfilePic);
         }
-        Country country = countryService.getCountryByTitle(userDto.getCountry());
-        user.setCountry(country);
+        user.setCountry(countryService.getSavedCountry(user.getCountry()));
 
         User savedUser = userRepository.save(user);
         return userMapper.toRegDto(savedUser);
     }
 
+    @Transactional
     public UserDto getUserDtoById(long id) {
         UserDto userDto = userMapper.toDto(getUserById(id));
-        publisher.publish(id);
+        profileViewEventPublisher.publish(id);
         userValidator.validateAccessToUser(id);
         return userDto;
     }
@@ -67,6 +76,7 @@ public class UserService {
         saveUser(user);
     }
 
+    @Transactional(readOnly = true)
     public boolean isOwnerExistById(Long id) {
         return userRepository.existsById(id);
     }
@@ -77,9 +87,18 @@ public class UserService {
         }
     }
 
+    @Transactional(readOnly = true)
     public User getUserById(long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("User with ID %d not found", id)));
+    }
+
+    public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
+        Stream<User> premiumUsers = userRepository.findPremiumUsers();
+        List<User> users = userFilters.stream()
+                .filter(filter -> filter.isApplicable(userFilterDto))
+                .flatMap(filter -> filter.apply(premiumUsers, userFilterDto)).toList();
+        return userMapper.toDtoList(users);
     }
 
     private void stopGoalsAndDeleteEventsAndDeleteMentor(User user) {
@@ -103,6 +122,43 @@ public class UserService {
                 mentorshipRepository.save(mentee);
             }
         }
+    }
+
+    public void saveStudents(MultipartFile csvFile) {
+        List<Person> people;
+        try {
+            people = csvPersonParser.parse(csvFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        personService.savePeopleAsUsers(people);
+        log.info("Students saved from csv file as users. Saved accounts count: {}", people.size());
+    }
+
+    public List<UserDto> getUsers(UserFilterDto filter, long actorId) {
+        List<User> users = userRepository.findAll();
+
+        userFilters.stream()
+                .filter(f -> f.isApplicable(filter))
+                .forEach(f -> f.apply(users.stream(), filter));
+
+        users.forEach(user -> {
+            SearchAppearanceEventDto event = new SearchAppearanceEventDto(
+                    user.getId(),
+                    actorId,
+                    LocalDateTime.now()
+            );
+            eventPublisher.publish(event);
+        });
+
+        return new ArrayList<>(users.stream()
+                .map(userMapper::toDto).toList());
+    }
+
+    @Transactional
+    public void banUserById(long userId) {
+        getUserById(userId).setBanned(true);
+        log.info("user with id = {} is banned", userId);
     }
 
     public UserDto getUserDtoByIdUtility(long userId) {

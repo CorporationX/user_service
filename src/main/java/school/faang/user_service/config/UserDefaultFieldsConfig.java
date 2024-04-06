@@ -15,12 +15,17 @@ public class UserDefaultFieldsConfig {
     private String smallAvatarBaseUrl;
 
     @Bean
-    public UserProfilePic generateUserProfilePic() {
+    public UserProfilePic generateProfilePic() {
         String seed = UUID.randomUUID().toString();
 
         return UserProfilePic.builder()
                 .fileId(avatarBaseUrl + seed)
                 .smallFileId(smallAvatarBaseUrl + seed)
                 .build();
+    }
+
+    @Bean
+    public String generatedPassword() {
+        return UUID.randomUUID().toString();
     }
 }

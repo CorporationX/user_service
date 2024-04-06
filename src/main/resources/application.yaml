@@ -26,6 +26,14 @@ spring:
           name: follower_channel
         profile_view_channel:
           name: profile_view_channel
+        premium_bought_channel:
+          name: premium_bought_channel
+        mentorship_offered_channel:
+          name: mentorship_offered_channel
+        search_appearance_channel:
+          name: search_appearance_channel
+        user_ban:
+          name: user_ban_channel
   mvc:
     servlet:
       path: /api/v1
@@ -40,6 +48,12 @@ server:
 logging:
   level:
     root: info
+
+person:
+  parser:
+    max_file_chunk_size: 13000
+    thread_num: 5
+    expected_chunk_size: 1300
 
 project-service:
   host: localhost
@@ -72,3 +86,9 @@ image:
   pixels:
     bigSize: 1024
     smallSize: 170
+
+springdoc:
+  version: "1.0.0"
+  swagger-ui:
+    url: /api-docs.yaml
+    filter: true

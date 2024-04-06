@@ -42,7 +42,7 @@ public class GoalService {
     }
 
     public void setSetSkillsToAchieve(GoalDto goalDto, Goal goal) {
-        goal.setSkillsToAchieve(goalDto.getSkillIds().stream().map(skillService::findById).toList());
+        goal.setSkillsToAchieve(goalDto.getSkillIds().stream().map(skillService::getSkillIfExists).toList());
     }
 
     public GoalDto updateGoal(Long goalId, GoalDto goalDto) {

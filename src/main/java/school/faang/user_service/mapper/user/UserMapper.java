@@ -1,13 +1,15 @@
-package school.faang.user_service.mapper;
+package school.faang.user_service.mapper.user;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
+import org.springframework.beans.factory.annotation.Autowired;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserRegistrationDto;
+import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
-import school.faang.user_service.mapper.base.UserMapperBase;
+import school.faang.user_service.repository.CountryRepository;
 
 import java.util.List;
 
@@ -21,7 +23,7 @@ public interface UserMapper extends UserMapperBase {
     List<UserDto> listToDto(List<User> users);
 
     @Mapping(target = "userProfilePic", expression = "java(getUserProfilePic(userDto))")
-    @Mapping(target = "country", expression = "java(getCountry(userDto.getCountry()))")
+    @Mapping(target = "country", ignore = true)
     User toEntity(UserRegistrationDto userDto);
 
     @Mapping(target = "country", source = "country.title")

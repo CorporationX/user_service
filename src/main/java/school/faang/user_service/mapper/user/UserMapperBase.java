@@ -1,4 +1,4 @@
-package school.faang.user_service.mapper.base;
+package school.faang.user_service.mapper.user;
 
 import school.faang.user_service.entity.Country;
 

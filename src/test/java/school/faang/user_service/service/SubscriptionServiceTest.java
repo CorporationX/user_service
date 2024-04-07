@@ -13,7 +13,7 @@ import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.filter.user.UserNameFilter;
-import school.faang.user_service.mapper.UserMapperImpl;
+import school.faang.user_service.mapper.user.UserMapperImpl;
 import school.faang.user_service.publisher.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.validator.SubscriptionValidator;
@@ -30,10 +30,8 @@ public class SubscriptionServiceTest {
     private SubscriptionValidator subscriptionValidator;
     @Mock
     private FollowerEventPublisher followerEventPublisher;
-
     @Spy
     private UserMapperImpl userMapper;
-
     @InjectMocks
     private SubscriptionService subscriptionService;
 

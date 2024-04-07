@@ -14,10 +14,6 @@ public class SearchAppearanceEventPublisher extends AbstractEventPublisher<Searc
     @Value("${spring.data.redis.channels.search_appearance_channel.name}")
     private String searchAppearanceChannel;
 
-    public SearchAppearanceEventPublisher(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper) {
-        super(redisTemplate, objectMapper);
-    }
-
     public void publish(SearchAppearanceEventDto searchAppearanceEventDto) {
         convertAndSend(searchAppearanceEventDto, searchAppearanceChannel);
     }

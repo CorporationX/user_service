@@ -3,6 +3,7 @@ package school.faang.user_service.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.User;
 
@@ -36,4 +37,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
             WHERE u.active = false AND u.updated_at < ?1
             """)
     void deleteAllInactiveUsersAndUpdatedAtOverMonths(LocalDate time);
+
+    @Query(nativeQuery = true, value = """
+            "SELECT follower_id FROM subscription WHERE followee_id = :userId"
+            """)
+    List<Long> findFollowersIdsByUserId(@Param("userId") long userId);
 }

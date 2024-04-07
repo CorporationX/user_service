@@ -69,4 +69,9 @@ public class UserController {
 
         return userService.getUsers(filter, actorId);
     }
+
+    @GetMapping("/{userId}/followersIds")
+    public List<Long> getFollowersIds(@PathVariable long userId) {
+        return userService.getFollowersIdsByUserId(userId);
+    }
 }

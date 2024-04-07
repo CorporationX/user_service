@@ -157,4 +157,8 @@ public class UserService {
         return new ArrayList<>(users.stream()
                 .map(userMapper::toDto).toList());
     }
+
+    public List<Long> getFollowersIdsByUserId(long userId) {
+       return userRepository.findFollowersIdsByUserId(userId);
+    }
 }

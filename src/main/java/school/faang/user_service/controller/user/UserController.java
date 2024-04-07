@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,7 +49,7 @@ public class UserController {
         return userService.getUsersByIds(ids);
     }
 
-    @GetMapping("/{userId}")
+    @DeleteMapping("/{userId}")
     public UserDto deactivationUserById(@PathVariable Long userId){
         return userService.deactivationUserById(userId);
     }

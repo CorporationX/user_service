@@ -15,11 +15,10 @@ import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserProfilePicDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
-import school.faang.user_service.handler.exception.EntityNotFoundException;
-import school.faang.user_service.handler.exception.FileReadException;
-import school.faang.user_service.handler.exception.FileWriteException;
+import school.faang.user_service.handler.exception.FileOperationException;
 import school.faang.user_service.mapper.user_profile_pic.UserProfilePicMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.user.UserService;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -27,12 +26,12 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import static school.faang.user_service.validator.user.UserConstraints.USER_NOT_FOUND;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ProfilePicService {
+
+    private final UserService userService;
 
     private final UserRepository userRepository;
 
@@ -50,7 +49,7 @@ public class ProfilePicService {
     private String s3BucketName;
 
     public UserProfilePicDto uploadAvatar(Long userId, MultipartFile file) {
-        User user = getUser(userId);
+        User user = userService.getUser(userId);
         String uniqueSmallPicName = file.getOriginalFilename() + "_small" + System.currentTimeMillis();
         String uniqueLargePicName = file.getOriginalFilename() + "_large" + System.currentTimeMillis();
 
@@ -65,25 +64,25 @@ public class ProfilePicService {
     }
 
     public ResponseEntity<byte[]> downloadAvatarLarge(Long userId) {
-        User user = getUser(userId);
+        User user = userService.getUser(userId);
         S3Object object = s3Client.getObject(s3BucketName, user.getUserProfilePic().getFileId());
         log.info(String.format("User with id %s download large avatar", userId));
         return getAvatar(object);
     }
 
     public ResponseEntity<byte[]> downloadAvatarSmall(Long userId) {
-        User user = getUser(userId);
+        User user = userService.getUser(userId);
         S3Object object = s3Client.getObject(s3BucketName, user.getUserProfilePic().getSmallFileId());
         log.info(String.format("User with id %s download small avatar", userId));
         return getAvatar(object);
     }
 
     public void deleteAvatar(Long userId) {
-        User user = getUser(userId);
+        User user = userService.getUser(userId);
         s3Client.deleteObject(s3BucketName, user.getUserProfilePic().getFileId());
         s3Client.deleteObject(s3BucketName, user.getUserProfilePic().getSmallFileId());
-        UserProfilePic userProfilePic = new UserProfilePic(null, null);
-        user.setUserProfilePic(userProfilePic);
+        user.getUserProfilePic().setFileId(null);
+        user.getUserProfilePic().setSmallFileId(null);
         log.info(String.format("User with id %s delete avatar", userId));
         userRepository.save(user);
     }
@@ -117,7 +116,7 @@ public class ProfilePicService {
         } catch (IOException e) {
             e.printStackTrace();
             log.error("File read exception on method compressorPhoto");
-            throw new FileReadException("File read exception");
+            throw new FileOperationException("File read exception");
         }
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
@@ -126,13 +125,7 @@ public class ProfilePicService {
         } catch (IOException e) {
             e.printStackTrace();
             log.error("File write exception on method compressorPhoto");
-            throw new FileWriteException("File write exception");
+            throw new FileOperationException("File write exception");
         }
-    }
-
-
-    private User getUser(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format(USER_NOT_FOUND.getMessage(), userId)));
     }
 }

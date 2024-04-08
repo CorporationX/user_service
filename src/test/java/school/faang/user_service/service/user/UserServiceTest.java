@@ -38,7 +38,7 @@ public class UserServiceTest {
 
         when(userRepository.findById(userId)).thenThrow(EntityNotFoundException.class);
 
-        assertThrows(EntityNotFoundException.class, () -> userService.getUserById(userId));
+        assertThrows(EntityNotFoundException.class, () -> userService.getUserDtoById(userId));
     }
 
     @Test
@@ -49,7 +49,7 @@ public class UserServiceTest {
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
-        assertEquals(userExpected, userService.getUserById(userId));
+        assertEquals(userExpected, userService.getUserDtoById(userId));
         verify(userRepository).findById(userId);
 
     }
@@ -63,7 +63,7 @@ public class UserServiceTest {
 
         when(userRepository.findAllById(ids)).thenReturn(List.of(firstUser, secondUser));
 
-        assertEquals(usersExpected, userService.getUsersByIds(ids));
+        assertEquals(usersExpected, userService.getUsersDtoByIds(ids));
         verify(userRepository).findAllById(ids);
     }
 

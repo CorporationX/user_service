@@ -17,12 +17,12 @@ import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.handler.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.user_profile_pic.UserProfilePicMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.user.UserService;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -33,6 +33,8 @@ import static org.mockito.Mockito.*;
 public class ProfilePicServiceTest {
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private UserService userService;
     @Mock
     private AmazonS3 s3Client;
     @Mock
@@ -46,7 +48,7 @@ public class ProfilePicServiceTest {
         MultipartFile file = null;
         Long userId = 1L;
 
-        when(userRepository.findById(userId)).thenThrow(EntityNotFoundException.class);
+        when(userService.getUser(userId)).thenThrow(EntityNotFoundException.class);
 
         assertThrows(EntityNotFoundException.class, () -> profilePicService.uploadAvatar(userId, file));
     }
@@ -72,11 +74,11 @@ public class ProfilePicServiceTest {
         ReflectionTestUtils.setField(profilePicService, "large_photo", 1080);
         ReflectionTestUtils.setField(profilePicService, "s3BucketName", "user-service-bucket");
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userService.getUser(userId)).thenReturn(user);
         when(userProfilePicMapper.toDto(any(UserProfilePic.class))).thenReturn(any(UserProfilePicDto.class));
 
         assertDoesNotThrow(() -> profilePicService.uploadAvatar(userId, file));
-        verify(userRepository).findById(userId);
+        verify(userService).getUser(userId);
         verify(userProfilePicMapper).toDto(any(UserProfilePic.class));
     }
     @Test
@@ -92,11 +94,11 @@ public class ProfilePicServiceTest {
         userAfterDeletePhoto.setUserProfilePic(userProfilePicAfter);
         ReflectionTestUtils.setField(profilePicService, "s3BucketName", "user-service-bucket");
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(userBeforeDeletePhoto));
+        when(userService.getUser(userId)).thenReturn(userBeforeDeletePhoto);
         when(userRepository.save(userAfterDeletePhoto)).thenReturn(userAfterDeletePhoto);
 
         assertDoesNotThrow(() -> profilePicService.deleteAvatar(userId));
-        verify(userRepository).findById(userId);
+        verify(userService).getUser(userId);
         verify(s3Client, times(2)).deleteObject(anyString(), anyString());
         verify(userRepository).save(userAfterDeletePhoto);
     }
@@ -113,13 +115,13 @@ public class ProfilePicServiceTest {
         user.setUserProfilePic(userProfilePic);
         ReflectionTestUtils.setField(profilePicService, "s3BucketName", "user-service-bucket");
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userService.getUser(userId)).thenReturn(user);
         when(s3Client.getObject(anyString(), eq(uniqueLargePicName))).thenReturn(s3Object);
         when(s3Object.getObjectContent()).thenReturn(s3ObjectInputStream);
         when(s3ObjectInputStream.readAllBytes()).thenReturn(new byte[]{});
 
         assertDoesNotThrow(() -> profilePicService.downloadAvatarLarge(userId));
-        verify(userRepository).findById(userId);
+        verify(userService).getUser(userId);
         verify(s3Client).getObject(anyString(), anyString());
     }
 
@@ -135,13 +137,13 @@ public class ProfilePicServiceTest {
         user.setUserProfilePic(userProfilePic);
         ReflectionTestUtils.setField(profilePicService, "s3BucketName", "user-service-bucket");
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userService.getUser(userId)).thenReturn(user);
         when(s3Client.getObject(anyString(), eq(uniqueSmallPicName))).thenReturn(s3Object);
         when(s3Object.getObjectContent()).thenReturn(s3ObjectInputStream);
         when(s3ObjectInputStream.readAllBytes()).thenReturn(new byte[]{});
 
         assertDoesNotThrow(() -> profilePicService.downloadAvatarSmall(userId));
-        verify(userRepository).findById(userId);
+        verify(userService).getUser(userId);
         verify(s3Client).getObject(anyString(), anyString());
     }
 }

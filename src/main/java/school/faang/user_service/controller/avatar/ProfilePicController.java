@@ -19,7 +19,7 @@ public class ProfilePicController {
 
     @PostMapping("/{userId}/profilePic")
     @Operation(summary = "Upload new avatar user")
-    public UserProfilePicDto uploadAvatar(@PathVariable Long userId, @RequestParam("file") MultipartFile file) {
+    public UserProfilePicDto uploadAvatar(@PathVariable long userId, @RequestParam("file") MultipartFile file) {
         if (file.getSize() > maxSize) {
             throw new IllegalArgumentException("File weight is more than 5 MB");
         }
@@ -28,19 +28,19 @@ public class ProfilePicController {
 
     @GetMapping("/{userId}/profilePic")
     @Operation(summary = "Download avatar user")
-    public ResponseEntity<byte[]> downloadAvatarLarge(@PathVariable Long userId) {
+    public ResponseEntity<byte[]> downloadAvatarLarge(@PathVariable long userId) {
         return profilePicService.downloadAvatarLarge(userId);
     }
 
     @GetMapping("/{userId}/profilePicSmall")
     @Operation(summary = "Download avatar user")
-    public ResponseEntity<byte[]> downloadAvatarSmall(@PathVariable Long userId) {
+    public ResponseEntity<byte[]> downloadAvatarSmall(@PathVariable long userId) {
         return profilePicService.downloadAvatarSmall(userId);
     }
 
     @DeleteMapping("/{userId}/profilePic")
     @Operation(summary = "Delete avatar user")
-    public void deleteAvatar(@PathVariable Long userId) {
+    public void deleteAvatar(@PathVariable long userId) {
         profilePicService.deleteAvatar(userId);
     }
 }

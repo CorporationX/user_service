@@ -12,12 +12,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class StorageConfig {
+public class S3Config {
     @Value("${services.s3.accessKey}")
     private String accessKey;
 
     @Value("${services.s3.secretKey}")
     private String secretKey;
+
+    @Value("${services.s3.bucketName}")
+    private String s3BucketName;
 
     @Value("${services.s3.endpoint}")
     private String endpoint;
@@ -31,6 +34,11 @@ public class StorageConfig {
                 .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
                 .withPathStyleAccessEnabled(true)
                 .build();
+        boolean bucketExist = clientAmazonS3.listBuckets().stream()
+                .anyMatch(bucket -> bucket.getName().equals(s3BucketName));
+        if (!bucketExist) {
+            clientAmazonS3.createBucket(s3BucketName);
+        }
         return clientAmazonS3;
     }
 }

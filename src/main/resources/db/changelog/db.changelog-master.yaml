@@ -14,4 +14,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/changeset/user_V007__user_premium.sql
   - include:
-      file: db/changelog/changeset/jira_acc_V001__initial.sql
+      file: db/changelog/changeset/user_V008__add_banned_col.sql
+  - include:
+      file: db/changelog/changeset/jira_acc_V009__initial.sql

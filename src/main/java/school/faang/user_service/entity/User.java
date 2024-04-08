@@ -10,6 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import school.faang.user_service.entity.contact.Contact;
 import school.faang.user_service.entity.contact.ContactPreference;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.event.Rating;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.entity.event.Rating;
@@ -143,6 +144,9 @@ public class User {
 
     @OneToOne(mappedBy = "user")
     private Premium premium;
+
+    @Column(name = "banned")
+    private boolean banned;
 
     @OneToOne(mappedBy = "user")
     private JiraAccount jiraAccount;

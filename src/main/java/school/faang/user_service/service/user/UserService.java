@@ -2,8 +2,10 @@ package school.faang.user_service.service.user;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.jira.JiraAccountDto;
 import school.faang.user_service.dto.user.UserDto;
@@ -21,6 +23,7 @@ import school.faang.user_service.validation.user.UserValidator;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -79,6 +82,13 @@ public class UserService {
                     .forEach(filter -> filter.apply(premiumUsers, filters));
         }
         return userMapper.toDto(premiumUsers);
+    }
+
+    @Transactional
+    public void banUser(Long userId) {
+        User user = getUserFromRepository(userId);
+        user.setBanned(true);
+        log.info("User {} banned", userId);
     }
 
     @Transactional

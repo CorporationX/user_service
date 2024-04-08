@@ -2,6 +2,7 @@ package school.faang.user_service.service.premium;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.client.PaymentServiceClient;
@@ -19,6 +20,7 @@ import school.faang.user_service.validation.premium.PremiumValidator;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +31,10 @@ public class PremiumService {
     private final UserRepository userRepository;
     private final PremiumMapper premiumMapper;
     private final PremiumValidator premiumValidator;
+    private final ExecutorService executorService;
+
+    @Value("${premium.expired.delete-batch}")
+    private Integer batch;
 
     @Transactional
     public PremiumDto buyPremium(Long userId, PremiumPeriod period) {
@@ -41,7 +47,10 @@ public class PremiumService {
     @Transactional
     public void deleteExpiredPremiums() {
         List<Premium> expiredPremiums = premiumRepository.findAllByEndDateBefore(LocalDateTime.now());
-        premiumRepository.deleteAll(expiredPremiums);
+        for (int i = 0; i < expiredPremiums.size(); i += batch) {
+            final int innerI = i + 1;
+            executorService.execute(() -> premiumRepository.deleteAll(expiredPremiums.subList(innerI, Math.min(innerI + batch + 1, expiredPremiums.size()))));
+        }
     }
 
     private PremiumDto savePremium(Long userId, PremiumPeriod period) {

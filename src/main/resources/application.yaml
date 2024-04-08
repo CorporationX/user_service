@@ -5,6 +5,11 @@ spring:
     username: user
     password: password
 
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -46,11 +51,21 @@ aws:
 
 services:
   s3:
-    bucket-name: user_backet
-    isMocked: true
+    endpoint: http://127.0.0.1:9000
+    accessKey: user
+    secretKey: password
+    bucketName: user-service-bucket
+
   dicebear:
     avatar: https://api.dicebear.com/8.x/pixel-art/svg?seed=
     small_avatar: https://api.dicebear.com/8.x/pixel-art/svg?size=100&seed=
 
 scheduler:
-  clear-premiums: "@daily"
+  premium-remover: "@weekly"
+
+premium:
+  expired:
+    delete-batch: 200
+
+thread-pool:
+  thread-count: 10

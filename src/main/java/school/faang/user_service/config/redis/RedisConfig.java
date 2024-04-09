@@ -1,4 +1,4 @@
-package school.faang.user_service.config;
+package school.faang.user_service.config.redis;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +28,6 @@ public class RedisConfig {
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
-        System.out.println(port);
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
         return new JedisConnectionFactory(config);
     }
@@ -56,7 +55,12 @@ public class RedisConfig {
     }
 
     @Bean
-    ChannelTopic banUserTopic() {
+    public ChannelTopic banUserTopic() {
         return new ChannelTopic("user_ban");
+    }
+
+    @Bean
+    public ChannelTopic premiumBoughtTopic() {
+        return new ChannelTopic("premium_bought");
     }
 }

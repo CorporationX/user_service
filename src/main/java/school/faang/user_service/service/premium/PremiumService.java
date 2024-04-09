@@ -2,6 +2,7 @@ package school.faang.user_service.service.premium;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,15 +14,19 @@ import school.faang.user_service.dto.premium.PremiumDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.premium.PremiumPeriod;
+import school.faang.user_service.event.UserPremiumBoughtEvent;
 import school.faang.user_service.mapper.premium.PremiumMapper;
+import school.faang.user_service.publisher.PremiumBoughtEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.validation.premium.PremiumValidator;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PremiumService {
@@ -32,6 +37,7 @@ public class PremiumService {
     private final PremiumMapper premiumMapper;
     private final PremiumValidator premiumValidator;
     private final ExecutorService executorService;
+    private final PremiumBoughtEventPublisher premiumBoughtEventPublisher;
 
     @Value("${premium.expired.delete-batch}")
     private Integer batch;
@@ -41,6 +47,7 @@ public class PremiumService {
         premiumValidator.validateUserPremiumStatus(userId);
         PaymentResponse response = paymentService.sendPayment(getPaymentRequest(userId, period));
         premiumValidator.validatePaymentResponse(response);
+        publishPremiumBoughtEvent(userId, response.getAmount(), period);
         return savePremium(userId, period);
     }
 
@@ -53,13 +60,24 @@ public class PremiumService {
         }
     }
 
+    private void publishPremiumBoughtEvent(long userId, BigDecimal amount, PremiumPeriod period) {
+        premiumBoughtEventPublisher.publish(UserPremiumBoughtEvent.builder()
+                .userId(userId)
+                .amount(amount)
+                .premiumPeriod(period.getDays())
+                .timestamp(LocalDateTime.now())
+                .build());
+    }
+
     private PremiumDto savePremium(Long userId, PremiumPeriod period) {
         User user = userRepository.findById(userId).orElseThrow(()
                 -> new EntityNotFoundException(String.format("User with ID %d not found", userId)));
         LocalDateTime startDate = LocalDateTime.now();
         LocalDateTime endDate = startDate.plusDays(period.getDays());
         Premium premium = getPremium(user, startDate, endDate);
-        return premiumMapper.toDto(premiumRepository.save(premium));
+        Premium savedPremium = premiumRepository.save(premium);
+        log.info("Premium saved: {}", premium.getId());
+        return premiumMapper.toDto(savedPremium);
     }
 
     private Premium getPremium(User user, LocalDateTime startDate, LocalDateTime endDate) {

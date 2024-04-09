@@ -1,4 +1,4 @@
-package school.faang.user_service.dto.event;
+package school.faang.user_service.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

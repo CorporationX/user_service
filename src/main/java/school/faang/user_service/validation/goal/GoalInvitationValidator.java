@@ -6,7 +6,6 @@ import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 import static school.faang.user_service.entity.RequestStatus.PENDING;
@@ -18,7 +17,6 @@ public class GoalInvitationValidator {
 
     private final GoalRepository goalRepository;
     private final UserRepository userRepository;
-    private final GoalInvitationRepository goalInvitationRepository;
 
     public void validateCreateInvitation(GoalInvitationDto invitationDto) {
         Long inviterId = invitationDto.getInviterId();

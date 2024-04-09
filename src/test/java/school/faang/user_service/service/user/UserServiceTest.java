@@ -1,11 +1,13 @@
 package school.faang.user_service.service.user;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.event.UserEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.handler.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.user.UserMapper;
@@ -91,6 +93,30 @@ public class UserServiceTest {
 
         assertThrows(NullPointerException.class, () -> userService.create(userDto));
 
+    }
+
+    @Test
+    void testBanUserNotFound(){
+        UserEvent userEvent = new UserEvent(1L);
+
+        when(userRepository.findById(userEvent.getUserId())).thenThrow(EntityNotFoundException.class);
+
+        Assertions.assertThrows(EntityNotFoundException.class, () -> userService.banUser(userEvent));
+        verify(userRepository).findById(userEvent.getUserId());
+    }
+
+    @Test
+    void testBanUserSuccessful(){
+        UserEvent userEvent = new UserEvent(1L);
+        User user = new User();
+        user.setBanned(true);
+
+        when(userRepository.findById(userEvent.getUserId())).thenReturn(Optional.of(new User()));
+        when(userRepository.save(user)).thenReturn(user);
+
+        Assertions.assertDoesNotThrow(() -> userService.banUser(userEvent));
+        verify(userRepository).findById(userEvent.getUserId());
+        verify(userRepository).save(user);
     }
 }
 

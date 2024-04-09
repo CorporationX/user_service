@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
+import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.UserEvent;
 import school.faang.user_service.service.user.UserService;
@@ -13,7 +14,7 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ReceiverUsersBan implements Receiver {
+public class SubscriberUsersBan implements MessageListener {
     private final ObjectMapper objectMapper;
     private final UserService userService;
 

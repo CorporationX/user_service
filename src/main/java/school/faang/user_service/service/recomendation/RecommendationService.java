@@ -2,10 +2,10 @@ package school.faang.user_service.service.recomendation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.RecommendationDto;
 import school.faang.user_service.dto.RecommendationEvent;
+import school.faang.user_service.dto.recomendation.RecommendationDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
-import school.faang.user_service.mapper.RecommendationMapper;
+import school.faang.user_service.mapper.recommendation.RecommendationMapper;
 import school.faang.user_service.publisher.RecommendationEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;

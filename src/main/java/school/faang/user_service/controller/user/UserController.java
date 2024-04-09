@@ -1,5 +1,8 @@
 package school.faang.user_service.controller.user;
 
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,5 +45,10 @@ public class UserController {
     @PostMapping(value = "/upload-csv-file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void parseCSV(@RequestParam MultipartFile file) {
         csvFileParserService.parseFile(file);
+    }
+
+    @GetMapping("/exists/{userId}")
+    public boolean existById(@PathVariable @Positive(message = "Id must be greater than zero") long userId) {
+        return userService.existById(userId);
     }
 }

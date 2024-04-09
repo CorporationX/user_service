@@ -34,7 +34,8 @@ public class UserService {
     }
 
     public UserDto getUserById(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User by id: " + userId + " not found"));
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new UserNotFoundException("User by id: " + userId + " not found"));
         return userMapper.toDto(user);
     }
 
@@ -45,6 +46,10 @@ public class UserService {
         avatarService.generateAndSaveAvatar(user).ifPresent(user::setUserProfilePic);
         return userMapper.toUserCreateDto(userRepository.save(user));
     }
+
+   public boolean existById(long id){
+        return userRepository.existsById(id);
+   }
 
     private Stream<UserDto> userFilter(Stream<UserDto> userDtoStream, UserFilterDto userFilterDto) {
         return userFilters.stream()

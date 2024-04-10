@@ -49,8 +49,11 @@ aws:
 
 services:
   s3:
-    bucket-name: user_backet
-    isMocked: true
+    bucket-name: user-service-bucket
+    endpoint: http://localhost:9000
+    accessKey: user
+    secretKey: password
+    isMocked: false
 
 task:
   scheduling:

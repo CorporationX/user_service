@@ -26,25 +26,27 @@ public class UserService {
     private String small_avatar;
 
     public UserDto getUser(long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("User not found!"));
-        return userMapper.toDto(user);
+        User user = userRepository.findById( userId ).orElseThrow( () -> new NoSuchElementException( "User not found!" ) );
+        return userMapper.toDto( user );
     }
 
-    public UserDto create(UserDto userDto){
-        User user = userMapper.toEntity(userDto);
-        user.setUserProfilePic(getRandomAvatar());
-        user.setActive(true);
-        User createdUser = userRepository.save(user);
-        return userMapper.toDto(createdUser);
+    public UserDto create(UserDto userDto) {
+        User user = userMapper.toEntity( userDto );
+        user.setUserProfilePic( getRandomAvatar() );
+        user.setActive( true );
+        User createdUser = userRepository.save( user );
+        return userMapper.toDto( createdUser );
 
     }
 
     public List<UserDto> getUsersByIds(List<Long> ids) {
-        return userMapper.toDto(userRepository.findAllById(ids));
+        return userMapper.toDto( userRepository.findAllById( ids ) );
     }
 
-    private UserProfilePic getRandomAvatar(){
+    private UserProfilePic getRandomAvatar() {
         UUID seed = UUID.randomUUID();
-        return UserProfilePic.builder().smallFileId( small_avatar ).fileId( large_avatar ).build();
+        return UserProfilePic.builder().
+                smallFileId( small_avatar ).
+                fileId( large_avatar ).build();
     }
 }

@@ -6,9 +6,10 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.exceptions.UserNotFoundException;
+import school.faang.user_service.service.exceptions.messageerror.MessageError;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -18,11 +19,18 @@ public class UserService {
     private final UserMapper userMapper;
 
     public UserDto getUser(long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("User not found!"));
-        return userMapper.toDto(user);
+        return userMapper.toDto(getUserEntityById(userId));
     }
 
-    public List<UserDto> getUsersByIds(List<Long> ids) {
-        return userMapper.toDto(userRepository.findAllById(ids));
+    public List<UserDto> getUsersByIds(List<Long> userIds) {
+        return userMapper.toDto(getUsersEntityByIds(userIds));
+    }
+
+    public User getUserEntityById(long userId){
+        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(MessageError.USER_NOT_FOUND_EXCEPTION));
+    }
+
+    public List<User> getUsersEntityByIds(List<Long> userIds){
+        return userRepository.findAllById(userIds);
     }
 }

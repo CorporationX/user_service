@@ -1,6 +1,7 @@
 package school.faang.user_service.service.user;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,9 +12,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.exceptions.UserNotFoundException;
+import school.faang.user_service.service.exceptions.messageerror.MessageError;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.mockito.Mockito.times;
@@ -52,8 +54,8 @@ public class UserServiceTest {
     public void testGetUser_UserDoesNotExist() {
         Mockito.when(userRepository.findById(firstUser.getId())).thenReturn(Optional.empty());
 
-        NoSuchElementException e = Assert.assertThrows(NoSuchElementException.class, () -> userService.getUser(firstUser.getId()));
-        Assert.assertEquals(e.getMessage(), "User not found!");
+        UserNotFoundException e = Assert.assertThrows(UserNotFoundException.class, () -> userService.getUser(firstUser.getId()));
+        Assertions.assertEquals(e.getMessage(), MessageError.USER_NOT_FOUND_EXCEPTION.getMessage());
     }
 
     @Test
@@ -75,5 +77,4 @@ public class UserServiceTest {
         verify(userRepository, times(1)).findAllById(userIds);
         verify(userMapper, times(1)).toDto(users);
     }
-
 }

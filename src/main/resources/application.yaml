@@ -58,3 +58,7 @@ task:
 
 cleanUpPremiumRepo:
   cron: *daily
+
+dicebear:
+  pic-base-url-small: https://api.dicebear.com/7.x/bottts/svg?size=64&seed=
+  pic-base-url: https://api.dicebear.com/7.x/bottts/svg?size=256&seed=

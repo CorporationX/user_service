@@ -29,7 +29,7 @@ public class UserDto {
     private boolean active;
 
     @NotNull(message = "Country ID can't be empty")
-    private Long countryId;
+    private long countryId;
 
     private List<Long> menteesIds;
     private List<Long> mentorsIds;

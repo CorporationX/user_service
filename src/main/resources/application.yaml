@@ -50,7 +50,7 @@ aws:
 services:
   s3:
     bucket-name: user-service-bucket
-    endpoint: http://localhost:9000
+    endpoint: http://127.0.0.1:9000
     accessKey: user
     secretKey: password
     isMocked: false

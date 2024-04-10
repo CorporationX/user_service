@@ -22,6 +22,10 @@ public class UserService {
         return userMapper.toDto(user);
     }
 
+    public UserDto create(UserDto userDto){
+
+    }
+
     public List<UserDto> getUsersByIds(List<Long> ids) {
         return userMapper.toDto(userRepository.findAllById(ids));
     }

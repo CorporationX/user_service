@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.user;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.UserDto;
@@ -18,6 +19,12 @@ public class UserController {
     public UserDto getUser(@PathVariable long userId) {
         return userService.getUser(userId);
     }
+
+    @PostMapping("/create")
+    public UserDto create(@RequestBody @Valid UserDto userDto){
+        return userService.create(userDto);
+    }
+
 
     @PostMapping
     public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {

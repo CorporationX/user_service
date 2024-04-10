@@ -2,21 +2,25 @@ package school.faang.user_service.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redis.testcontainers.RedisContainer;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import school.faang.user_service.UserServiceApplication;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(
         classes = {
@@ -25,7 +29,6 @@ import school.faang.user_service.UserServiceApplication;
 )
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles("test")
-@ExtendWith(SpringExtension.class)
 @Testcontainers
 @AutoConfigureMockMvc
 public class BaseContextTest {
@@ -40,7 +43,8 @@ public class BaseContextTest {
             new PostgreSQLContainer<>("postgres:13.6");
     @Container
     private static final RedisContainer REDIS_CONTAINER =
-            new RedisContainer(DockerImageName.parse("redis/redis-stack:latest"));
+            new RedisContainer(DockerImageName.parse("redis/redis-stack:latest"))
+                    .waitingFor(Wait.forListeningPort());
 
     @DynamicPropertySource
     static void postgresqlProperties(DynamicPropertyRegistry registry) {
@@ -53,11 +57,13 @@ public class BaseContextTest {
 
         registry.add("spring.data.redis.port", () -> REDIS_CONTAINER.getMappedPort(6379));
         registry.add("spring.data.redis.host", REDIS_CONTAINER::getHost);
+    }
 
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+    @Test
+    @DisplayName("Spring context test check")
+    @DirtiesContext
+    public void contextLoads() {
+        assertNotNull(mockMvc);
+        assertNotNull(objectMapper);
     }
 }

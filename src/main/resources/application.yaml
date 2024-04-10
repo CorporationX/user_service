@@ -16,7 +16,6 @@ spring:
 
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
-
   data:
     redis:
       port: 6379
@@ -28,6 +27,8 @@ spring:
           name: follower_channel
         profile_view_channel:
             name: profile_view_channel
+  profiles:
+    active: test
 
 server:
   port: 8080

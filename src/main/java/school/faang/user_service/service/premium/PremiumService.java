@@ -1,7 +1,10 @@
 package school.faang.user_service.service.premium;
 
-import jakarta.transaction.Transactional;
+import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -20,7 +23,9 @@ import school.faang.user_service.repository.premium.PremiumRepository;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +34,10 @@ public class PremiumService {
     private final PaymentServiceClient paymentServiceClient;
     private final UserRepository userRepository;
     private final PremiumMapper premiumMapper;
+    private final ExecutorService executorService;
+
+    @Value("${premium.remover.batchSize}")
+    private int batchSize;
 
     @Transactional
     public PremiumDto buyPremium(long userId, PremiumPeriod premiumPeriod) {
@@ -70,5 +79,17 @@ public class PremiumService {
         Premium premiumNew = premiumRepository.save(premium);
         user.setPremium(premiumNew);
         return premiumNew;
+    }
+
+    @Transactional
+    public void removeExpiredPremiums() {
+        List<Premium> expiredPremiums = premiumRepository.findAllByEndDateBefore(LocalDateTime.now());
+
+        List<List<Premium>> batches = Lists.partition(expiredPremiums, batchSize);
+
+        for (List<Premium> batch : batches) {
+            Runnable deleteExpiredPremiums = () -> batch.forEach(premiumRepository::delete);
+            executorService.execute(deleteExpiredPremiums);
+        }
     }
 }

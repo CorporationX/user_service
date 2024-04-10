@@ -58,3 +58,11 @@ task:
 
 cleanUpPremiumRepo:
   cron: *daily
+
+premium:
+  remover:
+    cron: "0 0 0 * * MON"
+    batchSize: 100
+
+executorConfig:
+  thread-pool-size: 10

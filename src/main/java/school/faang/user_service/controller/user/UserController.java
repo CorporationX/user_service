@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.user.UserService;
+
 import java.util.List;
 
 @Slf4j
@@ -25,5 +26,10 @@ public class UserController {
     public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         log.info("getUsersByIds was called");
         return userService.getUsersByIds(ids);
+    }
+
+    @PostMapping("/deactivate/{userId}")
+    public void deactivate(@PathVariable long userId) {
+        userService.deactivate(userId);
     }
 }

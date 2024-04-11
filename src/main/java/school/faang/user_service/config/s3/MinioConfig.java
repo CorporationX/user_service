@@ -28,21 +28,22 @@ public class MinioConfig {
 
 
     @Bean
-    public AmazonS3 createAmazonS3(){
+    public AmazonS3 createAmazonS3() {
         AWSCredentials credentials = new BasicAWSCredentials(
                 accessKey,
                 secretKey
         );
         AmazonS3 client = AmazonS3ClientBuilder
                 .standard()
-                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint, null))
-                .withCredentials(new AWSStaticCredentialsProvider(credentials) )
+                .withEndpointConfiguration( new AwsClientBuilder.EndpointConfiguration( endpoint, null ) )
+                .withCredentials( new AWSStaticCredentialsProvider( credentials ) )
                 .build();
         return client;
     }
 
     @Bean
     public RestTemplate restTemplate() {
+
         return new RestTemplate();
     }
 

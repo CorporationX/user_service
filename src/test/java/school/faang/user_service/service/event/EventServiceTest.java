@@ -111,7 +111,7 @@ class EventServiceTest {
         when(eventRepository.findAll()).thenReturn(events);
         when(postEventFilter.postEventFilter(events)).thenReturn(postEvents);
 
-        eventService.clearEvent();
+        eventService.clearPastEvent();
 
         verify(eventRepository, times(1)).findAll();
         verify(postEventFilter, times(1)).postEventFilter(anyList());

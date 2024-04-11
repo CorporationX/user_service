@@ -31,8 +31,8 @@ public class EventService {
     @Value("{$batch-size}")
     private int batchSize;
 
-    @Async("myPool")
-    public void clearEvent() {
+    @Async
+    public void clearPastEvent() {
         List<Event> events = eventRepository.findAll();
         List<Event> postEvents = postEventFilter.postEventFilter(events);
 

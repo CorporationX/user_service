@@ -2,6 +2,7 @@ package school.faang.user_service.service.premium;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PremiumService {
@@ -33,6 +35,7 @@ public class PremiumService {
     @Transactional
     public PremiumDto buyPremium(long userId, PremiumPeriod premiumPeriod) {
         if (premiumRepository.existsByUserId(userId)) {
+            log.warn("The user {} already has Premium subscription", userId);
             throw new DataValidationException("The user "+userId+" already has Premium subscription");
         }
 

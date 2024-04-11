@@ -11,10 +11,10 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.filter.EventFilter;
-import school.faang.user_service.service.event.filter.PostEventFilter;
 import school.faang.user_service.validation.event.EventValidator;
 import school.faang.user_service.validation.user.UserValidator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,15 +26,14 @@ public class EventService {
     private final List<EventFilter> eventFilters;
     private final EventValidator eventValidator;
     private final UserValidator userValidator;
-    private final PostEventFilter postEventFilter;
 
-    @Value("{$batch-size}")
+    @Value("{$application.properties.batch-size}")
     private int batchSize;
 
     @Async
     public void clearPastEvent() {
         List<Event> events = eventRepository.findAll();
-        List<Event> postEvents = postEventFilter.postEventFilter(events);
+        List<Event> postEvents = postEventFilter(events);
 
         if (!postEvents.isEmpty()) {
             List<List<Event>> batches = postEvents.stream()
@@ -97,5 +96,11 @@ public class EventService {
     private Event getEventFromRepository(long eventId) {
         return eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Event doesn't exist by id: " + eventId));
+    }
+
+    private List<Event> postEventFilter(List<Event> events) {
+        return events.stream()
+                .filter(event -> event.getEndDate().isBefore(LocalDateTime.now()))
+                .toList();
     }
 }

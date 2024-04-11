@@ -60,8 +60,9 @@ scheduler:
   cron-expression-weekly: "0 0 0 * * ?"
   cron-expression-daily: "0 0 0 * * *"
 
-application.properties:
-  batch-size: 1
+application:
+  properties:
+    batch-size: 1
 
 premium:
   expired:
@@ -69,4 +70,8 @@ premium:
 
 thread-pool:
   thread-count: 10
-  clear-premiums: @daily
+
+servlet:
+  multipart:
+    max-file-size: 5MB
+    max-request-size: 5MB

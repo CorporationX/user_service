@@ -12,7 +12,6 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.mapper.event.EventMapperImpl;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.filter.EventFilter;
-import school.faang.user_service.service.event.filter.PostEventFilter;
 import school.faang.user_service.validation.event.EventValidator;
 import school.faang.user_service.validation.user.UserValidator;
 
@@ -42,7 +41,6 @@ class EventServiceTest {
     private EventValidator eventValidator;
     private UserValidator userValidator;
     private EventService eventService;
-    private PostEventFilter postEventFilter;
 
     private EventFilterDto eventFilterDto;
     private EventFilter eventFilter;
@@ -100,30 +98,22 @@ class EventServiceTest {
         eventFilters = List.of(eventFilter);
         eventValidator = mock(EventValidator.class);
         userValidator = mock(UserValidator.class);
-        postEventFilter = mock(PostEventFilter.class);
-        eventService = new EventService(eventRepository, eventMapper, eventFilters, eventValidator, userValidator, postEventFilter);
+        eventService = new EventService(eventRepository, eventMapper, eventFilters, eventValidator, userValidator);
     }
 
     @Test
     public void testClearEvent() {
         List<Event> events = Arrays.asList(event1, event2, event3);
-        List<Event> postEvents = Arrays.asList(event1, event3);
         when(eventRepository.findAll()).thenReturn(events);
-        when(postEventFilter.postEventFilter(events)).thenReturn(postEvents);
 
         eventService.clearPastEvent();
 
         verify(eventRepository, times(1)).findAll();
-        verify(postEventFilter, times(1)).postEventFilter(anyList());
         verify(eventRepository, times(2)).deleteAll(anyList());
         ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
         verify(eventRepository, times(2)).deleteAll(captor.capture());
         List<List> capturedBatches = captor.getAllValues();
         assertEquals(2, capturedBatches.size());
-        ArgumentCaptor<List<Event>> captor2 = ArgumentCaptor.forClass(List.class);
-        verify(postEventFilter, times(1)).postEventFilter(captor2.capture());
-        List<Event> capturedEvents = captor2.getValue();
-        assertEquals(capturedEvents.size(), 3);
     }
 
     @Test

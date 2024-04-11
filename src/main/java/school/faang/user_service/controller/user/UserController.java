@@ -2,17 +2,14 @@ package school.faang.user_service.controller.user;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.user.UserService;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
@@ -22,7 +19,8 @@ public class UserController {
 
     @GetMapping("/{userId}")
     public UserDto getUser(@PathVariable long userId) {
-        return userService.getUser( userId );
+        log.info("getUser method was called");
+        return userService.getUser(userId);
     }
 
     @PostMapping("/create")
@@ -32,6 +30,7 @@ public class UserController {
 
     @PostMapping
     public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
-        return userService.getUsersByIds( ids );
+        log.info("getUsersByIds was called");
+        return userService.getUsersByIds(ids);
     }
 }

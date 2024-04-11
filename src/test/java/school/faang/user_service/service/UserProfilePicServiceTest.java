@@ -8,7 +8,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.S3.S3Service;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -38,9 +37,6 @@ public class UserProfilePicServiceTest {
 
     @Test
     public void testUploadUserProfilePic() throws IOException {
-        // Подготовка
-
-        // Устанавливаем значения
         Long userId = 1L;
         MockMultipartFile file = new MockMultipartFile("file", "test.png", "image/png", "test data".getBytes());
 
@@ -50,15 +46,10 @@ public class UserProfilePicServiceTest {
         when(userRepository.findById(userId)).thenReturn(java.util.Optional.of(user));
         when(s3Service.saveResizedImages(any(), anyString())).thenReturn(new String[]{"key1", "key2"});
 
-        // Действие
         User result = userProfilePicService.uploadUserProfilePic(userId, file);
 
-        // Проверка
-
-        // Проверяем, что результат соответствует ожиданиям
         assertEquals("key1", result.getUserProfilePic().getFileId());
         assertEquals("key2", result.getUserProfilePic().getSmallFileId());
-        // Проверяем, что методы были вызваны нужное количество раз
         verify(userRepository, times(1)).findById(userId);
         verify(s3Service, times(1)).saveResizedImages(file, "user-profile-pics");
         verify(userRepository, times(1)).save(user);
@@ -66,9 +57,6 @@ public class UserProfilePicServiceTest {
 
     @Test
     public void testDeleteUserProfilePic() throws IOException {
-        // Подготовка
-
-        // Устанавливаем значения
         Long userId = 1L;
 
         User user = new User();
@@ -79,23 +67,15 @@ public class UserProfilePicServiceTest {
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
-        // Действие
         userProfilePicService.deleteUserProfilePic(userId);
 
-        // Проверка
-
-        // Проверяем, что изображение пользователя удалено
         assertNull(user.getUserProfilePic());
-        // Проверяем, что методы были вызваны нужное количество раз
         verify(s3Service, times(1)).deleteFile("user-profile-pics", "fileId");
         verify(userRepository, times(1)).save(user);
     }
 
     @Test
     public void testGetUserProfilePic() throws IOException {
-        // Подготовка
-
-        // Устанавливаем значения
         Long userId = 1L;
         InputStream mockInputStream = new ByteArrayInputStream("test data".getBytes());
 
@@ -107,15 +87,10 @@ public class UserProfilePicServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(s3Service.downloadFile("user-profile-pics", "fileId")).thenReturn(mockInputStream);
 
-        // Действие
         InputStream result = userProfilePicService.getUserProfilePic(userId);
 
-        // Проверка
-
-        // Проверяем, что результат не пустой и содержит ожидаемые данные
         assertNotNull(result);
         assertArrayEquals("test data".getBytes(), result.readAllBytes());
-        // Проверяем, что методы были вызваны нужное количество раз
         verify(s3Service, times(1)).downloadFile("user-profile-pics", "fileId");
     }
 }

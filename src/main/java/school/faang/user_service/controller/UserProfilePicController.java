@@ -1,5 +1,6 @@
 package school.faang.user_service.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -11,18 +12,15 @@ import school.faang.user_service.service.UserProfilePicService;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @RestController
-@RequestMapping("/api/user/profile-pic")
+@RequestMapping("/user/profile-pic")
+@RequiredArgsConstructor
 public class UserProfilePicController {
 
     @Autowired
     private UserProfilePicService userProfilePicService;
 
-    // Контроллер для загрузки изображения профиля пользователя
     @PostMapping("/{userId}")
     public ResponseEntity<?> uploadUserProfilePic(@PathVariable Long userId, @RequestParam("file") MultipartFile file) {
         try {
@@ -33,7 +31,6 @@ public class UserProfilePicController {
         }
     }
 
-    // Контроллер для удаления изображения профиля пользователя
     @DeleteMapping("/{userId}")
     public ResponseEntity<?> deleteUserProfilePic(@PathVariable Long userId) {
         try {
@@ -44,21 +41,17 @@ public class UserProfilePicController {
         }
     }
 
-    // Контроллер для получения изображения профиля пользователя
     @GetMapping("/{userId}")
     public ResponseEntity<byte[]> getUserProfilePic(@PathVariable Long userId) {
         try {
             InputStream userProfilePicStream = userProfilePicService.getUserProfilePic(userId);
 
-            // Чтение изображения из потока в массив байтов
             byte[] imageBytes = userProfilePicStream.readAllBytes();
 
-            // Подготовка заголовков ответа для изображения
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.IMAGE_JPEG);
             headers.setContentLength(imageBytes.length);
 
-            // Возвращаем ответ с данными изображения и заголовками
             return ResponseEntity.ok().headers(headers).body(imageBytes);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);

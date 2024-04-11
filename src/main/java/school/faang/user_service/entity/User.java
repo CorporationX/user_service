@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import school.faang.user_service.entity.contact.Contact;
@@ -25,6 +27,8 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
+@Setter
+@Getter
 public class User {
 
     @Id
@@ -142,20 +146,4 @@ public class User {
 
     @OneToOne(mappedBy = "user")
     private Premium premium;
-
-    public long getId() {
-        return id;
-    }
-
-    public void setUserProfilePic(UserProfilePic userProfilePic) {
-        this.userProfilePic = userProfilePic;
-    }
-
-    public UserProfilePic getUserProfilePic() {
-        return userProfilePic;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
 }

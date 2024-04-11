@@ -12,7 +12,7 @@ import school.faang.user_service.service.exceptions.messageerror.MessageError;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor//or I can use @AutoWired and constructor with required fields instead
+@RequiredArgsConstructor
 public class MentorshipService {
     private final UserMapper userMapper;
     private final UserRepository userRepository;
@@ -60,4 +60,13 @@ public class MentorshipService {
         userRepository.save(mentee);
     }
 
+
+    public void deleteAllMentorMentorship(long mentorId) {
+        userRepository.findById(mentorId)
+                .orElseThrow(() -> new UserNotFoundException(MessageError.USER_NOT_FOUND_EXCEPTION));
+        List<Long> menteesId = getMentees(mentorId).stream().map(UserDto::getId).toList();
+        for (Long menteeId : menteesId) {
+            deleteMentor(menteeId, mentorId);
+        }
+    }
 }

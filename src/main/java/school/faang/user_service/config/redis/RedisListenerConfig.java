@@ -27,7 +27,7 @@ public class RedisListenerConfig {
     private final BanUserListener banUserListener;
 
     @Bean
-    ChannelTopic banUserTopic() {
+    public ChannelTopic banUserTopic() {
         return new ChannelTopic(userBanTopic);
     }
 

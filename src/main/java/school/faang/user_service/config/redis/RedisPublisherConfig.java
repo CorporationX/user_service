@@ -18,7 +18,7 @@ public class RedisPublisherConfig {
     private String followerTopic;
 
     @Bean
-    ChannelTopic followerTopic() {
+    public ChannelTopic followerTopic() {
         return new ChannelTopic(followerTopic);
     }
 

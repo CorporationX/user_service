@@ -23,12 +23,13 @@ public class UserController {
 
     @GetMapping("/{userId}")
     public UserDto getUser(@PathVariable long userId) {
-        //TODO: should I make a cascade class???
+        log.info("getUser method was called");
         return userService.getUser(userId);
     }
 
     @PostMapping
     public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
+        log.info("getUsersByIds was called");
         return userService.getUsersByIds(ids);
     }
 }

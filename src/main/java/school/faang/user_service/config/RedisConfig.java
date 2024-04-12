@@ -17,6 +17,9 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}")
     private int port;
 
+    @Value("${spring.data.redis.channels.profile_view_channel.name}")
+    private String profileViewTopic;
+
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
         System.out.println(port);
@@ -32,4 +35,5 @@ public class RedisConfig {
         redisTemplate.setValueSerializer(new StringRedisSerializer());
         return redisTemplate;
     }
+
 }

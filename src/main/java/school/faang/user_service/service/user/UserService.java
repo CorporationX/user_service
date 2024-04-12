@@ -15,7 +15,6 @@ import school.faang.user_service.service.exceptions.messageerror.MessageError;
 import school.faang.user_service.service.validators.UserValidator;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +27,8 @@ public class UserService {
     private final MentorshipService mentorshipService;
 
     public UserDto getUser(long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("User not found!"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(MessageError.USER_NOT_FOUND_EXCEPTION));
         return userMapper.toDto(user);
     }
 
@@ -38,11 +38,9 @@ public class UserService {
 
     @Transactional
     public void deactivate(long userId) {
-        userValidator.userExistenceInRepo(userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(MessageError.USER_NOT_FOUND_EXCEPTION));
         user.setActive(false);
-        userRepository.save(user);
         List<Long> eventIds = eventService.getOwnedEvents(userId).stream().map(EventDto::getId).toList();
         for (Long eventId : eventIds) {
             eventService.deleteEvent(eventId);

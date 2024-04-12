@@ -31,6 +31,10 @@ spring:
           name: follower_channel
         profile_view_channel:
           name: profile_view_channel
+    kafka:
+      bootstrap-server: localhost:9092
+      channels:
+        follower: follower_channel
 
 server:
   port: 8080

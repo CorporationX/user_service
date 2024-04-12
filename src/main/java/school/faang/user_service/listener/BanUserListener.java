@@ -26,6 +26,7 @@ public class BanUserListener implements MessageListener {
             UserEvent userEvent = objectMapper.readValue(message.getBody(), UserEvent.class);
             userService.banUser(userEvent.getUserId());
         } catch (IOException e) {
+            log.error("SerializationException was thrown", e);
             throw new SerializationException("Failed to deserialize message", e);
         }
     }

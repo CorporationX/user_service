@@ -1,22 +1,24 @@
 package school.faang.user_service.publisher;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.stereotype.Component;
 import school.faang.user_service.event.follower.FollowerEvent;
 
 @Slf4j
+@Component
 @RequiredArgsConstructor
 public class FollowerEventPublisher implements MessagePublisher<FollowerEvent> {
-    private final KafkaTemplate<String, Object> kafkaTemplate;
-
-    @Value("${spring.data.kafka.channels.follower}")
-    private String followerChannel;
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final ChannelTopic followerTopic;
+    private final ObjectMapper objectMapper;
 
     @Override
-    public void publish(FollowerEvent event) {
-        kafkaTemplate.send(followerChannel, event);
-        log.info("Follower event was published {}", event);
+    public void publish(FollowerEvent event) throws JsonProcessingException {
+        redisTemplate.convertAndSend(followerTopic.getTopic(), objectMapper.writeValueAsString(event));
     }
 }

@@ -1,5 +1,7 @@
 package school.faang.user_service.publisher;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 public interface MessagePublisher <T> {
-    public void publish(T event);
+    void publish(T event) throws JsonProcessingException;
 }

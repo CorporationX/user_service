@@ -24,7 +24,7 @@ public class FollowerEventPublisher implements MessagePublisher<FollowerEvent> {
             redisTemplate.convertAndSend(followerTopic.getTopic(), objectMapper.writeValueAsString(event));
         } catch (JsonProcessingException e) {
             log.error("JsonProcessingException was thrown", e);
-            throw new SerializationException(e.getMessage(), e);
+            throw new SerializationException("Failed to serialize message", e);
         }
     }
 }

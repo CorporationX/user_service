@@ -1,32 +1,34 @@
 package school.faang.user_service.service.user;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.event.ProfileViewEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
-import school.faang.user_service.mapper.user.UserMapper;
-import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.validator.user.UserValidator;
-
-import java.util.UUID;
-
-import school.faang.user_service.handler.exception.EntityNotFoundException;
-
-
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.handler.exception.DataValidationException;
+import school.faang.user_service.handler.exception.EntityNotFoundException;
+import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.publisher.ProfileViewEventPublisher;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.MentorshipService;
 import school.faang.user_service.service.goal.GoalService;
+import school.faang.user_service.validator.user.UserValidator;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
     private final UserMapper userMapper;
     private final UserValidator userValidator;
@@ -34,6 +36,8 @@ public class UserService {
     private final MentorshipService mentorshipService;
     private final GoalService goalService;
     private final EventRepository eventRepository;
+    private final UserContext userContext;
+    private final ProfileViewEventPublisher profileViewEventPublisher;
     @Value("${dicebear.avatar}")
     private String avatarUrl;
     @Value("${dicebear.small_avatar}")
@@ -59,14 +63,19 @@ public class UserService {
     public UserDto getUserById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("User with id: %s not found", userId)));
+        ProfileViewEvent profileViewEvent = ProfileViewEvent.builder()
+                .viewedUserId(userId).viewingUserId(userContext.getUserId()).viewedAt(LocalDateTime.now()).build();
+        profileViewEventPublisher.publish(profileViewEvent);
+        log.info("Отправлен profileViewEvent");
         return userMapper.toDto(user);
     }
 
     public List<UserDto> getUsersByIds(List<Long> ids) {
         return userMapper.toDto(userRepository.findAllById(ids));
     }
+
     public UserDto deactivationUserById(Long userId) {
-        User userDeactivate = userRepository.findById(userId).orElseThrow(() -> new DataValidationException("Пользователь с id: "+ userId+" не найден"));
+        User userDeactivate = userRepository.findById(userId).orElseThrow(() -> new DataValidationException("Пользователь с id: " + userId + " не найден"));
         if (userDeactivate.getGoals() != null && !userDeactivate.getGoals().isEmpty()) {
             List<Long> deleteGoals = userDeactivate.getGoals().stream().filter(goal -> !GoalStatus.COMPLETED.equals(goal.getStatus()))
                     .peek(goal -> goal.getUsers().removeIf(user -> user.getId() == userId))

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.serializer.SerializationException;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.event.follower.FollowerEvent;
 
@@ -18,7 +19,12 @@ public class FollowerEventPublisher implements MessagePublisher<FollowerEvent> {
     private final ObjectMapper objectMapper;
 
     @Override
-    public void publish(FollowerEvent event) throws JsonProcessingException {
-        redisTemplate.convertAndSend(followerTopic.getTopic(), objectMapper.writeValueAsString(event));
+    public void publish(FollowerEvent event) {
+        try {
+            redisTemplate.convertAndSend(followerTopic.getTopic(), objectMapper.writeValueAsString(event));
+        } catch (JsonProcessingException e) {
+            log.error("JsonProcessingException was thrown", e);
+            throw new SerializationException(e.getMessage(), e);
+        }
     }
 }

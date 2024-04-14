@@ -2,7 +2,6 @@ package school.faang.user_service.service.premium;
 
 import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.HttpStatus;
@@ -88,8 +87,7 @@ public class PremiumService {
         List<List<Premium>> batches = Lists.partition(expiredPremiums, batchSize);
 
         for (List<Premium> batch : batches) {
-            Runnable deleteExpiredPremiums = () -> batch.forEach(premiumRepository::delete);
-            executorService.execute(deleteExpiredPremiums);
+            executorService.execute(() -> batch.forEach(premiumRepository::delete));
         }
     }
 }

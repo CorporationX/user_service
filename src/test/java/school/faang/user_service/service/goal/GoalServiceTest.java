@@ -15,7 +15,6 @@ import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.goal.filter.GoalFilter;
 import school.faang.user_service.validator.goal.GoalValidation;
 
@@ -24,9 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

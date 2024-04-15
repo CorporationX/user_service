@@ -17,5 +17,4 @@ public class SchedulerService {
     public void deleteExpiredPremium() {
         premiumRepository.deleteAllByEndDateBefore(LocalDateTime.now());
     }
-
 }

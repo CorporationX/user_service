@@ -3,6 +3,7 @@ package school.faang.user_service.service.s3_minio_service;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -11,16 +12,11 @@ import java.io.ByteArrayInputStream;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class S3Service {
 
     private final AmazonS3 amazonS3;
     private final RestTemplate restTemplate;
-
-    public S3Service(AmazonS3 amazonS3, RestTemplate restTemplate) {
-        this.amazonS3 = amazonS3;
-        this.restTemplate = restTemplate;
-
-    }
 
     public void saveSvgToS3(String dicebearUrl, String bucketName, String fileName) {
 

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.config.s3.MinioConfig;
+import school.faang.user_service.config.s3.S3Config;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
@@ -35,8 +35,7 @@ public class UserServiceTest {
     @Mock
     private S3Service s3Service;
 
-    @Mock
-    private MinioConfig minioConfig;
+
 
     @InjectMocks
     private UserService userService;

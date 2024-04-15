@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.config.s3.MinioConfig;
+import school.faang.user_service.config.s3.S3Config;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
@@ -31,7 +31,8 @@ public class UserService {
     private String small_avatar;
 
     private final S3Service s3Service;
-    private final MinioConfig minioConfig;
+    private final S3Config s3Config;
+    private final String bucketName;
 
     public UserDto getUser(long userId) {
         User user = userRepository.findById( userId ).orElseThrow( () -> new NoSuchElementException( "User not found!" ) );
@@ -52,11 +53,11 @@ public class UserService {
 
         s3Service.
                 saveSvgToS3( user.getUserProfilePic().getSmallFileId(),
-                        minioConfig.getBucketName(),
+                        bucketName,
                         fileNameSmallAva );
         s3Service.
                 saveSvgToS3( user.getUserProfilePic().getFileId(),
-                        minioConfig.getBucketName(),
+                        bucketName,
                         fileNameLargeAva );
         return userMapper.toDto( createdUser );
 
@@ -80,7 +81,7 @@ public class UserService {
         boolean exists = userRepository.findById( userDto.getId() ).isPresent();
 
         if (exists) {
-            log.error( "User with id " + userDto.getId() + " exists" );
+            log.debug( "User with id " + userDto.getId() + " exists" );
             throw new DataValidationException( "User with id " + userDto.getId() + " exists" );
         }
     }

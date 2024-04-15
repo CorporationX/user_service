@@ -26,6 +26,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import static school.faang.user_service.validator.user.UserConstraints.USER_NOT_FOUND;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -60,7 +62,7 @@ public class UserService {
                 .build();
     }
 
-    public UserDto getUserById(Long userId) {
+    public UserDto getUserDtoById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("User with id: %s not found", userId)));
         ProfileViewEvent profileViewEvent = ProfileViewEvent.builder()
@@ -70,7 +72,7 @@ public class UserService {
         return userMapper.toDto(user);
     }
 
-    public List<UserDto> getUsersByIds(List<Long> ids) {
+    public List<UserDto> getUsersDtoByIds(List<Long> ids) {
         return userMapper.toDto(userRepository.findAllById(ids));
     }
 

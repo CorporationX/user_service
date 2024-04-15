@@ -49,7 +49,7 @@ public class UserServiceTest {
 
         when(userRepository.findById(userId)).thenThrow(EntityNotFoundException.class);
 
-        assertThrows(EntityNotFoundException.class, () -> userService.getUserById(userId));
+        assertThrows(EntityNotFoundException.class, () -> userService.getUserDtoById(userId));
     }
 
     @Test
@@ -61,7 +61,7 @@ public class UserServiceTest {
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
-        UserDto userById = userService.getUserById(userId);
+        UserDto userById = userService.getUserDtoById(userId);
         verify(profileViewEventPublisher).publish(captor.capture());
         verify(userRepository).findById(userId);
         assertEquals(userExpected, userById);
@@ -78,7 +78,7 @@ public class UserServiceTest {
 
         when(userRepository.findAllById(ids)).thenReturn(List.of(firstUser, secondUser));
 
-        assertEquals(usersExpected, userService.getUsersByIds(ids));
+        assertEquals(usersExpected, userService.getUsersDtoByIds(ids));
         verify(userRepository).findAllById(ids);
     }
 

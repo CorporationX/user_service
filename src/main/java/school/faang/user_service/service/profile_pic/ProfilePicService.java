@@ -13,10 +13,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserProfilePicDto;
+import school.faang.user_service.dto.event.EventProfilePic;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.handler.exception.FileOperationException;
 import school.faang.user_service.mapper.user_profile_pic.UserProfilePicMapper;
+import school.faang.user_service.publisher.ProfilePicEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.user.UserService;
 
@@ -39,6 +41,8 @@ public class ProfilePicService {
 
     private final UserProfilePicMapper userProfilePicMapper;
 
+    private final ProfilePicEventPublisher profilePicEventPublisher;
+
     @Value("${services.s3.large_photo}")
     private int large_photo;
 
@@ -59,6 +63,8 @@ public class ProfilePicService {
         UserProfilePic userProfilePic = new UserProfilePic(uniqueLargePicName, uniqueSmallPicName);
         user.setUserProfilePic(userProfilePic);
         userRepository.save(user);
+        EventProfilePic eventProfilePic = EventProfilePic.builder().userId(userId).fileId(userProfilePic.getFileId()).build();
+        profilePicEventPublisher.publish(eventProfilePic);
         log.info(String.format("User with id %s upload avatar", userId));
         return userProfilePicMapper.toDto(userProfilePic);
     }

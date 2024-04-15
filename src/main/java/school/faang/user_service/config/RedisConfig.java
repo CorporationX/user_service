@@ -18,7 +18,7 @@ public class RedisConfig {
     private String host;
     @Value("${spring.data.redis.port}")
     private int port;
-    @Value("")
+    @Value("${spring.data.redis.channels.profile_pic_channel.name}")
     private String profilePicTopic;
 
     @Bean
@@ -39,6 +39,6 @@ public class RedisConfig {
 
     @Bean
     public ChannelTopic profile_pic_channel(){
-        return new ChannelTopic()
+        return new ChannelTopic(profilePicTopic);
     }
 }

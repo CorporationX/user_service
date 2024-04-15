@@ -12,10 +12,12 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserProfilePicDto;
+import school.faang.user_service.dto.event.EventProfilePic;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.handler.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.user_profile_pic.UserProfilePicMapper;
+import school.faang.user_service.publisher.ProfilePicEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.user.UserService;
 
@@ -39,7 +41,8 @@ public class ProfilePicServiceTest {
     private AmazonS3 s3Client;
     @Mock
     private UserProfilePicMapper userProfilePicMapper;
-
+    @Mock
+    private ProfilePicEventPublisher profilePicEventPublisher;
     @InjectMocks
     private ProfilePicService profilePicService;
 
@@ -79,10 +82,12 @@ public class ProfilePicServiceTest {
 
         assertDoesNotThrow(() -> profilePicService.uploadAvatar(userId, file));
         verify(userService).getUser(userId);
+        verify(profilePicEventPublisher).publish(any(EventProfilePic.class));
         verify(userProfilePicMapper).toDto(any(UserProfilePic.class));
     }
+
     @Test
-    public void testDeleteAvatarSuccess(){
+    public void testDeleteAvatarSuccess() {
         Long userId = 1L;
         User userBeforeDeletePhoto = new User();
         User userAfterDeletePhoto = new User();

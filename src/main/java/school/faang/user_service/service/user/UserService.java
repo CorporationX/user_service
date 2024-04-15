@@ -74,6 +74,12 @@ public class UserService {
         return userMapper.toDto(userRepository.findAllById(ids));
     }
 
+    public User getUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format(USER_NOT_FOUND.getMessage(), userId)));
+    }
+
+
     public UserDto deactivationUserById(Long userId) {
         User userDeactivate = userRepository.findById(userId).orElseThrow(() -> new DataValidationException("Пользователь с id: " + userId + " не найден"));
         if (userDeactivate.getGoals() != null && !userDeactivate.getGoals().isEmpty()) {

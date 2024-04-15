@@ -26,6 +26,8 @@ spring:
           name: follower_channel
         profile_view_channel:
             name: profile_view_channel
+        profile_pic_channel:
+          name: "profile_pic_channel"
 
 server:
   port: 8080

@@ -7,7 +7,6 @@ public class Scheduler {
 
     private EventService eventService;
 
-    @Scheduled(cron = "$scheduler.cron-expression-daily")
     @Scheduled(cron = "$scheduler.cron-expression-weekly")
     public void clearPastEvents(){
         eventService.clearPastEvent();

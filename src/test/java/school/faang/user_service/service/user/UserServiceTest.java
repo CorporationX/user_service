@@ -1,6 +1,5 @@
 package school.faang.user_service.service.user;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,14 +11,14 @@ import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.MentorshipService;
 import school.faang.user_service.service.event.EventService;
+import school.faang.user_service.service.exceptions.UserNotFoundException;
 import school.faang.user_service.service.validators.UserValidator;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 
@@ -59,9 +58,7 @@ public class UserServiceTest {
     @Test
     public void testGetUser_UserDoesNotExist() {
         Mockito.when(userRepository.findById(firstUser.getId())).thenReturn(Optional.empty());
-
-        NoSuchElementException e = Assert.assertThrows(NoSuchElementException.class, () -> userService.getUser(firstUser.getId()));
-        assertEquals(e.getMessage(), "User not found!");
+        assertThrows(UserNotFoundException.class, () -> userService.getUser(firstUser.getId()));
     }
 
     @Test
@@ -87,12 +84,11 @@ public class UserServiceTest {
     @Test
     public void testDeactivateUser() {
         long id = 1L;
-        when(userRepository.findById(id)).thenReturn(Optional.of(User.builder().id(id).active(true).build()));
+        User user = User.builder().id(id).active(true).build();
+        when(userRepository.findById(id)).thenReturn(Optional.of(user));
         when(eventService.getOwnedEvents(id)).thenReturn(List.of(EventDto.builder().id(id).build()));
         userService.deactivate(id);
-        verify(userRepository, times(1)).save(userArgumentCaptor.capture());
         verify(eventService, times(1)).deleteEvent(id);
-        User capturedUser = userArgumentCaptor.getValue();
-        assertFalse(capturedUser.isActive());
+        assertFalse(user.isActive());
     }
 }

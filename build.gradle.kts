@@ -11,9 +11,9 @@ version = "1.0"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 configurations {
-	compileOnly {
-		extendsFrom(configurations.annotationProcessor.get())
-	}
+    compileOnly {
+        extendsFrom(configurations.annotationProcessor.get())
+    }
 }
 
 repositories {
@@ -21,18 +21,17 @@ repositories {
 }
 
 dependencies {
-	/**
-	 * Spring boot starters
-	 */
-
-	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2") //swagger
-	implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
-	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-	implementation("org.springframework.boot:spring-boot-starter-data-redis")
-	implementation("org.springframework.boot:spring-boot-starter-web")
-	implementation("org.springframework.boot:spring-boot-starter-validation")
-	implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.0.2")
-	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    /**
+     * Spring boot starters
+     */
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2") //swagger
+    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.0.2")
 
 	/**
 	 * Database
@@ -79,10 +78,10 @@ dependencies {
 }
 
 jsonSchema2Pojo {
-	setSource(files("src/main/resources/json"))
-	targetDirectory = file("${project.buildDir}/generated-sources/js2p")
-	targetPackage = "com.json.student"
-	setSourceType("jsonschema")
+    setSource(files("src/main/resources/json"))
+    targetDirectory = file("${project.buildDir}/generated-sources/js2p")
+    targetPackage = "com.json.student"
+    setSourceType("jsonschema")
 }
 
 tasks.withType<Test> {

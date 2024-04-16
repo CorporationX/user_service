@@ -46,7 +46,6 @@ class MentorshipControllerTest {
         verify(mentorshipService).getMentees(idTrue);
     }
 
-
     @Test
     void testGetMentorsSuccessful() {
         List<UserDto> mentors = List.of(new UserDto(), new UserDto());
@@ -59,13 +58,11 @@ class MentorshipControllerTest {
         verify(mentorshipService).getMentors(idTrue);
     }
 
-
     @Test
     void testDeleteMenteeSuccessful() {
         mentorshipController.deleteMentee(menteeId, mentorId);
         verify(mentorshipService).deleteMentee(menteeId, mentorId);
     }
-
 
     @Test
     void testDeleteMentorSuccessful() {

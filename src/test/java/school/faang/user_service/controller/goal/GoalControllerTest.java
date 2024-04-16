@@ -36,16 +36,15 @@ class GoalControllerTest {
         goalsDto = List.of(new GoalDto());
     }
 
-
     @Test
-    public void testSuccessfullyDeleteGoal() {
+    void testSuccessfullyDeleteGoal() {
         goalController.deleteGoal(1L);
 
         verify(goalService, times(1)).deleteGoal(1L);
     }
 
     @Test
-    public void testSuccessfullyGetGoalsByUser() {
+    void testSuccessfullyGetGoalsByUser() {
         when(goalController.getGoalsByUser(1L, goalFilterDto)).thenReturn(goalsDto);
         goalController.getGoalsByUser(1L, goalFilterDto);
 
@@ -53,7 +52,7 @@ class GoalControllerTest {
     }
 
     @Test
-    public void testSuccessfullyFindSubtasksByGoalId() {
+    void testSuccessfullyFindSubtasksByGoalId() {
         when(goalController.findSubtasksByGoalId(1L)).thenReturn(goalsDto);
         goalController.findSubtasksByGoalId(1L);
 
@@ -61,10 +60,11 @@ class GoalControllerTest {
     }
 
     @Test
-    public void testSuccessfullyFindSubtasksByGoalIdAndFilters() {
+    void testSuccessfullyFindSubtasksByGoalIdAndFilters() {
         when(goalController.retrieveFilteredSubtasksForGoal(1L, goalFilterDto)).thenReturn(goalsDto);
         goalController.retrieveFilteredSubtasksForGoal(1L, goalFilterDto);
 
         verify(goalService, times(1)).retrieveFilteredSubtasksForGoal(1L, goalFilterDto);
     }
+
 }

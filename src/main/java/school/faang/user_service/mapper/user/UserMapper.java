@@ -16,12 +16,12 @@ import java.util.List;
 public interface UserMapper {
 
     @Mapping(source = "country.id", target = "countryId")
+    @Mapping( source = "contactPreference.preference", target = "preference")
     UserDto toDto(User user);
 
     @Mapping(source = "country.id", target = "countryId")
     @Mapping(source = "userProfilePic.fileId", target = "userProfilePic")
     UserCreateDto toUserCreateDto(User user);
-
 
     @Mapping(source = "countryId", target = "country.id")
     @Mapping(source = "userProfilePic", target = "userProfilePic.fileId")
@@ -45,7 +45,6 @@ public interface UserMapper {
     @Mapping(target = "aboutMe", source = ".", qualifiedByName = "aboutMe")
     @Mapping(target = "country.title", source = "country")
     User personToUser(PersonSchemaV2 person);
-
 
     @Named("aboutMe")
     default String getAboutMe(PersonSchemaV2 person) {

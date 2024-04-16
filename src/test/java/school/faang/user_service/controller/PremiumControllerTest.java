@@ -1,6 +1,5 @@
 package school.faang.user_service.controller;
 
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,12 +28,10 @@ public class PremiumControllerTest {
     @InjectMocks
     private PremiumController premiumController;
 
-
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(premiumController).build();
     }
-
 
     @Test
     void testShouldBuyPremium() throws Exception {
@@ -49,8 +46,6 @@ public class PremiumControllerTest {
                         .param("days", days.toString())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
+  }
 
-
-
-    }
 }

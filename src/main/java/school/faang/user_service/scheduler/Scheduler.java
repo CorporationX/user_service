@@ -10,6 +10,5 @@ public class Scheduler {
     @Scheduled(cron = "$scheduler.cron-expression-weekly")
     public void clearPastEvents(){
         eventService.clearPastEvent();
-
     }
 }

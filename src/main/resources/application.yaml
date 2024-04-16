@@ -60,9 +60,9 @@ scheduler:
   cron-expression-weekly: "0 0 0 * * ?"
   cron-expression-daily: "0 0 0 * * *"
 
-application:
-  properties:
-    batch-size: 1
+event:
+  past:
+    delete-batch: 100
 
 premium:
   expired:

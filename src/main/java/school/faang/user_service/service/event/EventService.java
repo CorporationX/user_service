@@ -3,8 +3,8 @@ package school.faang.user_service.service.event;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.config.executor.ExecutorsConfig;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
@@ -26,11 +26,11 @@ public class EventService {
     private final List<EventFilter> eventFilters;
     private final EventValidator eventValidator;
     private final UserValidator userValidator;
+    private final ExecutorsConfig executorsConfig;
 
-    @Value("{$application.properties.batch-size}")
+    @Value("{$event.past.delete-batch}")
     private int batchSize;
 
-    @Async
     public void clearPastEvent() {
         List<Event> events = eventRepository.findAll();
         List<Event> postEvents = postEventFilter(events);
@@ -42,7 +42,7 @@ public class EventService {
                     .stream()
                     .map(batch -> batch.subList(0, Math.min(batch.size(), batchSize)))
                     .toList();
-            batches.parallelStream().forEach(eventRepository::deleteAll);
+            batches.parallelStream().forEach(batch -> executorsConfig.executorService().submit(() -> eventRepository.deleteAll(batch)));
         }
     }
 

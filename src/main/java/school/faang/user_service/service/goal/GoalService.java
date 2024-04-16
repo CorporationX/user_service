@@ -5,13 +5,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.dto.GoalFilterDto;
-import school.faang.user_service.dto.event.GoalCompletedEventDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.handler.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.GoalMapper;
-import school.faang.user_service.publisher.GoalCompletedEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -19,8 +17,9 @@ import school.faang.user_service.service.goal.filter.GoalFilter;
 import school.faang.user_service.validator.goal.GoalConstraints;
 import school.faang.user_service.validator.goal.GoalValidation;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,7 +32,6 @@ public class GoalService {
     private final GoalValidation goalValidation;
     private final UserRepository userRepository;
     private final List<GoalFilter> filters;
-    private final GoalCompletedEventPublisher goalCompletedEventPublisher;
     private final static int MAX_COUNT_GOALS = 3;
 
     @Transactional
@@ -85,17 +83,7 @@ public class GoalService {
                     .orElseThrow(() -> new EntityNotFoundException(GoalConstraints.ENTITY_NOT_FOUND.getMessage())));
         }
         if (GoalStatus.COMPLETED.equals(goalDto.getStatus())) {
-            goal.getUsers().forEach(user -> {
-                addSkillsToUser(user, goal);
-                GoalCompletedEventDto goalCompletedEventDto =
-                        GoalCompletedEventDto
-                                .builder()
-                                .goalId(goal.getId())
-                                .userId(user.getId())
-                                .goalCompletedAt(LocalDateTime.now())
-                                .build();
-                goalCompletedEventPublisher.publish(goalCompletedEventDto);
-            });
+            goal.getUsers().forEach(user -> addSkillsToUser(user, goal));
         }
         goal.setTitle(goalDto.getTitle());
         goal.setStatus(goalDto.getStatus());

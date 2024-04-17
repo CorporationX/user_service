@@ -9,7 +9,7 @@ import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.dto.recommendation.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.event.RecommendationEvent;
+import school.faang.user_service.dto.recommendation.RecommendationEvent;
 import school.faang.user_service.handler.exception.EntityExistException;
 import school.faang.user_service.handler.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;

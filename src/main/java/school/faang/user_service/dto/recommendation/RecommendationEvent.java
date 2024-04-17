@@ -1,4 +1,4 @@
-package school.faang.user_service.event;
+package school.faang.user_service.dto.recommendation;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

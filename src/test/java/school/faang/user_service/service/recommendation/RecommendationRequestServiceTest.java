@@ -12,9 +12,7 @@ import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.entity.recommendation.SkillRequest;
-import school.faang.user_service.event.RecommendationEvent;
-import school.faang.user_service.handler.exception.EntityNotFoundException;
+import school.faang.user_service.dto.recommendation.RecommendationEvent;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.publisher.RecommendationEventPublisher;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
@@ -23,8 +21,6 @@ import school.faang.user_service.service.recommendation.impl.RecommendationReque
 import school.faang.user_service.validator.recommendation.RecommendationRequestValidator;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 public class RecommendationRequestServiceTest {

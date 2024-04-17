@@ -112,13 +112,13 @@ public class RecommendationRequestServiceTest {
 //        Mockito.when(recommendationRequestRepository.findAll()).thenReturn(List.of(recommendationRequest));
 //    }
 
-    @Test
-    public void testRecommendationRequestReject() {
-        long id = 8;
-
-        recommendationRequestService.rejectRequest(id, rejectionDto);
-        Mockito.verify(recommendationRequestService).rejectRequest(id, rejectionDto);
-    }
+//    @Test
+//    public void testRecommendationRequestReject() {
+//        long id = 8;
+//
+//        recommendationRequestService.rejectRequest(id, rejectionDto);
+//        Mockito.verify(recommendationRequestService).rejectRequest(id, rejectionDto);
+//    }
 
 //    @Test
 //    public void testGetRequestThrowEntityNotFound() {

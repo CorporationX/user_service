@@ -24,16 +24,10 @@ import school.faang.user_service.service.s3_minio_service.S3Service;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -45,19 +39,13 @@ public class UserServiceTest {
     @Mock
     UserMapperImpl userMapper;
     @Mock
-    private UserRepository userRepository;
-    @Mock
     private S3Service s3Service;
-
-
+    @Mock
     private UserValidator userValidator;
     @Mock
     private EventService eventService;
     @Mock
     private MentorshipService mentorshipService;
-
-    @Captor
-    private ArgumentCaptor<User> userArgumentCaptor;
 
 
     User firstUser;
@@ -68,15 +56,15 @@ public class UserServiceTest {
     @BeforeEach
     void setUp() {
         firstUser = User.builder()
-                .id( 1L )
-                .username( "Petya" )
+                .id(1L)
+                .username("Petya")
                 .build();
         secondUser = User.builder()
-                .id( 2L )
-                .username( "Vanya" )
+                .id(2L)
+                .username("Vanya")
                 .build();
-        userIds = List.of( firstUser.getId(), firstUser.getId() );
-        users = List.of( firstUser, secondUser );
+        userIds = List.of(firstUser.getId(), firstUser.getId());
+        users = List.of(firstUser, secondUser);
     }
 
     @Test
@@ -115,32 +103,33 @@ public class UserServiceTest {
         verify(eventService, times(1)).deleteEvent(id);
         assertFalse(user.isActive());
     }
+
     @Test
     public void testCreateSuccess() {
 
         UserDto userDto = new UserDto();
-        userDto.setId( 1L );
-        userDto.setUsername( "John Doe" );
+        userDto.setId(1L);
+        userDto.setUsername("John Doe");
 
 
         User user = new User();
-        user.setId( 1L );
-        user.setUsername( "John Doe" );
+        user.setId(1L);
+        user.setUsername("John Doe");
 
         UserProfilePic userProfilePic = UserProfilePic.builder()
-                .smallFileId( "smallFileId" )
-                .fileId( "fileId" )
+                .smallFileId("smallFileId")
+                .fileId("fileId")
                 .build();
-        user.setUserProfilePic( userProfilePic );
+        user.setUserProfilePic(userProfilePic);
 
-        when( userMapper.toEntity( userDto ) ).thenReturn( user );
-        when( userRepository.save( user ) ).thenReturn( user );
-        when( userMapper.toDto( user ) ).thenReturn( userDto );
-        UserDto createdUserDto = userService.create( userDto );
+        when(userMapper.toEntity(userDto)).thenReturn(user);
+        when(userRepository.save(user)).thenReturn(user);
+        when(userMapper.toDto(user)).thenReturn(userDto);
+        UserDto createdUserDto = userService.create(userDto);
 
-        assertNotNull( createdUserDto );
-        assertEquals( userDto.getId(), createdUserDto.getId() );
-        assertEquals( userDto.getUsername(), createdUserDto.getUsername() );
+        assertNotNull(createdUserDto);
+        assertEquals(userDto.getId(), createdUserDto.getId());
+        assertEquals(userDto.getUsername(), createdUserDto.getUsername());
 
     }
 
@@ -148,11 +137,11 @@ public class UserServiceTest {
     public void testCreate_UserAlreadyExists_ExceptionThrown() {
 
         UserDto userDto = new UserDto();
-        userDto.setId( 1L );
+        userDto.setId(1L);
 
-        when( userRepository.findById( 1L ) ).thenReturn( java.util.Optional.of( new User() ) );
-        DataValidationException exception = assertThrows( DataValidationException.class, () -> userService.create( userDto ) );
-        assertEquals( "User with id 1 exists", exception.getMessage() );
+        when(userRepository.findById(1L)).thenReturn(java.util.Optional.of(new User()));
+        DataValidationException exception = assertThrows(DataValidationException.class, () -> userService.create(userDto));
+        assertEquals("User with id 1 exists", exception.getMessage());
 
     }
 }

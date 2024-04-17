@@ -21,7 +21,6 @@ import school.faang.user_service.service.validators.UserValidator;
 import school.faang.user_service.service.s3_minio_service.S3Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -52,25 +51,25 @@ public class UserService {
 
     public UserDto create(UserDto userDto) {
 
-        checkUserAlreadyExists( userDto );
+        checkUserAlreadyExists(userDto);
 
-        User user = userMapper.toEntity( userDto );
-        user.setUserProfilePic( getRandomAvatar() );
-        user.setActive( true );
+        User user = userMapper.toEntity(userDto);
+        user.setUserProfilePic(getRandomAvatar());
+        user.setActive(true);
 
-        User createdUser = userRepository.save( user );
+        User createdUser = userRepository.save(user);
         String fileNameSmallAva = "small_" + user.getId() + ".svg";
         String fileNameLargeAva = "large_" + user.getId() + ".svg";
 
         s3Service.
-                saveSvgToS3( user.getUserProfilePic().getSmallFileId(),
+                saveSvgToS3(user.getUserProfilePic().getSmallFileId(),
                         bucketName,
-                        fileNameSmallAva );
+                        fileNameSmallAva);
         s3Service.
-                saveSvgToS3( user.getUserProfilePic().getFileId(),
+                saveSvgToS3(user.getUserProfilePic().getFileId(),
                         bucketName,
-                        fileNameLargeAva );
-        return userMapper.toDto( createdUser );
+                        fileNameLargeAva);
+        return userMapper.toDto(createdUser);
 
     }
 
@@ -94,18 +93,18 @@ public class UserService {
 
         UUID seed = UUID.randomUUID();
         return UserProfilePic.builder().
-                smallFileId( small_avatar + seed ).
-                fileId( large_avatar + seed ).build();
+                smallFileId(small_avatar + seed).
+                fileId(large_avatar + seed).build();
 
     }
 
     private void checkUserAlreadyExists(UserDto userDto) {
 
-        boolean exists = userRepository.findById( userDto.getId() ).isPresent();
+        boolean exists = userRepository.findById(userDto.getId()).isPresent();
 
         if (exists) {
-            log.debug( "User with id " + userDto.getId() + " exists" );
-            throw new DataValidationException( "User with id " + userDto.getId() + " exists" );
+            log.debug("User with id " + userDto.getId() + " exists");
+            throw new DataValidationException("User with id " + userDto.getId() + " exists");
         }
     }
 }

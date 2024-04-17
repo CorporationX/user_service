@@ -78,8 +78,7 @@ public class EventService {
         List<Event> expiredEvents = allEvents.stream().filter(event -> event.getEndDate().isBefore(now)).toList();
         List<List<Event>> batches = Lists.partition(expiredEvents, batchSize);
         for (List<Event> batch : batches) {
-            Runnable deleteExpiredEvent = () -> batch.forEach(eventRepository::delete);
-            executorService.execute(deleteExpiredEvent);
+            executorService.execute(() -> batch.forEach(eventRepository::delete));
         }
     }
 }

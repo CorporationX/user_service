@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class FollowerEvent {
 
     private long followerId;
-    private long userId;
+    private long followeeId;
     private long projectId;
     private LocalDateTime subscriptionDateTime;
 

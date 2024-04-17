@@ -10,9 +10,11 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.SubscriptionUserDto;
 import school.faang.user_service.dto.SubscriptionUserFilterDto;
+import school.faang.user_service.dto.event.FollowerEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SubscriptionUserMapper;
+import school.faang.user_service.redis_messaging.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.filters.CityPatternFilter;
 import school.faang.user_service.service.filters.CountryPatternFilter;
@@ -44,6 +46,12 @@ public class SubscriptionServiceTest {
     @InjectMocks
     private SubscriptionService subscriptionService;
 
+    @Mock
+    private  FollowerEventPublisher followerEventPublisher;
+
+    @Mock
+    private  FollowerEvent followerEvent;
+
 
     @BeforeEach
     public void initialize() {
@@ -53,7 +61,7 @@ public class SubscriptionServiceTest {
         userFilters.add(new CountryPatternFilter());
         userFilters.add(new NamePatternFilter());
         userFilters.add(new ExperienceMaxFilter());
-        subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, userFilters);
+        subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, userFilters,  followerEventPublisher, followerEvent);
 
     }
     @Test

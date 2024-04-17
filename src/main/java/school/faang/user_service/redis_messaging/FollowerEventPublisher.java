@@ -1,5 +1,6 @@
 package school.faang.user_service.redis_messaging;
 
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import school.faang.user_service.dto.event.FollowerEvent;
 
 @Component
 @RequiredArgsConstructor
+
 
 public class FollowerEventPublisher implements MessagePublisher<FollowerEvent>{
 

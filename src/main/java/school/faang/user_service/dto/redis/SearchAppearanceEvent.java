@@ -1,4 +1,4 @@
-package school.faang.user_service.dto.analytics;
+package school.faang.user_service.dto.redis;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SearchAppearanceEventDto {
+public class SearchAppearanceEvent {
     @NotNull
     private Long viewedUserId;
     @NotNull

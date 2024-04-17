@@ -51,8 +51,11 @@ aws:
 
 services:
   s3:
-    bucket-name: user_backet
-    isMocked: true
+    bucket-name: user-service-bucket
+    endpoint: http://127.0.0.1:9000
+    accessKey: user
+    secretKey: password
+    isMocked: false
 
 task:
   scheduling:
@@ -61,6 +64,9 @@ task:
 cleanUpPremiumRepo:
   cron: *daily
 
+dicebear:
+  pic-base-url-small: https://api.dicebear.com/7.x/bottts/svg?size=64&seed=
+  pic-base-url: https://api.dicebear.com/7.x/bottts/svg?size=256&seed=
 premium:
   remover:
     cron: "0 0 0 * * MON"

@@ -1,4 +1,4 @@
-package school.faang.user_service.redis_messaging;
+package school.faang.user_service.service.publishers;
 
 public interface MessagePublisher<T> {
 

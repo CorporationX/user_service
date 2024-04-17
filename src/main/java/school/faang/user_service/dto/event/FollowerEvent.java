@@ -1,5 +1,6 @@
 package school.faang.user_service.dto.event;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 
@@ -9,9 +10,13 @@ import java.time.LocalDateTime;
 
 public class FollowerEvent {
 
+    @NotNull
     private long followerId;
+
+    @NotNull
     private long followeeId;
-    private long projectId;
+
+    @NotNull
     private LocalDateTime subscriptionDateTime;
 
 }

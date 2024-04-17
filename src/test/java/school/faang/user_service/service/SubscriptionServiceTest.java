@@ -14,7 +14,7 @@ import school.faang.user_service.dto.event.FollowerEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SubscriptionUserMapper;
-import school.faang.user_service.redis_messaging.FollowerEventPublisher;
+import school.faang.user_service.service.publishers.FollowerEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.filters.CityPatternFilter;
 import school.faang.user_service.service.filters.CountryPatternFilter;

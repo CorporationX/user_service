@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SearchAppearanceEventPublisher implements MessagePublisher {
 
-    @Value("${spring.data.redis.channels.profile_search_topic.name}")
+    @Value("${spring.data.redis.channels.profile_search_channel.name}")
     private String profileSearchTopic;
     private RedisTemplate<String, Object> redisTemplate;
 

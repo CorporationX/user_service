@@ -14,9 +14,9 @@ import java.time.LocalDateTime;
 @Builder
 public class SearchAppearanceEventDto {
     @NotNull
-    private Long foundUserProfileId;
+    private Long viewedUserId;
     @NotNull
-    private Long searcherUserId;
+    private Long viewerUserId;
     @NotNull
     private LocalDateTime viewingTime;
 }

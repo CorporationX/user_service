@@ -18,7 +18,7 @@ public abstract class AbstractPublisher<T> {
         try {
             json = objectMapper.writeValueAsString(eventType);
         } catch (JsonProcessingException e) {
-            log.error("Error when serializing an object to a JSON string: ", e);
+            log.error("Error when serializing an object to a JSON string", e);
             throw new RuntimeException(e);
         }
         redisTemplate.convertAndSend(channelName, json);

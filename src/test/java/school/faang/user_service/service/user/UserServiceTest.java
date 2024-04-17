@@ -69,13 +69,13 @@ public class UserServiceTest {
 
     @Test
     public void testGetUser_UserDoesNotExist() {
-        Mockito.when(userRepository.findById(firstUser.getId())).thenReturn(Optional.empty());
+        when(userRepository.findById(firstUser.getId())).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class, () -> userService.getUser(firstUser.getId()));
     }
 
     @Test
     public void testGetUser() {
-        Mockito.when(userRepository.findById(firstUser.getId())).thenReturn(Optional.ofNullable(firstUser));
+        when(userRepository.findById(firstUser.getId())).thenReturn(Optional.ofNullable(firstUser));
 
         userService.getUser(firstUser.getId());
 
@@ -85,7 +85,7 @@ public class UserServiceTest {
 
     @Test
     public void testGetUsers() {
-        Mockito.when(userRepository.findAllById(userIds)).thenReturn(users);
+        when(userRepository.findAllById(userIds)).thenReturn(users);
 
         userService.getUsersByIds(userIds);
 
@@ -140,7 +140,8 @@ public class UserServiceTest {
         userDto.setId(1L);
 
         when(userRepository.findById(1L)).thenReturn(java.util.Optional.of(new User()));
-        DataValidationException exception = assertThrows(DataValidationException.class, () -> userService.create(userDto));
+        DataValidationException exception = assertThrows(DataValidationException.class,
+                () -> userService.create(userDto));
         assertEquals("User with id 1 exists", exception.getMessage());
 
     }

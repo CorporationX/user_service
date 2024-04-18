@@ -14,7 +14,7 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class SubscriberUsersBan implements MessageListener {
+public class ListenerUsersBan implements MessageListener {
     private final ObjectMapper objectMapper;
     private final UserService userService;
 

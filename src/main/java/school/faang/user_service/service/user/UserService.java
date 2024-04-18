@@ -8,16 +8,6 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.event.UserEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
-import school.faang.user_service.mapper.user.UserMapper;
-import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.validator.user.UserConstraints;
-import school.faang.user_service.validator.user.UserValidator;
-
-import java.util.UUID;
-
-import school.faang.user_service.handler.exception.EntityNotFoundException;
-
-
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.handler.exception.DataValidationException;
@@ -32,6 +22,8 @@ import school.faang.user_service.validator.user.UserValidator;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+
+import static school.faang.user_service.validator.user.UserConstraints.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -58,7 +50,7 @@ public class UserService {
     }
 
     public void banUser(UserEvent userEvent){
-        User user = userRepository.findById(userEvent.getUserId()).orElseThrow(() -> new EntityNotFoundException("User with id %d not found"));
+        User user = getUser(userEvent.getUserId());
         user.setBanned(true);
         userRepository.save(user);
         log.info(String.format("User with id:%d banned :)", userEvent.getUserId()));
@@ -84,7 +76,7 @@ public class UserService {
 
     public User getUser(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format(UserConstraints.USER_NOT_FOUND.getMessage(), userId)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format(USER_NOT_FOUND.getMessage(), userId)));
     }
 
     public UserDto deactivationUserById(Long userId) {

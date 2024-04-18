@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.config.executor.ExecutorsConfig;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.User;
@@ -16,9 +17,11 @@ import school.faang.user_service.validation.user.UserValidator;
 
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,11 +41,15 @@ class EventServiceTest {
     private List<EventFilter> eventFilters;
     private EventValidator eventValidator;
     private UserValidator userValidator;
+    private ExecutorsConfig executorsConfig;
     private EventService eventService;
 
     private EventFilterDto eventFilterDto;
     private EventFilter eventFilter;
     private Event event;
+    private Event event1;
+    private Event event2;
+    private Event event3;
     private EventDto eventDto;
     private User user;
 
@@ -62,6 +69,15 @@ class EventServiceTest {
                 .maxAttendees(50)
                 .owner(user)
                 .relatedSkills(Collections.emptyList())
+                .build();
+        event1 = Event.builder()
+                .endDate(LocalDateTime.now().minusDays(2))
+                .build();
+        event2 = Event.builder()
+                .endDate(LocalDateTime.now().plusDays(1))
+                .build();
+        event3 = Event.builder()
+                .endDate(LocalDateTime.now().minusDays(3))
                 .build();
         eventDto = EventDto.builder()
                 .id(event.getId())
@@ -84,7 +100,22 @@ class EventServiceTest {
         eventFilters = List.of(eventFilter);
         eventValidator = mock(EventValidator.class);
         userValidator = mock(UserValidator.class);
-        eventService = new EventService(eventRepository, eventMapper, eventFilters, eventValidator, userValidator);
+        executorsConfig = mock(ExecutorsConfig.class);
+        eventService = new EventService(eventRepository, eventMapper, eventFilters, eventValidator, userValidator, executorsConfig);
+    }
+
+    @Test
+    public void testClearPastEvent() {
+        List<Event> events = Arrays.asList(event1, event2, event3);
+        ExecutorService mockExecutor = mock(ExecutorService.class);
+        when(executorsConfig.executorService()).thenReturn(mockExecutor);
+        when(eventRepository.findAll()).thenReturn(events);
+
+        eventService.clearPastEvent();
+
+        verify(eventRepository, times(1)).findAll();
+        verify(executorsConfig, times(2)).executorService();
+        verify(mockExecutor, times(2)).submit(any(Runnable.class));
     }
 
     @Test

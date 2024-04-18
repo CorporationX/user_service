@@ -28,6 +28,7 @@ public class SubscriptionService {
     private final FollowerEventPublisher followerEventPublisher;
 
 
+
     @Transactional
     public void followUser(long followerId, long followeeId) {
         if (followerId == followeeId) {
@@ -42,6 +43,9 @@ public class SubscriptionService {
         FollowerEvent followerEvent = FollowerEvent.builder().followerId( followerId ).
                 followeeId( followeeId ).
                 subscriptionDateTime( LocalDateTime.now() ).build();
+
+
+
 
         followerEventPublisher.publish( followerEvent );
 

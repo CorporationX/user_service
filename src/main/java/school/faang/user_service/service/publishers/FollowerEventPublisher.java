@@ -13,20 +13,17 @@ import school.faang.user_service.dto.event.FollowerEvent;
 public class FollowerEventPublisher implements MessagePublisher<FollowerEvent>{
 
 
-//    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Value("${spring.data.redis.channel.follower_channel.name}")
     private final String followerChannelTopic;
 
-//    public FollowerEventPublisher(ObjectMapper objectMapper, RedisTemplate<String, Object> redisTemplate) {
-//        super(objectMapper, redisTemplate);
-//    }
 
 
     @Override
-    public void publish(FollowerEvent event) {
+    public void publish(FollowerEvent followerEvent) {
 
-        redisTemplate.convertAndSend( followerChannelTopic, event );
+        redisTemplate.convertAndSend( followerChannelTopic, followerEvent );
 
     }
 }

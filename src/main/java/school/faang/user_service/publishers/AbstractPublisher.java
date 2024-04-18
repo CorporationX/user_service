@@ -13,7 +13,7 @@ public abstract class AbstractPublisher<T> {
     private final ObjectMapper objectMapper;
     private final String channelName;
 
-    protected void publish(T eventType) {
+    public void publish(T eventType) {
         String json;
         try {
             json = objectMapper.writeValueAsString(eventType);

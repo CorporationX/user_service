@@ -2,14 +2,18 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.SubscriptionUserDto;
 import school.faang.user_service.dto.SubscriptionUserFilterDto;
+import school.faang.user_service.dto.redis.SearchAppearanceEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SubscriptionUserMapper;
+import school.faang.user_service.publishers.SearchAppearanceEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.filters.UserFilter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -19,6 +23,8 @@ public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final SubscriptionUserMapper userMapper;
     private final List<UserFilter> userFilters;
+    private final SearchAppearanceEventPublisher searchAppearanceEventPublisher;
+    private final UserContext userContext;
 
     public void followUser(long followerId, long followeeId) {
         if (followerId == followeeId) {
@@ -61,7 +67,21 @@ public class SubscriptionService {
         userFilters.stream()
                 .filter(filter -> filter.isApplicable(filters))
                 .forEach(filter -> filter.apply(users, filters));
-        return userMapper.toDto(users.toList());
-    }
 
+        List<SubscriptionUserDto> filteredUsers = userMapper.toDto(users.toList());
+
+        // Получаем список ID юзеров
+        List<Long> userIds = filteredUsers.stream().map(SubscriptionUserDto::getId).toList();
+
+        // Создаем объект SearchAppearanceEvent с информацией о пользователе и отправляем уведомления в Redis
+        userIds.forEach(userId -> {
+            SearchAppearanceEvent event = new SearchAppearanceEvent();
+            event.setViewedUserId(userId);
+            event.setViewerUserId(userContext.getUserId());
+            event.setViewingTime(LocalDateTime.now());
+            searchAppearanceEventPublisher.publish(event);
+        });
+
+        return filteredUsers;
+    }
 }

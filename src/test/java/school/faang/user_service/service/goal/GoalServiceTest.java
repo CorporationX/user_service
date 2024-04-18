@@ -12,6 +12,7 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.handler.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.GoalMapper;
+import school.faang.user_service.publisher.GoalCompletedEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -36,6 +37,7 @@ public class GoalServiceTest {
     private List<GoalFilter> goalFilters;
     private UserRepository userRepository;
     private GoalService goalService;
+    private GoalCompletedEventPublisher goalCompletedEventPublisher;
 
 
     @BeforeEach
@@ -47,7 +49,7 @@ public class GoalServiceTest {
         goalFilter = mock(GoalFilter.class);
         userRepository = mock(UserRepository.class);
         goalFilters = List.of(goalFilter);
-        goalService = new GoalService(goalRepository, goalMapper, skillRepository, goalValidation, userRepository, goalFilters);
+        goalService = new GoalService(goalRepository, goalMapper, skillRepository, goalValidation, userRepository, goalFilters, goalCompletedEventPublisher);
     }
 
     @Test

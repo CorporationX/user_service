@@ -70,10 +70,8 @@ public class SubscriptionService {
 
         List<SubscriptionUserDto> filteredUsers = userMapper.toDto(users.toList());
 
-        // Получаем список ID юзеров
         List<Long> userIds = filteredUsers.stream().map(SubscriptionUserDto::getId).toList();
 
-        // Создаем объект SearchAppearanceEvent с информацией о пользователе и отправляем уведомления в Redis
         userIds.forEach(userId -> {
             SearchAppearanceEvent event = new SearchAppearanceEvent();
             event.setViewedUserId(userId);

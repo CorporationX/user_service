@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Embeddable
 public class UserProfilePic {
     private String fileId;

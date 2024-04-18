@@ -8,6 +8,16 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.event.UserEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.validator.user.UserConstraints;
+import school.faang.user_service.validator.user.UserValidator;
+
+import java.util.UUID;
+
+import school.faang.user_service.handler.exception.EntityNotFoundException;
+
+
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.handler.exception.DataValidationException;
@@ -62,17 +72,23 @@ public class UserService {
                 .build();
     }
 
-    public UserDto getUserById(Long userId) {
+    public UserDto getUserDtoById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("User with id: %s not found", userId)));
         return userMapper.toDto(user);
     }
 
-    public List<UserDto> getUsersByIds(List<Long> ids) {
+    public List<UserDto> getUsersDtoByIds(List<Long> ids) {
         return userMapper.toDto(userRepository.findAllById(ids));
     }
+
+    public User getUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format(UserConstraints.USER_NOT_FOUND.getMessage(), userId)));
+    }
+
     public UserDto deactivationUserById(Long userId) {
-        User userDeactivate = userRepository.findById(userId).orElseThrow(() -> new DataValidationException("Пользователь с id: "+ userId+" не найден"));
+        User userDeactivate = userRepository.findById(userId).orElseThrow(() -> new DataValidationException("Пользователь с id: " + userId + " не найден"));
         if (userDeactivate.getGoals() != null && !userDeactivate.getGoals().isEmpty()) {
             List<Long> deleteGoals = userDeactivate.getGoals().stream().filter(goal -> !GoalStatus.COMPLETED.equals(goal.getStatus()))
                     .peek(goal -> goal.getUsers().removeIf(user -> user.getId() == userId))

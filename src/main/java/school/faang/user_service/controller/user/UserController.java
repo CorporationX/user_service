@@ -7,19 +7,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.user.UserService;
 
-
 import java.util.List;
-
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,13 +32,13 @@ public class UserController {
     @GetMapping("/{userId}")
     @Operation(summary = "Get user by id")
     UserDto getUser(@PathVariable long userId) {
-        return userService.getUserById(userId);
+        return userService.getUserDtoById(userId);
     }
 
     @PostMapping("/list")
     @Operation(summary = "Get users by ids")
     List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
-        return userService.getUsersByIds(ids);
+        return userService.getUsersDtoByIds(ids);
     }
 
     @DeleteMapping("/{userId}")

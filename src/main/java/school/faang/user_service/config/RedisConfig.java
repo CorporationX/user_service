@@ -12,7 +12,7 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import school.faang.user_service.subscriber.ListenerUsersBan;
+import school.faang.user_service.subscriber.UsersBanListener;
 
 @Configuration
 @RequiredArgsConstructor
@@ -24,7 +24,7 @@ public class RedisConfig {
     private int port;
     @Value("${topic.user_ban}")
     private String userBanTopic;
-    private final ListenerUsersBan listenerUsersBan;
+    private final UsersBanListener usersBanListener;
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
@@ -50,7 +50,7 @@ public class RedisConfig {
 
     @Bean
     public MessageListenerAdapter userBanMessageListenerAdapter(){
-        return new MessageListenerAdapter(listenerUsersBan);
+        return new MessageListenerAdapter(usersBanListener);
     }
 
     @Bean

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.service.user.UserService;
 
 
@@ -50,7 +51,12 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public UserDto deactivationUserById(@PathVariable Long userId){
+    public UserDto deactivationUserById(@PathVariable Long userId) {
         return userService.deactivationUserById(userId);
+    }
+
+    @PostMapping("/searchUsers/{requestUser}")
+    public List<UserDto> searchUsersByFilter(@RequestBody UserFilterDto userFilterDto, @PathVariable Long requestUser) {
+        return userService.searchUsersByFilter(userFilterDto, requestUser);
     }
 }

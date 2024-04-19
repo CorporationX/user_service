@@ -7,7 +7,7 @@ import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.ProfileViewEventDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.ToJsonMapper;
+import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.publishers.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
@@ -24,25 +24,25 @@ public class UserService {
     private final UserMapper userMapper;
     private final UserContext userContext;
     private final ProfileViewEventPublisher profileViewEventPublisher;
-    private final ToJsonMapper toJsonMapper;
+    private final EventMapper eventMapper;
 
     public UserDto getUser(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("User not found!"));
-        //--------------------------------------------------------
-        ProfileViewEventDto event = ProfileViewEventDto.builder()
-                .observerId(userContext.getUserId())
-                .observedId(userId)
-                .viewedAt(LocalDateTime.now())
-                .build();
-        String json = toJsonMapper.toJson(event);
-        profileViewEventPublisher.publish(json);
-        log.info("Successfully sent data to analytics-service");
-        //--------------------------------------------------------
-        //TODO: what is better way to solve this?
+        sendProfileViewEventToPublisher(userId);
         return userMapper.toDto(user);
     }
 
     public List<UserDto> getUsersByIds(List<Long> ids) {
         return userMapper.toDto(userRepository.findAllById(ids));
+    }
+
+    private void sendProfileViewEventToPublisher(long userId){
+        ProfileViewEventDto event = ProfileViewEventDto.builder()
+                .observerId(userContext.getUserId())
+                .observedId(userId)
+                .viewedAt(LocalDateTime.now())
+                .build();
+        profileViewEventPublisher.publish(event);
+        log.info("Successfully sent data to analytics-service");
     }
 }

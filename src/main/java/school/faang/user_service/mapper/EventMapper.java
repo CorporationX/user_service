@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class ToJsonMapper {
+public class EventMapper {
     private final ObjectMapper objectMapper;
     public <T> String toJson(T object){
         String json;

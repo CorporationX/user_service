@@ -11,7 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.ProfileViewEventDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.ToJsonMapper;
+import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.publishers.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
@@ -35,7 +35,7 @@ public class UserServiceTest {
     @Mock
     private UserContext userContext;
     @Mock
-    private ToJsonMapper toJsonMapper;
+    private EventMapper eventMapper;
     @Mock
     private ProfileViewEventPublisher profileViewEventPublisher;
 
@@ -77,7 +77,7 @@ public class UserServiceTest {
     public void testGetUser() {
         when(userRepository.findById(firstUser.getId())).thenReturn(Optional.ofNullable(firstUser));
         when(userContext.getUserId()).thenReturn(secondUser.getId());
-        when(toJsonMapper.toJson(any(ProfileViewEventDto.class))).thenReturn("[]");
+        when(eventMapper.toJson(any(ProfileViewEventDto.class))).thenReturn("[]");
 
         userService.getUser(firstUser.getId());
 

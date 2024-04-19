@@ -51,6 +51,9 @@ dicebear:
   avatar: https://api.dicebear.com/8.x/thumbs/svg?seed=
   small_avatar: https://api.dicebear.com/8.x/thumbs/svg?size=100&seed=
 
+topic:
+  user_ban: user_ban
+
 services:
   s3:
     endpoint: http://localhost:9000

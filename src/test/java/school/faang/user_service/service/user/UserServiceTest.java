@@ -1,5 +1,6 @@
 package school.faang.user_service.service.user;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -7,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.filter.UserFilterDto;
+import school.faang.user_service.dto.messagebroker.SearchAppearanceEvent;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
@@ -15,10 +17,12 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.handler.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.MentorshipService;
 import school.faang.user_service.service.goal.GoalService;
+import school.faang.user_service.service.user.filter.UserFilter;
 import school.faang.user_service.validator.user.UserValidator;
 
 import java.util.ArrayList;
@@ -45,8 +49,18 @@ public class UserServiceTest {
     private UserMapper userMapper;
     @Mock
     private UserValidator userValidator;
+    @Mock
+    private SearchAppearanceEventPublisher searchAppearanceEventPublisher;
     @InjectMocks
     private UserService userService;
+    private List<UserFilter> userFilters= new ArrayList<>();
+
+    @BeforeEach
+    public void init(){
+        userService = new UserService(userMapper,userValidator,userRepository,mentorshipService,goalService
+                ,eventRepository,userFilters,searchAppearanceEventPublisher);
+
+    }
 
     @Test
     void test_GetUser_NotFound() {
@@ -171,12 +185,14 @@ public class UserServiceTest {
                 .id(2L)
                 .country(germany).build();
         List<User> userList = List.of(firstUser,secondUser);
-        when(userRepository.findAll()).thenReturn(userList);
-        UserFilterDto filterCountry = UserFilterDto.builder()
-                .countryName("Germany").build();
         UserDto secondUserDto = UserDto.builder()
                 .id(2L).countryId(2L).build();
-        List<UserDto> correctReturnListUser = List.of();
+        when(userRepository.findAll()).thenReturn(userList);
+        when(userMapper.toDto(secondUser)).thenReturn(secondUserDto);
+        UserFilterDto filterCountry = UserFilterDto.builder()
+                .countryName("Germany").build();
+
+        List<UserDto> correctReturnListUser = List.of(secondUserDto);
         assertEquals(correctReturnListUser,userService.searchUsersByFilter(filterCountry,5L));
     }
 }

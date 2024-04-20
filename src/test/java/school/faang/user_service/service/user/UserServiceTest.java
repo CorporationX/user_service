@@ -6,6 +6,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.filter.UserFilterDto;
+import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
@@ -152,6 +154,30 @@ public class UserServiceTest {
         verify(userMapper, times(1)).toDto(u);
         assertFalse(u.isActive());
         assertEquals(excepted, userDto);
+    }
+
+    @Test
+    public void searchUser(){
+        Country singapore = Country.builder()
+                .id(1L)
+                .title("Singapore").build();
+        Country germany = Country.builder()
+                .id(2L)
+                .title("Germany").build();
+        User firstUser = User.builder()
+                .id(1L)
+                .country(singapore).build();
+        User secondUser = User.builder()
+                .id(2L)
+                .country(germany).build();
+        List<User> userList = List.of(firstUser,secondUser);
+        when(userRepository.findAll()).thenReturn(userList);
+        UserFilterDto filterCountry = UserFilterDto.builder()
+                .countryName("Germany").build();
+        UserDto secondUserDto = UserDto.builder()
+                .id(2L).countryId(2L).build();
+        List<UserDto> correctReturnListUser = List.of();
+        assertEquals(correctReturnListUser,userService.searchUsersByFilter(filterCountry,5L));
     }
 }
 

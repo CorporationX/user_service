@@ -1,6 +1,7 @@
 package school.faang.user_service.service.user;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,11 +34,10 @@ import school.faang.user_service.service.goal.GoalService;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
     private final UserMapper userMapper;
     private final UserValidator userValidator;
@@ -48,8 +48,8 @@ public class UserService {
     private final List<UserFilter> userFilters;
     private final SearchAppearanceEventPublisher searchAppearanceEventPublisher;
 
-    @Autowired
-    public UserService(UserMapper userMapper,
+    //@Autowired
+    /*public UserService(UserMapper userMapper,
                        UserValidator userValidator,
                        UserRepository userRepository,
                        MentorshipService mentorshipService,
@@ -66,7 +66,7 @@ public class UserService {
         this.eventRepository = eventRepository;
         this.searchAppearanceEventPublisher = searchAppearanceEventPublisher;
         userFilters = List.of(userNameFilter, userCountryFilter);
-    }
+    }*/
 
     @Value("${dicebear.avatar}")
     private String avatarUrl;
@@ -133,11 +133,13 @@ public class UserService {
 
     public List<UserDto> searchUsersByFilter(UserFilterDto userFilterDto, Long requestUser) {
         List<User> userList = userRepository.findAll();
+        log.info("{} users found", userList.size());
         List<UserDto> filteredUserList = userFilters.stream()
                 .filter(userFilter -> userFilter.isApplicable(userFilterDto))
                 .flatMap(userFilter -> userFilter.apply(userList.stream(), userFilterDto))
                 .map(userMapper::toDto)
                 .toList();
+        log.info("After filtering, {} users remained",filteredUserList.size());
         filteredUserList.forEach(user -> {
             SearchAppearanceEvent event = new SearchAppearanceEvent(
                     user.getId(),

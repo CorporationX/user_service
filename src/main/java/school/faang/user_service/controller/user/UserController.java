@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.service.user.UserService;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
+    private final UserContext userContext;
 
     @Operation(summary = "Create new user")
     @ApiResponses(value = {
@@ -55,8 +57,9 @@ public class UserController {
         return userService.deactivationUserById(userId);
     }
 
-    @PostMapping("/searchUsers/{requestUser}")
-    public List<UserDto> searchUsersByFilter(@RequestBody UserFilterDto userFilterDto, @PathVariable Long requestUser) {
+    @PostMapping("/searchUsers")
+    public List<UserDto> searchUsersByFilter(@RequestBody UserFilterDto userFilterDto) {
+        Long requestUser = userContext.getUserId();
         return userService.searchUsersByFilter(userFilterDto, requestUser);
     }
 }

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestEvent;
 import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.dto.recommendation.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
@@ -14,6 +15,7 @@ import school.faang.user_service.handler.exception.EntityExistException;
 import school.faang.user_service.handler.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.publisher.RecommendationEventPublisher;
+import school.faang.user_service.publisher.RecommendationRequestEventPublisher;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 import school.faang.user_service.service.recommendation.RecommendationRequestService;
@@ -34,6 +36,7 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
     private final RecommendationRequestMapper recommendationRequestMapper;
     private final List<RecommendationRequestFilter> recommendationRequestFilters;
     private final RecommendationEventPublisher recommendationEventPublisher;
+    private final RecommendationRequestEventPublisher recommendationRequestEventPublisher;
 
     @Transactional
     @Override
@@ -74,9 +77,13 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
 
     @Override
     public RecommendationRequestDto getRequest(long id) {
-        Optional<RecommendationRequest> recommendationRequest = recommendationRequestRepository.findById(id);
-
-        return recommendationRequestMapper.toDto(recommendationRequest.orElseThrow(() -> new EntityNotFoundException("Request not found")));
+        RecommendationRequest recommendationRequest = recommendationRequestRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Request not found"));
+        RecommendationRequestEvent recommendationRequestEvent = new RecommendationRequestEvent(recommendationRequest.getId(),
+                recommendationRequest.getRecommendation().getAuthor().getId(),
+                recommendationRequest.getRecommendation().getReceiver().getId());
+        recommendationRequestEventPublisher.publish(recommendationRequestEvent);
+        log.info("Отправлено уведомление по запросу рекомендации пользователя");
+        return recommendationRequestMapper.toDto(recommendationRequest);
     }
 
     @Override

@@ -27,6 +27,7 @@ public class RedisConfig {
     private int port;
     @Value("${spring.data.redis.channel.recommendation_channel}")
     private String recommendationChannel;
+
     @Value("${topic.user_ban}")
     private String userBanTopic;
     private final UsersBanListener usersBanListener;

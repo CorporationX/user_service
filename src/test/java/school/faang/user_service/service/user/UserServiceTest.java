@@ -8,20 +8,20 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.filter.UserFilterDto;
-import school.faang.user_service.dto.messagebroker.SearchAppearanceEvent;
-import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.handler.exception.EntityNotFoundException;
-import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.mapper.user.UserMapperImpl;
 import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.MentorshipService;
+import school.faang.user_service.service.filter.CreatingTestData;
 import school.faang.user_service.service.goal.GoalService;
+import school.faang.user_service.service.user.filter.UserCountryFilter;
 import school.faang.user_service.service.user.filter.UserFilter;
 import school.faang.user_service.validator.user.UserValidator;
 
@@ -46,20 +46,22 @@ public class UserServiceTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    private UserMapper userMapper;
+    private UserMapperImpl userMapper;
     @Mock
     private UserValidator userValidator;
     @Mock
     private SearchAppearanceEventPublisher searchAppearanceEventPublisher;
     @InjectMocks
     private UserService userService;
-    private List<UserFilter> userFilters= new ArrayList<>();
+
+    private final UserCountryFilter userCountryFilter = new UserCountryFilter();
+
+    private final List<UserFilter> userFilters = List.of(userCountryFilter);
 
     @BeforeEach
-    public void init(){
-        userService = new UserService(userMapper,userValidator,userRepository,mentorshipService,goalService
-                ,eventRepository,userFilters,searchAppearanceEventPublisher);
-
+    public void init() {
+        userService = new UserService(userMapper, userValidator, userRepository, mentorshipService, goalService
+                , eventRepository, userFilters, searchAppearanceEventPublisher);
     }
 
     @Test
@@ -171,29 +173,19 @@ public class UserServiceTest {
     }
 
     @Test
-    public void searchUser(){
-        Country singapore = Country.builder()
-                .id(1L)
-                .title("Singapore").build();
-        Country germany = Country.builder()
-                .id(2L)
-                .title("Germany").build();
-        User firstUser = User.builder()
-                .id(1L)
-                .country(singapore).build();
-        User secondUser = User.builder()
-                .id(2L)
-                .country(germany).build();
-        List<User> userList = List.of(firstUser,secondUser);
+    public void searchUser() {
+        List<User> userList = CreatingTestData.createListUsers();
         UserDto secondUserDto = UserDto.builder()
+                .username("Женя")
                 .id(2L).countryId(2L).build();
-        when(userRepository.findAll()).thenReturn(userList);
-        when(userMapper.toDto(secondUser)).thenReturn(secondUserDto);
-        UserFilterDto filterCountry = UserFilterDto.builder()
+        UserFilterDto userFilterDto = UserFilterDto.builder()
                 .countryName("Germany").build();
 
+        when(userRepository.findAll()).thenReturn(userList);
+        when(userMapper.toDto(userList.get(1))).thenReturn(secondUserDto);
+
         List<UserDto> correctReturnListUser = List.of(secondUserDto);
-        assertEquals(correctReturnListUser,userService.searchUsersByFilter(filterCountry,5L));
+        assertEquals(correctReturnListUser, userService.searchUsersByFilter(userFilterDto, 5L));
     }
 }
 

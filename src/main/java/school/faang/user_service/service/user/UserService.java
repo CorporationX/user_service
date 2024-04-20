@@ -2,8 +2,6 @@ package school.faang.user_service.service.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
@@ -47,26 +45,6 @@ public class UserService {
     private final EventRepository eventRepository;
     private final List<UserFilter> userFilters;
     private final SearchAppearanceEventPublisher searchAppearanceEventPublisher;
-
-    //@Autowired
-    /*public UserService(UserMapper userMapper,
-                       UserValidator userValidator,
-                       UserRepository userRepository,
-                       MentorshipService mentorshipService,
-                       GoalService goalService,
-                       EventRepository eventRepository,
-                       @Qualifier("UserNameFilter") UserFilter userNameFilter,
-                       @Qualifier("UserCountryFilter") UserFilter userCountryFilter,
-                       SearchAppearanceEventPublisher searchAppearanceEventPublisher) {
-        this.userMapper = userMapper;
-        this.userValidator = userValidator;
-        this.userRepository = userRepository;
-        this.mentorshipService = mentorshipService;
-        this.goalService = goalService;
-        this.eventRepository = eventRepository;
-        this.searchAppearanceEventPublisher = searchAppearanceEventPublisher;
-        userFilters = List.of(userNameFilter, userCountryFilter);
-    }*/
 
     @Value("${dicebear.avatar}")
     private String avatarUrl;
@@ -134,12 +112,14 @@ public class UserService {
     public List<UserDto> searchUsersByFilter(UserFilterDto userFilterDto, Long requestUser) {
         List<User> userList = userRepository.findAll();
         log.info("{} users found", userList.size());
+
         List<UserDto> filteredUserList = userFilters.stream()
                 .filter(userFilter -> userFilter.isApplicable(userFilterDto))
                 .flatMap(userFilter -> userFilter.apply(userList.stream(), userFilterDto))
                 .map(userMapper::toDto)
                 .toList();
-        log.info("After filtering, {} users remained",filteredUserList.size());
+        log.info("After filtering, {} users remained", filteredUserList.size());
+
         filteredUserList.forEach(user -> {
             SearchAppearanceEvent event = new SearchAppearanceEvent(
                     user.getId(),
@@ -147,6 +127,7 @@ public class UserService {
                     LocalDateTime.now());
             searchAppearanceEventPublisher.publish(event);
         });
+
         return filteredUserList;
     }
 }

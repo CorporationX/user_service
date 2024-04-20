@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
+
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.dto.messagebroker.SearchAppearanceEvent;
 import school.faang.user_service.entity.User;
@@ -16,22 +17,26 @@ import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.user.filter.UserFilter;
 import school.faang.user_service.validator.user.UserValidator;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
-
 import school.faang.user_service.handler.exception.EntityNotFoundException;
-
-
+import school.faang.user_service.dto.event.UserEvent;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.handler.exception.DataValidationException;
+import school.faang.user_service.handler.exception.EntityNotFoundException;
+import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.MentorshipService;
 import school.faang.user_service.service.goal.GoalService;
+import school.faang.user_service.validator.user.UserValidator;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
+
+import static school.faang.user_service.validator.user.UserConstraints.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -60,6 +65,13 @@ public class UserService {
         return userMapper.toDto(createdUser);
     }
 
+    public void banUser(UserEvent userEvent){
+        User user = getUser(userEvent.getUserId());
+        user.setBanned(true);
+        userRepository.save(user);
+        log.info(String.format("User with id:%d banned :)", userEvent.getUserId()));
+    }
+
     private UserProfilePic getRandomAvatar() {
         UUID uuid = UUID.randomUUID();
         return UserProfilePic.builder()
@@ -68,14 +80,19 @@ public class UserService {
                 .build();
     }
 
-    public UserDto getUserById(Long userId) {
+    public UserDto getUserDtoById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("User with id: %s not found", userId)));
         return userMapper.toDto(user);
     }
 
-    public List<UserDto> getUsersByIds(List<Long> ids) {
+    public List<UserDto> getUsersDtoByIds(List<Long> ids) {
         return userMapper.toDto(userRepository.findAllById(ids));
+    }
+
+    public User getUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format(USER_NOT_FOUND.getMessage(), userId)));
     }
 
     public UserDto deactivationUserById(Long userId) {

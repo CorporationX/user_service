@@ -1,6 +1,7 @@
 package school.faang.user_service.service.user;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -8,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.filter.UserFilterDto;
+import school.faang.user_service.dto.event.UserEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
@@ -29,11 +31,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -70,7 +70,7 @@ public class UserServiceTest {
 
         when(userRepository.findById(userId)).thenThrow(EntityNotFoundException.class);
 
-        assertThrows(EntityNotFoundException.class, () -> userService.getUserById(userId));
+        assertThrows(EntityNotFoundException.class, () -> userService.getUserDtoById(userId));
     }
 
     @Test
@@ -81,7 +81,7 @@ public class UserServiceTest {
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
-        assertEquals(userExpected, userService.getUserById(userId));
+        assertEquals(userExpected, userService.getUserDtoById(userId));
         verify(userRepository).findById(userId);
 
     }
@@ -95,7 +95,7 @@ public class UserServiceTest {
 
         when(userRepository.findAllById(ids)).thenReturn(List.of(firstUser, secondUser));
 
-        assertEquals(usersExpected, userService.getUsersByIds(ids));
+        assertEquals(usersExpected, userService.getUsersDtoByIds(ids));
         verify(userRepository).findAllById(ids);
     }
 
@@ -126,7 +126,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void deactivateUserById() {
+    void deactivateUserById() {
         User u = new User();
         u.setId(1L);
         u.setUsername("user");
@@ -173,7 +173,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void searchUser() {
+    void searchUser() {
         List<User> userList = CreatingTestData.createListUsers();
         UserDto secondUserDto = UserDto.builder()
                 .username("Женя")
@@ -186,6 +186,29 @@ public class UserServiceTest {
 
         List<UserDto> correctReturnListUser = List.of(secondUserDto);
         assertEquals(correctReturnListUser, userService.searchUsersByFilter(userFilterDto, 5L));
+    }
+    @Test
+    void testBanUserNotFound(){
+        UserEvent userEvent = new UserEvent(1L);
+
+        when(userRepository.findById(userEvent.getUserId())).thenThrow(EntityNotFoundException.class);
+
+        Assertions.assertThrows(EntityNotFoundException.class, () -> userService.banUser(userEvent));
+        verify(userRepository).findById(userEvent.getUserId());
+    }
+
+    @Test
+    void testBanUserSuccessful(){
+        UserEvent userEvent = new UserEvent(1L);
+        User user = new User();
+        user.setBanned(true);
+
+        when(userRepository.findById(userEvent.getUserId())).thenReturn(Optional.of(new User()));
+        when(userRepository.save(user)).thenReturn(user);
+
+        Assertions.assertDoesNotThrow(() -> userService.banUser(userEvent));
+        verify(userRepository).findById(userEvent.getUserId());
+        verify(userRepository).save(user);
     }
 }
 

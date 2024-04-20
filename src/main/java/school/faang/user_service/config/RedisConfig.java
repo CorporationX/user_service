@@ -11,18 +11,33 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import school.faang.user_service.subscriber.UsersBanListener;
 
 @Configuration
 @RequiredArgsConstructor
 public class RedisConfig {
+  
     private final ObjectMapper objectMapper;
+  
     @Value("${spring.data.redis.host}")
     private String host;
+  
     @Value("${spring.data.redis.port}")
     private int port;
+  
     @Value("${spring.data.redis.channels.search_appearance_topic")
     private String searchAppearanceTopic;
+
+    @Value("${spring.data.redis.channel.recommendation_channel}")
+    private String recommendationChannel;
+  
+    @Value("${topic.user_ban}")
+    private String userBanTopic;
+  
+    private final UsersBanListener usersBanListener;
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
@@ -41,7 +56,30 @@ public class RedisConfig {
     }
 
     @Bean
+    public MessageListenerAdapter userBanMessageListenerAdapter(){
+        return new MessageListenerAdapter(usersBanListener);
+    }
+
+    @Bean
+    public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory redisConnectionFactory) {
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(redisConnectionFactory);
+        container.addMessageListener(userBanMessageListenerAdapter(), userBanTopic());
+        return container;
+    }
+
+    @Bean
+    public ChannelTopic recommendationTopic() {
+        return new ChannelTopic(recommendationChannel);
+    }
+  
+    @Bean
     public ChannelTopic SearchAppearanceTopic() {
         return new ChannelTopic(searchAppearanceTopic);
+    }
+  
+    @Bean  
+    public ChannelTopic userBanTopic(){
+        return new ChannelTopic(userBanTopic);
     }
 }

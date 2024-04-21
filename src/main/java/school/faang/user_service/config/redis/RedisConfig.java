@@ -1,4 +1,4 @@
-package school.faang.user_service.config;
+package school.faang.user_service.config.redis;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

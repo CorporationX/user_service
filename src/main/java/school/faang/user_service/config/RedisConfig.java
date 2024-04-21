@@ -1,4 +1,4 @@
-package school.faang.user_service.config.redis;
+package school.faang.user_service.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +21,7 @@ public class RedisConfig {
     private int port;
 
     @Value("${spring.data.redis.channels.profile_search_channel.name}")
-    private String profileSearchChannelName;
+    private String userProfileSearchTopic;
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
@@ -41,6 +41,6 @@ public class RedisConfig {
 
     @Bean
     public ChannelTopic profileSearchTopic() {
-        return new ChannelTopic(profileSearchChannelName);
+        return new ChannelTopic(userProfileSearchTopic);
     }
 }

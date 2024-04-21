@@ -8,5 +8,6 @@ public class EventRegistrationConflictException extends RuntimeException{
 
     public EventRegistrationConflictException (String message){
         super(message);
-    }
+    } //TODO проверить, почему такое узкое исключение
+    // переписать на более общее
 }

@@ -106,6 +106,7 @@ class EventServiceTest {
 
     @Test
     public void testClearPastEvent() {
+        eventService.setBatchSize(100);
         List<Event> events = Arrays.asList(event1, event2, event3);
         ExecutorService mockExecutor = mock(ExecutorService.class);
         when(executorsConfig.executorService()).thenReturn(mockExecutor);

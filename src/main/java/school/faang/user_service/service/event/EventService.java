@@ -2,6 +2,7 @@ package school.faang.user_service.service.event;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.config.executor.ExecutorsConfig;
@@ -19,8 +20,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Setter
 @RequiredArgsConstructor
 public class EventService {
+
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
     private final List<EventFilter> eventFilters;
@@ -28,8 +31,8 @@ public class EventService {
     private final UserValidator userValidator;
     private final ExecutorsConfig executorsConfig;
 
-    @Value("{$event.past.delete-batch}")
-    private int batchSize;
+    @Value("${event.past.delete-batch}")
+    private Integer batchSize;
 
     public void clearPastEvent() {
         List<Event> events = eventRepository.findAll();

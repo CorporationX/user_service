@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.event.SkillAcquiredEvent;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.dto.recommendation.RequestFilterDto;
@@ -14,6 +15,7 @@ import school.faang.user_service.handler.exception.EntityExistException;
 import school.faang.user_service.handler.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.publisher.RecommendationEventPublisher;
+import school.faang.user_service.publisher.SkillAcquiredEventPublisher;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 import school.faang.user_service.service.recommendation.RecommendationRequestService;
@@ -34,6 +36,7 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
     private final RecommendationRequestMapper recommendationRequestMapper;
     private final List<RecommendationRequestFilter> recommendationRequestFilters;
     private final RecommendationEventPublisher recommendationEventPublisher;
+    private final SkillAcquiredEventPublisher skillAcquiredEventPublisher;
 
     @Transactional
     @Override
@@ -56,6 +59,9 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
         if (skillIds != null && !skillIds.isEmpty()) {
             skillIds.forEach(skillId -> {
                 skillRequestRepository.create(savedRecommendationRequest.getId(), skillId);
+                SkillAcquiredEvent skillAcquiredEvent = createSkillAcquiredEvent(savedRecommendationRequest, skillId);
+                skillAcquiredEventPublisher.publish(skillAcquiredEvent);
+                log.info("Отправлено уведомление по созданию скилла пользователю");
             });
         }
 
@@ -94,5 +100,11 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
         });
 
         return recommendationRequestMapper.toDto(recommendationRequest.orElse(null));
+    }
+
+    private SkillAcquiredEvent createSkillAcquiredEvent(RecommendationRequest recommendationRequest, Long skillId){
+        long authorId = recommendationRequest.getRequester().getId();
+        long receiverId = recommendationRequest.getReceiver().getId();
+        return new SkillAcquiredEvent(skillId,authorId, receiverId);
     }
 }

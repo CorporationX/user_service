@@ -29,6 +29,8 @@ public class RedisConfig {
     private String recommendationChannel;
     @Value("${topic.user_ban}")
     private String userBanTopic;
+    @Value("${spring.data.redis.channel.skill_channel}")
+    private String skillChannel;
     private final UsersBanListener usersBanListener;
 
     @Bean
@@ -48,13 +50,13 @@ public class RedisConfig {
     }
 
     @Bean
-    public ChannelTopic userBanTopic(){
+    public ChannelTopic userBanTopic() {
         return new ChannelTopic(userBanTopic);
     }
 
 
     @Bean
-    public MessageListenerAdapter userBanMessageListenerAdapter(){
+    public MessageListenerAdapter userBanMessageListenerAdapter() {
         return new MessageListenerAdapter(usersBanListener);
     }
 
@@ -69,5 +71,10 @@ public class RedisConfig {
     @Bean
     public ChannelTopic recommendationTopic() {
         return new ChannelTopic(recommendationChannel);
+    }
+
+    @Bean
+    public ChannelTopic skillTopic() {
+        return new ChannelTopic(skillChannel);
     }
 }

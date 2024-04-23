@@ -28,6 +28,8 @@ spring:
           name: profile_view_channel
         recommendation_channel:
           name: recommendation_channel
+        skill_channel:
+          name: skill_channel
 
 server:
   port: 8080

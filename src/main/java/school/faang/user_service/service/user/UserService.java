@@ -8,14 +8,16 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.event.UserEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
+import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.handler.exception.DataValidationException;
 import school.faang.user_service.handler.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.service.MentorshipService;
+import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.validator.user.UserValidator;
 
@@ -29,12 +31,13 @@ import static school.faang.user_service.validator.user.UserConstraints.USER_NOT_
 @RequiredArgsConstructor
 @Slf4j
 public class UserService {
-    private final UserMapper userMapper;
-    private final UserValidator userValidator;
-    private final UserRepository userRepository;
     private final MentorshipService mentorshipService;
-    private final GoalService goalService;
     private final EventRepository eventRepository;
+    private final UserRepository userRepository;
+    private final UserValidator userValidator;
+    private final GoalService goalService;
+    private final UserMapper userMapper;
+
     @Value("${dicebear.avatar}")
     private String avatarUrl;
     @Value("${dicebear.small_avatar}")
@@ -49,7 +52,7 @@ public class UserService {
         return userMapper.toDto(createdUser);
     }
 
-    public void banUser(UserEvent userEvent){
+    public void banUser(UserEvent userEvent) {
         User user = getUser(userEvent.getUserId());
         user.setBanned(true);
         userRepository.save(user);
@@ -85,18 +88,18 @@ public class UserService {
             List<Long> deleteGoals = userDeactivate.getGoals().stream().filter(goal -> !GoalStatus.COMPLETED.equals(goal.getStatus()))
                     .peek(goal -> goal.getUsers().removeIf(user -> user.getId() == userId))
                     .filter(goal -> goal.getUsers().isEmpty())
-                    .map(goal -> goal.getId())
+                    .map(Goal::getId)
                     .toList();
             userDeactivate.setGoals(Collections.emptyList());
-            deleteGoals.forEach(deleteGoal -> goalService.deleteGoal(deleteGoal));
+            deleteGoals.forEach(goalService::deleteGoal);
         }
 
         if (userDeactivate.getOwnedEvents() != null && !userDeactivate.getOwnedEvents().isEmpty()) {
             List<Long> deleteEvents = userDeactivate.getOwnedEvents().stream().filter(event -> EventStatus.PLANNED.equals(event.getStatus()))
-                    .map(event -> event.getId())
+                    .map(Event::getId)
                     .toList();
             userDeactivate.setOwnedEvents(Collections.emptyList());
-            deleteEvents.forEach(deleteEvent -> eventRepository.deleteById(deleteEvent));
+            deleteEvents.forEach(eventRepository::deleteById);
         }
 
         userDeactivate.setActive(false);

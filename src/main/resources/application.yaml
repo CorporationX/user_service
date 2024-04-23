@@ -27,7 +27,9 @@ spring:
         profile_view_channel:
           name: profile_view_channel
         recommendation_channel:
-          name: recommendation_channel
+          name: "recommendation_channel"
+        goal_set_channel:
+          name: "goal_set_channel"
 
 server:
   port: 8080

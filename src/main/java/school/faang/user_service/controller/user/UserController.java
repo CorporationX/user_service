@@ -42,7 +42,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public UserDto deactivationUserById(@PathVariable Long userId){
+    public UserDto deactivationUserById(@PathVariable Long userId) {
         return userService.deactivationUserById(userId);
     }
 }

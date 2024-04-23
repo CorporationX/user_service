@@ -46,7 +46,7 @@ public class UserServiceTest {
     @Test
     void test_GetUser_ReturnsUser() {
         Long userId = 1L;
-        User user = User.builder().id(1L).email("buk@mail.ru").username("buk").build();
+        User user = User.builder().id(userId).email("buk@mail.ru").username("buk").build();
         UserDto userExpected = userMapper.toDto(user);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));

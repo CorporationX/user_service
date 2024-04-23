@@ -11,7 +11,6 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
-import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -25,11 +24,14 @@ public class RedisConfig {
     private String host;
     @Value("${spring.data.redis.port}")
     private int port;
-    @Value("${spring.data.redis.channel.recommendation_channel}")
+    @Value("{$spring.data.redis.channels.goal_set_channel.name}")
+    private String goalSetChannel;
+    @Value("${spring.data.redis.channels.recommendation_channel.name}")
     private String recommendationChannel;
+
     @Value("${topic.user_ban}")
     private String userBanTopic;
-    private final UsersBanListener usersBanListener;
+
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
@@ -48,26 +50,30 @@ public class RedisConfig {
     }
 
     @Bean
-    public ChannelTopic userBanTopic(){
-        return new ChannelTopic(userBanTopic);
-    }
-
-
-    @Bean
-    public MessageListenerAdapter userBanMessageListenerAdapter(){
+    public MessageListenerAdapter userBanMessageListenerAdapter(UsersBanListener usersBanListener) {
         return new MessageListenerAdapter(usersBanListener);
     }
 
     @Bean
-    public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory redisConnectionFactory) {
+    public RedisMessageListenerContainer redisMessageListenerContainer(MessageListenerAdapter userBanMessageListenerAdapter) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(redisConnectionFactory);
-        container.addMessageListener(userBanMessageListenerAdapter(), userBanTopic());
+        container.setConnectionFactory(redisConnectionFactory());
+        container.addMessageListener(userBanMessageListenerAdapter, userBanTopic());
         return container;
     }
 
     @Bean
     public ChannelTopic recommendationTopic() {
         return new ChannelTopic(recommendationChannel);
+    }
+
+    @Bean
+    public ChannelTopic goalSetTopic() {
+        return new ChannelTopic(goalSetChannel);
+    }
+
+    @Bean
+    public ChannelTopic userBanTopic() {
+        return new ChannelTopic(userBanTopic);
     }
 }

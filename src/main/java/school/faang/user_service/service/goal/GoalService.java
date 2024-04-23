@@ -1,15 +1,18 @@
 package school.faang.user_service.service.goal;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.dto.GoalFilterDto;
+import school.faang.user_service.dto.messagebroker.GoalSetEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.handler.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.GoalMapper;
+import school.faang.user_service.publisher.GoalSetEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -18,20 +21,20 @@ import school.faang.user_service.validator.goal.GoalConstraints;
 import school.faang.user_service.validator.goal.GoalValidation;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GoalService {
-    private final GoalRepository goalRepository;
-    private final GoalMapper goalMapper;
+    private final GoalSetEventPublisher goalSetEventPublisher;
     private final SkillRepository skillRepository;
+    private final GoalRepository goalRepository;
     private final GoalValidation goalValidation;
     private final UserRepository userRepository;
     private final List<GoalFilter> filters;
+    private final GoalMapper goalMapper;
     private final static int MAX_COUNT_GOALS = 3;
 
     @Transactional
@@ -40,7 +43,12 @@ public class GoalService {
         Goal createdGoal = goalRepository.create(goalDto.getTitle(), goalDto.getDescription(), goalDto.getParentId());
         createdGoal.setSkillsToAchieve(skillRepository.findAllById(goalDto.getSkillIds()));
         createdGoal.setUsers(new ArrayList<>(List.of(getUser(userId))));
-        return goalMapper.toDto(goalRepository.save(createdGoal));
+        Goal saveGoal = goalRepository.save(createdGoal);
+        long goalId = saveGoal.getId();
+        log.info("goal: {} was added by user {}", goalId, userId);
+        GoalSetEvent goalSetEvent = new GoalSetEvent(userId, goalId);
+        goalSetEventPublisher.publish(goalSetEvent);
+        return goalMapper.toDto(saveGoal);
     }
 
     @Transactional

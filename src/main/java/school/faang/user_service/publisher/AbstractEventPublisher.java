@@ -7,21 +7,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.serializer.SerializationException;
-import org.springframework.stereotype.Component;
-import school.faang.user_service.event.follower.FollowerEvent;
 
 @Slf4j
-@Component
 @RequiredArgsConstructor
-public class FollowerEventPublisher implements MessagePublisher<FollowerEvent> {
-    private final RedisTemplate<String, Object> redisTemplate;
-    private final ChannelTopic followerTopic;
-    private final ObjectMapper objectMapper;
+public abstract class AbstractEventPublisher<T> implements MessagePublisher<T> {
+    protected final RedisTemplate<String, Object> redisTemplate;
+    protected final ChannelTopic topic;
+    protected final ObjectMapper objectMapper;
 
-    @Override
-    public void publish(FollowerEvent event) {
+    public void publish(T event) {
         try {
-            redisTemplate.convertAndSend(followerTopic.getTopic(), objectMapper.writeValueAsString(event));
+            redisTemplate.convertAndSend(topic.getTopic(), objectMapper.writeValueAsString(event));
         } catch (JsonProcessingException e) {
             log.error("JsonProcessingException was thrown", e);
             throw new SerializationException("Failed to serialize message", e);

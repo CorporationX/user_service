@@ -18,4 +18,4 @@ public class ExecutorConfig {
     public ExecutorService executorService() {
         return Executors.newFixedThreadPool(threadPoolSize);
     }
-
+}

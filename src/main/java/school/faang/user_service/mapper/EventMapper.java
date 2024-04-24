@@ -2,8 +2,11 @@ package school.faang.user_service.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.EventStartEvent;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 
 import java.util.List;
@@ -20,4 +23,16 @@ public interface EventMapper {
     Event toEntity(EventDto eventDto);
 
     List<Event> toEntity(List<EventDto> eventDtoList);
+
+    @Mapping( source = "id", target="event_id")
+    @Mapping( source = "attendees.id", target = "attendeeIds", qualifiedByName = "attendeesIdMapper")
+    EventStartEvent toEventStartEvent (Event event);
+
+    @Named("attendeesIdMapper")
+    default List<Long> mapToAttendeeIds(List<User> users){
+
+        return users.stream().map( User::getId ).toList();
+
+    }
+
 }

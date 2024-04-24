@@ -13,8 +13,9 @@ import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.mapper.GoalInvitationMapperImpl;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
-import school.faang.user_service.service.goal.filter_goalinvitation.GoalInvitationFilter;
-import school.faang.user_service.validation.goal.GoalInvitationValidator;
+import school.faang.user_service.filter.goalinvitation.GoalInvitationFilter;
+import school.faang.user_service.service.GoalInvitationService;
+import school.faang.user_service.validator.GoalInvitationValidator;
 
 import java.util.ArrayList;
 import java.util.List;

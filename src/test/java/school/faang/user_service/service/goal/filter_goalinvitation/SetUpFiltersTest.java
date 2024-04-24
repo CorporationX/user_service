@@ -1,7 +1,7 @@
 package school.faang.user_service.service.goal.filter_goalinvitation;
 
 import org.junit.jupiter.api.BeforeEach;
-import school.faang.user_service.dto.goal.filter.GoalInvitationFilterDto;
+import school.faang.user_service.dto.goal.GoalInvitationFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.GoalInvitation;

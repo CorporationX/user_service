@@ -4,9 +4,9 @@ import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.dto.premium.PremiumDto;
-import school.faang.user_service.service.premium.PremiumService;
-import school.faang.user_service.service.validators.UserValidator;
+import school.faang.user_service.dto.PremiumDto;
+import school.faang.user_service.service.PremiumService;
+import school.faang.user_service.validator.UserValidator;
 
 @RestController
 @RequiredArgsConstructor

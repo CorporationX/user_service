@@ -9,11 +9,13 @@ import java.util.concurrent.Executors;
 
 @Configuration
 public class ExecutorConfig {
+
     @Value("${executorConfig.thread-pool-size}")
     private int threadPoolSize;
+
 
     @Bean
     public ExecutorService executorService() {
         return Executors.newFixedThreadPool(threadPoolSize);
     }
-}
+

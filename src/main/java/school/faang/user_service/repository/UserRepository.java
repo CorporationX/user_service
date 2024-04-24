@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    boolean existsUserByUsername (String name);
+    boolean existsUserByUsername(String name);
 
     @Query(nativeQuery = true, value = """
             SELECT COUNT(s.id) FROM users u
@@ -36,4 +36,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             WHERE u.active = false AND u.updated_at < ?1
             """)
     void deleteAllInactiveUsersAndUpdatedAtOverMonths(LocalDate time);
+
+    @Query("SELECT u.id FROM User u JOIN u.followers f WHERE u.id = :userId")
+    List<Long> findFollowerIdsByUserId(long userId);
 }

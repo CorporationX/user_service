@@ -163,4 +163,8 @@ public class UserService {
         getUserById(userId).setBanned(true);
         log.info("user with id = {} is banned", userId);
     }
+
+    public List<Long> getFollowerIds(long id) {
+        return userRepository.findFollowerIdsByUserId(id);
+    }
 }

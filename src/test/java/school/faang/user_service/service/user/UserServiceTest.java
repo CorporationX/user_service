@@ -7,19 +7,28 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.exceptions.UserNotFoundException;
 import school.faang.user_service.service.exceptions.messageerror.MessageError;
+import school.faang.user_service.service.S3Service;
+import school.faang.user_service.service.UserService;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -27,6 +36,10 @@ public class UserServiceTest {
     UserMapperImpl userMapper;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private S3Service s3Service;
+
+
 
     @InjectMocks
     private UserService userService;
@@ -76,5 +89,46 @@ public class UserServiceTest {
 
         verify(userRepository, times(1)).findAllById(userIds);
         verify(userMapper, times(1)).toDto(users);
+    }
+
+    @Test
+    public void testCreateSuccess() {
+
+        UserDto userDto = new UserDto();
+        userDto.setId( 1L );
+        userDto.setUsername( "John Doe" );
+
+
+        User user = new User();
+        user.setId( 1L );
+        user.setUsername( "John Doe" );
+
+        UserProfilePic userProfilePic = UserProfilePic.builder()
+                .smallFileId( "smallFileId" )
+                .fileId( "fileId" )
+                .build();
+        user.setUserProfilePic( userProfilePic );
+
+        when( userMapper.toEntity( userDto ) ).thenReturn( user );
+        when( userRepository.save( user ) ).thenReturn( user );
+        when( userMapper.toDto( user ) ).thenReturn( userDto );
+        UserDto createdUserDto = userService.create( userDto );
+
+        assertNotNull( createdUserDto );
+        assertEquals( userDto.getId(), createdUserDto.getId() );
+        assertEquals( userDto.getUsername(), createdUserDto.getUsername() );
+
+    }
+
+    @Test
+    public void testCreate_UserAlreadyExists_ExceptionThrown() {
+
+        UserDto userDto = new UserDto();
+        userDto.setId( 1L );
+
+        when( userRepository.findById( 1L ) ).thenReturn( java.util.Optional.of( new User() ) );
+        DataValidationException exception = assertThrows( DataValidationException.class, () -> userService.create( userDto ) );
+        assertEquals( "User with id 1 exists", exception.getMessage() );
+
     }
 }

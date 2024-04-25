@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.service.UserService;
+import school.faang.user_service.service.user.UserService;
 
 import java.util.List;
 

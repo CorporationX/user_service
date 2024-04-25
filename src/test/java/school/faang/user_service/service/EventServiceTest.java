@@ -13,7 +13,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.filter.event.EventTitlePatternFilter;
 import school.faang.user_service.filter.event.EventOwnerIdFilter;
-import school.faang.user_service.mapper.event.EventMapperImpl;
+import school.faang.user_service.mapper.EventMapperImpl;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.validator.event.EventValidator;

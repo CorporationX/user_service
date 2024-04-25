@@ -24,12 +24,12 @@ public interface EventMapper {
 
     List<Event> toEntity(List<EventDto> eventDtoList);
 
-    @Mapping( source = "id", target="event_id")
-    @Mapping( source = "attendees.id", target = "attendeeIds", qualifiedByName = "attendeesIdMapper")
-    EventStartEvent toEventStartEvent (Event event);
+    @Mapping(source = "id", target = "event_id")
+    @Mapping(source = "attendees", target = "attendeeIds", qualifiedByName = "attendeesIdMapper")
+    EventStartEvent toEventStartEvent(Event event);
 
     @Named("attendeesIdMapper")
-    default List<Long> mapToAttendeeIds(List<User> users){
+    default List<Long> mapToAttendeeIds(List<User> users) {
 
         return users.stream().map( User::getId ).toList();
 

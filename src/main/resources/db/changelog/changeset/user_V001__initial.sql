@@ -14,6 +14,7 @@ CREATE TABLE users (
     city varchar(64),
     country_id bigint NOT NULL,
     experience int,
+    banned boolean DEFAULT false NOT NULL,
     created_at timestamptz DEFAULT current_timestamp,
     updated_at timestamptz DEFAULT current_timestamp,
 

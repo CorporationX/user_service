@@ -30,4 +30,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             SELECT e.* FROM event e WHERE e.start_date = :dateTime """)
     List<Event> findEventStartingAt(LocalDateTime dateTime);
 
+    @Query(nativeQuery = true, value = """
+            SELECT e.* FROM event e WHERE e.start_date between :start and :end """)
+    List<Event> findEventStartingBetween(LocalDateTime start, LocalDateTime end);
+
 }

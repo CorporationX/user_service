@@ -22,6 +22,8 @@ spring:
       port: 6379
       host: localhost
       channels:
+        user_ban_channel:
+          name: user_ban
         follower_channel:
           name: follower_channel
         profile_view_channel:

@@ -17,6 +17,8 @@ import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.jira.JiraAccountDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.event.follower.FollowerEvent;
+import school.faang.user_service.publisher.followerevent.FollowerEventPublisher;
 import school.faang.user_service.service.user.DeactivationService;
 import school.faang.user_service.service.user.UserService;
 
@@ -31,6 +33,7 @@ public class UserController {
     private final UserService userService;
     private final DeactivationService deactivationService;
     private final UserContext userContext;
+    private final FollowerEventPublisher publisher;
 
     @Operation(summary = "Create new user")
     @PostMapping
@@ -82,5 +85,10 @@ public class UserController {
     public UserDto deactivateUser() {
         long userId = userContext.getUserId();
         return deactivationService.deactivateUser(userId);
+    }
+
+    @GetMapping("/test")
+    public void test() {
+        publisher.publish(new FollowerEvent(1L, 2L));
     }
 }

@@ -2,6 +2,8 @@ package school.faang.user_service.controller.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.service.event.EventService;
@@ -18,6 +20,11 @@ public class EventController {
     public EventDto create(EventDto eventDto) throws Exception {
         eventValidator.validateEventInController(eventDto);
         return eventService.createEvent(eventDto);
+    }
+
+    @PostMapping("start/{id}")
+    public void startEvent(@PathVariable long id){
+        eventService.startEvent(id);
     }
 
     public EventDto getEvent(long eventId) {

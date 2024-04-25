@@ -27,7 +27,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     boolean existsById(long eventId);
 
     @Query(nativeQuery = true, value = """
-            SELECT e FROM event e WHERE e.start_date =:dateTime """)
+            SELECT e.* FROM event e WHERE e.start_date = :dateTime """)
     List<Event> findEventStartingAt(LocalDateTime dateTime);
 
 }

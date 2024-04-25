@@ -39,4 +39,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u.id FROM User u JOIN u.followers f WHERE u.id = :userId")
     List<Long> findFollowerIdsByUserId(long userId);
+
+    @Query("SELECT u.id FROM User u")
+    List<Long> findAllUserIds();
 }

@@ -167,4 +167,8 @@ public class UserService {
     public List<Long> getFollowerIds(long id) {
         return userRepository.findFollowerIdsByUserId(id);
     }
+
+    public List<Long> getAllUserIds () {
+        return userRepository.findAllUserIds();
+    }
 }

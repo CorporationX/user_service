@@ -68,4 +68,9 @@ public class UserController {
     List<Long> getFollowerIdsById(@PathVariable long id) {
         return userService.getFollowerIds(id);
     }
+
+    @GetMapping("/ids")
+    List<Long> getAllUserIds () {
+        return userService.getAllUserIds();
+    };
 }

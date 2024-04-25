@@ -21,7 +21,7 @@ import school.faang.user_service.service.filters.CountryPatternFilter;
 import school.faang.user_service.service.filters.ExperienceMaxFilter;
 import school.faang.user_service.service.filters.NamePatternFilter;
 import school.faang.user_service.service.filters.UserFilter;
-import school.faang.user_service.service.publishers.FollowerEventPublisher;
+import school.faang.user_service.service.publisher.FollowerEventPublisher;
 
 import java.util.ArrayList;
 import java.util.List;

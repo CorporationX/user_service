@@ -3,7 +3,11 @@ package school.faang.user_service.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
@@ -11,9 +15,9 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.event.EventFilter;
-import school.faang.user_service.filter.event.EventTitlePatternFilter;
 import school.faang.user_service.filter.event.EventOwnerIdFilter;
-import school.faang.user_service.mapper.event.EventMapperImpl;
+import school.faang.user_service.filter.event.EventTitlePatternFilter;
+import school.faang.user_service.mapper.EventMapperImpl;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.validator.event.EventValidator;
@@ -22,8 +26,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class EventServiceTest {

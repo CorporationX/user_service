@@ -83,10 +83,8 @@ class SchedulerServiceTest {
     }
 
     @Test
-    public void testDeleteExpiredPremium() {
-        premiumRemover.removePremium();
-        Mockito.verify(premiumService, Mockito.times(1)).removeExpiredPremiums();
+    public void testDeleteExpiredPremium(){
+        schedulerService.deleteExpiredPremium();
+        Mockito.verify(premiumRepository, Mockito.times(1)).deleteAllByEndDateBefore(Mockito.any(LocalDateTime.class    ));
     }
-
-
 }

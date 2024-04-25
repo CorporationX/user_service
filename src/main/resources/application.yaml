@@ -65,6 +65,13 @@ task:
 cleanUpPremiumRepo:
   cron: *daily
 
+
+clearEvents:
+  cron: "0 0 10 * * *"
+  batchSize: 100
+
+
+
 dicebear:
   pic-base-url-small: https://api.dicebear.com/7.x/bottts/svg?size=64&seed=
   pic-base-url: https://api.dicebear.com/7.x/bottts/svg?size=256&seed=
@@ -75,3 +82,4 @@ premium:
 
 executorConfig:
   thread-pool-size: 10
+

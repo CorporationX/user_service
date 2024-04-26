@@ -11,7 +11,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SubscriptionUserMapper;
 import school.faang.user_service.publishers.SearchAppearanceEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.service.filters.UserFilter;
+import school.faang.user_service.filter.user_filter.UserFilter;
 
 import java.time.LocalDateTime;
 import java.util.List;

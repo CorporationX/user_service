@@ -21,9 +21,10 @@ import school.faang.user_service.dto.payment.PaymentStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.premium.PremiumMapper;
+import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
+import school.faang.user_service.service.PremiumService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

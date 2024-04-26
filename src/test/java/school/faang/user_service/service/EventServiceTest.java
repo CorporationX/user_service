@@ -18,7 +18,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.filter.event.EventOwnerIdFilter;
 import school.faang.user_service.filter.event.EventTitlePatternFilter;
-import school.faang.user_service.mapper.EventMapperImpl;
+import school.faang.user_service.mapper.event.EventMapperImpl;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.validator.event.EventValidator;
@@ -32,6 +32,7 @@ import java.util.concurrent.ExecutorService;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -159,7 +160,7 @@ public class EventServiceTest {
             event.setEndDate(LocalDateTime.now().minusDays(day));
             eventList.add(event);
         }
-        Mockito.when(eventRepository.findAll()).thenReturn(eventList);
+        when(eventRepository.findAll()).thenReturn(eventList);
         ReflectionTestUtils.setField(eventService, "batchSize", 100);
         eventService.clearEvents();
         verify(eventRepository, times(1)).findAll();

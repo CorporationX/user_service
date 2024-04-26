@@ -29,7 +29,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -87,15 +86,14 @@ public class UserServiceTest {
     @Test
     public void testGetUser() {
         when(userRepository.findById(firstUser.getId())).thenReturn(Optional.ofNullable(firstUser));
-        when(userRepository.findById(firstUser.getId())).thenReturn(Optional.ofNullable(firstUser));
         when(userContext.getUserId()).thenReturn(secondUser.getId());
-        when(eventMapper.toJson(any(ProfileViewEventDto.class))).thenReturn("[]");
+//        when(eventMapper.toJson(any(ProfileViewEventDto.class))).thenReturn("[]");
 
         userService.getUser(firstUser.getId());
 
         verify(userRepository, times(1)).findById(firstUser.getId());
         verify(userMapper, times(1)).toDto(firstUser);
-        verify(profileViewEventPublisher, times(1)).publish(anyString());
+        verify(profileViewEventPublisher, times(1)).publish(any(ProfileViewEventDto.class));
     }
 
     @Test

@@ -153,19 +153,21 @@ public class SkillServiceTest {
         long skillId = 1L;
         long userId = 1L;
         long senderId = 2L;
+        String titleSkill = "title1";
 
         Skill skill = new Skill();
         skill.setId(skillId);
-        skill.setTitle("title1");
+        skill.setTitle(titleSkill);
 
         SkillDto skillDto = new SkillDto();
         skillDto.setId(userId);
-        skillDto.setTitle("title1");
+        skillDto.setTitle(titleSkill);
 
         SkillOfferedEvent skillOfferedEvent = SkillOfferedEvent.builder()
                 .skillId(skillId)
                 .recipientUserId(userId)
                 .senderUserId(senderId)
+                .titleSkill(titleSkill)
                 .build();
 
         Mockito.when(skillRepository.findById(skillId)).thenReturn(Optional.of(skill));

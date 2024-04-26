@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-public class KafkaConfig {
+public class KafkaProducerConfig {
     @Value("${spring.data.kafka.host}")
     private String host;
 
@@ -23,6 +23,7 @@ public class KafkaConfig {
 
     @Value("${spring.data.kafka.channels.skill-channel.name}")
     private String skillEventChannel;
+
 
     @Bean
     public ProducerFactory<String, String> kafkaProducerFactory() {

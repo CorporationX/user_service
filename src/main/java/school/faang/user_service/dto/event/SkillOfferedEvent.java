@@ -13,4 +13,5 @@ public class SkillOfferedEvent {
     private long recipientUserId;
     private long senderUserId;
     private long skillId;
+    private String titleSkill;
 }

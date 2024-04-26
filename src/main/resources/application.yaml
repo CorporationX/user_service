@@ -16,12 +16,13 @@ spring:
 
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
-
   data:
     redis:
       port: 6379
       host: localhost
       channels:
+        user_ban_channel:
+          name: user_ban
         follower_channel:
           name: follower_channel
         profile_view_channel:
@@ -51,8 +52,11 @@ aws:
 
 services:
   s3:
-    bucket-name: user_backet
-    isMocked: true
+    bucket-name: user-service-bucket
+    endpoint: http://127.0.0.1:9000
+    accessKey: user
+    secretKey: password
+    isMocked: false
 
 task:
   scheduling:
@@ -60,3 +64,22 @@ task:
 
 cleanUpPremiumRepo:
   cron: *daily
+
+
+clearEvents:
+  cron: "0 0 10 * * *"
+  batchSize: 100
+
+
+
+dicebear:
+  pic-base-url-small: https://api.dicebear.com/7.x/bottts/svg?size=64&seed=
+  pic-base-url: https://api.dicebear.com/7.x/bottts/svg?size=256&seed=
+premium:
+  remover:
+    cron: "0 0 0 * * MON"
+    batchSize: 100
+
+executorConfig:
+  thread-pool-size: 10
+

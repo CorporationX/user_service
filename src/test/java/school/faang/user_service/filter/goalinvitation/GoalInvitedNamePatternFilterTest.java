@@ -1,12 +1,11 @@
-package school.faang.user_service.service.goal.filter_goalinvitation;
+package school.faang.user_service.filter.goalinvitation;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.filter.goalinvitation.GoalInvitedNamePatternFilter;
 
 @ExtendWith(MockitoExtension.class)
 public class GoalInvitedNamePatternFilterTest extends SetUpFiltersTest {
@@ -16,26 +15,26 @@ public class GoalInvitedNamePatternFilterTest extends SetUpFiltersTest {
     @Test
     @DisplayName("Testing if the filters are applicable")
     public void testFiltersAreApplicable() {
-        Assert.assertEquals(true, goalInvitedNamePatternFilter.isApplicable(filterInvitedNamePatternDto));
+        Assertions.assertTrue(goalInvitedNamePatternFilter.isApplicable(filterInvitedNamePatternDto));
     }
 
     @Test
     @DisplayName("Check if the filters are applied correctly")
     public void testFiltersAreNotApplicable() {
-        Assert.assertEquals(false, goalInvitedNamePatternFilter.isApplicable(filterInviterNamePatternDto));
+        Assertions.assertFalse(goalInvitedNamePatternFilter.isApplicable(filterInviterNamePatternDto));
     }
 
     @Test
     @DisplayName("Check if the filters are applied correctly")
     public void testFiltersAreApply() {
-        Assert.assertEquals(true, goalInvitedNamePatternFilter.isApplicable(filterInvitedNamePatternDto));
-        Assert.assertEquals(true, goalInvitedNamePatternFilter.apply(goalInvitation, filterInvitedNamePatternDto));
+        Assertions.assertTrue(goalInvitedNamePatternFilter.isApplicable(filterInvitedNamePatternDto));
+        Assertions.assertTrue(goalInvitedNamePatternFilter.apply(goalInvitation, filterInvitedNamePatternDto));
     }
 
     @Test
     @DisplayName("Check if the filters are applied correctly")
     public void testFiltersNotAreApply() {
-        Assert.assertEquals(true, goalInvitedNamePatternFilter.isApplicable(filterInvitedNamePatternDto));
-        Assert.assertEquals(false, goalInvitedNamePatternFilter.apply(goalInvitation, filterInviterNamePatternDto));
+        Assertions.assertTrue(goalInvitedNamePatternFilter.isApplicable(filterInvitedNamePatternDto));
+        Assertions.assertFalse(goalInvitedNamePatternFilter.apply(goalInvitation, filterInviterNamePatternDto));
     }
 }

@@ -1,4 +1,4 @@
-package school.faang.user_service.service.goal;
+package school.faang.user_service.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,6 @@ import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.mapper.GoalInvitationMapperImpl;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.filter.goalinvitation.GoalInvitationFilter;
-import school.faang.user_service.service.GoalInvitationService;
 import school.faang.user_service.validator.GoalInvitationValidator;
 
 import java.util.ArrayList;

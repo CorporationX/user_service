@@ -1,4 +1,4 @@
-package school.faang.user_service.service.goal.filter_goalinvitation;
+package school.faang.user_service.filter.goalinvitation;
 
 import org.junit.jupiter.api.BeforeEach;
 import school.faang.user_service.dto.goal.GoalInvitationFilterDto;

@@ -1,4 +1,4 @@
-package school.faang.user_service.service.s3_minio_service;
+package school.faang.user_service.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
@@ -8,7 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestTemplate;
-import school.faang.user_service.service.S3Service;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;

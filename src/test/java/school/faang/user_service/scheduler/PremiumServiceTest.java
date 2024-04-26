@@ -1,25 +1,25 @@
-package school.faang.user_service.service.scheduler;
+package school.faang.user_service.scheduler;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;
-import school.faang.user_service.scheduler.PremiumRemover;
 import school.faang.user_service.service.PremiumService;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 @ExtendWith(MockitoExtension.class)
-class SchedulerServiceTest {
+class PremiumServiceTest {
     @Mock
     PremiumService premiumService;
-
     @InjectMocks
     PremiumRemover premiumRemover;
 
@@ -83,8 +83,9 @@ class SchedulerServiceTest {
     }
 
     @Test
-    public void testDeleteExpiredPremium(){
-        schedulerService.deleteExpiredPremium();
-        Mockito.verify(premiumRepository, Mockito.times(1)).deleteAllByEndDateBefore(Mockito.any(LocalDateTime.class    ));
+    public void testRemoveExpiredPremiums(){
+        premiumRemover.removePremium();
+
+        verify(premiumService, times(1)).removeExpiredPremiums();
     }
 }

@@ -1,4 +1,4 @@
-package school.faang.user_service.service.user;
+package school.faang.user_service.service;
 
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
@@ -16,13 +16,10 @@ import school.faang.user_service.exception.MessageError;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.S3Service;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -111,9 +108,9 @@ public class UserServiceTest {
         when(userMapper.toDto(user)).thenReturn(userDto);
         UserDto createdUserDto = userService.create(userDto);
 
-        assertNotNull(createdUserDto);
-        assertEquals(userDto.getId(), createdUserDto.getId());
-        assertEquals(userDto.getUsername(), createdUserDto.getUsername());
+        Assertions.assertNotNull(createdUserDto);
+        Assertions.assertEquals(userDto.getId(), createdUserDto.getId());
+        Assertions.assertEquals(userDto.getUsername(), createdUserDto.getUsername());
 
     }
 
@@ -125,7 +122,7 @@ public class UserServiceTest {
 
         when(userRepository.findById(1L)).thenReturn(java.util.Optional.of(new User()));
         DataValidationException exception = assertThrows(DataValidationException.class, () -> userService.create(userDto));
-        assertEquals("User with id 1 exists", exception.getMessage());
+        Assertions.assertEquals("User with id 1 exists", exception.getMessage());
 
     }
 }

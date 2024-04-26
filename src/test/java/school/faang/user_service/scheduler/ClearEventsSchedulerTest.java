@@ -1,4 +1,4 @@
-package school.faang.user_service.service.scheduler;
+package school.faang.user_service.scheduler;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

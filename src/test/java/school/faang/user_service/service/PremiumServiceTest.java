@@ -1,6 +1,7 @@
-package school.faang.user_service.service.premium;
+package school.faang.user_service.service;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,6 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
-import school.faang.user_service.service.PremiumService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -103,7 +103,7 @@ class PremiumServiceTest {
 
         DataValidationException e = Assert.assertThrows(DataValidationException.class, () -> premiumService.buyPremium(userId, base));
 
-        Assert.assertEquals(e.getMessage(), "The user " + userId + " already has Premium subscription");
+        Assertions.assertEquals(e.getMessage(), "The user " + userId + " already has Premium subscription");
     }
     @Test
     @DisplayName("Internal payment operation exception")
@@ -113,7 +113,7 @@ class PremiumServiceTest {
 
         DataValidationException e = Assert.assertThrows(DataValidationException.class, () -> premiumService.buyPremium(userId, base));
 
-        Assert.assertEquals(e.getMessage(), "Transaction failed!");
+        Assertions.assertEquals(e.getMessage(), "Transaction failed!");
     }
 
     @Test

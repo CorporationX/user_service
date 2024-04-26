@@ -1,12 +1,11 @@
-package school.faang.user_service.service.goal.filter_goalinvitation;
+package school.faang.user_service.filter.goalinvitation;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.filter.goalinvitation.GoalInvitationStatusFilter;
 
 @ExtendWith(MockitoExtension.class)
 public class GoalInvitationStatusFilterTest extends SetUpFiltersTest {
@@ -16,26 +15,26 @@ public class GoalInvitationStatusFilterTest extends SetUpFiltersTest {
     @Test
     @DisplayName("Testing if the filters are applicable")
     public void testFiltersAreApplicable() {
-        Assert.assertEquals(true, goalInvitationStatusFilter.isApplicable(filterStatusDto));
+        Assertions.assertTrue(goalInvitationStatusFilter.isApplicable(filterStatusDto));
     }
 
     @Test
     @DisplayName("Check if the filters are applied correctly")
     public void testFiltersAreNotApplicable() {
-        Assert.assertEquals(false, goalInvitationStatusFilter.isApplicable(filterInviterNamePatternDto));
+        Assertions.assertFalse(goalInvitationStatusFilter.isApplicable(filterInviterNamePatternDto));
     }
 
     @Test
     @DisplayName("Check if the filters are applied correctly")
     public void testFiltersAreApply() {
-        Assert.assertEquals(true, goalInvitationStatusFilter.isApplicable(filterStatusDto));
-        Assert.assertEquals(true, goalInvitationStatusFilter.apply(goalInvitation, filterStatusDto));
+        Assertions.assertTrue(goalInvitationStatusFilter.isApplicable(filterStatusDto));
+        Assertions.assertTrue(goalInvitationStatusFilter.apply(goalInvitation, filterStatusDto));
     }
 
     @Test
     @DisplayName("Check if the filters are applied correctly")
     public void testFiltersNotAreApply() {
-        Assert.assertEquals(true, goalInvitationStatusFilter.isApplicable(filterStatusDto));
-        Assert.assertEquals(false, goalInvitationStatusFilter.apply(goalInvitation, filterInviterNamePatternDto));
+        Assertions.assertTrue(goalInvitationStatusFilter.isApplicable(filterStatusDto));
+        Assertions.assertFalse(goalInvitationStatusFilter.apply(goalInvitation, filterInviterNamePatternDto));
     }
 }

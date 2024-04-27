@@ -25,8 +25,10 @@ public class RedisConfig {
     private String host;
     @Value("${spring.data.redis.port}")
     private int port;
-    @Value("${spring.data.redis.channel.recommendation_channel}")
+    @Value("${spring.data.redis.channels.recommendation_channel.name}")
     private String recommendationChannel;
+    @Value("${spring.data.redis.channels.mentorship_accepted_channel.name}")
+    private String mentorshipAcceptedChannel;
     @Value("${topic.user_ban}")
     private String userBanTopic;
     private final UsersBanListener usersBanListener;
@@ -48,13 +50,13 @@ public class RedisConfig {
     }
 
     @Bean
-    public ChannelTopic userBanTopic(){
+    public ChannelTopic userBanTopic() {
         return new ChannelTopic(userBanTopic);
     }
 
 
     @Bean
-    public MessageListenerAdapter userBanMessageListenerAdapter(){
+    public MessageListenerAdapter userBanMessageListenerAdapter() {
         return new MessageListenerAdapter(usersBanListener);
     }
 
@@ -69,5 +71,10 @@ public class RedisConfig {
     @Bean
     public ChannelTopic recommendationTopic() {
         return new ChannelTopic(recommendationChannel);
+    }
+
+    @Bean
+    public ChannelTopic mentorshipAcceptedTopic() {
+        return new ChannelTopic(mentorshipAcceptedChannel);
     }
 }

@@ -26,8 +26,8 @@ spring:
           name: follower_channel
         profile_view_channel:
           name: profile_view_channel
-        search_appearance_topic:
-          name: SearchAppearance
+        search_appearance_channel:
+          name: SearchAppearance_channel
         recommendation_channel:
           name: recommendation_channel
 

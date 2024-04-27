@@ -55,7 +55,7 @@ public class RecommendationRequestServiceTest {
     }
 
     @Test
-    public void testRecommendationRequestCreated(){
+    public void testRecommendationRequestCreated() {
         User author = new User();
         author.setId(1L);
         User receiver = new User();
@@ -74,7 +74,7 @@ public class RecommendationRequestServiceTest {
         Mockito.verify(recommendationRequestValidator, Mockito.times(1)).validate(recommendationRequestDto);
         Mockito.verify(recommendationRequestMapper, Mockito.times(1)).toEntity(recommendationRequestDto);
         Mockito.verify(recommendationRequestRepository, Mockito.times(1)).save(recommendationRequest);
-        Mockito.verify(skillRequestRepository, Mockito.never()).create(Mockito.anyLong(),Mockito.anyLong());
+        Mockito.verify(skillRequestRepository, Mockito.never()).create(Mockito.anyLong(), Mockito.anyLong());
         Mockito.verify(recommendationRequestMapper, Mockito.times(1)).toEntity(recommendationRequestDto);
     }
 }

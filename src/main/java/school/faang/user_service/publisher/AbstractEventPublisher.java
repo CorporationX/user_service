@@ -5,11 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+
 @RequiredArgsConstructor
 @Slf4j
 public class AbstractEventPublisher<T> {
-    private final RedisTemplate<String,Object>redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
+
     public void convertAndSend(T event, String topic) {
         try {
             String jsonMessage = objectMapper.writeValueAsString(event);

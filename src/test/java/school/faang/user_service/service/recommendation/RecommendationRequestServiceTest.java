@@ -3,22 +3,18 @@ package school.faang.user_service.service.recommendation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
-
+import school.faang.user_service.handler.exception.EntityNotFoundException;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
-import school.faang.user_service.repository.recommendation.SkillRequestRepository;
-import school.faang.user_service.service.recommendation.impl.RecommendationRequestServiceImpl;
-import school.faang.user_service.validator.recommendation.RecommendationRequestValidator;
 
-import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 public class RecommendationRequestServiceTest {
@@ -53,7 +49,7 @@ public class RecommendationRequestServiceTest {
                 .message("message 2")
                 .build();
     }
-
+  
     @Test
     public void testRecommendationRequestCreated() {
         User author = new User();

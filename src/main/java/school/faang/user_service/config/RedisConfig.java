@@ -17,7 +17,6 @@ import school.faang.user_service.subscriber.UsersBanListener;
 @Configuration
 @RequiredArgsConstructor
 public class RedisConfig {
-  
     @Value("${spring.data.redis.host}")
     private String host;
   
@@ -29,7 +28,7 @@ public class RedisConfig {
 
     @Value("${spring.data.redis.channel.recommendation_channel}")
     private String recommendationChannel;
-  
+
     @Value("${topic.user_ban}")
     private String userBanTopic;
   
@@ -79,3 +78,4 @@ public class RedisConfig {
         return new ChannelTopic(userBanTopic);
     }
 }
+

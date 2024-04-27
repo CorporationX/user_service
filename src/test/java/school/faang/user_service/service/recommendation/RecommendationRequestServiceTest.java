@@ -8,13 +8,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
-import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.dto.recommendation.RecommendationEvent;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
-import school.faang.user_service.publisher.RecommendationEventPublisher;
+
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 import school.faang.user_service.service.recommendation.impl.RecommendationRequestServiceImpl;
@@ -26,7 +24,6 @@ import java.time.LocalDateTime;
 public class RecommendationRequestServiceTest {
     private RecommendationRequestDto recommendationRequestDto;
     private RecommendationRequest recommendationRequest;
-    private RejectionDto rejectionDto;
 
     @Mock
     private RecommendationRequestRepository recommendationRequestRepository;
@@ -34,8 +31,6 @@ public class RecommendationRequestServiceTest {
     private RecommendationRequestValidator recommendationRequestValidator;
     @Mock
     private RecommendationRequestMapper recommendationRequestMapper;
-    @Mock
-    private RecommendationEventPublisher recommendationEventPublisher;
     @Mock
     private SkillRequestRepository skillRequestRepository;
 
@@ -56,10 +51,6 @@ public class RecommendationRequestServiceTest {
                 .requester(new User())
                 .receiver(new User())
                 .message("message 2")
-                .build();
-
-        rejectionDto = RejectionDto.builder()
-                .reason("message")
                 .build();
     }
 
@@ -83,44 +74,7 @@ public class RecommendationRequestServiceTest {
         Mockito.verify(recommendationRequestValidator, Mockito.times(1)).validate(recommendationRequestDto);
         Mockito.verify(recommendationRequestMapper, Mockito.times(1)).toEntity(recommendationRequestDto);
         Mockito.verify(recommendationRequestRepository, Mockito.times(1)).save(recommendationRequest);
-        Mockito.verify(recommendationEventPublisher, Mockito.times(1)).publish(Mockito.any(RecommendationEvent.class));
         Mockito.verify(skillRequestRepository, Mockito.never()).create(Mockito.anyLong(),Mockito.anyLong());
         Mockito.verify(recommendationRequestMapper, Mockito.times(1)).toEntity(recommendationRequestDto);
     }
-
-//    @Test
-//    public void testRecommendationRequestCreated() {
-//        recommendationRequestService.create(recommendationRequestDto);
-//        Mockito.verify(recommendationRequestService).create(recommendationRequestDto);
-//        Mockito.when(recommendationRequestService.create(recommendationRequestDto)).thenReturn(recommendationRequestDto);
-//    }
-
-//    @Test
-//    public void testRecommendationRequestFindOne() {
-//        long validId = 8;
-//        Mockito.when(recommendationRequestRepository.findById(validId)).thenReturn(Optional.of(recommendationRequest));
-//        recommendationRequestService.getRequest(validId);
-//        Mockito.verify(recommendationRequestService).getRequest(validId);
-//    }
-
-//    @Test
-//    public void testRecommendationRequestsFindAll() {
-//        Mockito.when(recommendationRequestRepository.findAll()).thenReturn(List.of(recommendationRequest));
-//    }
-
-//    @Test
-//    public void testRecommendationRequestReject() {
-//        long id = 8;
-//
-//        recommendationRequestService.rejectRequest(id, rejectionDto);
-//        Mockito.verify(recommendationRequestService).rejectRequest(id, rejectionDto);
-//    }
-
-//    @Test
-//    public void testGetRequestThrowEntityNotFound() {
-//        long requestId = 1L;
-//
-//        Mockito.when(recommendationRequestRepository.findById(requestId)).thenReturn(Optional.empty());
-//        Mockito.when(recommendationRequestService.getRequest(requestId)).thenThrow(EntityNotFoundException.class);
-//    }
 }

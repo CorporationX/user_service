@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.recommendation.RequestFilterDto;
-import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
 
 import java.util.List;

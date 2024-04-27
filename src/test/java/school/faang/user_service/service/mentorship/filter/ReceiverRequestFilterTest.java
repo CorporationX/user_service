@@ -8,14 +8,12 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.recommendation.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.service.mentorship.filtres.ReceiverRequestFilter;
 
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static school.faang.user_service.service.mentorship.filter.MentorshipFilter.DESCRIPTION;
 import static school.faang.user_service.service.mentorship.filter.MentorshipFilter.RECEIVER;
 
 @ExtendWith(MockitoExtension.class)

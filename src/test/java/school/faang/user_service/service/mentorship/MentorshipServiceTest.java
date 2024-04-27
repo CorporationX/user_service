@@ -16,7 +16,6 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.mentorship.MenteeMapperImpl;
 import school.faang.user_service.mapper.mentorship.MentorMapperImpl;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
-import school.faang.user_service.service.mentorship.MentorshipService;
 
 import java.util.Collections;
 import java.util.List;

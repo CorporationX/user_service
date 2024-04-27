@@ -23,10 +23,10 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}")
     private int port;
   
-    @Value("${spring.data.redis.channels.search_appearance_topic")
+    @Value("${spring.data.redis.channels.search_appearance_topic.name}")
     private String searchAppearanceTopic;
 
-    @Value("${spring.data.redis.channel.recommendation_channel}")
+    @Value("${spring.data.redis.channels.recommendation_channel.name}")
     private String recommendationChannel;
 
     @Value("${topic.user_ban}")

@@ -11,7 +11,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SubscriptionUserMapper;
 import school.faang.user_service.publishers.SearchAppearanceEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.filter.user_filter.UserFilter;
+import school.faang.user_service.filter.user.UserFilter;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -63,14 +63,15 @@ public class SubscriptionService {
     }
 
     private List<SubscriptionUserDto> filterUsers(Stream<User> users, SubscriptionUserFilterDto filters) {
+        Stream<User> filteredUsers = users;
+        for (UserFilter userFilter : userFilters) {
+            if (userFilter.isApplicable(filters)) {
+                filteredUsers = userFilter.apply(filteredUsers, filters);
+            }
+        }
 
-        userFilters.stream()
-                .filter(filter -> filter.isApplicable(filters))
-                .forEach(filter -> filter.apply(users, filters));
-
-        List<SubscriptionUserDto> filteredUsers = userMapper.toDto(users.toList());
-
-        List<Long> userIds = filteredUsers.stream().map(SubscriptionUserDto::getId).toList();
+        List<SubscriptionUserDto> filteredUsersList = userMapper.toDto(users.toList());
+        List<Long> userIds = filteredUsersList.stream().map(SubscriptionUserDto::getId).toList();
 
         userIds.forEach(userId -> {
             SearchAppearanceEvent event = new SearchAppearanceEvent();
@@ -80,6 +81,6 @@ public class SubscriptionService {
             searchAppearanceEventPublisher.publish(event);
         });
 
-        return filteredUsers;
+        return filteredUsersList;
     }
 }

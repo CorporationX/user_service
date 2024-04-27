@@ -1,4 +1,4 @@
-package school.faang.user_service.filter.user_filter;
+package school.faang.user_service.filter.user;
 
 import school.faang.user_service.dto.subscription.SubscriptionUserFilterDto;
 import school.faang.user_service.entity.User;
@@ -12,7 +12,7 @@ public class ContactPatternFilter implements UserFilter {
     }
 
     @Override
-    public void apply(Stream<User> users, SubscriptionUserFilterDto subscriptionUserFilterDto) {
-        users.filter(user -> user.getContacts().contains(subscriptionUserFilterDto.getContactPattern()));
+    public Stream<User> apply(Stream<User> users, SubscriptionUserFilterDto subscriptionUserFilterDto) {
+        return users.filter(user -> user.getContacts().contains(subscriptionUserFilterDto.getContactPattern()));
     }
 }

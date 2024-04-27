@@ -17,11 +17,11 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SubscriptionUserMapper;
 import school.faang.user_service.publishers.SearchAppearanceEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.filter.user_filter.CityPatternFilter;
-import school.faang.user_service.filter.user_filter.CountryPatternFilter;
-import school.faang.user_service.filter.user_filter.ExperienceMaxFilter;
-import school.faang.user_service.filter.user_filter.NamePatternFilter;
-import school.faang.user_service.filter.user_filter.UserFilter;
+import school.faang.user_service.filter.user.CityPatternFilter;
+import school.faang.user_service.filter.user.CountryPatternFilter;
+import school.faang.user_service.filter.user.ExperienceMaxFilter;
+import school.faang.user_service.filter.user.NamePatternFilter;
+import school.faang.user_service.filter.user.UserFilter;
 
 import java.util.ArrayList;
 import java.util.List;

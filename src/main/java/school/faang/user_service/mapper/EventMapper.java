@@ -1,24 +1,22 @@
 package school.faang.user_service.mapper;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
+import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.entity.event.Event;
+import java.util.List;
 
-@Component
-@Slf4j
-@RequiredArgsConstructor
-public class EventMapper {
-    private final ObjectMapper objectMapper;
-    public <T> String toJson(T object){
-        String json;
-        try {
-            json = objectMapper.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            log.warn("Unsuccessful mapping to JSON", e);
-            throw new RuntimeException(e);
-        }
-        return json;
-    }
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public interface EventMapper {
+    @Mapping(source = "owner.id", target = "ownerId")
+    @Mapping(target = "relatedSkills", ignore = true)
+    EventDto toDto(Event event);
+
+    List<EventDto> toDto(List<Event> eventList);
+
+    @Mapping(target = "relatedSkills", ignore = true)
+    Event toEntity(EventDto eventDto);
+
+    List<Event> toEntity(List<EventDto> eventDtoList);
 }

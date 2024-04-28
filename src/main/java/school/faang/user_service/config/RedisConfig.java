@@ -11,6 +11,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import school.faang.user_service.listeners.UserBannerListener;
 
@@ -31,23 +32,22 @@ public class RedisConfig {
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
-        System.out.println(port);
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
         return new JedisConnectionFactory(config);
     }
 
     @Bean
-    public ChannelTopic getUserBannerTopic() {
+    public ChannelTopic getUserBannerTopic(){
         return new ChannelTopic(userBannerTopic);
     }
 
     @Bean
-    public MessageListenerAdapter userBannerListenerAdapter(UserBannerListener userBannerListener) {
+    public MessageListenerAdapter userBannerListenerAdapter(UserBannerListener userBannerListener){
         return new MessageListenerAdapter(userBannerListener);
     }
 
     @Bean
-    public RedisMessageListenerContainer getContainer(MessageListenerAdapter userBannerListenerAdapter) {
+    public RedisMessageListenerContainer getContainer(MessageListenerAdapter userBannerListenerAdapter){
         RedisMessageListenerContainer redisMessageListenerContainer = new RedisMessageListenerContainer();
         redisMessageListenerContainer.setConnectionFactory(redisConnectionFactory());
         redisMessageListenerContainer.addMessageListener(userBannerListenerAdapter, getUserBannerTopic());
@@ -59,8 +59,7 @@ public class RedisConfig {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new StringRedisSerializer()); //or StringRedisSerializer
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
         return redisTemplate;
     }
-
 }

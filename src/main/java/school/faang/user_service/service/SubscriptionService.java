@@ -1,25 +1,33 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.SubscriptionUserDto;
 import school.faang.user_service.dto.SubscriptionUserFilterDto;
+import school.faang.user_service.dto.event.FollowerEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.filter.user_filter.UserFilter;
 import school.faang.user_service.mapper.SubscriptionUserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.filter.user_filter.UserFilter;
+import school.faang.user_service.service.publisher.FollowerEventPublisher;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final SubscriptionUserMapper userMapper;
     private final List<UserFilter> userFilters;
+    private final FollowerEventPublisher followerEventPublisher;
 
+    @Transactional
     public void followUser(long followerId, long followeeId) {
         if (followerId == followeeId) {
             throw new DataValidationException("You can not follow yourself!");
@@ -27,7 +35,16 @@ public class SubscriptionService {
         if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             throw new DataValidationException("This subscription already exists!");
         }
+
         subscriptionRepository.followUser(followerId, followeeId);
+
+        FollowerEvent followerEvent = FollowerEvent.builder().followerId(followerId).
+                followeeId(followeeId).
+                subscriptionDateTime(LocalDateTime.now()).build();
+
+        followerEventPublisher.publish(followerEvent);
+
+        log.info("Successfully sent data to analytics-service" + followerEvent);
 
     }
 

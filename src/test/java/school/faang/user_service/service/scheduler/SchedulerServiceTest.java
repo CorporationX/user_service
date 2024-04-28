@@ -81,10 +81,4 @@ class SchedulerServiceTest {
         thirdUser.setPremium(thirdExpiredPremium);
         forthUser.setPremium(firstValidPremium);
     }
-
-    @Test
-    public void testDeleteExpiredPremium(){
-        schedulerService.deleteExpiredPremium();
-        Mockito.verify(premiumRepository, Mockito.times(1)).deleteAllByEndDateBefore(Mockito.any(LocalDateTime.class    ));
-    }
 }

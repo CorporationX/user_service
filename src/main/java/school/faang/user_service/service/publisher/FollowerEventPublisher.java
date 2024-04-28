@@ -14,7 +14,7 @@ import school.faang.user_service.dto.event.FollowerEvent;
 public class FollowerEventPublisher extends AbstractPublisher<FollowerEvent> {
     public FollowerEventPublisher(RedisTemplate<String, Object> redisTemplate,
                                   ObjectMapper jsonMapper,
-                                  @Value("${spring.data.redis.channel.follower_channel.name}") String followerChannelTopic) {
+                                  @Value("${spring.data.redis.channels.follower_channel.name}") String followerChannelTopic) {
 
         super( redisTemplate, jsonMapper, followerChannelTopic );
 

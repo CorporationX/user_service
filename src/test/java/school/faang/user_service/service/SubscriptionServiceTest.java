@@ -14,13 +14,9 @@ import school.faang.user_service.dto.SubscriptionUserFilterDto;
 import school.faang.user_service.dto.event.FollowerEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.filter.user_filter.*;
 import school.faang.user_service.mapper.SubscriptionUserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.service.filters.CityPatternFilter;
-import school.faang.user_service.service.filters.CountryPatternFilter;
-import school.faang.user_service.service.filters.ExperienceMaxFilter;
-import school.faang.user_service.service.filters.NamePatternFilter;
-import school.faang.user_service.service.filters.UserFilter;
 import school.faang.user_service.service.publisher.FollowerEventPublisher;
 
 import java.util.ArrayList;

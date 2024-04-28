@@ -17,15 +17,12 @@ public interface UserMapper {
     @Mapping(source = "country.id", target = "countryId")
     UserDto toDto(User user);
 
-
     List<UserDto> toDto(List<User> users);
-
 
     @Mapping(target = "mentees", ignore = true)
     @Mapping(target = "mentors", ignore = true)
     @Mapping(source = "countryId", target = "country")
     User toEntity(UserDto userDto);
-
 
     @Named("mapToIds")
     default List<Long> mapToIds(List<User> users) {

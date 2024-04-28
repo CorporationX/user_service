@@ -16,7 +16,6 @@ import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.MessageError;
 import school.faang.user_service.exception.UserNotFoundException;
-import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
@@ -41,6 +40,8 @@ public class UserServiceTest {
     private UserRepository userRepository;
     @Mock
     private UserContext userContext;
+    @Mock
+    private S3Service s3Service;
     @Mock
     private ProfileViewEventPublisher profileViewEventPublisher;
 

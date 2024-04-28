@@ -143,7 +143,17 @@ public class User {
     @OneToOne(mappedBy = "user")
     private Premium premium;
 
-//  //  public long getId() {
-//        return id;
-//    }
+    public long getId() {
+        return id;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", phone='" + phone + '\'' +
+                '}';
+    }
 }

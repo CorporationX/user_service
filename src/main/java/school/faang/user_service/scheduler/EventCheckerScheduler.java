@@ -1,6 +1,7 @@
 package school.faang.user_service.scheduler;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,31 +29,28 @@ public class EventCheckerScheduler {
     @Transactional
     @Scheduled(fixedRate = 60000)
     public void checkEventsStartingInAMinute() {
-        //truncatedTo( ChronoUnit.MINUTES)
-        LocalDateTime now = LocalDateTime.now();
-        System.out.println("\n\n\n\n============================== NOW " + now);
+        LocalDateTime now = LocalDateTime.now().truncatedTo( ChronoUnit.MINUTES );
 
         ZonedDateTime zonedDateTime = now.atZone(ZoneId.of("UTC"));
-        System.out.println("\n============================== NOW Time Zone" + zonedDateTime);
-       // publishEventAtDateTime( zonedDateTime );
 
-        System.out.println("\n\n========================= start between " + zonedDateTime + "        " + zonedDateTime.plusMinutes( 1 ));
         List<Event> upcomingEvents = eventRepository.findEventStartingBetween( zonedDateTime, zonedDateTime.plusMinutes( 1 ) );
-        System.out.println("\n\n\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% EVENT LIST: " + upcomingEvents);
         upcomingEvents.forEach( (event) -> startEventPublisher.publish( eventMapper
                 .toEventStartEvent( event ) ) );
 
     }
 
-    private void publishEventAtDateTime(ZonedDateTime start) {
+    @Transactional
+    @Scheduled(fixedRate = 60000)
+    public void checkEventsStartingIn5Hours() {
+        LocalDateTime now = LocalDateTime.now().truncatedTo( ChronoUnit.MINUTES );
 
+        ZonedDateTime zonedDateTime = now.atZone(ZoneId.of("UTC"));
+
+        List<Event> upcomingEvents = eventRepository.findEventStartingBetween( zonedDateTime.plusHours( 5 ), zonedDateTime.plusHours( 5 ).plusMinutes( 1 ) );
+        upcomingEvents.forEach( (event) -> startEventPublisher.publish( eventMapper
+                .toEventStartEvent( event ) ) );
 
     }
 
-    private long calculateInitialDelay() {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime nextWholeMinute = now.truncatedTo(ChronoUnit.MINUTES).plusMinutes(1);
-        return Duration.between(now, nextWholeMinute).toMillis();
-    }
 
 }

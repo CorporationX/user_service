@@ -24,7 +24,7 @@ public interface EventMapper {
 
     List<Event> toEntity(List<EventDto> eventDtoList);
 
-
+    @Mapping(source = "attendees", target = "attendeeIds", qualifiedByName = "attendeesIdMapper")
     EventStartEvent toEventStartEvent(Event event);
 
     @Named("attendeesIdMapper")

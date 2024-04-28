@@ -43,7 +43,7 @@ public class Event {
     @Column(name = "max_attendees")
     private int maxAttendees;
 
-    @ManyToMany(mappedBy = "participatedEvents")
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "participatedEvents")
     private List<User> attendees;
 
     @OneToMany(mappedBy = "event")

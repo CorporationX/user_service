@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 @ExtendWith(MockitoExtension.class)
-class SchedulerServiceTest {
+class PremiumRemoverTest {
     @Mock
     PremiumService premiumService;
 
@@ -80,5 +80,11 @@ class SchedulerServiceTest {
         secondUser.setPremium(secondExpiredPremium);
         thirdUser.setPremium(thirdExpiredPremium);
         forthUser.setPremium(firstValidPremium);
+    }
+
+    @Test
+    public void testDeleteExpiredPremium(){
+        premiumRemover.removePremium();
+        Mockito.verify(premiumService, Mockito.times(1)).removeExpiredPremiums();
     }
 }

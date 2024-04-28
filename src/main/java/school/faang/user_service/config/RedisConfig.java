@@ -11,8 +11,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import school.faang.user_service.listeners.UserBannerListener;
+
 
 @Configuration
 @RequiredArgsConstructor
@@ -24,6 +26,9 @@ public class RedisConfig {
     private int port;
     @Value("${spring.data.redis.channels.user_ban_channel.name}")
     private String userBannerTopic;
+
+    @Value("${spring.data.redis.channels.profile_view_channel.name}")
+    private String profileViewTopic;
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {

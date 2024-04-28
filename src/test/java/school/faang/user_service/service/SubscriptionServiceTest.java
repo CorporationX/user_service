@@ -17,7 +17,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.user_filter.*;
 import school.faang.user_service.mapper.SubscriptionUserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.service.publisher.FollowerEventPublisher;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,9 +45,6 @@ public class SubscriptionServiceTest {
 
     @Mock
     private  FollowerEventPublisher followerEventPublisher;
-
-    @Mock
-    private  FollowerEvent followerEvent;
 
 
     @BeforeEach

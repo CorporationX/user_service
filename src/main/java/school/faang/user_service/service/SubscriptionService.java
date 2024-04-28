@@ -12,7 +12,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.user_filter.UserFilter;
 import school.faang.user_service.mapper.SubscriptionUserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.service.publisher.FollowerEventPublisher;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 
 import java.time.LocalDateTime;
 import java.util.List;

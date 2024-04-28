@@ -1,6 +1,7 @@
 package school.faang.user_service.publisher;
 
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
@@ -8,14 +9,18 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.messagebroker.GoalSetEvent;
 
 @Component
-@RequiredArgsConstructor
-public class GoalSetEventPublisher implements MessagePublisher<GoalSetEvent> {
-    private final RedisTemplate<String, Object> redisTemplate;
+@Slf4j
+public class GoalSetEventPublisher extends AbstractEventPublisher<GoalSetEvent> {
     @Value("{$spring.data.redis.channels.goal_set_channel.name}")
     private ChannelTopic goalSetTopic;
 
-    @Override
-    public void publish(GoalSetEvent event) {
-        redisTemplate.convertAndSend(goalSetTopic.getTopic(), event);
+    public GoalSetEventPublisher(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper) {
+        super(redisTemplate, objectMapper);
+    }
+
+    public void publish(GoalSetEvent goalSetEvent) {
+        convertAndSend(goalSetEvent, goalSetTopic.getTopic());
+        log.info("Goal set event published user id: " + goalSetEvent.getUserId());
+
     }
 }

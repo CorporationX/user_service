@@ -9,7 +9,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;
-import school.faang.user_service.repository.premium.PremiumRepository;
+import school.faang.user_service.scheduler.PremiumRemover;
+import school.faang.user_service.service.PremiumService;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -17,10 +18,10 @@ import java.time.temporal.ChronoUnit;
 @ExtendWith(MockitoExtension.class)
 class SchedulerServiceTest {
     @Mock
-    PremiumRepository premiumRepository;
+    PremiumService premiumService;
 
     @InjectMocks
-    SchedulerService schedulerService;
+    PremiumRemover premiumRemover;
 
     Premium firstExpiredPremium;
     Premium secondExpiredPremium;
@@ -30,8 +31,9 @@ class SchedulerServiceTest {
     User secondUser;
     User thirdUser;
     User forthUser;
+
     @BeforeEach
-    void setUp(){
+    void setUp() {
         firstUser = User.builder()
                 .id(1)
                 .premium(new Premium())
@@ -52,25 +54,25 @@ class SchedulerServiceTest {
         firstExpiredPremium = Premium.builder()
                 .id(1)
                 .user(firstUser)
-                .startDate(LocalDateTime.of(2023, 1,1,1,1))
-                .endDate(LocalDateTime.of(2024, 3,23,1,1))
+                .startDate(LocalDateTime.of(2023, 1, 1, 1, 1))
+                .endDate(LocalDateTime.of(2024, 3, 23, 1, 1))
                 .build();
         secondExpiredPremium = Premium.builder()
                 .id(1)
                 .user(secondUser)
-                .startDate(LocalDateTime.of(2023, 1,1,1,1))
-                .endDate(LocalDateTime.of(2024, 3,24,1,1))
+                .startDate(LocalDateTime.of(2023, 1, 1, 1, 1))
+                .endDate(LocalDateTime.of(2024, 3, 24, 1, 1))
                 .build();
         thirdExpiredPremium = Premium.builder()
                 .id(1)
                 .user(thirdUser)
-                .startDate(LocalDateTime.of(2023, 1,1,1,1))
-                .endDate(LocalDateTime.of(2024, 3,25,1,1))
+                .startDate(LocalDateTime.of(2023, 1, 1, 1, 1))
+                .endDate(LocalDateTime.of(2024, 3, 25, 1, 1))
                 .build();
         firstValidPremium = Premium.builder()
                 .id(1)
                 .user(forthUser)
-                .startDate(LocalDateTime.of(2024, 1,1,1,1))
+                .startDate(LocalDateTime.of(2024, 1, 1, 1, 1))
                 .endDate(LocalDateTime.now().plus(1, ChronoUnit.DAYS))
                 .build();
 
@@ -85,7 +87,4 @@ class SchedulerServiceTest {
         schedulerService.deleteExpiredPremium();
         Mockito.verify(premiumRepository, Mockito.times(1)).deleteAllByEndDateBefore(Mockito.any(LocalDateTime.class    ));
     }
-
-
-
 }

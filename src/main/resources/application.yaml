@@ -5,11 +5,6 @@ spring:
     username: user
     password: password
 
-  servlet:
-    multipart:
-      max-file-size: 5MB
-      max-request-size: 5MB
-
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -27,6 +22,8 @@ spring:
       port: 6379
       host: localhost
       channels:
+        user_ban_channel:
+          name: user_ban
         follower_channel:
           name: follower_channel
         profile_view_channel:
@@ -62,6 +59,12 @@ services:
 
 scheduler:
   premium-remover: "@weekly"
+  cron-expression-weekly: "0 0 0 * * ?"
+  cron-expression-daily: "0 0 0 * * *"
+
+event:
+  past:
+    delete-batch: 100
 
 premium:
   expired:
@@ -69,3 +72,8 @@ premium:
 
 thread-pool:
   thread-count: 10
+
+servlet:
+  multipart:
+    max-file-size: 5MB
+    max-request-size: 5MB

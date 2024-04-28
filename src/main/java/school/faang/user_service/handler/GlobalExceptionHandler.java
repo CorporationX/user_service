@@ -2,6 +2,7 @@ package school.faang.user_service.handler;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.serializer.SerializationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -69,6 +70,13 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleMaxUploadSizeExceededException(MaxUploadSizeExceededException e) {
         log.error("MaxUploadSizeExceededException", e);
         return new ErrorResponse(e.getMessage(), HttpStatus.PAYLOAD_TOO_LARGE.value(), LocalDateTime.now());
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(SerializationException.class)
+    public ErrorResponse handleSerializationException(SerializationException e) {
+        log.error("SerializationException", e);
+        return new ErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), LocalDateTime.now());
     }
 
     private Map<String, String> getErrorsMap(MethodArgumentNotValidException e) {

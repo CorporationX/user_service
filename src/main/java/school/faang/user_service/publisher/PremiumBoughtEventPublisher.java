@@ -1,27 +1,15 @@
 package school.faang.user_service.publisher;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
-import org.hibernate.type.SerializationException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.event.UserPremiumBoughtEvent;
 
 @Component
-@RequiredArgsConstructor
-public class PremiumBoughtEventPublisher {
+public class PremiumBoughtEventPublisher extends AbstractEventPublisher<UserPremiumBoughtEvent> {
 
-    private final RedisTemplate<String, Object> redisTemplate;
-    private final ChannelTopic premiumBoughtTopic;
-    private final ObjectMapper objectMapper;
-
-    public void publish(UserPremiumBoughtEvent userPremiumBoughtEvent) {
-        try {
-            redisTemplate.convertAndSend(premiumBoughtTopic.getTopic(), objectMapper.writeValueAsString(userPremiumBoughtEvent));
-        } catch (JsonProcessingException e) {
-            throw new SerializationException("Failed to serialize user premium bought event", e);
-        }
+    public PremiumBoughtEventPublisher(RedisTemplate<String, Object> redisTemplate, ChannelTopic premiumBoughtTopic, ObjectMapper objectMapper) {
+        super(redisTemplate, premiumBoughtTopic, objectMapper);
     }
 }

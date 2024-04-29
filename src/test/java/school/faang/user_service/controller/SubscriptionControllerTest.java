@@ -8,6 +8,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.service.SubscriptionService;
 
@@ -100,5 +101,21 @@ class SubscriptionControllerTest {
         //then
         assertEquals(USER_UNFOLLOWING_HIMSELF_EXCEPTION.getMessage(), actualException.getMessage());
         verify(subscriptionService, times(0)).followUser(followerId, followeeId);
+    }
+
+    @Test
+    void getFollowersTest() {
+        //before
+        var filterArgumentCaptor = ArgumentCaptor.forClass(UserFilterDto.class);
+        var filter = new UserFilterDto();
+
+        //when
+        subscriptionController.getFollowers(followeeId, filter);
+
+
+        //then
+        verify(subscriptionService, times(1)).getFollowers(followeeArgumentCaptor.capture(), filterArgumentCaptor.capture());
+        assertEquals(filter, filterArgumentCaptor.getValue());
+        assertEquals(followeeId, followeeArgumentCaptor.getValue());
     }
 }

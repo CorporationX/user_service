@@ -7,8 +7,16 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -84,5 +92,62 @@ class SubscriptionServiceTest {
         verify(subscriptionRepo, times(1)).unfollowUser(followerArgumentCaptor.capture(), followeeArgumentCaptor.capture());
         assertEquals(followerId, followerArgumentCaptor.getValue());
         assertEquals(followeeId, followeeArgumentCaptor.getValue());
+    }
+
+    @Test
+    void getFollowersTest() {
+        //before
+        Stream<User> allFollowers = new ArrayList<User>().stream();
+        when(subscriptionRepo.findByFolloweeId(followeeId)).thenReturn(allFollowers);
+
+        //when
+        var actualFollowers = subscriptionService.getFollowers(followeeId, new UserFilterDto());
+
+        //then
+        verify(subscriptionRepo, times(1)).findByFolloweeId(followeeArgumentCaptor.capture());
+        assertEquals(followeeId, followeeArgumentCaptor.getValue());
+        assertEquals(new ArrayList<UserDto>(), actualFollowers);
+    }
+
+
+    @Test
+    void filterUsersTest() {
+        //before
+        var filter = new UserFilterDto();
+        filter.setCityPattern("Moscow");
+
+        var expectedFollowers = new ArrayList<UserDto>();
+        expectedFollowers.add(new UserDto(1L, "nadir", "nadir@gmail.com"));
+        expectedFollowers.add(new UserDto(2L, "cianid", "cianid@gmail.com"));
+
+        var allFollowers = new ArrayList<User>();
+
+        var nadir = new User();
+        nadir.setId(1L);
+        nadir.setUsername("nadir");
+        nadir.setEmail("nadir@gmail.com");
+        nadir.setCity("Moscow");
+        allFollowers.add(nadir);
+
+        var cianid = new User();
+        cianid.setId(2L);
+        cianid.setUsername("cianid");
+        cianid.setEmail("cianid@gmail.com");
+        cianid.setCity("Moscow");
+        allFollowers.add(cianid);
+
+        var zenith = new User();
+        zenith.setId(3L);
+        zenith.setUsername("zenith");
+        zenith.setEmail("zenith@gmail.com");
+        zenith.setCity("Kirov");
+        allFollowers.add(zenith);
+
+
+        //when
+        var actualFollowers = subscriptionService.filterUsers(allFollowers.stream(), filter);
+
+        //then
+        assertEquals(expectedFollowers, actualFollowers);
     }
 }

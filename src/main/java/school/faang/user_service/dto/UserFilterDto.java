@@ -63,12 +63,14 @@ public class UserFilterDto {
                 matches = false;
             }
         }
-        if (experienceMax > 0 && experienceMin > 0) {
+        if (experienceMax > 0 || experienceMin > 0) {
             var userExperience = user.getExperience();
 
-            if (userExperience < experienceMin || userExperience > experienceMax) {
+            if (userExperience < experienceMin || (experienceMax > 0 && userExperience > experienceMax)) {
                 matches = false;
             }
+
+
         }
 
         return matches;

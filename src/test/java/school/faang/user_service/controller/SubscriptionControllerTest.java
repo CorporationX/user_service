@@ -118,4 +118,15 @@ class SubscriptionControllerTest {
         assertEquals(filter, filterArgumentCaptor.getValue());
         assertEquals(followeeId, followeeArgumentCaptor.getValue());
     }
+
+    @Test
+    void getFollowersCountTest() {
+        //when
+        subscriptionController.getFollowersCount(followeeId);
+
+
+        //then
+        verify(subscriptionService, times(1)).getFollowersCount(followeeArgumentCaptor.capture());
+        assertEquals(followeeId, followeeArgumentCaptor.getValue());
+    }
 }

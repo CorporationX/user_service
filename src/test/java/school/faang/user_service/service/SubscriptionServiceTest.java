@@ -150,4 +150,14 @@ class SubscriptionServiceTest {
         //then
         assertEquals(expectedFollowers, actualFollowers);
     }
+
+    @Test
+    void getFollowersCountTest() {
+        //when
+        var followersCount = subscriptionService.getFollowersCount(followeeId);
+
+        //then
+        verify(subscriptionRepo, times(1)).findFollowersAmountByFolloweeId(followeeArgumentCaptor.capture());
+        assertEquals(followeeId, followeeArgumentCaptor.getValue());
+    }
 }

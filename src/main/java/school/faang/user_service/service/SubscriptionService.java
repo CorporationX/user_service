@@ -44,5 +44,9 @@ public class SubscriptionService {
                 .map(user -> new UserDto(user.getId(), user.getUsername(), user.getEmail()))
                 .toList();
     }
+
+    public int getFollowersCount(long followeeId) {
+        return subscriptionRepo.findFollowersAmountByFolloweeId(followeeId);
+    }
 }
 

@@ -6,11 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.event.MentorshipStartEvent;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.MentorshipMapper;
+import school.faang.user_service.publisher.MentorshipEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
@@ -27,7 +29,7 @@ public class MentorshipRequestService{
     private final UserRepository userRepository;
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final MentorshipMapper mentorshipMapper;
-
+    private final MentorshipEventPublisher mentorshipEventPublisher;
 
     @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto){
@@ -69,22 +71,28 @@ public class MentorshipRequestService{
 
     public void acceptRequest(long id){
 
-       MentorshipRequest mentorshipRequest = mentorshipRequestRepository.findById(id)
+        MentorshipRequest mentorshipRequest=mentorshipRequestRepository.findById(id)
                 .orElseThrow(()->{
-                    log.warn("No request with such id "  + id );
-                    return new EntityNotFoundException("No request with such id "  + id );
+                    log.warn("No request with such id "+id);
+                    return new EntityNotFoundException("No request with such id "+id);
 
                 });
-      User mentee = mentorshipRequest.getRequester();
-      User mentor = mentorshipRequest.getReceiver();
-      List<User> mentees = mentor.getMentees();
-      if(mentees.contains(mentee)){
-          log.warn("Already mentor for user: "  + mentee.getId());
-          throw new DataValidationException("Already mentor for user: "  + mentee.getId());
-      }else{
-          mentees.add(mentee);
-          mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
-      }
+
+        User mentee=mentorshipRequest.getRequester();
+        User mentor=mentorshipRequest.getReceiver();
+        List<User> mentees=mentor.getMentees();
+
+        if(mentees.contains(mentee)){
+            log.warn("Already mentor for user: "+mentee.getId());
+            throw new DataValidationException("Already mentor for user: "+mentee.getId());
+        }else{
+            mentees.add(mentee);
+            mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
+            MentorshipStartEvent mentorshipStartEvent=MentorshipStartEvent
+                    .builder().mentee_id(mentee.getId())
+                    .mentor_id(mentor.getId()).build();
+            mentorshipEventPublisher.publish(mentorshipStartEvent);
+        }
 
     }
 

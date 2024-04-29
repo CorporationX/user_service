@@ -22,4 +22,10 @@ public class SubscriptionService {
         subscriptionRepo.followUser(followerId, followeeId);
         log.info("User + (id=" + followerId + ") subscribed to user (id=" + followeeId + ").");
     }
+
+    public void unfollowUser(long followerId, long followeeId) {
+        subscriptionRepo.unfollowUser(followerId, followeeId);
+        log.info("User + (id=" + followerId + ") canceled subscription to user (id=" + followeeId + ").");
+    }
 }
+

@@ -74,4 +74,15 @@ class SubscriptionServiceTest {
         verify(subscriptionRepo, times(1)).existsByFollowerIdAndFolloweeId(followerId, followeeId);
         verify(subscriptionRepo, times(0)).followUser(followerId, followeeId);
     }
+
+    @Test
+    void unfollowUserTest() {
+        //when
+        subscriptionService.unfollowUser(followerId, followeeId);
+
+        //then
+        verify(subscriptionRepo, times(1)).unfollowUser(followerArgumentCaptor.capture(), followeeArgumentCaptor.capture());
+        assertEquals(followerId, followerArgumentCaptor.getValue());
+        assertEquals(followeeId, followeeArgumentCaptor.getValue());
+    }
 }

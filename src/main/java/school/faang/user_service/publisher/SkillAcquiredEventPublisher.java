@@ -15,10 +15,9 @@ public class SkillAcquiredEventPublisher extends AbstractMessagePublisher<SkillA
     public SkillAcquiredEventPublisher(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper) {
         super(redisTemplate, objectMapper);
     }
-    @Value("${spring.data.redis.channel.skill_channel.name}")
-    private String skillTopic;
+    private ChannelTopic skillTopic;
 
     public void publish(SkillAcquiredEvent event) {
-        convertAndSend(skillTopic, event);
+        convertAndSend(skillTopic.getTopic(), event);
     }
 }

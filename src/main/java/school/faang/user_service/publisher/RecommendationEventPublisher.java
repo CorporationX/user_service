@@ -12,8 +12,6 @@ public class RecommendationEventPublisher extends MessagePublisher<Recommendatio
     public RecommendationEventPublisher(ObjectMapper objectMapper, RedisTemplate<String, Object> redisTemplate) {
         super(objectMapper, redisTemplate);
     }
-
-    @Value("${spring.redis.channels.recommendation_channel.name}")
     private ChannelTopic recommendationTopic;
 
     public void publish(RecommendationEvent event) {

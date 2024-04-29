@@ -2,6 +2,7 @@ package school.faang.user_service.publisher;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
@@ -14,10 +15,10 @@ public class SkillAcquiredEventPublisher extends AbstractMessagePublisher<SkillA
     public SkillAcquiredEventPublisher(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper) {
         super(redisTemplate, objectMapper);
     }
-
-    private final ChannelTopic skillTopic;
+    @Value("${spring.data.redis.channel.skill_channel.name}")
+    private String skillTopic;
 
     public void publish(SkillAcquiredEvent event) {
-        convertAndSend(skillTopic.getTopic(), event);
+        convertAndSend(skillTopic, event);
     }
 }

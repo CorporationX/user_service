@@ -77,7 +77,8 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
 
     @Override
     public RecommendationRequestDto getRequest(long id) {
-        RecommendationRequest recommendationRequest = recommendationRequestRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Request not found"));
+        RecommendationRequest recommendationRequest = recommendationRequestRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Request not found"));
         RecommendationRequestEvent recommendationRequestEvent = new RecommendationRequestEvent(recommendationRequest.getId(),
                 recommendationRequest.getRecommendation().getAuthor().getId(),
                 recommendationRequest.getRecommendation().getReceiver().getId());

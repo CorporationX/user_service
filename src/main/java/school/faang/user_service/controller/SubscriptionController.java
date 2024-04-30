@@ -29,4 +29,14 @@ public class SubscriptionController {
         validator.validateUserTriedHimself(followerId, followeeId);
         service.followUser(followerId, followeeId);
     }
+
+    @DeleteMapping("/unfollow")
+    @ResponseStatus(HttpStatus.OK)
+    void unfollowUser(long followerId, long followeeId) {
+        if (followerId == followeeId) {
+            throw new DataValidationException("The user " + followeeId +
+                    " tried to unfollow himself!");
+        }
+        service.unfollowUser(followerId, followeeId);
+    }
 }

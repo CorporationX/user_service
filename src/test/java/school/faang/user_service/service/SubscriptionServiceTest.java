@@ -23,4 +23,10 @@ class SubscriptionServiceTest {
         subscriptionRepository.followUser(followerId, followeeId);
         verify(subscriptionRepository).followUser(followerId, followeeId);
     }
+
+    @Test
+    public void testUnfollowUserToAnotherUser() {
+        repository.unfollowUser(followerId, followeeId);
+        verify(repository).unfollowUser(followerId, followeeId);
+    }
 }

@@ -16,4 +16,8 @@ public class SubscriptionService {
         validator.validateIsExists(followerId, followeeId);
         subscriptionRepository.followUser(followerId, followeeId);
     }
+
+    public void unfollowUser(long followerId, long followeeId) {
+        repository.unfollowUser(followerId, followeeId);
+    }
 }

@@ -24,15 +24,14 @@ import java.util.List;
 @RequestMapping("/skills")
 public class SkillController {
 
+    private static final String EMPTY_TITLE_MSG = "Skill title can't be empty";
     private final SkillService skillService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public SkillDto create(@RequestBody SkillDto skillDto) {
         if (!validateSkill(skillDto)) {
-            String error = "Title of skill can't be empty";
-            log.error(error);
-            throw new DataValidationException(error);
+            throw new DataValidationException(EMPTY_TITLE_MSG);
         }
         return skillService.create(skillDto);
     }
@@ -40,7 +39,7 @@ public class SkillController {
     public boolean validateSkill(SkillDto skill) {
         boolean result = true;
         if (skill.getTitle().isBlank() || skill.getTitle().isEmpty()) {
-            log.error("Skill title can't be empty");
+            log.error(EMPTY_TITLE_MSG);
             result = false;
         }
         return result;

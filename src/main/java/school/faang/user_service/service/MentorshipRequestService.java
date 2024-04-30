@@ -45,19 +45,8 @@ public class MentorshipRequestService{
         long mentor_id = mentor.getId();
         long mentee_id = mentee.getId();
 
-        userRepository.findById(mentor_id)
-                .orElseThrow(()->{
-                       log.warn("No user with such id "  + mentor_id );
-                       return new EntityNotFoundException("No user with such id "  + mentor_id );
-
-                });
-
-        userRepository.findById(mentee_id)
-                .orElseThrow(()->{
-                    log.warn("No user with such id "  + mentor_id );
-                    return new EntityNotFoundException("No user with such id "  + mentor_id );
-
-                });
+        checkIfUserExists(mentor_id);
+        checkIfUserExists(mentee_id);
 
         if(!isAllowedToMakeRequest(mentee_id, mentor_id)){
            throw new DataValidationException("previous request was made earlier than 3 months!");
@@ -73,7 +62,7 @@ public class MentorshipRequestService{
 
         MentorshipRequest mentorshipRequest=mentorshipRequestRepository.findById(id)
                 .orElseThrow(()->{
-                    log.warn("No request with such id "+id);
+                    log.warn("No request with such id " + id);
                     return new EntityNotFoundException("No request with such id "+id);
 
                 });
@@ -109,5 +98,15 @@ public class MentorshipRequestService{
             log.warn("Error:previous request was made earlier than 3 months");
             return false;
         }
+    }
+
+    private void checkIfUserExists(long userId){
+
+        userRepository.findById(userId)
+                .orElseThrow(()->{
+                    log.warn("No user with such id "  + userId );
+                    return new EntityNotFoundException("No user with such id "  + userId );
+
+                });
     }
 }

@@ -1,15 +1,12 @@
 package school.faang.user_service.controller;
 
-import school.faang.user_service.dto.SkillDto;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+import school.faang.user_service.service.SkillService;
 
+@Component
+@RequiredArgsConstructor
 public class SkillController {
-    public SkillDto create(SkillDto skill) {
-        return null;
-    }
+    private final SkillService skillService;
 
-    private SkillDto validateSkillDto(SkillDto skill) {
-        if (skill.getId() != null && !skill.getTitle().isEmpty()) {
-            return skill;
-        } else throw new IllegalArgumentException();
-    }
 }

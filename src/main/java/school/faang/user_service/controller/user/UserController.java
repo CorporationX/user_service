@@ -69,4 +69,9 @@ public class UserController {
 
         return userService.getUsers(filter, actorId);
     }
+
+    @GetMapping
+    public List<Long> getAllUserIds() {
+        return userService.getUserIds();
+    }
 }

@@ -168,6 +168,14 @@ public class UserService {
                 .map(userMapper::toDto).toList());
     }
 
+    public List<Long> getUserIds() {
+        List<User> users = userRepository.findAll();
+
+        return users.stream()
+                .map(User::getId)
+                .toList();
+    }
+
     @Transactional
     public void banUserById(long userId) {
         getUserById(userId).setBanned(true);

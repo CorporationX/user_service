@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-@Component
+//@Component
 @RequiredArgsConstructor
 public class UserHeaderFilter implements Filter {
 

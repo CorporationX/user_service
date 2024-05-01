@@ -10,6 +10,10 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SkillService;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -53,6 +57,17 @@ public class SkillControllerTest {
 
         assertEquals(skillDto, result);
         verify(skillService).create(skillDto);
+    }
+
+    @Test
+    public void testGetUsersSkill() {
+        long userId = 1L;
+        List<SkillDto> expectedSkills = Arrays.asList(new SkillDto(1L, "firstTestInfo"), new SkillDto(2L, "secondTestInfo"));
+        when(skillService.getUserSkills(userId)).thenReturn(expectedSkills);
+
+        List<SkillDto> actualSkills = skillController.getUserSkills(userId);
+
+        assertEquals(expectedSkills, actualSkills);
     }
 
     private SkillDto createSkillDto(String title) {

@@ -8,6 +8,8 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mappers.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 
+import java.util.List;
+
 
 @Component
 @RequiredArgsConstructor
@@ -27,5 +29,10 @@ public class SkillService {
         if (skillRepository.existsByTitle(skillDto.getTitle())) {
             throw new DataValidationException("Навык с таким именем уже существует в базе данных");
         }
+    }
+
+    public List<SkillDto> getUserSkills(long userId) {
+        List<Skill> skills = skillRepository.findAllByUserId(userId);
+        return skills.stream().map(skillMapper::skillToDto).toList();
     }
 }

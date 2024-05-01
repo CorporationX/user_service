@@ -13,17 +13,17 @@ import java.util.List;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface GoalMapper {
 
-    @Mapping(source = "users", target = "userIds", qualifiedByName = "userToId")
+    @Mapping(source = "parent", target = "parent.id")
     @Mapping(source = "skillsToAchieve", target = "skillIds", qualifiedByName = "skillToId")
     GoalDto toDto(Goal goal);
 
-    Goal toGoal(GoalDto goalDto);
-
-    default List<Long> userToId(List<User> users) {
-        return users.stream().map(User::getId).toList();
-    }
+    @Mapping(target = "parent", ignore = true)
+    @Mapping(target = "skillsToAchieve", ignore = true)
+    Goal toEntity(GoalDto goalDto);
 
     default List<Long> skillToId(List<Skill> skills) {
-        return skills.stream().map(Skill::getId).toList();
+        return skills.stream()
+                .map(Skill::getId)
+                .toList();
     }
 }

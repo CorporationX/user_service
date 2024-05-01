@@ -3,7 +3,7 @@ package school.faang.user_service.controller.goal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.GoalDto;
-import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.goal.GoalService;
 
 @Component
@@ -12,19 +12,22 @@ public class GoalController {
 
     private final GoalService goalService;
 
-    public void createGoal(Long userId, Goal goal) {
-        titleValidation(goal);
-
-        goalService.createGoal(userId, goal);
-    }
-
-    public void updateGoal(Long goalId, GoalDto goal) {
+    public void createGoal(Long userId, GoalDto goalDto) {
 
     }
 
-    private void titleValidation(Goal goal) {
-        if (goal.getTitle() == null || goal.getTitle().isEmpty()) {
-            throw new IllegalArgumentException("Goal title can't be empty");
+    public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
+        validateGoalTitle(goalDto);
+        return goalService.updateGoal(goalId, goalDto);
+    }
+
+    public void deleteGoal(long goalId) {
+        goalService.deleteGoal(goalId);
+    }
+
+    private void validateGoalTitle(GoalDto goalDto) {
+        if (goalDto.getTitle().isEmpty()) {
+            throw new DataValidationException("Название цели не должно быть пустым");
         }
     }
 }

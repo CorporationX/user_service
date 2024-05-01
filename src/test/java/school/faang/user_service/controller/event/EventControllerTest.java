@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.exceptions.event.DataValidationException;
 import school.faang.user_service.service.event.EventService;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
@@ -84,5 +86,12 @@ class EventControllerTest {
     void getEvent() {
         when(service.getEvent(1L)).thenReturn(dto);
         assertEquals(dto, controller.getEvent(1L));
+    }
+
+    @Test
+    void getEventByFilter() {
+        EventFilterDto filterDto = new EventFilterDto();
+        when(service.getEventsByFilter(filterDto)).thenReturn(List.of(dto));
+        assertIterableEquals(List.of(dto), controller.getEventsByFilter(filterDto));
     }
 }

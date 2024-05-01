@@ -3,25 +3,35 @@ package school.faang.user_service.service.event;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.event.EventStatus;
+import school.faang.user_service.entity.event.EventType;
 import school.faang.user_service.exceptions.event.DataValidationException;
 import school.faang.user_service.exceptions.event.EventNotFoundException;
 import school.faang.user_service.mapper.event.EventMapper;
+import school.faang.user_service.mapper.event.EventMapperImpl;
+import school.faang.user_service.mapper.event.SkillMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
@@ -31,32 +41,82 @@ class EventServiceTest {
     private EventRepository eventRepository;
     @Mock
     private UserRepository userRepository;
-    @Mock
-    private EventMapper mapper;
+    @Spy
+    private EventMapper mapper = new EventMapperImpl(Mappers.getMapper(SkillMapper.class));
     @InjectMocks
     private EventService service;
 
-    private EventDto dto;
-    private User owner;
+    private EventDto eventDto1, eventDto2, eventDto3, eventDto4;
+    private User owner1;
+    private EventFilterDto filter;
 
     @BeforeEach
-    void init() {
-        dto = new EventDto();
-        List<SkillDto> skillDtoList = List.of(
+    void getEvents() {
+        List<SkillDto> skills1 = List.of(
                 new SkillDto(1L, "skill1"),
                 new SkillDto(2L, "skill2")
         );
-        dto.setOwnerId(1L);
-        dto.setRelatedSkills(skillDtoList);
-
-        List<Skill> skillList = List.of(
-                Skill.builder().id(1L).title("skill1").build(),
-                Skill.builder().id(2L).title("skill2").build()
+        List<SkillDto> skills2 = List.of(
+                new SkillDto(1L, "skill1"),
+                new SkillDto(3L, "skill3")
         );
-        owner = User.builder()
+        List<SkillDto> skills3 = List.of(
+                new SkillDto(2L, "skill3"),
+                new SkillDto(3L, "skill4")
+        );
+        List<SkillDto> skills4 = List.of(
+                new SkillDto(1L, "skill1"),
+                new SkillDto(4L, "skill4")
+        );
+        eventDto1 = EventDto.builder()
                 .id(1L)
-                .skills(skillList)
+                .title("event1")
+                .startDate(LocalDateTime.now().plusHours(10))
+                .endDate(LocalDateTime.now().plusDays(1))
+                .ownerId(1L)
+                .location("loc1")
+                .relatedSkills(skills1)
                 .build();
+        eventDto2 = EventDto.builder()
+                .id(2L)
+                .title("event2")
+                .startDate(LocalDateTime.now().plusMinutes(20))
+                .endDate(LocalDateTime.now().plusHours(2))
+                .ownerId(2L)
+                .location("loc2")
+                .relatedSkills(skills2)
+                .build();
+        eventDto3 = EventDto.builder()
+                .id(3L)
+                .title("event3")
+                .startDate(LocalDateTime.now())
+                .endDate(LocalDateTime.now().plusMinutes(30))
+                .ownerId(3L)
+                .location("loc3")
+                .relatedSkills(skills3)
+                .build();
+        eventDto4 = EventDto.builder()
+                .id(4L)
+                .title("event4")
+                .startDate(LocalDateTime.now().plusDays(3))
+                .endDate(LocalDateTime.now().plusDays(5))
+                .ownerId(4L)
+                .location("loc4")
+                .relatedSkills(skills4)
+                .build();
+    }
+
+    @BeforeEach
+    void getOwners() {
+        owner1 = User.builder()
+                .id(1L)
+                .username("owner1")
+                .build();
+    }
+
+    @BeforeEach
+    void getFilter() {
+        filter = new EventFilterDto();
     }
 
     @Test
@@ -66,35 +126,26 @@ class EventServiceTest {
 
     @Test
     void createNoOwnerEvent() {
-        dto.setOwnerId(-1L);
-        DataValidationException e = assertThrows(DataValidationException.class, () -> service.create(dto));
+        eventDto1.setOwnerId(-1L);
+        DataValidationException e = assertThrows(DataValidationException.class, () -> service.create(eventDto1));
         assertEquals("owner with id=-1 not found", e.getMessage());
     }
 
     @Test
     void createOwnerHasNoEnoughSkills() {
-        owner.setSkills(new ArrayList<>());
-        when(userRepository.findById(1L)).thenReturn(Optional.of(owner));
-
-        DataValidationException e = assertThrows(DataValidationException.class, () -> service.create(dto));
+        owner1.setSkills(new ArrayList<>());
+        when(userRepository.findById(1L)).thenReturn(Optional.of(owner1));
+        DataValidationException e = assertThrows(DataValidationException.class, () -> service.create(eventDto1));
         assertEquals("user with id=1 has no enough skills to create event", e.getMessage());
     }
 
     @Test
     void createGoodEvent() {
-        List<Skill> skillList = List.of(
-                Skill.builder().id(1L).title("skill1").build(),
-                Skill.builder().id(2L).title("skill2").build()
-        );
-        Event eventEntity = Event.builder()
-                .owner(owner)
-                .relatedSkills(skillList)
-                .build();
-        when(mapper.toEntity(dto)).thenReturn(eventEntity);
-        when(mapper.toDto(eventEntity)).thenReturn(dto);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(owner));
+        Event eventEntity = mapper.toEntity(eventDto1);
+        owner1.setSkills(eventEntity.getRelatedSkills());
+        when(userRepository.findById(1L)).thenReturn(Optional.of(owner1));
         when(eventRepository.save(eventEntity)).thenReturn(eventEntity);
-        assertEquals(dto, service.create(dto));
+        assertEquals(eventDto1, service.create(eventDto1));
     }
 
     @Test
@@ -105,16 +156,105 @@ class EventServiceTest {
 
     @Test
     void getExistingEvent() {
-        List<Skill> skillList = List.of(
-                Skill.builder().id(1L).title("skill1").build(),
-                Skill.builder().id(2L).title("skill2").build()
-        );
-        Event eventEntity = Event.builder()
-                .owner(owner)
-                .relatedSkills(skillList)
-                .build();
-        when(mapper.toDto(eventEntity)).thenReturn(dto);
+        Event eventEntity = mapper.toEntity(eventDto1);
         when(eventRepository.findById(1L)).thenReturn(Optional.of(eventEntity));
-        assertEquals(dto, service.getEvent(1L));
+        assertEquals(eventDto1, service.getEvent(1L));
+    }
+
+    @Test
+    void getEventsFilteredByFromDate() {
+        filter.setFromDate(eventDto4.getStartDate().minusMinutes(1));
+        List<Event> eventList = Stream.of(eventDto1, eventDto2, eventDto3, eventDto4)
+                .map(mapper::toEntity)
+                .toList();
+        when(eventRepository.findAll()).thenReturn(eventList);
+        assertIterableEquals(List.of(eventDto4), service.getEventsByFilter(filter));
+    }
+
+    @Test
+    void getEventsFilteredByToDate() {
+        filter.setToDate(LocalDateTime.now().plusMinutes(31));
+        List<Event> eventList = Stream.of(eventDto1, eventDto2, eventDto3, eventDto4)
+                .map(mapper::toEntity)
+                .toList();
+        when(eventRepository.findAll()).thenReturn(eventList);
+        assertIterableEquals(List.of(eventDto3), service.getEventsByFilter(filter));
+    }
+
+    @Test
+    void getEventsFilteredByRelatedSkillsOne() {
+        filter.setRelatedSkillsFilter(eventDto1.getRelatedSkills());
+        List<Event> eventList = Stream.of(eventDto1, eventDto2, eventDto3, eventDto4)
+                .map(mapper::toEntity)
+                .toList();
+        when(eventRepository.findAll()).thenReturn(eventList);
+        assertIterableEquals(List.of(eventDto1), service.getEventsByFilter(filter));
+    }
+
+    @Test
+    void getEventsFilteredByRelatedSkillsSeveral() {
+        filter.setRelatedSkillsFilter(List.of(eventDto1.getRelatedSkills().get(0)));
+        List<Event> eventList = Stream.of(eventDto1, eventDto2, eventDto3, eventDto4)
+                .map(mapper::toEntity)
+                .toList();
+        when(eventRepository.findAll()).thenReturn(eventList);
+        assertArrayEquals(List.of(eventDto1, eventDto2, eventDto4).toArray(), service.getEventsByFilter(filter).toArray());
+    }
+
+    @Test
+    void getEventsFilteredByLocation() {
+        filter.setLocationFilter(eventDto1.getLocation());
+        List<Event> eventList = Stream.of(eventDto1, eventDto2, eventDto3, eventDto4)
+                .map(mapper::toEntity)
+                .toList();
+        when(eventRepository.findAll()).thenReturn(eventList);
+        assertIterableEquals(List.of(eventDto1), service.getEventsByFilter(filter));
+    }
+
+    @Test
+    void getEventsFilteredByStatus() {
+        filter.setStatusFilter(EventStatus.IN_PROGRESS);
+        List<Event> eventList = Stream.of(eventDto1, eventDto2, eventDto3, eventDto4)
+                .map(mapper::toEntity)
+                .peek(event -> event.setStatus(EventStatus.PLANNED))
+                .toList();
+        eventList.get(0).setStatus(EventStatus.IN_PROGRESS);
+        when(eventRepository.findAll()).thenReturn(eventList);
+        assertIterableEquals(List.of(eventDto1), service.getEventsByFilter(filter));
+    }
+
+    @Test
+    void getEventsFilteredByType() {
+        filter.setTypeFilter(EventType.GIVEAWAY);
+        List<Event> eventList = Stream.of(eventDto1, eventDto2, eventDto3, eventDto4)
+                .map(mapper::toEntity)
+                .peek(event -> event.setType(EventType.POLL))
+                .toList();
+        eventList.get(0).setType(EventType.GIVEAWAY);
+        when(eventRepository.findAll()).thenReturn(eventList);
+        assertIterableEquals(List.of(eventDto1), service.getEventsByFilter(filter));
+    }
+
+    @Test
+    void getEventsFilteredByMultiplyFilters() {
+        filter.setTypeFilter(EventType.GIVEAWAY);
+        filter.setFromDate(eventDto2.getStartDate());
+        filter.setToDate(eventDto4.getEndDate());
+        List<Event> eventList = Stream.of(eventDto1, eventDto2, eventDto3, eventDto4)
+                .map(mapper::toEntity)
+                .peek(event -> event.setType(EventType.POLL))
+                .toList();
+        eventList.get(0).setType(EventType.GIVEAWAY);
+        when(eventRepository.findAll()).thenReturn(eventList);
+        assertIterableEquals(List.of(eventDto1), service.getEventsByFilter(filter));
+    }
+
+    @Test
+    void getEventsFilteredByEmptyFilter() {
+        List<Event> eventList = Stream.of(eventDto1, eventDto2, eventDto3, eventDto4)
+                .map(mapper::toEntity)
+                .toList();
+        when(eventRepository.findAll()).thenReturn(eventList);
+        assertArrayEquals(new EventDto[]{eventDto1, eventDto2, eventDto3, eventDto4}, service.getEventsByFilter(filter).toArray());
     }
 }

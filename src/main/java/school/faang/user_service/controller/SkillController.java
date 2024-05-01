@@ -10,11 +10,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import school.faang.user_service.dto.skill.AcquireSkillFromOffersDto;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SkillService;
+import school.faang.user_service.util.SkillValidator;
 
 import java.util.List;
 
@@ -24,25 +23,14 @@ import java.util.List;
 @RequestMapping("/skills")
 public class SkillController {
 
-    private static final String EMPTY_TITLE_MSG = "Skill title can't be empty";
+
     private final SkillService skillService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public SkillDto create(@RequestBody SkillDto skillDto) {
-        if (!validateSkill(skillDto)) {
-            throw new DataValidationException(EMPTY_TITLE_MSG);
-        }
+        SkillValidator.validateSkill(skillDto);
         return skillService.create(skillDto);
-    }
-
-    public boolean validateSkill(SkillDto skill) {
-        boolean result = true;
-        if (skill.getTitle().isBlank() || skill.getTitle().isEmpty()) {
-            log.error(EMPTY_TITLE_MSG);
-            result = false;
-        }
-        return result;
     }
 
     @GetMapping("/user/{userId}")
@@ -56,8 +44,8 @@ public class SkillController {
         return skillService.getOfferedSkills(userId);
     }
 
-    @PostMapping("/acquire")
-    public SkillDto acquireSkillFromOffers(@RequestBody AcquireSkillFromOffersDto acquireDto) {
-        return skillService.acquireSkillFromOffers(acquireDto.getSkillId(), acquireDto.getUserId());
+    @PostMapping("/{userId}/offered/{skillId}")
+    public SkillDto acquireSkillFromOffers(@PathVariable("userId") long userId, @PathVariable("skillId") long skillId) {
+        return skillService.acquireSkillFromOffers(skillId, userId);
     }
 }

@@ -7,6 +7,8 @@ import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 
+import java.util.List;
+
 @Mapper(
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         componentModel = MappingConstants.ComponentModel.SPRING,
@@ -16,4 +18,5 @@ public interface SkillMapper {
 
     Skill dtoToSkill(SkillDto skillDto);
     SkillDto skillToDto(Skill skill);
+    List<SkillDto> map(List<Skill> skills);
 }

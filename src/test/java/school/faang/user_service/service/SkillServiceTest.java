@@ -18,6 +18,7 @@ import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
+import school.faang.user_service.util.SkillValidator;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -47,6 +49,9 @@ public class SkillServiceTest {
 
     @Mock
     private SkillCandidateMapper skillCandidateMapper;
+
+    @Mock
+    private SkillValidator skillValidator;
 
     @Mock
     private UserSkillGuaranteeRepository userSkillGuaranteeRepository;
@@ -87,23 +92,26 @@ public class SkillServiceTest {
     @Test
     public void createExistsSkillWithException() {
         when(skillRepository.existsByTitle(skillDto.getTitle())).thenReturn(true);
+        String ERR_MSG = "Skill with title: '" + skillDto.getTitle() + "' already exists in DB";
+        doThrow(new DataValidationException(ERR_MSG)).when(skillValidator).validateExistSkillByTitle(true, skillDto.getTitle());
 
         DataValidationException exception = assertThrows(DataValidationException.class, () -> skillService.create(skillDto));
 
-        assertThat(exception.getMessage()).isEqualTo("Skill with title: '" + skillDto.getTitle() + "' already exists in DB");
+        assertThat(exception.getMessage()).isEqualTo(ERR_MSG);
     }
 
     @Test
     public void getAllSkillsByUserId() {
         List<Skill> skills = List.of(savedSkill);
+        List<SkillDto> skillDtoList = List.of(savedSkillDto);
 
         when(skillRepository.findAllByUserId(USER_ID)).thenReturn(skills);
-        when(skillMapper.skillToDto(savedSkill)).thenReturn(skillDto);
+        when(skillMapper.map(skills)).thenReturn(skillDtoList);
 
         List<SkillDto> actualResult = skillService.getUserSkills(USER_ID);
 
         assertEquals(1, actualResult.size());
-        assertEquals(skillDto, actualResult.get(0));
+        assertEquals(savedSkillDto, actualResult.get(0));
 
     }
 
@@ -136,9 +144,11 @@ public class SkillServiceTest {
     @Test
     public void acquireSkillFromOffersWhenSkillExists() {
         when(skillRepository.findUserSkill(SKILL_CREATED_ID, USER_ID)).thenReturn(Optional.of(savedSkill));
+        String ERR_MSG = "User " + USER_ID + " already has skill with ID: " + SKILL_CREATED_ID;
+        doThrow(new DataValidationException(ERR_MSG)).when(skillValidator).validateSkillPresent(true, SKILL_CREATED_ID, USER_ID);
 
         DataValidationException exception = assertThrows(DataValidationException.class, () -> skillService.acquireSkillFromOffers(SKILL_CREATED_ID, USER_ID));
-        assertThat(exception.getMessage()).isEqualTo("User " + USER_ID + " already has skill with ID: " + SKILL_CREATED_ID);
+        assertThat(exception.getMessage()).isEqualTo(ERR_MSG);
     }
 
     @Test
@@ -146,12 +156,14 @@ public class SkillServiceTest {
         SkillOffer offer1 = new SkillOffer();
         SkillOffer offer2 = new SkillOffer();
         List<SkillOffer> skillOfferList = List.of(offer1, offer2);
+        String OFFER_ERR_MSG = "Skill with ID: " + SKILL_CREATED_ID + " hasn't enough offers for user with ID: " + USER_ID;
 
         when(skillRepository.findUserSkill(SKILL_CREATED_ID, USER_ID)).thenReturn(Optional.empty());
         when(skillOfferRepository.findAllOffersOfSkill(SKILL_CREATED_ID, USER_ID)).thenReturn(skillOfferList);
+        doThrow(new DataValidationException(OFFER_ERR_MSG)).when(skillValidator).validateMinSkillOffers(skillOfferList.size(), SKILL_CREATED_ID, USER_ID);
 
         DataValidationException exception = assertThrows(DataValidationException.class, () -> skillService.acquireSkillFromOffers(SKILL_CREATED_ID, USER_ID));
-        assertThat(exception.getMessage()).isEqualTo("Skill with ID: " + SKILL_CREATED_ID + " hasn't enough offers for user with ID: " + USER_ID);
+        assertThat(exception.getMessage()).isEqualTo(OFFER_ERR_MSG);
     }
 
     @Test

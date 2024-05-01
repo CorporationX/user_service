@@ -16,4 +16,12 @@ public class SkillService {
         return skillRepository.findById(skillId)
                 .orElseThrow(() -> new DataValidationException("Навыка с id " + skillId + " не существует"));
     }
+
+    public void assignSkillToUser(long skillId, long userId) {
+        skillRepository.assignSkillToUser(skillId, userId);
+    }
+
+    public boolean existsById(Long skillId) {
+        return skillRepository.existsById(skillId);
+    }
 }

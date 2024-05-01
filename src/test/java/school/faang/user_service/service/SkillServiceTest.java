@@ -65,8 +65,8 @@ public class SkillServiceTest {
 
     @BeforeEach
     public void init() {
-        skillDto = new SkillDto(SKILL_NEW_ID, SKILL_TITLE);
-        savedSkillDto = new SkillDto(SKILL_CREATED_ID, SKILL_TITLE);
+        skillDto = new SkillDto(SKILL_NEW_ID, SKILL_TITLE, null);
+        savedSkillDto = new SkillDto(SKILL_CREATED_ID, SKILL_TITLE, null);
         savedSkill = Skill.builder()
                 .id(SKILL_CREATED_ID)
                 .title(SKILL_TITLE)

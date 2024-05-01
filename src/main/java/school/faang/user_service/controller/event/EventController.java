@@ -14,6 +14,10 @@ import java.util.List;
 public class EventController {
     private final EventService eventService;
 
+    public List<EventDto> getOwnedEvents(long userId) {
+        return eventService.getOwnedEvents(userId);
+    }
+
     public EventDto updateEvent(EventDto event) {
         if (isValid(event)) {
             return eventService.updateEvent(event);

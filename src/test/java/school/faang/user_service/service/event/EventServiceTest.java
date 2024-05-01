@@ -292,4 +292,16 @@ class EventServiceTest {
         when(eventRepository.save(eventEntity)).thenReturn(eventEntity);
         assertEquals(eventDto1, service.updateEvent(eventDto1));
     }
+
+    @Test
+    void getOwnedEvents() {
+        Event eventEntity = mapper.toEntity(eventDto1);
+        when(eventRepository.findAllByUserId(1L)).thenReturn(List.of(eventEntity));
+        assertIterableEquals(List.of(eventDto1), service.getOwnedEvents(1L));
+    }
+
+    @Test
+    void getOwnedEventsNonExistingUserId() {
+        assertIterableEquals(new ArrayList<>(), service.getOwnedEvents(1L));
+    }
 }

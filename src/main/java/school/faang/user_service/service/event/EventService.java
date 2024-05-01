@@ -26,6 +26,12 @@ public class EventService {
     private final UserRepository userRepository;
     private final EventMapper mapper;
 
+    public List<EventDto> getOwnedEvents(long userId) {
+        return eventRepository.findAllByUserId(userId).stream()
+                .map(mapper::toDto)
+                .toList();
+    }
+
     public EventDto updateEvent(@NonNull EventDto event) {
         if (hasOwnerEnoughSkillsForEvent(event)) {
             Event eventEntity = mapper.toEntity(event);

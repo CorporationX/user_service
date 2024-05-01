@@ -113,4 +113,10 @@ class EventControllerTest {
         when(service.updateEvent(event)).thenReturn(event);
         assertEquals(event, controller.updateEvent(event));
     }
+
+    @Test
+    void getOwnedEvents() {
+        when(service.getOwnedEvents(1L)).thenReturn(List.of(event));
+        assertIterableEquals(List.of(event), controller.getOwnedEvents(1L));
+    }
 }

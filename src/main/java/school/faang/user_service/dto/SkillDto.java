@@ -1,7 +1,9 @@
 package school.faang.user_service.dto;
 
-public record SkillDto(
-        Long id,
-        String title
-) {
+import lombok.Data;
+
+@Data
+public class SkillDto {
+    private Long id;
+    private String title;
 }

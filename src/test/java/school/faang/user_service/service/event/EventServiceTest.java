@@ -304,4 +304,16 @@ class EventServiceTest {
     void getOwnedEventsNonExistingUserId() {
         assertIterableEquals(new ArrayList<>(), service.getOwnedEvents(1L));
     }
+
+    @Test
+    void getParticipatedEvents() {
+        Event eventEntity = mapper.toEntity(eventDto1);
+        when(eventRepository.findParticipatedEventsByUserId(1L)).thenReturn(List.of(eventEntity));
+        assertIterableEquals(List.of(eventDto1), service.getParticipatedEvents(1L));
+    }
+
+    @Test
+    void getParticipatedEventsNonExistingUserId() {
+        assertIterableEquals(new ArrayList<>(), service.getParticipatedEvents(1L));
+    }
 }

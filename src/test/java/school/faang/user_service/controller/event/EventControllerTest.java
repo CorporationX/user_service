@@ -119,4 +119,10 @@ class EventControllerTest {
         when(service.getOwnedEvents(1L)).thenReturn(List.of(event));
         assertIterableEquals(List.of(event), controller.getOwnedEvents(1L));
     }
+
+    @Test
+    void getParticipatedEvents() {
+        when(service.getParticipatedEvents(1L)).thenReturn(List.of(event));
+        assertIterableEquals(List.of(event), controller.getParticipatedEvents(1L));
+    }
 }

@@ -14,6 +14,10 @@ import java.util.List;
 public class EventController {
     private final EventService eventService;
 
+    public List<EventDto> getParticipatedEvents(long userId) {
+        return eventService.getParticipatedEvents(userId);
+    }
+
     public List<EventDto> getOwnedEvents(long userId) {
         return eventService.getOwnedEvents(userId);
     }

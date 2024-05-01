@@ -41,7 +41,7 @@ public class GoalInvitationService {
         }
     }
 
-    public RequestStatus acceptGoalInvitation(long id) {
+    public void acceptGoalInvitation(long id) {
         if (goalInvitationRepository.findById(id).isPresent()) {
             goalInvitation = goalInvitationRepository.findById(id).get();
             if (goalRepository.findById(goalInvitation.getGoal().getId()).isPresent()) {
@@ -49,8 +49,8 @@ public class GoalInvitationService {
                 List<Goal> setGoals = goalInvitation.getInvited().getSetGoals();
                 if (setGoals.size() < 3) {
                     if (!setGoals.contains(goal)) {
+                        goalInvitation.setStatus(RequestStatus.ACCEPTED);
                         goalInvitation.getInvited().getGoals().add(goal);
-                        return RequestStatus.ACCEPTED;
                     } else {
                         throw runtimeException;
                     }
@@ -65,11 +65,11 @@ public class GoalInvitationService {
         }
     }
 
-    public RequestStatus rejectGoalInvitation(long id) {
+    public void rejectGoalInvitation(long id) {
         if (goalInvitationRepository.findById(id).isPresent()) {
             goalInvitation = goalInvitationRepository.findById(id).get();
             if (goalRepository.findById(goalInvitation.getGoal().getId()).isPresent()) {
-                return RequestStatus.REJECTED;
+                goalInvitation.setStatus(RequestStatus.REJECTED);
             } else {
                 throw runtimeException;
             }

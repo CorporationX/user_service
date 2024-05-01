@@ -4,11 +4,13 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import school.faang.user_service.entity.RequestStatus;
 
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class MentorshipRequestDto {
     @NotBlank(message = "The reason for the request must be completed")
     private String description;

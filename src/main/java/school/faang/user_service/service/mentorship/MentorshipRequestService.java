@@ -3,6 +3,7 @@ package school.faang.user_service.service.mentorship;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.event.MentorshipAcceptedEvent;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.dto.recommendation.RequestFilterDto;
@@ -12,6 +13,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.handler.exception.DataValidationException;
 import school.faang.user_service.handler.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.mentorship.filtres.RequestFilter;
 import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
@@ -23,6 +25,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class MentorshipRequestService {
+    private final MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher;
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final MentorshipRequestValidator mentorshipRequestValidator;
     private final MentorshipRequestMapper mentorshipRequestMapper;
@@ -70,6 +73,8 @@ public class MentorshipRequestService {
         }
         receiverMentees.add(requester);
         mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
+        MentorshipAcceptedEvent mentorshipAcceptedEvent = new MentorshipAcceptedEvent(requester.getId(),receiver.getId(),id);
+        mentorshipAcceptedEventPublisher.publish(mentorshipAcceptedEvent);
         mentorshipRequestRepository.save(mentorshipRequest);
         return mentorshipRequestMapper.toDto(mentorshipRequest);
     }

@@ -1,19 +1,23 @@
 package school.faang.user_service.publisher;
 
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.MentorshipAcceptedEvent;
 @Component
-@RequiredArgsConstructor
-public class MentorshipAcceptedEventPublisher implements MessagePublisher<MentorshipAcceptedEvent>{
-    private final RedisTemplate<String,Object> redisTemplate;
+@Slf4j
+public class MentorshipAcceptedEventPublisher extends AbstractEventPublisher<MentorshipAcceptedEvent> {
     @Value("${spring.data.redis.channels.mentorship_accepted_channel.name}")
     private ChannelTopic channelTopic;
-    @Override
+
+    public MentorshipAcceptedEventPublisher(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper) {
+        super(redisTemplate, objectMapper);
+    }
     public void publish(MentorshipAcceptedEvent event) {
-        redisTemplate.convertAndSend(channelTopic.getTopic(), event);
+        convertAndSend(event,channelTopic.getTopic());
+        log.info("Mentorship request event published request id: " + event.getIdRequest());
     }
 }

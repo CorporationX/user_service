@@ -12,6 +12,10 @@ import school.faang.user_service.service.event.EventService;
 public class EventController {
     private final EventService eventService;
 
+    public EventDto getEvent(long eventId) {
+        return eventService.getEvent(eventId);
+    }
+
     public EventDto create(@NonNull EventDto event) {
         if (isValid(event)) {
             return eventService.create(event);

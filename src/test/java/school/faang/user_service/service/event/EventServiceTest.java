@@ -12,6 +12,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exceptions.event.DataValidationException;
+import school.faang.user_service.exceptions.event.EventNotFoundException;
 import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
@@ -94,5 +95,26 @@ class EventServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(owner));
         when(eventRepository.save(eventEntity)).thenReturn(eventEntity);
         assertEquals(dto, service.create(dto));
+    }
+
+    @Test
+    void getNonExistingEvent() {
+        EventNotFoundException e = assertThrows(EventNotFoundException.class, () -> service.getEvent(-1L));
+        assertEquals("cannot find event with id=-1", e.getMessage());
+    }
+
+    @Test
+    void getExistingEvent() {
+        List<Skill> skillList = List.of(
+                Skill.builder().id(1L).title("skill1").build(),
+                Skill.builder().id(2L).title("skill2").build()
+        );
+        Event eventEntity = Event.builder()
+                .owner(owner)
+                .relatedSkills(skillList)
+                .build();
+        when(mapper.toDto(eventEntity)).thenReturn(dto);
+        when(eventRepository.findById(1L)).thenReturn(Optional.of(eventEntity));
+        assertEquals(dto, service.getEvent(1L));
     }
 }

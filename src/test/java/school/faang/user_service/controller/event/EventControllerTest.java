@@ -79,4 +79,10 @@ class EventControllerTest {
         when(service.create(dto)).thenReturn(dto);
         assertEquals(dto, controller.create(dto));
     }
+
+    @Test
+    void getEvent() {
+        when(service.getEvent(1L)).thenReturn(dto);
+        assertEquals(dto, controller.getEvent(1L));
+    }
 }

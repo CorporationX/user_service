@@ -2,6 +2,7 @@ package school.faang.user_service.scheduler;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
@@ -25,31 +27,26 @@ public class EventCheckerScheduler {
     private final EventStartEventPublisher startEventPublisher;
     private final EventMapper eventMapper;
 
+    @Value("${task.scheduling.interval-one-minute}")
+    private long oneMinuteInterval;
+
+    @Value("${task.scheduling.interval-five-hours}")
+    private long fiveHoursInterval;
+
 
     @Transactional
-    @Scheduled(fixedRate = 60000)
-    public void checkEventsStartingInAMinute() {
-        LocalDateTime now = LocalDateTime.now().truncatedTo( ChronoUnit.MINUTES );
+    @Scheduled(fixedRateString = "${task.scheduling.fix-rate-oneminute}")
+    public void checkUpcomingEvents() {
+        LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
+        ZonedDateTime zonedNow = now.atZone(ZoneId.of("UTC"));
 
-        ZonedDateTime zonedDateTime = now.atZone(ZoneId.of("UTC"));
-
-        List<Event> upcomingEvents = eventRepository.findEventStartingBetween( zonedDateTime, zonedDateTime.plusMinutes( 1 ) );
-        upcomingEvents.forEach( (event) -> startEventPublisher.publish( eventMapper
-                .toEventStartEvent( event ) ) );
-
+        checkAndPublishEventsStartingWithin(zonedNow, zonedNow.plusMinutes(oneMinuteInterval));
+        checkAndPublishEventsStartingWithin(zonedNow.plusHours(fiveHoursInterval), zonedNow.plusHours(fiveHoursInterval).plusMinutes(1));
     }
 
-    @Transactional
-    @Scheduled(fixedRate = 60000)
-    public void checkEventsStartingIn5Hours() {
-        LocalDateTime now = LocalDateTime.now().truncatedTo( ChronoUnit.MINUTES );
-
-        ZonedDateTime zonedDateTime = now.atZone(ZoneId.of("UTC"));
-
-        List<Event> upcomingEvents = eventRepository.findEventStartingBetween( zonedDateTime.plusHours( 5 ), zonedDateTime.plusHours( 5 ).plusMinutes( 1 ) );
-        upcomingEvents.forEach( (event) -> startEventPublisher.publish( eventMapper
-                .toEventStartEvent( event ) ) );
-
+    private void checkAndPublishEventsStartingWithin(ZonedDateTime start, ZonedDateTime end) {
+        List<Event> upcomingEvents = eventRepository.findEventStartingBetween(start, end);
+        upcomingEvents.forEach(event -> startEventPublisher.publish(eventMapper.toEventStartEvent(event)));
     }
 
 

@@ -15,7 +15,7 @@ public class EventStartEventPublisher extends AbstractPublisher<EventStartEvent>
 
 
     public EventStartEventPublisher(RedisTemplate<String, Object> redisTemplate,
-                                    ObjectMapper jsonMapper,  @Value( "${spring.data.redis.channel.event-start-channel}" )String eventStartChannel) {
+                                    ObjectMapper jsonMapper,  @Value( "${spring.data.redis.channel.event_start_channel}" )String eventStartChannel) {
 
         super(redisTemplate, jsonMapper, eventStartChannel);
 

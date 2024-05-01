@@ -7,7 +7,7 @@ import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.serializer.SerializationException;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.event.UserEvent;
+import school.faang.user_service.event.UserEvent;
 import school.faang.user_service.service.user.UserService;
 
 import java.io.IOException;

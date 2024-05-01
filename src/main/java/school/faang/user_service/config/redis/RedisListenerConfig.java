@@ -24,11 +24,19 @@ public class RedisListenerConfig {
     @Value("${spring.data.redis.channels.user_ban_channel.name}")
     private String userBanTopic;
 
+    @Value("${spring.data.redis.channels.premium-bought-channel.name}")
+    private String premiumBoughtTopic;
+
     private final BanUserListener banUserListener;
 
     @Bean
     public ChannelTopic banUserTopic() {
         return new ChannelTopic(userBanTopic);
+    }
+
+    @Bean
+    public ChannelTopic premiumBoughtTopic() {
+        return new ChannelTopic(premiumBoughtTopic);
     }
 
     @Bean
@@ -43,10 +51,16 @@ public class RedisListenerConfig {
     }
 
     @Bean
-    public RedisMessageListenerContainer banUserMessageListenerContainer() {
+    public MessageListenerAdapter premiumBoughtListenerAdapter() {
+        return new MessageListenerAdapter(premiumBoughtTopic());
+    }
+
+    @Bean
+    public RedisMessageListenerContainer messageListenerContainer() {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(redisConnectionFactory());
         container.addMessageListener(banUserListenerAdapter(), banUserTopic());
+        container.addMessageListener(premiumBoughtListenerAdapter(), premiumBoughtTopic());
         return container;
     }
 }

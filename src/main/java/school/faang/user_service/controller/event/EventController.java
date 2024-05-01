@@ -14,6 +14,14 @@ import java.util.List;
 public class EventController {
     private final EventService eventService;
 
+    public EventDto updateEvent(EventDto event) {
+        if (isValid(event)) {
+            return eventService.updateEvent(event);
+        } else {
+            throw new DataValidationException(String.format("not valid event - %s", event));
+        }
+    }
+
     public EventDto deleteEvent(long eventId) {
         return eventService.deleteEvent(eventId);
     }

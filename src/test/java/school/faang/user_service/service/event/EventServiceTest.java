@@ -268,4 +268,28 @@ class EventServiceTest {
         assertEquals(eventDto1, service.deleteEvent(1L));
         verify(eventRepository, times(1)).deleteById(1L);
     }
+
+    @Test
+    void updateNoOwnerEvent() {
+        eventDto1.setOwnerId(-1L);
+        DataValidationException e = assertThrows(DataValidationException.class, () -> service.create(eventDto1));
+        assertEquals("owner with id=-1 not found", e.getMessage());
+    }
+
+    @Test
+    void updateOwnerHasNoEnoughSkills() {
+        owner1.setSkills(new ArrayList<>());
+        when(userRepository.findById(1L)).thenReturn(Optional.of(owner1));
+        DataValidationException e = assertThrows(DataValidationException.class, () -> service.updateEvent(eventDto1));
+        assertEquals("user with id=1 has no enough skills to update event", e.getMessage());
+    }
+
+    @Test
+    void updateGoodEvent() {
+        Event eventEntity = mapper.toEntity(eventDto1);
+        owner1.setSkills(eventEntity.getRelatedSkills());
+        when(userRepository.findById(1L)).thenReturn(Optional.of(owner1));
+        when(eventRepository.save(eventEntity)).thenReturn(eventEntity);
+        assertEquals(eventDto1, service.updateEvent(eventDto1));
+    }
 }

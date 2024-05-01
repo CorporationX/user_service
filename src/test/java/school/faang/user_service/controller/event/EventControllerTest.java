@@ -26,7 +26,7 @@ class EventControllerTest {
     private EventService service;
     @InjectMocks
     private EventController controller;
-    private EventDto dto;
+    private EventDto event;
 
     @BeforeEach
     void init() {
@@ -34,7 +34,7 @@ class EventControllerTest {
                 new SkillDto(1L, "skill1"),
                 new SkillDto(2L, "skill2")
         );
-        dto = EventDto.builder()
+        event = EventDto.builder()
                 .ownerId(1L)
                 .title("dto")
                 .startDate(LocalDateTime.now())
@@ -50,54 +50,67 @@ class EventControllerTest {
 
     @Test
     void createNullTitleEvent() {
-        dto.setTitle(null);
-        DataValidationException e = assertThrows(DataValidationException.class, () -> controller.create(dto));
-        assertEquals("not valid event - " + dto, e.getMessage());
+        event.setTitle(null);
+        DataValidationException e = assertThrows(DataValidationException.class, () -> controller.create(event));
+        assertEquals("not valid event - " + event, e.getMessage());
     }
 
     @Test
     void createBlankTitleEvent() {
-        dto.setTitle("");
-        DataValidationException e = assertThrows(DataValidationException.class, () -> controller.create(dto));
-        assertEquals("not valid event - " + dto, e.getMessage());
+        event.setTitle("");
+        DataValidationException e = assertThrows(DataValidationException.class, () -> controller.create(event));
+        assertEquals("not valid event - " + event, e.getMessage());
     }
 
     @Test
     void createNullStartDateEvent() {
-        dto.setStartDate(null);
-        DataValidationException e = assertThrows(DataValidationException.class, () -> controller.create(dto));
-        assertEquals("not valid event - " + dto, e.getMessage());
+        event.setStartDate(null);
+        DataValidationException e = assertThrows(DataValidationException.class, () -> controller.create(event));
+        assertEquals("not valid event - " + event, e.getMessage());
     }
 
     @Test
     void createNullOwnerIdEvent() {
-        dto.setOwnerId(null);
-        DataValidationException e = assertThrows(DataValidationException.class, () -> controller.create(dto));
-        assertEquals("not valid event - " + dto, e.getMessage());
+        event.setOwnerId(null);
+        DataValidationException e = assertThrows(DataValidationException.class, () -> controller.create(event));
+        assertEquals("not valid event - " + event, e.getMessage());
     }
 
     @Test
     void createGoodEvent() {
-        when(service.create(dto)).thenReturn(dto);
-        assertEquals(dto, controller.create(dto));
+        when(service.create(event)).thenReturn(event);
+        assertEquals(event, controller.create(event));
     }
 
     @Test
     void getEvent() {
-        when(service.getEvent(1L)).thenReturn(dto);
-        assertEquals(dto, controller.getEvent(1L));
+        when(service.getEvent(1L)).thenReturn(event);
+        assertEquals(event, controller.getEvent(1L));
     }
 
     @Test
     void getEventByFilter() {
         EventFilterDto filterDto = new EventFilterDto();
-        when(service.getEventsByFilter(filterDto)).thenReturn(List.of(dto));
-        assertIterableEquals(List.of(dto), controller.getEventsByFilter(filterDto));
+        when(service.getEventsByFilter(filterDto)).thenReturn(List.of(event));
+        assertIterableEquals(List.of(event), controller.getEventsByFilter(filterDto));
     }
 
     @Test
     void deleteEvent() {
-        when(service.deleteEvent(1L)).thenReturn(dto);
-        assertEquals(dto, controller.deleteEvent(1L));
+        when(service.deleteEvent(1L)).thenReturn(event);
+        assertEquals(event, controller.deleteEvent(1L));
+    }
+
+    @Test
+    void updateBadEvent() {
+        event.setOwnerId(null);
+        DataValidationException e = assertThrows(DataValidationException.class, () -> controller.updateEvent(event));
+        assertEquals("not valid event - " + event, e.getMessage());
+    }
+
+    @Test
+    void updateGoodEvent() {
+        when(service.updateEvent(event)).thenReturn(event);
+        assertEquals(event, controller.updateEvent(event));
     }
 }

@@ -26,6 +26,16 @@ public class EventService {
     private final UserRepository userRepository;
     private final EventMapper mapper;
 
+    public EventDto updateEvent(@NonNull EventDto event) {
+        if (hasOwnerEnoughSkillsForEvent(event)) {
+            Event eventEntity = mapper.toEntity(event);
+            Event saved = eventRepository.save(eventEntity);
+            return mapper.toDto(saved);
+        } else {
+            throw new DataValidationException(String.format("user with id=%d has no enough skills to update event", event.getOwnerId()));
+        }
+    }
+
     public EventDto deleteEvent(long eventId) {
         Event eventToDelete = eventRepository
                 .findById(eventId)
@@ -49,19 +59,22 @@ public class EventService {
     }
 
     public EventDto create(@NonNull EventDto event) {
-        User user = userRepository
-                .findById(event.getOwnerId())
-                .orElseThrow(() -> new DataValidationException(String.format("owner with id=%d not found", event.getOwnerId())));
-        Set<Long> requiredSkillsIds = user.getSkills().stream().map(Skill::getId).collect(Collectors.toSet());
-        boolean isGood = event.getRelatedSkills().stream()
-                .map(SkillDto::getId)
-                .allMatch(requiredSkillsIds::contains);
-        if (isGood) {
+        if (hasOwnerEnoughSkillsForEvent(event)) {
             Event eventEntity = mapper.toEntity(event);
             Event saved = eventRepository.save(eventEntity);
             return mapper.toDto(saved);
         } else {
             throw new DataValidationException(String.format("user with id=%d has no enough skills to create event", event.getOwnerId()));
         }
+    }
+
+    private boolean hasOwnerEnoughSkillsForEvent(EventDto event) {
+        User user = userRepository
+                .findById(event.getOwnerId())
+                .orElseThrow(() -> new DataValidationException(String.format("owner with id=%d not found", event.getOwnerId())));
+        Set<Long> requiredSkillsIds = user.getSkills().stream().map(Skill::getId).collect(Collectors.toSet());
+        return event.getRelatedSkills().stream()
+                .map(SkillDto::getId)
+                .allMatch(requiredSkillsIds::contains);
     }
 }

@@ -1,6 +1,5 @@
 package school.faang.user_service.controller.event;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.event.EventDto;
@@ -14,6 +13,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EventController {
     private final EventService eventService;
+
+    public EventDto deleteEvent(long eventId) {
+        return eventService.deleteEvent(eventId);
+    }
 
     public List<EventDto> getEventsByFilter(EventFilterDto filter) {
         return eventService.getEventsByFilter(filter);

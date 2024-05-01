@@ -26,6 +26,14 @@ public class EventService {
     private final UserRepository userRepository;
     private final EventMapper mapper;
 
+    public EventDto deleteEvent(long eventId) {
+        Event eventToDelete = eventRepository
+                .findById(eventId)
+                .orElseThrow(() -> new EventNotFoundException(String.format("cannot find event with id=%d", eventId)));
+        eventRepository.deleteById(eventToDelete.getId());
+        return mapper.toDto(eventToDelete);
+    }
+
     public List<EventDto> getEventsByFilter(@NonNull EventFilterDto filter) {
         return eventRepository.findAll().stream()
                 .filter(filter.toPredicate())

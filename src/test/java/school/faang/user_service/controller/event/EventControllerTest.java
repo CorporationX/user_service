@@ -94,4 +94,10 @@ class EventControllerTest {
         when(service.getEventsByFilter(filterDto)).thenReturn(List.of(dto));
         assertIterableEquals(List.of(dto), controller.getEventsByFilter(filterDto));
     }
+
+    @Test
+    void deleteEvent() {
+        when(service.deleteEvent(1L)).thenReturn(dto);
+        assertEquals(dto, controller.deleteEvent(1L));
+    }
 }

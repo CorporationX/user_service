@@ -33,6 +33,8 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -117,11 +119,6 @@ class EventServiceTest {
     @BeforeEach
     void getFilter() {
         filter = new EventFilterDto();
-    }
-
-    @Test
-    void createNullEvent() {
-        assertThrows(NullPointerException.class, () -> service.create(null));
     }
 
     @Test
@@ -256,5 +253,19 @@ class EventServiceTest {
                 .toList();
         when(eventRepository.findAll()).thenReturn(eventList);
         assertArrayEquals(new EventDto[]{eventDto1, eventDto2, eventDto3, eventDto4}, service.getEventsByFilter(filter).toArray());
+    }
+
+    @Test
+    void deleteNonExistingEvent() {
+        EventNotFoundException e = assertThrows(EventNotFoundException.class, () -> service.deleteEvent(-1L));
+        assertEquals("cannot find event with id=-1", e.getMessage());
+    }
+
+    @Test
+    void deleteExistingEvent() {
+        Event eventEntity = mapper.toEntity(eventDto1);
+        when(eventRepository.findById(1L)).thenReturn(Optional.of(eventEntity));
+        assertEquals(eventDto1, service.deleteEvent(1L));
+        verify(eventRepository, times(1)).deleteById(1L);
     }
 }

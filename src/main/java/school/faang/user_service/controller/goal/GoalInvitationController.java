@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.service.GoalInvitationService;
 
 @Controller
@@ -12,7 +13,13 @@ import school.faang.user_service.service.GoalInvitationService;
 public class GoalInvitationController {
     private GoalInvitationService goalInvitationService;
 
-    public void createInvitation(GoalInvitationDto invitation) {
+    void createInvitation(GoalInvitationDto invitation) {
         goalInvitationService.createInvitation(invitation);
+    }
+    void acceptGoalInvitation(long id) {
+        RequestStatus requestStatus = goalInvitationService.acceptGoalInvitation(id);
+    }
+    void rejectGoalInvitation(long id) {
+        RequestStatus requestStatus = goalInvitationService.rejectGoalInvitation(id);
     }
 }

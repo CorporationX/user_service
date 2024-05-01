@@ -1,11 +1,11 @@
 package school.faang.user_service.service;
 
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
@@ -78,4 +78,16 @@ public class GoalInvitationService {
         }
     }
 
+    public List<GoalInvitation> getInvitations(InvitationFilterDto filter) {
+        if (filter != null) {
+            return goalInvitationRepository.findAll().stream().
+                    filter(goalInvitation -> goalInvitation.getInvited().getId() == filter.getInvitedId()).
+                    filter(goalInvitation -> goalInvitation.getInviter().getId() == filter.getInviterId()).
+                    filter(goalInvitation -> goalInvitation.getInvited().getUsername().equals(filter.getInvitedNamePattern())).
+                    filter(goalInvitation -> goalInvitation.getInviter().getUsername().equals(filter.getInviterNamePattern())).
+                    filter(goalInvitation -> goalInvitation.getStatus().equals(filter.getStatus())).toList();
+        } else {
+            throw runtimeException;
+        }
+    }
 }

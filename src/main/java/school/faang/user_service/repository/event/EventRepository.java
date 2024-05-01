@@ -28,10 +28,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     boolean existsById(long eventId);
 
     @Query(nativeQuery = true, value = """
-            SELECT e.* FROM event e WHERE e.start_date = :dateTime """)
-    List<Event> findEventStartingAt(LocalDateTime dateTime);
-
-    @Query(nativeQuery = true, value = """
            SELECT DISTINCT e.*
            FROM event e
            WHERE e.start_date BETWEEN :start AND :end

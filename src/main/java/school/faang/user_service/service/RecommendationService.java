@@ -72,9 +72,9 @@ public class RecommendationService {
 
     public Page<RecommendationDto> getAllRecommendation(long authorId, int pageNum, int pageSize) {
         Pageable pageable = PageRequest.of(pageNum, pageSize);
-        Page<Recommendation> authorRecommendation = recommendationRepository.findAllByAuthorId(authorId, pageable);
+        Page<Recommendation> authorRecommendations = recommendationRepository.findAllByAuthorId(authorId, pageable);
 
-        return authorRecommendation.map(recommendationMapper::toDto);
+        return authorRecommendations.map(recommendationMapper::toDto);
     }
 
     private void saveSkillOffers(Recommendation recommendation) {

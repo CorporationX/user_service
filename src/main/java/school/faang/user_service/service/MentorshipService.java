@@ -15,6 +15,6 @@ public class MentorshipService {
     private final UserRepository userRepository;
 
     public List<User> getMentees(long userId){
-        mentorshipRepository
+        mentorshipRepository.findById(userId).orElseThrow(() -> new RuntimeException("This mentor is not in the database"));
     }
 }

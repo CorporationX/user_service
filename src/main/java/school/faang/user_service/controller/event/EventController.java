@@ -23,11 +23,8 @@ public class EventController {
     }
 
     public EventDto updateEvent(EventDto event) {
-        if (isValid(event)) {
-            return eventService.updateEvent(event);
-        } else {
-            throw new DataValidationException(String.format("not valid event - %s", event));
-        }
+        validate(event);
+        return eventService.updateEvent(event);
     }
 
     public EventDto deleteEvent(long eventId) {
@@ -43,17 +40,22 @@ public class EventController {
     }
 
     public EventDto create(EventDto event) {
-        if (isValid(event)) {
-            return eventService.create(event);
-        } else {
-            throw new DataValidationException(String.format("not valid event - %s", event));
-        }
+        validate(event);
+        return eventService.create(event);
     }
 
-    private boolean isValid(EventDto event) {
-        return event.getTitle() != null &&
-                !event.getTitle().isBlank() &&
-                event.getStartDate() != null &&
-                event.getOwnerId() != null;
+    private void validate(EventDto event) {
+        if (event.getTitle() == null) {
+            throw new DataValidationException(String.format("title can't be null - %s", event));
+        }
+        if (event.getTitle().isBlank()) {
+            throw new DataValidationException(String.format("title can't be blank - %s", event));
+        }
+        if (event.getStartDate() == null) {
+            throw new DataValidationException(String.format("start date can't be null - %s", event));
+        }
+        if (event.getOwnerId() == null) {
+            throw new DataValidationException(String.format("event owner can't be null - %s", event));
+        }
     }
 }

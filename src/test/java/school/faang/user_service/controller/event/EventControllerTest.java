@@ -52,28 +52,28 @@ class EventControllerTest {
     void createNullTitleEvent() {
         event.setTitle(null);
         DataValidationException e = assertThrows(DataValidationException.class, () -> controller.create(event));
-        assertEquals("not valid event - " + event, e.getMessage());
+        assertEquals("title can't be null - " + event, e.getMessage());
     }
 
     @Test
     void createBlankTitleEvent() {
         event.setTitle("");
         DataValidationException e = assertThrows(DataValidationException.class, () -> controller.create(event));
-        assertEquals("not valid event - " + event, e.getMessage());
+        assertEquals("title can't be blank - " + event, e.getMessage());
     }
 
     @Test
     void createNullStartDateEvent() {
         event.setStartDate(null);
         DataValidationException e = assertThrows(DataValidationException.class, () -> controller.create(event));
-        assertEquals("not valid event - " + event, e.getMessage());
+        assertEquals("start date can't be null - " + event, e.getMessage());
     }
 
     @Test
     void createNullOwnerIdEvent() {
         event.setOwnerId(null);
         DataValidationException e = assertThrows(DataValidationException.class, () -> controller.create(event));
-        assertEquals("not valid event - " + event, e.getMessage());
+        assertEquals("event owner can't be null - " + event, e.getMessage());
     }
 
     @Test
@@ -102,10 +102,36 @@ class EventControllerTest {
     }
 
     @Test
-    void updateBadEvent() {
+    void updateNullEvent() {
+        assertThrows(NullPointerException.class, () -> controller.create(null));
+    }
+
+    @Test
+    void updateNullTitleEvent() {
+        event.setTitle(null);
+        DataValidationException e = assertThrows(DataValidationException.class, () -> controller.updateEvent(event));
+        assertEquals("title can't be null - " + event, e.getMessage());
+    }
+
+    @Test
+    void updateBlankTitleEvent() {
+        event.setTitle("");
+        DataValidationException e = assertThrows(DataValidationException.class, () -> controller.updateEvent(event));
+        assertEquals("title can't be blank - " + event, e.getMessage());
+    }
+
+    @Test
+    void updateNullStartDateEvent() {
+        event.setStartDate(null);
+        DataValidationException e = assertThrows(DataValidationException.class, () -> controller.updateEvent(event));
+        assertEquals("start date can't be null - " + event, e.getMessage());
+    }
+
+    @Test
+    void updateNullOwnerIdEvent() {
         event.setOwnerId(null);
         DataValidationException e = assertThrows(DataValidationException.class, () -> controller.updateEvent(event));
-        assertEquals("not valid event - " + event, e.getMessage());
+        assertEquals("event owner can't be null - " + event, e.getMessage());
     }
 
     @Test

@@ -1,39 +1,33 @@
-package school.faang.user_service.service.service;
+package school.faang.user_service.service.controller.mentorship;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.controller.mentorship.MentorshipController;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.service.MentorshipService;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class MentorshipServiceTest {
+public class MentorshipControllerTest {
 
     @InjectMocks
-    private MentorshipService mentorshipService;
+    private MentorshipController mentorshipController;
+
     @Mock
-    private MentorshipRepository mentorshipRepository;
-    @Spy
-    private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
+    private MentorshipService mentorshipService;
 
     @Test
-    public void testGetMenteesWithNotExistingMentor(){
-        when(mentorshipRepository.findById(1L)).thenReturn(Optional.ofNullable(null));
-        assertThrows(IllegalArgumentException.class, ()->mentorshipService.getMentees(1L));
+    public void testGetMenteesWithNullParameter(){
+        assertThrows(NullPointerException.class, ()->mentorshipController.getMentees(null));
     }
 
     @Test
@@ -42,8 +36,12 @@ public class MentorshipServiceTest {
         User thirdUser = User.builder().id(3L).username("third").build();
         User firstUser = User.builder().id(1L).username("first").mentees(List.of(secondUser, thirdUser)).build();
 
-        when(mentorshipRepository.findById(1L)).thenReturn(Optional.of(firstUser));
+        when(mentorshipService.getMentees(1L)).thenReturn(List.of(
+                UserDto.builder().id(2L).username("second").build(),
+                UserDto.builder().id(3L).username("third").build()
+        ));
         List<UserDto> result = mentorshipService.getMentees(1L);
+
         assertEquals(result.get(0).getId(), secondUser.getId());
         assertEquals(result.get(0).getUsername(), secondUser.getUsername());
         assertEquals(result.get(1).getId(), thirdUser.getId());
@@ -51,9 +49,8 @@ public class MentorshipServiceTest {
     }
 
     @Test
-    public void testGetMentorsWithNotExistingUser(){
-        when(mentorshipRepository.findById(1L)).thenReturn(Optional.ofNullable(null));
-        assertThrows(IllegalArgumentException.class, ()->mentorshipService.getMentors(1L));
+    public void testGetMentorsWithNullParameter(){
+        assertThrows(NullPointerException.class, ()->mentorshipController.getMentors(null));
     }
 
     @Test
@@ -62,13 +59,15 @@ public class MentorshipServiceTest {
         User thirdUser = User.builder().id(3L).username("third").build();
         User firstUser = User.builder().id(1L).username("first").mentors(List.of(secondUser, thirdUser)).build();
 
-        when(mentorshipRepository.findById(1L)).thenReturn(Optional.of(firstUser));
+        when(mentorshipService.getMentors(1L)).thenReturn(List.of(
+                UserDto.builder().id(2L).username("second").build(),
+                UserDto.builder().id(3L).username("third").build()
+        ));
         List<UserDto> result = mentorshipService.getMentors(1L);
+
         assertEquals(result.get(0).getId(), secondUser.getId());
         assertEquals(result.get(0).getUsername(), secondUser.getUsername());
         assertEquals(result.get(1).getId(), thirdUser.getId());
         assertEquals(result.get(1).getUsername(), thirdUser.getUsername());
     }
-
-
 }

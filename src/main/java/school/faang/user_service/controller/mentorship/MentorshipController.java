@@ -13,7 +13,21 @@ import java.util.List;
 public class MentorshipController {
     private final MentorshipService mentorshipService;
 
-    public List<UserDto> getMentees(@NonNull Long userId){
+    public List<UserDto> getMentees(Long userId){
+        if(userId == null){
+            throw new NullPointerException("Userid " + userId + " is null");
+        }
         return mentorshipService.getMentees(userId);
+    }
+
+    public List<UserDto> getMentors(Long userId){
+        if(userId == null){
+            throw new NullPointerException("Userid " + userId + " is null");
+        }
+        return mentorshipService.getMentors(userId);
+    }
+
+    public void deleteMentee(Long menteeId, Long mentorId){
+        mentorshipService.deleteMentee(menteeId, mentorId);
     }
 }

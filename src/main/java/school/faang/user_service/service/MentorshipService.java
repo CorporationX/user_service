@@ -18,6 +18,22 @@ public class MentorshipService {
     public List<UserDto> getMentees(long userId) {
         User user = mentorshipRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("This mentor with id: " + userId + " is not in the database"));
-        return user.getMentees().stream().map((mente)->userMapper.toDto(mente)).toList();
+        return user.getMentees().stream().map((mentee)->userMapper.toDto(mentee)).toList();
     }
+
+    public List<UserDto> getMentors(long userId){
+        User user = mentorshipRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("This user with id: " + userId + " is not in the database"));
+        return user.getMentors().stream().map((mentor)->userMapper.toDto(mentor)).toList();
+    }
+
+    public void deleteMentee(long menteeId, long mentorId){
+        List<UserDto> mentees = getMentees(mentorId);
+        UserDto userDto = mentees.stream().filter(mentee->mentee.getId()==menteeId).findAny().orElseThrow(()->
+            new IllegalArgumentException("A mentor with an id: "+ mentorId +" does not have a mentee with an id: " + menteeId)
+        );
+
+
+    }
+
 }

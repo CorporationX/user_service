@@ -18,20 +18,25 @@ public class MentorshipService {
     public List<UserDto> getMentees(long userId) {
         User user = mentorshipRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("This mentor with id: " + userId + " is not in the database"));
-        return user.getMentees().stream().map((mentee)->userMapper.toDto(mentee)).toList();
+        return user.getMentees().stream().map((mentee) -> userMapper.toDto(mentee)).toList();
     }
 
-    public List<UserDto> getMentors(long userId){
+    public List<UserDto> getMentors(long userId) {
         User user = mentorshipRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("This user with id: " + userId + " is not in the database"));
-        return user.getMentors().stream().map((mentor)->userMapper.toDto(mentor)).toList();
+                .orElseThrow(() -> new IllegalArgumentException("This mentee with id: " + userId + " is not in the database"));
+        return user.getMentors().stream().map((mentor) -> userMapper.toDto(mentor)).toList();
     }
 
-    public void deleteMentee(long menteeId, long mentorId){
-        List<UserDto> mentees = getMentees(mentorId);
-        UserDto userDto = mentees.stream().filter(mentee->mentee.getId()==menteeId).findAny().orElseThrow(()->
-            new IllegalArgumentException("A mentor with an id: "+ mentorId +" does not have a mentee with an id: " + menteeId)
-        );
+    public void deleteMentee(long menteeId, long mentorId) {
+        User mentor = mentorshipRepository.findById(mentorId)
+                .orElseThrow(() -> new IllegalArgumentException("Mentor with id: " + mentorId + " is not in the database"));
+
+        User mentee = mentorshipRepository.findById(menteeId)
+                .orElseThrow(() -> new IllegalArgumentException("Mentee with id: " + menteeId + " is not in the database"));
+
+        if (!mentor.getMentees().remove(mentee)) {
+            throw new IllegalArgumentException("A mentor with an id " + mentorId + " does not have a mentee with an id"+menteeId);
+        }
 
     }
 

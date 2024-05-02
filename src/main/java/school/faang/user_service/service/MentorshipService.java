@@ -33,12 +33,18 @@ public class MentorshipService {
 
         User mentee = mentorshipRepository.findById(menteeId)
                 .orElseThrow(() -> new IllegalArgumentException("Mentee with id: " + menteeId + " is not in the database"));
-
-        if (!mentor.getMentees().remove(mentee)) {
-            throw new IllegalArgumentException("A mentor with an id " + mentorId + " does not have a mentee with an id"+menteeId);
-        }
-
+        mentor.getMentees().remove(mentee);
+        mentorshipRepository.save(mentor);
     }
 
+    public void deleteMentor(long menteeId, long mentorId) {
+        User mentor = mentorshipRepository.findById(mentorId)
+                .orElseThrow(() -> new IllegalArgumentException("Mentor with id: " + mentorId + " is not in the database"));
+
+        User mentee = mentorshipRepository.findById(menteeId)
+                .orElseThrow(() -> new IllegalArgumentException("Mentee with id: " + menteeId + " is not in the database"));
+        mentee.getMentors().remove(mentor);
+        mentorshipRepository.save(mentee);
+    }
 
 }

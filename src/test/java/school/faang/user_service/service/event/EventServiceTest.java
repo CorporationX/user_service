@@ -46,7 +46,7 @@ class EventServiceTest {
     @Spy
     private EventMapper mapper = new EventMapperImpl(Mappers.getMapper(SkillMapper.class));
     @InjectMocks
-    private EventService service;
+    private EventServiceImpl service;
 
     private EventDto eventDto1, eventDto2, eventDto3, eventDto4;
     private User owner1;
@@ -160,7 +160,7 @@ class EventServiceTest {
 
     @Test
     void getEventsFilteredByFromDate() {
-        filter.setFromDate(eventDto4.getStartDate().minusMinutes(1));
+        filter.setStartDate(eventDto4.getStartDate().minusMinutes(1));
         List<Event> eventList = Stream.of(eventDto1, eventDto2, eventDto3, eventDto4)
                 .map(mapper::toEntity)
                 .toList();
@@ -170,7 +170,7 @@ class EventServiceTest {
 
     @Test
     void getEventsFilteredByToDate() {
-        filter.setToDate(LocalDateTime.now().plusMinutes(31));
+        filter.setEndDate(LocalDateTime.now().plusMinutes(31));
         List<Event> eventList = Stream.of(eventDto1, eventDto2, eventDto3, eventDto4)
                 .map(mapper::toEntity)
                 .toList();
@@ -180,7 +180,7 @@ class EventServiceTest {
 
     @Test
     void getEventsFilteredByRelatedSkillsOne() {
-        filter.setRelatedSkillsFilter(eventDto1.getRelatedSkills());
+        filter.setRelatedSkills(eventDto1.getRelatedSkills());
         List<Event> eventList = Stream.of(eventDto1, eventDto2, eventDto3, eventDto4)
                 .map(mapper::toEntity)
                 .toList();
@@ -190,7 +190,7 @@ class EventServiceTest {
 
     @Test
     void getEventsFilteredByRelatedSkillsSeveral() {
-        filter.setRelatedSkillsFilter(List.of(eventDto1.getRelatedSkills().get(0)));
+        filter.setRelatedSkills(List.of(eventDto1.getRelatedSkills().get(0)));
         List<Event> eventList = Stream.of(eventDto1, eventDto2, eventDto3, eventDto4)
                 .map(mapper::toEntity)
                 .toList();
@@ -200,7 +200,7 @@ class EventServiceTest {
 
     @Test
     void getEventsFilteredByLocation() {
-        filter.setLocationFilter(eventDto1.getLocation());
+        filter.setLocation(eventDto1.getLocation());
         List<Event> eventList = Stream.of(eventDto1, eventDto2, eventDto3, eventDto4)
                 .map(mapper::toEntity)
                 .toList();
@@ -210,7 +210,7 @@ class EventServiceTest {
 
     @Test
     void getEventsFilteredByStatus() {
-        filter.setStatusFilter(EventStatus.IN_PROGRESS);
+        filter.setStatus(EventStatus.IN_PROGRESS);
         List<Event> eventList = Stream.of(eventDto1, eventDto2, eventDto3, eventDto4)
                 .map(mapper::toEntity)
                 .peek(event -> event.setStatus(EventStatus.PLANNED))
@@ -222,7 +222,7 @@ class EventServiceTest {
 
     @Test
     void getEventsFilteredByType() {
-        filter.setTypeFilter(EventType.GIVEAWAY);
+        filter.setType(EventType.GIVEAWAY);
         List<Event> eventList = Stream.of(eventDto1, eventDto2, eventDto3, eventDto4)
                 .map(mapper::toEntity)
                 .peek(event -> event.setType(EventType.POLL))
@@ -234,9 +234,9 @@ class EventServiceTest {
 
     @Test
     void getEventsFilteredByMultiplyFilters() {
-        filter.setTypeFilter(EventType.GIVEAWAY);
-        filter.setFromDate(eventDto2.getStartDate());
-        filter.setToDate(eventDto4.getEndDate());
+        filter.setType(EventType.GIVEAWAY);
+        filter.setStartDate(eventDto2.getStartDate());
+        filter.setEndDate(eventDto4.getEndDate());
         List<Event> eventList = Stream.of(eventDto1, eventDto2, eventDto3, eventDto4)
                 .map(mapper::toEntity)
                 .peek(event -> event.setType(EventType.POLL))

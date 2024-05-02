@@ -11,7 +11,6 @@ import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.event.EventType;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -22,48 +21,67 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EventFilterDto {
-    private LocalDateTime fromDate;
-    private LocalDateTime toDate;
-    private List<SkillDto> relatedSkillsFilter;
-    private String locationFilter;
-    private EventType typeFilter;
-    private EventStatus statusFilter;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
+    private List<SkillDto> relatedSkills;
+    private String location;
+    private EventType type;
+    private EventStatus status;
 
     public Predicate<Event> toPredicate() {
-        List<Predicate<Event>> predicates = new ArrayList<>();
+        Predicate<Event> out = event -> true;
+        out = out.and(getFromDateFilter());
+        out = out.and(getToDateFilter());
+        out = out.and(getRelatedSkillsFilter());
+        out = out.and(getLocationFilter());
+        out = out.and(getTypeFilter());
+        out = out.and(getStatusFilter());
+        return out;
+    }
 
-        if (fromDate != null) {
-            predicates.add(event -> event.getStartDate().isAfter(fromDate));
+    public Predicate<Event> getFromDateFilter() {
+        if (startDate != null) {
+            return event -> event.getStartDate().isAfter(startDate);
         }
-        if (toDate != null) {
-            predicates.add(event -> event.getEndDate().isBefore(toDate));
+        return event -> true;
+    }
+
+    public Predicate<Event> getToDateFilter() {
+        if (endDate != null) {
+            return event -> event.getEndDate().isBefore(endDate);
         }
-        if (relatedSkillsFilter != null && !relatedSkillsFilter.isEmpty()) {
-            Set<Long> filterSkillIds = relatedSkillsFilter.stream().map(SkillDto::getId).collect(Collectors.toSet());
-            predicates.add(event -> event.getRelatedSkills().stream()
+        return event -> true;
+    }
+
+    public Predicate<Event> getRelatedSkillsFilter() {
+        if (relatedSkills != null && !relatedSkills.isEmpty()) {
+            Set<Long> filterSkillIds = relatedSkills.stream().map(SkillDto::getId).collect(Collectors.toSet());
+            return event -> event.getRelatedSkills().stream()
                     .map(Skill::getId)
                     .collect(Collectors.toSet())
-                    .containsAll(filterSkillIds)
-            );
+                    .containsAll(filterSkillIds);
         }
-        if (locationFilter != null) {
-            predicates.add(event -> event.getLocation().equals(locationFilter));
-        }
-        if (typeFilter != null) {
-            predicates.add(event -> event.getType().equals(typeFilter));
-        }
-        if (statusFilter != null) {
-            predicates.add(event -> event.getStatus().equals(statusFilter));
-        }
+        return event -> true;
+    }
 
-        if (predicates.isEmpty()) {
-            return event -> true;
+    public Predicate<Event> getLocationFilter() {
+        if (location != null) {
+            return event -> event.getLocation().equals(location);
         }
+        return event -> true;
+    }
 
-        Predicate<Event> out = predicates.get(0);
-        for (int i = 1; i < predicates.size(); i++) {
-            out = out.and(predicates.get(i));
+    public Predicate<Event> getTypeFilter() {
+        if (type != null) {
+            return event -> event.getType().equals(type);
         }
-        return out;
+        return event -> true;
+    }
+
+    public Predicate<Event> getStatusFilter() {
+        if (status != null) {
+            return event -> event.getStatus().equals(status);
+        }
+        return event -> true;
     }
 }

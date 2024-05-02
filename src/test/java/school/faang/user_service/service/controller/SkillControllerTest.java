@@ -6,11 +6,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.controller.SkillController;
+import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SkillService;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 
@@ -68,6 +68,19 @@ public class SkillControllerTest {
         List<SkillDto> actualSkills = skillController.getUserSkills(userId);
 
         assertEquals(expectedSkills, actualSkills);
+    }
+
+    @Test
+    public void testGetOfferedSkills() {
+        long userId = 1L;
+        List<SkillCandidateDto> expectedSkillCandidateDto = Arrays.asList
+                (new SkillCandidateDto(new SkillDto(1L, "firstTestInfo"), 1L),
+                        new SkillCandidateDto(new SkillDto(2L, "secondTestInfo"), 2L));
+        when(skillService.getOfferedSkills(userId)).thenReturn(expectedSkillCandidateDto);
+
+        List<SkillCandidateDto> candidateDtoList = skillController.getOfferedSkills(userId);
+
+        assertEquals(expectedSkillCandidateDto, candidateDtoList);
     }
 
     private SkillDto createSkillDto(String title) {

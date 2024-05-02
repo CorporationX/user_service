@@ -9,7 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.exceptions.event.DataValidationException;
 import school.faang.user_service.service.event.EventService;
 
 import java.time.LocalDateTime;
@@ -17,7 +16,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,38 +41,6 @@ class EventControllerTest {
                 .build();
     }
 
-    @Test
-    void createNullEvent() {
-        assertThrows(NullPointerException.class, () -> controller.create(null));
-    }
-
-    @Test
-    void createNullTitleEvent() {
-        event.setTitle(null);
-        DataValidationException e = assertThrows(DataValidationException.class, () -> controller.create(event));
-        assertEquals("title can't be null - " + event, e.getMessage());
-    }
-
-    @Test
-    void createBlankTitleEvent() {
-        event.setTitle("");
-        DataValidationException e = assertThrows(DataValidationException.class, () -> controller.create(event));
-        assertEquals("title can't be blank - " + event, e.getMessage());
-    }
-
-    @Test
-    void createNullStartDateEvent() {
-        event.setStartDate(null);
-        DataValidationException e = assertThrows(DataValidationException.class, () -> controller.create(event));
-        assertEquals("start date can't be null - " + event, e.getMessage());
-    }
-
-    @Test
-    void createNullOwnerIdEvent() {
-        event.setOwnerId(null);
-        DataValidationException e = assertThrows(DataValidationException.class, () -> controller.create(event));
-        assertEquals("event owner can't be null - " + event, e.getMessage());
-    }
 
     @Test
     void createGoodEvent() {
@@ -99,39 +65,6 @@ class EventControllerTest {
     void deleteEvent() {
         when(service.deleteEvent(1L)).thenReturn(event);
         assertEquals(event, controller.deleteEvent(1L));
-    }
-
-    @Test
-    void updateNullEvent() {
-        assertThrows(NullPointerException.class, () -> controller.create(null));
-    }
-
-    @Test
-    void updateNullTitleEvent() {
-        event.setTitle(null);
-        DataValidationException e = assertThrows(DataValidationException.class, () -> controller.updateEvent(event));
-        assertEquals("title can't be null - " + event, e.getMessage());
-    }
-
-    @Test
-    void updateBlankTitleEvent() {
-        event.setTitle("");
-        DataValidationException e = assertThrows(DataValidationException.class, () -> controller.updateEvent(event));
-        assertEquals("title can't be blank - " + event, e.getMessage());
-    }
-
-    @Test
-    void updateNullStartDateEvent() {
-        event.setStartDate(null);
-        DataValidationException e = assertThrows(DataValidationException.class, () -> controller.updateEvent(event));
-        assertEquals("start date can't be null - " + event, e.getMessage());
-    }
-
-    @Test
-    void updateNullOwnerIdEvent() {
-        event.setOwnerId(null);
-        DataValidationException e = assertThrows(DataValidationException.class, () -> controller.updateEvent(event));
-        assertEquals("event owner can't be null - " + event, e.getMessage());
     }
 
     @Test

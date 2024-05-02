@@ -39,19 +39,19 @@ public class EventServiceImpl implements EventService {
     }
 
     public EventDto updateEvent(@NonNull EventDto event) {
-        if (hasOwnerEnoughSkillsForEvent(event)) {
+        if (doesOwnerHasRequiredSkills(event)) {
             Event eventEntity = mapper.toEntity(event);
             Event saved = eventRepository.save(eventEntity);
             return mapper.toDto(saved);
         } else {
-            throw new DataValidationException(String.format("user with id=%d has no enough skills to update event", event.getOwnerId()));
+            throw new DataValidationException("user with id=" + event.getOwnerId() + " has no enough skills to update event");
         }
     }
 
     public EventDto deleteEvent(long eventId) {
         Event eventToDelete = eventRepository
                 .findById(eventId)
-                .orElseThrow(() -> new EventNotFoundException(String.format("cannot find event with id=%d", eventId)));
+                .orElseThrow(() -> new EventNotFoundException("cannot find event with id=" + eventId));
         eventRepository.deleteById(eventToDelete.getId());
         return mapper.toDto(eventToDelete);
     }
@@ -66,25 +66,27 @@ public class EventServiceImpl implements EventService {
     public EventDto getEvent(long eventId) {
         Event event = eventRepository
                 .findById(eventId)
-                .orElseThrow(() -> new EventNotFoundException(String.format("cannot find event with id=%d", eventId)));
+                .orElseThrow(() -> new EventNotFoundException("cannot find event with id=" + eventId));
         return mapper.toDto(event);
     }
 
     public EventDto create(@NonNull EventDto event) {
-        if (hasOwnerEnoughSkillsForEvent(event)) {
+        if (doesOwnerHasRequiredSkills(event)) {
             Event eventEntity = mapper.toEntity(event);
             Event saved = eventRepository.save(eventEntity);
             return mapper.toDto(saved);
         } else {
-            throw new DataValidationException(String.format("user with id=%d has no enough skills to create event", event.getOwnerId()));
+            throw new DataValidationException("user with id=" + event.getOwnerId() + " has no enough skills to create event");
         }
     }
 
-    private boolean hasOwnerEnoughSkillsForEvent(EventDto event) {
+    private boolean doesOwnerHasRequiredSkills(EventDto event) {
         User user = userRepository
                 .findById(event.getOwnerId())
-                .orElseThrow(() -> new DataValidationException(String.format("owner with id=%d not found", event.getOwnerId())));
-        Set<Long> requiredSkillsIds = user.getSkills().stream().map(Skill::getId).collect(Collectors.toSet());
+                .orElseThrow(() -> new DataValidationException("owner with id=" + event.getOwnerId() + " not found"));
+        Set<Long> requiredSkillsIds = user.getSkills().stream()
+                .map(Skill::getId)
+                .collect(Collectors.toSet());
         return event.getRelatedSkills().stream()
                 .map(SkillDto::getId)
                 .allMatch(requiredSkillsIds::contains);

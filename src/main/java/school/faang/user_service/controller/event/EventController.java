@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
-import school.faang.user_service.exceptions.event.DataValidationException;
 import school.faang.user_service.service.event.EventService;
+import school.faang.user_service.validator.event.EventValidator;
 
 import java.util.List;
 
@@ -13,6 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EventController {
     private final EventService eventService;
+    private final EventValidator eventValidator;
 
     public List<EventDto> getParticipatedEvents(long userId) {
         return eventService.getParticipatedEvents(userId);
@@ -23,7 +24,7 @@ public class EventController {
     }
 
     public EventDto updateEvent(EventDto event) {
-        validate(event);
+        eventValidator.validate(event);
         return eventService.updateEvent(event);
     }
 
@@ -40,22 +41,7 @@ public class EventController {
     }
 
     public EventDto create(EventDto event) {
-        validate(event);
+        eventValidator.validate(event);
         return eventService.create(event);
-    }
-
-    private void validate(EventDto event) {
-        if (event.getTitle() == null) {
-            throw new DataValidationException(String.format("title can't be null - %s", event));
-        }
-        if (event.getTitle().isBlank()) {
-            throw new DataValidationException(String.format("title can't be blank - %s", event));
-        }
-        if (event.getStartDate() == null) {
-            throw new DataValidationException(String.format("start date can't be null - %s", event));
-        }
-        if (event.getOwnerId() == null) {
-            throw new DataValidationException(String.format("event owner can't be null - %s", event));
-        }
     }
 }

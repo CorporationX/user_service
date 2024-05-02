@@ -1,4 +1,4 @@
-package school.faang.user_service.exceptions;
+package school.faang.user_service.exception;
 
 public enum ExceptionMessage {
     USER_FOLLOWING_HIMSELF_EXCEPTION("The user cannot follow himself."),

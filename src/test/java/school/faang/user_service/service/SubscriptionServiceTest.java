@@ -10,7 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exceptions.DataValidationException;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
 
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static school.faang.user_service.exceptions.ExceptionMessage.REPEATED_SUBSCRIPTION_EXCEPTION;
+import static school.faang.user_service.exception.ExceptionMessage.REPEATED_SUBSCRIPTION_EXCEPTION;
 
 @ExtendWith(MockitoExtension.class)
 class SubscriptionServiceTest {

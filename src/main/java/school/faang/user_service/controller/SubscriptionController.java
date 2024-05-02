@@ -4,13 +4,13 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
-import school.faang.user_service.exceptions.DataValidationException;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SubscriptionService;
 
 import java.util.List;
 
-import static school.faang.user_service.exceptions.ExceptionMessage.USER_FOLLOWING_HIMSELF_EXCEPTION;
-import static school.faang.user_service.exceptions.ExceptionMessage.USER_UNFOLLOWING_HIMSELF_EXCEPTION;
+import static school.faang.user_service.exception.ExceptionMessage.USER_FOLLOWING_HIMSELF_EXCEPTION;
+import static school.faang.user_service.exception.ExceptionMessage.USER_UNFOLLOWING_HIMSELF_EXCEPTION;
 
 @Controller
 @AllArgsConstructor

@@ -10,7 +10,6 @@ import school.faang.user_service.entity.goal.Goal;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface GoalMapper {
 
-    @Mapping(source = "parent.id", target = "parentId")
     GoalDto toDto (Goal goal);
     Goal toEntity(GoalDto goalDto);
     void update (GoalDto dto, @MappingTarget Goal entity);

@@ -1,193 +1,97 @@
 package school.faang.user_service.service.goal;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.ValidationException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
-import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.TooManyGoalsException;
+import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.GoalMapper;
-import school.faang.user_service.mapper.SkillMapper;
-import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.skill.SkillService;
+import school.faang.user_service.validator.GoalValidator;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
+@Service
+@RequiredArgsConstructor
 public class GoalServiceImpl implements GoalService {
     private static final int MAX_GOALS_AMOUNT = 3;
 
-    private GoalRepository goalRepository;
-    private UserRepository userRepository;
-    private SkillRepository skillRepository;
-    private SkillService skillService;
-    private GoalMapper goalMapper;
-    private SkillMapper skillMapper;
-    private List<GoalFilterDto> filters;
+    private final GoalRepository goalRepository;
+    private final UserRepository userRepository;
+    private final SkillService skillService;
+    private final GoalMapper goalMapper;
+    private final GoalValidator goalValidator;
 
 
     @Override
-    public Stream<Goal> findGoalsByUserId(long userId) {
-        return null;
+    public List<GoalDto> findGoalsByUserId(long userId, GoalFilterDto goalFilterDto) {
+        List<GoalDto> goals = goalRepository
+                .findGoalsByUserId(userId)
+                .map(goalMapper::toDto)
+                .toList();
+
+        return goals.stream()
+                .filter(goal -> goalFilterDto.getTitle() == null || goal.getTitle().equals(goalFilterDto.getTitle()))
+                .filter(goal -> goalFilterDto.getGoalStatus() == null || goal.getStatus() == goalFilterDto.getGoalStatus())
+                .sorted(Comparator.comparing(GoalDto::getId))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Goal create(String title, String description, long parent) {
-        return null;
-    }
-
-    @Override
-    public int countActiveGoalsPerUser(long userId) {
-        return 0;
-    }
-
-    @Override
-    public Stream<Goal> findByParent(long goalId) {
-        return goalRepository.findByParent(goalId);
-    }
-
-    @Override
-    public int countUsersSharingGoal(long goalId) {
-        return 0;
-    }
-
-    @Override
-    public List<User> findUsersByGoalId(long goalId) {
-        return null;
-    }
-
-    @Override
-    public void removeSkillsFromGoal(long goalId) {
-
-    }
-
-    @Override
-    public void addSkillToGoal(long skillId, long goalId) {
-
-    }
-
     public GoalDto createGoal(Long userId, Goal goal) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-        User user = getUser(userId);
-        validateGoalCreation(user, goal);
+        goalValidator.validateGoalCreation(user, goal, MAX_GOALS_AMOUNT);
 
-        saveGoalSkills(goal);
-        Goal goalToCreate = goalRepository.create(goal.getTitle(), goal.getDescription(), goal.getParent().getId());
+        goal.getSkillsToAchieve()
+                .forEach(skill -> skill.getGoals().add(goal));
 
-        return goalMapper.toDto(goalToCreate);
+        skillService.saveAll(goal.getSkillsToAchieve());
+
+        return goalMapper.toDto(goalRepository.save(goal));
     }
 
+    @Override
     public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
         Goal goalToUpdate = goalRepository.findById(goalId)
                 .orElseThrow(() -> new EntityNotFoundException("Goal not found"));
 
-        if (goalToUpdate.getStatus().equals("COMPLETED")) {
-            throw new ValidationException("Goal is already completed");
-        }
-
-        if (!allSkillsExist(goalToUpdate)) {
-            throw new ValidationException("Goal contains skills that don't exist");
-        }
-
-        if (goalDto.getStatus().equals("COMPLETED")) {
-            updateSkills(goalId, goalDto);
-        }
+        goalValidator.validateGoalUpdate(goalToUpdate);
 
         goalMapper.update(goalDto, goalToUpdate);
-        goalRepository.save(goalToUpdate);
-        return goalMapper.toDto(goalToUpdate);
+
+        return goalMapper.toDto(goalRepository.save(goalToUpdate));
     }
 
+    @Override
     public void deleteGoal(long goalId) {
-        Goal goal = goalRepository
-                .findById(goalId)
-                .orElseThrow(() -> new EntityNotFoundException("Goal with id: " + goalId + "not found"));
+        Goal goal = goalRepository.findById(goalId)
+                .orElseThrow(() -> new EntityNotFoundException("Goal with id: " + goalId + " not found"));
 
-        goalRepository.deleteById(goalId);
+        goalRepository.delete(goal);
     }
 
+    @Override
     public List<GoalDto> findSubtasksByGoalId(long goalId) {
-        Stream<Goal> subtasks = findByParent(goalId);
+        List<Goal> subtasks = goalRepository.findByParent(goalId)
+                .toList();
 
-        if (subtasks.findAny().isEmpty()) {
+        if (subtasks.isEmpty()) {
             throw new EntityNotFoundException("No subtasks found for goal with id: " + goalId);
         }
 
-        return subtasks
+        return subtasks.stream()
                 .sorted(Comparator.comparing(Goal::getId))
                 .map(goalMapper::toDto)
                 .collect(Collectors.toList());
-    }
-
-    private void updateSkills(Long goalId, GoalDto goalDto) {
-        List<User> users = goalRepository.findUsersByGoalId(goalId);
-        for (User user : users) {
-            user.getSkills().add((Skill) goalDto.getSkillIds());
-        }
-    }
-
-    private void saveGoalSkills(Goal goal) {
-        List<Skill> skills = goal.getSkillsToAchieve().stream()
-                .peek(skill -> skill.getGoals().add(goal))
-                .toList();
-
-        skillService.saveAll(skills);
-    }
-
-    private void validateGoalCreation(User user, Goal goal) {
-        int goalsAmount = user.getGoals().size();
-
-        if (goalsAmount >= MAX_GOALS_AMOUNT) {
-            throw new TooManyGoalsException();
-        }
-
-        if (!allSkillsExist(goal)) {
-            throw new EntityNotFoundException("Skill not exist");
-        }
-    }
-
-    private boolean allSkillsExist(Goal goal) {
-        return goal.getSkillsToAchieve().stream()
-                .map(Skill::getId)
-                .allMatch(skillService::checkActiveSkill);
-    }
-
-    private User getUser(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-    }
-
-    public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto goalFilterDto) {
-        Stream<Goal> userGoalsStream = goalRepository.findGoalsByUserId(userId);
-        return applyFilterAndMapToDto(userGoalsStream, goalFilterDto);
-    }
-
-    private List<GoalDto> applyFilterAndMapToDto(Stream<Goal> userGoalsStream, GoalFilterDto filter) {
-        List<GoalDto> filteredGoals = userGoalsStream
-                .filter(goal -> matchesFilter(goal, filter))
-                .map(goalMapper::toDto)
-                .collect(Collectors.toList());
-        return filteredGoals;
-    }
-
-    private boolean matchesFilter(Goal goal, GoalFilterDto filter) {
-        if (filter == null) {
-            return true;
-        }
-        if (filter.getTitle() != null && !goal.getTitle().contains(filter.getTitle())) {
-            return false;
-        }
-        if (filter.getGoalStatus() != null && goal.getStatus() != filter.getGoalStatus()) {
-            return false;
-        }
-        return true;
     }
 }

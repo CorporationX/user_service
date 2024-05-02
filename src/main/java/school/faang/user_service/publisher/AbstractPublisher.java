@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-
 @RequiredArgsConstructor
 @Slf4j
 public abstract class AbstractPublisher<T> {
@@ -23,7 +22,6 @@ public abstract class AbstractPublisher<T> {
             log.warn( "Exception with json processing at class"  + AbstractPublisher.class);
             throw new RuntimeException(e);
         }
-
         redisTemplate.convertAndSend(channel, json);
     }
 }

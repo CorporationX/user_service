@@ -26,9 +26,7 @@ public class MentorshipRequestDto{
     @NotNull(message = "Mentor cannot be blank")
     private User receiver;
 
-
     private RequestStatus status;
-
 
     private LocalDateTime createdAt;
 

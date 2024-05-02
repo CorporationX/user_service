@@ -38,21 +38,21 @@ public class MentorshipRequestService{
         User mentee=mentorshipRequestDto.getRequester();
 
         if(mentor.equals(mentee)){
-            log.warn("You cannot be mentor to yourself!"  + mentee );
+            log.warn("You cannot be mentor to yourself!"+mentee);
             throw new DataValidationException("You cannot be mentor to yourself!");
         }
 
-        long mentor_id = mentor.getId();
-        long mentee_id = mentee.getId();
+        long mentor_id=mentor.getId();
+        long mentee_id=mentee.getId();
 
         checkIfUserExists(mentor_id);
         checkIfUserExists(mentee_id);
 
         if(!isAllowedToMakeRequest(mentee_id, mentor_id)){
-           throw new DataValidationException("previous request was made earlier than 3 months!");
+            throw new DataValidationException("previous request was made earlier than 3 months!");
         }
 
-        MentorshipRequest mentorshipRequest = mentorshipRequestRepository.save(mentorshipMapper
+        MentorshipRequest mentorshipRequest=mentorshipRequestRepository.save(mentorshipMapper
                 .toEntity(mentorshipRequestDto));
 
         return mentorshipMapper.toDto(mentorshipRequest);
@@ -62,7 +62,7 @@ public class MentorshipRequestService{
 
         MentorshipRequest mentorshipRequest=mentorshipRequestRepository.findById(id)
                 .orElseThrow(()->{
-                    log.warn("No request with such id " + id);
+                    log.warn("No request with such id "+id);
                     return new EntityNotFoundException("No request with such id "+id);
 
                 });
@@ -87,12 +87,12 @@ public class MentorshipRequestService{
 
     private boolean isAllowedToMakeRequest(long mentee_id, long mentor_id){
 
-        LocalDateTime threeMonthsAgo = LocalDateTime.now().minus( 3, ChronoUnit.MONTHS);
-        Optional<MentorshipRequest> latestRequest = mentorshipRequestRepository
+        LocalDateTime threeMonthsAgo=LocalDateTime.now().minus(3, ChronoUnit.MONTHS);
+        Optional<MentorshipRequest> latestRequest=mentorshipRequestRepository
                 .findLatestRequest(mentee_id, mentor_id);
 
         if(latestRequest.isPresent()){
-            LocalDateTime requestedAt = latestRequest.get().getCreatedAt();
+            LocalDateTime requestedAt=latestRequest.get().getCreatedAt();
             return requestedAt.isBefore(threeMonthsAgo);
         }else{
             log.warn("Error:previous request was made earlier than 3 months");
@@ -104,9 +104,10 @@ public class MentorshipRequestService{
 
         userRepository.findById(userId)
                 .orElseThrow(()->{
-                    log.warn("No user with such id "  + userId );
-                    return new EntityNotFoundException("No user with such id "  + userId );
+                    log.warn("No user with such id "+userId);
+                    return new EntityNotFoundException("No user with such id "+userId);
 
                 });
     }
+
 }

@@ -13,9 +13,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -159,5 +157,20 @@ class SubscriptionServiceTest {
         //then
         verify(subscriptionRepo, times(1)).findFollowersAmountByFolloweeId(followeeArgumentCaptor.capture());
         assertEquals(followeeId, followeeArgumentCaptor.getValue());
+    }
+
+    @Test
+    void getFollowingTest() {
+        //before
+        Stream<User> allFollowing = new ArrayList<User>().stream();
+        when(subscriptionRepo.findByFollowerId(followerId)).thenReturn(allFollowing);
+
+        //when
+        var actualFollowing = subscriptionService.getFollowing(followerId, new UserFilterDto());
+
+        //then
+        verify(subscriptionRepo, times(1)).findByFollowerId(followerArgumentCaptor.capture());
+        assertEquals(followerId, followerArgumentCaptor.getValue());
+        assertEquals(new ArrayList<UserDto>(), actualFollowing);
     }
 }

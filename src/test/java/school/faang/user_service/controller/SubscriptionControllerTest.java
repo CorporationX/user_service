@@ -29,6 +29,7 @@ class SubscriptionControllerTest {
 
     ArgumentCaptor<Long> followerArgumentCaptor;
     ArgumentCaptor<Long> followeeArgumentCaptor;
+    ArgumentCaptor<UserFilterDto> filterArgumentCaptor;
 
     Long followerId;
     Long followeeId;
@@ -37,6 +38,7 @@ class SubscriptionControllerTest {
     void init() {
         followerArgumentCaptor = ArgumentCaptor.forClass(Long.class);
         followeeArgumentCaptor = ArgumentCaptor.forClass(Long.class);
+        filterArgumentCaptor = ArgumentCaptor.forClass(UserFilterDto.class);
 
         followerId = 1L;
         followeeId = 2L;
@@ -106,7 +108,6 @@ class SubscriptionControllerTest {
     @Test
     void getFollowersTest() {
         //before
-        var filterArgumentCaptor = ArgumentCaptor.forClass(UserFilterDto.class);
         var filter = new UserFilterDto();
 
         //when
@@ -128,5 +129,20 @@ class SubscriptionControllerTest {
         //then
         verify(subscriptionService, times(1)).getFollowersCount(followeeArgumentCaptor.capture());
         assertEquals(followeeId, followeeArgumentCaptor.getValue());
+    }
+
+    @Test
+    void getFollowingTest() {
+        //before
+        var filter = new UserFilterDto();
+
+        //when
+        subscriptionController.getFollowing(followerId, filter);
+
+
+        //then
+        verify(subscriptionService, times(1)).getFollowing(followerArgumentCaptor.capture(), filterArgumentCaptor.capture());
+        assertEquals(filter, filterArgumentCaptor.getValue());
+        assertEquals(followerId, followerArgumentCaptor.getValue());
     }
 }

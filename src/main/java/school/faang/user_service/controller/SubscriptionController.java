@@ -1,7 +1,6 @@
 package school.faang.user_service.controller;
 
 import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
@@ -19,7 +18,7 @@ public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
     public void followUser(long followerId, long followeeId) {
-        if(followerId == followeeId) {
+        if (followerId == followeeId) {
             throw new DataValidationException(USER_FOLLOWING_HIMSELF_EXCEPTION.getMessage());
         }
 
@@ -27,7 +26,7 @@ public class SubscriptionController {
     }
 
     public void unfollowUser(long followerId, long followeeId) {
-        if(followerId == followeeId) {
+        if (followerId == followeeId) {
             throw new DataValidationException(USER_UNFOLLOWING_HIMSELF_EXCEPTION.getMessage());
         }
 
@@ -35,10 +34,14 @@ public class SubscriptionController {
     }
 
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filter) {
-       return subscriptionService.getFollowers(followeeId, filter);
+        return subscriptionService.getFollowers(followeeId, filter);
     }
 
     public int getFollowersCount(long followeeId) {
         return subscriptionService.getFollowersCount(followeeId);
+    }
+
+    public List<UserDto> getFollowing(long followerId, UserFilterDto filter) {
+        return subscriptionService.getFollowing(followerId, filter);
     }
 }

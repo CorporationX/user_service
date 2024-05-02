@@ -18,7 +18,6 @@ import school.faang.user_service.util.SkillValidator;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -35,7 +34,7 @@ public class SkillService {
 
     @Transactional
     public SkillDto create(SkillDto skillDto) {
-        skillValidator.validateExistSkillByTitle(skillRepository.existsByTitle(skillDto.getTitle()), skillDto.getTitle());
+        skillValidator.validateExistSkillByTitle(skillDto.getTitle());
 
         Skill skill = skillMapper.dtoToSkill(skillDto);
         return skillMapper.skillToDto(skillRepository.save(skill));
@@ -58,8 +57,7 @@ public class SkillService {
 
     @Transactional
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
-        Optional<Skill> userSkill = skillRepository.findUserSkill(skillId, userId);
-        skillValidator.validateSkillPresent(userSkill.isPresent(), skillId, userId);
+        skillValidator.validateSkillPresent(skillId, userId);
 
         log.info("Find all skill offers for skill {} and user {}", skillId, userId);
         List<SkillOffer> skillOfferList = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
@@ -69,8 +67,14 @@ public class SkillService {
         log.info("Add skill with ID: {} to user with ID: {}", skillId, userId);
         skillRepository.assignSkillToUser(skillId, userId);
 
-        //Create guarantors for user skill
         Skill skill = skillOfferList.get(0).getSkill();
+
+        createGuarantorsForUserSkill(skillOfferList, skill);
+
+        return skillMapper.skillToDto(skill);
+    }
+
+    private void createGuarantorsForUserSkill(List<SkillOffer> skillOfferList, Skill skill) {
         skillOfferList.stream()
                 .map(SkillOffer::getRecommendation)
                 .forEach(recommendation -> {
@@ -79,7 +83,5 @@ public class SkillService {
                     userSkillGuaranteeRepository
                             .save(new UserSkillGuarantee(null, recommendation.getReceiver(), skill, recommendation.getAuthor()));
                 });
-
-        return skillMapper.skillToDto(skill);
     }
 }

@@ -21,7 +21,6 @@ import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.util.SkillValidator;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -80,7 +79,6 @@ public class SkillServiceTest {
                 .title(SKILL_TITLE)
                 .build();
 
-        when(skillRepository.existsByTitle(skillDto.getTitle())).thenReturn(false);
         when(skillRepository.save(skill)).thenReturn(savedSkill);
         when(skillMapper.dtoToSkill(skillDto)).thenReturn(skill);
         when(skillMapper.skillToDto(savedSkill)).thenReturn(savedSkillDto);
@@ -91,9 +89,8 @@ public class SkillServiceTest {
 
     @Test
     public void createExistsSkillWithException() {
-        when(skillRepository.existsByTitle(skillDto.getTitle())).thenReturn(true);
         String ERR_MSG = "Skill with title: '" + skillDto.getTitle() + "' already exists in DB";
-        doThrow(new DataValidationException(ERR_MSG)).when(skillValidator).validateExistSkillByTitle(true, skillDto.getTitle());
+        doThrow(new DataValidationException(ERR_MSG)).when(skillValidator).validateExistSkillByTitle(skillDto.getTitle());
 
         DataValidationException exception = assertThrows(DataValidationException.class, () -> skillService.create(skillDto));
 
@@ -143,9 +140,8 @@ public class SkillServiceTest {
 
     @Test
     public void acquireSkillFromOffersWhenSkillExists() {
-        when(skillRepository.findUserSkill(SKILL_CREATED_ID, USER_ID)).thenReturn(Optional.of(savedSkill));
         String ERR_MSG = "User " + USER_ID + " already has skill with ID: " + SKILL_CREATED_ID;
-        doThrow(new DataValidationException(ERR_MSG)).when(skillValidator).validateSkillPresent(true, SKILL_CREATED_ID, USER_ID);
+        doThrow(new DataValidationException(ERR_MSG)).when(skillValidator).validateSkillPresent(SKILL_CREATED_ID, USER_ID);
 
         DataValidationException exception = assertThrows(DataValidationException.class, () -> skillService.acquireSkillFromOffers(SKILL_CREATED_ID, USER_ID));
         assertThat(exception.getMessage()).isEqualTo(ERR_MSG);
@@ -158,7 +154,6 @@ public class SkillServiceTest {
         List<SkillOffer> skillOfferList = List.of(offer1, offer2);
         String OFFER_ERR_MSG = "Skill with ID: " + SKILL_CREATED_ID + " hasn't enough offers for user with ID: " + USER_ID;
 
-        when(skillRepository.findUserSkill(SKILL_CREATED_ID, USER_ID)).thenReturn(Optional.empty());
         when(skillOfferRepository.findAllOffersOfSkill(SKILL_CREATED_ID, USER_ID)).thenReturn(skillOfferList);
         doThrow(new DataValidationException(OFFER_ERR_MSG)).when(skillValidator).validateMinSkillOffers(skillOfferList.size(), SKILL_CREATED_ID, USER_ID);
 
@@ -177,7 +172,6 @@ public class SkillServiceTest {
         SkillOffer offer3 = new SkillOffer(3, savedSkill, Recommendation.builder().author(author3).receiver(receiver).build());
         List<SkillOffer> skillOfferList = List.of(offer1, offer2, offer3);
 
-        when(skillRepository.findUserSkill(SKILL_CREATED_ID, USER_ID)).thenReturn(Optional.empty());
         when(skillOfferRepository.findAllOffersOfSkill(SKILL_CREATED_ID, USER_ID)).thenReturn(skillOfferList);
         when(skillMapper.skillToDto(savedSkill)).thenReturn(savedSkillDto);
 

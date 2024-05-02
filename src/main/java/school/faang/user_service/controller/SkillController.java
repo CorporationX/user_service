@@ -38,7 +38,6 @@ public class SkillController {
         return skillService.getUserSkills(userId);
     }
 
-
     @GetMapping("/offered/user/{userId}")
     public List<SkillCandidateDto> getOfferedSkills(@PathVariable("userId") long userId) {
         return skillService.getOfferedSkills(userId);

@@ -1,18 +1,26 @@
 package school.faang.user_service.util;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.skill.SkillDto;
+import school.faang.user_service.entity.Skill;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.repository.SkillRepository;
+
+import java.util.Optional;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class SkillValidator {
 
     @Value("${skill.offers.min}")
     private long MIN_SKILL_OFFERS;
     private static final String EMPTY_TITLE_MSG = "Skill title can't be empty";
+
+    private final SkillRepository skillRepository;
 
     public static void validateSkill(SkillDto skill) {
         if (skill.getTitle().isBlank() || skill.getTitle().isEmpty()) {
@@ -21,7 +29,8 @@ public class SkillValidator {
         }
     }
 
-    public void validateExistSkillByTitle(boolean checkResult, String title) {
+    public void validateExistSkillByTitle(String title) {
+        boolean checkResult = skillRepository.existsByTitle(title);
         if (checkResult) {
             String error = "Skill with title: '" + title + "' already exists in DB";
             log.error(error);
@@ -29,8 +38,9 @@ public class SkillValidator {
         }
     }
 
-    public void validateSkillPresent(boolean presentSkill, long skillId, long userId) {
-        if (presentSkill) {
+    public void validateSkillPresent(long skillId, long userId) {
+        Optional<Skill> userSkill = skillRepository.findUserSkill(skillId, userId);
+        if (userSkill.isPresent()) {
             throw new DataValidationException("User " + userId + " already has skill with ID: " + skillId);
         }
     }

@@ -14,16 +14,19 @@ import school.faang.user_service.exceptions.event.EventNotFoundException;
 import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.service.event.filter.EventFilter;
 
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
+    private final List<EventFilter> eventFilters;
     private final EventMapper mapper;
 
     public List<EventDto> getParticipatedEvents(long userId) {
@@ -55,9 +58,11 @@ public class EventServiceImpl implements EventService {
         return mapper.toDto(eventToDelete);
     }
 
-    public List<EventDto> getEventsByFilter(@NonNull EventFilterDto filter) {
-        return eventRepository.findAll().stream()
-                .filter(filter.toPredicate())
+    public List<EventDto> getEventsByFilter(@NonNull EventFilterDto filters) {
+        Stream<Event> events = eventRepository.findAll().stream();
+        return eventFilters.stream()
+                .filter(filter -> filter.isAcceptable(filters))
+                .flatMap(filter -> filter.apply(events, filters))
                 .map(mapper::toDto)
                 .toList();
     }

@@ -10,6 +10,7 @@ import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.service.event.EventService;
+import school.faang.user_service.validator.event.EventValidator;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,6 +23,8 @@ import static org.mockito.Mockito.when;
 class EventControllerTest {
     @Mock
     private EventService service;
+    @Mock
+    private EventValidator validator;
     @InjectMocks
     private EventController controller;
     private EventDto event;

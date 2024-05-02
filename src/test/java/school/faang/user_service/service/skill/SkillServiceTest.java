@@ -7,13 +7,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.SkillCandidateDto;
 import school.faang.user_service.dto.SkillDto;
+import school.faang.user_service.dto.event.SkillOfferedEvent;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.handler.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
+import school.faang.user_service.publisher.MessagePublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
@@ -31,6 +33,10 @@ public class SkillServiceTest {
     private SkillMapper skillMapper;
     @Mock
     private SkillOfferRepository skillOfferRepository;
+    @Mock
+    private UserContext userContext;
+    @Mock
+    private MessagePublisher<SkillOfferedEvent> skillOfferedEventPublisher;
     @InjectMocks
     private SkillService skillService;
 
@@ -146,18 +152,28 @@ public class SkillServiceTest {
     public void testAcquireSkillFromOffers() {
         long skillId = 1L;
         long userId = 1L;
+        long senderId = 2L;
+        String titleSkill = "title1";
 
         Skill skill = new Skill();
         skill.setId(skillId);
-        skill.setTitle("title1");
+        skill.setTitle(titleSkill);
 
         SkillDto skillDto = new SkillDto();
         skillDto.setId(userId);
-        skillDto.setTitle("title1");
+        skillDto.setTitle(titleSkill);
+
+        SkillOfferedEvent skillOfferedEvent = SkillOfferedEvent.builder()
+                .skillId(skillId)
+                .recipientUserId(userId)
+                .senderUserId(senderId)
+                .titleSkill(titleSkill)
+                .build();
 
         Mockito.when(skillRepository.findById(skillId)).thenReturn(Optional.of(skill));
         Mockito.when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.empty());
         Mockito.when(skillOfferRepository.findAllOffersOfSkill(skillId, userId)).thenReturn(Arrays.asList(new SkillOffer(), new SkillOffer()));
+        Mockito.when(userContext.getUserId()).thenReturn(senderId);
         Mockito.when(skillMapper.toDtoSkill(skill)).thenReturn(skillDto);
 
         SkillDto result = skillService.acquireSkillFromOffers(skillId, userId);
@@ -165,6 +181,7 @@ public class SkillServiceTest {
         Mockito.verify(skillRepository, Mockito.times(1)).findById(skillId);
         Mockito.verify(skillRepository, Mockito.times(1)).findUserSkill(skillId, userId);
         Mockito.verify(skillOfferRepository, Mockito.times(1)).findAllOffersOfSkill(skillId, userId);
+        Mockito.verify(skillOfferedEventPublisher, Mockito.times(1)).publish(skillOfferedEvent);
         Mockito.verify(skillMapper, Mockito.times(1)).toDtoSkill(skill);
 
         Assert.assertEquals(skillDto, result);

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.event.ProfileViewEvent;
+import school.faang.user_service.dto.event.UserEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.event.EventStatus;
@@ -52,6 +53,13 @@ public class UserService {
         user.setActive(true);
         User createdUser = userRepository.save(user);
         return userMapper.toDto(createdUser);
+    }
+
+    public void banUser(UserEvent userEvent){
+        User user = getUser(userEvent.getUserId());
+        user.setBanned(true);
+        userRepository.save(user);
+        log.info(String.format("User with id:%d banned :)", userEvent.getUserId()));
     }
 
     private UserProfilePic getRandomAvatar() {

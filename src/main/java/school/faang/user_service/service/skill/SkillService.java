@@ -1,30 +1,34 @@
 package school.faang.user_service.service.skill;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.SkillCandidateDto;
 import school.faang.user_service.dto.SkillDto;
+import school.faang.user_service.dto.event.SkillOfferedEvent;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.handler.exception.DataValidationException;
+import school.faang.user_service.handler.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.SkillMapper;
+import school.faang.user_service.publisher.MessagePublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SkillService {
     private final SkillRepository skillRepository;
     private final SkillMapper skillMapper;
     private final SkillOfferRepository skillOfferRepository;
+    private final UserContext userContext;
+    private final MessagePublisher<SkillOfferedEvent> skillOfferedEventPublisher;
 
     public SkillDto create(SkillDto skillDto) {
         validateSkill(skillDto);
@@ -75,6 +79,22 @@ public class SkillService {
                 skillRepository.assignSkillToUser(skillId, userId);
             }
         }
+        log.info(String.format("User with id: %d acquire skill id: %d", userId, skillId));
+        publishSkillOffered(skillId, skill.getTitle(), userId);
         return skillMapper.toDtoSkill(skill);
+    }
+
+    public Skill getSkillById(long skillId){
+        return skillRepository.findById(skillId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Skill by id: %s not found", skillId)));
+    }
+
+    private void publishSkillOffered(long skillId, String skillName, long userId){
+        skillOfferedEventPublisher.publish(SkillOfferedEvent.builder()
+                .recipientUserId(userId)
+                .senderUserId(userContext.getUserId())
+                .skillId(skillId)
+                .titleSkill(skillName)
+                .build());
     }
 }

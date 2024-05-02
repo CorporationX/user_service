@@ -1,6 +1,5 @@
 package school.faang.user_service.config;
 
-import lombok.RequiredArgsConstructor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +12,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
-import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import school.faang.user_service.subscriber.UsersBanListener;
@@ -28,9 +26,9 @@ public class RedisConfig {
     private int port;
     @Value("${topic.user_ban}")
     private String userBanTopic;
-    private final UsersBanListener usersBanListener;
     @Value("${spring.data.redis.channels.profile_view_channel.name}")
     private String profileViewChannel;
+    private final UsersBanListener usersBanListener;
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
@@ -67,7 +65,7 @@ public class RedisConfig {
         return container;
     }
 
-    @Bean(name = "profileViewTopic")
+    @Bean
     public ChannelTopic profileViewTopic() {
         return new ChannelTopic(profileViewChannel);
     }

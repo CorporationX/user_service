@@ -1,14 +1,14 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 
-@Slf4j
+import java.util.List;
+
 @RequiredArgsConstructor
 @Component
 public class SkillService {
@@ -20,6 +20,9 @@ public class SkillService {
         return skillMapper.toDto(skillRepository.save(skillMapper.toEntity(skill)));
     }
 
+    public List<SkillDto> getUserSkills(long userId) {
+        return skillRepository.findAllByUserId(userId).stream().map(skillMapper::toDto).toList();
+    }
     private void validateSkill(SkillDto skill) {
         if (skill.getTitle().isBlank() || skill.getTitle() == null) {
             throw new DataValidationException("title doesn't exist");

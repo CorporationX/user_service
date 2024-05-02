@@ -35,7 +35,6 @@ public class SkillServiceTest {
     @Test
     public void testCreateWithBlankTitle() {
         skill.setTitle("   ");
-        System.out.println("skillService" + skillService);
         assertThrows(DataValidationException.class, () -> skillService.create(skill));
     }
 
@@ -49,5 +48,12 @@ public class SkillServiceTest {
     public void testCreateIfSkillExist() {
         Mockito.when(skillRepository.existsByTitle(skill.getTitle())).thenReturn(true);
         assertThrows(DataValidationException.class, () -> skillService.create(skill));
+    }
+
+    @Test
+    public void testGetSkillsUser() {
+        long userId = 1L;
+        skillService.getUserSkills(userId);
+        Mockito.verify(skillRepository, Mockito.times(1)).findAllByUserId(userId);
     }
 }

@@ -4,10 +4,12 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.GoalDto;
+import school.faang.user_service.dto.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -17,6 +19,7 @@ import school.faang.user_service.validator.GoalValidator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Component
 @RequiredArgsConstructor
@@ -27,9 +30,10 @@ public class GoalService {
     private final GoalMapper goalMapper;
     private final GoalValidator goalValidator;
     private final UserRepository userRepository;
+    private final List<GoalFilter> goalFilters;
 
     public GoalDto createGoal(Long userId, GoalDto goalDto) {
-        goalValidator.validateBeforeCreate(userId ,goalDto);
+        goalValidator.validateBeforeCreate(userId, goalDto);
 
         Goal goalToCreate = goalMapper.toEntity(goalDto);
         if (Objects.nonNull(goalDto.getParentId())) {
@@ -40,7 +44,7 @@ public class GoalService {
                 .map(skillService::getSkillById)
                 .toList();
         goalToCreate.setSkillsToAchieve(skills);
-        Optional<User> user =  userRepository.findById(userId);
+        Optional<User> user = userRepository.findById(userId);
         goalToCreate.getUsers().add(user.get());
         goalToCreate.setStatus(GoalStatus.ACTIVE);
 
@@ -60,6 +64,26 @@ public class GoalService {
 
         goalRepository.save(goalToUpdate);
         return goalMapper.toDto(goalToUpdate);
+    }
+
+    public List<GoalDto> findSubtasksByGoalId(long goalId, GoalFilterDto filter) {
+        Stream<GoalDto> goals = goalRepository.findByParent(goalId).map(goalMapper::toDto);
+        applyGoalFilter(goals, filter);
+
+        return goals.toList();
+    }
+
+    public List<GoalDto> findGoalsByUserId(Long userId, GoalFilterDto filter) {
+        Stream<GoalDto> goals = goalRepository.findGoalsByUserId(userId).map(goalMapper::toDto);
+        applyGoalFilter(goals, filter);
+
+        return goals.toList();
+    }
+
+    private void applyGoalFilter(Stream<GoalDto> goals, GoalFilterDto filter) {
+        goalFilters.stream()
+                .filter(goalFilter -> goalFilter.isApplicable(filter))
+                .forEach(goalFilter -> goalFilter.apply(goals, filter));
     }
 
     private void assignSkillToUser(Goal goalToUpdate) {

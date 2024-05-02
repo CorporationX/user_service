@@ -34,7 +34,7 @@ public class GoalValidator {
     }
 
     public void validateGoalTitle(GoalDto goalDto) {
-        if (goalDto.getTitle().isEmpty()) {
+        if (goalDto.getTitle() == null || goalDto.getTitle().isEmpty()) {
             throw new DataValidationException("Название цели не должно быть пустым");
         }
     }

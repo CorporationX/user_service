@@ -3,9 +3,11 @@ package school.faang.user_service.controller.goal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.GoalDto;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.dto.GoalFilterDto;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.validator.GoalValidator;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -26,5 +28,13 @@ public class GoalController {
 
     public void deleteGoal(long goalId) {
         goalService.deleteGoal(goalId);
+    }
+
+    public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter) {
+        return goalService.findSubtasksByGoalId(userId, filter);
+    }
+
+    public List<GoalDto> getGoalsByUser(long userId, GoalFilterDto filter) {
+        return goalService.findGoalsByUserId(userId, filter);
     }
 }

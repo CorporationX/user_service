@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.event;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,7 +7,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -21,7 +20,6 @@ import school.faang.user_service.filter.event.EventOwnerIdFilter;
 import school.faang.user_service.filter.event.EventTitlePatternFilter;
 import school.faang.user_service.mapper.EventMapperImpl;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.validator.event.EventValidator;
 
 import java.time.LocalDateTime;
@@ -52,7 +50,6 @@ public class EventServiceTest {
     ExecutorService executorService;
     private final List<EventFilter> eventFilters = new ArrayList<>();
 
-
     @Captor
     private ArgumentCaptor<Event> eventArgumentCaptor;
 
@@ -62,7 +59,6 @@ public class EventServiceTest {
         eventFilters.add(new EventOwnerIdFilter());
         eventService = new EventService(eventRepository, eventValidator, eventMapper, eventFilters, executorService);
     }
-
 
     @Test
     public void testCreate() {
@@ -161,7 +157,7 @@ public class EventServiceTest {
             event.setEndDate(LocalDateTime.now().minusDays(day));
             eventList.add(event);
         }
-        Mockito.when(eventRepository.findAll()).thenReturn(eventList);
+        when(eventRepository.findAll()).thenReturn(eventList);
         ReflectionTestUtils.setField(eventService, "batchSize", 100);
         eventService.clearEvents();
         verify(eventRepository, times(1)).findAll();

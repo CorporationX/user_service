@@ -9,18 +9,21 @@ import org.springframework.data.redis.core.RedisTemplate;
 @RequiredArgsConstructor
 @Slf4j
 public abstract class AbstractPublisher<T> {
-    private final RedisTemplate<String, Object> redisTemplate;
-    private final ObjectMapper objectMapper;
-    private final String channelName;
 
-    public void publish(T eventType) {
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final ObjectMapper jsonMapper;
+    private final String channel;
+
+    public void publish(T object) {
         String json;
+
         try {
-            json = objectMapper.writeValueAsString(eventType);
+            json = jsonMapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
-            log.error("Error when serializing an object to a JSON string", e);
+            log.warn( "Exception with json processing at class"  + AbstractPublisher.class);
             throw new RuntimeException(e);
         }
-        redisTemplate.convertAndSend(channelName, json);
+
+        redisTemplate.convertAndSend(channel, json);
     }
 }

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -12,16 +13,14 @@ import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.subscription.SubscriptionUserDto;
 import school.faang.user_service.dto.subscription.SubscriptionUserFilterDto;
 import school.faang.user_service.dto.event.SearchAppearanceEvent;
+import school.faang.user_service.dto.event.FollowerEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SubscriptionUserMapper;
 import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.filter.user.CityPatternFilter;
-import school.faang.user_service.filter.user.CountryPatternFilter;
-import school.faang.user_service.filter.user.ExperienceMaxFilter;
-import school.faang.user_service.filter.user.NamePatternFilter;
-import school.faang.user_service.filter.user.UserFilter;
+import school.faang.user_service.filter.user.*;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,13 +44,14 @@ public class SubscriptionServiceTest {
     private SearchAppearanceEventPublisher searchAppearanceEventPublisher;
     @Mock
     private UserContext userContext;
+    @Mock
+    private  FollowerEventPublisher followerEventPublisher;
 
     @Spy
     private SubscriptionUserMapper userMapper = Mappers.getMapper(SubscriptionUserMapper.class);
 
     @InjectMocks
     private SubscriptionService subscriptionService;
-
 
     @BeforeEach
     public void initialize() {
@@ -64,6 +64,7 @@ public class SubscriptionServiceTest {
         subscriptionService = new SubscriptionService(subscriptionRepository,
                                                       userMapper,
                                                       userFilters,
+                                                      followerEventPublisher,
                                                       searchAppearanceEventPublisher,
                                                       userContext);
     }
@@ -83,6 +84,22 @@ public class SubscriptionServiceTest {
     public void testFollowUser() {
         subscriptionService.followUser(userId1, userId2);
         verify(subscriptionRepository, times(1)).followUser(userId1, userId2);
+    }
+
+    @Test
+    public void testEventFollowPublisher() {
+
+        when( subscriptionRepository.existsByFollowerIdAndFolloweeId( userId1, userId2 ) ).thenReturn( false );
+        subscriptionService.followUser( userId1, userId2 );
+        verify( subscriptionRepository, times( 1 ) ).followUser( userId1, userId2 );
+
+
+        ArgumentCaptor<FollowerEvent> eventCaptor = ArgumentCaptor.forClass( FollowerEvent.class );
+        verify( followerEventPublisher ).publish( eventCaptor.capture() );
+        FollowerEvent capturedEvent = eventCaptor.getValue();
+
+        assertEquals( capturedEvent.getFollowerId(), userId1 );
+        assertEquals( capturedEvent.getFolloweeId(), userId2 );
     }
 
     @Test

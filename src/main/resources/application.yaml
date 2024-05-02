@@ -84,4 +84,3 @@ premium:
 
 executorConfig:
   thread-pool-size: 10
-

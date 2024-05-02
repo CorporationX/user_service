@@ -1,12 +1,13 @@
-package school.faang.user_service.service;
+package school.faang.user_service.controller;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.controller.RecommendationRequestController;
 import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.service.RecommendationRequestService;
+
 import java.util.Collections;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

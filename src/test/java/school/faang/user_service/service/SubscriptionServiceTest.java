@@ -173,4 +173,14 @@ class SubscriptionServiceTest {
         assertEquals(followerId, followerArgumentCaptor.getValue());
         assertEquals(new ArrayList<UserDto>(), actualFollowing);
     }
+
+    @Test
+    void getFollowingCountTest() {
+        //when
+        var followingCount = subscriptionService.getFollowingCount(followerId);
+
+        //then
+        verify(subscriptionRepo, times(1)).findFolloweesAmountByFollowerId(followerArgumentCaptor.capture());
+        assertEquals(followerId, followerArgumentCaptor.getValue());
+    }
 }

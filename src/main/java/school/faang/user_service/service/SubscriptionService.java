@@ -52,5 +52,9 @@ public class SubscriptionService {
     public List<UserDto> getFollowing(long followerId, UserFilterDto filter) {
         return filterUsers(subscriptionRepo.findByFollowerId(followerId), filter);
     }
+
+    public int getFollowingCount(long followerId) {
+        return subscriptionRepo.findFolloweesAmountByFollowerId(followerId);
+    }
 }
 

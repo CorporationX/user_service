@@ -1,92 +1,86 @@
 package school.faang.user_service.service.goal;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.function.Executable;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
-import school.faang.user_service.exception.SkillNotFoundException;
-import school.faang.user_service.exception.TooManyGoalsException;
+import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.skill.SkillServiceImpl;
+import school.faang.user_service.service.skill.SkillService;
+import school.faang.user_service.validator.GoalValidator;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class GoalServiceImplTest {
+
     @Mock
     private GoalRepository goalRepository;
     @Mock
     private UserRepository userRepository;
     @Mock
-    private SkillServiceImpl skillService;
+    private SkillService skillService;
+    @Mock
+    private GoalMapper goalMapper;
+    @Mock
+    private GoalValidator goalValidator;
     @InjectMocks
-    private GoalServiceImpl goalService;
+    private GoalServiceImpl goalServiceImpl;
 
     Goal goal;
     Goal goal2;
     Goal goal3;
     Goal goal4;
-    Goal goal5;
-    Goal goal6;
-    Goal goalUp;
-    Goal goalUp1;
     User user;
-    User user2;
-    User user3;
-    User user4;
-    User user5;
-    User user6;
-    Stream<Goal> goals;
-    Stream<Goal> goals1;
-    Stream<Goal> goals2;
+    GoalDto goalDto;
+    GoalFilterDto goalFilterDto;
+    List<Goal> subtasks;
+    Skill skill1;
 
     @BeforeEach
     void init() {
+    }
 
-        Skill skill1 = Skill.builder()
+    @Test
+    @DisplayName("Test successfully save skill and goal for user")
+    void testSuccessfullySaveIsActiveSkillAndSaveGoal() {
+        user = User.builder()
                 .id(1L)
                 .goals(new ArrayList<>())
                 .build();
 
-        Skill skill2 = Skill.builder()
-                .id(2L)
-                .build();
-
-        Skill skill3 = Skill.builder()
-                .id(3L)
+        skill1 = Skill.builder()
+                .id(1L)
+                .goals(new ArrayList<>())
                 .build();
 
         goal = Goal.builder()
-                .id(1L)
-                .title("title")
-                .description("descriptional")
-                .skillsToAchieve(Arrays.asList(skill1, skill2, skill3))
-                .build();
-
-        goal2 = Goal.builder()
-                .id(2L)
-                .skillsToAchieve(Arrays.asList(skill1, skill2))
-                .build();
-
-        goal3 = Goal.builder()
                 .id(1L)
                 .title("titles")
                 .description("description")
@@ -94,547 +88,195 @@ class GoalServiceImplTest {
                 .skillsToAchieve(Collections.singletonList(skill1))
                 .build();
 
-        goal4 = Goal.builder()
-                .id(4L)
-                .status(GoalStatus.ACTIVE)
-                .title("Java")
+        goalDto = GoalDto.builder()
+                .id(1L)
+                .title("titles")
+                .description("description")
                 .build();
 
-        goal5 = Goal.builder()
-                .id(5L)
-                .status(GoalStatus.ACTIVE)
-                .title("python")
-                .build();
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(goalRepository.save(goal)).thenReturn(goal);
+        when(goalMapper.toDto(goal)).thenReturn(goalDto);
 
-        goal6 = Goal.builder()
-                .id(6L)
-                .parent(goal4)
-                .title("Java")
-                .build();
-        goalUp = Goal.builder()
-                .id(111L)
-                .status(GoalStatus.COMPLETED)
-                .title("Hibernate")
-                .description("Optional")
-                .skillsToAchieve(Arrays.asList(skill1, skill2, skill3))
-                .build();
-        goalUp1 = Goal.builder()
-                .id(222L)
-                .status(GoalStatus.ACTIVE)
-                .title("Hibernate")
-                .description("Optional")
-                .skillsToAchieve(Arrays.asList(skill1, skill2, skill3))
-                .build();
-//        goalUpDto = GoalDto.builder()
-//                .id(111L)
-//                .status(GoalStatus.COMPLETED)
-//                .title("Hibernate")
-//                .description("Optional")
-//                .build();
-//        goalUpDto1 = GoalDto.builder()
-//                .id(222L)
-//                .status(GoalStatus.COMPLETED)
-//                .title("Hibernate")
-//                .description("Optional")
-//                .build();
-//        goalDto1 = GoalDto.builder()
-//                .id(1L)
-//                .title("title")
-//                .description("descriptional")
-//                .parentId(3L)
-//                .skillIds(Arrays.asList(1L, 2L, 3L))
-//                .build();
-//
-//        goalDto2 = GoalDto.builder()
-//                .id(2L)
-//                .skillIds(Arrays.asList(1L, 2L))
-//                .build();
-//
-//        goalDto3 = GoalDto.builder()
-//                .id(3L)
-//                .title("terqqe")
-//                .description("deork")
-//                .parentId(1L)
-//                .build();
-//
-//        goalDto4 = GoalDto.builder()
-//                .id(4L)
-//                .skillIds(Collections.emptyList())
-//                .status(GoalStatus.ACTIVE)
-//                .title("Java")
-//                .build();
-//
-//        goalDto5 = GoalDto.builder()
-//                .id(5L)
-//                .status(GoalStatus.ACTIVE)
-//                .title("python")
-//                .build();
-//
-//        goalDto6 = GoalDto.builder()
-//                .id(6L)
-//                .title("Java")
-//                .build();
+        goalServiceImpl.createGoal(user.getId(), goal);
 
+        InOrder inOrder = inOrder(userRepository, goalValidator, skillService, goalRepository, goalMapper);
+        verify(userRepository, times(1)).findById(1L);
+//        verify(goalValidator).validateGoalCreation(user, goal, 3);
+        verify(goalValidator).validateGoalCreation(any(User.class), eq(goal), eq(3));
+        verify(skillService).saveAll(goal.getSkillsToAchieve());
+        verify(goalRepository).save(goal);
+        verify(goalMapper).toDto(goal);
+    }
+
+
+    @Test
+    @DisplayName("Test successfully update goal")
+    void testSuccessfullyUpdateGoal() {
         user = User.builder()
                 .id(1L)
                 .goals(new ArrayList<>())
                 .build();
 
-        user2 = User.builder()
+        skill1 = Skill.builder()
                 .id(1L)
-                .goals(Collections.singletonList(goal2))
+                .goals(new ArrayList<>())
                 .build();
 
-        user3 = User.builder()
+        goal = Goal.builder()
                 .id(1L)
-                .goals(Arrays.asList(goal, goal2, goal3))
+                .title("My ultimate goall")
+                .description("Learn Python")
+                .parent(goal2)
+                .skillsToAchieve(Collections.singletonList(skill1))
                 .build();
 
-        user4 = User.builder()
+        goalDto = GoalDto.builder()
+                .id(1L)
+                .title("My ultimate goal")
+                .description("Learn Java")
+                .build();
+
+        when(goalRepository.findById(1L)).thenReturn(Optional.of(goal));
+        doNothing().when(goalMapper).update(eq(goalDto), eq(goal));
+        when(goalRepository.save(goal)).thenReturn(goal);
+        when(goalMapper.toDto(goal)).thenReturn(goalDto);
+
+        goalServiceImpl.updateGoal(1L, goalDto);
+
+        verify(goalRepository, times(1)).findById(1L);
+        verify(goalMapper, times(1)).update(goalDto, goal);
+        verify(goalRepository, times(1)).save(goal);
+        verify(goalMapper, times(1)).toDto(goal);
+    }
+
+    @Test
+    @DisplayName("Test successfully delete goal")
+    void testSuccessfullyDeleteGoal() {
+
+        goal = Goal.builder()
+                .id(1L)
+                .title("titles")
+                .description("description")
+                .parent(goal2)
+                .skillsToAchieve(Collections.singletonList(skill1))
+                .build();
+
+        when(goalRepository.findById(1L)).thenReturn(Optional.of(goal));
+
+        goalServiceImpl.deleteGoal(1L);
+
+        verify(goalRepository, times(1)).findById(1L);
+        verify(goalRepository, times(1)).delete(goal);
+    }
+
+    @Test
+    @DisplayName("Test successfully find subtasks by goal id")
+    void testSuccessfullyFindSubtasksByGoalId() {
+
+        goal = Goal.builder()
+                .id(1L)
+                .title("titles")
+                .description("description")
+                .skillsToAchieve(Collections.singletonList(skill1))
+                .build();
+
+        goal2 = Goal.builder()
+                .id(2L)
+                .title("titles")
+                .description("description")
+                .parent(goal)
+                .skillsToAchieve(Collections.singletonList(skill1))
+                .build();
+
+        goal3 = Goal.builder()
+                .id(3L)
+                .title("titles")
+                .description("description")
+                .parent(goal)
+                .skillsToAchieve(Collections.singletonList(skill1))
+                .build();
+
+        goal4 = Goal.builder()
                 .id(4L)
-                .goals(Arrays.asList(goal4, goal5))
+                .title("titles")
+                .description("description")
+                .parent(goal)
+                .skillsToAchieve(Collections.singletonList(skill1))
                 .build();
 
-        user5 = User.builder()
-                .id(5L)
-                .build();
+        subtasks = List.of(goal2, goal3, goal4);
 
-        user6 = User.builder()
+        goalDto = GoalDto.builder()
                 .id(1L)
-                .goals(Collections.singletonList(goal2))
+                .title("titles")
+                .description("description")
                 .build();
 
-        goals = Stream.of(goal4, goal5);
-    }
+        when(goalRepository.findByParent(1L)).thenReturn(subtasks.stream());
 
+        goalServiceImpl.findSubtasksByGoalId(1L);
 
-    @Test
-    void createGoal() {
-    }
-
-    @Test
-    void findGoalsByUserId() {
-    }
-
-    @Test
-    void create() {
+        verify(goalRepository, times(1)).findByParent(1L);
+        verify(goalValidator, times(1)).validateFindSubtasks(subtasks, 1L);
+        for (Goal subtask : subtasks) {
+            verify(goalMapper, times(1)).toDto(subtask);
+        }
     }
 
     @Test
-    void countActiveGoalsPerUser() {
+    @DisplayName("Test successfully find goals by user id")
+    void testSuccessfullyFindGoalsByUserId() {
+
+        goal = Goal.builder()
+                .id(1L)
+                .title("titles")
+                .description("description")
+                .parent(goal2)
+                .skillsToAchieve(Collections.singletonList(skill1))
+                .build();
+
+        goalDto = GoalDto.builder()
+                .id(1L)
+                .title("titles")
+                .description("description")
+                .build();
+
+        List<Goal> goals = List.of(
+                Goal.builder().id(1L).title("Goal 1").status(GoalStatus.ACTIVE).build(),
+                Goal.builder().id(2L).title("Goal 2").status(GoalStatus.COMPLETED).build(),
+                Goal.builder().id(3L).title("Goal 3").status(GoalStatus.ACTIVE).build()
+        );
+
+        List<GoalDto> goalDtos = goals.stream()
+                .map(goalMapper::toDto)
+                .collect(Collectors.toList());
+
+        GoalFilterDto goalFilterDto = new GoalFilterDto();
+
+        when(goalRepository.findGoalsByUserId(1L)).thenReturn(goals.stream());
+        when(goalValidator.validateGoalsByUserIdAndSort(goalDtos, goalFilterDto)).thenReturn(goalDtos);
+
+        List<GoalDto> result = goalServiceImpl.findGoalsByUserId(1L, goalFilterDto);
+
+        verify(goalRepository, times(1)).findGoalsByUserId(1L);
+        verify(goalValidator, times(1)).validateGoalsByUserIdAndSort(goalDtos, goalFilterDto);
+        assertEquals(3, result.size());
     }
 
     @Test
-    void findByParent() {
+    @DisplayName("Test returning an empty goal list when no applicable filters are found")
+    void testReturnEmptyListOfGoalsWhenNoApplicableFiltersFound() {
+        List<GoalDto> actualGoals = goalServiceImpl.findGoalsByUserId(anyLong(), goalFilterDto);
+
+        assertTrue(actualGoals.isEmpty());
     }
 
     @Test
-    void countUsersSharingGoal() {
-    }
+    @DisplayName("Test for returning an empty list when there are no subtask")
+    public void testReturningEmptyListSubtasksByGoalId() {
+        List<GoalDto> actualGoals = goalServiceImpl.findSubtasksByGoalId(anyLong());
 
-    @Test
-    void findUsersByGoalId() {
-    }
-
-    @Test
-    void removeSkillsFromGoal() {
-    }
-
-    @Test
-    void addSkillToGoal() {
-    }
-
-    @Test
-    void shouldThrowTooManyGoalsExceptionIfMaxGoalsLimitExceeded() {
-        when(userRepository.findById(user3.getId())).thenReturn(Optional.of(user3));
-
-        assertThrows(TooManyGoalsException.class, () -> goalService.createGoal(user3.getId(), goal));
-    }
-
-    @Test
-    void shouldThrowSkillNotFoundExceptionIfSkillNotExist() {
-        when(skillService.checkActiveSkill(anyLong())).thenReturn(false);
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-
-        assertThrows(SkillNotFoundException.class, () -> goalService.createGoal(user.getId(), goal));
-    }
-
-    @Test
-    void shouldGetUserById() {
-//        Optional<User> actualUser = userRepository.findById(user3.getId());
-        User actualUser = userRepository.findById(user3.getId())
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-
-        assertEquals(user3, actualUser);
-    }
-
-    @Test
-    void shouldThrowEntityNotFoundExceptionWhenCreateNewGoal() {
-
-        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
-
-        assertThrows(EntityNotFoundException.class, () -> goalService.createGoal(anyLong(), goal));
+        assertTrue(actualGoals.isEmpty());
     }
 }
-
-
-//import jakarta.persistence.EntityNotFoundException;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mapstruct.factory.Mappers;
-//import org.mockito.InjectMocks;
-//import org.mockito.Mock;
-//import org.mockito.Spy;
-//import org.mockito.junit.jupiter.MockitoExtension;
-////import school.faang.user_service.dto.goal.GoalDto;
-////import school.faang.user_service.dto.goal.GoalFilterDto;
-//import school.faang.user_service.entity.Skill;
-//import school.faang.user_service.entity.User;
-//import school.faang.user_service.entity.goal.Goal;
-//import school.faang.user_service.entity.goal.GoalStatus;
-////import school.faang.user_service.exception.DataValidationException;
-////import school.faang.user_service.exception.GoalOverflowException;
-//import school.faang.user_service.exception.SkillNotFoundException;
-////import school.faang.user_service.filter.goal.GoalFilter;
-////import school.faang.user_service.filter.goal.GoalStatusFilter;
-////import school.faang.user_service.filter.goal.GoalTitleFilter;
-////import school.faang.user_service.mapper.goal.GoalMapper;
-//import school.faang.user_service.repository.UserRepository;
-//import school.faang.user_service.repository.goal.GoalRepository;
-//import school.faang.user_service.service.skill.SkillServiceImpl;
-//
-//import java.util.*;
-//import java.util.stream.Stream;
-//
-//import static org.junit.Assert.assertThrows;
-//import static org.junit.Assert.assertTrue;
-//import static org.mockito.ArgumentMatchers.anyLong;
-//import static org.mockito.Mockito.verify;
-//import static org.mockito.Mockito.when;
-
-//@ExtendWith(MockitoExtension.class)
-//class GoalServiceTest {
-//    @Mock
-//    private GoalRepository goalRepository;
-//    @Mock
-//    private UserRepository userRepository;
-//    @Mock
-//    private SkillServiceImpl skillService;
-////    @Spy
-////    private GoalMapper goalMapper = Mappers.getMapper(GoalMapper.class);
-////    @Mock
-////    private List<GoalFilter> filters;
-//
-//    @InjectMocks
-//    private GoalServiceImpl goalService;
-//
-//    Goal goal;
-//    Goal goal2;
-//    Goal goal3;
-//    Goal goal4;
-//    Goal goal5;
-//    Goal goal6;
-//    Goal goalUp;
-//    Goal goalUp1;
-//    User user;
-//    User user2;
-//    User user3;
-//    User user4;
-//    User user5;
-//    User user6;
-////    GoalDto goalDto1;
-////    GoalDto goalDto2;
-////    GoalDto goalDto3;
-////    GoalDto goalDto4;
-////    GoalDto goalDto5;
-////    GoalDto goalDto6;
-////    GoalDto goalUpDto;
-////    GoalDto goalUpDto1;
-////    GoalFilterDto goalFilterDto;
-//    Stream<Goal> goals;
-//    Stream<Goal> goals1;
-//    Stream<Goal> goals2;
-////    Stream<GoalFilter> filterStream;
-
-//    @BeforeEach
-//    void init() {
-//
-//        Skill skill1 = Skill.builder()
-//                .id(1L)
-//                .goals(new ArrayList<>())
-//                .build();
-//
-//        Skill skill2 = Skill.builder()
-//                .id(2L)
-//                .build();
-//
-//        Skill skill3 = Skill.builder()
-//                .id(3L)
-//                .build();
-//
-//        goal = Goal.builder()
-//                .id(1L)
-//                .title("title")
-//                .description("descriptional")
-//                .skillsToAchieve(Arrays.asList(skill1, skill2, skill3))
-//                .build();
-//
-//        goal2 = Goal.builder()
-//                .id(2L)
-//                .skillsToAchieve(Arrays.asList(skill1, skill2))
-//                .build();
-//
-//        goal3 = Goal.builder()
-//                .id(1L)
-//                .title("titles")
-//                .description("description")
-//                .parent(goal2)
-//                .skillsToAchieve(Collections.singletonList(skill1))
-//                .build();
-//
-//        goal4 = Goal.builder()
-//                .id(4L)
-//                .status(GoalStatus.ACTIVE)
-//                .title("Java")
-//                .build();
-//
-//        goal5 = Goal.builder()
-//                .id(5L)
-//                .status(GoalStatus.ACTIVE)
-//                .title("python")
-//                .build();
-//
-//        goal6 = Goal.builder()
-//                .id(6L)
-//                .parent(goal4)
-//                .title("Java")
-//                .build();
-//        goalUp = Goal.builder()
-//                .id(111L)
-//                .status(GoalStatus.COMPLETED)
-//                .title("Hibernate")
-//                .description("Optional")
-//                .skillsToAchieve(Arrays.asList(skill1, skill2, skill3))
-//                .build();
-//        goalUp1 = Goal.builder()
-//                .id(222L)
-//                .status(GoalStatus.ACTIVE)
-//                .title("Hibernate")
-//                .description("Optional")
-//                .skillsToAchieve(Arrays.asList(skill1, skill2, skill3))
-//                .build();
-////        goalUpDto = GoalDto.builder()
-////                .id(111L)
-////                .status(GoalStatus.COMPLETED)
-////                .title("Hibernate")
-////                .description("Optional")
-////                .build();
-////        goalUpDto1 = GoalDto.builder()
-////                .id(222L)
-////                .status(GoalStatus.COMPLETED)
-////                .title("Hibernate")
-////                .description("Optional")
-////                .build();
-////        goalDto1 = GoalDto.builder()
-////                .id(1L)
-////                .title("title")
-////                .description("descriptional")
-////                .parentId(3L)
-////                .skillIds(Arrays.asList(1L, 2L, 3L))
-////                .build();
-////
-////        goalDto2 = GoalDto.builder()
-////                .id(2L)
-////                .skillIds(Arrays.asList(1L, 2L))
-////                .build();
-////
-////        goalDto3 = GoalDto.builder()
-////                .id(3L)
-////                .title("terqqe")
-////                .description("deork")
-////                .parentId(1L)
-////                .build();
-////
-////        goalDto4 = GoalDto.builder()
-////                .id(4L)
-////                .skillIds(Collections.emptyList())
-////                .status(GoalStatus.ACTIVE)
-////                .title("Java")
-////                .build();
-////
-////        goalDto5 = GoalDto.builder()
-////                .id(5L)
-////                .status(GoalStatus.ACTIVE)
-////                .title("python")
-////                .build();
-////
-////        goalDto6 = GoalDto.builder()
-////                .id(6L)
-////                .title("Java")
-////                .build();
-//
-//        user = User.builder()
-//                .id(1L)
-//                .goals(new ArrayList<>())
-//                .build();
-//
-//        user2 = User.builder()
-//                .id(1L)
-//                .goals(Collections.singletonList(goal2))
-//                .build();
-//
-//        user3 = User.builder()
-//                .id(1L)
-//                .goals(Arrays.asList(goal, goal2, goal3))
-//                .build();
-//
-//        user4 = User.builder()
-//                .id(4L)
-//                .goals(Arrays.asList(goal4, goal5))
-//                .build();
-//
-//        user5 = User.builder()
-//                .id(5L)
-//                .build();
-//
-//        user6 = User.builder()
-//                .id(1L)
-//                .goals(Collections.singletonList(goal2))
-//                .build();
-//
-////        goalFilterDto = GoalFilterDto.builder()
-////                .title("Java")
-////                .build();
-////
-////        filterStream = Stream.of(new GoalStatusFilter(), new GoalTitleFilter());
-//
-//        goals = Stream.of(goal4, goal5);
-//    }
-//
-////    @Test
-////    @DisplayName("Test remove correct id")
-////    void testSuccessfullyDeleteGoalById() {
-////        goalService.deleteGoal(goal.getId());
-////
-////        verify(goalRepository).deleteById(goal.getId());
-////    }
-//
-//    @Test
-//    @DisplayName("Test createGoal, for throwing an exception EntityNotFoundException")
-//    void testCreateGoalThrowEntityNotFoundException() {
-//        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
-//
-//        assertThrows(EntityNotFoundException.class, (Executable) () -> goalService.createGoal(anyLong(), goal));
-//    }
-//
-//    @Test
-//    @DisplayName("Test throwing an exception GoalOverflowException")
-//    void testFindByIdThrowingTooManyGoalsException() {
-//        when(userRepository.findById(user3.getId())).thenReturn(Optional.of(user3));
-//
-//        assertThrows(TooManyGoalsException.class, (Executable) () -> goalService.createGoal(user3.getId(), goal));
-//    }
-//
-//    @Test
-//    @DisplayName("Test throwing an exception SkillNotFoundException")
-//    void testSkillNotFoundException() {
-//        when(skillService.checkActiveSkill(anyLong())).thenReturn(false);
-//        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-//
-//        assertThrows(SkillNotFoundException.class, (Executable) () -> goalService.createGoal(user.getId(), goal));
-//    }
-//
-//    @Test
-//    @DisplayName("Test successfully save skill and goal")
-//    void testSuccessfullySaveIsActiveSkillAndSaveGoal() {
-//        when(skillService.checkActiveSkill(anyLong())).thenReturn(true);
-//        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
-//
-//        goalService.createGoal(user.getId(), goal3);
-//        skillService.saveAll(goal2.getSkillsToAchieve());
-//
-//        verify(goalRepository).create("titles", "description", goal2.getId());
-//        verify(skillService).saveAll(goal3.getSkillsToAchieve());
-//    }
-//
-////    @Test
-////    @DisplayName("Test successfully for obtaining a list of goals from a user using a filter")
-////    void testSuccessfullyGetListOfGoalsByUserFromFilters() {
-////        goalFilterDto = GoalFilterDto.builder()
-////                .title("Java")
-////                .build();
-////        when(filters.stream()).thenReturn(filterStream);
-////        when(goalRepository.findGoalsByUserId(user4.getId())).thenReturn(goals);
-////
-////        List<GoalDto> actualGoals = goalService.getGoalsByUser(user4.getId(), goalFilterDto);
-////        List<GoalDto> expectedGoals = Collections.singletonList(goalDto4);
-////
-////        assertTrue(expectedGoals.size() == actualGoals.size()
-////                && expectedGoals.containsAll(actualGoals));
-////    }
-//
-////    @Test
-////    @DisplayName("Test returning an empty goal list when no applicable filters are found")
-////    void testReturnEmptyListOfGoalsWhenNoApplicableFiltersFound() {
-////        List<GoalDto> actualGoals = goalService.getGoalsByUser(anyLong(), goalFilterDto);
-////
-////        assertTrue(actualGoals.isEmpty());
-////    }
-//
-////    @Test
-////    @DisplayName("Test successfully return subtasks goal by user id")
-////    void testSuccessfullyReturnSubtasksByGoalId() {
-////        goals1 = Stream.of(goal2);
-////        when(goalRepository.findByParent(anyLong())).thenReturn(goals1);
-////
-////        List<GoalDto> actualGoals = goalService.findSubtasksByGoalId(user2.getId());
-////        List<GoalDto> expectedGoals = Collections.singletonList(goalDto2);
-////
-////        assertTrue(expectedGoals.size() == actualGoals.size()
-////                && expectedGoals.containsAll(actualGoals));
-////    }
-//
-////    @Test
-////    @DisplayName("Test for returning an empty list when there are no subtask")
-////    public void testReturningEmptyListSubtasksByGoalId() {
-////        List<GoalDto> actualGoals = goalService.findSubtasksByGoalId(anyLong());
-////
-////        assertTrue(actualGoals.isEmpty());
-////    }
-//
-////    @Test
-////    @DisplayName("Test Successfully return subtasks goal by user id and filters")
-////    void testSuccessfullyReturnSubtasksByGoalIdAndFilters() {
-////        goals2 = Stream.of(goal4);
-////        when(filters.stream()).thenReturn(filterStream);
-////        when(goalRepository.findByParent(user6.getId())).thenReturn(goals2);
-////
-////        List<GoalDto> actualGoals = goalService.retrieveFilteredSubtasksForGoal(user6.getId(), goalFilterDto);
-////        List<GoalDto> expectedGoals = Collections.singletonList(goalDto4);
-////
-////        assertTrue(expectedGoals.size() == actualGoals.size()
-////                && expectedGoals.containsAll(actualGoals));
-////    }
-//
-////    @Test
-////    @DisplayName("Test return an empty sheet if there are no matches in the filters")
-////    void testReturningEmptyListSubtasksWhenTheFiltersNotWork() {
-////        List<GoalDto> actualGoals = goalService.retrieveFilteredSubtasksForGoal(anyLong(), goalFilterDto);
-////
-////        assertTrue(actualGoals.isEmpty());
-////    }
-//
-////    @Test
-////    void testUpdateCompletedGoalThrowsDataValidationException() {
-////        when(goalRepository.findGoalById(anyLong())).thenReturn(Optional.of(goalUp));
-////        assertThrows(DataValidationException.class, () -> goalService.updateGoal(goalUp.getId(), goalUpDto));
-////    }
-////
-////    @Test
-////    void testThrowExceptionWhenCompletingGoalWithInactiveSkills() {
-////        when(goalRepository.findGoalById(anyLong())).thenReturn(Optional.of(goalUp1));
-////        assertThrows(DataValidationException.class, () -> goalService.updateGoal(goalUp1.getId(), goalUpDto1));
-////    }
-//}

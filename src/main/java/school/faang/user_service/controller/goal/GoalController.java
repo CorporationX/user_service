@@ -1,16 +1,20 @@
 package school.faang.user_service.controller.goal;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.service.goal.GoalServiceImpl;
+import school.faang.user_service.validator.GoalValidator;
 
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class GoalController {
-    private GoalServiceImpl goalServiceImpl;
+    private final GoalServiceImpl goalServiceImpl;
+    private final GoalValidator goalValidator;
 
     private GoalDto createGoal(Long userId, Goal goal){
         return goalServiceImpl.createGoal(userId, goal);
@@ -23,9 +27,11 @@ public class GoalController {
         goalServiceImpl.deleteGoal(goalId);
     }
     private List<GoalDto> findSubtasksByGoalId(long goalId){
+        goalValidator.validateThatIdIsGreaterThan0(goalId);
         return goalServiceImpl.findSubtasksByGoalId(goalId);
     }
-    private List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter){
-        return goalServiceImpl.getGoalsByUser(userId, filter);
+    private List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto goalFilterDto){
+        goalValidator.validateThatIdIsGreaterThan0(userId);
+        return goalServiceImpl.findGoalsByUserId(userId, goalFilterDto);
     }
 }

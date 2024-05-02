@@ -15,7 +15,7 @@ import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.handler.exception.DataValidationException;
 import school.faang.user_service.handler.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.user.UserMapper;
-import school.faang.user_service.publisher.ProfileViewEventPublisher;
+import school.faang.user_service.publisher.AbstractEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.MentorshipService;
@@ -40,7 +40,7 @@ public class UserService {
     private final GoalService goalService;
     private final EventRepository eventRepository;
     private final UserContext userContext;
-    private final ProfileViewEventPublisher profileViewEventPublisher;
+    private final AbstractEventPublisher<ProfileViewEvent> profileViewEventPublisher;
     @Value("${dicebear.avatar}")
     private String avatarUrl;
     @Value("${dicebear.small_avatar}")

@@ -1,4 +1,4 @@
-package school.faang.user_service.listeners;
+package school.faang.user_service.listener;
 
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.service.UserBannerService;
+import school.faang.user_service.service.user.UserBannerService;
 
 import java.io.IOException;
 import java.util.List;

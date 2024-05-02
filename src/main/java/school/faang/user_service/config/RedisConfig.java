@@ -1,6 +1,5 @@
 package school.faang.user_service.config;
 
-import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,11 +13,10 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import school.faang.user_service.listeners.UserBannerListener;
+import school.faang.user_service.listener.UserBannerListener;
 
 
 @Configuration
-@Slf4j
 @RequiredArgsConstructor
 public class RedisConfig {
 
@@ -35,7 +33,6 @@ public class RedisConfig {
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
-        log.info("Connections to Redis created on the host: {}, port: {}", host, port);
         return new JedisConnectionFactory(config);
     }
 

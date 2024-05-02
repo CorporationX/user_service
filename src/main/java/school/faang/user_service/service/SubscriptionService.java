@@ -9,7 +9,7 @@ import school.faang.user_service.dto.event.SearchAppearanceEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SubscriptionUserMapper;
-import school.faang.user_service.publishers.SearchAppearanceEventPublisher;
+import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.filter.user.UserFilter;
 

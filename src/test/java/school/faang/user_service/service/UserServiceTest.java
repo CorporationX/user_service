@@ -16,6 +16,7 @@ import school.faang.user_service.exception.MessageError;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.user.UserService;
 
 import java.util.List;
 import java.util.Optional;

@@ -12,7 +12,7 @@ public class SubscriptionValidator {
 
     private final SubscriptionRepository subscriptionRepository;
 
-    public void validateUserTriedHimself(long followerId, long followeeId) {
+    public void validateUserTriedFollowHimself(long followerId, long followeeId) {
         if (followerId == followeeId) {
             throw new DataValidationException("The user " + followeeId +
                     " tried to follow himself!");
@@ -25,6 +25,13 @@ public class SubscriptionValidator {
         if (isExists) {
             throw new DataValidationException("User " + followerId +
                     " subscription to user " + followeeId + " exist");
+        }
+    }
+
+    public void validateUserTriedUnfollowHimself(long followerId, long followeeId) {
+        if (followerId == followeeId) {
+            throw new DataValidationException("The user " + followeeId +
+                    " tried to unfollow himself!");
         }
     }
 }

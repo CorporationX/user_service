@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,17 +27,16 @@ public class SubscriptionController {
     @ResponseStatus(HttpStatus.CREATED)
     public void followUser(@PathVariable long followeeId) {
         long followerId = userContext.getUserId();
-        validator.validateUserTriedHimself(followerId, followeeId);
+        validator.validateUserTriedFollowHimself(followerId, followeeId);
         service.followUser(followerId, followeeId);
     }
 
-    @DeleteMapping("/unfollow")
+    @Transactional
+    @DeleteMapping("/user/{followeeId}")
     @ResponseStatus(HttpStatus.OK)
-    void unfollowUser(long followerId, long followeeId) {
-        if (followerId == followeeId) {
-            throw new DataValidationException("The user " + followeeId +
-                    " tried to unfollow himself!");
-        }
+    public void unfollowUser(@PathVariable long followeeId) {
+        long followerId = userContext.getUserId();
+        validator.validateUserTriedUnfollowHimself(followerId, followeeId);
         service.unfollowUser(followerId, followeeId);
     }
 }

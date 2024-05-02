@@ -6,18 +6,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.service.SubscriptionService;
 import school.faang.user_service.validation.SubscriptionValidator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class SubscriptionControllerTest {
+
+    private final long followerId = 1L;
+    private final long followeeId = 2L;
     @Mock
     SubscriptionService service;
     @Mock
@@ -29,27 +29,17 @@ public class SubscriptionControllerTest {
 
     @Test
     public void testSubscribeUserToAnotherUser() {
-        long followerId = 1L;
-        long followeeId = 2L;
         when(ctx.getUserId()).thenReturn(1L);
         controller.followUser(followeeId);
         verify(service, times(1)).followUser(followerId, followeeId);
-        verify(validator, times(1)).validateUserTriedHimself(followerId, followeeId);
-    }
-    @Test
-    public void testUnsubscribeUserFromAnotherUser() {
-        controller.unfollowUser(followerId, followeeId);
-        verify(service, times(1)).unfollowUser(followerId, followeeId);
+        verify(validator, times(1)).validateUserTriedFollowHimself(followerId, followeeId);
     }
 
     @Test
-    public void testUnsubscribeUserToHimself() {
-        DataValidationException dataValidationException = assertThrows(
-                DataValidationException.class,
-                () -> controller.unfollowUser(followerId, followerId)
-        );
-        assertEquals("The user " + followeeId + " tried to unfollow himself!",
-                dataValidationException.getMessage()
-        );
+    public void testUnsubscribeUserFromAnotherUser() {
+        when(ctx.getUserId()).thenReturn(1L);
+        controller.unfollowUser(followeeId);
+        verify(service, times(1)).unfollowUser(followerId, followeeId);
+        verify(validator, times(1)).validateUserTriedUnfollowHimself(followerId, followeeId);
     }
 }

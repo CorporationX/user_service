@@ -26,7 +26,7 @@ class SubscriptionServiceTest {
 
     @Test
     public void testUnfollowUserToAnotherUser() {
-        repository.unfollowUser(followerId, followeeId);
-        verify(repository).unfollowUser(followerId, followeeId);
+        subscriptionRepository.unfollowUser(followerId, followeeId);
+        verify(subscriptionRepository).unfollowUser(followerId, followeeId);
     }
 }

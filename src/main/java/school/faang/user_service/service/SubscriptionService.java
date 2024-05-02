@@ -18,6 +18,6 @@ public class SubscriptionService {
     }
 
     public void unfollowUser(long followerId, long followeeId) {
-        repository.unfollowUser(followerId, followeeId);
+        subscriptionRepository.unfollowUser(followerId, followeeId);
     }
 }

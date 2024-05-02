@@ -15,13 +15,13 @@ public class SkillService {
     private final SkillRepository skillRepository;
     private final SkillMapper skillMapper;
 
-    public SkillDto create(SkillDto skill) throws DataValidationException {
+    public SkillDto create(SkillDto skill) {
         validateSkill(skill);
         return skillMapper.toDto(skillRepository.save(skillMapper.toEntity(skill)));
     }
 
-    private void validateSkill(SkillDto skill) throws DataValidationException {
-        if (skill.getTitle().isBlank()) {
+    private void validateSkill(SkillDto skill) {
+        if (skill.getTitle().isBlank() || skill.getTitle() == null) {
             throw new DataValidationException("title doesn't exist");
         }
         if (skillRepository.existsByTitle(skill.getTitle())) {

@@ -13,7 +13,13 @@ import school.faang.user_service.service.SkillService;
 public class SkillController {
     private final SkillService skillService;
 
-    public SkillDto create(SkillDto skill) throws DataValidationException {
-        return skillService.create(skill);
+    public SkillDto create(SkillDto skill) {
+        SkillDto createdSkill = null;
+        try {
+            createdSkill = skillService.create(skill);
+        } catch (DataValidationException e) {
+            log.warn(e.toString());
+        }
+        return createdSkill;
     }
 }

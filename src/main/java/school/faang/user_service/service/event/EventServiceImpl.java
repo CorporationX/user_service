@@ -49,8 +49,7 @@ public class EventServiceImpl implements EventService {
     }
 
     public EventDto deleteEvent(long eventId) {
-        Event eventToDelete = eventRepository
-                .findById(eventId)
+        Event eventToDelete = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotFoundException("cannot find event with id=" + eventId));
         eventRepository.deleteById(eventToDelete.getId());
         return mapper.toDto(eventToDelete);
@@ -64,8 +63,7 @@ public class EventServiceImpl implements EventService {
     }
 
     public EventDto getEvent(long eventId) {
-        Event event = eventRepository
-                .findById(eventId)
+        Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotFoundException("cannot find event with id=" + eventId));
         return mapper.toDto(event);
     }
@@ -84,9 +82,11 @@ public class EventServiceImpl implements EventService {
         User user = userRepository
                 .findById(event.getOwnerId())
                 .orElseThrow(() -> new DataValidationException("owner with id=" + event.getOwnerId() + " not found"));
+
         Set<Long> requiredSkillsIds = user.getSkills().stream()
                 .map(Skill::getId)
                 .collect(Collectors.toSet());
+
         return event.getRelatedSkills().stream()
                 .map(SkillDto::getId)
                 .allMatch(requiredSkillsIds::contains);

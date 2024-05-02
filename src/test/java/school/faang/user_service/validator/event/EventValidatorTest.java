@@ -17,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class EventValidatorTest {
-    @Spy
     EventValidator validator;
     EventDto event;
 
@@ -34,6 +33,7 @@ class EventValidatorTest {
                 .endDate(LocalDateTime.now().plusDays(1L))
                 .relatedSkills(skillDtoList)
                 .build();
+        validator = new EventValidator();
     }
 
     @Test

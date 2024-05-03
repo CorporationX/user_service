@@ -11,15 +11,18 @@ import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
-public class DefaultUserFilterService implements UserFilterService {
+public class UserFilterServiceImpl implements UserFilterService {
 
     private final List<UserFilter> userFilters;
 
     @Override
     public Stream<User> applyFilters(Stream<User> users, UserFilterDto userFilterDto) {
-        for (UserFilter userFilter : userFilters) {
-            userFilter.filter(users, userFilterDto);
+        if (userFilterDto != null) {
+            for (UserFilter userFilter : userFilters) {
+                users = userFilter.applyFilter(users, userFilterDto);
+            }
         }
+
         return users;
     }
 }

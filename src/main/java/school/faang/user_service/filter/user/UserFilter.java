@@ -7,5 +7,5 @@ import java.util.stream.Stream;
 
 public interface UserFilter {
 
-    Stream<User> filter(Stream<User> users, UserFilterDto userFilterDto);
+    Stream<User> applyFilter(Stream<User> users, UserFilterDto userFilterDto);
 }

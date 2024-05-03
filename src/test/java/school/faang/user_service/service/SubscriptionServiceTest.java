@@ -2,46 +2,44 @@ package school.faang.user_service.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static school.faang.user_service.util.TestUser.FOLLOWEE_ID;
+import static school.faang.user_service.util.TestUser.FOLLOWER_ID;
 
 
 @ExtendWith(MockitoExtension.class)
 class SubscriptionServiceTest {
 
-    private final long followerId = 1L;
-    private final long followeeId = 2L;
-
     @Mock
-    SubscriptionRepository repository;
-
-    @InjectMocks
-    SubscriptionService service;
+    SubscriptionRepository subscriptionRepository;
 
     @Test
     public void testFollowUserToAnotherUser() {
-        repository.followUser(followerId, followeeId);
-        verify(repository).followUser(followerId, followeeId);
+        subscriptionRepository.followUser(FOLLOWER_ID, FOLLOWEE_ID);
+        verify(subscriptionRepository).followUser(FOLLOWER_ID, FOLLOWEE_ID);
     }
 
     @Test
-    public void testIsFollowerUserAndFolloweeUserExist() {
-        when(repository.existsByFollowerIdAndFolloweeId(followerId, followeeId))
-                .thenReturn(true);
+    public void testUnfollowUserToAnotherUser() {
+        subscriptionRepository.unfollowUser(FOLLOWER_ID, FOLLOWEE_ID);
+        verify(subscriptionRepository).unfollowUser(FOLLOWER_ID, FOLLOWEE_ID);
+    }
 
-        DataValidationException dataValidationException = assertThrows(
-                DataValidationException.class,
-                () -> service.followUser(followerId, followeeId));
+    @Test
+    public void testGetFollowersCount() {
+        subscriptionRepository.findFollowersAmountByFolloweeId(FOLLOWER_ID);
+        verify(subscriptionRepository).findFollowersAmountByFolloweeId(FOLLOWER_ID);
 
-        assertEquals("User " + followerId + " subscription to user " +
-                followeeId + " exist", dataValidationException.getMessage());
+        when(subscriptionRepository.findFollowersAmountByFolloweeId(FOLLOWER_ID))
+                .thenReturn(1);
+        int count = subscriptionRepository.findFollowersAmountByFolloweeId(FOLLOWER_ID);
+
+        assertEquals(1, count);
     }
 }

@@ -24,7 +24,6 @@ public class SubscriptionController {
     private final UserContext userContext;
     private final SubscriptionValidator validator;
 
-    @Transactional
     @PostMapping("/user/{followeeId}")
     @ResponseStatus(HttpStatus.CREATED)
     public void followUser(@PathVariable long followeeId) {
@@ -33,7 +32,6 @@ public class SubscriptionController {
         service.followUser(followerId, followeeId);
     }
 
-    @Transactional
     @DeleteMapping("/user/{followeeId}")
     @ResponseStatus(HttpStatus.OK)
     public void unfollowUser(@PathVariable long followeeId) {
@@ -42,7 +40,6 @@ public class SubscriptionController {
         service.unfollowUser(followerId, followeeId);
     }
 
-    @Transactional(readOnly = true)
     @GetMapping("/followers/count")
     public ResponseEntity<Integer> getFollowersCount() {
         long followerId = userContext.getUserId();

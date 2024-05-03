@@ -44,9 +44,9 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
 
         RecommendationRequest savedRecommendationRequest = recommendationRequestRepository.save(recommendationRequest);
 
-        RecommendationEvent recommendationEvent = new RecommendationEvent(savedRecommendationRequest.getRecommendation().getId(),
-                savedRecommendationRequest.getRecommendation().getAuthor().getId(),
-                savedRecommendationRequest.getRecommendation().getReceiver().getId(),
+        RecommendationEvent recommendationEvent = new RecommendationEvent(savedRecommendationRequest.getId(),
+                savedRecommendationRequest.getRequester().getId(),
+                savedRecommendationRequest.getReceiver().getId(),
                 savedRecommendationRequest.getUpdatedAt());
         recommendationEventPublisher.publish(recommendationEvent);
         log.info("Отправлено уведомление по созданию рекомендации пользователя");

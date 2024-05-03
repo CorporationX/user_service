@@ -24,8 +24,6 @@ import school.faang.user_service.service.S3Service;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
@@ -84,7 +82,6 @@ public class UserServiceTest {
     public void testGetUser() {
         when(userRepository.findById(firstUser.getId())).thenReturn(Optional.ofNullable(firstUser));
         when(userContext.getUserId()).thenReturn(secondUser.getId());
-//        when(eventMapper.toJson(any(ProfileViewEventDto.class))).thenReturn("[]");
 
         userService.getUser(firstUser.getId());
 
@@ -110,7 +107,6 @@ public class UserServiceTest {
         userDto.setId(1L);
         userDto.setUsername("John Doe");
 
-
         User user = new User();
         user.setId(1L);
         user.setUsername("John Doe");
@@ -126,9 +122,9 @@ public class UserServiceTest {
         when(userMapper.toDto(user)).thenReturn(userDto);
         UserDto createdUserDto = userService.create(userDto);
 
-        assertNotNull(createdUserDto);
-        assertEquals(userDto.getId(), createdUserDto.getId());
-        assertEquals(userDto.getUsername(), createdUserDto.getUsername());
+        Assertions.assertNotNull(createdUserDto);
+        Assertions.assertEquals(userDto.getId(), createdUserDto.getId());
+        Assertions.assertEquals(userDto.getUsername(), createdUserDto.getUsername());
 
     }
 
@@ -140,7 +136,7 @@ public class UserServiceTest {
 
         when(userRepository.findById(1L)).thenReturn(java.util.Optional.of(new User()));
         DataValidationException exception = assertThrows(DataValidationException.class, () -> userService.create(userDto));
-        assertEquals("User with id 1 exists", exception.getMessage());
+        Assertions.assertEquals("User with id 1 exists", exception.getMessage());
 
     }
 }

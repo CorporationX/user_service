@@ -1,5 +1,6 @@
 package school.faang.user_service.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -8,11 +9,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import school.faang.user_service.entity.contact.ContactPreference;
+import school.faang.user_service.entity.contact.PreferredContact;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserDto {
     private long id;
     @NotBlank(message = "Username can't be empty")
@@ -28,4 +32,5 @@ public class UserDto {
     private boolean active;
     @NotNull(message = "Country ID can't be empty")
     private Long countryId;
+    private ContactPreference contactPreference;
 }

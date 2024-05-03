@@ -17,4 +17,8 @@ public class GoalController {
         }
         goalService.createGoal(userId, goal);
     }
+
+    public void deleteGoal(long goalId) {
+        goalService.deleteGoal(goalId);
+    }
 }

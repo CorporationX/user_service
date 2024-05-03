@@ -32,26 +32,32 @@ class GoalServiceTest {
     private SkillService skillService;
 
     @Test
-    void testGoalServiceWhenUserHaveActiveGoalsGrandThenMaxValue() {
+    void testCreateWhenUserHaveActiveGoalsGrandThenMaxValue() {
         when(goalRepository.countActiveGoalsPerUser(1L)).thenReturn(3);
 
         assertThrows(UserGoalsValidationException.class, () -> goalService.createGoal(1L, new Goal()));
     }
 
     @Test
-    void testGoalServiceWhenSomeSkillsDoesntExistInDB() {
+    void testCreateWhenSomeSkillsDoesntExistInDB() {
         Goal goal = init(false);
 
         assertThrows(DataValidationException.class, () -> goalService.createGoal(1L, goal));
     }
 
     @Test
-    void testGoalServiceWhenAllCorrect() {
+    void testCreateWhenAllCorrect() {
         Goal goal = init(true);
 
         goalService.createGoal(1L, goal);
 
         verify(goalRepository, times(1)).create(goal.getTitle(), goal.getDescription(), goal.getId());
+    }
+
+    @Test
+    void testDelete() {
+        goalService.deleteGoal(1L);
+        verify(goalRepository, times(1)).deleteGoalById(1L);
     }
 
     private Goal init(boolean param) {

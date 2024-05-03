@@ -25,4 +25,8 @@ public class GoalService {
         goal.getSkillsToAchieve()
                 .forEach(skill -> goalRepository.addSkillToGoal(skill.getId(), goal.getId()));
     }
+
+    public void deleteGoal(long goalId) {
+        goalRepository.deleteGoalById(goalId);
+    }
 }

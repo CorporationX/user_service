@@ -55,4 +55,10 @@ public interface GoalRepository extends CrudRepository<Goal, Long> {
             VALUES (goalId, skillId, NOW(), NOW())
             """)
     void addSkillToGoal(long skillId, long goalId);
+
+    @Query(nativeQuery = true, value = """
+            DELETE FROM goal
+            WHERE goal.id = goalId
+            """)
+    void deleteGoalById(long goalId);
 }

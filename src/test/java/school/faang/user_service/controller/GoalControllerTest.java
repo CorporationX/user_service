@@ -21,18 +21,24 @@ class GoalControllerTest {
     private GoalController goalController;
 
     @Test
-    void testControllerWhenReceivedGoalWithBlankTitle() {
+    void testCreateWhenReceivedGoalWithBlankTitle() {
         Goal goal = init("");
         assertThrows(DataValidationException.class, () -> goalController.createGoal(1L, goal));
     }
 
     @Test
-    void testControllerWhenAllCorrect() {
+    void testCreateWhenAllCorrect() {
         Goal goal = init("Test");
 
         goalController.createGoal(1L, goal);
 
         Mockito.verify(goalService, Mockito.times(1)).createGoal(1L, goal);
+    }
+
+    @Test
+    void testDelete() {
+        goalController.deleteGoal(1L);
+        Mockito.verify(goalService, Mockito.times(1)).deleteGoal(1L);
     }
 
     private Goal init(String title) {

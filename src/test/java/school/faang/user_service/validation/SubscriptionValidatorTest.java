@@ -10,12 +10,11 @@ import school.faang.user_service.repository.SubscriptionRepository;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
+import static school.faang.user_service.util.TestUser.FOLLOWEE_ID;
+import static school.faang.user_service.util.TestUser.FOLLOWER_ID;
 
 @ExtendWith(MockitoExtension.class)
 class SubscriptionValidatorTest {
-
-    private final long followerId = 1L;
-    private final long followeeId = 2L;
 
     @Mock
     SubscriptionRepository subscriptionRepository;
@@ -26,33 +25,33 @@ class SubscriptionValidatorTest {
     public void testValidateSubscribeUserToHimself() {
         DataValidationException dataValidationException = assertThrows(
                 DataValidationException.class,
-                () -> validator.validateUserTriedFollowHimself(followerId, followerId)
+                () -> validator.validateUserTriedFollowHimself(FOLLOWER_ID, FOLLOWER_ID)
         );
-        assertEquals("The user " + followerId + " tried to follow himself!",
+        assertEquals("The user " + FOLLOWER_ID + " tried to follow himself!",
                 dataValidationException.getMessage());
     }
 
     @Test
     public void testIsFollowerUserAndFolloweeUserExist() {
-        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId))
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(FOLLOWER_ID, FOLLOWEE_ID))
                 .thenReturn(true);
 
         DataValidationException dataValidationException = assertThrows(
                 DataValidationException.class,
-                () -> validator.validateIsExists(followerId, followeeId)
+                () -> validator.validateIsExists(FOLLOWER_ID, FOLLOWEE_ID)
         );
 
-        assertEquals("User " + followerId + " subscription to user " +
-                followeeId + " exist", dataValidationException.getMessage());
+        assertEquals("User " + FOLLOWER_ID + " subscription to user " +
+                FOLLOWEE_ID + " exist", dataValidationException.getMessage());
     }
 
     @Test
     public void testValidateUnsubscribeUserToHimself() {
         DataValidationException dataValidationException = assertThrows(
                 DataValidationException.class,
-                () -> validator.validateUserTriedUnfollowHimself(followerId, followerId)
+                () -> validator.validateUserTriedUnfollowHimself(FOLLOWER_ID, FOLLOWER_ID)
         );
-        assertEquals("The user " + followerId + " tried to unfollow himself!",
+        assertEquals("The user " + FOLLOWER_ID + " tried to unfollow himself!",
                 dataValidationException.getMessage()
         );
     }

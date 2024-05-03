@@ -20,4 +20,8 @@ public class SubscriptionService {
     public void unfollowUser(long followerId, long followeeId) {
         subscriptionRepository.unfollowUser(followerId, followeeId);
     }
+
+    public int getFollowersCount(long followeeId) {
+        return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
+    }
 }

@@ -12,12 +12,12 @@ import school.faang.user_service.validation.SubscriptionValidator;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static school.faang.user_service.util.TestUser.FOLLOWEE_ID;
+import static school.faang.user_service.util.TestUser.FOLLOWER_ID;
 
 @ExtendWith(MockitoExtension.class)
 public class SubscriptionControllerTest {
 
-    private final long followerId = 1L;
-    private final long followeeId = 2L;
     @Mock
     SubscriptionService service;
     @Mock
@@ -30,16 +30,23 @@ public class SubscriptionControllerTest {
     @Test
     public void testSubscribeUserToAnotherUser() {
         when(ctx.getUserId()).thenReturn(1L);
-        controller.followUser(followeeId);
-        verify(service, times(1)).followUser(followerId, followeeId);
-        verify(validator, times(1)).validateUserTriedFollowHimself(followerId, followeeId);
+        controller.followUser(FOLLOWEE_ID);
+        verify(service, times(1)).followUser(FOLLOWER_ID, FOLLOWEE_ID);
+        verify(validator, times(1)).validateUserTriedFollowHimself(FOLLOWER_ID, FOLLOWEE_ID);
     }
 
     @Test
     public void testUnsubscribeUserFromAnotherUser() {
         when(ctx.getUserId()).thenReturn(1L);
-        controller.unfollowUser(followeeId);
-        verify(service, times(1)).unfollowUser(followerId, followeeId);
-        verify(validator, times(1)).validateUserTriedUnfollowHimself(followerId, followeeId);
+        controller.unfollowUser(FOLLOWEE_ID);
+        verify(service, times(1)).unfollowUser(FOLLOWER_ID, FOLLOWEE_ID);
+        verify(validator, times(1)).validateUserTriedUnfollowHimself(FOLLOWER_ID, FOLLOWEE_ID);
+    }
+
+    @Test
+    public void testGetFollowerCount() {
+        when(ctx.getUserId()).thenReturn(1L);
+        controller.getFollowersCount();
+        verify(service, times(1)).getFollowersCount(FOLLOWER_ID);
     }
 }

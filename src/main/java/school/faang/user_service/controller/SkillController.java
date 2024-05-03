@@ -25,11 +25,12 @@ public class SkillController {
 
 
     private final SkillService skillService;
+    private final SkillValidator validator;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public SkillDto create(@RequestBody SkillDto skillDto) {
-        SkillValidator.validateSkill(skillDto);
+        validator.validateSkill(skillDto);
         return skillService.create(skillDto);
     }
 

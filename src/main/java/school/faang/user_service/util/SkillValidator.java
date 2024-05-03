@@ -22,9 +22,8 @@ public class SkillValidator {
 
     private final SkillRepository skillRepository;
 
-    public static void validateSkill(SkillDto skill) {
-        if (skill.getTitle().isBlank() || skill.getTitle().isEmpty()) {
-            log.error(EMPTY_TITLE_MSG);
+    public void validateSkill(SkillDto skill) {
+        if (skill.getTitle().isBlank()) {
             throw new DataValidationException(EMPTY_TITLE_MSG);
         }
     }
@@ -46,7 +45,6 @@ public class SkillValidator {
     }
 
     public void validateMinSkillOffers(int countOffersSkill, long skillId, long userId) {
-        System.out.println("MIN_SKILL_OFFERS: " + MIN_SKILL_OFFERS);
         if (countOffersSkill < MIN_SKILL_OFFERS) {
             throw new DataValidationException("Skill with ID: " + skillId + " hasn't enough offers for user with ID: " + userId);
         }

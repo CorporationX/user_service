@@ -10,6 +10,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.mapper.GoalInvitationMapper;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
@@ -22,22 +23,25 @@ public class GoalInvitationService {
     final GoalInvitationRepository goalInvitationRepository;
     final GoalInvitationMapper goalInvitationMapper;
     final GoalRepository goalRepository;
+    final UserRepository userRepository;
     GoalInvitation goalInvitation;
     RuntimeException runtimeException = new RuntimeException();
 
-    public void createInvitation(GoalInvitationDto goalInvitationDto) {
+    public GoalInvitationDto createInvitation(GoalInvitationDto goalInvitationDto) {
         if (goalInvitationDto.getInviterId() != null && goalInvitationDto.getInvitedUserId() != null) {
             if (!goalInvitationDto.getInviterId().equals(goalInvitationDto.getInvitedUserId())) {
-                if (goalInvitationRepository.existsById(goalInvitationDto.getInviterId()) && goalInvitationRepository.existsById(goalInvitationDto.getInvitedUserId())) {
-                    goalInvitationRepository.save(goalInvitationMapper.toEntity(goalInvitationDto));
+                if (userRepository.existsById(goalInvitationDto.getInviterId()) && userRepository.existsById(goalInvitationDto.getInvitedUserId())) {
+                    goalInvitation = goalInvitationMapper.toEntity(goalInvitationDto);
+                    goalInvitationRepository.save(goalInvitation);
+                    return goalInvitationMapper.toDto(goalInvitation);
                 } else {
-                    throw runtimeException;
+                    throw new RuntimeException("There is no such inviter or invitedUser in database");
                 }
             } else {
-                throw runtimeException;
+                throw new RuntimeException("InviterId equals InvitedUserId");
             }
         } else {
-            throw runtimeException;
+            throw new RuntimeException("InviterId == null or InvitedUserId == null");
         }
     }
 
@@ -90,4 +94,5 @@ public class GoalInvitationService {
             throw runtimeException;
         }
     }
+
 }

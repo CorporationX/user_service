@@ -74,35 +74,27 @@ class EventMapperTest {
 
     @Test
     void toEntityTest() {
-        //before
         event.setOwner(null);
 
-        //when
         Event actualEvent = eventMapper.toEntity(eventDto);
 
-        //then
         assertEquals(event, actualEvent);
     }
 
     @Test
     void toDtoTest() {
-        //before
         eventDto.setId(0L);
         eventDto.getRelatedSkills().forEach(skill -> skill.setId(0L));
 
-        //when
         EventDto actualEventDto = eventMapper.toDto(event);
 
-        //then
         assertEquals(eventDto, actualEventDto);
     }
 
     @Test
     void userToUserId() {
-        //when
         var actualUserId = EventMapper.userToUserId(nadir);
 
-        //then
         assertEquals(nadir.getId(), actualUserId);
     }
 }

@@ -30,7 +30,7 @@ public class EventService {
         return eventMapper.toDto(eventRepository.save(eventMapper.toEntity(eventDto)));
     }
 
-    public void checkOwnerSkills(Long ownerId, List<SkillDto> relatedSkills) {
+    private void checkOwnerSkills(Long ownerId, List<SkillDto> relatedSkills) {
         var ownerSkills = new HashSet<>(skillMapper.toDto(skillRepository.findAllByUserId(ownerId)));
 
         if (!ownerSkills.containsAll(relatedSkills)) {

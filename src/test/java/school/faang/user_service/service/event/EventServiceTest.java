@@ -3,13 +3,13 @@ package school.faang.user_service.service.event;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.skill.SkillDto;
+import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.EventMapper;
@@ -23,7 +23,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -32,19 +31,19 @@ import static school.faang.user_service.exception.ExceptionMessage.INAPPROPRIATE
 @ExtendWith(MockitoExtension.class)
 class EventServiceTest {
     @Mock
-    EventRepository eventRepository;
+    private EventRepository eventRepository;
     @Mock
-    SkillRepository skillRepository;
+    private SkillRepository skillRepository;
     @Mock
-    SkillMapper skillMapper;
+    private SkillMapper skillMapper;
     @Mock
-    EventMapper eventMapper;
+    private EventMapper eventMapper;
 
-    @Spy
     @InjectMocks
-    EventService eventService;
+    private EventService eventService;
 
-    EventDto eventDto;
+    private EventDto eventDto;
+    private Event event;
 
     @BeforeEach
     void setUp() {
@@ -61,48 +60,47 @@ class EventServiceTest {
         eventDto.setRelatedSkills(List.of(skillADto, skillBDto));
         eventDto.setLocation("Location");
         eventDto.setMaxAttendees(10);
+
+        event = new Event();
+        event.setTitle("Title");
+        event.setStartDate(LocalDateTime.of(2024, 6, 12, 12, 12));
+        var owner = new User();
+        owner.setId(1L);
+        event.setOwner(owner);
+        event.setDescription("Description");
+
+        var skillA = new Skill();
+        skillA.setTitle("SQL");
+        var skillB = new Skill();
+        skillB.setTitle("Java");
+        event.setRelatedSkills(List.of(skillA, skillB));
+        event.setLocation("Location");
+        event.setMaxAttendees(10);
     }
 
 
     @Test
-    void createTest() {
-        //before
-        doNothing().when(eventService).checkOwnerSkills(eventDto.getOwnerId(), eventDto.getRelatedSkills());
-
-        //when
-        eventService.create(eventDto);
-
-        //then
-        verify(eventService, times(1)).checkOwnerSkills(eventDto.getOwnerId(), eventDto.getRelatedSkills());
-        verify(eventRepository, times(1)).save(ArgumentCaptor.forClass(Event.class).capture());
-    }
-
-    @Test
-    void checkOwnerSkillsPositiveTest() {
-        //before
+    void createEventPositiveTest() {
         when(skillRepository.findAllByUserId(eventDto.getOwnerId())).thenReturn(List.of());
         when(skillMapper.toDto(List.of())).thenReturn(eventDto.getRelatedSkills());
 
-        //when
-        assertDoesNotThrow(() -> eventService.checkOwnerSkills(eventDto.getOwnerId(), eventDto.getRelatedSkills()));
+        when(eventMapper.toEntity(eventDto)).thenReturn(event);
 
-        //then
-        verify(skillRepository, times(1)).findAllByUserId(eventDto.getOwnerId());
+
+        assertDoesNotThrow(() -> eventService.create(eventDto));
+
+        verify(eventRepository).save(event);
     }
 
     @Test
-    void checkOwnerSkillsNegativeTest() {
-        //before
+    void createEventNegativeTest() {
         when(skillRepository.findAllByUserId(eventDto.getOwnerId())).thenReturn(List.of());
         when(skillMapper.toDto(List.of())).thenReturn(List.of());
 
-        //when
-        DataValidationException dataValidationException = assertThrows(DataValidationException.class,
-                () -> eventService.checkOwnerSkills(eventDto.getOwnerId(), eventDto.getRelatedSkills()));
+        DataValidationException exception = assertThrows(DataValidationException.class,
+                () -> eventService.create(eventDto));
 
-
-        //then
-        verify(skillRepository, times(1)).findAllByUserId(eventDto.getOwnerId());
-        assertEquals(INAPPROPRIATE_OWNER_SKILLS_EXCEPTION.getMessage(), dataValidationException.getMessage());
+        verify(eventRepository, times(0)).save(event);
+        assertEquals(INAPPROPRIATE_OWNER_SKILLS_EXCEPTION.getMessage(), exception.getMessage());
     }
 }

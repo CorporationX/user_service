@@ -30,23 +30,20 @@ class SkillMapperTest {
 
     @Test
     void toDtoTest() {
-        //when
         SkillDto actualSkillDto = skillMapper.toDto(skill);
 
-        //then
         assertEquals(skillDto, actualSkillDto);
     }
 
     @Test
     void toDtoListTest() {
-        //before
         List<Skill> skills = List.of(skill);
         List<SkillDto> skillDtos = List.of(skillDto);
 
-        //when
+
         List<SkillDto> actualSkillDtos = skillMapper.toDto(skills);
 
-        //then
+
         assertEquals(skillDtos, actualSkillDtos);
     }
 }

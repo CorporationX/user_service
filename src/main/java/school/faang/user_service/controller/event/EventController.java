@@ -23,7 +23,7 @@ public class EventController {
         return eventService.create(event);
     }
 
-    public void validateEvent(EventDto event) {
+    private void validateEvent(EventDto event) {
 
         if (event.getTitle() == null || event.getTitle().isBlank()) {
             throw new DataValidationException(NULL_OR_BLANK_EVENT_TITLE_EXCEPTION.getMessage());

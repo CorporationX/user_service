@@ -41,39 +41,37 @@ public class GoalInvitationServiceTest {
     @Captor
     ArgumentCaptor<GoalInvitation> captor;
 
-
-    private GoalInvitationDto setup() {
-        return new GoalInvitationDto();
-    }
-
     @Test
     public void testCreateInvitationWithInviterId() {
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> goalInvitationService.createInvitation(setup()));
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> goalInvitationService.createInvitation(new GoalInvitationDto()));
         assertEquals("InviterId == null or InvitedUserId == null", exception.getMessage());
     }
 
     @Test
     public void testCreateInvitationWithInvitedUserId() {
-        GoalInvitationDto goalInvitationDto = setup();
+        GoalInvitationDto goalInvitationDto = new GoalInvitationDto();
         goalInvitationDto.setInviterId(1L);
+
         RuntimeException exception = assertThrows(RuntimeException.class, () -> goalInvitationService.createInvitation(goalInvitationDto));
         assertEquals("InviterId == null or InvitedUserId == null", exception.getMessage());
     }
 
     @Test
     public void testCreateInvitationWithInviterIdEqualsInvitedUserId() {
-        GoalInvitationDto goalInvitationDto = setup();
+        GoalInvitationDto goalInvitationDto = new GoalInvitationDto();
         goalInvitationDto.setInviterId(25L);
         goalInvitationDto.setInvitedUserId(25L);
+
         RuntimeException exception = assertThrows(RuntimeException.class, () -> goalInvitationService.createInvitation(goalInvitationDto));
         assertEquals("InviterId equals InvitedUserId", exception.getMessage());
     }
 
     @Test
     public void testCreateInvitationWithInviteExists() {
-        GoalInvitationDto goalInvitationDto = setup();
+        GoalInvitationDto goalInvitationDto = new GoalInvitationDto();
         goalInvitationDto.setInviterId(25L);
         goalInvitationDto.setInvitedUserId(20L);
+
         when(userRepository.existsById(goalInvitationDto.getInviterId())).thenReturn(false);
         Exception exception = assertThrows(RuntimeException.class, () -> goalInvitationService.createInvitation(goalInvitationDto));
         assertEquals("There is no such inviter or invitedUser in database", exception.getMessage());
@@ -81,9 +79,10 @@ public class GoalInvitationServiceTest {
 
     @Test
     public void testCreateInvitationWithInvitedUserExists() {
-        GoalInvitationDto goalInvitationDto = setup();
+        GoalInvitationDto goalInvitationDto = new GoalInvitationDto();
         goalInvitationDto.setInviterId(25L);
         goalInvitationDto.setInvitedUserId(20L);
+
         when(userRepository.existsById(goalInvitationDto.getInviterId())).thenReturn(true);
         when(userRepository.existsById(goalInvitationDto.getInvitedUserId())).thenReturn(false);
         Exception exception = assertThrows(RuntimeException.class, () -> goalInvitationService.createInvitation(goalInvitationDto));
@@ -92,13 +91,7 @@ public class GoalInvitationServiceTest {
 
     @Test
     public void testCreateInvitationSaveGoalInvitation() {
-        GoalInvitationDto goalInvitationDto = setup();
-
-        goalInvitationDto.setInviterId(25L);
-        goalInvitationDto.setInvitedUserId(20L);
-        goalInvitationDto.setGoalId(30L);
-        goalInvitationDto.setId(1L);
-        goalInvitationDto.setStatus(RequestStatus.PENDING);
+        GoalInvitationDto goalInvitationDto = new GoalInvitationDto(25L, 25L, 20L, 30L, RequestStatus.PENDING);
 
         User inviter = new User();
         inviter.setId(25L);

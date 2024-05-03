@@ -12,8 +12,8 @@ import school.faang.user_service.service.GoalInvitationService;
 public class GoalInvitationController {
     private GoalInvitationService goalInvitationService;
 
-    void createInvitation(GoalInvitationDto invitation) {
-        goalInvitationService.createInvitation(invitation);
+    GoalInvitationDto createInvitation(GoalInvitationDto invitation) {
+        return goalInvitationService.createInvitation(invitation);
     }
 
     void acceptGoalInvitation(long id) {

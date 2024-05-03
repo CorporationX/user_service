@@ -11,4 +11,5 @@ import school.faang.user_service.entity.goal.GoalInvitation;
 public interface GoalInvitationMapper {
 
     GoalInvitation toEntity(GoalInvitationDto goalInvitationDto);
+    GoalInvitationDto toDto(GoalInvitation goalInvitation);
 }

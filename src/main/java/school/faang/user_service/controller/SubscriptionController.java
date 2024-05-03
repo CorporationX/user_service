@@ -3,7 +3,7 @@ package school.faang.user_service.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.ExceptionMessage;
 import school.faang.user_service.service.SubscriptionService;

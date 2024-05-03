@@ -9,18 +9,32 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
+import school.faang.user_service.service.user.filter.UserAboutFilter;
+import school.faang.user_service.service.user.filter.UserCityFilter;
+import school.faang.user_service.service.user.filter.UserContactFilter;
+import school.faang.user_service.service.user.filter.UserCountryFilter;
+import school.faang.user_service.service.user.filter.UserEmailFilter;
+import school.faang.user_service.service.user.filter.UserExperienceFilter;
+import school.faang.user_service.service.user.filter.UserFilter;
+import school.faang.user_service.service.user.filter.UserNameFilter;
+import school.faang.user_service.service.user.filter.UserPhoneFilter;
+import school.faang.user_service.service.user.filter.UserSkillFilter;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -32,6 +46,10 @@ class SubscriptionServiceTest {
     @Mock
     SubscriptionRepository subscriptionRepo;
 
+    @Mock
+    UserMapper userMapper;
+
+    @Spy
     @InjectMocks
     SubscriptionService subscriptionService;
 
@@ -40,6 +58,8 @@ class SubscriptionServiceTest {
 
     Long followerId;
     Long followeeId;
+    List<UserFilter> filters;
+    UserFilterDto filterDto;
 
     @BeforeEach
     void init() {
@@ -48,6 +68,23 @@ class SubscriptionServiceTest {
 
         followerId = 1L;
         followeeId = 2L;
+
+        filterDto = new UserFilterDto();
+
+        var userNameFilter = mock(UserNameFilter.class);
+        var userAboutFilter = mock(UserAboutFilter.class);
+        var userEmailFilter = mock(UserEmailFilter.class);
+        var userContactFilter = mock(UserContactFilter.class);
+        var userCountryFilter = mock(UserCountryFilter.class);
+        var userCityFilter = mock(UserCityFilter.class);
+        var userPhoneFilter = mock(UserPhoneFilter.class);
+        var userSkillFilter = mock(UserSkillFilter.class);
+        var userExperienceFilter = mock(UserExperienceFilter.class);
+
+        filters = List.of(userNameFilter, userAboutFilter, userEmailFilter,userContactFilter,
+                userCountryFilter,userCityFilter,userPhoneFilter,userSkillFilter,userExperienceFilter);
+
+        subscriptionService.setFilters(filters);
     }
 
     @DisplayName("Following new user test")
@@ -97,10 +134,16 @@ class SubscriptionServiceTest {
     @DisplayName("Getting followers test")
     @Test
     void getFollowersTest() {
-        when(subscriptionRepo.findByFolloweeId(followeeId)).thenReturn(Stream.<User>builder().build());
+        var allFollowers = Stream.<User>builder().build();
+
+        when(subscriptionRepo.findByFolloweeId(followeeId)).thenReturn(allFollowers);
+        filters.forEach(filter -> {
+            when(filter.isApplicable(filterDto)).thenReturn(true);
+            when(filter.apply(allFollowers, filterDto)).thenReturn(Stream.<User>builder().build());
+        });
 
 
-        var actualFollowers = subscriptionService.getFollowers(followeeId, new UserFilterDto());
+        var actualFollowers = subscriptionService.getFollowers(followeeId, filterDto);
 
 
         verify(subscriptionRepo).findByFolloweeId(followeeArgumentCaptor.capture());

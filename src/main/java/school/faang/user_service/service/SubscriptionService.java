@@ -1,13 +1,16 @@
 package school.faang.user_service.service;
 
 import lombok.AllArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
+import school.faang.user_service.service.user.filter.UserFilter;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -17,8 +20,11 @@ import static school.faang.user_service.exception.ExceptionMessage.REPEATED_SUBS
 @Service
 @AllArgsConstructor
 @Slf4j
+@Setter
 public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepo;
+    private List<UserFilter> filters;
+    private final UserMapper userMapper;
 
     public void followUser(long followerId, long followeeId) {
         if (subscriptionRepo.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
@@ -50,10 +56,11 @@ public class SubscriptionService {
         return subscriptionRepo.findFolloweesAmountByFollowerId(followerId);
     }
 
-    private List<UserDto> filterUsers(Stream<User> users, UserFilterDto filter) {
-        return users
-                .filter(filter::matches)
-                .map(user -> new UserDto(user.getId(), user.getUsername(), user.getEmail()))
+    private List<UserDto> filterUsers(Stream<User> users, UserFilterDto filterDto) {
+        return filters.stream()
+                .filter(userFilter -> userFilter.isApplicable(filterDto))
+                .flatMap(userFilter -> userFilter.apply(users, filterDto))
+                .map(userMapper::toDto)
                 .toList();
     }
 }

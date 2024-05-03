@@ -26,7 +26,7 @@ class SubscriptionValidatorTest {
     public void testValidateSubscribeUserToHimself() {
         DataValidationException dataValidationException = assertThrows(
                 DataValidationException.class,
-                () -> validator.validateUserTriedHimself(followerId, followerId));
+                () -> validator.validateUser(followerId, followerId));
         assertEquals("The user " + followerId + " tried to follow himself!",
                 dataValidationException.getMessage());
     }
@@ -38,7 +38,7 @@ class SubscriptionValidatorTest {
 
         DataValidationException dataValidationException = assertThrows(
                 DataValidationException.class,
-                () -> validator.validateIsExists(followerId, followeeId));
+                () -> validator.validateExistsSubscription(followerId, followeeId));
 
         assertEquals("User " + followerId + " subscription to user " +
                 followeeId + " exist", dataValidationException.getMessage());

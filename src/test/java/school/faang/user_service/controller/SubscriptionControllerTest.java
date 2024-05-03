@@ -31,7 +31,7 @@ public class SubscriptionControllerTest {
         when(ctx.getUserId()).thenReturn(1L);
         controller.followUser(followeeId);
         verify(service, times(1)).followUser(followerId, followeeId);
-        verify(validator, times(1)).validateUserTriedHimself(followerId, followeeId);
+        verify(validator, times(1)).validateUser(followerId, followeeId);
     }
 
 }

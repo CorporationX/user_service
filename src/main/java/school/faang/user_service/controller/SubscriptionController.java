@@ -3,7 +3,6 @@ package school.faang.user_service.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,12 +20,11 @@ public class SubscriptionController {
     private final UserContext userContext;
     private final SubscriptionValidator validator;
 
-    @Transactional
     @PostMapping("/user/{followeeId}")
     @ResponseStatus(HttpStatus.CREATED)
     public void followUser(@PathVariable long followeeId) {
         long followerId = userContext.getUserId();
-        validator.validateUserTriedHimself(followerId, followeeId);
+        validator.validateUser(followerId, followeeId);
         service.followUser(followerId, followeeId);
     }
 }

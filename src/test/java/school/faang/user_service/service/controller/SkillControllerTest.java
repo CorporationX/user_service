@@ -13,6 +13,7 @@ import school.faang.user_service.service.SkillService;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,14 +32,12 @@ public class SkillControllerTest {
     @Test
     public void testCreateWithNullTitle() {
         SkillDto skillDto = createSkillDto(null);
-        skillDto.setTitle(null);
         assertThrows(DataValidationException.class, () -> skillController.create(skillDto));
     }
 
     @Test
     public void testCreateWithEmptyTitle() {
         SkillDto skillDto = createSkillDto("");
-        skillDto.setTitle("");
         assertThrows(DataValidationException.class, () -> skillController.create(skillDto));
     }
 
@@ -81,6 +80,18 @@ public class SkillControllerTest {
         List<SkillCandidateDto> candidateDtoList = skillController.getOfferedSkills(userId);
 
         assertEquals(expectedSkillCandidateDto, candidateDtoList);
+    }
+
+    @Test
+    public void testAcquireSkillFromOffers() {
+        long userId = 1;
+        long skillId = 1;
+        Optional<SkillDto> expectedSkillDto = Optional.of(createSkillDto("title"));
+        when(skillService.acquireSkillFromOffers(skillId, userId)).thenReturn(expectedSkillDto);
+
+        Optional<SkillDto> skillDtoList = skillController.acquireSkillFromOffers(skillId, userId);
+
+        assertEquals(expectedSkillDto, skillDtoList);
     }
 
     private SkillDto createSkillDto(String title) {

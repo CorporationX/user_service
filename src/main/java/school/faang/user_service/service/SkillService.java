@@ -10,6 +10,7 @@ import school.faang.user_service.mappers.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Component
@@ -39,10 +40,36 @@ public class SkillService {
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
         List<Skill> offeredSkillList = skillRepository.findSkillsOfferedToUser(userId);
-        return offeredSkillList.stream().map(skill -> skillMapper.skillToSkillCandidateDto(skill, getSkillOffersNumber(userId, skill.getId()))).toList();
+        return offeredSkillList.stream().map(skill ->
+                skillMapper.skillToSkillCandidateDto(skill, getSkillOffersNumber(userId, skill.getId()))).toList();
     }
 
     private long getSkillOffersNumber(long userId, long skillId) {
         return skillRepository.countOffersByUserIdAndSkillId(userId, skillId);
+    }
+
+    public Optional<SkillDto> acquireSkillFromOffers(long skillId, long userId) {
+        if (hasAlreadyAcquiredSkill(skillId, userId) || !hasEnoughSkillOffers(skillId, userId)) {
+            return Optional.empty();
+        }
+
+        skillRepository.assignSkillToUser(skillId, userId);
+
+        return skillRepository.findById(skillId)
+                .map(skill -> {
+                    SkillDto acquiredSkillDto = new SkillDto();
+                    acquiredSkillDto.setId(skill.getId());
+                    acquiredSkillDto.setTitle(skill.getTitle());
+                    return acquiredSkillDto;
+                });
+    }
+
+    private boolean hasAlreadyAcquiredSkill(long skillId, long userId) {
+        return skillRepository.findUserSkill(skillId, userId).isPresent();
+    }
+
+     private boolean hasEnoughSkillOffers(long skillId, long userId) {
+        final int MIN_SKILL_OFFERS = 3;
+        return getSkillOffersNumber(skillId, userId) >= MIN_SKILL_OFFERS;
     }
 }

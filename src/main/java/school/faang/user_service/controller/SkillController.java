@@ -8,6 +8,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SkillService;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -31,5 +32,9 @@ public class SkillController {
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
         return skillService.getOfferedSkills(userId);
+    }
+
+    public Optional<SkillDto> acquireSkillFromOffers(long skillId, long userId) {
+        return skillService.acquireSkillFromOffers(skillId, userId);
     }
 }

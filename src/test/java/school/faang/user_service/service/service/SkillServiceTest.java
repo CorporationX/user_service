@@ -2,9 +2,7 @@ package school.faang.user_service.service.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
@@ -17,12 +15,10 @@ import school.faang.user_service.service.SkillService;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -160,6 +156,47 @@ public class SkillServiceTest {
         verify(skillRepository).countOffersByUserIdAndSkillId(userId, skillList.get(1).getId());
         verify(skillMapper).skillToSkillCandidateDto(skillList.get(0), 1L);
         verify(skillMapper).skillToSkillCandidateDto(skillList.get(1), 2L);
+    }
+
+    @Test
+    public void testAcquireSkillWhenSkillAlreadyAcquired() {
+        long skillId = 1;
+        long userId = 1;
+        when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.empty());
+
+        Optional<SkillDto> result = skillService.acquireSkillFromOffers(skillId, userId);
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testAcquireSkillWhenNotEnoughSkillOffers() {
+        long skillId = 1;
+        long userId = 1;
+        when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.empty());
+        when(skillRepository.countOffersByUserIdAndSkillId(skillId, userId)).thenReturn(2L);
+
+        Optional<SkillDto> result = skillService.acquireSkillFromOffers(skillId, userId);
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testAcquireSkillSuccessfully() {
+        long skillId = 1;
+        long userId = 1;
+        Skill skill = new Skill();
+        skill.setId(skillId);
+        skill.setTitle("Test Skill");
+        when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.empty());
+        when(skillRepository.countOffersByUserIdAndSkillId(skillId, userId)).thenReturn(3L);
+        when(skillRepository.findById(skillId)).thenReturn(Optional.of(skill));
+
+        Optional<SkillDto> result = skillService.acquireSkillFromOffers(skillId, userId);
+
+        assertTrue(result.isPresent());
+        assertEquals(skillId, result.get().getId());
+        assertEquals(skill.getTitle(), result.get().getTitle());
     }
 
     private List<SkillCandidateDto> createSkillCandidateDto() {

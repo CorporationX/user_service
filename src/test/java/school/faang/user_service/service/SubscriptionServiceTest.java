@@ -1,6 +1,9 @@
 package school.faang.user_service.service;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -23,13 +26,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static school.faang.user_service.exception.ExceptionMessage.REPEATED_SUBSCRIPTION_EXCEPTION;
 
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @ExtendWith(MockitoExtension.class)
 class SubscriptionServiceTest {
     @Mock
-    private SubscriptionRepository subscriptionRepo;
+    SubscriptionRepository subscriptionRepo;
 
     @InjectMocks
-    private SubscriptionService subscriptionService;
+    SubscriptionService subscriptionService;
 
     ArgumentCaptor<Long> followerArgumentCaptor;
     ArgumentCaptor<Long> followeeArgumentCaptor;
@@ -46,141 +50,96 @@ class SubscriptionServiceTest {
         followeeId = 2L;
     }
 
+    @DisplayName("Following new user test")
     @Test
     void followNewUserTest() {
-        //before
         when(subscriptionRepo.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(false);
 
 
-        //when
         subscriptionService.followUser(followerId, followeeId);
 
-        //then
-        verify(subscriptionRepo, times(1)).existsByFollowerIdAndFolloweeId(followerArgumentCaptor.capture(), followeeArgumentCaptor.capture());
+
+        verify(subscriptionRepo).existsByFollowerIdAndFolloweeId(followerArgumentCaptor.capture(), followeeArgumentCaptor.capture());
         assertEquals(followerId, followerArgumentCaptor.getValue());
         assertEquals(followeeId, followeeArgumentCaptor.getValue());
 
-        verify(subscriptionRepo, times(1)).followUser(followerArgumentCaptor.capture(), followeeArgumentCaptor.capture());
+        verify(subscriptionRepo).followUser(followerArgumentCaptor.capture(), followeeArgumentCaptor.capture());
         assertEquals(followerId, followerArgumentCaptor.getValue());
         assertEquals(followeeId, followeeArgumentCaptor.getValue());
     }
 
+    @DisplayName("Following the followed user test")
     @Test
     void followFollowedUserTest() {
-        //before
         when(subscriptionRepo.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
 
 
-        //when
         var actualException = assertThrows(DataValidationException.class,
                 () -> subscriptionService.followUser(followerId, followeeId));
 
-        //then
+
         assertEquals(REPEATED_SUBSCRIPTION_EXCEPTION.getMessage(), actualException.getMessage());
-        verify(subscriptionRepo, times(1)).existsByFollowerIdAndFolloweeId(followerId, followeeId);
+        verify(subscriptionRepo).existsByFollowerIdAndFolloweeId(followerId, followeeId);
         verify(subscriptionRepo, times(0)).followUser(followerId, followeeId);
     }
 
+    @DisplayName("Unfollowing user test")
     @Test
     void unfollowUserTest() {
-        //when
         subscriptionService.unfollowUser(followerId, followeeId);
 
-        //then
-        verify(subscriptionRepo, times(1)).unfollowUser(followerArgumentCaptor.capture(), followeeArgumentCaptor.capture());
+
+        verify(subscriptionRepo).unfollowUser(followerArgumentCaptor.capture(), followeeArgumentCaptor.capture());
         assertEquals(followerId, followerArgumentCaptor.getValue());
         assertEquals(followeeId, followeeArgumentCaptor.getValue());
     }
 
+    @DisplayName("Getting followers test")
     @Test
     void getFollowersTest() {
-        //before
-        Stream<User> allFollowers = new ArrayList<User>().stream();
-        when(subscriptionRepo.findByFolloweeId(followeeId)).thenReturn(allFollowers);
+        when(subscriptionRepo.findByFolloweeId(followeeId)).thenReturn(Stream.<User>builder().build());
 
-        //when
+
         var actualFollowers = subscriptionService.getFollowers(followeeId, new UserFilterDto());
 
-        //then
-        verify(subscriptionRepo, times(1)).findByFolloweeId(followeeArgumentCaptor.capture());
+
+        verify(subscriptionRepo).findByFolloweeId(followeeArgumentCaptor.capture());
         assertEquals(followeeId, followeeArgumentCaptor.getValue());
         assertEquals(new ArrayList<UserDto>(), actualFollowers);
     }
 
-
-    @Test
-    void filterUsersTest() {
-        //before
-        var filter = new UserFilterDto();
-        filter.setCityPattern("Moscow");
-
-        var expectedFollowers = new ArrayList<UserDto>();
-        expectedFollowers.add(new UserDto(1L, "nadir", "nadir@gmail.com"));
-        expectedFollowers.add(new UserDto(2L, "cianid", "cianid@gmail.com"));
-
-        var allFollowers = new ArrayList<User>();
-
-        var nadir = new User();
-        nadir.setId(1L);
-        nadir.setUsername("nadir");
-        nadir.setEmail("nadir@gmail.com");
-        nadir.setCity("Moscow");
-        allFollowers.add(nadir);
-
-        var cianid = new User();
-        cianid.setId(2L);
-        cianid.setUsername("cianid");
-        cianid.setEmail("cianid@gmail.com");
-        cianid.setCity("Moscow");
-        allFollowers.add(cianid);
-
-        var zenith = new User();
-        zenith.setId(3L);
-        zenith.setUsername("zenith");
-        zenith.setEmail("zenith@gmail.com");
-        zenith.setCity("Kirov");
-        allFollowers.add(zenith);
-
-
-        //when
-        var actualFollowers = subscriptionService.filterUsers(allFollowers.stream(), filter);
-
-        //then
-        assertEquals(expectedFollowers, actualFollowers);
-    }
-
+    @DisplayName("Getting followers count test")
     @Test
     void getFollowersCountTest() {
-        //when
         var followersCount = subscriptionService.getFollowersCount(followeeId);
 
-        //then
-        verify(subscriptionRepo, times(1)).findFollowersAmountByFolloweeId(followeeArgumentCaptor.capture());
+
+        verify(subscriptionRepo).findFollowersAmountByFolloweeId(followeeArgumentCaptor.capture());
         assertEquals(followeeId, followeeArgumentCaptor.getValue());
     }
 
+    @DisplayName("Getting subscriptions test")
     @Test
     void getFollowingTest() {
-        //before
         Stream<User> allFollowing = new ArrayList<User>().stream();
         when(subscriptionRepo.findByFollowerId(followerId)).thenReturn(allFollowing);
 
-        //when
+
         var actualFollowing = subscriptionService.getFollowing(followerId, new UserFilterDto());
 
-        //then
-        verify(subscriptionRepo, times(1)).findByFollowerId(followerArgumentCaptor.capture());
+
+        verify(subscriptionRepo).findByFollowerId(followerArgumentCaptor.capture());
         assertEquals(followerId, followerArgumentCaptor.getValue());
         assertEquals(new ArrayList<UserDto>(), actualFollowing);
     }
 
+    @DisplayName("Getting subscriptions count test")
     @Test
     void getFollowingCountTest() {
-        //when
-        var followingCount = subscriptionService.getFollowingCount(followerId);
+        subscriptionService.getFollowingCount(followerId);
 
-        //then
-        verify(subscriptionRepo, times(1)).findFolloweesAmountByFollowerId(followerArgumentCaptor.capture());
+
+        verify(subscriptionRepo).findFolloweesAmountByFollowerId(followerArgumentCaptor.capture());
         assertEquals(followerId, followerArgumentCaptor.getValue());
     }
 }

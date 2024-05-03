@@ -1,7 +1,10 @@
 package school.faang.user_service.controller;
 
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -19,13 +22,14 @@ import static org.mockito.Mockito.verify;
 import static school.faang.user_service.exception.ExceptionMessage.USER_FOLLOWING_HIMSELF_EXCEPTION;
 import static school.faang.user_service.exception.ExceptionMessage.USER_UNFOLLOWING_HIMSELF_EXCEPTION;
 
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @ExtendWith(MockitoExtension.class)
 class SubscriptionControllerTest {
     @Mock
-    private SubscriptionService subscriptionService;
+    SubscriptionService subscriptionService;
 
     @InjectMocks
-    private SubscriptionController subscriptionController;
+    SubscriptionController subscriptionController;
 
     ArgumentCaptor<Long> followerArgumentCaptor;
     ArgumentCaptor<Long> followeeArgumentCaptor;
@@ -44,116 +48,107 @@ class SubscriptionControllerTest {
         followeeId = 2L;
     }
 
+    @DisplayName("Following other user test")
     @Test
     void followOtherUserTest() {
-        //before
         var followerArgumentCaptor = ArgumentCaptor.forClass(Long.class);
         var followeeArgumentCaptor = ArgumentCaptor.forClass(Long.class);
 
 
-        //when
         subscriptionController.followUser(followerId, followeeId);
 
-        //then
-        verify(subscriptionService, times(1)).followUser(followerArgumentCaptor.capture(), followeeArgumentCaptor.capture());
+
+        verify(subscriptionService).followUser(followerArgumentCaptor.capture(), followeeArgumentCaptor.capture());
         assertEquals(followerId, followerArgumentCaptor.getValue());
         assertEquals(followeeId, followeeArgumentCaptor.getValue());
     }
 
+    @DisplayName("Following yourself test")
     @Test
     void followYourselfTest() {
-        //before
         followeeId = followerId;
 
-        //when
         var actualException = assertThrows(DataValidationException.class,
                 () -> subscriptionController.followUser(followerId, followeeId));
 
-        //then
+
         assertEquals(USER_FOLLOWING_HIMSELF_EXCEPTION.getMessage(), actualException.getMessage());
         verify(subscriptionService, times(0)).followUser(followerId, followeeId);
     }
 
+    @DisplayName("Unfollowing other user test")
     @Test
     void unfollowOtherUserTest() {
-        //before
         var followerArgumentCaptor = ArgumentCaptor.forClass(Long.class);
         var followeeArgumentCaptor = ArgumentCaptor.forClass(Long.class);
 
 
-        //when
         subscriptionController.unfollowUser(followerId, followeeId);
 
-        //then
-        verify(subscriptionService, times(1)).unfollowUser(followerArgumentCaptor.capture(), followeeArgumentCaptor.capture());
+
+        verify(subscriptionService).unfollowUser(followerArgumentCaptor.capture(), followeeArgumentCaptor.capture());
         assertEquals(followerId, followerArgumentCaptor.getValue());
         assertEquals(followeeId, followeeArgumentCaptor.getValue());
     }
 
+    @DisplayName("Unfollowing yourself test")
     @Test
     void unfollowYourselfTest() {
-        //before
         followeeId = followerId;
 
 
-        //when
         var actualException = assertThrows(DataValidationException.class,
                 () -> subscriptionController.unfollowUser(followerId, followeeId));
 
-        //then
+
         assertEquals(USER_UNFOLLOWING_HIMSELF_EXCEPTION.getMessage(), actualException.getMessage());
         verify(subscriptionService, times(0)).followUser(followerId, followeeId);
     }
 
+    @DisplayName("Getting followers test")
     @Test
     void getFollowersTest() {
-        //before
         var filter = new UserFilterDto();
 
-        //when
         subscriptionController.getFollowers(followeeId, filter);
 
 
-        //then
-        verify(subscriptionService, times(1)).getFollowers(followeeArgumentCaptor.capture(), filterArgumentCaptor.capture());
+        verify(subscriptionService).getFollowers(followeeArgumentCaptor.capture(), filterArgumentCaptor.capture());
         assertEquals(filter, filterArgumentCaptor.getValue());
         assertEquals(followeeId, followeeArgumentCaptor.getValue());
     }
 
+    @DisplayName("Getting followers count test")
     @Test
     void getFollowersCountTest() {
-        //when
         subscriptionController.getFollowersCount(followeeId);
 
 
-        //then
-        verify(subscriptionService, times(1)).getFollowersCount(followeeArgumentCaptor.capture());
+        verify(subscriptionService).getFollowersCount(followeeArgumentCaptor.capture());
         assertEquals(followeeId, followeeArgumentCaptor.getValue());
     }
 
+    @DisplayName("Getting subscriptions of user test")
     @Test
     void getFollowingTest() {
-        //before
         var filter = new UserFilterDto();
 
-        //when
+
         subscriptionController.getFollowing(followerId, filter);
 
 
-        //then
-        verify(subscriptionService, times(1)).getFollowing(followerArgumentCaptor.capture(), filterArgumentCaptor.capture());
+        verify(subscriptionService).getFollowing(followerArgumentCaptor.capture(), filterArgumentCaptor.capture());
         assertEquals(filter, filterArgumentCaptor.getValue());
         assertEquals(followerId, followerArgumentCaptor.getValue());
     }
 
+    @DisplayName("Getting subscriptions count test")
     @Test
     void getFollowingCountTest() {
-        //when
         subscriptionController.getFollowingCount(followerId);
 
 
-        //then
-        verify(subscriptionService, times(1)).getFollowingCount(followerArgumentCaptor.capture());
+        verify(subscriptionService).getFollowingCount(followerArgumentCaptor.capture());
         assertEquals(followerId, followerArgumentCaptor.getValue());
     }
 }

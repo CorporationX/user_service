@@ -38,13 +38,6 @@ public class SubscriptionService {
         return filterUsers(subscriptionRepo.findByFolloweeId(followeeId), filter);
     }
 
-    public List<UserDto> filterUsers(Stream<User> users, UserFilterDto filter) {
-        return users
-                .filter(filter::matches)
-                .map(user -> new UserDto(user.getId(), user.getUsername(), user.getEmail()))
-                .toList();
-    }
-
     public int getFollowersCount(long followeeId) {
         return subscriptionRepo.findFollowersAmountByFolloweeId(followeeId);
     }
@@ -55,6 +48,13 @@ public class SubscriptionService {
 
     public int getFollowingCount(long followerId) {
         return subscriptionRepo.findFolloweesAmountByFollowerId(followerId);
+    }
+
+    private List<UserDto> filterUsers(Stream<User> users, UserFilterDto filter) {
+        return users
+                .filter(filter::matches)
+                .map(user -> new UserDto(user.getId(), user.getUsername(), user.getEmail()))
+                .toList();
     }
 }
 

@@ -1,7 +1,10 @@
 package school.faang.user_service.dto;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.Skill;
@@ -13,6 +16,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@FieldDefaults(level = AccessLevel.PRIVATE)
 class UserFilterDtoTest {
     UserFilterDto filter = new UserFilterDto();
     List<User> expectedMatches = new ArrayList<>();
@@ -100,162 +104,162 @@ class UserFilterDtoTest {
         allUsers.add(zenith);
     }
 
+    @DisplayName("Matching by name pattern test")
     @Test
     void matchesByNamePatternTest() {
-        //before
         filter.setNamePattern("nadir");
         expectedMatches = List.of(allUsers.get(0));
 
-        //when
+
         var actualResult = getMatches();
 
-        //then
+
         assertEquals(expectedMatches, actualResult);
     }
 
+    @DisplayName("Matching by about me pattern test")
     @Test
     void matchesByAboutMePatternTest() {
-        //before
         filter.setAboutPattern("About nadir");
         expectedMatches = List.of(allUsers.get(0));
 
-        //when
+
         var actualResult = getMatches();
 
-        //then
+
         assertEquals(expectedMatches, actualResult);
     }
 
+    @DisplayName("Matching by email pattern test")
     @Test
     void matchesByEmailPatternTest() {
-        //before
         filter.setEmailPattern("nadir@gmail.com");
         expectedMatches = List.of(allUsers.get(0));
 
-        //when
+
         var actualResult = getMatches();
 
-        //then
+
         assertEquals(expectedMatches, actualResult);
     }
 
+    @DisplayName("Matching by contact pattern test")
     @Test
     void matchesByContactPatternTest() {
-        //before
         filter.setContactPattern("Nadir");
         expectedMatches = List.of(allUsers.get(1), allUsers.get(2));
 
-        //when
+
         var actualResult = getMatches();
 
-        //then
+
         assertEquals(expectedMatches, actualResult);
     }
 
+    @DisplayName("Matching by country pattern test")
     @Test
     void matchesByCountryPatternTest() {
-        //before
         filter.setCountryPattern("Russia");
         expectedMatches = List.of(allUsers.get(0), allUsers.get(2));
 
-        //when
+
         var actualResult = getMatches();
 
-        //then
+
         assertEquals(expectedMatches, actualResult);
     }
 
+    @DisplayName("Matching by city pattern test")
     @Test
     void matchesByCityPatternTest() {
-        //before
         filter.setCityPattern("Lon.*");
         expectedMatches = List.of(allUsers.get(1));
 
-        //when
+
         var actualResult = getMatches();
 
-        //then
+
         assertEquals(expectedMatches, actualResult);
     }
 
+    @DisplayName("Matching by phone pattern test")
     @Test
     void matchesByPhonePatternTest() {
-        //before
         filter.setPhonePattern("123..");
         expectedMatches = List.of(allUsers.get(0));
 
-        //when
+
         var actualResult = getMatches();
 
-        //then
+
         assertEquals(expectedMatches, actualResult);
     }
 
+    @DisplayName("Matching by skill pattern test")
     @Test
     void matchesBySkillPatternTest() {
-        //before
         filter.setSkillPattern("SQL");
         expectedMatches = List.of(allUsers.get(0), allUsers.get(1));
 
-        //when
+
         var actualResult = getMatches();
 
-        //then
+
         assertEquals(expectedMatches, actualResult);
     }
 
+    @DisplayName("Matching by experience bounds test")
     @Test
     void matchesByExperienceMinMaxPatternTest() {
-        //before
         filter.setExperienceMin(3);
         filter.setExperienceMax(12);
         expectedMatches = List.of(allUsers.get(0), allUsers.get(2));
 
-        //when
+
         var actualResult = getMatches();
 
-        //then
+
         assertEquals(expectedMatches, actualResult);
     }
 
+    @DisplayName("Matching by experience min bound test")
     @Test
     void matchesByExperienceMinPatternTest() {
-        //before
         filter.setExperienceMin(1);
         expectedMatches = allUsers;
 
-        //when
+
         var actualResult = getMatches();
 
-        //then
+
         assertEquals(expectedMatches, actualResult);
     }
 
+    @DisplayName("Matching by experience max bound test")
     @Test
     void matchesByExperienceMaxPatternTest() {
-        //before
         filter.setExperienceMax(4);
         expectedMatches = List.of(allUsers.get(0), allUsers.get(1));
 
-        //when
+
         var actualResult = getMatches();
 
-        //then
+
         assertEquals(expectedMatches, actualResult);
     }
 
+    @DisplayName("Non matching user test")
     @Test
-    void nonmatchingArgTest() {
-        //before
+    void nonMatchingArgTest() {
         filter.setNamePattern("nadir");
         filter.setCountryPattern("Russia");
         filter.setPhonePattern("tgdfg");
         expectedMatches = List.of();
 
-        //when
+
         var actualResult = getMatches();
 
-        //then
+
         assertEquals(expectedMatches, actualResult);
     }
 

@@ -21,9 +21,9 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class GoalInvitationService {
     final GoalInvitationRepository goalInvitationRepository;
-    final GoalInvitationMapper goalInvitationMapper;
     final GoalRepository goalRepository;
     final UserRepository userRepository;
+    final GoalInvitationMapper goalInvitationMapper;
     GoalInvitation goalInvitation;
     RuntimeException runtimeException = new RuntimeException();
 
@@ -32,6 +32,11 @@ public class GoalInvitationService {
             if (!goalInvitationDto.getInviterId().equals(goalInvitationDto.getInvitedUserId())) {
                 if (userRepository.existsById(goalInvitationDto.getInviterId()) && userRepository.existsById(goalInvitationDto.getInvitedUserId())) {
                     goalInvitation = goalInvitationMapper.toEntity(goalInvitationDto);
+
+                    goalInvitation.setInviter(userRepository.findById(goalInvitationDto.getInviterId()).get());
+                    goalInvitation.setInvited(userRepository.findById(goalInvitationDto.getInvitedUserId()).get());
+                    goalInvitation.setGoal(goalRepository.findById(goalInvitationDto.getGoalId()).get());
+
                     goalInvitationRepository.save(goalInvitation);
                     return goalInvitationMapper.toDto(goalInvitation);
                 } else {

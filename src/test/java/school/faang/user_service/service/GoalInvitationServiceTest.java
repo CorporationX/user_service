@@ -4,14 +4,20 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -27,7 +33,7 @@ public class GoalInvitationServiceTest {
     @Mock
     GoalInvitationRepository goalInvitationRepository;
     @Spy
-    GoalInvitationMapper goalInvitationMapper;
+    GoalInvitationMapper goalInvitationMapper = Mappers.getMapper(GoalInvitationMapper.class);
     @Mock
     GoalRepository goalRepository;
     @Mock
@@ -87,11 +93,31 @@ public class GoalInvitationServiceTest {
     @Test
     public void testCreateInvitationSaveGoalInvitation() {
         GoalInvitationDto goalInvitationDto = setup();
+
         goalInvitationDto.setInviterId(25L);
         goalInvitationDto.setInvitedUserId(20L);
+        goalInvitationDto.setGoalId(30L);
+        goalInvitationDto.setId(1L);
+        goalInvitationDto.setStatus(RequestStatus.PENDING);
+
+        User inviter = new User();
+        inviter.setId(25L);
+
+        User invited = new User();
+        invited.setId(20L);
+
+        Goal goal = new Goal();
+        goal.setId(30L);
+
         when(userRepository.existsById(goalInvitationDto.getInviterId())).thenReturn(true);
         when(userRepository.existsById(goalInvitationDto.getInvitedUserId())).thenReturn(true);
+
+        when(userRepository.findById(goalInvitationDto.getInviterId())).thenReturn(Optional.of(inviter));
+        when(userRepository.findById(goalInvitationDto.getInvitedUserId())).thenReturn(Optional.of(invited));
+        when(goalRepository.findById(goalInvitationDto.getGoalId())).thenReturn(Optional.of(goal));
+
         goalInvitationService.createInvitation(goalInvitationDto);
+
         verify(goalInvitationRepository, times(1)).save(captor.capture());
         GoalInvitation goalInvitation = captor.getValue();
         assertEquals(goalInvitationDto.getInviterId(), goalInvitation.getInviter().getId());

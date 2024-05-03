@@ -3,6 +3,7 @@ package school.faang.user_service.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.dto.SkillCandidateDto;
 import school.faang.user_service.dto.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SkillService;
@@ -27,5 +28,9 @@ public class SkillController {
 
     public List<SkillDto> getUserSkills(long userId) {
         return skillService.getUserSkills(userId);
+    }
+
+    public List<SkillCandidateDto> getOfferedSkills(long userId) {
+        return skillService.getOfferedSkills(userId);
     }
 }

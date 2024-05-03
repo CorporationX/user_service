@@ -1,7 +1,7 @@
 package school.faang.user_service.controller.goal;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.dto.GoalFilterDto;
 import school.faang.user_service.service.goal.GoalService;
@@ -9,7 +9,7 @@ import school.faang.user_service.validator.GoalValidator;
 
 import java.util.List;
 
-@Component
+@Controller
 @RequiredArgsConstructor
 public class GoalController {
 
@@ -30,8 +30,8 @@ public class GoalController {
         goalService.deleteGoal(goalId);
     }
 
-    public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filter) {
-        return goalService.findSubtasksByGoalId(userId, filter);
+    public List<GoalDto> getSubtasksByGoal(Long goalId, GoalFilterDto filter) {
+        return goalService.findSubtasksByGoalId(goalId, filter);
     }
 
     public List<GoalDto> getGoalsByUser(long userId, GoalFilterDto filter) {

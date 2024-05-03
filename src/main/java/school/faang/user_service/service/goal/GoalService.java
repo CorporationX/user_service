@@ -2,7 +2,7 @@ package school.faang.user_service.service.goal;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.dto.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
@@ -16,12 +16,12 @@ import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.SkillService;
 import school.faang.user_service.validator.GoalValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Stream;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class GoalService {
 
@@ -36,15 +36,12 @@ public class GoalService {
         goalValidator.validateBeforeCreate(userId, goalDto);
 
         Goal goalToCreate = goalMapper.toEntity(goalDto);
-        if (Objects.nonNull(goalDto.getParentId())) {
-            goalRepository.findById(goalDto.getParentId())
-                    .ifPresent(goalToCreate::setParent);
-        }
-        List<Skill> skills = goalDto.getSkillIds().stream()
-                .map(skillService::getSkillById)
-                .toList();
-        goalToCreate.setSkillsToAchieve(skills);
+
+        setParent(goalToCreate, goalDto);
+        setSkillToAchieve(goalToCreate, goalDto);
+
         Optional<User> user = userRepository.findById(userId);
+        goalToCreate.setUsers(new ArrayList<>());
         goalToCreate.getUsers().add(user.get());
         goalToCreate.setStatus(GoalStatus.ACTIVE);
 
@@ -59,28 +56,32 @@ public class GoalService {
 
         if (goalDto.getStatus() == GoalStatus.COMPLETED) {
             assignSkillToUser(goalToUpdate);
+            goalToUpdate.setStatus(GoalStatus.COMPLETED);
         }
-        goalToUpdate.setStatus(GoalStatus.COMPLETED);
 
         goalRepository.save(goalToUpdate);
         return goalMapper.toDto(goalToUpdate);
     }
 
     public List<GoalDto> findSubtasksByGoalId(long goalId, GoalFilterDto filter) {
-        Stream<GoalDto> goals = goalRepository.findByParent(goalId).map(goalMapper::toDto);
+        List<GoalDto> goals = goalRepository.findByParent(goalId)
+                .map(goalMapper::toDto)
+                .toList();
         applyGoalFilter(goals, filter);
 
-        return goals.toList();
+        return goals;
     }
 
     public List<GoalDto> findGoalsByUserId(Long userId, GoalFilterDto filter) {
-        Stream<GoalDto> goals = goalRepository.findGoalsByUserId(userId).map(goalMapper::toDto);
+        List<GoalDto> goals = goalRepository.findGoalsByUserId(userId)
+                .map(goalMapper::toDto)
+                .toList();
         applyGoalFilter(goals, filter);
 
-        return goals.toList();
+        return goals;
     }
 
-    private void applyGoalFilter(Stream<GoalDto> goals, GoalFilterDto filter) {
+    private void applyGoalFilter(List<GoalDto> goals, GoalFilterDto filter) {
         goalFilters.stream()
                 .filter(goalFilter -> goalFilter.isApplicable(filter))
                 .forEach(goalFilter -> goalFilter.apply(goals, filter));
@@ -96,24 +97,31 @@ public class GoalService {
                 }));
     }
 
-    private void updateFields(Goal goalToUpdate, GoalDto goalDto) {
+    private void setParent(Goal goal, GoalDto goalDto) {
         if (Objects.nonNull(goalDto.getParentId())) {
             goalRepository.findById(goalDto.getParentId())
-                    .ifPresent(goalToUpdate::setParent);
+                    .ifPresent(goal::setParent);
         }
+    }
 
-        goalToUpdate.setTitle(goalToUpdate.getTitle());
-
-        if (Objects.nonNull(goalDto.getDescription())) {
-            goalToUpdate.setDescription(goalDto.getDescription());
-        }
-
+    private void setSkillToAchieve(Goal goal, GoalDto goalDto) {
         if (Objects.nonNull(goalDto.getSkillIds())) {
             List<Skill> skills = goalDto.getSkillIds().stream()
                     .map(skillService::getSkillById)
                     .toList();
-            goalToUpdate.setSkillsToAchieve(skills);
+            goal.setSkillsToAchieve(skills);
         }
+    }
+
+    private void updateFields(Goal goalToUpdate, GoalDto goalDto) {
+        setParent(goalToUpdate, goalDto);
+
+        goalToUpdate.setTitle(goalDto.getTitle());
+
+        if (Objects.nonNull(goalDto.getDescription())) {
+            goalToUpdate.setDescription(goalDto.getDescription());
+        }
+        setSkillToAchieve(goalToUpdate, goalDto);
     }
 
     public void deleteGoal(long goalId) {

@@ -8,7 +8,9 @@ import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface GoalMapper {
@@ -23,8 +25,11 @@ public interface GoalMapper {
 
     @Named("skillToId")
     default List<Long> skillToId(List<Skill> skills) {
-        return skills.stream()
-                .map(Skill::getId)
-                .toList();
+        if (Objects.nonNull(skills)) {
+            return skills.stream()
+                    .map(Skill::getId)
+                    .toList();
+        }
+        return new ArrayList<>();
     }
 }

@@ -1,19 +1,21 @@
 package school.faang.user_service.filter.goal;
 
+import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.dto.GoalFilterDto;
 
+import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
 
+@Component
 public class GoalSkillFilter implements GoalFilter {
     @Override
     public boolean isApplicable(GoalFilterDto filter) {
-        return Objects.nonNull(filter.getStatus());
+        return Objects.nonNull(filter.getSkillId());
     }
 
     @Override
-    public void apply(Stream<GoalDto> goals, GoalFilterDto filter) {
-        goals.filter(goalDto -> goalDto.getSkillIds().contains(filter.getSkillId()));
+    public void apply(List<GoalDto> goals, GoalFilterDto filter) {
+        goals.removeIf(goalDto -> !goalDto.getSkillIds().contains(filter.getSkillId()));
     }
 }

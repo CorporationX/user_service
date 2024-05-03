@@ -4,12 +4,12 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.dto.GoalFilterDto;
 
-import java.util.stream.Stream;
+import java.util.List;
 
 @Component
 public interface GoalFilter {
 
     boolean isApplicable(GoalFilterDto filter);
 
-    void apply(Stream<GoalDto> goals, GoalFilterDto filter);
+    void apply(List<GoalDto> goals, GoalFilterDto filter);
 }

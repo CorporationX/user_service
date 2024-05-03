@@ -4,8 +4,8 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.dto.GoalFilterDto;
 
+import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 @Component
 public class GoalDescriptionFilter implements GoalFilter {
@@ -16,7 +16,7 @@ public class GoalDescriptionFilter implements GoalFilter {
     }
 
     @Override
-    public void apply(Stream<GoalDto> goals, GoalFilterDto filter) {
-        goals.filter(goal -> goal.getDescription().contains(filter.getDescriptionPattern()));
+    public void apply(List<GoalDto> goals, GoalFilterDto filter) {
+        goals.removeIf(goal -> !goal.getDescription().contains(filter.getDescriptionPattern()));
     }
 }

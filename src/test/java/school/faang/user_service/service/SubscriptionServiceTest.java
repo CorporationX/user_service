@@ -6,7 +6,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.repository.SubscriptionRepository;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static school.faang.user_service.util.TestUser.FOLLOWEE_ID;
 import static school.faang.user_service.util.TestUser.FOLLOWER_ID;
 
@@ -31,7 +33,13 @@ class SubscriptionServiceTest {
 
     @Test
     public void testGetFollowersCount() {
-        subscriptionRepository.findFollowersAmountByFolloweeId(FOLLOWEE_ID);
-        verify(subscriptionRepository).findFollowersAmountByFolloweeId(FOLLOWEE_ID);
+        subscriptionRepository.findFollowersAmountByFolloweeId(FOLLOWER_ID);
+        verify(subscriptionRepository).findFollowersAmountByFolloweeId(FOLLOWER_ID);
+
+        when(subscriptionRepository.findFollowersAmountByFolloweeId(FOLLOWER_ID))
+                .thenReturn(1);
+        int count = subscriptionRepository.findFollowersAmountByFolloweeId(FOLLOWER_ID);
+
+        assertEquals(1, count);
     }
 }

@@ -15,23 +15,31 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class SubscriptionControllerTest {
+
+    private final long followerId = 1L;
+    private final long followeeId = 2L;
     @Mock
-    SubscriptionService service;
+    SubscriptionService subscriptionService;
     @Mock
-    UserContext ctx;
+    UserContext userContext;
     @Mock
-    SubscriptionValidator validator;
+    SubscriptionValidator subscriptionValidator;
     @InjectMocks
-    private SubscriptionController controller;
+    private SubscriptionController subscriptionController;
+
 
     @Test
+    public void testUnsubscribeUserFromAnotherUser() {
+        when(userContext.getUserId()).thenReturn(1L);
+        subscriptionController.unfollowUser(followeeId);
+        verify(subscriptionService, times(1)).unfollowUser(followerId, followeeId);
+        verify(subscriptionValidator, times(1)).validateUser(followerId, followeeId);
+    
+    @Test
     public void testSubscribeUserToAnotherUser() {
-        long followerId = 1L;
-        long followeeId = 2L;
         when(ctx.getUserId()).thenReturn(1L);
         controller.followUser(followeeId);
         verify(service, times(1)).followUser(followerId, followeeId);
         verify(validator, times(1)).validateUser(followerId, followeeId);
     }
-
 }

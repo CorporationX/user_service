@@ -20,15 +20,18 @@ class SubscriptionValidatorTest {
     @Mock
     SubscriptionRepository subscriptionRepository;
     @InjectMocks
-    SubscriptionValidator validator;
+    SubscriptionValidator subscriptionValidator;
 
     @Test
     public void testValidateSubscribeUserToHimself() {
+
+        when(subscriptionRepository.existsById(followerId)).thenReturn(true);
+
         DataValidationException dataValidationException = assertThrows(
                 DataValidationException.class,
-                () -> validator.validateUser(followerId, followerId));
-        assertEquals("The user " + followerId + " tried to follow himself!",
-                dataValidationException.getMessage());
+                () -> subscriptionValidator.validateUser(followerId, followerId)
+        );
+        assertEquals("IDs cannot be equal!", dataValidationException.getMessage());
     }
 
     @Test
@@ -38,9 +41,20 @@ class SubscriptionValidatorTest {
 
         DataValidationException dataValidationException = assertThrows(
                 DataValidationException.class,
-                () -> validator.validateExistsSubscription(followerId, followeeId));
+                () -> subscriptionValidator.validateExistsSubscription(followerId, followeeId)
+        );
 
-        assertEquals("User " + followerId + " subscription to user " +
-                followeeId + " exist", dataValidationException.getMessage());
+        assertEquals("Subscription already exists!", dataValidationException.getMessage());
+    }
+
+    @Test
+    public void testValidateUnsubscribeUserToHimself() {
+        when(subscriptionRepository.existsById(followerId)).thenReturn(true);
+
+        DataValidationException dataValidationException = assertThrows(
+                DataValidationException.class,
+                () -> subscriptionValidator.validateUser(followerId, followerId)
+        );
+        assertEquals("IDs cannot be equal!", dataValidationException.getMessage());
     }
 }

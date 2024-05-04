@@ -11,6 +11,7 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.exception.DataGettingException;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.mapper.SkillMapper;
@@ -19,14 +20,18 @@ import school.faang.user_service.repository.event.EventRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static school.faang.user_service.exception.ExceptionMessage.INAPPROPRIATE_OWNER_SKILLS_EXCEPTION;
+import static school.faang.user_service.exception.ExceptionMessage.NO_SUCH_EVENT_EXCEPTION;
 
 @ExtendWith(MockitoExtension.class)
 class EventServiceTest {
@@ -102,5 +107,26 @@ class EventServiceTest {
 
         verify(eventRepository, times(0)).save(event);
         assertEquals(INAPPROPRIATE_OWNER_SKILLS_EXCEPTION.getMessage(), exception.getMessage());
+    }
+
+    @Test
+    void getEventPositiveTest() {
+        when(eventRepository.findById(anyLong())).thenReturn(Optional.of(new Event()));
+
+        assertDoesNotThrow(() -> eventService.getEvent(anyLong()));
+
+        verify(eventRepository).findById(anyLong());
+        verify(eventMapper).toDto(new Event());
+    }
+
+    @Test
+    void getEventNegativeTest() {
+        when(eventRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        DataGettingException exception = assertThrows(DataGettingException.class, () -> eventService.getEvent(anyLong()));
+
+        verify(eventRepository).findById(anyLong());
+        verify(eventMapper, times(0)).toDto(any());
+        assertEquals(NO_SUCH_EVENT_EXCEPTION.getMessage(), exception.getMessage());
     }
 }

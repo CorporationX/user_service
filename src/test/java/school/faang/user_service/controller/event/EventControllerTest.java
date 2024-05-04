@@ -20,6 +20,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static school.faang.user_service.exception.ExceptionMessage.INVALID_EVENT_START_DATE_EXCEPTION;
@@ -122,5 +124,12 @@ class EventControllerTest {
 
         verify(eventService, times(0)).create(eventDto);
         assertEquals(NULL_EVENT_OWNER_ID_EXCEPTION.getMessage(), exception.getMessage());
+    }
+
+    @Test
+    void getEventTest() {
+        eventController.getEvent(anyLong());
+
+        verify(eventService).getEvent(anyLong());
     }
 }

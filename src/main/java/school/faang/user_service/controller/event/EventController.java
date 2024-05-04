@@ -23,6 +23,10 @@ public class EventController {
         return eventService.create(event);
     }
 
+    public EventDto getEvent(long eventId) {
+        return eventService.getEvent(eventId);
+    }
+
     private void validateEvent(EventDto event) {
 
         if (event.getTitle() == null || event.getTitle().isBlank()) {

@@ -10,7 +10,6 @@ import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.service.event.EventService;
-import school.faang.user_service.validator.event.EventValidator;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,8 +22,6 @@ import static org.mockito.Mockito.when;
 class EventControllerTest {
     @Mock
     private EventService service;
-    @Mock
-    private EventValidator validator;
     @InjectMocks
     private EventController controller;
     private EventDto event;
@@ -44,47 +41,54 @@ class EventControllerTest {
                 .build();
     }
 
-
     @Test
     void createGoodEvent() {
         when(service.create(event)).thenReturn(event);
+
         assertEquals(event, controller.create(event));
     }
 
     @Test
     void getEvent() {
         when(service.getEvent(1L)).thenReturn(event);
+
         assertEquals(event, controller.getEvent(1L));
     }
 
     @Test
     void getEventByFilter() {
         EventFilterDto filterDto = new EventFilterDto();
+
         when(service.getEventsByFilter(filterDto)).thenReturn(List.of(event));
+
         assertIterableEquals(List.of(event), controller.getEventsByFilter(filterDto));
     }
 
     @Test
     void deleteEvent() {
         when(service.deleteEvent(1L)).thenReturn(event);
+
         assertEquals(event, controller.deleteEvent(1L));
     }
 
     @Test
     void updateGoodEvent() {
         when(service.updateEvent(event)).thenReturn(event);
+
         assertEquals(event, controller.updateEvent(event));
     }
 
     @Test
     void getOwnedEvents() {
         when(service.getOwnedEvents(1L)).thenReturn(List.of(event));
+
         assertIterableEquals(List.of(event), controller.getOwnedEvents(1L));
     }
 
     @Test
     void getParticipatedEvents() {
         when(service.getParticipatedEvents(1L)).thenReturn(List.of(event));
+
         assertIterableEquals(List.of(event), controller.getParticipatedEvents(1L));
     }
 }

@@ -5,7 +5,6 @@ import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.service.event.EventService;
-import school.faang.user_service.validator.event.EventValidator;
 
 import java.util.List;
 
@@ -13,7 +12,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EventController {
     private final EventService eventService;
-    private final EventValidator eventValidator;
 
     public List<EventDto> getParticipatedEvents(long userId) {
         return eventService.getParticipatedEvents(userId);
@@ -24,7 +22,6 @@ public class EventController {
     }
 
     public EventDto updateEvent(EventDto event) {
-        eventValidator.validate(event);
         return eventService.updateEvent(event);
     }
 
@@ -41,7 +38,6 @@ public class EventController {
     }
 
     public EventDto create(EventDto event) {
-        eventValidator.validate(event);
         return eventService.create(event);
     }
 }

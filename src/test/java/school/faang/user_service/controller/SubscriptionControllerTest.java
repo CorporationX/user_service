@@ -34,12 +34,13 @@ public class SubscriptionControllerTest {
         subscriptionController.unfollowUser(followeeId);
         verify(subscriptionService, times(1)).unfollowUser(followerId, followeeId);
         verify(subscriptionValidator, times(1)).validateUser(followerId, followeeId);
+    }
     
     @Test
     public void testSubscribeUserToAnotherUser() {
-        when(ctx.getUserId()).thenReturn(1L);
-        controller.followUser(followeeId);
-        verify(service, times(1)).followUser(followerId, followeeId);
-        verify(validator, times(1)).validateUser(followerId, followeeId);
+        when(userContext.getUserId()).thenReturn(1L);
+        subscriptionController.followUser(followeeId);
+        verify(subscriptionService, times(1)).followUser(followerId, followeeId);
+        verify(subscriptionValidator, times(1)).validateUser(followerId, followeeId);
     }
 }

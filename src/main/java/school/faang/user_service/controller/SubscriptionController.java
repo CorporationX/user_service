@@ -27,13 +27,14 @@ public class SubscriptionController {
         long followerId = userContext.getUserId();
         subscriptionValidator.validateUser(followerId, followeeId);
         subscriptionService.unfollowUser(followerId, followeeId);
+    }
 
     @PostMapping("/user/{followeeId}")
     @ResponseStatus(HttpStatus.CREATED)
     public void followUser(@PathVariable long followeeId) {
-        long followerId = userContext.getUserId();
-        validator.validateUser(followerId, followeeId);
-        service.followUser(followerId, followeeId);
+            long followerId = userContext.getUserId();
+            subscriptionValidator.validateUser(followerId, followeeId);
+            subscriptionService.followUser(followerId, followeeId);
 
-    }
+        }
 }

@@ -15,9 +15,9 @@ public class RecommendationRequestEventPublisher extends AbstractEventPublisher<
         super(redisTemplate, objectMapper);
     }
     @Autowired
-    private String recommendationRequestTopic;
+    private ChannelTopic recommendationRequestTopic;
 
     public void publish(RecommendationRequestEvent event) {
-        convertAndSend(recommendationRequestTopic, event);
+        convertAndSend(recommendationRequestTopic.getTopic(), event);
     }
 }

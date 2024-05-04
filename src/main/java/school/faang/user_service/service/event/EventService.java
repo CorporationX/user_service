@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.filter.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
+import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataGettingException;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.EventMapper;
@@ -16,6 +17,7 @@ import school.faang.user_service.service.event.filter.EventFilter;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 import static school.faang.user_service.exception.ExceptionMessage.INAPPROPRIATE_OWNER_SKILLS_EXCEPTION;
 import static school.faang.user_service.exception.ExceptionMessage.NO_SUCH_EVENT_EXCEPTION;
@@ -46,9 +48,7 @@ public class EventService {
     }
 
     public EventDto getEvent(long eventId) {
-        var optionalEvent = eventRepository.findById(eventId);
-
-        return eventMapper.toDto(optionalEvent
+        return eventMapper.toDto(getEventById(eventId)
                 .orElseThrow(() -> new DataGettingException(NO_SUCH_EVENT_EXCEPTION.getMessage())));
     }
 
@@ -61,5 +61,14 @@ public class EventService {
                 .distinct()
                 .map(eventMapper::toDto)
                 .toList();
+    }
+
+    public void deleteEvent(long eventId) {
+        eventRepository.delete(getEventById(eventId)
+                .orElseThrow(() -> new DataGettingException(NO_SUCH_EVENT_EXCEPTION.getMessage())));
+    }
+
+    private Optional<Event> getEventById(long eventId) {
+        return eventRepository.findById(eventId);
     }
 }

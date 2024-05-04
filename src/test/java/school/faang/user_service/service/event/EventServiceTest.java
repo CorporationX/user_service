@@ -189,4 +189,24 @@ class EventServiceTest {
         assertEquals(List.of(), filteredEvents);
     }
 
+    @Test
+    void deleteEventPositiveTest() {
+        when(eventRepository.findById(anyLong())).thenReturn(Optional.of(new Event()));
+
+        assertDoesNotThrow(() -> eventService.deleteEvent(anyLong()));
+
+        verify(eventRepository).findById(anyLong());
+        verify(eventRepository).delete(any(Event.class));
+    }
+
+    @Test
+    void deleteEventNegativeTest() {
+        when(eventRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        DataGettingException exception = assertThrows(DataGettingException.class, () -> eventService.deleteEvent(anyLong()));
+
+        verify(eventRepository).findById(anyLong());
+        verify(eventRepository, times(0)).delete(any());
+        assertEquals(NO_SUCH_EVENT_EXCEPTION.getMessage(), exception.getMessage());
+    }
 }

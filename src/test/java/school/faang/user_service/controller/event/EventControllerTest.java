@@ -155,4 +155,11 @@ class EventControllerTest {
         verify(eventService, times(0)).getEventsByFilter(any(EventFilterDto.class));
         assertEquals(NULL_EVENT_FILTER_EXCEPTION.getMessage(), exception.getMessage());
     }
+
+    @Test
+    void deleteEvent() {
+        eventController.deleteEvent(anyLong());
+
+        verify(eventService).deleteEvent(anyLong());
+    }
 }

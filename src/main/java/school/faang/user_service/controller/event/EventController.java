@@ -38,6 +38,10 @@ public class EventController {
         return eventService.getEventsByFilter(filter);
     }
 
+    public void deleteEvent(long eventId) {
+        eventService.deleteEvent(eventId);
+    }
+
     private void validateEvent(EventDto event) {
 
         if (event.getTitle() == null || event.getTitle().isBlank()) {

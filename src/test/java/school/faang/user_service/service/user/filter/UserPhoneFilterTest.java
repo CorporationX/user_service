@@ -1,6 +1,8 @@
 package school.faang.user_service.service.user.filter;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.entity.User;
@@ -29,44 +31,55 @@ class UserPhoneFilterTest {
         expectedFilteredUsers = Stream.of(ALL_USERS.get(0));
     }
 
-    @Test
-    void isApplicablePositiveTest() {
-        var isApplicable = userPhoneFilter.isApplicable(filter);
+    @Nested
+    class PositiveTests {
+        @DisplayName("should return true when \"phonePattern\" is present")
+        @Test
+        void shouldReturnTrueWhenPhonePatternIsPresent() {
+            var isApplicable = userPhoneFilter.isApplicable(filter);
 
-        assertTrue(isApplicable);
+            assertTrue(isApplicable);
+        }
+
+        @DisplayName("should return filtered by \"phonePattern\" users ")
+        @Test
+        void shouldReturnFilteredUsersWhenPhonePatternIsPresent() {
+            var actualFilteredUsers = userPhoneFilter.apply(usersToFilter, filter);
+
+            assertEquals(expectedFilteredUsers.toList(), actualFilteredUsers.toList());
+        }
     }
 
-    @Test
-    void isApplicableForNullPatternTest() {
-        filter.setPhonePattern(null);
+    @Nested
+    class NegativeTests {
+        @DisplayName("should return false when \"phonePattern\" is null")
+        @Test
+        void shouldReturnFalseWhenPhonePatternIsNull() {
+            filter.setPhonePattern(null);
 
-        var isApplicable = userPhoneFilter.isApplicable(filter);
+            var isApplicable = userPhoneFilter.isApplicable(filter);
 
-        assertFalse(isApplicable);
-    }
+            assertFalse(isApplicable);
+        }
 
-    @Test
-    void isApplicableForBlankPatternTest() {
-        filter.setPhonePattern("   ");
+        @DisplayName("should return false when \"phonePattern\" is blank")
+        @Test
+        void shouldReturnFalseWhenPhonePatternIsBlank() {
+            filter.setPhonePattern("   ");
 
-        var isApplicable = userPhoneFilter.isApplicable(filter);
+            var isApplicable = userPhoneFilter.isApplicable(filter);
 
-        assertFalse(isApplicable);
-    }
+            assertFalse(isApplicable);
+        }
 
-    @Test
-    void applyPositiveTest() {
-        var actualFilteredUsers = userPhoneFilter.apply(usersToFilter, filter);
+        @DisplayName("should return empty list when no one user is matching filter")
+        @Test
+        void shouldReturnEmptyListWhenNothingMatch() {
+            filter.setPhonePattern("dfgdfg");
 
-        assertEquals(expectedFilteredUsers.toList(), actualFilteredUsers.toList());
-    }
+            var actualFilteredUsers = userPhoneFilter.apply(usersToFilter, filter);
 
-    @Test
-    void applyNonMatchingTest() {
-        filter.setPhonePattern("dfgdfg");
-
-        var actualFilteredUsers = userPhoneFilter.apply(usersToFilter, filter);
-
-        assertEquals(List.of(), actualFilteredUsers.toList());
+            assertEquals(List.of(), actualFilteredUsers.toList());
+        }
     }
 }

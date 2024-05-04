@@ -5,7 +5,7 @@ import school.faang.user_service.entity.User;
 
 import java.util.stream.Stream;
 
-public class UserCityFilter  implements UserFilter{
+public class UserCityFilter implements UserFilter {
     @Override
     public boolean isApplicable(UserFilterDto filters) {
         return filters.getCityPattern() != null && !filters.getCityPattern().isBlank();

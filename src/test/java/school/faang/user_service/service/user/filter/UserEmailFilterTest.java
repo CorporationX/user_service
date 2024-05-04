@@ -1,6 +1,8 @@
 package school.faang.user_service.service.user.filter;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.entity.User;
@@ -29,44 +31,55 @@ class UserEmailFilterTest {
         expectedFilteredUsers = Stream.of(ALL_USERS.get(2));
     }
 
-    @Test
-    void isApplicablePositiveTest() {
-        var isApplicable = userEmailFilter.isApplicable(filter);
+    @Nested
+    class PositiveTests {
+        @DisplayName("should return true when \"emailPattern\" is present")
+        @Test
+        void shouldReturnTrueWhenEmailPatternIsPresent() {
+            var isApplicable = userEmailFilter.isApplicable(filter);
 
-        assertTrue(isApplicable);
+            assertTrue(isApplicable);
+        }
+
+        @DisplayName("should return filtered by \"emailPattern\" users ")
+        @Test
+        void shouldReturnFilteredUsersWhenEmailPatternIsPresent() {
+            var actualFilteredUsers = userEmailFilter.apply(usersToFilter, filter);
+
+            assertEquals(expectedFilteredUsers.toList(), actualFilteredUsers.toList());
+        }
     }
 
-    @Test
-    void isApplicableForNullPatternTest() {
-        filter.setEmailPattern(null);
+    @Nested
+    class NegativeTests {
+        @DisplayName("should return false when \"emailPattern\" is null")
+        @Test
+        void shouldReturnFalseWhenEmailPatternIsNull() {
+            filter.setEmailPattern(null);
 
-        var isApplicable = userEmailFilter.isApplicable(filter);
+            var isApplicable = userEmailFilter.isApplicable(filter);
 
-        assertFalse(isApplicable);
-    }
+            assertFalse(isApplicable);
+        }
 
-    @Test
-    void isApplicableForBlankPatternTest() {
-        filter.setEmailPattern("   ");
+        @DisplayName("should return false when \"emailPattern\" is blank")
+        @Test
+        void shouldReturnFalseWhenEmailPatternIsBlank() {
+            filter.setEmailPattern("   ");
 
-        var isApplicable = userEmailFilter.isApplicable(filter);
+            var isApplicable = userEmailFilter.isApplicable(filter);
 
-        assertFalse(isApplicable);
-    }
+            assertFalse(isApplicable);
+        }
 
-    @Test
-    void applyPositiveTest() {
-        var actualFilteredUsers = userEmailFilter.apply(usersToFilter, filter);
+        @DisplayName("should return empty list when no one user is matching filter")
+        @Test
+        void shouldReturnEmptyListWhenNothingMatch() {
+            filter.setEmailPattern("dgdfg@mail.ru");
 
-        assertEquals(expectedFilteredUsers.toList(), actualFilteredUsers.toList());
-    }
+            var actualFilteredUsers = userEmailFilter.apply(usersToFilter, filter);
 
-    @Test
-    void applyNonMatchingTest() {
-        filter.setEmailPattern("dgdfg@mail.ru");
-
-        var actualFilteredUsers = userEmailFilter.apply(usersToFilter, filter);
-
-        assertEquals(List.of(), actualFilteredUsers.toList());
+            assertEquals(List.of(), actualFilteredUsers.toList());
+        }
     }
 }

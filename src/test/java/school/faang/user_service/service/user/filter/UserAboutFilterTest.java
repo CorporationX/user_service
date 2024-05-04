@@ -1,6 +1,8 @@
 package school.faang.user_service.service.user.filter;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.entity.User;
@@ -29,44 +31,55 @@ class UserAboutFilterTest {
         expectedFilteredUsers = Stream.of(ALL_USERS.get(2));
     }
 
-    @Test
-    void isApplicablePositiveTest() {
-        var isApplicable = userAboutFilter.isApplicable(filter);
+    @Nested
+    class PositiveTests {
+        @DisplayName("should return true when \"aboutPattern\" is present")
+        @Test
+        void shouldReturnTrueWhenAboutPatternIsPresent() {
+            var isApplicable = userAboutFilter.isApplicable(filter);
 
-        assertTrue(isApplicable);
+            assertTrue(isApplicable);
+        }
+
+        @DisplayName("should return filtered by \"aboutPattern\" users ")
+        @Test
+        void shouldReturnFilteredUsersWhenAboutPatternIsPresent() {
+            var actualFilteredUsers = userAboutFilter.apply(usersToFilter, filter);
+
+            assertEquals(expectedFilteredUsers.toList(), actualFilteredUsers.toList());
+        }
     }
 
-    @Test
-    void isApplicableForNullPatternTest() {
-        filter.setAboutPattern(null);
+    @Nested
+    class NegativeTests {
+        @DisplayName("should return false when \"aboutPattern\" is null")
+        @Test
+        void shouldReturnFalseWhenAboutPatternIsNull() {
+            filter.setAboutPattern(null);
 
-        var isApplicable = userAboutFilter.isApplicable(filter);
+            var isApplicable = userAboutFilter.isApplicable(filter);
 
-        assertFalse(isApplicable);
-    }
+            assertFalse(isApplicable);
+        }
 
-    @Test
-    void isApplicableForBlankPatternTest() {
-        filter.setAboutPattern("   ");
+        @DisplayName("should return false when \"aboutPattern\" is blank")
+        @Test
+        void shouldReturnFalseWhenAboutPatternIsBlank() {
+            filter.setAboutPattern("   ");
 
-        var isApplicable = userAboutFilter.isApplicable(filter);
+            var isApplicable = userAboutFilter.isApplicable(filter);
 
-        assertFalse(isApplicable);
-    }
+            assertFalse(isApplicable);
+        }
 
-    @Test
-    void applyPositiveTest() {
-        var actualFilteredUsers = userAboutFilter.apply(usersToFilter, filter);
+        @DisplayName("should return empty list when no one user is matching filter")
+        @Test
+        void shouldReturnEmptyListWhenNothingMatch() {
+            filter.setAboutPattern("About albert");
 
-        assertEquals(expectedFilteredUsers.toList(), actualFilteredUsers.toList());
-    }
+            var actualFilteredUsers = userAboutFilter.apply(usersToFilter, filter);
 
-    @Test
-    void applyNonMatchingTest() {
-        filter.setAboutPattern("About albert");
-
-        var actualFilteredUsers = userAboutFilter.apply(usersToFilter, filter);
-
-        assertEquals(List.of(), actualFilteredUsers.toList());
+            assertEquals(List.of(), actualFilteredUsers.toList());
+        }
     }
 }

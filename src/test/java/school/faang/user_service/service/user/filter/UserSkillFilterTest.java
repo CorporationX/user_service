@@ -1,6 +1,8 @@
 package school.faang.user_service.service.user.filter;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.entity.User;
@@ -29,44 +31,55 @@ class UserSkillFilterTest {
         expectedFilteredUsers = Stream.of(ALL_USERS.get(0), ALL_USERS.get(1));
     }
 
-    @Test
-    void isApplicablePositiveTest() {
-        var isApplicable = userSkillFilter.isApplicable(filter);
+    @Nested
+    class PositiveTests {
+        @DisplayName("should return true when \"skillPattern\" is present")
+        @Test
+        void shouldReturnTrueWhenSkillPatternIsPresent() {
+            var isApplicable = userSkillFilter.isApplicable(filter);
 
-        assertTrue(isApplicable);
+            assertTrue(isApplicable);
+        }
+
+        @DisplayName("should return filtered by \"skillPattern\" users ")
+        @Test
+        void shouldReturnFilteredUsersWhenSkillPatternIsPresent() {
+            var actualFilteredUsers = userSkillFilter.apply(usersToFilter, filter);
+
+            assertEquals(expectedFilteredUsers.toList(), actualFilteredUsers.toList());
+        }
     }
 
-    @Test
-    void isApplicableForNullPatternTest() {
-        filter.setSkillPattern(null);
+    @Nested
+    class NegativeTests {
+        @DisplayName("should return false when \"skillPattern\" is null")
+        @Test
+        void shouldReturnFalseWhenSkillPatternIsNull() {
+            filter.setSkillPattern(null);
 
-        var isApplicable = userSkillFilter.isApplicable(filter);
+            var isApplicable = userSkillFilter.isApplicable(filter);
 
-        assertFalse(isApplicable);
-    }
+            assertFalse(isApplicable);
+        }
 
-    @Test
-    void isApplicableForBlankPatternTest() {
-        filter.setSkillPattern("   ");
+        @DisplayName("should return false when \"skillPattern\" is blank")
+        @Test
+        void shouldReturnFalseWhenSkillPatternIsBlank() {
+            filter.setSkillPattern("   ");
 
-        var isApplicable = userSkillFilter.isApplicable(filter);
+            var isApplicable = userSkillFilter.isApplicable(filter);
 
-        assertFalse(isApplicable);
-    }
+            assertFalse(isApplicable);
+        }
 
-    @Test
-    void applyPositiveTest() {
-        var actualFilteredUsers = userSkillFilter.apply(usersToFilter, filter);
+        @DisplayName("should return empty list when no one user is matching filter")
+        @Test
+        void shouldReturnEmptyListWhenNothingMatch() {
+            filter.setSkillPattern("docker");
 
-        assertEquals(expectedFilteredUsers.toList(), actualFilteredUsers.toList());
-    }
+            var actualFilteredUsers = userSkillFilter.apply(usersToFilter, filter);
 
-    @Test
-    void applyNonMatchingTest() {
-        filter.setSkillPattern("docker");
-
-        var actualFilteredUsers = userSkillFilter.apply(usersToFilter, filter);
-
-        assertEquals(List.of(), actualFilteredUsers.toList());
+            assertEquals(List.of(), actualFilteredUsers.toList());
+        }
     }
 }

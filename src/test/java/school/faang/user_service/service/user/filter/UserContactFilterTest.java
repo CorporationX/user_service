@@ -1,6 +1,8 @@
 package school.faang.user_service.service.user.filter;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.entity.User;
@@ -29,44 +31,55 @@ class UserContactFilterTest {
         expectedFilteredUsers = Stream.of(ALL_USERS.get(1), ALL_USERS.get(2));
     }
 
-    @Test
-    void isApplicablePositiveTest() {
-        var isApplicable = userContactFilter.isApplicable(filter);
+    @Nested
+    class PositiveTests {
+        @DisplayName("should return true when \"contactPattern\" is present")
+        @Test
+        void shouldReturnTrueWhenContactPatternIsPresent() {
+            var isApplicable = userContactFilter.isApplicable(filter);
 
-        assertTrue(isApplicable);
+            assertTrue(isApplicable);
+        }
+
+        @DisplayName("should return filtered by \"contactPattern\" users ")
+        @Test
+        void shouldReturnFilteredUsersWhenContactPatternIsPresent() {
+            var actualFilteredUsers = userContactFilter.apply(usersToFilter, filter);
+
+            assertEquals(expectedFilteredUsers.toList(), actualFilteredUsers.toList());
+        }
     }
 
-    @Test
-    void isApplicableForNullPatternTest() {
-        filter.setContactPattern(null);
+    @Nested
+    class NegativeTests {
+        @DisplayName("should return false when \"contactPattern\" is null")
+        @Test
+        void shouldReturnFalseWhenContactPatternIsNull() {
+            filter.setContactPattern(null);
 
-        var isApplicable = userContactFilter.isApplicable(filter);
+            var isApplicable = userContactFilter.isApplicable(filter);
 
-        assertFalse(isApplicable);
-    }
+            assertFalse(isApplicable);
+        }
 
-    @Test
-    void isApplicableForBlankPatternTest() {
-        filter.setContactPattern("   ");
+        @DisplayName("should return false when \"contactPattern\" is blank")
+        @Test
+        void shouldReturnFalseWhenContactPatternIsBlank() {
+            filter.setContactPattern("   ");
 
-        var isApplicable = userContactFilter.isApplicable(filter);
+            var isApplicable = userContactFilter.isApplicable(filter);
 
-        assertFalse(isApplicable);
-    }
+            assertFalse(isApplicable);
+        }
 
-    @Test
-    void applyPositiveTest() {
-        var actualFilteredUsers = userContactFilter.apply(usersToFilter, filter);
+        @DisplayName("should return empty list when no one user is matching filter")
+        @Test
+        void shouldReturnEmptyListWhenNothingMatch() {
+            filter.setContactPattern("Ace");
 
-        assertEquals(expectedFilteredUsers.toList(), actualFilteredUsers.toList());
-    }
+            var actualFilteredUsers = userContactFilter.apply(usersToFilter, filter);
 
-    @Test
-    void applyNonMatchingTest() {
-        filter.setContactPattern("Ace");
-
-        var actualFilteredUsers = userContactFilter.apply(usersToFilter, filter);
-
-        assertEquals(List.of(), actualFilteredUsers.toList());
+            assertEquals(List.of(), actualFilteredUsers.toList());
+        }
     }
 }

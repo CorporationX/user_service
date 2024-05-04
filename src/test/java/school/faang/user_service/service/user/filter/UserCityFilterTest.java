@@ -1,6 +1,8 @@
 package school.faang.user_service.service.user.filter;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.entity.User;
@@ -29,44 +31,55 @@ class UserCityFilterTest {
         expectedFilteredUsers = Stream.of(ALL_USERS.get(1));
     }
 
-    @Test
-    void isApplicablePositiveTest() {
-        var isApplicable = userCityFilter.isApplicable(filter);
+    @Nested
+    class PositiveTests {
+        @DisplayName("should return true when \"cityPattern\" is present")
+        @Test
+        void shouldReturnTrueWhenCityPatternIsPresent() {
+            var isApplicable = userCityFilter.isApplicable(filter);
 
-        assertTrue(isApplicable);
+            assertTrue(isApplicable);
+        }
+
+        @DisplayName("should return filtered by \"cityPattern\" users ")
+        @Test
+        void shouldReturnFilteredUsersWhenCityFilterIsPresent() {
+            var actualFilteredUsers = userCityFilter.apply(usersToFilter, filter);
+
+            assertEquals(expectedFilteredUsers.toList(), actualFilteredUsers.toList());
+        }
     }
 
-    @Test
-    void isApplicableForNullPatternTest() {
-        filter.setCityPattern(null);
+    @Nested
+    class NegativeTests {
+        @DisplayName("should return false when \"cityPattern\" is null")
+        @Test
+        void shouldReturnFalseWhenCityFilterIsNull() {
+            filter.setCityPattern(null);
 
-        var isApplicable = userCityFilter.isApplicable(filter);
+            var isApplicable = userCityFilter.isApplicable(filter);
 
-        assertFalse(isApplicable);
-    }
+            assertFalse(isApplicable);
+        }
 
-    @Test
-    void isApplicableForBlankPatternTest() {
-        filter.setCityPattern("   ");
+        @DisplayName("should return false when \"aboutPattern\" is blank")
+        @Test
+        void shouldReturnFalseWhenCityFilterIsBlank() {
+            filter.setCityPattern("   ");
 
-        var isApplicable = userCityFilter.isApplicable(filter);
+            var isApplicable = userCityFilter.isApplicable(filter);
 
-        assertFalse(isApplicable);
-    }
+            assertFalse(isApplicable);
+        }
 
-    @Test
-    void applyPositiveTest() {
-        var actualFilteredUsers = userCityFilter.apply(usersToFilter, filter);
+        @DisplayName("should return empty list when no one user is matching filter")
+        @Test
+        void shouldReturnEmptyListWhenNothingMatching() {
+            filter.setCityPattern("Cahul");
 
-        assertEquals(expectedFilteredUsers.toList(), actualFilteredUsers.toList());
-    }
+            var actualFilteredUsers = userCityFilter.apply(usersToFilter, filter);
 
-    @Test
-    void applyNonMatchingTest() {
-        filter.setCityPattern("Cahul");
-
-        var actualFilteredUsers = userCityFilter.apply(usersToFilter, filter);
-
-        assertEquals(List.of(), actualFilteredUsers.toList());
+            assertEquals(List.of(), actualFilteredUsers.toList());
+        }
     }
 }

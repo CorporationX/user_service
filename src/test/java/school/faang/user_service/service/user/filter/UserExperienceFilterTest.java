@@ -1,6 +1,8 @@
 package school.faang.user_service.service.user.filter;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.entity.User;
@@ -28,100 +30,116 @@ class UserExperienceFilterTest {
         expectedFilteredUsers = Stream.of(ALL_USERS.get(0), ALL_USERS.get(2));
     }
 
-    @Test
-    void isApplicableForBothBoundsTest() {
-        filter.setExperienceMin(3);
-        filter.setExperienceMax(12);
+    @Nested
+    class PositiveTests {
+        @DisplayName("should return true when both experience bounds are present")
+        @Test
+        void shouldReturnTrueWhenBothExperienceBoundsArePresent() {
+            filter.setExperienceMin(3);
+            filter.setExperienceMax(12);
 
-        var isApplicable = userExperienceFilter.isApplicable(filter);
+            var isApplicable = userExperienceFilter.isApplicable(filter);
 
-        assertTrue(isApplicable);
+            assertTrue(isApplicable);
+        }
+
+        @DisplayName("should return true when only min bound is present")
+        @Test
+        void shouldReturnTrueWhenMinBoundOnlyIsPresent() {
+            filter.setExperienceMin(3);
+
+            var isApplicable = userExperienceFilter.isApplicable(filter);
+
+            assertTrue(isApplicable);
+        }
+
+        @DisplayName("should return true when only max bound is present")
+        @Test
+        void shouldReturnTrueWhenMaxBoundOnlyIsPresent() {
+            filter.setExperienceMax(3);
+
+            var isApplicable = userExperienceFilter.isApplicable(filter);
+
+            assertTrue(isApplicable);
+        }
+
+        @DisplayName("should return filtered users when both experience bounds are present")
+        @Test
+        void shouldReturnFilteredUsersWhenBothExperienceBoundsArePresent() {
+            filter.setExperienceMin(3);
+            filter.setExperienceMax(12);
+
+            var actualFilteredUsers = userExperienceFilter.apply(usersToFilter, filter);
+
+            assertEquals(expectedFilteredUsers.toList(), actualFilteredUsers.toList());
+        }
+
+        @DisplayName("should return filtered users when min bound only is present")
+        @Test
+        void shouldReturnFilteredUsersWhenMinBoundOnlyIsPresent() {
+            filter.setExperienceMin(1);
+
+            var actualFilteredUsers = userExperienceFilter.apply(usersToFilter, filter);
+
+            assertEquals(ALL_USERS, actualFilteredUsers.toList());
+        }
+
+        @DisplayName("should return filtered users when max bound only is present")
+        @Test
+        void shouldReturnFilteredUsersWhenMaxBoundOnlyIsPresent() {
+            filter.setExperienceMax(4);
+            expectedFilteredUsers = Stream.of(ALL_USERS.get(0), ALL_USERS.get(1));
+
+            var actualFilteredUsers = userExperienceFilter.apply(usersToFilter, filter);
+
+            assertEquals(expectedFilteredUsers.toList(), actualFilteredUsers.toList());
+        }
     }
 
-    @Test
-    void isApplicableForMinBoundOnlyTest() {
-        filter.setExperienceMin(3);
+    @Nested
+    class NegativeTests {
+        @DisplayName("should return false when both bounds are zero")
+        @Test
+        void shouldReturnFalseWhenBothBoundsAreZero() {
+            filter.setExperienceMin(0);
+            filter.setExperienceMax(0);
 
-        var isApplicable = userExperienceFilter.isApplicable(filter);
+            var isApplicable = userExperienceFilter.isApplicable(filter);
 
-        assertTrue(isApplicable);
-    }
+            assertFalse(isApplicable);
+        }
 
-    @Test
-    void isApplicableForMaxBoundOnlyTest() {
-        filter.setExperienceMax(3);
+        @DisplayName("should return false when one of bounds is negative")
+        @Test
+        void shouldReturnFalseWhenOneBoundIsNegative() {
+            filter.setExperienceMin(-10);
+            filter.setExperienceMax(0);
 
-        var isApplicable = userExperienceFilter.isApplicable(filter);
+            var isApplicable = userExperienceFilter.isApplicable(filter);
 
-        assertTrue(isApplicable);
-    }
+            assertFalse(isApplicable);
+        }
 
-    @Test
-    void isntApplicableForZeroExperiencePatternTest() {
-        filter.setExperienceMin(0);
-        filter.setExperienceMax(0);
+        @DisplayName("should return false when both bounds are negative")
+        @Test
+        void shouldReturnFalseWhenBothBoundsAreNegative() {
+            filter.setExperienceMin(-10);
+            filter.setExperienceMax(-10);
 
-        var isApplicable = userExperienceFilter.isApplicable(filter);
+            var isApplicable = userExperienceFilter.isApplicable(filter);
 
-        assertFalse(isApplicable);
-    }
+            assertFalse(isApplicable);
+        }
 
-    @Test
-    void isntApplicableForOneNegativeExperienceBoundPatternTest() {
-        filter.setExperienceMin(-10);
-        filter.setExperienceMax(0);
+        @DisplayName("should return empty list when no one user is matching filter")
+        @Test
+        void shouldReturnEmptyListWhenNothingMatch() {
+            filter.setExperienceMin(12);
+            filter.setExperienceMax(15);
 
-        var isApplicable = userExperienceFilter.isApplicable(filter);
+            var actualFilteredUsers = userExperienceFilter.apply(usersToFilter, filter);
 
-        assertFalse(isApplicable);
-    }
-
-    @Test
-    void isntApplicableForNegativeExperiencePatternTest() {
-        filter.setExperienceMin(-10);
-        filter.setExperienceMax(-10);
-
-        var isApplicable = userExperienceFilter.isApplicable(filter);
-
-        assertFalse(isApplicable);
-    }
-
-    @Test
-    void applyPositiveForBothBoundsTest() {
-        filter.setExperienceMin(3);
-        filter.setExperienceMax(12);
-
-        var actualFilteredUsers = userExperienceFilter.apply(usersToFilter, filter);
-
-        assertEquals(expectedFilteredUsers.toList(), actualFilteredUsers.toList());
-    }
-
-    @Test
-    void applyPositiveForMinBoundOnlyTest() {
-        filter.setExperienceMin(1);
-
-        var actualFilteredUsers = userExperienceFilter.apply(usersToFilter, filter);
-
-        assertEquals(ALL_USERS, actualFilteredUsers.toList());
-    }
-
-    @Test
-    void applyPositiveForMaxBoundOnlyTest() {
-        filter.setExperienceMax(4);
-        expectedFilteredUsers = Stream.of(ALL_USERS.get(0), ALL_USERS.get(1));
-
-        var actualFilteredUsers = userExperienceFilter.apply(usersToFilter, filter);
-
-        assertEquals(expectedFilteredUsers.toList(), actualFilteredUsers.toList());
-    }
-
-    @Test
-    void applyNonMatchingTest() {
-        filter.setExperienceMin(12);
-        filter.setExperienceMax(15);
-
-        var actualFilteredUsers = userExperienceFilter.apply(usersToFilter, filter);
-
-        assertEquals(List.of(), actualFilteredUsers.toList());
+            assertEquals(List.of(), actualFilteredUsers.toList());
+        }
     }
 }

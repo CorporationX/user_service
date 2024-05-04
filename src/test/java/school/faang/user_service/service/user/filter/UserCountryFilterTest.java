@@ -1,6 +1,8 @@
 package school.faang.user_service.service.user.filter;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.entity.User;
@@ -29,44 +31,55 @@ class UserCountryFilterTest {
         expectedFilteredUsers = Stream.of(ALL_USERS.get(0), ALL_USERS.get(2));
     }
 
-    @Test
-    void isApplicablePositiveTest() {
-        var isApplicable = userCountryFilter.isApplicable(filter);
+    @Nested
+    class PositiveTests {
+        @DisplayName("should return true when \"countryPattern\" is present")
+        @Test
+        void shouldReturnTrueWhenCountryPatternIsPresent() {
+            var isApplicable = userCountryFilter.isApplicable(filter);
 
-        assertTrue(isApplicable);
+            assertTrue(isApplicable);
+        }
+
+        @DisplayName("should return filtered by \"countryPattern\" users ")
+        @Test
+        void shouldReturnFilteredUsersWhenCountryPatternIsPresent() {
+            var actualFilteredUsers = userCountryFilter.apply(usersToFilter, filter);
+
+            assertEquals(expectedFilteredUsers.toList(), actualFilteredUsers.toList());
+        }
     }
 
-    @Test
-    void isApplicableForNullPatternTest() {
-        filter.setCountryPattern(null);
+    @Nested
+    class NegativeTests {
+        @DisplayName("should return false when \"countryPattern\" is null")
+        @Test
+        void shouldReturnFalseWhenCountryPatternIsNull() {
+            filter.setCountryPattern(null);
 
-        var isApplicable = userCountryFilter.isApplicable(filter);
+            var isApplicable = userCountryFilter.isApplicable(filter);
 
-        assertFalse(isApplicable);
-    }
+            assertFalse(isApplicable);
+        }
 
-    @Test
-    void isApplicableForBlankPatternTest() {
-        filter.setCountryPattern("   ");
+        @DisplayName("should return false when \"countryPattern\" is blank")
+        @Test
+        void shouldReturnFalseWhenCountryPatternIsBlank() {
+            filter.setCountryPattern("   ");
 
-        var isApplicable = userCountryFilter.isApplicable(filter);
+            var isApplicable = userCountryFilter.isApplicable(filter);
 
-        assertFalse(isApplicable);
-    }
+            assertFalse(isApplicable);
+        }
 
-    @Test
-    void applyPositiveTest() {
-        var actualFilteredUsers = userCountryFilter.apply(usersToFilter, filter);
+        @DisplayName("should return empty list when no one user is matching filter")
+        @Test
+        void shouldReturnEmptyListWhenNothingMatch() {
+            filter.setCountryPattern("Moldova");
 
-        assertEquals(expectedFilteredUsers.toList(), actualFilteredUsers.toList());
-    }
+            var actualFilteredUsers = userCountryFilter.apply(usersToFilter, filter);
 
-    @Test
-    void applyNonMatchingTest() {
-        filter.setCountryPattern("Moldova");
-
-        var actualFilteredUsers = userCountryFilter.apply(usersToFilter, filter);
-
-        assertEquals(List.of(), actualFilteredUsers.toList());
+            assertEquals(List.of(), actualFilteredUsers.toList());
+        }
     }
 }

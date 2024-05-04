@@ -72,6 +72,10 @@ public class EventService {
         return eventMapper.toDtos(eventRepository.findAllByUserId(userId));
     }
 
+    public List<EventDto> getParticipatedEvents(long userId) {
+        return eventMapper.toDtos(eventRepository.findParticipatedEventsByUserId(userId));
+    }
+
     private void checkOwnerSkills(EventDto event) {
         List<Skill> ownersSkills = skillRepository.findAllByUserId(event.getOwnerId());
         var ownerSkills = new HashSet<>(skillMapper.toDto(ownersSkills));

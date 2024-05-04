@@ -121,6 +121,14 @@ class EventControllerTest {
 
             verify(eventService).getOwnedEvents(anyLong());
         }
+
+        @DisplayName("should call eventService.getParticipatedEvents()")
+        @Test
+        void shouldReturnParticipatedEvents() {
+            eventController.getParticipatedEvents(anyLong());
+
+            verify(eventService).getParticipatedEvents(anyLong());
+        }
     }
 
     @Nested

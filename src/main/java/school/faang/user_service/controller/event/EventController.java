@@ -52,6 +52,10 @@ public class EventController {
         return eventService.getOwnedEvents(userId);
     }
 
+    public List<EventDto> getParticipatedEvents(long userId) {
+        return eventService.getParticipatedEvents(userId);
+    }
+
     private void validateEvent(EventDto event) {
 
         if (event.getTitle() == null || event.getTitle().isBlank()) {

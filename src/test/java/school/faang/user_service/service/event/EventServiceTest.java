@@ -185,6 +185,15 @@ class EventServiceTest {
             verify(eventRepository).findAllByUserId(anyLong());
             verify(eventMapper).toDtos(any(List.class));
         }
+
+        @DisplayName("should return participated by user events")
+        @Test
+        void shouldReturnParticipatedEvents() {
+            eventService.getParticipatedEvents(anyLong());
+
+            verify(eventRepository).findParticipatedEventsByUserId(anyLong());
+            verify(eventMapper).toDtos(any(List.class));
+        }
     }
 
     @Nested

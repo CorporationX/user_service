@@ -17,6 +17,8 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -116,4 +118,97 @@ public class GoalInvitationServiceTest {
         assertEquals(goalInvitationDto.getInviterId(), goalInvitation.getInviter().getId());
         assertEquals(goalInvitationDto.getInvitedUserId(), goalInvitation.getInvited().getId());
     }
+
+    @Test
+    public void acceptGoalInvitationWithIdIsNotPresent() {
+        GoalInvitation goalInvitation = setupForAcceptGoalInvitation();
+
+        when(goalInvitationRepository.existsById(goalInvitation.getId())).thenReturn(false);
+        Exception exception = assertThrows(RuntimeException.class, () -> goalInvitationService.acceptGoalInvitation(goalInvitation.getId()));
+        assertEquals("There is no such goalInvitation in database", exception.getMessage());
+    }
+
+    @Test
+    public void acceptGoalInvitationWithGoalIdIsNotPresent() {
+        GoalInvitation goalInvitation = setupForAcceptGoalInvitation();
+
+        when(goalInvitationRepository.existsById(goalInvitation.getId())).thenReturn(true);
+        when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.of(goalInvitation));
+        when(goalRepository.existsById(goalInvitation.getGoal().getId())).thenReturn(false);
+        Exception exception = assertThrows(RuntimeException.class, () -> goalInvitationService.acceptGoalInvitation(goalInvitation.getId()));
+        assertEquals("There is no such goal in database", exception.getMessage());
+    }
+
+    @Test
+    public void acceptGoalInvitationWithSetGoalsMoreThanThree() {
+        GoalInvitation goalInvitation = setupForAcceptGoalInvitation();
+        List<Goal> setGoals = goalInvitation.getInvited().getSetGoals();
+        setGoals.add(new Goal());
+        setGoals.add(new Goal());
+
+        when(goalInvitationRepository.existsById(goalInvitation.getId())).thenReturn(true);
+        when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.of(goalInvitation));
+        when(goalRepository.existsById(goalInvitation.getGoal().getId())).thenReturn(true);
+        when(goalRepository.findById(goalInvitation.getGoal().getId())).thenReturn(Optional.of(goalInvitation.getGoal()));
+        Exception exception = assertThrows(RuntimeException.class, () -> goalInvitationService.acceptGoalInvitation(goalInvitation.getId()));
+        assertEquals("SetGoals > 3", exception.getMessage());
+    }
+
+    @Test
+    public void acceptGoalInvitationWithSetGoalsWithoutCertainGoal() {
+        GoalInvitation goalInvitation = setupForAcceptGoalInvitation();
+
+        when(goalInvitationRepository.existsById(goalInvitation.getId())).thenReturn(true);
+        when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.of(goalInvitation));
+        when(goalRepository.existsById(goalInvitation.getGoal().getId())).thenReturn(true);
+        when(goalRepository.findById(goalInvitation.getGoal().getId())).thenReturn(Optional.of(goalInvitation.getGoal()));
+        Exception exception = assertThrows(RuntimeException.class, () -> goalInvitationService.acceptGoalInvitation(goalInvitation.getId()));
+        assertEquals("Invited already has such goal", exception.getMessage());
+    }
+
+    @Test
+    public void acceptGoalInvitationSetStatusAddGoal() {
+        GoalInvitation goalInvitation = setupForAcceptGoalInvitation();
+        List<Goal> setGoals = goalInvitation.getInvited().getSetGoals();
+        setGoals.remove(1);
+
+        when(goalInvitationRepository.existsById(goalInvitation.getId())).thenReturn(true);
+        when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.of(goalInvitation));
+        when(goalRepository.existsById(goalInvitation.getGoal().getId())).thenReturn(true);
+        when(goalRepository.findById(goalInvitation.getGoal().getId())).thenReturn(Optional.of(goalInvitation.getGoal()));
+        goalInvitationService.acceptGoalInvitation(goalInvitation.getId());
+        assertEquals(goalInvitation.getStatus(), RequestStatus.ACCEPTED);
+        assertEquals(goalInvitation.getInvited().getGoals().get(0), goalInvitation.getGoal());
+    }
+
+
+    private GoalInvitation setupForAcceptGoalInvitation() {
+        GoalInvitation goalInvitation = new GoalInvitation();
+        goalInvitation.setId(1L);
+        Goal goal = new Goal();
+        goal.setId(2L);
+        goalInvitation.setGoal(goal);
+        User invited = new User();
+        invited.setSetGoals(new ArrayList<>(List.of(
+                new Goal(),
+                goal
+        )));
+        invited.setGoals(new ArrayList<>());
+        goalInvitation.setInvited(invited);
+        return goalInvitation;
+    }
+
+
+//    public void rejectGoalInvitation(long id) {
+//        if (goalInvitationRepository.findById(id).isPresent()) {
+//            goalInvitation = goalInvitationRepository.findById(id).get();
+//            if (goalRepository.findById(goalInvitation.getGoal().getId()).isPresent()) {
+//                goalInvitation.setStatus(RequestStatus.REJECTED);
+//            } else {
+//                throw runtimeException;
+//            }
+//        } else {
+//            throw runtimeException;
+//        }
+//    }
 }

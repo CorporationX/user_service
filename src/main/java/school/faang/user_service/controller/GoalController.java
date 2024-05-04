@@ -2,6 +2,7 @@ package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.service.GoalService;
@@ -20,5 +21,12 @@ public class GoalController {
 
     public void deleteGoal(long goalId) {
         goalService.deleteGoal(goalId);
+    }
+
+    public void updateGoal(Long goalId, GoalDto goalDto) {
+        if (goalDto.getTitle().isBlank()) {
+            throw new DataValidationException("Goals title must exists");
+        }
+        goalService.updateGoal(goalId, goalDto);
     }
 }

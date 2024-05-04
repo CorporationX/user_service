@@ -52,13 +52,25 @@ public interface GoalRepository extends CrudRepository<Goal, Long> {
 
     @Query(nativeQuery = true, value = """
             INSERT INTO goal_skill (goal_id, skill_id, created_at, updated_at)
-            VALUES (goalId, skillId, NOW(), NOW())
+            VALUES (?1, ?2, NOW(), NOW())
             """)
     void addSkillToGoal(long skillId, long goalId);
 
     @Query(nativeQuery = true, value = """
+            DELETE FROM goal_skill
+            WHERE goal_skill.goal_id = ?1
+            """)
+    void removeSkillsFromGoal(long goalId);
+
+    @Query(nativeQuery = true, value = """
             DELETE FROM goal
-            WHERE goal.id = goalId
+            WHERE goal.id = ?1
             """)
     void deleteGoalById(long goalId);
+
+    @Query(nativeQuery = true, value = """
+            SELECT * FROM goal
+            WHERE goal.id = ?1
+            """)
+    Goal findGoalById(long goalId);
 }

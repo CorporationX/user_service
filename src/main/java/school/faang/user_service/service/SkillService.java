@@ -16,4 +16,12 @@ public class SkillService {
         return skills.stream()
                 .allMatch(skill -> skillRepository.existsByTitle(skill.getTitle()));
     }
+
+    public int checkAmountSkillsInDB(List<Long> skillsIds) {
+        return skillRepository.countExisting(skillsIds);
+    }
+
+    public void assignSkillToUser(long skillId, long userId) {
+        skillRepository.assignSkillToUser(skillId, userId);
+    }
 }

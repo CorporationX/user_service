@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.service.GoalService;
@@ -41,9 +42,31 @@ class GoalControllerTest {
         Mockito.verify(goalService, Mockito.times(1)).deleteGoal(1L);
     }
 
+    @Test
+    void testUpdateWhereGoalDtoHaveBlankTitle() {
+        GoalDto goalDto = initDto("");
+
+        assertThrows(DataValidationException.class, () -> goalController.updateGoal(1L, goalDto));
+    }
+
+    @Test
+    void testUpdateWithCorrectData() {
+        GoalDto goalDto = initDto("Test");
+
+        goalController.updateGoal(1L, goalDto);
+
+        Mockito.verify(goalService, Mockito.times(1)).updateGoal(1L, goalDto);
+    }
+
     private Goal init(String title) {
         Goal goal = new Goal();
         goal.setTitle(title);
         return goal;
+    }
+
+    private GoalDto initDto(String title) {
+        GoalDto goalDto = new GoalDto();
+        goalDto.setTitle(title);
+        return goalDto;
     }
 }

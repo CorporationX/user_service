@@ -7,5 +7,7 @@ import java.util.stream.Stream;
 
 public interface UserFilter {
 
+    boolean isAcceptable(UserFilterDto userFilterDto);
+
     Stream<User> applyFilter(Stream<User> users, UserFilterDto userFilterDto);
 }

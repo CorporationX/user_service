@@ -11,12 +11,14 @@ import java.util.stream.Stream;
 public class UserContactFilter implements UserFilter {
 
     @Override
+    public boolean isAcceptable(UserFilterDto userFilterDto) {
+        return userFilterDto.getContactPattern() != null;
+    }
+
+    @Override
     @Transactional
     public Stream<User> applyFilter(Stream<User> users, UserFilterDto userFilterDto) {
-        if (userFilterDto.getContactPattern() != null) {
-            return users.filter(user -> user.getContacts().stream()
-                    .anyMatch(contact -> contact.getContact().startsWith(userFilterDto.getContactPattern())));
-        }
-        return users;
+        return users.filter(user -> user.getContacts().stream()
+                .anyMatch(contact -> contact.getContact().startsWith(userFilterDto.getContactPattern())));
     }
 }

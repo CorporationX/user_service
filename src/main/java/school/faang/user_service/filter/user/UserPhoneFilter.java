@@ -10,10 +10,12 @@ import java.util.stream.Stream;
 public class UserPhoneFilter implements UserFilter {
 
     @Override
+    public boolean isAcceptable(UserFilterDto userFilterDto) {
+        return userFilterDto.getPhonePattern() != null;
+    }
+
+    @Override
     public Stream<User> applyFilter(Stream<User> users, UserFilterDto userFilterDto) {
-        if (userFilterDto.getPhonePattern() != null) {
-            return users.filter(user -> user.getPhone().startsWith(userFilterDto.getAboutPattern()));
-        }
-        return users;
+        return users.filter(user -> user.getPhone().startsWith(userFilterDto.getAboutPattern()));
     }
 }

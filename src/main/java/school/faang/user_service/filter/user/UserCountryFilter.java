@@ -10,10 +10,12 @@ import java.util.stream.Stream;
 public class UserCountryFilter implements UserFilter {
 
     @Override
+    public boolean isAcceptable(UserFilterDto userFilterDto) {
+        return userFilterDto.getCountryPattern() != null;
+    }
+
+    @Override
     public Stream<User> applyFilter(Stream<User> users, UserFilterDto userFilterDto) {
-        if (userFilterDto.getCountryPattern() != null) {
-            return users.filter(user -> user.getCountry().getTitle().startsWith(userFilterDto.getAboutPattern()));
-        }
-        return users;
+        return users.filter(user -> user.getCountry().getTitle().startsWith(userFilterDto.getAboutPattern()));
     }
 }

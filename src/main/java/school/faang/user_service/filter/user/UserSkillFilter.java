@@ -11,12 +11,14 @@ import java.util.stream.Stream;
 public class UserSkillFilter implements UserFilter {
 
     @Override
+    public boolean isAcceptable(UserFilterDto userFilterDto) {
+        return userFilterDto.getSkillPattern() != null;
+    }
+
+    @Override
     @Transactional
     public Stream<User> applyFilter(Stream<User> users, UserFilterDto userFilterDto) {
-        if (userFilterDto.getSkillPattern() != null) {
-            return users.filter(user -> user.getSkills().stream()
-                    .anyMatch(skill -> skill.getTitle().startsWith(userFilterDto.getSkillPattern())));
-        }
-        return users;
+        return users.filter(user -> user.getSkills().stream()
+                .anyMatch(skill -> skill.getTitle().startsWith(userFilterDto.getSkillPattern())));
     }
 }

@@ -19,7 +19,9 @@ public class UserFilterServiceImpl implements UserFilterService {
     public Stream<User> applyFilters(Stream<User> users, UserFilterDto userFilterDto) {
         if (userFilterDto != null) {
             for (UserFilter userFilter : userFilters) {
-                users = userFilter.applyFilter(users, userFilterDto);
+                if (userFilter.isAcceptable(userFilterDto)) {
+                    users = userFilter.applyFilter(users, userFilterDto);
+                }
             }
         }
 

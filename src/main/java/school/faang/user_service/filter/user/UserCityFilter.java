@@ -10,10 +10,12 @@ import java.util.stream.Stream;
 public class UserCityFilter implements UserFilter {
 
     @Override
+    public boolean isAcceptable(UserFilterDto userFilterDto) {
+        return userFilterDto.getCityPattern() != null;
+    }
+
+    @Override
     public Stream<User> applyFilter(Stream<User> users, UserFilterDto userFilterDto) {
-        if (userFilterDto.getCityPattern() != null) {
-            return users.filter(user -> user.getCity().startsWith(userFilterDto.getCityPattern()));
-        }
-        return users;
+        return users.filter(user -> user.getCity().startsWith(userFilterDto.getCityPattern()));
     }
 }

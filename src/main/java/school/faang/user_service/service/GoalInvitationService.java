@@ -51,9 +51,9 @@ public class GoalInvitationService {
     }
 
     public void acceptGoalInvitation(long id) {
-        if (goalInvitationRepository.findById(id).isPresent()) {
+        if (goalInvitationRepository.existsById(id)) {
             goalInvitation = goalInvitationRepository.findById(id).get();
-            if (goalRepository.findById(goalInvitation.getGoal().getId()).isPresent()) {
+            if (goalRepository.existsById(goalInvitation.getGoal().getId())) {
                 Goal goal = goalRepository.findById(goalInvitation.getGoal().getId()).get();
                 List<Goal> setGoals = goalInvitation.getInvited().getSetGoals();
                 if (setGoals.size() < 3) {
@@ -61,16 +61,16 @@ public class GoalInvitationService {
                         goalInvitation.setStatus(RequestStatus.ACCEPTED);
                         goalInvitation.getInvited().getGoals().add(goal);
                     } else {
-                        throw runtimeException;
+                        throw new RuntimeException("Invited already has such goal");
                     }
                 } else {
-                    throw runtimeException;
+                    throw new RuntimeException("SetGoals > 3");
                 }
             } else {
-                throw runtimeException;
+                throw new RuntimeException("There is no such goal in database");
             }
         } else {
-            throw runtimeException;
+            throw new RuntimeException("There is no such goalInvitation in database");
         }
     }
 

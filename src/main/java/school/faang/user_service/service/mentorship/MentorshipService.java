@@ -40,6 +40,18 @@ public class MentorshipService {
                         .collect(Collectors.toList());
     }
 
+    @Transactional
+    public void deleteMentee(long mentorId, long menteeId) {
+        User user = getUserById(mentorId);
+        user.getMentees().removeIf(mentee -> mentee.getId() == menteeId);
+    }
+
+    @Transactional
+    public void deleteMentor(long menteeId, long mentorId) {
+        User user = getUserById(menteeId);
+        user.getMentors().removeIf(mentor -> mentor.getId() == mentorId);
+    }
+
     // Утилитный private метод
     private User getUserById(long id) {
         return mentorshipRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));

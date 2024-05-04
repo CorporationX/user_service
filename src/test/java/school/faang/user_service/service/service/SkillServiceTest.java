@@ -11,6 +11,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mappers.SkillMapper;
 import school.faang.user_service.mappers.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.SkillService;
 
 import java.util.Arrays;
@@ -28,6 +29,9 @@ public class SkillServiceTest {
 
     @Mock
     private SkillRepository skillRepository;
+
+    @Mock
+    private UserRepository userRepository;
 
     @Spy
     private SkillMapper skillMapper;
@@ -121,6 +125,7 @@ public class SkillServiceTest {
         List<Skill> skillList = createSkillList();
         List<SkillDto> skillDtoList = createSkillDtoList();
 
+        when(userRepository.existsById(userId)).thenReturn(true);
         when(skillRepository.findAllByUserId(userId)).thenReturn(skillList);
         when(skillMapper.skillToDto(skillList.get(0))).thenReturn(skillDtoList.get(0));
         when(skillMapper.skillToDto(skillList.get(1))).thenReturn(skillDtoList.get(1));
@@ -129,6 +134,7 @@ public class SkillServiceTest {
 
         assertEquals(skillDtoList, result);
 
+        verify(userRepository).existsById(userId);
         verify(skillRepository).findAllByUserId(userId);
         verify(skillMapper).skillToDto(skillList.get(0));
         verify(skillMapper).skillToDto(skillList.get(1));
@@ -141,6 +147,7 @@ public class SkillServiceTest {
         List<Skill> skillList = createSkillList();
         List<SkillCandidateDto> skillCandidateDtoList = createSkillCandidateDto();
 
+        when(userRepository.existsById(userId)).thenReturn(true);
         when(skillRepository.findSkillsOfferedToUser(userId)).thenReturn(skillList);
         when(skillRepository.countOffersByUserIdAndSkillId(userId, skillList.get(0).getId())).thenReturn(1L);
         when(skillRepository.countOffersByUserIdAndSkillId(userId, skillList.get(1).getId())).thenReturn(2L);
@@ -151,6 +158,7 @@ public class SkillServiceTest {
 
         assertEquals(skillCandidateDtoList, result);
 
+        verify(userRepository).existsById(userId);
         verify(skillRepository).findSkillsOfferedToUser(userId);
         verify(skillRepository).countOffersByUserIdAndSkillId(userId, skillList.get(0).getId());
         verify(skillRepository).countOffersByUserIdAndSkillId(userId, skillList.get(1).getId());
@@ -159,9 +167,20 @@ public class SkillServiceTest {
     }
 
     @Test
+    public void testGetOfferedSkillsFailValidation() {
+        long userId = 1;
+        when(userRepository.existsById(userId)).thenReturn(false);
+
+        assertThrows(DataValidationException.class, ()-> skillService.getOfferedSkills(userId));
+        verify(userRepository).existsById(userId);
+    }
+
+    @Test
     public void testAcquireSkillWhenSkillAlreadyAcquired() {
         long skillId = 1;
         long userId = 1;
+        when(userRepository.existsById(userId)).thenReturn(true);
+        when(skillRepository.existsById(skillId)).thenReturn(true);
         when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.empty());
 
         Optional<SkillDto> result = skillService.acquireSkillFromOffers(skillId, userId);
@@ -173,6 +192,8 @@ public class SkillServiceTest {
     public void testAcquireSkillWhenNotEnoughSkillOffers() {
         long skillId = 1;
         long userId = 1;
+        when(userRepository.existsById(userId)).thenReturn(true);
+        when(skillRepository.existsById(skillId)).thenReturn(true);
         when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.empty());
         when(skillRepository.countOffersByUserIdAndSkillId(skillId, userId)).thenReturn(2L);
 
@@ -188,6 +209,9 @@ public class SkillServiceTest {
         Skill skill = new Skill();
         skill.setId(skillId);
         skill.setTitle("Test Skill");
+
+        when(userRepository.existsById(userId)).thenReturn(true);
+        when(skillRepository.existsById(skillId)).thenReturn(true);
         when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.empty());
         when(skillRepository.countOffersByUserIdAndSkillId(skillId, userId)).thenReturn(3L);
         when(skillRepository.findById(skillId)).thenReturn(Optional.of(skill));
@@ -197,6 +221,33 @@ public class SkillServiceTest {
         assertTrue(result.isPresent());
         assertEquals(skillId, result.get().getId());
         assertEquals(skill.getTitle(), result.get().getTitle());
+
+        verify(userRepository).existsById(userId);
+        verify(skillRepository).existsById(skillId);
+    }
+
+    @Test
+    public void setAcquireSkillWhenSkillIdIsEmpty() {
+        long skillId = 1;
+        long userId = 1;
+
+        when(userRepository.existsById(userId)).thenReturn(true);
+        when(skillRepository.existsById(skillId)).thenReturn(false);
+
+        assertThrows(DataValidationException.class, () -> skillService.acquireSkillFromOffers(skillId, userId));
+        verify(userRepository).existsById(userId);
+        verify(skillRepository).existsById(skillId);
+    }
+
+    @Test
+    public void setAcquireSkillWhenUserIdIsEmpty() {
+        long skillId = 1;
+        long userId = 1;
+
+        when(userRepository.existsById(userId)).thenReturn(false);
+
+        assertThrows(DataValidationException.class, () -> skillService.acquireSkillFromOffers(skillId, userId));
+        verify(userRepository).existsById(userId);
     }
 
     private List<SkillCandidateDto> createSkillCandidateDto() {

@@ -8,6 +8,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mappers.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +18,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class SkillService {
     private final SkillRepository skillRepository;
+    private final UserRepository userRepository;
     private final SkillMapper skillMapper;
 
     public SkillDto create(SkillDto skillDto) {
@@ -34,14 +36,22 @@ public class SkillService {
     }
 
     public List<SkillDto> getUserSkills(long userId) {
+        checkUserInDB(userId);
         List<Skill> skills = skillRepository.findAllByUserId(userId);
         return skills.stream().map(skillMapper::skillToDto).toList();
     }
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
+        checkUserInDB(userId);
         List<Skill> offeredSkillList = skillRepository.findSkillsOfferedToUser(userId);
         return offeredSkillList.stream().map(skill ->
                 skillMapper.skillToSkillCandidateDto(skill, getSkillOffersNumber(userId, skill.getId()))).toList();
+    }
+
+    private void checkUserInDB(long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new DataValidationException("Не найден пользователь с данным id: " + userId);
+        }
     }
 
     private long getSkillOffersNumber(long userId, long skillId) {
@@ -49,6 +59,7 @@ public class SkillService {
     }
 
     public Optional<SkillDto> acquireSkillFromOffers(long skillId, long userId) {
+        checkNotNullSkillIdOrUserId(skillId, userId);
         if (hasAlreadyAcquiredSkill(skillId, userId) || !hasEnoughSkillOffers(skillId, userId)) {
             return Optional.empty();
         }
@@ -71,5 +82,11 @@ public class SkillService {
      private boolean hasEnoughSkillOffers(long skillId, long userId) {
         final int MIN_SKILL_OFFERS = 3;
         return getSkillOffersNumber(skillId, userId) >= MIN_SKILL_OFFERS;
+    }
+
+    private void checkNotNullSkillIdOrUserId(long skillId, long userId) {
+        if (!userRepository.existsById(userId) || !skillRepository.existsById(skillId)) {
+            throw new DataValidationException("Переданы пустые параметры skillId или userId");
+        }
     }
 }

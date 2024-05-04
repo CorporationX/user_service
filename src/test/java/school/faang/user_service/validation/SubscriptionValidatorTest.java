@@ -10,12 +10,11 @@ import school.faang.user_service.repository.SubscriptionRepository;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
+import static school.faang.user_service.util.TestUser.FOLLOWEE_ID;
+import static school.faang.user_service.util.TestUser.FOLLOWER_ID;
 
 @ExtendWith(MockitoExtension.class)
 class SubscriptionValidatorTest {
-
-    private final long followerId = 1L;
-    private final long followeeId = 2L;
 
     @Mock
     SubscriptionRepository subscriptionRepository;
@@ -25,23 +24,23 @@ class SubscriptionValidatorTest {
     @Test
     public void testValidateSubscribeUserToHimself() {
 
-        when(subscriptionRepository.existsById(followerId)).thenReturn(true);
+        when(subscriptionRepository.existsById(FOLLOWER_ID)).thenReturn(true);
 
         DataValidationException dataValidationException = assertThrows(
                 DataValidationException.class,
-                () -> subscriptionValidator.validateUser(followerId, followerId)
+                () -> subscriptionValidator.validateUser(FOLLOWER_ID, FOLLOWER_ID)
         );
         assertEquals("IDs cannot be equal!", dataValidationException.getMessage());
     }
 
     @Test
     public void testIsFollowerUserAndFolloweeUserExist() {
-        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId))
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(FOLLOWER_ID, FOLLOWEE_ID))
                 .thenReturn(true);
 
         DataValidationException dataValidationException = assertThrows(
                 DataValidationException.class,
-                () -> subscriptionValidator.validateExistsSubscription(followerId, followeeId)
+                () -> subscriptionValidator.validateExistsSubscription(FOLLOWER_ID, FOLLOWEE_ID)
         );
 
         assertEquals("Subscription already exists!", dataValidationException.getMessage());
@@ -49,11 +48,11 @@ class SubscriptionValidatorTest {
 
     @Test
     public void testValidateUnsubscribeUserToHimself() {
-        when(subscriptionRepository.existsById(followerId)).thenReturn(true);
+        when(subscriptionRepository.existsById(FOLLOWER_ID)).thenReturn(true);
 
         DataValidationException dataValidationException = assertThrows(
                 DataValidationException.class,
-                () -> subscriptionValidator.validateUser(followerId, followerId)
+                () -> subscriptionValidator.validateUser(FOLLOWER_ID, FOLLOWER_ID)
         );
         assertEquals("IDs cannot be equal!", dataValidationException.getMessage());
     }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +30,12 @@ public class SubscriptionController {
         subscriptionService.unfollowUser(followerId, followeeId);
     }
 
+    @GetMapping("/followers/count")
+    public int getFollowersCount() {
+        long followerId = userContext.getUserId();
+        return subscriptionService.getFollowersCount(followerId);
+    }
+
     @PostMapping("/user/{followeeId}")
     @ResponseStatus(HttpStatus.CREATED)
     public void followUser(@PathVariable long followeeId) {
@@ -37,4 +44,7 @@ public class SubscriptionController {
             subscriptionService.followUser(followerId, followeeId);
 
         }
+
+
+
 }

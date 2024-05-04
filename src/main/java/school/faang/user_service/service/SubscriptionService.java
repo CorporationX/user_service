@@ -13,9 +13,15 @@ public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     public final SubscriptionValidator subscriptionValidator;
 
-
     @Transactional
     public void unfollowUser(long followerId, long followeeId) {
         subscriptionRepository.unfollowUser(followerId, followeeId);
+
+    private final SubscriptionValidator subscriptionValidator;
+
+    @Transactional
+    public void followUser(long followerId, long followeeId) {
+        subscriptionValidator.validateExistsSubscription(followerId, followeeId);
+        subscriptionRepository.followUser(followerId, followeeId);
     }
 }

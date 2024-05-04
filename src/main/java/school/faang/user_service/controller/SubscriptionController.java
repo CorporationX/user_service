@@ -21,12 +21,19 @@ public class SubscriptionController {
     private final UserContext userContext;
     private final SubscriptionValidator subscriptionValidator;
 
-
     @DeleteMapping("/user/{followeeId}")
     @ResponseStatus(HttpStatus.OK)
     public void unfollowUser(@PathVariable long followeeId) {
         long followerId = userContext.getUserId();
         subscriptionValidator.validateUser(followerId, followeeId);
         subscriptionService.unfollowUser(followerId, followeeId);
+
+    @PostMapping("/user/{followeeId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void followUser(@PathVariable long followeeId) {
+        long followerId = userContext.getUserId();
+        validator.validateUser(followerId, followeeId);
+        service.followUser(followerId, followeeId);
+
     }
 }

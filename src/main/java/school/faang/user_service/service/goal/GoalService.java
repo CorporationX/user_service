@@ -54,10 +54,14 @@ public class GoalService {
     @Transactional
     public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
         goalValidation.validateGoalUpdate(goalId, goalDto);
-        Goal createdGoal = goalRepository.findById(goalId)
-                .orElseThrow(() -> new EntityNotFoundException(GoalConstraints.ENTITY_NOT_FOUND.getMessage()));
+        Goal createdGoal = getGoal(goalId);
         updateFields(createdGoal, goalDto);
         return goalMapper.toDto(goalRepository.save(createdGoal));
+    }
+
+    public Goal getGoal(Long goalId) {
+        return goalRepository.findById(goalId)
+                .orElseThrow(() -> new EntityNotFoundException(GoalConstraints.ENTITY_NOT_FOUND.getMessage()));
     }
 
     public void deleteGoal(Long goalId) {
@@ -87,8 +91,7 @@ public class GoalService {
         if (goalDto.getParentId() != null) {
             Long parentId = goalDto.getParentId();
             goalValidation.validateExistGoal(parentId);
-            goal.setParent(goalRepository.findById(parentId)
-                    .orElseThrow(() -> new EntityNotFoundException(GoalConstraints.ENTITY_NOT_FOUND.getMessage())));
+            goal.setParent(getGoal(parentId));
         }
         if (GoalStatus.COMPLETED.equals(goalDto.getStatus())) {
             goal.getUsers().forEach(user -> addSkillsToUser(user, goal));

@@ -11,8 +11,9 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.MenteeMapper;
 import school.faang.user_service.mapper.MentorMapper;
 import school.faang.user_service.publisher.GoalSetEventPublisher;
-import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
+import school.faang.user_service.service.goal.GoalService;
+import school.faang.user_service.validator.mentorship.MentorshipValidator;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,11 +24,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class MentorshipService {
-    private final MentorshipRepository mentorshipRepository;
-    private final GoalRepository goalRepository;
     private final GoalSetEventPublisher goalSetEventPublisher;
+    private final MentorshipRepository mentorshipRepository;
+    private final MentorshipValidator mentorshipValidator;
     private final MenteeMapper menteeMapper;
     private final MentorMapper mentorMapper;
+    private final GoalService goalService;
 
     public List<User> getMentees(Long userId) {
         User user = getUser(userId);
@@ -103,15 +105,8 @@ public class MentorshipService {
     public MenteeDto addGoalToMenteeFromMentor(Long menteeId, Long goalId, Long mentorId) {
         User mentee = getMentee(menteeId);
         User mentor = getMentor(mentorId);
-        if (mentee.getMentors() == null) {
-            throw new NullPointerException("User does not have mentors yet.");
-        }
-        if (!(mentee.getMentors().contains(mentor))) {
-            throw new IllegalArgumentException(String.format("The specified mentor: %s is not in the" +
-                    " list of assigned mentors for the user: %s ", mentorId, menteeId));
-        }
-        Goal goal = goalRepository.findById(goalId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Goal with id: %s not found", goalId)));
+        mentorshipValidator.addGoalToMenteeFromMentorValidation(mentee,mentor);
+        Goal goal = goalService.getGoal(goalId);
         List<Goal> userGoalList = mentee.getGoals();
         if (userGoalList == null) {
             userGoalList = new ArrayList<>();

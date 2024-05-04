@@ -19,8 +19,9 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.MenteeMapperImpl;
 import school.faang.user_service.mapper.MentorMapperImpl;
 import school.faang.user_service.publisher.GoalSetEventPublisher;
-import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
+import school.faang.user_service.service.goal.GoalService;
+import school.faang.user_service.validator.mentorship.MentorshipValidator;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,9 +30,11 @@ import java.util.Optional;
 @ExtendWith(MockitoExtension.class)
 public class MentorshipServiceTest {
     @Mock
+    private MentorshipValidator mentorshipValidator;
+    @Mock
     private GoalSetEventPublisher goalSetEventPublisher;
     @Mock
-    private GoalRepository goalRepository;
+    private GoalService goalService;
     @Mock
     private MentorshipRepository mentorshipRepository;
     @InjectMocks
@@ -172,31 +175,10 @@ public class MentorshipServiceTest {
         firstMentee.setMentors(List.of(secondMentor));
         when(mentorshipRepository.findById(menteeId)).thenReturn(Optional.of(firstMentee));
         when(mentorshipRepository.findById(mentorId)).thenReturn(Optional.of(secondMentor));
-        when(goalRepository.findById(anyLong())).thenReturn(Optional.of(goalTest));
+        when(goalService.getGoal(anyLong())).thenReturn(goalTest);
 
         assertEquals(menteeDtoResult,mentorshipService.addGoalToMenteeFromMentor(menteeId,goalId,mentorId));
         verify(mentorshipRepository).save(firstMentee);
         verify(goalSetEventPublisher).publish(goalSetEvent);
-    }
-    @Test
-    void addGoalToUserTestMenteeDoesNotMentors() {
-        long menteeId = 1L;
-        long goalId = 1L;
-        long mentorId = 1L;
-        when(mentorshipRepository.findById(menteeId)).thenReturn(Optional.of(firstMentee));
-        when(mentorshipRepository.findById(mentorId)).thenReturn(Optional.of(firstMentor));
-
-        assertThrows(NullPointerException.class,()-> mentorshipService.addGoalToMenteeFromMentor(menteeId,goalId,mentorId));
-    }
-    @Test
-    void addGoalToUserTestMenteeDoesNotThisMentors() {
-        long menteeId = 1L;
-        long goalId = 1L;
-        long mentorId = 2L;
-        firstMentee.setMentors(List.of(secondMentor));
-        when(mentorshipRepository.findById(menteeId)).thenReturn(Optional.of(firstMentee));
-        when(mentorshipRepository.findById(mentorId)).thenReturn(Optional.of(firstMentor));
-
-        assertThrows(IllegalArgumentException.class,()-> mentorshipService.addGoalToMenteeFromMentor(menteeId,goalId,mentorId));
     }
 }

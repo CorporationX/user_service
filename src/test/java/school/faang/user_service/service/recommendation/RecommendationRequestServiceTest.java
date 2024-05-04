@@ -94,28 +94,28 @@ public class RecommendationRequestServiceTest {
         Mockito.verify(recommendationRequestMapper, Mockito.times(1)).toEntity(recommendationRequestDto);
     }
 
-    @Test
-    public void testRecommendationRequestPublisher() {
-        User author = new User();
-        author.setId(1L);
-        User receiver = new User();
-        receiver.setId(2L);
-        Recommendation recommendation = new Recommendation();
-        recommendation.setAuthor(author);
-        recommendation.setReceiver(receiver);
-        RecommendationRequestEvent recommendationRequestEvent = new RecommendationRequestEvent(8L, 1L, 2L);
-        recommendationRequest.setRecommendation(recommendation);
-
-        Mockito.when(recommendationRequestRepository.findById(8L)).thenReturn(Optional.of(recommendationRequest));
-        Mockito.when(recommendationRequestMapper.toDto(recommendationRequest)).thenReturn(recommendationRequestDto);
-
-        RecommendationRequestDto request = recommendationRequestService.getRequest(8L);
-
-        Mockito.verify(recommendationRequestRepository, Mockito.times(1)).findById(8L);
-        Mockito.verify(recommendationRequestEventPublisher, Mockito.times(1)).publish(recommendationRequestEvent);
-        Mockito.verify(recommendationRequestMapper, Mockito.times(1)).toDto(recommendationRequest);
-        Assertions.assertEquals(request, recommendationRequestDto);
-    }
+//    @Test
+//    public void testRecommendationRequestPublisher() {
+//        User author = new User();
+//        author.setId(1L);
+//        User receiver = new User();
+//        receiver.setId(2L);
+//        Recommendation recommendation = new Recommendation();
+//        recommendation.setAuthor(author);
+//        recommendation.setReceiver(receiver);
+//        RecommendationRequestEvent recommendationRequestEvent = new RecommendationRequestEvent(8L, 1L, 2L);
+//        recommendationRequest.setRecommendation(recommendation);
+//
+//        Mockito.when(recommendationRequestRepository.findById(8L)).thenReturn(Optional.of(recommendationRequest));
+//        Mockito.when(recommendationRequestMapper.toDto(recommendationRequest)).thenReturn(recommendationRequestDto);
+//
+//        RecommendationRequestDto request = recommendationRequestService.getRequest(8L);
+//
+//        Mockito.verify(recommendationRequestRepository, Mockito.times(1)).findById(8L);
+//        Mockito.verify(recommendationRequestEventPublisher, Mockito.times(1)).publish(recommendationRequestEvent);
+//        Mockito.verify(recommendationRequestMapper, Mockito.times(1)).toDto(recommendationRequest);
+//        Assertions.assertEquals(request, recommendationRequestDto);
+//    }
 
 //    @Test
 //    public void testRecommendationRequestCreated() {

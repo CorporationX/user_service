@@ -9,10 +9,19 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.SkillDto;
+import school.faang.user_service.entity.Skill;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.recommendation.Recommendation;
+import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.UserSkillGuaranteeRepository;
+import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.service.SkillService;
+
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(MockitoExtension.class)
@@ -21,34 +30,46 @@ public class SkillServiceTest {
     private SkillService skillService;
     @Mock
     private SkillRepository skillRepository;
+    @Mock
+    private SkillOfferRepository skillOfferRepository;
+    @Mock
+    private Skill skill;
+    @Mock
+    private SkillOffer skillOffer;
+    @Mock
+    private Recommendation recommendation;
+    @Mock
+    private User user;
+    @Mock
+    private UserSkillGuaranteeRepository skillGuaranteeRepository;
     @Spy
     private SkillMapper skillMapper;
-    SkillDto skill;
+    SkillDto skillDto;
     long userId = 1L;
-
+    long skillId = 1L;
     @BeforeEach
     public void init() {
-        skill = new SkillDto();
-        skill.setId(1L);
-        skill.setTitle("Driving a car");
+        skillDto = new SkillDto();
+        skillDto.setId(1L);
+        skillDto.setTitle("Driving a car");
     }
 
     @Test
     public void testCreateWithBlankTitle() {
-        skill.setTitle("   ");
-        assertThrows(DataValidationException.class, () -> skillService.create(skill));
+        skillDto.setTitle("   ");
+        assertThrows(DataValidationException.class, () -> skillService.create(skillDto));
     }
 
     @Test
     public void testSkillSave() throws DataValidationException {
-        skillService.create(skill);
-        Mockito.verify(skillRepository, Mockito.times(1)).save(skillMapper.toEntity(skill));
+        skillService.create(skillDto);
+        Mockito.verify(skillRepository, Mockito.times(1)).save(skillMapper.toEntity(skillDto));
     }
 
     @Test
     public void testCreateIfSkillExist() {
-        Mockito.when(skillRepository.existsByTitle(skill.getTitle())).thenReturn(true);
-        assertThrows(DataValidationException.class, () -> skillService.create(skill));
+        Mockito.when(skillRepository.existsByTitle(skillDto.getTitle())).thenReturn(true);
+        assertThrows(DataValidationException.class, () -> skillService.create(skillDto));
     }
 
     @Test
@@ -61,5 +82,27 @@ public class SkillServiceTest {
     public void testGetOfferedSkill() {
         skillService.getOfferedSkills(userId);
         Mockito.verify(skillRepository, Mockito.times(1)).findSkillsOfferedToUser(userId);
+    }
+
+    @Test
+    public void testIfOfferedSkillExist() {
+        Mockito.when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.of(skill));
+        assertThrows(DataValidationException.class, () -> skillService.acquireSkillFromOffers(skillId, userId));
+    }
+
+    @Test
+    public void testAssignSkillToUser() {
+        List<SkillOffer> skillOffers = List.of(skillOffer, skillOffer, skillOffer, skillOffer);
+
+
+        Mockito.when(skillRepository.findUserSkill(skillId, userId)).thenReturn(null);
+        Mockito.when(skillOfferRepository.findAllOffersOfSkill(skillId, userId)).
+                thenReturn(skillOffers);
+        Mockito.when(skillOffer.getRecommendation()).thenReturn(recommendation);
+        Mockito.when(skillOffer.getRecommendation().getAuthor()).thenReturn(user);
+        Mockito.when(skillOffer.getRecommendation().getAuthor().getId()).thenReturn(2L);
+
+        skillService.acquireSkillFromOffers(skillId, userId);
+        Mockito.verify(skillRepository, Mockito.times(1)).assignSkillToUser(skillId, userId);
     }
 }

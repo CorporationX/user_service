@@ -3,9 +3,12 @@ package school.faang.user_service.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.GoalDto;
+import school.faang.user_service.dto.filter.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.service.GoalService;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -28,5 +31,9 @@ public class GoalController {
             throw new DataValidationException("Goals title must exists");
         }
         goalService.updateGoal(goalId, goalDto);
+    }
+
+    public List<GoalDto> findSubtasksByGoalId(long goalId, GoalFilterDto filters) {
+        return goalService.findSubtasksByGoalId(goalId, filters);
     }
 }

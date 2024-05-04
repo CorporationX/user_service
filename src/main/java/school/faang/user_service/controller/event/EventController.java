@@ -3,12 +3,15 @@ package school.faang.user_service.controller.event;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.filter.EventFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventService;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static school.faang.user_service.exception.ExceptionMessage.INVALID_EVENT_START_DATE_EXCEPTION;
+import static school.faang.user_service.exception.ExceptionMessage.NULL_EVENT_FILTER_EXCEPTION;
 import static school.faang.user_service.exception.ExceptionMessage.NULL_EVENT_OWNER_ID_EXCEPTION;
 import static school.faang.user_service.exception.ExceptionMessage.NULL_OR_BLANK_EVENT_TITLE_EXCEPTION;
 
@@ -25,6 +28,14 @@ public class EventController {
 
     public EventDto getEvent(long eventId) {
         return eventService.getEvent(eventId);
+    }
+
+    public List<EventDto> getEventsByFilter(EventFilterDto filter) {
+        if (filter == null) {
+            throw new DataValidationException(NULL_EVENT_FILTER_EXCEPTION.getMessage());
+        }
+
+        return eventService.getEventsByFilter(filter);
     }
 
     private void validateEvent(EventDto event) {

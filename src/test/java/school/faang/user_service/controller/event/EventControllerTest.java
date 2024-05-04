@@ -10,7 +10,9 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.filter.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
+import school.faang.user_service.exception.DataGettingException;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventService;
 
@@ -25,6 +27,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static school.faang.user_service.exception.ExceptionMessage.INVALID_EVENT_START_DATE_EXCEPTION;
+import static school.faang.user_service.exception.ExceptionMessage.NULL_EVENT_FILTER_EXCEPTION;
 import static school.faang.user_service.exception.ExceptionMessage.NULL_EVENT_OWNER_ID_EXCEPTION;
 import static school.faang.user_service.exception.ExceptionMessage.NULL_OR_BLANK_EVENT_TITLE_EXCEPTION;
 
@@ -131,5 +134,25 @@ class EventControllerTest {
         eventController.getEvent(anyLong());
 
         verify(eventService).getEvent(anyLong());
+    }
+
+    @Test
+    void getEventsByFilterPositiveTest() {
+        ArgumentCaptor<EventFilterDto> filterCaptor = ArgumentCaptor.forClass(EventFilterDto.class);
+        EventFilterDto filter = new EventFilterDto();
+
+        assertDoesNotThrow(() -> eventController.getEventsByFilter(filter));
+
+        verify(eventService).getEventsByFilter(filterCaptor.capture());
+        assertEquals(filter, filterCaptor.getValue());
+    }
+
+    @Test
+    void getEventsByFilterNegativeTest() {
+        DataValidationException exception = assertThrows(DataValidationException.class,
+                () -> eventController.getEventsByFilter(null));
+
+        verify(eventService, times(0)).getEventsByFilter(any(EventFilterDto.class));
+        assertEquals(NULL_EVENT_FILTER_EXCEPTION.getMessage(), exception.getMessage());
     }
 }

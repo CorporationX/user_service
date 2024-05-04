@@ -13,7 +13,7 @@ import java.util.List;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface GoalMapper {
 
-    @Mapping(source = "skillsToAchieve", target = "skillsToAchieve", qualifiedByName = "map")
+    @Mapping(source = "skillsToAchieve", target = "skillIds", qualifiedByName = "map")
     GoalDto toDto(Goal goal);
 
     @Mapping(target = "skillsToAchieve", ignore = true)

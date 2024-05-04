@@ -42,9 +42,5 @@ public class SubscriptionController {
             long followerId = userContext.getUserId();
             subscriptionValidator.validateUser(followerId, followeeId);
             subscriptionService.followUser(followerId, followeeId);
-
-        }
-
-
-
+    }
 }

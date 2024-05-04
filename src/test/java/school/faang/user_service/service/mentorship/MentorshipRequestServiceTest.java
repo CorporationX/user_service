@@ -16,6 +16,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.handler.exception.DataValidationException;
 import school.faang.user_service.handler.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.mentorship.filtres.DescriptionRequestFilter;
 import school.faang.user_service.service.mentorship.filtres.RequestFilter;
@@ -32,6 +33,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class MentorshipRequestServiceTest {
     @Mock
+    private MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher;
+    @Mock
     private MentorshipRequestRepository mentorshipRequestRepository;
     @Mock
     private MentorshipRequestValidator mentorshipRequestValidator;
@@ -45,7 +48,7 @@ public class MentorshipRequestServiceTest {
 
     @BeforeEach
     public void init() {
-        mentorshipRequestService = new MentorshipRequestService(mentorshipRequestRepository, mentorshipRequestValidator
+        mentorshipRequestService = new MentorshipRequestService(mentorshipAcceptedEventPublisher, mentorshipRequestRepository, mentorshipRequestValidator
                 , mentorshipRequestMapper, requestFilters);
     }
 

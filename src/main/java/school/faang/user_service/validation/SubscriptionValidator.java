@@ -14,8 +14,7 @@ public class SubscriptionValidator {
 
     public void validateUser(long followerId, long followeeId) {
         if (!subscriptionRepository.existsById(followeeId) ||
-                !subscriptionRepository.existsById(followerId)
-        ) {
+                !subscriptionRepository.existsById(followerId)) {
             throw new DataValidationException("This user is not registered");
         }
         if (followerId == followeeId) {

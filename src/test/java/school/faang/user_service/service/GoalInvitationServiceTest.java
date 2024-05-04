@@ -8,6 +8,7 @@ import org.mapstruct.factory.Mappers;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
@@ -18,6 +19,7 @@ import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,14 +45,15 @@ public class GoalInvitationServiceTest {
     @Captor
     ArgumentCaptor<GoalInvitation> captor;
 
+
     @Test
-    public void testCreateInvitationWithInviterId() {
+    void testCreateInvitationWithInviterId() {
         RuntimeException exception = assertThrows(RuntimeException.class, () -> goalInvitationService.createInvitation(new GoalInvitationDto()));
         assertEquals("InviterId == null or InvitedUserId == null", exception.getMessage());
     }
 
     @Test
-    public void testCreateInvitationWithInvitedUserId() {
+    void testCreateInvitationWithInvitedUserId() {
         GoalInvitationDto goalInvitationDto = new GoalInvitationDto();
         goalInvitationDto.setInviterId(1L);
 
@@ -59,7 +62,7 @@ public class GoalInvitationServiceTest {
     }
 
     @Test
-    public void testCreateInvitationWithInviterIdEqualsInvitedUserId() {
+    void testCreateInvitationWithInviterIdEqualsInvitedUserId() {
         GoalInvitationDto goalInvitationDto = new GoalInvitationDto();
         goalInvitationDto.setInviterId(25L);
         goalInvitationDto.setInvitedUserId(25L);
@@ -69,7 +72,7 @@ public class GoalInvitationServiceTest {
     }
 
     @Test
-    public void testCreateInvitationWithInviteExists() {
+    void testCreateInvitationWithInviteExists() {
         GoalInvitationDto goalInvitationDto = new GoalInvitationDto();
         goalInvitationDto.setInviterId(25L);
         goalInvitationDto.setInvitedUserId(20L);
@@ -80,7 +83,7 @@ public class GoalInvitationServiceTest {
     }
 
     @Test
-    public void testCreateInvitationWithInvitedUserExists() {
+    void testCreateInvitationWithInvitedUserExists() {
         GoalInvitationDto goalInvitationDto = new GoalInvitationDto();
         goalInvitationDto.setInviterId(25L);
         goalInvitationDto.setInvitedUserId(20L);
@@ -92,7 +95,7 @@ public class GoalInvitationServiceTest {
     }
 
     @Test
-    public void testCreateInvitationSaveGoalInvitation() {
+    void testCreateInvitationSaveGoalInvitation() {
         GoalInvitationDto goalInvitationDto = new GoalInvitationDto(25L, 25L, 20L, 30L, RequestStatus.PENDING);
 
         User inviter = new User();
@@ -120,7 +123,7 @@ public class GoalInvitationServiceTest {
     }
 
     @Test
-    public void acceptGoalInvitationWithIdIsNotPresent() {
+    void testAcceptGoalInvitationWithIdIsNotPresent() {
         GoalInvitation goalInvitation = setupForAcceptGoalInvitation();
 
         when(goalInvitationRepository.existsById(goalInvitation.getId())).thenReturn(false);
@@ -129,7 +132,7 @@ public class GoalInvitationServiceTest {
     }
 
     @Test
-    public void acceptGoalInvitationWithGoalIdIsNotPresent() {
+    void testAcceptGoalInvitationWithGoalIdIsNotPresent() {
         GoalInvitation goalInvitation = setupForAcceptGoalInvitation();
 
         when(goalInvitationRepository.existsById(goalInvitation.getId())).thenReturn(true);
@@ -140,7 +143,7 @@ public class GoalInvitationServiceTest {
     }
 
     @Test
-    public void acceptGoalInvitationWithSetGoalsMoreThanThree() {
+    void testAcceptGoalInvitationWithSetGoalsMoreThanThree() {
         GoalInvitation goalInvitation = setupForAcceptGoalInvitation();
         List<Goal> setGoals = goalInvitation.getInvited().getSetGoals();
         setGoals.add(new Goal());
@@ -155,7 +158,7 @@ public class GoalInvitationServiceTest {
     }
 
     @Test
-    public void acceptGoalInvitationWithSetGoalsWithoutCertainGoal() {
+    void testAcceptGoalInvitationWithSetGoalsWithoutCertainGoal() {
         GoalInvitation goalInvitation = setupForAcceptGoalInvitation();
 
         when(goalInvitationRepository.existsById(goalInvitation.getId())).thenReturn(true);
@@ -167,7 +170,7 @@ public class GoalInvitationServiceTest {
     }
 
     @Test
-    public void acceptGoalInvitationSetStatusAddGoal() {
+    void testAcceptGoalInvitationSetStatusAddGoal() {
         GoalInvitation goalInvitation = setupForAcceptGoalInvitation();
         List<Goal> setGoals = goalInvitation.getInvited().getSetGoals();
         setGoals.remove(1);
@@ -183,32 +186,80 @@ public class GoalInvitationServiceTest {
 
 
     private GoalInvitation setupForAcceptGoalInvitation() {
+
         GoalInvitation goalInvitation = new GoalInvitation();
         goalInvitation.setId(1L);
+
         Goal goal = new Goal();
         goal.setId(2L);
+
         goalInvitation.setGoal(goal);
+
         User invited = new User();
+        invited.setGoals(new ArrayList<>());
+        invited.setUsername("Mike");
+        invited.setId(2L);
+
         invited.setSetGoals(new ArrayList<>(List.of(
                 new Goal(),
                 goal
         )));
-        invited.setGoals(new ArrayList<>());
+
+        User inviter = new User();
+        inviter.setId(1L);
+        inviter.setUsername("John");
+
         goalInvitation.setInvited(invited);
+        goalInvitation.setInviter(inviter);
         return goalInvitation;
     }
 
+    @Test
+    void testRejectGoalInvitationWithIdIsNotPresent() {
+        GoalInvitation goalInvitation = setupForAcceptGoalInvitation();
 
-//    public void rejectGoalInvitation(long id) {
-//        if (goalInvitationRepository.findById(id).isPresent()) {
-//            goalInvitation = goalInvitationRepository.findById(id).get();
-//            if (goalRepository.findById(goalInvitation.getGoal().getId()).isPresent()) {
-//                goalInvitation.setStatus(RequestStatus.REJECTED);
-//            } else {
-//                throw runtimeException;
-//            }
-//        } else {
-//            throw runtimeException;
-//        }
-//    }
+        when(goalInvitationRepository.existsById(goalInvitation.getId())).thenReturn(false);
+        Exception exception = assertThrows(RuntimeException.class, () -> goalInvitationService.acceptGoalInvitation(goalInvitation.getId()));
+        assertEquals("There is no such goalInvitation in database", exception.getMessage());
+    }
+
+    @Test
+    void testRejectGoalInvitationWithNoGoal() {
+        GoalInvitation goalInvitation = setupForAcceptGoalInvitation();
+
+        when(goalInvitationRepository.existsById(goalInvitation.getId())).thenReturn(true);
+        when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.of(goalInvitation));
+        when(goalRepository.existsById(goalInvitation.getGoal().getId())).thenReturn(false);
+        Exception exception = assertThrows(RuntimeException.class, () -> goalInvitationService.acceptGoalInvitation(goalInvitation.getId()));
+        assertEquals("There is no such goal in database", exception.getMessage());
+    }
+
+    @Test
+    void testRejectGoalInvitationSetStatus() {
+        GoalInvitation goalInvitation = setupForAcceptGoalInvitation();
+
+        when(goalInvitationRepository.existsById(goalInvitation.getId())).thenReturn(true);
+        when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.of(goalInvitation));
+        when(goalRepository.existsById(goalInvitation.getGoal().getId())).thenReturn(true);
+
+        goalInvitationService.rejectGoalInvitation(goalInvitation.getId());
+        assertEquals(goalInvitation.getStatus(), RequestStatus.REJECTED);
+    }
+
+    @Test
+    void testGetInvitationsWithFilterNull() {
+        Exception exception = assertThrows(RuntimeException.class, () -> goalInvitationService.getInvitations(null));
+        assertEquals("InvitationFilterDto is null", exception.getMessage());
+    }
+
+    @Test
+    void testGetInvitationsReturnGoalInvitations() {
+        InvitationFilterDto filterDto = new InvitationFilterDto("John", "Mike", 1L, 2L, RequestStatus.ACCEPTED);
+        GoalInvitation goalInvitation = setupForAcceptGoalInvitation();
+        List<GoalInvitation> goalInvitations = Arrays.asList(goalInvitation, new GoalInvitation(), new GoalInvitation());
+
+        when(goalInvitationRepository.findAll()).thenReturn(goalInvitations);
+        goalInvitations = goalInvitationService.getInvitations(filterDto);
+        assertEquals(1, goalInvitations.size());
+    }
 }

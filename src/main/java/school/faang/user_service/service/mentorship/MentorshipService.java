@@ -10,6 +10,7 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.List;
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -18,35 +19,29 @@ public class MentorshipService {
     private final UserMapper userMapper;
 
     public List<UserDto> getMentees(long userId) {
-        List<User> mentees;
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found."));
-        mentees = user.getMentees();
-        return userMapper.toDto(mentees);
+        return getUsers(userId, User::getMentees);
     }
 
     public List<UserDto> getMentors(long userId) {
-        List<User> mentors;
+        return getUsers(userId, User::getMentors);
+    }
+
+    private List<UserDto> getUsers(long userId, Function<User, List<User>> userFunction) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found."));
-        mentors = user.getMentors();
-        return userMapper.toDto(mentors);
+        List<User> users = userFunction.apply(user);
+        return userMapper.toDto(users);
     }
 
     @Transactional
     public void deleteMentee(long menteeId, long mentorId) {
-        List<UserDto> menteesDto = getMentees(mentorId);
-        checkInList(menteesDto, menteeId, "Mentee not found.");
-        User mentee = userRepository.findById(menteeId).get();
-        User mentor = userRepository.findById(mentorId).get();
-        mentor.getMentees().remove(mentee);
+        String message = "Mentee not found.";
+        deleteUserRelation(mentorId, menteeId, message);
     }
 
     @Transactional
     public void deleteMentor(long menteeId, long mentorId) {
-        List<UserDto> mentorsDto = getMentors(menteeId);
-        checkInList(mentorsDto, mentorId, "Mentor not found.");
-        User mentee = userRepository.findById(menteeId).get();
-        User mentor = userRepository.findById(mentorId).get();
-        mentee.getMentors().remove(mentor);
+        String message = "Mentor not found.";
+        deleteUserRelation(menteeId, mentorId, message);
     }
 
     private static void checkInList(List<UserDto> userDtos, long userId, String message) {
@@ -55,6 +50,14 @@ public class MentorshipService {
                 .findFirst().isEmpty()) {
             throw new UserNotFoundException(message);
         }
+    }
+
+    public void deleteUserRelation(long userId, long relatedUserId, String message) {
+        List<UserDto> userDto = getMentees(userId);
+        checkInList(userDto, relatedUserId, message);
+        User user = userRepository.findById(userId).get();
+        User relatedUser = userRepository.findById(relatedUserId).get();
+        user.getMentees().remove(relatedUser);
     }
 
 }

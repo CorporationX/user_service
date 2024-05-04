@@ -58,7 +58,6 @@ public class MentorshipServiceTest {
         user2.getMentees().add(user);
     }
 
-    //getMentees tests
     @Test
     public void testGetMenteesUserNotFound() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
@@ -80,7 +79,6 @@ public class MentorshipServiceTest {
         assertEquals(menteesDto, result);
     }
 
-    //getMentors test
     @Test
     public void testGetMentorsUserNotFound() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
@@ -102,7 +100,6 @@ public class MentorshipServiceTest {
         assertEquals(mentorsDto, result);
     }
 
-    //deleteMentee tests
     @Test
     public void testDeleteMenteeUserNotFound() {
         UserNotFoundException userNotFoundException = assertThrows(UserNotFoundException.class, () ->
@@ -131,10 +128,8 @@ public class MentorshipServiceTest {
         when(userRepository.findById(2L)).thenReturn(Optional.of(user2));
         mentorshipService.deleteMentee(2L, 1L);
         userMock.getMentees().remove(userMock);
-//        verify(userMock, atLeastOnce()).getMentees().remove(user2);
     }
 
-    //deleteMentor tests
     @Test
     public void testDeleteMentorUserNotFound() {
         UserNotFoundException userNotFoundException = assertThrows(UserNotFoundException.class, () ->
@@ -153,4 +148,15 @@ public class MentorshipServiceTest {
         );
         assertEquals("Mentor not found.", userNotFoundException.getMessage());
     }
+
+    @Test
+    public void testDeleteMentor() {
+        User userMock = mock(User.class);
+        when(userMock.getMentors()).thenReturn(user.getMentors());
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(user2));
+        mentorshipService.deleteMentor(1L, 2L);
+        userMock.getMentors().remove(userMock);
+    }
+
 }

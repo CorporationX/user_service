@@ -19,6 +19,18 @@ class SubscriptionServiceTest {
     SubscriptionRepository subscriptionRepository;
 
     @Test
+    public void testFollowUserToAnotherUser() {
+        subscriptionRepository.followUser(followerId, followeeId);
+        verify(subscriptionRepository).followUser(followerId, followeeId);
+    }
+
+    @Test
+    public void testUnfollowUserToAnotherUser() {
+        subscriptionRepository.unfollowUser(followerId, followeeId);
+        verify(subscriptionRepository).unfollowUser(followerId, followeeId);
+    }
+
+    @Test
     public void testGetFollowersCount() {
         subscriptionRepository.findFollowersAmountByFolloweeId(FOLLOWER_ID);
         verify(subscriptionRepository).findFollowersAmountByFolloweeId(FOLLOWER_ID);

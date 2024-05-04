@@ -32,7 +32,7 @@ public class MentorshipValidator {
     private int MIN_REQ_PERIOD;
 
     public void validateRequest(MentorshipRequestDto dto) {
-        if (dto.getDescription().isBlank() || dto.getDescription().isEmpty()) {
+        if (dto.getDescription().isBlank()) {
             log.error(REQUEST_MSG_ERR);
             throw new DataValidationException(REQUEST_MSG_ERR);
         }

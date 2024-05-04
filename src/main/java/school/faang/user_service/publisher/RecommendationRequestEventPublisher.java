@@ -14,7 +14,7 @@ public class RecommendationRequestEventPublisher extends AbstractEventPublisher<
     public RecommendationRequestEventPublisher(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper) {
         super(redisTemplate, objectMapper);
     }
-    @Value("${spring.data.redis.channels.recommendation_request_channel.name")
+    @Autowired
     private String recommendationRequestTopic;
 
     public void publish(RecommendationRequestEvent event) {

@@ -141,8 +141,7 @@ class MentorshipRequestServiceTest {
 
     @Test
     public void testAcceptRequestWhenRequestNotExists() {
-        doThrow(new EntityNotFoundException("Mentorship request with ID " + RESPONSE_ID + " not found!"))
-                .when(validator).validateExistsRequest(RESPONSE_ID);
+        when(mentorshipRequestRepository.findById(RESPONSE_ID)).thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> mentorshipRequestService.acceptRequest(RESPONSE_ID));
         assertThat(exception.getMessage()).isEqualTo("Mentorship request with ID " + RESPONSE_ID + " not found!");
@@ -156,10 +155,9 @@ class MentorshipRequestServiceTest {
         request.setRequester(requester);
         request.setReceiver(receiver);
 
+        when(mentorshipRequestRepository.findById(RESPONSE_ID)).thenReturn(Optional.of(request));
         doThrow(new DataValidationException("Mentor " + receiver.getUsername() + " already assign to " + requester.getUsername()))
                 .when(validator).validateExistMentorInRequesterList(requester, receiver);
-        when(validator.validateExistsRequest(RESPONSE_ID)).thenReturn(request);
-
 
         DataValidationException exception = assertThrows(DataValidationException.class, () -> mentorshipRequestService.acceptRequest(RESPONSE_ID));
         assertThat(exception.getMessage()).isEqualTo("Mentor " + receiver.getUsername() + " already assign to " + requester.getUsername());
@@ -176,7 +174,7 @@ class MentorshipRequestServiceTest {
         request.setStatus(RequestStatus.PENDING);
         MentorshipResponseDto responseDto = new MentorshipResponseDto(RESPONSE_ID, RequestStatus.ACCEPTED.name());
 
-        when(validator.validateExistsRequest(RESPONSE_ID)).thenReturn(request);
+        when(mentorshipRequestRepository.findById(RESPONSE_ID)).thenReturn(Optional.of(request));
         when(mentorshipRequestMapper.mentorshipRequestToResponseDto(request)).thenReturn(responseDto);
 
         MentorshipResponseDto actualResult = mentorshipRequestService.acceptRequest(RESPONSE_ID);
@@ -190,8 +188,7 @@ class MentorshipRequestServiceTest {
         RejectionDto rejection = new RejectionDto();
         rejection.setReason("Not enough time");
 
-        doThrow(new EntityNotFoundException("Mentorship request with ID " + RESPONSE_ID + " not found!"))
-                .when(validator).validateExistsRequest(RESPONSE_ID);
+        when(mentorshipRequestRepository.findById(RESPONSE_ID)).thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> mentorshipRequestService.rejectRequest(RESPONSE_ID, rejection));
         assertThat(exception.getMessage()).isEqualTo("Mentorship request with ID " + RESPONSE_ID + " not found!");
@@ -205,7 +202,7 @@ class MentorshipRequestServiceTest {
         request.setId(RESPONSE_ID);
         MentorshipResponseDto responseDto = new MentorshipResponseDto(RESPONSE_ID, RequestStatus.REJECTED.name());
 
-        when(validator.validateExistsRequest(RESPONSE_ID)).thenReturn(request);
+        when(mentorshipRequestRepository.findById(RESPONSE_ID)).thenReturn(Optional.of(request));
         when(mentorshipRequestMapper.mentorshipRequestToResponseDto(request)).thenReturn(responseDto);
 
         MentorshipResponseDto actualResult = mentorshipRequestService.rejectRequest(RESPONSE_ID, rejection);

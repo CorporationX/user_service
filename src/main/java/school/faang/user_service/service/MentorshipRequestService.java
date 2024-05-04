@@ -11,6 +11,7 @@ import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.filter.MentorshipRequestFilter;
@@ -63,7 +64,7 @@ public class MentorshipRequestService {
 
     @Transactional
     public MentorshipResponseDto acceptRequest(long id) {
-        MentorshipRequest request = validator.validateExistsRequest(id);
+        MentorshipRequest request = validateExistsRequest(id);
 
         User requester = request.getRequester();
         User receiver = request.getReceiver();
@@ -78,9 +79,19 @@ public class MentorshipRequestService {
 
     @Transactional
     public MentorshipResponseDto rejectRequest(long id, RejectionDto rejection) {
-        MentorshipRequest request = validator.validateExistsRequest(id);
+        MentorshipRequest request = validateExistsRequest(id);
         request.setStatus(RequestStatus.REJECTED);
         request.setRejectionReason(rejection.getReason());
         return mentorshipRequestMapper.mentorshipRequestToResponseDto(request);
+    }
+
+    private MentorshipRequest validateExistsRequest(long id) {
+        Optional<MentorshipRequest> request = mentorshipRequestRepository.findById(id);
+        if (request.isEmpty()) {
+            String errMessage = "Mentorship request with ID " + id + " not found!";
+            log.error(errMessage);
+            throw new EntityNotFoundException(errMessage);
+        }
+        return request.get();
     }
 }

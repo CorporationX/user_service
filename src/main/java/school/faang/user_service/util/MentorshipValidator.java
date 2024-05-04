@@ -10,7 +10,6 @@ import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
@@ -70,16 +69,6 @@ public class MentorshipValidator {
             log.error(errMessage);
             throw new DataValidationException(errMessage);
         }
-    }
-
-    public MentorshipRequest validateExistsRequest(long id) {
-        Optional<MentorshipRequest> request = mentorshipRequestRepository.findById(id);
-        if (request.isEmpty()) {
-            String errMessage = "Mentorship request with ID " + id + " not found!";
-            log.error(errMessage);
-            throw new EntityNotFoundException(errMessage);
-        }
-        return request.get();
     }
 
     public void validateExistMentorInRequesterList(User requester, User receiver) {

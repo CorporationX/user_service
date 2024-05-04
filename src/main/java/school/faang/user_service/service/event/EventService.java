@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.filter.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
+import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataGettingException;
 import school.faang.user_service.exception.DataValidationException;
@@ -33,18 +34,10 @@ public class EventService {
     private List<EventFilter> filters;
 
 
-    public EventDto create(EventDto eventDto) {
-        checkOwnerSkills(eventDto.getOwnerId(), eventDto.getRelatedSkills());
+    public EventDto create(EventDto event) {
+        checkOwnerSkills(event);
 
-        return eventMapper.toDto(eventRepository.save(eventMapper.toEntity(eventDto)));
-    }
-
-    private void checkOwnerSkills(Long ownerId, List<SkillDto> relatedSkills) {
-        var ownerSkills = new HashSet<>(skillMapper.toDto(skillRepository.findAllByUserId(ownerId)));
-
-        if (!ownerSkills.containsAll(relatedSkills)) {
-            throw new DataValidationException(INAPPROPRIATE_OWNER_SKILLS_EXCEPTION.getMessage());
-        }
+        return eventMapper.toDto(eventRepository.save(eventMapper.toEntity(event)));
     }
 
     public EventDto getEvent(long eventId) {
@@ -70,5 +63,18 @@ public class EventService {
 
     private Optional<Event> getEventById(long eventId) {
         return eventRepository.findById(eventId);
+    }
+
+    public EventDto updateEvent(EventDto event) {
+        return create(event);
+    }
+
+    private void checkOwnerSkills(EventDto event) {
+        List<Skill> ownersSkills = skillRepository.findAllByUserId(event.getOwnerId());
+        var ownerSkills = new HashSet<>(skillMapper.toDto(ownersSkills));
+
+        if (!ownerSkills.containsAll(event.getRelatedSkills())) {
+            throw new DataValidationException(INAPPROPRIATE_OWNER_SKILLS_EXCEPTION.getMessage());
+        }
     }
 }

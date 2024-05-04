@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.filter.EventFilterDto;
@@ -31,6 +32,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -49,6 +52,7 @@ class EventServiceTest {
     @Mock
     private EventMapper eventMapper;
 
+    @Spy
     @InjectMocks
     private EventService eventService;
 
@@ -208,5 +212,14 @@ class EventServiceTest {
         verify(eventRepository).findById(anyLong());
         verify(eventRepository, times(0)).delete(any());
         assertEquals(NO_SUCH_EVENT_EXCEPTION.getMessage(), exception.getMessage());
+    }
+
+    @Test
+    void updateEventTest() {
+        doReturn(null).when(eventService).create(eventDto);
+
+        eventService.updateEvent(eventDto);
+
+        verify(eventService).create(eventDto);
     }
 }

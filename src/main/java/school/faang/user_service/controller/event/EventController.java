@@ -42,6 +42,13 @@ public class EventController {
         eventService.deleteEvent(eventId);
     }
 
+    public EventDto updateEvent(EventDto event) {
+        validateEvent(event);
+
+        return eventService.updateEvent(event);
+    }
+
+
     private void validateEvent(EventDto event) {
 
         if (event.getTitle() == null || event.getTitle().isBlank()) {

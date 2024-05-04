@@ -19,27 +19,20 @@ public class SubscriptionControllerTest {
     private final long followerId = 1L;
     private final long followeeId = 2L;
     @Mock
-    SubscriptionService service;
+    SubscriptionService subscriptionService;
     @Mock
-    UserContext ctx;
+    UserContext userContext;
     @Mock
-    SubscriptionValidator validator;
+    SubscriptionValidator subscriptionValidator;
     @InjectMocks
-    private SubscriptionController controller;
+    private SubscriptionController subscriptionController;
 
-    @Test
-    public void testSubscribeUserToAnotherUser() {
-        when(ctx.getUserId()).thenReturn(1L);
-        controller.followUser(followeeId);
-        verify(service, times(1)).followUser(followerId, followeeId);
-        verify(validator, times(1)).validateUserTriedFollowHimself(followerId, followeeId);
-    }
 
     @Test
     public void testUnsubscribeUserFromAnotherUser() {
-        when(ctx.getUserId()).thenReturn(1L);
-        controller.unfollowUser(followeeId);
-        verify(service, times(1)).unfollowUser(followerId, followeeId);
-        verify(validator, times(1)).validateUserTriedUnfollowHimself(followerId, followeeId);
+        when(userContext.getUserId()).thenReturn(1L);
+        subscriptionController.unfollowUser(followeeId);
+        verify(subscriptionService, times(1)).unfollowUser(followerId, followeeId);
+        verify(subscriptionValidator, times(1)).validateUser(followerId, followeeId);
     }
 }

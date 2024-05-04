@@ -12,26 +12,20 @@ public class SubscriptionValidator {
 
     private final SubscriptionRepository subscriptionRepository;
 
-    public void validateUserTriedFollowHimself(long followerId, long followeeId) {
+    public void validateUser(long followerId, long followeeId) {
+        if (!subscriptionRepository.existsById(followeeId) ||
+                !subscriptionRepository.existsById(followerId)
+        ) {
+            throw new DataValidationException("This user is not registered");
+        }
         if (followerId == followeeId) {
-            throw new DataValidationException("The user " + followeeId +
-                    " tried to follow himself!");
+            throw new DataValidationException("IDs cannot be equal!");
         }
     }
 
-    public void validateIsExists(long followerId, long followeeId) {
-        boolean isExists = subscriptionRepository
-                .existsByFollowerIdAndFolloweeId(followerId, followeeId);
-        if (isExists) {
-            throw new DataValidationException("User " + followerId +
-                    " subscription to user " + followeeId + " exist");
-        }
-    }
-
-    public void validateUserTriedUnfollowHimself(long followerId, long followeeId) {
-        if (followerId == followeeId) {
-            throw new DataValidationException("The user " + followeeId +
-                    " tried to unfollow himself!");
+    public void validateExistsSubscription(long followerId, long followeeId) {
+        if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
+            throw new DataValidationException("Subscription already exists!");
         }
     }
 }

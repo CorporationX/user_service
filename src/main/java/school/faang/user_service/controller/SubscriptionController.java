@@ -3,7 +3,6 @@ package school.faang.user_service.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,25 +17,16 @@ import school.faang.user_service.validation.SubscriptionValidator;
 @RequiredArgsConstructor
 public class SubscriptionController {
 
-    private final SubscriptionService service;
+    private final SubscriptionService subscriptionService;
     private final UserContext userContext;
-    private final SubscriptionValidator validator;
+    private final SubscriptionValidator subscriptionValidator;
 
-    @Transactional
-    @PostMapping("/user/{followeeId}")
-    @ResponseStatus(HttpStatus.CREATED)
-    public void followUser(@PathVariable long followeeId) {
-        long followerId = userContext.getUserId();
-        validator.validateUserTriedFollowHimself(followerId, followeeId);
-        service.followUser(followerId, followeeId);
-    }
 
-    @Transactional
     @DeleteMapping("/user/{followeeId}")
     @ResponseStatus(HttpStatus.OK)
     public void unfollowUser(@PathVariable long followeeId) {
         long followerId = userContext.getUserId();
-        validator.validateUserTriedUnfollowHimself(followerId, followeeId);
-        service.unfollowUser(followerId, followeeId);
+        subscriptionValidator.validateUser(followerId, followeeId);
+        subscriptionService.unfollowUser(followerId, followeeId);
     }
 }

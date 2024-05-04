@@ -6,8 +6,8 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.exceptions.UserNotFoundException;
-import school.faang.user_service.service.exceptions.messageerror.MessageError;
+import school.faang.user_service.exception.UserNotFoundException;
+import school.faang.user_service.exception.MessageError;
 
 import java.util.List;
 

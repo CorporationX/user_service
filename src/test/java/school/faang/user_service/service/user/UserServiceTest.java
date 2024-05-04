@@ -1,5 +1,7 @@
 package school.faang.user_service.service.user;
 
+import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,26 +10,34 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
-import school.faang.user_service.config.s3.S3Config;
+import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.dto.ProfileViewEventDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.MessageError;
+import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.mapper.UserMapperImpl;
+import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.MentorshipService;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.exceptions.UserNotFoundException;
 import school.faang.user_service.service.validators.UserValidator;
-import school.faang.user_service.service.s3_minio_service.S3Service;
+import school.faang.user_service.service.S3Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import static org.junit.Assert.assertThrows;
+import static org.mockito.Mockito.any;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -39,6 +49,8 @@ public class UserServiceTest {
     @Mock
     UserMapperImpl userMapper;
     @Mock
+    private UserContext userContext;
+    @Mock
     private S3Service s3Service;
     @Mock
     private UserValidator userValidator;
@@ -46,12 +58,14 @@ public class UserServiceTest {
     private EventService eventService;
     @Mock
     private MentorshipService mentorshipService;
-
+    @Mock
+    private ProfileViewEventPublisher profileViewEventPublisher;
 
     User firstUser;
     User secondUser;
     List<Long> userIds;
     List<User> users;
+    ProfileViewEventDto eventDto;
 
     @BeforeEach
     void setUp() {
@@ -65,22 +79,29 @@ public class UserServiceTest {
                 .build();
         userIds = List.of(firstUser.getId(), firstUser.getId());
         users = List.of(firstUser, secondUser);
+
+        eventDto = ProfileViewEventDto.builder()
+                .build();
     }
 
     @Test
     public void testGetUser_UserDoesNotExist() {
         when(userRepository.findById(firstUser.getId())).thenReturn(Optional.empty());
-        assertThrows(UserNotFoundException.class, () -> userService.getUser(firstUser.getId()));
+
+        UserNotFoundException e = Assert.assertThrows(UserNotFoundException.class, () -> userService.getUser(firstUser.getId()));
+        Assertions.assertEquals(e.getMessage(), MessageError.USER_NOT_FOUND_EXCEPTION.getMessage());
     }
 
     @Test
     public void testGetUser() {
         when(userRepository.findById(firstUser.getId())).thenReturn(Optional.ofNullable(firstUser));
+        when(userContext.getUserId()).thenReturn(secondUser.getId());
 
         userService.getUser(firstUser.getId());
 
         verify(userRepository, times(1)).findById(firstUser.getId());
         verify(userMapper, times(1)).toDto(firstUser);
+        verify(profileViewEventPublisher, times(1)).publish(any(ProfileViewEventDto.class));
     }
 
     @Test
@@ -110,7 +131,6 @@ public class UserServiceTest {
         UserDto userDto = new UserDto();
         userDto.setId(1L);
         userDto.setUsername("John Doe");
-
 
         User user = new User();
         user.setId(1L);

@@ -143,6 +143,9 @@ public class User {
     @OneToOne(mappedBy = "user")
     private Premium premium;
 
+    @Column(name = "banned", nullable = false)
+    private boolean banned;
+
     public long getId() {
         return id;
     }

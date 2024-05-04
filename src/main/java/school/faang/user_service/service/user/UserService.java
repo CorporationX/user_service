@@ -6,12 +6,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.config.s3.S3Config;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.config.S3Config;
+import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.dto.ProfileViewEventDto;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.MessageError;
+import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.MentorshipService;
 import school.faang.user_service.service.event.EventService;
@@ -19,17 +25,22 @@ import school.faang.user_service.service.exceptions.UserNotFoundException;
 import school.faang.user_service.service.exceptions.messageerror.MessageError;
 import school.faang.user_service.service.validators.UserValidator;
 import school.faang.user_service.service.s3_minio_service.S3Service;
+import school.faang.user_service.service.S3Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final UserContext userContext;
+    private final ProfileViewEventPublisher profileViewEventPublisher;
+
     @Value("${dicebear.pic-base-url}")
     private String large_avatar;
 
@@ -43,10 +54,23 @@ public class UserService {
     private final EventService eventService;
     private final MentorshipService mentorshipService;
 
-    public UserDto getUser(long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(MessageError.USER_NOT_FOUND_EXCEPTION));
+
+    public List<UserDto> getUsersByIds(List<Long> userIds) {
+        return userMapper.toDto(getUsersEntityByIds(userIds));
+    }
+
+    public UserDto getUser(Long userId) {
+        User user = getUserEntityById(userId);
+        sendProfileViewEventToPublisher(userId);
         return userMapper.toDto(user);
+    }
+
+    public User getUserEntityById(long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(MessageError.USER_NOT_FOUND_EXCEPTION));
+    }
+
+    public List<User> getUsersEntityByIds(List<Long> userIds) {
+        return userRepository.findAllById(userIds);
     }
 
     public UserDto create(UserDto userDto) {
@@ -106,5 +130,15 @@ public class UserService {
             log.debug("User with id " + userDto.getId() + " exists");
             throw new DataValidationException("User with id " + userDto.getId() + " exists");
         }
+    }
+
+    private void sendProfileViewEventToPublisher(long userId) {
+        ProfileViewEventDto event = ProfileViewEventDto.builder()
+                .observerId(userContext.getUserId())
+                .observedId(userId)
+                .viewedAt(LocalDateTime.now())
+                .build();
+        profileViewEventPublisher.publish(event);
+        log.info("Successfully sent data to analytics-service");
     }
 }

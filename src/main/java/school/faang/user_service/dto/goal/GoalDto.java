@@ -1,8 +1,7 @@
-package school.faang.user_service.dto;
+package school.faang.user_service.dto.goal;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -10,7 +9,7 @@ public class GoalDto {
     private long id;
     private String title;
     private String description;
+    private Long parentId;
     private String status;
-    private LocalDateTime deadline;
-    private List<Long> skillsToAchieve;
+    private List<Long> skillIds;
 }

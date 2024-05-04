@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.GoalDto;
+import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
@@ -74,7 +74,7 @@ class GoalServiceTest {
     @Test
     void testUpdateWhereGoalContainsNonExistingSkills() {
         GoalDto goalDto = updateInit(GoalStatus.ACTIVE);
-        when(skillService.checkAmountSkillsInDB(goalDto.getSkillsToAchieve())).thenReturn(2);
+        when(skillService.checkAmountSkillsInDB(goalDto.getSkillIds())).thenReturn(2);
 
         assertThrows(DataValidationException.class, () -> goalService.updateGoal(1L, goalDto));
     }
@@ -83,7 +83,7 @@ class GoalServiceTest {
     void testUpdateWhereGoalStatusUpdatingToCompleted() {
         GoalDto goalDto = new GoalDto();
         goalDto.setStatus("COMPLETED");
-        goalDto.setSkillsToAchieve(List.of(1L, 2L, 3L, 4L, 5L));
+        goalDto.setSkillIds(List.of(1L, 2L, 3L, 4L, 5L));
         Goal goal = new Goal();
         goal.setStatus(GoalStatus.ACTIVE);
 
@@ -91,7 +91,7 @@ class GoalServiceTest {
         firstUser.setId(1L);
 
         when(goalRepository.findGoalById(1L)).thenReturn(goal);
-        when(skillService.checkAmountSkillsInDB(goalDto.getSkillsToAchieve())).thenReturn(5);
+        when(skillService.checkAmountSkillsInDB(goalDto.getSkillIds())).thenReturn(5);
         when(goalRepository.findUsersByGoalId(1L)).thenReturn(List.of(firstUser));
 
         goalService.updateGoal(1L, goalDto);
@@ -108,7 +108,7 @@ class GoalServiceTest {
     void testUpdateWhereUpdateSkillsInGoal() {
         GoalDto goalDto = new GoalDto();
         goalDto.setStatus("ACTIVE");
-        goalDto.setSkillsToAchieve(List.of(1L, 2L, 3L, 4L, 5L));
+        goalDto.setSkillIds(List.of(1L, 2L, 3L, 4L, 5L));
         Goal goal = new Goal();
         goal.setStatus(GoalStatus.ACTIVE);
 
@@ -116,7 +116,7 @@ class GoalServiceTest {
         firstUser.setId(1L);
 
         when(goalRepository.findGoalById(1L)).thenReturn(goal);
-        when(skillService.checkAmountSkillsInDB(goalDto.getSkillsToAchieve())).thenReturn(5);
+        when(skillService.checkAmountSkillsInDB(goalDto.getSkillIds())).thenReturn(5);
 
         goalService.updateGoal(1L, goalDto);
 
@@ -143,7 +143,7 @@ class GoalServiceTest {
 
     private GoalDto updateInit(GoalStatus status) {
         GoalDto goalDto = new GoalDto();
-        goalDto.setSkillsToAchieve(List.of(1L, 2L, 3L, 4L, 5L));
+        goalDto.setSkillIds(List.of(1L, 2L, 3L, 4L, 5L));
         Goal goal = new Goal();
         goal.setStatus(status);
 

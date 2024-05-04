@@ -2,7 +2,7 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.GoalDto;
+import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.filter.GoalFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
@@ -47,20 +47,20 @@ public class GoalService {
                 .equals(GoalStatus.COMPLETED)) {
             throw new UpdatingCompletedGoalException("This goal completed");
         }
-        if (goalDto.getSkillsToAchieve().size() !=
-                skillService.checkAmountSkillsInDB(goalDto.getSkillsToAchieve())) {
+        if (goalDto.getSkillIds().size() !=
+                skillService.checkAmountSkillsInDB(goalDto.getSkillIds())) {
             throw new DataValidationException("The goal contains non-existent skills");
         }
         if (goalDto.getStatus().equals(GoalStatus.COMPLETED.toString())) {
             List<User> users = goalRepository.findUsersByGoalId(goalId);
             users.forEach(user ->
-                    goalDto.getSkillsToAchieve()
+                    goalDto.getSkillIds()
                             .forEach(skill ->
                                     skillService.assignSkillToUser(skill, user.getId())));
             //update in table goals
         } else {
             goalRepository.removeSkillsFromGoal(goalId);
-            goalDto.getSkillsToAchieve()
+            goalDto.getSkillIds()
                     .forEach(skill ->
                             goalRepository.addSkillToGoal(skill, goalId));
         }
@@ -68,9 +68,18 @@ public class GoalService {
 
     public List<GoalDto> findSubtasksByGoalId(long goalId, GoalFilterDto filters) {
         Stream<Goal> goals = goalRepository.findByParent(goalId);
+        return applyFilters(goals, filters);
+    }
+
+    public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filters) {
+        Stream<Goal> goals = goalRepository.findGoalsByUserId(userId);
+        return applyFilters(goals, filters);
+    }
+
+    private List<GoalDto> applyFilters(Stream<Goal> stream, GoalFilterDto filters) {
         return goalFilters.stream()
                 .filter(goalFilter -> goalFilter.isApplicable(filters))
-                .flatMap(goalFilter -> goalFilter.apply(goals, filters))
+                .flatMap(goalFilter -> goalFilter.apply(stream, filters))
                 .map(goalMapper::toDto)
                 .toList();
     }

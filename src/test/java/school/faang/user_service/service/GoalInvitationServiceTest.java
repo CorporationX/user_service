@@ -252,14 +252,33 @@ public class GoalInvitationServiceTest {
         assertEquals("InvitationFilterDto is null", exception.getMessage());
     }
 
+    private InvitationFilterDto setupForGetInvitations() {
+        InvitationFilterDto filterDto = new InvitationFilterDto();
+        filterDto.setInviterNamePattern("John");
+        filterDto.setInvitedNamePattern("Mike");
+        filterDto.setInviterId(1L);
+        filterDto.setInvitedId(2L);
+        return filterDto;
+    }
+
     @Test
     void testGetInvitationsReturnGoalInvitations() {
-        InvitationFilterDto filterDto = new InvitationFilterDto("John", "Mike", 1L, 2L, RequestStatus.ACCEPTED);
+        InvitationFilterDto filterDto = setupForGetInvitations();
         GoalInvitation goalInvitation = setupForAcceptGoalInvitation();
         List<GoalInvitation> goalInvitations = Arrays.asList(goalInvitation, new GoalInvitation(), new GoalInvitation());
 
         when(goalInvitationRepository.findAll()).thenReturn(goalInvitations);
         goalInvitations = goalInvitationService.getInvitations(filterDto);
         assertEquals(1, goalInvitations.size());
+    }
+
+    @Test
+    void testGetInvitationsWithNoGoalInvitations() {
+        InvitationFilterDto filterDto = setupForGetInvitations();
+        List<GoalInvitation> goalInvitations = Arrays.asList(new GoalInvitation(), new GoalInvitation(), new GoalInvitation());
+
+        when(goalInvitationRepository.findAll()).thenReturn(goalInvitations);
+        goalInvitations = goalInvitationService.getInvitations(filterDto);
+        assertEquals(0, goalInvitations.size());
     }
 }

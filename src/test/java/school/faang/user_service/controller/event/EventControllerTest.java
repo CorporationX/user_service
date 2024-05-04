@@ -2,8 +2,12 @@ package school.faang.user_service.controller.event;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -12,7 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.filter.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.exception.DataGettingException;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventService;
 
@@ -35,12 +38,12 @@ import static school.faang.user_service.exception.ExceptionMessage.NULL_OR_BLANK
 class EventControllerTest {
     @Spy
     @InjectMocks
-    EventController eventController;
+    private EventController eventController;
 
     @Mock
-    EventService eventService;
+    private EventService eventService;
 
-    EventDto eventDto;
+    private EventDto eventDto;
 
     @BeforeEach
     void setUp() {
@@ -59,177 +62,177 @@ class EventControllerTest {
         eventDto.setMaxAttendees(10);
     }
 
-    @Test
-    void createEventPositiveTest() {
-        ArgumentCaptor<EventDto> eventDtoArgumentCaptor = ArgumentCaptor.forClass(EventDto.class);
+    @Nested
+    class PositiveTests {
+        @DisplayName("should call eventService.create() when eventDto is valid")
+        @Test
+        void shouldCreateEventWhenDtoIsValid() {
+            ArgumentCaptor<EventDto> eventDtoArgumentCaptor = ArgumentCaptor.forClass(EventDto.class);
 
-        assertDoesNotThrow(() -> eventController.create(eventDto));
+            assertDoesNotThrow(() -> eventController.create(eventDto));
 
-        verify(eventService).create(eventDtoArgumentCaptor.capture());
-        assertEquals(eventDto, eventDtoArgumentCaptor.getValue());
+            verify(eventService).create(eventDtoArgumentCaptor.capture());
+            assertEquals(eventDto, eventDtoArgumentCaptor.getValue());
+        }
+
+        @DisplayName("should call eventService.getEvent()")
+        @Test
+        void shouldReturnEventById() {
+            eventController.getEvent(anyLong());
+
+            verify(eventService).getEvent(anyLong());
+        }
+
+        @DisplayName("should return filtered events when filter isn't null")
+        @Test
+        void shouldReturnFilteredEventsWhenFilterIsntNull() {
+            ArgumentCaptor<EventFilterDto> filterCaptor = ArgumentCaptor.forClass(EventFilterDto.class);
+            EventFilterDto filter = new EventFilterDto();
+
+            assertDoesNotThrow(() -> eventController.getEventsByFilter(filter));
+
+            verify(eventService).getEventsByFilter(filterCaptor.capture());
+            assertEquals(filter, filterCaptor.getValue());
+        }
+
+        @DisplayName("should call eventService.deleteEvent()")
+        @Test
+        void shouldDeleteEvent() {
+            eventController.deleteEvent(anyLong());
+
+            verify(eventService).deleteEvent(anyLong());
+        }
+
+        @DisplayName("should call eventService.updateEvent() when eventDto is valid")
+        @Test
+        void shouldUpdateEventWhenDtoIsValid() {
+            ArgumentCaptor<EventDto> eventDtoArgumentCaptor = ArgumentCaptor.forClass(EventDto.class);
+
+            assertDoesNotThrow(() -> eventController.updateEvent(eventDto));
+
+            verify(eventService).updateEvent(eventDtoArgumentCaptor.capture());
+            assertEquals(eventDto, eventDtoArgumentCaptor.getValue());
+        }
+
+        @DisplayName("should call eventService.getOwnedEvents()")
+        @Test
+        void shouldReturnOwnedEvents() {
+            eventController.getOwnedEvents(anyLong());
+
+            verify(eventService).getOwnedEvents(anyLong());
+        }
     }
 
-    @DisplayName("Should throw exception instead of creating event with null title")
-    @Test
-    void shouldThrowExceptionWhenCreateEventWithNullTitleTest() {
-        eventDto.setTitle(null);
+    @Nested
+    class NegativeTests {
+        @DisplayName("Should throw exception instead of creating event with empty title")
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {"", "  ", "\t", "\n"})
+        void shouldThrowExceptionWhenTitleIsEmpty(String pattern) {
+            eventDto.setTitle(pattern);
 
-        DataValidationException exception = assertThrows(DataValidationException.class,
-                () -> eventController.create(eventDto));
+            DataValidationException exception = assertThrows(DataValidationException.class,
+                    () -> eventController.create(eventDto));
 
-        verify(eventService, times(0)).create(eventDto);
-        assertEquals(NULL_OR_BLANK_EVENT_TITLE_EXCEPTION.getMessage(), exception.getMessage());
-    }
+            verify(eventService, times(0)).create(eventDto);
+            assertEquals(NULL_OR_BLANK_EVENT_TITLE_EXCEPTION.getMessage(), exception.getMessage());
+        }
 
-    @DisplayName("Should throw exception instead of creating event with blank title")
-    @Test
-    void shouldThrowExceptionWhenCreateEventWithBlankTitleTest() {
-        eventDto.setTitle("   ");
+        @DisplayName("Should throw exception instead of creating event with null start date")
+        @Test
+        void shouldThrowExceptionWhenStartDateIsNull() {
+            eventDto.setStartDate(null);
 
-        DataValidationException exception = assertThrows(DataValidationException.class,
-                () -> eventController.create(eventDto));
+            DataValidationException exception = assertThrows(DataValidationException.class,
+                    () -> eventController.create(eventDto));
 
-        verify(eventService, times(0)).create(eventDto);
-        assertEquals(NULL_OR_BLANK_EVENT_TITLE_EXCEPTION.getMessage(), exception.getMessage());
-    }
+            verify(eventService, times(0)).create(eventDto);
+            assertEquals(INVALID_EVENT_START_DATE_EXCEPTION.getMessage(), exception.getMessage());
+        }
 
-    @DisplayName("Should throw exception instead of creating event with null start date")
-    @Test
-    void shouldThrowExceptionWhenCreateEventWithNullStartDateTest() {
-        eventDto.setStartDate(null);
+        @DisplayName("Should throw exception instead of creating event with past start date")
+        @Test
+        void shouldThrowExceptionWhenStartDateIsInPast() {
+            eventDto.setStartDate(LocalDateTime.of(2023, 6, 12, 12, 12));
 
-        DataValidationException exception = assertThrows(DataValidationException.class,
-                () -> eventController.create(eventDto));
+            DataValidationException exception = assertThrows(DataValidationException.class,
+                    () -> eventController.create(eventDto));
 
-        verify(eventService, times(0)).create(eventDto);
-        assertEquals(INVALID_EVENT_START_DATE_EXCEPTION.getMessage(), exception.getMessage());
-    }
+            verify(eventService, times(0)).create(eventDto);
+            assertEquals(INVALID_EVENT_START_DATE_EXCEPTION.getMessage(), exception.getMessage());
+        }
 
-    @DisplayName("Should throw exception instead of creating event with past start date")
-    @Test
-    void shouldThrowExceptionWhenCreateEventWithPastStartDateTest() {
-        eventDto.setStartDate(LocalDateTime.of(2023, 6, 12, 12, 12));
+        @DisplayName("Should throw exception instead of creating event with nul owner id")
+        @Test
+        void shouldThrowExceptionWhenOwnerIdIsNull() {
+            eventDto.setOwnerId(null);
 
-        DataValidationException exception = assertThrows(DataValidationException.class,
-                () -> eventController.create(eventDto));
+            DataValidationException exception = assertThrows(DataValidationException.class,
+                    () -> eventController.create(eventDto));
 
-        verify(eventService, times(0)).create(eventDto);
-        assertEquals(INVALID_EVENT_START_DATE_EXCEPTION.getMessage(), exception.getMessage());
-    }
+            verify(eventService, times(0)).create(eventDto);
+            assertEquals(NULL_EVENT_OWNER_ID_EXCEPTION.getMessage(), exception.getMessage());
+        }
 
-    @DisplayName("Should throw exception instead of creating event with nul owner id")
-    @Test
-    void shouldThrowExceptionWhenCreateEventWithOwnerIdTest() {
-        eventDto.setOwnerId(null);
+        @DisplayName("should throw exception when filter is null")
+        @Test
+        void shouldThrowExceptionWhenFilterIsNull() {
+            DataValidationException exception = assertThrows(DataValidationException.class,
+                    () -> eventController.getEventsByFilter(null));
 
-        DataValidationException exception = assertThrows(DataValidationException.class,
-                () -> eventController.create(eventDto));
+            verify(eventService, times(0)).getEventsByFilter(any(EventFilterDto.class));
+            assertEquals(NULL_EVENT_FILTER_EXCEPTION.getMessage(), exception.getMessage());
+        }
 
-        verify(eventService, times(0)).create(eventDto);
-        assertEquals(NULL_EVENT_OWNER_ID_EXCEPTION.getMessage(), exception.getMessage());
-    }
+        @DisplayName("Should throw exception instead of updating event with empty title")
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {"", "  ", "\t", "\n"})
+        void shouldThrowExceptionWhenUpdatedEventTitleIsEmpty(String pattern) {
+            eventDto.setTitle(pattern);
 
-    @Test
-    void getEventTest() {
-        eventController.getEvent(anyLong());
+            DataValidationException exception = assertThrows(DataValidationException.class,
+                    () -> eventController.updateEvent(eventDto));
 
-        verify(eventService).getEvent(anyLong());
-    }
+            verify(eventService, times(0)).updateEvent(eventDto);
+            assertEquals(NULL_OR_BLANK_EVENT_TITLE_EXCEPTION.getMessage(), exception.getMessage());
+        }
 
-    @Test
-    void getEventsByFilterPositiveTest() {
-        ArgumentCaptor<EventFilterDto> filterCaptor = ArgumentCaptor.forClass(EventFilterDto.class);
-        EventFilterDto filter = new EventFilterDto();
+        @DisplayName("Should throw exception instead of updating event with null start date")
+        @Test
+        void shouldThrowExceptionWhenUpdatedEventStartDateIsNull() {
+            eventDto.setStartDate(null);
 
-        assertDoesNotThrow(() -> eventController.getEventsByFilter(filter));
+            DataValidationException exception = assertThrows(DataValidationException.class,
+                    () -> eventController.updateEvent(eventDto));
 
-        verify(eventService).getEventsByFilter(filterCaptor.capture());
-        assertEquals(filter, filterCaptor.getValue());
-    }
+            verify(eventService, times(0)).updateEvent(eventDto);
+            assertEquals(INVALID_EVENT_START_DATE_EXCEPTION.getMessage(), exception.getMessage());
+        }
 
-    @Test
-    void getEventsByFilterNegativeTest() {
-        DataValidationException exception = assertThrows(DataValidationException.class,
-                () -> eventController.getEventsByFilter(null));
+        @DisplayName("Should throw exception instead of updating event with past start date")
+        @Test
+        void shouldThrowExceptionWhenUpdatedEventStartDateIsInPast() {
+            eventDto.setStartDate(LocalDateTime.of(2023, 6, 12, 12, 12));
 
-        verify(eventService, times(0)).getEventsByFilter(any(EventFilterDto.class));
-        assertEquals(NULL_EVENT_FILTER_EXCEPTION.getMessage(), exception.getMessage());
-    }
+            DataValidationException exception = assertThrows(DataValidationException.class,
+                    () -> eventController.updateEvent(eventDto));
 
-    @Test
-    void deleteEvent() {
-        eventController.deleteEvent(anyLong());
+            verify(eventService, times(0)).updateEvent(eventDto);
+            assertEquals(INVALID_EVENT_START_DATE_EXCEPTION.getMessage(), exception.getMessage());
+        }
 
-        verify(eventService).deleteEvent(anyLong());
-    }
+        @DisplayName("Should throw exception instead of updating event with nul owner id")
+        @Test
+        void shouldThrowExceptionWhenUpdatedEventOwnerIdIsNull() {
+            eventDto.setOwnerId(null);
 
-    @Test
-    void updateEventPositiveTest() {
-        ArgumentCaptor<EventDto> eventDtoArgumentCaptor = ArgumentCaptor.forClass(EventDto.class);
+            DataValidationException exception = assertThrows(DataValidationException.class,
+                    () -> eventController.updateEvent(eventDto));
 
-        assertDoesNotThrow(() -> eventController.updateEvent(eventDto));
-
-        verify(eventService).updateEvent(eventDtoArgumentCaptor.capture());
-        assertEquals(eventDto, eventDtoArgumentCaptor.getValue());
-    }
-
-    @DisplayName("Should throw exception instead of updating event with null title")
-    @Test
-    void shouldThrowExceptionWhenUpdateEventWithNullTitleTest() {
-        eventDto.setTitle(null);
-
-        DataValidationException exception = assertThrows(DataValidationException.class,
-                () -> eventController.updateEvent(eventDto));
-
-        verify(eventService, times(0)).updateEvent(eventDto);
-        assertEquals(NULL_OR_BLANK_EVENT_TITLE_EXCEPTION.getMessage(), exception.getMessage());
-    }
-
-    @DisplayName("Should throw exception instead of updating event with blank title")
-    @Test
-    void shouldThrowExceptionWhenUpdateEventWithBlankTitleTest() {
-        eventDto.setTitle("   ");
-
-        DataValidationException exception = assertThrows(DataValidationException.class,
-                () -> eventController.updateEvent(eventDto));
-
-        verify(eventService, times(0)).updateEvent(eventDto);
-        assertEquals(NULL_OR_BLANK_EVENT_TITLE_EXCEPTION.getMessage(), exception.getMessage());
-    }
-
-    @DisplayName("Should throw exception instead of updating event with null start date")
-    @Test
-    void shouldThrowExceptionWhenUpdateEventWithNullStartDateTest() {
-        eventDto.setStartDate(null);
-
-        DataValidationException exception = assertThrows(DataValidationException.class,
-                () -> eventController.updateEvent(eventDto));
-
-        verify(eventService, times(0)).updateEvent(eventDto);
-        assertEquals(INVALID_EVENT_START_DATE_EXCEPTION.getMessage(), exception.getMessage());
-    }
-
-    @DisplayName("Should throw exception instead of updating event with past start date")
-    @Test
-    void shouldThrowExceptionWhenUpdateEventWithPastStartDateTest() {
-        eventDto.setStartDate(LocalDateTime.of(2023, 6, 12, 12, 12));
-
-        DataValidationException exception = assertThrows(DataValidationException.class,
-                () -> eventController.updateEvent(eventDto));
-
-        verify(eventService, times(0)).updateEvent(eventDto);
-        assertEquals(INVALID_EVENT_START_DATE_EXCEPTION.getMessage(), exception.getMessage());
-    }
-
-    @DisplayName("Should throw exception instead of updating event with nul owner id")
-    @Test
-    void shouldThrowExceptionWhenUpdateEventWithOwnerIdTest() {
-        eventDto.setOwnerId(null);
-
-        DataValidationException exception = assertThrows(DataValidationException.class,
-                () -> eventController.updateEvent(eventDto));
-
-        verify(eventService, times(0)).updateEvent(eventDto);
-        assertEquals(NULL_EVENT_OWNER_ID_EXCEPTION.getMessage(), exception.getMessage());
+            verify(eventService, times(0)).updateEvent(eventDto);
+            assertEquals(NULL_EVENT_OWNER_ID_EXCEPTION.getMessage(), exception.getMessage());
+        }
     }
 }

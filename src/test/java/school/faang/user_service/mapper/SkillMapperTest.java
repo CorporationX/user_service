@@ -1,16 +1,15 @@
 package school.faang.user_service.mapper;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 
-import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SkillMapperTest {
     SkillMapper skillMapper = Mappers.getMapper(SkillMapper.class);
@@ -28,15 +27,17 @@ class SkillMapperTest {
         skillDto.setTitle("SQL");
     }
 
+    @DisplayName("should map skill entity to skill dto")
     @Test
-    void toDtoTest() {
+    void shouldMapSkillEntityToDto() {
         SkillDto actualSkillDto = skillMapper.toDto(skill);
 
         assertEquals(skillDto, actualSkillDto);
     }
 
+    @DisplayName("should map list of skill entities to list of skill dto")
     @Test
-    void toDtoListTest() {
+    void shouldMapSkillEntitiesToDtos() {
         List<Skill> skills = List.of(skill);
         List<SkillDto> skillDtos = List.of(skillDto);
 

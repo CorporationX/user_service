@@ -1,7 +1,12 @@
 package school.faang.user_service.service.event.filter;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import school.faang.user_service.dto.filter.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
 
@@ -29,44 +34,47 @@ class EventSkillFilterTest {
         expectedFilteredEvents = ALL_EVENTS.stream();
     }
 
-    @Test
-    void isApplicablePositiveTest() {
-        var isApplicable = eventSkillFilter.isApplicable(filter);
+    @Nested
+    class positiveTests {
+        @DisplayName("should return true when pattern isn't empty")
+        @Test
+        void shouldReturnTrueWhenPatternIsntEmpty() {
+            var isApplicable = eventSkillFilter.isApplicable(filter);
 
-        assertTrue(isApplicable);
+            assertTrue(isApplicable);
+        }
+
+        @DisplayName("should return filtered events")
+        @Test
+        void shouldReturnFilteredEvents() {
+            var actualFilteredUsers = eventSkillFilter.apply(eventsToFilter, filter);
+
+            assertEquals(expectedFilteredEvents.toList(), actualFilteredUsers.toList());
+        }
     }
 
-    @Test
-    void isApplicableForNullPatternTest() {
-        filter.setSkillPattern(null);
+    @Nested
+    class NegativeTests {
+        @DisplayName("should return false when empty pattern is passed")
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {" ", "\t", "\n"})
+        void shouldReturnFalseWhenPatternIsEmpty(String pattern) {
+            filter.setSkillPattern(pattern);
 
-        var isApplicable = eventSkillFilter.isApplicable(filter);
+            var isApplicable = eventSkillFilter.isApplicable(filter);
 
-        assertFalse(isApplicable);
-    }
+            assertFalse(isApplicable);
+        }
 
-    @Test
-    void isApplicableForBlankPatternTest() {
-        filter.setSkillPattern("   ");
+        @DisplayName("should return empty list when no one event matched passed filter")
+        @Test
+        void shouldReturnEmptyListWhenNothingMatchedFilter() {
+            filter.setSkillPattern("C++");
 
-        var isApplicable = eventSkillFilter.isApplicable(filter);
+            var actualFilteredUsers = eventSkillFilter.apply(eventsToFilter, filter);
 
-        assertFalse(isApplicable);
-    }
-
-    @Test
-    void applyPositiveTest() {
-        var actualFilteredUsers = eventSkillFilter.apply(eventsToFilter, filter);
-
-        assertEquals(expectedFilteredEvents.toList(), actualFilteredUsers.toList());
-    }
-
-    @Test
-    void applyNonMatchingTest() {
-        filter.setSkillPattern("C++");
-
-        var actualFilteredUsers = eventSkillFilter.apply(eventsToFilter, filter);
-
-        assertEquals(List.of(), actualFilteredUsers.toList());
+            assertEquals(List.of(), actualFilteredUsers.toList());
+        }
     }
 }

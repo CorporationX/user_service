@@ -5,7 +5,6 @@ import lombok.Setter;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.filter.EventFilterDto;
-import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataGettingException;
@@ -67,6 +66,10 @@ public class EventService {
 
     public EventDto updateEvent(EventDto event) {
         return create(event);
+    }
+
+    public List<EventDto> getOwnedEvents(long userId) {
+        return eventMapper.toDtos(eventRepository.findAllByUserId(userId));
     }
 
     private void checkOwnerSkills(EventDto event) {

@@ -8,6 +8,8 @@ import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = SkillMapper.class)
 public interface EventMapper {
 
@@ -15,7 +17,10 @@ public interface EventMapper {
     Event toEntity(EventDto eventDto);
 
     @Mapping(source = "owner", target = "ownerId", qualifiedByName = "userToUserId")
-    EventDto toDto(Event save);
+    EventDto toDto(Event event);
+
+    @Mapping(source = "owner", target = "ownerId", qualifiedByName = "userToUserId")
+    List<EventDto> toDtos(List<Event> events);
 
     @Named("userToUserId")
     static Long userToUserId(User user) {

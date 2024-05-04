@@ -1,6 +1,8 @@
 package school.faang.user_service.service.event;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -32,7 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -102,124 +103,147 @@ class EventServiceTest {
         eventService.setFilters(filters);
     }
 
+    @Nested
+    class PositiveTests {
+        @DisplayName("should create event when owner has required skills")
+        @Test
+        void shouldCreateEventWhenOwnerHasRequiredSkills() {
+            when(skillRepository.findAllByUserId(eventDto.getOwnerId())).thenReturn(List.of());
+            when(skillMapper.toDto(List.of())).thenReturn(eventDto.getRelatedSkills());
 
-    @Test
-    void createEventPositiveTest() {
-        when(skillRepository.findAllByUserId(eventDto.getOwnerId())).thenReturn(List.of());
-        when(skillMapper.toDto(List.of())).thenReturn(eventDto.getRelatedSkills());
-
-        when(eventMapper.toEntity(eventDto)).thenReturn(event);
+            when(eventMapper.toEntity(eventDto)).thenReturn(event);
 
 
-        assertDoesNotThrow(() -> eventService.create(eventDto));
+            assertDoesNotThrow(() -> eventService.create(eventDto));
 
-        verify(eventRepository).save(event);
+            verify(eventRepository).save(event);
+        }
+
+        @DisplayName("should get event when such event exists")
+        @Test
+        void shouldGetEventWhenItsExists() {
+            when(eventRepository.findById(anyLong())).thenReturn(Optional.of(new Event()));
+
+            assertDoesNotThrow(() -> eventService.getEvent(anyLong()));
+
+            verify(eventRepository).findById(anyLong());
+            verify(eventMapper).toDto(new Event());
+        }
+
+        @DisplayName("should return filtered events when filter isn't empty")
+        @Test
+        void shouldReturnFilteredEventsWhenFilterIsntEmpty() {
+            EventFilterDto eventFilterDto = new EventFilterDto();
+            when(eventRepository.findAll()).thenReturn(List.of(event));
+            when(eventMapper.toDto(any(Event.class))).thenReturn(eventDto);
+
+            filters.forEach(filter -> {
+                when(filter.isApplicable(eventFilterDto)).thenReturn(true);
+                when(filter.apply(any(Stream.class), eq(eventFilterDto))).thenReturn(Stream.of(event));
+            });
+
+
+            var filteredEvents = eventService.getEventsByFilter(eventFilterDto);
+
+
+            verify(eventRepository).findAll();
+
+            filters.forEach(filter -> {
+                verify(filter).isApplicable(eventFilterDto);
+                verify(filter).apply(any(Stream.class), eq(eventFilterDto));
+            });
+            verify(eventMapper).toDto(any(Event.class));
+            assertEquals(List.of(eventDto), filteredEvents);
+        }
+
+        @DisplayName("should delete event when such event exists")
+        @Test
+        void shouldDeleteEventWhenItExists() {
+            when(eventRepository.findById(anyLong())).thenReturn(Optional.of(new Event()));
+
+            assertDoesNotThrow(() -> eventService.deleteEvent(anyLong()));
+
+            verify(eventRepository).findById(anyLong());
+            verify(eventRepository).delete(any(Event.class));
+        }
+
+        @DisplayName("should update event when dto is valid")
+        @Test
+        void shouldUpdateEventWhenDtoIsValid() {
+            doReturn(null).when(eventService).create(eventDto);
+
+            eventService.updateEvent(eventDto);
+
+            verify(eventService).create(eventDto);
+        }
+
+        @DisplayName("should return owned by user events")
+        @Test
+        void shouldReturnOwnedEvents() {
+            eventService.getOwnedEvents(anyLong());
+
+            verify(eventRepository).findAllByUserId(anyLong());
+            verify(eventMapper).toDtos(any(List.class));
+        }
     }
 
-    @Test
-    void createEventNegativeTest() {
-        when(skillRepository.findAllByUserId(eventDto.getOwnerId())).thenReturn(List.of());
-        when(skillMapper.toDto(List.of())).thenReturn(List.of());
+    @Nested
+    class NegativeTests {
+        @DisplayName("should throw exception when owner doesn't have required skills")
+        @Test
+        void shouldThrowExceptionWhenOwnersSkillsDoesntMatchRequired() {
+            when(skillRepository.findAllByUserId(eventDto.getOwnerId())).thenReturn(List.of());
+            when(skillMapper.toDto(List.of())).thenReturn(List.of());
 
-        DataValidationException exception = assertThrows(DataValidationException.class,
-                () -> eventService.create(eventDto));
+            DataValidationException exception = assertThrows(DataValidationException.class,
+                    () -> eventService.create(eventDto));
 
-        verify(eventRepository, times(0)).save(event);
-        assertEquals(INAPPROPRIATE_OWNER_SKILLS_EXCEPTION.getMessage(), exception.getMessage());
-    }
+            verify(eventRepository, times(0)).save(event);
+            assertEquals(INAPPROPRIATE_OWNER_SKILLS_EXCEPTION.getMessage(), exception.getMessage());
+        }
 
-    @Test
-    void getEventPositiveTest() {
-        when(eventRepository.findById(anyLong())).thenReturn(Optional.of(new Event()));
+        @DisplayName("should throw exception when such event doesn't exist")
+        @Test
+        void shouldThrowExceptionWhenSuchEventDoesntExist() {
+            when(eventRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertDoesNotThrow(() -> eventService.getEvent(anyLong()));
+            DataGettingException exception = assertThrows(DataGettingException.class, () -> eventService.getEvent(anyLong()));
 
-        verify(eventRepository).findById(anyLong());
-        verify(eventMapper).toDto(new Event());
-    }
+            verify(eventRepository).findById(anyLong());
+            verify(eventMapper, times(0)).toDto(any());
+            assertEquals(NO_SUCH_EVENT_EXCEPTION.getMessage(), exception.getMessage());
+        }
 
-    @Test
-    void getEventNegativeTest() {
-        when(eventRepository.findById(anyLong())).thenReturn(Optional.empty());
-
-        DataGettingException exception = assertThrows(DataGettingException.class, () -> eventService.getEvent(anyLong()));
-
-        verify(eventRepository).findById(anyLong());
-        verify(eventMapper, times(0)).toDto(any());
-        assertEquals(NO_SUCH_EVENT_EXCEPTION.getMessage(), exception.getMessage());
-    }
-
-    @Test
-    void getEventsByFullFilterTest() {
-        EventFilterDto eventFilterDto = new EventFilterDto();
-        when(eventRepository.findAll()).thenReturn(List.of(event));
-        when(eventMapper.toDto(any(Event.class))).thenReturn(eventDto);
-
-        filters.forEach(filter -> {
-            when(filter.isApplicable(eventFilterDto)).thenReturn(true);
-            when(filter.apply(any(Stream.class), eq(eventFilterDto))).thenReturn(Stream.of(event));
-        });
+        @DisplayName("should return empty event list when filter is empty")
+        @Test
+        void shouldReturnEmptyListWhenFilterIsEmpty() {
+            EventFilterDto eventFilterDto = new EventFilterDto();
+            when(eventRepository.findAll()).thenReturn(List.of(event));
 
 
-        var filteredEvents = eventService.getEventsByFilter(eventFilterDto);
+            var filteredEvents = eventService.getEventsByFilter(eventFilterDto);
 
 
-        verify(eventRepository).findAll();
+            verify(eventRepository).findAll();
 
-        filters.forEach(filter -> {
-            verify(filter).isApplicable(eventFilterDto);
-            verify(filter).apply(any(Stream.class), eq(eventFilterDto));
-        });
-        verify(eventMapper).toDto(any(Event.class));
-        assertEquals(List.of(eventDto), filteredEvents);
-    }
+            filters.forEach(filter -> {
+                verify(filter).isApplicable(eventFilterDto);
+                verify(filter, times(0)).apply(any(Stream.class), eq(eventFilterDto));
+            });
+            verify(eventMapper, times(0)).toDto(any(Event.class));
+            assertEquals(List.of(), filteredEvents);
+        }
 
-    @Test
-    void getEventsByEmptyFilterTest() {
-        EventFilterDto eventFilterDto = new EventFilterDto();
-        when(eventRepository.findAll()).thenReturn(List.of(event));
+        @DisplayName("should throw exception when such event doesn't exists")
+        @Test
+        void shouldThrowExceptionWhenEventToBeDeletedDoesntExist() {
+            when(eventRepository.findById(anyLong())).thenReturn(Optional.empty());
 
+            DataGettingException exception = assertThrows(DataGettingException.class, () -> eventService.deleteEvent(anyLong()));
 
-        var filteredEvents = eventService.getEventsByFilter(eventFilterDto);
-
-
-        verify(eventRepository).findAll();
-
-        filters.forEach(filter -> {
-            verify(filter).isApplicable(eventFilterDto);
-            verify(filter, times(0)).apply(any(Stream.class), eq(eventFilterDto));
-        });
-        verify(eventMapper, times(0)).toDto(any(Event.class));
-        assertEquals(List.of(), filteredEvents);
-    }
-
-    @Test
-    void deleteEventPositiveTest() {
-        when(eventRepository.findById(anyLong())).thenReturn(Optional.of(new Event()));
-
-        assertDoesNotThrow(() -> eventService.deleteEvent(anyLong()));
-
-        verify(eventRepository).findById(anyLong());
-        verify(eventRepository).delete(any(Event.class));
-    }
-
-    @Test
-    void deleteEventNegativeTest() {
-        when(eventRepository.findById(anyLong())).thenReturn(Optional.empty());
-
-        DataGettingException exception = assertThrows(DataGettingException.class, () -> eventService.deleteEvent(anyLong()));
-
-        verify(eventRepository).findById(anyLong());
-        verify(eventRepository, times(0)).delete(any());
-        assertEquals(NO_SUCH_EVENT_EXCEPTION.getMessage(), exception.getMessage());
-    }
-
-    @Test
-    void updateEventTest() {
-        doReturn(null).when(eventService).create(eventDto);
-
-        eventService.updateEvent(eventDto);
-
-        verify(eventService).create(eventDto);
+            verify(eventRepository).findById(anyLong());
+            verify(eventRepository, times(0)).delete(any());
+            assertEquals(NO_SUCH_EVENT_EXCEPTION.getMessage(), exception.getMessage());
+        }
     }
 }

@@ -1,6 +1,7 @@
 package school.faang.user_service.mapper;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -17,7 +18,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class EventMapperTest {
@@ -72,8 +72,9 @@ class EventMapperTest {
         eventDto.setMaxAttendees(10);
     }
 
+    @DisplayName("should map event dto to event entity")
     @Test
-    void toEntityTest() {
+    void shouldMapDtoToEntity() {
         event.setOwner(null);
 
         Event actualEvent = eventMapper.toEntity(eventDto);
@@ -81,8 +82,10 @@ class EventMapperTest {
         assertEquals(event, actualEvent);
     }
 
+
+    @DisplayName("should map event entity to event dto")
     @Test
-    void toDtoTest() {
+    void shouldMapEntityToDto() {
         eventDto.setId(0L);
         eventDto.getRelatedSkills().forEach(skill -> skill.setId(0L));
 
@@ -91,10 +94,22 @@ class EventMapperTest {
         assertEquals(eventDto, actualEventDto);
     }
 
+    @DisplayName("should return userId from user")
     @Test
-    void userToUserId() {
+    void shouldReturnUserId() {
         var actualUserId = EventMapper.userToUserId(nadir);
 
         assertEquals(nadir.getId(), actualUserId);
+    }
+
+    @DisplayName("should map list of event entities to list of event dto")
+    @Test
+    void shouldMapEntityListToDtoList() {
+        eventDto.setId(0L);
+        eventDto.getRelatedSkills().forEach(skill -> skill.setId(0L));
+
+        var actualEventDtoList = eventMapper.toDtos(List.of(event));
+
+        assertEquals(List.of(eventDto), actualEventDtoList);
     }
 }

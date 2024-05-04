@@ -1,7 +1,8 @@
 package school.faang.user_service.service.event.filter;
 
-import net.bytebuddy.dynamic.ClassFileLocator;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.filter.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
@@ -31,35 +32,45 @@ class EventStartDateFilterTest {
         expectedFilteredEvents = ALL_EVENTS.stream();
     }
 
-    @Test
-    void isApplicablePositiveTest() {
-        var isApplicable = eventStartDateFilter.isApplicable(filter);
+    @Nested
+    class positiveTests {
+        @DisplayName("should return true when pattern isn't empty")
+        @Test
+        void shouldReturnTrueWhenPatternIsntEmpty() {
+            var isApplicable = eventStartDateFilter.isApplicable(filter);
 
-        assertTrue(isApplicable);
+            assertTrue(isApplicable);
+        }
+
+        @DisplayName("should return filtered events")
+        @Test
+        void shouldReturnFilteredEvents() {
+            var actualFilteredUsers = eventStartDateFilter.apply(eventsToFilter, filter);
+
+            assertEquals(expectedFilteredEvents.toList(), actualFilteredUsers.toList());
+        }
     }
 
-    @Test
-    void isApplicableForNullPatternTest() {
-        filter.setStartDatePattern(null);
+    @Nested
+    class NegativeTests {
+        @DisplayName("should return false when empty pattern is passed")
+        @Test
+        void shouldReturnFalseWhenPatternIsEmpty() {
+            filter.setStartDatePattern(null);
 
-        var isApplicable = eventStartDateFilter.isApplicable(filter);
+            var isApplicable = eventStartDateFilter.isApplicable(filter);
 
-        assertFalse(isApplicable);
-    }
+            assertFalse(isApplicable);
+        }
 
-    @Test
-    void applyPositiveTest() {
-        var actualFilteredUsers = eventStartDateFilter.apply(eventsToFilter, filter);
+        @DisplayName("should return empty list when no one event matched passed filter")
+        @Test
+        void shouldReturnEmptyListWhenNothingMatchedFilter() {
+            filter.setStartDatePattern(LocalDateTime.of(2024, 7, 10, 12, 0));
 
-        assertEquals(expectedFilteredEvents.toList(), actualFilteredUsers.toList());
-    }
+            var actualFilteredUsers = eventStartDateFilter.apply(eventsToFilter, filter);
 
-    @Test
-    void applyNonMatchingTest() {
-        filter.setStartDatePattern(LocalDateTime.of(2024, 7, 10, 12, 0));
-
-        var actualFilteredUsers = eventStartDateFilter.apply(eventsToFilter, filter);
-
-        assertEquals(List.of(), actualFilteredUsers.toList());
+            assertEquals(List.of(), actualFilteredUsers.toList());
+        }
     }
 }

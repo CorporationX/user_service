@@ -1,6 +1,8 @@
 package school.faang.user_service.service.event.filter;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.filter.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
@@ -30,31 +32,43 @@ class EventEndDateFilterTest {
         expectedFilteredEvents = Stream.of(ALL_EVENTS.get(1));
     }
 
-    @Test
-    void isApplicablePositiveTest() {
-        var isApplicable = eventEndDateFilter.isApplicable(filter);
+    @Nested
+    class positiveTests {
+        @DisplayName("should return true when pattern isn't empty")
+        @Test
+        void shouldReturnTrueWhenPatternIsntEmpty() {
+            var isApplicable = eventEndDateFilter.isApplicable(filter);
 
-        assertTrue(isApplicable);
+            assertTrue(isApplicable);
+        }
+
+        @DisplayName("should return filtered events")
+        @Test
+        void shouldReturnFilteredEvents() {
+            var actualFilteredUsers = eventEndDateFilter.apply(eventsToFilter, filter);
+
+            assertEquals(expectedFilteredEvents.toList(), actualFilteredUsers.toList());
+        }
+
     }
 
-    @Test
-    void isApplicableForNullPatternTest() {
-        filter.setEndDatePattern(null);
+    @Nested
+    class NegativeTests {
+        @DisplayName("should return false when empty pattern is passed")
+        @Test
+        void shouldReturnFalseWhenPatternIsEmpty() {
+            filter.setEndDatePattern(null);
 
-        var isApplicable = eventEndDateFilter.isApplicable(filter);
+            var isApplicable = eventEndDateFilter.isApplicable(filter);
 
-        assertFalse(isApplicable);
+            assertFalse(isApplicable);
+        }
     }
 
-    @Test
-    void applyPositiveTest() {
-        var actualFilteredUsers = eventEndDateFilter.apply(eventsToFilter, filter);
 
-        assertEquals(expectedFilteredEvents.toList(), actualFilteredUsers.toList());
-    }
-
+    @DisplayName("should return empty list when no one event matched passed filter")
     @Test
-    void applyNonMatchingTest() {
+    void shouldReturnEmptyListWhenNothingMatchedFilter() {
         filter.setEndDatePattern(LocalDateTime.of(2024, 3, 10, 12, 0));
 
         var actualFilteredUsers = eventEndDateFilter.apply(eventsToFilter, filter);

@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.config.s3.S3Config;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.config.S3Config;
 import school.faang.user_service.config.context.UserContext;
@@ -21,11 +20,8 @@ import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.MentorshipService;
 import school.faang.user_service.service.event.EventService;
-import school.faang.user_service.service.exceptions.UserNotFoundException;
-import school.faang.user_service.service.exceptions.messageerror.MessageError;
-import school.faang.user_service.service.validators.UserValidator;
-import school.faang.user_service.service.s3_minio_service.S3Service;
 import school.faang.user_service.service.S3Service;
+import school.faang.user_service.validator.UserValidator;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -54,10 +50,6 @@ public class UserService {
     private final EventService eventService;
     private final MentorshipService mentorshipService;
 
-
-    public List<UserDto> getUsersByIds(List<Long> userIds) {
-        return userMapper.toDto(getUsersEntityByIds(userIds));
-    }
 
     public UserDto getUser(Long userId) {
         User user = getUserEntityById(userId);
@@ -103,14 +95,13 @@ public class UserService {
 
     @Transactional
     public void deactivate(long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(MessageError.USER_NOT_FOUND_EXCEPTION));
+        User user = getUserEntityById(userId);
         user.setActive(false);
         List<Long> eventIds = eventService.getOwnedEvents(userId).stream().map(EventDto::getId).toList();
         for (Long eventId : eventIds) {
             eventService.deleteEvent(eventId);
         }
-        mentorshipService.deleteAllMentorMentorship(userId);
+        mentorshipService.deleteAllMentorMentorship(user);
     }
 
     private UserProfilePic getRandomAvatar() {

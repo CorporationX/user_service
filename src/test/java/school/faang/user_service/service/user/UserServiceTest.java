@@ -5,14 +5,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.ProfileViewEventDto;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DataValidationException;
@@ -22,19 +21,17 @@ import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.MentorshipService;
-import school.faang.user_service.service.event.EventService;
-import school.faang.user_service.service.exceptions.UserNotFoundException;
-import school.faang.user_service.service.validators.UserValidator;
 import school.faang.user_service.service.S3Service;
+import school.faang.user_service.service.event.EventService;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.any;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -52,8 +49,6 @@ public class UserServiceTest {
     private UserContext userContext;
     @Mock
     private S3Service s3Service;
-    @Mock
-    private UserValidator userValidator;
     @Mock
     private EventService eventService;
     @Mock
@@ -122,6 +117,7 @@ public class UserServiceTest {
         when(eventService.getOwnedEvents(id)).thenReturn(List.of(EventDto.builder().id(id).build()));
         userService.deactivate(id);
         verify(eventService, times(1)).deleteEvent(id);
+        verify(mentorshipService, times(1)).deleteAllMentorMentorship(user);
         assertFalse(user.isActive());
     }
 

@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.MessageError;
+import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.exception.UserNotFoundException;
-import school.faang.user_service.exception.MessageError;
 
 import java.util.List;
 
@@ -45,8 +45,7 @@ public class MentorshipService {
         userRepository.save(mentor);
     }
 
-    public void deleteMentor(long menteeId, long mentorId) {
-
+    public void deleteMentorById(long menteeId, long mentorId) {
         User mentee = userRepository.findById(menteeId)
                 .orElseThrow(() -> new UserNotFoundException(MessageError.USER_NOT_FOUND_EXCEPTION));
 
@@ -60,13 +59,20 @@ public class MentorshipService {
         userRepository.save(mentee);
     }
 
+    public void deleteMentorByEntity(User mentee, User mentor) {
+        if (!mentee.getMentees().contains(mentor)) {
+            throw new UserNotFoundException(MessageError.USER_NOT_FOUND_EXCEPTION);
+        } else {
+            mentee.getMentors().remove(mentor);
+            userRepository.save(mentee);
+        }
+    }
 
-    public void deleteAllMentorMentorship(long mentorId) {
-        userRepository.findById(mentorId)
-                .orElseThrow(() -> new UserNotFoundException(MessageError.USER_NOT_FOUND_EXCEPTION));
-        List<Long> menteesId = getMentees(mentorId).stream().map(UserDto::getId).toList();
-        for (Long menteeId : menteesId) {
-            deleteMentor(menteeId, mentorId);
+
+    public void deleteAllMentorMentorship(User mentor) {
+        List<User> mentees = mentor.getMentees();
+        for (User mentee : mentees) {
+            deleteMentorByEntity(mentee, mentor);
         }
     }
 }

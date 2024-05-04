@@ -134,28 +134,43 @@ public class MentorshipServiceTest {
 
     @Test
     @DisplayName("There is no such mentee in Repository")
-    public void testDeleteMentor_MentorDoesNotExist() {
+    public void testDeleteMentorById_MentorDoesNotExist() {
         when(userRepository.findById(thirdUser.getId())).thenReturn(Optional.empty());
         UserNotFoundException userNotFoundException = assertThrows(UserNotFoundException.class,
-                () -> mentorshipService.deleteMentor(thirdUser.getId(), firstUser.getId()));
+                () -> mentorshipService.deleteMentorById(thirdUser.getId(), firstUser.getId()));
 
         assertEquals(MessageError.USER_NOT_FOUND_EXCEPTION.getMessage(), userNotFoundException.getMessage());
     }
 
     @Test
     @DisplayName("There is no such mentor iin mentee's list of mentors")
-    public void testDeleteMentor_MentorDoesNotExistInListMentors() {
+    public void testDeleteMentorById_MentorDoesNotExistInListMentors() {
         when(userRepository.findById(firstUser.getId())).thenReturn(Optional.of(firstUser));
         UserNotFoundException userNotFoundException = assertThrows(UserNotFoundException.class,
-                () -> mentorshipService.deleteMentor(firstUser.getId(), thirdUser.getId()));
+                () -> mentorshipService.deleteMentorById(firstUser.getId(), thirdUser.getId()));
         assertEquals(userNotFoundException.getMessage(), MessageError.USER_NOT_FOUND_EXCEPTION.getMessage());
     }
 
     @Test
     @DisplayName("Mentor is deleted successful and Info is updated in DB")
-    public void testDeleteMentor_MentorIsDeleted() {
+    public void testDeleteMentorById_MentorIsDeleted() {
         when(userRepository.findById(thirdUser.getId())).thenReturn(Optional.of(thirdUser));
-        mentorshipService.deleteMentor(thirdUser.getId(), firstUser.getId());
+        mentorshipService.deleteMentorById(thirdUser.getId(), firstUser.getId());
+        verify(userRepository, times(1)).save(thirdUser);
+    }
+
+    @Test
+    @DisplayName("There is no such mentor iin mentee's list of mentors")
+    public void testDeleteMentorByEntity_MentorDoesNotExistInListMentors() {
+        UserNotFoundException userNotFoundException = assertThrows(UserNotFoundException.class,
+                () -> mentorshipService.deleteMentorByEntity(firstUser, thirdUser));
+        assertEquals(userNotFoundException.getMessage(), MessageError.USER_NOT_FOUND_EXCEPTION.getMessage());
+    }
+
+    @Test
+    @DisplayName("Mentor is deleted successful and Info is updated in DB")
+    public void testDeleteMentorByEntity_MentorIsDeleted() {
+        mentorshipService.deleteMentorByEntity(thirdUser, firstUser);
         verify(userRepository, times(1)).save(thirdUser);
     }
 

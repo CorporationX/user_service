@@ -38,6 +38,6 @@ public class MentorshipController {
     @DeleteMapping("mentee/{mentorId}/deleteMentor/{menteeId} ")
     @Operation(description = "Delete mentor from a mentee's list of mentors")
     public void deleteMentor(@PathVariable long menteeId, @PathVariable long mentorId) {
-        mentorshipService.deleteMentor(menteeId, mentorId);
+        mentorshipService.deleteMentorById(menteeId, mentorId);
     }
 }

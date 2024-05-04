@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.goal;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,6 +12,7 @@ import school.faang.user_service.exceptions.UpdatingCompletedGoalException;
 import school.faang.user_service.exceptions.UserGoalsValidationException;
 import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.skill.SkillService;
 import school.faang.user_service.service.filters.GoalFilter;
 
 import java.util.List;
@@ -28,14 +29,17 @@ public class GoalService {
 
     public void createGoal(Long userId, Goal goal) {
         if (goalRepository.countActiveGoalsPerUser(userId) >= MAX_ACTIVE_GOALS) {
-            throw new UserGoalsValidationException("Max active goals doesnt grand then MAX_ACTIVE_GOALS");
+            throw new UserGoalsValidationException(
+                    "You already have the maximum number of active goals ("
+                            + MAX_ACTIVE_GOALS + ")");
         }
         if (!skillService.checkSkillsInDB(goal.getSkillsToAchieve())) {
-            throw new DataValidationException("The goal contains non-existent skills");
+            throwDataValidationExceptionWithMessage();
         }
         goalRepository.create(goal.getTitle(), goal.getDescription(), goal.getId());
         goal.getSkillsToAchieve()
-                .forEach(skill -> goalRepository.addSkillToGoal(skill.getId(), goal.getId()));
+                .forEach(skill -> goalRepository.addSkillToGoal(skill.getId(),
+                        goalRepository.findGoalIdByTitle(goal.getTitle())));
     }
 
     public void deleteGoal(long goalId) {
@@ -49,7 +53,7 @@ public class GoalService {
         }
         if (goalDto.getSkillIds().size() !=
                 skillService.checkAmountSkillsInDB(goalDto.getSkillIds())) {
-            throw new DataValidationException("The goal contains non-existent skills");
+            throwDataValidationExceptionWithMessage();
         }
         if (goalDto.getStatus().equals(GoalStatus.COMPLETED.toString())) {
             List<User> users = goalRepository.findUsersByGoalId(goalId);
@@ -82,5 +86,9 @@ public class GoalService {
                 .flatMap(goalFilter -> goalFilter.apply(stream, filters))
                 .map(goalMapper::toDto)
                 .toList();
+    }
+
+    private void throwDataValidationExceptionWithMessage() {
+        throw new DataValidationException("The goal contains non-existent skills");
     }
 }

@@ -73,4 +73,10 @@ public interface GoalRepository extends CrudRepository<Goal, Long> {
             WHERE goal.id = ?1
             """)
     Goal findGoalById(long goalId);
+
+    @Query(nativeQuery = true, value = """
+                SELECT id FROM  goal
+                WHERE goal.title = ?1
+            """)
+    Long findGoalIdByTitle(String title);
 }

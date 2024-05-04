@@ -6,11 +6,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.controller.goal.GoalController;
+import school.faang.user_service.dto.filter.GoalFilterDto;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exceptions.DataValidationException;
-import school.faang.user_service.service.GoalService;
+import school.faang.user_service.service.goal.GoalService;
 
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
@@ -20,6 +25,12 @@ class GoalControllerTest {
     private GoalService goalService;
     @InjectMocks
     private GoalController goalController;
+
+    @Test
+    void testCreateWhenGoalIsNull() {
+        Goal goal = null;
+        assertThrows(NullPointerException.class, () -> goalController.createGoal(1L, goal));
+    }
 
     @Test
     void testCreateWhenReceivedGoalWithBlankTitle() {
@@ -43,6 +54,13 @@ class GoalControllerTest {
     }
 
     @Test
+    void testUpdateWhenGoalDtoIsNull() {
+        GoalDto goalDto = null;
+
+        assertThrows(NullPointerException.class, () -> goalController.updateGoal(1L, goalDto));
+    }
+
+    @Test
     void testUpdateWhereGoalDtoHaveBlankTitle() {
         GoalDto goalDto = initDto("");
 
@@ -56,6 +74,20 @@ class GoalControllerTest {
         goalController.updateGoal(1L, goalDto);
 
         Mockito.verify(goalService, Mockito.times(1)).updateGoal(1L, goalDto);
+    }
+
+    @Test
+    void testFindSubtaskByGoalId() {
+        Mockito.when(goalService.findSubtasksByGoalId(1L, new GoalFilterDto()))
+                .thenReturn(List.of(new GoalDto(), new GoalDto()));
+        assertEquals(2, goalController.findSubtasksByGoalId(1L, new GoalFilterDto()).size());
+    }
+
+    @Test
+    void testGetGoalsByUser() {
+        Mockito.when(goalService.getGoalsByUser(1L, new GoalFilterDto()))
+                .thenReturn(List.of(new GoalDto(), new GoalDto()));
+        assertEquals(2, goalController.getGoalsByUser(1L, new GoalFilterDto()).size());
     }
 
     private Goal init(String title) {

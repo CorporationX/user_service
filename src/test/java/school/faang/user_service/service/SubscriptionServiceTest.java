@@ -9,7 +9,6 @@ import school.faang.user_service.repository.SubscriptionRepository;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static school.faang.user_service.util.TestUser.FOLLOWEE_ID;
 import static school.faang.user_service.util.TestUser.FOLLOWER_ID;
 
 
@@ -18,18 +17,6 @@ class SubscriptionServiceTest {
 
     @Mock
     SubscriptionRepository subscriptionRepository;
-
-    @Test
-    public void testFollowUserToAnotherUser() {
-        subscriptionRepository.followUser(FOLLOWER_ID, FOLLOWEE_ID);
-        verify(subscriptionRepository).followUser(FOLLOWER_ID, FOLLOWEE_ID);
-    }
-
-    @Test
-    public void testUnfollowUserToAnotherUser() {
-        subscriptionRepository.unfollowUser(FOLLOWER_ID, FOLLOWEE_ID);
-        verify(subscriptionRepository).unfollowUser(FOLLOWER_ID, FOLLOWEE_ID);
-    }
 
     @Test
     public void testGetFollowersCount() {

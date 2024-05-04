@@ -122,12 +122,12 @@ class SubscriptionServiceTest {
         @DisplayName("should return followers")
         @Test
         void shouldReturnAllFollowers() {
-            var allFollowers = Stream.<User>builder().build();
+            var allFollowers = Stream.<User>of();
 
             when(subscriptionRepo.findByFolloweeId(followeeId)).thenReturn(allFollowers);
             filters.forEach(filter -> {
                 when(filter.isApplicable(filterDto)).thenReturn(true);
-                when(filter.apply(allFollowers, filterDto)).thenReturn(Stream.<User>builder().build());
+                when(filter.apply(allFollowers, filterDto)).thenReturn(Stream.of());
             });
 
 
@@ -136,7 +136,7 @@ class SubscriptionServiceTest {
 
             verify(subscriptionRepo).findByFolloweeId(followeeArgumentCaptor.capture());
             assertEquals(followeeId, followeeArgumentCaptor.getValue());
-            assertEquals(new ArrayList<UserDto>(), actualFollowers);
+            assertEquals(List.of(), actualFollowers);
         }
 
         @DisplayName("should call subscriptionRepo.findFollowersAmountByFolloweeId()")

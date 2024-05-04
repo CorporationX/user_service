@@ -4,6 +4,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.entity.User;
 
@@ -52,20 +55,12 @@ class UserEmailFilterTest {
 
     @Nested
     class NegativeTests {
-        @DisplayName("should return false when \"emailPattern\" is null")
-        @Test
-        void shouldReturnFalseWhenEmailPatternIsNull() {
-            filter.setEmailPattern(null);
-
-            var isApplicable = userEmailFilter.isApplicable(filter);
-
-            assertFalse(isApplicable);
-        }
-
-        @DisplayName("should return false when \"emailPattern\" is blank")
-        @Test
-        void shouldReturnFalseWhenEmailPatternIsBlank() {
-            filter.setEmailPattern("   ");
+        @DisplayName("should return false when \"emailPattern\" is empty")
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {"  ", "\t", "\n"})
+        void shouldReturnFalseWhenEmailPatternIsEmpty(String pattern) {
+            filter.setEmailPattern(pattern);
 
             var isApplicable = userEmailFilter.isApplicable(filter);
 

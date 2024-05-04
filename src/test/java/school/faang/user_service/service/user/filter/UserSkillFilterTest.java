@@ -4,6 +4,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.entity.User;
 
@@ -52,20 +55,12 @@ class UserSkillFilterTest {
 
     @Nested
     class NegativeTests {
-        @DisplayName("should return false when \"skillPattern\" is null")
-        @Test
-        void shouldReturnFalseWhenSkillPatternIsNull() {
-            filter.setSkillPattern(null);
-
-            var isApplicable = userSkillFilter.isApplicable(filter);
-
-            assertFalse(isApplicable);
-        }
-
-        @DisplayName("should return false when \"skillPattern\" is blank")
-        @Test
-        void shouldReturnFalseWhenSkillPatternIsBlank() {
-            filter.setSkillPattern("   ");
+        @DisplayName("should return false when \"skillPattern\" is empty")
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {"  ", "\t", "\n"})
+        void shouldReturnFalseWhenSkillPatternIsEmpty(String pattern) {
+            filter.setSkillPattern(pattern);
 
             var isApplicable = userSkillFilter.isApplicable(filter);
 

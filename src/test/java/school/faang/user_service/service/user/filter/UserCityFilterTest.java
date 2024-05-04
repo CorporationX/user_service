@@ -4,6 +4,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.entity.User;
 
@@ -52,20 +55,12 @@ class UserCityFilterTest {
 
     @Nested
     class NegativeTests {
-        @DisplayName("should return false when \"cityPattern\" is null")
-        @Test
-        void shouldReturnFalseWhenCityFilterIsNull() {
-            filter.setCityPattern(null);
-
-            var isApplicable = userCityFilter.isApplicable(filter);
-
-            assertFalse(isApplicable);
-        }
-
-        @DisplayName("should return false when \"aboutPattern\" is blank")
-        @Test
-        void shouldReturnFalseWhenCityFilterIsBlank() {
-            filter.setCityPattern("   ");
+        @DisplayName("should return false when \"cityPattern\" is empty")
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {"  ", "\t", "\n"})
+        void shouldReturnFalseWhenCityPatternIsEmpty(String pattern) {
+            filter.setCityPattern(pattern);
 
             var isApplicable = userCityFilter.isApplicable(filter);
 

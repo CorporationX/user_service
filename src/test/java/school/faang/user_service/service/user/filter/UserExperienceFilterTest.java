@@ -4,6 +4,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.entity.User;
 
@@ -32,31 +35,12 @@ class UserExperienceFilterTest {
 
     @Nested
     class PositiveTests {
-        @DisplayName("should return true when both experience bounds are present")
-        @Test
-        void shouldReturnTrueWhenBothExperienceBoundsArePresent() {
-            filter.setExperienceMin(3);
-            filter.setExperienceMax(12);
-
-            var isApplicable = userExperienceFilter.isApplicable(filter);
-
-            assertTrue(isApplicable);
-        }
-
-        @DisplayName("should return true when only min bound is present")
-        @Test
-        void shouldReturnTrueWhenMinBoundOnlyIsPresent() {
-            filter.setExperienceMin(3);
-
-            var isApplicable = userExperienceFilter.isApplicable(filter);
-
-            assertTrue(isApplicable);
-        }
-
-        @DisplayName("should return true when only max bound is present")
-        @Test
-        void shouldReturnTrueWhenMaxBoundOnlyIsPresent() {
-            filter.setExperienceMax(3);
+        @DisplayName("should return true when experience bounds are present")
+        @ParameterizedTest
+        @MethodSource("provideExpBoundsForPositiveTest")
+        void shouldReturnTrueWhenExperienceBoundsArePresent(int minBound, int maxBound) {
+            filter.setExperienceMin(minBound);
+            filter.setExperienceMax(maxBound);
 
             var isApplicable = userExperienceFilter.isApplicable(filter);
 
@@ -94,37 +78,24 @@ class UserExperienceFilterTest {
 
             assertEquals(expectedFilteredUsers.toList(), actualFilteredUsers.toList());
         }
+
+        private static Stream<Arguments> provideExpBoundsForPositiveTest() {
+            return Stream.of(
+                    Arguments.of(10, 10),
+                    Arguments.of(10, 0),
+                    Arguments.of(0, 10)
+            );
+        }
     }
 
     @Nested
     class NegativeTests {
-        @DisplayName("should return false when both bounds are zero")
-        @Test
-        void shouldReturnFalseWhenBothBoundsAreZero() {
-            filter.setExperienceMin(0);
-            filter.setExperienceMax(0);
-
-            var isApplicable = userExperienceFilter.isApplicable(filter);
-
-            assertFalse(isApplicable);
-        }
-
-        @DisplayName("should return false when one of bounds is negative")
-        @Test
-        void shouldReturnFalseWhenOneBoundIsNegative() {
-            filter.setExperienceMin(-10);
-            filter.setExperienceMax(0);
-
-            var isApplicable = userExperienceFilter.isApplicable(filter);
-
-            assertFalse(isApplicable);
-        }
-
-        @DisplayName("should return false when both bounds are negative")
-        @Test
-        void shouldReturnFalseWhenBothBoundsAreNegative() {
-            filter.setExperienceMin(-10);
-            filter.setExperienceMax(-10);
+        @DisplayName("should return false when experience bounds are empty or negative")
+        @ParameterizedTest
+        @MethodSource("provideExpBoundsForNegativeTest")
+        void shouldReturnFalseWhenBoundsAreEmptyOrNegative(int minBound, int maxBound) {
+            filter.setExperienceMin(minBound);
+            filter.setExperienceMax(maxBound);
 
             var isApplicable = userExperienceFilter.isApplicable(filter);
 
@@ -140,6 +111,17 @@ class UserExperienceFilterTest {
             var actualFilteredUsers = userExperienceFilter.apply(usersToFilter, filter);
 
             assertEquals(List.of(), actualFilteredUsers.toList());
+        }
+
+        private static Stream<Arguments> provideExpBoundsForNegativeTest() {
+            return Stream.of(
+                    Arguments.of(-10, -10),
+                    Arguments.of(-10, 0),
+                    Arguments.of(0, -10),
+                    Arguments.of(0, 0),
+                    Arguments.of(10, -10),
+                    Arguments.of(-10, 10)
+            );
         }
     }
 }

@@ -4,6 +4,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.entity.User;
 
@@ -52,20 +55,12 @@ class UserContactFilterTest {
 
     @Nested
     class NegativeTests {
-        @DisplayName("should return false when \"contactPattern\" is null")
-        @Test
-        void shouldReturnFalseWhenContactPatternIsNull() {
-            filter.setContactPattern(null);
-
-            var isApplicable = userContactFilter.isApplicable(filter);
-
-            assertFalse(isApplicable);
-        }
-
-        @DisplayName("should return false when \"contactPattern\" is blank")
-        @Test
-        void shouldReturnFalseWhenContactPatternIsBlank() {
-            filter.setContactPattern("   ");
+        @DisplayName("should return false when \"contactPattern\" is empty")
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {"  ", "\t", "\n"})
+        void shouldReturnFalseWhenContactPatternIsEmpty(String pattern) {
+            filter.setContactPattern(pattern);
 
             var isApplicable = userContactFilter.isApplicable(filter);
 

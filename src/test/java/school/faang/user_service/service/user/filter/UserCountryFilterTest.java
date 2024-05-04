@@ -4,6 +4,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.entity.User;
 
@@ -52,20 +55,12 @@ class UserCountryFilterTest {
 
     @Nested
     class NegativeTests {
-        @DisplayName("should return false when \"countryPattern\" is null")
-        @Test
-        void shouldReturnFalseWhenCountryPatternIsNull() {
-            filter.setCountryPattern(null);
-
-            var isApplicable = userCountryFilter.isApplicable(filter);
-
-            assertFalse(isApplicable);
-        }
-
-        @DisplayName("should return false when \"countryPattern\" is blank")
-        @Test
-        void shouldReturnFalseWhenCountryPatternIsBlank() {
-            filter.setCountryPattern("   ");
+        @DisplayName("should return false when \"countryPattern\" is empty")
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {"  ", "\t", "\n"})
+        void shouldReturnFalseWhenCountryPatternIsEmpty(String pattern) {
+            filter.setCountryPattern(pattern);
 
             var isApplicable = userCountryFilter.isApplicable(filter);
 

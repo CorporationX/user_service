@@ -75,29 +75,30 @@ public class GoalInvitationService {
     }
 
     public void rejectGoalInvitation(long id) {
-        if (goalInvitationRepository.findById(id).isPresent()) {
+        if (goalInvitationRepository.existsById(id)) {
             goalInvitation = goalInvitationRepository.findById(id).get();
-            if (goalRepository.findById(goalInvitation.getGoal().getId()).isPresent()) {
+            if (goalRepository.existsById(goalInvitation.getGoal().getId())) {
                 goalInvitation.setStatus(RequestStatus.REJECTED);
             } else {
-                throw runtimeException;
+                throw new RuntimeException("There is no such goal in database");
             }
         } else {
-            throw runtimeException;
+            throw new RuntimeException("There is no such goalInvitation in database");
         }
     }
 
     public List<GoalInvitation> getInvitations(InvitationFilterDto filter) {
         if (filter != null) {
             return goalInvitationRepository.findAll().stream().
+                    filter(goalInvitation -> goalInvitation.getInvited() != null && goalInvitation.getInviter() != null &&
+                            goalInvitation.getInvited().getUsername() != null && goalInvitation.getInviter().getUsername() != null).
                     filter(goalInvitation -> goalInvitation.getInvited().getId() == filter.getInvitedId()).
                     filter(goalInvitation -> goalInvitation.getInviter().getId() == filter.getInviterId()).
                     filter(goalInvitation -> goalInvitation.getInvited().getUsername().equals(filter.getInvitedNamePattern())).
                     filter(goalInvitation -> goalInvitation.getInviter().getUsername().equals(filter.getInviterNamePattern())).
-                    filter(goalInvitation -> goalInvitation.getStatus().equals(filter.getStatus())).toList();
+                    toList();
         } else {
-            throw runtimeException;
+            throw new RuntimeException("InvitationFilterDto is null");
         }
     }
-
 }

@@ -80,8 +80,8 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
         RecommendationRequest recommendationRequest = recommendationRequestRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Request not found"));
         RecommendationRequestEvent recommendationRequestEvent = new RecommendationRequestEvent(recommendationRequest.getId(),
-                recommendationRequest.getRecommendation().getAuthor().getId(),
-                recommendationRequest.getRecommendation().getReceiver().getId());
+                recommendationRequest.getRequester().getId(),
+                recommendationRequest.getReceiver().getId());
         recommendationRequestEventPublisher.publish(recommendationRequestEvent);
         log.info("Отправлено уведомление по запросу рекомендации пользователя");
         return recommendationRequestMapper.toDto(recommendationRequest);

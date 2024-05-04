@@ -23,13 +23,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class EventMapperTest {
     @Spy
     @InjectMocks
-    EventMapper eventMapper = Mappers.getMapper(EventMapper.class);
+    private EventMapper eventMapper = Mappers.getMapper(EventMapper.class);
 
     @Spy
-    SkillMapper skillMapper = Mappers.getMapper(SkillMapper.class);
-    Event event;
-    EventDto eventDto;
-    User nadir;
+    private SkillMapper skillMapper = Mappers.getMapper(SkillMapper.class);
+    private Event event;
+    private EventDto eventDto;
+    private User nadir;
 
     @BeforeEach
     void setUp() {

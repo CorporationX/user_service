@@ -12,9 +12,9 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SkillMapperTest {
-    SkillMapper skillMapper = Mappers.getMapper(SkillMapper.class);
-    Skill skill;
-    SkillDto skillDto;
+    private SkillMapper skillMapper = Mappers.getMapper(SkillMapper.class);
+    private Skill skill;
+    private SkillDto skillDto;
 
     @BeforeEach
     void setUp() {

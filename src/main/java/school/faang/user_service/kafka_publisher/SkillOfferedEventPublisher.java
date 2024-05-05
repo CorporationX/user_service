@@ -12,7 +12,7 @@ import school.faang.user_service.dto.event.SkillOfferedEvent;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class SkillOfferedEventPublisher extends AbstractEventPublisher<SkillOfferedEvent> {
+public class SkillOfferedEventPublisher implements KafkaMessagePublisher<SkillOfferedEvent> {
     private final ObjectMapper objectMapper;
     private final KafkaTemplate<String, String> kafkaTemplate;
     @Value("${spring.data.kafka.channels.skill-channel.name}")

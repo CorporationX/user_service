@@ -16,10 +16,7 @@ public class GoalController {
     private final GoalService goalService;
 
     public void createGoal(Long userId, Goal goal) {
-        if (goal == null) {
-            throwNullPointerExceptionWithMessage();
-        }
-        if (goal.getTitle().isBlank()) {
+        if (goal.getTitle().isBlank() || goal == null) {
             throwDataValidationExceptionWithMessage();
         }
         goalService.createGoal(userId, goal);
@@ -30,10 +27,7 @@ public class GoalController {
     }
 
     public void updateGoal(Long goalId, GoalDto goalDto) {
-        if (goalDto == null) {
-            throwNullPointerExceptionWithMessage();
-        }
-        if (goalDto.getTitle().isBlank()) {
+        if (goalDto.getTitle().isBlank() || goalDto == null) {
             throwDataValidationExceptionWithMessage();
         }
         goalService.updateGoal(goalId, goalDto);
@@ -48,10 +42,6 @@ public class GoalController {
     }
 
     private void throwDataValidationExceptionWithMessage() {
-        throw new DataValidationException("Goals title must exists");
-    }
-
-    private void throwNullPointerExceptionWithMessage() {
-        throw new NullPointerException("Goal must exist");
+        throw new DataValidationException("Goals title or goal must exists");
     }
 }

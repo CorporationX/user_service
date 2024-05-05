@@ -1,8 +1,4 @@
 spring:
-  mvc:
-    servlet:
-      path: /api/v1  # Set default path for Spring MVC controllers
-
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
@@ -36,9 +32,10 @@ spring:
           name: follower_channel
         profile_view_channel:
           name: profile_view_channel
+        search_appearance_channel:
+          name: SearchAppearance_channel
         recommendation_channel:
           name: recommendation_channel
-
 
 server:
   port: 8080

@@ -54,9 +54,7 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
         List<Long> skillIds = recommendationRequestDto.getSkillIds();
 
         if (skillIds != null && !skillIds.isEmpty()) {
-            skillIds.forEach(skillId -> {
-                skillRequestRepository.create(savedRecommendationRequest.getId(), skillId);
-            });
+            skillIds.forEach(skillId -> skillRequestRepository.create(savedRecommendationRequest.getId(), skillId));
         }
 
         return recommendationRequestMapper.toDto(savedRecommendationRequest);

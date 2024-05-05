@@ -13,11 +13,17 @@ import school.faang.user_service.subscriber.UsersBanListener;
 @Configuration
 @RequiredArgsConstructor
 public class RedisConfig {
+    private final UsersBanListener usersBanListener;
+
+    @Value("${spring.data.redis.channels.search_appearance_channel.name}")
+    private String searchAppearanceTopic;
+
     @Value("${spring.data.redis.channels.recommendation_channel.name}")
     private String recommendationChannel;
-    private final UsersBanListener usersBanListener;
+
     @Value("${topic.user_ban}")
     private String userBanTopic;
+
     @Value("${spring.data.redis.channels.profile_view_channel.name}")
     private String profileViewChannel;
 
@@ -33,6 +39,15 @@ public class RedisConfig {
         container.addMessageListener(userBanMessageListenerAdapter(), userBanTopic());
         return container;
     }
+    @Bean
+    public ChannelTopic SearchAppearanceTopic() {
+        return new ChannelTopic(searchAppearanceTopic);
+    }
+
+    @Bean
+    public ChannelTopic userBanTopic(){
+        return new ChannelTopic(userBanTopic);
+    }
 
     @Bean
     public ChannelTopic recommendationTopic() {
@@ -42,10 +57,5 @@ public class RedisConfig {
     @Bean
     public ChannelTopic profileViewTopic() {
         return new ChannelTopic(profileViewChannel);
-    }
-
-    @Bean
-    public ChannelTopic userBanTopic() {
-        return new ChannelTopic(userBanTopic);
     }
 }

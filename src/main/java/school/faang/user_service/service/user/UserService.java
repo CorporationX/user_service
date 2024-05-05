@@ -8,8 +8,22 @@ import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.event.ProfileViewEvent;
 import school.faang.user_service.dto.event.UserEvent;
+
+import school.faang.user_service.dto.filter.UserFilterDto;
+import school.faang.user_service.dto.messagebroker.SearchAppearanceEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
+import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.user.filter.UserFilter;
+import school.faang.user_service.validator.user.UserValidator;
+import java.time.LocalDateTime;
+import java.util.UUID;
+import school.faang.user_service.handler.exception.EntityNotFoundException;
+import school.faang.user_service.dto.event.UserEvent;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.handler.exception.DataValidationException;
@@ -41,6 +55,9 @@ public class UserService {
     private final EventRepository eventRepository;
     private final UserContext userContext;
     private final ProfileViewEventPublisher profileViewEventPublisher;
+    private final List<UserFilter> userFilters;
+    private final SearchAppearanceEventPublisher searchAppearanceEventPublisher;
+
     @Value("${dicebear.avatar}")
     private String avatarUrl;
     @Value("${dicebear.small_avatar}")
@@ -89,25 +106,24 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException(String.format(USER_NOT_FOUND.getMessage(), userId)));
     }
 
-
     public UserDto deactivationUserById(Long userId) {
         User userDeactivate = userRepository.findById(userId).orElseThrow(() -> new DataValidationException("Пользователь с id: " + userId + " не найден"));
         if (userDeactivate.getGoals() != null && !userDeactivate.getGoals().isEmpty()) {
             List<Long> deleteGoals = userDeactivate.getGoals().stream().filter(goal -> !GoalStatus.COMPLETED.equals(goal.getStatus()))
                     .peek(goal -> goal.getUsers().removeIf(user -> user.getId() == userId))
                     .filter(goal -> goal.getUsers().isEmpty())
-                    .map(goal -> goal.getId())
+                    .map(Goal::getId)
                     .toList();
             userDeactivate.setGoals(Collections.emptyList());
-            deleteGoals.forEach(deleteGoal -> goalService.deleteGoal(deleteGoal));
+            deleteGoals.forEach(goalService::deleteGoal);
         }
 
         if (userDeactivate.getOwnedEvents() != null && !userDeactivate.getOwnedEvents().isEmpty()) {
             List<Long> deleteEvents = userDeactivate.getOwnedEvents().stream().filter(event -> EventStatus.PLANNED.equals(event.getStatus()))
-                    .map(event -> event.getId())
+                    .map(Event::getId)
                     .toList();
             userDeactivate.setOwnedEvents(Collections.emptyList());
-            deleteEvents.forEach(deleteEvent -> eventRepository.deleteById(deleteEvent));
+            deleteEvents.forEach(eventRepository::deleteById);
         }
 
         userDeactivate.setActive(false);
@@ -119,5 +135,27 @@ public class UserService {
 
         User savedUser = userRepository.save(userDeactivate);
         return userMapper.toDto(savedUser);
+    }
+
+    public List<UserDto> searchUsersByFilter(UserFilterDto userFilterDto, Long requestUser) {
+        List<User> userList = userRepository.findAll();
+        log.info("{} users found", userList.size());
+
+        List<UserDto> filteredUserList = userFilters.stream()
+                .filter(userFilter -> userFilter.isApplicable(userFilterDto))
+                .flatMap(userFilter -> userFilter.apply(userList.stream(), userFilterDto))
+                .map(userMapper::toDto)
+                .toList();
+        log.info("After filtering, {} users remained", filteredUserList.size());
+
+        filteredUserList.forEach(user -> {
+            SearchAppearanceEvent event = new SearchAppearanceEvent(
+                    user.getId(),
+                    requestUser,
+                    LocalDateTime.now());
+            searchAppearanceEventPublisher.publish(event);
+        });
+
+        return filteredUserList;
     }
 }

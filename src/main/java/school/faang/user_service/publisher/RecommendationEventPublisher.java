@@ -14,7 +14,7 @@ public class RecommendationEventPublisher extends AbstractEventPublisher<Recomme
     public RecommendationEventPublisher(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper) {
         super(redisTemplate, objectMapper);
     }
-    //@Autowired
+    @Autowired
     private ChannelTopic recommendationTopic;
 
     public void publish(RecommendationEvent event) {

@@ -24,6 +24,9 @@ public class RedisConfig {
     private int port;
     @Value("${spring.data.redis.channels.recommendation_request_channel.name}")
     private String recommendationRequestChannel;
+    @Value("${spring.data.redis.channels.recommendation_channel.name}")
+    private String recommendationChannel;
+
     @Value("${topic.user_ban}")
     private String userBanTopic;
     private final UsersBanListener usersBanListener;
@@ -66,6 +69,10 @@ public class RedisConfig {
     @Bean
     public ChannelTopic recommendationRequestTopic() {
         return new ChannelTopic(recommendationRequestChannel);
+    }
+    @Bean
+    public ChannelTopic recommendationTopic(){
+        return new ChannelTopic(recommendationChannel);
     }
 }
 

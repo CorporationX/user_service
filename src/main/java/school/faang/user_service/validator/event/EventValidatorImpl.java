@@ -7,7 +7,7 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exceptions.event.DataValidationException;
-import school.faang.user_service.exceptions.event.EntityNotFoundException;
+import school.faang.user_service.exceptions.event.NotFoundException;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.Set;
@@ -36,7 +36,7 @@ public class EventValidatorImpl implements EventValidator {
     public void validateOwnersRequiredSkills(EventDto event) {
         User user = userRepository
                 .findById(event.getOwnerId())
-                .orElseThrow(() -> new EntityNotFoundException("user with id=" + event.getOwnerId() + " not found"));
+                .orElseThrow(() -> new NotFoundException("user with id=" + event.getOwnerId() + " not found"));
 
         Set<Long> requiredSkillsIds = user.getSkills().stream()
                 .map(Skill::getId)

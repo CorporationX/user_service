@@ -11,7 +11,7 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exceptions.event.DataValidationException;
-import school.faang.user_service.exceptions.event.EntityNotFoundException;
+import school.faang.user_service.exceptions.event.NotFoundException;
 import school.faang.user_service.repository.UserRepository;
 
 import java.time.LocalDateTime;
@@ -85,7 +85,7 @@ class EventValidatorImplTest {
     void validateOwnersRequiredSkillsNotFoundUser() {
         when(userRepository.findById(id)).thenReturn(Optional.empty());
 
-        EntityNotFoundException e = assertThrows(EntityNotFoundException.class, () -> validator.validateOwnersRequiredSkills(eventDto));
+        NotFoundException e = assertThrows(NotFoundException.class, () -> validator.validateOwnersRequiredSkills(eventDto));
         assertEquals("user with id=" + id + " not found", e.getMessage());
     }
 

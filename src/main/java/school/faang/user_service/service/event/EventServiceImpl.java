@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.exceptions.event.EntityNotFoundException;
+import school.faang.user_service.exceptions.event.NotFoundException;
 import school.faang.user_service.mapper.event.EventMapper;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.validator.event.EventValidator;
@@ -45,7 +45,7 @@ public class EventServiceImpl implements EventService {
 
     public EventDto deleteEvent(long eventId) {
         Event eventToDelete = eventRepository.findById(eventId)
-                .orElseThrow(() -> new EntityNotFoundException("event with id=" + eventId + " not found"));
+                .orElseThrow(() -> new NotFoundException("event with id=" + eventId + " not found"));
         eventRepository.deleteById(eventToDelete.getId());
         return mapper.toDto(eventToDelete);
     }
@@ -59,7 +59,7 @@ public class EventServiceImpl implements EventService {
 
     public EventDto getEvent(long eventId) {
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new EntityNotFoundException("event with id=" + eventId + " not found"));
+                .orElseThrow(() -> new NotFoundException("event with id=" + eventId + " not found"));
         return mapper.toDto(event);
     }
 

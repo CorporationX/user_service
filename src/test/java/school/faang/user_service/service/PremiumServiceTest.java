@@ -23,6 +23,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.PremiumMapper;
+import school.faang.user_service.publisher.PremiumBoughtEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 
@@ -49,6 +50,9 @@ class PremiumServiceTest {
     UserRepository userRepository;
     @Mock
     PremiumMapper premiumMapper;
+
+    @Mock
+    PremiumBoughtEventPublisher premiumBoughtEventPublisher;
     @Mock
     ExecutorService executorService;
     @InjectMocks
@@ -64,7 +68,7 @@ class PremiumServiceTest {
     User user;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         userId = 1;
         base = PremiumPeriod.BASE;
         standard = PremiumPeriod.STANDARD;
@@ -98,16 +102,17 @@ class PremiumServiceTest {
 
     @Test
     @DisplayName("User already has premium subscription")
-    public void testBuyPremium_UserAlreadyHasPremium(){
+    public void testBuyPremium_UserAlreadyHasPremium() {
         when(premiumRepository.existsByUserId(userId)).thenReturn(true);
 
         DataValidationException e = Assert.assertThrows(DataValidationException.class, () -> premiumService.buyPremium(userId, base));
 
         Assertions.assertEquals(e.getMessage(), "The user " + userId + " already has Premium subscription");
     }
+
     @Test
     @DisplayName("Internal payment operation exception")
-    public void testBuyPremium_InternalPaymentException(){
+    public void testBuyPremium_InternalPaymentException() {
         when(premiumRepository.existsByUserId(userId)).thenReturn(false);
         when(paymentServiceClient.sendPayment(Mockito.any(PaymentRequest.class))).thenReturn(ResponseEntity.badRequest().build());
 
@@ -118,9 +123,9 @@ class PremiumServiceTest {
 
     @Test
     @DisplayName("Successful buying premium")
-    public void testBuy(){
+    public void testBuy() {
         when(premiumRepository.existsByUserId(userId)).thenReturn(false);
-        when(paymentServiceClient.sendPayment(Mockito.any(PaymentRequest.class))).thenReturn(new ResponseEntity<PaymentResponse>(paymentResponse, HttpStatus.OK));
+        when(paymentServiceClient.sendPayment(Mockito.any(PaymentRequest.class))).thenReturn(new ResponseEntity<>(paymentResponse, HttpStatus.OK));
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(premiumRepository.save(Mockito.any(Premium.class))).thenReturn(premium);

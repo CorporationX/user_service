@@ -29,8 +29,10 @@ spring:
           name: profile_view_channel
         profile_search_channel:
           name: profile_search_channel
+        premium_bought_channel:
+          name: premium_bought_channel
   profiles:
-    active: dev
+    active: test
 
 server:
   port: 8080

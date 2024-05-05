@@ -4,20 +4,22 @@ import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.client.PaymentServiceClient;
 import school.faang.user_service.controller.premium.PremiumPeriod;
+import school.faang.user_service.dto.PremiumBoughtEvent;
+import school.faang.user_service.dto.PremiumDto;
 import school.faang.user_service.dto.payment.Currency;
 import school.faang.user_service.dto.payment.PaymentRequest;
 import school.faang.user_service.dto.payment.PaymentResponse;
-import school.faang.user_service.dto.PremiumDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.PremiumMapper;
+import school.faang.user_service.publisher.PremiumBoughtEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 
@@ -36,6 +38,7 @@ public class PremiumService {
     private final UserRepository userRepository;
     private final PremiumMapper premiumMapper;
     private final ExecutorService executorService;
+    private final PremiumBoughtEventPublisher premiumBoughtEventPublisher;
 
     @Value("${premium.remover.batchSize}")
     private int batchSize;
@@ -44,7 +47,7 @@ public class PremiumService {
     public PremiumDto buyPremium(long userId, PremiumPeriod premiumPeriod) {
         if (premiumRepository.existsByUserId(userId)) {
             log.warn("The user {} already has Premium subscription", userId);
-            throw new DataValidationException("The user "+userId+" already has Premium subscription");
+            throw new DataValidationException("The user " + userId + " already has Premium subscription");
         }
 
         PaymentRequest paymentRequest = generatePaymentRequest(userId, premiumPeriod);
@@ -56,6 +59,12 @@ public class PremiumService {
         PaymentResponse payment = paymentResponse.getBody();
 
         Premium premium = acqiurePremium(userId, premiumPeriod);
+
+        PremiumBoughtEvent premiumBoughtEvent = PremiumBoughtEvent.builder().userId(userId).
+                amount(paymentRequest.amount()).currency(paymentRequest.currency()).days(premiumPeriod.getDays())
+                .build();
+
+        premiumBoughtEventPublisher.publish(premiumBoughtEvent);
 
         return premiumMapper.toDto(premium);
     }

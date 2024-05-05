@@ -7,20 +7,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.recommendation.RecommendationEvent;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
-import school.faang.user_service.handler.exception.EntityNotFoundException;
+import school.faang.user_service.publisher.RecommendationEventPublisher;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 import school.faang.user_service.service.recommendation.impl.RecommendationRequestServiceImpl;
 import school.faang.user_service.validator.recommendation.RecommendationRequestValidator;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 public class RecommendationRequestServiceTest {
@@ -35,6 +34,8 @@ public class RecommendationRequestServiceTest {
     private RecommendationRequestMapper recommendationRequestMapper;
     @Mock
     private SkillRequestRepository skillRequestRepository;
+    @Mock
+    private RecommendationEventPublisher recommendationEventPublisher;
 
     @InjectMocks
     private RecommendationRequestServiceImpl recommendationRequestService;
@@ -78,5 +79,6 @@ public class RecommendationRequestServiceTest {
         Mockito.verify(recommendationRequestRepository, Mockito.times(1)).save(recommendationRequest);
         Mockito.verify(skillRequestRepository, Mockito.never()).create(Mockito.anyLong(), Mockito.anyLong());
         Mockito.verify(recommendationRequestMapper, Mockito.times(1)).toEntity(recommendationRequestDto);
+        Mockito.verify(recommendationEventPublisher, Mockito.times(1)).publish(Mockito.any(RecommendationEvent.class));
     }
 }

@@ -15,7 +15,7 @@ import school.faang.user_service.subscriber.UsersBanListener;
 public class RedisConfig {
     private final UsersBanListener usersBanListener;
 
-    @Value("${spring.data.redis.channels.search_appearance_topic.name}")
+    @Value("${spring.data.redis.channels.search_appearance_channel.name}")
     private String searchAppearanceTopic;
 
     @Value("${spring.data.redis.channels.recommendation_channel.name}")

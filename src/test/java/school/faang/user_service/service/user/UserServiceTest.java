@@ -20,7 +20,6 @@ import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.handler.exception.EntityNotFoundException;
-import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.mapper.user.UserMapperImpl;
 import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
@@ -73,7 +72,7 @@ public class UserServiceTest {
     @BeforeEach
     public void init() {
         userService = new UserService(userMapper, userValidator, userRepository, mentorshipService, goalService
-                , eventRepository, userFilters, searchAppearanceEventPublisher);
+                , eventRepository,userContext,profileViewEventPublisher, userFilters, searchAppearanceEventPublisher);
     }
 
     @Test

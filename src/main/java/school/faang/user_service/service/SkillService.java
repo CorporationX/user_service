@@ -19,7 +19,7 @@ public class SkillService {
     private final SkillRepository skillRepository;
     private final UserRepository userRepository;
     private final SkillMapper skillMapper;
-    static final int MIN_SKILL_OFFERS = 3;
+    private static final int MIN_SKILL_OFFERS = 3;
 
     public SkillDto create(SkillDto skillDto) {
         validateTitleRepetition(skillDto);

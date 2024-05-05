@@ -4,7 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.event.ProfileViewEvent;
+import school.faang.user_service.dto.event.UserEvent;
 
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.dto.messagebroker.SearchAppearanceEvent;
@@ -26,12 +29,14 @@ import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.handler.exception.DataValidationException;
 import school.faang.user_service.handler.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.MentorshipService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.validator.user.UserValidator;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -48,6 +53,8 @@ public class UserService {
     private final MentorshipService mentorshipService;
     private final GoalService goalService;
     private final EventRepository eventRepository;
+    private final UserContext userContext;
+    private final ProfileViewEventPublisher profileViewEventPublisher;
     private final List<UserFilter> userFilters;
     private final SearchAppearanceEventPublisher searchAppearanceEventPublisher;
 
@@ -83,6 +90,10 @@ public class UserService {
     public UserDto getUserDtoById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("User with id: %s not found", userId)));
+        ProfileViewEvent profileViewEvent = ProfileViewEvent.builder()
+                .viewedUserId(userId).viewingUserId(userContext.getUserId()).viewedAt(LocalDateTime.now()).build();
+        profileViewEventPublisher.publish(profileViewEvent);
+        log.info("Отправлен profileViewEvent");
         return userMapper.toDto(user);
     }
 

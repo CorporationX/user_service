@@ -26,13 +26,13 @@ public class RecommendationController {
     }
 
     @PostMapping("/recommendation/deleted")
-    public void deleteRecommendation(RecommendationDto recommendationDto) {
+    public void deleteRecommendation(@RequestBody RecommendationDto recommendationDto) {
         recommendationValidation(recommendationDto);
         recommendationService.delete(recommendationDto.getId());
     }
 
     @GetMapping
-    public Page<RecommendationDto> getAllUserRecommendations(@RequestParam(name = "receiver_id") long receiverId,
+    public Page<RecommendationDto> getAllUserRecommendations(@PathVariable("receiver_id") long receiverId,
                                                              @RequestParam(name = "page_number") int pageNum,
                                                              @RequestParam(name = "page_size") int pageSize) {
         idValidation(receiverId);
@@ -40,7 +40,7 @@ public class RecommendationController {
     }
 
     @GetMapping
-    public Page<RecommendationDto> getAllRecommendation(@RequestParam(name = "author_id") long authorId,
+    public Page<RecommendationDto> getAllRecommendation(@PathVariable("author_id") long authorId,
                                                         @RequestParam(name = "page_number") int pageNum,
                                                         @RequestParam(name = "page_size") int pageSize) {
         idValidation(authorId);

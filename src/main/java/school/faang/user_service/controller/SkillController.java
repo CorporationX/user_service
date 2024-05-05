@@ -34,7 +34,7 @@ public class SkillController {
         return skillService.getOfferedSkills(userId);
     }
 
-    public Optional<SkillDto> acquireSkillFromOffers(long skillId, long userId) {
+    public SkillDto acquireSkillFromOffers(long skillId, long userId) {
         return skillService.acquireSkillFromOffers(skillId, userId);
     }
 }

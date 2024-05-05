@@ -11,7 +11,6 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 
 @Component
@@ -20,6 +19,7 @@ public class SkillService {
     private final SkillRepository skillRepository;
     private final UserRepository userRepository;
     private final SkillMapper skillMapper;
+    static final int MIN_SKILL_OFFERS = 3;
 
     public SkillDto create(SkillDto skillDto) {
         validateTitleRepetition(skillDto);
@@ -58,21 +58,17 @@ public class SkillService {
         return skillRepository.countOffersByUserIdAndSkillId(userId, skillId);
     }
 
-    public Optional<SkillDto> acquireSkillFromOffers(long skillId, long userId) {
+    public SkillDto acquireSkillFromOffers(long skillId, long userId) {
         checkNotNullSkillIdOrUserId(skillId, userId);
         if (hasAlreadyAcquiredSkill(skillId, userId) || !hasEnoughSkillOffers(skillId, userId)) {
-            return Optional.empty();
+            throw new IllegalStateException("Пользователь уже приобрел этот навык или у него недостаточно предложений по навыкам.");
         }
 
         skillRepository.assignSkillToUser(skillId, userId);
 
         return skillRepository.findById(skillId)
-                .map(skill -> {
-                    SkillDto acquiredSkillDto = new SkillDto();
-                    acquiredSkillDto.setId(skill.getId());
-                    acquiredSkillDto.setTitle(skill.getTitle());
-                    return acquiredSkillDto;
-                });
+                .map(skillMapper::skillToDto)
+                .orElseThrow(() -> new IllegalStateException("Не удалось найти приобретенный навык с помощью id:" + skillId));
     }
 
     private boolean hasAlreadyAcquiredSkill(long skillId, long userId) {
@@ -80,7 +76,6 @@ public class SkillService {
     }
 
      private boolean hasEnoughSkillOffers(long skillId, long userId) {
-        final int MIN_SKILL_OFFERS = 3;
         return getSkillOffersNumber(skillId, userId) >= MIN_SKILL_OFFERS;
     }
 

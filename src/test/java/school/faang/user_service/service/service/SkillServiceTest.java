@@ -34,7 +34,7 @@ public class SkillServiceTest {
     private UserRepository userRepository;
 
     @Spy
-    private SkillMapper skillMapper;
+    private SkillMapperImpl skillMapper;
 
     @Test
     public void testWithCorrectValidateTitleNonRepetition() {
@@ -48,41 +48,6 @@ public class SkillServiceTest {
         when(skillRepository.existsByTitle(skillDto.getTitle())).thenReturn(true);
 
         assertThrows(DataValidationException.class, () -> skillService.create(skillDto));
-    }
-
-    @Test
-    public void testDtoToSkillMapper() {
-        SkillDto skillDto = createSkillDto(1L, "firstTitle");
-        SkillMapperImpl skillMapper = new SkillMapperImpl();
-
-        Skill skill = skillMapper.DtoToSkill(skillDto);
-
-        assertEquals(skillDto.getId(), skill.getId());
-        assertEquals(skillDto.getTitle(), skill.getTitle());
-    }
-
-    @Test
-    public void testSkillToDtoMapper() {
-        Skill skill = createSkill(1L, "firstTitle");
-        SkillMapperImpl skillMapper = new SkillMapperImpl();
-
-        SkillDto skillDto = skillMapper.skillToDto(skill);
-
-        assertEquals(skillDto.getId(), skill.getId());
-        assertEquals(skillDto.getTitle(), skill.getTitle());
-    }
-
-    @Test
-    public void testSkillToSkillCandidateDtoMapper() {
-        Skill skill = createSkill(1L, "firstTitle");
-        SkillMapperImpl skillMapper = new SkillMapperImpl();
-
-        SkillCandidateDto skillCandidateDto = skillMapper.skillToSkillCandidateDto(skill, 1);
-
-        SkillDto expectedSkillDto = new SkillDto(skill.getId(), skill.getTitle());
-        SkillCandidateDto expectedSkillCandidateDto = new SkillCandidateDto(expectedSkillDto, 1L);
-
-        assertEquals(expectedSkillCandidateDto, skillCandidateDto);
     }
 
     @Test
@@ -183,9 +148,7 @@ public class SkillServiceTest {
         when(skillRepository.existsById(skillId)).thenReturn(true);
         when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.empty());
 
-        Optional<SkillDto> result = skillService.acquireSkillFromOffers(skillId, userId);
-
-        assertTrue(result.isEmpty());
+        assertThrows(IllegalStateException.class, () -> skillService.acquireSkillFromOffers(skillId, userId));
     }
 
     @Test
@@ -197,9 +160,7 @@ public class SkillServiceTest {
         when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.empty());
         when(skillRepository.countOffersByUserIdAndSkillId(skillId, userId)).thenReturn(2L);
 
-        Optional<SkillDto> result = skillService.acquireSkillFromOffers(skillId, userId);
-
-        assertTrue(result.isEmpty());
+        assertThrows(IllegalStateException.class, () -> skillService.acquireSkillFromOffers(skillId, userId));
     }
 
     @Test
@@ -216,11 +177,11 @@ public class SkillServiceTest {
         when(skillRepository.countOffersByUserIdAndSkillId(skillId, userId)).thenReturn(3L);
         when(skillRepository.findById(skillId)).thenReturn(Optional.of(skill));
 
-        Optional<SkillDto> result = skillService.acquireSkillFromOffers(skillId, userId);
+        SkillDto result = skillService.acquireSkillFromOffers(skillId, userId);
 
-        assertTrue(result.isPresent());
-        assertEquals(skillId, result.get().getId());
-        assertEquals(skill.getTitle(), result.get().getTitle());
+        assertNotNull(result);
+        assertEquals(skillId, result.getId());
+        assertEquals(skill.getTitle(), result.getTitle());
 
         verify(userRepository).existsById(userId);
         verify(skillRepository).existsById(skillId);

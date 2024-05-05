@@ -13,7 +13,6 @@ import school.faang.user_service.service.SkillService;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -67,6 +66,7 @@ public class SkillControllerTest {
         List<SkillDto> actualSkills = skillController.getUserSkills(userId);
 
         assertEquals(expectedSkills, actualSkills);
+        verify(skillService).getUserSkills(userId);
     }
 
     @Test
@@ -86,10 +86,10 @@ public class SkillControllerTest {
     public void testAcquireSkillFromOffers() {
         long userId = 1;
         long skillId = 1;
-        Optional<SkillDto> expectedSkillDto = Optional.of(createSkillDto("title"));
+        SkillDto expectedSkillDto = createSkillDto("title");
         when(skillService.acquireSkillFromOffers(skillId, userId)).thenReturn(expectedSkillDto);
 
-        Optional<SkillDto> skillDtoList = skillController.acquireSkillFromOffers(skillId, userId);
+        SkillDto skillDtoList = skillController.acquireSkillFromOffers(skillId, userId);
 
         assertEquals(expectedSkillDto, skillDtoList);
     }

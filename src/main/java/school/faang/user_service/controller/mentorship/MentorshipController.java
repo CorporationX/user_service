@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.mentorship;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.UserDto;
@@ -12,37 +13,19 @@ import java.util.List;
 public class MentorshipController {
     private final MentorshipService mentorshipService;
 
-    public List<UserDto> getMentees(Long userId) {
-        if (userId == null) {
-            throw new NullPointerException("User id " + userId + " is null");
-        }
+    public List<UserDto> getMentees(@NonNull Long userId) {
         return mentorshipService.getMentees(userId);
     }
 
-    public List<UserDto> getMentors(Long userId) {
-        if (userId == null) {
-            throw new NullPointerException("User id " + userId + " is null");
-        }
+    public List<UserDto> getMentors(@NonNull Long userId) {
         return mentorshipService.getMentors(userId);
     }
 
-    public void deleteMentee(Long menteeId, Long mentorId) {
-        if (menteeId == null) {
-            throw new NullPointerException("Mentee id: " + menteeId + " is null");
-        }
-        if (mentorId == null) {
-            throw new NullPointerException("Mentor id: " + mentorId + " is null");
-        }
+    public void deleteMentee(@NonNull Long menteeId, @NonNull Long mentorId) {
         mentorshipService.deleteMentee(menteeId, mentorId);
     }
 
-    public void deleteMentor(Long menteeId, Long mentorId) {
-        if (menteeId == null) {
-            throw new NullPointerException("Mentee id: " + menteeId + " is null");
-        }
-        if (mentorId == null) {
-            throw new NullPointerException("Mentor id: " + mentorId + " is null");
-        }
+    public void deleteMentor(@NonNull Long menteeId, @NonNull Long mentorId) {
         mentorshipService.deleteMentor(menteeId, mentorId);
     }
 }

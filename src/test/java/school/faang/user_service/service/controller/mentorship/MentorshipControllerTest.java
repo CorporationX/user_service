@@ -28,7 +28,9 @@ public class MentorshipControllerTest {
 
     @Test
     public void testGetMenteesWithNullParameter() {
-        assertThrows(NullPointerException.class, () -> mentorshipController.getMentees(null));
+        var exception = assertThrows(NullPointerException.class,
+                () -> mentorshipController.getMentees(null));
+        assertEquals("userId is marked non-null but is null", exception.getMessage());
     }
 
     @Test
@@ -43,7 +45,9 @@ public class MentorshipControllerTest {
 
     @Test
     public void testGetMentorsWithNullParameter() {
-        assertThrows(NullPointerException.class, () -> mentorshipController.getMentors(null));
+        var exception = assertThrows(NullPointerException.class,
+                () -> mentorshipController.getMentors(null));
+        assertEquals("userId is marked non-null but is null", exception.getMessage());
     }
 
     @Test
@@ -58,7 +62,9 @@ public class MentorshipControllerTest {
 
     @Test
     public void testDeleteMenteeWithNullMenteeParameter() {
-        assertThrows(NullPointerException.class, () -> mentorshipController.deleteMentee(null, 1L));
+        var exception = assertThrows(NullPointerException.class,
+                () -> mentorshipController.deleteMentee(null, 1L));
+        assertEquals("menteeId is marked non-null but is null", exception.getMessage());
     }
 
     @Test
@@ -69,17 +75,23 @@ public class MentorshipControllerTest {
 
     @Test
     public void testDeleteMenteeWithNullMentorParameter() {
-        assertThrows(NullPointerException.class, () -> mentorshipController.deleteMentee(1L, null));
+        var exception = assertThrows(NullPointerException.class,
+                () -> mentorshipController.deleteMentee(1L, null));
+        assertEquals("mentorId is marked non-null but is null", exception.getMessage());
     }
 
     @Test
     public void testDeleteMentorWithNullMenteeParameter() {
-        assertThrows(NullPointerException.class, () -> mentorshipController.deleteMentor(null, 1L));
+        var exception = assertThrows(NullPointerException.class,
+                () -> mentorshipController.deleteMentor(null, 1L));
+        assertEquals("menteeId is marked non-null but is null", exception.getMessage());
     }
 
     @Test
     public void testDeleteMentorWithNullMentorParameter() {
-        assertThrows(NullPointerException.class, () -> mentorshipController.deleteMentor(1L, null));
+        var exception = assertThrows(NullPointerException.class,
+                () -> mentorshipController.deleteMentor(1L, null));
+        assertEquals("mentorId is marked non-null but is null", exception.getMessage());
     }
 
     @Test

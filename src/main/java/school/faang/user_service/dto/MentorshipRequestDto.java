@@ -2,8 +2,10 @@ package school.faang.user_service.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 
@@ -11,6 +13,8 @@ import java.time.LocalDateTime;
 
 @Builder
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class MentorshipRequestDto{
 
     @NotNull
@@ -21,10 +25,10 @@ public class MentorshipRequestDto{
     private String description;
 
     @NotNull(message = "Mentee cannot be blank")
-    private User requester;
+    private long requesterId;
 
     @NotNull(message = "Mentor cannot be blank")
-    private User receiver;
+    private long receiverId;
 
     private RequestStatus status;
 

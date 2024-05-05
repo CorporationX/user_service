@@ -54,7 +54,7 @@ public class GoalService {
         goalValidator.validateBeforeUpdate(goalToUpdate, goalDto);
         updateFields(goalToUpdate, goalDto);
 
-        if (goalDto.getStatus() == GoalStatus.COMPLETED) {
+        if (goalDto.getStatus().equals(GoalStatus.COMPLETED)) {
             assignSkillToUser(goalToUpdate);
             goalToUpdate.setStatus(GoalStatus.COMPLETED);
         }

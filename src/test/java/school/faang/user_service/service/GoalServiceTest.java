@@ -26,6 +26,7 @@ import school.faang.user_service.mapper.GoalMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.goal.GoalService;
+import school.faang.user_service.validator.GoalValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +69,9 @@ public class GoalServiceTest {
     @Mock
     private List<GoalFilter> goalFilters;
 
+    @Mock
+    private GoalValidator goalValidator;
+
     @Spy
     private GoalMapperImpl goalMapper;
 
@@ -97,7 +101,7 @@ public class GoalServiceTest {
                 .title("title")
                 .description("desc")
                 .parentId(parent.getId())
-                .status(GoalStatus.COMPLETED)
+                .status(GoalStatus.ACTIVE)
                 .skillIds(skillIds)
                 .build();
     }
@@ -135,6 +139,7 @@ public class GoalServiceTest {
                 .title("old title")
                 .description("old desc")
                 .skillsToAchieve(List.of(new Skill()))
+                .status(GoalStatus.ACTIVE)
                 .parent(new Goal())
                 .users(List.of(user))
                 .build();

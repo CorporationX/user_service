@@ -1,7 +1,5 @@
 package school.faang.user_service.service;
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -41,26 +39,25 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static school.faang.user_service.exception.ExceptionMessage.REPEATED_SUBSCRIPTION_EXCEPTION;
 
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @ExtendWith(MockitoExtension.class)
 class SubscriptionServiceTest {
     @Mock
-    SubscriptionRepository subscriptionRepo;
+    private SubscriptionRepository subscriptionRepo;
 
     @Mock
-    UserMapper userMapper;
+    private UserMapper userMapper;
 
     @Spy
     @InjectMocks
-    SubscriptionService subscriptionService;
+    private SubscriptionService subscriptionService;
 
-    ArgumentCaptor<Long> followerArgumentCaptor;
-    ArgumentCaptor<Long> followeeArgumentCaptor;
+    private ArgumentCaptor<Long> followerArgumentCaptor;
+    private ArgumentCaptor<Long> followeeArgumentCaptor;
 
-    Long followerId;
-    Long followeeId;
-    List<UserFilter> filters;
-    UserFilterDto filterDto;
+    private Long followerId;
+    private Long followeeId;
+    private List<UserFilter> filters;
+    private UserFilterDto filterDto;
 
     @BeforeEach
     void init() {

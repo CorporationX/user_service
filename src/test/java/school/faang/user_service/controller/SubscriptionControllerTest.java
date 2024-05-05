@@ -1,8 +1,6 @@
 package school.faang.user_service.controller;
 
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -23,21 +21,20 @@ import static org.mockito.Mockito.verify;
 import static school.faang.user_service.exception.ExceptionMessage.USER_FOLLOWING_HIMSELF_EXCEPTION;
 import static school.faang.user_service.exception.ExceptionMessage.USER_UNFOLLOWING_HIMSELF_EXCEPTION;
 
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @ExtendWith(MockitoExtension.class)
 class SubscriptionControllerTest {
     @Mock
-    SubscriptionService subscriptionService;
+    private SubscriptionService subscriptionService;
 
     @InjectMocks
-    SubscriptionController subscriptionController;
+    private SubscriptionController subscriptionController;
 
-    ArgumentCaptor<Long> followerArgumentCaptor;
-    ArgumentCaptor<Long> followeeArgumentCaptor;
-    ArgumentCaptor<UserFilterDto> filterArgumentCaptor;
+    private ArgumentCaptor<Long> followerArgumentCaptor;
+    private ArgumentCaptor<Long> followeeArgumentCaptor;
+    private ArgumentCaptor<UserFilterDto> filterArgumentCaptor;
 
-    Long followerId;
-    Long followeeId;
+    private Long followerId;
+    private Long followeeId;
 
     @BeforeEach
     void init() {

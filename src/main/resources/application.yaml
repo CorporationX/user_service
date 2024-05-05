@@ -52,6 +52,6 @@ services:
     bucket-name: user_backet
     isMocked: true
 
-req:
-  period:
-    min: 3
+minimum:
+  request:
+    period: 3

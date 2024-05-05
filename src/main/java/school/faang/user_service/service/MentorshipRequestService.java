@@ -15,7 +15,7 @@ import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.filter.MentorshipRequestFilter;
-import school.faang.user_service.util.MentorshipValidator;
+import school.faang.user_service.validator.MentorshipRequestValidator;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,24 +29,24 @@ public class MentorshipRequestService {
 
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final MentorshipRequestMapper mentorshipRequestMapper;
-    private final MentorshipValidator validator;
+    private final MentorshipRequestValidator mentorshipRequestValidator;
     private final List<MentorshipRequestFilter> mentorshipRequestFilters;
 
     @Transactional
-    public MentorshipResponseDto requestMentorship(MentorshipRequestDto dto) {
-        long requesterId = dto.getRequesterId();
-        long receiverId = dto.getReceiverId();
+    public MentorshipResponseDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
+        long requesterId = mentorshipRequestDto.getRequesterId();
+        long receiverId = mentorshipRequestDto.getReceiverId();
 
-        validator.validateEqualsId(requesterId, receiverId);
-        validator.validateForEmptyRequester(requesterId);
-        validator.validateForEmptyReceiver(receiverId);
+        mentorshipRequestValidator.validateEqualsId(requesterId, receiverId);
+        mentorshipRequestValidator.validateForEmptyRequester(requesterId);
+        mentorshipRequestValidator.validateForEmptyReceiver(receiverId);
 
         Optional<MentorshipRequest> lastRequest = mentorshipRequestRepository.findLatestRequest(requesterId, receiverId);
-        lastRequest.ifPresent(validator::validateLastRequest);
+        lastRequest.ifPresent(mentorshipRequestValidator::validateLastRequest);
 
         log.info("Create mentorship request from {} to {}", requesterId, receiverId);
 
-        MentorshipRequest resultRequest = mentorshipRequestRepository.create(requesterId, receiverId, dto.getDescription());
+        MentorshipRequest resultRequest = mentorshipRequestRepository.create(requesterId, receiverId, mentorshipRequestDto.getDescription());
         log.info("Mentorship request with ID: {} and with status: {} was created", resultRequest.getId(), resultRequest.getStatus());
         return mentorshipRequestMapper.mentorshipRequestToResponseDto(resultRequest);
     }
@@ -64,12 +64,12 @@ public class MentorshipRequestService {
 
     @Transactional
     public MentorshipResponseDto acceptRequest(long id) {
-        MentorshipRequest request = validateExistsRequest(id);
+        MentorshipRequest request = validateExistsRequestAndGet(id);
 
         User requester = request.getRequester();
         User receiver = request.getReceiver();
 
-        validator.validateExistMentorInRequesterList(requester, receiver);
+        mentorshipRequestValidator.validateExistMentorInRequesterList(requester, receiver);
 
         requester.getMentors().add(receiver);
         request.setStatus(RequestStatus.ACCEPTED);
@@ -79,13 +79,13 @@ public class MentorshipRequestService {
 
     @Transactional
     public MentorshipResponseDto rejectRequest(long id, RejectionDto rejection) {
-        MentorshipRequest request = validateExistsRequest(id);
+        MentorshipRequest request = validateExistsRequestAndGet(id);
         request.setStatus(RequestStatus.REJECTED);
         request.setRejectionReason(rejection.getReason());
         return mentorshipRequestMapper.mentorshipRequestToResponseDto(request);
     }
 
-    private MentorshipRequest validateExistsRequest(long id) {
+    private MentorshipRequest validateExistsRequestAndGet(long id) {
         Optional<MentorshipRequest> request = mentorshipRequestRepository.findById(id);
         if (request.isEmpty()) {
             String errMessage = "Mentorship request with ID " + id + " not found!";

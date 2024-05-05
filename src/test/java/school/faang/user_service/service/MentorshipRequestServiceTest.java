@@ -1,9 +1,11 @@
 package school.faang.user_service.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.MentorshipRequestFilterDto;
@@ -18,7 +20,7 @@ import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.filter.MentorshipRequestDescriptionFilter;
 import school.faang.user_service.service.filter.MentorshipRequestFilter;
-import school.faang.user_service.util.MentorshipValidator;
+import school.faang.user_service.validator.MentorshipRequestValidator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -50,7 +52,7 @@ class MentorshipRequestServiceTest {
     private MentorshipRequestMapper mentorshipRequestMapper;
 
     @Mock
-    private MentorshipValidator validator;
+    private MentorshipRequestValidator validator;
 
     @Mock
     private List<MentorshipRequestFilter> mentorshipRequestFilters;
@@ -58,14 +60,20 @@ class MentorshipRequestServiceTest {
     @InjectMocks
     private MentorshipRequestService mentorshipRequestService;
 
+    @BeforeEach
+    void init() {
+        MentorshipRequestFilter filterMock = Mockito.mock(MentorshipRequestFilter.class);
+        List<MentorshipRequestFilter> mentorshipRequestFilters = List.of(filterMock);
+    }
+
     @Test
     public void requestMentorshipWhenUsersIdsEquals() {
         MentorshipRequestDto requestDto = new MentorshipRequestDto(REQ_DESCRIPTION, REQUESTER_ID, REQUESTER_ID);
 
-        doThrow(new DataValidationException(MentorshipValidator.SAME_USER_ERR)).when(validator).validateEqualsId(REQUESTER_ID, REQUESTER_ID);
+        doThrow(new DataValidationException(MentorshipRequestValidator.SAME_USER_ERR)).when(validator).validateEqualsId(REQUESTER_ID, REQUESTER_ID);
 
         DataValidationException exception = assertThrows(DataValidationException.class, () -> mentorshipRequestService.requestMentorship(requestDto));
-        assertThat(exception.getMessage()).isEqualTo(MentorshipValidator.SAME_USER_ERR);
+        assertThat(exception.getMessage()).isEqualTo(MentorshipRequestValidator.SAME_USER_ERR);
     }
 
     @Test
@@ -208,6 +216,4 @@ class MentorshipRequestServiceTest {
         MentorshipResponseDto actualResult = mentorshipRequestService.rejectRequest(RESPONSE_ID, rejection);
         assertEquals(responseDto, actualResult);
     }
-
-
 }

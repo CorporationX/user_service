@@ -1,4 +1,4 @@
-package school.faang.user_service.util;
+package school.faang.user_service.validator;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ import java.util.Optional;
 @Getter
 @Component
 @RequiredArgsConstructor
-public class MentorshipValidator {
+public class MentorshipRequestValidator {
 
     public static final String REQUEST_MSG_ERR = "Request description can't be empty";
     public static final String SAME_USER_ERR = "Requester can't be the same as a receiver";
@@ -28,7 +28,7 @@ public class MentorshipValidator {
     private final UserRepository userRepository;
     private final MentorshipRequestRepository mentorshipRequestRepository;
 
-    @Value("${req.period.min}")
+    @Value("${minimum.request.period}")
     private int MIN_REQ_PERIOD;
 
     public void validateRequest(MentorshipRequestDto dto) {

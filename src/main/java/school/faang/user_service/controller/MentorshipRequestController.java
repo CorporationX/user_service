@@ -15,25 +15,23 @@ import school.faang.user_service.dto.MentorshipResponseDto;
 import school.faang.user_service.dto.MentorshipRequestFilterDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.service.MentorshipRequestService;
-import school.faang.user_service.util.MentorshipValidator;
+import school.faang.user_service.validator.MentorshipRequestValidator;
 
 import java.util.List;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/mentorship")
+@RequestMapping("/mentorship/request")
 public class MentorshipRequestController {
-
-
     private final MentorshipRequestService mentorshipRequestService;
-    private final MentorshipValidator validator;
+    private final MentorshipRequestValidator mentorshipRequestValidator;
 
-    @PostMapping("/request")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public MentorshipResponseDto requestMentorship(@RequestBody MentorshipRequestDto dto) {
-        validator.validateRequest(dto);
-        return mentorshipRequestService.requestMentorship(dto);
+    public MentorshipResponseDto requestMentorship(@RequestBody MentorshipRequestDto mentorshipRequestDto) {
+        mentorshipRequestValidator.validateRequest(mentorshipRequestDto);
+        return mentorshipRequestService.requestMentorship(mentorshipRequestDto);
     }
 
     @GetMapping("/filter")
@@ -41,16 +39,14 @@ public class MentorshipRequestController {
         return mentorshipRequestService.getRequests(filter);
     }
 
-    //Не придумал чем заменить глагол "accept"
-    @PostMapping("/request/accept/{id}")
-    public MentorshipResponseDto acceptRequest(@PathVariable("id") long id) {
+    @PostMapping("/approval/{id}")
+    public MentorshipResponseDto acceptRequest(@PathVariable long id) {
         return mentorshipRequestService.acceptRequest(id);
     }
 
-    //Не придумал чем заменить глагол "reject"
-    @PostMapping("/request/reject/{id}")
-    public MentorshipResponseDto rejectRequest(@PathVariable("id") long id, @RequestBody RejectionDto rejection) {
-        validator.validateRejectionDto(rejection);
+    @PostMapping("/rejection/{id}")
+    public MentorshipResponseDto rejectRequest(@PathVariable long id, @RequestBody RejectionDto rejection) {
+        mentorshipRequestValidator.validateRejectionDto(rejection);
         return mentorshipRequestService.rejectRequest(id, rejection);
     }
 }

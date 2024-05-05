@@ -16,6 +16,8 @@ import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.util.List;
 
+import static school.faang.user_service.exception.MessageForGoalInvitationService.*;
+
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -24,81 +26,60 @@ public class GoalInvitationService {
     final GoalRepository goalRepository;
     final UserRepository userRepository;
     final GoalInvitationMapper goalInvitationMapper;
+    static final int SETGOALSIZE = 3;
     GoalInvitation goalInvitation;
-    RuntimeException runtimeException = new RuntimeException();
 
     public GoalInvitationDto createInvitation(GoalInvitationDto goalInvitationDto) {
-        if (goalInvitationDto.getInviterId() != null && goalInvitationDto.getInvitedUserId() != null) {
-            if (!goalInvitationDto.getInviterId().equals(goalInvitationDto.getInvitedUserId())) {
-                if (userRepository.existsById(goalInvitationDto.getInviterId()) && userRepository.existsById(goalInvitationDto.getInvitedUserId())) {
-                    goalInvitation = goalInvitationMapper.toEntity(goalInvitationDto);
-
-                    goalInvitation.setInviter(userRepository.findById(goalInvitationDto.getInviterId()).get());
-                    goalInvitation.setInvited(userRepository.findById(goalInvitationDto.getInvitedUserId()).get());
-                    goalInvitation.setGoal(goalRepository.findById(goalInvitationDto.getGoalId()).get());
-
-                    goalInvitationRepository.save(goalInvitation);
-                    return goalInvitationMapper.toDto(goalInvitation);
-                } else {
-                    throw new RuntimeException("There is no such inviter or invitedUser in database");
-                }
-            } else {
-                throw new RuntimeException("InviterId equals InvitedUserId");
-            }
-        } else {
-            throw new RuntimeException("InviterId == null or InvitedUserId == null");
+        if (goalInvitationDto == null) {
+            throw new RuntimeException(INPUT_IS_NULL.getMessage());
         }
+        goalInvitation = goalInvitationMapper.toEntity(goalInvitationDto);
+        Long inviterId = goalInvitationDto.getInviterId();
+        Long invitedUserId = goalInvitationDto.getInvitedUserId();
+        goalInvitation.setInviter(userRepository.findById(inviterId).orElseThrow(() -> new RuntimeException(INVITER_ID_IS_NULL.getMessage())));
+        goalInvitation.setInvited(userRepository.findById(invitedUserId).orElseThrow(() -> new RuntimeException(INVITED_USER_ID_IS_NULL.getMessage())));
+        if (inviterId.equals(invitedUserId)) {
+            throw new RuntimeException(INVITER_ID_EQUALS_INVITED_USER_ID.getMessage());
+        }
+        goalInvitation.setGoal(goalRepository.findById(goalInvitationDto.getGoalId()).orElseThrow(() -> new RuntimeException(NO_GOAL_IN_DB.getMessage())));
+
+        goalInvitationRepository.save(goalInvitation);
+        return goalInvitationMapper.toDto(goalInvitation);
     }
 
     public void acceptGoalInvitation(long id) {
-        if (goalInvitationRepository.existsById(id)) {
-            goalInvitation = goalInvitationRepository.findById(id).get();
-            if (goalRepository.existsById(goalInvitation.getGoal().getId())) {
-                Goal goal = goalRepository.findById(goalInvitation.getGoal().getId()).get();
-                List<Goal> setGoals = goalInvitation.getInvited().getSetGoals();
-                if (setGoals.size() < 3) {
-                    if (!setGoals.contains(goal)) {
-                        goalInvitation.setStatus(RequestStatus.ACCEPTED);
-                        goalInvitation.getInvited().getGoals().add(goal);
-                    } else {
-                        throw new RuntimeException("Invited already has such goal");
-                    }
-                } else {
-                    throw new RuntimeException("SetGoals > 3");
-                }
-            } else {
-                throw new RuntimeException("There is no such goal in database");
-            }
-        } else {
-            throw new RuntimeException("There is no such goalInvitation in database");
+        goalInvitation = goalInvitationRepository.findById(id).orElseThrow(() -> new RuntimeException(NO_GOAL_INVITATION_IN_DB.getMessage()));
+        Goal goal = goalRepository.findById(goalInvitation.getGoal().getId()).orElseThrow(() -> new RuntimeException(NO_GOAL_IN_DB.getMessage()));
+        List<Goal> setGoals = goalInvitation.getInvited().getSetGoals();
+        if (setGoals.size() > SETGOALSIZE) {
+            throw new RuntimeException(MORE_THEN_THREE_GOALS.getMessage());
         }
+        if (setGoals.contains(goal)) {
+            throw new RuntimeException(INVITED_HAS_GOAL.getMessage());
+        }
+        goalInvitation.setStatus(RequestStatus.ACCEPTED);
+        goalInvitation.getInvited().getGoals().add(goal);
+        goalInvitationRepository.save(goalInvitation);
     }
 
     public void rejectGoalInvitation(long id) {
-        if (goalInvitationRepository.existsById(id)) {
-            goalInvitation = goalInvitationRepository.findById(id).get();
-            if (goalRepository.existsById(goalInvitation.getGoal().getId())) {
-                goalInvitation.setStatus(RequestStatus.REJECTED);
-            } else {
-                throw new RuntimeException("There is no such goal in database");
-            }
-        } else {
-            throw new RuntimeException("There is no such goalInvitation in database");
-        }
+        goalInvitation = goalInvitationRepository.findById(id).orElseThrow(() -> new RuntimeException(NO_GOAL_INVITATION_IN_DB.getMessage()));
+        goalRepository.findById(goalInvitation.getGoal().getId()).orElseThrow(() -> new RuntimeException(NO_GOAL_IN_DB.getMessage()));
+        goalInvitation.setStatus(RequestStatus.REJECTED);
+        goalInvitationRepository.save(goalInvitation);
     }
 
     public List<GoalInvitation> getInvitations(InvitationFilterDto filter) {
-        if (filter != null) {
-            return goalInvitationRepository.findAll().stream().
-                    filter(goalInvitation -> goalInvitation.getInvited() != null && goalInvitation.getInviter() != null &&
-                            goalInvitation.getInvited().getUsername() != null && goalInvitation.getInviter().getUsername() != null).
-                    filter(goalInvitation -> goalInvitation.getInvited().getId() == filter.getInvitedId()).
-                    filter(goalInvitation -> goalInvitation.getInviter().getId() == filter.getInviterId()).
-                    filter(goalInvitation -> goalInvitation.getInvited().getUsername().equals(filter.getInvitedNamePattern())).
-                    filter(goalInvitation -> goalInvitation.getInviter().getUsername().equals(filter.getInviterNamePattern())).
-                    toList();
-        } else {
-            throw new RuntimeException("InvitationFilterDto is null");
+        if (filter == null) {
+            throw new RuntimeException(INPUT_IS_NULL.getMessage());
         }
+        return goalInvitationRepository.findAll().stream().
+                filter(goalInvitation -> goalInvitation.getInvited() != null && goalInvitation.getInviter() != null &&
+                        goalInvitation.getInvited().getUsername() != null && goalInvitation.getInviter().getUsername() != null).
+                filter(goalInvitation -> goalInvitation.getInvited().getId() == filter.getInvitedId()).
+                filter(goalInvitation -> goalInvitation.getInviter().getId() == filter.getInviterId()).
+                filter(goalInvitation -> goalInvitation.getInvited().getUsername().equals(filter.getInvitedNamePattern())).
+                filter(goalInvitation -> goalInvitation.getInviter().getUsername().equals(filter.getInviterNamePattern())).
+                toList();
     }
 }

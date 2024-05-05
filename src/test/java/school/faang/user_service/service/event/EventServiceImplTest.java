@@ -1,5 +1,6 @@
 package school.faang.user_service.service.event;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InOrder;
@@ -39,14 +40,30 @@ class EventServiceImplTest {
     @InjectMocks
     private EventServiceImpl service;
 
+    private final long id = 1L;
+    private Event event1;
+    private Event event2;
+    private EventDto eventDto1;
+    private EventDto eventDto2;
+
+    @BeforeEach
+    void init() {
+        event1 = Event.builder()
+                .id(1L)
+                .build();
+        event2 = Event.builder()
+                .id(2L)
+                .build();
+        eventDto1 = EventDto.builder()
+                .id(1L)
+                .build();
+        eventDto2 = EventDto.builder()
+                .id(2L)
+                .build();
+    }
+
     @Test
     void getParticipatedEvents() {
-        long id = 1L;
-        Event event1 = Event.builder().id(1L).build();
-        Event event2 = Event.builder().id(2L).build();
-        EventDto eventDto1 = EventDto.builder().id(1L).build();
-        EventDto eventDto2 = EventDto.builder().id(2L).build();
-
         when(eventRepository.findParticipatedEventsByUserId(id)).thenReturn(List.of(event1, event2));
         when(mapper.toDto(event1)).thenReturn(eventDto1);
         when(mapper.toDto(event2)).thenReturn(eventDto2);
@@ -62,20 +79,6 @@ class EventServiceImplTest {
 
     @Test
     void getOwnedEvents() {
-        long id = 1L;
-        Event event1 = Event.builder()
-                .id(1L)
-                .build();
-        Event event2 = Event.builder()
-                .id(2L)
-                .build();
-        EventDto eventDto1 = EventDto.builder()
-                .id(1L)
-                .build();
-        EventDto eventDto2 = EventDto.builder()
-                .id(2L)
-                .build();
-
         when(eventRepository.findAllByUserId(id)).thenReturn(List.of(event1, event2));
         when(mapper.toDto(event1)).thenReturn(eventDto1);
         when(mapper.toDto(event2)).thenReturn(eventDto2);
@@ -91,14 +94,8 @@ class EventServiceImplTest {
 
     @Test
     void updateEvent() {
-        Event event1 = Event.builder()
-                .id(1L)
-                .build();
-        EventDto eventDto1 = EventDto.builder()
-                .id(1L)
-                .ownerId(1L)
-                .relatedSkills(new ArrayList<>())
-                .build();
+        eventDto1.setOwnerId(id);
+        eventDto1.setRelatedSkills(new ArrayList<>());
 
         when(eventRepository.save(event1)).thenReturn(event1);
         when(mapper.toEntity(eventDto1)).thenReturn(event1);
@@ -117,14 +114,6 @@ class EventServiceImplTest {
 
     @Test
     void deleteEvent() {
-        long id = 1L;
-        Event event1 = Event.builder()
-                .id(1L)
-                .build();
-        EventDto eventDto1 = EventDto.builder()
-                .id(1L)
-                .build();
-
         when(eventRepository.findById(id)).thenReturn(Optional.of(event1));
         when(mapper.toDto(event1)).thenReturn(eventDto1);
 
@@ -139,18 +128,6 @@ class EventServiceImplTest {
 
     @Test
     void getEventsByFilter() {
-        Event event1 = Event.builder()
-                .id(1L)
-                .build();
-        Event event2 = Event.builder()
-                .id(2L)
-                .build();
-        EventDto eventDto1 = EventDto.builder()
-                .id(1L)
-                .build();
-        EventDto eventDto2 = EventDto.builder()
-                .id(2L)
-                .build();
         List<Event> events = List.of(event1, event2);
         Stream<Event> eventStream = events.stream();
         EventFilterDto filterDto = EventFilterDto.builder().build();
@@ -172,14 +149,6 @@ class EventServiceImplTest {
 
     @Test
     void getEvent() {
-        long id = 1L;
-        Event event1 = Event.builder()
-                .id(1L)
-                .build();
-        EventDto eventDto1 = EventDto.builder()
-                .id(1L)
-                .build();
-
         when(eventRepository.findById(id)).thenReturn(Optional.of(event1));
         when(mapper.toDto(event1)).thenReturn(eventDto1);
 
@@ -193,14 +162,8 @@ class EventServiceImplTest {
 
     @Test
     void create() {
-        Event event1 = Event.builder()
-                .id(1L)
-                .build();
-        EventDto eventDto1 = EventDto.builder()
-                .id(1L)
-                .ownerId(1L)
-                .relatedSkills(new ArrayList<>())
-                .build();
+        eventDto1.setOwnerId(id);
+        eventDto1.setRelatedSkills(new ArrayList<>());
 
         when(eventRepository.save(event1)).thenReturn(event1);
         when(mapper.toEntity(eventDto1)).thenReturn(event1);

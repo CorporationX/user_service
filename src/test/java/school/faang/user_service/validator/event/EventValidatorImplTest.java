@@ -15,6 +15,7 @@ import school.faang.user_service.exceptions.event.NotFoundException;
 import school.faang.user_service.repository.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,6 +33,7 @@ class EventValidatorImplTest {
 
     private final Long id = 1L;
     private EventDto eventDto;
+    private User user;
 
     @BeforeEach
     void init() {
@@ -42,6 +44,19 @@ class EventValidatorImplTest {
                 .startDate(LocalDateTime.now())
                 .endDate(LocalDateTime.now())
                 .build();
+        List<Skill> skills = List.of(
+                Skill.builder().id(1L).build(),
+                Skill.builder().id(2L).build()
+        );
+        List<SkillDto> skillDtoList = List.of(
+                SkillDto.builder().id(1L).build(),
+                SkillDto.builder().id(2L).build()
+        );
+        user = User.builder()
+                .id(id)
+                .skills(skills)
+                .build();
+        eventDto.setRelatedSkills(skillDtoList);
     }
 
     @Test
@@ -91,19 +106,7 @@ class EventValidatorImplTest {
 
     @Test
     void validateOwnersRequiredSkillsNoRequiredSkills() {
-        List<Skill> skills = List.of(
-                Skill.builder().id(1L).build()
-        );
-        List<SkillDto> skillDtoList = List.of(
-                SkillDto.builder().id(1L).build(),
-                SkillDto.builder().id(2L).build()
-        );
-        User user = User.builder()
-                .id(id)
-                .skills(skills)
-                .build();
-        eventDto.setRelatedSkills(skillDtoList);
-
+        user.setSkills(new ArrayList<>());
         when(userRepository.findById(id)).thenReturn(Optional.of(user));
 
         DataValidationException e = assertThrows(DataValidationException.class, () -> validator.validateOwnersRequiredSkills(eventDto));
@@ -112,22 +115,8 @@ class EventValidatorImplTest {
 
     @Test
     void validateOwnersRequiredSkillsGoodEventAndUser() {
-        List<Skill> skills = List.of(
-                Skill.builder().id(1L).build(),
-                Skill.builder().id(2L).build()
-        );
-        List<SkillDto> skillDtoList = List.of(
-                SkillDto.builder().id(1L).build(),
-                SkillDto.builder().id(2L).build()
-        );
-        User user = User.builder()
-                .id(id)
-                .skills(skills)
-                .build();
-        eventDto.setRelatedSkills(skillDtoList);
-
         when(userRepository.findById(id)).thenReturn(Optional.of(user));
 
-       assertDoesNotThrow(() -> validator.validateOwnersRequiredSkills(eventDto));
+        assertDoesNotThrow(() -> validator.validateOwnersRequiredSkills(eventDto));
     }
 }

@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.config.S3Config;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.ProfileViewEventDto;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DataValidationException;
@@ -16,7 +18,10 @@ import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.MentorshipService;
+import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.S3Service;
+import school.faang.user_service.validator.UserValidator;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,11 +46,10 @@ public class UserService {
     private final S3Service s3Service;
     private final S3Config s3Config;
     private final String bucketName;
+    private final UserValidator userValidator;
+    private final EventService eventService;
+    private final MentorshipService mentorshipService;
 
-
-    public List<UserDto> getUsersByIds(List<Long> userIds) {
-        return userMapper.toDto(getUsersEntityByIds(userIds));
-    }
 
     public UserDto getUser(Long userId) {
         User user = getUserEntityById(userId);
@@ -85,6 +89,20 @@ public class UserService {
 
     }
 
+    public List<UserDto> getUsersByIds(List<Long> ids) {
+        return userMapper.toDto(userRepository.findAllById(ids));
+    }
+
+    @Transactional
+    public void deactivate(long userId) {
+        User user = getUserEntityById(userId);
+        user.setActive(false);
+        List<Long> eventIds = eventService.getOwnedEvents(userId).stream().map(EventDto::getId).toList();
+        for (Long eventId : eventIds) {
+            eventService.deleteEvent(eventId);
+        }
+        mentorshipService.deleteAllMentorMentorship(user);
+    }
 
     private UserProfilePic getRandomAvatar() {
 

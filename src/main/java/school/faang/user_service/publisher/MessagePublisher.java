@@ -9,7 +9,7 @@ public abstract class MessagePublisher<T> {
     private final ObjectMapper objectMapper;
     private final RedisTemplate<String, Object> redisTemplate;
 
-    protected void convertAndSend(String topic, T event) {
+    public void convertAndSend(String topic, T event) {
         try {
             String jsonObject = objectMapper.writeValueAsString(event);
             redisTemplate.convertAndSend(topic, jsonObject);

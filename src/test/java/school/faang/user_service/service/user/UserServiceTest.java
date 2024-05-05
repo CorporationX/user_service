@@ -3,14 +3,19 @@ package school.faang.user_service.service.user;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.event.ProfileViewEvent;
 import school.faang.user_service.dto.event.UserEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.handler.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.validator.user.UserValidator;
 
@@ -31,8 +36,14 @@ public class UserServiceTest {
     private UserMapper userMapper;
     @Mock
     private UserValidator userValidator;
+    @Mock
+    private UserContext userContext;
+    @Mock
+    private ProfileViewEventPublisher profileViewEventPublisher;
     @InjectMocks
     private UserService userService;
+    @Captor
+    private ArgumentCaptor<ProfileViewEvent> captor;
 
     @Test
     void test_GetUser_NotFound() {
@@ -45,15 +56,19 @@ public class UserServiceTest {
 
     @Test
     void test_GetUser_ReturnsUser() {
+        userContext.setUserId(5L);
         Long userId = 1L;
         User user = User.builder().id(1L).email("buk@mail.ru").username("buk").build();
         UserDto userExpected = userMapper.toDto(user);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
-        assertEquals(userExpected, userService.getUserDtoById(userId));
+        UserDto userById = userService.getUserDtoById(userId);
+        verify(profileViewEventPublisher).publish(captor.capture());
         verify(userRepository).findById(userId);
-
+        assertEquals(userExpected, userById);
+        assertEquals(userContext.getUserId(), captor.getValue().getViewingUserId());
+        assertEquals(userId, captor.getValue().getViewedUserId());
     }
 
     @Test

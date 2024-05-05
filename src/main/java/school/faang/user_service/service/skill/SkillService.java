@@ -12,7 +12,7 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.handler.exception.DataValidationException;
 import school.faang.user_service.handler.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.SkillMapper;
-import school.faang.user_service.kafka_publisher.MessagePublisher;
+import school.faang.user_service.kafka_publisher.KafkaMessagePublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
@@ -28,7 +28,7 @@ public class SkillService {
     private final SkillMapper skillMapper;
     private final SkillOfferRepository skillOfferRepository;
     private final UserContext userContext;
-    private final MessagePublisher<SkillOfferedEvent> skillOfferedEventPublisher;
+    private final KafkaMessagePublisher<SkillOfferedEvent> skillOfferedEventPublisher;
 
     public SkillDto create(SkillDto skillDto) {
         validateSkill(skillDto);

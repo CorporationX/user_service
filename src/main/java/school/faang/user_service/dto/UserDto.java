@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import school.faang.user_service.entity.contact.PreferredContact;
 
 @Data
 @NoArgsConstructor
@@ -28,4 +29,5 @@ public class UserDto {
     private boolean active;
     @NotNull(message = "Country ID can't be empty")
     private Long countryId;
+    private PreferredContact contactPreference;
 }

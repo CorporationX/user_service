@@ -5,7 +5,7 @@ import school.faang.user_service.entity.User;
 
 import java.util.stream.Stream;
 
-public class UserAboutFilter implements UserFilter{
+public class UserAboutFilter implements UserFilter {
     @Override
     public boolean isApplicable(UserFilterDto filters) {
         return filters.getAboutPattern() != null && !filters.getAboutPattern().isBlank();

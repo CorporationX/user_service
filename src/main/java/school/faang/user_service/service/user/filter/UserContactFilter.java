@@ -6,10 +6,10 @@ import school.faang.user_service.entity.contact.Contact;
 
 import java.util.stream.Stream;
 
-public class UserContactFilter implements UserFilter{
+public class UserContactFilter implements UserFilter {
     @Override
     public boolean isApplicable(UserFilterDto filters) {
-        return filters.getContactPattern() != null  && !filters.getContactPattern().isBlank();
+        return filters.getContactPattern() != null && !filters.getContactPattern().isBlank();
     }
 
     @Override

@@ -1,10 +1,13 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.dto.recommendation.SkillOfferDto;
 import school.faang.user_service.entity.Skill;
@@ -28,7 +31,8 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class RecommendationService {
-    private static final int RECOMMENDATION_PERIOD_IN_MONTH = 6;
+    @Value("${recommendation.service.recommendation_period_in_month}")
+    private int RECOMMENDATION_PERIOD_IN_MONTH;
     private final RecommendationRepository recommendationRepository;
     private final SkillOfferRepository skillOfferRepository;
     private final SkillRepository skillRepository;
@@ -36,6 +40,7 @@ public class RecommendationService {
     private final UserRepository userRepository;
     private final RecommendationMapper recommendationMapper;
 
+    @Transactional
     public RecommendationDto create(RecommendationDto recommendationDto) {
         validateAll(recommendationDto);
 
@@ -46,11 +51,11 @@ public class RecommendationService {
         return recommendationMapper.toDto(recommendation);
     }
 
+    @Transactional
     public RecommendationDto update(RecommendationDto recommendationDto) {
         validateRecommendationForUpdate(recommendationDto);
         validateAll(recommendationDto);
 
-        delete(recommendationDto.getId());
         Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
         skillOfferRepository.deleteAllByRecommendationId(recommendation.getId());
         saveSkillOffers(recommendation);
@@ -59,6 +64,7 @@ public class RecommendationService {
         return recommendationMapper.toDto(recommendation);
     }
 
+    @Transactional(readOnly = true)
     public void delete(Long id) {
         recommendationRepository.deleteById(id);
     }

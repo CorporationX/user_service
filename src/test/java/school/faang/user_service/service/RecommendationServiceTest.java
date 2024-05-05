@@ -177,7 +177,6 @@ public class RecommendationServiceTest {
 
         RecommendationDto result = recommendationService.update(recommendationDto);
 
-        verify(recommendationRepository, times(1)).deleteById(1L);
         verify(recommendationRepository, times(1)).save(recommendationEntity);
 
         assertEquals(result, recommendationDto);

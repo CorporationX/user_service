@@ -7,8 +7,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import school.faang.user_service.config.context.UserContext;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.service.user.UserService;
 
 import java.util.List;
@@ -18,6 +20,7 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
+    private final UserContext userContext;
 
     @Operation(summary = "Create new user")
     @ApiResponses(value = {
@@ -44,5 +47,11 @@ public class UserController {
     @DeleteMapping("/{userId}")
     public UserDto deactivationUserById(@PathVariable Long userId) {
         return userService.deactivationUserById(userId);
+    }
+
+    @PostMapping("/searchUsers")
+    public List<UserDto> searchUsersByFilter(@RequestBody UserFilterDto userFilterDto) {
+        Long requestUser = userContext.getUserId();
+        return userService.searchUsersByFilter(userFilterDto, requestUser);
     }
 }

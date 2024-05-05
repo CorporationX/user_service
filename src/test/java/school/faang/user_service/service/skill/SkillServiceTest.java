@@ -15,7 +15,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.handler.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
-import school.faang.user_service.publisher.MessagePublisher;
+import school.faang.user_service.kafka_publisher.KafkaMessagePublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
@@ -36,7 +36,7 @@ public class SkillServiceTest {
     @Mock
     private UserContext userContext;
     @Mock
-    private MessagePublisher<SkillOfferedEvent> skillOfferedEventPublisher;
+    private KafkaMessagePublisher<SkillOfferedEvent> skillOfferedEventPublisher;
     @InjectMocks
     private SkillService skillService;
 

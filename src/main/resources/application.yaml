@@ -31,15 +31,16 @@ spring:
         follower_channel:
           name: follower_channel
         profile_view_channel:
-            name: profile_view_channel
+          name: profile_view_channel
+        search_appearance_channel:
+          name: SearchAppearance_channel
+        recommendation_channel:
+          name: recommendation_channel
         goal_set_channel:
-          name: "goal_set_channel"
+          name: goal_set_channel
 
 server:
   port: 8080
-
-api:
-  v1: "api/v1"
 
 logging:
   level:

@@ -4,26 +4,21 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.SkillCandidateDto;
+import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.SkillDto;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SkillService;
 
 import java.util.List;
 
 @Slf4j
 @Component
+@Controller
 @RequiredArgsConstructor
 public class SkillController {
     private final SkillService skillService;
 
     public SkillDto create(SkillDto skill) {
-        SkillDto createdSkill = null;
-        try {
-            createdSkill = skillService.create(skill);
-        } catch (DataValidationException e) {
-            log.warn(e.toString());
-        }
-        return createdSkill;
+        return skillService.create(skill);
     }
 
     public List<SkillDto> getUserSkills(long userId) {

@@ -17,7 +17,6 @@ import school.faang.user_service.exceptions.UserGoalsValidationException;
 import school.faang.user_service.mapper.GoalMapperImpl;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.filters.GoalFilter;
-import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.skill.SkillService;
 
 import java.util.List;
@@ -83,13 +82,13 @@ class GoalServiceTest {
 
         goalService.createGoal(1L, goal);
 
-        verify(goalRepository, times(1)).create(goal.getTitle(), goal.getDescription(), goal.getId());
+        verify(goalRepository).create(goal.getTitle(), goal.getDescription(), goal.getId());
     }
 
     @Test
     void testDelete() {
         goalService.deleteGoal(1L);
-        verify(goalRepository, times(1)).deleteGoalById(1L);
+        verify(goalRepository).deleteGoalById(1L);
     }
 
     @Test

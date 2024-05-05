@@ -44,13 +44,13 @@ class GoalControllerTest {
 
         goalController.createGoal(1L, goal);
 
-        Mockito.verify(goalService, Mockito.times(1)).createGoal(1L, goal);
+        Mockito.verify(goalService).createGoal(1L, goal);
     }
 
     @Test
     void testDelete() {
         goalController.deleteGoal(1L);
-        Mockito.verify(goalService, Mockito.times(1)).deleteGoal(1L);
+        Mockito.verify(goalService).deleteGoal(1L);
     }
 
     @Test
@@ -73,7 +73,7 @@ class GoalControllerTest {
 
         goalController.updateGoal(1L, goalDto);
 
-        Mockito.verify(goalService, Mockito.times(1)).updateGoal(1L, goalDto);
+        Mockito.verify(goalService).updateGoal(1L, goalDto);
     }
 
     @Test

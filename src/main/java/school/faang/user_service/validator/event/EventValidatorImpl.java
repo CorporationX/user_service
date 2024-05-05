@@ -2,6 +2,7 @@ package school.faang.user_service.validator.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 public class EventValidatorImpl implements EventValidator {
     private final UserRepository userRepository;
 
+    @Override
     public void validate(EventDto event) {
         if (event.getTitle() == null) {
             throw new DataValidationException("title can't be null");
@@ -33,6 +35,8 @@ public class EventValidatorImpl implements EventValidator {
         }
     }
 
+    @Override
+    @Transactional
     public void validateOwnersRequiredSkills(EventDto event) {
         User user = userRepository
                 .findById(event.getOwnerId())

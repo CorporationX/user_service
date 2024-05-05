@@ -1,6 +1,13 @@
 package school.faang.user_service.controller.event;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
@@ -10,34 +17,42 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("events")
 public class EventController {
     private final EventService eventService;
 
-    public List<EventDto> getParticipatedEvents(long userId) {
+    @GetMapping("users/participated/{userId}")
+    public List<EventDto> getParticipatedEvents(@PathVariable long userId) {
         return eventService.getParticipatedEvents(userId);
     }
 
-    public List<EventDto> getOwnedEvents(long userId) {
+    @GetMapping("users/owned/{userId}")
+    public List<EventDto> getOwnedEvents(@PathVariable long userId) {
         return eventService.getOwnedEvents(userId);
     }
 
-    public EventDto updateEvent(EventDto event) {
+    @PutMapping
+    public EventDto updateEvent(@RequestBody EventDto event) {
         return eventService.updateEvent(event);
     }
 
-    public EventDto deleteEvent(long eventId) {
+    @DeleteMapping("delete/{eventId}")
+    public EventDto deleteEvent(@PathVariable long eventId) {
         return eventService.deleteEvent(eventId);
     }
 
-    public List<EventDto> getEventsByFilter(EventFilterDto filter) {
+    @GetMapping("filter")
+    public List<EventDto> getEventsByFilter(@RequestBody EventFilterDto filter) {
         return eventService.getEventsByFilter(filter);
     }
 
-    public EventDto getEvent(long eventId) {
+    @GetMapping("{eventId}")
+    public EventDto getEvent(@PathVariable long eventId) {
         return eventService.getEvent(eventId);
     }
 
-    public EventDto create(EventDto event) {
+    @PostMapping
+    public EventDto create(@RequestBody EventDto event) {
         return eventService.create(event);
     }
 }

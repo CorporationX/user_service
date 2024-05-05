@@ -1,6 +1,7 @@
 package school.faang.user_service.service.event.filter;
 
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
@@ -18,6 +19,7 @@ public class EventRelatedSkillsFilter implements EventFilter {
     }
 
     @Override
+    @Transactional
     public Stream<Event> apply(Stream<Event> events, EventFilterDto filters) {
         Set<Long> filterSkillIds = filters.getRelatedSkills().stream()
                 .map(SkillDto::getId)

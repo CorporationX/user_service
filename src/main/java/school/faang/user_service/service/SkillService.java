@@ -19,7 +19,6 @@ public class SkillService {
     private final SkillMapper skillMapper;
     private final SkillValidator skillValidator;
     public SkillDto create(SkillDto skill) {
-        System.out.println(3);
         skillValidator.validateSkill(skill);
         Skill convertedSkill = skillMapper.toEntity(skill);
         return skillMapper.toDto(skillRepository.save(convertedSkill));

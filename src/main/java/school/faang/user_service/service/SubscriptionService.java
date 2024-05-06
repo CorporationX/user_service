@@ -6,8 +6,9 @@ import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.validation.SubscriptionValidator;
+import school.faang.user_service.service.user.filter.UserFilter;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -17,16 +18,16 @@ import java.util.stream.Stream;
 public class SubscriptionService {
 
     private final SubscriptionRepository subscriptionRepository;
-    public final SubscriptionValidator subscriptionValidator;
+    private final List<UserFilter> userFilters;
+    private final UserMapper userMapper;
 
     @Transactional(readOnly = true)
-    public List<UserDto> getFollowers(long followeeId, UserFilterDto filter) {
+    public List<UserDto> getFollowers(long followeeId, UserFilterDto filters) {
         Stream<User> followersUsers = subscriptionRepository.findByFolloweeId(followeeId);
-        return filterUsers(followersUsers, filter);
-    }
-
-    private List<UserDto> filterUsers(Stream<User> users, UserFilterDto filter) {
-        //ToDo Сделать фильтрацию. На данный момент возвращается заглушка
-        return List.of(new UserDto(1, "1", "11111"));
+        return userFilters.stream()
+                .filter(filter -> filter.isApplicable(filters))
+                .flatMap(filter -> filter.apply(followersUsers, filters))
+                .map(userMapper::toDto)
+                .toList();
     }
 }

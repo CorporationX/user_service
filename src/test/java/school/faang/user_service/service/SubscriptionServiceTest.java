@@ -8,7 +8,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.filter.UserFilterDto;
@@ -16,16 +15,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.service.user.filter.UserAboutFilter;
-import school.faang.user_service.service.user.filter.UserCityFilter;
-import school.faang.user_service.service.user.filter.UserContactFilter;
-import school.faang.user_service.service.user.filter.UserCountryFilter;
-import school.faang.user_service.service.user.filter.UserEmailFilter;
-import school.faang.user_service.service.user.filter.UserExperienceFilter;
 import school.faang.user_service.service.user.filter.UserFilter;
-import school.faang.user_service.service.user.filter.UserNameFilter;
-import school.faang.user_service.service.user.filter.UserPhoneFilter;
-import school.faang.user_service.service.user.filter.UserSkillFilter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,11 +33,8 @@ import static school.faang.user_service.exception.ExceptionMessage.REPEATED_SUBS
 class SubscriptionServiceTest {
     @Mock
     private SubscriptionRepository subscriptionRepo;
-
     @Mock
     private UserMapper userMapper;
-
-    @Spy
     @InjectMocks
     private SubscriptionService subscriptionService;
 
@@ -56,6 +43,7 @@ class SubscriptionServiceTest {
 
     private Long followerId;
     private Long followeeId;
+
     private List<UserFilter> filters;
     private UserFilterDto filterDto;
 
@@ -69,19 +57,11 @@ class SubscriptionServiceTest {
 
         filterDto = new UserFilterDto();
 
-        var userNameFilter = mock(UserNameFilter.class);
-        var userAboutFilter = mock(UserAboutFilter.class);
-        var userEmailFilter = mock(UserEmailFilter.class);
-        var userContactFilter = mock(UserContactFilter.class);
-        var userCountryFilter = mock(UserCountryFilter.class);
-        var userCityFilter = mock(UserCityFilter.class);
-        var userPhoneFilter = mock(UserPhoneFilter.class);
-        var userSkillFilter = mock(UserSkillFilter.class);
-        var userExperienceFilter = mock(UserExperienceFilter.class);
+        var filterA = mock(UserFilter.class);
+        var filterB = mock(UserFilter.class);
+        var filterC = mock(UserFilter.class);
 
-        filters = List.of(userNameFilter, userAboutFilter, userEmailFilter, userContactFilter,
-                userCountryFilter, userCityFilter, userPhoneFilter, userSkillFilter, userExperienceFilter);
-
+        filters = List.of(filterA, filterB, filterC);
         subscriptionService.setFilters(filters);
     }
 
@@ -92,14 +72,11 @@ class SubscriptionServiceTest {
         void shouldFollowNewUser() {
             when(subscriptionRepo.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(false);
 
-
             subscriptionService.followUser(followerId, followeeId);
-
 
             verify(subscriptionRepo).existsByFollowerIdAndFolloweeId(followerArgumentCaptor.capture(), followeeArgumentCaptor.capture());
             assertEquals(followerId, followerArgumentCaptor.getValue());
             assertEquals(followeeId, followeeArgumentCaptor.getValue());
-
             verify(subscriptionRepo).followUser(followerArgumentCaptor.capture(), followeeArgumentCaptor.capture());
             assertEquals(followerId, followerArgumentCaptor.getValue());
             assertEquals(followeeId, followeeArgumentCaptor.getValue());
@@ -110,7 +87,6 @@ class SubscriptionServiceTest {
         void shouldUnfollowUser() {
             subscriptionService.unfollowUser(followerId, followeeId);
 
-
             verify(subscriptionRepo).unfollowUser(followerArgumentCaptor.capture(), followeeArgumentCaptor.capture());
             assertEquals(followerId, followerArgumentCaptor.getValue());
             assertEquals(followeeId, followeeArgumentCaptor.getValue());
@@ -119,28 +95,30 @@ class SubscriptionServiceTest {
         @DisplayName("should return followers")
         @Test
         void shouldReturnAllFollowers() {
-            var allFollowers = Stream.<User>of();
+            var user = new User();
+            var allFollowers = Stream.of(user);
 
             when(subscriptionRepo.findByFolloweeId(followeeId)).thenReturn(allFollowers);
             filters.forEach(filter -> {
                 when(filter.isApplicable(filterDto)).thenReturn(true);
-                when(filter.apply(allFollowers, filterDto)).thenReturn(Stream.of());
+                when(filter.apply(allFollowers, filterDto)).thenReturn(Stream.of(user));
             });
 
+            UserDto userDto = new UserDto();
+            when(userMapper.toDto(user)).thenReturn(userDto);
 
             var actualFollowers = subscriptionService.getFollowers(followeeId, filterDto);
 
-
             verify(subscriptionRepo).findByFolloweeId(followeeArgumentCaptor.capture());
             assertEquals(followeeId, followeeArgumentCaptor.getValue());
-            assertEquals(List.of(), actualFollowers);
+            assertEquals(List.of(userDto), actualFollowers);
+            verify(userMapper).toDto(user);
         }
 
         @DisplayName("should call subscriptionRepo.findFollowersAmountByFolloweeId()")
         @Test
         void shouldReturnFollowersCount() {
             subscriptionService.getFollowersCount(followeeId);
-
 
             verify(subscriptionRepo).findFollowersAmountByFolloweeId(followeeArgumentCaptor.capture());
             assertEquals(followeeId, followeeArgumentCaptor.getValue());
@@ -151,9 +129,7 @@ class SubscriptionServiceTest {
         void shouldReturnAllSubscriptions() {
             when(subscriptionRepo.findByFollowerId(followerId)).thenReturn(Stream.of());
 
-
             var actualFollowing = subscriptionService.getFollowing(followerId, new UserFilterDto());
-
 
             verify(subscriptionRepo).findByFollowerId(followerArgumentCaptor.capture());
             assertEquals(followerId, followerArgumentCaptor.getValue());
@@ -164,7 +140,6 @@ class SubscriptionServiceTest {
         @Test
         void shouldReturnSubscriptionCount() {
             subscriptionService.getFollowingCount(followerId);
-
 
             verify(subscriptionRepo).findFolloweesAmountByFollowerId(followerArgumentCaptor.capture());
             assertEquals(followerId, followerArgumentCaptor.getValue());
@@ -178,10 +153,8 @@ class SubscriptionServiceTest {
         void shouldThrowExceptionWhenSuchFolloweeExists() {
             when(subscriptionRepo.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
 
-
             var actualException = assertThrows(DataValidationException.class,
                     () -> subscriptionService.followUser(followerId, followeeId));
-
 
             assertEquals(REPEATED_SUBSCRIPTION_EXCEPTION.getMessage(), actualException.getMessage());
             verify(subscriptionRepo).existsByFollowerIdAndFolloweeId(followerId, followeeId);

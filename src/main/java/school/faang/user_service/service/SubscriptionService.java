@@ -60,6 +60,7 @@ public class SubscriptionService {
         return filters.stream()
                 .filter(userFilter -> userFilter.isApplicable(filterDto))
                 .flatMap(userFilter -> userFilter.apply(users, filterDto))
+                .distinct()
                 .map(userMapper::toDto)
                 .toList();
     }

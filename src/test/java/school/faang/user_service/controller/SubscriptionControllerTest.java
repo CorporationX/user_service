@@ -54,9 +54,7 @@ class SubscriptionControllerTest {
             var followerArgumentCaptor = ArgumentCaptor.forClass(Long.class);
             var followeeArgumentCaptor = ArgumentCaptor.forClass(Long.class);
 
-
             subscriptionController.followUser(followerId, followeeId);
-
 
             verify(subscriptionService).followUser(followerArgumentCaptor.capture(), followeeArgumentCaptor.capture());
             assertEquals(followerId, followerArgumentCaptor.getValue());
@@ -69,9 +67,7 @@ class SubscriptionControllerTest {
             var followerArgumentCaptor = ArgumentCaptor.forClass(Long.class);
             var followeeArgumentCaptor = ArgumentCaptor.forClass(Long.class);
 
-
             subscriptionController.unfollowUser(followerId, followeeId);
-
 
             verify(subscriptionService).unfollowUser(followerArgumentCaptor.capture(), followeeArgumentCaptor.capture());
             assertEquals(followerId, followerArgumentCaptor.getValue());
@@ -85,7 +81,6 @@ class SubscriptionControllerTest {
 
             subscriptionController.getFollowers(followeeId, filter);
 
-
             verify(subscriptionService).getFollowers(followeeArgumentCaptor.capture(), filterArgumentCaptor.capture());
             assertEquals(filter, filterArgumentCaptor.getValue());
             assertEquals(followeeId, followeeArgumentCaptor.getValue());
@@ -96,7 +91,6 @@ class SubscriptionControllerTest {
         void shouldReturnFollowersCount() {
             subscriptionController.getFollowersCount(followeeId);
 
-
             verify(subscriptionService).getFollowersCount(followeeArgumentCaptor.capture());
             assertEquals(followeeId, followeeArgumentCaptor.getValue());
         }
@@ -106,9 +100,7 @@ class SubscriptionControllerTest {
         void shouldReturnSubscriptions() {
             var filter = new UserFilterDto();
 
-
             subscriptionController.getFollowing(followerId, filter);
-
 
             verify(subscriptionService).getFollowing(followerArgumentCaptor.capture(), filterArgumentCaptor.capture());
             assertEquals(filter, filterArgumentCaptor.getValue());
@@ -119,7 +111,6 @@ class SubscriptionControllerTest {
         @Test
         void shouldReturnSubscriptionsCount() {
             subscriptionController.getFollowingCount(followerId);
-
 
             verify(subscriptionService).getFollowingCount(followerArgumentCaptor.capture());
             assertEquals(followerId, followerArgumentCaptor.getValue());
@@ -136,7 +127,6 @@ class SubscriptionControllerTest {
             var actualException = assertThrows(DataValidationException.class,
                     () -> subscriptionController.followUser(followerId, followeeId));
 
-
             assertEquals(USER_FOLLOWING_HIMSELF_EXCEPTION.getMessage(), actualException.getMessage());
             verify(subscriptionService, times(0)).followUser(followerId, followeeId);
         }
@@ -146,10 +136,8 @@ class SubscriptionControllerTest {
         void shouldThrowExceptionWhenUnfollowingYourself() {
             followeeId = followerId;
 
-
             var actualException = assertThrows(DataValidationException.class,
                     () -> subscriptionController.unfollowUser(followerId, followeeId));
-
 
             assertEquals(USER_UNFOLLOWING_HIMSELF_EXCEPTION.getMessage(), actualException.getMessage());
             verify(subscriptionService, times(0)).followUser(followerId, followeeId);

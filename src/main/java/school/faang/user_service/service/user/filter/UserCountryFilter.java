@@ -5,14 +5,14 @@ import school.faang.user_service.entity.User;
 
 import java.util.stream.Stream;
 
-public class UserCountryFilter implements UserFilter {
-    @Override
-    public boolean isApplicable(UserFilterDto filters) {
-        return filters.getCountryPattern() != null && !filters.getCountryPattern().isBlank();
-    }
+ class UserCountryFilter implements UserFilter {
+     @Override
+     public boolean isApplicable(UserFilterDto filters) {
+         return filters.getCountryPattern() != null && !filters.getCountryPattern().isBlank();
+     }
 
-    @Override
-    public Stream<User> apply(Stream<User> users, UserFilterDto filters) {
-        return users.filter(user -> user.getCountry().getTitle().matches(filters.getCountryPattern()));
-    }
-}
+     @Override
+     public Stream<User> apply(Stream<User> users, UserFilterDto filters) {
+         return users.filter(user -> user.getCountry().getTitle().matches(filters.getCountryPattern()));
+     }
+ }

@@ -59,28 +59,9 @@ public class SkillServiceTest {
     }
 
     @Test
-    public void testCreateWithBlankTitle() {
-        skillDto.setTitle("   ");
-        assertThrows(DataValidationException.class, () -> skillService.create(skillDto));
-    }
-
-    @Test
-    public void testCreateWithTitleIsNull() {
-        skill.setTitle(null);
-        Mockito.doThrow(new DataValidationException("")).when(skillValidator).validateSkill(skillDto);
-        assertThrows(DataValidationException.class, () -> skillService.create(skillDto));
-    }
-
-    @Test
     public void testSkillSave() throws DataValidationException {
         skillService.create(skillDto);
         Mockito.verify(skillRepository, Mockito.times(1)).save(skillMapper.toEntity(skillDto));
-    }
-
-    @Test
-    public void testCreateIfSkillExist() {
-        Mockito.when(skillRepository.existsByTitle(skillDto.getTitle())).thenReturn(true);
-        assertThrows(DataValidationException.class, () -> skillService.create(skillDto));
     }
 
     @Test

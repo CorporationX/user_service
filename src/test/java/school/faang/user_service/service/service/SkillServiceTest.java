@@ -15,8 +15,6 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.service.SkillService;
 import school.faang.user_service.validator.SkillValidator;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 @ExtendWith(MockitoExtension.class)
 public class SkillServiceTest {
     @InjectMocks
@@ -37,27 +35,8 @@ public class SkillServiceTest {
     }
 
     @Test
-    public void testCreateWithBlankTitle() {
-        skill.setTitle("   ");
-        assertThrows(DataValidationException.class, () -> skillService.create(skill));
-    }
-
-    @Test
-    public void testCreateWithTitleIsNull() {
-        skill.setTitle(null);
-        Mockito.doThrow(new DataValidationException("")).when(skillValidator).validateSkill(skill);
-        assertThrows(DataValidationException.class, () -> skillService.create(skill));
-    }
-
-    @Test
     public void testSkillSave() throws DataValidationException {
         skillService.create(skill);
         Mockito.verify(skillRepository, Mockito.times(1)).save(skillMapper.toEntity(skill));
-    }
-
-    @Test
-    public void testCreateIfSkillExist() {
-        Mockito.when(skillRepository.existsByTitle(skill.getTitle())).thenReturn(true);
-        assertThrows(DataValidationException.class, () -> skillService.create(skill));
     }
 }

@@ -20,6 +20,7 @@ import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.goal.GoalInvitationValidator;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -75,7 +76,8 @@ public class GoalInvitationServiceImpl implements GoalInvitationService {
 
     @Override
     public List<GoalInvitationDto> getInvitations(InvitationFilterDto filterDto) {
-        return goalInvitationFilterService.applyFilters(goalInvitationRepository.findAll().stream(), filterDto)
+        Stream<GoalInvitation> invitationStream = goalInvitationRepository.findAll().stream();
+        return goalInvitationFilterService.applyFilters(invitationStream, filterDto)
                 .map(goalInvitationMapper::toDto)
                 .toList();
     }

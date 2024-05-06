@@ -20,4 +20,10 @@ public class SkillValidator {
             throw new DataValidationException(skill.getTitle() + " already exist");
         }
     }
+
+    public void validateSkill(long skillId, long userId) {
+        if (skillRepository.findUserSkill(skillId, userId) != null) {
+            throw new DataValidationException("this skill with id " + skillId + " already exist");
+        }
+    }
 }

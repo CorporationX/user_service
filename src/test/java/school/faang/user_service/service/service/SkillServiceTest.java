@@ -67,8 +67,8 @@ public class SkillServiceTest {
     @Test
     public void testCreateWithTitleIsNull() {
         skill.setTitle(null);
-        Mockito.doThrow(new DataValidationException("")).when(skillValidator).validateSkill(skill);
-        assertThrows(DataValidationException.class, () -> skillService.create(skill));
+        Mockito.doThrow(new DataValidationException("")).when(skillValidator).validateSkill(skillDto);
+        assertThrows(DataValidationException.class, () -> skillService.create(skillDto));
     }
 
     @Test

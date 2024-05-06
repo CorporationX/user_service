@@ -22,8 +22,6 @@ import static org.mockito.Mockito.when;
 import static school.faang.user_service.util.TestUser.FOLLOWEE_ID;
 import static school.faang.user_service.util.TestUser.FOLLOWER_ID;
 
-import static school.faang.user_service.util.TestUser.FOLLOWER_ID;
-
 @ExtendWith(MockitoExtension.class)
 class SubscriptionServiceTest {
 
@@ -31,9 +29,6 @@ class SubscriptionServiceTest {
     SubscriptionRepository subscriptionRepository;
     @InjectMocks
     private SubscriptionService subscriptionService;
-    @Mock
-    private SubscriptionRepository subscriptionRepository;
-
     @Mock
     private UserMapper userMapper;
     @Mock

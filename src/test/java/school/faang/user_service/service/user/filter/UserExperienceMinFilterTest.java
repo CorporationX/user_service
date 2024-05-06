@@ -40,5 +40,4 @@ class UserExperienceMinFilterTest {
         Stream<User> receivedUsers = userExperienceMinFilter.apply(USER_LIST.stream(), filters);
         assertEquals(FILTERED_BY_EXP_MIN, receivedUsers.toList());
     }
-
 }

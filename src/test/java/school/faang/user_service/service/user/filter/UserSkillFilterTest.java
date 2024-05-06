@@ -40,5 +40,4 @@ class UserSkillFilterTest {
         Stream<User> receivedUsers = userSkillFilter.apply(USER_LIST.stream(), filters);
         assertEquals(FILTERED_USERS, receivedUsers.toList());
     }
-
 }

@@ -1,6 +1,5 @@
 package school.faang.user_service.controller.mentorship;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.UserDto;
@@ -13,19 +12,19 @@ import java.util.List;
 public class MentorshipController {
     private final MentorshipService mentorshipService;
 
-    public List<UserDto> getMentees(@NonNull Long userId) {
+    public List<UserDto> getMentees(long userId) {
         return mentorshipService.getMentees(userId);
     }
 
-    public List<UserDto> getMentors(@NonNull Long userId) {
+    public List<UserDto> getMentors(long userId) {
         return mentorshipService.getMentors(userId);
     }
 
-    public void deleteMentee(@NonNull Long menteeId, @NonNull Long mentorId) {
+    public void deleteMentee(long menteeId, long mentorId) {
         mentorshipService.deleteMentee(menteeId, mentorId);
     }
 
-    public void deleteMentor(@NonNull Long menteeId, @NonNull Long mentorId) {
+    public void deleteMentor(long menteeId, long mentorId) {
         mentorshipService.deleteMentor(menteeId, mentorId);
     }
 }

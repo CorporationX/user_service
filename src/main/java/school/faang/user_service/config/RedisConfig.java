@@ -36,12 +36,12 @@ public class RedisConfig{
     }
 
     @Bean
-    public ChannelTopic getUserBannerTopic(){
+    public ChannelTopic userBannerTopic(){
         return new ChannelTopic(userBannerTopic);
     }
 
     @Bean
-    public ChannelTopic getMentorshipTopic(){
+    public ChannelTopic mentorshipTopic(){
         return new ChannelTopic(mentorshipTopic);
     }
 
@@ -55,7 +55,7 @@ public class RedisConfig{
     public RedisMessageListenerContainer getContainer(MessageListenerAdapter userBannerListenerAdapter){
         RedisMessageListenerContainer redisMessageListenerContainer=new RedisMessageListenerContainer();
         redisMessageListenerContainer.setConnectionFactory(redisConnectionFactory());
-        redisMessageListenerContainer.addMessageListener(userBannerListenerAdapter, getUserBannerTopic());
+        redisMessageListenerContainer.addMessageListener(userBannerListenerAdapter, userBannerTopic());
         return redisMessageListenerContainer;
     }
 

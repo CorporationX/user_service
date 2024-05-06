@@ -9,8 +9,8 @@ import lombok.Data;
 public class MentorshipStartEvent {
 
     @NotNull
-    private long mentor_id;
+    private long mentorId;
     @NotNull
-    private long mentee_id;
+    private long menteeId;
 
 }

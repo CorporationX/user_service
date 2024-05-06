@@ -12,12 +12,11 @@ import school.faang.user_service.service.MentorshipRequestService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
 public class MentorshipRequestController{
 
     private final MentorshipRequestService mentorshipRequestService;
 
-    @PostMapping
+    @PostMapping("/request")
     public MentorshipRequestDto requestMentorship(@Valid @RequestBody MentorshipRequestDto mentorshipRequestDto){
         return mentorshipRequestService.requestMentorship(mentorshipRequestDto);
     }

@@ -16,4 +16,5 @@ public interface MentorshipMapper extends AbstractMapper<MentorshipRequest, Ment
     @Mapping(source = "receiverId", target = "receiver.id")
     @Mapping(source = "requesterId",target = "requester.id")
     MentorshipRequest toEntity(MentorshipRequestDto mentorshipRequestDto);
+
 }

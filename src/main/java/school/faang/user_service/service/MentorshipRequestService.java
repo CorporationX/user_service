@@ -14,7 +14,9 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.MentorshipMapper;
 import school.faang.user_service.publisher.MentorshipEventPublisher;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+import school.faang.user_service.validator.mentorship.MentorshipValidator;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -26,33 +28,31 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class MentorshipRequestService{
-    private final UserRepository userRepository;
+
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final MentorshipMapper mentorshipMapper;
     private final MentorshipEventPublisher mentorshipEventPublisher;
+    private final MentorshipValidator mentorshipValidator;
 
     @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto){
-
-//        User mentor=mentorshipRequestDto.getReceiver();
-//        User mentee=mentorshipRequestDto.getRequester();
 
         if(mentorshipRequestDto.getRequesterId()==mentorshipRequestDto.getReceiverId()){
             log.warn("You cannot be mentor to yourself!");
             throw new DataValidationException("You cannot be mentor to yourself!");
         }
 
-        long mentor_id=mentorshipRequestDto.getReceiverId();
-        long mentee_id=mentorshipRequestDto.getRequesterId();
+        long mentorId=mentorshipRequestDto.getReceiverId();
+        long menteeId=mentorshipRequestDto.getRequesterId();
 
-        checkIfUserExists(mentor_id);
-        checkIfUserExists(mentee_id);
+        mentorshipValidator.checkIfUserExists(mentorId);
+        mentorshipValidator.checkIfUserExists(menteeId);
 
-        if(!isAllowedToMakeRequest(mentee_id, mentor_id)){
-            throw new DataValidationException("previous request was made earlier than 3 months!");
+        if(!mentorshipValidator.isAllowedToMakeRequest(menteeId, mentorId)){
+            throw new DataValidationException("Error:previous request was made earlier than 3 months");
         }
 
-        MentorshipRequest mentorshipRequest=mentorshipRequestRepository.save(mentorshipMapper
+        MentorshipRequest mentorshipRequest = mentorshipRequest=mentorshipRequestRepository.save(mentorshipMapper
                 .toEntity(mentorshipRequestDto));
 
         return mentorshipMapper.toDto(mentorshipRequest);
@@ -60,18 +60,7 @@ public class MentorshipRequestService{
 
     public void acceptRequest(long id){
 
-        /*
-
-        TODO:   change mentorshiprequestrepo status to Accepted
-                add to mentorship bd
-
-        */
-        MentorshipRequest mentorshipRequest=mentorshipRequestRepository.findById(id)
-                .orElseThrow(()->{
-                    log.warn("No request with such id "+id);
-                    return new EntityNotFoundException("No request with such id "+id);
-
-                });
+        MentorshipRequest mentorshipRequest=checkMentorshipReqExists(id);
 
         User mentee=mentorshipRequest.getRequester();
         User mentor=mentorshipRequest.getReceiver();
@@ -84,35 +73,22 @@ public class MentorshipRequestService{
             mentees.add(mentee);
             mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
             MentorshipStartEvent mentorshipStartEvent=MentorshipStartEvent
-                    .builder().mentee_id(mentee.getId())
-                    .mentor_id(mentor.getId()).build();
+                    .builder().menteeId(mentee.getId())
+                    .mentorId(mentor.getId()).build();
             mentorshipEventPublisher.publish(mentorshipStartEvent);
         }
 
     }
 
-    private boolean isAllowedToMakeRequest(long mentee_id, long mentor_id){
-
-        LocalDateTime threeMonthsAgo=LocalDateTime.now().minus(3, ChronoUnit.MONTHS);
-        Optional<MentorshipRequest> latestRequest=mentorshipRequestRepository
-                .findLatestRequest(mentee_id, mentor_id);
-
-        if (latestRequest.isPresent() && latestRequest.get().getCreatedAt().isAfter(threeMonthsAgo)) {
-            log.warn("Error: previous request was made earlier than 3 months");
-            return false;
-        }
-
-        return true;
-    }
-
-    private void checkIfUserExists(long userId){
-
-        userRepository.findById(userId)
+    private MentorshipRequest checkMentorshipReqExists(long id){
+        return mentorshipRequestRepository.findById(id)
                 .orElseThrow(()->{
-                    log.warn("No user with such id "+userId);
-                    return new EntityNotFoundException("No user with such id "+userId);
+                    log.warn("No request with such id "+id);
+                    return new EntityNotFoundException("No request with such id "+id);
 
                 });
     }
+
+
 
 }

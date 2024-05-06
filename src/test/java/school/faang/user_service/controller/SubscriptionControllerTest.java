@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static school.faang.user_service.util.TestUser.FOLLOWEE_ID;
 import static school.faang.user_service.util.TestUser.FOLLOWER_ID;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,11 +30,32 @@ public class SubscriptionControllerTest {
     UserContext userContext;
     @Mock
     SubscriptionValidator subscriptionValidator;
-    @Mock
-    UserFilterDto userFilterDto;
     @InjectMocks
     private SubscriptionController subscriptionController;
 
+
+    @Test
+    public void testUnsubscribeUserFromAnotherUser() {
+        when(userContext.getUserId()).thenReturn(1L);
+        subscriptionController.unfollowUser(FOLLOWEE_ID);
+        verify(subscriptionService, times(1)).unfollowUser(FOLLOWER_ID, FOLLOWEE_ID);
+        verify(subscriptionValidator, times(1)).validateUser(FOLLOWER_ID, FOLLOWEE_ID);
+    }
+
+    @Test
+    public void testSubscribeUserToAnotherUser() {
+        when(userContext.getUserId()).thenReturn(1L);
+        subscriptionController.followUser(FOLLOWEE_ID);
+        verify(subscriptionService, times(1)).followUser(FOLLOWER_ID, FOLLOWEE_ID);
+        verify(subscriptionValidator, times(1)).validateUser(FOLLOWER_ID, FOLLOWEE_ID);
+    }
+
+    @Test
+    public void testGetFollowerCount() {
+        when(userContext.getUserId()).thenReturn(1L);
+        subscriptionController.getFollowersCount();
+        verify(subscriptionService, times(1)).getFollowersCount(FOLLOWER_ID);
+    }
     @Test
     public void testGetFollowers() {
         UserFilterDto filters = new UserFilterDto();
@@ -49,5 +71,4 @@ public class SubscriptionControllerTest {
         List<UserDto> users = subscriptionController.getFollowers(FOLLOWER_ID, filters);
         assertEquals(receivedUsers, users);
     }
-
 }

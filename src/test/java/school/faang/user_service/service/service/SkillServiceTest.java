@@ -19,11 +19,13 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.service.SkillService;
+import school.faang.user_service.validator.SkillValidator;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
 @ExtendWith(MockitoExtension.class)
 public class SkillServiceTest {
     @InjectMocks
@@ -38,6 +40,8 @@ public class SkillServiceTest {
     private SkillOffer skillOffer;
     @Mock
     private Recommendation recommendation;
+    @Mock
+    SkillValidator skillValidator;
     @Mock
     private User user;
     @Mock
@@ -58,6 +62,13 @@ public class SkillServiceTest {
     public void testCreateWithBlankTitle() {
         skillDto.setTitle("   ");
         assertThrows(DataValidationException.class, () -> skillService.create(skillDto));
+    }
+
+    @Test
+    public void testCreateWithTitleIsNull() {
+        skill.setTitle(null);
+        Mockito.doThrow(new DataValidationException("")).when(skillValidator).validateSkill(skill);
+        assertThrows(DataValidationException.class, () -> skillService.create(skill));
     }
 
     @Test

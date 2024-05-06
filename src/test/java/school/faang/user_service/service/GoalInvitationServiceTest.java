@@ -83,6 +83,7 @@ public class GoalInvitationServiceTest {
         when(userRepository.findById(goalInvitationDto.getInviterId())).thenReturn(Optional.of(new User()));
         when(userRepository.findById(goalInvitationDto.getInvitedUserId())).thenReturn(Optional.of(new User()));
         when(goalRepository.findById(goalInvitationDto.getGoalId())).thenReturn(Optional.empty());
+
         Exception exception = assertThrows(RuntimeException.class, () -> goalInvitationService.createInvitation(goalInvitationDto));
 
         assertEquals(NO_GOAL_IN_DB.getMessage(), exception.getMessage());
@@ -132,7 +133,9 @@ public class GoalInvitationServiceTest {
         GoalInvitation goalInvitation = setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
 
         when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.empty());
+
         Exception exception = assertThrows(RuntimeException.class, () -> goalInvitationService.acceptGoalInvitation(goalInvitation.getId()));
+
         assertEquals(NO_GOAL_INVITATION_IN_DB.getMessage(), exception.getMessage());
     }
 

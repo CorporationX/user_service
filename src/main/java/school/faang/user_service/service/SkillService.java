@@ -36,6 +36,6 @@ public class SkillService {
         return skillRepository.findSkillsOfferedToUser(userId).stream()
                 .collect(Collectors.groupingBy(skill -> skill, Collectors.counting()))
                 .entrySet().stream()
-                .map(entry -> skillCandidateMapper.toDto(entry.getKey(), entry.getValue())).collect(Collectors.toList());
+                .map(entry -> skillCandidateMapper.toDto(entry.getKey(), entry.getValue())).toList();
     }
 }

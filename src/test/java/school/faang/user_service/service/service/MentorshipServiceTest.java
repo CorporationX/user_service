@@ -11,7 +11,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exceptions.mentorship.NotFoundException;
+import school.faang.user_service.exceptions.mentorship.EntityNotFoundException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.service.MentorshipService;
@@ -40,7 +40,7 @@ public class MentorshipServiceTest {
     @Test
     public void testGetMenteesWithNotExistingMentor() {
         when(mentorshipRepository.findById(1L)).thenReturn(Optional.empty());
-        var exception = assertThrows(NotFoundException.class,
+        var exception = assertThrows(EntityNotFoundException.class,
                 () -> mentorshipService.getMentees(1L));
         assertEquals("This mentor with id: 1 is not in the database", exception.getMessage());
     }
@@ -62,7 +62,7 @@ public class MentorshipServiceTest {
     @Test
     public void testGetMentorsWithNotExistingUser() {
         when(mentorshipRepository.findById(1L)).thenReturn(Optional.empty());
-        var exception = assertThrows(NotFoundException.class,
+        var exception = assertThrows(EntityNotFoundException.class,
                 () -> mentorshipService.getMentors(1L));
         assertEquals("This mentee with id: 1 is not in the database", exception.getMessage());
     }
@@ -84,7 +84,7 @@ public class MentorshipServiceTest {
     @Test
     public void testDeleteMenteeWithNotExistingMentor() {
         when(mentorshipRepository.findById(2L)).thenReturn(Optional.empty());
-        var exception = assertThrows(NotFoundException.class,
+        var exception = assertThrows(EntityNotFoundException.class,
                 () -> mentorshipService.deleteMentee(1L, 2L));
         assertEquals("Mentor with id: 2 is not in the database", exception.getMessage());
     }
@@ -93,7 +93,7 @@ public class MentorshipServiceTest {
     public void testDeleteMenteeWithNotExistingMentee() {
         when(mentorshipRepository.findById(1L)).thenReturn(Optional.empty());
         when(mentorshipRepository.findById(2L)).thenReturn(Optional.of(new User()));
-        var exception = assertThrows(NotFoundException.class,
+        var exception = assertThrows(EntityNotFoundException.class,
                 () -> mentorshipService.deleteMentee(1L, 2L));
         assertEquals("Mentee with id: 1 is not in the database", exception.getMessage());
     }
@@ -121,7 +121,7 @@ public class MentorshipServiceTest {
     @Test
     public void testDeleteMentorWithNotExistingMentor() {
         when(mentorshipRepository.findById(2L)).thenReturn(Optional.empty());
-        var exception = assertThrows(NotFoundException.class,
+        var exception = assertThrows(EntityNotFoundException.class,
                 () -> mentorshipService.deleteMentor(1L, 2L));
         assertEquals("Mentor with id: 2 is not in the database", exception.getMessage());
     }
@@ -130,7 +130,7 @@ public class MentorshipServiceTest {
     public void testDeleteMentorWithNotExistingMentee() {
         when(mentorshipRepository.findById(1L)).thenReturn(Optional.empty());
         when(mentorshipRepository.findById(2L)).thenReturn(Optional.of(new User()));
-        var exception = assertThrows(NotFoundException.class,
+        var exception = assertThrows(EntityNotFoundException.class,
                 () -> mentorshipService.deleteMentor(1L, 2L));
         assertEquals("Mentee with id: 1 is not in the database", exception.getMessage());
     }

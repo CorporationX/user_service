@@ -14,6 +14,7 @@ public class SkillService {
     private final SkillRepository skillRepository;
     private final SkillMapper skillMapper;
     private final SkillValidator skillValidator;
+
     public SkillDto create(SkillDto skill) {
         skillValidator.validateSkill(skill);
         Skill convertedSkill = skillMapper.toEntity(skill);

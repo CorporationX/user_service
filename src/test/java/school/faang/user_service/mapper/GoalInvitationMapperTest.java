@@ -1,5 +1,39 @@
 package school.faang.user_service.mapper;
 
-public class GoalInvitationMapperTest {
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
+import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.entity.goal.GoalInvitation;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class GoalInvitationMapperTest {
+    final GoalInvitationMapper goalInvitationMapper = Mappers.getMapper(GoalInvitationMapper.class);
+    GoalInvitation goalInvitation;
+    GoalInvitationDto goalInvitationDto;
+
+    @BeforeEach
+    void setUp() {
+        goalInvitation = new GoalInvitation();
+        goalInvitation.setId(1L);
+
+        goalInvitationDto = new GoalInvitationDto();
+        goalInvitationDto.setId(1L);
+    }
+
+    @Test
+    void testToEntity() {
+        GoalInvitation actualGoalInvitation = goalInvitationMapper.toEntity(goalInvitationDto);
+        assertEquals(goalInvitation, actualGoalInvitation);
+    }
+
+    @Test
+    void testToDto() {
+        GoalInvitationDto actualGoalInvitationDto = goalInvitationMapper.toDto(goalInvitation);
+        assertEquals(goalInvitationDto, actualGoalInvitationDto);
+    }
 }

@@ -31,14 +31,14 @@ public class GoalInvitationControllerTest {
     ArgumentCaptor<Long> longCaptor;
     @Captor
     ArgumentCaptor<InvitationFilterDto> invitationFilterDtoCapture;
-    long id = 1L;
+    final long id = 1L;
 
     @Test
     void testCreateInvitationWithRightArgument() {
         GoalInvitationDto goalInvitationDto = new GoalInvitationDto();
         goalInvitationDto.setStatus(RequestStatus.ACCEPTED);
 
-        goalInvitationService.createInvitation(goalInvitationDto);
+        goalInvitationController.createInvitation(goalInvitationDto);
 
         verify(goalInvitationService).createInvitation(goalInvitationDtoCapture.capture());
         assertEquals(goalInvitationDto.getStatus(), goalInvitationDtoCapture.getValue().getStatus());
@@ -46,15 +46,19 @@ public class GoalInvitationControllerTest {
 
     @Test
     void testAcceptGoalInvitationWithRightArgument() {
-        goalInvitationService.acceptGoalInvitation(id);
+        goalInvitationController.acceptGoalInvitation(id);
+
         verify(goalInvitationService).acceptGoalInvitation(longCaptor.capture());
+
         assertEquals(id, longCaptor.getValue());
     }
 
     @Test
     void testRejectGoalInvitationWithRightArgument() {
-        goalInvitationService.rejectGoalInvitation(id);
+        goalInvitationController.rejectGoalInvitation(id);
+
         verify(goalInvitationService).rejectGoalInvitation(longCaptor.capture());
+
         assertEquals(id, longCaptor.getValue());
     }
 
@@ -63,7 +67,7 @@ public class GoalInvitationControllerTest {
         InvitationFilterDto invitationFilterDto = new InvitationFilterDto();
         invitationFilterDto.setStatus(RequestStatus.ACCEPTED);
 
-        goalInvitationService.getInvitations(invitationFilterDto);
+        goalInvitationController.getInvitations(invitationFilterDto);
 
         verify(goalInvitationService).getInvitations(invitationFilterDtoCapture.capture());
         assertEquals(invitationFilterDto.getStatus(), invitationFilterDtoCapture.getValue().getStatus());

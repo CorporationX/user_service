@@ -16,19 +16,19 @@ import java.util.List;
 public class GoalInvitationController {
     private GoalInvitationService goalInvitationService;
 
-    GoalInvitationDto createInvitation(GoalInvitationDto invitation) {
+    public GoalInvitationDto createInvitation(GoalInvitationDto invitation) {
         return goalInvitationService.createInvitation(invitation);
     }
 
-    void acceptGoalInvitation(long id) {
+    public void acceptGoalInvitation(long id) {
         goalInvitationService.acceptGoalInvitation(id);
     }
 
-    void rejectGoalInvitation(long id) {
+    public void rejectGoalInvitation(long id) {
         goalInvitationService.rejectGoalInvitation(id);
     }
 
-    List<GoalInvitation> getInvitations(InvitationFilterDto filter) {
+    public List<GoalInvitation> getInvitations(InvitationFilterDto filter) {
         return goalInvitationService.getInvitations(filter);
     }
 }

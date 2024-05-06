@@ -13,16 +13,10 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.MentorshipMapper;
 import school.faang.user_service.publisher.MentorshipEventPublisher;
-import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.validator.mentorship.MentorshipValidator;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
-
 
 @Service
 @RequiredArgsConstructor
@@ -52,7 +46,7 @@ public class MentorshipRequestService{
             throw new DataValidationException("Error:previous request was made earlier than 3 months");
         }
 
-        MentorshipRequest mentorshipRequest = mentorshipRequest=mentorshipRequestRepository.save(mentorshipMapper
+        MentorshipRequest mentorshipRequest=mentorshipRequestRepository.save(mentorshipMapper
                 .toEntity(mentorshipRequestDto));
 
         return mentorshipMapper.toDto(mentorshipRequest);
@@ -65,9 +59,10 @@ public class MentorshipRequestService{
         User mentee=mentorshipRequest.getRequester();
         User mentor=mentorshipRequest.getReceiver();
         List<User> mentees=mentor.getMentees();
+        log.info(mentees.toString());
 
         if(mentees.contains(mentee)){
-            log.warn("Already mentor for user: "+mentee.getId());
+            log.warn("Already mentor for user: " + mentee.getId());
             throw new DataValidationException("Already mentor for user: "+mentee.getId());
         }else{
             mentees.add(mentee);

@@ -5,15 +5,15 @@ import school.faang.user_service.entity.event.Event;
 
 import java.util.stream.Stream;
 
-public class EventTypeFilter implements EventFilter{
-    @Override
-    public boolean isApplicable(EventFilterDto filters) {
-        return filters.getTypePattern() != null && !filters.getTypePattern().isBlank();
-    }
+ class EventTypeFilter implements EventFilter {
+     @Override
+     public boolean isApplicable(EventFilterDto filters) {
+         return filters.getTypePattern() != null && !filters.getTypePattern().isBlank();
+     }
 
-    @Override
-    public Stream<Event> apply(Stream<Event> events, EventFilterDto filters) {
-        return events
-                .filter(event -> event.getType().getMessage().contains(filters.getTypePattern()));
-    }
+     @Override
+     public Stream<Event> apply(Stream<Event> events, EventFilterDto filters) {
+         return events
+                 .filter(event -> event.getType().getMessage().contains(filters.getTypePattern()));
+     }
 }

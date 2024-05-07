@@ -1,15 +1,16 @@
 package school.faang.user_service.repository;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.User;
 
 import java.util.stream.Stream;
 
 @Repository
-public interface SubscriptionRepository extends CrudRepository<User, Long> {
+public interface SubscriptionRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
 
     @Query(nativeQuery = true, value = "insert into subscription (follower_id, followee_id) values (:followerId, :followeeId)")
     @Modifying
@@ -28,6 +29,7 @@ public interface SubscriptionRepository extends CrudRepository<User, Long> {
             where subs.followee_id = :followeeId
             """)
     Stream<User> findByFolloweeId(long followeeId);
+
 
     @Query(nativeQuery = true, value = "select count(id) from subscription where followee_id = :followeeId")
     int findFollowersAmountByFolloweeId(long followeeId);

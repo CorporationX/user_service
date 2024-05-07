@@ -10,16 +10,16 @@ import school.faang.user_service.dto.messagebroker.SearchAppearanceEvent;
 
 @Component
 @Slf4j
-public class SearchAppearanceEventPublisher extends AbstractEventPublisher<SearchAppearanceEvent>{
+public class SearchAppearanceEventPublisher extends MessagePublisher<SearchAppearanceEvent>{
     @Value("${spring.data.redis.channels.search_appearance_topic")
     private ChannelTopic SearchAppearanceTopic;
 
-    public SearchAppearanceEventPublisher(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper) {
-        super(redisTemplate, objectMapper);
+    public SearchAppearanceEventPublisher(ObjectMapper objectMapper, RedisTemplate<String, Object> redisTemplate) {
+        super(objectMapper, redisTemplate);
     }
 
     public void publish(SearchAppearanceEvent searchAppearanceEvent){
-        convertAndSend(searchAppearanceEvent, SearchAppearanceTopic.getTopic());
+        convertAndSend(SearchAppearanceTopic.getTopic(),searchAppearanceEvent);
         log.info("search Appearance Event published user id: "+ searchAppearanceEvent.getUserId());
     }
 }

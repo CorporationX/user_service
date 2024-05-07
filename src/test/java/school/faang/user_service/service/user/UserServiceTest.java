@@ -25,7 +25,7 @@ import school.faang.user_service.mapper.user.UserMapperImpl;
 import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.service.MentorshipService;
+import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.service.filter.CreatingTestData;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.user.filter.UserCountryFilter;
@@ -71,8 +71,8 @@ public class UserServiceTest {
 
     @BeforeEach
     public void init() {
-        userService = new UserService(userMapper, userValidator, userRepository, mentorshipService, goalService
-                , eventRepository,userContext,profileViewEventPublisher, userFilters, searchAppearanceEventPublisher);
+        userService = new UserService(searchAppearanceEventPublisher,profileViewEventPublisher, mentorshipService
+                , eventRepository, userRepository, userFilters, userValidator, goalService,userContext, userMapper);
     }
 
     @Test

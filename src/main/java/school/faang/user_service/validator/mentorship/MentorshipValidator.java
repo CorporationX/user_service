@@ -1,7 +1,8 @@
 package school.faang.user_service.validator.mentorship;
 
+import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.User;
-
+@Component
 public class MentorshipValidator {
     public void addGoalToMenteeFromMentorValidation(User mentee , User mentor) {
         if (mentee.getMentors() == null) {

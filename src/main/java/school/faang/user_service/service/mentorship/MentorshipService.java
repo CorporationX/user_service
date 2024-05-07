@@ -9,7 +9,6 @@ import school.faang.user_service.dto.messagebroker.GoalSetEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.MenteeMapper;
-import school.faang.user_service.mapper.MentorMapper;
 import school.faang.user_service.publisher.GoalSetEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.service.goal.GoalService;
@@ -28,7 +27,6 @@ public class MentorshipService {
     private final MentorshipRepository mentorshipRepository;
     private final MentorshipValidator mentorshipValidator;
     private final MenteeMapper menteeMapper;
-    private final MentorMapper mentorMapper;
     private final GoalService goalService;
 
     public List<User> getMentees(Long userId) {
@@ -105,7 +103,7 @@ public class MentorshipService {
     public MenteeDto addGoalToMenteeFromMentor(Long menteeId, Long goalId, Long mentorId) {
         User mentee = getMentee(menteeId);
         User mentor = getMentor(mentorId);
-        mentorshipValidator.addGoalToMenteeFromMentorValidation(mentee,mentor);
+        mentorshipValidator.addGoalToMenteeFromMentorValidation(mentee, mentor);
         Goal goal = goalService.getGoal(goalId);
         List<Goal> userGoalList = mentee.getGoals();
         if (userGoalList == null) {

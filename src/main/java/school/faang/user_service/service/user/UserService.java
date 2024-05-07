@@ -8,23 +8,11 @@ import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.event.ProfileViewEvent;
 import school.faang.user_service.dto.event.UserEvent;
-
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.dto.messagebroker.SearchAppearanceEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.mapper.user.UserMapper;
-import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
-import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.user.filter.UserFilter;
-import school.faang.user_service.validator.user.UserValidator;
-import java.time.LocalDateTime;
-import java.util.UUID;
-import school.faang.user_service.handler.exception.EntityNotFoundException;
-import school.faang.user_service.dto.event.UserEvent;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
@@ -32,10 +20,12 @@ import school.faang.user_service.handler.exception.DataValidationException;
 import school.faang.user_service.handler.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.publisher.ProfileViewEventPublisher;
+import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.service.goal.GoalService;
+import school.faang.user_service.service.mentorship.MentorshipService;
+import school.faang.user_service.service.user.filter.UserFilter;
 import school.faang.user_service.validator.user.UserValidator;
 
 import java.time.LocalDateTime;
@@ -49,17 +39,16 @@ import static school.faang.user_service.validator.user.UserConstraints.USER_NOT_
 @RequiredArgsConstructor
 @Slf4j
 public class UserService {
+    private final SearchAppearanceEventPublisher searchAppearanceEventPublisher;
+    private final ProfileViewEventPublisher profileViewEventPublisher;
     private final MentorshipService mentorshipService;
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
+    private final List<UserFilter> userFilters;
     private final UserValidator userValidator;
     private final GoalService goalService;
-    private final UserMapper userMapper;
-
     private final UserContext userContext;
-    private final ProfileViewEventPublisher profileViewEventPublisher;
-    private final List<UserFilter> userFilters;
-    private final SearchAppearanceEventPublisher searchAppearanceEventPublisher;
+    private final UserMapper userMapper;
 
     @Value("${dicebear.avatar}")
     private String avatarUrl;

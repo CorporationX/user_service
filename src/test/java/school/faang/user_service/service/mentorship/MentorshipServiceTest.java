@@ -80,20 +80,22 @@ public class MentorshipServiceTest {
 
     @Test
     public void testGetMenteesInvalidId() {
-        assertThrows(EntityNotFoundException.class,() -> mentorshipService.getMentees(1L));
+        assertThrows(EntityNotFoundException.class, () -> mentorshipService.getMentees(1L));
     }
+
     @Test
-    public void testGetMenteesEmptyList(){
+    public void testGetMenteesEmptyList() {
         when(mentorshipRepository.findById(2L)).thenReturn(Optional.of(secondMentor));
         assertEquals(Collections.emptyList(), mentorshipService.getMentees(2L));
     }
 
     @Test
     public void testGetMentorsInvalidId() {
-        assertThrows(EntityNotFoundException.class,()-> mentorshipService.getMentors(1L));
+        assertThrows(EntityNotFoundException.class, () -> mentorshipService.getMentors(1L));
     }
+
     @Test
-    public void testGetMentorsEmptyList(){
+    public void testGetMentorsEmptyList() {
         when(mentorshipRepository.findById(10L)).thenReturn(Optional.of(secondMentee));
         assertEquals(Collections.emptyList(), mentorshipService.getMentors(10L));
     }
@@ -115,12 +117,13 @@ public class MentorshipServiceTest {
 
         verify(mentorshipRepository, times(1)).save(thirdMentee);
     }
+
     @Test
-    public void testDeleteMenteeIsNotOnTheList(){
+    public void testDeleteMenteeIsNotOnTheList() {
         when(mentorshipRepository.findById(1L)).thenReturn(Optional.of(firstMentor));
         when(mentorshipRepository.findById(16L)).thenReturn(Optional.of(User.builder()
                 .id(16L).build()));
-        assertThrows(IllegalArgumentException.class,() ->mentorshipService.deleteMentee(16L, 1L));
+        assertThrows(IllegalArgumentException.class, () -> mentorshipService.deleteMentee(16L, 1L));
     }
 
     @Test
@@ -136,12 +139,13 @@ public class MentorshipServiceTest {
 
         assertThrows(EntityNotFoundException.class, () -> mentorshipService.deleteMentor(13L, 5L));
     }
+
     @Test
-    public void testDeleteMentorIsNotOnTheList(){
+    public void testDeleteMentorIsNotOnTheList() {
         when(mentorshipRepository.findById(13L)).thenReturn(Optional.of(thirdMentee));
         when(mentorshipRepository.findById(5L)).thenReturn(Optional.of(User.builder()
                 .id(5L).build()));
-        assertThrows(IllegalArgumentException.class,() ->mentorshipService.deleteMentor(13L, 5L));
+        assertThrows(IllegalArgumentException.class, () -> mentorshipService.deleteMentor(13L, 5L));
     }
 
     @Test
@@ -157,8 +161,9 @@ public class MentorshipServiceTest {
 
         assertThrows(EntityNotFoundException.class, () -> mentorshipService.deleteMentor(16L, 1L));
     }
+
     @Test
-    void addGoalToUserTest(){
+    void addGoalToUserTest() {
         long menteeId = 11L;
         long goalId = 1L;
         long mentorId = 2L;
@@ -171,13 +176,13 @@ public class MentorshipServiceTest {
                 .mentorsIds(List.of(mentorId))
                 .goalIds(List.of(goalId))
                 .build();
-        GoalSetEvent goalSetEvent = new GoalSetEvent(menteeId,goalId);
+        GoalSetEvent goalSetEvent = new GoalSetEvent(menteeId, goalId);
         firstMentee.setMentors(List.of(secondMentor));
         when(mentorshipRepository.findById(menteeId)).thenReturn(Optional.of(firstMentee));
         when(mentorshipRepository.findById(mentorId)).thenReturn(Optional.of(secondMentor));
         when(goalService.getGoal(anyLong())).thenReturn(goalTest);
 
-        assertEquals(menteeDtoResult,mentorshipService.addGoalToMenteeFromMentor(menteeId,goalId,mentorId));
+        assertEquals(menteeDtoResult, mentorshipService.addGoalToMenteeFromMentor(menteeId, goalId, mentorId));
         verify(mentorshipRepository).save(firstMentee);
         verify(goalSetEventPublisher).publish(goalSetEvent);
     }

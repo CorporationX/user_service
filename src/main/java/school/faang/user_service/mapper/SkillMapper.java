@@ -14,5 +14,4 @@ public interface SkillMapper {
     Skill toEntity(SkillDto skillDto);
 
     void update(SkillDto dto, @MappingTarget Skill entity);
-
 }

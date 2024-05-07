@@ -28,7 +28,7 @@ public class MentorshipRequestValidator {
     private final UserRepository userRepository;
     private final MentorshipRequestRepository mentorshipRequestRepository;
 
-    @Value("${minimum.request.period}")
+    @Value("${mentoring.request_limit_months}")
     private int MIN_REQ_PERIOD;
 
     public void validateRequest(MentorshipRequestDto dto) {

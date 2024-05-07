@@ -54,3 +54,7 @@ services:
 
 mentoring:
   request_limit_months: 3
+
+skill:
+  offers:
+    min: 3

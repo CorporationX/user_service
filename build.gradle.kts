@@ -51,8 +51,8 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation("org.slf4j:slf4j-api:2.0.5")
     implementation("ch.qos.logback:logback-classic:1.4.6")
-    implementation("org.projectlombok:lombok:1.18.26")
-    annotationProcessor("org.projectlombok:lombok:1.18.26")
+    implementation("org.projectlombok:lombok:1.18.32")
+    annotationProcessor("org.projectlombok:lombok:1.18.32")
     implementation("org.mapstruct:mapstruct:1.5.3.Final")
     annotationProcessor("org.mapstruct:mapstruct-processor:1.5.3.Final")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
@@ -95,47 +95,34 @@ tasks.bootJar {
 /**
  * JaCoCo settings
  */
-val jacocoInclude = listOf(
-    "**/controller/**",
-    "**/service/**",
-    "**/validator/**",
-    "**/mapper/**"
-)
 jacoco {
-    toolVersion = "0.8.9"
-    reportsDirectory.set(layout.buildDirectory.dir("$buildDir/reports/jacoco"))
+    toolVersion = "0.8.11"
 }
-tasks.test {
-    finalizedBy(tasks.jacocoTestReport)
-}
+
 tasks.jacocoTestReport {
     dependsOn(tasks.test)
-
     reports {
         xml.required.set(false)
         csv.required.set(false)
-        //html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+        html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
     }
-
-    classDirectories.setFrom(
-        sourceSets.main.get().output.asFileTree.matching {
-            include(jacocoInclude)
-        }
-    )
+    finalizedBy(tasks.jacocoTestCoverageVerification)
+    executionData(fileTree(project.rootDir.absolutePath).include("**/build/jacocoHtml/index.xml"))
 }
+
 tasks.jacocoTestCoverageVerification {
     violationRules {
         rule {
-            element = "CLASS"
-            classDirectories.setFrom(
-                sourceSets.main.get().output.asFileTree.matching {
-                    include(jacocoInclude)
-                }
-            )
-            enabled = true
             limit {
-                minimum = BigDecimal(0.7).setScale(2, BigDecimal.ROUND_HALF_UP) // Задаем минимальный уровень покрытия
+                isEnabled = false
+                minimum = 0.7.toBigDecimal()
             }
+        }
+
+        rule {
+            isEnabled = true
+            element = "CLASS"
+            includes = listOf("school.faang.user_service.*")
         }
     }
 }

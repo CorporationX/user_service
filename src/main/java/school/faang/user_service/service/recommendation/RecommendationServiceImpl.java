@@ -37,7 +37,10 @@ public class RecommendationServiceImpl implements RecommendationService {
     @Override
     @Transactional
     public RecommendationDto create(RecommendationDto recommendationDto) {
-        validator.validateAuthorAndReceiver(recommendationDto);
+        User author = findUserByUserId(recommendationDto.getAuthorId());
+        User receiver = findUserByUserId(recommendationDto.getReceiverId());
+
+        validator.validateAuthorAndReceiver(recommendationDto, author, receiver);
 
         recommendationRepository.create(
                 recommendationDto.getAuthorId(),
@@ -52,7 +55,11 @@ public class RecommendationServiceImpl implements RecommendationService {
     @Override
     @Transactional
     public RecommendationDto updateRecommendation(RecommendationDto updatedRecommendationDto) {
-        validator.validateAuthorAndReceiver(updatedRecommendationDto);
+
+        User author = findUserByUserId(updatedRecommendationDto.getAuthorId());
+        User receiver = findUserByUserId(updatedRecommendationDto.getReceiverId());
+
+        validator.validateAuthorAndReceiver(updatedRecommendationDto, author, receiver);
 
         skillOfferRepository.deleteAllByRecommendationId(updatedRecommendationDto.getId());
         processSkillsAndGuarantees(updatedRecommendationDto);
@@ -66,10 +73,20 @@ public class RecommendationServiceImpl implements RecommendationService {
     }
 
     @Override
-    public void delete(long id) {
+    public RecommendationDto delete(long id) {
         validator.checkIfRecommendationNotExist(id);
 
+        Optional<Recommendation> recommendationToDelete = recommendationRepository.findById(id);
+
+        if (recommendationToDelete.isEmpty()) {
+            throw new EntityNotFoundException("Recommendation with id: " + id + " not found");
+        }
+
+        RecommendationDto recommendationDto = recommendationMapper.toDto(recommendationToDelete.get());
+
         recommendationRepository.deleteById(id);
+
+        return recommendationDto;
     }
 
     @Override
@@ -86,6 +103,7 @@ public class RecommendationServiceImpl implements RecommendationService {
     }
 
     @Override
+    @Transactional
     public List<RecommendationDto> getAllGivenRecommendations(long authorId) {
         Page<Recommendation> recommendationPage = recommendationRepository
                 .findAllByAuthorId(
@@ -98,22 +116,13 @@ public class RecommendationServiceImpl implements RecommendationService {
                 .toList();
     }
 
-    @Transactional
-    public Participants getAuthorAndReceiver(RecommendationDto updated) {
-        User author = findUserByUserId(updated.getAuthorId());
-        User receiver = findUserByUserId(updated.getReceiverId());
-        return new Participants(author, receiver);
-    }
-
-    public record Participants(User author, User receiver) {
-    }
-
 
     @Transactional
     public void processSkillsAndGuarantees(RecommendationDto recommendationDto) {
-        Participants participants = getAuthorAndReceiver(recommendationDto);
+        User author = findUserByUserId(recommendationDto.getAuthorId());
+        User receiver = findUserByUserId(recommendationDto.getReceiverId());
 
-        List<Skill> existingReceiverSkills = skillRepository.findAllByUserId(participants.receiver.getId());
+        List<Skill> existingReceiverSkills = skillRepository.findAllByUserId(receiver.getId());
         List<SkillOfferDto> skillOffersDto = recommendationDto.getSkillOffers();
 
         if (skillOffersDto == null) {
@@ -123,10 +132,12 @@ public class RecommendationServiceImpl implements RecommendationService {
         updateSkillsGuarantees(
                 skillOffersDto,
                 existingReceiverSkills,
-                participants);
+                author,
+                receiver);
 
         saveNewSkills(
-                participants,
+                author,
+                receiver,
                 skillOffersDto);
 
         saveSkillOffers(skillOffersDto);
@@ -143,7 +154,8 @@ public class RecommendationServiceImpl implements RecommendationService {
     private void updateSkillsGuarantees(
             List<SkillOfferDto> skillOffersDto,
             List<Skill> receiverSkills,
-            Participants participants) {
+            User author,
+            User receiver) {
 
         List<Long> skillOfferIds = skillOffersDto.stream()
                 .map(SkillOfferDto::getSkillId).toList();
@@ -151,19 +163,19 @@ public class RecommendationServiceImpl implements RecommendationService {
         receiverSkills.stream()
                 .filter(skill -> skillOfferIds.contains(skill.getId()))
                 .forEach(matchedSkill -> {
-                    if (!validator.checkIsGuarantor(matchedSkill, participants.author.getId())) {
-                        addGuarantor(matchedSkill, participants);
+                    if (!validator.checkIsGuarantor(matchedSkill, author.getId())) {
+                        addGuarantor(matchedSkill, author, receiver);
                     }
                 });
 
         skillOffersDto.removeIf(offer -> skillOfferIds.contains(offer.getSkillId()));
     }
 
-    private void addGuarantor(Skill skill, Participants participants) {
+    private void addGuarantor(Skill skill, User author, User receiver) {
         UserSkillGuarantee guarantee = UserSkillGuarantee.builder()
-                .user(participants.receiver)
+                .user(receiver)
                 .skill(skill)
-                .guarantor(participants.author)
+                .guarantor(author)
                 .build();
 
         List<UserSkillGuarantee> guarantees = Optional.ofNullable(skill.getGuarantees())
@@ -173,16 +185,17 @@ public class RecommendationServiceImpl implements RecommendationService {
     }
 
     @Transactional
-    public void saveNewSkills(Participants participants, List<SkillOfferDto> skillOffersDto) {
+    public void saveNewSkills(User author, User receiver, List<SkillOfferDto> skillOffersDto) {
         List<Skill> newSkills = skillRepository.findAllById(
                 skillOffersDto.stream()
                         .map(SkillOfferDto::getSkillId)
                         .collect(Collectors.toList()));
 
-        newSkills.forEach(skill -> addGuarantor(skill, participants));
-        participants.receiver.getSkills().addAll(newSkills);
+        newSkills.forEach(skill -> addGuarantor(skill, author,
+                receiver));
+        receiver.getSkills().addAll(newSkills);
 
-        userRepository.save(participants.receiver);
+        userRepository.save(receiver);
     }
 
     @Transactional

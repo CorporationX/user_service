@@ -10,7 +10,6 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
-import school.faang.user_service.service.recommendation.RecommendationServiceImpl;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -20,17 +19,6 @@ import java.util.Optional;
 public class RecommendationValidator {
     private final SkillRepository skillRepository;
     private final RecommendationRepository recommendationRepository;
-    private final RecommendationServiceImpl recommendationServiceImpl;
-
-    public void validate(RecommendationDto recommendation) {
-        validateRecommendationHaveContent(recommendation);
-    }
-
-    private void validateRecommendationHaveContent(RecommendationDto recommendation) {
-        if (recommendation.getContent().isBlank() || recommendation.getContent().isEmpty()) {
-            throw new DataValidationException("Content field should be filled");
-        }
-    }
 
     public void validateLastRecommendationToThisReceiverInterval(User author, User receiver) {
 
@@ -68,13 +56,11 @@ public class RecommendationValidator {
                 .anyMatch(guarantee -> guarantee.getGuarantor().getId() == authorId);
     }
 
-    public void validateAuthorAndReceiver(RecommendationDto recommendationDto) {
-        RecommendationServiceImpl.Participants participants = recommendationServiceImpl
-                .getAuthorAndReceiver(recommendationDto);
+    public void validateAuthorAndReceiver(RecommendationDto recommendationDto, User author, User receiver) {
 
         validateLastRecommendationToThisReceiverInterval(
-                participants.author(),
-                participants.receiver());
+                author,
+                receiver);
 
         validaIfSkillsFromOfferNotExist(recommendationDto);
     }

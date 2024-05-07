@@ -10,7 +10,7 @@ public interface RecommendationService {
 
     RecommendationDto updateRecommendation(RecommendationDto updated);
 
-    void delete(long id);
+    RecommendationDto delete(long id);
 
     List<RecommendationDto> getAllUserRecommendations(long receiverId);
 

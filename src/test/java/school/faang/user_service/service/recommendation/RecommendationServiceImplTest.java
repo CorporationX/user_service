@@ -91,15 +91,13 @@ public class RecommendationServiceImplTest {
                 new Skill(),
                 new Skill());
 
-        RecommendationServiceImpl.Participants participants = new RecommendationServiceImpl.Participants(author, receiver);
-
         when(skillRepository.findAllById(any())).thenReturn(returnedSkills);
 
-        recommendationServiceImpl.saveNewSkills(participants, skillOffersDto);
+        recommendationServiceImpl.saveNewSkills(author, receiver, skillOffersDto);
 
         recommendationServiceImpl.create(recommendationDto);
 
-        verify(validator, times(1)).validateAuthorAndReceiver(recommendationDto);
+        verify(validator, times(1)).validateAuthorAndReceiver(recommendationDto, author, receiver);
         verify(recommendationRepository, times(1)).create(
                 recommendationDto.getAuthorId(),
                 recommendationDto.getReceiverId(),
@@ -136,22 +134,27 @@ public class RecommendationServiceImplTest {
                 new Skill(),
                 new Skill());
 
-        RecommendationServiceImpl.Participants participants = new RecommendationServiceImpl.Participants(author, receiver);
-
         when(skillRepository.findAllById(any())).thenReturn(returnedSkills);
 
-        recommendationServiceImpl.saveNewSkills(participants, skillOffersDto);
+        recommendationServiceImpl.saveNewSkills(author, receiver, skillOffersDto);
 
         recommendationServiceImpl.updateRecommendation(updatedDto);
 
-        verify(validator).validateAuthorAndReceiver(updatedDto);
+        verify(validator).validateAuthorAndReceiver(updatedDto, author, receiver);
         verify(skillOfferRepository).deleteAllByRecommendationId(1);
         verify(recommendationRepository).update(1, 2, "Updated content");
     }
 
     @Test
     void deleteRecommendation_success() {
+        Optional<Recommendation> recommendationToDelete = Optional.ofNullable(Recommendation.builder()
+                .id(1L)
+                .content("content")
+                .build());
+
         long recommendationId = 1;
+        when(recommendationRepository.findById(recommendationId)).thenReturn(recommendationToDelete);
+
 
         recommendationServiceImpl.delete(recommendationId);
 
@@ -170,19 +173,25 @@ public class RecommendationServiceImplTest {
 
     @Test
     void testSaveNewSkills() {
+
         List<SkillOfferDto> skillOffersDto = List.of(new SkillOfferDto(), new SkillOfferDto());
         List<Skill> returnedSkills = List.of(new Skill(), new Skill());
+
+        User author = new User();
+        author.setId(1L);
+        author.setSkills(new ArrayList<>());
+
         User receiver = new User();
+        receiver.setId(2L);
         receiver.setSkills(new ArrayList<>());
-        RecommendationServiceImpl.Participants participants = new RecommendationServiceImpl.Participants(new User(), receiver);
 
         when(skillRepository.findAllById(any())).thenReturn(returnedSkills);
 
-        recommendationServiceImpl.saveNewSkills(participants, skillOffersDto);
+        recommendationServiceImpl.saveNewSkills(author, receiver, skillOffersDto);
 
         verify(skillRepository, times(1)).findAllById(any());
-        verify(userRepository, times(1)).save(participants.receiver());
-        assertEquals(participants.receiver().getSkills().size(), 2);
+        verify(userRepository, times(1)).save(receiver);
+        assertEquals(receiver.getSkills().size(), 2);
     }
 
     @Test
@@ -213,22 +222,6 @@ public class RecommendationServiceImplTest {
         verify(recommendationRepository).findAllByAuthorId(eq(authorId), any());
         verify(recommendationMapper, times(recommendations.size())).toDto(any());
         assertEquals(1, result.size());
-    }
-
-    @Test
-    void getAuthorAndReceiver_success() {
-        RecommendationDto dto = new RecommendationDto();
-        dto.setAuthorId(1L);
-        dto.setReceiverId(2L);
-        User author = new User();
-        User receiver = new User();
-        when(userRepository.findById(1L)).thenReturn(Optional.of(author));
-        when(userRepository.findById(2L)).thenReturn(Optional.of(receiver));
-
-        RecommendationServiceImpl.Participants result = recommendationServiceImpl.getAuthorAndReceiver(dto);
-
-        assertEquals(author, result.author());
-        assertEquals(receiver, result.receiver());
     }
 
     @Test

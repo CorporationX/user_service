@@ -3,31 +3,42 @@ package school.faang.user_service.controler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.RecommendationService;
+import school.faang.user_service.validator.RecommendationValidator;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/recommendation")
 public class RecommendationController {
     private final RecommendationService recommendationService;
+    private final RecommendationValidator recommendationValidator;
+    private final UserContext userContext;
 
-    @PostMapping("/recommendation/created")
+    @PostMapping
     public RecommendationDto giveRecommendation(@RequestBody RecommendationDto recommendationDto) {
-        recommendationValidation(recommendationDto);
+        long authorId = userContext.getUserId();
+        recommendationDto.setAuthorId(authorId);
+
+        recommendationValidator.validateRecommendation(recommendationDto);
         return recommendationService.create(recommendationDto);
     }
 
-    @PostMapping("/recommendation/updated")
-    public RecommendationDto updateRecommendation(@RequestBody RecommendationDto updated) {
-        recommendationValidation(updated);
-        return recommendationService.update(updated);
+    @PutMapping
+    public RecommendationDto updateRecommendation(@RequestBody RecommendationDto recommendationDto) {
+        long userId = userContext.getUserId();
+        long authorId = recommendationDto.getAuthorId();
+
+        recommendationValidator.validateUserAndAuthorIds(userId, authorId);
+
+        recommendationValidator.validateRecommendation(recommendationDto);
+        return recommendationService.update(recommendationDto);
     }
 
-    @PostMapping("/recommendation/deleted")
+    @DeleteMapping
     public void deleteRecommendation(@RequestBody RecommendationDto recommendationDto) {
-        recommendationValidation(recommendationDto);
+        recommendationValidator.validateRecommendation(recommendationDto);
         recommendationService.delete(recommendationDto.getId());
     }
 
@@ -35,7 +46,7 @@ public class RecommendationController {
     public Page<RecommendationDto> getAllUserRecommendations(@PathVariable("receiver_id") long receiverId,
                                                              @RequestParam(name = "page_number") int pageNum,
                                                              @RequestParam(name = "page_size") int pageSize) {
-        idValidation(receiverId);
+        recommendationValidator.validateId(receiverId);
         return recommendationService.getAllUserRecommendation(receiverId, pageNum, pageSize);
     }
 
@@ -43,19 +54,7 @@ public class RecommendationController {
     public Page<RecommendationDto> getAllRecommendation(@PathVariable("author_id") long authorId,
                                                         @RequestParam(name = "page_number") int pageNum,
                                                         @RequestParam(name = "page_size") int pageSize) {
-        idValidation(authorId);
+        recommendationValidator.validateId(authorId);
         return recommendationService.getAllRecommendation(authorId, pageNum, pageSize);
-    }
-
-    private void recommendationValidation(RecommendationDto recommendation) {
-        if (recommendation.getContent() == null || recommendation.getContent().trim().isEmpty()) {
-            throw new DataValidationException("Validation failed. The text cannot be empty.");
-        }
-    }
-
-    private void idValidation(long id) {
-        if (id <= 0) {
-            throw new DataValidationException("Id is not correct.");
-        }
     }
 }

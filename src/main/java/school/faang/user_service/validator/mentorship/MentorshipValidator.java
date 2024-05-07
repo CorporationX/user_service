@@ -20,18 +20,18 @@ public class MentorshipValidator{
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final UserRepository userRepository;
 
-    public boolean isAllowedToMakeRequest(long mentee_id, long mentor_id){
+    public boolean isAllowedToMakeRequest(long menteeId, long mentorId){
 
         LocalDateTime threeMonthsAgo=LocalDateTime.now().minus(3, ChronoUnit.MONTHS);
         Optional<MentorshipRequest> latestRequest=mentorshipRequestRepository
-                .findLatestRequest(mentee_id, mentor_id);
+                .findLatestRequest(menteeId, mentorId);
 
         if(latestRequest.isPresent()){
             LocalDateTime requestedAt=latestRequest.get().getCreatedAt();
             return requestedAt.isBefore(threeMonthsAgo);
         }else{
-            log.warn("Error:previous request was made earlier than 3 months");
-            return false;
+            log.warn("Allowed to make request to mentor" + mentorId );
+            return true;
         }
     }
 

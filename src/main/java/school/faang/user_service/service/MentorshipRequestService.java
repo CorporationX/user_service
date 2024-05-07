@@ -43,8 +43,11 @@ public class MentorshipRequestService{
         mentorshipValidator.checkIfUserExists(menteeId);
 
         if(!mentorshipValidator.isAllowedToMakeRequest(menteeId, mentorId)){
+            log.warn("Error:previous request was made earlier than 3 months!");
             throw new DataValidationException("Error:previous request was made earlier than 3 months");
         }
+
+        mentorshipRequestDto.setStatus(RequestStatus.PENDING);
 
         MentorshipRequest mentorshipRequest=mentorshipRequestRepository.save(mentorshipMapper
                 .toEntity(mentorshipRequestDto));
@@ -59,14 +62,18 @@ public class MentorshipRequestService{
         User mentee=mentorshipRequest.getRequester();
         User mentor=mentorshipRequest.getReceiver();
         List<User> mentees=mentor.getMentees();
-        log.info(mentees.toString());
 
-        if(mentees.contains(mentee)){
+        boolean isAlreadyMentee = mentorshipRequestRepository
+                .existsAcceptedRequest(mentee.getId(), mentor.getId());
+
+        if( isAlreadyMentee){
             log.warn("Already mentor for user: " + mentee.getId());
             throw new DataValidationException("Already mentor for user: "+mentee.getId());
         }else{
             mentees.add(mentee);
             mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
+            mentorshipRequestRepository.save(mentorshipRequest);
+            log.info("You are mentor for user with id " + mentee.getId());
             MentorshipStartEvent mentorshipStartEvent=MentorshipStartEvent
                     .builder().menteeId(mentee.getId())
                     .mentorId(mentor.getId()).build();

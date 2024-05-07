@@ -2,7 +2,7 @@ on:
   pull_request:
   push:
     branches:
-      - 'feature-BJS2-6416'
+      - 'basilisk-master-bc4'
 
 jobs:
   build:

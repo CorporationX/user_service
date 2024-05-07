@@ -3,6 +3,7 @@ package school.faang.user_service.service.goal;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class GoalServiceImpl implements GoalService {
-    private static final int MAX_GOALS_AMOUNT = 3;
+
 
     private final GoalRepository goalRepository;
     private final UserRepository userRepository;
@@ -31,7 +32,10 @@ public class GoalServiceImpl implements GoalService {
 
 
     @Override
+    @Transactional
     public List<GoalDto> findGoalsByUserId(long userId, GoalFilterDto goalFilterDto) {
+        goalValidator.validateThatIdIsGreaterThan0(userId);
+
         List<GoalDto> goals = goalRepository
                 .findGoalsByUserId(userId)
                 .map(goalMapper::toDto)
@@ -41,11 +45,12 @@ public class GoalServiceImpl implements GoalService {
     }
 
     @Override
+    @Transactional
     public GoalDto createGoal(Long userId, Goal goal) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-        goalValidator.validateGoalCreation(user, goal, MAX_GOALS_AMOUNT);
+        goalValidator.validateGoalCreation(user, goal);
 
         List<Skill> skillsToAchieve = goal.getSkillsToAchieve();
 
@@ -57,6 +62,7 @@ public class GoalServiceImpl implements GoalService {
     }
 
     @Override
+    @Transactional
     public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
         Goal goalToUpdate = goalRepository.findById(goalId)
                 .orElseThrow(() -> new EntityNotFoundException("Goal not found"));
@@ -69,6 +75,7 @@ public class GoalServiceImpl implements GoalService {
     }
 
     @Override
+    @Transactional
     public void deleteGoal(long goalId) {
         Goal goal = goalRepository.findById(goalId)
                 .orElseThrow(() -> new EntityNotFoundException("Goal with id: " + goalId + " not found"));
@@ -77,7 +84,10 @@ public class GoalServiceImpl implements GoalService {
     }
 
     @Override
+    @Transactional
     public List<GoalDto> findSubtasksByGoalId(long goalId) {
+        goalValidator.validateThatIdIsGreaterThan0(goalId);
+
         List<Goal> subtasks = goalRepository.findByParent(goalId)
                 .toList();
 

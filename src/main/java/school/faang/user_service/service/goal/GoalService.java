@@ -8,9 +8,13 @@ import java.util.List;
 
 public interface GoalService {
     List<GoalDto> findGoalsByUserId(long userId, GoalFilterDto goalFilterDto);
+
     GoalDto createGoal(Long userId, Goal goal);
+
     GoalDto updateGoal(Long goalId, GoalDto goalDto);
+
     void deleteGoal(long goalId);
+
     List<GoalDto> findSubtasksByGoalId(long goalId);
 }
 

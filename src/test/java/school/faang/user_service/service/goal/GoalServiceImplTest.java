@@ -53,7 +53,7 @@ class GoalServiceImplTest {
     @InjectMocks
     private GoalServiceImpl goalServiceImpl;
 
-    Goal goal;
+    Goal updatedGoal;
     Goal goal2;
     Goal goal3;
     Goal goal4;
@@ -80,7 +80,7 @@ class GoalServiceImplTest {
                 .goals(new ArrayList<>())
                 .build();
 
-        goal = Goal.builder()
+        updatedGoal = Goal.builder()
                 .id(1L)
                 .title("titles")
                 .description("description")
@@ -95,18 +95,18 @@ class GoalServiceImplTest {
                 .build();
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(goalRepository.save(goal)).thenReturn(goal);
-        when(goalMapper.toDto(goal)).thenReturn(goalDto);
+        when(goalRepository.save(updatedGoal)).thenReturn(updatedGoal);
+        when(goalMapper.toDto(updatedGoal)).thenReturn(goalDto);
 
-        goalServiceImpl.createGoal(user.getId(), goal);
+        goalServiceImpl.createGoal(user.getId(), updatedGoal);
 
         InOrder inOrder = inOrder(userRepository, goalValidator, skillService, goalRepository, goalMapper);
         verify(userRepository, times(1)).findById(1L);
 //        verify(goalValidator).validateGoalCreation(user, goal, 3);
-        verify(goalValidator).validateGoalCreation(any(User.class), eq(goal), eq(3));
-        verify(skillService).saveAll(goal.getSkillsToAchieve());
-        verify(goalRepository).save(goal);
-        verify(goalMapper).toDto(goal);
+        verify(goalValidator).validateGoalCreation(any(User.class), eq(updatedGoal));
+        verify(skillService).saveAll(updatedGoal.getSkillsToAchieve());
+        verify(goalRepository).save(updatedGoal);
+        verify(goalMapper).toDto(updatedGoal);
     }
 
 
@@ -123,9 +123,9 @@ class GoalServiceImplTest {
                 .goals(new ArrayList<>())
                 .build();
 
-        goal = Goal.builder()
+        updatedGoal = Goal.builder()
                 .id(1L)
-                .title("My ultimate goall")
+                .title("My ultimate goal")
                 .description("Learn Python")
                 .parent(goal2)
                 .skillsToAchieve(Collections.singletonList(skill1))
@@ -133,28 +133,30 @@ class GoalServiceImplTest {
 
         goalDto = GoalDto.builder()
                 .id(1L)
-                .title("My ultimate goal")
+                .title("My ultimate goall")
                 .description("Learn Java")
                 .build();
 
-        when(goalRepository.findById(1L)).thenReturn(Optional.of(goal));
-        doNothing().when(goalMapper).update(eq(goalDto), eq(goal));
-        when(goalRepository.save(goal)).thenReturn(goal);
-        when(goalMapper.toDto(goal)).thenReturn(goalDto);
+        when(goalRepository.findById(1L)).thenReturn(Optional.of(updatedGoal));
+        doNothing().when(goalMapper).update(eq(goalDto), eq(updatedGoal));
+        when(goalRepository.save(updatedGoal)).thenReturn(updatedGoal);
+        when(goalMapper.toDto(updatedGoal)).thenReturn(goalDto);
 
         goalServiceImpl.updateGoal(1L, goalDto);
 
         verify(goalRepository, times(1)).findById(1L);
-        verify(goalMapper, times(1)).update(goalDto, goal);
-        verify(goalRepository, times(1)).save(goal);
-        verify(goalMapper, times(1)).toDto(goal);
+        verify(goalMapper, times(1)).update(goalDto, updatedGoal);
+        verify(goalRepository, times(1)).save(updatedGoal);
+        verify(goalMapper, times(1)).toDto(updatedGoal);
+
+        assertEquals(updatedGoal.getTitle(), "My ultimate goal");
     }
 
     @Test
     @DisplayName("Test successfully delete goal")
     void testSuccessfullyDeleteGoal() {
 
-        goal = Goal.builder()
+        updatedGoal = Goal.builder()
                 .id(1L)
                 .title("titles")
                 .description("description")
@@ -162,19 +164,19 @@ class GoalServiceImplTest {
                 .skillsToAchieve(Collections.singletonList(skill1))
                 .build();
 
-        when(goalRepository.findById(1L)).thenReturn(Optional.of(goal));
+        when(goalRepository.findById(1L)).thenReturn(Optional.of(updatedGoal));
 
         goalServiceImpl.deleteGoal(1L);
 
         verify(goalRepository, times(1)).findById(1L);
-        verify(goalRepository, times(1)).delete(goal);
+        verify(goalRepository, times(1)).delete(updatedGoal);
     }
 
     @Test
     @DisplayName("Test successfully find subtasks by goal id")
     void testSuccessfullyFindSubtasksByGoalId() {
 
-        goal = Goal.builder()
+        updatedGoal = Goal.builder()
                 .id(1L)
                 .title("titles")
                 .description("description")
@@ -185,7 +187,7 @@ class GoalServiceImplTest {
                 .id(2L)
                 .title("titles")
                 .description("description")
-                .parent(goal)
+                .parent(updatedGoal)
                 .skillsToAchieve(Collections.singletonList(skill1))
                 .build();
 
@@ -193,7 +195,7 @@ class GoalServiceImplTest {
                 .id(3L)
                 .title("titles")
                 .description("description")
-                .parent(goal)
+                .parent(updatedGoal)
                 .skillsToAchieve(Collections.singletonList(skill1))
                 .build();
 
@@ -201,7 +203,7 @@ class GoalServiceImplTest {
                 .id(4L)
                 .title("titles")
                 .description("description")
-                .parent(goal)
+                .parent(updatedGoal)
                 .skillsToAchieve(Collections.singletonList(skill1))
                 .build();
 
@@ -228,7 +230,7 @@ class GoalServiceImplTest {
     @DisplayName("Test successfully find goals by user id")
     void testSuccessfullyFindGoalsByUserId() {
 
-        goal = Goal.builder()
+        updatedGoal = Goal.builder()
                 .id(1L)
                 .title("titles")
                 .description("description")

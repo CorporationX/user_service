@@ -86,6 +86,7 @@ public class RecommendationServiceImpl implements RecommendationService {
     }
 
     @Override
+    @Transactional
     public List<RecommendationDto> getAllGivenRecommendations(long authorId) {
         Page<Recommendation> recommendationPage = recommendationRepository
                 .findAllByAuthorId(

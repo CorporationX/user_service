@@ -25,13 +25,13 @@ public class RecommendationController {
 
     @PostMapping
     public RecommendationDto giveRecommendation(@RequestBody RecommendationDto recommendation) {
-        validator.validate(recommendation);
+        validator.validateRecommendationHaveContent(recommendation);
         return recommendationService.create(recommendation);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping
     public RecommendationDto updateRecommendation(@RequestBody RecommendationDto updated) {
-        validator.validate(updated);
+        validator.validateRecommendationHaveContent(updated);
         return recommendationService.create(updated);
     }
 

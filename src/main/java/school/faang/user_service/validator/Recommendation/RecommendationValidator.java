@@ -22,11 +22,7 @@ public class RecommendationValidator {
     private final RecommendationRepository recommendationRepository;
     private final RecommendationServiceImpl recommendationServiceImpl;
 
-    public void validate(RecommendationDto recommendation) {
-        validateRecommendationHaveContent(recommendation);
-    }
-
-    private void validateRecommendationHaveContent(RecommendationDto recommendation) {
+    public void validateRecommendationHaveContent(RecommendationDto recommendation) {
         if (recommendation.getContent().isBlank() || recommendation.getContent().isEmpty()) {
             throw new DataValidationException("Content field should be filled");
         }

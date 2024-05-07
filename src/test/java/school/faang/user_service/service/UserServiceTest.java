@@ -78,9 +78,7 @@ class EventParticipationServiceTest {
         long userId = 1;
         when(eventParticipationRepository.existsByEventIdAndUserId(eventId, userId)).thenReturn(true);
 
-        assertThrows(IllegalStateException.class, () -> {
-            eventParticipationService.registerParticipant(eventId, userId);
-        });
+        assertThrows(IllegalStateException.class, () -> eventParticipationService.registerParticipant(eventId, userId));
     }
     @Test
     public void testUnregisterParticipant_UserNotRegistered() {

@@ -13,7 +13,7 @@ public abstract class AbstractMessagePublisher<T> {
 
     public void convertAndSend(String topic, T event) {
         try {
-            String jsonObject = objectMapper.writeValueAsString(topic);
+            String jsonObject = objectMapper.writeValueAsString(event);
             redisTemplate.convertAndSend(topic, jsonObject);
             log.info("Event published to topic " + topic);
         } catch (Exception e) {

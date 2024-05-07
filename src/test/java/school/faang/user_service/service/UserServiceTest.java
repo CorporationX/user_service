@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import school.faang.user_service.controller.event.EventParticipationController;
 import school.faang.user_service.dto.UserDto;
@@ -40,17 +39,33 @@ class EventParticipationControllerTest {
 
     @Test
     void testGetParticipants() {
-        MockitoAnnotations.initMocks(this);
-
-        long eventId = 1L;
+        // Arrange
+        long event_Id = 1L;
         User user1 = new User("User1");
         User user2 = new User("User2");
         List<User> expectedParticipants = Arrays.asList(user1, user2);
 
-        when(eventParticipationService.getAllParticipantsByEventId(eventId)).thenReturn(expectedParticipants);
-        List<User> actualParticipants = eventParticipationController.getParticipants(eventId);
+        when(eventParticipationService.getAllParticipantsByEventId(event_Id)).thenReturn(expectedParticipants);
 
-        Assertions.assertEquals(expectedParticipants, actualParticipants);
+        List<User> actualParticipants = eventParticipationController.getParticipants(event_Id);
+
+        Assertions.assertEquals(expectedParticipants.size(), actualParticipants.size());
+        for (int i = 0; i < expectedParticipants.size(); i++) {
+            User expectedUser = expectedParticipants.get(i);
+            User actualUser = actualParticipants.get(i);
+            Assertions.assertEquals(expectedUser.getUsername(), actualUser.getUsername());
+        }
+    }
+
+    @Test
+    void testGetParticipantsCount() {
+        long eventId = 1L;
+        int expectedCount = 10;
+        when(eventParticipationService.getParticipantsCount(eventId)).thenReturn(expectedCount);
+
+        int actualCount = eventParticipationController.getParticipantsCount(eventId);
+
+        Assertions.assertEquals(expectedCount, actualCount);
     }
 }
 @SpringBootTest

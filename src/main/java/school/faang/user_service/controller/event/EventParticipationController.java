@@ -36,4 +36,9 @@ public class EventParticipationController {
     public List<User> getParticipants(@PathVariable long eventId) {
         return eventParticipationService.getAllParticipantsByEventId(eventId);
     }
+
+    @GetMapping("/{eventId}/participants/count")
+    public int getParticipantsCount(@PathVariable long eventId) {
+        return eventParticipationService.getParticipantsCount(eventId);
+    }
 }

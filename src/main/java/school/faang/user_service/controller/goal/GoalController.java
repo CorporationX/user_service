@@ -2,36 +2,51 @@ package school.faang.user_service.controller.goal;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.service.goal.GoalServiceImpl;
-import school.faang.user_service.validator.GoalValidator;
+import school.faang.user_service.service.goal.GoalService;
 
 import java.util.List;
 
 @Component
+@RequestMapping("/goals")
 @RequiredArgsConstructor
 public class GoalController {
-    private final GoalServiceImpl goalServiceImpl;
-    private final GoalValidator goalValidator;
+    private final GoalService goalService;
 
-    private GoalDto createGoal(Long userId, Goal goal){
-        return goalServiceImpl.createGoal(userId, goal);
+    @PostMapping("/user/{userId}")
+    public GoalDto createGoal(@PathVariable Long userId, @RequestBody Goal goal) {
+        return goalService.createGoal(userId, goal);
     }
 
-    private GoalDto updateGoal(Long goalId, GoalDto goal){
-        return goalServiceImpl.updateGoal(goalId, goal);
+    @PutMapping("/{goalId}")
+    public GoalDto updateGoal(@PathVariable Long goalId, @RequestBody GoalDto goal) {
+        return goalService.updateGoal(goalId, goal);
     }
-    private void deleteGoal(long goalId){
-        goalServiceImpl.deleteGoal(goalId);
+
+    @DeleteMapping("/{goalId}")
+    public void deleteGoal(@PathVariable long goalId) {
+        goalService.deleteGoal(goalId);
     }
-    private List<GoalDto> findSubtasksByGoalId(long goalId){
-        goalValidator.validateThatIdIsGreaterThan0(goalId);
-        return goalServiceImpl.findSubtasksByGoalId(goalId);
+
+    @GetMapping("/{goalId}/subtasks")
+    public List<GoalDto> findSubtasksByGoalId(@PathVariable long goalId) {
+        return goalService.findSubtasksByGoalId(goalId);
     }
-    private List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto goalFilterDto){
-        goalValidator.validateThatIdIsGreaterThan0(userId);
-        return goalServiceImpl.findGoalsByUserId(userId, goalFilterDto);
+
+
+    @GetMapping
+    public List<GoalDto> getGoalsByUser(@RequestParam Long userId, @ModelAttribute GoalFilterDto goalFilterDto) {
+        return goalService.findGoalsByUserId(userId, goalFilterDto);
     }
 }

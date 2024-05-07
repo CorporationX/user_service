@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.GoalStatus;
 
 @Data
@@ -11,6 +12,7 @@ import school.faang.user_service.entity.goal.GoalStatus;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GoalFilterDto {
+    private User mentor;
     private String title;
     private GoalStatus goalStatus;
 }

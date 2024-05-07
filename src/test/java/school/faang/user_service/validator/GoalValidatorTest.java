@@ -1,6 +1,5 @@
 package school.faang.user_service.validator;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,9 +9,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.exception.TooManyGoalsException;
-import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.service.skill.SkillService;
+import school.faang.user_service.exception.NotFoundException;
 
 import java.util.Collections;
 import java.util.List;
@@ -30,18 +27,14 @@ class GoalValidatorTest {
     private User user;
     @Mock
     private Goal goal;
-    @Mock
-    private SkillService skillService;
-    @Mock
-    private SkillRepository skillRepository;
     @InjectMocks
     private GoalValidator validator;
-    private final int MAX_GOALS_AMOUNT = 5;
+    private final int MAX_GOALS_AMOUNT = 3;
 
     @Test
     void shouldThrowTooManyGoalsException() {
         when(user.getGoals()).thenReturn(Collections.nCopies(MAX_GOALS_AMOUNT, new Goal()));
-        assertThrows(TooManyGoalsException.class, () -> validator.validateGoalCreation(user, goal, MAX_GOALS_AMOUNT));
+        assertThrows(DataValidationException.class, () -> validator.validateGoalCreation(user, goal));
     }
 
     @Test
@@ -70,10 +63,10 @@ class GoalValidatorTest {
     }
 
     @Test
-    void testValidateFindSubtasks_withNoSubtasks_throwsEntityNotFoundException() {
+    void testValidateFindSubtasks_withNoSubtasks_throwsNotFoundException() {
         List<Goal> subtasks = Collections.emptyList();
         long goalId = 1L;
         GoalValidator validator = new GoalValidator(null);
-        assertThrows(EntityNotFoundException.class, () -> validator.validateFindSubtasks(subtasks, goalId));
+        assertThrows(NotFoundException.class, () -> validator.validateFindSubtasks(subtasks, goalId));
     }
 }

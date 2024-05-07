@@ -51,3 +51,7 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
+
+goals:
+  limit:
+    max-per-user: 3

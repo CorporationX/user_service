@@ -11,15 +11,18 @@ import school.faang.user_service.service.recommendation.RecommendationRequestSer
 
 import java.util.List;
 
+import static school.faang.user_service.exception.recommendation.RecommendationRequestExceptions.REJECT_MESSAGE_EMPTY;
+import static school.faang.user_service.exception.recommendation.RecommendationRequestExceptions.REQUEST_MESSAGE_EMPTY;
+
 @RestController("recommendation/request")
 @RequiredArgsConstructor
 public class RecommendationRequestController {
-    private RecommendationRequestService recommendationRequestService;
+    private final RecommendationRequestService recommendationRequestService;
 
     @PostMapping("create")
     public RecommendationRequestDto requestRecommendation(@RequestBody RecommendationRequestDto recommendationRequest) {
         if (StringUtils.isEmpty(recommendationRequest.getMessage())) {
-            throw new DataValidationException("Recommendation request message is empty");
+            throw new DataValidationException(REQUEST_MESSAGE_EMPTY.getMessage());
         }
         return recommendationRequestService.create(recommendationRequest);
     }
@@ -37,7 +40,7 @@ public class RecommendationRequestController {
     @PostMapping("reject/{id}")
     public RecommendationRequestDto rejectRequest(@PathVariable Long id, @RequestBody RejectionDto rejection) {
         if (StringUtils.isEmpty(rejection.getReason())) {
-            throw new DataValidationException("Recommendation reject message is empty");
+            throw new DataValidationException(REJECT_MESSAGE_EMPTY.getMessage());
         }
         return recommendationRequestService.rejectRequest(id, rejection);
     }

@@ -6,7 +6,10 @@ public enum ExceptionMessage {
     NULL_EVENT_OWNER_ID_EXCEPTION("The event must have owner."),
     INAPPROPRIATE_OWNER_SKILLS_EXCEPTION("The owner has inappropriate skills to create/update such event."),
     NULL_EVENT_FILTER_EXCEPTION("The event filter must be non null."),
-    NO_SUCH_EVENT_EXCEPTION("Database doesn't contains event with such id.");
+    NO_SUCH_EVENT_EXCEPTION("Database doesn't contains event with such id."),
+    USER_FOLLOWING_HIMSELF_EXCEPTION("The user cannot follow himself."),
+    USER_UNFOLLOWING_HIMSELF_EXCEPTION("The user cannot unfollow himself."),
+    REPEATED_SUBSCRIPTION_EXCEPTION("The user cannot follow another user twice.");
 
     private final String message;
 
@@ -17,4 +20,5 @@ public enum ExceptionMessage {
     public String getMessage() {
         return message;
     }
+
 }

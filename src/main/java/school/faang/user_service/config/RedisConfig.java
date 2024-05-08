@@ -24,7 +24,7 @@ public class RedisConfig {
     @Value("${topic.user_ban}")
     private String userBanTopic;
 
-    @Value("{$spring.data.redis.channels.goal_set_channel.name}")
+    @Value("${spring.data.redis.channels.goal_set_channel.name}")
     private String goalSetChannel;
 
     @Value("${spring.data.redis.channels.profile_view_channel.name}")

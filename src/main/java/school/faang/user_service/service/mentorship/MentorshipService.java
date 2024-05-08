@@ -91,7 +91,7 @@ public class MentorshipService {
     }
 
     public void deleteMentorForHisMentees(Long mentorId, List<User> mentees) {
-        mentees.stream().forEach(mentee -> {
+        mentees.forEach(mentee -> {
             mentee.getMentors().removeIf(mentor -> mentor.getId() == mentorId);
             mentee.getGoals().stream()
                     .filter(goal -> goal.getMentor().getId() == mentorId)

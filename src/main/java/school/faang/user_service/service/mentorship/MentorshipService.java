@@ -1,6 +1,7 @@
 package school.faang.user_service.service.mentorship;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,12 +34,18 @@ public class MentorshipService {
     @Transactional
     public void deleteMentee(long mentorId, long menteeId) {
         User user = getUserById(mentorId);
+        if (mentorId == menteeId) {
+            throw new ValidationException("Same mentorId and menteeId");
+        }
         user.getMentees().removeIf(mentee -> mentee.getId() == menteeId);
     }
 
     @Transactional
     public void deleteMentor(long menteeId, long mentorId) {
         User user = getUserById(menteeId);
+        if (mentorId == menteeId) {
+            throw new ValidationException("Same mentorId and menteeId");
+        }
         user.getMentors().removeIf(mentor -> mentor.getId() == mentorId);
     }
 

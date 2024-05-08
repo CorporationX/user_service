@@ -8,9 +8,7 @@ import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RecommendationRequestFilter;
 import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.exception.recommendation.RecommendationRequestNotFoundException;
@@ -26,8 +24,6 @@ import school.faang.user_service.validator.RecommendationRequestValidator;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static school.faang.user_service.exception.recommendation.RecommendationRequestExceptions.*;

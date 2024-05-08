@@ -96,12 +96,12 @@ class SubscriptionServiceTest {
         @Test
         void shouldReturnAllFollowers() {
             var user = new User();
-            var allFollowers = Stream.of(user);
+            var allFollowers = List.of(user);
 
-            when(subscriptionRepo.findByFolloweeId(followeeId)).thenReturn(allFollowers);
+            when(subscriptionRepo.findByFolloweeId(followeeId)).thenReturn(allFollowers.stream());
             filters.forEach(filter -> {
                 when(filter.isApplicable(filterDto)).thenReturn(true);
-                when(filter.apply(allFollowers, filterDto)).thenReturn(Stream.of(user));
+                when(filter.apply(allFollowers, filterDto)).thenReturn(allFollowers.stream().filter((curUser) -> true));
             });
 
             UserDto userDto = new UserDto();

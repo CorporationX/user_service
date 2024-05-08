@@ -13,7 +13,6 @@ import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.user.filter.UserFilter;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 import static school.faang.user_service.exception.ExceptionMessage.REPEATED_SUBSCRIPTION_EXCEPTION;
 
@@ -41,7 +40,7 @@ public class SubscriptionService {
     }
 
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filter) {
-        return filterUsers(subscriptionRepo.findByFolloweeId(followeeId), filter);
+        return filterUsers(subscriptionRepo.findByFolloweeId(followeeId).toList(), filter);
     }
 
     public int getFollowersCount(long followeeId) {
@@ -49,14 +48,14 @@ public class SubscriptionService {
     }
 
     public List<UserDto> getFollowing(long followerId, UserFilterDto filter) {
-        return filterUsers(subscriptionRepo.findByFollowerId(followerId), filter);
+        return filterUsers(subscriptionRepo.findByFollowerId(followerId).toList(), filter);
     }
 
     public int getFollowingCount(long followerId) {
         return subscriptionRepo.findFolloweesAmountByFollowerId(followerId);
     }
 
-    private List<UserDto> filterUsers(Stream<User> users, UserFilterDto filterDto) {
+    private List<UserDto> filterUsers(List<User> users, UserFilterDto filterDto) {
         return filters.stream()
                 .filter(userFilter -> userFilter.isApplicable(filterDto))
                 .flatMap(userFilter -> userFilter.apply(users, filterDto))

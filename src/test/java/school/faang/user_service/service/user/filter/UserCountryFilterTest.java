@@ -21,12 +21,12 @@ import static school.faang.user_service.service.user.filter.TestData.ALL_USERS;
 class UserCountryFilterTest {
     private final UserCountryFilter userCountryFilter = new UserCountryFilter();
     private UserFilterDto filter;
-    private Stream<User> usersToFilter;
+    private List<User> usersToFilter;
     private Stream<User> expectedFilteredUsers;
 
     @BeforeEach
     void setUp() {
-        usersToFilter = ALL_USERS.stream();
+        usersToFilter = ALL_USERS;
 
         filter = new UserFilterDto();
         filter.setCountryPattern("Russia");

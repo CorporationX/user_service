@@ -21,12 +21,12 @@ import static school.faang.user_service.service.user.filter.TestData.ALL_USERS;
 class UserContactFilterTest {
     private final UserContactFilter userContactFilter = new UserContactFilter();
     private UserFilterDto filter;
-    private Stream<User> usersToFilter;
+    private List<User> usersToFilter;
     private Stream<User> expectedFilteredUsers;
 
     @BeforeEach
     void setUp() {
-        usersToFilter = ALL_USERS.stream();
+        usersToFilter = ALL_USERS;
 
         filter = new UserFilterDto();
         filter.setContactPattern("Nadir");

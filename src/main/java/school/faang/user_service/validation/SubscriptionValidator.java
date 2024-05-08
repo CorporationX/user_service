@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
 
+
 @Component
 @RequiredArgsConstructor
 public class SubscriptionValidator {

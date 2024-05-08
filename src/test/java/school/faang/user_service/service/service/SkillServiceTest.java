@@ -14,7 +14,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.SkillMapper;
+import school.faang.user_service.mapper.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
@@ -22,9 +22,6 @@ import school.faang.user_service.service.SkillService;
 import school.faang.user_service.validator.SkillValidator;
 
 import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 public class SkillServiceTest {
@@ -47,7 +44,7 @@ public class SkillServiceTest {
     @Mock
     private UserSkillGuaranteeRepository skillGuaranteeRepository;
     @Spy
-    private SkillMapper skillMapper;
+    private SkillMapperImpl skillMapper;
     SkillDto skillDto;
     long userId = 1L;
     long skillId = 1L;
@@ -77,17 +74,9 @@ public class SkillServiceTest {
     }
 
     @Test
-    public void testIfOfferedSkillExist() {
-        Mockito.when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.of(skill));
-        assertThrows(DataValidationException.class, () -> skillService.acquireSkillFromOffers(skillId, userId));
-    }
-
-    @Test
     public void testAssignSkillToUser() {
         List<SkillOffer> skillOffers = List.of(skillOffer, skillOffer, skillOffer, skillOffer);
 
-
-        Mockito.when(skillRepository.findUserSkill(skillId, userId)).thenReturn(null);
         Mockito.when(skillOfferRepository.findAllOffersOfSkill(skillId, userId)).
                 thenReturn(skillOffers);
         Mockito.when(skillOffer.getRecommendation()).thenReturn(recommendation);

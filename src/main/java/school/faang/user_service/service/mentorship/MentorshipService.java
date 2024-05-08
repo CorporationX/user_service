@@ -9,9 +9,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -23,21 +21,13 @@ public class MentorshipService {
     @Transactional(readOnly = true)
     public List<UserDto> getMentees(long userId) {
         User user = getUserById(userId);
-        return user == null ? Collections.emptyList() :
-                user.getMentees()
-                        .stream()
-                        .map(userMapper::toDto)
-                        .collect(Collectors.toList());
+        return userMapper.toDtoList(user.getMentors());
     }
 
     @Transactional(readOnly = true)
     public List<UserDto> getMentors(long userId) {
         User user = getUserById(userId);
-        return user == null ? Collections.emptyList() :
-                user.getMentors()
-                        .stream()
-                        .map(userMapper::toDto)
-                        .collect(Collectors.toList());
+        return userMapper.toDtoList(user.getMentees());
     }
 
     @Transactional

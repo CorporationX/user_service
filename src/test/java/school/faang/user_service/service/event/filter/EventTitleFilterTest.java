@@ -21,12 +21,12 @@ import static school.faang.user_service.service.event.filter.TestData.ALL_EVENTS
 class EventTitleFilterTest {
     private final EventTitleFilter eventTitleFilter = new EventTitleFilter();
     private EventFilterDto filter;
-    private Stream<Event> eventsToFilter;
+    private List<Event> eventsToFilter;
     private Stream<Event> expectedFilteredEvents;
 
     @BeforeEach
     void setUp() {
-        eventsToFilter = ALL_EVENTS.stream();
+        eventsToFilter = ALL_EVENTS;
 
         filter = new EventFilterDto();
         filter.setTitlePattern("forum");

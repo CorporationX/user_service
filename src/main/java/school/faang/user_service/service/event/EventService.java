@@ -45,7 +45,7 @@ public class EventService {
     }
 
     public List<EventDto> getEventsByFilter(EventFilterDto filter) {
-        var allEvents = eventRepository.findAll().stream();
+        var allEvents = eventRepository.findAll();
 
         return filters.stream()
                 .filter(eventFilter -> eventFilter.isApplicable(filter))

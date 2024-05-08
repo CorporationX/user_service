@@ -139,7 +139,7 @@ class EventServiceTest {
 
             filters.forEach(filter -> {
                 when(filter.isApplicable(eventFilterDto)).thenReturn(true);
-                when(filter.apply(any(Stream.class), eq(eventFilterDto))).thenReturn(Stream.of(event));
+                when(filter.apply(any(List.class), eq(eventFilterDto))).thenReturn(Stream.of(event));
             });
 
 
@@ -150,7 +150,7 @@ class EventServiceTest {
 
             filters.forEach(filter -> {
                 verify(filter).isApplicable(eventFilterDto);
-                verify(filter).apply(any(Stream.class), eq(eventFilterDto));
+                verify(filter).apply(any(List.class), eq(eventFilterDto));
             });
             verify(eventMapper).toDto(any(Event.class));
             assertEquals(List.of(eventDto), filteredEvents);
@@ -237,7 +237,7 @@ class EventServiceTest {
 
             filters.forEach(filter -> {
                 verify(filter).isApplicable(eventFilterDto);
-                verify(filter, times(0)).apply(any(Stream.class), eq(eventFilterDto));
+                verify(filter, times(0)).apply(any(List.class), eq(eventFilterDto));
             });
             verify(eventMapper, times(0)).toDto(any(Event.class));
             assertEquals(List.of(), filteredEvents);

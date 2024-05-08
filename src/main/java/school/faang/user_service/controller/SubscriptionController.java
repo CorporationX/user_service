@@ -54,4 +54,16 @@ public class SubscriptionController {
             @PathVariable long followeeId, @RequestBody UserFilterDto filters) {
         return subscriptionService.getFollowers(followeeId, filters);
     }
+
+    @GetMapping("/followees")
+    public List<UserDto> getFollowing(@RequestBody UserFilterDto filters) {
+        long followerId = userContext.getUserId();
+        return subscriptionService.getFollowers(followerId, filters);
+    }
+
+    @GetMapping("/followees/count")
+    public int getFollowingCount() {
+        long followerId = userContext.getUserId();
+        return subscriptionService.getFollowersCount(followerId);
+    }
 }

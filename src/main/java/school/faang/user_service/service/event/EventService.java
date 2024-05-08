@@ -1,5 +1,6 @@
 package school.faang.user_service.service.event;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @Service
+@RequiredArgsConstructor
 public class EventService {
 
     private final EventRepository eventRepository;
@@ -23,21 +25,10 @@ public class EventService {
     private final List<EventFilter> eventFilters;
     private final UserRepository userRepository;
 
-    public EventService(EventRepository eventRepository, EventMapper eventMapper,
-                        List<EventFilter> eventFilter, UserRepository userRepository) {
-        this.eventRepository = eventRepository;
-        this.eventMapper = eventMapper;
-        this.eventFilters = eventFilter;
-        this.userRepository = userRepository;
-    }
-
     public EventDto create(EventDto eventDto) {
         Event event = eventMapper.toEntity(eventDto);
         User user = userRepository.findById(eventDto.getOwnerId()).orElseThrow(() ->
                 new DataValidationException("Пользователя с id: " + eventDto.getOwnerId() + " нет в базе данных."));
-
-        event.setOwner(user); // Временная реализация добавления владельца события, при преобразовании из Dto в сущность
-        //из-за отсутствия пользователей в userRepository
 
         checkNeedSkillsForEvent(user, event);
         eventRepository.save(event);
@@ -65,11 +56,6 @@ public class EventService {
         Event event = eventMapper.toEntity(eventDto);
         User user = userRepository.findById(eventDto.getOwnerId()).orElseThrow(() ->
                 new DataValidationException("Пользователя с id: " + eventDto.getOwnerId() + " нет в базе данных."));
-
-        event.setOwner(user); // Временная реализация добавления владельца события, при преобразовании из Dto в сущность
-        //из-за отсутствия пользователей в userRepository
-
-//        User user1 = new User();  //Временный пользователь для запуска теста testEventUpdateNotOwner()
 
         if (!event.getOwner().equals(user)) {
             throw new DataValidationException("Пользователь не является автором события " + event.getTitle());

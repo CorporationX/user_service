@@ -1,5 +1,6 @@
 package school.faang.user_service.controller;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,25 +29,33 @@ public class EventControllerTest {
     @Mock
     private EventService eventService;
 
+    private Event event;
+    private EventDto eventDto;
+    private User user;
+
+    @BeforeEach
+    public void setUp() {
+        event = new Event();
+        eventDto = new EventDto();
+        user = new User();
+    }
+
+
     @Test
     public void testCreateEventNullOrBlank() {
-        EventDto eventDto = new EventDto();
-
         assertThrows(DataValidationException.class, () -> eventController.create(eventDto));
     }
 
     @Test
     public void testCreateWithNullStartDate() {
-        EventDto eventDto = new EventDto();
-        eventDto.setTitle("Title1");
+        eventDto.setTitle("Title");
 
         assertThrows(DataValidationException.class, () -> eventController.create(eventDto));
     }
 
     @Test
     public void testCreateWithNullOwnerId() {
-        EventDto eventDto = new EventDto();
-        eventDto.setTitle("Title1");
+        eventDto.setTitle("Title");
         eventDto.setStartDate(LocalDateTime.of(2014, 9, 19, 14, 5));
 
         assertThrows(DataValidationException.class, () -> eventController.create(eventDto));
@@ -54,7 +63,6 @@ public class EventControllerTest {
 
     @Test
     public void testGetEvent() {
-        Event event = new Event();
         event.setId(1L);
 
         eventController.getEvent(event.getId());
@@ -71,7 +79,6 @@ public class EventControllerTest {
 
     @Test
     public void testDeleteEvent() {
-        Event event = new Event();
         event.setId(1L);
 
         eventController.deleteEvent(event.getId());
@@ -80,8 +87,7 @@ public class EventControllerTest {
 
     @Test
     public void testUpdateEvent() {
-        EventDto eventDto = new EventDto();
-        eventDto.setTitle("Title1");
+        eventDto.setTitle("Title");
         eventDto.setOwnerId(1L);
         eventDto.setStartDate(LocalDateTime.of(2014, 9, 19, 14, 5));
 
@@ -91,7 +97,6 @@ public class EventControllerTest {
 
     @Test
     public void testGetOwnedEvents() {
-        User user = new User();
         user.setId(1L);
 
         eventController.getOwnedEvents(user.getId());
@@ -100,7 +105,6 @@ public class EventControllerTest {
 
     @Test
     public void testGetParticipatedEvents() {
-        User user = new User();
         user.setId(1L);
 
         eventController.getParticipatedEvents(user.getId());

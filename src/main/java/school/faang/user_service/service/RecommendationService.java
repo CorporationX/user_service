@@ -1,7 +1,6 @@
 package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,8 +20,8 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
+import school.faang.user_service.validator.RecommendationValidator;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -30,18 +29,17 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class RecommendationService {
-    @Value("${recommendation.service.recommendation_period_in_month}")
-    private int RECOMMENDATION_PERIOD_IN_MONTH;
     private final RecommendationRepository recommendationRepository;
     private final SkillOfferRepository skillOfferRepository;
     private final SkillRepository skillRepository;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final UserRepository userRepository;
     private final RecommendationMapper recommendationMapper;
+    private final RecommendationValidator recommendationValidator;
 
     @Transactional
     public RecommendationDto create(RecommendationDto recommendationDto) {
-        validateAll(recommendationDto);
+        recommendationValidator.validateAll(recommendationDto);
 
         Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
         recommendationRepository.save(recommendation);
@@ -52,8 +50,8 @@ public class RecommendationService {
 
     @Transactional
     public RecommendationDto update(RecommendationDto recommendationDto) {
-        validateRecommendationForUpdate(recommendationDto);
-        validateAll(recommendationDto);
+        recommendationValidator.validateRecommendationForUpdate(recommendationDto);
+        recommendationValidator.validateAll(recommendationDto);
 
         Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
         skillOfferRepository.deleteAllByRecommendationId(recommendation.getId());
@@ -63,7 +61,7 @@ public class RecommendationService {
         return recommendationMapper.toDto(recommendation);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public void delete(Long id) {
         recommendationRepository.deleteById(id);
     }
@@ -119,62 +117,10 @@ public class RecommendationService {
                 userSkillGuaranteeRepository.existsById(guarantorId));
     }
 
-    private void validateAll(RecommendationDto recommendationDto) {
-        List<SkillOfferDto> skillOffersDto = recommendationDto.getSkillOffers();
-
-        validationLastUpdate(recommendationDto);
-        validateSkills(skillOffersDto);
-        validateSkillInRepository(skillOffersDto);
-    }
-
-    private void validationLastUpdate(RecommendationDto recommendationDto) {
-        long authorId = recommendationDto.getAuthorId();
-        long userId = recommendationDto.getReceiverId();
-
-        Optional<Recommendation> lastRecommendation = recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(authorId, userId);
-
-        if (lastRecommendation.isPresent()) {
-            LocalDateTime lastUpdate = lastRecommendation.get().getUpdatedAt();
-            LocalDateTime now = LocalDateTime.now();
-
-            if (lastUpdate.plusMonths(RECOMMENDATION_PERIOD_IN_MONTH).isAfter(now)) {
-                String errorMessage =
-                        String.format("User with this ID %d cannot give recommendations yet, since %d months have not passed yet.",
-                                userId, RECOMMENDATION_PERIOD_IN_MONTH);
-                throw new DataValidationException(errorMessage);
-            }
-        }
-    }
-
-    private void validateSkills(List<SkillOfferDto> skillOfferDtos) {
-        if (skillOfferDtos == null || skillOfferDtos.isEmpty()) {
-            throw new DataValidationException("Skills null or empty.");
-        }
-    }
-
-    private void validateSkillInRepository(List<SkillOfferDto> skills) {
-        List<Long> skillIds = getUniqueSkillIds(skills);
-
-        for (Long skillId : skillIds) {
-            if (!skillRepository.existsById(skillId)) {
-                throw new DataValidationException("Skill " + skillId + " doesnt exist in system.");
-            }
-        }
-    }
-
-    private List<Long> getUniqueSkillIds(List<SkillOfferDto> skills) {
+    public List<Long> getUniqueSkillIds(List<SkillOfferDto> skills) {
         return skills.stream()
                 .map(SkillOfferDto::getSkillId)
                 .distinct()
                 .toList();
-    }
-
-    private void validateRecommendationForUpdate(RecommendationDto recommendationDto) {
-        Long id = recommendationDto.getId();
-        if (id == null) {
-            throw new DataValidationException("Recommendation ID is null.");
-        }
-        recommendationRepository.findById(recommendationDto.getId())
-                .orElseThrow(() -> new DataValidationException("Update is failed."));
     }
 }

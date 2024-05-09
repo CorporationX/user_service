@@ -42,7 +42,7 @@ public class RecommendationController {
         recommendationService.delete(recommendationDto.getId());
     }
 
-    @GetMapping
+    @GetMapping("/userRec/{receiver_id}")
     public Page<RecommendationDto> getAllUserRecommendations(@PathVariable("receiver_id") long receiverId,
                                                              @RequestParam(name = "page_number") int pageNum,
                                                              @RequestParam(name = "page_size") int pageSize) {
@@ -50,7 +50,7 @@ public class RecommendationController {
         return recommendationService.getAllUserRecommendation(receiverId, pageNum, pageSize);
     }
 
-    @GetMapping
+    @GetMapping("/allRec/{author_id}")
     public Page<RecommendationDto> getAllRecommendation(@PathVariable("author_id") long authorId,
                                                         @RequestParam(name = "page_number") int pageNum,
                                                         @RequestParam(name = "page_size") int pageSize) {

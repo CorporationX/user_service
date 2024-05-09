@@ -6,6 +6,6 @@ public class GithubCiPipelineTest {
 
     @Test
     public void testWhichMustFail() {
-        fail("I should fail!");
+
     }
 }

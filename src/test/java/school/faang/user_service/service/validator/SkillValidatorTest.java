@@ -25,7 +25,7 @@ public class SkillValidatorTest {
     @BeforeEach
     public void init() {
         skill = new SkillDto();
-        skill.setId(1L);
+            skill.setId(1L);
     }
 
     @InjectMocks

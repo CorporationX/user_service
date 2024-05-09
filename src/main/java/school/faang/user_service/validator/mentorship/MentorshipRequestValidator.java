@@ -2,24 +2,29 @@ package school.faang.user_service.validator.mentorship;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.handler.exception.EntityNotFoundException;
-import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.handler.exception.DataValidationException;
+import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+
+import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
 public class MentorshipRequestValidator {
-    private final UserRepository userRepository;
+    private final MentorshipRequestRepository mentorshipRequestRepository;
 
-    public void requestMentorshipValidation(long requesterId, long receiverId) {
+    public void requestMentorshipValidationUserIds(long requesterId, long receiverId) {
         if (receiverId == requesterId) {
             throw new IllegalArgumentException("The requester and recipient user must not be the same user");
         }
-        getUser(requesterId);
-        getUser(receiverId);
+
     }
 
-    private void getUser(long userId) {
-        userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("There is no user with this ID in the database"));
+    public void requestMentorshipValidationLatestRequest(long requesterId, long receiverId) {
+        mentorshipRequestRepository.findLatestRequest(requesterId, receiverId).ifPresent(request -> {
+            if (LocalDateTime.now().minusMonths(3).isBefore(request.getCreatedAt())) {
+                throw new DataValidationException("A request for mentorship can only be made once every 3 months");
+            }
+        });
     }
 }
+

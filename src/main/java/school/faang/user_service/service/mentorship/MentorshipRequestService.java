@@ -9,15 +9,12 @@ import school.faang.user_service.dto.recommendation.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.handler.exception.DataValidationException;
 import school.faang.user_service.handler.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.mentorship.filtres.RequestFilter;
 import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -32,41 +29,26 @@ public class MentorshipRequestService {
     public void requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         long requesterId = mentorshipRequestDto.getIdRequester();
         long receiverId = mentorshipRequestDto.getIdReceiver();
-        mentorshipRequestValidator.requestMentorshipValidation(requesterId, receiverId);
-
-        MentorshipRequest lastMentorshipRequest = mentorshipRequestRepository.findLatestRequest(requesterId, receiverId)
-                .orElse(null);
-
-        if (null == lastMentorshipRequest || LocalDateTime.now().minusMonths(3).isAfter(lastMentorshipRequest.getCreatedAt())) {
-            mentorshipRequestRepository.create(requesterId, receiverId, mentorshipRequestDto.getDescription());
-        } else {
-            throw new DataValidationException("A request for mentorship can only be made once every 3 months");
-        }
+        mentorshipRequestValidator.requestMentorshipValidationUserIds(requesterId, receiverId);
+        mentorshipRequestValidator.requestMentorshipValidationLatestRequest(requesterId, receiverId);
+        mentorshipRequestRepository.create(requesterId, receiverId, mentorshipRequestDto.getDescription());
     }
 
     public List<MentorshipRequestDto> getRequest(RequestFilterDto requestFilterDto) {
-        List<MentorshipRequest> mentorshipRequests = new ArrayList<>();
-        mentorshipRequestRepository.findAll().forEach(mentorshipRequests::add);
-
         return requestFilters.stream()
                 .filter(requestFilter -> requestFilter.isApplicable(requestFilterDto))
-                .flatMap(requestFilter -> requestFilter.apply(mentorshipRequests.stream(), requestFilterDto))
+                .flatMap(requestFilter -> requestFilter.apply(mentorshipRequestRepository.findAll().stream()
+                        , requestFilterDto))
                 .map(mentorshipRequestMapper::toDto).toList();
     }
 
     public MentorshipRequestDto acceptRequest(long id) {
-        MentorshipRequest mentorshipRequest = mentorshipRequestRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("There is no such query in the database"));
+        MentorshipRequest mentorshipRequest = getMentorshipRequest(id);
         User requester = mentorshipRequest.getRequester();
         User receiver = mentorshipRequest.getReceiver();
         List<User> receiverMentees = receiver.getMentees();
-
-        if (null == receiverMentees) {
-            receiverMentees = new ArrayList<>();
-        }else{
-            if (receiverMentees.contains(requester)) {
-                throw new IllegalArgumentException("The requester is already on the mentees list for this mentor");
-            }
+        if (receiverMentees.contains(requester)) {
+            throw new IllegalArgumentException("The requester is already on the mentees list for this mentor");
         }
         receiverMentees.add(requester);
         mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
@@ -74,10 +56,14 @@ public class MentorshipRequestService {
         return mentorshipRequestMapper.toDto(mentorshipRequest);
     }
 
+    private MentorshipRequest getMentorshipRequest(long id) {
+        return mentorshipRequestRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("There is no such query in the database"));
+    }
+
     @Transactional
     public MentorshipRequestDto rejectRequest(long id, RejectionDto rejection) {
-        MentorshipRequest mentorshipRequest = mentorshipRequestRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("There is no request for mentoring with this ID."));
+        MentorshipRequest mentorshipRequest = getMentorshipRequest(id);
         mentorshipRequest.setStatus(RequestStatus.REJECTED);
         mentorshipRequest.setRejectionReason(rejection.getReason());
         mentorshipRequestRepository.save(mentorshipRequest);

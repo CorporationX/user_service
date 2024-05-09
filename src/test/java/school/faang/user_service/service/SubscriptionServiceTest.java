@@ -4,27 +4,30 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.SubscriptionUserDto;
-import school.faang.user_service.dto.SubscriptionUserFilterDto;
+import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.dto.subscription.SubscriptionUserDto;
+import school.faang.user_service.dto.subscription.SubscriptionUserFilterDto;
+import school.faang.user_service.dto.event.SearchAppearanceEvent;
+import school.faang.user_service.dto.event.FollowerEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SubscriptionUserMapper;
+import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.filter.user_filter.CityPatternFilter;
-import school.faang.user_service.filter.user_filter.CountryPatternFilter;
-import school.faang.user_service.filter.user_filter.ExperienceMaxFilter;
-import school.faang.user_service.filter.user_filter.NamePatternFilter;
-import school.faang.user_service.filter.user_filter.UserFilter;
+import school.faang.user_service.filter.user.*;
+import school.faang.user_service.publisher.FollowerEventPublisher;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -37,13 +40,18 @@ public class SubscriptionServiceTest {
 
     @Mock
     private SubscriptionRepository subscriptionRepository;
+    @Mock
+    private SearchAppearanceEventPublisher searchAppearanceEventPublisher;
+    @Mock
+    private UserContext userContext;
+    @Mock
+    private  FollowerEventPublisher followerEventPublisher;
 
     @Spy
     private SubscriptionUserMapper userMapper = Mappers.getMapper(SubscriptionUserMapper.class);
 
     @InjectMocks
     private SubscriptionService subscriptionService;
-
 
     @BeforeEach
     public void initialize() {
@@ -53,9 +61,14 @@ public class SubscriptionServiceTest {
         userFilters.add(new CountryPatternFilter());
         userFilters.add(new NamePatternFilter());
         userFilters.add(new ExperienceMaxFilter());
-        subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, userFilters);
-
+        subscriptionService = new SubscriptionService(subscriptionRepository,
+                                                      userMapper,
+                                                      userFilters,
+                                                      followerEventPublisher,
+                                                      searchAppearanceEventPublisher,
+                                                      userContext);
     }
+
     @Test
     public void testFollowUserThrowsExceptionWhenFollowsItself() {
         assertThrows(DataValidationException.class, () -> subscriptionService.followUser(userId1, userId1));
@@ -74,9 +87,26 @@ public class SubscriptionServiceTest {
     }
 
     @Test
+    public void testEventFollowPublisher() {
+
+        when( subscriptionRepository.existsByFollowerIdAndFolloweeId( userId1, userId2 ) ).thenReturn( false );
+        subscriptionService.followUser( userId1, userId2 );
+        verify( subscriptionRepository, times( 1 ) ).followUser( userId1, userId2 );
+
+
+        ArgumentCaptor<FollowerEvent> eventCaptor = ArgumentCaptor.forClass( FollowerEvent.class );
+        verify( followerEventPublisher ).publish( eventCaptor.capture() );
+        FollowerEvent capturedEvent = eventCaptor.getValue();
+
+        assertEquals( capturedEvent.getFollowerId(), userId1 );
+        assertEquals( capturedEvent.getFolloweeId(), userId2 );
+    }
+
+    @Test
     public void testUnfollowUserThrowsExceptionWhenUnfollowYourself() {
         assertThrows(DataValidationException.class, () -> subscriptionService.unfollowUser(userId2, userId2));
     }
+
     @Test
     public void testUnfollowUser() {
         subscriptionService.unfollowUser(userId1, userId2);
@@ -91,6 +121,7 @@ public class SubscriptionServiceTest {
         when(subscriptionRepository.findByFolloweeId(userId1)).thenReturn(user1.getFollowers().stream());
         List<SubscriptionUserDto> result = subscriptionService.getFollowers(userId1, new SubscriptionUserFilterDto());
         assertEquals(result.get(0).getId(), userId2);
+        verify(searchAppearanceEventPublisher, times(1)).publish(any(SearchAppearanceEvent.class));
     }
 
     @Test
@@ -109,7 +140,7 @@ public class SubscriptionServiceTest {
         when(subscriptionRepository.findByFolloweeId(userId1)).thenReturn(user1.getFollowees().stream());
         List<SubscriptionUserDto> result = subscriptionService.getFollowing(userId1, new SubscriptionUserFilterDto());
         assertEquals(result.get(0).getId(), userId2);
-
+        verify(searchAppearanceEventPublisher, times(1)).publish(any(SearchAppearanceEvent.class));
     }
 
     @Test

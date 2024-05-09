@@ -3,15 +3,20 @@ package school.faang.user_service.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.service.UserService;
+import school.faang.user_service.service.user.UserService;
 
 import java.util.List;
 
-@Slf4j
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/users")
 public class UserController {
 
@@ -32,5 +37,10 @@ public class UserController {
     public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         log.info("getUsersByIds was called");
         return userService.getUsersByIds(ids);
+    }
+
+    @PostMapping("/deactivate/{userId}")
+    public void deactivate(@PathVariable long userId) {
+        userService.deactivate(userId);
     }
 }

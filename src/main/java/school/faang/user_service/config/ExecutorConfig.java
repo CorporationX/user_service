@@ -11,7 +11,8 @@ import java.util.concurrent.Executors;
 public class ExecutorConfig {
 
     @Value("${executorConfig.thread-pool-size}")
-    private Integer threadPoolSize;
+    private int threadPoolSize;
+
 
     @Bean
     public ExecutorService executorService() {

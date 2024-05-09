@@ -1,7 +1,10 @@
 package school.faang.user_service.service.event;
 
 import jakarta.persistence.EntityNotFoundException;
+import com.google.common.collect.Lists;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.event.EventDto;
@@ -16,7 +19,9 @@ import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.publisher.EventStartEventPublisher;
 import school.faang.user_service.validator.event.EventValidator;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Stream;
 
 @Service
@@ -27,6 +32,10 @@ public class EventService {
     private final EventMapper eventMapper;
     private final List<EventFilter> eventFilters;
     private final EventStartEventPublisher startEventPublisher;
+
+    private final ExecutorService executorService;
+    @Value("${clearEvents.batchSize}")
+    private int batchSize;
 
 
     public EventDto createEvent(EventDto eventDto) {
@@ -78,5 +87,16 @@ public class EventService {
     public List<EventDto> getParticipatedEvents(Long userId){
         List<Event> events = eventRepository.findParticipatedEventsByUserId(userId);
         return events.stream().map(eventMapper::toDto).toList();
+    }
+
+    @Transactional
+    public void clearEvents() {
+        List<Event> allEvents = eventRepository.findAll();
+        LocalDateTime now = LocalDateTime.now();
+        List<Event> expiredEvents = allEvents.stream().filter(event -> event.getEndDate().isBefore(now)).toList();
+        List<List<Event>> batches = Lists.partition(expiredEvents, batchSize);
+        for (List<Event> batch : batches) {
+            executorService.execute(() -> batch.forEach(eventRepository::delete));
+        }
     }
 }

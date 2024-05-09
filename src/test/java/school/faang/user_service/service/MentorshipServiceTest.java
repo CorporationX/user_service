@@ -1,7 +1,5 @@
 package school.faang.user_service.service;
 
-
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -68,9 +68,9 @@ public class MentorshipServiceTest {
     @DisplayName("There is no such id of User in Repository")
     public void testGetMentees_UserNotFound() {
         when(userRepository.findById(firstUser.getId())).thenReturn(Optional.empty());
-        UserNotFoundException userNotFoundException = Assert.assertThrows(UserNotFoundException.class,
+        UserNotFoundException userNotFoundException = assertThrows(UserNotFoundException.class,
                 () -> mentorshipService.getMentees(firstUser.getId()));
-        Assert.assertEquals(userNotFoundException.getMessage(), MessageError.USER_NOT_FOUND_EXCEPTION.getMessage());
+        assertEquals(userNotFoundException.getMessage(), MessageError.USER_NOT_FOUND_EXCEPTION.getMessage());
     }
 
 
@@ -82,16 +82,16 @@ public class MentorshipServiceTest {
         verify(userMapper, times(1)).toDto(thirdUser.getMentees());
 
         List<UserDto> expected = userMapper.toDto(thirdUser.getMentees());
-        Assert.assertEquals(expected, mentees);
+        assertEquals(expected, mentees);
     }
 
     @Test
     @DisplayName("There is no such id of user in Repository")
     public void testGetMentors_UserNotFound() {
         when(userRepository.findById(thirdUser.getId())).thenReturn(Optional.empty());
-        UserNotFoundException userNotFoundException = Assert.assertThrows(UserNotFoundException.class,
+        UserNotFoundException userNotFoundException = assertThrows(UserNotFoundException.class,
                 () -> mentorshipService.getMentors(thirdUser.getId()));
-        Assert.assertEquals(userNotFoundException.getMessage(), MessageError.USER_NOT_FOUND_EXCEPTION.getMessage());
+        assertEquals(userNotFoundException.getMessage(), MessageError.USER_NOT_FOUND_EXCEPTION.getMessage());
     }
 
     @Test
@@ -100,9 +100,8 @@ public class MentorshipServiceTest {
         when(userRepository.findById(thirdUser.getId())).thenReturn(Optional.of(thirdUser));
         List<UserDto> mentors = mentorshipService.getMentors(thirdUser.getId());
         verify(userMapper, times(1)).toDto(thirdUser.getMentees());
-
         List<UserDto> expected = userMapper.toDto(thirdUser.getMentees());
-        Assert.assertEquals(expected, mentors);
+        assertEquals(expected, mentors);
     }
 
 
@@ -110,19 +109,18 @@ public class MentorshipServiceTest {
     @DisplayName("There is no such mentor in Repository")
     public void testDeleteMentee_MentorDoesNotExist() {
         when(userRepository.findById(firstUser.getId())).thenReturn(Optional.empty());
-        UserNotFoundException userNotFoundException = Assert.assertThrows(UserNotFoundException.class,
+        UserNotFoundException userNotFoundException = assertThrows(UserNotFoundException.class,
                 () -> mentorshipService.deleteMentee(firstUser.getId(), thirdUser.getId()));
-
-        Assert.assertEquals(MessageError.USER_NOT_FOUND_EXCEPTION.getMessage(), userNotFoundException.getMessage());
+        assertEquals(MessageError.USER_NOT_FOUND_EXCEPTION.getMessage(), userNotFoundException.getMessage());
     }
 
     @Test
     @DisplayName("There is no such mentee in mentor's list of mentees")
     public void testDeleteMentee_MenteeDoesNotExistInListMentees() {
         when(userRepository.findById(firstUser.getId())).thenReturn(Optional.of(firstUser));
-        UserNotFoundException userNotFoundException = Assert.assertThrows(UserNotFoundException.class,
+        UserNotFoundException userNotFoundException = assertThrows(UserNotFoundException.class,
                 () -> mentorshipService.deleteMentee(firstUser.getId(), thirdUser.getId()));
-        Assert.assertEquals(userNotFoundException.getMessage(), MessageError.USER_NOT_FOUND_EXCEPTION.getMessage());
+        assertEquals(userNotFoundException.getMessage(), MessageError.USER_NOT_FOUND_EXCEPTION.getMessage());
     }
 
 
@@ -130,37 +128,61 @@ public class MentorshipServiceTest {
     @DisplayName("Mentee is deleted successful and Info is updated in DB")
     public void testDeleteMentee_MenteeIsDeleted() {
         when(userRepository.findById(thirdUser.getId())).thenReturn(Optional.of(thirdUser));
-
         mentorshipService.deleteMentee(thirdUser.getId(), firstUser.getId());
         verify(userRepository, times(1)).save(thirdUser);
     }
 
     @Test
     @DisplayName("There is no such mentee in Repository")
-    public void testDeleteMentor_MentorDoesNotExist() {
+    public void testDeleteMentorById_MentorDoesNotExist() {
         when(userRepository.findById(thirdUser.getId())).thenReturn(Optional.empty());
-        UserNotFoundException userNotFoundException = Assert.assertThrows(UserNotFoundException.class,
-                () -> mentorshipService.deleteMentor(thirdUser.getId(), firstUser.getId()));
+        UserNotFoundException userNotFoundException = assertThrows(UserNotFoundException.class,
+                () -> mentorshipService.deleteMentorById(thirdUser.getId(), firstUser.getId()));
 
-        Assert.assertEquals(MessageError.USER_NOT_FOUND_EXCEPTION.getMessage(), userNotFoundException.getMessage());
+        assertEquals(MessageError.USER_NOT_FOUND_EXCEPTION.getMessage(), userNotFoundException.getMessage());
     }
 
     @Test
     @DisplayName("There is no such mentor iin mentee's list of mentors")
-    public void testDeleteMentor_MentorDoesNotExistInListMentors() {
+    public void testDeleteMentorById_MentorDoesNotExistInListMentors() {
         when(userRepository.findById(firstUser.getId())).thenReturn(Optional.of(firstUser));
-        UserNotFoundException userNotFoundException = Assert.assertThrows(UserNotFoundException.class,
-                () -> mentorshipService.deleteMentor(firstUser.getId(), thirdUser.getId()));
-        Assert.assertEquals(userNotFoundException.getMessage(), MessageError.USER_NOT_FOUND_EXCEPTION.getMessage());
+        UserNotFoundException userNotFoundException = assertThrows(UserNotFoundException.class,
+                () -> mentorshipService.deleteMentorById(firstUser.getId(), thirdUser.getId()));
+        assertEquals(userNotFoundException.getMessage(), MessageError.USER_NOT_FOUND_EXCEPTION.getMessage());
     }
 
     @Test
     @DisplayName("Mentor is deleted successful and Info is updated in DB")
-    public void testDeleteMentor_MentorIsDeleted() {
+    public void testDeleteMentorById_MentorIsDeleted() {
         when(userRepository.findById(thirdUser.getId())).thenReturn(Optional.of(thirdUser));
-
-        mentorshipService.deleteMentor(thirdUser.getId(), firstUser.getId());
+        mentorshipService.deleteMentorById(thirdUser.getId(), firstUser.getId());
         verify(userRepository, times(1)).save(thirdUser);
     }
+
+    @Test
+    @DisplayName("There is no such mentor iin mentee's list of mentors")
+    public void testDeleteMentorByEntity_MentorDoesNotExistInListMentors() {
+        UserNotFoundException userNotFoundException = assertThrows(UserNotFoundException.class,
+                () -> mentorshipService.deleteMentorByEntity(firstUser, thirdUser));
+        assertEquals(userNotFoundException.getMessage(), MessageError.USER_NOT_FOUND_EXCEPTION.getMessage());
+    }
+
+    @Test
+    @DisplayName("Mentor is deleted successful and Info is updated in DB")
+    public void testDeleteMentorByEntity_MentorIsDeleted() {
+        mentorshipService.deleteMentorByEntity(thirdUser, firstUser);
+        verify(userRepository, times(1)).save(thirdUser);
+    }
+
+    // Инна сказала пока не делать этот тест
+//    @Test
+//    public void testDeleteAllMentorMentorship(){
+//        when(userRepository.findById(firstUser.getId())).thenReturn(Optional.of(firstUser));
+//        when(userRepository.findById(secondUser.getId())).thenReturn(Optional.of(secondUser));
+//        when(userRepository.findById(thirdUser.getId())).thenReturn(Optional.of(thirdUser));
+//        mentorshipService.deleteAllMentorMentorship(thirdUser.getId());
+//        verify(mentorshipService, times(1)).deleteMentor(firstUser.getId(), thirdUser.getId());
+//        verify(mentorshipService, times(1)).deleteMentor(secondUser.getId(), thirdUser.getId());
+//    }
 
 }

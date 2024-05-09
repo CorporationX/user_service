@@ -38,4 +38,9 @@ public class UserController {
         log.info("getUsersByIds was called");
         return userService.getUsersByIds(ids);
     }
+
+    @PostMapping("/deactivate/{userId}")
+    public void deactivate(@PathVariable long userId) {
+        userService.deactivate(userId);
+    }
 }

@@ -28,10 +28,14 @@ public class RedisConfig{
 
     @Value("${spring.data.redis.channels.mentorship_channel.name}")
     private String mentorshipTopic;
+    @Value("${spring.data.redis.channels.profile_view_channel.name}")
+    private String profileViewTopic;
+    @Value("${spring.data.redis.channels.profile_search_channel.name}")
+    private String userProfileSearchTopic;
 
     @Bean
-    public JedisConnectionFactory redisConnectionFactory(){
-        RedisStandaloneConfiguration config=new RedisStandaloneConfiguration(host, port);
+    public JedisConnectionFactory redisConnectionFactory() {
+        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
         return new JedisConnectionFactory(config);
     }
 

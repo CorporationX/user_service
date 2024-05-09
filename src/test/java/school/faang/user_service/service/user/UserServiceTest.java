@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.ProfileViewEventDto;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DataValidationException;
@@ -19,14 +20,17 @@ import school.faang.user_service.exception.UserNotFoundException;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.MentorshipService;
 import school.faang.user_service.service.S3Service;
+import school.faang.user_service.service.event.EventService;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -34,20 +38,23 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
-    @Mock
-    UserMapperImpl userMapper;
+    @InjectMocks
+    private UserService userService;
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    UserMapperImpl userMapper;
     @Mock
     private UserContext userContext;
     @Mock
     private S3Service s3Service;
     @Mock
+    private EventService eventService;
+    @Mock
+    private MentorshipService mentorshipService;
+    @Mock
     private ProfileViewEventPublisher profileViewEventPublisher;
-
-
-    @InjectMocks
-    private UserService userService;
 
     User firstUser;
     User secondUser;
@@ -84,7 +91,6 @@ public class UserServiceTest {
     public void testGetUser() {
         when(userRepository.findById(firstUser.getId())).thenReturn(Optional.ofNullable(firstUser));
         when(userContext.getUserId()).thenReturn(secondUser.getId());
-//        when(eventMapper.toJson(any(ProfileViewEventDto.class))).thenReturn("[]");
 
         userService.getUser(firstUser.getId());
 
@@ -104,12 +110,23 @@ public class UserServiceTest {
     }
 
     @Test
+    public void testDeactivateUser() {
+        long id = 1L;
+        User user = User.builder().id(id).active(true).build();
+        when(userRepository.findById(id)).thenReturn(Optional.of(user));
+        when(eventService.getOwnedEvents(id)).thenReturn(List.of(EventDto.builder().id(id).build()));
+        userService.deactivate(id);
+        verify(eventService, times(1)).deleteEvent(id);
+        verify(mentorshipService, times(1)).deleteAllMentorMentorship(user);
+        assertFalse(user.isActive());
+    }
+
+    @Test
     public void testCreateSuccess() {
 
         UserDto userDto = new UserDto();
         userDto.setId(1L);
         userDto.setUsername("John Doe");
-
 
         User user = new User();
         user.setId(1L);
@@ -139,7 +156,8 @@ public class UserServiceTest {
         userDto.setId(1L);
 
         when(userRepository.findById(1L)).thenReturn(java.util.Optional.of(new User()));
-        DataValidationException exception = assertThrows(DataValidationException.class, () -> userService.create(userDto));
+        DataValidationException exception = assertThrows(DataValidationException.class,
+                () -> userService.create(userDto));
         assertEquals("User with id 1 exists", exception.getMessage());
 
     }

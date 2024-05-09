@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.controller.event.EventParticipationController;
@@ -22,7 +21,6 @@ import school.faang.user_service.validator.event.EventParticipationValidator;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -53,24 +51,24 @@ public class EventParticipationControllerTest {
 
     @BeforeEach
     public void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup( controller ).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         eventId = 1L;
         userId = 2L;
     }
 
     @Test
     public void testRegisterParticipant() throws Exception {
-        when( userContext.getUserId() ).thenReturn( userId );
+        when(userContext.getUserId()).thenReturn(userId);
 
-        when( eventParticipationService.registerParticipant( eventId, userId ) )
-                .thenReturn( ResponseEntity.ok( "Participant registered successfully" ) );
+        when(eventParticipationService.registerParticipant(eventId, userId))
+                .thenReturn(ResponseEntity.ok("Participant registered successfully"));
 
-        mockMvc.perform( post( "/events/{eventId}", eventId ) )
-                .andExpect( status().isOk() )
-                .andExpect( content().string( "Participant registered successfully" ) );
+        mockMvc.perform(post("/events/{eventId}", eventId))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Participant registered successfully"));
 
-        verify( eventValidator ).checkEventIdForNull( eventId);
-        verify( eventParticipationService, times( 1 ) ).registerParticipant( eventId, userId );
+        verify(eventValidator).checkEventIdForNull(eventId);
+        verify(eventParticipationService, times(1)).registerParticipant(eventId, userId);
     }
 
     @Test
@@ -81,7 +79,7 @@ public class EventParticipationControllerTest {
         doThrow(new DataValidationException("Event id is null"))
                 .when(eventValidator).checkEventIdForNull(anyLong());
 
-        mockMvc.perform(post( "/events/{eventId}", badEventId ))
+        mockMvc.perform(post("/events/{eventId}", badEventId))
                 .andExpect(status().isNotFound());
 
         verify(eventParticipationService, never()).registerParticipant(anyLong(), anyLong());
@@ -89,13 +87,13 @@ public class EventParticipationControllerTest {
 
     @Test
     public void testUnregisterParticipantSuccess() throws Exception {
-        when( userContext.getUserId() ).thenReturn( userId );
-        when( eventParticipationService.unregisterParticipant( eventId, userId ) )
-                .thenReturn( ResponseEntity.noContent().build() );
-        mockMvc.perform( delete( "/events/{eventId}", eventId ) )
-                .andExpect( status().isNoContent() );
-        verify( eventValidator ).checkEventIdForNull( eventId );
-        verify( eventParticipationService ).unregisterParticipant( eventId, userId );
+        when(userContext.getUserId()).thenReturn(userId);
+        when(eventParticipationService.unregisterParticipant(eventId, userId))
+                .thenReturn(ResponseEntity.noContent().build());
+        mockMvc.perform(delete("/events/{eventId}", eventId))
+                .andExpect(status().isNoContent());
+        verify(eventValidator).checkEventIdForNull(eventId);
+        verify(eventParticipationService).unregisterParticipant(eventId, userId);
     }
 
     @Test
@@ -105,7 +103,7 @@ public class EventParticipationControllerTest {
         doThrow(new DataValidationException("Event id is null"))
                 .when(eventValidator).checkEventIdForNull(anyLong());
 
-        mockMvc.perform(delete("/events/{eventId}", 0L ))
+        mockMvc.perform(delete("/events/{eventId}", 0L))
                 .andExpect(status().isNotFound());
 
         verify(eventValidator).checkEventIdForNull(anyLong());
@@ -115,11 +113,11 @@ public class EventParticipationControllerTest {
 
     @Test
     public void testGetParticipants() throws Exception {
-        List<User> users = List.of( User.builder().id( 1L ).build(), User.builder().id( 2L ).build() );
-        when( eventParticipationService.getParticipants( eventId ) ).thenReturn( ResponseEntity.status( HttpStatus.OK ).body( users ) );
-        mockMvc.perform( get( "/events/{eventId}", eventId ) ).andExpect( status().isOk() );
-        verify( eventValidator ).checkEventIdForNull( eventId );
-        verify( eventParticipationService ).getParticipants( eventId );
+        List<User> users = List.of(User.builder().id(1L).build(), User.builder().id(2L).build());
+        when(eventParticipationService.getParticipants(eventId)).thenReturn(ResponseEntity.status(HttpStatus.OK).body(users));
+        mockMvc.perform(get("/events/{eventId}", eventId)).andExpect(status().isOk());
+        verify(eventValidator).checkEventIdForNull(eventId);
+        verify(eventParticipationService).getParticipants(eventId);
     }
 
 
@@ -142,9 +140,3 @@ public class EventParticipationControllerTest {
         verify(eventParticipationService).getParticipantsCount(eventId);
     }
 }
-
-
-
-
-
-

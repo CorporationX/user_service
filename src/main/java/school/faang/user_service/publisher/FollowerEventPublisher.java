@@ -14,9 +14,5 @@ public class FollowerEventPublisher extends AbstractPublisher<FollowerEvent> {
                                   @Value("${spring.data.redis.channels.follower_channel.name}") String followerChannelTopic) {
 
         super( redisTemplate, jsonMapper, followerChannelTopic );
-
     }
 }
-
-
-

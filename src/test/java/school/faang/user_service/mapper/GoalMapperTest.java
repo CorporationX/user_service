@@ -79,7 +79,7 @@ public class GoalMapperTest {
 
     @Test
     public void testSkillToId() {
-        List<Long> result = goalMapper.skillToId(skills);
+        List<Long> result = goalMapper.toSkillIds(skills);
 
         assertEquals(skillIds, result);
     }

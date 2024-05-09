@@ -10,8 +10,8 @@ import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.SkillService;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ public class GoalValidatorTest {
     private GoalRepository goalRepository;
 
     @Mock
-    private SkillRepository skillRepository;
+    private SkillService skillService;
 
     private long userId;
     private Goal goal;
@@ -53,7 +53,7 @@ public class GoalValidatorTest {
     @Test
     public void testValidateBeforeCreateWithNoExistSkills() {
         when(goalRepository.countActiveGoalsPerUser(userId)).thenReturn(2);
-        when(skillRepository.existsById(anyLong())).thenReturn(false);
+        when(skillService.existsById(anyLong())).thenReturn(false);
 
         assertThrows(DataValidationException.class, () -> goalValidator.validateBeforeCreate(userId, goalDto));
     }
@@ -61,7 +61,7 @@ public class GoalValidatorTest {
     @Test
     public void testValidateBeforeCreateWithValidArgs() {
         when(goalRepository.countActiveGoalsPerUser(userId)).thenReturn(2);
-        when(skillRepository.existsById(anyLong())).thenReturn(true);
+        when(skillService.existsById(anyLong())).thenReturn(true);
 
         goalValidator.validateBeforeCreate(userId, goalDto);
     }
@@ -76,7 +76,7 @@ public class GoalValidatorTest {
     @Test
     public void testValidateBeforeUpdateWithStatusActive() {
         goal.setStatus(GoalStatus.ACTIVE);
-        when(skillRepository.existsById(anyLong())).thenReturn(true);
+        when(skillService.existsById(anyLong())).thenReturn(true);
 
         goalValidator.validateBeforeUpdate(goal, goalDto);
     }

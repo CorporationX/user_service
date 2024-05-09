@@ -23,7 +23,6 @@ import school.faang.user_service.filter.goal.GoalSkillFilter;
 import school.faang.user_service.filter.goal.GoalStatusFilter;
 import school.faang.user_service.filter.goal.GoalTitleFilter;
 import school.faang.user_service.mapper.GoalMapperImpl;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.validator.GoalValidator;
@@ -52,7 +51,7 @@ public class GoalServiceTest {
     private SkillService skillService;
 
     @Mock
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Mock
     private GoalTitleFilter goalTitleFilter;
@@ -114,8 +113,7 @@ public class GoalServiceTest {
         when(skillService.getSkillById(2L)).thenReturn(skillTwo);
         when(skillService.getSkillById(3L)).thenReturn(skillThree);
         expected.setSkillsToAchieve(skills);
-        Optional<User> optionalUser = Optional.of(user);
-        when(userRepository.findById(userId)).thenReturn(optionalUser);
+        when(userService.getById(userId)).thenReturn(user);
         expected.setUsers(new ArrayList<>());
         expected.getUsers().add(user);
 
@@ -157,9 +155,9 @@ public class GoalServiceTest {
 
         goalService.updateGoal(fromRepository.getId(), goalDto);
 
-        verify(goalRepository, times(1)).save(captor.capture());
+
+        verify(goalMapper, times(1)).toDto(captor.capture());
         assertEquals(expected, captor.getValue());
-        verify(goalMapper, times(1)).toDto(captor.getValue());
     }
 
     @Test
@@ -206,7 +204,7 @@ public class GoalServiceTest {
         when(goalStatusFilter.isApplicable(filter)).thenReturn(true);
         when(goalSkillFilter.isApplicable(filter)).thenReturn(false);
 
-        goalService.findGoalsByUserId(1L, filter);
+        goalService.getGoalsByUserId(1L, filter);
 
         verify(goalTitleFilter, times(1)).apply(goals, filter);
         verify(goalDescriptionFilter, times(1)).apply(goals, filter);

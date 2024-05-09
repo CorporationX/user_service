@@ -2,6 +2,7 @@ package school.faang.user_service.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.GoalDto;
@@ -16,15 +17,15 @@ import java.util.Objects;
 public interface GoalMapper {
 
     @Mapping(source = "parent.id", target = "parentId")
-    @Mapping(source = "skillsToAchieve", target = "skillIds", qualifiedByName = "skillToId")
+    @Mapping(source = "skillsToAchieve", target = "skillIds", qualifiedByName = "toSkillIds")
     GoalDto toDto(Goal goal);
 
     @Mapping(target = "parent", ignore = true)
     @Mapping(target = "skillsToAchieve", ignore = true)
     Goal toEntity(GoalDto goalDto);
 
-    @Named("skillToId")
-    default List<Long> skillToId(List<Skill> skills) {
+    @Named("toSkillIds")
+    default List<Long> toSkillIds(List<Skill> skills) {
         if (Objects.nonNull(skills)) {
             return skills.stream()
                     .map(Skill::getId)
@@ -32,4 +33,7 @@ public interface GoalMapper {
         }
         return new ArrayList<>();
     }
+
+    @Mapping(target = "id", ignore = true)
+    void updateGoal(@MappingTarget Goal goal, GoalDto goalDto);
 }

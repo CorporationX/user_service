@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.goal;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,18 +26,23 @@ public class GoalControllerTest {
     @Mock
     private GoalValidator goalValidator;
 
+    private GoalDto goalDto;
+    private GoalFilterDto goalFilterDto;
+
+    @BeforeEach
+    public void setUp() {
+        goalDto = new GoalDto();
+        goalFilterDto = new GoalFilterDto();
+    }
+
     @Test
     public void testCreateGoal() {
-        GoalDto goalDto = new GoalDto();
-
         goalController.createGoal(1L, goalDto);
         verify(goalService, times(1)).createGoal(1L, goalDto);
     }
 
     @Test
     public void testUpdateGoal() {
-        GoalDto goalDto = new GoalDto();
-
         goalController.updateGoal(1L, goalDto);
         verify(goalService, times(1)).updateGoal(1L, goalDto);
     }
@@ -49,14 +55,12 @@ public class GoalControllerTest {
 
     @Test
     public void testGetGoalsById() {
-        GoalFilterDto goalFilterDto = new GoalFilterDto();
         goalController.getGoalsByUser(1L, goalFilterDto);
-        verify(goalService, times(1)).findGoalsByUserId(1L, goalFilterDto);
+        verify(goalService, times(1)).getGoalsByUserId(1L, goalFilterDto);
     }
 
     @Test
     public void testGetSubtasksByGoal() {
-        GoalFilterDto goalFilterDto = new GoalFilterDto();
         goalController.getSubtasksByGoal(1L, goalFilterDto);
         verify(goalService, times(1)).findSubtasksByGoalId(1L, goalFilterDto);
     }

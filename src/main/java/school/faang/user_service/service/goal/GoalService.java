@@ -3,6 +3,7 @@ package school.faang.user_service.service.goal;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.dto.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
@@ -11,15 +12,14 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.GoalMapper;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.SkillService;
+import school.faang.user_service.service.UserService;
 import school.faang.user_service.validator.GoalValidator;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,40 +29,42 @@ public class GoalService {
     private final SkillService skillService;
     private final GoalMapper goalMapper;
     private final GoalValidator goalValidator;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final List<GoalFilter> goalFilters;
 
+    @Transactional
     public GoalDto createGoal(Long userId, GoalDto goalDto) {
         goalValidator.validateBeforeCreate(userId, goalDto);
 
-        Goal goalToCreate = goalMapper.toEntity(goalDto);
+        Goal goal = goalMapper.toEntity(goalDto);
 
-        setParent(goalToCreate, goalDto);
-        setSkillToAchieve(goalToCreate, goalDto);
+        setParent(goal, goalDto);
+        setSkillToAchieve(goal, goalDto);
 
-        Optional<User> user = userRepository.findById(userId);
-        goalToCreate.setUsers(new ArrayList<>());
-        goalToCreate.getUsers().add(user.get());
-        goalToCreate.setStatus(GoalStatus.ACTIVE);
+        User user = userService.getById(userId);
+        goal.setUsers(new ArrayList<>());
+        goal.getUsers().add(user);
+        goal.setStatus(GoalStatus.ACTIVE);
 
-        goalRepository.save(goalToCreate);
-        return goalMapper.toDto(goalToCreate);
+        goalRepository.save(goal);
+        return goalMapper.toDto(goal);
     }
 
+
+    @Transactional
     public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
         Goal goalToUpdate = getGoalById(goalId);
         goalValidator.validateBeforeUpdate(goalToUpdate, goalDto);
-        updateFields(goalToUpdate, goalDto);
+        setFieldsFromDto(goalToUpdate, goalDto);
 
-        if (goalDto.getStatus().equals(GoalStatus.COMPLETED)) {
+        if (goalToUpdate.getStatus().equals(GoalStatus.COMPLETED)) {
             assignSkillToUser(goalToUpdate);
-            goalToUpdate.setStatus(GoalStatus.COMPLETED);
         }
 
-        goalRepository.save(goalToUpdate);
         return goalMapper.toDto(goalToUpdate);
     }
 
+    @Transactional(readOnly = true)
     public List<GoalDto> findSubtasksByGoalId(long goalId, GoalFilterDto filter) {
         List<GoalDto> goals = goalRepository.findByParent(goalId)
                 .map(goalMapper::toDto)
@@ -72,13 +74,19 @@ public class GoalService {
         return goals;
     }
 
-    public List<GoalDto> findGoalsByUserId(Long userId, GoalFilterDto filter) {
+    @Transactional(readOnly = true)
+    public List<GoalDto> getGoalsByUserId(Long userId, GoalFilterDto filter) {
         List<GoalDto> goals = goalRepository.findGoalsByUserId(userId)
                 .map(goalMapper::toDto)
                 .toList();
         applyGoalFilter(goals, filter);
 
         return goals;
+    }
+
+    @Transactional
+    public void deleteGoal(long goalId) {
+        goalRepository.deleteById(goalId);
     }
 
     private void applyGoalFilter(List<GoalDto> goals, GoalFilterDto filter) {
@@ -88,13 +96,13 @@ public class GoalService {
     }
 
     private void assignSkillToUser(Goal goalToUpdate) {
-        List<User> users = goalToUpdate.getUsers();
-        users.forEach((user) -> goalToUpdate.getSkillsToAchieve()
-                .forEach((skill) -> {
-                    if (!user.getSkills().contains(skill)) {
-                        skillService.assignSkillToUser(skill.getId(), user.getId());
-                    }
-                }));
+        goalToUpdate.getUsers().forEach(
+                (user) -> goalToUpdate.getSkillsToAchieve().forEach(
+                        (skill) -> {
+                            if (!user.getSkills().contains(skill)) {
+                                skillService.assignSkillToUser(skill.getId(), user.getId());
+                            }
+                        }));
     }
 
     private void setParent(Goal goal, GoalDto goalDto) {
@@ -113,19 +121,10 @@ public class GoalService {
         }
     }
 
-    private void updateFields(Goal goalToUpdate, GoalDto goalDto) {
+    private void setFieldsFromDto(Goal goalToUpdate, GoalDto goalDto) {
+        goalMapper.updateGoal(goalToUpdate, goalDto);
         setParent(goalToUpdate, goalDto);
-
-        goalToUpdate.setTitle(goalDto.getTitle());
-
-        if (Objects.nonNull(goalDto.getDescription())) {
-            goalToUpdate.setDescription(goalDto.getDescription());
-        }
         setSkillToAchieve(goalToUpdate, goalDto);
-    }
-
-    public void deleteGoal(long goalId) {
-        goalRepository.deleteById(goalId);
     }
 
     private Goal getGoalById(Long goalId) {

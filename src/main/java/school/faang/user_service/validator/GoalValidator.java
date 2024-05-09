@@ -6,15 +6,15 @@ import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.SkillService;
 
 @Component
 @RequiredArgsConstructor
 public class GoalValidator {
 
     private final GoalRepository goalRepository;
-    private final SkillRepository skillRepository;
+    private final SkillService skillService;
     private static final int MAX_COUNT_ACTIVE_GOALS = 3;
 
     public void validateBeforeCreate(Long userId, GoalDto goalDto) {
@@ -34,14 +34,14 @@ public class GoalValidator {
     }
 
     public void validateGoalTitle(GoalDto goalDto) {
-        if (goalDto.getTitle() == null || goalDto.getTitle().isEmpty()) {
+        if (goalDto.getTitle() == null || goalDto.getTitle().isBlank()) {
             throw new DataValidationException("Название цели не должно быть пустым");
         }
     }
 
     private void validateSkills(GoalDto goalDto) {
         goalDto.getSkillIds().forEach((skillId) -> {
-            if (!skillRepository.existsById(skillId)) {
+            if (!skillService.existsById(skillId)) {
                 throw new DataValidationException("Навык с id " + skillId + " не существует");
             }
         });

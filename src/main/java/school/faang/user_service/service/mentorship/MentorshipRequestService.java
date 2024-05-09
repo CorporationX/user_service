@@ -34,6 +34,7 @@ public class MentorshipRequestService {
         mentorshipRequestRepository.create(requesterId, receiverId, mentorshipRequestDto.getDescription());
     }
 
+    @Transactional(readOnly = true)
     public List<MentorshipRequestDto> getRequest(RequestFilterDto requestFilterDto) {
         return requestFilters.stream()
                 .filter(requestFilter -> requestFilter.isApplicable(requestFilterDto))
@@ -42,6 +43,7 @@ public class MentorshipRequestService {
                 .map(mentorshipRequestMapper::toDto).toList();
     }
 
+    @Transactional
     public MentorshipRequestDto acceptRequest(long id) {
         MentorshipRequest mentorshipRequest = getMentorshipRequest(id);
         User requester = mentorshipRequest.getRequester();
@@ -56,11 +58,6 @@ public class MentorshipRequestService {
         return mentorshipRequestMapper.toDto(mentorshipRequest);
     }
 
-    private MentorshipRequest getMentorshipRequest(long id) {
-        return mentorshipRequestRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("There is no such query in the database"));
-    }
-
     @Transactional
     public MentorshipRequestDto rejectRequest(long id, RejectionDto rejection) {
         MentorshipRequest mentorshipRequest = getMentorshipRequest(id);
@@ -68,5 +65,10 @@ public class MentorshipRequestService {
         mentorshipRequest.setRejectionReason(rejection.getReason());
         mentorshipRequestRepository.save(mentorshipRequest);
         return mentorshipRequestMapper.toDto(mentorshipRequest);
+    }
+
+    private MentorshipRequest getMentorshipRequest(long id) {
+        return mentorshipRequestRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("There is no such query in the database"));
     }
 }

@@ -29,6 +29,8 @@ public class RedisConfig{
     @Value("${spring.data.redis.channels.mentorship_channel.name}")
     private String mentorshipTopic;
 
+    @Value("${spring.data.redis.channels.profile_search_channel.name}")
+    private String userProfileSearchTopic;
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
@@ -51,6 +53,13 @@ public class RedisConfig{
     public MessageListenerAdapter userBannerListenerAdapter(UserBannerListener userBannerListener){
         return new MessageListenerAdapter(userBannerListener);
     }
+
+
+    @Bean
+    public ChannelTopic profileSearchTopic() {
+        return new ChannelTopic(userProfileSearchTopic);
+    }
+
 
     @Bean
     public RedisMessageListenerContainer getContainer(MessageListenerAdapter userBannerListenerAdapter){

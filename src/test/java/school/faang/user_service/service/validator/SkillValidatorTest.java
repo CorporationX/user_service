@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
@@ -65,9 +64,9 @@ public class SkillValidatorTest {
     public void testIfOfferedSkillExist() {
         long skillId = 1L;
         long userId = 1L;
-        Mockito.doThrow(new DataValidationException("this skill with id " + skillId + " already exist")).
+        doThrow(new DataValidationException("this skill with id " + skillId + " already exist")).
                 when(skillValidator).validateSkill(skillId, userId);
         DataValidationException thrownException = assertThrows(DataValidationException.class, () -> skillValidator.validateSkill(skillId, userId));
-        assertEquals("Invalid validation - this skill with id " + skillId + " already exist", thrownException.getMessage());
+        assertEquals("this skill with id " + skillId + " already exist", thrownException.getMessage());
     }
 }

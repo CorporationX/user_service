@@ -21,12 +21,12 @@ import static school.faang.user_service.service.user.filter.TestData.ALL_USERS;
 class UserAboutFilterTest {
     private final UserAboutFilter userAboutFilter = new UserAboutFilter();
     private UserFilterDto filter;
-    private Stream<User> usersToFilter;
+    private List<User> usersToFilter;
     private Stream<User> expectedFilteredUsers;
 
     @BeforeEach
     void setUp() {
-        usersToFilter = ALL_USERS.stream();
+        usersToFilter = ALL_USERS;
 
         filter = new UserFilterDto();
         filter.setAboutPattern("About zenith");

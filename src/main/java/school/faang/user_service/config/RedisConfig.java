@@ -12,7 +12,7 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import school.faang.user_service.listeners.UserBannerListener;
+import school.faang.user_service.listener.UserBannerListener;
 
 
 @Configuration
@@ -28,10 +28,7 @@ public class RedisConfig{
 
     @Value("${spring.data.redis.channels.mentorship_channel.name}")
     private String mentorshipTopic;
-    @Value("${spring.data.redis.channels.profile_view_channel.name}")
-    private String profileViewTopic;
-    @Value("${spring.data.redis.channels.profile_search_channel.name}")
-    private String userProfileSearchTopic;
+
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {

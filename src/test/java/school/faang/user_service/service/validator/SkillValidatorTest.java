@@ -15,6 +15,7 @@ import school.faang.user_service.validator.SkillValidator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class SkillValidatorTest {
@@ -25,7 +26,7 @@ public class SkillValidatorTest {
     @BeforeEach
     public void init() {
         skill = new SkillDto();
-            skill.setId(1L);
+        skill.setId(1L);
     }
 
     @InjectMocks
@@ -36,25 +37,28 @@ public class SkillValidatorTest {
     @Test
     public void testValidateSkillIfTitleIsNull() {
         skill.setTitle(null);
-        Mockito.doThrow(new DataValidationException("title doesn't exist")).when(skillValidator).validateSkill(skill);
+        doThrow(new DataValidationException("title doesn't exist")).when(skillValidator).validateSkill(skill);
         DataValidationException thrownException = assertThrows(DataValidationException.class, () -> skillValidator.validateSkill(skill));
-        assertEquals("Invalid validation - title doesn't exist", thrownException.getMessage());
+        assertEquals("title doesn't exist", thrownException.getMessage());
+        verify(skillValidator, timeout(1)).validateSkill(skill);
     }
 
     @Test
     public void testValidateSkillIfTitleIsBlank() {
         skill.setTitle(" ");
-        Mockito.doThrow(new DataValidationException("title is empty")).when(skillValidator).validateSkill(skill);
+        doThrow(new DataValidationException("title is empty")).when(skillValidator).validateSkill(skill);
         DataValidationException thrownException = assertThrows(DataValidationException.class, () -> skillValidator.validateSkill(skill));
-        assertEquals("Invalid validation - title is empty", thrownException.getMessage());
+        assertEquals("title is empty", thrownException.getMessage());
+        verify(skillValidator, timeout(1)).validateSkill(skill);
     }
 
     @Test
     public void testValidationSkillIfTitleExist() {
         skill.setTitle("Driving a car");
-        Mockito.doThrow(new DataValidationException("already exist")).when(skillValidator).validateSkill(skill);
+        doThrow(new DataValidationException("already exist")).when(skillValidator).validateSkill(skill);
         DataValidationException thrownException = assertThrows(DataValidationException.class, () -> skillValidator.validateSkill(skill));
-        assertEquals("Invalid validation - already exist", thrownException.getMessage());
+        assertEquals("already exist", thrownException.getMessage());
+        verify(skillValidator, timeout(1)).validateSkill(skill);
     }
 
     @Test

@@ -18,6 +18,12 @@ spring:
     change-log: classpath:db/changelog/db.changelog-master.yaml
 
   data:
+    kafka:
+      port: 9092
+      host: localhost
+      channels:
+        skill-channel:
+          name: "skill_event_channel"
     redis:
       port: 6379
       host: localhost
@@ -26,6 +32,8 @@ spring:
           name: follower_channel
         profile_view_channel:
           name: profile_view_channel
+        search_appearance_channel:
+          name: SearchAppearance_channel
         recommendation_channel:
           name: recommendation_channel
         mentorship_accepted_channel:

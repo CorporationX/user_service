@@ -135,14 +135,14 @@ public class MentorshipServiceTest {
 
     @Test
     public void testDeleteMenteeNotValidIdMentor() {
-        lenient().when(mentorshipRepository.findById(1L)).thenReturn(Optional.of(firstMentor));
+        when(mentorshipRepository.findById(1L)).thenReturn(Optional.of(firstMentor));
 
-        assertThrows(EntityNotFoundException.class, () -> mentorshipService.deleteMentee(10L, 2L));
+        assertThrows(EntityNotFoundException.class, () -> mentorshipService.deleteMentee(10L, 1L));
     }
 
     @Test
     public void testDeleteMentorNotValidIdMentee() {
-        lenient().when(mentorshipRepository.findById(13L)).thenReturn(Optional.of(thirdMentee));
+        when(mentorshipRepository.findById(16L)).thenReturn(Optional.of(thirdMentee));
 
         assertThrows(EntityNotFoundException.class, () -> mentorshipService.deleteMentor(16L, 1L));
     }

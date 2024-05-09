@@ -71,4 +71,21 @@ public class SubscriptionControllerTest {
         List<UserDto> users = subscriptionController.getFollowers(FOLLOWER_ID, filters);
         assertEquals(receivedUsers, users);
     }
+
+    @Test
+    public void getFollowing() {
+        when(userContext.getUserId()).thenReturn(1L);
+        UserFilterDto filters = new UserFilterDto();
+        List<UserDto> receivedUsers = List.of(new UserDto());
+        subscriptionController.getFollowing(filters);
+
+        verify(subscriptionService, times(1))
+                .getFollowers(FOLLOWER_ID, filters);
+
+        when(subscriptionService.getFollowers(FOLLOWER_ID, filters))
+                .thenReturn(receivedUsers);
+
+        List<UserDto> users = subscriptionController.getFollowers(FOLLOWER_ID, filters);
+        assertEquals(receivedUsers, users);
+    }
 }

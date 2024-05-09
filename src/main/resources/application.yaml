@@ -29,8 +29,10 @@ spring:
           name: profile_view_channel
         profile_search_channel:
           name: profile_search_channel
+        mentorship_channel:
+          name: mentorship_channel
   profiles:
-    active: dev
+    active: test
 
 server:
   port: 8080
@@ -67,16 +69,14 @@ task:
 cleanUpPremiumRepo:
   cron: *daily
 
-
 clearEvents:
   cron: "0 0 10 * * *"
   batchSize: 100
 
-
-
 dicebear:
   pic-base-url-small: https://api.dicebear.com/7.x/bottts/svg?size=64&seed=
   pic-base-url: https://api.dicebear.com/7.x/bottts/svg?size=256&seed=
+
 premium:
   remover:
     cron: "0 0 0 * * MON"

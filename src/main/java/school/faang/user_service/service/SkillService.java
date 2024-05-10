@@ -27,7 +27,10 @@ public class SkillService {
     }
 
     public List<SkillDto> getUserSkills(long userId) {
-        return skillRepository.findAllByUserId(userId).stream().map(skillMapper::toDto).toList();
+        return skillRepository.findAllByUserId(userId).
+                stream().
+                map(skillMapper::toDto).
+                toList();
     }
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {

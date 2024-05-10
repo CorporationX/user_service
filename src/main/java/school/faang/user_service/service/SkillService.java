@@ -1,14 +1,16 @@
 package school.faang.user_service.service;
 
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mappers.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.validation.SkillValidator;
+import school.faang.user_service.validation.UserValidator;
 
 import java.util.List;
 
@@ -17,49 +19,38 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SkillService {
     private final SkillRepository skillRepository;
-    private final UserRepository userRepository;
+    private final SkillValidator skillValidator;
     private final SkillMapper skillMapper;
+    private final UserValidator userValidator;
     private static final int MIN_SKILL_OFFERS = 3;
 
+    @Transactional
     public SkillDto create(SkillDto skillDto) {
-        validateTitleRepetition(skillDto);
+        skillValidator.validateTitleRepetition(skillDto.getTitle());
 
-        Skill skill = skillMapper.DtoToSkill(skillDto);
+        Skill skill = skillMapper.toEntity(skillDto);
         Skill skillSaved = skillRepository.save(skill);
-        return skillMapper.skillToDto(skillSaved);
+        return skillMapper.toDto(skillSaved);
     }
 
-    private void validateTitleRepetition(SkillDto skillDto) {
-        if (skillRepository.existsByTitle(skillDto.getTitle())) {
-            throw new DataValidationException("Навык с таким именем уже существует в базе данных");
-        }
-    }
-
-    public List<SkillDto> getUserSkills(long userId) {
-        checkUserInDB(userId);
+    @Transactional(readOnly = true)
+    public List<SkillDto> getUserSkills(Long userId) {
+        userValidator.checkUserInDB(userId);
         List<Skill> skills = skillRepository.findAllByUserId(userId);
-        return skills.stream().map(skillMapper::skillToDto).toList();
+        return skills.stream().map(skillMapper::toDto).toList();
     }
 
+    @Transactional(readOnly = true)
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
-        checkUserInDB(userId);
+        userValidator.checkUserInDB(userId);
         List<Skill> offeredSkillList = skillRepository.findSkillsOfferedToUser(userId);
         return offeredSkillList.stream().map(skill ->
                 skillMapper.skillToSkillCandidateDto(skill, getSkillOffersNumber(userId, skill.getId()))).toList();
     }
 
-    private void checkUserInDB(long userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new DataValidationException("Не найден пользователь с данным id: " + userId);
-        }
-    }
-
-    private long getSkillOffersNumber(long userId, long skillId) {
-        return skillRepository.countOffersByUserIdAndSkillId(userId, skillId);
-    }
-
+    @Transactional
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
-        checkNotNullSkillIdOrUserId(skillId, userId);
+        skillValidator.checkSkillIdAndUserIdInDB(skillId, userId);
         if (hasAlreadyAcquiredSkill(skillId, userId) || !hasEnoughSkillOffers(skillId, userId)) {
             throw new IllegalStateException("Пользователь уже приобрел этот навык или у него недостаточно предложений по навыкам.");
         }
@@ -67,7 +58,7 @@ public class SkillService {
         skillRepository.assignSkillToUser(skillId, userId);
 
         return skillRepository.findById(skillId)
-                .map(skillMapper::skillToDto)
+                .map(skillMapper::toDto)
                 .orElseThrow(() -> new IllegalStateException("Не удалось найти приобретенный навык с помощью id:" + skillId));
     }
 
@@ -75,13 +66,11 @@ public class SkillService {
         return skillRepository.findUserSkill(skillId, userId).isPresent();
     }
 
-     private boolean hasEnoughSkillOffers(long skillId, long userId) {
+    private boolean hasEnoughSkillOffers(long skillId, long userId) {
         return getSkillOffersNumber(skillId, userId) >= MIN_SKILL_OFFERS;
     }
 
-    private void checkNotNullSkillIdOrUserId(long skillId, long userId) {
-        if (!userRepository.existsById(userId) || !skillRepository.existsById(skillId)) {
-            throw new DataValidationException("Переданы пустые параметры skillId или userId");
-        }
+    private long getSkillOffersNumber(long userId, long skillId) {
+        return skillRepository.countOffersByUserIdAndSkillId(userId, skillId);
     }
 }

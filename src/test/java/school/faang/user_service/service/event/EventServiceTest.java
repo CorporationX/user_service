@@ -15,11 +15,8 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.exception.DataGettingException;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.EventMapper;
-import school.faang.user_service.mapper.SkillMapper;
-import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.filter.EventFilter;
 
@@ -34,7 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -47,11 +45,9 @@ class EventServiceTest {
     @Mock
     private EventRepository eventRepository;
     @Mock
-    private SkillRepository skillRepository;
-    @Mock
-    private SkillMapper skillMapper;
-    @Mock
     private EventMapper eventMapper;
+    @Mock
+    private EventServiceValidation eventServiceValidation;
 
     @Spy
     @InjectMocks
@@ -108,11 +104,8 @@ class EventServiceTest {
         @DisplayName("should create event when owner has required skills")
         @Test
         void shouldCreateEventWhenOwnerHasRequiredSkills() {
-            when(skillRepository.findAllByUserId(eventDto.getOwnerId())).thenReturn(List.of());
-            when(skillMapper.toDto(List.of())).thenReturn(eventDto.getRelatedSkills());
-
+            doNothing().when(eventServiceValidation).checkOwnerSkills(eventDto);
             when(eventMapper.toEntity(eventDto)).thenReturn(event);
-
 
             assertDoesNotThrow(() -> eventService.create(eventDto));
 
@@ -121,13 +114,15 @@ class EventServiceTest {
 
         @DisplayName("should get event when such event exists")
         @Test
-        void shouldGetEventWhenItsExists() {
-            when(eventRepository.findById(anyLong())).thenReturn(Optional.of(new Event()));
+        void shouldGetEventWhenItExists() {
+            doNothing().when(eventServiceValidation).checkEventPresence(anyLong());
+            when(eventRepository.findById(anyLong())).thenReturn(Optional.of(event));
+            when(eventMapper.toDto(event)).thenReturn(new EventDto());
 
             assertDoesNotThrow(() -> eventService.getEvent(anyLong()));
 
             verify(eventRepository).findById(anyLong());
-            verify(eventMapper).toDto(new Event());
+            verify(eventMapper).toDto(event);
         }
 
         @DisplayName("should return filtered events when filter isn't empty")
@@ -159,22 +154,19 @@ class EventServiceTest {
         @DisplayName("should delete event when such event exists")
         @Test
         void shouldDeleteEventWhenItExists() {
-            when(eventRepository.findById(anyLong())).thenReturn(Optional.of(new Event()));
-
+            doNothing().when(eventRepository).deleteById(anyLong());
             assertDoesNotThrow(() -> eventService.deleteEvent(anyLong()));
-
-            verify(eventRepository).findById(anyLong());
-            verify(eventRepository).delete(any(Event.class));
         }
 
-        @DisplayName("should update event when dto is valid")
+        @DisplayName("should update event when passed event exists and owner has required skills")
         @Test
         void shouldUpdateEventWhenDtoIsValid() {
-            doReturn(null).when(eventService).create(eventDto);
+            doNothing().when(eventServiceValidation).eventUpdateValidation(eventDto);
+            when(eventMapper.toEntity(eventDto)).thenReturn(event);
 
-            eventService.updateEvent(eventDto);
+            assertDoesNotThrow(() -> eventService.updateEvent(eventDto));
 
-            verify(eventService).create(eventDto);
+            verify(eventRepository).save(event);
         }
 
         @DisplayName("should return owned by user events")
@@ -198,11 +190,11 @@ class EventServiceTest {
 
     @Nested
     class NegativeTests {
-        @DisplayName("should throw exception when owner doesn't have required skills")
+        @DisplayName("should throw exception when owner doesn't have required skills during event creation")
         @Test
-        void shouldThrowExceptionWhenOwnersSkillsDoesntMatchRequired() {
-            when(skillRepository.findAllByUserId(eventDto.getOwnerId())).thenReturn(List.of());
-            when(skillMapper.toDto(List.of())).thenReturn(List.of());
+        void shouldThrowExceptionWhenOwnersSkillsDoesntMatchRequiredDuringEventCreation() {
+            doThrow(new DataValidationException(INAPPROPRIATE_OWNER_SKILLS_EXCEPTION.getMessage()))
+                    .when(eventServiceValidation).checkOwnerSkills(eventDto);
 
             DataValidationException exception = assertThrows(DataValidationException.class,
                     () -> eventService.create(eventDto));
@@ -214,11 +206,11 @@ class EventServiceTest {
         @DisplayName("should throw exception when such event doesn't exist")
         @Test
         void shouldThrowExceptionWhenSuchEventDoesntExist() {
-            when(eventRepository.findById(anyLong())).thenReturn(Optional.empty());
+            doThrow(new DataValidationException(NO_SUCH_EVENT_EXCEPTION.getMessage()))
+                    .when(eventServiceValidation).checkEventPresence(anyLong());
 
-            DataGettingException exception = assertThrows(DataGettingException.class, () -> eventService.getEvent(anyLong()));
+            DataValidationException exception = assertThrows(DataValidationException.class, () -> eventService.getEvent(anyLong()));
 
-            verify(eventRepository).findById(anyLong());
             verify(eventMapper, times(0)).toDto(any());
             assertEquals(NO_SUCH_EVENT_EXCEPTION.getMessage(), exception.getMessage());
         }
@@ -243,16 +235,31 @@ class EventServiceTest {
             assertEquals(List.of(), filteredEvents);
         }
 
-        @DisplayName("should throw exception when such event doesn't exists")
+        @DisplayName("should throw exception when event to be updated doesn't exist")
         @Test
-        void shouldThrowExceptionWhenEventToBeDeletedDoesntExist() {
-            when(eventRepository.findById(anyLong())).thenReturn(Optional.empty());
+        void shouldThrowExceptionWhenEventToBeUpdatedDoesntExist() {
+            doThrow(new DataValidationException(NO_SUCH_EVENT_EXCEPTION.getMessage()))
+                    .when(eventServiceValidation).eventUpdateValidation(eventDto);
 
-            DataGettingException exception = assertThrows(DataGettingException.class, () -> eventService.deleteEvent(anyLong()));
+            DataValidationException exception = assertThrows(DataValidationException.class,
+                    () -> eventService.updateEvent(eventDto));
 
-            verify(eventRepository).findById(anyLong());
-            verify(eventRepository, times(0)).delete(any());
+            verify(eventRepository, times(0)).save(any());
             assertEquals(NO_SUCH_EVENT_EXCEPTION.getMessage(), exception.getMessage());
         }
+
+        @DisplayName("should throw exception when owner of event to be updated doesn't have required skills")
+        @Test
+        void shouldThrowExceptionWhenOwnerOfEventToBeUpdatedDoesntHaveRequiredSkills() {
+            doThrow(new DataValidationException(INAPPROPRIATE_OWNER_SKILLS_EXCEPTION.getMessage()))
+                    .when(eventServiceValidation).eventUpdateValidation(eventDto);
+
+            DataValidationException exception = assertThrows(DataValidationException.class,
+                    () -> eventService.updateEvent(eventDto));
+
+            verify(eventRepository, times(0)).save(any());
+            assertEquals(INAPPROPRIATE_OWNER_SKILLS_EXCEPTION.getMessage(), exception.getMessage());
+        }
+
     }
 }

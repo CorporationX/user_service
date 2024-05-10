@@ -8,6 +8,5 @@ public class FailedTest {
     @Test
     void failingTest() {
         fail();
-
     }
 }

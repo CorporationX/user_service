@@ -15,7 +15,6 @@ import school.faang.user_service.validator.SkillValidator;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 public class SkillService {
@@ -46,7 +45,9 @@ public class SkillService {
     }
 
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
-        skillValidator.validateSkill(skillId, userId);
+        if (!skillValidator.validateSkill(skillId, userId)) {
+            return null;
+        }
         List<SkillOffer> skillOffers = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
         if (skillOffers.size() >= MIN_SKILL_OFFERS) {
             skillRepository.assignSkillToUser(skillId, userId);

@@ -38,7 +38,7 @@ public class SkillServiceTest {
     @Mock
     private Recommendation recommendation;
     @Mock
-    SkillValidator skillValidator;
+    private SkillValidator skillValidator;
     @Mock
     private User user;
     @Mock
@@ -77,6 +77,7 @@ public class SkillServiceTest {
     public void testAssignSkillToUser() {
         List<SkillOffer> skillOffers = List.of(skillOffer, skillOffer, skillOffer, skillOffer);
 
+        Mockito.when(skillValidator.validateSkill(skillId, userId)).thenReturn(true);
         Mockito.when(skillOfferRepository.findAllOffersOfSkill(skillId, userId)).
                 thenReturn(skillOffers);
         Mockito.when(skillOffer.getRecommendation()).thenReturn(recommendation);

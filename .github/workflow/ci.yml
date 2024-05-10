@@ -1,0 +1,14 @@
+name: ci
+
+on:
+  pull_request:
+    branches:
+      - 'phoenix-master-bc4'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Tests
+        run: ./gradlew test

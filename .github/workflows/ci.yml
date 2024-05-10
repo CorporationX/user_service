@@ -11,4 +11,4 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Tests
-        run: ./gradlew init build clean test
+        run: ./gradlew --stop test

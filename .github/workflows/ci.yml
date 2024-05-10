@@ -3,7 +3,7 @@ name: ci
 on:
   pull_request:
     branches:
-      - 'feature/pipline-BC-BJS2-6440'
+      - 'phoenix-master-bc4'
 
 jobs:
   build:

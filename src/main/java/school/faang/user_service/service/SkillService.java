@@ -34,14 +34,19 @@ public class SkillService {
     }
 
     public List<SkillDto> getUserSkills(long userId) {
-        return skillRepository.findAllByUserId(userId).stream().map(skillMapper::toDto).toList();
+        return skillRepository.findAllByUserId(userId).
+                stream().
+                map(skillMapper::toDto).
+                toList();
     }
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
-        return skillRepository.findSkillsOfferedToUser(userId).stream()
-                .collect(Collectors.groupingBy(skill -> skill, Collectors.counting()))
-                .entrySet().stream()
-                .map(entry -> skillCandidateMapper.toDto(entry.getKey(), entry.getValue())).toList();
+        return skillRepository.findSkillsOfferedToUser(userId).stream().
+                collect(Collectors.groupingBy(skill -> skill, Collectors.counting())).
+                entrySet().
+                stream().
+                map(entry -> skillCandidateMapper.toDto(entry.getKey(), entry.getValue())).
+                toList();
     }
 
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {

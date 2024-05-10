@@ -103,7 +103,7 @@ class EventControllerValidationTest {
         @DisplayName("Should throw exception when events end date is earlier than start date")
         @Test
         void shouldThrowExceptionWhenEndDateIsEarlierThanStartDate() {
-            eventDto.setEndDate(LocalDateTime.of(2024, 6, 12, 12, 12));
+            eventDto.setEndDate(LocalDateTime.of(2024, 6, 10, 12, 12));
 
             DataValidationException exception = assertThrows(DataValidationException.class,
                     () -> eventControllerValidation.validateEvent(eventDto));

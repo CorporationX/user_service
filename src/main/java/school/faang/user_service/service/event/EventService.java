@@ -6,12 +6,15 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.filter.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.filter.EventFilter;
 
 import java.util.List;
 import java.util.Optional;
+
+import static school.faang.user_service.exception.ExceptionMessage.NO_SUCH_EVENT_EXCEPTION;
 
 @Service
 @AllArgsConstructor
@@ -32,7 +35,7 @@ public class EventService {
     public EventDto getEvent(Long eventId) {
         eventServiceValidation.checkEventPresence(eventId);
 
-        return eventMapper.toDto(getEventById(eventId).get());
+        return eventMapper.toDto(getEventById(eventId).orElseThrow(() -> new DataValidationException(NO_SUCH_EVENT_EXCEPTION.getMessage())));
     }
 
     public List<EventDto> getEventsByFilter(EventFilterDto filter) {

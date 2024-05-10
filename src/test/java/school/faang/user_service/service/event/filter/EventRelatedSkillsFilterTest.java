@@ -17,6 +17,7 @@ class EventRelatedSkillsFilterTest {
     private EventRelatedSkillsFilter filter;
     private EventFilterDto filterDto;
     private Event event1, event2, event3;
+    private SkillDto skillDto;
 
     @BeforeEach
     void init() {
@@ -25,6 +26,8 @@ class EventRelatedSkillsFilterTest {
         event1 = Event.builder().relatedSkills(List.of(Skill.builder().id(1L).build())).build();
         event2 = Event.builder().relatedSkills(List.of(Skill.builder().id(2L).build())).build();
         event3 = Event.builder().relatedSkills(List.of(Skill.builder().id(1L).build())).build();
+        skillDto = new SkillDto();
+        skillDto.setId(1L);
     }
 
     @Test
@@ -40,13 +43,13 @@ class EventRelatedSkillsFilterTest {
 
     @Test
     void isAcceptableGoodDto() {
-        filterDto.setRelatedSkills(List.of(SkillDto.builder().id(1L).build()));
+        filterDto.setRelatedSkills(List.of(skillDto));
         assertTrue(filter.isAcceptable(filterDto));
     }
 
     @Test
     void apply() {
-        filterDto.setRelatedSkills(List.of(SkillDto.builder().id(1L).build()));
+        filterDto.setRelatedSkills(List.of(skillDto));
         Event[] expected = new Event[]{event1, event3};
         Stream<Event> out = filter.apply(Stream.of(event1, event2, event3), filterDto);
         assertArrayEquals(expected, out.toArray());

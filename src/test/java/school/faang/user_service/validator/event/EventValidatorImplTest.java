@@ -55,9 +55,15 @@ class EventValidatorImplTest {
                 Skill.builder().id(2L).build()
         );
 
+        SkillDto skillDto1 = new SkillDto();
+        SkillDto skillDto2 = new SkillDto();
+
+        skillDto1.setId(1L);
+        skillDto2.setId(2L);
+
         List<SkillDto> skillDtoList = List.of(
-                SkillDto.builder().id(1L).build(),
-                SkillDto.builder().id(2L).build()
+                skillDto1,
+                skillDto2
         );
 
         user = User.builder()

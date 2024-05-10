@@ -28,9 +28,15 @@ class EventControllerTest {
 
     @BeforeEach
     void init() {
+        SkillDto skillDto1 = new SkillDto();
+        SkillDto skillDto2 = new SkillDto();
+
+        skillDto1.setId(1L);
+        skillDto2.setId(2L);
+
         List<SkillDto> skillDtoList = List.of(
-                new SkillDto(1L, "skill1"),
-                new SkillDto(2L, "skill2")
+                skillDto1,
+                skillDto2
         );
         event = EventDto.builder()
                 .ownerId(1L)

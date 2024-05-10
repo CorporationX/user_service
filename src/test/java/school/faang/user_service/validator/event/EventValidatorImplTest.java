@@ -10,6 +10,8 @@ import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.event.EventStatus;
+import school.faang.user_service.entity.event.EventType;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.repository.UserRepository;
@@ -41,17 +43,23 @@ class EventValidatorImplTest {
                 .id(1L)
                 .ownerId(1L)
                 .title("eventDto")
+                .description("desc")
                 .startDate(LocalDateTime.now())
                 .endDate(LocalDateTime.now())
+                .type(EventType.GIVEAWAY)
+                .status(EventStatus.IN_PROGRESS)
                 .build();
+
         List<Skill> skills = List.of(
                 Skill.builder().id(1L).build(),
                 Skill.builder().id(2L).build()
         );
+
         List<SkillDto> skillDtoList = List.of(
                 SkillDto.builder().id(1L).build(),
                 SkillDto.builder().id(2L).build()
         );
+
         user = User.builder()
                 .id(id)
                 .skills(skills)
@@ -89,6 +97,30 @@ class EventValidatorImplTest {
 
         DataValidationException e = assertThrows(DataValidationException.class, () -> validator.validate(eventDto));
         assertEquals("event owner can't be null", e.getMessage());
+    }
+
+    @Test
+    void validateNoTitleDescription() {
+        eventDto.setDescription(null);
+
+        DataValidationException e = assertThrows(DataValidationException.class, () -> validator.validate(eventDto));
+        assertEquals("description can't be null", e.getMessage());
+    }
+
+    @Test
+    void validateNoStatus() {
+        eventDto.setStatus(null);
+
+        DataValidationException e = assertThrows(DataValidationException.class, () -> validator.validate(eventDto));
+        assertEquals("status can't be null", e.getMessage());
+    }
+
+    @Test
+    void validateNoTypeEvent() {
+        eventDto.setType(null);
+
+        DataValidationException e = assertThrows(DataValidationException.class, () -> validator.validate(eventDto));
+        assertEquals("type can't be null", e.getMessage());
     }
 
     @Test

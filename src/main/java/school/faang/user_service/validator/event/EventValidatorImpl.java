@@ -7,8 +7,8 @@ import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exceptions.event.DataValidationException;
-import school.faang.user_service.exceptions.event.NotFoundException;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.Set;
@@ -33,6 +33,15 @@ public class EventValidatorImpl implements EventValidator {
         if (event.getOwnerId() == null) {
             throw new DataValidationException("event owner can't be null");
         }
+        if (event.getDescription() == null) {
+            throw new DataValidationException("description can't be null");
+        }
+        if (event.getStatus() == null) {
+            throw new DataValidationException("status can't be null");
+        }
+        if (event.getType() == null) {
+            throw new DataValidationException("type can't be null");
+        }
     }
 
     @Override
@@ -40,7 +49,7 @@ public class EventValidatorImpl implements EventValidator {
     public void validateOwnersRequiredSkills(EventDto event) {
         User user = userRepository
                 .findById(event.getOwnerId())
-                .orElseThrow(() -> new NotFoundException("user with id=" + event.getOwnerId() + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException("user with id=" + event.getOwnerId() + " not found"));
 
         Set<Long> requiredSkillsIds = user.getSkills().stream()
                 .map(Skill::getId)
@@ -52,6 +61,13 @@ public class EventValidatorImpl implements EventValidator {
 
         if (!doesOwnerHasRequiredSkills) {
             throw new DataValidationException("user with id=" + event.getOwnerId() + " has no enough skills to create event");
+        }
+    }
+
+    @Override
+    public void validateUserId(long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new EntityNotFoundException("user with id=" + userId + " not found");
         }
     }
 }

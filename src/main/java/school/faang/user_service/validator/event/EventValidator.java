@@ -6,4 +6,6 @@ public interface EventValidator {
     void validate(EventDto eventDto);
 
     void validateOwnersRequiredSkills(EventDto event);
+
+    void validateUserId(long userId);
 }

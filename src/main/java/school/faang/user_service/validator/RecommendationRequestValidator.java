@@ -76,7 +76,7 @@ public class RecommendationRequestValidator {
 
     public void checkMessageIsBlank(String message) {
         if (StringUtils.isBlank(message)) {
-            throw new DataValidationException(REJECT_MESSAGE_EMPTY.getMessage());
+            throw new DataValidationException(REQUEST_MESSAGE_EMPTY.getMessage());
         }
     }
 }

@@ -4,8 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum RecommendationRequestExceptions {
-    REQUEST_MESSAGE_EMPTY("Recommendation request message is empty"),
-    REJECT_MESSAGE_EMPTY("Recommendation reject message is empty"),
+    REQUEST_MESSAGE_EMPTY("Request message is empty"),
     REQUEST_REQUESTER_ID_EMPTY("Recommendation request requester ID is empty"),
     REQUEST_RECEIVER_ID_EMPTY("Recommendation request requester ID is empty"),
     REQUEST_SKILLS_EMPTY("Recommendation request skills requests are empty"),

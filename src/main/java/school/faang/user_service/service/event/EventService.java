@@ -14,6 +14,7 @@ import school.faang.user_service.service.event.filter.EventFilter;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -26,9 +27,9 @@ public class EventService {
     private final UserRepository userRepository;
 
     public EventDto create(EventDto eventDto) {
-        Event event = eventMapper.toEntity(eventDto);
         User user = userRepository.findById(eventDto.getOwnerId()).orElseThrow(() ->
                 new DataValidationException("Пользователя с id: " + eventDto.getOwnerId() + " нет в базе данных."));
+        Event event = eventMapper.toEntity(eventDto);
 
         checkNeedSkillsForEvent(user, event);
         eventRepository.save(event);
@@ -41,11 +42,11 @@ public class EventService {
     }
 
     public List<EventDto> getEventsByFilter(EventFilterDto filters) {
-        Stream<Event> events = eventRepository.findAll().stream();
 
-        eventFilters.stream().filter(eventFilter -> eventFilter.isApplicable(filters))
-                .forEach(filter -> filter.apply(events, filters));
-        return eventMapper.toEventsDto(events.toList());
+       return eventFilters.stream().filter(eventFilter -> eventFilter.isApplicable(filters))
+                .flatMap(filter -> filter.apply(eventRepository.findAll().stream(), filters))
+                .map(eventMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     public void deleteEvent(long eventId) {
@@ -53,9 +54,9 @@ public class EventService {
     }
 
     public EventDto updateEvent(EventDto eventDto) {
-        Event event = eventMapper.toEntity(eventDto);
         User user = userRepository.findById(eventDto.getOwnerId()).orElseThrow(() ->
                 new DataValidationException("Пользователя с id: " + eventDto.getOwnerId() + " нет в базе данных."));
+        Event event = eventMapper.toEntity(eventDto);
 
         if (!event.getOwner().equals(user)) {
             throw new DataValidationException("Пользователь не является автором события " + event.getTitle());

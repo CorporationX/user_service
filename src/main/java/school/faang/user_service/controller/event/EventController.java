@@ -17,7 +17,7 @@ public class EventController {
     private final EventService eventService;
 
     public EventDto create(EventDto eventDto) {
-        validByTitle_StartDate_Owner(eventDto);
+        validByTitleStartDateOwner(eventDto);
         return eventService.create(eventDto);
     }
 
@@ -34,7 +34,7 @@ public class EventController {
     }
 
     public EventDto updateEvent(EventDto eventDto) {
-        validByTitle_StartDate_Owner(eventDto);
+        validByTitleStartDateOwner(eventDto);
         return eventService.updateEvent(eventDto);
     }
 
@@ -46,7 +46,7 @@ public class EventController {
         return eventService.getParticipatedEvents(userId);
     }
 
-    private void validByTitle_StartDate_Owner(EventDto eventDto) {
+    private void validByTitleStartDateOwner(EventDto eventDto) {
         if (eventDto.getTitle() == null || eventDto.getTitle().isBlank()) {
             throw new DataValidationException("Событие должно иметь название, и не должно быть пустым.");
         }

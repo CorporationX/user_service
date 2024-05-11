@@ -40,7 +40,6 @@ public class EventControllerTest {
         user = new User();
     }
 
-
     @Test
     public void testCreateEventNullOrBlank() {
         assertThrows(DataValidationException.class, () -> eventController.create(eventDto));
@@ -55,8 +54,10 @@ public class EventControllerTest {
 
     @Test
     public void testCreateWithNullOwnerId() {
-        eventDto.setTitle("Title");
-        eventDto.setStartDate(LocalDateTime.of(2014, 9, 19, 14, 5));
+        eventDto = EventDto.builder()
+                .title("Title")
+                .startDate(LocalDateTime.of(2014, 9, 19, 14, 5))
+                .build();
 
         assertThrows(DataValidationException.class, () -> eventController.create(eventDto));
     }
@@ -87,9 +88,11 @@ public class EventControllerTest {
 
     @Test
     public void testUpdateEvent() {
-        eventDto.setTitle("Title");
-        eventDto.setOwnerId(1L);
-        eventDto.setStartDate(LocalDateTime.of(2014, 9, 19, 14, 5));
+        eventDto = EventDto.builder()
+                .title("Title")
+                .ownerId(1L)
+                .startDate(LocalDateTime.of(2014, 9, 19, 14, 5))
+                .build();
 
         eventController.updateEvent(eventDto);
         verify(eventService, times(1)).updateEvent(eventDto);

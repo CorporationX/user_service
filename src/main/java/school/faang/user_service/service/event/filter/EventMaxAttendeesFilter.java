@@ -15,7 +15,7 @@ public class EventMaxAttendeesFilter implements EventFilter {
     }
 
     @Override
-    public void apply(Stream<Event> events, EventFilterDto filters) {
-        events.filter(event -> event.getMaxAttendees() == filters.getMaxAttendees());
+    public Stream<Event> apply(Stream<Event> events, EventFilterDto filters) {
+       return events.filter(event -> event.getMaxAttendees() == filters.getMaxAttendees());
     }
 }

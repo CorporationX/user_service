@@ -14,7 +14,7 @@ public class EventTypeFilter implements EventFilter {
     }
 
     @Override
-    public void apply(Stream<Event> events, EventFilterDto filters) {
-        events.filter(event -> event.getType().equals(filters.getType()));
+    public Stream<Event> apply(Stream<Event> events, EventFilterDto filters) {
+        return events.filter(event -> event.getType().equals(filters.getType()));
     }
 }

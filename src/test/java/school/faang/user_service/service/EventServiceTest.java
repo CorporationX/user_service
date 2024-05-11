@@ -54,27 +54,34 @@ public class EventServiceTest {
         event = new Event();
         eventDto = new EventDto();
 
-        firstSkill = new Skill();
-        firstSkill.setId(1);
-        firstSkill.setTitle("FirstSkill");
+        firstSkill = Skill.builder()
+                .id(1)
+                .title("FirstSkill")
+                .build();
 
-        secondSkill = new Skill();
-        secondSkill.setId(2);
-        secondSkill.setTitle("SecondSkill");
+        secondSkill = Skill.builder()
+                .id(2)
+                .title("secondSkill")
+                .build();
 
-        thirdSkill = new Skill();
-        thirdSkill.setId(3);
-        thirdSkill.setTitle("ThirdSkill");
+        thirdSkill = Skill.builder()
+                .id(3)
+                .title("thirdSkill")
+                .build();
     }
 
     @Test
     public void testCreateAbsentSkillsAtUser() {
-        userOne.setSkills(List.of(firstSkill, secondSkill));
-        userOne.setId(1L);
 
-        event.setId(1L);
-        event.setOwner(userOne);
-        event.setRelatedSkills(List.of(thirdSkill));
+        userOne = User.builder()
+                .skills(List.of(firstSkill, secondSkill))
+                .id(1L)
+                .build();
+
+        event = Event.builder()
+                .id(1L).owner(userOne)
+                .relatedSkills(List.of(thirdSkill))
+                .build();
 
         eventDto = eventMapper.toDto(event);
 
@@ -86,12 +93,16 @@ public class EventServiceTest {
 
     @Test
     public void testCreateSaveEvent() {
-        userOne.setSkills(List.of(firstSkill));
-        userOne.setId(1L);
+        userOne = User.builder()
+                .skills(List.of(firstSkill))
+                .id(1)
+                .build();
 
-        event.setId(1L);
-        event.setOwner(userOne);
-        event.setRelatedSkills(List.of(firstSkill));
+        event = Event.builder()
+                .id(1L)
+                .owner(userOne)
+                .relatedSkills(List.of(firstSkill))
+                .build();
 
         eventDto = eventMapper.toDto(event);
 
@@ -104,9 +115,11 @@ public class EventServiceTest {
 
     @Test
     public void testGetEvent() {
-        event.setId(1L);
-        event.setOwner(userOne);
-        event.setRelatedSkills(List.of(firstSkill, secondSkill));
+        event = Event.builder()
+                .id(1L)
+                .owner(userOne)
+                .relatedSkills(List.of(firstSkill, secondSkill))
+                .build();
 
         when(eventRepository.findById(event.getId())).thenReturn(Optional.of(event));
 
@@ -125,12 +138,16 @@ public class EventServiceTest {
 
     @Test
     public void testUpdateEventWithAbsentUserBd() {
-        userOne.setSkills(List.of(firstSkill));
-        userOne.setId(1L);
+        userOne = User.builder()
+                .skills(List.of(firstSkill))
+                .id(1L)
+                .build();
 
-        event.setId(1L);
-        event.setOwner(userOne);
-        event.setRelatedSkills(List.of(firstSkill));
+        event = Event.builder()
+                .id(1L)
+                .owner(userOne)
+                .relatedSkills(List.of(firstSkill))
+                .build();
 
         eventDto = eventMapper.toDto(event);
 
@@ -143,6 +160,7 @@ public class EventServiceTest {
         userSecond.setId(2L);
 
         event.setOwner(userFirst);
+
         eventDto = eventMapper.toDto(event);
 
         when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(userSecond));
@@ -151,14 +169,18 @@ public class EventServiceTest {
 
     @Test
     public void testEventUpdateAbsentSkillsAtUser() {
-        userFirst.setId(1L);
-        userFirst.setSkills(List.of(firstSkill));
+        userFirst = User.builder()
+                .id(1L)
+                .skills(List.of(firstSkill))
+                .build();
 
         userSecond.setId(2L);
 
-        event.setId(1L);
-        event.setOwner(userSecond);
-        event.setRelatedSkills(List.of(secondSkill));
+        event = Event.builder()
+                .id(1L)
+                .owner(userSecond)
+                .relatedSkills(List.of(secondSkill))
+                .build();
 
         eventDto = eventMapper.toDto(event);
 

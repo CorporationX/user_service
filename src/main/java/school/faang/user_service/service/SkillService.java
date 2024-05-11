@@ -1,6 +1,5 @@
 package school.faang.user_service.service;
 
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,9 +10,9 @@ import school.faang.user_service.mappers.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.validation.SkillValidator;
 import school.faang.user_service.validation.UserValidator;
+import school.faang.user_service.exception.DataValidationException;
 
 import java.util.List;
-
 
 @Component
 @RequiredArgsConstructor
@@ -34,10 +33,26 @@ public class SkillService {
     }
 
     @Transactional(readOnly = true)
+    public void assignSkillToUser(long skillId, long userId) {
+        skillRepository.assignSkillToUser(skillId, userId);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean existsById(Long skillId) {
+        return skillRepository.existsById(skillId);
+    }
+
+    @Transactional(readOnly = true)
     public List<SkillDto> getUserSkills(Long userId) {
         userValidator.checkUserInDB(userId);
         List<Skill> skills = skillRepository.findAllByUserId(userId);
         return skills.stream().map(skillMapper::toDto).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Skill getSkillById(Long skillId) {
+        return skillRepository.findById(skillId)
+                .orElseThrow(() -> new DataValidationException("Навыка с id " + skillId + " не существует"));
     }
 
     @Transactional(readOnly = true)

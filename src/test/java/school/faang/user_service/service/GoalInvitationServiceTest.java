@@ -20,7 +20,6 @@ import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.filter.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,6 +46,7 @@ public class GoalInvitationServiceTest {
     @Captor
     ArgumentCaptor<GoalInvitation> captor;
     List<InvitationFilter> invitationFilters;
+    ForTests forTests;
 
     @BeforeEach
     void init() {
@@ -64,7 +64,7 @@ public class GoalInvitationServiceTest {
 
     @Test
     void testCreateInvitationSaveGoalInvitation() {
-        GoalInvitationDto goalInvitationDto = setupForCreateInvitation();
+        GoalInvitationDto goalInvitationDto = forTests.setupForCreateInvitation();
 
         User inviter = new User();
         inviter.setId(goalInvitationDto.getInviterId());
@@ -90,7 +90,7 @@ public class GoalInvitationServiceTest {
 
     @Test
     void testAcceptGoalInvitationSetStatusAddGoal() {
-        GoalInvitation goalInvitation = setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
+        GoalInvitation goalInvitation = forTests.setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
         List<Goal> setGoals = goalInvitation.getInvited().getSetGoals();
         setGoals.remove(1);
 
@@ -108,7 +108,7 @@ public class GoalInvitationServiceTest {
 
     @Test
     void testRejectGoalInvitationSetStatus() {
-        GoalInvitation goalInvitation = setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
+        GoalInvitation goalInvitation = forTests.setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
 
         when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.of(goalInvitation));
         when(goalRepository.findById(goalInvitation.getGoal().getId())).thenReturn(Optional.of(goalInvitation.getGoal()));
@@ -130,47 +130,12 @@ public class GoalInvitationServiceTest {
         filterDto.setInvitedNamePattern("White");
         filterDto.setStatus(RequestStatus.PENDING);
 
-        GoalInvitation goalInvitation = setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
+        GoalInvitation goalInvitation = forTests.setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
         List<GoalInvitation> goalInvitations = List.of(goalInvitation);
 
         when(goalInvitationRepository.findAll()).thenReturn(goalInvitations);
 
         List<GoalInvitationDto> goalInvitationDtos = goalInvitationService.getInvitations(filterDto);
         assertEquals(0, goalInvitationDtos.size());
-    }
-
-    private GoalInvitationDto setupForCreateInvitation() {
-        return new GoalInvitationDto(25L, 25L, 20L, 30L, RequestStatus.PENDING);
-    }
-
-    public GoalInvitation setupForAcceptAndRejectGoalInvitationAndForGetInvitations() {
-
-        GoalInvitation goalInvitation = new GoalInvitation();
-        goalInvitation.setId(1L);
-
-        Goal goal = new Goal();
-        goal.setId(2L);
-
-        goalInvitation.setGoal(goal);
-
-        User invited = new User();
-        invited.setGoals(new ArrayList<>());
-        invited.setUsername("Mike");
-        invited.setId(2L);
-
-        invited.setSetGoals(new ArrayList<>(List.of(
-                new Goal(),
-                goal
-        )));
-
-        User inviter = new User();
-        inviter.setId(1L);
-        inviter.setUsername("John");
-
-        goalInvitation.setStatus(RequestStatus.ACCEPTED);
-
-        goalInvitation.setInvited(invited);
-        goalInvitation.setInviter(inviter);
-        return goalInvitation;
     }
 }

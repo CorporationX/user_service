@@ -8,7 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
-import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
@@ -17,7 +16,6 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,6 +35,7 @@ public class GoalInvitationServiceTestValidator {
     GoalRepository goalRepository;
     @Mock
     GoalInvitationRepository goalInvitationRepository;
+    ForTests forTests = new ForTests();
 
     @Test
     void testValidateForCreateInvitationWithInputIsNull() {
@@ -49,7 +48,7 @@ public class GoalInvitationServiceTestValidator {
     @Test
     void testValidateForCreateInvitationWhenInviterIdIsNull() {
 
-        GoalInvitationDto goalInvitationDto = setupForCreateInvitation();
+        GoalInvitationDto goalInvitationDto = forTests.setupForCreateInvitation();
         goalInvitationDto.setInviterId(null);
 
         DataValidationException exception = assertThrows(DataValidationException.class, () -> goalInvitationServiceValidator.validateForCreateInvitation(goalInvitationDto));
@@ -60,7 +59,7 @@ public class GoalInvitationServiceTestValidator {
     @Test
     void testValidateForCreateInvitationWhenInvitedUserIdIsNull() {
 
-        GoalInvitationDto goalInvitationDto = setupForCreateInvitation();
+        GoalInvitationDto goalInvitationDto = forTests.setupForCreateInvitation();
         goalInvitationDto.setInvitedUserId(null);
 
         DataValidationException exception = assertThrows(DataValidationException.class, () -> goalInvitationServiceValidator.validateForCreateInvitation(goalInvitationDto));
@@ -71,7 +70,7 @@ public class GoalInvitationServiceTestValidator {
     @Test
     void testValidateForCreateInvitationWhenInvitedUserIdEqualsInviterId() {
 
-        GoalInvitationDto goalInvitationDto = setupForCreateInvitation();
+        GoalInvitationDto goalInvitationDto = forTests.setupForCreateInvitation();
         goalInvitationDto.setInvitedUserId(25L);
 
         DataValidationException exception = assertThrows(DataValidationException.class, () -> goalInvitationServiceValidator.validateForCreateInvitation(goalInvitationDto));
@@ -82,7 +81,7 @@ public class GoalInvitationServiceTestValidator {
     @Test
     void testValidateForCreateInvitationWhenThereIsNoInviterInDB() {
 
-        GoalInvitationDto goalInvitationDto = setupForCreateInvitation();
+        GoalInvitationDto goalInvitationDto = forTests.setupForCreateInvitation();
 
         when(userRepository.findById(goalInvitationDto.getInviterId())).thenReturn(Optional.empty());
 
@@ -94,7 +93,7 @@ public class GoalInvitationServiceTestValidator {
     @Test
     void testValidateForCreateInvitationWhenThereIsNoInvitedInDB() {
 
-        GoalInvitationDto goalInvitationDto = setupForCreateInvitation();
+        GoalInvitationDto goalInvitationDto = forTests.setupForCreateInvitation();
 
         when(userRepository.findById(goalInvitationDto.getInviterId())).thenReturn(Optional.of(new User()));
         when(userRepository.findById(goalInvitationDto.getInvitedUserId())).thenReturn(Optional.empty());
@@ -107,7 +106,7 @@ public class GoalInvitationServiceTestValidator {
     @Test
     void testValidateForCreateInvitationWhenThereIsNoGoalInDB() {
 
-        GoalInvitationDto goalInvitationDto = setupForCreateInvitation();
+        GoalInvitationDto goalInvitationDto = forTests.setupForCreateInvitation();
 
         when(userRepository.findById(goalInvitationDto.getInviterId())).thenReturn(Optional.of(new User()));
         when(userRepository.findById(goalInvitationDto.getInvitedUserId())).thenReturn(Optional.of(new User()));
@@ -120,7 +119,7 @@ public class GoalInvitationServiceTestValidator {
 
     @Test
     void testValidateForAcceptGoalInvitationIfThereIsNoGoalInvitationInDB() {
-        GoalInvitation goalInvitation = setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
+        GoalInvitation goalInvitation = forTests.setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
 
         when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.empty());
 
@@ -131,7 +130,7 @@ public class GoalInvitationServiceTestValidator {
 
     @Test
     void testValidateForAcceptGoalInvitationIfThereIsNoGoalInDB() {
-        GoalInvitation goalInvitation = setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
+        GoalInvitation goalInvitation = forTests.setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
 
         when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.of(goalInvitation));
         when(goalRepository.findById(goalInvitation.getGoal().getId())).thenReturn(Optional.empty());
@@ -143,7 +142,7 @@ public class GoalInvitationServiceTestValidator {
 
     @Test
     void testValidateForAcceptGoalInvitationWithNoInvited() {
-        GoalInvitation goalInvitation = setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
+        GoalInvitation goalInvitation = forTests.setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
 
         when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.of(goalInvitation));
         when(goalRepository.findById(goalInvitation.getGoal().getId())).thenReturn(Optional.of(goalInvitation.getGoal()));
@@ -157,7 +156,7 @@ public class GoalInvitationServiceTestValidator {
 
     @Test
     void testValidateForAcceptGoalInvitationIfSetGoalsIsNull() {
-        GoalInvitation goalInvitation = setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
+        GoalInvitation goalInvitation = forTests.setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
 
         when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.of(goalInvitation));
         when(goalRepository.findById(goalInvitation.getGoal().getId())).thenReturn(Optional.of(goalInvitation.getGoal()));
@@ -171,7 +170,7 @@ public class GoalInvitationServiceTestValidator {
 
     @Test
     void testValidateForAcceptGoalInvitationIfSetGoalsMoreThanThree() {
-        GoalInvitation goalInvitation = setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
+        GoalInvitation goalInvitation = forTests.setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
 
         when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.of(goalInvitation));
         when(goalRepository.findById(goalInvitation.getGoal().getId())).thenReturn(Optional.of(goalInvitation.getGoal()));
@@ -187,7 +186,7 @@ public class GoalInvitationServiceTestValidator {
 
     @Test
     void testValidateForAcceptGoalInvitationSetGoalsWithoutCertainGoal() {
-        GoalInvitation goalInvitation = setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
+        GoalInvitation goalInvitation = forTests.setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
 
         when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.of(goalInvitation));
         when(goalRepository.findById(goalInvitation.getGoal().getId())).thenReturn(Optional.of(goalInvitation.getGoal()));
@@ -199,7 +198,7 @@ public class GoalInvitationServiceTestValidator {
 
     @Test
     void testValidateForRejectGoalInvitationWithNoGoalInvitation() {
-        GoalInvitation goalInvitation = setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
+        GoalInvitation goalInvitation = forTests.setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
 
         when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.empty());
         DataValidationException exception = assertThrows(DataValidationException.class, () -> goalInvitationServiceValidator.validateForRejectGoalInvitation(goalInvitation.getId()));
@@ -208,7 +207,7 @@ public class GoalInvitationServiceTestValidator {
 
     @Test
     void testValidateForRejectGoalInvitationWithNoGoal() {
-        GoalInvitation goalInvitation = setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
+        GoalInvitation goalInvitation = forTests.setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
 
         when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.of(goalInvitation));
         when(goalRepository.findById(goalInvitation.getGoal().getId())).thenReturn(Optional.empty());
@@ -221,40 +220,5 @@ public class GoalInvitationServiceTestValidator {
     void testValidateGetInvitationsWithFilterIsNull() {
         DataValidationException exception = assertThrows(DataValidationException.class, () -> goalInvitationServiceValidator.validateForGetInvitations(null));
         assertEquals(INPUT_IS_NULL.getMessage(), exception.getMessage());
-    }
-
-    private GoalInvitationDto setupForCreateInvitation() {
-        return new GoalInvitationDto(25L, 25L, 20L, 30L, RequestStatus.PENDING);
-    }
-
-    private GoalInvitation setupForAcceptAndRejectGoalInvitationAndForGetInvitations() {
-
-        GoalInvitation goalInvitation = new GoalInvitation();
-        goalInvitation.setId(1L);
-
-        Goal goal = new Goal();
-        goal.setId(2L);
-
-        goalInvitation.setGoal(goal);
-
-        User invited = new User();
-        invited.setGoals(new ArrayList<>());
-        invited.setUsername("Mike");
-        invited.setId(2L);
-
-        invited.setSetGoals(new ArrayList<>(List.of(
-                new Goal(),
-                goal
-        )));
-
-        User inviter = new User();
-        inviter.setId(1L);
-        inviter.setUsername("John");
-
-        goalInvitation.setStatus(RequestStatus.ACCEPTED);
-
-        goalInvitation.setInvited(invited);
-        goalInvitation.setInviter(inviter);
-        return goalInvitation;
     }
 }

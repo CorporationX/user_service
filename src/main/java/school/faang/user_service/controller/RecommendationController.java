@@ -1,4 +1,4 @@
-package school.faang.user_service.controler;
+package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

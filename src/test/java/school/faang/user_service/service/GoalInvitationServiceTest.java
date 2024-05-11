@@ -46,7 +46,7 @@ public class GoalInvitationServiceTest {
     @Captor
     ArgumentCaptor<GoalInvitation> captor;
     List<InvitationFilter> invitationFilters;
-    ForTests forTests;
+    ForTests forTests = new ForTests();
 
     @BeforeEach
     void init() {

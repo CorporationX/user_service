@@ -1,0 +1,12 @@
+package school.faang.user_service.dto;
+
+import lombok.Data;
+
+@Data
+public class MentorshipRequestFilterDto {
+
+    private String description;
+    private Long requesterId;
+    private Long receiverId;
+    private String status;
+}

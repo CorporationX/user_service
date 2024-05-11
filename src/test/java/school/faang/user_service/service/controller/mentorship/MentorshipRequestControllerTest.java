@@ -248,7 +248,7 @@ public class MentorshipRequestControllerTest {
                 .rejectionReason(rejectionReasonOfMRWithId1)
                 .build();
 
-        rejectionDtoForMr1 = RejectionDto.builder()
+        rejectionDtoForMr2 = RejectionDto.builder()
                 .id(mentorshipRequestId2)
                 .requesterId(userId1)
                 .receiverId(userId2)

@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
-import school.faang.user_service.dto.mentorship.RequestFilterDto;
+import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
@@ -31,8 +31,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 import static org.mockito.Mockito.*;
@@ -48,6 +46,9 @@ public class MentorshipRequestServiceTest {
     private MentorshipRequest mrEntityWithId2;
     private MentorshipRequest mrEntityWithId3;
     private MentorshipRequest mrEntityWithId4;
+
+    private RejectionDto rejectionDtoForMr1;
+
     private Long userId1;
     private Long userId2;
     private Long userId3;
@@ -258,6 +259,14 @@ public class MentorshipRequestServiceTest {
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
                 .build();
+
+        rejectionDtoForMr1 = RejectionDto.builder()
+                .id(mentorshipRequestId1)
+                .requesterId(userId3)
+                .receiverId(userId5)
+                .rejectionReason(rejectionReasonOfMRWithId1)
+                .build();
+
     }
 
 
@@ -276,6 +285,13 @@ public class MentorshipRequestServiceTest {
                 .thenReturn(mrEntityWithId1);
         userWithId3.setMentors(new ArrayList<>());
         mentorshipRequestService.acceptRequest(mentorshipRequestId1);
+    }
+
+    private void setUpForRejectRequest() {
+        when(mentorshipRequestValidator.validateMentorshipRequestExistence(mentorshipRequestId1))
+                .thenReturn(mrEntityWithId1);
+        userWithId3.setMentors(new ArrayList<>());
+        mentorshipRequestService.rejectRequest(mentorshipRequestId1, rejectionDtoForMr1);
     }
 
     @Test
@@ -417,6 +433,41 @@ public class MentorshipRequestServiceTest {
                 .requester(userWithId3)
                 .receiver(userWithId5)
                 .status(RequestStatus.ACCEPTED)
+                .rejectionReason(rejectionReasonOfMRWithId1)
+                .createdAt(firstCreatedAt)
+                .updatedAt(firstUpdatedAt)
+                .build();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testRejectRequestMentorshipRequestValidateMentorshipRequestExistenceShouldReceiveMentorshipRequestId1AsArgument() {
+        setUpForRejectRequest();
+
+        verify(mentorshipRequestValidator, times(1))
+                .validateMentorshipRequestExistence(idCaptor.capture());
+
+        var actual = idCaptor.getValue();
+        var expected = mentorshipRequestId1;
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testRejectMentorshipSaveShouldReceiveMrEntityWithId1AndStatusREJECTEDAndMentorUserWithId5AsArgument() {
+        setUpForRejectRequest();
+
+        verify(mentorshipRequestRepository, times(1))
+                .save(mentorshipRequestCaptor.capture());
+
+        var actual = mentorshipRequestCaptor.getValue();
+        var expected = MentorshipRequest.builder()
+                .id(mentorshipRequestId1)
+                .description(descriptionOfMRWithId1)
+                .requester(userWithId3)
+                .receiver(userWithId5)
+                .status(RequestStatus.REJECTED)
                 .rejectionReason(rejectionReasonOfMRWithId1)
                 .createdAt(firstCreatedAt)
                 .updatedAt(firstUpdatedAt)

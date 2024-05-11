@@ -35,12 +35,7 @@ public class SubscriptionControllerTest {
 
     @Test
     @DisplayName("Проверка, что пользователь не может подписаться сам на себя")
-    public void followUserSameIdTest() {
-//        try {
-//            controller.followUser(42, 42);
-//        } catch (DataValidationException dve) {
-//            System.out.println("DataValidationException успешно обработана.");
-//        }
+    void followUserSameIdTest() {
         Exception exception = assertThrows(DataValidationException.class, () -> {
             controller.followUser(42, 42);
         });
@@ -49,14 +44,14 @@ public class SubscriptionControllerTest {
 
     @Test
     @DisplayName("Проверка, что подписка на пользователя работает, в controller")
-    public void followUserSuccessControllerTest() {
+    void followUserSuccessControllerTest() {
         subscriptionController.followUser(10, 20);
         verify(subscriptionService, Mockito.times(1)).followUser(10, 20);
     }
 
     @Test
     @DisplayName("Проверка, что пользователь не может отписаться от самого себя")
-    public void unfollowUserSamIdTest() {
+    void unfollowUserSamIdTest() {
         assertThrows(DataValidationException.class, () -> {
             subscriptionController.unfollowUser(42, 42);
         });
@@ -64,14 +59,14 @@ public class SubscriptionControllerTest {
 
     @Test
     @DisplayName("Проверка, что отписка от пользователя работает, в controller")
-    public void unfollowUserSuccessControllerTest() {
+    void unfollowUserSuccessControllerTest() {
         subscriptionController.unfollowUser(10, 20);
         verify(subscriptionService).unfollowUser(10, 20);
     }
 
     @Test
     @DisplayName("Проверка, что выводится список подписчиков")
-    public void testGetFollowers() {
+    void testGetFollowers() {
 
         SubscriptionService service = mock(SubscriptionService.class);
 
@@ -92,7 +87,7 @@ public class SubscriptionControllerTest {
 
     @Test
     @DisplayName("Проверка, что с список подписчиков не выводится, если ввести неправильный followeeId")
-    public void testGetFollowersWithInvalidInput() {
+    void testGetFollowersWithInvalidInput() {
 
         SubscriptionService service = mock(SubscriptionService.class);
 
@@ -112,7 +107,7 @@ public class SubscriptionControllerTest {
 
     @Test
     @DisplayName("Проверка, что метод getFollowersCount работает, в controller")
-    public void testGetFollowersCountPositive() {
+    void testGetFollowersCountPositive() {
         SubscriptionService service = mock(SubscriptionService.class);
         // Устанавливаем поведение заглушки для позитивного теста
         when(service.getFollowersCount(1L)).thenReturn(42);
@@ -124,7 +119,7 @@ public class SubscriptionControllerTest {
 
     @Test
     @DisplayName("Проверка, что метод getFollowersCount работает, в controller, если передать  несуществующее ID")
-    public void testGetFollowersCountNegative() {
+    void testGetFollowersCountNegative() {
         SubscriptionService service = mock(SubscriptionService.class);
         when(service.getFollowersCount(2L)).thenThrow(new RuntimeException("User not found"));
 
@@ -137,7 +132,7 @@ public class SubscriptionControllerTest {
 
     @Test
     @DisplayName("Проверка, что метод getFollowingCount работает, в controller")
-    public void testGetFollowingCountPositive() {
+    void testGetFollowingCountPositive() {
         SubscriptionService service = mock(SubscriptionService.class);
         // Устанавливаем поведение заглушки для позитивного теста
         when(service.getFollowingCount(1L)).thenReturn(42);
@@ -149,7 +144,7 @@ public class SubscriptionControllerTest {
 
     @Test
     @DisplayName("Проверка, что метод getFollowingCount работает, в controller, если передать  несуществующее ID")
-    public void testGetFollowingCountNegative() {
+    void testGetFollowingCountNegative() {
         SubscriptionService service = mock(SubscriptionService.class);
         when(service.getFollowingCount(2L)).thenThrow(new RuntimeException("User not found"));
 

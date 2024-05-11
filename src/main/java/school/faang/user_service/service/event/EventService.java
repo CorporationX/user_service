@@ -15,7 +15,7 @@ import school.faang.user_service.service.event.filter.EventFilter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 
 @Service
 @RequiredArgsConstructor

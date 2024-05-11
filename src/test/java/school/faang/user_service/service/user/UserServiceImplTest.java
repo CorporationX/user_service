@@ -38,10 +38,14 @@ class UserServiceImplTest {
                 () -> userService.existsById(USER_ID));
     }
 
-
     @Test
     public void whenSkillExistsByIdThenNoException() {
         when(userRepository.existsById(USER_ID)).thenReturn(true);
         assertThat(userService.existsById(USER_ID)).isTrue();
+    }
+
+    @Test
+    public void testFailed() {
+        fail("fail");
     }
 }

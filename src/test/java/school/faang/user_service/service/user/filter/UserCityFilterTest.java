@@ -23,26 +23,33 @@ public class UserCityFilterTest {
 
     @Test
     public void testIsApplicable() {
-        UserFilterDto userFilterDto = new UserFilterDto();
-        userFilterDto.setCity("Moscow");
+        UserFilterDto userFilterDto = UserFilterDto.builder()
+                .city("Moscow")
+                .build();
 
         assertTrue(userCityFilter.isApplicable(userFilterDto));
     }
 
     @Test
     public void testApply() {
-        User user1 = new User();
-        user1.setCity("Kirov");
-        User user2 = new User();
-        user2.setCity("Moscow");
-        User user3 = new User();
-        user3.setCity("Kirov");
+        User user1 = User.builder()
+                .city("Kirov")
+                .build();
+
+        User user2 = User.builder()
+                .city("Moscow")
+                .build();
+
+        User user3 = User.builder()
+                .city("Kirov")
+                .build();
 
         List<User> users = List.of(user1, user2, user3);
         Stream<User> userStream = users.stream();
 
-        UserFilterDto filterDto = new UserFilterDto();
-        filterDto.setCity("Kirov");
+        UserFilterDto filterDto = UserFilterDto.builder()
+                .city("Kirov")
+                .build();
 
         List<User> resUsers = List.of(user1, user3);
         Stream<User> resUserStream = resUsers.stream();

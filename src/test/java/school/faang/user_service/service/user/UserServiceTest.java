@@ -33,10 +33,11 @@ public class UserServiceTest {
 
     @Test
     public void testGetPremiumUsers_IsRunFindPremiumUsers() {
-        UserFilterDto userFilterDto = new UserFilterDto();
-        userFilterDto.setCity("Rostov");
-        userFilterDto.setExperience(500);
-
+        UserFilterDto userFilterDto = UserFilterDto.builder()
+                .city("Rostov")
+                .experience(500)
+                .build();
+        
         userService.getPremiumUsers(userFilterDto);
 
         verify(userRepository, times(1)).findPremiumUsers();

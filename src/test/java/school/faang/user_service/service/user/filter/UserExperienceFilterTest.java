@@ -31,18 +31,24 @@ public class UserExperienceFilterTest {
 
     @Test
     public void testApply() {
-        User user1 = new User();
-        user1.setExperience(100);
-        User user2 = new User();
-        user2.setExperience(700);
-        User user3 = new User();
-        user3.setExperience(100);
+        User user1 = User.builder()
+                .experience(100)
+                .build();
+
+        User user2 = User.builder()
+                .experience(700)
+                .build();
+
+        User user3 = User.builder()
+                .experience(100)
+                .build();
 
         List<User> users = List.of(user1, user2, user3);
         Stream<User> userStream = users.stream();
 
-        UserFilterDto filterDto = new UserFilterDto();
-        filterDto.setExperience(100);
+        UserFilterDto filterDto = UserFilterDto.builder()
+                .experience(100)
+                .build();
 
         List<User> resUsers = List.of(user1, user3);
         Stream<User> resUserStream = resUsers.stream();

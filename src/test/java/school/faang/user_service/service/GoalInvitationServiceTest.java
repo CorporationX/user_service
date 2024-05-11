@@ -2,6 +2,7 @@ package school.faang.user_service.service;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -17,16 +18,15 @@ import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.filter.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
-import static school.faang.user_service.exception.MessageForGoalInvitationService.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -42,64 +42,24 @@ public class GoalInvitationServiceTest {
     GoalRepository goalRepository;
     @Mock
     UserRepository userRepository;
+    @Mock
+    GoalInvitationServiceValidator goalInvitationServiceValidator;
     @Captor
     ArgumentCaptor<GoalInvitation> captor;
+    List<InvitationFilter> invitationFilters;
 
-    @Test
-    void testCreateInvitationWithGoalInvitationDtoIsNull() {
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> goalInvitationService.createInvitation(null));
+    @BeforeEach
+    void init() {
 
-        assertEquals(INPUT_IS_NULL.getMessage(), exception.getMessage());
-    }
+        InviterIdFilter inviterIdFilter = Mockito.spy(InviterIdFilter.class);
+        InvitedIdFilter invitedIdFilter = Mockito.spy(InvitedIdFilter.class);
+        InvitedNamePatternFilter invitedNamePatternFilter = Mockito.spy(InvitedNamePatternFilter.class);
+        InviterNamePatternFilter inviterNamePatternFilter = Mockito.spy(InviterNamePatternFilter.class);
+        RequestStatusFilter requestStatusFilter = Mockito.spy(RequestStatusFilter.class);
 
-    @Test
-    void testCreateInvitationWithInviterNotExists() {
-        GoalInvitationDto goalInvitationDto = setupForCreateInvitation();
+        invitationFilters = List.of(inviterIdFilter, invitedIdFilter, invitedNamePatternFilter, inviterNamePatternFilter, requestStatusFilter);
 
-        when(userRepository.findById(goalInvitationDto.getInviterId())).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(RuntimeException.class, () -> goalInvitationService.createInvitation(goalInvitationDto));
-
-        assertEquals(INVITER_ID_IS_NULL.getMessage(), exception.getMessage());
-    }
-
-
-    @Test
-    void testCreateInvitationWithInvitedUserNotExists() {
-        GoalInvitationDto goalInvitationDto = setupForCreateInvitation();
-
-        when(userRepository.findById(goalInvitationDto.getInviterId())).thenReturn(Optional.of(new User()));
-        when(userRepository.findById(goalInvitationDto.getInvitedUserId())).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(RuntimeException.class, () -> goalInvitationService.createInvitation(goalInvitationDto));
-
-        assertEquals(INVITED_USER_ID_IS_NULL.getMessage(), exception.getMessage());
-    }
-
-    @Test
-    void testCreateInvitationWithNoGoal() {
-        GoalInvitationDto goalInvitationDto = setupForCreateInvitation();
-
-        when(userRepository.findById(goalInvitationDto.getInviterId())).thenReturn(Optional.of(new User()));
-        when(userRepository.findById(goalInvitationDto.getInvitedUserId())).thenReturn(Optional.of(new User()));
-        when(goalRepository.findById(goalInvitationDto.getGoalId())).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(RuntimeException.class, () -> goalInvitationService.createInvitation(goalInvitationDto));
-
-        assertEquals(NO_GOAL_IN_DB.getMessage(), exception.getMessage());
-    }
-
-    @Test
-    void testCreateInvitationWithInviterIdEqualsInvitedUserId() {
-        GoalInvitationDto goalInvitationDto = setupForCreateInvitation();
-        goalInvitationDto.setInvitedUserId(goalInvitationDto.getInviterId());
-
-        when(userRepository.findById(goalInvitationDto.getInviterId())).thenReturn(Optional.of(new User()));
-        when(userRepository.findById(goalInvitationDto.getInvitedUserId())).thenReturn(Optional.of(new User()));
-
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> goalInvitationService.createInvitation(goalInvitationDto));
-
-        assertEquals(INVITER_ID_EQUALS_INVITED_USER_ID.getMessage(), exception.getMessage());
+        goalInvitationService.setInvitationFilters(invitationFilters);
     }
 
     @Test
@@ -129,53 +89,6 @@ public class GoalInvitationServiceTest {
     }
 
     @Test
-    void testAcceptGoalInvitationWithIdIsNotPresent() {
-        GoalInvitation goalInvitation = setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
-
-        when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(RuntimeException.class, () -> goalInvitationService.acceptGoalInvitation(goalInvitation.getId()));
-
-        assertEquals(NO_GOAL_INVITATION_IN_DB.getMessage(), exception.getMessage());
-    }
-
-    @Test
-    void testAcceptGoalInvitationWithGoalIdIsNotPresent() {
-        GoalInvitation goalInvitation = setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
-
-        when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.of(goalInvitation));
-        when(goalRepository.findById(goalInvitation.getGoal().getId())).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(RuntimeException.class, () -> goalInvitationService.acceptGoalInvitation(goalInvitation.getId()));
-        assertEquals(NO_GOAL_IN_DB.getMessage(), exception.getMessage());
-    }
-
-    @Test
-    void testAcceptGoalInvitationWithSetGoalsMoreThanThree() {
-        GoalInvitation goalInvitation = setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
-        List<Goal> setGoals = goalInvitation.getInvited().getSetGoals();
-        setGoals.add(new Goal());
-        setGoals.add(new Goal());
-
-        when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.of(goalInvitation));
-        when(goalRepository.findById(goalInvitation.getGoal().getId())).thenReturn(Optional.of(goalInvitation.getGoal()));
-
-        Exception exception = assertThrows(RuntimeException.class, () -> goalInvitationService.acceptGoalInvitation(goalInvitation.getId()));
-        assertEquals(MORE_THEN_THREE_GOALS.getMessage(), exception.getMessage());
-    }
-
-    @Test
-    void testAcceptGoalInvitationWithSetGoalsWithoutCertainGoal() {
-        GoalInvitation goalInvitation = setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
-
-        when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.of(goalInvitation));
-        when(goalRepository.findById(goalInvitation.getGoal().getId())).thenReturn(Optional.of(goalInvitation.getGoal()));
-
-        Exception exception = assertThrows(RuntimeException.class, () -> goalInvitationService.acceptGoalInvitation(goalInvitation.getId()));
-        assertEquals(INVITED_HAS_GOAL.getMessage(), exception.getMessage());
-    }
-
-    @Test
     void testAcceptGoalInvitationSetStatusAddGoal() {
         GoalInvitation goalInvitation = setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
         List<Goal> setGoals = goalInvitation.getInvited().getSetGoals();
@@ -194,26 +107,6 @@ public class GoalInvitationServiceTest {
     }
 
     @Test
-    void testRejectGoalInvitationWithIdIsNotPresent() {
-        GoalInvitation goalInvitation = setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
-
-        when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.empty());
-        Exception exception = assertThrows(RuntimeException.class, () -> goalInvitationService.acceptGoalInvitation(goalInvitation.getId()));
-        assertEquals(NO_GOAL_INVITATION_IN_DB.getMessage(), exception.getMessage());
-    }
-
-    @Test
-    void testRejectGoalInvitationWithNoGoal() {
-        GoalInvitation goalInvitation = setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
-
-        when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.of(goalInvitation));
-        when(goalRepository.findById(goalInvitation.getGoal().getId())).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(RuntimeException.class, () -> goalInvitationService.acceptGoalInvitation(goalInvitation.getId()));
-        assertEquals(NO_GOAL_IN_DB.getMessage(), exception.getMessage());
-    }
-
-    @Test
     void testRejectGoalInvitationSetStatus() {
         GoalInvitation goalInvitation = setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
 
@@ -229,37 +122,28 @@ public class GoalInvitationServiceTest {
     }
 
     @Test
-    void testGetInvitationsWithFilterIsNull() {
-        Exception exception = assertThrows(RuntimeException.class, () -> goalInvitationService.getInvitations(null));
-        assertEquals(INPUT_IS_NULL.getMessage(), exception.getMessage());
-    }
-
-    @Test
-    void testGetInvitationsReturnGoalInvitations() {
-        InvitationFilterDto filterDto = setupForGetInvitations();
-        GoalInvitation goalInvitation = setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
-        List<GoalInvitation> goalInvitations = Arrays.asList(goalInvitation, new GoalInvitation(), new GoalInvitation());
-
-        when(goalInvitationRepository.findAll()).thenReturn(goalInvitations);
-        goalInvitations = goalInvitationService.getInvitations(filterDto);
-        assertEquals(1, goalInvitations.size());
-    }
-
-    @Test
     void testGetInvitationsWithNoGoalInvitations() {
-        InvitationFilterDto filterDto = setupForGetInvitations();
-        List<GoalInvitation> goalInvitations = Arrays.asList(new GoalInvitation(), new GoalInvitation(), new GoalInvitation());
+        InvitationFilterDto filterDto = new InvitationFilterDto();
+        filterDto.setInvitedId(22L);
+        filterDto.setInviterId(23L);
+        filterDto.setInviterNamePattern("Jessica");
+        filterDto.setInvitedNamePattern("White");
+        filterDto.setStatus(RequestStatus.PENDING);
+
+        GoalInvitation goalInvitation = setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
+        List<GoalInvitation> goalInvitations = List.of(goalInvitation);
 
         when(goalInvitationRepository.findAll()).thenReturn(goalInvitations);
-        goalInvitations = goalInvitationService.getInvitations(filterDto);
-        assertEquals(0, goalInvitations.size());
+
+        List<GoalInvitationDto> goalInvitationDtos = goalInvitationService.getInvitations(filterDto);
+        assertEquals(0, goalInvitationDtos.size());
     }
 
     private GoalInvitationDto setupForCreateInvitation() {
         return new GoalInvitationDto(25L, 25L, 20L, 30L, RequestStatus.PENDING);
     }
 
-    private GoalInvitation setupForAcceptAndRejectGoalInvitationAndForGetInvitations() {
+    public GoalInvitation setupForAcceptAndRejectGoalInvitationAndForGetInvitations() {
 
         GoalInvitation goalInvitation = new GoalInvitation();
         goalInvitation.setId(1L);
@@ -283,17 +167,10 @@ public class GoalInvitationServiceTest {
         inviter.setId(1L);
         inviter.setUsername("John");
 
+        goalInvitation.setStatus(RequestStatus.ACCEPTED);
+
         goalInvitation.setInvited(invited);
         goalInvitation.setInviter(inviter);
         return goalInvitation;
-    }
-
-    private InvitationFilterDto setupForGetInvitations() {
-        InvitationFilterDto filterDto = new InvitationFilterDto();
-        filterDto.setInviterNamePattern("John");
-        filterDto.setInvitedNamePattern("Mike");
-        filterDto.setInviterId(1L);
-        filterDto.setInvitedId(2L);
-        return filterDto;
     }
 }

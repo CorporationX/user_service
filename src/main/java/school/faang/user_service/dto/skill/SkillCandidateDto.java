@@ -1,7 +1,6 @@
 package school.faang.user_service.dto.skill;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -10,8 +9,7 @@ import org.springframework.stereotype.Component;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class SkillDto {
-    private Long id;
-    private String title;
+public class SkillCandidateDto {
+    private SkillDto skillDto;
+    private long offersAmount;
 }

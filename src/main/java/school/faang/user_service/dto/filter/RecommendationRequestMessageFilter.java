@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 class RecommendationRequestMessageFilter implements RecommendationRequestFilterInterface {
     @Override
     public boolean isApplicable(RecommendationRequestFilter filter) {
-        return StringUtils.isEmpty(filter.getMessage());
+        return !StringUtils.isBlank(filter.getMessage());
     }
 
     @Override

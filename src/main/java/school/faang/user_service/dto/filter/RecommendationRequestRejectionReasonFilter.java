@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 class RecommendationRequestRejectionReasonFilter implements RecommendationRequestFilterInterface {
     @Override
     public boolean isApplicable(RecommendationRequestFilter filter) {
-        return StringUtils.isEmpty(filter.getRejectionReason());
+        return !StringUtils.isBlank(filter.getRejectionReason());
     }
 
     @Override

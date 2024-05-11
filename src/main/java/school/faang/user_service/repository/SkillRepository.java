@@ -33,6 +33,13 @@ public interface SkillRepository extends JpaRepository<Skill, Long> {
     List<Skill> findSkillsOfferedToUser(long userId);
 
     @Query(nativeQuery = true, value = """
+            SELECT COUNT(*) FROM skill_offer so
+            JOIN recommendation r ON r.id = so.recommendation_id
+            WHERE r.receiver_id = :userId AND so.skill_id = :skillId
+            """)
+    long countOffersByUserIdAndSkillId(long userId, long skillId);
+
+    @Query(nativeQuery = true, value = """
             SELECT s.* FROM skill s
             JOIN user_skill us ON s.id = us.skill_id AND us.skill_id = :skillId AND us.user_id = :userId
             """)

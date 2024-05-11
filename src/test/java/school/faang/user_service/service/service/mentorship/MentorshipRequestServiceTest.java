@@ -20,6 +20,7 @@ import school.faang.user_service.filter.mentorship.MentorshipRequestReceiverIdFi
 import school.faang.user_service.filter.mentorship.MentorshipRequestRequesterIdFilter;
 import school.faang.user_service.filter.mentorship.MentorshipRequestStatusFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapperImpl;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.mentorship.impl.MentorshipRequestServiceImpl;
 import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
@@ -84,6 +85,8 @@ public class MentorshipRequestServiceTest {
 
     @Mock
     private UserValidator userValidator;
+    @Mock
+    private UserRepository userRepository;
 
     @Spy
     private MentorshipRequestMapperImpl mapper;
@@ -105,6 +108,9 @@ public class MentorshipRequestServiceTest {
 
     @InjectMocks
     private MentorshipRequestServiceImpl mentorshipRequestService;
+
+    @Captor
+    private ArgumentCaptor<Long> idCaptor;
 
     @Captor
     private ArgumentCaptor<List<Long>> usersIdsCaptor;
@@ -255,7 +261,8 @@ public class MentorshipRequestServiceTest {
     }
 
 
-    private MentorshipRequestDto setUp(Long requesterId, Long receiverId, List<Long> listOfUsersIds, List<User> listOfUsers, MentorshipRequestDto mentorshipRequestDto) {
+    private MentorshipRequestDto setUp(Long requesterId, Long receiverId, List<Long> listOfUsersIds,
+                                       List<User> listOfUsers, MentorshipRequestDto mentorshipRequestDto) {
         when(userValidator.validateUsersExistence(listOfUsersIds))
                 .thenReturn(listOfUsers);
         when(mentorshipRequestRepository.save(mrEntityWithId1))
@@ -263,6 +270,13 @@ public class MentorshipRequestServiceTest {
         return mentorshipRequestService.requestMentorship(requesterId, receiverId, mentorshipRequestDto);
     }
 
+
+    private void setUpForAcceptRequest() {
+        when(mentorshipRequestValidator.validateMentorshipRequestExistence(mentorshipRequestId1))
+                .thenReturn(mrEntityWithId1);
+        userWithId3.setMentors(new ArrayList<>());
+        mentorshipRequestService.acceptRequest(mentorshipRequestId1);
+    }
 
     @Test
     public void testRequestMentorshipCallsValidateUsersExistenceWithReceiverId5AndRequesterId4() {
@@ -363,4 +377,51 @@ public class MentorshipRequestServiceTest {
         verifyNoMoreInteractions(userValidator, mentorshipRequestRepository);
     }
 
+    @Test
+    public void testAcceptMentorshipRequestValidateMentorshipRequestExistenceShouldReceiveMentorshipRequestId1AsArgument() {
+        setUpForAcceptRequest();
+
+        verify(mentorshipRequestValidator, times(1))
+                .validateMentorshipRequestExistence(idCaptor.capture());
+
+        var actual = idCaptor.getValue();
+        var expected = mentorshipRequestId1;
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testAcceptMentorshipRequestValidateMentorShouldReceiveMrEntityWithId1AsArgument() {
+        setUpForAcceptRequest();
+
+        verify(mentorshipRequestValidator, times(1))
+                .validateMentor(mentorshipRequestCaptor.capture());
+
+        var actual = mentorshipRequestCaptor.getValue();
+        var expected = mrEntityWithId1;
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testAcceptMentorshipSaveShouldReceiveMrEntityWithId1AndStatusACCEPTEDAAndMentorUserWithId5AsArgument() {
+        setUpForAcceptRequest();
+
+        verify(mentorshipRequestRepository, times(1))
+                .save(mentorshipRequestCaptor.capture());
+
+        var actual = mentorshipRequestCaptor.getValue();
+        var expected = MentorshipRequest.builder()
+                .id(mentorshipRequestId1)
+                .description(descriptionOfMRWithId1)
+                .requester(userWithId3)
+                .receiver(userWithId5)
+                .status(RequestStatus.ACCEPTED)
+                .rejectionReason(rejectionReasonOfMRWithId1)
+                .createdAt(firstCreatedAt)
+                .updatedAt(firstUpdatedAt)
+                .build();
+
+        assertEquals(expected, actual);
+    }
 }

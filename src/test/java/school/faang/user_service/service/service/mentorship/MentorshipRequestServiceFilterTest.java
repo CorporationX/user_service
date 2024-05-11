@@ -20,6 +20,7 @@ import school.faang.user_service.filter.mentorship.MentorshipRequestReceiverIdFi
 import school.faang.user_service.filter.mentorship.MentorshipRequestRequesterIdFilter;
 import school.faang.user_service.filter.mentorship.MentorshipRequestStatusFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapperImpl;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
 import school.faang.user_service.service.mentorship.impl.MentorshipRequestServiceImpl;
@@ -90,6 +91,8 @@ public class MentorshipRequestServiceFilterTest {
     private MentorshipRequestValidator mentorshipRequestValidator;
     @Mock
     private UserValidator userValidator;
+    @Mock
+    private UserRepository userRepository;
     @Spy
     private MentorshipRequestMapperImpl mapper;
 
@@ -269,6 +272,7 @@ public class MentorshipRequestServiceFilterTest {
                 filters,
                 mentorshipRequestValidator,
                 mapper,
+                userRepository,
                 userValidator
         );
     }

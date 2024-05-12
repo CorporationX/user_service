@@ -1,23 +1,36 @@
 package school.faang.user_service.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import school.faang.user_service.subscriber.UsersBanListener;
 
 @Configuration
 @RequiredArgsConstructor
 public class RedisConfig {
+    private final ObjectMapper objectMapper;
+    @Value("${spring.data.redis.host}")
+    private String host;
+    @Value("${spring.data.redis.port}")
+    private int port;
+
     private final UsersBanListener usersBanListener;
 
     @Value("${spring.data.redis.channels.search_appearance_channel.name}")
     private String searchAppearanceTopic;
 
+    @Value("${spring.data.redis.channels.recommendation_request_channel.name}")
+    private String recommendationRequestChannel;
     @Value("${spring.data.redis.channels.recommendation_channel.name}")
     private String recommendationChannel;
 
@@ -29,6 +42,15 @@ public class RedisConfig {
 
     @Value("${spring.data.redis.channels.profile_view_channel.name}")
     private String profileViewChannel;
+
+    @Value("${spring.data.redis.channels.skill_channel.name}")
+    private String skillChannel;
+
+    @Bean
+    public ChannelTopic userBanTopic() {
+        return new ChannelTopic(userBanTopic);
+    }
+
 
     @Bean
     public MessageListenerAdapter userBanMessageListenerAdapter() {
@@ -43,19 +65,25 @@ public class RedisConfig {
         return container;
     }
 
+
+    @Bean
+    public ChannelTopic recommendationRequestTopic() {
+        return new ChannelTopic(recommendationRequestChannel);
+    }
     @Bean
     public ChannelTopic SearchAppearanceTopic() {
         return new ChannelTopic(searchAppearanceTopic);
     }
 
+
     @Bean
-    public ChannelTopic userBanTopic() {
-        return new ChannelTopic(userBanTopic);
+    public ChannelTopic recommendationTopic(){
+        return new ChannelTopic(recommendationChannel);
     }
 
     @Bean
-    public ChannelTopic recommendationTopic() {
-        return new ChannelTopic(recommendationChannel);
+    public ChannelTopic skillTopic() {
+        return new ChannelTopic(skillChannel);
     }
 
     @Bean

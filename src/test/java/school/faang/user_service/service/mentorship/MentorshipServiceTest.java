@@ -18,6 +18,8 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.MenteeMapperImpl;
 import school.faang.user_service.mapper.MentorMapperImpl;
 import school.faang.user_service.publisher.GoalSetEventPublisher;
+import school.faang.user_service.mapper.mentorship.MenteeMapperImpl;
+import school.faang.user_service.mapper.mentorship.MentorMapperImpl;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.validator.mentorship.MentorshipValidator;

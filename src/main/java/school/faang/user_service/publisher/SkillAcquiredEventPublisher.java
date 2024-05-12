@@ -7,17 +7,19 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.recommendation.RecommendationEvent;
+import school.faang.user_service.dto.event.SkillAcquiredEvent;
 
 @Component
-public class RecommendationEventPublisher extends AbstractEventPublisher<RecommendationEvent> {
-    public RecommendationEventPublisher(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper) {
+
+public class SkillAcquiredEventPublisher extends AbstractMessagePublisher<SkillAcquiredEvent> {
+
+    public SkillAcquiredEventPublisher(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper) {
         super(redisTemplate, objectMapper);
     }
     @Autowired
-    private ChannelTopic recommendationTopic;
+    private ChannelTopic skillTopic;
 
-    public void publish(RecommendationEvent event) {
-        convertAndSend(recommendationTopic.getTopic(), event);
+    public void publish(SkillAcquiredEvent event) {
+        convertAndSend(skillTopic.getTopic(), event);
     }
 }

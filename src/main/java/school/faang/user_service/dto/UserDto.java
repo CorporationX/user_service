@@ -33,4 +33,5 @@ public class UserDto {
     private Long countryId;
     private List<Long> goalIds;
     private PreferredContact preference;
+    private PreferredContact contactPreference;
 }

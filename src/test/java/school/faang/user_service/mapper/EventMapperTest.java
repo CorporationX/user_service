@@ -108,7 +108,7 @@ class EventMapperTest {
         eventDto.setId(0L);
         eventDto.getRelatedSkills().forEach(skill -> skill.setId(0L));
 
-        var actualEventDtoList = eventMapper.toDtos(List.of(event));
+        var actualEventDtoList = eventMapper.toDtoList(List.of(event));
 
         assertEquals(List.of(eventDto), actualEventDtoList);
     }

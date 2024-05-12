@@ -10,10 +10,12 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.filter.EventFilter;
+import school.faang.user_service.service.skill.SkillService;
 
+import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 
+import static school.faang.user_service.exception.ExceptionMessage.INAPPROPRIATE_OWNER_SKILLS_EXCEPTION;
 import static school.faang.user_service.exception.ExceptionMessage.NO_SUCH_EVENT_EXCEPTION;
 
 @Service
@@ -22,20 +24,21 @@ import static school.faang.user_service.exception.ExceptionMessage.NO_SUCH_EVENT
 public class EventService {
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
+    private final SkillService skillService;
     private List<EventFilter> filters;
-    private final EventServiceValidation eventServiceValidation;
 
 
     public EventDto create(EventDto event) {
-        eventServiceValidation.checkOwnerSkills(event);
+        checkOwnerSkills(event);
 
         return saveEvent(event);
     }
 
     public EventDto getEvent(Long eventId) {
-        eventServiceValidation.checkEventPresence(eventId);
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new DataValidationException(NO_SUCH_EVENT_EXCEPTION.getMessage()));
 
-        return eventMapper.toDto(getEventById(eventId).orElseThrow(() -> new DataValidationException(NO_SUCH_EVENT_EXCEPTION.getMessage())));
+        return eventMapper.toDto(event);
     }
 
     public List<EventDto> getEventsByFilter(EventFilterDto filter) {
@@ -54,24 +57,33 @@ public class EventService {
     }
 
     public EventDto updateEvent(EventDto event) {
-        eventServiceValidation.eventUpdateValidation(event);
+        if (!eventRepository.existsById(event.getId())) {
+            throw new DataValidationException(NO_SUCH_EVENT_EXCEPTION.getMessage());
+        }
+
+        checkOwnerSkills(event);
 
         return saveEvent(event);
     }
 
     public List<EventDto> getOwnedEvents(Long userId) {
-        return eventMapper.toDtos(eventRepository.findAllByUserId(userId));
+        return eventMapper.toDtoList(eventRepository.findAllByUserId(userId));
     }
 
     public List<EventDto> getParticipatedEvents(Long userId) {
-        return eventMapper.toDtos(eventRepository.findParticipatedEventsByUserId(userId));
-    }
-
-    private Optional<Event> getEventById(Long eventId) {
-        return eventRepository.findById(eventId);
+        return eventMapper.toDtoList(eventRepository.findParticipatedEventsByUserId(userId));
     }
 
     private EventDto saveEvent(EventDto event) {
         return eventMapper.toDto(eventRepository.save(eventMapper.toEntity(event)));
     }
+
+    private void checkOwnerSkills(EventDto event) {
+        var ownerSkills = new HashSet<>(skillService.getUserSkills(event.getOwnerId()));
+
+        if (!ownerSkills.containsAll(event.getRelatedSkills())) {
+            throw new DataValidationException(INAPPROPRIATE_OWNER_SKILLS_EXCEPTION.getMessage());
+        }
+    }
+
 }

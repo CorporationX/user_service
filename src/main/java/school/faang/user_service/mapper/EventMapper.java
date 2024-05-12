@@ -19,8 +19,7 @@ public interface EventMapper {
     @Mapping(source = "owner", target = "ownerId", qualifiedByName = "userToUserId")
     EventDto toDto(Event event);
 
-    @Mapping(source = "owner", target = "ownerId", qualifiedByName = "userToUserId")
-    List<EventDto> toDtos(List<Event> events);
+    List<EventDto> toDtoList(List<Event> events);
 
     @Named("userToUserId")
     static Long userToUserId(User user) {

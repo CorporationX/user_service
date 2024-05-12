@@ -41,11 +41,14 @@ public class RedisConfig {
     @Value("${spring.data.redis.channels.skill_channel.name}")
     private String skillChannel;
 
+    @Value("${spring.data.redis.channels.mentorship_accepted_channel.name}")
+    private String mentorshipAcceptedChannel;
+
+
     @Bean
     public ChannelTopic userBanTopic() {
         return new ChannelTopic(userBanTopic);
     }
-
 
     @Bean
     public MessageListenerAdapter userBanMessageListenerAdapter() {
@@ -59,7 +62,6 @@ public class RedisConfig {
         container.addMessageListener(userBanMessageListenerAdapter(), userBanTopic());
         return container;
     }
-
 
     @Bean
     public ChannelTopic recommendationRequestTopic() {
@@ -89,5 +91,10 @@ public class RedisConfig {
     @Bean
     public ChannelTopic profileViewTopic() {
         return new ChannelTopic(profileViewChannel);
+    }
+
+    @Bean
+    public ChannelTopic mentorshipAcceptedTopic() {
+        return new ChannelTopic(mentorshipAcceptedChannel);
     }
 }

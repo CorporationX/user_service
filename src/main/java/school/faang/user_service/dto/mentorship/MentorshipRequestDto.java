@@ -15,7 +15,7 @@ public class MentorshipRequestDto {
     @NotBlank(message = "The reason for the request must be completed")
     private String description;
     @NotBlank(message = "Requester id must be filled in")
-    private long idRequester;
+    private long requesterId;
     @NotBlank(message = "Receiver id must be filled in")
     private long idReceiver;
     private RequestStatus status;

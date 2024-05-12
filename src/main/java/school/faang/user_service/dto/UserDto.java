@@ -1,5 +1,6 @@
 package school.faang.user_service.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,6 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserDto {
     private long id;
     @NotBlank(message = "Username can't be empty")
@@ -32,6 +34,5 @@ public class UserDto {
     @NotNull(message = "Country ID can't be empty")
     private Long countryId;
     private List<Long> goalIds;
-    private PreferredContact preference;
     private PreferredContact contactPreference;
 }

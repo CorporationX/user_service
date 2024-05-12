@@ -12,13 +12,14 @@ import java.util.List;
 
 @Mapper(componentModel = "Spring",unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface MentorshipRequestMapper {
-    @Mapping(source = "requester",target = "idRequester", qualifiedByName = "getUserId")
+    @Mapping(source = "requester",target = "requesterId", qualifiedByName = "getUserId")
     @Mapping(source = "receiver",target = "idReceiver", qualifiedByName = "getUserId")
     MentorshipRequestDto toDto(MentorshipRequest mentorshipRequest);
 
     List<MentorshipRequestDto> toDto(List<MentorshipRequest> mentorshipRequests);
 
     MentorshipRequest toEntity(MentorshipRequestDto mentorshipRequestDto);
+
     @Named("getUserId")
     default long getUserId(User user){
         return user.getId();

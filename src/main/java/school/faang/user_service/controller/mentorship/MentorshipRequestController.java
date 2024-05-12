@@ -11,16 +11,16 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/mentorshipRequest")
+@RequestMapping("/mentorship/request")
 public class MentorshipRequestController {
     private final MentorshipRequestService mentorshipRequestService;
 
-    @PostMapping("/create")
+    @PostMapping
     public void requestMentorship(@RequestBody MentorshipRequestDto mentorshipRequestDto) {
         mentorshipRequestService.requestMentorship(mentorshipRequestDto);
     }
 
-    @GetMapping("/get")
+    @GetMapping
     public List<MentorshipRequestDto> getRequest(@RequestBody RequestFilterDto requestFilterDto) {
         return mentorshipRequestService.getRequest(requestFilterDto);
     }

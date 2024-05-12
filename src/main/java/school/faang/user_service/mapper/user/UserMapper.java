@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public interface UserMapper {
     @Mapping(source = "country.id", target = "countryId")
     @Mapping(source = "goals", target = "goalIds", qualifiedByName = "convertGoalToId")
-    @Mapping(source = "contactPreference", target = "contactPreference", qualifiedByName = "contactPreference_to_preferredContact")
+    @Mapping(source = "contactPreference", target = "contactPreference", qualifiedByName = "convertUserToId")
     UserDto toDto(User user);
 
     @Mapping(source = "countryId", target = "country.id")
@@ -25,16 +25,16 @@ public interface UserMapper {
 
     List<UserDto> toDto(List<User> users);
 
-    @Named("convertGoalToId")
-    default List<Long> convertGoalToId(List<Goal> goals) {
-        return goals.stream().map(Goal::getId).collect(Collectors.toList());
-    }
-
-    @Named("contactPreference_to_preferredContact")
+    @Named("convertUserToId")
     default PreferredContact convertUserToId(ContactPreference contactPreference) {
         if (contactPreference != null) {
             return contactPreference.getPreference();
         } else
             return null;
+    }
+
+    @Named("convertGoalToId")
+    default List<Long> convertGoalToId(List<Goal> goals) {
+        return goals.stream().map(Goal::getId).collect(Collectors.toList());
     }
 }

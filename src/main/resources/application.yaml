@@ -48,6 +48,9 @@ spring:
 server:
   port: 8080
 
+api:
+  v1: "api/v1"
+
 logging:
   level:
     root: info

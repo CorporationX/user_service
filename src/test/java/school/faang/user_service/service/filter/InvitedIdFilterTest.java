@@ -14,12 +14,12 @@ public class InvitedIdFilterTest {
     @InjectMocks
     private InvitedIdFilter invitedIdFilter;
     private InvitationFilterDto invitationFilterDto;
-    private Data data;
+    private TestData testData;
 
     @BeforeEach
     void prepareInvitationFilterDto() {
-        data = new Data();
-        invitationFilterDto = data.prepareInvitationFilterDto();
+        testData = new TestData();
+        invitationFilterDto = testData.prepareInvitationFilterDto();
     }
 
 
@@ -36,13 +36,13 @@ public class InvitedIdFilterTest {
 
     @Test
     void testApplyWithGoalInvitation() {
-        assertEquals(data.prepareGoalInvitationStream().toList().size(), invitedIdFilter.apply(data.prepareGoalInvitationStream(),
+        assertEquals(testData.prepareGoalInvitationStream().toList().size(), invitedIdFilter.apply(testData.prepareGoalInvitationStream(),
                 invitationFilterDto).toList().size());
     }
 
     @Test
     void testApplyWithoutGoalInvitation() {
         invitationFilterDto.setInvitedId(22L);
-        assertEquals(0, invitedIdFilter.apply(data.prepareGoalInvitationStream(), invitationFilterDto).toList().size());
+        assertEquals(0, invitedIdFilter.apply(testData.prepareGoalInvitationStream(), invitationFilterDto).toList().size());
     }
 }

@@ -15,7 +15,7 @@ public class RequestStatusFilterTest {
     @InjectMocks
     private RequestStatusFilter requestStatusFilter;
     private InvitationFilterDto invitationFilterDto;
-    private Data data;
+    private TestData testData;
 
     @BeforeEach
     void prepareInvitationFilterDto() {
@@ -25,7 +25,7 @@ public class RequestStatusFilterTest {
         invitationFilterDto.setInviterNamePattern("John");
         invitationFilterDto.setInvitedNamePattern("Mike");
         invitationFilterDto.setStatus(RequestStatus.ACCEPTED);
-        data = new Data();
+        testData = new TestData();
     }
 
 
@@ -42,13 +42,13 @@ public class RequestStatusFilterTest {
 
     @Test
     void testApplyWithGoalInvitation() {
-        assertEquals(data.prepareGoalInvitationStream().toList().size(), requestStatusFilter.apply(data.prepareGoalInvitationStream(),
+        assertEquals(testData.prepareGoalInvitationStream().toList().size(), requestStatusFilter.apply(testData.prepareGoalInvitationStream(),
                 invitationFilterDto).toList().size());
     }
 
     @Test
     void testApplyWithoutGoalInvitation() {
         invitationFilterDto.setStatus(RequestStatus.PENDING);
-        assertEquals(0, requestStatusFilter.apply(data.prepareGoalInvitationStream(), invitationFilterDto).toList().size());
+        assertEquals(0, requestStatusFilter.apply(testData.prepareGoalInvitationStream(), invitationFilterDto).toList().size());
     }
 }

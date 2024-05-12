@@ -42,8 +42,7 @@ public class GoalInvitationServiceTest {
     private GoalInvitationServiceValidator goalInvitationServiceValidator;
     @Captor
     private ArgumentCaptor<GoalInvitation> captor;
-    private List<InvitationFilter> invitationFilters;
-    private ForTests forTests = new ForTests();
+    private final TestData testData = new TestData();
 
     @BeforeEach
     void init() {
@@ -54,14 +53,14 @@ public class GoalInvitationServiceTest {
         InviterNamePatternFilter inviterNamePatternFilter = Mockito.spy(InviterNamePatternFilter.class);
         RequestStatusFilter requestStatusFilter = Mockito.spy(RequestStatusFilter.class);
 
-        invitationFilters = List.of(inviterIdFilter, invitedIdFilter, invitedNamePatternFilter, inviterNamePatternFilter, requestStatusFilter);
+        List<InvitationFilter> invitationFilters = List.of(inviterIdFilter, invitedIdFilter, invitedNamePatternFilter, inviterNamePatternFilter, requestStatusFilter);
 
         goalInvitationService.setInvitationFilters(invitationFilters);
     }
 
     @Test
     void testCreateInvitationSaveGoalInvitation() {
-        GoalInvitationDto goalInvitationDto = forTests.setupForCreateInvitation();
+        GoalInvitationDto goalInvitationDto = testData.setupForCreateInvitation();
 
         User inviter = new User();
         inviter.setId(goalInvitationDto.getInviterId());
@@ -87,7 +86,7 @@ public class GoalInvitationServiceTest {
 
     @Test
     void testAcceptGoalInvitationSetStatusAddGoal() {
-        GoalInvitation goalInvitation = forTests.setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
+        GoalInvitation goalInvitation = testData.setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
         List<Goal> setGoals = goalInvitation.getInvited().getSetGoals();
         setGoals.remove(1);
 
@@ -105,7 +104,7 @@ public class GoalInvitationServiceTest {
 
     @Test
     void testRejectGoalInvitationSetStatus() {
-        GoalInvitation goalInvitation = forTests.setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
+        GoalInvitation goalInvitation = testData.setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
 
         when(goalInvitationRepository.findById(goalInvitation.getId())).thenReturn(Optional.of(goalInvitation));
         when(goalRepository.findById(goalInvitation.getGoal().getId())).thenReturn(Optional.of(goalInvitation.getGoal()));
@@ -127,7 +126,7 @@ public class GoalInvitationServiceTest {
         filterDto.setInvitedNamePattern("White");
         filterDto.setStatus(RequestStatus.PENDING);
 
-        GoalInvitation goalInvitation = forTests.setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
+        GoalInvitation goalInvitation = testData.setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
         List<GoalInvitation> goalInvitations = List.of(goalInvitation);
 
         when(goalInvitationRepository.findAll()).thenReturn(goalInvitations);

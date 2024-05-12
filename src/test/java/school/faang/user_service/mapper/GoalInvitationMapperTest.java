@@ -1,20 +1,20 @@
 package school.faang.user_service.mapper;
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.entity.goal.GoalInvitation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@ExtendWith(MockitoExtension.class)
 public class GoalInvitationMapperTest {
     final GoalInvitationMapper goalInvitationMapper = Mappers.getMapper(GoalInvitationMapper.class);
-    GoalInvitation goalInvitation;
-    GoalInvitationDto goalInvitationDto;
+    private GoalInvitation goalInvitation;
+    private GoalInvitationDto goalInvitationDto;
 
     @BeforeEach
     void setUp() {

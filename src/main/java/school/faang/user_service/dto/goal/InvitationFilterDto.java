@@ -8,13 +8,13 @@ import school.faang.user_service.entity.RequestStatus;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class InvitationFilterDto {
-    String inviterNamePattern;
+    private String inviterNamePattern;
 
-    String invitedNamePattern;
+    private String invitedNamePattern;
 
-    Long inviterId;
+    private Long inviterId;
 
-    Long invitedId;
+    private Long invitedId;
 
-    RequestStatus status;
+    private RequestStatus status;
 }

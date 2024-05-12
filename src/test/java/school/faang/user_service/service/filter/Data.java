@@ -1,4 +1,4 @@
-package school.faang.user_service.filter;
+package school.faang.user_service.service.filter;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 @Component
 public class Data {
-    InvitationFilterDto invitationFilterDto;
+    private InvitationFilterDto invitationFilterDto;
 
     public Stream<GoalInvitation> prepareGoalInvitationStream() {
         GoalInvitation goalInvitation = new GoalInvitation();

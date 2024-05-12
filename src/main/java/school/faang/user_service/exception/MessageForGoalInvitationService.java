@@ -1,9 +1,5 @@
 package school.faang.user_service.exception;
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
-
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public enum MessageForGoalInvitationService {
     INVITER_ID_IS_NULL("InviterId can not be null."),
     INVITED_USER_ID_IS_NULL("InvitedUserId cannot be null."),
@@ -18,7 +14,7 @@ public enum MessageForGoalInvitationService {
     NO_INVITED_IN_DB("There is no invited in database"),
     NO_INVITED_IN_GOAL_INVITATION("There is no invited in GoalInvitation");
 
-    final String message;
+    private final String message;
 
     MessageForGoalInvitationService(String message) {
         this.message = message;

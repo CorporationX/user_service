@@ -1,7 +1,5 @@
 package school.faang.user_service.service;
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,18 +22,17 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static school.faang.user_service.exception.MessageForGoalInvitationService.*;
 
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @ExtendWith(MockitoExtension.class)
 public class GoalInvitationServiceTestValidator {
     @InjectMocks
-    GoalInvitationServiceValidator goalInvitationServiceValidator;
+    private GoalInvitationServiceValidator goalInvitationServiceValidator;
     @Mock
-    UserRepository userRepository;
+    private UserRepository userRepository;
     @Mock
-    GoalRepository goalRepository;
+    private GoalRepository goalRepository;
     @Mock
-    GoalInvitationRepository goalInvitationRepository;
-    ForTests forTests = new ForTests();
+    private GoalInvitationRepository goalInvitationRepository;
+    private ForTests forTests = new ForTests();
 
     @Test
     void testValidateForCreateInvitationWithInputIsNull() {

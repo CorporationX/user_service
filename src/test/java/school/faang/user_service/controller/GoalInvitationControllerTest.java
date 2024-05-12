@@ -19,18 +19,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class GoalInvitationControllerTest {
     @Mock
-    GoalInvitationService goalInvitationService;
+    private GoalInvitationService goalInvitationService;
     @InjectMocks
-    GoalInvitationController goalInvitationController;
+    private GoalInvitationController goalInvitationController;
     @Captor
-    ArgumentCaptor<GoalInvitationDto> goalInvitationDtoCapture;
+    private ArgumentCaptor<GoalInvitationDto> goalInvitationDtoCapture;
     @Captor
-    ArgumentCaptor<Long> longCaptor;
+    private ArgumentCaptor<Long> longCaptor;
     @Captor
-    ArgumentCaptor<InvitationFilterDto> invitationFilterDtoCapture;
+    private ArgumentCaptor<InvitationFilterDto> invitationFilterDtoCapture;
     final long id = 1L;
 
     @Test

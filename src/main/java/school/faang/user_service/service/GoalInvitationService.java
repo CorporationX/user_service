@@ -1,9 +1,7 @@
 package school.faang.user_service.service;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
@@ -19,16 +17,15 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
 public class GoalInvitationService {
 
-    GoalInvitationRepository goalInvitationRepository;
-    GoalRepository goalRepository;
-    UserRepository userRepository;
-    GoalInvitationMapper goalInvitationMapper;
-    List<InvitationFilter> invitationFilters;
-    GoalInvitationServiceValidator goalInvitationServiceValidator;
+    private GoalInvitationRepository goalInvitationRepository;
+    private GoalRepository goalRepository;
+    private UserRepository userRepository;
+    private GoalInvitationMapper goalInvitationMapper;
+    private List<InvitationFilter> invitationFilters;
+    private GoalInvitationServiceValidator goalInvitationServiceValidator;
     static final int SETGOAL_SIZE = 3;
 
     public GoalInvitationDto createInvitation(GoalInvitationDto goalInvitationDto) {

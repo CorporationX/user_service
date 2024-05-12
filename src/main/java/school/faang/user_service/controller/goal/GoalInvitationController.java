@@ -1,9 +1,7 @@
 package school.faang.user_service.controller.goal;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
@@ -14,9 +12,8 @@ import java.util.List;
 @Controller
 @Data
 @AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class GoalInvitationController {
-    GoalInvitationService goalInvitationService;
+    private GoalInvitationService goalInvitationService;
 
     public GoalInvitationDto createInvitation(GoalInvitationDto invitation) {
         return goalInvitationService.createInvitation(invitation);

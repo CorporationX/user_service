@@ -1,7 +1,5 @@
 package school.faang.user_service.service;
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,25 +26,24 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @ExtendWith(MockitoExtension.class)
 public class GoalInvitationServiceTest {
     @InjectMocks
-    GoalInvitationService goalInvitationService;
+    private GoalInvitationService goalInvitationService;
     @Mock
-    GoalInvitationRepository goalInvitationRepository;
+    private GoalInvitationRepository goalInvitationRepository;
     @Spy
-    GoalInvitationMapper goalInvitationMapper = Mappers.getMapper(GoalInvitationMapper.class);
+    private GoalInvitationMapper goalInvitationMapper = Mappers.getMapper(GoalInvitationMapper.class);
     @Mock
-    GoalRepository goalRepository;
+    private GoalRepository goalRepository;
     @Mock
-    UserRepository userRepository;
+    private UserRepository userRepository;
     @Mock
-    GoalInvitationServiceValidator goalInvitationServiceValidator;
+    private GoalInvitationServiceValidator goalInvitationServiceValidator;
     @Captor
-    ArgumentCaptor<GoalInvitation> captor;
-    List<InvitationFilter> invitationFilters;
-    ForTests forTests = new ForTests();
+    private ArgumentCaptor<GoalInvitation> captor;
+    private List<InvitationFilter> invitationFilters;
+    private ForTests forTests = new ForTests();
 
     @BeforeEach
     void init() {

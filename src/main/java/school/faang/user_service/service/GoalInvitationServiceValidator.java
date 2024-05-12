@@ -1,8 +1,6 @@
 package school.faang.user_service.service;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
@@ -20,12 +18,11 @@ import static school.faang.user_service.exception.MessageForGoalInvitationServic
 
 @Component
 @AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class GoalInvitationServiceValidator {
 
-    GoalInvitationRepository goalInvitationRepository;
-    GoalRepository goalRepository;
-    UserRepository userRepository;
+    private GoalInvitationRepository goalInvitationRepository;
+    private GoalRepository goalRepository;
+    private UserRepository userRepository;
 
     void validateForCreateInvitation(GoalInvitationDto goalInvitationDto) {
         if (goalInvitationDto == null) {

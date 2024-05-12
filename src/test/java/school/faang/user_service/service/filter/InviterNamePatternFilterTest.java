@@ -1,7 +1,5 @@
-package school.faang.user_service.filter;
+package school.faang.user_service.service.filter;
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,17 +7,16 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.service.filter.InviterNamePatternFilter;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@FieldDefaults(level = AccessLevel.PRIVATE)
+
 @ExtendWith(MockitoExtension.class)
 public class InviterNamePatternFilterTest {
     @InjectMocks
-    InviterNamePatternFilter inviterNamePatternFilter;
-    InvitationFilterDto invitationFilterDto;
-    Data data;
+    private InviterNamePatternFilter inviterNamePatternFilter;
+    private InvitationFilterDto invitationFilterDto;
+    private Data data;
 
     @BeforeEach
     void prepareInvitationFilterDto() {

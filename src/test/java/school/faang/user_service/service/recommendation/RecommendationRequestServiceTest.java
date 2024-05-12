@@ -1,5 +1,6 @@
 package school.faang.user_service.service.recommendation;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.SkillAcquiredEvent;
 import school.faang.user_service.dto.recommendation.RecommendationEvent;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestEvent;
 import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
@@ -18,6 +20,7 @@ import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.publisher.RecommendationEventPublisher;
+import school.faang.user_service.publisher.RecommendationRequestEventPublisher;
 import school.faang.user_service.publisher.SkillAcquiredEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
@@ -44,6 +47,8 @@ public class RecommendationRequestServiceTest {
     private RecommendationRequestMapper recommendationRequestMapper;
     @Mock
     private RecommendationEventPublisher recommendationEventPublisher;
+    @Mock
+    private RecommendationRequestEventPublisher recommendationRequestEventPublisher;
     @Mock
     private SkillRequestRepository skillRequestRepository;
     @Mock
@@ -76,7 +81,7 @@ public class RecommendationRequestServiceTest {
     }
 
     @Test
-    public void testRecommendationRequestCreated(){
+    public void testRecommendationRequestCreatedPublisher() {
         User author = new User();
         author.setId(1L);
         User receiver = new User();

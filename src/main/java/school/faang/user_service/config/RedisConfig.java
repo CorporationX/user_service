@@ -29,6 +29,8 @@ public class RedisConfig {
     @Value("${spring.data.redis.channels.search_appearance_channel.name}")
     private String searchAppearanceTopic;
 
+    @Value("${spring.data.redis.channels.recommendation_request_channel.name}")
+    private String recommendationRequestChannel;
     @Value("${spring.data.redis.channels.recommendation_channel.name}")
     private String recommendationChannel;
 
@@ -61,13 +63,17 @@ public class RedisConfig {
     }
 
     @Bean
+    public ChannelTopic recommendationRequestTopic() {
+        return new ChannelTopic(recommendationRequestChannel);
+    }
+    @Bean
     public ChannelTopic SearchAppearanceTopic() {
         return new ChannelTopic(searchAppearanceTopic);
     }
 
 
     @Bean
-    public ChannelTopic recommendationTopic() {
+    public ChannelTopic recommendationTopic(){
         return new ChannelTopic(recommendationChannel);
     }
 
@@ -81,3 +87,4 @@ public class RedisConfig {
         return new ChannelTopic(profileViewChannel);
     }
 }
+

@@ -76,7 +76,7 @@ public class MentorshipRequestServiceTest {
 
         User receiver = User.builder()
                 .id(2)
-                .mentees(new ArrayList<User>()).build();
+                .mentees(new ArrayList<>()).build();
         MentorshipRequest mentorshipRequest = MentorshipRequest.builder()
                 .id(id)
                 .requester(requester)

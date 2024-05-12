@@ -6,14 +6,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorship.MenteeDto;
 import school.faang.user_service.dto.messagebroker.GoalSetEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.mapper.mentorship.MenteeMapperImpl;
 import school.faang.user_service.publisher.GoalSetEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.service.goal.GoalService;
+import school.faang.user_service.validator.mentorship.MentorshipValidator;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +32,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class MentorshipServiceTest {
     @Mock
+    private MentorshipValidator mentorshipValidator;
+    @Mock
     private GoalSetEventPublisher goalSetEventPublisher;
     @Mock
     private GoalService goalService;
@@ -36,6 +41,8 @@ public class MentorshipServiceTest {
     private MentorshipRepository mentorshipRepository;
     @InjectMocks
     private MentorshipService mentorshipService;
+    @Spy
+    private MenteeMapperImpl menteeMapper;
 
     User firstMentor;
     User secondMentee;

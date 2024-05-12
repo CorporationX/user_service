@@ -36,6 +36,8 @@ spring:
           name: SearchAppearance_channel
         recommendation_channel:
           name: recommendation_channel
+        mentorship_accepted_channel:
+          name: mentorship_accepted_channel
 
 server:
   port: 8080

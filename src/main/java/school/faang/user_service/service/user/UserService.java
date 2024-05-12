@@ -32,7 +32,7 @@ import school.faang.user_service.mapper.user.UserMapper;
 import school.faang.user_service.publisher.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.service.MentorshipService;
+import school.faang.user_service.service.mentorship.MentorshipService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.validator.user.UserValidator;
 

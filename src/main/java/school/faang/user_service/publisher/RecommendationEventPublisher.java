@@ -10,11 +10,9 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.recommendation.RecommendationEvent;
 
 @Component
-
-public class RecommendationEventPublisher extends AbstractMessagePublisher<RecommendationEvent> {
-
-    public RecommendationEventPublisher(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper) {
-        super(redisTemplate, objectMapper);
+public class RecommendationEventPublisher extends MessagePublisher<RecommendationEvent> {
+    public RecommendationEventPublisher(ObjectMapper objectMapper, RedisTemplate<String, Object> redisTemplate) {
+        super(objectMapper, redisTemplate);
     }
     @Autowired
     private ChannelTopic recommendationTopic;

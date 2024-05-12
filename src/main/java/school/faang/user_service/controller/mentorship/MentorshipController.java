@@ -3,7 +3,7 @@ package school.faang.user_service.controller.mentorship;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.service.MentorshipService;
+import school.faang.user_service.service.mentorship.MentorshipService;
 
 import java.util.List;
 
@@ -27,4 +27,6 @@ public class MentorshipController {
     public void deleteMentor(Long menteeId, Long mentorId) {
         mentorshipService.deleteMentor(menteeId, mentorId);
     }
+
+
 }

@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.mentorship;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -13,8 +13,8 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.MenteeMapperImpl;
-import school.faang.user_service.mapper.MentorMapperImpl;
+import school.faang.user_service.mapper.mentorship.MenteeMapperImpl;
+import school.faang.user_service.mapper.mentorship.MentorMapperImpl;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import java.util.Collections;
@@ -135,14 +135,14 @@ public class MentorshipServiceTest {
 
     @Test
     public void testDeleteMenteeNotValidIdMentor() {
-        lenient().when(mentorshipRepository.findById(1L)).thenReturn(Optional.of(firstMentor));
+        when(mentorshipRepository.findById(1L)).thenReturn(Optional.of(firstMentor));
 
-        assertThrows(EntityNotFoundException.class, () -> mentorshipService.deleteMentee(10L, 2L));
+        assertThrows(EntityNotFoundException.class, () -> mentorshipService.deleteMentee(10L, 1L));
     }
 
     @Test
     public void testDeleteMentorNotValidIdMentee() {
-        lenient().when(mentorshipRepository.findById(13L)).thenReturn(Optional.of(thirdMentee));
+        when(mentorshipRepository.findById(16L)).thenReturn(Optional.of(thirdMentee));
 
         assertThrows(EntityNotFoundException.class, () -> mentorshipService.deleteMentor(16L, 1L));
     }

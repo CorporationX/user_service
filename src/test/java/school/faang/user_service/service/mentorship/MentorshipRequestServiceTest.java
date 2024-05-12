@@ -53,7 +53,7 @@ public class MentorshipRequestServiceTest {
     @Test
     void requestMentorshipTest() {
         MentorshipRequestDto mentorshipRequestDto = MentorshipRequestDto.builder()
-                .idRequester(1)
+                .requesterId(1)
                 .idReceiver(2)
                 .description("Запрос на менторство").build();
         mentorshipRequestService.requestMentorship(mentorshipRequestDto);
@@ -63,7 +63,7 @@ public class MentorshipRequestServiceTest {
     @Test
     void requestMentorshipTestNoRequest() {
         MentorshipRequestDto mentorshipRequestDto = MentorshipRequestDto.builder()
-                .idRequester(1)
+                .requesterId(1)
                 .idReceiver(2)
                 .description("Запрос на менторство").build();
 

@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class MentorshipAcceptedEvent {
     private long requestAuthorId;
     private long idRequestRecipient;
-    private long idRequest;
+    private long requestId;
 }

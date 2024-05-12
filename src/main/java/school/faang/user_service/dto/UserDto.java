@@ -33,8 +33,6 @@ public class UserDto {
     private boolean active;
     @NotNull(message = "Country ID can't be empty")
     private Long countryId;
-    private PreferredContact preferredContact;
     private List<Long> goalIds;
-    private PreferredContact preference;
     private PreferredContact contactPreference;
 }

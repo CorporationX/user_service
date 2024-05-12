@@ -30,7 +30,7 @@ public class MentorshipRequestService {
 
     @Transactional
     public void requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
-        long requesterId = mentorshipRequestDto.getIdRequester();
+        long requesterId = mentorshipRequestDto.getRequesterId();
         long receiverId = mentorshipRequestDto.getIdReceiver();
         mentorshipRequestValidator.requestMentorshipValidationUserIds(requesterId, receiverId);
         mentorshipRequestValidator.requestMentorshipValidationLatestRequest(requesterId, receiverId);

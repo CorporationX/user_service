@@ -18,6 +18,6 @@ public class MentorshipAcceptedEventPublisher extends AbstractEventPublisher<Men
     }
     public void publish(MentorshipAcceptedEvent event) {
         convertAndSend(event,channelTopic.getTopic());
-        log.info("Mentorship request event published request id: " + event.getIdRequest());
+        log.info("Mentorship request event published request id: " + event.getRequestId());
     }
 }

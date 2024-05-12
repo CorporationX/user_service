@@ -29,7 +29,6 @@ public class RedisConfig {
     @Value("${spring.data.redis.channels.search_appearance_channel.name}")
     private String searchAppearanceTopic;
 
-    @Value("${spring.data.redis.channels.recommendation_channel.name}")
     @Value("${spring.data.redis.channels.recommendation_request_channel.name}")
     private String recommendationRequestChannel;
     @Value("${spring.data.redis.channels.recommendation_channel.name}")

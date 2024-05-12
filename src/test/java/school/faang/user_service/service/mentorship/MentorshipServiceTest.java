@@ -1,37 +1,33 @@
 package school.faang.user_service.service.mentorship;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
-
 import jakarta.persistence.EntityNotFoundException;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.mentorship.MenteeDto;
 import school.faang.user_service.dto.messagebroker.GoalSetEvent;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.mapper.MenteeMapperImpl;
-import school.faang.user_service.mapper.MentorMapperImpl;
 import school.faang.user_service.publisher.GoalSetEventPublisher;
-import school.faang.user_service.mapper.mentorship.MenteeMapperImpl;
-import school.faang.user_service.mapper.mentorship.MentorMapperImpl;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.service.goal.GoalService;
-import school.faang.user_service.validator.mentorship.MentorshipValidator;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
 public class MentorshipServiceTest {
-    @Mock
-    private MentorshipValidator mentorshipValidator;
     @Mock
     private GoalSetEventPublisher goalSetEventPublisher;
     @Mock
@@ -40,10 +36,6 @@ public class MentorshipServiceTest {
     private MentorshipRepository mentorshipRepository;
     @InjectMocks
     private MentorshipService mentorshipService;
-    @Spy
-    private MenteeMapperImpl menteeMapper;
-    @Spy
-    private MentorMapperImpl mentorMapper;
 
     User firstMentor;
     User secondMentee;

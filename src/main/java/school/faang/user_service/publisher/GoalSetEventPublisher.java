@@ -9,12 +9,12 @@ import school.faang.user_service.dto.messagebroker.GoalSetEvent;
 
 @Component
 @Slf4j
-public class GoalSetEventPublisher extends MessagePublisher<GoalSetEvent> {
+public class GoalSetEventPublisher extends AbstractMessagePublisher<GoalSetEvent> {
     @Value("${spring.data.redis.channels.goal_set_channel.name}")
     private String goalSetTopic;
 
     public GoalSetEventPublisher(ObjectMapper objectMapper, RedisTemplate<String, Object> redisTemplate) {
-        super(objectMapper, redisTemplate);
+        super(redisTemplate, objectMapper);
     }
 
     public void publish(GoalSetEvent goalSetEvent) {

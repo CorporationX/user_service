@@ -18,12 +18,6 @@ import school.faang.user_service.subscriber.UsersBanListener;
 @Configuration
 @RequiredArgsConstructor
 public class RedisConfig {
-    private final ObjectMapper objectMapper;
-    @Value("${spring.data.redis.host}")
-    private String host;
-    @Value("${spring.data.redis.port}")
-    private int port;
-
     private final UsersBanListener usersBanListener;
 
     @Value("${spring.data.redis.channels.search_appearance_channel.name}")
@@ -31,6 +25,7 @@ public class RedisConfig {
 
     @Value("${spring.data.redis.channels.recommendation_request_channel.name}")
     private String recommendationRequestChannel;
+
     @Value("${spring.data.redis.channels.recommendation_channel.name}")
     private String recommendationChannel;
 
@@ -70,14 +65,14 @@ public class RedisConfig {
     public ChannelTopic recommendationRequestTopic() {
         return new ChannelTopic(recommendationRequestChannel);
     }
+
     @Bean
     public ChannelTopic SearchAppearanceTopic() {
         return new ChannelTopic(searchAppearanceTopic);
     }
 
-
     @Bean
-    public ChannelTopic recommendationTopic(){
+    public ChannelTopic recommendationTopic() {
         return new ChannelTopic(recommendationChannel);
     }
 

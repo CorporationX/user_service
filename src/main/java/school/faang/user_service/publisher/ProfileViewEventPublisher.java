@@ -9,12 +9,12 @@ import school.faang.user_service.dto.event.ProfileViewEvent;
 
 @Component
 @Slf4j
-public class ProfileViewEventPublisher extends MessagePublisher<ProfileViewEvent> {
+public class ProfileViewEventPublisher extends AbstractMessagePublisher<ProfileViewEvent> {
     @Value("${spring.data.redis.channels.profile_view_channel.name}")
     private String profileViewChannel;
 
     public ProfileViewEventPublisher(ObjectMapper objectMapper, RedisTemplate<String, Object> redisTemplate) {
-        super(objectMapper, redisTemplate);
+        super(redisTemplate, objectMapper);
     }
 
     public void publish(ProfileViewEvent event) {

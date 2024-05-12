@@ -15,7 +15,7 @@ public abstract class AbstractMessagePublisher<T> {
         try {
             String jsonObject = objectMapper.writeValueAsString(event);
             redisTemplate.convertAndSend(topic, jsonObject);
-            log.info("Event published to topic " + topic);
+            log.info("Event published to topic {}", topic);
         } catch (Exception e) {
             e.printStackTrace();
         }

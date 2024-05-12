@@ -134,10 +134,7 @@ public class UserServiceTest {
 
     @Test
     void testCreateUserFailure() {
-        UserDto userDto = null;
-
-        assertThrows(NullPointerException.class, () -> userService.create(userDto));
-
+        assertThrows(NullPointerException.class, () -> userService.create(null));
     }
 
     @Test

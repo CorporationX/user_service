@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
+import school.faang.user_service.dto.mentorship.MentorDto;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
@@ -14,12 +15,10 @@ public interface MentorMapper {
     @Mapping(source = "mentees", target = "menteesIds", qualifiedByName = "convertUserToId")
     MentorDto toDTO(User mentor);
 
-
     User toEntity(MentorDto mentorDTO);
 
     @Named("convertUserToId")
     default List<Long> convertUserToId(List<User> users) {
         return users.stream().map(User::getId).collect(Collectors.toList());
     }
-
 }

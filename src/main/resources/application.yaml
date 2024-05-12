@@ -36,6 +36,8 @@ spring:
           name: SearchAppearance_channel
         recommendation_channel:
           name: recommendation_channel
+        skill_channel:
+          name: skill_channel
         mentorship_accepted_channel:
           name: mentorship_accepted_channel
 

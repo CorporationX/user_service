@@ -1,13 +1,11 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.mentorship;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.MenteeDTO;
-import school.faang.user_service.dto.MentorDTO;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.MenteeMapper;
-import school.faang.user_service.mapper.MentorMapper;
+import school.faang.user_service.mapper.mentorship.MenteeMapper;
+import school.faang.user_service.mapper.mentorship.MentorMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import java.util.Collections;
@@ -82,7 +80,7 @@ public class MentorshipService {
     }
 
     public void deleteMentorForHisMentees(Long mentorId, List<User> mentees){
-        mentees.stream().forEach(mentee -> {
+        mentees.forEach(mentee -> {
             mentee.getMentors().removeIf(mentor -> mentor.getId() == mentorId);
             mentee.getGoals().stream()
                     .filter(goal -> goal.getMentor().getId() == mentorId)

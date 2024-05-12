@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class MentorshipAcceptedEvent {
-    private long requestAuthorId;
-    private long idRequestRecipient;
-    private long idRequest;
+public class SkillAcquiredEvent {
+    private Long skillId;
+    private Long authorId;
+    private Long receiverId;
 }

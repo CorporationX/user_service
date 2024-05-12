@@ -14,20 +14,24 @@ import java.util.List;
 @RequestMapping("/mentorshipRequest")
 public class MentorshipRequestController {
     private final MentorshipRequestService mentorshipRequestService;
+
     @PostMapping("/create")
     public void requestMentorship(@RequestBody MentorshipRequestDto mentorshipRequestDto) {
         mentorshipRequestService.requestMentorship(mentorshipRequestDto);
     }
+
     @GetMapping("/get")
-    public List<MentorshipRequestDto> getRequest(@RequestBody RequestFilterDto requestFilterDto){
+    public List<MentorshipRequestDto> getRequest(@RequestBody RequestFilterDto requestFilterDto) {
         return mentorshipRequestService.getRequest(requestFilterDto);
     }
+
     @PutMapping("/accept/{id}")
     public MentorshipRequestDto acceptRequest(@PathVariable long id) {
         return mentorshipRequestService.acceptRequest(id);
     }
+
     @PutMapping("/reject/{id}")
-    public MentorshipRequestDto rejectRequest(@PathVariable long id,@RequestBody RejectionDto rejection){
-        return mentorshipRequestService.rejectRequest(id,rejection);
+    public MentorshipRequestDto rejectRequest(@PathVariable long id, @RequestBody RejectionDto rejection) {
+        return mentorshipRequestService.rejectRequest(id, rejection);
     }
 }

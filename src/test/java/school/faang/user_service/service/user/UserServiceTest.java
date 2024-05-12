@@ -1,38 +1,79 @@
 package school.faang.user_service.service.user;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.event.ProfileViewEvent;
+import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.dto.event.UserEvent;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.event.EventStatus;
+import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.handler.exception.EntityNotFoundException;
-import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.publisher.ProfileViewEventPublisher;
+import school.faang.user_service.mapper.user.UserMapperImpl;
+import school.faang.user_service.publisher.SearchAppearanceEventPublisher;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.service.mentorship.MentorshipService;
+import school.faang.user_service.service.filter.CreatingTestData;
+import school.faang.user_service.service.goal.GoalService;
+import school.faang.user_service.service.user.filter.UserCountryFilter;
+import school.faang.user_service.service.user.filter.UserFilter;
 import school.faang.user_service.validator.user.UserValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
     @Mock
+    private MentorshipService mentorshipService;
+    @Mock
+    private EventRepository eventRepository;
+    @Mock
+    private GoalService goalService;
+    @Mock
     private UserRepository userRepository;
     @Mock
-    private UserMapper userMapper;
+    private UserMapperImpl userMapper;
     @Mock
     private UserValidator userValidator;
+    @Mock
+    private UserContext userContext;
+    @Mock
+    private ProfileViewEventPublisher profileViewEventPublisher;
+    @Mock
+    private SearchAppearanceEventPublisher searchAppearanceEventPublisher;
     @InjectMocks
     private UserService userService;
+    @Captor
+    private ArgumentCaptor<ProfileViewEvent> captor;
+
+    private final UserCountryFilter userCountryFilter = new UserCountryFilter();
+
+    private final List<UserFilter> userFilters = List.of(userCountryFilter);
+
+    @BeforeEach
+    public void init() {
+        userService = new UserService(searchAppearanceEventPublisher,profileViewEventPublisher, mentorshipService
+                , eventRepository, userRepository, userFilters, userValidator, goalService,userContext, userMapper);
+    }
 
     @Test
     void test_GetUser_NotFound() {
@@ -45,15 +86,19 @@ public class UserServiceTest {
 
     @Test
     void test_GetUser_ReturnsUser() {
+        userContext.setUserId(5L);
         Long userId = 1L;
-        User user = User.builder().id(1L).email("buk@mail.ru").username("buk").build();
+        User user = User.builder().id(userId).email("buk@mail.ru").username("buk").build();
         UserDto userExpected = userMapper.toDto(user);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
-        assertEquals(userExpected, userService.getUserDtoById(userId));
+        UserDto userById = userService.getUserDtoById(userId);
+        verify(profileViewEventPublisher).publish(captor.capture());
         verify(userRepository).findById(userId);
-
+        assertEquals(userExpected, userById);
+        assertEquals(userContext.getUserId(), captor.getValue().getViewingUserId());
+        assertEquals(userId, captor.getValue().getViewedUserId());
     }
 
     @Test
@@ -89,12 +134,71 @@ public class UserServiceTest {
 
     @Test
     void testCreateUserFailure() {
-        UserDto userDto = null;
-
-        assertThrows(NullPointerException.class, () -> userService.create(userDto));
-
+        assertThrows(NullPointerException.class, () -> userService.create(null));
     }
 
+    @Test
+    void deactivateUserById() {
+        User u = new User();
+        u.setId(1L);
+        u.setUsername("user");
+        u.setActive(true);
+
+        Goal g = new Goal();
+        g.setId(1L);
+        g.setStatus(GoalStatus.ACTIVE);
+        g.setUsers(new ArrayList<>(List.of(u)));
+        g.setMentor(u);
+
+        User ment = new User();
+        ment.setId(2L);
+        ment.setMentors(new ArrayList<>(List.of(u)));
+
+        Event ev = new Event();
+        ev.setId(1L);
+        ev.setOwner(u);
+        ev.setStatus(EventStatus.PLANNED);
+
+        u.setGoals(new ArrayList<>(List.of(g)));
+        u.setMentees(new ArrayList<>(List.of(ment)));
+        u.setOwnedEvents(new ArrayList<>(List.of(ev)));
+
+
+        UserDto excepted = new UserDto();
+        excepted.setId(1L);
+        excepted.setUsername("user");
+        when(userRepository.findById(1L)).thenReturn(Optional.of(u));
+        when(userRepository.save(u)).thenReturn(u);
+        when(userMapper.toDto(u)).thenReturn(excepted);
+
+
+        UserDto userDto = userService.deactivationUserById(u.getId());
+
+        verify(userRepository, times(1)).findById(1L);
+        verify(goalService, times(1)).deleteGoal(g.getId());
+        verify(eventRepository, times(1)).deleteById(ev.getId());
+        verify(mentorshipService, times(1)).deleteMentorForHisMentees(u.getId(), List.of(ment));
+        verify(userRepository, times(1)).save(u);
+        verify(userMapper, times(1)).toDto(u);
+        assertFalse(u.isActive());
+        assertEquals(excepted, userDto);
+    }
+
+    @Test
+    void searchUser() {
+        List<User> userList = CreatingTestData.createListUsers();
+        UserDto secondUserDto = UserDto.builder()
+                .username("Женя")
+                .id(2L).countryId(2L).build();
+        UserFilterDto userFilterDto = UserFilterDto.builder()
+                .countryName("Germany").build();
+
+        when(userRepository.findAll()).thenReturn(userList);
+        when(userMapper.toDto(userList.get(1))).thenReturn(secondUserDto);
+
+        List<UserDto> correctReturnListUser = List.of(secondUserDto);
+        assertEquals(correctReturnListUser, userService.searchUsersByFilter(userFilterDto, 5L));
+    }
     @Test
     void testBanUserNotFound(){
         UserEvent userEvent = new UserEvent(1L);

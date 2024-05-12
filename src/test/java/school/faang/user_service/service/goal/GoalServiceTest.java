@@ -6,12 +6,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.dto.GoalFilterDto;
+import school.faang.user_service.dto.messagebroker.GoalSetEvent;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.handler.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.GoalMapper;
+import school.faang.user_service.publisher.GoalSetEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
@@ -28,6 +30,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class GoalServiceTest {
+    private GoalSetEventPublisher goalSetEventPublisher;
     private GoalRepository goalRepository;
     private GoalMapper goalMapper;
     private SkillRepository skillRepository;
@@ -40,6 +43,7 @@ public class GoalServiceTest {
 
     @BeforeEach
     void setUp() {
+        goalSetEventPublisher = mock(GoalSetEventPublisher.class);
         goalRepository = mock(GoalRepository.class);
         goalMapper = mock(GoalMapper.class);
         skillRepository = mock(SkillRepository.class);
@@ -47,7 +51,7 @@ public class GoalServiceTest {
         goalFilter = mock(GoalFilter.class);
         userRepository = mock(UserRepository.class);
         goalFilters = List.of(goalFilter);
-        goalService = new GoalService(goalRepository, goalMapper, skillRepository, goalValidation, userRepository, goalFilters);
+        goalService = new GoalService(goalSetEventPublisher, skillRepository, goalRepository, goalValidation, userRepository, goalFilters, goalMapper);
     }
 
     @Test
@@ -72,6 +76,7 @@ public class GoalServiceTest {
         Goal goalCreated = getGoal();
         User user = new User();
         List<Skill> skills = getSkills();
+        GoalSetEvent goalSetEvent = new GoalSetEvent(userId, goalDto.getId());
 
         when(goalRepository.create(goalDto.getTitle(), goalDto.getDescription(), goalDto.getParentId()))
                 .thenReturn(goalCreated);
@@ -89,6 +94,7 @@ public class GoalServiceTest {
         verify(skillRepository, times(1))
                 .findAllById(goalDto.getSkillIds());
         verify(userRepository, times(1)).findById(userId);
+        verify(goalSetEventPublisher).publish(goalSetEvent);
 
         assertEquals(goalDto, goalDtoCreated);
     }
@@ -186,7 +192,7 @@ public class GoalServiceTest {
         );
     }
 
-    private List<Skill> getSkills(){
+    private List<Skill> getSkills() {
         return new ArrayList<>(List.of(Skill.builder().id(1L).build(),
                 Skill.builder().id(2L).build()));
     }

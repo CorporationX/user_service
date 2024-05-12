@@ -1,7 +1,13 @@
 package school.faang.user_service.controller.mentorship;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import school.faang.user_service.dto.mentorship.MenteeDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.service.mentorship.MentorshipService;
 
@@ -9,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/mentorship")
 public class MentorshipController {
     private final MentorshipService mentorshipService;
 
@@ -28,5 +35,8 @@ public class MentorshipController {
         mentorshipService.deleteMentor(menteeId, mentorId);
     }
 
-
+    @PutMapping("/goal/{menteeId}")
+    public MenteeDto addGoalToMentee(@PathVariable Long menteeId, @RequestBody Long goalId, @RequestBody Long mentorId) {
+        return mentorshipService.addGoalToMenteeFromMentor(menteeId, goalId, mentorId);
+    }
 }

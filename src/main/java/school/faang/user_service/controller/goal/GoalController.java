@@ -33,7 +33,7 @@ public class GoalController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Created the goal",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = GoalDto.class)) }) })
+                            schema = @Schema(implementation = GoalDto.class))})})
     public GoalDto createGoal(@PathVariable("userId") Long userId, @RequestBody GoalDto goalDto) {
         return goalService.createGoal(userId, goalDto);
     }
@@ -43,7 +43,7 @@ public class GoalController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Updated the goal",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = GoalDto.class)) }) })
+                            schema = @Schema(implementation = GoalDto.class))})})
     public GoalDto updateGoal(@PathVariable("goalId") Long goalId, @RequestBody GoalDto goalDto) {
         return goalService.updateGoal(goalId, goalDto);
     }
@@ -61,7 +61,7 @@ public class GoalController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Getting list subtasks",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = GoalDto.class, type = "array")) }) })
+                            schema = @Schema(implementation = GoalDto.class, type = "array"))})})
     public List<GoalDto> findSubtasksByGoalId(@PathVariable("goalId") Long goalId, @RequestBody GoalFilterDto filteredGoalDto) {
         return goalService.findSubtasksByGoalId(goalId, filteredGoalDto);
     }
@@ -71,7 +71,7 @@ public class GoalController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Getting goals by user id",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = GoalDto.class, type = "array")) }) })
+                            schema = @Schema(implementation = GoalDto.class, type = "array"))})})
     public List<GoalDto> findGoalsByUserId(@PathVariable("userId") Long userId, @RequestBody GoalFilterDto filterGoalDto) {
         return goalService.findGoalsByUserId(userId, filterGoalDto);
     }

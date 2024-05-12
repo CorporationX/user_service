@@ -18,12 +18,6 @@ import school.faang.user_service.subscriber.UsersBanListener;
 @Configuration
 @RequiredArgsConstructor
 public class RedisConfig {
-    private final ObjectMapper objectMapper;
-    @Value("${spring.data.redis.host}")
-    private String host;
-    @Value("${spring.data.redis.port}")
-    private int port;
-
     private final UsersBanListener usersBanListener;
 
     @Value("${spring.data.redis.channels.search_appearance_channel.name}")
@@ -31,11 +25,15 @@ public class RedisConfig {
 
     @Value("${spring.data.redis.channels.recommendation_request_channel.name}")
     private String recommendationRequestChannel;
+
     @Value("${spring.data.redis.channels.recommendation_channel.name}")
     private String recommendationChannel;
 
     @Value("${topic.user_ban}")
     private String userBanTopic;
+
+    @Value("${spring.data.redis.channels.goal_set_channel.name}")
+    private String goalSetChannel;
 
     @Value("${spring.data.redis.channels.profile_view_channel.name}")
     private String profileViewChannel;
@@ -62,18 +60,19 @@ public class RedisConfig {
         return container;
     }
 
+
     @Bean
     public ChannelTopic recommendationRequestTopic() {
         return new ChannelTopic(recommendationRequestChannel);
     }
+
     @Bean
     public ChannelTopic SearchAppearanceTopic() {
         return new ChannelTopic(searchAppearanceTopic);
     }
 
-
     @Bean
-    public ChannelTopic recommendationTopic(){
+    public ChannelTopic recommendationTopic() {
         return new ChannelTopic(recommendationChannel);
     }
 
@@ -83,8 +82,12 @@ public class RedisConfig {
     }
 
     @Bean
+    public ChannelTopic goalSetTopic() {
+        return new ChannelTopic(goalSetChannel);
+    }
+
+    @Bean
     public ChannelTopic profileViewTopic() {
         return new ChannelTopic(profileViewChannel);
     }
 }
-

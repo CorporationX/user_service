@@ -18,6 +18,7 @@ public class UsersBanListener implements MessageListener {
     private final ObjectMapper objectMapper;
     private final UserService userService;
 
+
     @Override
     public void onMessage(Message message, byte[] pattern) {
         try {

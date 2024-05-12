@@ -71,8 +71,8 @@ public class UserServiceTest {
 
     @BeforeEach
     public void init() {
-        userService = new UserService(userMapper, userValidator, userRepository, mentorshipService, goalService
-                , eventRepository,userContext,profileViewEventPublisher, userFilters, searchAppearanceEventPublisher);
+        userService = new UserService(searchAppearanceEventPublisher,profileViewEventPublisher, mentorshipService
+                , eventRepository, userRepository, userFilters, userValidator, goalService,userContext, userMapper);
     }
 
     @Test
@@ -88,7 +88,7 @@ public class UserServiceTest {
     void test_GetUser_ReturnsUser() {
         userContext.setUserId(5L);
         Long userId = 1L;
-        User user = User.builder().id(1L).email("buk@mail.ru").username("buk").build();
+        User user = User.builder().id(userId).email("buk@mail.ru").username("buk").build();
         UserDto userExpected = userMapper.toDto(user);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
@@ -134,10 +134,7 @@ public class UserServiceTest {
 
     @Test
     void testCreateUserFailure() {
-        UserDto userDto = null;
-
-        assertThrows(NullPointerException.class, () -> userService.create(userDto));
-
+        assertThrows(NullPointerException.class, () -> userService.create(null));
     }
 
     @Test

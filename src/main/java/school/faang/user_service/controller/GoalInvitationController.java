@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Validated
-@RequestMapping("/api/invitations")
+@RequestMapping("/api/v1/invitations")
 public class GoalInvitationController {
     private final GoalInvitationService goalInvitationService;
 

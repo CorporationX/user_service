@@ -15,6 +15,7 @@ public interface UserMapper {
     @Mapping(source = "mentees", target = "menteesIds", qualifiedByName = "mapToIds")
     @Mapping(source = "mentors", target = "mentorsIds", qualifiedByName = "mapToIds")
     @Mapping(source = "country.id", target = "countryId")
+    @Mapping(target = "preferredContact", source = "contactPreference.preference")
     UserDto toDto(User user);
 
     List<UserDto> toDto(List<User> users);
@@ -22,6 +23,7 @@ public interface UserMapper {
     @Mapping(target = "mentees", ignore = true)
     @Mapping(target = "mentors", ignore = true)
     @Mapping(source = "countryId", target = "country")
+    @Mapping(target = "contactPreference", source = "preferredContact")
     User toEntity(UserDto userDto);
 
     @Named("mapToIds")

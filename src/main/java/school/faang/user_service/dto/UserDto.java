@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
+import school.faang.user_service.entity.contact.PreferredContact;
 
 import java.util.List;
 
@@ -12,11 +13,11 @@ import java.util.List;
 public class UserDto {
 
     private long id;
+
     @NotBlank(message = "Username can't be empty")
-
     private String username;
-    @NotBlank(message = "E-mail can't be empty")
 
+    @NotBlank(message = "E-mail can't be empty")
     @Email
     private String email;
 
@@ -33,4 +34,6 @@ public class UserDto {
 
     private List<Long> menteesIds;
     private List<Long> mentorsIds;
+
+    private PreferredContact preferredContact;
 }

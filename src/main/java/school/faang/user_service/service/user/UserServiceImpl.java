@@ -3,6 +3,9 @@ package school.faang.user_service.service.user;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.NotFoundException;
+import school.faang.user_service.repository.UserRepository;
 import org.webjars.NotFoundException;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
@@ -24,7 +27,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public User findById(Long id) {
+    public User findUserById(long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("User with id %s not found", id)));
     }
@@ -32,7 +35,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void deactivateUserById(Long id) {
-        User user = findById(id);
+        User user = findUserById(id);
         List<Goal> userGoals = user.getGoals();
 
         userGoals.forEach(goal -> {

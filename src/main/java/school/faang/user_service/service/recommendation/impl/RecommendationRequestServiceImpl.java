@@ -72,12 +72,6 @@ public class RecommendationRequestServiceImpl implements RecommendationRequestSe
                 skillAcquiredEventPublisher.publish(skillAcquiredEvent);
                 log.info("Отправлено уведомление по созданию скилла пользователю");
             }
-//            skillIds.forEach(skillId -> {
-//                skillRequestRepository.create(savedRecommendationRequest.getId(), skillId);
-//                SkillAcquiredEvent skillAcquiredEvent = createSkillAcquiredEvent(savedRecommendationRequest, skillId);
-//                skillAcquiredEventPublisher.publish(skillAcquiredEvent);
-//                log.info("Отправлено уведомление по созданию скилла пользователю");
-//            });
         }
 
         return recommendationRequestMapper.toDto(savedRecommendationRequest);

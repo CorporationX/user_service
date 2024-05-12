@@ -1,13 +1,18 @@
 package school.faang.user_service.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import school.faang.user_service.subscriber.UsersBanListener;
 
 @Configuration
@@ -18,7 +23,7 @@ public class RedisConfig {
     private String host;
     @Value("${spring.data.redis.port}")
     private int port;
-    @Value("${spring.data.redis.channels.recommendation_channel.name}")
+
     private final UsersBanListener usersBanListener;
 
     @Value("${spring.data.redis.channels.search_appearance_channel.name}")
@@ -32,25 +37,9 @@ public class RedisConfig {
 
     @Value("${spring.data.redis.channels.profile_view_channel.name}")
     private String profileViewChannel;
+
     @Value("${spring.data.redis.channels.skill_channel.name}")
     private String skillChannel;
-    private final UsersBanListener usersBanListener;
-
-    @Bean
-    public JedisConnectionFactory redisConnectionFactory() {
-        System.out.println(port);
-        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
-        return new JedisConnectionFactory(config);
-    }
-
-    @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
-        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(redisConnectionFactory);
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new StringRedisSerializer());
-        return redisTemplate;
-    }
 
     @Bean
     public ChannelTopic userBanTopic() {
@@ -70,15 +59,12 @@ public class RedisConfig {
         container.addMessageListener(userBanMessageListenerAdapter(), userBanTopic());
         return container;
     }
+
     @Bean
     public ChannelTopic SearchAppearanceTopic() {
         return new ChannelTopic(searchAppearanceTopic);
     }
 
-    @Bean
-    public ChannelTopic userBanTopic(){
-        return new ChannelTopic(userBanTopic);
-    }
 
     @Bean
     public ChannelTopic recommendationTopic() {

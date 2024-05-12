@@ -8,6 +8,8 @@ import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.validator.SkillValidator;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class SkillService {
@@ -19,5 +21,12 @@ public class SkillService {
         skillValidator.validateSkill(skill);
         Skill convertedSkill = skillMapper.toEntity(skill);
         return skillMapper.toDto(skillRepository.save(convertedSkill));
+    }
+
+    public List<SkillDto> getUserSkills(long userId) {
+        return skillRepository.findAllByUserId(userId).
+                stream().
+                map(skillMapper::toDto).
+                toList();
     }
 }

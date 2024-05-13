@@ -1,5 +1,7 @@
 package school.faang.user_service.exception;
+import lombok.Getter;
 
+@Getter
 public enum MessageForGoalInvitationService {
     INVITER_ID_IS_NULL("InviterId can not be null."),
     INVITED_USER_ID_IS_NULL("InvitedUserId cannot be null."),
@@ -20,7 +22,4 @@ public enum MessageForGoalInvitationService {
         this.message = message;
     }
 
-    public String getMessage() {
-        return message;
-    }
 }

@@ -29,7 +29,7 @@ public class EventService {
 
 
     public EventDto create(EventDto event) {
-        checkOwnerSkills(event);
+        doesOwnerHaveEventRelatedSkills(event);
 
         return saveEvent(event);
     }
@@ -61,7 +61,7 @@ public class EventService {
             throw new DataValidationException(NO_SUCH_EVENT_EXCEPTION.getMessage());
         }
 
-        checkOwnerSkills(event);
+        doesOwnerHaveEventRelatedSkills(event);
 
         return saveEvent(event);
     }
@@ -78,7 +78,7 @@ public class EventService {
         return eventMapper.toDto(eventRepository.save(eventMapper.toEntity(event)));
     }
 
-    private void checkOwnerSkills(EventDto event) {
+    private void doesOwnerHaveEventRelatedSkills(EventDto event) {
         var ownerSkills = new HashSet<>(skillService.getUserSkills(event.getOwnerId()));
 
         if (!ownerSkills.containsAll(event.getRelatedSkills())) {

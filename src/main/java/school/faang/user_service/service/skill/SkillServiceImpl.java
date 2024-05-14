@@ -13,23 +13,5 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SkillServiceImpl implements SkillService{
     private final SkillRepository skillRepository;
-    @Override
-    public boolean checkActiveSkill(Long skillId) {
-        return skillRepository.existsById(skillId);
-    }
 
-    @Override
-    public void saveAll(List<Skill> skills) {
-        skillRepository.saveAll(skills);
-    }
-
-    @Override
-    public void deleteAllSkills(List<Skill> skills) {
-        skillRepository.deleteAll(skills);
-    }
-
-    @Override
-    public boolean exist(long skillId) {
-        return skillRepository.existsById(skillId);
-    }
 }

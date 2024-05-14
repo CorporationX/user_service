@@ -8,10 +8,4 @@ import java.util.List;
 @Component
 public interface SkillService {
 
-    boolean checkActiveSkill(Long skillId);
-
-    void saveAll(List<Skill> skills);
-
-    void deleteAllSkills(List<Skill> skills);
-    boolean exist(long skillId);
 }

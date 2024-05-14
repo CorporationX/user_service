@@ -1,47 +1,46 @@
 package school.faang.user_service.controller.goal;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import school.faang.user_service.dto.filter.GoalFilterDto;
+import org.springframework.web.bind.annotation.*;
+import school.faang.user_service.dto.goal.filter.GoalFilterDto;
 import school.faang.user_service.dto.goal.GoalDto;
-import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.exceptions.DataValidationException;
 import school.faang.user_service.service.goal.GoalService;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class GoalController {
     private final GoalService goalService;
+    private final ValidationGoal validationGoal;
 
-    public void createGoal(Long userId, Goal goal) {
-        if (goal.getTitle().isBlank() || goal == null) {
-            throwDataValidationExceptionWithMessage();
-        }
-        goalService.createGoal(userId, goal);
+    @PostMapping("/goal/{userId}")
+    public GoalDto createGoal(@NonNull @PathVariable Long userId, @NonNull @RequestBody GoalDto goalDto) {
+        validationGoal.checkGoalTitleForBlank(goalDto);
+
+        return goalService.createGoal(userId, goalDto);
     }
 
-    public void deleteGoal(long goalId) {
+    @DeleteMapping("/delete/{goalId}")
+    public void deleteGoal(@NonNull @PathVariable Long goalId) {
         goalService.deleteGoal(goalId);
     }
 
-    public void updateGoal(Long goalId, GoalDto goalDto) {
-        if (goalDto.getTitle().isBlank() || goalDto == null) {
-            throwDataValidationExceptionWithMessage();
-        }
+    @PutMapping("/goal/{goalId}")
+    public void updateGoal(@NonNull @PathVariable Long goalId, @NonNull GoalDto goalDto) {
+        validationGoal.checkGoalTitleForBlank(goalDto);
+
         goalService.updateGoal(goalId, goalDto);
     }
 
-    public List<GoalDto> findSubtasksByGoalId(long goalId, GoalFilterDto filters) {
+    @PostMapping("/subtasks/{goalId}")
+    public List<GoalDto> findSubtasksByGoalId(@NonNull @PathVariable Long goalId, @RequestBody GoalFilterDto filters) {
         return goalService.findSubtasksByGoalId(goalId, filters);
     }
 
-    public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filters) {
+    @PostMapping("/goals/{userId}")
+    public List<GoalDto> getGoalsByUser(@NonNull @PathVariable Long userId, @RequestBody GoalFilterDto filters) {
         return goalService.getGoalsByUser(userId, filters);
-    }
-
-    private void throwDataValidationExceptionWithMessage() {
-        throw new DataValidationException("Goals title or goal must exists");
     }
 }

@@ -32,25 +32,19 @@ public class MentorshipService {
     }
 
     @Transactional
-    public void deleteMentee(long mentorId, long menteeId) {
+    public void deleteMentee(Long mentorId, Long menteeId) {
         User user = getUserById(mentorId);
-        if (mentorId == menteeId) {
-            throw new ValidationException("Same mentorId and menteeId");
-        }
         user.getMentees().removeIf(mentee -> mentee.getId() == menteeId);
     }
 
     @Transactional
-    public void deleteMentor(long menteeId, long mentorId) {
+    public void deleteMentor(Long menteeId, Long mentorId) {
         User user = getUserById(menteeId);
-        if (mentorId == menteeId) {
-            throw new ValidationException("Same mentorId and menteeId");
-        }
         user.getMentors().removeIf(mentor -> mentor.getId() == mentorId);
     }
 
     // Утилитный private метод
-    private User getUserById(long id) {
+    private User getUserById(Long id) {
         return mentorshipRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
     }
 }

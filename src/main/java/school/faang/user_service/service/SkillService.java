@@ -8,7 +8,8 @@ import java.util.List;
 
 public interface SkillService {
     SkillDto create(Skill skill);
-    List<SkillDto> getUserSkills(long userId);
+   public List<SkillDto> getUserSkills(long userId);
+
     List<SkillCandidateDto> getOfferedSkills(long userId);
     SkillDto acquireSkillFromOffers(long skillId, long userId);
     Skill findById(long skillId);

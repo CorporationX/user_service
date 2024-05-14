@@ -55,3 +55,7 @@ services:
 mentorship:
   request:
     time-period-for-single-request: 3
+
+goals:
+  invitations:
+    max-per-user: 3

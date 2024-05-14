@@ -1,7 +1,6 @@
 package school.faang.user_service.service.mentorship;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,13 +21,13 @@ public class MentorshipService {
     @Transactional(readOnly = true)
     public List<UserDto> getMentees(long userId) {
         User user = getUserById(userId);
-        return userMapper.toDtoList(user.getMentors());
+        return userMapper.toDtoList(user.getMentees());
     }
 
     @Transactional(readOnly = true)
     public List<UserDto> getMentors(long userId) {
         User user = getUserById(userId);
-        return userMapper.toDtoList(user.getMentees());
+        return userMapper.toDtoList(user.getMentors());
     }
 
     @Transactional

@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.config.context.UserHeaderFilter;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.dto.mentorship.RequestFilterDto;
@@ -27,13 +29,14 @@ import java.util.List;
 @Validated
 public class MentorshipRequestController {
     private final MentorshipRequestService mentorshipRequestService;
+    private final UserContext userContext;
 
     @PostMapping(path = "/{userId}")
     @ResponseStatus(HttpStatus.CREATED)
     public MentorshipRequestDto requestMentorship(
-            @Positive @PathVariable(name = "userId") Long requesterId,
             @Positive @RequestParam(name = "mentorId") Long receiverId,
             @Valid @RequestBody MentorshipRequestDto dto) {
+        var requesterId = userContext.getUserId();
         return mentorshipRequestService.requestMentorship(requesterId, receiverId, dto);
     }
 

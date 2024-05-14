@@ -8,6 +8,7 @@ import org.mockito.Mock;
 
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.controller.mentorship.MentorshipRequestController;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
@@ -28,9 +29,11 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class MentorshipRequestControllerTest {
     @Mock
-    MentorshipRequestService mentorshipRequestService;
+    private UserContext userContext;
+    @Mock
+    private MentorshipRequestService mentorshipRequestService;
     @InjectMocks
-    MentorshipRequestController mentorshipRequestController;
+    private MentorshipRequestController mentorshipRequestController;
     private MentorshipRequestDto mrDtoWithId1;
     private MentorshipRequestDto mrDtoWithId2;
     private MentorshipRequestDto mrDtoWithId3;
@@ -266,7 +269,10 @@ public class MentorshipRequestControllerTest {
         when(mentorshipRequestService.requestMentorship(userId3, userId5, mrDtoWithId1))
                 .thenReturn(mrDtoWithId1);
 
-        var actual = mentorshipRequestController.requestMentorship(userId3, userId5, mrDtoWithId1);
+        when(userContext.getUserId())
+                .thenReturn(userId3);
+
+        var actual = mentorshipRequestController.requestMentorship(userId5, mrDtoWithId1);
 
         assertEquals(mrDtoWithId1, actual);
         verifyNoMoreInteractions(mentorshipRequestService);

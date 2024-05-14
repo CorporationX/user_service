@@ -3,9 +3,6 @@ package school.faang.user_service.service.service.mentorship;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -15,7 +12,6 @@ import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.filter.mentorship.MentorshipRequestDescriptionFilter;
-import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.filter.mentorship.MentorshipRequestReceiverIdFilter;
 import school.faang.user_service.filter.mentorship.MentorshipRequestRequesterIdFilter;
 import school.faang.user_service.filter.mentorship.MentorshipRequestStatusFilter;
@@ -23,6 +19,7 @@ import school.faang.user_service.mapper.MentorshipRequestMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
+import school.faang.user_service.service.mentorship.filter.impl.MentorshipRequestFilterServiceImpl;
 import school.faang.user_service.service.mentorship.impl.MentorshipRequestServiceImpl;
 import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
 import school.faang.user_service.validator.user.UserValidator;
@@ -31,13 +28,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -266,10 +258,11 @@ public class MentorshipRequestServiceFilterTest {
         var filters = new ArrayList<>(List.of(descriptionFilter, requesterIdFilter, receiverIdFilter, statusFilter));
         when(mentorshipRequestRepository.findAll())
                 .thenReturn(listOfEntities);
+        var mentorshipRequestFilterService = new MentorshipRequestFilterServiceImpl(filters);
 
         return new MentorshipRequestServiceImpl(
                 mentorshipRequestRepository,
-                filters,
+                mentorshipRequestFilterService,
                 mentorshipRequestValidator,
                 mapper,
                 userRepository,
@@ -279,6 +272,8 @@ public class MentorshipRequestServiceFilterTest {
 
     @Test
     public void testGetRequestsFiltersEntitiesByRequesterIdAndReceiverId() {
+        when(mentorshipRequestRepository.findAll())
+                .thenReturn(listOfEntities);
         filterDto.setRequesterIdPattern(userId3);
         filterDto.setReceiverIdPattern(userId5);
         var mentorshipRequestService = setUp();

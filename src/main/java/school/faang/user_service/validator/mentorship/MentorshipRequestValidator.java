@@ -5,6 +5,7 @@ import school.faang.user_service.entity.MentorshipRequest;
 
 public interface MentorshipRequestValidator {
     void validateMentorshipRequest(MentorshipRequestDto dto);
+
     MentorshipRequest validateMentorshipRequestExistence(long id);
 
     void validateMentor(MentorshipRequest entity);

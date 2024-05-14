@@ -8,5 +8,6 @@ import java.util.stream.Stream;
 
 public interface MentorshipRequestFilter {
     boolean isApplicable(RequestFilterDto filter);
-    boolean apply(MentorshipRequest entity, RequestFilterDto filterDto);
+
+    Stream<MentorshipRequest> apply(Stream<MentorshipRequest> entities, RequestFilterDto filterDto);
 }

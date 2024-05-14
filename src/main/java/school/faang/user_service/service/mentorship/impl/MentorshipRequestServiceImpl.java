@@ -9,11 +9,11 @@ import school.faang.user_service.dto.mentorship.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
+import school.faang.user_service.service.mentorship.filter.MentorshipRequestFilterService;
 import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
 import school.faang.user_service.validator.user.UserValidator;
 
@@ -23,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     private final MentorshipRequestRepository mentorshipRequestRepository;
-    private final List<MentorshipRequestFilter> mentorshipRequestFilter;
+    private final MentorshipRequestFilterService mentorshipRequestFilterService;
     private final MentorshipRequestValidator mentorshipRequestValidator;
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final UserRepository userRepository;
@@ -36,12 +36,12 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         var userList = userValidator.validateUsersExistence(List.of(requesterId, receiverId));
         mentorshipRequestValidator.validateMentorshipRequest(dto);
 
-        var entity = mentorshipRequestMapper.toEntity(dto);
-        var requesterEntity = getUser(userList, requesterId);
-        var receiverEntity = getUser(userList, receiverId);
+        MentorshipRequest entity = mentorshipRequestMapper.toEntity(dto);
+        User requesterEntity = getUser(userList, requesterId);
+        User receiverEntity = getUser(userList, receiverId);
         entity.setRequester(requesterEntity);
         entity.setReceiver(receiverEntity);
-        var entityFromDB = mentorshipRequestRepository.save(entity);
+        MentorshipRequest entityFromDB = mentorshipRequestRepository.save(entity);
 
         return mentorshipRequestMapper.toDto(entityFromDB);
     }
@@ -49,22 +49,18 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     @Override
     @Transactional(readOnly = true)
     public List<MentorshipRequestDto> getRequests(RequestFilterDto requestFilterDto) {
-        var entities = mentorshipRequestRepository.findAll();
+        var entitiesStream = mentorshipRequestRepository.findAll().stream();
 
-        var filterList = mentorshipRequestFilter.stream()
-                .filter(filter -> filter.isApplicable(requestFilterDto))
-                .toList();
-        var filteredEntities = entities.stream()
-                .filter(entity -> filterEntities(filterList, entity, requestFilterDto))
-                .toList();
+        entitiesStream = mentorshipRequestFilterService.apply(entitiesStream, requestFilterDto);
 
-        return mentorshipRequestMapper.toDtoList(filteredEntities);
+        return mentorshipRequestMapper.toDtoList(entitiesStream.toList());
     }
 
     @Override
     @Transactional
     public MentorshipRequestDto acceptRequest(Long id) {
         var entity = mentorshipRequestValidator.validateMentorshipRequestExistence(id);
+
         addMentor(entity);
         entity.setStatus(RequestStatus.ACCEPTED);
         entity = mentorshipRequestRepository.save(entity);
@@ -76,6 +72,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     @Transactional
     public MentorshipRequestDto rejectRequest(Long id, RejectionDto rejection) {
         var entity = mentorshipRequestValidator.validateMentorshipRequestExistence(id);
+
         entity.setStatus(RequestStatus.REJECTED);
         entity.setRejectionReason(rejection.getRejectionReason());
         entity = mentorshipRequestRepository.save(entity);
@@ -90,21 +87,6 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
                 .orElseThrow();
     }
 
-    private boolean filterEntities(List<MentorshipRequestFilter> filterList,
-                                   MentorshipRequest mentorshipRequest,
-                                   RequestFilterDto requestFilterDto) {
-        boolean flag = true;
-        for (MentorshipRequestFilter mrFilter : filterList) {
-            flag = mrFilter.apply(mentorshipRequest, requestFilterDto);
-            if (!flag) {
-                return flag;
-            }
-        }
-
-        return flag;
-    }
-
-    @Transactional
     private void addMentor(MentorshipRequest entity) {
         mentorshipRequestValidator.validateMentor(entity);
         var requester = entity.getRequester();

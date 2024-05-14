@@ -1,6 +1,7 @@
 package school.faang.user_service.validator.mentorship.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
@@ -14,8 +15,10 @@ import java.time.LocalDateTime;
 @Component
 @RequiredArgsConstructor
 public class MentorshipRequestValidatorImpl implements MentorshipRequestValidator {
-    private static final LocalDateTime TIME_PERIOD_FOR_SINGLE_REQUEST = LocalDateTime.now().minusMonths(3L);
     private final MentorshipRequestRepository mentorshipRequestRepository;
+    @Value("${mentorship.request.time-period-for-single-request}")
+    private long MONTHS;
+    private final LocalDateTime TIME_PERIOD_FOR_SINGLE_REQUEST = LocalDateTime.now().minusMonths(MONTHS);
 
     @Override
     public void validateMentorshipRequest(MentorshipRequestDto dto) {
@@ -67,8 +70,10 @@ public class MentorshipRequestValidatorImpl implements MentorshipRequestValidato
     }
 
     private void validateItIsFirstMentorshipRequestInLastThreeMonth(MentorshipRequest mentorshipRequest) {
-        var mentorshipRequestCreatedDate = mentorshipRequest.getCreatedAt();
-        var isAfter = mentorshipRequestCreatedDate.isAfter(TIME_PERIOD_FOR_SINGLE_REQUEST);
+        LocalDateTime dateBeforeWhichLastRequestShouldBe = LocalDateTime.now().minusMonths(MONTHS);
+        LocalDateTime mentorshipRequestCreatedDate = mentorshipRequest.getCreatedAt();
+
+        var isAfter = mentorshipRequestCreatedDate.isAfter(dateBeforeWhichLastRequestShouldBe);
         if (isAfter) {
             var receiverId = mentorshipRequest.getReceiver().getId();
             var message = String.format("a mentorship request to user with id %d" +

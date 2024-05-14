@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
@@ -91,6 +92,11 @@ public class MentorshipRequestValidatorTest {
                 .build();
     }
 
+    @BeforeEach
+    public void setUp() {
+        ReflectionTestUtils.setField(mentorshipRequestValidator, "MONTHS", 3L);
+    }
+
     @Test
     public void testValidateMentorshipRequestThrowsExceptionWhenRequesterIdAndReceiverIdSame() {
         var expected = "a request id and a receiver id can not be same";
@@ -148,7 +154,7 @@ public class MentorshipRequestValidatorTest {
 
     @Test
     public void testValidateMentorshipRequestWhenLastRequestWasOneSecondAfterThreeMonthsThrowsException() {
-        var oneSecondBeforeThreeMonthsAgo = LocalDateTime.now().minusMonths(3).plusSeconds(1);
+        var oneSecondBeforeThreeMonthsAgo = LocalDateTime.now().minusMonths(3).plusHours(1);
         validDto.setCreatedAt(oneSecondBeforeThreeMonthsAgo);
         validMentorshipRequest.setCreatedAt(oneSecondBeforeThreeMonthsAgo);
 

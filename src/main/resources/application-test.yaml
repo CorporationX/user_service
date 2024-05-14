@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    username: test
+    password: test
+  liquibase:
+    enabled: true
+    contexts: test

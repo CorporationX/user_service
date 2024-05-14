@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Component
 @RequiredArgsConstructor
 public class MentorshipRequestValidatorImpl implements MentorshipRequestValidator {
-    private static final LocalDateTime LOCAL_DATA_TIME_THREE_MONTHS_AGO = LocalDateTime.now().minusMonths(3L);
+    private static final LocalDateTime TIME_PERIOD_FOR_SINGLE_REQUEST = LocalDateTime.now().minusMonths(3L);
     private final MentorshipRequestRepository mentorshipRequestRepository;
 
     @Override
@@ -68,7 +68,7 @@ public class MentorshipRequestValidatorImpl implements MentorshipRequestValidato
 
     private void validateItIsFirstMentorshipRequestInLastThreeMonth(MentorshipRequest mentorshipRequest) {
         var mentorshipRequestCreatedDate = mentorshipRequest.getCreatedAt();
-        var isAfter = mentorshipRequestCreatedDate.isAfter(LOCAL_DATA_TIME_THREE_MONTHS_AGO);
+        var isAfter = mentorshipRequestCreatedDate.isAfter(TIME_PERIOD_FOR_SINGLE_REQUEST);
         if (isAfter) {
             var receiverId = mentorshipRequest.getReceiver().getId();
             var message = String.format("a mentorship request to user with id %d" +

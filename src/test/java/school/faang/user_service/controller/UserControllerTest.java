@@ -5,10 +5,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.controller.user.UserController;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.validation.UserFilterDtoValidator;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
@@ -22,6 +24,9 @@ public class UserControllerTest {
 
     @Mock
     private UserService userService;
+
+    @Spy
+    private UserFilterDtoValidator userFilterDtoValidator;
 
     private UserFilterDto userFilterDto;
 

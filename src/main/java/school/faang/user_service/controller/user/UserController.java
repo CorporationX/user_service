@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.validation.UserFilterDtoValidator;
 
 import java.util.List;
 
@@ -12,12 +13,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final UserFilterDtoValidator userFilterDtoValidator;
 
     public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
-        if (userFilterDto == null) {
-            throw new IllegalArgumentException("Аргумент метода getPremiumUsers не может быть null");
-        }
-
+        userFilterDtoValidator.checkIsNull(userFilterDto);
         return userService.getPremiumUsers(userFilterDto);
     }
 }

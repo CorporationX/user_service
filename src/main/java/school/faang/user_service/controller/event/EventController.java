@@ -5,8 +5,8 @@ import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventService;
+import school.faang.user_service.validation.EventValidator;
 
 import java.util.List;
 
@@ -15,9 +15,10 @@ import java.util.List;
 public class EventController {
 
     private final EventService eventService;
+    private final EventValidator eventValidator;
 
     public EventDto create(EventDto eventDto) {
-        validByTitleStartDateOwner(eventDto);
+        eventValidator.validByTitleStartDateOwner(eventDto);
         return eventService.create(eventDto);
     }
 
@@ -34,7 +35,7 @@ public class EventController {
     }
 
     public EventDto updateEvent(EventDto eventDto) {
-        validByTitleStartDateOwner(eventDto);
+        eventValidator.validByTitleStartDateOwner(eventDto);
         return eventService.updateEvent(eventDto);
     }
 
@@ -44,17 +45,5 @@ public class EventController {
 
     public List<Event> getParticipatedEvents(long userId) {
         return eventService.getParticipatedEvents(userId);
-    }
-
-    private void validByTitleStartDateOwner(EventDto eventDto) {
-        if (eventDto.getTitle() == null || eventDto.getTitle().isBlank()) {
-            throw new DataValidationException("Событие должно иметь название, и не должно быть пустым.");
-        }
-        if (eventDto.getStartDate() == null) {
-            throw new DataValidationException("Событие должно иметь время начала.");
-        }
-        if (eventDto.getOwnerId() == null) {
-            throw new DataValidationException("Событие должно иметь id владельца.");
-        }
     }
 }

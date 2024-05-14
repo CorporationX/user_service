@@ -45,6 +45,7 @@ public class EventServiceTest {
     private Skill firstSkill;
     private Skill secondSkill;
     private Skill thirdSkill;
+    private Long id;
 
     @BeforeEach
     public void setUp() {
@@ -53,6 +54,7 @@ public class EventServiceTest {
         userSecond = new User();
         event = new Event();
         eventDto = new EventDto();
+        id = 1L;
 
         firstSkill = Skill.builder()
                 .id(1)
@@ -75,11 +77,11 @@ public class EventServiceTest {
 
         userOne = User.builder()
                 .skills(List.of(firstSkill, secondSkill))
-                .id(1L)
+                .id(id)
                 .build();
 
         event = Event.builder()
-                .id(1L).owner(userOne)
+                .id(id).owner(userOne)
                 .relatedSkills(List.of(thirdSkill))
                 .build();
 
@@ -95,11 +97,11 @@ public class EventServiceTest {
     public void testCreateSaveEvent() {
         userOne = User.builder()
                 .skills(List.of(firstSkill))
-                .id(1)
+                .id(id)
                 .build();
 
         event = Event.builder()
-                .id(1L)
+                .id(id)
                 .owner(userOne)
                 .relatedSkills(List.of(firstSkill))
                 .build();
@@ -116,7 +118,7 @@ public class EventServiceTest {
     @Test
     public void testGetEvent() {
         event = Event.builder()
-                .id(1L)
+                .id(id)
                 .owner(userOne)
                 .relatedSkills(List.of(firstSkill, secondSkill))
                 .build();
@@ -130,7 +132,7 @@ public class EventServiceTest {
 
     @Test
     public void testDeleteEvent() {
-        event.setId(1L);
+        event.setId(id);
 
         eventService.deleteEvent(event.getId());
         verify(eventRepository, times(1)).deleteById(event.getId());
@@ -140,11 +142,11 @@ public class EventServiceTest {
     public void testUpdateEventWithAbsentUserBd() {
         userOne = User.builder()
                 .skills(List.of(firstSkill))
-                .id(1L)
+                .id(id)
                 .build();
 
         event = Event.builder()
-                .id(1L)
+                .id(id)
                 .owner(userOne)
                 .relatedSkills(List.of(firstSkill))
                 .build();
@@ -156,7 +158,7 @@ public class EventServiceTest {
 
     @Test
     public void testUpdateEventNotOwner() {
-        userFirst.setId(1L);
+        userFirst.setId(id);
         userSecond.setId(2L);
 
         event.setOwner(userFirst);
@@ -170,14 +172,14 @@ public class EventServiceTest {
     @Test
     public void testEventUpdateAbsentSkillsAtUser() {
         userFirst = User.builder()
-                .id(1L)
+                .id(id)
                 .skills(List.of(firstSkill))
                 .build();
 
         userSecond.setId(2L);
 
         event = Event.builder()
-                .id(1L)
+                .id(id)
                 .owner(userSecond)
                 .relatedSkills(List.of(secondSkill))
                 .build();
@@ -190,7 +192,7 @@ public class EventServiceTest {
 
     @Test
     public void testGetOwnedEvents() {
-        userOne.setId(1L);
+        userOne.setId(id);
 
         eventService.getOwnedEvents(userOne.getId());
         verify(eventRepository, times(1)).findAllByUserId(userOne.getId());
@@ -198,7 +200,7 @@ public class EventServiceTest {
 
     @Test
     public void testGetParticipatedEvents() {
-        userOne.setId(1L);
+        userOne.setId(id);
 
         eventService.getParticipatedEvents(userOne.getId());
         verify(eventRepository, times(1)).findParticipatedEventsByUserId(userOne.getId());

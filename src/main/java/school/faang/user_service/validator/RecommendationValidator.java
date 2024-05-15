@@ -9,7 +9,6 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
-import school.faang.user_service.service.RecommendationService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,7 +20,6 @@ public class RecommendationValidator {
     @Value("${recommendation.service.recommendation_period_in_month}")
     private int RECOMMENDATION_PERIOD_IN_MONTH;
     private final RecommendationRepository recommendationRepository;
-    private final RecommendationService recommendationService;
     private final SkillRepository skillRepository;
 
     public void validateRecommendation(RecommendationDto recommendationDto) {
@@ -80,7 +78,10 @@ public class RecommendationValidator {
     }
 
     private void validateSkillInRepository(List<SkillOfferDto> skills) {
-        List<Long> skillIds = recommendationService.getUniqueSkillIds(skills);
+        List<Long> skillIds = skills.stream()
+                .map(SkillOfferDto::getSkillId)
+                .distinct()
+                .toList();
 
         for (Long skillId : skillIds) {
             if (!skillRepository.existsById(skillId)) {

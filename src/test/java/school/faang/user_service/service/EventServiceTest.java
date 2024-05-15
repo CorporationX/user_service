@@ -101,7 +101,7 @@ public class EventServiceTest {
     public void testEventIsCreated() {
         EventDto eventDto = new EventDto();
         Event eventEntity = eventMapper.toEntity(eventDto);
-
+        Mockito.when(eventMapper.toEntity(eventDto)).thenReturn(eventEntity);
         eventService.create(eventDto);
         Mockito.verify(eventRepository, Mockito.times(1)).save(eventEntity);
     }

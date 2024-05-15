@@ -24,11 +24,7 @@ public interface EventMapper {
         return skills.stream().map(Skill::getId).toList();
     }
 
-    default List<EventDto> toListDto(List<Event> events) {
-        return events.stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
-    }
+    List<EventDto> toListDto(List<Event> events);
 
     default List<Event> toListEntity(List<EventDto> events) {
         return events.stream()

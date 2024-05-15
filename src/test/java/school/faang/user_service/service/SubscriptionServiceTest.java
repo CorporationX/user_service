@@ -23,6 +23,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -80,6 +81,8 @@ class SubscriptionServiceTest {
             verify(subscriptionRepo).followUser(followerArgumentCaptor.capture(), followeeArgumentCaptor.capture());
             assertEquals(followerId, followerArgumentCaptor.getValue());
             assertEquals(followeeId, followeeArgumentCaptor.getValue());
+
+            fail();
         }
 
         @DisplayName("should unfollow user")

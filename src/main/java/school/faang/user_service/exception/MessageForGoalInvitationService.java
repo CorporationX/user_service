@@ -14,8 +14,9 @@ public enum MessageForGoalInvitationService {
     SET_GOALS_IS_NULL("SetGoals should not be null"),
     NO_INVITER_IN_DB("There is no inviter in database"),
     NO_INVITED_IN_DB("There is no invited in database"),
-    NO_INVITED_IN_GOAL_INVITATION("There is no invited in GoalInvitation");
-
+    NO_INVITED_IN_GOAL_INVITATION("There is no invited in GoalInvitation"),
+    ID_IS_NULL("User id can not e null"),
+    NO_USER_IN_DB("There is no such user in database");
     private final String message;
 
     MessageForGoalInvitationService(String message) {

@@ -40,23 +40,11 @@ public class GoalInvitationServiceTest {
     private UserRepository userRepository;
     @Mock
     private GoalInvitationServiceValidator goalInvitationServiceValidator;
+    @Mock
+    List<InvitationFilter> invitationFilters;
     @Captor
     private ArgumentCaptor<GoalInvitation> captor;
     private final TestData testData = new TestData();
-
-    @BeforeEach
-    void init() {
-
-        InviterIdFilter inviterIdFilter = Mockito.spy(InviterIdFilter.class);
-        InvitedIdFilter invitedIdFilter = Mockito.spy(InvitedIdFilter.class);
-        InvitedNamePatternFilter invitedNamePatternFilter = Mockito.spy(InvitedNamePatternFilter.class);
-        InviterNamePatternFilter inviterNamePatternFilter = Mockito.spy(InviterNamePatternFilter.class);
-        RequestStatusFilter requestStatusFilter = Mockito.spy(RequestStatusFilter.class);
-
-        List<InvitationFilter> invitationFilters = List.of(inviterIdFilter, invitedIdFilter, invitedNamePatternFilter, inviterNamePatternFilter, requestStatusFilter);
-
-        goalInvitationService.setInvitationFilters(invitationFilters);
-    }
 
     @Test
     void testCreateInvitationSaveGoalInvitation() {
@@ -129,7 +117,7 @@ public class GoalInvitationServiceTest {
         GoalInvitation goalInvitation = testData.setupForAcceptAndRejectGoalInvitationAndForGetInvitations();
         List<GoalInvitation> goalInvitations = List.of(goalInvitation);
 
-        when(goalInvitationRepository.findAll()).thenReturn(goalInvitations);
+//        when(goalInvitationRepository.findAll()).thenReturn(goalInvitations);
 
         List<GoalInvitationDto> goalInvitationDtos = goalInvitationService.getInvitations(filterDto);
         assertEquals(0, goalInvitationDtos.size());

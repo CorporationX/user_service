@@ -5,9 +5,10 @@ import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.user.filter.UserFilter;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -27,5 +28,10 @@ public class UserService {
                 .filter(userFilter -> userFilter.isApplicable(userFilterDto))
                 .flatMap(userFilter -> userFilter.apply(users, userFilterDto))
                 .map(userMapper::toDto).toList();
+    }
+
+    public User getById(long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new DataValidationException("Пользователь с id " + userId + " не найден"));
     }
 }

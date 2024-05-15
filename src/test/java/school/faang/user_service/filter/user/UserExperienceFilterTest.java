@@ -1,4 +1,4 @@
-package school.faang.user_service.service.user.filter;
+package school.faang.user_service.filter.user;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

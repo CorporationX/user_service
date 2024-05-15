@@ -1,11 +1,11 @@
-package school.faang.user_service.controller;
+package school.faang.user_service.controller.skill;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.service.SkillService;
-import school.faang.user_service.validation.SkillValidator;
+import school.faang.user_service.service.skill.SkillService;
+import school.faang.user_service.validator.SkillValidator;
 
 import java.util.List;
 

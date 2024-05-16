@@ -20,7 +20,7 @@ public class UserController {
     private final UserService userService;
 
     @Operation(summary = "Get premium users")
-    @PostMapping("premium/get")
+    @PostMapping("premium")
     public List<UserDto> getPremiumUsers(@ParameterObject @RequestBody(required = false) UserFilterDto filter) {
         return userService.findPremiumUsers(filter);
     }

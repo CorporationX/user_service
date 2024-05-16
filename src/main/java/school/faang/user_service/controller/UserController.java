@@ -19,7 +19,7 @@ public class UserController {
     private final UserService userService;
 
     @Operation(summary = "Deactivate user")
-    @PostMapping("deactivate/{id}")
+    @PostMapping("deactivation/{id}")
     public void deactivateUser(@Parameter @PathVariable Long id) {
         userService.deactivateUserById(id);
     }

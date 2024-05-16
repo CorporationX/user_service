@@ -24,7 +24,7 @@ public class SubscriptionController {
         if (followerId == followeeId) {
             throw new DataValidationException( "You can not follow yourself!" );
         }
-        subscriptionService.followUser( followerId, followeeId );
+        subscriptionService.followUser(followerId, followeeId);
     }
 
     public void unfollowUser(long followerId, long followeeId) {
@@ -35,15 +35,15 @@ public class SubscriptionController {
     }
 
     public List<SubscriptionUserDto> getFollowers(long followeeId, SubscriptionUserFilterDto filter) {
-        return subscriptionService.getFollowers( followeeId, filter );
+        return subscriptionService.getFollowers(followeeId, filter);
     }
 
     public int getFollowersCount(long followeeId) {
-        return subscriptionService.getFollowersCount( followeeId );
+        return subscriptionService.getFollowersCount(followeeId);
     }
 
     public List<SubscriptionUserDto> getFollowing(long followeeId, SubscriptionUserFilterDto filter) {
-        return subscriptionService.getFollowing( followeeId, filter );
+        return subscriptionService.getFollowing(followeeId, filter);
     }
 
     public int getFollowingCount(long followerId) {

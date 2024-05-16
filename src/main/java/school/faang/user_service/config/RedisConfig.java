@@ -32,6 +32,9 @@ public class RedisConfig{
     @Value("${spring.data.redis.channels.profile_search_channel.name}")
     private String userProfileSearchTopic;
 
+    @Value("${spring.data.redis.channels.follower_channel.name}")
+    private String followerEventTopic;
+
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
@@ -41,6 +44,11 @@ public class RedisConfig{
     @Bean
     public ChannelTopic userBannerTopic(){
         return new ChannelTopic(userBannerTopic);
+    }
+
+    @Bean
+    public ChannelTopic getFollowerEventTopic() {
+        return new ChannelTopic(followerEventTopic);
     }
 
     @Bean

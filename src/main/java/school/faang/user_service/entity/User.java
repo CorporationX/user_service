@@ -77,7 +77,7 @@ public class User {
     @ManyToMany(mappedBy = "followers")
     private List<User> followees;
 
-    @OneToMany(mappedBy = "owner")
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Event> ownedEvents;
 
     @ManyToMany(mappedBy = "mentors")

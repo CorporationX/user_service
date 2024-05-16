@@ -13,8 +13,8 @@ import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +30,7 @@ class UserServiceTest {
     private static final long SET_GOAL_ID = 1L;
     private static final long GOAL_ID = 2L;
     private static final long EVENT_ID = 1L;
+    private static final long MENTEE_ID = 2L;
 
     @Mock
     private UserRepository userRepository;
@@ -37,18 +38,23 @@ class UserServiceTest {
     private GoalRepository goalRepository;
     @Mock
     private EventRepository eventRepository;
-    @Mock
-    private MentorshipRepository mentorshipRepository;
 
     @InjectMocks
     private UserService userService;
 
     User user;
+    User mentee;
 
     @BeforeEach
     public void init() {
         user = User.builder()
                 .id(USER_ID)
+                .ownedEvents(new ArrayList<>())
+                .mentees(new ArrayList<>())
+                .build();
+        mentee = User.builder()
+                .id(MENTEE_ID)
+                .mentors(new ArrayList<>())
                 .build();
     }
 
@@ -67,8 +73,9 @@ class UserServiceTest {
                 .build();
         Goal goal = Goal.builder()
                 .id(GOAL_ID)
-                .users(List.of(user))
+                .users(new ArrayList<>())
                 .build();
+        goal.getUsers().add(user);
         Event userEvent = Event.builder()
                 .id(EVENT_ID)
                 .owner(user)
@@ -76,14 +83,15 @@ class UserServiceTest {
         user.setGoals(List.of(goal));
         user.setSetGoals(List.of(setGoal));
         user.setParticipatedEvents(List.of(userEvent));
+        user.getMentees().add(mentee);
+        user.getOwnedEvents().add(userEvent);
+        mentee.getMentors().add(user);
 
         when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
 
         userService.deactivate(USER_ID);
 
-        verify(mentorshipRepository).deleteAllMentorshipByMentorId(USER_ID);
         verify(goalRepository).save(setGoal);
         verify(goalRepository).deleteById(GOAL_ID);
-        verify(eventRepository).deleteById(EVENT_ID);
     }
 }

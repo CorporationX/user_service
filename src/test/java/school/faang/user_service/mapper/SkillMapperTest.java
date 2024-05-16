@@ -1,4 +1,4 @@
-package school.faang.user_service.service.mappers;
+package school.faang.user_service.mapper;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,7 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
-import school.faang.user_service.mappers.SkillMapperImpl;
+
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

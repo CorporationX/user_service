@@ -3,8 +3,8 @@ package school.faang.user_service.filter.goal;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import school.faang.user_service.dto.GoalDto;
-import school.faang.user_service.dto.GoalFilterDto;
+import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.goal.GoalStatus;
 
 import java.util.ArrayList;

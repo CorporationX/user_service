@@ -1,20 +1,20 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.skill;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
-import school.faang.user_service.mappers.SkillMapper;
-import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.validation.SkillValidator;
-import school.faang.user_service.validation.UserValidator;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.mapper.SkillMapper;
+import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.validator.SkillValidator;
+import school.faang.user_service.validator.UserValidator;
 
 import java.util.List;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class SkillService {
     private final SkillRepository skillRepository;

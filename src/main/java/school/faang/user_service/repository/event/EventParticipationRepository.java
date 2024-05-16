@@ -1,5 +1,6 @@
 package school.faang.user_service.repository.event;
 
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -10,14 +11,16 @@ import java.util.List;
 @Repository
 public interface EventParticipationRepository extends CrudRepository<User, Long> {
 
-    @Query(nativeQuery = true, value = "INSERT INTO user_event (event_id, user_id) VALUES (:eventId, :userId")
+    @Modifying
+    @Query(nativeQuery = true, value = "INSERT INTO user_event (event_id, user_id) VALUES (:eventId, :userId)")
     void register(long eventId, long userId);
 
+    @Modifying
     @Query(nativeQuery = true, value = "DELETE FROM user_event WHERE event_id = :eventId and user_id = :userId")
     void unregister(long eventId, long userId);
 
     @Query(nativeQuery = true, value = """
-            SELECT u.* FROM user u
+            SELECT u.* FROM users u
             JOIN user_event ue ON u.id = ue.user_id
             WHERE ue.event_id = :eventId
             """)

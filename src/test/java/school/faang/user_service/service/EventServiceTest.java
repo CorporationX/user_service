@@ -14,6 +14,7 @@ import school.faang.user_service.mapper.EventMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.EventService;
+import school.faang.user_service.validator.EventValidator;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +37,8 @@ public class EventServiceTest {
     private UserRepository userRepository;
     @Captor
     private ArgumentCaptor<Event> captor;
+    @Spy
+    private EventValidator eventValidator;
 
     private User userOne;
     private User userFirst;
@@ -74,7 +77,6 @@ public class EventServiceTest {
 
     @Test
     public void testCreateAbsentSkillsAtUser() {
-
         userOne = User.builder()
                 .skills(List.of(firstSkill, secondSkill))
                 .id(id)
@@ -96,19 +98,20 @@ public class EventServiceTest {
     @Test
     public void testCreateSaveEvent() {
         userOne = User.builder()
-                .skills(List.of(firstSkill))
+                .skills(List.of(Skill.builder().id(1).build()))
                 .id(id)
                 .build();
 
         event = Event.builder()
                 .id(id)
                 .owner(userOne)
-                .relatedSkills(List.of(firstSkill))
+                .relatedSkills(List.of(Skill.builder().id(1).build()))
                 .build();
 
         eventDto = eventMapper.toDto(event);
 
         when(userRepository.findById(eventDto.getOwnerId())).thenReturn(java.util.Optional.of(event.getOwner()));
+
         eventService.create(eventDto);
         verify(eventRepository, times(1)).save(captor.capture());
         Event eventCaptor = captor.getValue();
@@ -162,6 +165,11 @@ public class EventServiceTest {
         userSecond.setId(2L);
 
         event.setOwner(userFirst);
+        event.setRelatedSkills(List.of(
+                Skill.builder().id(1).build(),
+                Skill.builder().id(2).build(),
+                Skill.builder().id(3).build()));
+
 
         eventDto = eventMapper.toDto(event);
 

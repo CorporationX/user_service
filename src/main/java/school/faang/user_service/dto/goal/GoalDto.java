@@ -29,6 +29,7 @@ public class GoalDto {
     @Length(max = 64, message = "Title cannot be longer than 64 characters")
     private String title;
 
+    @Builder.Default
     private GoalStatus status = GoalStatus.ACTIVE;
 
     @Future(message = "Deadline must be in the future")

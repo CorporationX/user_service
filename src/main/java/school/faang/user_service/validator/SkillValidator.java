@@ -2,7 +2,7 @@ package school.faang.user_service.validator;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.SkillDto;
+import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
 
@@ -19,5 +19,12 @@ public class SkillValidator {
         } else if (skillRepository.existsByTitle(skill.getTitle())) {
             throw new DataValidationException(skill.getTitle() + " already exist");
         }
+    }
+
+    public boolean validateSkill(long skillId, long userId) {
+        if (skillRepository.findUserSkill(skillId, userId) != null) {
+            return false;
+        }
+        return true;
     }
 }

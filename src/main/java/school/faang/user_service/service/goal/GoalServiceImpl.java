@@ -50,6 +50,18 @@ public class GoalServiceImpl implements GoalService {
         return applyFilters(goalStream, filter);
     }
 
+    @Override
+    @Transactional
+    public Goal findGoalById(long id) {
+        return goalRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(String.format("Goal with id %s not found", id)));
+    }
+
+    @Override
+    public int findActiveGoalsByUserId(long id) {
+        return goalRepository.countActiveGoalsPerUser(id);
+    }
+
     @Transactional
     public GoalDto createGoal(Long userId, GoalDto goalDto) {
 

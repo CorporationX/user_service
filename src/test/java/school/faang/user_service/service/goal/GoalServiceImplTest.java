@@ -18,7 +18,6 @@ import school.faang.user_service.mapper.GoalMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.skill.SkillService;
 import school.faang.user_service.validator.GoalValidator;
 
 import java.time.LocalDateTime;
@@ -43,7 +42,7 @@ class GoalServiceTests {
     @Mock private GoalRepository goalRepository;
     @Mock private UserRepository userRepository;
     @Mock private SkillRepository skillRepository;
-    @Mock private SkillService skillService;
+//    @Mock private SkillService skillService;
     @Spy private GoalMapperImpl goalMapper;
     @Mock private GoalValidator goalValidator;
     @InjectMocks private GoalServiceImpl goalService;

@@ -25,7 +25,7 @@ spring:
         follower_channel:
           name: follower_channel
         profile_view_channel:
-            name: profile_view_channel
+          name: profile_view_channel
 
 server:
   port: 8080
@@ -55,3 +55,9 @@ services:
 goals:
   limit:
     max-per-user: 3
+  invitations:
+    max-per-user: 3
+
+mentorship:
+  request:
+    time-period-for-single-request: 3

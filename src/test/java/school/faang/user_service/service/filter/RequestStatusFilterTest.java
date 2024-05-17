@@ -19,13 +19,8 @@ public class RequestStatusFilterTest {
 
     @BeforeEach
     void prepareInvitationFilterDto() {
-        invitationFilterDto = new InvitationFilterDto();
-        invitationFilterDto.setInvitedId(2L);
-        invitationFilterDto.setInviterId(1L);
-        invitationFilterDto.setInviterNamePattern("John");
-        invitationFilterDto.setInvitedNamePattern("Mike");
-        invitationFilterDto.setStatus(RequestStatus.ACCEPTED);
         testData = new TestData();
+        invitationFilterDto = testData.prepareInvitationFilterDto();
     }
 
 
@@ -42,13 +37,13 @@ public class RequestStatusFilterTest {
 
     @Test
     void testApplyWithGoalInvitation() {
-        assertEquals(testData.prepareGoalInvitationStream().toList().size(), requestStatusFilter.apply(testData.prepareGoalInvitationStream(),
+        assertEquals(2, requestStatusFilter.apply(testData.prepareGoalInvitationList().stream(),
                 invitationFilterDto).toList().size());
     }
 
     @Test
     void testApplyWithoutGoalInvitation() {
         invitationFilterDto.setStatus(RequestStatus.PENDING);
-        assertEquals(0, requestStatusFilter.apply(testData.prepareGoalInvitationStream(), invitationFilterDto).toList().size());
+        assertEquals(0, requestStatusFilter.apply(testData.prepareGoalInvitationList().stream(), invitationFilterDto).toList().size());
     }
 }

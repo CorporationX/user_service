@@ -36,13 +36,13 @@ public class InvitedIdFilterTest {
 
     @Test
     void testApplyWithGoalInvitation() {
-        assertEquals(testData.prepareGoalInvitationStream().toList().size(), invitedIdFilter.apply(testData.prepareGoalInvitationStream(),
+        assertEquals(1, invitedIdFilter.apply(testData.prepareGoalInvitationList().stream(),
                 invitationFilterDto).toList().size());
     }
 
     @Test
     void testApplyWithoutGoalInvitation() {
-        invitationFilterDto.setInvitedId(22L);
-        assertEquals(0, invitedIdFilter.apply(testData.prepareGoalInvitationStream(), invitationFilterDto).toList().size());
+        invitationFilterDto.setInvitedId(100L);
+        assertEquals(0, invitedIdFilter.apply(testData.prepareGoalInvitationList().stream(), invitationFilterDto).toList().size());
     }
 }

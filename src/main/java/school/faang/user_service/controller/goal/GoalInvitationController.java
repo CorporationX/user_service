@@ -1,6 +1,5 @@
 package school.faang.user_service.controller.goal;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
@@ -11,9 +10,8 @@ import java.util.List;
 
 @Controller
 @Data
-@AllArgsConstructor
 public class GoalInvitationController {
-    private GoalInvitationService goalInvitationService;
+    private final GoalInvitationService goalInvitationService;
 
     public GoalInvitationDto createInvitation(GoalInvitationDto invitation) {
         return goalInvitationService.createInvitation(invitation);

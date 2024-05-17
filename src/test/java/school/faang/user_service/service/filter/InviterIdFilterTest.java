@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
-import school.faang.user_service.entity.RequestStatus;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,13 +18,8 @@ public class InviterIdFilterTest {
 
     @BeforeEach
     void prepareInvitationFilterDto() {
-        invitationFilterDto = new InvitationFilterDto();
-        invitationFilterDto.setInvitedId(2L);
-        invitationFilterDto.setInviterId(1L);
-        invitationFilterDto.setInviterNamePattern("Mike");
-        invitationFilterDto.setInvitedNamePattern("John");
-        invitationFilterDto.setStatus(RequestStatus.ACCEPTED);
         testData = new TestData();
+        invitationFilterDto = testData.prepareInvitationFilterDto();
     }
 
 
@@ -42,13 +36,13 @@ public class InviterIdFilterTest {
 
     @Test
     void testApplyWithGoalInvitation() {
-        assertEquals(testData.prepareGoalInvitationStream().toList().size(), inviterIdFilter.apply(testData.prepareGoalInvitationStream(),
+        assertEquals(1, inviterIdFilter.apply(testData.prepareGoalInvitationList().stream(),
                 invitationFilterDto).toList().size());
     }
 
     @Test
     void testApplyWithoutGoalInvitation() {
-        invitationFilterDto.setInviterId(22L);
-        assertEquals(0, inviterIdFilter.apply(testData.prepareGoalInvitationStream(), invitationFilterDto).toList().size());
+        invitationFilterDto.setInviterId(200L);
+        assertEquals(0, inviterIdFilter.apply(testData.prepareGoalInvitationList().stream(), invitationFilterDto).toList().size());
     }
 }

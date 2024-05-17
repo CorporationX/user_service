@@ -10,12 +10,11 @@ import school.faang.user_service.entity.goal.GoalInvitation;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Component
 public class TestData {
 
-    public Stream<GoalInvitation> prepareGoalInvitationStream() {
+    public List<GoalInvitation> prepareGoalInvitationList() {
         GoalInvitation goalInvitation = new GoalInvitation();
 
         User invited = new User();
@@ -30,7 +29,35 @@ public class TestData {
         goalInvitation.setInvited(invited);
         goalInvitation.setInviter(inviter);
 
-        return Stream.of(goalInvitation);
+        GoalInvitation secondGoalInvitation = new GoalInvitation();
+
+        User secondInvited = new User();
+        secondInvited.setUsername("Jessica");
+        secondInvited.setId(22L);
+
+        User secondInviter = new User();
+        secondInviter.setId(11L);
+        secondInviter.setUsername("Kate");
+
+        secondGoalInvitation.setStatus(RequestStatus.REJECTED);
+        secondGoalInvitation.setInvited(secondInvited);
+        secondGoalInvitation.setInviter(secondInviter);
+
+        GoalInvitation thirdGoalInvitation = new GoalInvitation();
+
+        User thirdInviter = new User();
+        thirdInviter.setUsername("Jessica");
+        thirdInviter.setId(33L);
+
+        User thirdInvited = new User();
+        thirdInvited.setId(44L);
+        thirdInvited.setUsername("Kate");
+
+        thirdGoalInvitation.setStatus(RequestStatus.ACCEPTED);
+        thirdGoalInvitation.setInvited(thirdInviter);
+        thirdGoalInvitation.setInviter(thirdInvited);
+
+        return List.of(thirdGoalInvitation, goalInvitation, secondGoalInvitation);
     }
 
     public InvitationFilterDto prepareInvitationFilterDto() {
@@ -58,10 +85,8 @@ public class TestData {
         goalInvitation.setGoal(goal);
 
         User invited = new User();
-        invited.setGoals(new ArrayList<>());
         invited.setUsername("Mike");
         invited.setId(2L);
-
         invited.setSetGoals(new ArrayList<>(List.of(
                 new Goal(),
                 goal

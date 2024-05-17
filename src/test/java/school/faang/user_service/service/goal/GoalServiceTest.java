@@ -1,30 +1,23 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.goal;
 
 
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.GoalDto;
-import school.faang.user_service.dto.GoalFilterDto;
+import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
-import school.faang.user_service.filter.goal.GoalDescriptionFilter;
-import school.faang.user_service.filter.goal.GoalFilter;
-import school.faang.user_service.filter.goal.GoalSkillFilter;
-import school.faang.user_service.filter.goal.GoalStatusFilter;
-import school.faang.user_service.filter.goal.GoalTitleFilter;
+import school.faang.user_service.filter.goal.*;
 import school.faang.user_service.mapper.GoalMapperImpl;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.goal.GoalService;
+import school.faang.user_service.service.skill.SkillService;
+import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.GoalValidator;
 
 import java.util.ArrayList;
@@ -34,9 +27,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class GoalServiceTest {

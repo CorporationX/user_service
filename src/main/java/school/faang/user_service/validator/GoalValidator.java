@@ -2,12 +2,12 @@ package school.faang.user_service.validator;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.GoalDto;
+import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.SkillService;
+import school.faang.user_service.service.skill.SkillService;
 
 @Component
 @RequiredArgsConstructor

@@ -1,4 +1,4 @@
-package school.faang.user_service.service.mappers;
+package school.faang.user_service.mapper;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,7 +8,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
-import school.faang.user_service.mappers.SkillMapperImpl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -21,7 +20,7 @@ public class SkillMapperTest {
     private Skill skill;
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
         skillDto = SkillDto.builder().id(1L).title("title").build();
         skill = Skill.builder().id(1L).title("title").build();
     }

@@ -1,4 +1,4 @@
-package school.faang.user_service.service.controller;
+package school.faang.user_service.controller.skill;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -6,11 +6,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.controller.SkillController;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.service.SkillService;
-import school.faang.user_service.validation.SkillValidator;
+import school.faang.user_service.service.skill.SkillService;
+import school.faang.user_service.validator.SkillValidator;
 
 import java.util.Arrays;
 import java.util.List;

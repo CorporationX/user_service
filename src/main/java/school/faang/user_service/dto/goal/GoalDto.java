@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import school.faang.user_service.entity.goal.GoalStatus;
 
 import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor

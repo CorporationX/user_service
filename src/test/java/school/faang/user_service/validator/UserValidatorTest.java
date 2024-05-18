@@ -24,7 +24,7 @@ public class UserValidatorTest {
     private Long userId;
 
     @BeforeEach
-    public void setUd(){
+    public void setUd() {
         userId = 1L;
     }
 

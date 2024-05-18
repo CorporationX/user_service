@@ -6,9 +6,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.filter.user.UserFilter;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.user.filter.UserFilter;
 
 import java.util.List;
 
@@ -37,7 +37,7 @@ public class UserServiceTest {
                 .city("Rostov")
                 .experience(500)
                 .build();
-        
+
         userService.getPremiumUsers(userFilterDto);
 
         verify(userRepository, times(1)).findPremiumUsers();

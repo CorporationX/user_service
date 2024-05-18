@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.skill;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,6 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.service.skill.SkillService;
 import school.faang.user_service.validator.SkillValidator;
 import school.faang.user_service.validator.UserValidator;
 
@@ -21,10 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 

@@ -10,6 +10,7 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -43,6 +44,9 @@ public class RedisConfig {
 
     @Value("${spring.data.redis.channels.mentorship_accepted_channel.name}")
     private String mentorshipAcceptedChannel;
+
+    @Value("${spring.data.redis.channels.profile_pic_channel.name}")
+    private String profilePicTopic;
 
 
     @Bean
@@ -96,5 +100,10 @@ public class RedisConfig {
     @Bean
     public ChannelTopic mentorshipAcceptedTopic() {
         return new ChannelTopic(mentorshipAcceptedChannel);
+    }
+
+    @Bean
+    public ChannelTopic profilePicChannel(){
+        return new ChannelTopic(profilePicTopic);
     }
 }

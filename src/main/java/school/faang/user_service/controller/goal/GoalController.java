@@ -2,8 +2,8 @@ package school.faang.user_service.controller.goal;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import school.faang.user_service.dto.GoalDto;
-import school.faang.user_service.dto.GoalFilterDto;
+import school.faang.user_service.dto.goal.GoalDto;
+import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.validator.GoalValidator;
 

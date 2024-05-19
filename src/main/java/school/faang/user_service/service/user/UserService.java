@@ -12,7 +12,7 @@ import school.faang.user_service.service.user.filter.UserFilter;
 import java.util.List;
 import java.util.stream.Stream;
 
-@Service
+@Service("UserService1")
 @RequiredArgsConstructor
 public class UserService {
 

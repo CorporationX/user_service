@@ -23,6 +23,8 @@ import school.faang.user_service.validator.SkillValidator;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 @ExtendWith(MockitoExtension.class)
 public class SkillServiceTest {
     @InjectMocks
@@ -57,7 +59,7 @@ public class SkillServiceTest {
 
     @Test
     public void testSkillSave() throws DataValidationException {
-        skillService.create(skillDto);
+        SkillDto createdSkill = skillService.create(skillDto);
         Mockito.verify(skillRepository, Mockito.times(1)).save(skillMapper.toEntity(skillDto));
     }
 

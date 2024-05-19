@@ -11,4 +11,8 @@ public interface UserService {
     User findUserById(long id);
 
     List<UserDto> findPremiumUsers(UserFilterDto filterDto);
+
+    UserDto getUser(long userId);
+
+    List<UserDto> getUsersByIds(List<Long> ids);
 }

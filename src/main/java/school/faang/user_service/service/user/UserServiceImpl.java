@@ -12,6 +12,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.user.filter.UserFilterService;
 
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +32,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDto> findPremiumUsers(UserFilterDto filterDto) {
         return userFilterService.applyFilters(userRepository.findPremiumUsers(), filterDto)
+                .map(userMapper::toDto)
+                .toList();
+    }
+
+    @Override
+    public UserDto getUser(long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User with id - " + userId + " doesn't exist"));
+        return userMapper.toDto(user);
+    }
+
+    @Override
+    public List<UserDto> getUsersByIds(List<Long> ids) {
+        return StreamSupport.stream(userRepository.findAllById(ids).spliterator(), false)
                 .map(userMapper::toDto)
                 .toList();
     }

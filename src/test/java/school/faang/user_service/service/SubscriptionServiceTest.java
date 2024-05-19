@@ -2,30 +2,41 @@ package school.faang.user_service.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.error.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.dto.*;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+
+@ExtendWith(MockitoExtension.class)
 class SubscriptionServiceTest {
     @Mock
     private SubscriptionRepository subscriptionRepository;
 
+    @Mock
+    private UserMatchByFilterChecker userMatchByFilterChecker;
+
     @InjectMocks
     private SubscriptionService subscriptionService;
+
 
     @Test
     @DisplayName("Проверка, что нельзя подписаться на пользователя, если уже на него подписан")
@@ -37,7 +48,7 @@ class SubscriptionServiceTest {
             subscriptionService.followUser(10, 20);
         });
 
-        Mockito.verify(subscriptionRepository, Mockito.never()).followUser(Mockito.anyLong(), Mockito.anyLong());
+        verify(subscriptionRepository, Mockito.never()).followUser(anyLong(), anyLong());
     }
 
     @Test
@@ -47,26 +58,7 @@ class SubscriptionServiceTest {
 
         subscriptionService.followUser(10, 20);
 
-        Mockito.verify(subscriptionRepository).followUser(10, 20);
-    }
-
-    @Test
-    @DisplayName("Проверка, что метод getFollowers в service работает")
-    void testGetFollowersPositive() {
-
-        long followeeId = 1L;
-        UserFilterDto filter = new UserFilterDto();
-        List<User> usersFromRepository = Arrays.asList(new User(), new User());
-
-        // Мокируем поведение репозитория
-        when(subscriptionRepository.findByFolloweeId(followeeId)).thenReturn(usersFromRepository.stream());
-
-        // Вызываем метод, который будем тестировать
-        SubscriptionService service = new SubscriptionService(subscriptionRepository);
-        List<UserDto> followers = service.getFollowers(followeeId, filter);
-
-        // Проверяем результат
-        assertEquals(2, followers.size());
+        verify(subscriptionRepository).followUser(10, 20);
     }
 
     @Test

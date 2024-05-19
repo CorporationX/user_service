@@ -15,6 +15,7 @@ public class RecommendationRequestEventPublisher extends AbstractMessagePublishe
     @Autowired
     private ChannelTopic recommendationRequestTopic;
 
+    @Override
     public void publish(RecommendationRequestEvent event) {
         convertAndSend(recommendationRequestTopic.getTopic(), event);
     }

@@ -18,7 +18,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.handler.exception.FileOperationException;
 import school.faang.user_service.mapper.user_profile_pic.UserProfilePicMapper;
-import school.faang.user_service.publisher.AbstractEventPublisher;
+import school.faang.user_service.publisher.AbstractMessagePublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.user.UserService;
 
@@ -41,7 +41,7 @@ public class ProfilePicService {
 
     private final UserProfilePicMapper userProfilePicMapper;
 
-    private final AbstractEventPublisher<EventProfilePic> profilePicEventPublisher;
+    private final AbstractMessagePublisher<EventProfilePic> profilePicEventPublisher;
 
     @Value("${services.s3.large_photo}")
     private int large_photo;

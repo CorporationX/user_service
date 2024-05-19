@@ -16,7 +16,7 @@ public class GoalSetEventPublisher extends AbstractMessagePublisher<GoalSetEvent
     public GoalSetEventPublisher(ObjectMapper objectMapper, RedisTemplate<String, Object> redisTemplate) {
         super(redisTemplate, objectMapper);
     }
-
+    @Override
     public void publish(GoalSetEvent goalSetEvent) {
         convertAndSend(goalSetTopic, goalSetEvent);
         log.info("Goal set event published user id: {}", goalSetEvent.getUserId());

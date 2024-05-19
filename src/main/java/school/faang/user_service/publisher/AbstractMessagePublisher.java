@@ -20,4 +20,5 @@ public abstract class AbstractMessagePublisher<T> {
             e.printStackTrace();
         }
     }
+    public abstract void publish(T event);
 }

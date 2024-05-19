@@ -18,6 +18,7 @@ public class SearchAppearanceEventPublisher extends AbstractMessagePublisher<Sea
         super(redisTemplate, objectMapper);
     }
 
+    @Override
     public void publish(SearchAppearanceEvent searchAppearanceEvent) {
         convertAndSend(SearchAppearanceTopic.getTopic(), searchAppearanceEvent);
         log.info("Search Appearance Event published user id: {}", searchAppearanceEvent.getUserId());

@@ -16,7 +16,7 @@ public class ProfileViewEventPublisher extends AbstractMessagePublisher<ProfileV
     public ProfileViewEventPublisher(ObjectMapper objectMapper, RedisTemplate<String, Object> redisTemplate) {
         super(redisTemplate, objectMapper);
     }
-
+    @Override
     public void publish(ProfileViewEvent event) {
         convertAndSend(profileViewChannel, event);
     }

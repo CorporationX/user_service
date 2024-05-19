@@ -18,6 +18,8 @@ public class SubscriptionService {
 
     private final SubscriptionRepository subscriptionRepository;
 
+    private UserMatchByFilterChecker userMatchByFilterChecker;
+
     public void followUser(long followerId, long followeeId) {
         if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             throw new DataValidationException("Подписка уже существует.");
@@ -34,39 +36,12 @@ public class SubscriptionService {
 
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filter) {
         return subscriptionRepository.findByFolloweeId(followeeId)
-                .filter(user -> isUserMatchFiltration(user, filter))
+                .filter(user -> userMatchByFilterChecker.isUserMatchFiltration(user, filter))
                 .skip((long) (filter.getPage() - 1) * filter.getPageSize())
                 .limit(filter.getPageSize())
                 .map(user -> new UserDto(user.getId(), user.getUsername(), user.getEmail()))
                 .collect(Collectors.toList());
     }
-
-
-    public boolean isUserMatchFiltration(User user, UserFilterDto filter) {
-        if (filter.getUsernamePattern() != null && !user.getUsername().matches(filter.getUsernamePattern())) {
-            return false;
-        }
-        if (filter.getAboutPattern() != null && !user.getAboutMe().matches(filter.getAboutPattern())) {
-            return false;
-        }
-        if (filter.getEmailPattern() != null && !user.getEmail().matches(filter.getEmailPattern())) {
-            return false;
-        }
-        if (filter.getCityPattern() != null && !user.getCity().matches(filter.getCityPattern())) {
-            return false;
-        }
-        if (filter.getPhonePattern() != null && !user.getPhone().matches(filter.getPhonePattern())) {
-            return false;
-        }
-        if (filter.getExperienceMin() != null && user.getExperience() < filter.getExperienceMin()) {
-            return false;
-        }
-        if (filter.getExperienceMax() != null && user.getExperience() > filter.getExperienceMax()) {
-            return false;
-        }
-        return true;
-    }
-
 
     public int getFollowersCount(long followeeId) {
         return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
@@ -74,7 +49,7 @@ public class SubscriptionService {
 
     public List<UserDto> getFollowing(long followerId, UserFilterDto filter) {
         return subscriptionRepository.findByFollowerId(followerId)
-                .filter(user -> isUserMatchFiltration(user, filter))
+                .filter(user -> userMatchByFilterChecker.isUserMatchFiltration(user, filter))
                 .skip((long) (filter.getPage() - 1) * filter.getPageSize())
                 .limit(filter.getPageSize())
                 .map(user -> new UserDto(user.getId(), user.getUsername(), user.getEmail()))

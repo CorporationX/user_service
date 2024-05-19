@@ -20,18 +20,16 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
-public class SubscriptionServiceTest {
+class SubscriptionServiceTest {
     @Mock
     private SubscriptionRepository subscriptionRepository;
 
     @InjectMocks
-    @Autowired
     private SubscriptionService subscriptionService;
 
     @Test
     @DisplayName("Проверка, что нельзя подписаться на пользователя, если уже на него подписан")
-    public void followUserAlreadySubscribeTest() {
+    void followUserAlreadySubscribeTest() {
 
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(10, 20)).thenReturn(true);
 
@@ -44,17 +42,17 @@ public class SubscriptionServiceTest {
 
     @Test
     @DisplayName("Проверка, что подписка на пользователя работает, в service")
-    public void followUserSuccessServiceTest() {
+    void followUserSuccessServiceTest() {
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(10, 20)).thenReturn(false);
 
         subscriptionService.followUser(10, 20);
 
-        Mockito.verify(subscriptionRepository, Mockito.times(1)).followUser(10, 20);
+        Mockito.verify(subscriptionRepository).followUser(10, 20);
     }
 
     @Test
     @DisplayName("Проверка, что метод getFollowers в service работает")
-    public void testGetFollowersPositive() {
+    void testGetFollowersPositive() {
 
         long followeeId = 1L;
         UserFilterDto filter = new UserFilterDto();
@@ -73,7 +71,7 @@ public class SubscriptionServiceTest {
 
     @Test
     @DisplayName("Проверка, что фильтрация не найдет пользователей, если ввести несуществующее имя")
-    public void testIsUserMatchUsernamePatternFiltrationFalse() {
+    void testIsUserMatchUsernamePatternFiltrationFalse() {
 
         User user = User.builder()
                 .id(1L)
@@ -83,12 +81,13 @@ public class SubscriptionServiceTest {
         UserFilterDto filter = new UserFilterDto();
         filter.setUsernamePattern("nonexistent");
 
-        assertFalse(subscriptionService.isUserMatchFiltration(user, filter));
+        UserMatchByFilterChecker checker = new UserMatchByFilterChecker();
+        assertFalse(checker.isUserMatchFiltration(user, filter));
     }
 
     @Test
     @DisplayName("Проверка, что метод getFollowersCount работает, в service")
-    public void testGetFollowersCountPositive() {
+    void testGetFollowersCountPositive() {
 
         when(subscriptionRepository.findFollowersAmountByFolloweeId(1L)).thenReturn(42);
 
@@ -98,7 +97,7 @@ public class SubscriptionServiceTest {
 
     @Test
     @DisplayName("Проверка, что метод getFollowersCount работает, в service, если передать  несуществующее ID")
-    public void testGetFollowersCountNegative() {
+    void testGetFollowersCountNegative() {
 
         when(subscriptionRepository.findFollowersAmountByFolloweeId(2L)).thenReturn(0); // Предположим, что возвращается 0 при отсутствии данных
 
@@ -108,7 +107,7 @@ public class SubscriptionServiceTest {
 
     @Test
     @DisplayName("Проверка, что метод getFollowingCount работает, в service")
-    public void testGetFollowingCountPositive() {
+    void testGetFollowingCountPositive() {
 
         when(subscriptionRepository.findFollowersAmountByFolloweeId(1L)).thenReturn(42);
 
@@ -118,13 +117,11 @@ public class SubscriptionServiceTest {
 
     @Test
     @DisplayName("Проверка, что метод getFollowingCount работает, в service, если передать  несуществующее ID")
-    public void testGetFollowingCountNegative() {
+    void testGetFollowingCountNegative() {
 
         when(subscriptionRepository.findFollowersAmountByFolloweeId(2L)).thenReturn(0); // Предположим, что возвращается 0 при отсутствии данных
 
         int FollowingCount = subscriptionService.getFollowingCount(2L);
         assertEquals(0, FollowingCount);
     }
-
-
 }

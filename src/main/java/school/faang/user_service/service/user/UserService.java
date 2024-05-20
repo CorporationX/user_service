@@ -11,6 +11,8 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -33,5 +35,17 @@ public class UserService {
     public User getById(long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new DataValidationException("Пользователь с id " + userId + " не найден"));
+    }
+
+    public UserDto getUser(long userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        return userOptional.map(userMapper::toDto).orElse(null);
+    }
+
+    public List<UserDto> getUsersByIds(List<Long> ids) {
+        List<User> users = (List<User>) userRepository.findAllById(ids);
+        return users.stream()
+                .map(userMapper::toDto)
+                .collect(Collectors.toList());
     }
 }

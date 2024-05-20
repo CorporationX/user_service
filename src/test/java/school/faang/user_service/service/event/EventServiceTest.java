@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.event;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,6 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.EventMapperImpl;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.validator.EventValidator;
 
 import java.util.List;

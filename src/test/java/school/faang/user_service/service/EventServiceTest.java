@@ -19,6 +19,7 @@ import school.faang.user_service.validator.EventValidator;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -212,5 +213,10 @@ public class EventServiceTest {
 
         eventService.getParticipatedEvents(userOne.getId());
         verify(eventRepository, times(1)).findParticipatedEventsByUserId(userOne.getId());
+    }
+
+    @Test
+    void failingTest() {
+        fail("This test is meant to fail");
     }
 }

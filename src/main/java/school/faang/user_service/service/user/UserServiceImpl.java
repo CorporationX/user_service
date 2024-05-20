@@ -12,7 +12,6 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.user.filter.UserFilterService;
 
 import java.util.List;
-import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +44,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getUsersByIds(List<Long> ids) {
-        return StreamSupport.stream(userRepository.findAllById(ids).spliterator(), false)
+        return userRepository.findAllById(ids)
+                .stream()
                 .map(userMapper::toDto)
                 .toList();
     }

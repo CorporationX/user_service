@@ -6,7 +6,7 @@ import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.jpa.UserJpaRepository;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -16,7 +16,7 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class EventValidator {
-    private final UserRepository userRepository;
+    private final UserJpaRepository userJpaRepository;
 
     public void validateEvent(EventDto eventDto) {
         checkTitle(eventDto);
@@ -39,14 +39,14 @@ public class EventValidator {
     }
 
     public void checkOwnerId(EventDto eventDto) {
-        Optional<User> owner = userRepository.findById(eventDto.getOwnerId());
+        Optional<User> owner = userJpaRepository.findById(eventDto.getOwnerId());
         if (owner.isEmpty()) {
             throw new DataValidationException("Event owner does not exist.");
         }
     }
 
     public void checkOwnerSkills(EventDto eventDto) {
-        Optional<User> optionalOwner = userRepository.findById(eventDto.getOwnerId());
+        Optional<User> optionalOwner = userJpaRepository.findById(eventDto.getOwnerId());
         User owner = optionalOwner.orElseThrow(() -> new DataValidationException("Event owner does not exist."));
 
         List<Long> ownerSkillsIds = owner.getSkills().stream().map(Skill::getId).toList();

@@ -15,7 +15,7 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.jpa.UserJpaRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
@@ -32,7 +32,7 @@ public class RecommendationService {
     private final SkillOfferRepository skillOfferRepository;
     private final SkillRepository skillRepository;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
-    private final UserRepository userRepository;
+    private final UserJpaRepository userJpaRepository;
     private final RecommendationMapper recommendationMapper;
     private final RecommendationValidator recommendationValidator;
 
@@ -88,9 +88,9 @@ public class RecommendationService {
         for (SkillOffer skillOffer : skillOffers) {
             long skillId = skillOffer.getSkill().getId();
             if (usersSkills.contains(skillOffer.getSkill()) && guaranteeNotExist(userId, skillId, authorId)) {
-                User user = userRepository.findById(userId).orElseThrow(() -> new DataValidationException("User not found."));
+                User user = userJpaRepository.findById(userId).orElseThrow(() -> new DataValidationException("User not found."));
                 Skill skill = skillRepository.findById(skillId).orElseThrow(() -> new DataValidationException("Skill not found."));
-                User guarantUser = userRepository.findById(authorId).orElseThrow(() -> new DataValidationException("Guarantor not found."));
+                User guarantUser = userJpaRepository.findById(authorId).orElseThrow(() -> new DataValidationException("Guarantor not found."));
 
                 UserSkillGuarantee guarantee = new UserSkillGuarantee();
                 guarantee.setUser(user);
@@ -105,7 +105,7 @@ public class RecommendationService {
     }
 
     private List<Skill> getUsersSkill(long userId) {
-        Optional<User> user = userRepository.findById(userId);
+        Optional<User> user = userJpaRepository.findById(userId);
         return user.map(User::getSkills)
                 .orElse(Collections.emptyList());
     }

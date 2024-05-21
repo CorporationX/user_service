@@ -31,7 +31,7 @@ public class RecommendationRequestService {
 
     @Transactional
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequest) {
-        validator.validateForCreate(recommendationRequest);
+        validator.verifyCanCreate(recommendationRequest);
 
         RecommendationRequest savedRequest = recommendationRequestRepository.save(mapper.fromDto(recommendationRequest));
         skillRequestRepository.saveAll(recommendationRequest.getSkills());
@@ -60,7 +60,7 @@ public class RecommendationRequestService {
     @Transactional
     public RecommendationRequestDto rejectRequest(Long id, RejectionDto rejection) {
         RecommendationRequest recommendationRequest = requestById(id);
-        validator.checkStatusIsPending(recommendationRequest);
+        validator.verifyStatusIsPending(recommendationRequest);
 
         recommendationRequest.setStatus(RequestStatus.REJECTED);
         recommendationRequest.setRejectionReason(rejection.getReason());

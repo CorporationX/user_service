@@ -31,7 +31,7 @@ public class RecommendationRequestValidator {
     private final RecommendationRequestRepository recommendationRequestRepository;
 
     //TODO: Подумать над общим валидатором полей
-    public void validateForCreate(RecommendationRequestDto recommendationRequest) {
+    public void verifyCanCreate(RecommendationRequestDto recommendationRequest) {
         if (recommendationRequest.getRequesterId() == null) {
             throw new DataValidationException(REQUEST_REQUESTER_ID_EMPTY.getMessage());
         }
@@ -68,7 +68,7 @@ public class RecommendationRequestValidator {
         }
     }
 
-    public void checkStatusIsPending(RecommendationRequest recommendationRequest) {
+    public void verifyStatusIsPending(RecommendationRequest recommendationRequest) {
         if (recommendationRequest.getStatus() != RequestStatus.PENDING) {
             throw new RecommendationRequestRejectionException(REJECT_REQUEST_STATUS_NOT_VALID.getMessage());
         }

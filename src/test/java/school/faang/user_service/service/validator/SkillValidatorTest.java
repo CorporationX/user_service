@@ -7,7 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.SkillDto;
+import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.service.SkillService;

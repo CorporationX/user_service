@@ -3,7 +3,7 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.SkillCandidateDto;
-import school.faang.user_service.dto.SkillDto;
+import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.mapper.SkillCandidateMapper;

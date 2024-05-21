@@ -60,12 +60,13 @@ public class PremiumService {
 
         Premium premium = acqiurePremium(userId, premiumPeriod);
 
-        PremiumBoughtEvent premiumBoughtEvent = PremiumBoughtEvent.builder().userId(userId).
-                amount(paymentRequest.amount()).currency(paymentRequest.currency()).days(premiumPeriod.getDays())
-                .build();
-
-        premiumBoughtEventPublisher.publish(premiumBoughtEvent);
-
+        premiumBoughtEventPublisher.publish(
+                PremiumBoughtEvent.builder()
+                        .userId(userId)
+                        .amount(paymentRequest.amount())
+                        .currency(paymentRequest.currency())
+                        .days(premiumPeriod.getDays())
+                        .build());
         return premiumMapper.toDto(premium);
     }
 

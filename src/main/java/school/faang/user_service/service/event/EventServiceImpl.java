@@ -91,4 +91,10 @@ public class EventServiceImpl implements EventService {
         Event saved = eventRepository.save(eventEntity);
         return mapper.toDto(saved);
     }
+
+    @Override
+    @Transactional
+    public void deleteAll(List<Event> events) {
+        eventRepository.deleteAll(events);
+    }
 }

@@ -10,6 +10,10 @@ import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.user.filter.UserFilterService;
+import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.service.event.EventService;
+import school.faang.user_service.service.goal.GoalService;
+import school.faang.user_service.service.user.mentorship.MentorshipService;
 
 import java.util.List;
 
@@ -20,6 +24,9 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserFilterService userFilterService;
     private final UserMapper userMapper;
+    private final GoalService goalService;
+    private final EventService eventService;
+    private final MentorshipService mentorshipService;
 
     @Override
     @Transactional
@@ -33,5 +40,26 @@ public class UserServiceImpl implements UserService {
         return userFilterService.applyFilters(userRepository.findPremiumUsers(), filterDto)
                 .map(userMapper::toDto)
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public void deactivateUserById(Long id) {
+        User user = findUserById(id);
+        List<Goal> userGoals = user.getGoals();
+
+        userGoals.forEach(goal -> {
+            List<User> goalUsers = goal.getUsers();
+            goalUsers.remove(user);
+            if (goalUsers.isEmpty()) {
+                goalService.delete(goal);
+            }
+        });
+
+        eventService.deleteAll(user.getOwnedEvents());
+        mentorshipService.deleteMentorFromMentee(user);
+
+        user.setActive(false);
+        userRepository.save(user);
     }
 }

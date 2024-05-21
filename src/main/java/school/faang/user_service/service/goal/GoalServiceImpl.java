@@ -138,4 +138,10 @@ public class GoalServiceImpl implements GoalService {
             }
         }
     }
+
+    @Override
+    @Transactional
+    public void delete(Goal goal) {
+        goalRepository.delete(goal);
+    }
 }

@@ -1,6 +1,7 @@
 package school.faang.user_service.controller.user;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
@@ -33,5 +34,11 @@ public class UserController {
     public UserDto getUserById(@PathVariable long userId) {
         User user = userService.findUserById(userId);
         return userMapper.toDto(user);
+    }
+
+    @Operation(summary = "Deactivate user")
+    @PostMapping("deactivation/{id}")
+    public void deactivateUser(@Parameter @PathVariable Long id) {
+        userService.deactivateUserById(id);
     }
 }

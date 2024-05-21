@@ -11,22 +11,23 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/skills")
 public class SkillController {
     private final SkillService skillService;
     private final SkillValidator validator;
 
-    @PostMapping("/createSkill")
+    @PostMapping("/create")
     public SkillDto create(@RequestBody SkillDto skillDto) {
         validator.validateSkill(skillDto.getTitle());
         return skillService.create(skillDto);
     }
 
-    @GetMapping("/getUserSkills/{userId}")
+    @GetMapping("/userSkills/{userId}")
     public List<SkillDto> getUserSkills(@PathVariable long userId) {
         return skillService.getUserSkills(userId);
     }
 
-    @GetMapping("/getOfferedSkills/{userId}")
+    @GetMapping("/offeredSkills/{userId}")
     public List<SkillCandidateDto> getOfferedSkills(@PathVariable long userId) {
         return skillService.getOfferedSkills(userId);
     }

@@ -1,55 +1,18 @@
-package school.faang.user_service.service.user;
+package school.faang.user_service.service.user.image;
 
-import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
-import school.faang.user_service.exception.DataValidationException;
+import lombok.Getter;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.List;
 
-import static school.faang.user_service.exception.ExceptionMessage.FILE_PROCESSING_EXCEPTION;
-import static school.faang.user_service.exception.ExceptionMessage.PICTURE_TYPE_EXCEPTION;
-
-@Component
-public class ImageProcessor {
+@Getter
+public class BufferedPicHolder {
     private static final int BIG_PIC_MAX_DIM = 1080;
     private static final int SMALL_PIC_MAX_DIM = 170;
+    private BufferedImage bigPic;
+    private BufferedImage smallPic;
 
-    public BufferedImage getBufferedImage(MultipartFile pic) {
-        BufferedImage bufferedImage;
-        try {
-            bufferedImage = ImageIO.read(pic.getInputStream());
-        } catch (IOException e) {
-            throw new RuntimeException(FILE_PROCESSING_EXCEPTION.getMessage() + e.getMessage());
-        }
-
-        if (bufferedImage == null) {
-            throw new DataValidationException(PICTURE_TYPE_EXCEPTION.getMessage());
-        }
-
-        return bufferedImage;
-    }
-
-    /**
-     * @param image original image
-     * @return the image as ByteArrayOutputStream with in jpeg format
-     */
-    public ByteArrayOutputStream getImageOS(Image image) {
-        try (ByteArrayOutputStream bigPicOS = new ByteArrayOutputStream()) {
-            ImageIO.write((RenderedImage) image, "jpeg", bigPicOS);
-
-            return bigPicOS;
-        } catch (IOException e) {
-            throw new RuntimeException(FILE_PROCESSING_EXCEPTION.getMessage() + e.getMessage());
-        }
-    }
-
-    public List<BufferedImage> scaleImage(BufferedImage originalPic) {
+    public BufferedPicHolder(BufferedImage originalPic) {
         int originalWidth = originalPic.getWidth();
         int originalHeight = originalPic.getHeight();
         float originalRatio;
@@ -82,7 +45,8 @@ public class ImageProcessor {
         BufferedImage bufferedBigPic = getScaledImage(originalPic, bigPicWidth, bigPicHeight);
         BufferedImage bufferedSmallPic = getScaledImage(originalPic, smallPicWidth, smallPicHeight);
 
-        return List.of(bufferedBigPic, bufferedSmallPic);
+        bigPic = bufferedBigPic;
+        smallPic = bufferedSmallPic;
     }
 
     private BufferedImage getScaledImage(BufferedImage originalPic, int bigPicWidth, int bigPicHeight) {
@@ -94,4 +58,3 @@ public class ImageProcessor {
         return bufferedBigPic;
     }
 }
-

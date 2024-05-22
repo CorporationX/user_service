@@ -14,23 +14,23 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.user.ImageProcessor;
 import school.faang.user_service.service.user.UserService;
+import school.faang.user_service.service.user.image.ImageProcessor;
 
-import static school.faang.user_service.exception.ExceptionMessage.TOO_LARGE_FILE_EXCEPTION;
+import static school.faang.user_service.exception.ExceptionMessage.FILE_SIZE_EXCEPTION;
 
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
-    private static final double MAX_SIZE = 5_242_880L;
+    private static final double MAX_AVATAR_SIZE = 5_242_880L;
     private final UserService userService;
     private final ImageProcessor imageProcessor;
 
     @PutMapping("/{userId}/pic")
     public UserDto uploadUserPic(@PathVariable Long userId, MultipartFile file) {
-        if (file.getSize() > MAX_SIZE) {
-            throw new DataValidationException(TOO_LARGE_FILE_EXCEPTION.getMessage());
+        if (file.getSize() > MAX_AVATAR_SIZE) {
+            throw new DataValidationException(FILE_SIZE_EXCEPTION.getMessage());
         }
 
         return userService.uploadUserPic(userId, imageProcessor.getBufferedImage(file));

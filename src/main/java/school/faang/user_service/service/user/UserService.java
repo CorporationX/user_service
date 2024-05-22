@@ -9,13 +9,14 @@ import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DataGettingException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.S3Service;
+import school.faang.user_service.service.amazonS3.S3Service;
+import school.faang.user_service.service.user.image.BufferedPicHolder;
+import school.faang.user_service.service.user.image.ImageProcessor;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 import static school.faang.user_service.exception.ExceptionMessage.FILE_PROCESSING_EXCEPTION;
 import static school.faang.user_service.exception.ExceptionMessage.NO_SUCH_USER_EXCEPTION;
@@ -35,10 +36,10 @@ public class UserService {
     public UserDto uploadUserPic(Long userId, BufferedImage uploadedImage) {
         User user = getUser(userId);
 
-        List<BufferedImage> scaledImages = imageProcessor.scaleImage(uploadedImage);
+        BufferedPicHolder scaledImages = imageProcessor.scaleImage(uploadedImage);
 
-        String fileId = getFileId(userId, imageProcessor.getImageOS(scaledImages.get(0)), BIG_PIC_NAME);
-        String smallFileId = getFileId(userId, imageProcessor.getImageOS(scaledImages.get(1)), SMALL_PIC_NAME);
+        String fileId = getFileId(userId, imageProcessor.getImageOS(scaledImages.getBigPic()), BIG_PIC_NAME);
+        String smallFileId = getFileId(userId, imageProcessor.getImageOS(scaledImages.getSmallPic()), SMALL_PIC_NAME);
 
         user.setUserProfilePic(UserProfilePic.builder()
                 .fileId(fileId)

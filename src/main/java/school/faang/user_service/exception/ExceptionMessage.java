@@ -12,7 +12,7 @@ public enum ExceptionMessage {
     USER_FOLLOWING_HIMSELF_EXCEPTION("The user cannot follow himself."),
     USER_UNFOLLOWING_HIMSELF_EXCEPTION("The user cannot unfollow himself."),
     REPEATED_SUBSCRIPTION_EXCEPTION("The user cannot follow another user twice."),
-    TOO_LARGE_FILE_EXCEPTION("The uploaded file can have a maximum size of no more than 5 MB."),
+    FILE_SIZE_EXCEPTION("The uploaded file can have a maximum size of no more than 5 MB."),
     PICTURE_TYPE_EXCEPTION("Only image could be uploaded as user picture."),
     FILE_PROCESSING_EXCEPTION("During file processing was caught exception: ");
 

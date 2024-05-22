@@ -31,6 +31,9 @@ public class RedisConfig{
 
     @Value("${spring.data.redis.channels.profile_search_channel.name}")
     private String userProfileSearchTopic;
+    @Value("${spring.data.redis.channels.premium_bought_channel.name}")
+    private String premiumBoughtTopic;
+
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {

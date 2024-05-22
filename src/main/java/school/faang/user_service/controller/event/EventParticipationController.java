@@ -15,23 +15,22 @@ public class EventParticipationController {
     private final EventParticipationService eventParticipationService;
 
     @PostMapping("/register")
-    public UserDto registerParticipant(long eventId, long userId) {
+    public UserDto registerParticipant(Long eventId, Long userId) {
         return eventParticipationService.registerParticipant(eventId, userId);
     }
 
     @DeleteMapping("/unregister")
-    public void unregisterParticipant(long eventId, long userId) {
+    public void unregisterParticipant(Long eventId, Long userId) {
         eventParticipationService.unregisterParticipant(eventId, userId);
     }
 
     @GetMapping("/{eventId}/participants")
-    public List<UserDto> getParticipants(long eventId) {
+    public List<UserDto> getParticipants(Long eventId) {
         return eventParticipationService.getParticipants(eventId);
     }
 
     @GetMapping("/events/{eventId}/participants/count")
-    public int getParticipantsCount(long eventId) {
+    public int getParticipantsCount(Long eventId) {
         return eventParticipationService.getParticipantsCount(eventId);
     }
 }
-

@@ -101,16 +101,13 @@ public class EventParticipationServiceTest {
 
     @Test
     void testGetParticipantsCount() {
-        // Arrange
         long eventId = 1L;
         int expectedCount = 5;
 
         when(eventParticipationRepository.countParticipants(eventId)).thenReturn(expectedCount);
 
-        // Act
         int actualCount = eventParticipationService.getParticipantsCount(eventId);
 
-        // Assert
         assertEquals(expectedCount, actualCount);
         verify(eventParticipationRepository).countParticipants(eventId);
     }

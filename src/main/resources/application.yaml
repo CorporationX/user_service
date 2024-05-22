@@ -27,6 +27,9 @@ spring:
         profile_view_channel:
           name: profile_view_channel
 
+  profiles:
+    active: test
+
 server:
   port: 8080
 

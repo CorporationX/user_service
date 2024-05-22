@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
@@ -23,8 +24,13 @@ class UserMapperTest {
         user.setUsername("nadir");
         user.setAboutMe("About nadir");
         user.setEmail("nadir@gmail.com");
+        user.setPassword("12345678");
+        user.setActive(true);
+        var country = new Country();
+        country.setId(1L);
+        user.setCountry(country);
 
-        userDto = new UserDto(1L, "nadir", "nadir@gmail.com");
+        userDto = new UserDto(1L, "nadir", "12345678", "nadir@gmail.com", true, 1L);
     }
 
     @DisplayName("should map user to userDto")

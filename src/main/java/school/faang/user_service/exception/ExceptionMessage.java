@@ -11,7 +11,10 @@ public enum ExceptionMessage {
     NO_SUCH_EVENT_EXCEPTION("Database doesn't contains event with such id."),
     USER_FOLLOWING_HIMSELF_EXCEPTION("The user cannot follow himself."),
     USER_UNFOLLOWING_HIMSELF_EXCEPTION("The user cannot unfollow himself."),
-    REPEATED_SUBSCRIPTION_EXCEPTION("The user cannot follow another user twice.");
+    REPEATED_SUBSCRIPTION_EXCEPTION("The user cannot follow another user twice."),
+    TOO_LARGE_FILE_EXCEPTION("The uploaded file can have a maximum size of no more than 5 MB."),
+    PICTURE_TYPE_EXCEPTION("Only image could be uploaded as user picture."),
+    FILE_PROCESSING_EXCEPTION("During file processing was caught exception: ");
 
     private final String message;
 

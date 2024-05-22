@@ -2,10 +2,10 @@ package school.faang.user_service.service;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.error.DataValidationException;
 import school.faang.user_service.repository.SubscriptionRepository;
 
@@ -18,7 +18,7 @@ public class SubscriptionService {
 
     private final SubscriptionRepository subscriptionRepository;
 
-    private UserMatchByFilterChecker userMatchByFilterChecker;
+    private final UserMatchByFilterChecker userMatchByFilterChecker;
 
     public void followUser(long followerId, long followeeId) {
         if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {

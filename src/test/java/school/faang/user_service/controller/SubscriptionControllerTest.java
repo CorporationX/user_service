@@ -11,11 +11,12 @@ import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.error.DataValidationException;
 import school.faang.user_service.service.SubscriptionService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -58,41 +59,7 @@ class SubscriptionControllerTest {
         verify(subscriptionService).unfollowUser(10, 20);
     }
 
-    @Test
-    @DisplayName("Проверка, что выводится список подписчиков")
-    void testGetFollowers() {
 
-        long followeeId = 1L;
-        UserFilterDto filter = new UserFilterDto();
-
-        List<UserDto> fakeFollowers = new ArrayList<>();
-        fakeFollowers.add(new UserDto(1L, "Ivan", "ivan@test.com"));
-
-        when(subscriptionService.getFollowers(followeeId, filter)).thenReturn(fakeFollowers);
-
-        List<UserDto> result = subscriptionService.getFollowers(followeeId, filter);
-
-        verify(subscriptionService).getFollowers(followeeId, filter);
-
-        assertEquals(fakeFollowers, result);
-    }
-
-    @Test
-    @DisplayName("Проверка, что с список подписчиков не выводится, если ввести неправильный followeeId")
-    void testGetFollowersWithInvalidInput() {
-
-        long followeeId = -1L;
-        UserFilterDto filter = new UserFilterDto();
-
-
-        when(subscriptionService.getFollowers(followeeId, filter)).thenThrow(new IllegalArgumentException("Неверный followeeId"));
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            subscriptionService.getFollowers(followeeId, filter);
-        });
-
-        verify(subscriptionService).getFollowers(followeeId, filter);
-    }
 
     @Test
     @DisplayName("Проверка, что метод getFollowersCount работает, в controller")
@@ -111,5 +78,45 @@ class SubscriptionControllerTest {
 
         int followingCount = subscriptionController.getFollowingCount(1L);
         assertEquals(42, followingCount);
+    }
+
+    @Test
+    void testGetFollowers() {
+
+        when(subscriptionService.getFollowers(anyLong(), any(UserFilterDto.class)))
+                .thenReturn(List.of(new UserDto(1L, "user1", "user1@example.com")));
+
+        SubscriptionController subscriptionController = new SubscriptionController(subscriptionService);
+
+        UserFilterDto filter = new UserFilterDto();
+        filter.setPage(1);
+        filter.setPageSize(10);
+        List<UserDto> result = subscriptionController.getFollowers(456L, filter);
+
+        assertEquals(1, result.size());
+        assertEquals("user1", result.get(0).getUsername());
+        assertEquals("user1@example.com", result.get(0).getEmail());
+
+        verify(subscriptionService).getFollowers(456L, filter);
+    }
+
+    @Test
+    void testGetFollowing() {
+
+        when(subscriptionService.getFollowing(anyLong(), any(UserFilterDto.class)))
+                .thenReturn(List.of(new UserDto(1L, "user1", "user1@example.com")));
+
+        SubscriptionController subscriptionController = new SubscriptionController(subscriptionService);
+
+        UserFilterDto filter = new UserFilterDto();
+        filter.setPage(1);
+        filter.setPageSize(10);
+        List<UserDto> result = subscriptionController.getFollowing(123L, filter);
+
+        assertEquals(1, result.size());
+        assertEquals("user1", result.get(0).getUsername());
+        assertEquals("user1@example.com", result.get(0).getEmail());
+
+        verify(subscriptionService).getFollowing(123L, filter);
     }
 }

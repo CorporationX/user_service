@@ -17,6 +17,7 @@ public class UserService {
     private final UserMapper userMapper;
 
     public UserDto getUser(long userId) {
-        return userMapper.toDto(userRepository.findById(userId).orElseThrow(() -> new DataValidationException(NO_USER_IN_DB.getMessage())));
+        return userMapper.toDto(userRepository.findById(userId).orElseThrow(()
+                -> new DataValidationException(NO_USER_IN_DB.getMessage())));
     }
 }

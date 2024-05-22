@@ -36,13 +36,12 @@ public class InvitedNamePatternFilterTest {
 
     @Test
     void testApplyWithGoalInvitation() {
-        assertEquals(1, invitedNamePatternFilter.apply(testData.prepareGoalInvitationList().stream(),
+        assertEquals(1, invitedNamePatternFilter.apply(testData.prepareGoalInvitationList().get(1),
                 invitationFilterDto).toList().size());
     }
 
     @Test
     void testApplyWithoutGoalInvitation() {
-        invitationFilterDto.setInvitedNamePattern("Kelly");
-        assertEquals(0, invitedNamePatternFilter.apply(testData.prepareGoalInvitationList().stream(), invitationFilterDto).toList().size());
+        assertEquals(0, invitedNamePatternFilter.apply(testData.prepareGoalInvitationList().get(0), invitationFilterDto).toList().size());
     }
 }

@@ -37,13 +37,13 @@ public class RequestStatusFilterTest {
 
     @Test
     void testApplyWithGoalInvitation() {
-        assertEquals(2, requestStatusFilter.apply(testData.prepareGoalInvitationList().stream(),
+        assertEquals(1, requestStatusFilter.apply(testData.prepareGoalInvitationList().get(1),
                 invitationFilterDto).toList().size());
     }
 
     @Test
     void testApplyWithoutGoalInvitation() {
         invitationFilterDto.setStatus(RequestStatus.PENDING);
-        assertEquals(0, requestStatusFilter.apply(testData.prepareGoalInvitationList().stream(), invitationFilterDto).toList().size());
+        assertEquals(0, requestStatusFilter.apply(testData.prepareGoalInvitationList().get(0), invitationFilterDto).toList().size());
     }
 }

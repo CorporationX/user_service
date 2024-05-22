@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -15,8 +16,7 @@ import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.filter.InvitationFilter;
-import school.faang.user_service.service.filter.TestData;
+import school.faang.user_service.service.filter.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -42,11 +42,21 @@ public class GoalInvitationServiceTest {
     private UserRepository userRepository;
     @Mock
     private GoalInvitationServiceValidator goalInvitationServiceValidator;
-    @Mock
-    List<InvitationFilter> invitationFilters;
     @Captor
     private ArgumentCaptor<GoalInvitation> captor;
+
     private final TestData testData = new TestData();
+
+    @BeforeEach
+    void init() {
+        InviterIdFilter inviterIdFilter = Mockito.spy(InviterIdFilter.class);
+        InvitedNamePatternFilter invitedNamePatternFilter = Mockito.spy(InvitedNamePatternFilter.class);
+        InvitedIdFilter invitedIdFilter = Mockito.spy(InvitedIdFilter.class);
+        InviterNamePatternFilter inviterNamePatternFilter = Mockito.spy(InviterNamePatternFilter.class);
+        RequestStatusFilter requestStatusFilter = Mockito.spy(RequestStatusFilter.class);
+        List<InvitationFilter> filters = List.of(inviterIdFilter, invitedIdFilter, inviterNamePatternFilter, invitedNamePatternFilter, requestStatusFilter);
+        goalInvitationService.setInvitationFilters(filters);
+    }
 
     @Test
     void testForCreateInvitationWhenThereIsNoInviterInDB() {
@@ -55,7 +65,8 @@ public class GoalInvitationServiceTest {
 
         when(userRepository.findById(goalInvitationDto.getInviterId())).thenReturn(Optional.empty());
 
-        DataValidationException exception = assertThrows(DataValidationException.class, () -> goalInvitationService.createInvitation(goalInvitationDto));
+        DataValidationException exception = assertThrows(DataValidationException.class,
+                () -> goalInvitationService.createInvitation(goalInvitationDto));
 
         assertEquals(NO_INVITER_IN_DB.getMessage(), exception.getMessage());
     }
@@ -68,7 +79,8 @@ public class GoalInvitationServiceTest {
         when(userRepository.findById(goalInvitationDto.getInviterId())).thenReturn(Optional.of(new User()));
         when(userRepository.findById(goalInvitationDto.getInvitedUserId())).thenReturn(Optional.empty());
 
-        DataValidationException exception = assertThrows(DataValidationException.class, () -> goalInvitationService.createInvitation(goalInvitationDto));
+        DataValidationException exception = assertThrows(DataValidationException.class,
+                () -> goalInvitationService.createInvitation(goalInvitationDto));
 
         assertEquals(NO_INVITED_IN_DB.getMessage(), exception.getMessage());
     }
@@ -82,7 +94,8 @@ public class GoalInvitationServiceTest {
         when(userRepository.findById(goalInvitationDto.getInvitedUserId())).thenReturn(Optional.of(new User()));
         when(goalRepository.findById(goalInvitationDto.getGoalId())).thenReturn(Optional.empty());
 
-        DataValidationException exception = assertThrows(DataValidationException.class, () -> goalInvitationService.createInvitation(goalInvitationDto));
+        DataValidationException exception = assertThrows(DataValidationException.class,
+                () -> goalInvitationService.createInvitation(goalInvitationDto));
 
         assertEquals(NO_GOAL_IN_DB.getMessage(), exception.getMessage());
     }
@@ -200,7 +213,7 @@ public class GoalInvitationServiceTest {
 
         when(goalInvitationRepository.findAll()).thenReturn(goalInvitations);
 
-        assertEquals(goalInvitations.size(),3);
-        assertEquals(goalInvitationService.getInvitations(invitationFilterDto).size(), 1);
+        assertEquals(goalInvitations.size(), 3);
+        assertEquals(goalInvitationService.getInvitations(invitationFilterDto).size(), 2);
     }
 }

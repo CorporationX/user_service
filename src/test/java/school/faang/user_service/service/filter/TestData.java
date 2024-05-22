@@ -32,14 +32,14 @@ public class TestData {
         GoalInvitation secondGoalInvitation = new GoalInvitation();
 
         User secondInvited = new User();
-        secondInvited.setUsername("Jessica");
-        secondInvited.setId(22L);
+        secondInvited.setUsername("Mike");
+        secondInvited.setId(2L);
 
         User secondInviter = new User();
-        secondInviter.setId(11L);
-        secondInviter.setUsername("Kate");
+        secondInviter.setId(1L);
+        secondInviter.setUsername("John");
 
-        secondGoalInvitation.setStatus(RequestStatus.REJECTED);
+        secondGoalInvitation.setStatus(RequestStatus.ACCEPTED);
         secondGoalInvitation.setInvited(secondInvited);
         secondGoalInvitation.setInviter(secondInviter);
 
@@ -51,7 +51,7 @@ public class TestData {
 
         User thirdInvited = new User();
         thirdInvited.setId(44L);
-        thirdInvited.setUsername("Kate");
+        thirdInvited.setUsername("Mike");
 
         thirdGoalInvitation.setStatus(RequestStatus.ACCEPTED);
         thirdGoalInvitation.setInvited(thirdInviter);

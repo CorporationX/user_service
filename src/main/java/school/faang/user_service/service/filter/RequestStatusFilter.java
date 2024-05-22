@@ -5,6 +5,7 @@ import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.goal.GoalInvitation;
 
 import java.util.stream.Stream;
+
 @Component
 public class RequestStatusFilter implements InvitationFilter {
     @Override
@@ -13,7 +14,7 @@ public class RequestStatusFilter implements InvitationFilter {
     }
 
     @Override
-    public Stream<GoalInvitation> apply(Stream<GoalInvitation> invitations, InvitationFilterDto filters) {
-        return invitations.filter(invitation -> invitation.getStatus().equals(filters.getStatus()));
+    public Stream<GoalInvitation> apply(GoalInvitation invitation, InvitationFilterDto filters) {
+        return Stream.of(invitation).filter(goalInvitation -> goalInvitation.getStatus() == filters.getStatus());
     }
 }

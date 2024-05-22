@@ -14,7 +14,7 @@ import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.filter.*;
+import school.faang.user_service.service.filter.InvitationFilter;
 
 import java.util.List;
 
@@ -30,19 +30,21 @@ public class GoalInvitationService {
     private UserRepository userRepository;
     private GoalInvitationMapper goalInvitationMapper;
     private GoalInvitationServiceValidator goalInvitationServiceValidator;
+    private List<InvitationFilter> invitationFilters;
     static final int SETGOAL_SIZE = 3;
+
 
     public GoalInvitationDto createInvitation(GoalInvitationDto goalInvitationDto) {
         goalInvitationServiceValidator.validateForCreateInvitation(goalInvitationDto);
 
         GoalInvitation goalInvitation = goalInvitationMapper.toEntity(goalInvitationDto);
 
-        goalInvitation.setInviter(userRepository.findById(goalInvitationDto.getInviterId()).
-                orElseThrow(() -> new DataValidationException(NO_INVITER_IN_DB.getMessage())));
-        goalInvitation.setInvited(userRepository.findById(goalInvitationDto.getInvitedUserId()).
-                orElseThrow(() -> new DataValidationException(NO_INVITED_IN_DB.getMessage())));
-        goalInvitation.setGoal(goalRepository.findById(goalInvitationDto.getGoalId()).
-                orElseThrow(() -> new DataValidationException(NO_GOAL_IN_DB.getMessage())));
+        goalInvitation.setInviter(userRepository.findById(goalInvitationDto.getInviterId())
+                .orElseThrow(() -> new DataValidationException(NO_INVITER_IN_DB.getMessage())));
+        goalInvitation.setInvited(userRepository.findById(goalInvitationDto.getInvitedUserId())
+                .orElseThrow(() -> new DataValidationException(NO_INVITED_IN_DB.getMessage())));
+        goalInvitation.setGoal(goalRepository.findById(goalInvitationDto.getGoalId())
+                .orElseThrow(() -> new DataValidationException(NO_GOAL_IN_DB.getMessage())));
 
         goalInvitationRepository.save(goalInvitation);
         return goalInvitationMapper.toDto(goalInvitation);
@@ -68,8 +70,8 @@ public class GoalInvitationService {
     }
 
     public void rejectGoalInvitation(long id) {
-        GoalInvitation goalInvitation = goalInvitationRepository.findById(id).
-                orElseThrow(() -> new DataValidationException(NO_GOAL_INVITATION_IN_DB.getMessage()));
+        GoalInvitation goalInvitation = goalInvitationRepository.findById(id)
+                .orElseThrow(() -> new DataValidationException(NO_GOAL_INVITATION_IN_DB.getMessage()));
 
         goalRepository.findById(goalInvitation.getGoal().getId()).orElseThrow(() ->
                 new DataValidationException(NO_GOAL_IN_DB.getMessage()));
@@ -79,20 +81,18 @@ public class GoalInvitationService {
     }
 
     public List<GoalInvitationDto> getInvitations(InvitationFilterDto filters) {
-        List<InvitationFilter> invitationFilters = List.of(
-                new InviterIdFilter(),
-                new InviterIdFilter(),
-                new InvitedNamePatternFilter(),
-                new InviterNamePatternFilter(),
-                new RequestStatusFilter()
-        );
-        goalInvitationServiceValidator.validateForGetInvitations(filters);
 
-        return invitationFilters.stream().
-                filter(filter -> filter.isApplicable(filters)).
-                flatMap(filter -> filter.apply(goalInvitationRepository.findAll().stream(), filters)).
-                distinct().
-                map(goalInvitationMapper::toDto).
-                toList();
+        goalInvitationServiceValidator.validateForGetInvitations(filters);
+        List<GoalInvitation> goalInvitations = goalInvitationRepository.findAll();
+
+        return goalInvitations
+                .stream()
+                .filter(goalInvitation -> invitationFilters
+                        .stream()
+                        .filter(filter -> filter.isApplicable(filters))
+                        .flatMap(filter -> filter.apply(goalInvitation, filters))
+                        .toList().size() == invitationFilters.size())
+                .map(goalInvitation -> goalInvitationMapper.toDto(goalInvitation))
+                .toList();
     }
 }

@@ -1,5 +1,6 @@
 package school.faang.user_service.service.user.image;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.exception.DataValidationException;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import static school.faang.user_service.exception.ExceptionMessage.FILE_PROCESSING_EXCEPTION;
 import static school.faang.user_service.exception.ExceptionMessage.PICTURE_TYPE_EXCEPTION;
 
+@Slf4j
 @Component
 public class ImageProcessor {
     public static final String FORMAT_NAME = "jpeg";
@@ -23,10 +25,12 @@ public class ImageProcessor {
         try {
             bufferedImage = ImageIO.read(pic.getInputStream());
         } catch (IOException e) {
+            log.error(FILE_PROCESSING_EXCEPTION.getMessage() + e.getMessage());
             throw new RuntimeException(FILE_PROCESSING_EXCEPTION.getMessage() + e.getMessage());
         }
 
         if (bufferedImage == null) {
+            log.error(PICTURE_TYPE_EXCEPTION.getMessage() + "Received file: " + pic.getOriginalFilename());
             throw new DataValidationException(PICTURE_TYPE_EXCEPTION.getMessage());
         }
 
@@ -43,6 +47,7 @@ public class ImageProcessor {
 
             return bigPicOS;
         } catch (IOException e) {
+            log.error(FILE_PROCESSING_EXCEPTION.getMessage() + e.getMessage());
             throw new RuntimeException(FILE_PROCESSING_EXCEPTION.getMessage() + e.getMessage());
         }
     }

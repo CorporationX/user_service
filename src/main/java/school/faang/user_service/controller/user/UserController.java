@@ -1,6 +1,7 @@
 package school.faang.user_service.controller.user;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,6 +20,7 @@ import school.faang.user_service.service.user.image.ImageProcessor;
 
 import static school.faang.user_service.exception.ExceptionMessage.FILE_SIZE_EXCEPTION;
 
+@Slf4j
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -30,14 +32,18 @@ public class UserController {
     @PutMapping("/{userId}/pic")
     public UserDto uploadUserPic(@PathVariable Long userId, MultipartFile file) {
         if (file.getSize() > MAX_AVATAR_SIZE) {
+            log.error(FILE_SIZE_EXCEPTION.getMessage() + "(userId = " + userId + ")");
             throw new DataValidationException(FILE_SIZE_EXCEPTION.getMessage());
         }
 
+        log.info("Uploading avatar for user with id = " + userId);
         return userService.uploadUserPic(userId, imageProcessor.getBufferedImage(file));
     }
 
     @GetMapping("/{userId}/pic")
     public ResponseEntity<byte[]> downloadUserPic(@PathVariable Long userId) {
+        log.info("Downloading avatar for user with id = " + userId);
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);
         return new ResponseEntity<>(userService.downloadUserPic(userId), headers, HttpStatus.OK);
@@ -45,6 +51,8 @@ public class UserController {
 
     @DeleteMapping("/{userId}/pic")
     public void deleteUserPic(@PathVariable Long userId) {
+        log.info("Deleting avatar for user with id = " + userId);
+
         userService.deleteUserPic(userId);
     }
 }

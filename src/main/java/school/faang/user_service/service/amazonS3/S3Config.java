@@ -8,10 +8,12 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import jakarta.annotation.PostConstruct;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @ConfigurationProperties(prefix = "services.s3")
 @ConfigurationPropertiesScan
@@ -35,5 +37,7 @@ class S3Config {
                 )
                 .withPathStyleAccessEnabled(true)
                 .build();
+
+        log.info("Connected to AmazonS3 system.");
     }
 }

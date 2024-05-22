@@ -1,6 +1,7 @@
 package school.faang.user_service.service.user;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
@@ -21,6 +22,7 @@ import java.io.InputStream;
 import static school.faang.user_service.exception.ExceptionMessage.FILE_PROCESSING_EXCEPTION;
 import static school.faang.user_service.exception.ExceptionMessage.NO_SUCH_USER_EXCEPTION;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class UserService {
@@ -37,41 +39,58 @@ public class UserService {
         User user = getUser(userId);
 
         BufferedPicHolder scaledImages = imageProcessor.scaleImage(uploadedImage);
+        log.info("Received avatar image was successfully scaled.");
 
-        String fileId = getFileId(userId, imageProcessor.getImageOS(scaledImages.getBigPic()), BIG_PIC_NAME);
-        String smallFileId = getFileId(userId, imageProcessor.getImageOS(scaledImages.getSmallPic()), SMALL_PIC_NAME);
+        String fileId = uploadFile(userId, imageProcessor.getImageOS(scaledImages.getBigPic()), BIG_PIC_NAME);
+        String smallFileId = uploadFile(userId, imageProcessor.getImageOS(scaledImages.getSmallPic()), SMALL_PIC_NAME);
+
+        log.info("Scaled images of user avatar were uploaded on cloud.");
 
         user.setUserProfilePic(UserProfilePic.builder()
                 .fileId(fileId)
                 .smallFileId(smallFileId)
                 .build());
 
-        return userMapper.toDto(userRepository.save(user));
+        User updatedUser = userRepository.save(user);
+
+        log.info("Keys of uploaded images were saved in database.");
+        return userMapper.toDto(updatedUser);
     }
 
+    @Transactional
     public byte[] downloadUserPic(Long userId) {
         User user = getUser(userId);
 
         try (InputStream userPicIS = s3Service.downloadFile(user.getUserProfilePic().getFileId())) {
-            return userPicIS.readAllBytes();
+            byte[] imageInBytesArray = userPicIS.readAllBytes();
+
+            log.info("User's avatar image was downloaded successfully.");
+            return imageInBytesArray;
 
         } catch (IOException e) {
+            log.error(FILE_PROCESSING_EXCEPTION.getMessage() + e.getMessage());
             throw new RuntimeException(FILE_PROCESSING_EXCEPTION.getMessage() + e.getMessage());
         }
     }
 
+    @Transactional
     public void deleteUserPic(Long userId) {
         User user = getUser(userId);
         s3Service.deleteFile(user.getUserProfilePic().getFileId());
         s3Service.deleteFile(user.getUserProfilePic().getSmallFileId());
+
+        log.info("User's avatar images were deleted successfully.");
     }
 
     private User getUser(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new DataGettingException(NO_SUCH_USER_EXCEPTION.getMessage()));
+                .orElseThrow(() -> {
+                    log.error(NO_SUCH_USER_EXCEPTION.getMessage() + "UserId = " + userId);
+                    return new DataGettingException(NO_SUCH_USER_EXCEPTION.getMessage());
+                });
     }
 
-    private String getFileId(Long userId, ByteArrayOutputStream outputStream, String fileName) {
+    private String uploadFile(Long userId, ByteArrayOutputStream outputStream, String fileName) {
         String key = String.format("%s/%d%s", FOLDER_PREFIX + userId, System.currentTimeMillis(), fileName);
         s3Service.uploadFile(outputStream, key);
         return key;

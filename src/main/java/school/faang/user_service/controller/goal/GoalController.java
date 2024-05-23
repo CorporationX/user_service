@@ -17,8 +17,8 @@ public class GoalController {
     private final GoalService goalService;
     private final GoalValidator goalValidator;
 
-    @PostMapping("/{userId}")
-    public GoalDto createGoal(@PathVariable Long userId, @RequestBody GoalDto goalDto) {
+    @PostMapping("/add")
+    public GoalDto createGoal(@RequestParam("userId") Long userId, @RequestBody GoalDto goalDto) {
         goalValidator.validateGoalTitle(goalDto);
         return goalService.createGoal(userId, goalDto);
     }

@@ -6,13 +6,13 @@ import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.user.filter.UserFilterService;
-import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.goal.GoalService;
+import school.faang.user_service.service.user.filter.UserFilterService;
 import school.faang.user_service.service.user.mentorship.MentorshipService;
 
 import java.util.List;
@@ -61,13 +61,6 @@ public class UserServiceImpl implements UserService {
 
         user.setActive(false);
         userRepository.save(user);
-    }
-
-    @Override
-    public UserDto getUser(long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User with id - " + userId + " doesn't exist"));
-        return userMapper.toDto(user);
     }
 
     @Override

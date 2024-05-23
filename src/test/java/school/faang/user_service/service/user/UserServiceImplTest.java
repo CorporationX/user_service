@@ -11,12 +11,12 @@ import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.premium.Premium;
-import school.faang.user_service.service.event.EventService;
-import school.faang.user_service.service.goal.GoalService;
-import school.faang.user_service.service.user.mentorship.MentorshipService;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.event.EventService;
+import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.user.filter.UserFilterService;
+import school.faang.user_service.service.user.mentorship.MentorshipService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,12 +87,11 @@ class UserServiceImplTest {
         ));
     }
 
-
     @Test
     public void testGetUser() {
         long userId = 1L;
         Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(new User()));
-        userServiceImpl.getUser(userId);
+        userServiceImpl.findUserById(userId);
         Mockito.verify(userRepository).findById(userId);
     }
 

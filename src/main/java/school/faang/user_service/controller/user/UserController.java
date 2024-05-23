@@ -47,11 +47,7 @@ public class UserController {
         userService.deactivateUserById(id);
     }
 
-    @GetMapping("{userId}")
-    public UserDto getUser(@PathVariable long userId) {
-        return userService.getUser(userId);
-    }
-
+    @Operation(summary = "Get users by ids")
     @PostMapping
     public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);

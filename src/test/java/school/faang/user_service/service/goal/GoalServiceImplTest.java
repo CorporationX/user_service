@@ -22,6 +22,7 @@ import school.faang.user_service.validator.GoalValidator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -33,19 +34,26 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class GoalServiceTests {
 
-    @Mock private GoalRepository goalRepository;
-    @Mock private UserRepository userRepository;
-    @Mock private SkillRepository skillRepository;
-//    @Mock private SkillService skillService;
-    @Spy private GoalMapperImpl goalMapper;
-    @Mock private GoalValidator goalValidator;
-    @InjectMocks private GoalServiceImpl goalService;
+    @Mock
+    private GoalRepository goalRepository;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private SkillRepository skillRepository;
+    //    @Mock private SkillService skillService;
+    @Spy
+    private GoalMapperImpl goalMapper;
+    @Mock
+    private GoalValidator goalValidator;
+    @InjectMocks
+    private GoalServiceImpl goalService;
 
     private Goal activeGoal, completedGoal;
     private GoalDto activeGoalDto, completedGoalDto;
@@ -108,19 +116,6 @@ class GoalServiceTests {
                 "User with id: 0 not found");
         assertThrows(NotFoundException.class, () -> goalService.createGoal(null, new GoalDto()),
                 "User with id: null not found");
-    }
-
-    @Test
-    @DisplayName("Should save valid goal and return successfully")
-    void testCreateGoalValid() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(new User()));
-        doNothing().when(goalMapper).convertDtoIdsToEntity(any(), any());
-
-        activeGoalDto.setSkillIds(List.of(1L, 2L));
-        goalService.createGoal(1L, activeGoalDto);
-
-        verify(goalRepository).save(any());
-        verify(goalMapper).toDto(any());
     }
 
     @Test

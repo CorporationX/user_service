@@ -12,6 +12,8 @@ public interface UserService {
 
     List<UserDto> findPremiumUsers(UserFilterDto filterDto);
 
+    void deactivateUserById(Long id);
+
     UserDto getUser(long userId);
 
     List<UserDto> getUsersByIds(List<Long> ids);

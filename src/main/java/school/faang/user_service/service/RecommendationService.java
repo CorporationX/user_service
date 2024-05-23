@@ -10,7 +10,7 @@ import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
-import school.faang.user_service.entity.mapper.RecommendationMapper;
+import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;

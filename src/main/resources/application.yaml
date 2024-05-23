@@ -51,6 +51,9 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
+    maxSizeBytes: 5242880
+    smallSize: 170
+    largeSize: 1080
 
 goals:
   limit:

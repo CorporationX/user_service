@@ -1,7 +1,6 @@
 package school.faang.user_service.service.ProfilePic;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -16,9 +15,7 @@ import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.repository.UserRepository;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -37,25 +34,17 @@ public class ProfilePicService {
     private int largeSize;
 
     @SneakyThrows
-    private InputStreamResource compressPic(MultipartFile file, int size) {
-//        InputStream inputStream = file.getInputStream();
-//
-//        BufferedImage image = ImageIO.read(inputStream);
-//        Image scaledImage = image.getScaledInstance(size, size, Image.SCALE_SMOOTH);
-//
-
+    private InputStream compressPic(MultipartFile file, int size) {
         BufferedImage scaledImage = Thumbnails.of(file.getInputStream()).size(size, size).asBufferedImage();
-
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ImageIO.write(scaledImage, "jpg", outputStream);
         byte[] bytes = outputStream.toByteArray();
 
-        return new InputStreamResource(new ByteArrayInputStream(bytes));
+        return new ByteArrayInputStream(bytes);
     }
 
-    private User getUser(long userId){
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User with id: " + userId + " was not found"));
+    private User getUser(long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User with id: " + userId + " was not found"));
     }
 
     @SneakyThrows
@@ -65,8 +54,8 @@ public class ProfilePicService {
         String nameForSmallPic = "small" + file.getName() + LocalDateTime.now();
         String nameForLargePic = "large" + file.getName() + LocalDateTime.now();
 
-        s3Client.putObject(bucketName, nameForSmallPic, compressPic(file, smallSize).getFile());
-        s3Client.putObject(bucketName, nameForLargePic, compressPic(file, largeSize).getFile());
+        s3Client.putObject(bucketName, nameForSmallPic, compressPic(file, smallSize), null);
+        s3Client.putObject(bucketName, nameForLargePic, compressPic(file, largeSize), null);
 
         UserProfilePic userProfilePic = new UserProfilePic(nameForLargePic, nameForSmallPic);
         user.setUserProfilePic(userProfilePic);
@@ -90,6 +79,6 @@ public class ProfilePicService {
         user.getUserProfilePic().setFileId(null);
         userRepository.save(user);
 
-        return "The user's avatar with the ID: "+userId+" has been successfully deleted";
+        return "The user's avatar with the ID: " + userId + " has been successfully deleted";
     }
 }

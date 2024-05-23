@@ -1,11 +1,9 @@
 package school.faang.user_service.config.cloud;
 
-
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder;
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,19 +25,13 @@ public class AmazonS3Config {
     @Value("${services.s3.bucketName}")
     private String bucketName;
 
-    @Bean
+    @Bean(name = "clientAmazonS3")
     public AmazonS3 amazons3() {
         AWSCredentials awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
-        AmazonS3 clientAmazonS3 = AmazonS3ClientBuilder.standard()
-                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint,
-                        Regions.DEFAULT_REGION.getName()))
-                .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
-                .withPathStyleAccessEnabled(true)
-                .build();
 
-        if (!clientAmazonS3.doesBucketExistV2(bucketName)) {
-            clientAmazonS3.createBucket(bucketName);
-        }
-        return clientAmazonS3;
+        return AmazonS3ClientBuilder.standard()
+                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint, null))
+                .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+                .build();
     }
 }

@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
@@ -37,14 +38,16 @@ public class ProfilePicService {
 
     @SneakyThrows
     private InputStreamResource compressPic(MultipartFile file, int size) {
-        InputStream inputStream = file.getInputStream();
+//        InputStream inputStream = file.getInputStream();
+//
+//        BufferedImage image = ImageIO.read(inputStream);
+//        Image scaledImage = image.getScaledInstance(size, size, Image.SCALE_SMOOTH);
+//
 
-        BufferedImage image = ImageIO.read(inputStream);
-        Image scaledImage = image.getScaledInstance(size, size, Image.SCALE_SMOOTH);
+        BufferedImage scaledImage = Thumbnails.of(file.getInputStream()).size(size, size).asBufferedImage();
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ImageIO.write((RenderedImage) scaledImage, "jpg", outputStream);
-
+        ImageIO.write(scaledImage, "jpg", outputStream);
         byte[] bytes = outputStream.toByteArray();
 
         return new InputStreamResource(new ByteArrayInputStream(bytes));

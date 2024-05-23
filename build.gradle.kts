@@ -21,6 +21,7 @@ repositories {
 }
 
 dependencies {
+    implementation("'net.coobird:thumbnailator:0.4.9'")
     /**
      * Spring boot starters
      */

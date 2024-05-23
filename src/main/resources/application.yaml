@@ -52,7 +52,6 @@ services:
     endpoint: http://localhost:9000
     accessKey: user
     secretKey: password
-    region: bucket_region
     bucketName: user-bucket
     isMocked: true
     maxSizeBytes: 5242880

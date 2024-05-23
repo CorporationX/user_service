@@ -17,12 +17,11 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.filter.event.EventFilter;
-import school.faang.user_service.filter.event.EventTitlePattern;
 import school.faang.user_service.filter.event.EventOwnerIdPattern;
-import school.faang.user_service.mapper.event.EventMapperImpl;
+import school.faang.user_service.filter.event.EventTitlePattern;
+import school.faang.user_service.mapper.EventMapperImpl;
 import school.faang.user_service.repository.event.EventRepository;
-import school.faang.user_service.service.event.EventService;
-import school.faang.user_service.validator.event.EventValidator;
+import school.faang.user_service.validator.EventValidator;
 
 import java.util.ArrayList;
 import java.util.Collections;

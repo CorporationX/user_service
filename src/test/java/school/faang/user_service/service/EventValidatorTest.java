@@ -10,7 +10,7 @@ import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.jpa.UserJpaRepository;
-import school.faang.user_service.validator.event.EventValidator;
+import school.faang.user_service.validator.EventValidator;
 
 import java.time.LocalDateTime;
 import java.util.Optional;

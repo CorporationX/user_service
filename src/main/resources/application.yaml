@@ -67,3 +67,6 @@ skill:
 
 urls:
   dicebear_avatar_service_url: https://api.dicebear.com/8.x/adventurer/svg?seed=
+
+images:
+  avatar_dicebear_format: svg+xml

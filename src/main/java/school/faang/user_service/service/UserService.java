@@ -2,9 +2,11 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.dto.user.UserAvatarDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.goal.Goal;
@@ -26,6 +28,9 @@ public class UserService {
     private final GoalRepository goalRepository;
     private final S3Service s3Service;
     private final DiceBearService diceBearService;
+
+    @Value("${images.avatar_dicebear_format}")
+    private String avatarFormat;
 
     @Transactional
     public void deactivate(long id) {
@@ -71,7 +76,7 @@ public class UserService {
         });
     }
 
-    public byte[] getRandomAvatar(UserDto userDto, Long userId) {
+    public UserAvatarDto getRandomAvatar(UserDto userDto, Long userId) {
         User user = userRepository.findById(userId);
 
         byte[] image = diceBearService.getAvatar(userDto.getEmail());
@@ -82,6 +87,6 @@ public class UserService {
         user.setUserProfilePic(userProfilePic);
 
         userJpaRepository.save(user);
-        return image;
+        return new UserAvatarDto(imageKey, avatarFormat);
     }
 }

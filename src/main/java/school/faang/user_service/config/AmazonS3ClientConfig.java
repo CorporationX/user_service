@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
-public class RestConfig {
+public class AmazonS3ClientConfig {
 
     @Value("${services.s3.endpoint}")
     private String endpoint;

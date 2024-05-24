@@ -21,6 +21,13 @@ public class UserService {
     private final List<UserFilter> userFilters;
     private final UserMapper userMapper;
 
+
+    public User getById(long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new DataValidationException("Пользователь с id " + userId + " не найден"));
+    }
+    
+    
     public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
         Stream<User> users = userRepository.findPremiumUsers();
 
@@ -28,10 +35,5 @@ public class UserService {
                 .filter(userFilter -> userFilter.isApplicable(userFilterDto))
                 .flatMap(userFilter -> userFilter.apply(users, userFilterDto))
                 .map(userMapper::toDto).toList();
-    }
-
-    public User getById(long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new DataValidationException("Пользователь с id " + userId + " не найден"));
     }
 }

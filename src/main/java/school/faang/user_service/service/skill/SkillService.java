@@ -1,7 +1,7 @@
 package school.faang.user_service.service.skill;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
@@ -14,7 +14,7 @@ import school.faang.user_service.validator.UserValidator;
 
 import java.util.List;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class SkillService {
     private final SkillRepository skillRepository;

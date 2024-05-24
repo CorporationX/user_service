@@ -1,17 +1,13 @@
-package school.faang.user_service.entity;
+package school.faang.user_service.dto.avatar;
 
-import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Embeddable
 @AllArgsConstructor
-@Builder
 @NoArgsConstructor
-public class UserProfilePic {
+public class UserProfilePicDto {
     private String fileId;
     private String smallFileId;
 }

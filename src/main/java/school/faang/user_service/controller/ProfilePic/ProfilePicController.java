@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.dto.avatar.UserProfilePicDto;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.ProfilePic.ProfilePicService;
+import school.faang.user_service.service.avatar.ProfilePicService;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,7 +25,7 @@ public class ProfilePicController {
     private int maxSizeBytes;
 
     @PostMapping("/{userId}")
-    public UserProfilePic saveProfilePic(@PathVariable long userId, @RequestParam("file") MultipartFile file) {
+    public UserProfilePicDto saveProfilePic(@PathVariable long userId, @RequestParam("file") MultipartFile file) {
         if (file.getSize() > maxSizeBytes) {
             throw new DataValidationException("The maximum file size of 5 MB has been exceeded");
         }

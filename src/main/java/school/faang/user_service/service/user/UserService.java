@@ -21,6 +21,7 @@ import java.io.InputStream;
 
 import static school.faang.user_service.exception.ExceptionMessage.FILE_PROCESSING_EXCEPTION;
 import static school.faang.user_service.exception.ExceptionMessage.NO_SUCH_USER_EXCEPTION;
+import static school.faang.user_service.exception.ExceptionMessage.USER_AVATAR_ABSENCE_EXCEPTION;
 
 @Slf4j
 @Service
@@ -46,6 +47,10 @@ public class UserService {
 
         log.info("Scaled images of user avatar were uploaded on cloud.");
 
+        if (user.getUserProfilePic() != null) {
+            deleteUserPic(userId);
+        }
+
         user.setUserProfilePic(UserProfilePic.builder()
                 .fileId(fileId)
                 .smallFileId(smallFileId)
@@ -60,8 +65,14 @@ public class UserService {
     @Transactional
     public byte[] downloadUserPic(Long userId) {
         User user = getUser(userId);
+        UserProfilePic userProfilePic = user.getUserProfilePic();
 
-        try (InputStream userPicIS = s3Service.downloadFile(user.getUserProfilePic().getFileId())) {
+        if (userProfilePic == null) {
+            log.warn("Can't download user's avatar, cause user doesn't have it.");
+            throw new DataGettingException(USER_AVATAR_ABSENCE_EXCEPTION.getMessage());
+        }
+
+        try (InputStream userPicIS = s3Service.downloadFile(userProfilePic.getSmallFileId())) {
             byte[] imageInBytesArray = userPicIS.readAllBytes();
 
             log.info("User's avatar image was downloaded successfully.");
@@ -76,8 +87,16 @@ public class UserService {
     @Transactional
     public void deleteUserPic(Long userId) {
         User user = getUser(userId);
+        if (user.getUserProfilePic() == null) {
+            log.warn("Can't delete user's avatar, cause user doesn't have it.");
+
+            throw new DataGettingException(USER_AVATAR_ABSENCE_EXCEPTION.getMessage());
+        }
+
         s3Service.deleteFile(user.getUserProfilePic().getFileId());
         s3Service.deleteFile(user.getUserProfilePic().getSmallFileId());
+
+        user.setUserProfilePic(null);
 
         log.info("User's avatar images were deleted successfully.");
     }

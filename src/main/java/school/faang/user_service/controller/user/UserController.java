@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,7 +29,7 @@ public class UserController {
     private final UserService userService;
     private final ImageProcessor imageProcessor;
 
-    @PutMapping("/{userId}/pic")
+    @PostMapping("/{userId}/pic")
     public UserDto uploadUserPic(@PathVariable Long userId, MultipartFile file) {
         if (file.getSize() > MAX_AVATAR_SIZE) {
             log.error(FILE_SIZE_EXCEPTION.getMessage() + "(userId = " + userId + ")");

@@ -14,7 +14,8 @@ public enum ExceptionMessage {
     REPEATED_SUBSCRIPTION_EXCEPTION("The user cannot follow another user twice."),
     FILE_SIZE_EXCEPTION("The uploaded file can have a maximum size of no more than 5 MB."),
     PICTURE_TYPE_EXCEPTION("Only image could be uploaded as user picture."),
-    FILE_PROCESSING_EXCEPTION("During file processing was caught exception: ");
+    FILE_PROCESSING_EXCEPTION("During file processing was caught exception: "),
+    USER_AVATAR_ABSENCE_EXCEPTION("User doesn't have avatar.");
 
     private final String message;
 

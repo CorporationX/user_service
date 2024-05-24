@@ -20,12 +20,6 @@ public class GoalInvitationServiceValidator {
         if (goalInvitationDto == null) {
             throw new DataValidationException(INPUT_IS_NULL.getMessage());
         }
-        if (goalInvitationDto.getInviterId() == null) {
-            throw new DataValidationException(INVITER_ID_IS_NULL.getMessage());
-        }
-        if (goalInvitationDto.getInvitedUserId() == null) {
-            throw new DataValidationException(INVITED_USER_ID_IS_NULL.getMessage());
-        }
         if (goalInvitationDto.getInviterId().equals(goalInvitationDto.getInvitedUserId())) {
             throw new DataValidationException(INVITER_ID_EQUALS_INVITED_USER_ID.getMessage());
         }

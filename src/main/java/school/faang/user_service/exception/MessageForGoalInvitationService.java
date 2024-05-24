@@ -1,10 +1,9 @@
 package school.faang.user_service.exception;
+
 import lombok.Getter;
 
 @Getter
 public enum MessageForGoalInvitationService {
-    INVITER_ID_IS_NULL("InviterId can not be null."),
-    INVITED_USER_ID_IS_NULL("InvitedUserId cannot be null."),
     NO_GOAL_IN_DB("Database hasn't goal."),
     INVITER_ID_EQUALS_INVITED_USER_ID("InviterId cannot be the same as InvitedUserId."),
     INPUT_IS_NULL("Input should not be null."),
@@ -17,6 +16,7 @@ public enum MessageForGoalInvitationService {
     NO_INVITED_IN_GOAL_INVITATION("There is no invited in GoalInvitation"),
     ID_IS_NULL("User id can not e null"),
     NO_USER_IN_DB("There is no such user in database");
+
     private final String message;
 
     MessageForGoalInvitationService(String message) {

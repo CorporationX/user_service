@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.goal;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
@@ -14,7 +15,7 @@ public class GoalInvitationController {
     private final GoalInvitationService goalInvitationService;
 
     @PostMapping("/createInvitation")
-    public GoalInvitationDto createInvitation(@RequestBody GoalInvitationDto invitation) {
+    public GoalInvitationDto createInvitation(@Valid @RequestBody GoalInvitationDto invitation) {
         return goalInvitationService.createInvitation(invitation);
     }
 

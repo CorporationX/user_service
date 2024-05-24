@@ -1,7 +1,5 @@
 package school.faang.user_service.controller;
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;

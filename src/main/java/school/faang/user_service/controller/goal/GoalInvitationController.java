@@ -1,31 +1,35 @@
 package school.faang.user_service.controller.goal;
 
-import lombok.Data;
-import org.springframework.stereotype.Controller;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.service.GoalInvitationService;
 
 import java.util.List;
 
-@Controller
-@Data
+@RestController
+@RequiredArgsConstructor
 public class GoalInvitationController {
     private final GoalInvitationService goalInvitationService;
 
-    public GoalInvitationDto createInvitation(GoalInvitationDto invitation) {
+    @PostMapping("/createInvitation")
+    public GoalInvitationDto createInvitation(@RequestBody GoalInvitationDto invitation) {
         return goalInvitationService.createInvitation(invitation);
     }
 
-    public void acceptGoalInvitation(long id) {
+    @PutMapping("/acceptGoalInvitation/{id}")
+    public void acceptGoalInvitation(@PathVariable long id) {
         goalInvitationService.acceptGoalInvitation(id);
     }
 
-    public void rejectGoalInvitation(long id) {
+    @PutMapping("/rejectGoalInvitation/{id}")
+    public void rejectGoalInvitation(@PathVariable long id) {
         goalInvitationService.rejectGoalInvitation(id);
     }
 
-    public List<GoalInvitationDto> getInvitations(InvitationFilterDto filter) {
+    @GetMapping("/getInvitations")
+    public List<GoalInvitationDto> getInvitations(@RequestBody InvitationFilterDto filter) {
         return goalInvitationService.getInvitations(filter);
     }
 }

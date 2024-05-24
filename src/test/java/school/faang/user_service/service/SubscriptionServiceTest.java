@@ -6,31 +6,33 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.user.filter.UserAboutFilter;
 import school.faang.user_service.service.user.filter.UserEmailFilter;
 import school.faang.user_service.service.user.filter.UserFilter;
 import school.faang.user_service.service.user.filter.UserNameFilter;
+import school.faang.user_service.validator.SubscriptionValidator;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class SubscriptionServiceTest {
+    @InjectMocks
+    private SubscriptionService subscriptionService;
+
     @Mock
     private SubscriptionRepository subscriptionRepository;
 
@@ -38,62 +40,51 @@ class SubscriptionServiceTest {
     private UserMapper userMapper;
 
     @Mock
-    UserFilterDto userFilterDto;
+    private SubscriptionValidator subscriptionValidator;
 
     @Mock
-    UserDto userDto;
+    private List<UserFilter> userFilters;
 
-    @Mock
+    private UserFilterDto userFilterDto;
+
+    private UserDto userDto;
+
     private User user;
 
-    @InjectMocks
-    private SubscriptionService subscriptionService;
-
-    List<UserFilter> userFilters;
-    long followerId = 1L;
-    long followeeId = 2L;
-    int expectationCount = 15;
+    private long followerId;
+    private long followeeId;
+    private int expectationCount;
 
     @BeforeEach
     public void setUp() {
-        userFilters = List.of(new UserNameFilter(), new UserAboutFilter(), new UserEmailFilter());
-        subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, userFilters);
+        userFilterDto = new UserFilterDto();
+        userDto = new UserDto();
+        user = new User();
+
+        followerId = 1L;
+        followeeId = 2L;
+        expectationCount = 15;
     }
 
     @Test
-    public void testExceptionTheSubscriptionExistsForFollowUser() {
-        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
-
-        assertThrows(DataValidationException.class, () -> subscriptionService.followUser(followerId, followeeId));
-    }
-
-    @Test
-    public void testFollowUserIsSaved() {
-        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(false);
-
+    public void testFollowUser() {
         subscriptionService.followUser(followerId, followeeId);
-        verify(subscriptionRepository, times(1)).existsByFollowerIdAndFolloweeId(followerId, followeeId);
+        verify(subscriptionValidator, times(1)).checkSubscriptionExists(followerId, followeeId);
         verify(subscriptionRepository, times(1)).followUser(followerId, followeeId);
     }
 
     @Test
-    public void testExceptionTheSubscriptionExistsForUnfollowUser() {
-        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(false);
-
-        assertThrows(DataValidationException.class, () -> subscriptionService.unfollowUser(followerId, followeeId));
-    }
-
-    @Test
-    public void testUnfollowUserIsSaved() {
-        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)).thenReturn(true);
-
+    public void testUnfollowUser() {
         subscriptionService.unfollowUser(followerId, followeeId);
-        verify(subscriptionRepository, times(1)).existsByFollowerIdAndFolloweeId(followerId, followeeId);
+        verify(subscriptionValidator, times(1)).checkSubscriptionNotExists(followerId, followeeId);
         verify(subscriptionRepository, times(1)).unfollowUser(followerId, followeeId);
     }
 
     @Test
     public void testGetFollowers() {
+        userFilters = List.of(new UserNameFilter(), new UserAboutFilter(), new UserEmailFilter());
+        subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, subscriptionValidator, userFilters);
+
         User userAnna = User.builder()
                 .id(1L)
                 .username("Anna Kern")
@@ -119,11 +110,22 @@ class SubscriptionServiceTest {
                 .experience(7)
                 .build();
 
-        UserDto userDtoAnna = new UserDto(1L, "Anna Kern", "annak@examle.com");
-        UserDto userDtoBeast = new UserDto(2L, "Mr Beast", "mrbeast@gmail.com");
+        UserDto userDtoAnna = UserDto.builder()
+                .id(1L)
+                .username("Anna Kern")
+                .email("annak@examle.com")
+                .build();
+        UserDto userDtoBeast = UserDto.builder()
+                .id(2L)
+                .username("Mr Beast")
+                .email("mrbeast@gmail.com")
+                .build();
 
-        UserFilterDto filters = new UserFilterDto("Mr", "actor", null, null, null, null, null, null, 0, 0, 0, 0);
-        UserFilterDto filtersNull = new UserFilterDto();
+        UserFilterDto filters = UserFilterDto.builder()
+                .namePattern("Mr")
+                .aboutPattern("actor")
+                .build();
+        UserFilterDto filtersNull = UserFilterDto.builder().build();
 
         List<User> users = List.of(userAnna, userBeast);
 
@@ -143,6 +145,9 @@ class SubscriptionServiceTest {
 
     @Test
     public void testFindByFollowerIdIsInvoked() {
+        userFilters = List.of(new UserNameFilter(), new UserAboutFilter(), new UserEmailFilter());
+        subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, subscriptionValidator, userFilters);
+
         Stream<User> users = Stream.of(user);
 
         when(subscriptionRepository.findByFollowerId(followeeId)).thenReturn(users);
@@ -157,6 +162,9 @@ class SubscriptionServiceTest {
 
     @Test
     public void testGetFollowing() {
+        userFilters = List.of(new UserNameFilter(), new UserAboutFilter(), new UserEmailFilter());
+        subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, subscriptionValidator, userFilters);
+
         User userAnna = User.builder()
                 .id(1L)
                 .username("Anna Kern")
@@ -182,11 +190,22 @@ class SubscriptionServiceTest {
                 .experience(7)
                 .build();
 
-        UserDto userDtoAnna = new UserDto(1L, "Anna Kern", "annak@examle.com");
-        UserDto userDtoBeast = new UserDto(2L, "Mr Beast", "mrbeast@gmail.com");
+        UserDto userDtoAnna = UserDto.builder()
+                .id(1L)
+                .username("Anna Kern")
+                .email("annak@examle.com")
+                .build();
+        UserDto userDtoBeast = UserDto.builder()
+                .id(2L)
+                .username("Mr Beast")
+                .email("mrbeast@gmail.com")
+                .build();
 
-        UserFilterDto filters = new UserFilterDto("Mr", "actor", null, null, null, null, null, null, 0, 0, 0, 0);
-        UserFilterDto filtersNull = new UserFilterDto();
+        UserFilterDto filters = UserFilterDto.builder()
+                .namePattern("Mr")
+                .aboutPattern("actor")
+                .build();
+        UserFilterDto filtersNull = UserFilterDto.builder().build();
 
         List<User> users = List.of(userAnna, userBeast);
 
@@ -206,6 +225,9 @@ class SubscriptionServiceTest {
 
     @Test
     public void testFindByFolloweeIdIsInvoked() {
+        userFilters = List.of(new UserNameFilter(), new UserAboutFilter(), new UserEmailFilter());
+        subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, subscriptionValidator, userFilters);
+
         Stream<User> users = Stream.of(user);
 
         when(subscriptionRepository.findByFolloweeId(followerId)).thenReturn(users);

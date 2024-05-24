@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
@@ -22,34 +22,34 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(MockitoExtension.class)
 public class UserFilterTest {
 
-    UserFilterDto filters;
-    UserFilterDto nullFilters;
-    List<User> users;
-    User userAnna;
-    User userBeast;
-    User userAnne;
-    User userConor;
-    User userVasya;
-    boolean actualResultBoolean;
-    Stream<User> expectedResultUsers;
-    Stream<User> actualResultUsers;
+    private UserFilterDto filters;
+    private UserFilterDto nullFilters;
+    private List<User> users;
+    private User userAnna;
+    private User userBeast;
+    private User userAnne;
+    private User userConor;
+    private User userVasya;
+    private boolean actualResultBoolean;
+    private Stream<User> expectedResultUsers;
+    private Stream<User> actualResultUsers;
 
     @BeforeEach
     public void setUp() {
-        filters = new UserFilterDto(
-                "An",
-                "actor",
-                "@gmail.com",
-                "e",
-                "Russia",
-                "Orel",
-                "67",
-                "skill2",
-                1,
-                5,
-                1,
-                1);
-        nullFilters = new UserFilterDto();
+        filters = UserFilterDto.builder()
+                .namePattern("An")
+                .aboutPattern("actor")
+                .emailPattern("@gmail.com")
+                .contactPattern("e")
+                .countryPattern("Russia")
+                .cityPattern("Orel")
+                .phonePattern("67")
+                .skillPattern("skill2")
+                .experienceMin(1)
+                .experienceMax(5)
+                .build();
+
+        nullFilters = UserFilterDto.builder().build();
 
         userAnna = User.builder()
                 .username("Anna Kern")

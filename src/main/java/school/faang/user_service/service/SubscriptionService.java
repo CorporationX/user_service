@@ -2,13 +2,13 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.user.filter.UserFilter;
+import school.faang.user_service.validator.SubscriptionValidator;
 
 import java.util.List;
 
@@ -17,19 +17,16 @@ import java.util.List;
 public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final UserMapper userMapper;
+    private final SubscriptionValidator subscriptionValidator;
     private final List<UserFilter> userFilters;
 
     public void followUser(long followerId, long followeeId) {
-        if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
-            throw new DataValidationException("Подписка уже существует");
-        }
+        subscriptionValidator.checkSubscriptionExists(followerId, followeeId);
         subscriptionRepository.followUser(followerId, followeeId);
     }
 
     public void unfollowUser(long followerId, long followeeId) {
-        if (!subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
-            throw new DataValidationException("Подписки не существует");
-        }
+        subscriptionValidator.checkSubscriptionNotExists(followerId, followeeId);
         subscriptionRepository.unfollowUser(followerId, followeeId);
     }
 

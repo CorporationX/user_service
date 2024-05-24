@@ -9,7 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.jpa.UserJpaRepository;
 import school.faang.user_service.validator.EventValidator;
 
 import java.time.LocalDateTime;
@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class EventValidatorTest {
     @Mock
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
 
     @InjectMocks
     private EventValidator eventValidator;
@@ -46,7 +46,7 @@ public class EventValidatorTest {
     @Test
     public void testValidateEventWithEmptyOwnerId() {
         EventDto eventDto = createEventDto("Title", LocalDateTime.now());
-        when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.empty());
+        when(userJpaRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.empty());
         Assert.assertThrows(DataValidationException.class, () -> eventValidator.validateEvent(eventDto));
     }
 
@@ -55,7 +55,7 @@ public class EventValidatorTest {
         EventDto eventDto = createEventDto("Title", LocalDateTime.now());
         User owner = new User();
         owner.setId(1L);
-        when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(owner));
+        when(userJpaRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(owner));
         eventValidator.validateEvent(eventDto);
     }
 
@@ -64,7 +64,7 @@ public class EventValidatorTest {
         EventDto eventDto = createEventDto("Title", LocalDateTime.now());
         User owner = new User();
         owner.setId(1L);
-        when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(owner));
+        when(userJpaRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(owner));
         eventValidator.validateEvent(eventDto);
     }
 

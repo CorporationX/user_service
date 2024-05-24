@@ -10,7 +10,7 @@ import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.jpa.UserJpaRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 import java.time.LocalDateTime;
@@ -25,7 +25,7 @@ public class MentorshipRequestValidator {
     public static final String REQUEST_MSG_ERR = "Request description can't be empty";
     public static final String SAME_USER_ERR = "Requester can't be the same as a receiver";
 
-    private final UserRepository userRepository;
+    private final UserJpaRepository userJpaRepository;
     private final MentorshipRequestRepository mentorshipRequestRepository;
 
     @Value("${mentoring.request_limit_months}")
@@ -46,7 +46,7 @@ public class MentorshipRequestValidator {
     }
 
     public void validateForEmptyRequester(long requesterId) {
-        Optional<User> requester = userRepository.findById(requesterId);
+        Optional<User> requester = userJpaRepository.findById(requesterId);
         if (requester.isEmpty()) {
             String errMessage = "Requester with ID: " + requesterId + " doesn't exist";
             log.error(errMessage);
@@ -55,7 +55,7 @@ public class MentorshipRequestValidator {
     }
 
     public void validateForEmptyReceiver(long receiverId) {
-        Optional<User> receiver = userRepository.findById(receiverId);
+        Optional<User> receiver = userJpaRepository.findById(receiverId);
         if (receiver.isEmpty()) {
             String errMessage = "Receiver with ID: " + receiverId + " doesn't exist";
             log.error(errMessage);

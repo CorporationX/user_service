@@ -1,7 +1,7 @@
 package school.faang.user_service.controller.user;
 
 
-import lombok.NonNull;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,11 +17,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/users")
-    public List<UserDto> getUsersByIds(@NonNull @RequestBody List<Long> ids) {
-        if (ids.isEmpty()) {
-            return List.of();
-        }
-
+    public List<UserDto> getUsersByIds(@RequestBody List<@NotNull Long> ids) {
         return userService.getUsersByIds(ids);
     }
 }

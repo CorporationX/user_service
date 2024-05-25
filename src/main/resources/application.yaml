@@ -67,3 +67,6 @@ goals:
 mentorship:
   request:
     time-period-for-single-request: 3
+
+api:
+  default: /api/v1

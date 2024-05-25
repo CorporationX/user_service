@@ -18,8 +18,10 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.filter.event.EventOwnerIdFilter;
 import school.faang.user_service.filter.event.EventTitlePatternFilter;
+import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.mapper.EventMapperImpl;
 import school.faang.user_service.repository.event.EventRepository;
+import school.faang.user_service.service.publisher.EventStartEventPublisher;
 import school.faang.user_service.validator.event.EventValidator;
 
 import java.time.LocalDateTime;
@@ -45,10 +47,12 @@ public class EventServiceTest {
     @Mock
     private EventValidator eventValidator;
     @Spy
-    private EventMapperImpl eventMapper;
+    private EventMapper eventMapper;
     @Mock
     ExecutorService executorService;
     private final List<EventFilter> eventFilters = new ArrayList<>();
+    @Mock
+    private EventStartEventPublisher startEventPublisher;
 
     @Captor
     private ArgumentCaptor<Event> eventArgumentCaptor;
@@ -57,7 +61,7 @@ public class EventServiceTest {
     void setUp() {
         eventFilters.add(new EventTitlePatternFilter());
         eventFilters.add(new EventOwnerIdFilter());
-        eventService = new EventService(eventRepository, eventValidator, eventMapper, eventFilters, executorService);
+        eventService = new EventService(eventRepository, eventValidator, eventMapper, eventFilters, startEventPublisher, executorService);
     }
 
     @Test

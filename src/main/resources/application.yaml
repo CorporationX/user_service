@@ -16,6 +16,7 @@ spring:
 
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
+
   data:
     redis:
       port: 6379
@@ -67,6 +68,9 @@ services:
 task:
   scheduling:
     cron: &daily "0 0 0 * * *"
+    fix-rate-oneminute: 60000
+    interval-one-minute: 1
+    interval-five-hours: 5
 
 cleanUpPremiumRepo:
   cron: *daily

@@ -10,6 +10,20 @@ import school.faang.user_service.repository.SubscriptionRepository;
 public class SubscriptionValidator {
     private final SubscriptionRepository subscriptionRepository;
 
+    public void checkIdIsGreaterThanZero(long Id) {
+        if (Id <= 0) {
+            throw new DataValidationException("Id пользователей должен быть больше нуля");
+        }
+    }
+
+    public void checkFollowerAndFolloweeAreDifferent(long followerId, long followeeId) {
+        checkIdIsGreaterThanZero(followerId);
+        checkIdIsGreaterThanZero(followeeId);
+        if (followerId == followeeId) {
+            throw new DataValidationException("Нельзя подписаться на себя или отписаться от себя");
+        }
+    }
+
     public void checkSubscriptionExists(long followerId, long followeeId) {
         if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             throw new DataValidationException("Подписка уже существует");
@@ -19,12 +33,6 @@ public class SubscriptionValidator {
     public void checkSubscriptionNotExists(long followerId, long followeeId) {
         if (!subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             throw new DataValidationException("Подписки не существует");
-        }
-    }
-
-    public void checkFollowerAndFolloweeAreDifferent(Long followerId, Long followeeId) {
-        if (followerId != null && followerId.equals(followeeId)) {
-            throw new DataValidationException("Нельзя подписаться на себя или отписаться от себя");
         }
     }
 }

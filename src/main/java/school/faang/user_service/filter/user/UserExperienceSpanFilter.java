@@ -1,12 +1,13 @@
-package school.faang.user_service.service.user.filter;
+package school.faang.user_service.filter.user;
 
+import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 
-import java.util.List;
 import java.util.stream.Stream;
 
-public class UserExperienceFilter implements UserFilter {
+@Component
+public class UserExperienceSpanFilter implements UserFilter {
     @Override
     public boolean isApplicable(UserFilterDto filters) {
         int experienceMin = filters.getExperienceMin();
@@ -16,8 +17,8 @@ public class UserExperienceFilter implements UserFilter {
     }
 
     @Override
-    public Stream<User> apply(List<User> users, UserFilterDto filters) {
-        return users.stream().filter(user -> {
+    public Stream<User> apply(Stream<User> users, UserFilterDto filters) {
+        return users.filter(user -> {
             if (filters.getExperienceMax() == 0) {
                 return user.getExperience() >= filters.getExperienceMin();
             } else {

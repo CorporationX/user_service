@@ -1,4 +1,4 @@
-package school.faang.user_service.service.user.filter;
+package school.faang.user_service.filter.user;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -167,12 +167,12 @@ public class UserFilterTest {
 
     @Test
     public void testCityIsApplicable() {
-        UserCityFilter userCityFilter = new UserCityFilter();
+        UserCityPatternFilter userCityPatternFilter = new UserCityPatternFilter();
 
-        actualResultBoolean = userCityFilter.isApplicable(nullFilters);
+        actualResultBoolean = userCityPatternFilter.isApplicable(nullFilters);
         assertFalse(actualResultBoolean);
 
-        actualResultBoolean = userCityFilter.isApplicable(filters);
+        actualResultBoolean = userCityPatternFilter.isApplicable(filters);
         assertTrue(actualResultBoolean);
     }
 
@@ -200,7 +200,7 @@ public class UserFilterTest {
 
     @Test
     public void testExperienceIsApplicable() {
-        UserExperienceFilter userExperienceFilter = new UserExperienceFilter();
+        UserExperienceSpanFilter userExperienceFilter = new UserExperienceSpanFilter();
 
         actualResultBoolean = userExperienceFilter.isApplicable(nullFilters);
         assertFalse(actualResultBoolean);
@@ -229,7 +229,7 @@ public class UserFilterTest {
         UserNameFilter userNameFilter = new UserNameFilter();
 
         expectedResultUsers = Stream.of(userAnna, userAnne);
-        actualResultUsers = userNameFilter.apply(users, filters);
+        actualResultUsers = userNameFilter.apply(users.stream(), filters);
 
         assertArrayEquals(expectedResultUsers.toArray(), actualResultUsers.toArray());
     }
@@ -239,7 +239,7 @@ public class UserFilterTest {
         UserAboutFilter userAboutFilter = new UserAboutFilter();
 
         expectedResultUsers = Stream.of(userBeast, userConor);
-        actualResultUsers = userAboutFilter.apply(users, filters);
+        actualResultUsers = userAboutFilter.apply(users.stream(), filters);
 
         assertArrayEquals(expectedResultUsers.toArray(), actualResultUsers.toArray());
     }
@@ -249,7 +249,7 @@ public class UserFilterTest {
         UserEmailFilter userEmailFilter = new UserEmailFilter();
 
         expectedResultUsers = Stream.of(userBeast, userAnne, userConor);
-        actualResultUsers = userEmailFilter.apply(users, filters);
+        actualResultUsers = userEmailFilter.apply(users.stream(), filters);
 
         assertArrayEquals(expectedResultUsers.toArray(), actualResultUsers.toArray());
     }
@@ -276,7 +276,7 @@ public class UserFilterTest {
         UserContactFilter userContactFilter = new UserContactFilter();
 
         expectedResultUsers = Stream.of(userBeast, userAnne, userConor);
-        actualResultUsers = userContactFilter.apply(users, filters);
+        actualResultUsers = userContactFilter.apply(users.stream(), filters);
 
         assertArrayEquals(expectedResultUsers.toArray(), actualResultUsers.toArray());
     }
@@ -286,17 +286,17 @@ public class UserFilterTest {
         UserCountryFilter userCountryFilter = new UserCountryFilter();
 
         expectedResultUsers = Stream.of(userAnna, userVasya);
-        actualResultUsers = userCountryFilter.apply(users, filters);
+        actualResultUsers = userCountryFilter.apply(users.stream(), filters);
 
         assertArrayEquals(expectedResultUsers.toArray(), actualResultUsers.toArray());
     }
 
     @Test
     public void testCityApply() {
-        UserCityFilter userCityFilter = new UserCityFilter();
+        UserCityPatternFilter userCityPatternFilter = new UserCityPatternFilter();
 
         expectedResultUsers = Stream.of(userAnna);
-        actualResultUsers = userCityFilter.apply(users, filters);
+        actualResultUsers = userCityPatternFilter.apply(users.stream(), filters);
 
         assertArrayEquals(expectedResultUsers.toArray(), actualResultUsers.toArray());
     }
@@ -306,7 +306,7 @@ public class UserFilterTest {
         UserPhoneFilter userPhoneFilter = new UserPhoneFilter();
 
         expectedResultUsers = Stream.of(userBeast, userConor, userVasya);
-        actualResultUsers = userPhoneFilter.apply(users, filters);
+        actualResultUsers = userPhoneFilter.apply(users.stream(), filters);
 
         assertArrayEquals(expectedResultUsers.toArray(), actualResultUsers.toArray());
     }
@@ -316,17 +316,17 @@ public class UserFilterTest {
         UserSkillFilter userSkillFilter = new UserSkillFilter();
 
         expectedResultUsers = Stream.of(userAnna, userBeast, userConor);
-        actualResultUsers = userSkillFilter.apply(users, filters);
+        actualResultUsers = userSkillFilter.apply(users.stream(), filters);
 
         assertArrayEquals(expectedResultUsers.toArray(), actualResultUsers.toArray());
     }
 
     @Test
     public void testExperienceApply() {
-        UserExperienceFilter userExperienceFilter = new UserExperienceFilter();
+        UserExperienceSpanFilter userExperienceFilter = new UserExperienceSpanFilter();
 
         expectedResultUsers = Stream.of(userAnna, userAnne, userVasya);
-        actualResultUsers = userExperienceFilter.apply(users, filters);
+        actualResultUsers = userExperienceFilter.apply(users.stream(), filters);
 
         assertArrayEquals(expectedResultUsers.toArray(), actualResultUsers.toArray());
     }

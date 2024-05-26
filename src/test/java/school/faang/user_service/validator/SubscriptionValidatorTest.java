@@ -24,11 +24,23 @@ public class SubscriptionValidatorTest {
 
     private long followerId;
     private long followeeId;
+    private long invalidId;
 
     @BeforeEach
     public void setUp() {
         followerId = 1L;
         followeeId = 2L;
+        invalidId = 0L;
+    }
+
+    @Test
+    public void testCheckIdIsGreaterThanZero() {
+        assertThrows(DataValidationException.class, () -> subscriptionValidator.checkIdIsGreaterThanZero(invalidId));
+    }
+
+    @Test
+    public void testCheckFollowerAndFolloweeAreDifferent() {
+        assertThrows(DataValidationException.class, () -> subscriptionValidator.checkFollowerAndFolloweeAreDifferent(followerId, followerId));
     }
 
     @Test
@@ -45,10 +57,5 @@ public class SubscriptionValidatorTest {
 
         assertThrows(DataValidationException.class, () -> subscriptionValidator.checkSubscriptionNotExists(followerId, followeeId));
         verify(subscriptionRepository, times(1)).existsByFollowerIdAndFolloweeId(followerId, followeeId);
-    }
-
-    @Test
-    public void testCheckFollowerAndFolloweeAreDifferent() {
-        assertThrows(DataValidationException.class, () -> subscriptionValidator.checkFollowerAndFolloweeAreDifferent(followerId, followerId));
     }
 }

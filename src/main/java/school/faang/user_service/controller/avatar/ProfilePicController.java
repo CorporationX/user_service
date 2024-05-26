@@ -1,4 +1,4 @@
-package school.faang.user_service.controller.ProfilePic;
+package school.faang.user_service.controller.avatar;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
@@ -22,7 +22,7 @@ import school.faang.user_service.service.avatar.ProfilePicServiceImpl;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("${api.default}/pic")
+@RequestMapping("${api.default:/api/v1}/pic")
 public class ProfilePicController {
     private final ProfilePicServiceImpl profilePicService;
 
@@ -31,7 +31,8 @@ public class ProfilePicController {
 
     @PostMapping("/{userId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public @Valid UserProfilePicDto saveProfilePic(@Positive @PathVariable long userId, @NotEmpty @RequestParam("file") MultipartFile file) {
+    public @Valid UserProfilePicDto saveProfilePic(@Positive @PathVariable long userId,
+                                                   @NotEmpty @RequestParam("file") MultipartFile file) {
         if (file.getSize() > maxSizeBytes) {
             throw new DataValidationException("The maximum file size of 5 MB has been exceeded");
         }

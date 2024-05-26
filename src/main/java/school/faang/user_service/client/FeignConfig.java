@@ -1,6 +1,7 @@
 package school.faang.user_service.client;
 
 
+import org.bouncycastle.asn1.dvcs.DVCSObjectIdentifiers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import school.faang.user_service.config.context.UserContext;

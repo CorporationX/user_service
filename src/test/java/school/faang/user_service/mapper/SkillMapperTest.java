@@ -9,6 +9,7 @@ import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
@@ -20,7 +21,7 @@ public class SkillMapperTest {
     private Skill skill;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp(){
         skillDto = SkillDto.builder().id(1L).title("title").build();
         skill = Skill.builder().id(1L).title("title").build();
     }

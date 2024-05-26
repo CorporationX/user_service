@@ -42,6 +42,12 @@ public class UserService {
     private static final int BIG_PIC_MAX_SIDE_LENGTH = 1080;
     private static final int SMALL_PIC_MAX_SIDE_LENGTH = 170;
 
+
+    public User getById(long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new DataValidationException("Пользователь с id " + userId + " не найден"));
+    }
+
     public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
         Stream<User> users = userRepository.findPremiumUsers();
 
@@ -49,10 +55,6 @@ public class UserService {
                 .filter(userFilter -> userFilter.isApplicable(userFilterDto))
                 .flatMap(userFilter -> userFilter.apply(users, userFilterDto))
                 .map(userMapper::toDto).toList();
-    }
-
-    public User getById(long userId) {
-        return getUserById(userId);
     }
 
     public UserDto savePic(Long userId, MultipartFile pic) {

@@ -6,10 +6,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class UserFilterDto {
+    private String city;
+    private Integer experience;
     private String namePattern;
     private String aboutPattern;
     private String emailPattern;

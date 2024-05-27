@@ -1,9 +1,13 @@
 package school.faang.user_service.controller.avatar;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
@@ -23,6 +27,7 @@ import school.faang.user_service.service.avatar.ProfilePicServiceImpl;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("${api.version}/pic")
+@Tag(name = "Avatar")
 public class ProfilePicController {
     private final ProfilePicServiceImpl profilePicService;
 
@@ -31,7 +36,8 @@ public class ProfilePicController {
 
     @PostMapping("/{userId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public @Valid UserProfilePicDto saveProfilePic(@Positive @PathVariable long userId,
+    @Operation(summary = "Save profile picture")
+    public @Valid UserProfilePicDto saveProfilePic(@Positive @Parameter @PathVariable long userId,
                                                    @NotEmpty @RequestParam("file") MultipartFile file) {
         if (file.getSize() > maxSizeBytes) {
             throw new DataValidationException("The maximum file size of 5 MB has been exceeded");
@@ -40,12 +46,14 @@ public class ProfilePicController {
     }
 
     @GetMapping("/{userId}")
-    public InputStreamResource getProfilePic(@Positive @PathVariable long userId) {
+    @Operation(summary = "Get profile picture")
+    public InputStreamResource getProfilePic(@Positive @Parameter @PathVariable long userId) {
         return profilePicService.getProfilePic(userId);
     }
 
     @DeleteMapping("/{userId}")
-    public String deleteProfilePic(@Positive @PathVariable long userId) {
+    @Operation(summary = "Delete profile picture")
+    public String deleteProfilePic(@Positive @Parameter @PathVariable long userId) {
         return profilePicService.deleteProfilePic(userId);
     }
 }

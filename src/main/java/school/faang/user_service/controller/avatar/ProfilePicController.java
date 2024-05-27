@@ -22,7 +22,7 @@ import school.faang.user_service.service.avatar.ProfilePicServiceImpl;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("${api.default:/api/v1}/pic")
+@RequestMapping("${api.version}/pic")
 public class ProfilePicController {
     private final ProfilePicServiceImpl profilePicService;
 

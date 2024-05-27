@@ -69,4 +69,4 @@ mentorship:
     time-period-for-single-request: 3
 
 api:
-  default: /api/v1
+  version: /api/v1

@@ -2,18 +2,17 @@ package school.faang.user_service.controller.event.avatar;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import school.faang.user_service.controller.avatar.ProfilePicController;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.mapper.avatar.PictureMapper;
@@ -37,17 +36,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class ProfilePicControllerTest {
-
-    @InjectMocks
-    private ProfilePicController controller;
-    @Mock
+    @MockBean
     private ProfilePicServiceImpl profilePicService;
+    @Autowired
     private MockMvc mockMvc;
     private User user;
     private final PictureMapper mapper = Mappers.getMapper(PictureMapper.class);
-    private final String versionApi = "/api/v1";
+    @Value("${test.api.version}")
+    private String versionApi;
 
     private byte[] getImageBytes() {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -68,52 +68,37 @@ public class ProfilePicControllerTest {
 
     @BeforeEach
     public void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         user = User.builder().id(1L).userProfilePic(new UserProfilePic("Big picture", "Small picture")).build();
     }
 
     @Test
     void testSaveProfilePic() throws Exception {
-        MockMultipartFile file = new MockMultipartFile("file",
-                "example.jpg",
-                MediaType.IMAGE_JPEG_VALUE,
-                getImageBytes());
+        MockMultipartFile file = new MockMultipartFile("file", "example.jpg", MediaType.IMAGE_JPEG_VALUE, getImageBytes());
         when(profilePicService.saveProfilePic(user.getId(), file)).thenReturn(mapper.toDto(user.getUserProfilePic()));
-        ReflectionTestUtils.setField(controller, "maxSizeBytes", 5242880);
         mockMvc.perform(multipart(versionApi + "/pic/" + user.getId()).file(file))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.fileId")
-                        .value(user.getUserProfilePic().getFileId()))
-                .andExpect(jsonPath("$.smallFileId")
-                        .value(user.getUserProfilePic().getSmallFileId()));
+                .andExpect(jsonPath("$.fileId").value(user.getUserProfilePic().getFileId()))
+                .andExpect(jsonPath("$.smallFileId").value(user.getUserProfilePic().getSmallFileId()));
 
         verify(profilePicService, times(1)).saveProfilePic(user.getId(), file);
     }
 
     @Test
     void testGetProfilePic() throws Exception {
-        InputStreamResource inputStream= new InputStreamResource(new ByteArrayInputStream(getImageBytes()));
+        InputStreamResource inputStream = new InputStreamResource(new ByteArrayInputStream(getImageBytes()));
         when(profilePicService.getProfilePic(user.getId())).thenReturn(inputStream);
 
-        mockMvc.perform(get(versionApi + "/pic/" + user.getId()))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json"));
+        mockMvc.perform(get(versionApi + "/pic/" + user.getId())).andExpect(status().isOk()).andExpect(content().contentType("application/json"));
 
         verify(profilePicService, times(1)).getProfilePic(user.getId());
     }
 
     @Test
     void testDeleteProfilePic() throws Exception {
-        when(profilePicService.deleteProfilePic(user.getId()))
-                .thenReturn("The user's avatar with the ID: " + user.getId() + " has been successfully deleted");
+        when(profilePicService.deleteProfilePic(user.getId())).thenReturn("The user's avatar with the ID: " + user.getId() + " has been successfully deleted");
 
-        mockMvc.perform(delete(versionApi + "/pic/" + user.getId()))
-                .andExpect(status().isOk())
-                .andExpect(content()
-                        .string("The user's avatar with the ID: " + user.getId() + " has been successfully deleted"));
+        mockMvc.perform(delete(versionApi + "/pic/" + user.getId())).andExpect(status().isOk()).andExpect(content().string("The user's avatar with the ID: " + user.getId() + " has been successfully deleted"));
 
         verify(profilePicService, times(1)).deleteProfilePic(user.getId());
     }
-
-
 }

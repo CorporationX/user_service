@@ -13,7 +13,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventService;
-import school.faang.user_service.validation.EventValidator;
+import school.faang.user_service.validation.EventValidatorController;
 
 import java.time.LocalDateTime;
 
@@ -31,7 +31,7 @@ public class EventControllerTest {
     private EventService eventService;
 
     @Spy
-    private EventValidator eventValidator;
+    private EventValidatorController eventValidatorController;
 
     private Event event;
     private EventDto eventDto;

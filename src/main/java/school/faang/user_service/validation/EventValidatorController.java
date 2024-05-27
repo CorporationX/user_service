@@ -7,7 +7,7 @@ import school.faang.user_service.exception.DataValidationException;
 
 @Component
 @RequiredArgsConstructor
-public class EventValidator {
+public class EventValidatorController {
 
     public void validByTitleStartDateOwner(EventDto eventDto) {
         if (eventDto.getTitle() == null || eventDto.getTitle().isBlank()) {

@@ -11,7 +11,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class EventValidatorTest {
+public class EventValidatorControllerTest {
 
     private EventValidator eventValidator;
     private User user;

@@ -6,7 +6,7 @@ import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.service.event.EventService;
-import school.faang.user_service.validation.EventValidator;
+import school.faang.user_service.validation.EventValidatorController;
 
 import java.util.List;
 
@@ -15,10 +15,10 @@ import java.util.List;
 public class EventController {
 
     private final EventService eventService;
-    private final EventValidator eventValidator;
+    private final EventValidatorController eventValidatorController;
 
     public EventDto create(EventDto eventDto) {
-        eventValidator.validByTitleStartDateOwner(eventDto);
+        eventValidatorController.validByTitleStartDateOwner(eventDto);
         return eventService.create(eventDto);
     }
 
@@ -35,7 +35,7 @@ public class EventController {
     }
 
     public EventDto updateEvent(EventDto eventDto) {
-        eventValidator.validByTitleStartDateOwner(eventDto);
+        eventValidatorController.validByTitleStartDateOwner(eventDto);
         return eventService.updateEvent(eventDto);
     }
 

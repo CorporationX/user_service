@@ -48,6 +48,8 @@ public class ProfilePicControllerTest {
     private final PictureMapper mapper = Mappers.getMapper(PictureMapper.class);
     @Value("${test.api.version}")
     private String versionApi;
+    @Value("${server.port}")
+    private String port;
 
     private byte[] getImageBytes() {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -75,7 +77,7 @@ public class ProfilePicControllerTest {
     void testSaveProfilePic() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", "example.jpg", MediaType.IMAGE_JPEG_VALUE, getImageBytes());
         when(profilePicService.saveProfilePic(user.getId(), file)).thenReturn(mapper.toDto(user.getUserProfilePic()));
-        mockMvc.perform(multipart(versionApi + "/pic/" + user.getId()).file(file))
+        mockMvc.perform(multipart("http://localhost:"+port+ versionApi + "/pic/" + user.getId()).file(file))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.fileId").value(user.getUserProfilePic().getFileId()))
                 .andExpect(jsonPath("$.smallFileId").value(user.getUserProfilePic().getSmallFileId()));
@@ -88,7 +90,7 @@ public class ProfilePicControllerTest {
         InputStreamResource inputStream = new InputStreamResource(new ByteArrayInputStream(getImageBytes()));
         when(profilePicService.getProfilePic(user.getId())).thenReturn(inputStream);
 
-        mockMvc.perform(get(versionApi + "/pic/" + user.getId())).andExpect(status().isOk()).andExpect(content().contentType("application/json"));
+        mockMvc.perform(get("http://localhost:"+port+versionApi + "/pic/" + user.getId())).andExpect(status().isOk()).andExpect(content().contentType("application/json"));
 
         verify(profilePicService, times(1)).getProfilePic(user.getId());
     }
@@ -97,7 +99,7 @@ public class ProfilePicControllerTest {
     void testDeleteProfilePic() throws Exception {
         when(profilePicService.deleteProfilePic(user.getId())).thenReturn("The user's avatar with the ID: " + user.getId() + " has been successfully deleted");
 
-        mockMvc.perform(delete(versionApi + "/pic/" + user.getId())).andExpect(status().isOk()).andExpect(content().string("The user's avatar with the ID: " + user.getId() + " has been successfully deleted"));
+        mockMvc.perform(delete("http://localhost:"+port+versionApi + "/pic/" + user.getId())).andExpect(status().isOk()).andExpect(content().string("The user's avatar with the ID: " + user.getId() + " has been successfully deleted"));
 
         verify(profilePicService, times(1)).deleteProfilePic(user.getId());
     }

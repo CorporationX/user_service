@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -62,23 +63,14 @@ public class UserController {
         return userService.getUsersByIds(ids);
     }
 
-    //    @Operation(summary = "Upload CSV file")
-//    @PostMapping(value = "upload-csv-file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    public ResponseEntity<String> uploadCSVFile(@RequestParam("file") MultipartFile file) {
-//        try {
-//            csvFileParserService.parseCSVFile(file);
-//        } catch (IOException e) {
-//            throw new NotFoundException("CSV File not found");
-//        }
-//
-//        String fileName = file.getOriginalFilename();
-//        return ResponseEntity.ok("File uploaded: " + fileName);
-//    }
     @Operation(summary = "Upload CSV file")
     @PostMapping("/add/file")
-    public void convertCsvFile(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> convertCsvFile(@RequestParam("file") MultipartFile file) {
+
         List<Person> persons = converter.convertCsvToPerson(file);
         log.info("Received Persons: {}", persons);
         csvFileService.convertCsvFile(persons);
+        String fileName = file.getOriginalFilename();
+        return ResponseEntity.ok("File uploaded: " + fileName);
     }
 }

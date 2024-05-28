@@ -32,14 +32,16 @@ public class MentorshipService {
 
     @Transactional
     public void deleteMentee(Long mentorId, Long menteeId) {
-        User user = getUserById(mentorId);
-        user.getMentees().removeIf(mentee -> mentee.getId() == menteeId);
+        getUserById(mentorId)
+                .getMentees()
+                .removeIf(mentee -> mentee.getId() == menteeId);
     }
 
     @Transactional
     public void deleteMentor(Long menteeId, Long mentorId) {
-        User user = getUserById(menteeId);
-        user.getMentors().removeIf(mentor -> mentor.getId() == mentorId);
+        getUserById(menteeId)
+                .getMentors()
+                .removeIf(mentor -> mentor.getId() == mentorId);
     }
 
     // Утилитный private метод

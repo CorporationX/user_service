@@ -3,10 +3,10 @@ name: ci
 on:
   pull_request:
     branches:
-      - 'phoenix-master-bc4'
+      - 'docker-run-into-ci'
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -17,5 +17,18 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Set up Docker
+        uses: docker-practice/actions-setup-docker@master
+          timeout-minutes: 12
+        run: |
+          set -x
+          
+          docker version
+          
+          ./run.sh
+
       - name: Tests
         run: ./gradlew test
+
+      - name: Stop Docker
+        run: ./stop.sh

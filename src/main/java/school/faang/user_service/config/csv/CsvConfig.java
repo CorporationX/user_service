@@ -12,5 +12,4 @@ public class CsvConfig {
     public CsvMapper csvMapper() {
         return new CsvMapper();
     }
-
 }

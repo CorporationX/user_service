@@ -40,12 +40,11 @@ public class GoalInvitationService {
 
         GoalInvitation goalInvitation = goalInvitationMapper.toEntity(goalInvitationDto);
 
-        goalInvitation.setInviter(userRepository.findById(goalInvitationDto.getInviterId())
-                .orElseThrow(() -> new DataValidationException(NO_INVITER_IN_DB.getMessage())));
-        goalInvitation.setInvited(userRepository.findById(goalInvitationDto.getInvitedUserId())
-                .orElseThrow(() -> new DataValidationException(NO_INVITED_IN_DB.getMessage())));
+        goalInvitation.setInviter(returnUser(goalInvitationDto.getInviterId(), NO_INVITER_IN_DB.getMessage()));
+        goalInvitation.setInvited(returnUser(goalInvitationDto.getInvitedUserId(), NO_INVITED_IN_DB.getMessage()));
         goalInvitation.setGoal(goalRepository.findById(goalInvitationDto.getGoalId())
                 .orElseThrow(() -> new DataValidationException(NO_GOAL_IN_DB.getMessage())));
+        goalInvitation.setStatus(RequestStatus.PENDING);
 
         goalInvitationRepository.save(goalInvitation);
         return goalInvitationMapper.toDto(goalInvitation);
@@ -92,5 +91,10 @@ public class GoalInvitationService {
                         .toList().size() == invitationFilters.size())
                 .map(goalInvitation -> goalInvitationMapper.toDto(goalInvitation))
                 .toList();
+    }
+
+    private User returnUser(Long id, String message) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new DataValidationException(message));
     }
 }

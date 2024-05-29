@@ -1,7 +1,9 @@
 package school.faang.user_service.controller.goal;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
@@ -11,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@Validated
 public class GoalInvitationController {
     private final GoalInvitationService goalInvitationService;
 
@@ -20,12 +23,12 @@ public class GoalInvitationController {
     }
 
     @PutMapping("/acceptGoalInvitation/{id}")
-    public void acceptGoalInvitation(@PathVariable long id) {
+    public void acceptGoalInvitation(@Min(1) @PathVariable long id) {
         goalInvitationService.acceptGoalInvitation(id);
     }
 
     @PutMapping("/rejectGoalInvitation/{id}")
-    public void rejectGoalInvitation(@PathVariable long id) {
+    public void rejectGoalInvitation(@Min(1) @PathVariable long id) {
         goalInvitationService.rejectGoalInvitation(id);
     }
 

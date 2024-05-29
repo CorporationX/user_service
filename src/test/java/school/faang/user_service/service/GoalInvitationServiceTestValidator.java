@@ -23,15 +23,6 @@ public class GoalInvitationServiceTestValidator {
     private final TestData testData = new TestData();
 
     @Test
-    void testValidateForCreateInvitationWithInputIsNull() {
-
-        DataValidationException exception = assertThrows(DataValidationException.class,
-                () -> goalInvitationServiceValidator.validateForCreateInvitation(null));
-
-        assertEquals(INPUT_IS_NULL.getMessage(), exception.getMessage());
-    }
-
-    @Test
     void testValidateForCreateInvitationWhenInvitedUserIdEqualsInviterId() {
 
         GoalInvitationDto goalInvitationDto = testData.setupForCreateInvitation();
@@ -87,12 +78,5 @@ public class GoalInvitationServiceTestValidator {
                 () -> goalInvitationServiceValidator.validateForAcceptGoalInvitation(goalInvitation.getInvited(), goalInvitation.getGoal()));
 
         assertEquals(INVITED_HAS_GOAL.getMessage(), exception.getMessage());
-    }
-
-    @Test
-    void testValidateGetInvitationsWithFilterIsNull() {
-        DataValidationException exception = assertThrows(DataValidationException.class,
-                () -> goalInvitationServiceValidator.validateForGetInvitations(null));
-        assertEquals(INPUT_IS_NULL.getMessage(), exception.getMessage());
     }
 }

@@ -81,7 +81,6 @@ public class GoalInvitationService {
     }
 
     public List<GoalInvitationDto> getInvitations(InvitationFilterDto filters) {
-        goalInvitationServiceValidator.validateForGetInvitations(filters);
         List<GoalInvitation> goalInvitations = goalInvitationRepository.findAll();
 
         return goalInvitations

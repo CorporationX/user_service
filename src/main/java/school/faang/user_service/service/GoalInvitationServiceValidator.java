@@ -2,7 +2,6 @@ package school.faang.user_service.service;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
-import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.DataValidationException;
@@ -15,9 +14,6 @@ import static school.faang.user_service.exception.MessageForGoalInvitationServic
 public class GoalInvitationServiceValidator {
 
     void validateForCreateInvitation(GoalInvitationDto goalInvitationDto) {
-        if (goalInvitationDto == null) {
-            throw new DataValidationException(INPUT_IS_NULL.getMessage());
-        }
         if (goalInvitationDto.getInviterId().equals(goalInvitationDto.getInvitedUserId())) {
             throw new DataValidationException(INVITER_ID_EQUALS_INVITED_USER_ID.getMessage());
         }
@@ -41,11 +37,5 @@ public class GoalInvitationServiceValidator {
         }
 
         return setGoals;
-    }
-
-    void validateForGetInvitations(InvitationFilterDto filters) {
-        if (filters == null) {
-            throw new DataValidationException(INPUT_IS_NULL.getMessage());
-        }
     }
 }

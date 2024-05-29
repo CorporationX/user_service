@@ -3,7 +3,7 @@ name: ci
 on:
   pull_request:
     branches:
-      - 'docker-run-into-ci'
+      - 'phoenix-master-bc4'
 
 jobs:
   test:
@@ -19,10 +19,12 @@ jobs:
 
       - name: Set up Docker
         uses: docker-practice/actions-setup-docker@master
+      - name: Run Docker
         run: |
           set -x
           
-          docker version
+          sudo chmod 755 run.sh
+          sudo chmod 755 stop.sh
           
           ./run.sh
 

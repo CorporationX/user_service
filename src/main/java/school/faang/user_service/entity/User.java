@@ -43,12 +43,6 @@ public class User {
     @Column(name = "password", length = 128, nullable = false)
     private String password;
 
-    @Column(name = "event_id")
-    private long eventId;
-
-    @Column(name = "user_id")
-    private long userId;
-
     @Column(name = "active", nullable = false)
     private boolean active;
 

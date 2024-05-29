@@ -3,7 +3,7 @@ name: ci
 on:
   pull_request:
     branches:
-      - 'docker-run-into-ci'
+      - 'phoenix-master-bc4'
 
 jobs:
   test:

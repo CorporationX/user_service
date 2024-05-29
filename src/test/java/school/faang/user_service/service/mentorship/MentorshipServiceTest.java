@@ -11,11 +11,11 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipServiceTest {
@@ -25,60 +25,165 @@ class MentorshipServiceTest {
     private UserMapper userMapper;
     @InjectMocks
     private MentorshipService mentorshipService;
+    private User mentee1;
+    private User mentee2;
+    private User mentor1;
+    private User mentor2;
+    private User mentee3;
+    private User mentor3;
 
-    private User mentor;
-    private User mentee;
 
     @BeforeEach
     void beforeEach() {
-        mentor = getMentorUser();
-        mentee = getMenteeUser();
+        mentee1 = getMentee1();
+        mentee2 = getMentee2();
+
+        mentor1 = getMentor1();
+        mentor2 = getMentor2();
+
+        mentee3 = getMentee3();
+        mentor3 = getMentor3();
     }
 
     @Test
     void testGetMentorsException() {
-        when(mentorshipRepository.findById(mentor.getId())).thenReturn(Optional.empty());
+        when(mentorshipRepository.findById(mentor2.getId())).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> mentorshipService.getMentors(mentor.getId()));
+        assertThrows(EntityNotFoundException.class, () -> mentorshipService.getMentors(mentor2.getId()));
     }
 
     @Test
     void testGetMentorsList() {
-        when(mentorshipRepository.findById(mentor.getId())).thenReturn(Optional.of(mentor));
-        mentorshipService.getMentors(mentor.getId());
+        when(mentorshipRepository.findById(mentor2.getId())).thenReturn(Optional.of(mentor2));
+        
+        mentorshipService.getMentors(mentor2.getId());
 
-        verify(mentorshipRepository).findById(mentor.getId());
-        verify(userMapper).toDtoList(mentorshipRepository.findById(mentor.getId()).get().getMentees());
+        verify(mentorshipRepository).findById(mentor2.getId());
+        verify(userMapper).toDtoList(mentorshipRepository.findById(mentor2.getId()).get().getMentees());
     }
 
     @Test
     void testGetMenteesException() {
-        when(mentorshipRepository.findById(mentee.getId())).thenReturn(Optional.empty());
+        when(mentorshipRepository.findById(mentee1.getId())).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> mentorshipService.getMentees(mentee.getId()));
+        assertThrows(EntityNotFoundException.class, () -> mentorshipService.getMentees(mentee1.getId()));
     }
 
     @Test
     void testGetMenteesList() {
-        when(mentorshipRepository.findById(mentee.getId())).thenReturn(Optional.of(mentee));
-        mentorshipService.getMentees(mentee.getId());
+        when(mentorshipRepository.findById(mentee1.getId())).thenReturn(Optional.of(mentee1));
 
-        verify(mentorshipRepository).findById(mentee.getId());
-        verify(userMapper).toDtoList(mentorshipRepository.findById(mentee.getId()).get().getMentees());
+        mentorshipService.getMentees(mentee1.getId());
+
+        verify(mentorshipRepository).findById(mentee1.getId());
+        verify(userMapper).toDtoList(mentorshipRepository.findById(mentee1.getId()).get().getMentees());
     }
 
 
-    private static User getMenteeUser() {
+    @Test
+    public void testDeleteMentee() {
+        when(mentorshipRepository.findById(mentor1.getId())).thenReturn(Optional.of(mentor1));
+        when(mentorshipRepository.findById(mentee2.getId())).thenReturn(Optional.of(mentee2));
+
+        mentorshipService.deleteMentee(mentee2.getId(), mentor1.getId());
+
+        verify(mentorshipRepository, times(1)).save(mentor1);
+    }
+
+    @Test
+    public void testDeleteMentor() {
+        when(mentorshipRepository.findById(mentee3.getId())).thenReturn(Optional.of(mentee3));
+        when(mentorshipRepository.findById(mentor2.getId())).thenReturn(Optional.of(mentor2));
+
+        mentorshipService.deleteMentor(mentee3.getId(), mentor2.getId());
+
+        verify(mentorshipRepository, times(1)).save(mentee3);
+    }
+
+    @Test
+    public void testDeleteMenteeThatNotOnTheList() {
+        when(mentorshipRepository.findById(mentor1.getId())).thenReturn(Optional.of(mentor1));
+        when(mentorshipRepository.findById(mentee3.getId())).thenReturn(Optional.of(mentee3));
+        assertThrows(IllegalArgumentException.class,
+                () -> mentorshipService.deleteMentee(mentee3.getId(), mentor1.getId()));
+    }
+
+    @Test
+    public void testDeleteMentorThatNotOnTheList() {
+        when(mentorshipRepository.findById(mentee3.getId())).thenReturn(Optional.of(mentee3));
+        when(mentorshipRepository.findById(mentor3.getId())).thenReturn(Optional.of(mentor3));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> mentorshipService.deleteMentor(mentee3.getId(), mentor3.getId()));
+    }
+
+    @Test
+    public void testDeleteMenteeNotValidIdMentee() {
+        when(mentorshipRepository.findById(mentor1.getId())).thenReturn(Optional.of(mentor1));
+
+        assertThrows(EntityNotFoundException.class,
+                () -> mentorshipService.deleteMentee(-1L, mentor1.getId()));
+    }
+
+    @Test
+    public void testDeleteMenteeNotValidIdMentor() {
+        when(mentorshipRepository.findById(mentor1.getId())).thenReturn(Optional.of(mentor1));
+
+        assertThrows(EntityNotFoundException.class,
+                () -> mentorshipService.deleteMentee(-1L, mentor1.getId()));
+    }
+
+    @Test
+    public void testDeleteMentorNotValidIdMentor() {
+        when(mentorshipRepository.findById(mentee3.getId())).thenReturn(Optional.of(mentee3));
+
+        assertThrows(EntityNotFoundException.class,
+                () -> mentorshipService.deleteMentor(mentee3.getId(), -1L));
+    }
+
+    @Test
+    public void testDeleteMentorNotValidIdMentee() {
+        when(mentorshipRepository.findById(mentee3.getId())).thenReturn(Optional.of(mentee3));
+
+        assertThrows(EntityNotFoundException.class,
+                () -> mentorshipService.deleteMentor(mentee3.getId(), -1L));
+    }
+
+    private static User getMentee1() {
         return User.builder()
-                .id(11L)
-                .username("Mentee")
+                .id(101L)
                 .build();
     }
 
-    private static User getMentorUser() {
+    private static User getMentee2() {
+        return User.builder().
+                id(102L).
+                build();
+    }
+
+    private User getMentor1() {
         return User.builder()
-                .id(12L)
-                .username("Mentor")
+                .id(201L)
+                .mentees(List.of(mentee2, mentee1))
                 .build();
+    }
+
+    private static User getMentor2() {
+        return User.builder()
+                .id(202L)
+                .build();
+    }
+
+    private static User getMentor3() {
+        return User.builder()
+                .id(103L)
+                .build();
+    }
+
+    private User getMentee3() {
+        return User.builder().
+                id(203L).
+                mentors(List.of(mentor2, mentor1)).
+                build();
     }
 }

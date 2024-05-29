@@ -24,8 +24,8 @@ public class MentorshipController {
     }
 
     @DeleteMapping("/{mentorId}/mentees/{menteeId}")
-    public void deleteMentee(@PathVariable Long mentorId, @PathVariable Long menteeId) {
-        mentorshipService.deleteMentee(mentorId, menteeId);
+    public void deleteMentee(@PathVariable Long menteeId, @PathVariable Long mentorId) {
+        mentorshipService.deleteMentee(menteeId, mentorId);
     }
 
     @DeleteMapping("/{menteeId}/mentors/{mentorId}")

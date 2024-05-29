@@ -10,6 +10,7 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -30,18 +31,40 @@ public class MentorshipService {
         return userMapper.toDtoList(user.getMentors());
     }
 
-    @Transactional
-    public void deleteMentee(Long mentorId, Long menteeId) {
-        getUserById(mentorId)
-                .getMentees()
-                .removeIf(mentee -> mentee.getId() == menteeId);
+    public void deleteMentee(Long menteeId, Long mentorId) {
+        User mentor = getUserById(mentorId);
+        User mentee = getUserById(menteeId);
+
+        List<User> mentees = mentor.getMentees();
+
+        if (mentees.contains(mentee)) {
+            mentor.setMentees(mentees.
+                    stream().
+                    filter(user -> !user.equals(mentee)).
+                    collect(Collectors.toList()));
+            mentorshipRepository.save(mentor);
+        } else {
+            throw new IllegalArgumentException(
+                    "That mentee: " + menteeId + " not available for this mentor."
+            );
+        }
     }
 
-    @Transactional
     public void deleteMentor(Long menteeId, Long mentorId) {
-        getUserById(menteeId)
-                .getMentors()
-                .removeIf(mentor -> mentor.getId() == mentorId);
+        User mentee = getUserById(menteeId);
+        User mentor = getUserById(mentorId);
+        List<User> mentors = mentee.getMentors();
+        if (mentors.contains(mentor)) {
+            mentee.setMentors(mentors.
+                    stream().
+                    filter(user -> !user.equals(mentor)).
+                    collect(Collectors.toList()));
+            mentorshipRepository.save(mentee);
+        } else {
+            throw new IllegalArgumentException(
+                    "That mentor: " + mentorId + " not available for this mentee."
+            );
+        }
     }
 
     // Утилитный private метод

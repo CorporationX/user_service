@@ -10,6 +10,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.exception.DataValidationException;
+
 import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
@@ -28,8 +29,8 @@ public class GoalInvitationService {
     private GoalInvitationRepository goalInvitationRepository;
     private GoalRepository goalRepository;
     private UserRepository userRepository;
-    private GoalInvitationMapper goalInvitationMapper;
     private GoalInvitationServiceValidator goalInvitationServiceValidator;
+    private GoalInvitationMapper goalInvitationMapper;
     private List<InvitationFilter> invitationFilters;
     static final int SETGOAL_SIZE = 3;
 
@@ -51,7 +52,6 @@ public class GoalInvitationService {
     }
 
     public void acceptGoalInvitation(long id) {
-
         GoalInvitation goalInvitation = goalInvitationRepository.findById(id).orElseThrow(() ->
                 new DataValidationException(NO_GOAL_INVITATION_IN_DB.getMessage()));
 
@@ -81,7 +81,6 @@ public class GoalInvitationService {
     }
 
     public List<GoalInvitationDto> getInvitations(InvitationFilterDto filters) {
-
         goalInvitationServiceValidator.validateForGetInvitations(filters);
         List<GoalInvitation> goalInvitations = goalInvitationRepository.findAll();
 

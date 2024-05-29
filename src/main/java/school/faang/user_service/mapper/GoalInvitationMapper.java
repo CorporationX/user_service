@@ -8,12 +8,11 @@ import school.faang.user_service.entity.goal.GoalInvitation;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface GoalInvitationMapper {
-
     GoalInvitation toEntity(GoalInvitationDto goalInvitationDto);
-
 
     @Mapping(source = "inviter.id", target = "inviterId")
     @Mapping(source = "invited.id", target = "invitedUserId")
     @Mapping(source = "goal.id", target = "goalId")
     GoalInvitationDto toDto(GoalInvitation goalInvitation);
 }
+

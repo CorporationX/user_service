@@ -4,10 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode
+
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

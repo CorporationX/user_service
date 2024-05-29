@@ -19,6 +19,7 @@ jobs:
 
       - name: Set up Docker
         uses: docker-practice/actions-setup-docker@master
+      - name: Run Docker
         run: |
           set -x
           

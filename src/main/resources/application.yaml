@@ -64,3 +64,6 @@ goals:
 mentorship:
   request:
     time-period-for-single-request: 3
+randomAvatar:
+  url: https://api.dicebear.com/8.x/
+  styles: adventurer, adventurer-neutral, avataaars, avataaars-neutral, big-ears, big-ears-neutral, big-smile,bottts

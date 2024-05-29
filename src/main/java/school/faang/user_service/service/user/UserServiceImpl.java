@@ -10,6 +10,7 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.avatar.ProfilePicServiceImpl;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.user.filter.UserFilterService;
@@ -27,6 +28,17 @@ public class UserServiceImpl implements UserService {
     private final GoalService goalService;
     private final EventService eventService;
     private final MentorshipService mentorshipService;
+    private final ProfilePicServiceImpl profilePicService;
+
+    @Override
+    @Transactional
+    public UserDto createUser(UserDto userDto){
+        User user = userMapper.toEntity(userDto);
+        user.setActive(true);
+        user.setUserProfilePic(profilePicService.generatePic());
+        User saved = userRepository.save(user);
+        return userMapper.toDto(saved);
+    }
 
     @Override
     @Transactional

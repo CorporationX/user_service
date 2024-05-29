@@ -3,6 +3,7 @@ package school.faang.user_service.controller.user;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,7 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.service.avatar.ProfilePicServiceImpl;
 import school.faang.user_service.service.user.UserService;
 
 import java.util.List;
@@ -25,8 +27,15 @@ import java.util.List;
 @Tag(name = "Users")
 public class UserController {
 
+    private final ProfilePicServiceImpl profilePicService;
     private final UserService userService;
     private final UserMapper userMapper;
+
+    @Operation(summary = "Create user")
+    @PostMapping("creature")
+    public UserDto createUser(@ParameterObject @RequestBody @Valid UserDto userDto){
+        return userService.createUser(userDto);
+    }
 
     @Operation(summary = "Get premium users")
     @PostMapping("premium")

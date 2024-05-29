@@ -39,7 +39,7 @@ public class SubscriptionService {
         subscriptionRepository.unfollowUser(followerId, followeeId);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filters) {
         userValidator.checkUserInDB(followeeId);
 
@@ -47,14 +47,14 @@ public class SubscriptionService {
         return filterUser(followers, filters);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public int getFollowersCount(long followeeId) {
         userValidator.checkUserInDB(followeeId);
 
         return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<UserDto> getFollowing(long followerId, UserFilterDto filter) {
         userValidator.checkUserInDB(followerId);
 
@@ -62,7 +62,7 @@ public class SubscriptionService {
         return filterUser(followees, filter);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public int getFollowingCount(long followerId) {
         userValidator.checkUserInDB(followerId);
 

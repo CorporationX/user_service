@@ -7,10 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import java.util.Optional;
@@ -23,8 +21,6 @@ import static org.mockito.Mockito.when;
 class MentorshipServiceTest {
     @Mock
     private MentorshipRepository mentorshipRepository;
-    @Mock
-    private UserRepository userRepository;
     @Mock
     private UserMapper userMapper;
     @InjectMocks
@@ -74,21 +70,15 @@ class MentorshipServiceTest {
 
     private static User getMenteeUser() {
         return User.builder()
+                .id(11L)
                 .username("Mentee")
-                .email("testMentee@mail.ru")
-                .password("321")
-                .active(true)
-                .country(Country.builder().title("MentorCountry").build())
                 .build();
     }
 
     private static User getMentorUser() {
         return User.builder()
+                .id(12L)
                 .username("Mentor")
-                .email("testMentor@mail.ru")
-                .password("123")
-                .active(true)
-                .country(Country.builder().title("MenteeCountry").build())
                 .build();
     }
 }

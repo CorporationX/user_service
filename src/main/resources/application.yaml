@@ -32,7 +32,7 @@ server:
 
 logging:
   level:
-    root: info
+    root: debug
 
 project-service:
   host: localhost

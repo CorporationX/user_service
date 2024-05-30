@@ -25,12 +25,12 @@ public class EventParticipationController {
     }
 
     @GetMapping("/{eventId}/participants")
-    public List<UserDto> getParticipants(Long eventId) {
+    public List<UserDto> getParticipants(@PathVariable("eventId")Long eventId) {
         return eventParticipationService.getParticipants(eventId);
     }
 
     @GetMapping("/events/{eventId}/participants/count")
-    public int getParticipantsCount(Long eventId) {
+    public int getParticipantsCount(@PathVariable("eventId") Long eventId) {
         return eventParticipationService.getParticipantsCount(eventId);
     }
 }

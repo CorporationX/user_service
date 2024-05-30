@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.recommendation;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
@@ -10,19 +11,19 @@ import school.faang.user_service.validator.RecommendationRequestValidator;
 
 import java.util.List;
 
-@RestController("recommendation/request")
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("recommendation/request")
 public class RecommendationRequestController {
     private final RecommendationRequestService recommendationRequestService;
     private final RecommendationRequestValidator validator;
 
-    @PostMapping("create")
-    public RecommendationRequestDto requestRecommendation(@RequestBody RecommendationRequestDto recommendationRequest) {
-        validator.checkMessageIsBlank(recommendationRequest.getMessage());
+    @PostMapping
+    public RecommendationRequestDto createRequestRecommendation(@Valid @RequestBody RecommendationRequestDto recommendationRequest) {
         return recommendationRequestService.create(recommendationRequest);
     }
 
-    @PostMapping
+    @PostMapping("/search")
     public List<RecommendationRequestDto> getRecommendationRequests(@RequestBody RecommendationRequestFilter filter) {
         return recommendationRequestService.getRequests(filter);
     }
@@ -32,7 +33,7 @@ public class RecommendationRequestController {
         return recommendationRequestService.getRequestById(id);
     }
 
-    @PostMapping("reject/{id}")
+    @PutMapping("reject/{id}")
     public RecommendationRequestDto rejectRequest(@PathVariable Long id, @RequestBody RejectionDto rejection) {
         validator.checkMessageIsBlank(rejection.getReason());
         return recommendationRequestService.rejectRequest(id, rejection);

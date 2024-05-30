@@ -5,13 +5,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.cache.HashMapCountry;
-import school.faang.user_service.dto.CountryDto;
+import school.faang.user_service.dto.country.CountryDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.filter.user.UserFilter;
+import school.faang.user_service.generator.password.UserPasswordGenerator;
+import school.faang.user_service.mapper.CountryMapper;
+import school.faang.user_service.mapper.PersonMapper;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -29,8 +32,12 @@ public class UserService {
     private final CountryRepository countryRepository;
     private final List<UserFilter> userFilters;
     private final UserMapper userMapper;
+    private final PersonMapper personMapper;
     private final ThreadPoolForConvertCsvFile threadPoolForConvertCsvFile;
+    private final UserPasswordGenerator userPasswordGenerator;
     private final HashMapCountry hashMapCountry;
+    private final CountryMapper countryMapper;
+
 
     @Transactional
     public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
@@ -48,15 +55,15 @@ public class UserService {
                 .orElseThrow(() -> new DataValidationException("Пользователь с id " + userId + " не найден"));
     }
 
-    @Transactional()
+    @Transactional
     public void convertScvFile(List<Person> persons) {
         ExecutorService executor = threadPoolForConvertCsvFile.taskExecutor();
-        List<CompletableFuture<Void>> futures = persons.stream().map(person -> {
-                    System.out.println("persons = " + person);
-                    User user = userMapper.toEntity(person);
-                    System.out.println("user = " + user);
+        List<CompletableFuture<Void>> futures = persons.stream()
+                .map(person -> {
+                    User user = personMapper.toEntity(person);
                     return CompletableFuture.runAsync(() -> setUpBeforeSaveToDB(user), executor);
-                }).toList();
+                })
+                .toList();
 
         CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
 
@@ -81,9 +88,8 @@ public class UserService {
     }
 
     private void setUpBeforeSaveToDB(User user) {
-        user.setPassword("1");
+        user.setPassword(userPasswordGenerator.createPassword());
 
-        // Создать мапу для выгрузки пользователей из бы, а потом простого обращения к ней.
         if (hashMapCountry.isContainsKey(user.getCountry().getTitle())) {
             setCountryForUser(user);
         } else {
@@ -93,20 +99,16 @@ public class UserService {
 
     private void saveCountry(Country country, User user) {
         Country countrySaved = countryRepository.save(country);
-        CountryDto countryDto = new CountryDto();
-        countryDto.setId(countrySaved.getId());
-        countryDto.setTitle(countrySaved.getTitle());
+        CountryDto countryDto = countryMapper.toDto(countrySaved);
         hashMapCountry.addCountry(countryDto);
         setCountryForUser(user);
     }
 
-    // Присвоить id страны, так как сейчас мы получаем только название а в бд явно храниться уникальное значение.
+
     private void setCountryForUser(User user) {
         CountryDto country = hashMapCountry.findCountryByTitle(user.getCountry().getTitle());
-        Country countryS = new Country();
-        countryS.setId(country.getId());
-        countryS.setTitle(country.getTitle());
-        user.setCountry(countryS);
+        Country userCountry = countryMapper.toEntity(country);
+        user.setCountry(userCountry);
         saveUser(user);
     }
 

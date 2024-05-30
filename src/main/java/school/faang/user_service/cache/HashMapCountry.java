@@ -1,11 +1,9 @@
 package school.faang.user_service.cache;
 
 import org.springframework.stereotype.Component;
-import school.faang.user_service.dto.CountryDto;
-import school.faang.user_service.entity.Country;
+import school.faang.user_service.dto.country.CountryDto;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component

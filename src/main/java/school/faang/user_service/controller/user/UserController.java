@@ -32,12 +32,7 @@ public class UserController {
     }
 
     @PostMapping("/add/file")
-    public void convertScvFile(@RequestParam("file") MultipartFile file) {
-        try {
-            System.out.println("file = " + file.getInputStream());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public void convertScvFile(@RequestParam("file") MultipartFile file) throws IOException {
         List<Person> persons = converterScvToPerson.convertScvToPerson(file);
         log.info("Received Persons: {}", persons);
         userService.convertScvFile(persons);

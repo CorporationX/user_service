@@ -28,7 +28,7 @@ public interface EventMapper {
     List<Event> toEvents(List<EventDto> eventsDto);
 
     @Named("getOwner")
-    default User getOwner(Long ownerId) {  // Метод имитация получения владельца события из базы данных
+    default User getOwner(Long ownerId) {
         User user = new User();
         user.setId(ownerId);
         return user;
@@ -45,7 +45,7 @@ public interface EventMapper {
     }
 
     @Named("getSkills")
-    default List<Skill> getSkills(List<Long> skillIds) {  //Метод имитация получения skill по skillId из базы данных
+    default List<Skill> getSkills(List<Long> skillIds) {
         List<Skill> skills = new ArrayList<>();
         skillIds.forEach(skillId -> skills.add(Skill.builder().id(skillId).build()));
         return skills;

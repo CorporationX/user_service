@@ -38,6 +38,11 @@ public class UserService {
     private final HashMapCountry hashMapCountry;
     private final CountryMapper countryMapper;
 
+    @Transactional(readOnly = true)
+    public User getById(long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new DataValidationException("Пользователь с id " + userId + " не найден"));
+    }
 
     @Transactional
     public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
@@ -47,12 +52,6 @@ public class UserService {
                 .filter(userFilter -> userFilter.isApplicable(userFilterDto))
                 .flatMap(userFilter -> userFilter.apply(users, userFilterDto))
                 .map(userMapper::toDto).toList();
-    }
-
-    @Transactional(readOnly = true)
-    public User getById(long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new DataValidationException("Пользователь с id " + userId + " не найден"));
     }
 
     @Transactional

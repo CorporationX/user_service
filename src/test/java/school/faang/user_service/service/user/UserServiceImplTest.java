@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDTO;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.mapper.UserMapper;
@@ -92,6 +93,14 @@ class UserServiceImplTest {
         when(userMapper.toDTO(user)).thenReturn(userDto);
         UserDTO actual = userService.findById(USER_ID);
         assertThat(actual).isEqualTo(userDto);
+    }
+
+    @Test
+    public void whenFindAllThenGetListOfUserDto() {
+        when(userRepository.findAll()).thenReturn(List.of(user));
+        when(userMapper.toDtoList(any())).thenReturn(List.of(userDto));
+        List<UserDto> actual = userService.findAll();
+        assertThat(actual).isEqualTo(List.of(userDto));
     }
 
     @Test

@@ -66,6 +66,12 @@ public class UserServiceImpl implements UserService {
         mentorshipService.stopMentorship(userId);
     }
 
+    @Override
+    public List<UserDto> findAll() {
+        List<User> users = userRepository.findAll();
+        return userMapper.toDtoList(users);
+    }
+
     private User findUserById(long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("user with id=%d not found", userId)));

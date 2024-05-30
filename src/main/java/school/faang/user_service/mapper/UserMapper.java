@@ -11,6 +11,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {GoalMapper.class})
 public interface UserMapper {
+    @Mapping(source = "participatedEvents", target = "participatedEventIds", qualifiedByName = "mapEventsToEventIds")
     @Mapping(source = "mentors", target = "mentorIds", qualifiedByName = "mapUsersToUserIds")
     @Mapping(source = "mentees", target = "menteeIds", qualifiedByName = "mapUsersToUserIds")
     UserDTO toDTO(User user);
@@ -20,6 +21,13 @@ public interface UserMapper {
     User toEntity(UserDTO userDTO);
 
     List<UserDTO> toDTOList(List<User> userList);
+
+    @Named("mapEventsToEventIds")
+    default List<Long> mapEventsToEventIds(List<Event> participatedEvents) {
+        return participatedEvents.stream()
+                .map(Event::getId)
+                .toList();
+    }
 
     @Named("mapUsersToUserIds")
     default List<Long> mapUsersToUserIds(List<UserDTO> userDTOs) {

@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import school.faang.user_service.dto.UserDTO;
 import school.faang.user_service.service.user.UserService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/user")
 @AllArgsConstructor
@@ -18,12 +20,17 @@ public class UserController {
 
     @PostMapping("/")
     public UserDTO createUser(@RequestBody UserDTO userDto) {
-        userService.createUser(userDto);
-        return UserDTO.builder()
-                .id(userDto.getId())
-                .username(userDto.getUsername())
-                .email(userDto.getEmail())
-                .build();
+        return userService.createUser(userDto);
+    }
+
+    @GetMapping("/{userId}")
+    public UserDto getUser(@PathVariable long userId) {
+        return userService.findById(userId);
+    }
+
+    @GetMapping("/")
+    public List<UserDTO> getAll() {
+        return userService.findAll();
     }
 
     @PutMapping("/deactivate/{id}")

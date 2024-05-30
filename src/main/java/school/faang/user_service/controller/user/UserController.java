@@ -65,12 +65,10 @@ public class UserController {
 
     @Operation(summary = "Upload CSV file")
     @PostMapping("/add/file")
-    public ResponseEntity<String> convertCsvFile(@RequestParam("file") MultipartFile file) {
-
+    public String convertCsvFile(@RequestParam("file") MultipartFile file) {
         List<Person> persons = converter.convertCsvToPerson(file);
         log.info("Received Persons: {}", persons);
         csvFileService.convertCsvFile(persons);
-        String fileName = file.getOriginalFilename();
-        return ResponseEntity.ok("File uploaded: " + fileName);
+        return file.getOriginalFilename();
     }
 }

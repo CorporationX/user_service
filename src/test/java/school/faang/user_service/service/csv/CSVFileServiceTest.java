@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 public class CSVFileServiceTest {
 
     @InjectMocks
-    private CSVFileService csvFileService;
+    private CSVFileServiceImpl csvFileService;
 
     @Mock
     private UserRepository userRepository;
@@ -69,7 +69,7 @@ public class CSVFileServiceTest {
 
     @Test
     public void testGeneratePassword() throws Exception {
-        Method generatePasswordMethod = CSVFileService.class.getDeclaredMethod("generatePassword");
+        Method generatePasswordMethod = CSVFileServiceImpl.class.getDeclaredMethod("generatePassword");
         generatePasswordMethod.setAccessible(true);
         String password = (String) generatePasswordMethod.invoke(csvFileService);
 

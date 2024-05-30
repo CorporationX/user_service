@@ -72,55 +72,39 @@ public interface PersonMapper {
 
     @Named("getAboutMe")
     default String getAboutMe(Person person) {
+        if (person == null) return "";
+
         StringBuilder builder = new StringBuilder();
-        if (person != null) {
-            if (person.getContactInfo() != null && person.getContactInfo().getAddress() != null) {
-                if (person.getContactInfo().getAddress().getState() != null) {
-                    builder.append("State - ").append(person.getContactInfo().getAddress().getState()).append(", ");
-                }
-                if (person.getContactInfo().getAddress().getStreet() != null) {
-                    builder.append("Street - ").append(person.getContactInfo().getAddress().getStreet()).append(", ");
-                }
-                if (person.getContactInfo().getAddress().getPostalCode() != null) {
-                    builder.append("Postal code - ").append(person.getContactInfo().getAddress().getPostalCode()).append(", ");
-                }
-            }
-            if (person.getEducation() != null) {
-                if (person.getEducation().getFaculty() != null) {
-                    builder.append("Faculty - ").append(person.getEducation().getFaculty()).append(", ");
-                }
-                if (person.getEducation().getYearOfStudy() != null) {
-                    builder.append("Year of study - ").append(person.getEducation().getYearOfStudy()).append(", ");
-                }
-                if (person.getEducation().getMajor() != null) {
-                    builder.append("Major - ").append(person.getEducation().getMajor()).append(", ");
-                }
-                if (person.getEducation().getGpa() != null) {
-                    builder.append("GPA - ").append(person.getEducation().getGpa()).append(", ");
-                }
-                if (person.getStatus() != null) {
-                    builder.append("Status - ").append(person.getStatus()).append(", ");
-                }
-            }
-            if (person.getEmployer() != null) {
-                builder.append("Employer - ").append(person.getEmployer()).append(", ");
-            }
-            if (person.getPreviousEducation() != null && !person.getPreviousEducation().isEmpty()) {
-                if (person.getPreviousEducation().get(0).getDegree() != null) {
-                    builder.append("Degree - ").append(person.getPreviousEducation().get(0).getDegree()).append(", ");
-                }
-                if (person.getPreviousEducation().get(0).getInstitution() != null) {
-                    builder.append("Institution - ").append(person.getPreviousEducation().get(0).getInstitution()).append(", ");
-                }
-                if (person.getPreviousEducation().get(0).getCompletionYear() != null) {
-                    builder.append("Completion year - ").append(person.getPreviousEducation().get(0).getCompletionYear()).append(", ");
-                }
-            }
-            int length = builder.length();
-            if (length > 2 && builder.substring(length - 2).equals(", ")) {
-                builder.setLength(length - 2);
-            }
+        if (person.getContactInfo() != null && person.getContactInfo().getAddress() != null) {
+            appendIfNotNull(builder, "State", person.getContactInfo().getAddress().getState());
+            appendIfNotNull(builder, "Street", person.getContactInfo().getAddress().getStreet());
+            appendIfNotNull(builder, "Postal code", person.getContactInfo().getAddress().getPostalCode());
+        }
+        if (person.getEducation() != null) {
+            appendIfNotNull(builder, "Faculty", person.getEducation().getFaculty());
+            appendIfNotNull(builder, "Year of study", person.getEducation().getYearOfStudy());
+            appendIfNotNull(builder, "Major", person.getEducation().getMajor());
+            appendIfNotNull(builder, "GPA", person.getEducation().getGpa());
+        }
+        appendIfNotNull(builder, "Status", person.getStatus());
+        appendIfNotNull(builder, "Employer", person.getEmployer());
+
+        if (person.getPreviousEducation() != null && !person.getPreviousEducation().isEmpty()) {
+            PreviousEducation prevEdu = person.getPreviousEducation().get(0);
+            appendIfNotNull(builder, "Degree", prevEdu.getDegree());
+            appendIfNotNull(builder, "Institution", prevEdu.getInstitution());
+            appendIfNotNull(builder, "Completion year", prevEdu.getCompletionYear());
+        }
+
+        if (builder.length() > 2) {
+            builder.setLength(builder.length() - 2);
         }
         return builder.toString();
+    }
+
+    private void appendIfNotNull(StringBuilder builder, String label, Object value) {
+        if (value != null) {
+            builder.append(label).append(" - ").append(value).append(", ");
+        }
     }
 }

@@ -10,5 +10,5 @@ public interface ProfilePicService {
 
     InputStreamResource getProfilePic(long userId);
 
-    String deleteProfilePic(long userId);
+    UserProfilePicDto deleteProfilePic(long userId);
 }

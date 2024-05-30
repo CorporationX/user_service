@@ -113,9 +113,12 @@ public class ProfilePicControllerTest {
 
     @Test
     void testDeleteProfilePic() throws Exception {
-        when(profilePicService.deleteProfilePic(user.getId())).thenReturn("The user's avatar with the ID: " + user.getId() + " has been successfully deleted");
+        when(profilePicService.deleteProfilePic(user.getId())).thenReturn(mapper.toDto(user.getUserProfilePic()));
 
-        mockMvc.perform(delete("http://localhost:"+port+versionApi + "/pic/" + user.getId())).andExpect(status().isOk()).andExpect(content().string("The user's avatar with the ID: " + user.getId() + " has been successfully deleted"));
+        mockMvc.perform(delete("http://localhost:"+port+versionApi + "/pic/" + user.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.fileId").value(user.getUserProfilePic().getFileId()))
+                .andExpect(jsonPath("$.smallFileId").value(user.getUserProfilePic().getSmallFileId()));
 
         verify(profilePicService, times(1)).deleteProfilePic(user.getId());
     }

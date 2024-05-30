@@ -52,7 +52,7 @@ public class ProfilePicController {
 
     @DeleteMapping("/{userId}")
     @Operation(summary = "Delete profile picture")
-    public String deleteProfilePic(@Positive @Parameter @PathVariable long userId) {
+    public UserProfilePicDto deleteProfilePic(@Positive @Parameter @PathVariable long userId) {
         return profilePicService.deleteProfilePic(userId);
     }
 }

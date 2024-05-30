@@ -6,10 +6,8 @@ import lombok.RequiredArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.avatar.UserProfilePicDto;
 import school.faang.user_service.entity.User;
@@ -42,8 +40,8 @@ public class ProfilePicServiceImpl implements ProfilePicService {
     private InputStream compressPic(MultipartFile file, int size) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
-        BufferedImage scaledImage = Thumbnails.of(file.getInputStream()).size(size, size).asBufferedImage();
-        ImageIO.write(scaledImage, "jpg", outputStream);
+            BufferedImage scaledImage = Thumbnails.of(file.getInputStream()).size(size, size).asBufferedImage();
+            ImageIO.write(scaledImage, "jpg", outputStream);
         }catch (IOException e){
             throw new RuntimeException(e);
         }
@@ -86,14 +84,15 @@ public class ProfilePicServiceImpl implements ProfilePicService {
 
     @Override
     @Transactional
-    public String deleteProfilePic(long userId) {
+    public UserProfilePicDto deleteProfilePic(long userId) {
         User user = getUser(userId);
         s3Client.deleteObject(bucketName, user.getUserProfilePic().getFileId());
         s3Client.deleteObject(bucketName, user.getUserProfilePic().getSmallFileId());
+        UserProfilePicDto deletedProfilePicDto = pictureMapper.toDto(user.getUserProfilePic());
         user.getUserProfilePic().setSmallFileId(null);
         user.getUserProfilePic().setFileId(null);
         userRepository.save(user);
 
-        return "The user's avatar with the ID: " + userId + " has been successfully deleted";
+        return deletedProfilePicDto;
     }
 }

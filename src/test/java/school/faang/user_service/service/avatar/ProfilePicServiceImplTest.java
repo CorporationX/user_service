@@ -139,12 +139,11 @@ public class ProfilePicServiceImplTest {
         when(userRepository.findById(user.getId())).thenReturn(Optional.ofNullable(user));
         ReflectionTestUtils.setField(profilePicService, "bucketName", backetName);
 
-        String result = profilePicService.deleteProfilePic(user.getId());
+        UserProfilePicDto result = profilePicService.deleteProfilePic(user.getId());
         verify(s3Client, times(2)).deleteObject(eq(backetName), anyString());
         verify(userRepository, times(1)).save(user);
         assertNull(user.getUserProfilePic().getFileId());
         assertNull(user.getUserProfilePic().getSmallFileId());
-        assertEquals(result, "The user's avatar with the ID: " + user.getId() + " has been successfully deleted");
     }
 
     @Test

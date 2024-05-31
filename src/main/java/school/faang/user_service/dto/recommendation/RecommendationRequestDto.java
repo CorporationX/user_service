@@ -6,6 +6,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
@@ -18,7 +19,7 @@ public class RecommendationRequestDto {
     @NotBlank(message = "Message can't be blank or empty")
     private String message;
     private RequestStatus status;
-    @NotNull(message = "Skills can't be empty")
+    @NotEmpty(message = "Skills can't be empty")
     private List<SkillRequestDto> skills;
     @NotNull(message = "Requester Id can't be empty")
     @Positive

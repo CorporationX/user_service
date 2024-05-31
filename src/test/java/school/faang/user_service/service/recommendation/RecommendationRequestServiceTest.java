@@ -1,7 +1,11 @@
 package school.faang.user_service.service.recommendation;
 
-import org.junit.Ignore;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,37 +13,38 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.filter.RecommendationRequestFilterInterface;
+
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
-import school.faang.user_service.dto.recommendation.RejectionDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestRejectionDto;
 import school.faang.user_service.dto.skill.SkillRequestDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
-import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.recommendation.RecommendationRequestNotFoundException;
 import school.faang.user_service.exception.recommendation.RecommendationRequestRejectionException;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
-import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
+import school.faang.user_service.service.recommendation.filter.RecommendationRequestFilter;
 import school.faang.user_service.validator.RecommendationRequestValidator;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
-import static school.faang.user_service.exception.recommendation.RecommendationRequestExceptions.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static school.faang.user_service.exception.recommendation.RecommendationRequestExceptions.REQUEST_RECEIVER_ID_EMPTY;
+import static school.faang.user_service.exception.recommendation.RecommendationRequestExceptions.REQUEST_REQUESTER_ID_EMPTY;
+import static school.faang.user_service.exception.recommendation.RecommendationRequestExceptions.REQUEST_SKILLS_EMPTY;
 
 @ExtendWith(MockitoExtension.class)
+@Disabled
 //TODO: Сделать тесты для сервиса. Перенести некоторые из них в валидатор сервиса
-@Ignore
 class RecommendationRequestServiceTest {
     @InjectMocks
     private RecommendationRequestService service;
@@ -48,26 +53,20 @@ class RecommendationRequestServiceTest {
     @Mock
     private RecommendationRequestRepository recommendationRequestRepository;
     @Mock
-    private UserRepository userRepository;
-    @Mock
-    private SkillRepository skillRepository;
-    @Mock
     private SkillRequestRepository skillRequestRepository;
     @Spy
     private RecommendationRequestMapper mapper;
-    private List<RecommendationRequestFilterInterface> filters;
-
-    private Long id = 5L;
-
+    private List<RecommendationRequestFilter> filters;
+    private Long recommendationRequestId = 5L;
     private RecommendationRequestDto dto = null;
     private RecommendationRequest request = null;
-    private RejectionDto rejectionDto = null;
+    private RecommendationRequestRejectionDto rejectionDto = null;
 
     @BeforeEach
     public void setUp() {
         dto = new RecommendationRequestDto();
-        dto.setRequesterId(id);
-        dto.setReceiverId(id);
+        dto.setRequesterId(recommendationRequestId);
+        dto.setReceiverId(recommendationRequestId);
         SkillRequestDto skillRequestDto = new SkillRequestDto();
         skillRequestDto.setSkillId(1L);
         skillRequestDto.setTitle("Something");
@@ -77,8 +76,8 @@ class RecommendationRequestServiceTest {
         request.setMessage("Wowowow");
         request.setReceiver(new User());
         request.setRequester(new User());
-        request.setId(id);
-        rejectionDto = new RejectionDto();
+        request.setId(recommendationRequestId);
+        rejectionDto = new RecommendationRequestRejectionDto();
         rejectionDto.setReason("Reject");
     }
 

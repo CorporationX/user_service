@@ -8,10 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import school.faang.user_service.dto.filter.RecommendationRequestFilterInterface;
+import school.faang.user_service.service.recommendation.filter.RecommendationRequestFilter;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
-import school.faang.user_service.dto.recommendation.RecommendationRequestFilter;
-import school.faang.user_service.dto.recommendation.RejectionDto;
+import school.faang.user_service.dto.filter.RecommendationRequestFilterDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestRejectionDto;
 import school.faang.user_service.dto.skill.SkillRequestDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.Skill;
@@ -34,7 +34,7 @@ import static school.faang.user_service.exception.recommendation.RecommendationR
 //TODO: Доделать тесты!!!
 public class RecommendationRequestService {
     private final RecommendationRequestRepository recommendationRequestRepository;
-    private final List<RecommendationRequestFilterInterface> filters;
+    private final List<RecommendationRequestFilter> filters;
     private final SkillRequestRepository skillRequestRepository;
     private final SkillRepository skillRepository;
     private final UserRepository userRepository;
@@ -46,26 +46,19 @@ public class RecommendationRequestService {
         validator.verifyCanCreate(dto);
         
         RecommendationRequest recommendationRequest = recommendationRequestMapper.fromDto(dto);
-        List<SkillRequest> skillRequests = convertSkillsToSkillsRequest(dto.getSkills(),recommendationRequest);
+        List<SkillRequest> skillRequests = convertSkillsToSkillsRequest(dto.getSkills(), recommendationRequest);
         recommendationRequest.setRequester(findUserById(dto.getRequesterId()));
         recommendationRequest.setReceiver(findUserById(dto.getReceiverId()));
         recommendationRequest.setSkills(skillRequests);
+        
         RecommendationRequest savedRequest = recommendationRequestRepository.save(recommendationRequest);
         
         skillRequestRepository.saveAll(skillRequests);
         
-        
         return recommendationRequestMapper.toDto(savedRequest);
     }
     
-    //TODO: Использовать классы-сервисы для получени юзеров, скиллов и т.д
-    private User findUserById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(
-            ()->new EntityNotFoundException("User not found")
-        );
-    }
-    
-    public List<RecommendationRequestDto> getRequests(RecommendationRequestFilter filter) {
+    public List<RecommendationRequestDto> getRequests(RecommendationRequestFilterDto filter) {
         List<RecommendationRequest> requests = StreamSupport.stream(
                 recommendationRequestRepository.findAll().spliterator(),
                 false
@@ -84,7 +77,7 @@ public class RecommendationRequestService {
     }
     
     @Transactional
-    public RecommendationRequestDto rejectRequest(Long id, RejectionDto rejection) {
+    public RecommendationRequestDto rejectRequest(Long id, RecommendationRequestRejectionDto rejection) {
         RecommendationRequest recommendationRequest = requestById(id);
         validator.verifyStatusIsPending(recommendationRequest);
 
@@ -93,6 +86,13 @@ public class RecommendationRequestService {
         recommendationRequestRepository.save(recommendationRequest);
 
         return recommendationRequestMapper.toDto(recommendationRequest);
+    }
+    
+    //TODO: Использовать классы-сервисы для получени юзеров, скиллов и т.д
+    private User findUserById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(
+            ()->new EntityNotFoundException("User not found")
+        );
     }
     
     private RecommendationRequest requestById(Long id) {

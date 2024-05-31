@@ -4,8 +4,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
-import school.faang.user_service.dto.recommendation.RecommendationRequestFilter;
-import school.faang.user_service.dto.recommendation.RejectionDto;
+import school.faang.user_service.dto.filter.RecommendationRequestFilterDto;
+import school.faang.user_service.dto.recommendation.RecommendationRequestRejectionDto;
 import school.faang.user_service.service.recommendation.RecommendationRequestService;
 import school.faang.user_service.validator.RecommendationRequestValidator;
 
@@ -24,7 +24,7 @@ public class RecommendationRequestController {
     }
 
     @PostMapping("/search")
-    public List<RecommendationRequestDto> getRecommendationRequests(@RequestBody RecommendationRequestFilter filter) {
+    public List<RecommendationRequestDto> getRecommendationRequests(@Valid @RequestBody RecommendationRequestFilterDto filter) {
         return recommendationRequestService.getRequests(filter);
     }
 
@@ -34,8 +34,13 @@ public class RecommendationRequestController {
     }
 
     @PutMapping("reject/{id}")
-    public RecommendationRequestDto rejectRequest(@PathVariable Long id, @RequestBody RejectionDto rejection) {
-        validator.checkMessageIsBlank(rejection.getReason());
+    public RecommendationRequestDto rejectRequest(
+        @PathVariable
+        Long id,
+        @Valid
+        @RequestBody
+        RecommendationRequestRejectionDto rejection
+    ) {
         return recommendationRequestService.rejectRequest(id, rejection);
     }
 }

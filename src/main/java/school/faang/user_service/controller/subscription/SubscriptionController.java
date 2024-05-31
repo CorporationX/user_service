@@ -19,7 +19,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/subscription")
+@RequestMapping("${servlet.pathV1}/subscription")
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
     private final SubscriptionValidator subscriptionValidator;

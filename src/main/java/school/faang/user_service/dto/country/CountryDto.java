@@ -1,9 +1,9 @@
 package school.faang.user_service.dto.country;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 @Builder
 public class CountryDto {
     private long id;

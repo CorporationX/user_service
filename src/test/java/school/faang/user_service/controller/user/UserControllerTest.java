@@ -15,6 +15,7 @@ import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.UserFilterDtoValidator;
+import school.faang.user_service.validator.UserValidator;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,6 +37,9 @@ public class UserControllerTest {
 
     @Spy
     private UserFilterDtoValidator userFilterDtoValidator;
+
+    @Mock
+    private UserValidator userValidator;
 
     private UserFilterDto userFilterDto;
 
@@ -59,7 +63,7 @@ public class UserControllerTest {
     @Test
     void testEmptyFile() {
         MultipartFile file = new MockMultipartFile("file", "".getBytes());
-
+        doThrow(DataValidationException.class).when(userValidator).validateCsvFile(file);
         assertThrows(DataValidationException.class, () -> userController.convertScvFile(file));
 
         verify(converterCsvToPerson, never()).convertCsvToPerson(file);
@@ -75,7 +79,7 @@ public class UserControllerTest {
         List<Person> persons = Arrays.asList(person1, person2);
 
         when(converterCsvToPerson.convertCsvToPerson(file)).thenReturn(persons);
-
+        doNothing().when(userValidator).validateCsvFile(file);
         userController.convertScvFile(file);
 
         verify(converterCsvToPerson, times(1)).convertCsvToPerson(file);

@@ -14,6 +14,7 @@ import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.UserFilterDtoValidator;
+import school.faang.user_service.validator.UserValidator;
 
 import java.util.List;
 
@@ -25,6 +26,7 @@ public class UserController {
     private final UserService userService;
     private final UserFilterDtoValidator userFilterDtoValidator;
     private final ConverterCsvToPerson converterCsvToPerson;
+    private final UserValidator userValidator;
 
     public List<UserDto> getPremiumUsers(UserFilterDto userFilterDto) {
         userFilterDtoValidator.checkIsNull(userFilterDto);
@@ -34,11 +36,7 @@ public class UserController {
 
     @PostMapping("/add/file")
     public void convertScvFile(@RequestParam("file") MultipartFile file) {
-        if (file.isEmpty()) {
-            log.error("Received empty csv file");
-            throw new DataValidationException("The file can't be empty");
-        }
-
+        userValidator.validateCsvFile(file);
         List<Person> persons = converterCsvToPerson.convertCsvToPerson(file);
         log.info("Received Persons: {}", persons);
         userService.convertCsvFile(persons);

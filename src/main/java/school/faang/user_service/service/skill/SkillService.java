@@ -44,7 +44,7 @@ public class SkillService {
 
     @Transactional(readOnly = true)
     public List<SkillDto> getUserSkills(Long userId) {
-        userValidator.checkUserInDB(userId);
+        userValidator.validateUserExists(userId);
         List<Skill> skills = skillRepository.findAllByUserId(userId);
         return skills.stream().map(skillMapper::toDto).toList();
     }
@@ -57,7 +57,7 @@ public class SkillService {
 
     @Transactional(readOnly = true)
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
-        userValidator.checkUserInDB(userId);
+        userValidator.validateUserExists(userId);
         List<Skill> offeredSkillList = skillRepository.findSkillsOfferedToUser(userId);
         return offeredSkillList.stream().map(skill ->
                 skillMapper.skillToSkillCandidateDto(skill, getSkillOffersNumber(userId, skill.getId()))).toList();

@@ -15,7 +15,7 @@ public class SkillValidator {
         if (!skillRepository.existsById(skillId)) {
             throw new DataValidationException("Не найден скилл с id: " + skillId);
         }
-        userValidator.checkUserInDB(userId);
+        userValidator.validateUserExists(userId);
     }
 
 

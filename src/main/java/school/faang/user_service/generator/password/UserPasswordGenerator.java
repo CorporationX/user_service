@@ -8,7 +8,6 @@ import java.security.SecureRandom;
 public class UserPasswordGenerator {
     private static final SecureRandom RANDOM = new SecureRandom();
 
-
     public String createPassword() {
         final String LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
         final String UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";

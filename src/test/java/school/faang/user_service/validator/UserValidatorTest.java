@@ -29,14 +29,14 @@ public class UserValidatorTest {
     }
 
     @Test
-    public void testCheckUserInDBWitchIsInDB() {
+    public void testValidateUserInDBWitchIsExists() {
         when(userRepository.existsById(userId)).thenReturn(true);
-        assertDoesNotThrow(() -> userValidator.checkUserInDB(userId));
+        assertDoesNotThrow(() -> userValidator.validateUserExists(userId));
     }
 
     @Test
-    public void testCheckUserInDBWitchIsNotInDB() {
+    public void testValidateUserInDBWitchIsNotExists() {
         when(userRepository.existsById(userId)).thenReturn(false);
-        assertThrows(DataValidationException.class, () -> userValidator.checkUserInDB(userId));
+        assertThrows(DataValidationException.class, () -> userValidator.validateUserExists(userId));
     }
 }

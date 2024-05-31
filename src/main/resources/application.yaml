@@ -51,3 +51,10 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
+
+
+servlet:
+  PathV1: /api/v1
+
+pull:
+  pullForCsvReader: 4

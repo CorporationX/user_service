@@ -9,9 +9,9 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface RecommendationMapper {
 
-    @Mapping(target = "id", ignore = true)
+    @Mapping(source = "author.id", target = "authorId")
+    @Mapping(source = "receiver.id", target = "receiverId")
     RecommendationDto toDto(Recommendation recommendation);
 
-    @Mapping(target = "id", ignore = true)
     Recommendation toEntity(RecommendationDto recommendationDto);
 }

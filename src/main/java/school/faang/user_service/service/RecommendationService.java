@@ -33,26 +33,29 @@ public class RecommendationService {
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final RecommendationMapper recommendationMapper;
 
-
-    public RecommendationDto create(RecommendationDto recommendationDto) throws DataValidationException {
+    public RecommendationDto create(RecommendationDto recommendationDto) {
         validationData(recommendationDto);
+        Recommendation recommendation = fillRecommendation(recommendationDto);
 
-        Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
         recommendationRepository.save(recommendation);
         saveSkillOffers(recommendation);
+
         return recommendationMapper.toDto(recommendation);
     }
 
-    public RecommendationDto update(RecommendationDto updated) throws DataValidationException {
+    public RecommendationDto update(RecommendationDto updated) {
         validationData(updated);
         Recommendation recommendation = recommendationMapper.toEntity(updated);
+
         skillOfferRepository.deleteAllByRecommendationId(recommendation.getId());
         saveSkillOffers(recommendation);
+
         recommendationRepository.save(recommendation);
         return recommendationMapper.toDto(recommendation);
     }
 
     public void delete(long id) {
+        validationBeforeDelete(id);
         recommendationRepository.deleteById(id);
     }
 
@@ -68,20 +71,23 @@ public class RecommendationService {
         return authorRecommendation.map(recommendationMapper::toDto);
     }
 
-    public void saveSkillOffers(Recommendation recommendation) {
+    private void saveSkillOffers(Recommendation recommendation) {
         long authorId = recommendation.getAuthor().getId();
         long receiverId = recommendation.getReceiver().getId();
+        User user = userRepository.findById(receiverId)
+                .orElseThrow(() -> new DataValidationException("User not found"));
+        User guarantee = userRepository.findById(authorId)
+                .orElseThrow(() -> new DataValidationException("Guarantee not found"));
+
         List<SkillOffer> skillOffers = recommendation.getSkillOffers();
-        List<Skill> userSkills = userRepository.getById(receiverId).getSkills();
-
-
-        for (SkillOffer skillOffer : skillOffers) {
+        List<Skill> userSkills = userRepository.findById(receiverId).get().getSkills();
+        skillOffers.forEach(skillOffer -> {
             long skillId = skillOffer.getSkill().getId();
             if (userSkills.contains(skillId) && !userSkillGuaranteeRepository.existsById(authorId)) {
-                User user = userRepository.getById(receiverId);
-                Skill skill = skillRepository.getById(skillId);
-                User guarantee = userRepository.getById(authorId);
+                Skill skill = skillRepository.findById(skillId).orElseThrow(() ->
+                        new DataValidationException("Skill not found"));
                 UserSkillGuarantee guaranteeSkill = new UserSkillGuarantee();
+
                 guaranteeSkill.setSkill(skill);
                 guaranteeSkill.setUser(user);
                 guaranteeSkill.setGuarantor(guarantee);
@@ -90,17 +96,35 @@ public class RecommendationService {
             } else {
                 skillOfferRepository.save(skillOffer);
             }
-        }
+        });
     }
 
-    public void validationData(RecommendationDto recommendation) throws DataValidationException {
+    private void validationData(RecommendationDto recommendation) {
         LocalDate currentDate = LocalDate.now();
         boolean skillInSystem = recommendation.getSkillOffers().stream()
                 .allMatch(skill -> skillOfferRepository.existsById(skill.getId()));
         if (!skillInSystem) {
             throw new DataValidationException("Skill was not found");
-        } else if (ChronoUnit.MONTHS.between(recommendation.getCreateAt(), currentDate) <= 6) {
+        }
+        if (ChronoUnit.MONTHS.between(recommendation.getCreateAt().toLocalDate(), currentDate) <= 6) {
             throw new DataValidationException("It has been less than 6 months since the last recommendation");
         }
+    }
+
+    private void validationBeforeDelete(long id) {
+        if (recommendationRepository.findById(id).isEmpty()) {
+            throw new DataValidationException("Object is null");
+        }
+    }
+
+    private Recommendation fillRecommendation(RecommendationDto recommendationDto) {
+        Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
+
+        recommendation.setReceiver(userRepository.findById(recommendationDto.getReceiverId())
+                .orElseThrow(() -> new DataValidationException("User not found")));
+        recommendation.setAuthor(userRepository.findById(recommendationDto.getAuthorId())
+                .orElseThrow(() -> new DataValidationException(("Author not found"))));
+
+        return recommendation;
     }
 }

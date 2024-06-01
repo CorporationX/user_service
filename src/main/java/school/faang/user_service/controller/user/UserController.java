@@ -11,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.converter.starter.ConverterCsvToPerson;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.UserFilterDtoValidator;
 import school.faang.user_service.validator.UserValidator;
@@ -21,7 +20,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("${servlet.PathV1}/users")
+@RequestMapping("/users")
 public class UserController {
     private final UserService userService;
     private final UserFilterDtoValidator userFilterDtoValidator;

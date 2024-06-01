@@ -29,6 +29,8 @@ spring:
 
 server:
   port: 8080
+  servlet:
+    context-path: /api/v1
 
 logging:
   level:
@@ -51,10 +53,6 @@ services:
   s3:
     bucket-name: user_backet
     isMocked: true
-
-
-servlet:
-  PathV1: /api/v1
 
 pull:
   pullForCsvReader: 4

@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/users")
+@RequestMapping("${controller.user.url}")
 public class UserController {
     private final UserService userService;
     private final UserFilterDtoValidator userFilterDtoValidator;

@@ -27,6 +27,10 @@ spring:
         profile_view_channel:
           name: profile_view_channel
 
+controller:
+  user:
+    url: api/v1/users
+
 server:
   port: 8080
 

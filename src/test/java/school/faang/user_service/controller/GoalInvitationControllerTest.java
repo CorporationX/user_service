@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class   GoalInvitationControllerTest {
+public class GoalInvitationControllerTest {
     @Mock
     private GoalInvitationService goalInvitationService;
     @InjectMocks

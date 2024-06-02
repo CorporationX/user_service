@@ -14,7 +14,7 @@ import school.faang.user_service.service.RecommendationService;
 public class RecommendationController {
     private final RecommendationService recommendationService;
 
-    @GetMapping
+    @PostMapping
     public RecommendationDto giveRecommendation(@RequestBody @Valid RecommendationDto recommendation) {
         return recommendationService.create(recommendation);
     }
@@ -31,18 +31,20 @@ public class RecommendationController {
     }
 
     @GetMapping("/receiver/{receiverId}")
-    public Page<RecommendationDto> getAllUserRecommendations(@PathVariable("receiverId") long receiverId, int offset, int limit) {
+    public Page<RecommendationDto> getAllUserRecommendations(@PathVariable("receiverId") long receiverId,
+                                                             @RequestParam int offset, @RequestParam int limit) {
         return recommendationService.getAllUserRecommendations(receiverId, offset, limit);
     }
 
     @GetMapping("/author/{authorId}")
-    public Page<RecommendationDto> getAllGivenRecommendations(@PathVariable("authorId") long authorId, int offset, int limit) {
+    public Page<RecommendationDto> getAllGivenRecommendations(@PathVariable("authorId") long authorId,
+                                                              @RequestParam int offset, @RequestParam int limit) {
         return recommendationService.getAllGivenRecommendations(authorId, offset, limit);
     }
 
 
     private void validationDataBeforeUpdate(RecommendationDto recommendationDto) {
-        if(recommendationDto.getId() == null) {
+        if (recommendationDto.getId() == null) {
             throw new DataValidationException("Id cannot be null");
         }
     }

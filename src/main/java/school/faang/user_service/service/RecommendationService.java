@@ -32,10 +32,11 @@ public class RecommendationService {
     private final SkillRepository skillRepository;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final RecommendationMapper recommendationMapper;
+    private final int FILTER_MONTH = 6;
 
     public RecommendationDto create(RecommendationDto recommendationDto) {
         validationData(recommendationDto);
-        Recommendation recommendation = fillRecommendation(recommendationDto);
+        Recommendation recommendation = fillEntityRecommendation(recommendationDto);
 
         recommendationRepository.save(recommendation);
         saveSkillOffers(recommendation);
@@ -43,10 +44,10 @@ public class RecommendationService {
         return recommendationMapper.toDto(recommendation);
     }
 
-    public RecommendationDto update(RecommendationDto updated) {
-        validationData(updated);
-        Recommendation recommendation = recommendationMapper.toEntity(updated);
+    public RecommendationDto update(RecommendationDto recommendationDto) {
+        validationData(recommendationDto);
 
+        Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
         skillOfferRepository.deleteAllByRecommendationId(recommendation.getId());
         saveSkillOffers(recommendation);
 
@@ -80,7 +81,9 @@ public class RecommendationService {
                 .orElseThrow(() -> new DataValidationException("Guarantee not found"));
 
         List<SkillOffer> skillOffers = recommendation.getSkillOffers();
-        List<Skill> userSkills = userRepository.findById(receiverId).get().getSkills();
+        List<Skill> userSkills = userRepository.findById(receiverId)
+                .orElseThrow(() -> new DataValidationException("Skills not found"))
+                .getSkills();
         skillOffers.forEach(skillOffer -> {
             long skillId = skillOffer.getSkill().getId();
             if (userSkills.contains(skillId) && !userSkillGuaranteeRepository.existsById(authorId)) {
@@ -106,18 +109,18 @@ public class RecommendationService {
         if (!skillInSystem) {
             throw new DataValidationException("Skill was not found");
         }
-        if (ChronoUnit.MONTHS.between(recommendation.getCreateAt().toLocalDate(), currentDate) <= 6) {
+        if (ChronoUnit.MONTHS.between(recommendation.getCreateAt().toLocalDate(), currentDate) <= FILTER_MONTH) {
             throw new DataValidationException("It has been less than 6 months since the last recommendation");
         }
     }
 
     private void validationBeforeDelete(long id) {
         if (recommendationRepository.findById(id).isEmpty()) {
-            throw new DataValidationException("Object is null");
+            throw new DataValidationException("Recommendation not found");
         }
     }
 
-    private Recommendation fillRecommendation(RecommendationDto recommendationDto) {
+    private Recommendation fillEntityRecommendation(RecommendationDto recommendationDto) {
         Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
 
         recommendation.setReceiver(userRepository.findById(recommendationDto.getReceiverId())

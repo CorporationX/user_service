@@ -23,7 +23,7 @@ public class S3Service {
     private String bucketName;
 
     @Transactional
-    public String savePic(String folder, ByteArrayOutputStream pic, ObjectMetadata picMetadata) {
+    public String uploadPicture(String folder, ByteArrayOutputStream pic, ObjectMetadata picMetadata) {
         String key = folder + "/" + picMetadata.getUserMetadata().get("originalFileName") + "." + System.currentTimeMillis();
 
         PutObjectRequest putObjectRequest = new PutObjectRequest(
@@ -36,7 +36,7 @@ public class S3Service {
         return key;
     }
 
-    public InputStream downloadPic(String key) {
+    public InputStream downloadPicture(String key) {
         return clientAmazonS3.getObject(bucketName, key).getObjectContent();
     }
 

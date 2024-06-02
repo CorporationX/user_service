@@ -64,18 +64,18 @@ public class UserServiceTest {
     @Test
     public void testSavePic_NotUserInBd() {
         when(userRepository.findById(id)).thenThrow(DataValidationException.class);
-        assertThrows(DataValidationException.class, () -> userService.savePic(id, multipartFile));
+        assertThrows(DataValidationException.class, () -> userService.uploadProfilePicture(id, multipartFile));
     }
 
     @Test
     public void testGetPic() {
         when(userRepository.findById(id)).thenThrow(DataValidationException.class);
-        assertThrows(DataValidationException.class, () -> userService.getPic(id));
+        assertThrows(DataValidationException.class, () -> userService.downloadProfilePicture(id));
     }
 
     @Test
     public void testDeletePic() {
         when(userRepository.findById(id)).thenThrow(DataValidationException.class);
-        assertThrows(DataValidationException.class, () -> userService.deletePic(id));
+        assertThrows(DataValidationException.class, () -> userService.deleteProfilePicture(id));
     }
 }

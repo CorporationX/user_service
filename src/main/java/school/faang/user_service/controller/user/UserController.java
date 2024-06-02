@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("${controller.user.url}")
+@RequestMapping("api/v1/users")
 public class UserController {
     private final UserService userService;
     private final UserFilterDtoValidator userFilterDtoValidator;
@@ -27,25 +27,25 @@ public class UserController {
         return userService.getPremiumUsers(userFilterDto);
     }
 
-    @PostMapping("{userid}/pic")
-    public UserDto savePic(@PathVariable Long userid, @RequestParam MultipartFile pic) {
+    @PostMapping("{userid}/picture")
+    public UserDto uploadProfilePicture(@PathVariable Long userid, @RequestParam MultipartFile picture) {
         userValidator.checkUserInDB(userid);
-        userValidator.checkMaxSizePic(pic);
+        userValidator.checkMaxSizePic(picture);
 
-        return userService.savePic(userid, pic);
+        return userService.uploadProfilePicture(userid, picture);
     }
 
-    @GetMapping("{userId}/pic")
-    public ResponseEntity<byte[]> getPic(@PathVariable Long userId) {
+    @GetMapping("{userId}/picture")
+    public ResponseEntity<byte[]> downloadProfilePicture(@PathVariable Long userId) {
         userValidator.checkUserInDB(userId);
 
-        return userService.getPic(userId);
+        return userService.downloadProfilePicture(userId);
     }
 
-    @DeleteMapping("{userId}/pic")
-    public UserDto deletePic(@PathVariable Long userId) {
+    @DeleteMapping("{userId}/picture")
+    public UserDto deleteProfilePicture(@PathVariable Long userId) {
         userValidator.checkUserInDB(userId);
 
-        return userService.deletePic(userId);
+        return userService.deleteProfilePicture(userId);
     }
 }

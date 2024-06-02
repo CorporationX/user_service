@@ -17,11 +17,9 @@ import school.faang.user_service.validator.EventValidator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 @Service
 @RequiredArgsConstructor
 public class EventService {
-
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
     private final List<EventFilter> eventFilters;
@@ -32,7 +30,10 @@ public class EventService {
         User user = userRepository.findById(eventDto.getOwnerId()).orElseThrow(() ->
                 new DataValidationException("Пользователя с id: " + eventDto.getOwnerId() + " нет в базе данных."));
         Event event = eventMapper.toEntity(eventDto);
-        event.setRelatedSkills(List.of(Skill.builder().id(1).build()));
+        event.setOwner(user);
+
+        event.setRelatedSkills(List.of(Skill.builder().id(1L).build()));
+        user.setSkills(List.of(Skill.builder().id(1L).build()));
 
         eventValidator.checkNeedSkillsForEvent(user, event);
         eventRepository.save(event);

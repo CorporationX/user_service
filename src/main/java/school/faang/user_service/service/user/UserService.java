@@ -57,19 +57,19 @@ public class UserService {
                 .map(userMapper::toDto).toList();
     }
 
-    public UserDto savePic(Long userId, MultipartFile pic) {
+    public UserDto uploadProfilePicture(Long userId, MultipartFile picture) {
         User user = getUserById(userId);
 
         String folder = String.format("%d_%s", user.getId(), user.getUsername());
 
-        ByteArrayOutputStream bigPicBaos = picProcessor.getPicBaosByLength(pic, BIG_PIC_MAX_SIDE_LENGTH);
-        ByteArrayOutputStream smallPicBaos = picProcessor.getPicBaosByLength(pic, SMALL_PIC_MAX_SIDE_LENGTH);
+        ByteArrayOutputStream bigPicBaos = picProcessor.getPicBaosByLength(picture, BIG_PIC_MAX_SIDE_LENGTH);
+        ByteArrayOutputStream smallPicBaos = picProcessor.getPicBaosByLength(picture, SMALL_PIC_MAX_SIDE_LENGTH);
 
-        ObjectMetadata bigPicMetadata = picProcessor.getPicMetaData(pic, bigPicBaos);
-        ObjectMetadata smallPicMetadata = picProcessor.getPicMetaData(pic, smallPicBaos);
+        ObjectMetadata bigPicMetadata = picProcessor.getPicMetaData(picture, bigPicBaos);
+        ObjectMetadata smallPicMetadata = picProcessor.getPicMetaData(picture, smallPicBaos);
 
-        String keyBigPic = uploadPic(folder, bigPicBaos, bigPicMetadata);
-        String keySmallPic = uploadPic(folder, smallPicBaos, smallPicMetadata);
+        String keyBigPic = uploadPicture(folder, bigPicBaos, bigPicMetadata);
+        String keySmallPic = uploadPicture(folder, smallPicBaos, smallPicMetadata);
 
         if (user.getUserProfilePic() == null) {
             UserProfilePic userProfilePic = UserProfilePic.builder()
@@ -86,12 +86,12 @@ public class UserService {
         return userMapper.toDto(user);
     }
 
-    public ResponseEntity<byte[]> getPic(Long userId) {
+    public ResponseEntity<byte[]> downloadProfilePicture(Long userId) {
         User user = getUserById(userId);
         userValidator.checkExistPicId(user);
         String key = user.getUserProfilePic().getFileId();
         log.info("Началась загрузка картинки пользователя с id: {}", user.getId());
-        InputStream inputStreamPic = s3Service.downloadPic(key);
+        InputStream inputStreamPic = s3Service.downloadPicture(key);
         log.info("Загрузка картинки пользователя с id: {} завершена", user.getId());
 
         try {
@@ -106,7 +106,7 @@ public class UserService {
         }
     }
 
-    public UserDto deletePic(Long userId) {
+    public UserDto deleteProfilePicture(Long userId) {
         User user = getUserById(userId);
         userValidator.checkExistPicId(user);
         s3Service.deletePic(user.getUserProfilePic().getFileId());
@@ -122,7 +122,7 @@ public class UserService {
                 new DataValidationException("Пользователь с id " + userId + " не найден"));
     }
 
-    private String uploadPic(String folder, ByteArrayOutputStream pic, ObjectMetadata objectMetadata) {
-        return s3Service.savePic(folder, pic, objectMetadata);
+    private String uploadPicture(String folder, ByteArrayOutputStream picture, ObjectMetadata objectMetadata) {
+        return s3Service.uploadPicture(folder, picture, objectMetadata);
     }
 }

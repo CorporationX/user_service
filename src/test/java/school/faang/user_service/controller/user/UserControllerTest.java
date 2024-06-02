@@ -58,23 +58,23 @@ public class UserControllerTest {
 
     @Test
     public void testSavePic() {
-        userController.savePic(id, multipartFile);
+        userController.uploadProfilePicture(id, multipartFile);
         verify(userValidator, times(1)).checkUserInDB(id);
         verify(userValidator, times(1)).checkMaxSizePic(multipartFile);
-        verify(userService, times(1)).savePic(id, multipartFile);
+        verify(userService, times(1)).uploadProfilePicture(id, multipartFile);
     }
 
     @Test
     public void testGetPic() {
-        userController.getPic(id);
+        userController.downloadProfilePicture(id);
         verify(userValidator, times(1)).checkUserInDB(id);
-        verify(userService, times(1)).getPic(id);
+        verify(userService, times(1)).downloadProfilePicture(id);
     }
 
     @Test
     public void deletePicTest() {
-        userController.deletePic(id);
+        userController.deleteProfilePicture(id);
         verify(userValidator, times(1)).checkUserInDB(id);
-        verify(userService, times(1)).deletePic(id);
+        verify(userService, times(1)).deleteProfilePicture(id);
     }
 }

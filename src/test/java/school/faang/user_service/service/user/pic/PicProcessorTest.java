@@ -23,7 +23,7 @@ public class PicProcessorTest {
 
     @Test
     public void testGetPicBaosByLength() throws IOException {
-        when(multipartFile.getInputStream()).thenThrow(new IOException("Test message"));
+        when(multipartFile.getInputStream()).thenThrow(new IOException("Exception message"));
         assertThrows(RuntimeException.class, () -> picProcessor.getPicBaosByLength(multipartFile, 1));
     }
 }

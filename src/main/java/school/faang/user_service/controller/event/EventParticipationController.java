@@ -15,12 +15,12 @@ public class EventParticipationController {
     private final EventParticipationService eventParticipationService;
 
     @PostMapping("/register")
-    public UserDto registerParticipant(Long eventId, Long userId) {
+    public UserDto registerParticipant(@RequestParam Long eventId, @RequestParam Long userId) {
         return eventParticipationService.registerParticipant(eventId, userId);
     }
 
     @DeleteMapping("/unregister")
-    public void unregisterParticipant(Long eventId, Long userId) {
+    public void unregisterParticipant(@RequestParam Long eventId, @RequestParam Long userId) {
         eventParticipationService.unregisterParticipant(eventId, userId);
     }
 

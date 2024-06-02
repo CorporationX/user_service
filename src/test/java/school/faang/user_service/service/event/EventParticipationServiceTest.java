@@ -1,5 +1,6 @@
 package school.faang.user_service.service.event;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -30,7 +31,8 @@ public class EventParticipationServiceTest {
     @Mock
     private UserMapper userMapper;
 
-    public EventParticipationServiceTest() {
+    @BeforeEach
+    public void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 

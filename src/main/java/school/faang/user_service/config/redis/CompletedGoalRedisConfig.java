@@ -10,7 +10,7 @@ import school.faang.user_service.publisher.CompletedGoalPublisher;
 @Configuration
 public class CompletedGoalRedisConfig {
 
-    @Value("${redis.pubsub.topic:goal-complete}")
+    @Value("${spring.data.redis.channels.goal_channel.name}")
     private String topicName;
 
     @Bean

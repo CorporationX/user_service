@@ -41,6 +41,7 @@ public class GoalServiceImpl implements GoalService {
         return applyFilters(goalStream, goalFilterDto);
     }
 
+    @Override
     @Transactional
     public List<GoalDto> getSubtasksByGoalId(long goalId, GoalFilterDto filter) {
         goalValidator.validateGoalId(goalId);
@@ -62,6 +63,7 @@ public class GoalServiceImpl implements GoalService {
         return goalRepository.countActiveGoalsPerUser(id);
     }
 
+    @Override
     @Transactional
     public GoalDto createGoal(Long userId, GoalDto goalDto) {
 
@@ -79,6 +81,7 @@ public class GoalServiceImpl implements GoalService {
         return goalMapper.toDto(goal);
     }
 
+    @Override
     @Transactional
     public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
         Goal goalToUpdate = goalRepository.findById(goalId)
@@ -110,6 +113,12 @@ public class GoalServiceImpl implements GoalService {
         return goalMapper.toDto(goal);
     }
 
+    @Override
+    @Transactional
+    public void delete(Goal goal) {
+        goalRepository.delete(goal);
+    }
+
     private List<GoalDto> applyFilters(Stream<Goal> goalStream, GoalFilterDto filter) {
 
         if (filter == null) {
@@ -139,11 +148,5 @@ public class GoalServiceImpl implements GoalService {
                 skills.forEach(skill -> skillRepository.assignSkillToUser(skill.getId(), user.getId()));
             }
         }
-    }
-
-    @Override
-    @Transactional
-    public void delete(Goal goal) {
-        goalRepository.delete(goal);
     }
 }

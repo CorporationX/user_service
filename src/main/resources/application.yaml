@@ -26,6 +26,9 @@ spring:
           name: follower_channel
         profile_view_channel:
           name: profile_view_channel
+      pubsub:
+        topic:
+          goal-complete: goalComplete
 
   profiles:
     active: test

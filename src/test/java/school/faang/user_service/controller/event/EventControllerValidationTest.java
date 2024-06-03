@@ -17,10 +17,10 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static school.faang.user_service.exception.ExceptionMessage.INVALID_EVENT_END_DATE_EXCEPTION;
-import static school.faang.user_service.exception.ExceptionMessage.INVALID_EVENT_START_DATE_EXCEPTION;
-import static school.faang.user_service.exception.ExceptionMessage.NULL_EVENT_OWNER_ID_EXCEPTION;
-import static school.faang.user_service.exception.ExceptionMessage.NULL_OR_BLANK_EVENT_TITLE_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.INVALID_EVENT_END_DATE_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.INVALID_EVENT_START_DATE_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.NULL_EVENT_OWNER_ID_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.NULL_OR_BLANK_EVENT_TITLE_EXCEPTION;
 
 class EventControllerValidationTest {
     private final EventControllerValidation eventControllerValidation = new EventControllerValidation();

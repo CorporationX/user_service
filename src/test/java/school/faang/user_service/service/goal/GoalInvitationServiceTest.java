@@ -1,10 +1,15 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.goal;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
@@ -16,7 +21,13 @@ import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.filter.*;
+import school.faang.user_service.service.filter.TestData;
+import school.faang.user_service.service.goal.filter.InvitationFilter;
+import school.faang.user_service.service.goal.filter.InvitedIdFilter;
+import school.faang.user_service.service.goal.filter.InvitedNamePatternFilter;
+import school.faang.user_service.service.goal.filter.InviterIdFilter;
+import school.faang.user_service.service.goal.filter.InviterNamePatternFilter;
+import school.faang.user_service.service.goal.filter.RequestStatusFilter;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +36,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static school.faang.user_service.exception.MessageForGoalInvitationService.*;
+import static school.faang.user_service.exception.message.MessageForGoalInvitationService.NO_GOAL_INVITATION_IN_DB;
+import static school.faang.user_service.exception.message.MessageForGoalInvitationService.NO_GOAL_IN_DB;
+import static school.faang.user_service.exception.message.MessageForGoalInvitationService.NO_INVITED_IN_DB;
+import static school.faang.user_service.exception.message.MessageForGoalInvitationService.NO_INVITER_IN_DB;
 
 
 @ExtendWith(MockitoExtension.class)

@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.goal;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +14,11 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static school.faang.user_service.exception.MessageForGoalInvitationService.*;
+import static school.faang.user_service.exception.message.MessageForGoalInvitationService.INVITED_HAS_GOAL;
+import static school.faang.user_service.exception.message.MessageForGoalInvitationService.INVITER_ID_EQUALS_INVITED_USER_ID;
+import static school.faang.user_service.exception.message.MessageForGoalInvitationService.MORE_THEN_THREE_GOALS;
+import static school.faang.user_service.exception.message.MessageForGoalInvitationService.NO_INVITED_IN_GOAL_INVITATION;
+import static school.faang.user_service.exception.message.MessageForGoalInvitationService.SET_GOALS_IS_NULL;
 
 @ExtendWith(MockitoExtension.class)
 public class GoalInvitationServiceTestValidator {

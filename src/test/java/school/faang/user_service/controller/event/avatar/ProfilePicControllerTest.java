@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -52,10 +51,6 @@ public class ProfilePicControllerTest {
     private MockMvc mockMvc;
     private User user;
     private final PictureMapper mapper = Mappers.getMapper(PictureMapper.class);
-    @Value("${test.api.version}")
-    private String versionApi;
-    @Value("${server.port}")
-    private String port;
 
     @Container
     public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:latest");
@@ -93,7 +88,7 @@ public class ProfilePicControllerTest {
     void testSaveProfilePic() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", "example.jpg", MediaType.IMAGE_JPEG_VALUE, getImageBytes());
         when(profilePicService.saveProfilePic(user.getId(), file)).thenReturn(mapper.toDto(user.getUserProfilePic()));
-        mockMvc.perform(multipart("http://localhost:"+port+ versionApi + "/pic/" + user.getId()).file(file))
+        mockMvc.perform(multipart("/pic/" + user.getId()).file(file))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.fileId").value(user.getUserProfilePic().getFileId()))
                 .andExpect(jsonPath("$.smallFileId").value(user.getUserProfilePic().getSmallFileId()));
@@ -106,7 +101,7 @@ public class ProfilePicControllerTest {
         InputStreamResource inputStream = new InputStreamResource(new ByteArrayInputStream(getImageBytes()));
         when(profilePicService.getProfilePic(user.getId())).thenReturn(inputStream);
 
-        mockMvc.perform(get("http://localhost:"+port+versionApi + "/pic/" + user.getId())).andExpect(status().isOk()).andExpect(content().contentType("application/json"));
+        mockMvc.perform(get( "/pic/" + user.getId())).andExpect(status().isOk()).andExpect(content().contentType("application/json"));
 
         verify(profilePicService, times(1)).getProfilePic(user.getId());
     }
@@ -115,7 +110,7 @@ public class ProfilePicControllerTest {
     void testDeleteProfilePic() throws Exception {
         when(profilePicService.deleteProfilePic(user.getId())).thenReturn(mapper.toDto(user.getUserProfilePic()));
 
-        mockMvc.perform(delete("http://localhost:"+port+versionApi + "/pic/" + user.getId()))
+        mockMvc.perform(delete( "/pic/" + user.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.fileId").value(user.getUserProfilePic().getFileId()))
                 .andExpect(jsonPath("$.smallFileId").value(user.getUserProfilePic().getSmallFileId()));

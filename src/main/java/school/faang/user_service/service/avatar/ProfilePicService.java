@@ -8,6 +8,7 @@ import school.faang.user_service.entity.User;
 public interface ProfilePicService {
 
     void generateAndSetPic(User user);
+
     UserProfilePicDto saveProfilePic(long userId, MultipartFile file);
 
     InputStreamResource getProfilePic(long userId);

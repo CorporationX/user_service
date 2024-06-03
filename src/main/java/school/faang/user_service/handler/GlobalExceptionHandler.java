@@ -8,6 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.NoAccessException;
 import school.faang.user_service.exception.NotFoundException;
@@ -51,6 +52,13 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleNotFoundException(NotFoundException e, HttpServletRequest request) {
         log.error("Not found: {}", e.getMessage());
         return buildErrorResponse(e, request, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    @ResponseStatus(HttpStatus.REQUEST_ENTITY_TOO_LARGE)
+    public ErrorResponse handleMaxUploadSizeExceededException(RuntimeException e, HttpServletRequest request) {
+        log.error("Max upload size exceeded exception: {}", e.getMessage(), e);
+        return buildErrorResponse(e, request, HttpStatus.REQUEST_ENTITY_TOO_LARGE);
     }
 
     @ExceptionHandler(RuntimeException.class)

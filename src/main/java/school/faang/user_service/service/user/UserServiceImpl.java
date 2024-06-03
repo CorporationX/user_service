@@ -22,7 +22,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-
     private final UserRepository userRepository;
     private final UserFilterService userFilterService;
     private final UserMapperImpl userMapper;
@@ -30,7 +29,6 @@ public class UserServiceImpl implements UserService {
     private final EventService eventService;
     private final MentorshipService mentorshipService;
     private final ProfilePicService profilePicService;
-
 
     @Override
     @Transactional
@@ -56,7 +54,6 @@ public class UserServiceImpl implements UserService {
                 goalService.delete(goal);
             }
         });
-
         eventService.deleteAll(user.getOwnedEvents());
         mentorshipService.deleteMentorFromMentee(user);
 

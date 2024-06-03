@@ -30,8 +30,15 @@ spring:
   profiles:
     active: test
 
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
 server:
   port: 8080
+  servlet:
+    context-path: /api/v1
 
 logging:
   level:
@@ -70,8 +77,6 @@ goals:
 mentorship:
   request:
     time-period-for-single-request: 3
+
 randomAvatar:
   url: https://api.dicebear.com/8.x/pixel-art/jpg?seed=
-
-api:
-  version: /api/v1

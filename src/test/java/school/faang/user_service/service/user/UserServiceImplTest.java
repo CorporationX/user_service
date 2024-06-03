@@ -41,7 +41,8 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
-
+    @InjectMocks
+    private UserServiceImpl userServiceImpl;
     @Mock
     private UserRepository userRepository;
     @Mock
@@ -59,9 +60,6 @@ class UserServiceImplTest {
     @Captor
     private ArgumentCaptor<User> captor;
     private User user;
-
-    @InjectMocks
-    private UserServiceImpl userServiceImpl;
 
     private List<User> getUsers() {
         return new ArrayList<>(List.of(

@@ -36,7 +36,7 @@ class SubscriptionControllerTest {
 
     private long followerId;
     private long followeeId;
-    private int expectationCount;
+    private long expectationCount;
     private List<UserDto> expectationUsersDto;
 
     @BeforeEach
@@ -46,7 +46,7 @@ class SubscriptionControllerTest {
         expectationUsersDto = List.of(userDto);
         followerId = 1L;
         followeeId = 2L;
-        expectationCount = 55;
+        expectationCount = 55L;
     }
 
     @Test
@@ -69,7 +69,7 @@ class SubscriptionControllerTest {
 
         List<UserDto> actualUsersDto = subscriptionController.getFollowers(followeeId, userFilterDto);
 
-        verify(subscriptionValidator, times(1)).checkIdIsGreaterThanZero(followeeId);
+        verify(subscriptionValidator, times(1)).checkIdIsCorrect(followeeId);
         verify(userFilterDtoValidator, times(1)).checkUserFilterDtoIsNull(userFilterDto);
         verify(subscriptionService, times(1)).getFollowers(followeeId, userFilterDto);
         assertEquals(expectationUsersDto, actualUsersDto);
@@ -79,9 +79,9 @@ class SubscriptionControllerTest {
     public void testGetFollowersCount() {
         when(subscriptionService.getFollowersCount(followeeId)).thenReturn(expectationCount);
 
-        int actualCount = subscriptionController.getFollowersCount(followeeId);
+        long actualCount = subscriptionController.getFollowersCount(followeeId);
 
-        verify(subscriptionValidator, times(1)).checkIdIsGreaterThanZero(followeeId);
+        verify(subscriptionValidator, times(1)).checkIdIsCorrect(followeeId);
         verify(subscriptionService, times(1)).getFollowersCount(followeeId);
         assertEquals(expectationCount, actualCount);
     }
@@ -92,7 +92,7 @@ class SubscriptionControllerTest {
 
         List<UserDto> actualUsersDto = subscriptionController.getFollowing(followerId, userFilterDto);
 
-        verify(subscriptionValidator, times(1)).checkIdIsGreaterThanZero(followerId);
+        verify(subscriptionValidator, times(1)).checkIdIsCorrect(followerId);
         verify(userFilterDtoValidator, times(1)).checkUserFilterDtoIsNull(userFilterDto);
         verify(subscriptionService, times(1)).getFollowing(followerId, userFilterDto);
         assertEquals(expectationUsersDto, actualUsersDto);
@@ -102,9 +102,9 @@ class SubscriptionControllerTest {
     public void testGetFollowingCount() {
         when(subscriptionService.getFollowingCount(followerId)).thenReturn(expectationCount);
 
-        int actualCount = subscriptionController.getFollowingCount(followerId);
+        long actualCount = subscriptionController.getFollowingCount(followerId);
 
-        verify(subscriptionValidator, times(1)).checkIdIsGreaterThanZero(followerId);
+        verify(subscriptionValidator, times(1)).checkIdIsCorrect(followerId);
         verify(subscriptionService, times(1)).getFollowingCount(followerId);
         assertEquals(expectationCount, actualCount);
     }

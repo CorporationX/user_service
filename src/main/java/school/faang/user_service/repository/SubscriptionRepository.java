@@ -19,7 +19,11 @@ public interface SubscriptionRepository extends CrudRepository<User, Long> {
     @Modifying
     void unfollowUser(long followerId, long followeeId);
 
-    @Query(nativeQuery = true, value = "select exists(select 1 from subscription where follower_id = :followerId and followee_id = :followeeId)")
+    @Query(nativeQuery = true, value = """
+            select not exists(select from users where id = :followerId)
+            or not exists(select from users where id = :followeeId)
+            or exists(select 1 from subscription where follower_id = :followerId and followee_id = :followeeId)
+            """)
     boolean existsByFollowerIdAndFolloweeId(long followerId, long followeeId);
 
     @Query(nativeQuery = true, value = """

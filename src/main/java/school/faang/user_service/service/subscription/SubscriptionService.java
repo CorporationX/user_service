@@ -13,6 +13,7 @@ import school.faang.user_service.validator.SubscriptionValidator;
 import school.faang.user_service.validator.UserValidator;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -25,8 +26,6 @@ public class SubscriptionService {
 
     @Transactional
     public void followUser(long followerId, long followeeId) {
-        userValidator.checkUserInDB(followerId);
-        userValidator.checkUserInDB(followeeId);
         subscriptionValidator.checkSubscriptionExists(followerId, followeeId);
 
         subscriptionRepository.followUser(followerId, followeeId);
@@ -48,7 +47,7 @@ public class SubscriptionService {
     }
 
     @Transactional(readOnly = true)
-    public int getFollowersCount(long followeeId) {
+    public long getFollowersCount(long followeeId) {
         userValidator.checkUserInDB(followeeId);
 
         return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
@@ -63,18 +62,19 @@ public class SubscriptionService {
     }
 
     @Transactional(readOnly = true)
-    public int getFollowingCount(long followerId) {
+    public long getFollowingCount(long followerId) {
         userValidator.checkUserInDB(followerId);
 
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
     }
 
     private List<UserDto> filterUser(List<User> users, UserFilterDto filters) {
-        for (UserFilter filter : userFilters) {
-            if (filter.isApplicable(filters)) {
-                users = filter.apply(users.stream(), filters).toList();
-            }
-        }
-        return users.stream().map(userMapper::toDto).toList();
+
+        return userFilters.stream()
+                .filter(filter -> filter.isApplicable(filters))
+                .reduce(users.stream(), (userStream, filter) -> filter.apply(userStream, filters), Stream::concat)
+                .map(userMapper::toDto)
+                .toList();
+
     }
 }

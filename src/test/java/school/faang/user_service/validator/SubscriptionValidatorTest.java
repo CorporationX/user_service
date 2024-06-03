@@ -34,8 +34,8 @@ public class SubscriptionValidatorTest {
     }
 
     @Test
-    public void testCheckIdIsGreaterThanZero() {
-        assertThrows(DataValidationException.class, () -> subscriptionValidator.checkIdIsGreaterThanZero(invalidId));
+    public void testCheckIdIsCorrect() {
+        assertThrows(DataValidationException.class, () -> subscriptionValidator.checkIdIsCorrect(invalidId));
     }
 
     @Test

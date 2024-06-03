@@ -41,31 +41,30 @@ public class SubscriptionController {
 
     @GetMapping("/followers/{followeeId}")
     public List<UserDto> getFollowers(@PathVariable long followeeId, @RequestBody UserFilterDto filters) {
-        subscriptionValidator.checkIdIsGreaterThanZero(followeeId);
+        subscriptionValidator.checkIdIsCorrect(followeeId);
         userFilterDtoValidator.checkUserFilterDtoIsNull(filters);
 
-        List<UserDto> answer = subscriptionService.getFollowers(followeeId, filters);
-        return answer;
+        return subscriptionService.getFollowers(followeeId, filters);
     }
 
-    @GetMapping("/followersCount/{followeeId}")
-    public int getFollowersCount(@PathVariable long followeeId) {
-        subscriptionValidator.checkIdIsGreaterThanZero(followeeId);
+    @GetMapping("/followers/{followeeId}/count")
+    public long getFollowersCount(@PathVariable long followeeId) {
+        subscriptionValidator.checkIdIsCorrect(followeeId);
 
         return subscriptionService.getFollowersCount(followeeId);
     }
 
     @GetMapping("/following/{followerId}")
     public List<UserDto> getFollowing(@PathVariable long followerId, @RequestBody UserFilterDto filters) {
-        subscriptionValidator.checkIdIsGreaterThanZero(followerId);
+        subscriptionValidator.checkIdIsCorrect(followerId);
         userFilterDtoValidator.checkUserFilterDtoIsNull(filters);
 
         return subscriptionService.getFollowing(followerId, filters);
     }
 
-    @GetMapping("/followingCount/{followerId}")
-    public int getFollowingCount(@PathVariable long followerId) {
-        subscriptionValidator.checkIdIsGreaterThanZero(followerId);
+    @GetMapping("/following/{followerId}/count")
+    public long getFollowingCount(@PathVariable long followerId) {
+        subscriptionValidator.checkIdIsCorrect(followerId);
 
         return subscriptionService.getFollowingCount(followerId);
     }

@@ -74,8 +74,6 @@ class SubscriptionServiceTest {
     public void testFollowUser() {
         subscriptionService.followUser(followerId, followeeId);
 
-        verify(userValidator, times(1)).checkUserInDB(followerId);
-        verify(userValidator, times(1)).checkUserInDB(followeeId);
         verify(subscriptionValidator, times(1)).checkSubscriptionExists(followerId, followeeId);
         verify(subscriptionRepository, times(1)).followUser(followerId, followeeId);
     }
@@ -253,7 +251,7 @@ class SubscriptionServiceTest {
     public void testGetFollowersCount() {
         when(subscriptionRepository.findFollowersAmountByFolloweeId(followeeId)).thenReturn(expectationCount);
 
-        int actualCount = subscriptionService.getFollowersCount(followeeId);
+        long actualCount = subscriptionService.getFollowersCount(followeeId);
 
         verify(userValidator, times(1)).checkUserInDB(followeeId);
         verify(subscriptionRepository, times(1)).findFollowersAmountByFolloweeId(followeeId);
@@ -264,7 +262,7 @@ class SubscriptionServiceTest {
     public void testGetFollowingCount() {
         when(subscriptionRepository.findFolloweesAmountByFollowerId(followerId)).thenReturn(expectationCount);
 
-        int actualCount = subscriptionService.getFollowingCount(followerId);
+        long actualCount = subscriptionService.getFollowingCount(followerId);
 
         verify(userValidator, times(1)).checkUserInDB(followerId);
         verify(subscriptionRepository, times(1)).findFolloweesAmountByFollowerId(followerId);

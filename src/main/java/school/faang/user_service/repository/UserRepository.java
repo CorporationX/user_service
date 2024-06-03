@@ -30,4 +30,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u WHERE u.id = :id")
     Optional<User> findById(@Param("id") long id);
+
+    @Query(nativeQuery = true, value = "SELECT COUNT(*) = 0 FROM users WHERE email = :valueToCheck")
+    boolean isEmailUnique(@Param("valueToCheck") String valueToCheck);
+
+    @Query(nativeQuery = true, value = "SELECT COUNT(*) = 0 FROM users WHERE phone = :valueToCheck")
+    boolean isPhoneUnique(@Param("valueToCheck") String valueToCheck);
+
+    @Query(nativeQuery = true, value = "SELECT COUNT(*) = 0 FROM users WHERE username = :valueToCheck")
+    boolean isUsernameUnique(@Param("valueToCheck") String valueToCheck);
 }

@@ -12,6 +12,7 @@ import org.springframework.retry.annotation.EnableRetry;
 
 @SpringBootApplication
 @EnableFeignClients("school.faang.user_service.client")
+@EnableRetry
 @OpenAPIDefinition(
         info = @Info(
                 title = "User Service",

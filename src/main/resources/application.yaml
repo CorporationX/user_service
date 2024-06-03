@@ -52,6 +52,9 @@ aws:
 
 services:
   s3:
+    endpoint: http://localhost:9000
+    accessKey: user
+    secretKey: password
     bucket-name: user_backet
     isMocked: true
 
@@ -64,3 +67,6 @@ goals:
 mentorship:
   request:
     time-period-for-single-request: 3
+
+spring.servlet.multipart.max-file-size: 10KB
+

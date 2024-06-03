@@ -1,9 +1,10 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.subscription;
 
 import lombok.AllArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.entity.User;
@@ -14,7 +15,7 @@ import school.faang.user_service.service.user.filter.UserFilter;
 
 import java.util.List;
 
-import static school.faang.user_service.exception.ExceptionMessage.REPEATED_SUBSCRIPTION_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.REPEATED_SUBSCRIPTION_EXCEPTION;
 
 @Service
 @AllArgsConstructor
@@ -25,6 +26,7 @@ public class SubscriptionService {
     private List<UserFilter> filters;
     private final UserMapper userMapper;
 
+    @Transactional
     public void followUser(long followerId, long followeeId) {
         if (subscriptionRepo.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             throw new DataValidationException(REPEATED_SUBSCRIPTION_EXCEPTION.getMessage());
@@ -39,6 +41,7 @@ public class SubscriptionService {
         log.info("User + (id=" + followerId + ") canceled subscription to user (id=" + followeeId + ").");
     }
 
+    @Transactional
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filter) {
         return filterUsers(subscriptionRepo.findByFolloweeId(followeeId).toList(), filter);
     }
@@ -47,6 +50,7 @@ public class SubscriptionService {
         return subscriptionRepo.findFollowersAmountByFolloweeId(followeeId);
     }
 
+    @Transactional
     public List<UserDto> getFollowing(long followerId, UserFilterDto filter) {
         return filterUsers(subscriptionRepo.findByFollowerId(followerId).toList(), filter);
     }

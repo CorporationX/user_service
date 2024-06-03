@@ -10,16 +10,17 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.controller.subscription.SubscriptionController;
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.SubscriptionService;
+import school.faang.user_service.service.subscription.SubscriptionService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static school.faang.user_service.exception.ExceptionMessage.USER_FOLLOWING_HIMSELF_EXCEPTION;
-import static school.faang.user_service.exception.ExceptionMessage.USER_UNFOLLOWING_HIMSELF_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.USER_FOLLOWING_HIMSELF_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.USER_UNFOLLOWING_HIMSELF_EXCEPTION;
 
 @ExtendWith(MockitoExtension.class)
 class SubscriptionControllerTest {

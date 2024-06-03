@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.goal;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,16 +10,18 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.exception.DataValidationException;
-
 import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.filter.InvitationFilter;
+import school.faang.user_service.service.goal.filter.InvitationFilter;
 
 import java.util.List;
 
-import static school.faang.user_service.exception.MessageForGoalInvitationService.*;
+import static school.faang.user_service.exception.message.MessageForGoalInvitationService.NO_GOAL_INVITATION_IN_DB;
+import static school.faang.user_service.exception.message.MessageForGoalInvitationService.NO_GOAL_IN_DB;
+import static school.faang.user_service.exception.message.MessageForGoalInvitationService.NO_INVITED_IN_DB;
+import static school.faang.user_service.exception.message.MessageForGoalInvitationService.NO_INVITER_IN_DB;
 
 @Service
 @AllArgsConstructor

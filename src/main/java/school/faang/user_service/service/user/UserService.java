@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -7,7 +7,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 
-import static school.faang.user_service.exception.ExceptionMessage.NO_USER_IN_DB;
+import static school.faang.user_service.exception.message.ExceptionMessage.NO_USER_IN_DB;
 
 @Service
 @RequiredArgsConstructor

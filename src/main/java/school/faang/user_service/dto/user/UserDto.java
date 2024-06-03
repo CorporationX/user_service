@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import school.faang.user_service.entity.Country;
 
 @Data
 @Builder
@@ -16,4 +17,8 @@ public class UserDto {
     private String username;
     @NotBlank
     private String email;
+    @NotBlank
+    private String password;
+    private Country country;
+    private boolean active;
 }

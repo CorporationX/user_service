@@ -39,7 +39,7 @@ public class UserController {
 
     @GetMapping("/users/{userId}")
     UserDto getUser(@Min(1) @PathVariable long userId) {
-        return userService.getUserEntity(userId);
+        return userService.getUser(userId);
     }
 
     @PostMapping("/{userId}/avatar")

@@ -18,7 +18,6 @@ public class BufferedImagesHolder {
 
         boolean maxIsWidth = originalWidth > originalHeight;
         if (maxIsWidth) {
-
             setPics(originalPic, originalWidth);
         } else {
             setPics(originalPic, originalHeight);

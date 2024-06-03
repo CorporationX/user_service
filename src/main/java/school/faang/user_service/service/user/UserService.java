@@ -61,7 +61,7 @@ public class UserService {
         return uploadUserAvatar(createdUser.getId(), avatar);
     }
 
-    public UserDto getUserEntity(long userId) {
+    public UserDto getUser(long userId) {
         return userMapper.toDto(userRepository.findById(userId).orElseThrow(()
                 -> new DataValidationException(NO_SUCH_USER_EXCEPTION.getMessage())));
     }

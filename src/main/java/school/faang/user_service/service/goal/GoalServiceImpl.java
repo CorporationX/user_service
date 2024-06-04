@@ -90,7 +90,9 @@ public class GoalServiceImpl implements GoalService {
         goalMapper.convertDtoIdsToEntity(goalDto, goalToUpdate);
         assignSkills(goalToUpdate);
 
-        return goalMapper.toDto(goalRepository.save(goalToUpdate));
+        Goal updatedGoal = goalMapper.toEntity(goalDto);
+        goalRepository.save(updatedGoal);
+        return goalDto;
     }
 
     @Override

@@ -15,16 +15,12 @@ public class UserService {
 
     public void createUsers(InputStream inputStream) throws IOException {
         CsvMapper mapper = new CsvMapper();
-
         CsvSchema schema = CsvSchema.emptySchema().withHeader();
-
         MappingIterator<Person> iterator = mapper
                 .readerFor(Person.class)
                 .with(schema)
                 .readValues(inputStream);
-
         List<Person> persons = iterator.readAll();
-
         for (Person person : persons) {
             System.out.println(person.toString());
         }

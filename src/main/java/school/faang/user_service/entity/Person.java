@@ -20,8 +20,10 @@ public class Person {
     private String group;
 
     private String studentID;
+
     @JsonUnwrapped
     private ContactInfo contactInfo;
+
     @JsonUnwrapped
     private Education education;
 

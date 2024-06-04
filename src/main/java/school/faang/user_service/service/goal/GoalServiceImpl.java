@@ -86,11 +86,11 @@ public class GoalServiceImpl implements GoalService {
 
         goalValidator.validateGoalNotCompleted(goalToUpdate);
 
-        goalMapper.update(goalDto, goalToUpdate);
-        goalMapper.convertDtoIdsToEntity(goalDto, goalToUpdate);
+        Goal updatedGoal = goalMapper.toEntity(goalDto);
+        goalMapper.update(goalDto, updatedGoal);
+        goalMapper.convertDtoIdsToEntity(goalDto, updatedGoal);
         assignSkills(goalToUpdate);
 
-        Goal updatedGoal = goalMapper.toEntity(goalDto);
         goalRepository.save(updatedGoal);
         return goalDto;
     }

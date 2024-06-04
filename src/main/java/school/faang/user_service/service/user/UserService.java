@@ -8,7 +8,8 @@ import school.faang.user_service.exception.DataGettingException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 
-import static school.faang.user_service.exception.ExceptionMessage.NO_SUCH_USER_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.NO_SUCH_USER_EXCEPTION;
+
 
 @Service
 @RequiredArgsConstructor

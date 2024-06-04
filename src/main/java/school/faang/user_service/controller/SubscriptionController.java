@@ -33,22 +33,34 @@ public class SubscriptionController {
         subscriptionService.unfollowUser(subscriptionRequestDto);
     }
 
-    @Operation(summary = "Get all followers by followeeId")
-    @GetMapping("followers/{followeeId}")
-    public List<UserDto> getFollowers(
+    @Operation(summary = "Get all followers by followeeId with filters")
+    @GetMapping("followers/{followeeId}/filter")
+    public List<UserDto> getFollowersWithFilter(
             @Parameter @PathVariable long followeeId,
             @ParameterObject @RequestBody(required = false) UserFilterDto filter
     ) {
         return subscriptionService.getFollowers(followeeId, filter);
     }
 
-    @Operation(summary = "Get all followings by followerId")
-    @GetMapping("followings/{followerId}")
-    public List<UserDto> getFollowings(
+    @Operation(summary = "Get all followers by followeeId")
+    @GetMapping("followers/{followeeId}")
+    public List<UserDto> getFollowers(@Parameter @PathVariable long followeeId) {
+        return subscriptionService.getFollowers(followeeId, new UserFilterDto());
+    }
+
+    @Operation(summary = "Get all followings by followerId with filter")
+    @GetMapping("followings/{followerId}/filter")
+    public List<UserDto> getFollowingsWithFilter(
             @Parameter @PathVariable long followerId,
             @ParameterObject @RequestBody(required = false) UserFilterDto filter
     ) {
         return subscriptionService.getFollowings(followerId, filter);
+    }
+
+    @Operation(summary = "Get all followings by followerId")
+    @GetMapping("followings/{followerId}")
+    public List<UserDto> getFollowings(@Parameter @PathVariable long followerId) {
+        return subscriptionService.getFollowings(followerId, new UserFilterDto());
     }
 
     @Operation(summary = "Get followers count by foloweeId")

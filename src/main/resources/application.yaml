@@ -52,14 +52,8 @@ aws:
 
 services:
   s3:
-    endpoint: http://localhost:9000
-    accessKey: user
-    secretKey: password
-    bucketName: user-bucket
+    bucket-name: user_backet
     isMocked: true
-    maxSizeBytes: 5242880
-    smallSize: 170
-    largeSize: 1080
 
 goals:
   limit:
@@ -70,5 +64,6 @@ goals:
 mentorship:
   request:
     time-period-for-single-request: 3
+
 randomAvatar:
   url: https://api.dicebear.com/8.x/pixel-art/jpg?seed=

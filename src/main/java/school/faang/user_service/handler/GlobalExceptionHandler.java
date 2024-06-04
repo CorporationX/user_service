@@ -8,6 +8,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import school.faang.user_service.exception.ConversionException;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.NoAccessException;
 import school.faang.user_service.exception.NotFoundException;
@@ -26,7 +28,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleDataValidationException(DataValidationException e, HttpServletRequest request) {
         log.error("Data validation error: {}", e.getMessage());
-        return buildErrorResponse(e, request, HttpStatus.BAD_REQUEST);
+        return buildErrorResponse(e, request);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -43,28 +45,34 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ErrorResponse handleNoAccessException(NoAccessException e, HttpServletRequest request) {
         log.error("Access denied: {}", e.getMessage());
-        return buildErrorResponse(e, request, HttpStatus.FORBIDDEN);
+        return buildErrorResponse(e, request);
     }
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundException(NotFoundException e, HttpServletRequest request) {
         log.error("Not found: {}", e.getMessage());
-        return buildErrorResponse(e, request, HttpStatus.NOT_FOUND);
+        return buildErrorResponse(e, request);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleMaxUploadSizeExceededException(NotFoundException e, HttpServletRequest request) {
+        log.error("The maximum file size is overestimated: {}", e.getMessage());
+        return buildErrorResponse(e, request);
     }
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleRuntimeException(RuntimeException e, HttpServletRequest request) {
         log.error("Runtime exception: {}", e.getMessage(), e);
-        return buildErrorResponse(e, request, HttpStatus.INTERNAL_SERVER_ERROR);
+        return buildErrorResponse(e, request);
     }
 
-    private ErrorResponse buildErrorResponse(Exception e, HttpServletRequest request, HttpStatus status) {
+    private ErrorResponse buildErrorResponse(Exception e, HttpServletRequest request) {
         return ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .url(request.getRequestURI())
-                .status(status)
                 .message(e.getMessage())
                 .build();
     }

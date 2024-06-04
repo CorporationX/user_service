@@ -19,7 +19,7 @@ public class EventController {
 
     private final EventService eventService;
 
-    @PostMapping()
+    @PostMapping("/event")
     public EventDto create(@RequestBody @Valid EventDto eventDto) {
         return eventService.create(eventDto);
     }
@@ -40,7 +40,7 @@ public class EventController {
         eventService.deleteEvent(eventId);
     }
 
-    @PutMapping()
+    @PutMapping("/event")
     public EventDto updateEvent(@RequestBody @Valid EventDto eventDto) {
         return eventService.updateEvent(eventDto);
     }

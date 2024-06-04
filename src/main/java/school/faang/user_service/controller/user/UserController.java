@@ -19,7 +19,7 @@ public class UserController {
     }
 
     @GetMapping("/users/{userId}/exists")
-    public boolean existsById(@PathVariable long userId) {
+    public boolean existsById(@Min(1) @PathVariable long userId) {
         return userService.existsById(userId);
     }
 }

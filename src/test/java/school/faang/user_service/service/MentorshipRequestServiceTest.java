@@ -57,6 +57,9 @@ class MentorshipRequestServiceTest {
     @Mock
     private List<MentorshipRequestFilter> mentorshipRequestFilters;
 
+    @Mock
+    private MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
+
     @InjectMocks
     private MentorshipRequestService mentorshipRequestService;
 

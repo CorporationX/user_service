@@ -26,6 +26,11 @@ spring:
           name: follower_channel
         profile_view_channel:
           name: profile_view_channel
+        mentorship_requested_channel:
+          name: mentorship_requested_channel
+
+  main:
+    allow-bean-definition-overriding: true
 
 server:
   port: 8080

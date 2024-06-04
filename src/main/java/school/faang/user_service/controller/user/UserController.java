@@ -22,6 +22,7 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.service.avatar.ProfilePicService;
 import school.faang.user_service.service.csv.CSVFileService;
 import school.faang.user_service.service.csv.CsvFileConverter;
 import school.faang.user_service.service.user.UserService;
@@ -34,7 +35,7 @@ import java.util.List;
 @Tag(name = "Users")
 @Slf4j
 public class UserController {
-
+    private final ProfilePicService profilePicService;
     private final UserService userService;
     private final UserMapper userMapper;
     private final CSVFileService csvFileService;
@@ -76,8 +77,9 @@ public class UserController {
 
     @Operation(summary = "Create user")
     @PostMapping("creature")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(value = HttpStatus.CREATED)
     public UserDto createUser(@ParameterObject @RequestBody @Valid UserDto userDto){
+        profilePicService.generateAndSetPic(userDto);
         return userService.createUser(userDto);
     }
 }

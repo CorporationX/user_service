@@ -27,7 +27,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleDataValidationException(DataValidationException e, HttpServletRequest request) {
         log.error("Data validation error: {}", e.getMessage());
-        return buildErrorResponse(e, request, HttpStatus.BAD_REQUEST);
+        return buildErrorResponse(e, request);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -44,35 +44,34 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ErrorResponse handleNoAccessException(NoAccessException e, HttpServletRequest request) {
         log.error("Access denied: {}", e.getMessage());
-        return buildErrorResponse(e, request, HttpStatus.FORBIDDEN);
+        return buildErrorResponse(e, request);
     }
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundException(NotFoundException e, HttpServletRequest request) {
         log.error("Not found: {}", e.getMessage());
-        return buildErrorResponse(e, request, HttpStatus.NOT_FOUND);
+        return buildErrorResponse(e, request);
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     @ResponseStatus(HttpStatus.REQUEST_ENTITY_TOO_LARGE)
     public ErrorResponse handleMaxUploadSizeExceededException(RuntimeException e, HttpServletRequest request) {
         log.error("Max upload size exceeded exception: {}", e.getMessage(), e);
-        return buildErrorResponse(e, request, HttpStatus.REQUEST_ENTITY_TOO_LARGE);
+        return buildErrorResponse(e, request);
     }
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleRuntimeException(RuntimeException e, HttpServletRequest request) {
         log.error("Runtime exception: {}", e.getMessage(), e);
-        return buildErrorResponse(e, request, HttpStatus.INTERNAL_SERVER_ERROR);
+        return buildErrorResponse(e, request);
     }
 
-    private ErrorResponse buildErrorResponse(Exception e, HttpServletRequest request, HttpStatus status) {
+    private ErrorResponse buildErrorResponse(Exception e, HttpServletRequest request) {
         return ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .url(request.getRequestURI())
-                .status(status)
                 .message(e.getMessage())
                 .build();
     }

@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import school.faang.user_service.entity.Country;
+import school.faang.user_service.entity.UserProfilePic;
 
 @Data
 @Builder
@@ -21,4 +22,5 @@ public class UserDto {
     private String password;
     private Country country;
     private boolean active;
+    private UserProfilePic userProfilePic;
 }

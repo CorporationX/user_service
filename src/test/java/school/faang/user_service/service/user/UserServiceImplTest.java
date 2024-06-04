@@ -137,7 +137,6 @@ class UserServiceImplTest {
 
         InOrder inOrder = inOrder(userMapper, userRepository, profilePicService);
         inOrder.verify(userMapper, times(1)).toEntity(userDto);
-        inOrder.verify(profilePicService, times(1)).generateAndSetPic(any(User.class));
         inOrder.verify(userRepository, times(1)).save(captor.capture());
         inOrder.verify(userMapper, times(1)).toDto(user);
         assertTrue(captor.getValue().isActive());

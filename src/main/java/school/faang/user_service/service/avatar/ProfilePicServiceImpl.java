@@ -15,12 +15,13 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.avatar.UserProfilePicDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.avatar.PictureMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.user.UserServiceImpl;
+import school.faang.user_service.service.user.UserService;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -34,9 +35,9 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class ProfilePicServiceImpl implements ProfilePicService {
     private final UserRepository userRepository;
+    private final UserService userService;
     private final AmazonS3 s3Client;
     private final PictureMapper pictureMapper;
-    private final UserServiceImpl userService;
     private final RestTemplate restTemplate;
     @Value("${services.s3.bucket-name}")
     private String bucketName;
@@ -63,7 +64,7 @@ public class ProfilePicServiceImpl implements ProfilePicService {
     @Override
     @Transactional
     @Retryable(retryFor = {RestClientException.class}, maxAttempts = 5, backoff = @Backoff(delay = 1000, multiplier = 3))
-    public void generateAndSetPic(User user) {
+    public void generateAndSetPic(UserDto user) {
         byte[] image = restTemplate.getForObject(url + user.getUsername(), byte[].class);
         if (image == null || image.length == 0) {
             throw new DataValidationException("Failed to get the generated image");

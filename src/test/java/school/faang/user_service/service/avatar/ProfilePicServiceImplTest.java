@@ -20,12 +20,13 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 import school.faang.user_service.dto.avatar.UserProfilePicDto;
+import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.avatar.PictureMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.user.UserService;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -35,7 +36,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -56,6 +56,8 @@ public class ProfilePicServiceImplTest {
     @Mock
     private AmazonS3 s3Client;
     @Mock
+    private UserService userService;
+    @Mock
     private UserRepository userRepository;
     @Mock
     private RestTemplate restTemplate;
@@ -64,6 +66,7 @@ public class ProfilePicServiceImplTest {
     @Captor
     private ArgumentCaptor<String> forPictures;
     private User user;
+    private UserDto userDto;
     private String backetName = "user-bucket";
 
     private byte[] getImageBytes() {
@@ -86,12 +89,13 @@ public class ProfilePicServiceImplTest {
     @BeforeEach
     void init() {
         user = User.builder().id(1L).username("name").email("test@mail.ru").password("password").userProfilePic(new UserProfilePic("Big picture", "Small picture")).build();
+        userDto = UserDto.builder().id(1L).username("name").email("test@mail.ru").password("password").build();
     }
 
     @Test
     public void testGenerateAndSetPicWithException() {
         when(restTemplate.getForObject(anyString(), eq(byte[].class))).thenReturn(null);
-        var exception = assertThrows(DataValidationException.class, () -> profilePicService.generateAndSetPic(user));
+        var exception = assertThrows(DataValidationException.class, () -> profilePicService.generateAndSetPic(userDto));
         assertEquals(exception.getMessage(), "Failed to get the generated image");
     }
 
@@ -102,8 +106,8 @@ public class ProfilePicServiceImplTest {
         ReflectionTestUtils.setField(profilePicService, "smallSize", 170);
         ReflectionTestUtils.setField(profilePicService, "bucketName", "user-bucket");
 
-        profilePicService.generateAndSetPic(user);
-        UserProfilePic generated = user.getUserProfilePic();
+        profilePicService.generateAndSetPic(userDto);
+        UserProfilePic generated = userDto.getUserProfilePic();
         assertNull(generated.getFileId());
         assertNotNull(generated.getSmallFileId());
 
@@ -114,7 +118,7 @@ public class ProfilePicServiceImplTest {
 
     @Test
     public void testSaveProfilePicWithSaving() {
-        when(userRepository.findById(user.getId())).thenReturn(Optional.ofNullable(user));
+        when(userService.findUserById(user.getId())).thenReturn(user);
         MockMultipartFile file = new MockMultipartFile("file", "example.jpg", MediaType.IMAGE_JPEG_VALUE, getImageBytes());
         ReflectionTestUtils.setField(profilePicService, "smallSize", 170);
         ReflectionTestUtils.setField(profilePicService, "largeSize", 1080);
@@ -122,7 +126,7 @@ public class ProfilePicServiceImplTest {
 
         UserProfilePicDto result = profilePicService.saveProfilePic(user.getId(), file);
 
-        verify(userRepository, times(1)).findById(user.getId());
+        verify(userService, times(1)).findUserById(user.getId());
         verify(s3Client, times(2)).putObject(eq(backetName), forPictures.capture(), any(InputStream.class), any());
         var pictures = forPictures.getAllValues();
         String forSmallPicture = pictures.get(0);
@@ -134,48 +138,29 @@ public class ProfilePicServiceImplTest {
     }
 
     @Test
-    public void testSaveProfilePicWithEntityNotFoundException() {
-        when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
-        var exception = assertThrows(EntityNotFoundException.class, () -> profilePicService.saveProfilePic(user.getId(), null));
-        assertEquals(exception.getMessage(), "User with id: " + user.getId() + " was not found");
-    }
-
-    @Test
     public void testGetProfilePic() {
-        when(userRepository.findById(user.getId())).thenReturn(Optional.ofNullable(user));
+        when(userService.findUserById(user.getId())).thenReturn(user);
         ReflectionTestUtils.setField(profilePicService, "bucketName", backetName);
         S3Object s3Object = new S3Object();
         s3Object.setObjectContent(new ByteArrayInputStream(getImageBytes()));
         when(s3Client.getObject(eq(backetName), any())).thenReturn(s3Object);
 
         InputStreamResource result = profilePicService.getProfilePic(user.getId());
+        verify(userService, times(1)).findUserById(user.getId());
         verify(s3Client, times(1)).getObject(backetName, user.getUserProfilePic().getFileId());
         assertNotNull(result);
     }
 
     @Test
-    public void testGetProfilePicWithEntityNotFoundException() {
-        when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
-        var exception = assertThrows(EntityNotFoundException.class, () -> profilePicService.getProfilePic(user.getId()));
-        assertEquals(exception.getMessage(), "User with id: " + user.getId() + " was not found");
-    }
-
-    @Test
     public void testDeleteProfilePic() {
-        when(userRepository.findById(user.getId())).thenReturn(Optional.ofNullable(user));
+        when(userService.findUserById(user.getId())).thenReturn(user);
         ReflectionTestUtils.setField(profilePicService, "bucketName", backetName);
 
         UserProfilePicDto result = profilePicService.deleteProfilePic(user.getId());
+        verify(userService, times(1)).findUserById(user.getId());
         verify(s3Client, times(2)).deleteObject(eq(backetName), anyString());
         verify(userRepository, times(1)).save(user);
         assertNull(user.getUserProfilePic().getFileId());
         assertNull(user.getUserProfilePic().getSmallFileId());
-    }
-
-    @Test
-    public void testDeleteProfilePicWithEntityNotFoundException() {
-        when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
-        var exception = assertThrows(EntityNotFoundException.class, () -> profilePicService.deleteProfilePic(user.getId()));
-        assertEquals(exception.getMessage(), "User with id: " + user.getId() + " was not found");
     }
 }

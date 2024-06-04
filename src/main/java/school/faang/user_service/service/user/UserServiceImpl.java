@@ -9,9 +9,8 @@ import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.NotFoundException;
-import school.faang.user_service.mapper.UserMapperImpl;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.avatar.ProfilePicService;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.user.filter.UserFilterService;
@@ -24,11 +23,10 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserFilterService userFilterService;
-    private final UserMapperImpl userMapper;
+    private final UserMapper userMapper;
     private final GoalService goalService;
     private final EventService eventService;
     private final MentorshipService mentorshipService;
-    private final ProfilePicService profilePicService;
 
     @Override
     @Transactional
@@ -70,7 +68,6 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDto createUser(@Valid UserDto userDto) {
         User user = userMapper.toEntity(userDto);
-        profilePicService.generateAndSetPic(user);
         user.setActive(true);
         User saved = userRepository.save(user);
         return userMapper.toDto(saved);

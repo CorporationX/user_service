@@ -19,14 +19,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.avatar.UserProfilePicDto;
-import school.faang.user_service.service.avatar.ProfilePicServiceImpl;
+import school.faang.user_service.service.avatar.ProfilePicService;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/pic")
 @Tag(name = "Avatar")
 public class ProfilePicController {
-    private final ProfilePicServiceImpl profilePicService;
+    private final ProfilePicService profilePicService;
 
     @PostMapping("/{userId}")
     @ResponseStatus(HttpStatus.CREATED)

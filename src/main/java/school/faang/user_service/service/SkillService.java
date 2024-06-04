@@ -32,7 +32,6 @@ public class SkillService {
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
 
     public SkillDto create(SkillDto skillDto) {
-        skillValidate.validateSkillTitle(skillDto);
         skillValidate.validateSkill(skillDto);
         Skill skillEntity = skillMapper.dtoToSkill(skillDto);
         return skillMapper.skillToDto(skillRepository.save(skillEntity));

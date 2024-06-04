@@ -1,38 +1,45 @@
 package school.faang.user_service.controller.skill;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SkillService;
+import school.faang.user_service.validation.skill.SkillValidator;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
 public class SkillController {
 
     private final SkillService skillService;
+    private final SkillValidator skillValidator;
 
     @PostMapping
-    public SkillDto create(SkillDto skillDto) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public SkillDto create(@RequestBody SkillDto skillDto)
+    {
+        skillValidator.validateSkillTitle(skillDto);
         return skillService.create(skillDto);
     }
 
-    @GetMapping
-    public List<SkillDto> getUserSkills(long userId) {
+    @GetMapping ("/user/{userId}")
+    public List<SkillDto> getUserSkills(@PathVariable("userId") long userId) {
         return skillService.getUserSkills(userId);
     }
 
-    @GetMapping
-    public List<SkillCandidateDto> getOfferedSkills(long userId) {
+    @GetMapping ("/offered/user/{userId}")
+    public List<SkillCandidateDto> getOfferedSkills(@PathVariable("userId") long userId) {
         return skillService.getOfferedSkills(userId);
     }
 
-    @PostMapping
-    public SkillDto acquireSkillFromOffers(Long skillId, Long userId) {
+    @PostMapping ("/{userId}/offered/{skillId}")
+    public SkillDto acquireSkillFromOffers(@PathVariable("userId") long userId, @PathVariable("skillId") long skillId) {
         return skillService.acquireSkillFromOffers(skillId, userId);
     }
 }

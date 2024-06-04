@@ -15,8 +15,8 @@ import school.faang.user_service.service.skill.SkillService;
 import java.util.HashSet;
 import java.util.List;
 
-import static school.faang.user_service.exception.ExceptionMessage.INAPPROPRIATE_OWNER_SKILLS_EXCEPTION;
-import static school.faang.user_service.exception.ExceptionMessage.NO_SUCH_EVENT_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.INAPPROPRIATE_OWNER_SKILLS_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.NO_SUCH_EVENT_EXCEPTION;
 
 @Service
 @AllArgsConstructor

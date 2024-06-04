@@ -1,4 +1,4 @@
-package school.faang.user_service.exception;
+package school.faang.user_service.exception.message;
 
 public enum ExceptionMessage {
     NULL_OR_BLANK_EVENT_TITLE_EXCEPTION("The event cannot have null-valued or blank title."),
@@ -11,7 +11,8 @@ public enum ExceptionMessage {
     NO_SUCH_EVENT_EXCEPTION("Database doesn't contains event with such id."),
     USER_FOLLOWING_HIMSELF_EXCEPTION("The user cannot follow himself."),
     USER_UNFOLLOWING_HIMSELF_EXCEPTION("The user cannot unfollow himself."),
-    REPEATED_SUBSCRIPTION_EXCEPTION("The user cannot follow another user twice.");
+    REPEATED_SUBSCRIPTION_EXCEPTION("The user cannot follow another user twice."),
+    NO_USER_IN_DB("No such user in database");
 
     private final String message;
 

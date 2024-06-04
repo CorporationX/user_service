@@ -18,7 +18,6 @@ import org.springframework.retry.annotation.EnableRetry;
                 title = "User Service",
                 version = "1.0.0")
 )
-@EnableRetry
 public class UserServiceApplication {
 
     public static void main(String[] args) {

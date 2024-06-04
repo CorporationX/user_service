@@ -32,6 +32,8 @@ spring:
 
 server:
   port: 8080
+  servlet:
+    context-path: /api/v1
 
 logging:
   level:
@@ -49,11 +51,6 @@ aws:
   accessKey: access_key
   secretKey: secret_key
   region: bucket_region
-
-services:
-  s3:
-    bucket-name: user_backet
-    isMocked: true
 
 goals:
   limit:

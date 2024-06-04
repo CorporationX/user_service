@@ -1,11 +1,10 @@
 package school.faang.user_service.service.avatar;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.ObjectMetadata;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -14,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.service.cloud.S3Service;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -25,16 +25,15 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@PropertySource(value = "classpath:s3.properties")
 public class ProfilePicServiceImpl implements ProfilePicService {
     @Value("${randomAvatar.url}")
     private String url;
-    @Value("${services.s3.bucket-name}")
-    private String bucketName;
-    @Value("${services.s3.smallSize}")
+    @Value("${smallSize}")
     private int smallSize;
-    @Value("${services.s3.largeSize}")
+    @Value("${largeSize}")
     private int largeSize;
-    private final AmazonS3 s3Client;
+    private final S3Service s3Service;
     private final RestTemplate restTemplate;
 
     private InputStream compressPic(InputStream inputStream, int size) {
@@ -59,11 +58,9 @@ public class ProfilePicServiceImpl implements ProfilePicService {
             throw new DataValidationException("Failed to get the generated image");
         }
         String nameForSmallPic = "small" + user.getUsername() + LocalDateTime.now() + ".jpg";
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentType("image/jpeg");
 
         InputStream inputStream = new ByteArrayInputStream(image);
-        s3Client.putObject(bucketName, nameForSmallPic, compressPic(inputStream, smallSize), metadata);
+        s3Service.uploadFile(compressPic(inputStream, smallSize), nameForSmallPic);
         UserProfilePic userProfilePic = new UserProfilePic();
         userProfilePic.setSmallFileId(nameForSmallPic);
         user.setUserProfilePic(userProfilePic);

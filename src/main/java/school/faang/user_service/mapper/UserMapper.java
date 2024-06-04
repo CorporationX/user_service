@@ -1,6 +1,7 @@
 package school.faang.user_service.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.Person;
 import school.faang.user_service.entity.User;
@@ -13,5 +14,7 @@ public interface UserMapper {
 
     List<UserDto> toDto(List<User> users);
 
+    @Mapping(target = "Person.firstName", source = "User.username")
+    @Mapping(target = "Person.lastName", source = "User.username")
     User toUser(Person person);
 }

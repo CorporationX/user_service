@@ -1,4 +1,4 @@
-package school.faang.user_service.service.amazonS3;
+package school.faang.user_service.config.amazonS3;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;

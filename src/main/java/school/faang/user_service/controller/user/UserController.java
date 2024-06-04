@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/users")
+@RequestMapping("/users")
 public class UserController {
     private final UserService userService;
     private final UserFilterDtoValidator userFilterDtoValidator;

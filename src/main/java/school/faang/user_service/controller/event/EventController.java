@@ -13,13 +13,13 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/events")
+@RequestMapping("/events")
 @Validated
 public class EventController {
 
     private final EventService eventService;
 
-    @PostMapping("/create")
+    @PostMapping()
     public EventDto create(@RequestBody @Valid EventDto eventDto) {
         return eventService.create(eventDto);
     }
@@ -40,7 +40,7 @@ public class EventController {
         eventService.deleteEvent(eventId);
     }
 
-    @PutMapping("/update")
+    @PutMapping()
     public EventDto updateEvent(@RequestBody @Valid EventDto eventDto) {
         return eventService.updateEvent(eventDto);
     }

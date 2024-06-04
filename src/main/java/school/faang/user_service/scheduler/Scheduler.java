@@ -13,6 +13,6 @@ public class Scheduler {
 
     @Scheduled(cron = "${events.clean_interval}")
     public void clearEvents() {
-        eventService.deleteEndEvents();
+        eventService.deleteEndedEvents();
     }
 }

@@ -2,6 +2,7 @@ package school.faang.user_service.repository.event;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.event.Event;
 
@@ -22,4 +23,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             WHERE ue.user_id = :userId
             """)
     List<Event> findParticipatedEventsByUserId(long userId);
+
+    @Async("fixedThreadPool")
+    @Override
+    void deleteAllById(Iterable<? extends Long> longs);
 }

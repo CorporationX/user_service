@@ -53,3 +53,6 @@ services:
     accessKey: user
     secretKey: password
     bucketName: corpbucket
+
+servlet:
+  pathV1: /api/v1

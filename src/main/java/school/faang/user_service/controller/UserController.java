@@ -2,6 +2,7 @@ package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.user.UserAvatarDto;
 import school.faang.user_service.dto.user.UserDto;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.service.UserService;
 
 @RestController
@@ -19,6 +21,7 @@ import school.faang.user_service.service.UserService;
 public class UserController {
 
     private final UserService userService;
+    private final UserMapper userMapper;
 
     @PutMapping("/deactivation/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -29,5 +32,10 @@ public class UserController {
     @PostMapping("/{userId}/avatar")
     public UserAvatarDto getAvatar(@RequestBody UserDto userDto, @PathVariable Long userId) {
         return userService.getRandomAvatar(userDto, userId);
+    }
+
+    @GetMapping("/{id}")
+    public UserDto getUser(@PathVariable long id) {
+        return userMapper.toDto(userService.findById(id));
     }
 }

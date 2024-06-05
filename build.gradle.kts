@@ -4,6 +4,7 @@ plugins {
     id("org.springframework.boot") version "3.0.6"
     id("io.spring.dependency-management") version "1.1.0"
     id("org.jsonschema2pojo") version "1.2.1"
+    id("io.freefair.lombok") version "6.5.1"
 }
 
 group = "faang.school"
@@ -58,6 +59,7 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
 
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.13.0")
+    implementation("org.imgscalr:imgscalr-lib:4.2")
 
     /**
      * Test containers

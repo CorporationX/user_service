@@ -20,17 +20,18 @@ import static school.faang.user_service.exception.ExceptionMessage.PICTURE_TYPE_
 public class ImageProcessor {
     public static final String FORMAT_NAME = "jpeg";
 
-    public BufferedImage getBufferedImage(MultipartFile pic) {
+    public BufferedImage getBufferedImage(MultipartFile file) {
         BufferedImage bufferedImage;
         try {
-            bufferedImage = ImageIO.read(pic.getInputStream());
+            bufferedImage = ImageIO.read(file.getInputStream());
         } catch (IOException e) {
             log.error(FILE_PROCESSING_EXCEPTION.getMessage() + e.getMessage());
             throw new RuntimeException(FILE_PROCESSING_EXCEPTION.getMessage() + e.getMessage());
         }
 
+        //Если загруженный файл не является картинкой, то в объект bufferedImage не запишется ничего
         if (bufferedImage == null) {
-            log.error(PICTURE_TYPE_EXCEPTION.getMessage() + "Received file: " + pic.getOriginalFilename());
+            log.error(PICTURE_TYPE_EXCEPTION.getMessage() + "Received file: " + file.getOriginalFilename());
             throw new DataValidationException(PICTURE_TYPE_EXCEPTION.getMessage());
         }
 
@@ -42,18 +43,18 @@ public class ImageProcessor {
      * @return the image as ByteArrayOutputStream with in jpeg format
      */
     public ByteArrayOutputStream getImageOS(Image image) {
-        try (ByteArrayOutputStream bigPicOS = new ByteArrayOutputStream()) {
-            ImageIO.write((RenderedImage) image, FORMAT_NAME, bigPicOS);
+        try (ByteArrayOutputStream bigImageOS = new ByteArrayOutputStream()) {
+            ImageIO.write((RenderedImage) image, FORMAT_NAME, bigImageOS);
 
-            return bigPicOS;
+            return bigImageOS;
         } catch (IOException e) {
             log.error(FILE_PROCESSING_EXCEPTION.getMessage() + e.getMessage());
             throw new RuntimeException(FILE_PROCESSING_EXCEPTION.getMessage() + e.getMessage());
         }
     }
 
-    public BufferedPicHolder scaleImage(BufferedImage originalPic) {
-        return new BufferedPicHolder(originalPic);
+    public BufferedImagesHolder scaleImage(BufferedImage originalPicture) {
+        return new BufferedImagesHolder(originalPicture);
     }
 }
 

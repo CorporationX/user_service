@@ -5,13 +5,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
+import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DataGettingException;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.amazonS3.S3Service;
-import school.faang.user_service.service.user.image.BufferedPicHolder;
+import school.faang.user_service.service.user.image.AvatarGeneratorService;
+import school.faang.user_service.service.user.image.BufferedImagesHolder;
 import school.faang.user_service.service.user.image.ImageProcessor;
 
 import java.awt.image.BufferedImage;
@@ -20,35 +24,62 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import static school.faang.user_service.exception.ExceptionMessage.FILE_PROCESSING_EXCEPTION;
+import static school.faang.user_service.exception.ExceptionMessage.NO_SUCH_COUNTRY_EXCEPTION;
 import static school.faang.user_service.exception.ExceptionMessage.NO_SUCH_USER_EXCEPTION;
+import static school.faang.user_service.exception.ExceptionMessage.REPEATED_USER_CREATION_EXCEPTION;
 import static school.faang.user_service.exception.ExceptionMessage.USER_AVATAR_ABSENCE_EXCEPTION;
 
 @Slf4j
 @Service
 @AllArgsConstructor
 public class UserService {
-    public static final String BIG_PIC_NAME = "bigPic";
-    public static final String SMALL_PIC_NAME = "smallPic";
+    public static final String BIG_AVATAR_PICTURE_NAME = "bigPicture";
+    public static final String SMALL_AVATAR_PICTURE_NAME = "smallPicture";
     public static final String FOLDER_PREFIX = "user";
     private S3Service s3Service;
+    private AvatarGeneratorService avatarGeneratorService;
     private ImageProcessor imageProcessor;
     private UserRepository userRepository;
     private UserMapper userMapper;
+    private CountryRepository countryRepository;
 
     @Transactional
-    public UserDto uploadUserPic(Long userId, BufferedImage uploadedImage) {
-        User user = getUser(userId);
+    public UserDto createUser(UserDto userDto) {
+        Long userId = userDto.getId();
+        if (userId != null && userRepository.existsById(userId)) {
+            log.warn("Registered attempt to create user by id of existing user.");
+            throw new DataValidationException(REPEATED_USER_CREATION_EXCEPTION.getMessage());
+        }
 
-        BufferedPicHolder scaledImages = imageProcessor.scaleImage(uploadedImage);
+        User userToBeCreated = userMapper.toEntity(userDto);
+        setCountryByCountryId(userDto.getCountryId(), userToBeCreated);
+        User createdUser = userRepository.save(userToBeCreated);
+
+        log.info("User created successfully.");
+
+        BufferedImage avatar = avatarGeneratorService.getRandomAvatar();
+        return uploadUserAvatar(createdUser.getId(), avatar);
+    }
+
+    public UserDto getUser(long userId) {
+        return userMapper.toDto(userRepository.findById(userId).orElseThrow(()
+                -> new DataValidationException(NO_SUCH_USER_EXCEPTION.getMessage())));
+    }
+
+    @Transactional
+    public UserDto uploadUserAvatar(Long userId, BufferedImage uploadedImage) {
+        User user = getUserEntity(userId);
+
+        BufferedImagesHolder scaledImages = imageProcessor.scaleImage(uploadedImage);
         log.info("Received avatar image was successfully scaled.");
 
-        String fileId = uploadFile(userId, imageProcessor.getImageOS(scaledImages.getBigPic()), BIG_PIC_NAME);
-        String smallFileId = uploadFile(userId, imageProcessor.getImageOS(scaledImages.getSmallPic()), SMALL_PIC_NAME);
+        String fileId = uploadFile(userId, imageProcessor.getImageOS(scaledImages.getBigPicture()), BIG_AVATAR_PICTURE_NAME);
+        String smallFileId = uploadFile(userId, imageProcessor.getImageOS(scaledImages.getSmallPicture()), SMALL_AVATAR_PICTURE_NAME);
 
         log.info("Scaled images of user avatar were uploaded on cloud.");
 
         if (user.getUserProfilePic() != null) {
-            deleteUserPic(userId);
+            deleteUserAvatar(userId);
         }
 
         user.setUserProfilePic(UserProfilePic.builder()
@@ -63,17 +94,17 @@ public class UserService {
     }
 
     @Transactional
-    public byte[] downloadUserPic(Long userId) {
-        User user = getUser(userId);
-        UserProfilePic userProfilePic = user.getUserProfilePic();
+    public byte[] downloadUserAvatar(Long userId) {
+        User user = getUserEntity(userId);
+        UserProfilePic userProfilePictures = user.getUserProfilePic();
 
-        if (userProfilePic == null) {
+        if (userProfilePictures == null) {
             log.warn("Can't download user's avatar, cause user doesn't have it.");
             throw new DataGettingException(USER_AVATAR_ABSENCE_EXCEPTION.getMessage());
         }
 
-        try (InputStream userPicIS = s3Service.downloadFile(userProfilePic.getSmallFileId())) {
-            byte[] imageInBytesArray = userPicIS.readAllBytes();
+        try (InputStream userAvatarIS = s3Service.downloadFile(userProfilePictures.getSmallFileId())) {
+            byte[] imageInBytesArray = userAvatarIS.readAllBytes();
 
             log.info("User's avatar image was downloaded successfully.");
             return imageInBytesArray;
@@ -85,8 +116,8 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUserPic(Long userId) {
-        User user = getUser(userId);
+    public void deleteUserAvatar(Long userId) {
+        User user = getUserEntity(userId);
         if (user.getUserProfilePic() == null) {
             log.warn("Can't delete user's avatar, cause user doesn't have it.");
 
@@ -101,7 +132,7 @@ public class UserService {
         log.info("User's avatar images were deleted successfully.");
     }
 
-    private User getUser(Long userId) {
+    private User getUserEntity(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> {
                     log.error(NO_SUCH_USER_EXCEPTION.getMessage() + "UserId = " + userId);
@@ -113,5 +144,11 @@ public class UserService {
         String key = String.format("%s/%d%s", FOLDER_PREFIX + userId, System.currentTimeMillis(), fileName);
         s3Service.uploadFile(outputStream, key);
         return key;
+    }
+
+    private void setCountryByCountryId(Long countryId, User userToBeCreated) {
+        Country country = countryRepository.findById(countryId)
+                .orElseThrow(() -> new DataGettingException(NO_SUCH_COUNTRY_EXCEPTION.getMessage()));
+        userToBeCreated.setCountry(country);
     }
 }

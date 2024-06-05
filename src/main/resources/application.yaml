@@ -28,7 +28,7 @@ spring:
           name: profile_view_channel
 
 server:
-  port: 8081
+  port: 8080
 
 logging:
   level:
@@ -53,3 +53,6 @@ services:
     bucketName: userbucket
     endpoint: http://localhost:9000
     accessKey: user
+
+  avatar-generator:
+    baseUrl: https://api.dicebear.com/8.x/notionists/png?size=170&seed=

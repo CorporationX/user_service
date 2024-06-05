@@ -37,7 +37,7 @@ public class UserController {
         return userService.createUser(userDto);
     }
 
-    @GetMapping("/users/{userId}")
+    @GetMapping("/{userId}")
     UserDto getUser(@Min(1) @PathVariable long userId) {
         return userService.getUser(userId);
     }

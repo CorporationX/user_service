@@ -15,7 +15,6 @@ class AvatarGeneratorServiceTest {
 
     @Test
     void getRandomAvatarPositiveTest() {
-        avatarGeneratorService.setUp();
         ReflectionTestUtils.setField(avatarGeneratorService,
                 "baseUrl",
                 "https://api.dicebear.com/8.x/notionists/png?size=170&seed=");

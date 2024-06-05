@@ -70,3 +70,10 @@ mentorship:
 
 spring.servlet.multipart.max-file-size: 10KB
 
+scheduler:
+  clearEvents:
+    cronExpression: "0 0 0 * * ?" # Каждый день в полночь
+
+batchSize:
+  eventDeletion: 1000
+

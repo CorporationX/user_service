@@ -8,14 +8,18 @@ import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.event.GoalCompletedEvent;
 import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.GoalMapper;
+import school.faang.user_service.publisher.CompletedGoalPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validator.GoalValidator;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -30,6 +34,7 @@ public class GoalServiceImpl implements GoalService {
     private final GoalMapper goalMapper;
     private final GoalValidator goalValidator;
     private final List<GoalFilter> goalFilters;
+    private final CompletedGoalPublisher completedGoalPublisher;
 
     @Override
     @Transactional
@@ -77,6 +82,10 @@ public class GoalServiceImpl implements GoalService {
         goalMapper.convertDtoIdsToEntity(goalDto, goal);
         goal.setUsers(Collections.singletonList(user));
         goal = goalRepository.save(goal);
+
+        if (goal.getStatus().equals(GoalStatus.COMPLETED)) {
+            completedGoalPublisher.publish(new GoalCompletedEvent(userId, goal.getId(), LocalDateTime.now()));
+        }
 
         return goalMapper.toDto(goal);
     }

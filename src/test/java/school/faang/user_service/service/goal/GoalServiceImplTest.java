@@ -6,23 +6,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalDto;
-import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.NotFoundException;
-import school.faang.user_service.mapper.GoalMapperImpl;
-import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.validator.GoalValidator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -31,10 +24,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -45,13 +35,6 @@ class GoalServiceTests {
     private GoalRepository goalRepository;
     @Mock
     private UserRepository userRepository;
-    @Mock
-    private SkillRepository skillRepository;
-    //    @Mock private SkillService skillService;
-    @Spy
-    private GoalMapperImpl goalMapper;
-    @Mock
-    private GoalValidator goalValidator;
     @InjectMocks
     private GoalServiceImpl goalService;
 
@@ -97,16 +80,6 @@ class GoalServiceTests {
                 .skillIds(Collections.emptyList())
                 .userIds(new ArrayList<>())
                 .build();
-
-        User testUser = User.builder()
-                .id(1L)
-                .goals(new ArrayList<>())
-                .build();
-
-        Skill testSkill = Skill.builder()
-                .id(1L)
-                .goals(new ArrayList<>())
-                .build();
     }
 
     @Test
@@ -121,9 +94,9 @@ class GoalServiceTests {
     @Test
     @DisplayName("Should throw NotFoundException when updating non-existent goal")
     void testUpdateGoalNonExistent() {
-        assertThrows(NotFoundException.class, () -> goalService.updateGoal(0L, new GoalDto()),
+        assertThrows(NotFoundException.class, () -> goalService.updateGoal(0L,0L, new GoalDto()),
                 "Goal with id: 0 not found");
-        assertThrows(NotFoundException.class, () -> goalService.updateGoal(null, new GoalDto()),
+        assertThrows(NotFoundException.class, () -> goalService.updateGoal(0L,null, new GoalDto()),
                 "Goal with id: null not found");
     }
 
@@ -173,10 +146,10 @@ class GoalServiceTests {
     @Test
     @DisplayName("Should handle null or invalid goal ID in update goal")
     void testUpdateGoalWithInvalidId() {
-        assertThrows(NotFoundException.class, () -> goalService.updateGoal(null, new GoalDto()),
+        assertThrows(NotFoundException.class, () -> goalService.updateGoal(0L, null, new GoalDto()),
                 "Goal ID must not be null");
 
-        assertThrows(NotFoundException.class, () -> goalService.updateGoal(-1L, new GoalDto()),
+        assertThrows(NotFoundException.class, () -> goalService.updateGoal(0L, -1L, new GoalDto()),
                 "Invalid goal ID: -1");
     }
 
@@ -187,7 +160,7 @@ class GoalServiceTests {
         when(goalRepository.findById(goalId)).thenReturn(Optional.empty());
 
         NotFoundException exception = assertThrows(NotFoundException.class,
-                () -> goalService.updateGoal(goalId, new GoalDto()));
+                () -> goalService.updateGoal(0L, goalId, new GoalDto()));
         assertEquals("Goal with id: 999 not found", exception.getMessage());
     }
 

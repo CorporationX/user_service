@@ -11,8 +11,10 @@ import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
 import school.faang.user_service.exception.NotFoundException;
+import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.validator.GoalValidator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,6 +37,10 @@ class GoalServiceTests {
     private GoalRepository goalRepository;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private GoalValidator goalValidator;
+    @Mock
+    private GoalMapper goalMapper;
     @InjectMocks
     private GoalServiceImpl goalService;
 
@@ -114,6 +120,8 @@ class GoalServiceTests {
     void testGetGoalsByUser() {
         Stream<Goal> goalStream = Stream.of(activeGoal, completedGoal);
         when(goalRepository.findGoalsByUserId(anyLong())).thenReturn(goalStream);
+        when(goalMapper.toDto(activeGoal)).thenReturn(activeGoalDto);
+        when(goalMapper.toDto(completedGoal)).thenReturn(completedGoalDto);
 
         List<GoalDto> retrievedGoals = goalService.getGoalsByUser(1L, null);
         List<GoalDto> expectedGoals = List.of(activeGoalDto, completedGoalDto);
@@ -191,6 +199,8 @@ class GoalServiceTests {
     void testFindSubtasksByGoalId() {
         long parentId = 1L;
         when(goalRepository.findByParent(parentId)).thenReturn(Stream.of(activeGoal, completedGoal));
+        when(goalMapper.toDto(activeGoal)).thenReturn(activeGoalDto);
+        when(goalMapper.toDto(completedGoal)).thenReturn(completedGoalDto);
 
         List<GoalDto> subtasks = goalService.getSubtasksByGoalId(parentId, null);
 

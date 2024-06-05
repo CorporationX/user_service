@@ -60,6 +60,7 @@ dependencies {
 
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.13.0")
     implementation("org.imgscalr:imgscalr-lib:4.2")
+    implementation("net.imagej:ij:1.53t")
 
     /**
      * Test containers

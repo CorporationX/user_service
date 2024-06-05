@@ -83,16 +83,12 @@ public class GoalServiceImpl implements GoalService {
         goal.setUsers(Collections.singletonList(user));
         goal = goalRepository.save(goal);
 
-        if (goal.getStatus().equals(GoalStatus.COMPLETED)) {
-            completedGoalPublisher.publish(new GoalCompletedEvent(userId, goal.getId(), LocalDateTime.now()));
-        }
-
         return goalMapper.toDto(goal);
     }
 
     @Override
     @Transactional
-    public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
+    public GoalDto updateGoal(long userId, Long goalId, GoalDto goalDto) {
         Goal goalToUpdate = goalRepository.findById(goalId)
                 .orElseThrow(() -> new NotFoundException("Goal with id: " + goalId + " not found"));
 
@@ -102,6 +98,10 @@ public class GoalServiceImpl implements GoalService {
         goalMapper.update(goalDto, updatedGoal);
         goalMapper.convertDtoIdsToEntity(goalDto, updatedGoal);
         assignSkills(goalToUpdate);
+
+        if (updatedGoal.getStatus().equals(GoalStatus.COMPLETED)) {
+            completedGoalPublisher.publish(new GoalCompletedEvent(userId, updatedGoal.getId(), LocalDateTime.now()));
+        }
 
         goalRepository.save(updatedGoal);
         return goalDto;

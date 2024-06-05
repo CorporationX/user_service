@@ -13,11 +13,11 @@ import school.faang.user_service.event.GoalCompletedEvent;
 public class CompletedGoalPublisher implements MessagePublisher<GoalCompletedEvent> {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final ChannelTopic channelTopic;
+    private final ChannelTopic completedGoalTopic;
 
     @Override
     public void publish(GoalCompletedEvent event) {
-        redisTemplate.convertAndSend(channelTopic.getTopic(), event);
-        log.info("Published goal completed event: {}", event);
+        redisTemplate.convertAndSend(completedGoalTopic.getTopic(), event);
+        log.info("Published goal completed event - {}:{}", completedGoalTopic.getTopic(), event);
     }
 }

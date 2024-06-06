@@ -29,15 +29,11 @@ import java.util.List;
 @Validated
 public class MentorshipRequestController {
     private final MentorshipRequestService mentorshipRequestService;
-    private final UserContext userContext;
 
-    @PostMapping(path = "/{userId}")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public MentorshipRequestDto requestMentorship(
-            @Positive @RequestParam(name = "mentorId") Long receiverId,
-            @Valid @RequestBody MentorshipRequestDto dto) {
-        var requesterId = userContext.getUserId();
-        return mentorshipRequestService.requestMentorship(requesterId, receiverId, dto);
+    public MentorshipRequestDto requestMentorship(@Valid @RequestBody MentorshipRequestDto dto) {
+        return mentorshipRequestService.requestMentorship(dto);
     }
 
     @GetMapping

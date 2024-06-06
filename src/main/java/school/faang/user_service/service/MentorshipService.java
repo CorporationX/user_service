@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exceptions.mentorship.EntityNotFoundException;
+import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
@@ -18,7 +18,7 @@ public class MentorshipService {
 
     public List<UserDto> getMentees(long userId) {
         User user = mentorshipRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("This mentor with id: " + userId + " is not in the database"));
+                .orElseThrow(() -> new NotFoundException("This mentor with id: " + userId + " is not in the database"));
         return user.getMentees().stream()
                 .map(userMapper::toDto)
                 .toList();
@@ -26,7 +26,7 @@ public class MentorshipService {
 
     public List<UserDto> getMentors(long userId) {
         User user = mentorshipRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("This mentee with id: " + userId + " is not in the database"));
+                .orElseThrow(() -> new NotFoundException("This mentee with id: " + userId + " is not in the database"));
         return user.getMentors().stream()
                 .map(userMapper::toDto)
                 .toList();
@@ -34,19 +34,19 @@ public class MentorshipService {
 
     public void deleteMentee(long menteeId, long mentorId) {
         User mentor = mentorshipRepository.findById(mentorId)
-                .orElseThrow(() -> new EntityNotFoundException("Mentor with id: " + mentorId + " is not in the database"));
+                .orElseThrow(() -> new NotFoundException("Mentor with id: " + mentorId + " is not in the database"));
         User mentee = mentorshipRepository.findById(menteeId)
-                .orElseThrow(() -> new EntityNotFoundException("Mentee with id: " + menteeId + " is not in the database"));
+                .orElseThrow(() -> new NotFoundException("Mentee with id: " + menteeId + " is not in the database"));
         mentor.getMentees().remove(mentee);
         mentorshipRepository.save(mentor);
     }
 
     public void deleteMentor(long menteeId, long mentorId) {
         User mentor = mentorshipRepository.findById(mentorId)
-                .orElseThrow(() -> new EntityNotFoundException("Mentor with id: " + mentorId + " is not in the database"));
+                .orElseThrow(() -> new NotFoundException("Mentor with id: " + mentorId + " is not in the database"));
 
         User mentee = mentorshipRepository.findById(menteeId)
-                .orElseThrow(() -> new EntityNotFoundException("Mentee with id: " + menteeId + " is not in the database"));
+                .orElseThrow(() -> new NotFoundException("Mentee with id: " + menteeId + " is not in the database"));
         mentee.getMentors().remove(mentor);
         mentorshipRepository.save(mentee);
     }

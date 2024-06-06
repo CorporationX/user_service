@@ -70,3 +70,8 @@ urls:
 
 images:
   avatar_dicebear_format: svg+xml
+
+events:
+  clean_interval: "0 0 5 * * 6"
+  sublist_size: 2
+  threads_num: 5

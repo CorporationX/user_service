@@ -53,4 +53,3 @@ public class EventParticipationService {
         return eventParticipationRepository.countParticipants(eventId);
     }
 }
-

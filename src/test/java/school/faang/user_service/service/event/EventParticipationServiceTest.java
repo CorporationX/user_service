@@ -1,26 +1,26 @@
 package school.faang.user_service.service.event;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
+@ExtendWith(MockitoExtension.class)
 public class EventParticipationServiceTest {
-
-    @InjectMocks
-    private EventParticipationService eventParticipationService;
 
     @Mock
     private EventParticipationRepository eventParticipationRepository;
@@ -31,25 +31,41 @@ public class EventParticipationServiceTest {
     @Mock
     private UserMapper userMapper;
 
+    @InjectMocks
+    private EventParticipationService eventParticipationService;
+
+    private User user;
+    private UserDto userDto;
+
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
+        user = User.builder()
+                .id(1L)
+                .username("testUser")
+                .email("test@example.com")
+                .city("Test City")
+                .experience(1)
+                .premium(null)
+                .build();
+
+        userDto = UserDto.builder()
+                .id(user.getId())
+                .city(user.getCity())
+                .email(user.getEmail())
+                .experience(user.getExperience())
+                .username(user.getUsername())
+                .premium(user.getPremium())
+                .build();
     }
 
     @Test
-    public void testRegisterParticipant() {
+    public void testRegisterParticipant_Success() {
         long userId = 1L;
         long eventId = 1L;
-        User user = new User();
-        user.setId(userId);
-        user.setUsername("testUser");
-        user.setEmail("test@example.com");
 
         when(eventParticipationRepository.findAllParticipantsByEventId(eventId)).thenReturn(Collections.emptyList());
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userMapper.toDto(user)).thenReturn(new UserDto
-                (user.getId(), user.getCity(), user.getEmail(),
-                        user.getExperience(), user.getUsername(), user.getPremium()));
+        when(userMapper.toDto(user)).thenReturn(userDto);
 
         UserDto result = eventParticipationService.registerParticipant(eventId, userId);
 
@@ -62,11 +78,36 @@ public class EventParticipationServiceTest {
     }
 
     @Test
-    public void testUnregisterParticipant() {
+    public void testRegisterParticipant_UserAlreadyRegistered() {
         long userId = 1L;
         long eventId = 1L;
-        User user = new User();
-        user.setId(userId);
+
+        when(eventParticipationRepository.findAllParticipantsByEventId(eventId)).thenReturn(Collections.singletonList(user));
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                eventParticipationService.registerParticipant(eventId, userId));
+
+        assertEquals("User is already registered for the event", exception.getMessage());
+    }
+
+    @Test
+    public void testRegisterParticipant_UserNotFound() {
+        long userId = 1L;
+        long eventId = 1L;
+
+        when(eventParticipationRepository.findAllParticipantsByEventId(eventId)).thenReturn(Collections.emptyList());
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                eventParticipationService.registerParticipant(eventId, userId));
+
+        assertEquals("User not found", exception.getMessage());
+    }
+
+    @Test
+    public void testUnregisterParticipant_Success() {
+        long userId = 1L;
+        long eventId = 1L;
 
         when(eventParticipationRepository.findAllParticipantsByEventId(eventId)).thenReturn(Collections.singletonList(user));
 
@@ -76,41 +117,40 @@ public class EventParticipationServiceTest {
     }
 
     @Test
-    public void testUnregisterParticipantNotRegistered() {
+    public void testUnregisterParticipant_UserNotRegistered() {
         long userId = 1L;
         long eventId = 1L;
 
         when(eventParticipationRepository.findAllParticipantsByEventId(eventId)).thenReturn(Collections.emptyList());
 
-        assertThrows(RuntimeException.class, () -> eventParticipationService.unregisterParticipant(eventId, userId));
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> eventParticipationService.unregisterParticipant(eventId, userId));
+
+        assertEquals("User is not registered for the event", exception.getMessage());
     }
 
     @Test
-    void testGetParticipants() {
+    public void testGetParticipants() {
         long eventId = 1L;
-        List<User> participants = Arrays.asList(new User(), new User());
-        List<UserDto> participantDto = participants.stream()
-                .map(userMapper::toDto)
-                .collect(Collectors.toList());
 
-        when(eventParticipationRepository.findAllParticipantsByEventId(eventId)).thenReturn(participants);
+        when(eventParticipationRepository.findAllParticipantsByEventId(eventId)).thenReturn(Collections.singletonList(user));
+        when(userMapper.toDto(user)).thenReturn(userDto);
 
-        List<UserDto> result = eventParticipationService.getParticipants(eventId);
+        List<UserDto> participants = eventParticipationService.getParticipants(eventId);
 
-        assertEquals(participantDto, result);
-        verify(eventParticipationRepository).findAllParticipantsByEventId(eventId);
+        assertNotNull(participants);
+        assertEquals(1, participants.size());
+        assertEquals(userDto, participants.get(0));
     }
 
     @Test
-    void testGetParticipantsCount() {
+    public void testGetParticipantsCount() {
         long eventId = 1L;
-        int expectedCount = 5;
 
-        when(eventParticipationRepository.countParticipants(eventId)).thenReturn(expectedCount);
+        when(eventParticipationRepository.countParticipants(eventId)).thenReturn(5);
 
-        int actualCount = eventParticipationService.getParticipantsCount(eventId);
+        int count = eventParticipationService.getParticipantsCount(eventId);
 
-        assertEquals(expectedCount, actualCount);
-        verify(eventParticipationRepository).countParticipants(eventId);
+        assertEquals(5, count);
     }
 }
+

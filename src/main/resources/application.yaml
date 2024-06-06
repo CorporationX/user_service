@@ -30,8 +30,15 @@ spring:
   profiles:
     active: test
 
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
 server:
   port: 8080
+  servlet:
+    context-path: /api/v1
 
 logging:
   level:
@@ -55,8 +62,11 @@ services:
     endpoint: http://localhost:9000
     accessKey: user
     secretKey: password
-    bucket-name: user_backet
+    bucketName: user-bucket
     isMocked: true
+    maxSizeBytes: 5242880
+    smallSize: 170
+    largeSize: 1080
 
 goals:
   limit:
@@ -68,5 +78,5 @@ mentorship:
   request:
     time-period-for-single-request: 3
 
-spring.servlet.multipart.max-file-size: 10KB
-
+randomAvatar:
+  url: https://api.dicebear.com/8.x/pixel-art/jpg?seed=

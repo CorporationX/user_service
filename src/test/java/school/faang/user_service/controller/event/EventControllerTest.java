@@ -13,7 +13,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventService;
-import school.faang.user_service.validation.EventValidator;
+import school.faang.user_service.validator.EventValidator;
 
 import java.time.LocalDateTime;
 

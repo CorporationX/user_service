@@ -1,5 +1,6 @@
-package school.faang.user_service.service.event;
+package school.faang.user_service.repository.premium.service.event;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.user.UserDto;
@@ -18,6 +19,7 @@ public class EventParticipationService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
+    @Transactional
     public UserDto registerParticipant(long eventId, long userId) {
         List<User> participants = eventParticipationRepository.findAllParticipantsByEventId(eventId);
         for (User user : participants) {
@@ -30,6 +32,7 @@ public class EventParticipationService {
         return userMapper.toDto(user);
     }
 
+    @Transactional
     public void unregisterParticipant(long eventId, long userId) {
         List<User> participants = eventParticipationRepository.findAllParticipantsByEventId(eventId);
         boolean isRegistered = participants.stream().anyMatch(user -> user.getId() == userId);
@@ -50,3 +53,4 @@ public class EventParticipationService {
         return eventParticipationRepository.countParticipants(eventId);
     }
 }
+

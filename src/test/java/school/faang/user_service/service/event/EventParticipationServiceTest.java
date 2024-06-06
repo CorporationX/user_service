@@ -10,6 +10,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventParticipationRepository;
+import school.faang.user_service.repository.premium.service.event.EventParticipationService;
 
 import java.util.*;
 import java.util.stream.Collectors;

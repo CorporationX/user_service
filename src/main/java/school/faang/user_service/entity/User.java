@@ -142,8 +142,4 @@ public class User {
 
     @OneToOne(mappedBy = "user")
     private Premium premium;
-
-    public User(String username){
-        this.username = username;
-    }
 }

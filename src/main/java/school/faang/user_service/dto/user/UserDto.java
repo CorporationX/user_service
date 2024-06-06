@@ -1,9 +1,6 @@
 package school.faang.user_service.dto.user;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import school.faang.user_service.entity.premium.Premium;
 
 @Data
@@ -17,4 +14,5 @@ public class UserDto {
     private Integer experience;
     private String username;
     private Premium premium;
+
 }

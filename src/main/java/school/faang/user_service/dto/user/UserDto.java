@@ -17,4 +17,6 @@ public class UserDto {
     private String username;
     private Premium premium;
     private String email;
+    private String picId;
+    private String smallPicId;
 }

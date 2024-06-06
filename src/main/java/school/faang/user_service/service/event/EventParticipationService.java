@@ -1,4 +1,4 @@
-package school.faang.user_service.repository.premium.service.event;
+package school.faang.user_service.service.event;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

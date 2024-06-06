@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.user.UserDto;
-import school.faang.user_service.repository.premium.service.event.EventParticipationService;
+import school.faang.user_service.service.event.EventParticipationService;
 
 import java.util.HashMap;
 import java.util.List;

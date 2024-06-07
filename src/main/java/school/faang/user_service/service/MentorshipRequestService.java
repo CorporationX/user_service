@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.dto.MessageEvent;
+import school.faang.user_service.dto.MentorshipRequestedEvent;
 import school.faang.user_service.dto.mentorship_request.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship_request.MentorshipResponseDto;
 import school.faang.user_service.dto.mentorship_request.MentorshipRequestFilterDto;
@@ -51,7 +51,7 @@ public class MentorshipRequestService {
 
         MentorshipRequest resultRequest = mentorshipRequestRepository.create(requesterId, receiverId, mentorshipRequestDto.getDescription());
         log.info("Mentorship request with ID: {} and with status: {} was created", resultRequest.getId(), resultRequest.getStatus());
-        mentorshipRequestedEventPublisher.publish(new MessageEvent(requesterId, receiverId, LocalDateTime.now()));
+        mentorshipRequestedEventPublisher.publish(new MentorshipRequestedEvent(requesterId, receiverId, LocalDateTime.now()));
         return mentorshipRequestMapper.mentorshipRequestToResponseDto(resultRequest);
     }
 

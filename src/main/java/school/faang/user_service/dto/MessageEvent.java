@@ -6,16 +6,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
-
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class MessageEvent {
+public abstract class MessageEvent {
 
     private long actorId;
     private long receiverId;
-    private LocalDateTime receivedAt;
 }

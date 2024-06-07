@@ -13,7 +13,6 @@ public interface UserMapper {
 
     @Mapping(source = "userProfilePic.fileId", target = "picId")
     @Mapping(source = "userProfilePic.smallFileId", target = "smallPicId")
-
     UserDto toDto(User user);
 
     @Mapping(source = "picId", target = "userProfilePic.fileId")

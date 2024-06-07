@@ -17,8 +17,30 @@ public class UserValidator {
 
     public void checkUserInDB(Long userId) {
         if (!userRepository.existsById(userId)) {
-            log.error("Не найден пользователь с данным id: " + userId);
-            throw new DataValidationException("Не найден пользователь с данным id: " + userId);
+            log.error("The user with this id was not found: {}", userId);
+            throw new DataValidationException("The user with this id was not found: " + userId);
+        }
+    }
+
+    public void validateUserNotExists(User user) {
+        if (userRepository.existsUserByUsername(user.getUsername())) {
+            log.error("The user with this username already exists id: {}", user.getUsername());
+            throw new DataValidationException("The user with this username already exists id: " + user.getUsername());
+        }
+        if (userRepository.existsUserByEmail(user.getEmail())) {
+            log.error("The user with this email already exists id: {}", user.getEmail());
+            throw new DataValidationException("The user with this email already exists id: " + user.getEmail());
+        }
+        if (userRepository.existsUserByPhone(user.getPhone())) {
+            log.error("The user with this phone already exists id: {}", user.getPhone());
+            throw new DataValidationException("The user with this phone already exists id: " + user.getPhone());
+        }
+    }
+
+    public void validateCsvFile(MultipartFile file) {
+        if (file.isEmpty()) {
+            log.error("Received empty csv file");
+            throw new DataValidationException("The file can't be empty");
         }
     }
 

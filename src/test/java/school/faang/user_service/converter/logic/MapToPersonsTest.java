@@ -5,6 +5,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.converter.component.SetContactInfo;
+import school.faang.user_service.converter.component.SetEducation;
+import school.faang.user_service.converter.component.SetPerson;
+import school.faang.user_service.converter.component.SetPreviousEducation;
 
 import java.util.*;
 
@@ -53,8 +57,12 @@ public class MapToPersonsTest {
         Assertions.assertEquals(Optional.of(2012), Optional.ofNullable(previousEducation.getCompletionYear()));
     }
 
-    private static List<Person> getPeople() {
-        MapToPerson mapToPerson = new MapToPerson();
+    private List<Person> getPeople() {
+        SetPreviousEducation setPreviousEducation = new SetPreviousEducation();
+        SetContactInfo setContactInfo = new SetContactInfo();
+        SetEducation setEducation = new SetEducation();
+        SetPerson setPerson = new SetPerson();
+        MapToPerson mapToPerson = new MapToPerson(setPreviousEducation, setContactInfo, setEducation, setPerson);
 
         List<Map<String, String>> csvData = new ArrayList<>();
         Map<String, String> rowData = new HashMap<>();

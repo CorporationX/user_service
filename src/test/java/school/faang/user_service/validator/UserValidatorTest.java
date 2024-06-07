@@ -45,13 +45,13 @@ public class UserValidatorTest {
     @Test
     public void testValidateUserInDBWitchIsExists() {
         when(userRepository.existsById(userId)).thenReturn(true);
-        assertDoesNotThrow(() -> userValidator.validateUserExists(userId));
+        assertDoesNotThrow(() -> userValidator.checkUserInDB(userId));
     }
 
     @Test
     public void testValidateUserInDBWitchIsNotExists() {
         when(userRepository.existsById(userId)).thenReturn(false);
-        assertThrows(DataValidationException.class, () -> userValidator.validateUserExists(userId));
+        assertThrows(DataValidationException.class, () -> userValidator.checkUserInDB(userId));
     }
 
     @Test

@@ -67,7 +67,7 @@ public class SkillServiceTest {
 
     @Test
     public void testCreateSkill() {
-        assertDoesNotThrow(() -> userValidator.validateUserExists(userId));
+        assertDoesNotThrow(() -> userValidator.checkUserInDB(userId));
         when(skillRepository.save(skill)).thenReturn(skill);
         when(skillMapper.toDto(skill)).thenReturn(skillDto);
 
@@ -95,7 +95,7 @@ public class SkillServiceTest {
         List<Skill> skillList = createSkillList();
         List<SkillDto> skillDtoList = createSkillDtoList();
 
-        assertDoesNotThrow(() -> userValidator.validateUserExists(userId));
+        assertDoesNotThrow(() -> userValidator.checkUserInDB(userId));
         when(skillRepository.findAllByUserId(userId)).thenReturn(skillList);
         when(skillMapper.toDto(skillList.get(0))).thenReturn(skillDtoList.get(0));
         when(skillMapper.toDto(skillList.get(1))).thenReturn(skillDtoList.get(1));
@@ -113,7 +113,7 @@ public class SkillServiceTest {
         List<Skill> skillList = createSkillList();
         List<SkillCandidateDto> skillCandidateDtoList = createSkillCandidateDto();
 
-        doNothing().when(userValidator).validateUserExists(userId);
+        doNothing().when(userValidator).checkUserInDB(userId);
         when(skillRepository.findSkillsOfferedToUser(userId)).thenReturn(skillList);
         when(skillRepository.countOffersByUserIdAndSkillId(userId, skillList.get(0).getId())).thenReturn(1L);
         when(skillRepository.countOffersByUserIdAndSkillId(userId, skillList.get(1).getId())).thenReturn(2L);
@@ -132,7 +132,7 @@ public class SkillServiceTest {
 
     @Test
     public void testGetOfferedSkillsFailValidation() {
-        doThrow(DataValidationException.class).when(userValidator).validateUserExists(userId);
+        doThrow(DataValidationException.class).when(userValidator).checkUserInDB(userId);
         assertThrows(DataValidationException.class, () -> skillService.getOfferedSkills(userId));
     }
 

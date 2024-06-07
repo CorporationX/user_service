@@ -50,7 +50,7 @@ public class SkillValidatorTest {
     public void testCheckSkillIdAndUserIdInDBWithCorrectInput() {
         when(skillRepository.existsById(skillId)).thenReturn(true);
 
-        assertDoesNotThrow(() -> userValidator.validateUserExists(userId));
+        assertDoesNotThrow(() -> userValidator.checkUserInDB(userId));
         assertDoesNotThrow(() -> skillValidator.checkSkillIdAndUserIdInDB(skillId, userId));
     }
 
@@ -64,7 +64,7 @@ public class SkillValidatorTest {
     public void testCheckSkillIdAndUserIdInDBWithIncorrectUserId() {
         when(skillRepository.existsById(skillId)).thenReturn(true);
 
-        doThrow(DataValidationException.class).when(userValidator).validateUserExists(nullUserId);
+        doThrow(DataValidationException.class).when(userValidator).checkUserInDB(nullUserId);
         assertThrows(DataValidationException.class, () -> skillValidator.checkSkillIdAndUserIdInDB(skillId, nullUserId));
     }
 

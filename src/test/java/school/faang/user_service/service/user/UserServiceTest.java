@@ -141,7 +141,6 @@ public class UserServiceTest {
 
         executorService.shutdownNow();
     }
-}
 
     @Test
     public void testGetPic() {

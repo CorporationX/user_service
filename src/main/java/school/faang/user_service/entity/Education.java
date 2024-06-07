@@ -11,6 +11,7 @@ public class Education {
     private Integer yearOfStudy;
 
     private String major;
+
     @JsonProperty("GPA")
     private Float gpa;
 

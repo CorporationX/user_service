@@ -11,7 +11,6 @@ import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.avatar.ProfilePicService;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.user.filter.UserFilterService;
@@ -58,7 +57,6 @@ public class UserServiceImpl implements UserService {
                 goalService.delete(goal);
             }
         });
-
         eventService.deleteAll(user.getOwnedEvents());
         mentorshipService.deleteMentorFromMentee(user);
 

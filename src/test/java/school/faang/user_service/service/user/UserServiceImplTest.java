@@ -41,7 +41,8 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
-
+    @InjectMocks
+    private UserServiceImpl userServiceImpl;
     @Mock
     private UserRepository userRepository;
     @Mock
@@ -59,9 +60,6 @@ class UserServiceImplTest {
     @Captor
     private ArgumentCaptor<User> captor;
     private User user;
-
-    @InjectMocks
-    private UserServiceImpl userServiceImpl;
 
     private List<User> getUsers() {
         return new ArrayList<>(List.of(
@@ -139,7 +137,6 @@ class UserServiceImplTest {
 
         InOrder inOrder = inOrder(userMapper, userRepository, profilePicService);
         inOrder.verify(userMapper, times(1)).toEntity(userDto);
-        inOrder.verify(profilePicService, times(1)).generateAndSetPic(any(User.class));
         inOrder.verify(userRepository, times(1)).save(captor.capture());
         inOrder.verify(userMapper, times(1)).toDto(user);
         assertTrue(captor.getValue().isActive());

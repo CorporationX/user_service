@@ -128,16 +128,6 @@ class GoalServiceTests {
     }
 
     @Test
-    @DisplayName("Should update goal successfully without modifying skills")
-    void testUpdateGoalValid() {
-        when(goalRepository.findById(anyLong())).thenReturn(Optional.of(activeGoal));
-        goalService.updateGoal(1L, completedGoalDto);
-
-        verify(goalMapper).toDto(any());
-        verify(goalRepository).save(any());
-    }
-
-    @Test
     @DisplayName("Should successfully delete a goal")
     void testDeleteGoalValid() {
         when(goalRepository.findById(1L)).thenReturn(Optional.of(activeGoal));

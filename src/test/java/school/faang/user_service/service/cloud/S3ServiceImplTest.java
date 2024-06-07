@@ -1,6 +1,7 @@
 package school.faang.user_service.service.cloud;
 
 import com.amazonaws.AmazonServiceException;
+import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import org.junit.jupiter.api.Test;
@@ -8,7 +9,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -22,16 +22,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class S3ServiceImplTest {
+
     @InjectMocks
     S3ServiceImpl s3Service;
     @Mock
     private AmazonS3 s3Client;
+    private final String bucketName = "bucketName";
+    private final String key  = "key";
 
     private byte[] getImageBytes() {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -52,12 +57,29 @@ public class S3ServiceImplTest {
 
     @Test
     public void testUploadFileWithException() {
-        ReflectionTestUtils.setField(s3Service, "bucketName", "bucket-name" );
-        when(s3Client.putObject(anyString(), anyString(), any(ByteArrayInputStream.class), any(ObjectMetadata.class)))
+        when(s3Client.putObject(eq(bucketName), eq(key), any(ByteArrayInputStream.class), any(ObjectMetadata.class)))
                 .thenThrow(AmazonServiceException.class);
         var exception = assertThrows(RuntimeException.class,
-                () -> s3Service.uploadFile(new ByteArrayInputStream(getImageBytes()), "file"));
+                () -> s3Service.uploadFile(bucketName,  key, new ByteArrayInputStream(getImageBytes())));
         assertEquals("Error uploading a file to Amazon S3", exception.getMessage());
         verify(s3Client, times(1)).putObject(anyString(), anyString(), any(ByteArrayInputStream.class), any(ObjectMetadata.class));
+    }
+
+    @Test
+    public void testGetFileWithException(){
+        when(s3Client.getObject(bucketName, key)).
+                thenThrow(AmazonServiceException.class);
+
+        var exception = assertThrows(RuntimeException.class, ()->s3Service.getFile(bucketName, key));
+        assertEquals(exception.getMessage(), "Error getting a file from Amazon S3");
+        verify(s3Client, times(1)).getObject(bucketName, key);
+    }
+
+    @Test
+    public void testDeleteFileWithException(){
+        doThrow(SdkClientException.class).when(s3Client).deleteObject(bucketName, key);
+        var exception = assertThrows(RuntimeException.class, ()->s3Service.deleteFile(bucketName, key));
+        assertEquals(exception.getMessage(), "Error deleting a file from Amazon S3");
+        verify(s3Client, times(1)).deleteObject(bucketName, key);
     }
 }

@@ -1,7 +1,5 @@
 package school.faang.user_service.service.avatar;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,9 +22,9 @@ import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.cloud.S3Service;
 import school.faang.user_service.mapper.avatar.PictureMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.cloud.S3Service;
 import school.faang.user_service.service.user.UserService;
 
 import javax.imageio.ImageIO;
@@ -56,8 +54,6 @@ public class ProfilePicServiceImplTest {
     @InjectMocks
     private ProfilePicServiceImpl profilePicService;
     @Mock
-    private AmazonS3 s3Client;
-    @Mock
     private UserService userService;
     @Mock
     private UserRepository userRepository;
@@ -71,7 +67,7 @@ public class ProfilePicServiceImplTest {
     private ArgumentCaptor<String> forPictures;
     private User user;
     private UserDto userDto;
-    private String backetName = "user-bucket";
+    private final String backetName = "user-bucket";
 
     private byte[] getImageBytes() {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -99,24 +95,25 @@ public class ProfilePicServiceImplTest {
     @Test
     public void testGenerateAndSetPicWithException(){
         when(restTemplate.getForObject(anyString(),eq(byte[].class))).thenReturn(null);
-        var exception = assertThrows(DataValidationException.class, ()->profilePicService.generateAndSetPic(user));
+        var exception = assertThrows(DataValidationException.class, ()->profilePicService.generateAndSetPic(userDto));
         assertEquals(exception.getMessage(), "Failed to get the generated image");
     }
 
     @Test
     public void testGenerateAndSetPicWithSetting(){
-        when(restTemplate.getForObject(any(String.class),eq(byte[].class))).thenReturn(getImageBytes());
-        doNothing().when(s3Service).uploadFile(any(InputStream.class), anyString());
+        when(restTemplate.getForObject(anyString(),eq(byte[].class))).thenReturn(getImageBytes());
+        doNothing().when(s3Service).uploadFile(anyString(), anyString(), any(InputStream.class));
         ReflectionTestUtils.setField(profilePicService, "smallSize", 170);
+        ReflectionTestUtils.setField(profilePicService, "bucketName", backetName);
 
-        profilePicService.generateAndSetPic(user);
-        UserProfilePic generated = user.getUserProfilePic();
+        profilePicService.generateAndSetPic(userDto);
+        UserProfilePic generated = userDto.getUserProfilePic();
         assertNull(generated.getFileId());
         assertNotNull(generated.getSmallFileId());
 
         InOrder inorder = inOrder(restTemplate, s3Service);
         inorder.verify(restTemplate, times(1)).getForObject(anyString(),eq(byte[].class));
-        inorder.verify(s3Service, times(1)).uploadFile(any(InputStream.class), anyString());
+        inorder.verify(s3Service, times(1)).uploadFile(anyString(), anyString(), any(InputStream.class));
     }
 
     @Test
@@ -130,7 +127,7 @@ public class ProfilePicServiceImplTest {
         UserProfilePicDto result = profilePicService.saveProfilePic(user.getId(), file);
 
         verify(userService, times(1)).findUserById(user.getId());
-        verify(s3Client, times(2)).putObject(eq(backetName), forPictures.capture(), any(InputStream.class), any());
+        verify(s3Service, times(2)).uploadFile(eq(backetName), forPictures.capture(), any(InputStream.class));
         var pictures = forPictures.getAllValues();
         String forSmallPicture = pictures.get(0);
         String forLargePicture = pictures.get(1);
@@ -146,11 +143,11 @@ public class ProfilePicServiceImplTest {
         ReflectionTestUtils.setField(profilePicService, "bucketName", backetName);
         S3Object s3Object = new S3Object();
         s3Object.setObjectContent(new ByteArrayInputStream(getImageBytes()));
-        when(s3Client.getObject(eq(backetName), any())).thenReturn(s3Object);
+        when(s3Service.getFile(backetName, user.getUserProfilePic().getFileId())).thenReturn(s3Object);
 
         InputStreamResource result = profilePicService.getProfilePic(user.getId());
         verify(userService, times(1)).findUserById(user.getId());
-        verify(s3Client, times(1)).getObject(backetName, user.getUserProfilePic().getFileId());
+        verify(s3Service, times(1)).getFile(backetName, user.getUserProfilePic().getFileId());
         assertNotNull(result);
     }
 
@@ -159,9 +156,9 @@ public class ProfilePicServiceImplTest {
         when(userService.findUserById(user.getId())).thenReturn(user);
         ReflectionTestUtils.setField(profilePicService, "bucketName", backetName);
 
-        UserProfilePicDto result = profilePicService.deleteProfilePic(user.getId());
+        profilePicService.deleteProfilePic(user.getId());
         verify(userService, times(1)).findUserById(user.getId());
-        verify(s3Client, times(2)).deleteObject(eq(backetName), anyString());
+        verify(s3Service, times(2)).deleteFile(eq(backetName), anyString());
         verify(userRepository, times(1)).save(user);
         assertNull(user.getUserProfilePic().getFileId());
         assertNull(user.getUserProfilePic().getSmallFileId());

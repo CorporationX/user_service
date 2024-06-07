@@ -28,7 +28,6 @@ public class UserServiceImpl implements UserService {
     private final GoalService goalService;
     private final EventService eventService;
     private final MentorshipService mentorshipService;
-    private final ProfilePicService profilePicService;
 
     @Override
     @Transactional
@@ -75,7 +74,6 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDto createUser(@Valid UserDto userDto) {
         User user = userMapper.toEntity(userDto);
-        profilePicService.generateAndSetPic(user);
         user.setActive(true);
         User saved = userRepository.save(user);
         return userMapper.toDto(saved);

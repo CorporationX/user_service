@@ -11,7 +11,8 @@ public enum ExceptionMessage {
     NO_SUCH_EVENT_EXCEPTION("Database doesn't contains event with such id."),
     USER_FOLLOWING_HIMSELF_EXCEPTION("The user cannot follow himself."),
     USER_UNFOLLOWING_HIMSELF_EXCEPTION("The user cannot unfollow himself."),
-    REPEATED_SUBSCRIPTION_EXCEPTION("The user cannot follow another user twice.");
+    REPEATED_SUBSCRIPTION_EXCEPTION("The user cannot follow another user twice."),
+    NO_FILE_IN_REQUEST("There is no file send");
 
     private final String message;
 

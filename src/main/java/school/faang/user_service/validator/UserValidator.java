@@ -12,9 +12,10 @@ import school.faang.user_service.repository.UserRepository;
 @Component
 @RequiredArgsConstructor
 public class UserValidator {
+    private static final long MAX_PIC_SIZE = 5_242_880L;
     private final UserRepository userRepository;
 
-    public void validateUserExists(Long userId) {
+    public void checkUserInDB(Long userId) {
         if (!userRepository.existsById(userId)) {
             log.error("The user with this id was not found: {}", userId);
             throw new DataValidationException("The user with this id was not found: " + userId);
@@ -40,6 +41,21 @@ public class UserValidator {
         if (file.isEmpty()) {
             log.error("Received empty csv file");
             throw new DataValidationException("The file can't be empty");
+        }
+    }
+
+    public void checkMaxSizePic(MultipartFile file) {
+        if (file.getSize() > MAX_PIC_SIZE) {
+            log.error("Размер файла (" + file.getSize() + ") превышает максимальный");
+            throw new DataValidationException("Превышен максимальный размер файла");
+        }
+    }
+
+    public void checkExistPicId(User user) {
+        if (user.getUserProfilePic() == null || user.getUserProfilePic().getFileId() == null) {
+            log.error("У пользователя c id: " + user.getId() + " отсутствует аватар");
+
+            throw new DataValidationException("У пользователя c id: " + user.getId() + " отсутствует аватар");
         }
     }
 }

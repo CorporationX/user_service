@@ -14,13 +14,10 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface EventMapper {
-
-    @Mapping(source = "owner", target = "ownerId", qualifiedByName = "getOwnerId")
+    @Mapping(source = "owner.id", target = "ownerId")
     @Mapping(source = "relatedSkills", target = "relatedSkillsIds", qualifiedByName = "getSkillId")
     EventDto toDto(Event event);
 
-    @Mapping(source = "ownerId", target = "owner", qualifiedByName = "getOwner")
-    @Mapping(source = "relatedSkillsIds", target = "relatedSkills", qualifiedByName = "getSkills")
     Event toEntity(EventDto eventDto);
 
     List<EventDto> toEventsDto(List<Event> events);

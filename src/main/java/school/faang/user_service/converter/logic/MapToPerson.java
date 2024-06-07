@@ -1,58 +1,43 @@
 package school.faang.user_service.converter.logic;
 
 import com.json.student.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.converter.component.SetContactInfo;
+import school.faang.user_service.converter.component.SetEducation;
+import school.faang.user_service.converter.component.SetPerson;
+import school.faang.user_service.converter.component.SetPreviousEducation;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
 public class MapToPerson {
+    private final SetPreviousEducation setPreviousEducation;
+    private final SetContactInfo setContactInfo;
+    private final SetEducation setEducation;
+    private final SetPerson setPerson;
 
     public List<Person> mapToPersons(List<Map<String, String>> csvData) {
         List<Person> persons = new ArrayList<>();
 
         for (Map<String, String> row : csvData) {
-            Person person = new Person();
-            person.setFirstName(row.get("firstName"));
-            person.setLastName(row.get("lastName"));
-            person.setYearOfBirth(Integer.parseInt(row.get("yearOfBirth")));
-            person.setGroup(row.get("group"));
-            person.setStudentID(row.get("studentID"));
-            person.setStatus(row.get("status"));
-            person.setAdmissionDate(row.get("admissionDate"));
-            person.setGraduationDate(row.get("graduationDate"));
-            person.setScholarship(Boolean.parseBoolean(row.get("scholarship")));
-            person.setEmployer(row.get("employer"));
+            Person person = setPerson.setPerson(row.get("firstName"), row.get("lastName"), Integer.parseInt(row.get("yearOfBirth")),
+                    row.get("group"), row.get("studentID"), row.get("status"), row.get("admissionDate"), row.get("graduationDate"),
+                    Boolean.parseBoolean(row.get("scholarship")), row.get("employer"));
 
-            ContactInfo contactInfo = new ContactInfo();
-            contactInfo.setEmail(row.get("email"));
-            contactInfo.setPhone(row.get("phone"));
-
-            Address address = new Address();
-            address.setStreet(row.get("street"));
-            address.setCity(row.get("city"));
-            address.setState(row.get("state"));
-            address.setCountry(row.get("country"));
-            address.setPostalCode(row.get("postalCode"));
-            contactInfo.setAddress(address);
-
+            ContactInfo contactInfo = setContactInfo.setContactInfo(row.get("email"), row.get("phone"), row.get("street"),
+                    row.get("city"), row.get("state"), row.get("country"), row.get("postalCode"));
             person.setContactInfo(contactInfo);
 
-            Education education = new Education();
-            education.setFaculty(row.get("faculty"));
-            education.setYearOfStudy(Integer.parseInt(row.get("yearOfStudy")));
-            education.setMajor(row.get("major"));
-            education.setGpa(Double.parseDouble(row.get("GPA")));
+            Education education = setEducation.setEducation(row.get("faculty"), Integer.parseInt(row.get("yearOfStudy")), row.get("major"),
+                    Double.parseDouble(row.get("GPA")));
             person.setEducation(education);
 
-            List<PreviousEducation> previousEducations = new ArrayList<>();
-            PreviousEducation previousEducation = new PreviousEducation();
-            previousEducation.setDegree(row.get("degree"));
-            previousEducation.setInstitution(row.get("institution"));
-            previousEducation.setCompletionYear(Integer.parseInt(row.get("completionYear")));
-            previousEducations.add(previousEducation);
+            List<PreviousEducation> previousEducations = setPreviousEducation.setPreviousEducation(row.get("degree"),
+                    row.get("institution"), Integer.parseInt(row.get("completionYear")));
             person.setPreviousEducation(previousEducations);
 
             persons.add(person);

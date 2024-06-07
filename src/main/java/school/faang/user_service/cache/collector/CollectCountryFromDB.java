@@ -23,9 +23,9 @@ public class CollectCountryFromDB {
     @Transactional
     public void collectCountry(){
         List<Country> country = countryRepository.findAll();
-        List<CountryDto> ListCountryDto = country.stream().map(countryMapper::toDto).toList();
+        List<CountryDto> listCountryDto = country.stream().map(countryMapper::toDto).toList();
 
-        hashMapCountry.addCountry(ListCountryDto);
+        hashMapCountry.addCountry(listCountryDto);
     }
 
     @EventListener(ApplicationReadyEvent.class)

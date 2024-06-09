@@ -21,7 +21,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.service.user.image.ImageProcessor;
 
-import static school.faang.user_service.exception.ExceptionMessage.AVATAR_FILE_SIZE_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.AVATAR_FILE_SIZE_EXCEPTION;
 
 @Slf4j
 @RestController

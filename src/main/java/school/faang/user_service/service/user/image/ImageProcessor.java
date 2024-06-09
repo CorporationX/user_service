@@ -12,8 +12,8 @@ import java.awt.image.RenderedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import static school.faang.user_service.exception.ExceptionMessage.FILE_PROCESSING_EXCEPTION;
-import static school.faang.user_service.exception.ExceptionMessage.PICTURE_TYPE_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.FILE_PROCESSING_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.PICTURE_TYPE_EXCEPTION;
 
 @Slf4j
 @Component

@@ -11,7 +11,7 @@ import school.faang.user_service.exception.DataGettingException;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
-import static school.faang.user_service.exception.ExceptionMessage.RANDOM_AVATAR_GETTING_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.RANDOM_AVATAR_GETTING_EXCEPTION;
 
 @Slf4j
 @Service
@@ -33,6 +33,4 @@ public class AvatarGeneratorService {
         log.info("Avatar generated successfully.");
         return ipImage.getBufferedImage();
     }
-
-
 }

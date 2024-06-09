@@ -23,11 +23,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static school.faang.user_service.exception.ExceptionMessage.FILE_PROCESSING_EXCEPTION;
-import static school.faang.user_service.exception.ExceptionMessage.NO_SUCH_COUNTRY_EXCEPTION;
-import static school.faang.user_service.exception.ExceptionMessage.NO_SUCH_USER_EXCEPTION;
-import static school.faang.user_service.exception.ExceptionMessage.REPEATED_USER_CREATION_EXCEPTION;
-import static school.faang.user_service.exception.ExceptionMessage.USER_AVATAR_ABSENCE_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.FILE_PROCESSING_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.NO_SUCH_COUNTRY_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.NO_SUCH_USER_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.REPEATED_USER_CREATION_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.USER_AVATAR_ABSENCE_EXCEPTION;
 
 @Slf4j
 @Service

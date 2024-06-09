@@ -30,7 +30,7 @@ public class MentorshipService {
         User user = getUserById(userId);
         return userMapper.toDtoList(user.getMentors());
     }
-
+    @Transactional
     public void deleteMentee(Long menteeId, Long mentorId) {
         User mentor = getUserById(mentorId);
         User mentee = getUserById(menteeId);
@@ -50,10 +50,13 @@ public class MentorshipService {
         }
     }
 
+    @Transactional
     public void deleteMentor(Long menteeId, Long mentorId) {
         User mentee = getUserById(menteeId);
         User mentor = getUserById(mentorId);
+
         List<User> mentors = mentee.getMentors();
+
         if (mentors.contains(mentor)) {
             mentee.setMentors(mentors.
                     stream().
@@ -67,7 +70,6 @@ public class MentorshipService {
         }
     }
 
-    // Утилитный private метод
     private User getUserById(Long id) {
         return mentorshipRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
     }

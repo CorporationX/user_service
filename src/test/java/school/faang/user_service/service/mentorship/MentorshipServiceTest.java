@@ -55,7 +55,7 @@ class MentorshipServiceTest {
     @Test
     void testGetMentorsList() {
         when(mentorshipRepository.findById(mentor2.getId())).thenReturn(Optional.of(mentor2));
-        
+
         mentorshipService.getMentors(mentor2.getId());
 
         verify(mentorshipRepository).findById(mentor2.getId());
@@ -98,6 +98,23 @@ class MentorshipServiceTest {
         mentorshipService.deleteMentor(mentee3.getId(), mentor2.getId());
 
         verify(mentorshipRepository, times(1)).save(mentee3);
+    }
+
+    @Test
+    public void testDeleteEmptyMentee() {
+        when(mentorshipRepository.findById(mentor2.getId())).thenReturn(Optional.of(mentor2));
+        when(mentorshipRepository.findById(mentee2.getId())).thenReturn(Optional.of(mentee2));
+        assertThrows(NullPointerException.class,
+                () -> mentorshipService.deleteMentee(mentee2.getId(), mentor2.getId()));
+    }
+
+    @Test
+    public void testDeleteEmptyMentor() {
+        when(mentorshipRepository.findById(mentee1.getId())).thenReturn(Optional.of(mentee1));
+        when(mentorshipRepository.findById(mentor1.getId())).thenReturn(Optional.of(mentor1));
+
+        assertThrows(NullPointerException.class,
+                () -> mentorshipService.deleteMentor(mentee1.getId(), mentor1.getId()));
     }
 
     @Test
@@ -156,9 +173,9 @@ class MentorshipServiceTest {
     }
 
     private static User getMentee2() {
-        return User.builder().
-                id(102L).
-                build();
+        return User.builder()
+                .id(102L)
+                .build();
     }
 
     private User getMentor1() {
@@ -181,9 +198,9 @@ class MentorshipServiceTest {
     }
 
     private User getMentee3() {
-        return User.builder().
-                id(203L).
-                mentors(List.of(mentor2, mentor1)).
-                build();
+        return User.builder()
+                .id(203L)
+                .mentors(List.of(mentor2, mentor1))
+                .build();
     }
 }

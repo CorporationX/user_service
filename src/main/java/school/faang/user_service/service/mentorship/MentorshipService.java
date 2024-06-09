@@ -30,6 +30,7 @@ public class MentorshipService {
         User user = getUserById(userId);
         return userMapper.toDtoList(user.getMentors());
     }
+
     @Transactional
     public void deleteMentee(Long menteeId, Long mentorId) {
         User mentor = getUserById(mentorId);
@@ -37,7 +38,11 @@ public class MentorshipService {
 
         List<User> mentees = mentor.getMentees();
 
-        if (mentees.contains(mentee)) {
+        if (mentees.isEmpty()) {
+            throw new NullPointerException (
+                    "That mentee doesn't have any mentors"
+            );
+        } else if (mentees.contains(mentee)) {
             mentor.setMentees(mentees.
                     stream().
                     filter(user -> !user.equals(mentee)).
@@ -56,12 +61,12 @@ public class MentorshipService {
         User mentor = getUserById(mentorId);
 
         List<User> mentors = mentee.getMentors();
-
-        if (mentors.contains(mentor)) {
-            mentee.setMentors(mentors.
-                    stream().
-                    filter(user -> !user.equals(mentor)).
-                    collect(Collectors.toList()));
+        if (mentors.isEmpty()) {
+            throw new NullPointerException (
+                    "That mentor doesn't have any mentees"
+            );
+        } else if (mentors.contains(mentor)) {
+            mentee.setMentors(mentors.stream().filter(user -> !user.equals(mentor)).collect(Collectors.toList()));
             mentorshipRepository.save(mentee);
         } else {
             throw new IllegalArgumentException(

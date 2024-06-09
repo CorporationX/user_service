@@ -8,7 +8,7 @@ import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.service.filter.TestData;
+import school.faang.user_service.service.goal.filter.TestData;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package school.faang.user_service.service.filter;
+package school.faang.user_service.service.goal.filter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -6,17 +6,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
-import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.service.goal.filter.RequestStatusFilter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+
 @ExtendWith(MockitoExtension.class)
-public class RequestStatusFilterTest {
+public class InviterNamePatternFilterTest {
     @InjectMocks
-    private RequestStatusFilter requestStatusFilter;
+    private InviterNamePatternFilter inviterNamePatternFilter;
     private InvitationFilterDto invitationFilterDto;
     private TestData testData;
 
@@ -29,24 +28,23 @@ public class RequestStatusFilterTest {
 
     @Test
     void testIsApplicableFalse() {
-        invitationFilterDto.setStatus(null);
-        assertFalse(requestStatusFilter.isApplicable(invitationFilterDto));
+        invitationFilterDto.setInviterNamePattern(null);
+        assertFalse(inviterNamePatternFilter.isApplicable(invitationFilterDto));
     }
 
     @Test
     void testIsApplicableTrue() {
-        assertTrue(requestStatusFilter.isApplicable(invitationFilterDto));
+        assertTrue(inviterNamePatternFilter.isApplicable(invitationFilterDto));
     }
 
     @Test
     void testApplyWithGoalInvitation() {
-        assertEquals(1, requestStatusFilter.apply(testData.prepareGoalInvitationList().get(1),
+        assertEquals(1, inviterNamePatternFilter.apply(testData.prepareGoalInvitationList().get(1),
                 invitationFilterDto).toList().size());
     }
 
     @Test
     void testApplyWithoutGoalInvitation() {
-        invitationFilterDto.setStatus(RequestStatus.PENDING);
-        assertEquals(0, requestStatusFilter.apply(testData.prepareGoalInvitationList().get(0), invitationFilterDto).toList().size());
+        assertEquals(0, inviterNamePatternFilter.apply(testData.prepareGoalInvitationList().get(0), invitationFilterDto).toList().size());
     }
 }

@@ -21,13 +21,13 @@ import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
-import school.faang.user_service.service.filter.TestData;
 import school.faang.user_service.service.goal.filter.InvitationFilter;
 import school.faang.user_service.service.goal.filter.InvitedIdFilter;
 import school.faang.user_service.service.goal.filter.InvitedNamePatternFilter;
 import school.faang.user_service.service.goal.filter.InviterIdFilter;
 import school.faang.user_service.service.goal.filter.InviterNamePatternFilter;
 import school.faang.user_service.service.goal.filter.RequestStatusFilter;
+import school.faang.user_service.service.goal.filter.TestData;
 
 import java.util.List;
 import java.util.Optional;

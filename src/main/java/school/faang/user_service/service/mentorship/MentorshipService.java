@@ -39,14 +39,13 @@ public class MentorshipService {
         List<User> mentees = mentor.getMentees();
 
         if (mentees.isEmpty()) {
-            throw new NullPointerException (
+            throw new NullPointerException(
                     "That mentee doesn't have any mentors"
             );
         } else if (mentees.contains(mentee)) {
-            mentor.setMentees(mentees.
-                    stream().
-                    filter(user -> !user.equals(mentee)).
-                    collect(Collectors.toList()));
+            mentor.setMentees(mentees.stream()
+                    .filter(user -> !user.equals(mentee))
+                    .collect(Collectors.toList()));
             mentorshipRepository.save(mentor);
         } else {
             throw new IllegalArgumentException(
@@ -61,12 +60,15 @@ public class MentorshipService {
         User mentor = getUserById(mentorId);
 
         List<User> mentors = mentee.getMentors();
+
         if (mentors.isEmpty()) {
-            throw new NullPointerException (
+            throw new NullPointerException(
                     "That mentor doesn't have any mentees"
             );
         } else if (mentors.contains(mentor)) {
-            mentee.setMentors(mentors.stream().filter(user -> !user.equals(mentor)).collect(Collectors.toList()));
+            mentee.setMentors(mentors.stream()
+                    .filter(user -> !user.equals(mentor))
+                    .collect(Collectors.toList()));
             mentorshipRepository.save(mentee);
         } else {
             throw new IllegalArgumentException(

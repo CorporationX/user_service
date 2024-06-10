@@ -1,17 +1,16 @@
 package school.faang.user_service.controller.profile;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.event.profile.ProfileViewEvent;
 import school.faang.user_service.publisher.profile.ProfileViewEventPublisher;
 import school.faang.user_service.validator.profile.ViewProfileValidator;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,9 +26,7 @@ public class ProfileController {
         long userId = userContext.getUserId();
         viewProfileValidator.validate(userId, viewerId);
 
-        ProfileViewEvent event = new ProfileViewEvent();
-        event.setUserId(userId);
-        event.setViewerId(viewerId);
+        ProfileViewEvent event = new ProfileViewEvent(userId, viewerId, LocalDateTime.now());
 
         eventPublisher.publish(event);
     }

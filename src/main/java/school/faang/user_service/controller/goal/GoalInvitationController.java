@@ -1,17 +1,14 @@
 package school.faang.user_service.controller.goal;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
 import school.faang.user_service.service.goal.GoalInvitationService;
@@ -21,27 +18,40 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Validated
+@Tag(name = "GoalInvitation Controller", description = "Контроллер для приглашений на цель")
 public class GoalInvitationController {
     private final GoalInvitationService goalInvitationService;
 
+    @Operation(summary = "Создать приглашение", description = "Создать новое приглашение для цели")
+    @ApiResponse(responseCode = "201", description = "Приглашение успешно создано")
+    @ApiResponse(responseCode = "400", description = "Ошибка на стороне клиента")
     @PostMapping("/createInvitation")
     @ResponseStatus(HttpStatus.CREATED)
     public GoalInvitationDto createInvitation(@Valid @RequestBody GoalInvitationDto invitation) {
         return goalInvitationService.createInvitation(invitation);
     }
 
+    @Operation(summary = "Принять приглашение", description = "Принять приглашение по идентификатору")
+    @ApiResponse(responseCode = "201", description = "Приглашение успешно принято")
+    @ApiResponse(responseCode = "400", description = "Ошибка на стороне клиента")
     @PutMapping("/acceptGoalInvitation/{id}")
     @ResponseStatus(HttpStatus.OK)
     public void acceptGoalInvitation(@Min(1) @PathVariable long id) {
         goalInvitationService.acceptGoalInvitation(id);
     }
 
+    @Operation(summary = "Отклонить приглашение", description = "Отклонить приглашение по идентификатору")
+    @ApiResponse(responseCode = "200", description = "Приглашение успешно отклонено")
+    @ApiResponse(responseCode = "400", description = "Ошибка на стороне клиента")
     @PutMapping("/rejectGoalInvitation/{id}")
     @ResponseStatus(HttpStatus.OK)
     public void rejectGoalInvitation(@Min(1) @PathVariable long id) {
         goalInvitationService.rejectGoalInvitation(id);
     }
 
+    @Operation(summary = "Получить приглашения", description = "Получить список всех приглашений на основе фильтра")
+    @ApiResponse(responseCode = "200", description = "Список приглашений получен")
+    @ApiResponse(responseCode = "400", description = "Ошибка на стороне клиента")
     @GetMapping("/getInvitations")
     @ResponseStatus(HttpStatus.OK)
     public List<GoalInvitationDto> getInvitations(@RequestBody InvitationFilterDto filter) {

@@ -36,8 +36,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static school.faang.user_service.exception.ExceptionMessage.INAPPROPRIATE_OWNER_SKILLS_EXCEPTION;
-import static school.faang.user_service.exception.ExceptionMessage.NO_SUCH_EVENT_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.INAPPROPRIATE_OWNER_SKILLS_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.NO_SUCH_EVENT_EXCEPTION;
 
 @ExtendWith(MockitoExtension.class)
 class EventServiceTest {

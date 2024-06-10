@@ -4,6 +4,7 @@ plugins {
     id("org.springframework.boot") version "3.0.6"
     id("io.spring.dependency-management") version "1.1.0"
     id("org.jsonschema2pojo") version "1.2.1"
+    id("io.freefair.lombok") version "6.5.1"
 }
 
 group = "faang.school"
@@ -42,7 +43,7 @@ dependencies {
     /**
      * Amazon S3
      */
-    implementation("com.amazonaws:aws-java-sdk-s3:1.12.464")
+    implementation("com.amazonaws:aws-java-sdk-s3:1.12.481")
 
     /**
      * Utils & Logging
@@ -58,6 +59,8 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
 
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.13.0")
+    implementation("org.imgscalr:imgscalr-lib:4.2")
+    implementation("net.imagej:ij:1.53t")
 
     /**
      * Test containers

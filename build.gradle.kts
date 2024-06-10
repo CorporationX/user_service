@@ -51,7 +51,7 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation("org.slf4j:slf4j-api:2.0.5")
-    implementation("ch.qos.logback:logback-classic:1.4.12")
+    implementation("ch.qos.logback:logback-classic:1.4.6")
     implementation("org.projectlombok:lombok:1.18.26")
     annotationProcessor("org.projectlombok:lombok:1.18.26")
     implementation("org.mapstruct:mapstruct:1.5.3.Final")
@@ -99,10 +99,10 @@ tasks.bootJar {
  * JaCoCo settings
  */
 val jacocoInclude = listOf(
-    "**/controller/**",
-    "**/service/**",
-    "**/validator/**",
-    "**/mapper/**"
+        "**/controller/**",
+        "**/service/**",
+        "**/validator/**",
+        "**/mapper/**"
 )
 jacoco {
     toolVersion = "0.8.9"
@@ -121,9 +121,9 @@ tasks.jacocoTestReport {
     }
 
     classDirectories.setFrom(
-        sourceSets.main.get().output.asFileTree.matching {
-            include(jacocoInclude)
-        }
+            sourceSets.main.get().output.asFileTree.matching {
+                include(jacocoInclude)
+            }
     )
 }
 tasks.jacocoTestCoverageVerification {
@@ -131,9 +131,9 @@ tasks.jacocoTestCoverageVerification {
         rule {
             element = "CLASS"
             classDirectories.setFrom(
-                sourceSets.main.get().output.asFileTree.matching {
-                    include(jacocoInclude)
-                }
+                    sourceSets.main.get().output.asFileTree.matching {
+                        include(jacocoInclude)
+                    }
             )
             enabled = true
             limit {

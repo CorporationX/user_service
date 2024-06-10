@@ -32,7 +32,7 @@ public class GoalInvitationController {
     }
 
     @Operation(summary = "Принять приглашение", description = "Принять приглашение по идентификатору")
-    @ApiResponse(responseCode = "201", description = "Приглашение успешно принято")
+    @ApiResponse(responseCode = "200", description = "Приглашение успешно принято")
     @ApiResponse(responseCode = "400", description = "Ошибка на стороне клиента")
     @PutMapping("/acceptGoalInvitation/{id}")
     @ResponseStatus(HttpStatus.OK)

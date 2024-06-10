@@ -11,7 +11,7 @@ public class OpenApiConfig {
     public GroupedOpenApi publicApi() {
         return GroupedOpenApi.builder()
                 .group("user-service")
-                .pathsToMatch("/")
+                .pathsToMatch("/**")
                 .build();
     }
 }

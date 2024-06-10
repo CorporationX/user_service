@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.SkillAcquiredEvent;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
@@ -14,6 +15,7 @@ import school.faang.user_service.mapper.RecommendationMapper;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.publisher.SkillAcquiredEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.jpa.UserJpaRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
@@ -35,6 +37,7 @@ public class RecommendationService {
     private final UserJpaRepository userJpaRepository;
     private final RecommendationMapper recommendationMapper;
     private final RecommendationValidator recommendationValidator;
+    private final SkillAcquiredEventPublisher skillAcquiredEventPublisher;
 
     @Transactional
     public RecommendationDto create(RecommendationDto recommendationDto) {
@@ -43,6 +46,13 @@ public class RecommendationService {
         Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
         recommendationRepository.save(recommendation);
         saveSkillOffers(recommendation);
+
+        recommendationDto.getSkillOffers().stream()
+                .map(skillDto ->
+                        new SkillAcquiredEvent(recommendationDto.getAuthorId(),
+                                recommendationDto.getReceiverId(),
+                                skillDto.getSkillId()))
+                .forEach(skillAcquiredEventPublisher::publish);
 
         return recommendationMapper.toDto(recommendation);
     }

@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
+import school.faang.user_service.publisher.SkillAcquiredEventPublisher;
 import school.faang.user_service.service.RecommendationService;
 import school.faang.user_service.validator.RecommendationValidator;
 
@@ -15,6 +16,7 @@ public class RecommendationController {
     private final RecommendationService recommendationService;
     private final RecommendationValidator recommendationValidator;
     private final UserContext userContext;
+    private final SkillAcquiredEventPublisher skillAcquiredEventPublisher;
 
     @PostMapping
     public RecommendationDto giveRecommendation(@RequestBody RecommendationDto recommendationDto) {

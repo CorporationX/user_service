@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface UserService {
 
+    UserDto createUser(UserDto userDto);
+
     User findUserById(long id);
 
     List<UserDto> findPremiumUsers(UserFilterDto filterDto);

@@ -4,8 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.validator.enumvalidator.EnumValidator;
 
 @Data
 @Builder
@@ -13,6 +15,10 @@ import school.faang.user_service.entity.goal.GoalStatus;
 @AllArgsConstructor
 public class GoalFilterDto {
     private User mentor;
+
+    @Length(max = 64, message = "Title cannot be longer than 64 characters")
     private String title;
-    private GoalStatus goalStatus;
+
+    @EnumValidator(enumClass = GoalStatus.class, message = "Invalid Goal Status")
+    private String goalStatus;
 }

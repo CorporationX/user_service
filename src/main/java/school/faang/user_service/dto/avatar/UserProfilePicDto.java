@@ -12,10 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class UserProfilePicDto {
-    @NotNull
     @NotBlank
     private String fileId;
-    @NotNull
     @NotBlank
     private String smallFileId;
 }

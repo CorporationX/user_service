@@ -46,8 +46,8 @@ class EventValidatorImplTest {
                 .description("desc")
                 .startDate(LocalDateTime.now())
                 .endDate(LocalDateTime.now())
-                .type(EventType.GIVEAWAY)
-                .status(EventStatus.IN_PROGRESS)
+                .type(EventType.GIVEAWAY.toString())
+                .status(EventStatus.IN_PROGRESS.toString())
                 .build();
 
         List<Skill> skills = List.of(

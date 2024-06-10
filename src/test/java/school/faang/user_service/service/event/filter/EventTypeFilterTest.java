@@ -31,13 +31,13 @@ class EventTypeFilterTest {
 
     @Test
     void isAcceptableGoodDto() {
-        filterDto.setType(EventType.GIVEAWAY);
+        filterDto.setType(EventType.GIVEAWAY.toString());
         assertTrue(filter.isAcceptable(filterDto));
     }
 
     @Test
     void apply() {
-        filterDto.setType(EventType.GIVEAWAY);
+        filterDto.setType(EventType.GIVEAWAY.toString());
         Event[] expected = new Event[]{event1, event3};
         Stream<Event> out = filter.apply(Stream.of(event1, event2, event3), filterDto);
         assertArrayEquals(expected, out.toArray());

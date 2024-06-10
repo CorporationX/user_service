@@ -151,7 +151,7 @@ public class MentorshipRequestServiceFilterTest {
                 .description(descriptionOfMRWithId1)
                 .requesterId(userId3)
                 .receiverId(userId5)
-                .status(RequestStatus.PENDING)
+                .status(RequestStatus.PENDING.toString())
                 .rejectionReason(rejectionReasonOfMRWithId1)
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
@@ -161,7 +161,7 @@ public class MentorshipRequestServiceFilterTest {
                 .description(descriptionOfMRWithId2)
                 .requesterId(userId1)
                 .receiverId(userId2)
-                .status(RequestStatus.PENDING)
+                .status(RequestStatus.PENDING.toString())
                 .rejectionReason(rejectionReasonOfMRWithId2)
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
@@ -171,7 +171,7 @@ public class MentorshipRequestServiceFilterTest {
                 .description(descriptionOfMRWithId3)
                 .requesterId(userId3)
                 .receiverId(userId4)
-                .status(RequestStatus.PENDING)
+                .status(RequestStatus.PENDING.toString())
                 .rejectionReason(rejectionReasonOfMRWithId3)
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
@@ -181,7 +181,7 @@ public class MentorshipRequestServiceFilterTest {
                 .description(descriptionOfMRWithId1)
                 .requesterId(userId4)
                 .receiverId(userId5)
-                .status(RequestStatus.PENDING)
+                .status(RequestStatus.PENDING.toString())
                 .rejectionReason(rejectionReasonOfMRWithId4)
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
@@ -191,7 +191,7 @@ public class MentorshipRequestServiceFilterTest {
                 .description(descriptionOfMRWithId5)
                 .requesterId(userId3)
                 .receiverId(userId5)
-                .status(RequestStatus.ACCEPTED)
+                .status(RequestStatus.ACCEPTED.toString())
                 .rejectionReason(rejectionReasonOfMRWithId5)
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
@@ -297,7 +297,7 @@ public class MentorshipRequestServiceFilterTest {
     @Test
     public void testGetRequestsFiltersEntitiesByRequesterIdAndStatusPending() {
         filterDto.setRequesterIdPattern(userId3);
-        filterDto.setStatusPattern(RequestStatus.PENDING);
+        filterDto.setStatusPattern(RequestStatus.PENDING.toString());
         var mentorshipRequestService = setUp();
         var actual = mentorshipRequestService.getRequests(filterDto);
         var expected = List.of(mrDtoWithId1, mrDtoWithId3);
@@ -308,7 +308,7 @@ public class MentorshipRequestServiceFilterTest {
     @Test
     public void testGetRequestsFiltersEntitiesByRequesterIdAndStatusAccepted() {
         filterDto.setRequesterIdPattern(userId3);
-        filterDto.setStatusPattern(RequestStatus.ACCEPTED);
+        filterDto.setStatusPattern(RequestStatus.ACCEPTED.toString());
         var mentorshipRequestService = setUp();
         var actual = mentorshipRequestService.getRequests(filterDto);
         var expected = List.of(mrDtoWithId5);

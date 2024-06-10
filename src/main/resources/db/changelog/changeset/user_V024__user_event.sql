@@ -1,0 +1,55 @@
+INSERT INTO user_event (user_id,event_id) VALUES
+	 (1,2),
+	 (1,4),
+	 (1,6),
+	 (1,8),
+	 (1,10),
+	 (2,1),
+	 (2,3),
+	 (2,5),
+	 (2,7),
+	 (2,9);
+INSERT INTO user_event (user_id,event_id) VALUES
+	 (3,2),
+	 (3,4),
+	 (3,6),
+	 (3,8),
+	 (3,10),
+	 (4,1),
+	 (4,3),
+	 (4,5),
+	 (4,7),
+	 (4,9);
+INSERT INTO user_event (user_id,event_id) VALUES
+	 (5,2),
+	 (5,4),
+	 (5,6),
+	 (5,8),
+	 (5,10),
+	 (6,1),
+	 (6,3),
+	 (6,5),
+	 (6,7),
+	 (6,9);
+INSERT INTO user_event (user_id,event_id) VALUES
+	 (7,2),
+	 (7,4),
+	 (7,6),
+	 (7,8),
+	 (7,10),
+	 (8,1),
+	 (8,3),
+	 (8,5),
+	 (8,7),
+	 (8,9);
+INSERT INTO user_event (user_id,event_id) VALUES
+	 (9,2),
+	 (9,4),
+	 (9,6),
+	 (9,8),
+	 (9,10),
+	 (10,1),
+	 (10,3),
+	 (10,5),
+	 (10,7),
+	 (10,9);

@@ -60,7 +60,7 @@ public class RecommendationService {
         recommendationRepository.deleteById(id);
     }
 
-    public Page<RecommendationDto> getAllUserRecommendations(long receiverId, int offset, int limit) {
+    public Page<RecommendationDto> getAllUserRecommendations(Long receiverId, int offset, int limit) {
         Pageable pageable = PageRequest.of(offset, limit);
         Page<Recommendation> receiverRecommendation = recommendationRepository.findAllByReceiverId(receiverId, pageable);
         return receiverRecommendation.map(recommendationMapper::toDto);
@@ -75,27 +75,17 @@ public class RecommendationService {
     private void saveSkillOffers(Recommendation recommendation) {
         long authorId = recommendation.getAuthor().getId();
         long receiverId = recommendation.getReceiver().getId();
-        User user = userRepository.findById(receiverId)
-                .orElseThrow(() -> new DataValidationException("User not found"));
-        User guarantee = userRepository.findById(authorId)
-                .orElseThrow(() -> new DataValidationException("Guarantee not found"));
+        User user = getUserById(receiverId);
+        User guarantee = getUserById(authorId);
 
         List<SkillOffer> skillOffers = recommendation.getSkillOffers();
-        List<Skill> userSkills = userRepository.findById(receiverId)
-                .orElseThrow(() -> new DataValidationException("Skills not found"))
-                .getSkills();
+        List<Skill> userSkills = getUserSkillsById(receiverId);
+
         skillOffers.forEach(skillOffer -> {
             long skillId = skillOffer.getSkill().getId();
             if (userSkills.contains(skillId) && !userSkillGuaranteeRepository.existsById(authorId)) {
-                Skill skill = skillRepository.findById(skillId).orElseThrow(() ->
-                        new DataValidationException("Skill not found"));
-                UserSkillGuarantee guaranteeSkill = new UserSkillGuarantee();
 
-                guaranteeSkill.setSkill(skill);
-                guaranteeSkill.setUser(user);
-                guaranteeSkill.setGuarantor(guarantee);
-
-                userSkillGuaranteeRepository.save(guaranteeSkill);
+                addNewGuarantee(user, guarantee, skillId);
             } else {
                 skillOfferRepository.save(skillOffer);
             }
@@ -118,6 +108,29 @@ public class RecommendationService {
         if (recommendationRepository.findById(id).isEmpty()) {
             throw new DataValidationException("Recommendation not found");
         }
+    }
+
+    private void addNewGuarantee(User user, User guarantee, Long skillId) {
+        Skill skill = skillRepository.findById(skillId).orElseThrow(() ->
+                new DataValidationException("Skill not found"));
+        UserSkillGuarantee guaranteeSkill = new UserSkillGuarantee();
+
+        guaranteeSkill.setSkill(skill);
+        guaranteeSkill.setUser(user);
+        guaranteeSkill.setGuarantor(guarantee);
+
+        userSkillGuaranteeRepository.save(guaranteeSkill);
+    }
+
+    private List<Skill> getUserSkillsById (Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new DataValidationException("Skills not found"))
+                .getSkills();
+    }
+
+    private User getUserById (Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new DataValidationException("User not found"));
     }
 
     private Recommendation fillEntityRecommendation(RecommendationDto recommendationDto) {

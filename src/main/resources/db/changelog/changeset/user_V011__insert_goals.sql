@@ -38,3 +38,4 @@
   VALUES ('goal # 19', 'description of goal # 19', 0, '2024-10-22 12:00:00.000 +0300', 9, 2);
  INSERT INTO goal (title, description, status, deadline, mentor_id, parent_goal_id)
   VALUES ('goal # 20', 'description of goal # 20', 0, '2024-10-23 12:00:00.000 +0300', 10, 1);
+

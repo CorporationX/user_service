@@ -17,3 +17,4 @@ INSERT INTO recommendation_request (message,requester_id,receiver_id,status,reje
 	 ('recommendation request from 4 to 2',4,2,2,'rejection reason from 4 to 2',NULL,'2024-05-11 00:35:12.572671+03','2024-05-11 00:35:12.572671+03'),
 	 ('recommendation request from 6 to 4',6,4,2,'rejection reason from 6 to 4',NULL,'2024-05-11 00:35:12.572671+03','2024-05-11 00:35:12.572671+03'),
 	 ('recommendation request from 8 to 6',8,6,2,'rejection reason from 8 to 6',NULL,'2024-05-11 00:35:12.572671+03','2024-05-11 00:35:12.572671+03');
+

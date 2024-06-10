@@ -3,8 +3,10 @@ package school.faang.user_service.exception;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-@AllArgsConstructor
+
 @Data
+@AllArgsConstructor
 public class ErrorResponse {
+
     private String message;
 }

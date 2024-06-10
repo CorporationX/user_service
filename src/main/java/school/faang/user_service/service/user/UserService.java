@@ -9,6 +9,6 @@ public interface UserService {
     UserDTO createUser(UserDTO userDto);
     void deactivateUser(long userId);
     UserDTO findById(long userId);
-    List<UserDto> findAll();
+    List<UserDTO> findAll();
     UserDTO update(UserDTO userDto);
 }

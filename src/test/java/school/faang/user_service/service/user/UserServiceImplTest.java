@@ -98,8 +98,8 @@ class UserServiceImplTest {
     @Test
     public void whenFindAllThenGetListOfUserDto() {
         when(userRepository.findAll()).thenReturn(List.of(user));
-        when(userMapper.toDtoList(any())).thenReturn(List.of(userDto));
-        List<UserDto> actual = userService.findAll();
+        when(userMapper.toDTOList(any())).thenReturn(List.of(userDto));
+        List<UserDTO> actual = userService.findAll();
         assertThat(actual).isEqualTo(List.of(userDto));
     }
 

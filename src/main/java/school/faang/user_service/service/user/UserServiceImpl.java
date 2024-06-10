@@ -67,9 +67,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> findAll() {
+    public List<UserDTO> findAll() {
         List<User> users = userRepository.findAll();
-        return userMapper.toDtoList(users);
+        return userMapper.toDTOList(users);
     }
 
     private User findUserById(long userId) {

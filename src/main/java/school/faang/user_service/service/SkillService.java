@@ -38,18 +38,15 @@ public class SkillService {
     }
 
     public List<SkillDto> getUserSkills(long userId) {
-        List<Skill> skills = skillRepository.findAllByUserId(userId);
-        return skills.stream()
+                return skillRepository.findAllByUserId(userId).stream()
                 .map(skillMapper::skillToDto)
                 .toList();
     }
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
-        return skillRepository.findSkillsOfferedToUser(userId)
-                .stream()
+        return skillRepository.findSkillsOfferedToUser(userId).stream()
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
-                .entrySet()
-                .stream()
+                .entrySet().stream()
                 .map(entry -> skillCandidateMapper.skillToCandidateDto(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
     }
@@ -70,12 +67,13 @@ public class SkillService {
     }
 
     private void addUserSkillGuarantee(Skill userSkill, List<SkillOffer> allOffersOfSkill) {
-        for (SkillOffer skillOffer : allOffersOfSkill) {
-            userSkillGuaranteeRepository.save(UserSkillGuarantee.builder()
-                    .user(skillOffer.getRecommendation().getReceiver())
-                    .skill(userSkill)
-                    .guarantor(skillOffer.getRecommendation().getAuthor())
-                    .build());
+            allOffersOfSkill.stream()
+                    .map(skillOffer -> UserSkillGuarantee.builder()
+                            .user(skillOffer.getRecommendation().getReceiver())
+                            .skill(userSkill)
+                            .guarantor(skillOffer.getRecommendation().getAuthor())
+                            .build())
+                    .forEach(userSkillGuaranteeRepository::save);
         }
     }
 }

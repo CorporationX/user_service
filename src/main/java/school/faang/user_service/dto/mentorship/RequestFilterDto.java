@@ -24,5 +24,5 @@ public class RequestFilterDto {
     private Long receiverIdPattern;
 
     @EnumValidator(enumClass = RequestStatus.class, message = "Invalid Request Status")
-    private String statusPattern;
+    private RequestStatus statusPattern;
 }

@@ -36,7 +36,7 @@ public class MentorshipRequestDto {
 
     @NotNull
     @EnumValidator(enumClass = RequestStatus.class, message = "Invalid Request Status")
-    private String status;
+    private RequestStatus status;
 
     @Size(min = 20, max = 4096, message = "description should be more then 19 and less or equal to 4096 symbols")
     private String rejectionReason;

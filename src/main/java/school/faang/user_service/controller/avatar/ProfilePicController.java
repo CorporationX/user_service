@@ -26,7 +26,6 @@ import school.faang.user_service.service.avatar.ProfilePicService;
 @RequiredArgsConstructor
 @RequestMapping("/pic")
 @Tag(name = "Avatar")
-@Validated
 public class ProfilePicController {
     private final ProfilePicService profilePicService;
 

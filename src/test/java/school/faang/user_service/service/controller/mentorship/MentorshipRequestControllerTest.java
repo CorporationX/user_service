@@ -146,7 +146,7 @@ public class MentorshipRequestControllerTest {
                 .description(descriptionOfMRWithId1)
                 .requesterId(userId3)
                 .receiverId(userId5)
-                .status(RequestStatus.PENDING.toString())
+                .status(RequestStatus.PENDING)
                 .rejectionReason(rejectionReasonOfMRWithId1)
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
@@ -156,7 +156,7 @@ public class MentorshipRequestControllerTest {
                 .description(descriptionOfMRWithId2)
                 .requesterId(userId1)
                 .receiverId(userId2)
-                .status(RequestStatus.PENDING.toString())
+                .status(RequestStatus.PENDING)
                 .rejectionReason(rejectionReasonOfMRWithId2)
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
@@ -166,7 +166,7 @@ public class MentorshipRequestControllerTest {
                 .description(descriptionOfMRWithId3)
                 .requesterId(userId3)
                 .receiverId(userId4)
-                .status(RequestStatus.PENDING.toString())
+                .status(RequestStatus.PENDING)
                 .rejectionReason(rejectionReasonOfMRWithId3)
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
@@ -176,7 +176,7 @@ public class MentorshipRequestControllerTest {
                 .description(descriptionOfMRWithId1)
                 .requesterId(userId4)
                 .receiverId(userId5)
-                .status(RequestStatus.PENDING.toString())
+                .status(RequestStatus.PENDING)
                 .rejectionReason(rejectionReasonOfMRWithId4)
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
@@ -186,7 +186,7 @@ public class MentorshipRequestControllerTest {
                 .description(descriptionOfMRWithId5)
                 .requesterId(userId3)
                 .receiverId(userId5)
-                .status(RequestStatus.ACCEPTED.toString())
+                .status(RequestStatus.ACCEPTED)
                 .rejectionReason(rejectionReasonOfMRWithId5)
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
@@ -291,7 +291,7 @@ public class MentorshipRequestControllerTest {
 
     @Test
     public void testAcceptRequestShouldReturnMentorshipRequestDto() {
-        mrDtoWithId1.setStatus(RequestStatus.ACCEPTED.toString());
+        mrDtoWithId1.setStatus(RequestStatus.ACCEPTED);
         when(mentorshipRequestService.acceptRequest(mentorshipRequestId1))
                 .thenReturn(mrDtoWithId1);
 
@@ -303,7 +303,7 @@ public class MentorshipRequestControllerTest {
 
     @Test
     public void testRejectRequestShouldReturnMentorshipRequestDto() {
-        mrDtoWithId2.setStatus(RequestStatus.REJECTED.toString());
+        mrDtoWithId2.setStatus(RequestStatus.REJECTED);
         when(mentorshipRequestService.rejectRequest(mentorshipRequestId2, rejectionDtoForMr2))
                 .thenReturn(mrDtoWithId2);
 

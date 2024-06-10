@@ -20,5 +20,5 @@ public class GoalFilterDto {
     private String title;
 
     @EnumValidator(enumClass = GoalStatus.class, message = "Invalid Goal Status")
-    private String goalStatus;
+    private GoalStatus goalStatus;
 }

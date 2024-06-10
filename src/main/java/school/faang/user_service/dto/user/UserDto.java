@@ -28,7 +28,6 @@ public class UserDto {
     @Size(max = 128, message = "password should be less than 129 symbols")
     private String password;
 
-    @NotBlank
     private Country country;
 
     private boolean active;

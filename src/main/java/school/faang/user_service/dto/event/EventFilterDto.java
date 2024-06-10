@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.event.EventType;
-import school.faang.user_service.validator.enumvalidator.EnumValidator;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,9 +24,6 @@ public class EventFilterDto {
     @Size(max = 128, message = "location should be less than 129 symbols")
     private String location;
 
-    @EnumValidator(enumClass = EventType.class, message = "Invalid Event Type")
-    private String type;
-
-    @EnumValidator(enumClass = EventStatus.class, message = "Invalid Event Status")
+    private EventType type;
     private EventStatus status;
 }

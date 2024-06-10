@@ -44,9 +44,6 @@ public class EventDto {
 
     private List<SkillDto> relatedSkills;
 
-    @EnumValidator(enumClass = EventType.class, message = "Invalid Event Type")
-    private String type;
-
-    @EnumValidator(enumClass = EventStatus.class, message = "Invalid Event Status")
-    private String status;
+    private EventType type;
+    private EventStatus status;
 }

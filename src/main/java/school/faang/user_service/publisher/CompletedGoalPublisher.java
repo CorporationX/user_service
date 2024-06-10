@@ -2,8 +2,8 @@ package school.faang.user_service.publisher;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.event.GoalCompletedEvent;
 
@@ -12,12 +12,13 @@ import school.faang.user_service.event.GoalCompletedEvent;
 @RequiredArgsConstructor
 public class CompletedGoalPublisher implements MessagePublisher<GoalCompletedEvent> {
 
+    @Value("${spring.data.redis.channels.goal_channel.name}")
+    private String channelTopic;
     private final RedisTemplate<String, Object> redisTemplate;
-    private final ChannelTopic completedGoalTopic;
 
     @Override
     public void publish(GoalCompletedEvent event) {
-        redisTemplate.convertAndSend(completedGoalTopic.getTopic(), event);
-        log.info("Published goal completed event - {}:{}", completedGoalTopic.getTopic(), event);
+        redisTemplate.convertAndSend(channelTopic, event);
+        log.info("Published goal completed event - {}:{}", channelTopic, event);
     }
 }

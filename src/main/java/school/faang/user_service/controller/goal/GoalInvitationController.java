@@ -20,6 +20,7 @@ import java.util.List;
 @Validated
 @Tag(name = "GoalInvitation Controller", description = "Контроллер для приглашений на цель")
 public class GoalInvitationController {
+
     private final GoalInvitationService goalInvitationService;
 
     @Operation(summary = "Создать приглашение", description = "Создать новое приглашение для цели")

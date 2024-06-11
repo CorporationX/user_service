@@ -24,7 +24,4 @@ public interface SkillMapper {
     SkillDto skillToDto(Skill skill);
 
     List<SkillDto> toSkillDtoList(List<Skill> skills);
-
-    SkillCandidateDto toCandidateDto(Skill skill);
-    }
 }

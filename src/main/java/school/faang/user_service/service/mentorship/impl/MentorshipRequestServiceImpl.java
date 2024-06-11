@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.dto.event.mentorship.MentorshipStartEvent;
+import school.faang.user_service.event.mentorship.MentorshipStartEvent;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.dto.mentorship.RequestFilterDto;
@@ -64,19 +64,17 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     @Override
     @Transactional
     public MentorshipRequestDto acceptRequest(Long id) {
-        var entity = mentorshipRequestValidator.validateMentorshipRequestExistence(id);
+        MentorshipRequest request = mentorshipRequestValidator.validateMentorshipRequestExistence(id);
 
-        addMentor(entity);
-        entity.setStatus(RequestStatus.ACCEPTED);
-        entity = mentorshipRequestRepository.save(entity);
+        addMentor(request);
+        request.setStatus(RequestStatus.ACCEPTED);
+        mentorshipRequestRepository.save(request);
 
-        mentorshipStartPublisher.publish(new MentorshipStartEvent(
-                entity.getReceiver().getId(),
-                entity.getRequester().getId(),
-                LocalDateTime.now()));
+        MentorshipStartEvent event = mentorshipRequestMapper.toEvent(request);
+        mentorshipStartPublisher.publish(event);
         log.info("Published mentorship start event");
 
-        return mentorshipRequestMapper.toDto(entity);
+        return mentorshipRequestMapper.toDto(request);
     }
 
     @Override

@@ -66,7 +66,7 @@ public class SkillService {
     @Transactional
     public SkillDto acquireSkillFromOffers(Long skillId, Long userId) {
 
-        skillValidate.validateSkillPresent(skillId,userId);
+        skillValidate.validateSkillPresent(skillId, userId);
 
         Skill skillUser = skillRepository.findUserSkill(skillId, userId)
                 .orElseThrow(() -> new ValidationException(ExceptionMessage.USER_SKILL_NOT_FOUND.getMessage()));
@@ -83,14 +83,14 @@ public class SkillService {
 
 
     private void addUserSkillGuarantee(Skill userSkill, List<SkillOffer> allOffersOfSkill) {
-            allOffersOfSkill.stream()
-                    .map(skillOffer -> UserSkillGuarantee.builder()
-                            .user(skillOffer.getRecommendation().getReceiver())
-                            .skill(userSkill)
-                            .guarantor(skillOffer.getRecommendation().getAuthor())
-                            .build())
-                    .forEach(userSkillGuaranteeRepository::save);
-        }
+        allOffersOfSkill.stream()
+                .map(skillOffer -> UserSkillGuarantee.builder()
+                        .user(skillOffer.getRecommendation().getReceiver())
+                        .skill(userSkill)
+                        .guarantor(skillOffer.getRecommendation().getAuthor())
+                        .build())
+                .forEach(userSkillGuaranteeRepository::save);
+    }
 }
 
 

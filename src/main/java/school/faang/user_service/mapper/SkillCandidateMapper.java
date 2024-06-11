@@ -17,8 +17,4 @@ public interface SkillCandidateMapper {
     @Mapping(source = "title", target = "skillDto.title")
     @Mapping(target = "offersAmount", ignore = true)
     SkillCandidateDto toDto(Skill skill);
-
-    @Mapping(source = "skillDto.id", target = "id")
-    @Mapping(source = "skillDto.title", target = "title")
-    Skill toEntity(SkillCandidateDto skillCandidateDto);
 }

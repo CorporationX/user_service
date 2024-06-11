@@ -25,10 +25,10 @@ spring:
         follower_channel:
           name: follower_channel
         profile_view_channel:
-            name: profile_view_channel
+          name: profile_view_channel
 
 server:
-  port: 8081
+  port: 8080
 
 logging:
   level:
@@ -49,5 +49,10 @@ aws:
 
 services:
   s3:
-    bucket-name: user_backet
-    isMocked: true
+    secretKey: password
+    bucketName: userbucket
+    endpoint: http://localhost:9000
+    accessKey: user
+
+  avatar-generator:
+    baseUrl: https://api.dicebear.com/8.x/notionists/png?size=170&seed=

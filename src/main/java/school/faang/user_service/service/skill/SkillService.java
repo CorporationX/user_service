@@ -13,7 +13,7 @@ import school.faang.user_service.repository.UserRepository;
 import java.util.List;
 import java.util.Optional;
 
-import static school.faang.user_service.exception.ExceptionMessage.NO_SUCH_USER_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.NO_SUCH_USER_EXCEPTION;
 
 @Service
 @RequiredArgsConstructor

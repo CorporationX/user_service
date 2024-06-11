@@ -6,25 +6,25 @@ import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.testData.TestData;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class UserMapperTest {
+
     private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
     private User user;
     private UserDto userDto;
 
     @BeforeEach
     void setUp() {
-        user = new User();
-        user.setId(1L);
-        user.setUsername("nadir");
-        user.setAboutMe("About nadir");
-        user.setEmail("nadir@gmail.com");
+        TestData testData = new TestData();
 
-        userDto = new UserDto(1L, "nadir", "nadir@gmail.com");
+        user = testData.getUser();
+
+        userDto = testData.getUserDto();
     }
 
     @DisplayName("should map user to userDto")

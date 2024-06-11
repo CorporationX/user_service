@@ -5,6 +5,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
+import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
@@ -22,12 +23,8 @@ public interface SkillMapper {
     @Mapping(source = "users", target = "userIds", qualifiedByName = "usersToIds")
     SkillDto skillToDto(Skill skill);
 
-    List<SkillDto> map(List<Skill> skills);
+    List<SkillDto> toSkillDtoList(List<Skill> skills);
 
-    @Named("usersToIds")
-    default List<Long> convertUsersToIds (List<User> users) {
-        return users != null
-                ? users.stream().map(User::getId).toList()
-                : Collections.emptyList();
+    SkillCandidateDto toCandidateDto(Skill skill);
     }
 }

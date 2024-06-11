@@ -16,6 +16,7 @@ import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.validation.skill.SkillValidator;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -38,17 +39,25 @@ public class SkillService {
     }
 
     public List<SkillDto> getUserSkills(long userId) {
-                return skillRepository.findAllByUserId(userId).stream()
-                .map(skillMapper::skillToDto)
-                .toList();
+        List<Skill> skills = skillRepository.findAllByUserId( userId );
+        return skillMapper.toSkillDtoList( skills );
     }
 
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
-        return skillRepository.findSkillsOfferedToUser(userId).stream()
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
-                .entrySet().stream()
-                .map(entry -> skillCandidateMapper.skillToCandidateDto(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
+
+        List<Skill> skillsOfferedToUser = skillRepository.findSkillsOfferedToUser(userId);
+
+        Map<Long, Long> skillCountMap = skillsOfferedToUser.stream()
+                .collect(Collectors.groupingBy(Skill::getId, Collectors.counting()));
+
+        return skillsOfferedToUser.stream()
+                .distinct()
+                .map(skillCandidateMapper::toDto)
+                .peek((skillCandidateDto -> {
+                    long countSkill = skillCountMap.get(skillCandidateDto.getSkillDto().getId());
+                    skillCandidateDto.setOffersAmount(countSkill);
+                }))
+                .toList();
     }
 
     public SkillDto acquireSkillFromOffers(Long skillId, Long userId) {

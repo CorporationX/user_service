@@ -21,10 +21,12 @@ class SkillMapperTest {
         skill = new Skill();
         skill.setId(0);
         skill.setTitle("SQL");
+        skill.setUsers(List.of());
 
         skillDto = new SkillDto();
         skillDto.setId(0L);
         skillDto.setTitle("SQL");
+        skillDto.setUserIds(List.of());
     }
 
     @DisplayName("should map skill entity to skill dto")

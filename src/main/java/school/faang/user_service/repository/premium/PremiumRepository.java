@@ -1,5 +1,6 @@
 package school.faang.user_service.repository.premium;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.premium.Premium;
@@ -16,4 +17,10 @@ public interface PremiumRepository extends CrudRepository<Premium, Long> {
     boolean existsByUserId(long userId);
 
     List<Premium> findAllByEndDateBefore(LocalDateTime endDate);
+
+    @Query(value = """
+            SELECT p.id FROM Premium p
+            WHERE p.endDate < CURRENT_TIMESTAMP
+            """)
+    List<Long> findAllExpiredIds();
 }

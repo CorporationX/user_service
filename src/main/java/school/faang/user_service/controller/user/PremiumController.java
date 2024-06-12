@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.user;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class PremiumController {
     private final PremiumService premiumService;
     private final UserContext userContext;
 
+    @Operation(summary = "Buy premium")
     @PostMapping
     public void buyPremium(@PathParam("premiumPeriod") PremiumPeriod premiumPeriod) {
         premiumService.buyPremium(userContext.getUserId(), premiumPeriod);

@@ -19,6 +19,7 @@ import school.faang.user_service.mapper.PremiumMapper;
 import school.faang.user_service.repository.premium.PremiumRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -46,15 +47,23 @@ public class PremiumServiceImpl implements PremiumService {
             return;
         }
 
-        Premium premium = premiumRepository.findByUserId(userId)
-                .orElseThrow(() -> new NotFoundException(String.format("Premium with userId $s not found", userId)));
+        premiumRepository.findByUserId(userId)
+                .ifPresentOrElse(
+                        premium -> {
+                            premium.setEndDate(premium.getEndDate().plusDays(premiumPeriod.getDays()));
+                            premiumRepository.save(premium);
+                        },
+                        () -> {
+                            Premium premium = premiumMapper.toEntity(userId, LocalDateTime.now(), LocalDateTime.now().plusDays(premiumPeriod.getDays()));
+                            premiumRepository.save(premium);
+                        }
+                );
+    }
 
-        boolean isExpired = premium.getEndDate().isBefore(LocalDateTime.now());
-        if (isExpired) {
-            premium.setStartDate(LocalDateTime.now());
-        }
-
-        premium.setEndDate(premium.getEndDate().plusDays(premiumPeriod.getDays()));
-        premiumRepository.save(premium);
+    @Override
+    @Transactional
+    public void deleteAllExpiredPremium() {
+        List<Long> expiredIds = premiumRepository.findAllExpiredIds();
+        premiumRepository.deleteAllById(expiredIds);
     }
 }

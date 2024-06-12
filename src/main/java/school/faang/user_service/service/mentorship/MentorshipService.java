@@ -10,7 +10,6 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -43,9 +42,7 @@ public class MentorshipService {
                     "That mentee doesn't have any mentors"
             );
         } else if (mentees.contains(mentee)) {
-            mentor.setMentees(mentees.stream()
-                    .filter(user -> !user.equals(mentee))
-                    .collect(Collectors.toList()));
+            mentor.getMentees().removeIf(user -> user.getId() == menteeId);
             mentorshipRepository.save(mentor);
         } else {
             throw new IllegalArgumentException(
@@ -66,9 +63,7 @@ public class MentorshipService {
                     "That mentor doesn't have any mentees"
             );
         } else if (mentors.contains(mentor)) {
-            mentee.setMentors(mentors.stream()
-                    .filter(user -> !user.equals(mentor))
-                    .collect(Collectors.toList()));
+            mentee.getMentors().removeIf(user -> user.getId() == mentorId);
             mentorshipRepository.save(mentee);
         } else {
             throw new IllegalArgumentException(

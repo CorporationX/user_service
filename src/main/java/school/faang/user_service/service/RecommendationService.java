@@ -32,7 +32,7 @@ public class RecommendationService {
     private final SkillRepository skillRepository;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final RecommendationMapper recommendationMapper;
-    private final int FILTER_MONTH = 6;
+    private static final int FILTER_MONTH = 6;
 
     public RecommendationDto create(RecommendationDto recommendationDto) {
         validationData(recommendationDto);
@@ -83,7 +83,7 @@ public class RecommendationService {
 
         skillOffers.forEach(skillOffer -> {
             long skillId = skillOffer.getSkill().getId();
-            if (userSkills.contains(skillId) && !userSkillGuaranteeRepository.existsById(authorId)) {
+            if (userSkills.contains(skillOffer.getSkill()) && !userSkillGuaranteeRepository.existsById(authorId)) {
 
                 addNewGuarantee(user, guarantee, skillId);
             } else {
@@ -122,13 +122,13 @@ public class RecommendationService {
         userSkillGuaranteeRepository.save(guaranteeSkill);
     }
 
-    private List<Skill> getUserSkillsById (Long id) {
+    private List<Skill> getUserSkillsById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new DataValidationException("Skills not found"))
                 .getSkills();
     }
 
-    private User getUserById (Long id) {
+    private User getUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new DataValidationException("User not found"));
     }

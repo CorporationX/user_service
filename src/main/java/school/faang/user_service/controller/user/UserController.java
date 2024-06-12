@@ -2,17 +2,16 @@ package school.faang.user_service.controller.user;
 
 import com.json.student.Person;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.converter.starter.ConverterCsvToPerson;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.UserFilterDtoValidator;
 import school.faang.user_service.validator.UserValidator;
@@ -28,6 +27,14 @@ public class UserController {
     private final UserFilterDtoValidator userFilterDtoValidator;
     private final UserValidator userValidator;
     private final ConverterCsvToPerson converterCsvToPerson;
+    private final UserMapper userMapper;
+    private final UserRepository userRepository;
+
+    @GetMapping("/{userId}")
+    public UserDto getUser(@PathVariable("userId") long userId) {
+        return userMapper.toDto(userRepository.findById(userId)
+                .orElseThrow(() -> new DataValidationException("Пользователя с id: " + userId + " нет в базе данных")));
+    }
 
     @PostMapping("/premium")
     public List<UserDto> getPremiumUsers(@RequestBody UserFilterDto userFilterDto) {

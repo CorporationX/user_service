@@ -59,7 +59,7 @@ class MentorshipServiceTest {
         mentorshipService.getMentors(mentor2.getId());
 
         verify(mentorshipRepository).findById(mentor2.getId());
-        verify(userMapper).toDtoList(mentorshipRepository.findById(mentor2.getId()).get().getMentees());
+        verify(userMapper).toDto(mentorshipRepository.findById(mentor2.getId()).get().getMentees());
     }
 
     @Test
@@ -76,7 +76,7 @@ class MentorshipServiceTest {
         mentorshipService.getMentees(mentee1.getId());
 
         verify(mentorshipRepository).findById(mentee1.getId());
-        verify(userMapper).toDtoList(mentorshipRepository.findById(mentee1.getId()).get().getMentees());
+        verify(userMapper).toDto(mentorshipRepository.findById(mentee1.getId()).get().getMentees());
     }
 
 

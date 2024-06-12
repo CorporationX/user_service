@@ -21,13 +21,13 @@ public class MentorshipService {
     @Transactional(readOnly = true)
     public List<UserDto> getMentees(long userId) {
         User user = getUserById(userId);
-        return userMapper.toDtoList(user.getMentees());
+        return userMapper.toDto(user.getMentees());
     }
 
     @Transactional(readOnly = true)
     public List<UserDto> getMentors(long userId) {
         User user = getUserById(userId);
-        return userMapper.toDtoList(user.getMentors());
+        return userMapper.toDto(user.getMentors());
     }
 
     @Transactional

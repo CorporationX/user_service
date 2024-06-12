@@ -11,6 +11,8 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRepository;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -104,7 +106,8 @@ class MentorshipServiceTest {
     public void testDeleteEmptyMentee() {
         when(mentorshipRepository.findById(mentor2.getId())).thenReturn(Optional.of(mentor2));
         when(mentorshipRepository.findById(mentee2.getId())).thenReturn(Optional.of(mentee2));
-        assertThrows(NullPointerException.class,
+        mentor2.setMentees(new ArrayList<>(Collections.emptyList()));
+        assertThrows(IllegalArgumentException.class,
                 () -> mentorshipService.deleteMentee(mentee2.getId(), mentor2.getId()));
     }
 
@@ -112,8 +115,8 @@ class MentorshipServiceTest {
     public void testDeleteEmptyMentor() {
         when(mentorshipRepository.findById(mentee1.getId())).thenReturn(Optional.of(mentee1));
         when(mentorshipRepository.findById(mentor1.getId())).thenReturn(Optional.of(mentor1));
-
-        assertThrows(NullPointerException.class,
+        mentee1.setMentors(new ArrayList<>(Collections.emptyList()));
+        assertThrows(IllegalArgumentException.class,
                 () -> mentorshipService.deleteMentor(mentee1.getId(), mentor1.getId()));
     }
 
@@ -181,7 +184,7 @@ class MentorshipServiceTest {
     private User getMentor1() {
         return User.builder()
                 .id(201L)
-                .mentees(List.of(mentee2, mentee1))
+                .mentees(new ArrayList<>(List.of(mentee2, mentee1)))
                 .build();
     }
 
@@ -200,7 +203,7 @@ class MentorshipServiceTest {
     private User getMentee3() {
         return User.builder()
                 .id(203L)
-                .mentors(List.of(mentor2, mentor1))
+                .mentors(new ArrayList<>(List.of(mentor2, mentor1)))
                 .build();
     }
 }

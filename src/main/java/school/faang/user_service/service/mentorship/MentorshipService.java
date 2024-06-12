@@ -38,7 +38,7 @@ public class MentorshipService {
         List<User> mentees = mentor.getMentees();
 
         if (mentees.isEmpty()) {
-            throw new NullPointerException(
+            throw new IllegalArgumentException(
                     "That mentee doesn't have any mentors"
             );
         } else if (mentees.contains(mentee)) {
@@ -59,7 +59,7 @@ public class MentorshipService {
         List<User> mentors = mentee.getMentors();
 
         if (mentors.isEmpty()) {
-            throw new NullPointerException(
+            throw new IllegalArgumentException(
                     "That mentor doesn't have any mentees"
             );
         } else if (mentors.contains(mentor)) {

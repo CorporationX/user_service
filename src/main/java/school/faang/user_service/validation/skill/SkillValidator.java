@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.exception.ExceptionMessage;
+import school.faang.user_service.exception.message.ExceptionMessage;
 import school.faang.user_service.repository.SkillRepository;
 import java.util.Optional;
 

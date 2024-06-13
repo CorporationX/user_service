@@ -10,6 +10,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.event.EventType;
+import school.faang.user_service.validator.enumvalidator.EnumValidator;
 
 import java.time.LocalDateTime;
 
@@ -33,6 +35,7 @@ public class MentorshipRequestDto {
     private Long receiverId;
 
     @NotNull
+    @EnumValidator(enumClass = RequestStatus.class, message = "Invalid Request Status")
     private RequestStatus status;
 
     @Size(min = 20, max = 4096, message = "description should be more then 19 and less or equal to 4096 symbols")

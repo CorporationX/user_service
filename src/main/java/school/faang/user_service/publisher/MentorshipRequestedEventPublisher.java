@@ -6,7 +6,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.MessageEvent;
-import school.faang.user_service.service.MessagePublisher;
 
 @Slf4j
 @Service
@@ -14,11 +13,11 @@ import school.faang.user_service.service.MessagePublisher;
 public class MentorshipRequestedEventPublisher implements MessagePublisher {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final ChannelTopic topic;
+    private final ChannelTopic mentorshipRequestedChannel;
 
     @Override
     public void publish(MessageEvent message) {
-        log.info("Publishing message on Redis channel {} with content: {}", topic.getTopic(), message);
-        redisTemplate.convertAndSend(topic.getTopic(), message);
+        log.info("Publishing message on Redis channel {} with content: {}", mentorshipRequestedChannel.getTopic(), message);
+        redisTemplate.convertAndSend(mentorshipRequestedChannel.getTopic(), message);
     }
 }

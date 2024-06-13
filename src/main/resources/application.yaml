@@ -29,9 +29,6 @@ spring:
         mentorship_requested_channel:
           name: mentorship_requested_channel
 
-  main:
-    allow-bean-definition-overriding: true
-
 server:
   port: 8080
 

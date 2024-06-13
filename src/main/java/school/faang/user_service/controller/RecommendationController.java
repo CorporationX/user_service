@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.config.context.UserContext;
+import school.faang.user_service.dto.SkillAcquiredEvent;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
 import school.faang.user_service.publisher.SkillAcquiredEventPublisher;
 import school.faang.user_service.service.RecommendationService;
@@ -58,5 +59,10 @@ public class RecommendationController {
                                                         @RequestParam(name = "page_size") int pageSize) {
         recommendationValidator.validateId(authorId);
         return recommendationService.getAllRecommendation(authorId, pageNum, pageSize);
+    }
+
+    @GetMapping("/skill/publish/{id}")
+    public void skillPublish(@PathVariable long id) {
+        skillAcquiredEventPublisher.publish(new SkillAcquiredEvent(id, 2, 3L));
     }
 }

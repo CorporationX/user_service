@@ -18,7 +18,6 @@ public class SkillAcquiredEventPublisher implements MessagePublisher {
 
     @Override
     public void publish(MessageEvent message) {
-        System.out.println(message.getActorId() + " : " + message.getReceiverId());
         log.info("Publishing message on Redis channel {} with content: {}", skillTopic.getTopic(), message);
         redisTemplate.convertAndSend(skillTopic.getTopic(), message);
     }

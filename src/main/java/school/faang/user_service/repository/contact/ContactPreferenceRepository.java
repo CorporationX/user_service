@@ -9,6 +9,5 @@ import java.util.Optional;
 @Repository
 public interface ContactPreferenceRepository extends CrudRepository<ContactPreference, Long> {
 
-    Optional<ContactPreference> findByUserId(long id);
-
+    Optional<ContactPreference> findByUserUsername(String username);
 }

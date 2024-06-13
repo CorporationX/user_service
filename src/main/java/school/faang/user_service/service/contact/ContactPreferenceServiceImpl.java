@@ -20,8 +20,8 @@ public class ContactPreferenceServiceImpl implements ContactPreferenceService {
 
     @Override
     @Transactional(readOnly = true)
-    public ContactPreferenceDto getContact(long userId) {
-        ContactPreference contactPreference = contactRepository.findByUserId(userId)
+    public ContactPreferenceDto getContact(String username) {
+        ContactPreference contactPreference = contactRepository.findByUserUsername(username)
                 .orElseThrow(() -> new NotFoundException("Contact not found"));
 
         return contactPreferenceMapper.toDto(contactPreference);

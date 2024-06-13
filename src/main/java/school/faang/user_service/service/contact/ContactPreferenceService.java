@@ -4,5 +4,5 @@ import school.faang.user_service.dto.contact.ContactPreferenceDto;
 
 public interface ContactPreferenceService {
 
-    ContactPreferenceDto getContact(long userId);
+    ContactPreferenceDto getContact(String username);
 }

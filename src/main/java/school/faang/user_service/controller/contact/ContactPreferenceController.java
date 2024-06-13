@@ -16,7 +16,7 @@ public class ContactPreferenceController {
     private final ContactPreferenceService contactPreferenceService;
 
     @GetMapping("/{userName}")
-    public ContactPreferenceDto getContact(@PathVariable String userName) {
+    public ContactPreferenceDto getContactPreference(@PathVariable String userName) {
         return contactPreferenceService.getContact(userName);
     }
 }

@@ -14,8 +14,7 @@ import org.springframework.context.annotation.Bean;
 @OpenAPIDefinition(
         info = @Info(
                 title = "User Service",
-                version = "1.0.0")
-)
+                version = "1.0.0"))
 public class UserServiceApplication {
 
     public static void main(String[] args) {

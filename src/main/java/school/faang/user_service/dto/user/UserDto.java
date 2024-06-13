@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.entity.contact.PreferredContact;
 
 @Data
 @Builder
@@ -31,5 +32,8 @@ public class UserDto {
     private Country country;
 
     private boolean active;
+
     private UserProfilePic userProfilePic;
+
+    private PreferredContact preferredContact;
 }

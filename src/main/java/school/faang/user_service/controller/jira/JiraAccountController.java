@@ -1,6 +1,8 @@
 package school.faang.user_service.controller.jira;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,16 +31,22 @@ public class JiraAccountController {
     private final JiraAccountService jiraAccountService;
     private final UserContext userContext;
 
-    @Operation(summary = "Add Jira account to user")
     @PostMapping
     @ResponseStatus(value = HttpStatus.CREATED)
+    @Operation(
+            summary = "Add Jira account to user",
+            parameters = {@Parameter(in = ParameterIn.HEADER, name = "x-user-id", required = true)}
+    )
     public JiraAccountDto addJiraAccount(@Valid @RequestBody JiraAccountDto jiraAccountDto) {
         long usrId = userContext.getUserId();
         return jiraAccountService.addJiraAccount(usrId, jiraAccountDto);
     }
 
-    @Operation(summary = "Get user's Jira account")
     @GetMapping
+    @Operation(
+            summary = "Get user's Jira account",
+            parameters = {@Parameter(in = ParameterIn.HEADER, name = "x-user-id", required = true)}
+    )
     public JiraAccountDto getJiraAccount() {
         long usrId = userContext.getUserId();
         return jiraAccountService.getJiraAccountInfo(usrId);

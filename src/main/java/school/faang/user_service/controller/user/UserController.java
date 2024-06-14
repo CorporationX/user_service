@@ -71,7 +71,7 @@ public class UserController {
         userService.deleteUserAvatar(userId);
     }
 
-    @PostMapping("/uploadData")
+    @PostMapping("/bulk-data")
     List<UserDto> uploadData(@RequestParam("file") MultipartFile multipartFile) {
         if (multipartFile.isEmpty()) {
             throw new DataValidationException(NO_FILE_IN_REQUEST.getMessage());

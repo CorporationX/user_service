@@ -1,12 +1,12 @@
 package school.faang.user_service.service.avatar;
 
-import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -21,6 +21,7 @@ import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.avatar.PictureMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.cloud.S3Service;
 import school.faang.user_service.service.user.UserService;
 
 import javax.imageio.ImageIO;
@@ -33,20 +34,21 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@PropertySource(value = "classpath:s3.properties")
 public class ProfilePicServiceImpl implements ProfilePicService {
-    private final UserRepository userRepository;
-    private final UserService userService;
-    private final AmazonS3 s3Client;
-    private final PictureMapper pictureMapper;
-    private final RestTemplate restTemplate;
-    @Value("${services.s3.bucket-name}")
-    private String bucketName;
-    @Value("${services.s3.smallSize}")
-    private int smallSize;
-    @Value("${services.s3.largeSize}")
-    private int largeSize;
     @Value("${randomAvatar.url}")
     private String url;
+    @Value("${smallSize}")
+    private int smallSize;
+    @Value("${largeSize}")
+    private int largeSize;
+    @Value("${bucketName}")
+    private String bucketName;
+    private final S3Service s3Service;
+    private final RestTemplate restTemplate;
+    private final UserRepository userRepository;
+    private final UserService userService;
+    private final PictureMapper pictureMapper;
 
     private InputStream compressPic(InputStream inputStream, int size) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -74,7 +76,7 @@ public class ProfilePicServiceImpl implements ProfilePicService {
         metadata.setContentType("image/jpeg");
 
         InputStream inputStream = new ByteArrayInputStream(image);
-        s3Client.putObject(bucketName, nameForSmallPic, compressPic(inputStream, smallSize), metadata);
+        s3Service.uploadFile(bucketName, nameForSmallPic, compressPic(inputStream, smallSize));
         UserProfilePic userProfilePic = new UserProfilePic();
         userProfilePic.setSmallFileId(nameForSmallPic);
         user.setUserProfilePic(userProfilePic);
@@ -87,12 +89,11 @@ public class ProfilePicServiceImpl implements ProfilePicService {
         String nameForSmallPic = "small" + file.getName() + LocalDateTime.now();
         String nameForLargePic = "large" + file.getName() + LocalDateTime.now();
         try {
-            s3Client.putObject(bucketName, nameForSmallPic, compressPic(file.getInputStream(), smallSize), null);
-            s3Client.putObject(bucketName, nameForLargePic, compressPic(file.getInputStream(), largeSize), null);
+            s3Service.uploadFile(bucketName, nameForSmallPic, compressPic(file.getInputStream(), smallSize));
+            s3Service.uploadFile(bucketName, nameForLargePic, compressPic(file.getInputStream(), largeSize));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
         UserProfilePic userProfilePic = new UserProfilePic(nameForLargePic, nameForSmallPic);
         user.setUserProfilePic(userProfilePic);
         userRepository.save(user);
@@ -104,7 +105,7 @@ public class ProfilePicServiceImpl implements ProfilePicService {
     @Transactional
     public InputStreamResource getProfilePic(long userId) {
         User user = userService.findUserById(userId);
-        S3Object s3Object = s3Client.getObject(bucketName, user.getUserProfilePic().getFileId());
+        S3Object s3Object = s3Service.getFile(bucketName, user.getUserProfilePic().getFileId());
 
         return new InputStreamResource(s3Object.getObjectContent());
     }
@@ -113,8 +114,8 @@ public class ProfilePicServiceImpl implements ProfilePicService {
     @Transactional
     public UserProfilePicDto deleteProfilePic(long userId) {
         User user = userService.findUserById(userId);
-        s3Client.deleteObject(bucketName, user.getUserProfilePic().getFileId());
-        s3Client.deleteObject(bucketName, user.getUserProfilePic().getSmallFileId());
+        s3Service.deleteFile(bucketName, user.getUserProfilePic().getFileId());
+        s3Service.deleteFile(bucketName, user.getUserProfilePic().getSmallFileId());
         UserProfilePicDto deletedProfilePicDto = pictureMapper.toDto(user.getUserProfilePic());
         user.getUserProfilePic().setSmallFileId(null);
         user.getUserProfilePic().setFileId(null);

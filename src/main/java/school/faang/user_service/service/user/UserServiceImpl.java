@@ -21,6 +21,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
     private final UserRepository userRepository;
     private final UserFilterService userFilterService;
     private final UserMapper userMapper;
@@ -31,12 +32,15 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User findUserById(long id) {
-        return userRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("User with id %s not found", id)));
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(String.format("User with id %s not found", id)));
     }
 
     @Override
     public List<UserDto> findPremiumUsers(UserFilterDto filterDto) {
-        return userFilterService.applyFilters(userRepository.findPremiumUsers(), filterDto).map(userMapper::toDto).toList();
+        return userFilterService.applyFilters(userRepository.findPremiumUsers(), filterDto)
+                .map(userMapper::toDto)
+                .toList();
     }
 
     @Override
@@ -61,7 +65,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getUsersByIds(List<Long> ids) {
-        return userRepository.findAllById(ids).stream().map(userMapper::toDto).toList();
+        return userRepository.findAllById(ids).stream()
+                .map(userMapper::toDto)
+                .toList();
     }
 
     @Override

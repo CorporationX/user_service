@@ -19,7 +19,6 @@ import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.avatar.ProfilePicService;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.user.filter.UserFilterService;
@@ -51,8 +50,6 @@ class UserServiceImplTest {
     private EventService eventService;
     @Mock
     private MentorshipService mentorshipService;
-    @Mock
-    private ProfilePicService profilePicService;
     @Mock
     private UserFilterService userFilterService;
     @Spy
@@ -135,10 +132,13 @@ class UserServiceImplTest {
         UserDto userDto = UserDto.builder().username("name").email("test@mail.ru").password("password").build();
         UserDto result = userServiceImpl.createUser(userDto);
 
-        InOrder inOrder = inOrder(userMapper, userRepository, profilePicService);
+        InOrder inOrder = inOrder(userMapper, userRepository);
         inOrder.verify(userMapper, times(1)).toEntity(userDto);
         inOrder.verify(userRepository, times(1)).save(captor.capture());
         inOrder.verify(userMapper, times(1)).toDto(user);
         assertTrue(captor.getValue().isActive());
+        assertEquals(result.getUsername(), userDto.getUsername());
+        assertEquals(result.getEmail(), userDto.getEmail());
+        assertEquals(result.getPassword(), userDto.getPassword());
     }
 }

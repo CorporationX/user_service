@@ -1,5 +1,6 @@
 package school.faang.user_service.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -24,5 +26,6 @@ public class Country {
     private String title;
 
     @OneToMany(mappedBy = "country")
-    private List<User> residents;
+    @JsonManagedReference
+    private Set<User> residents;
 }

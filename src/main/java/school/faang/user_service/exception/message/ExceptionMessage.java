@@ -18,7 +18,9 @@ public enum ExceptionMessage {
     USER_AVATAR_ABSENCE_EXCEPTION("User doesn't have avatar."),
     REPEATED_USER_CREATION_EXCEPTION("User with such id already exists in system."),
     RANDOM_AVATAR_GETTING_EXCEPTION("Getting random avatar failed."),
-    NO_SUCH_COUNTRY_EXCEPTION("Database doesn't contain country with such id.");
+    NO_SUCH_COUNTRY_EXCEPTION("Database doesn't contain country with such id."),
+    NO_FILE_IN_REQUEST("There is no file send"),
+    INPUT_OUTPUT_EXCEPTION("Something wrong with input or output");
 
     private final String message;
 
@@ -29,5 +31,4 @@ public enum ExceptionMessage {
     public String getMessage() {
         return message;
     }
-
 }

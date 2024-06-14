@@ -22,6 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 public class GoalInvitationController {
+
     private final GoalInvitationService goalInvitationService;
 
     @PostMapping("/createInvitation")

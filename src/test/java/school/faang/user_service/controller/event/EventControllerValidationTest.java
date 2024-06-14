@@ -30,7 +30,7 @@ class EventControllerValidationTest {
     void setUp() {
         eventDto = new EventDto();
         eventDto.setTitle("Title");
-        eventDto.setStartDate(LocalDateTime.of(2024, 6, 12, 12, 12));
+        eventDto.setStartDate(LocalDateTime.of(3024, 6, 12, 12, 12));
         eventDto.setOwnerId(1L);
         eventDto.setDescription("Description");
 

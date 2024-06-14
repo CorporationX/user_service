@@ -1,5 +1,8 @@
 package school.faang.user_service.controller.goal;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -16,29 +19,44 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 @RequestMapping("/goal-invitations")
+@Tag(name = "GoalInvitation Controller", description = "Контроллер для приглашений на цель")
 public class GoalInvitationController {
 
     private final GoalInvitationService goalInvitationService;
 
+
     @PostMapping()
+    @Operation(summary = "Создать приглашение", description = "Создать новое приглашение для цели")
+    @ApiResponse(responseCode = "201", description = "Приглашение успешно создано")
+    @ApiResponse(responseCode = "400", description = "Ошибка на стороне клиента")
     @ResponseStatus(HttpStatus.CREATED)
     public GoalInvitationDto createInvitation(@Valid @RequestBody GoalInvitationDto invitation) {
         return goalInvitationService.createInvitation(invitation);
     }
 
+
     @PutMapping("/{id}/accept")
+    @Operation(summary = "Принять приглашение", description = "Принять приглашение по идентификатору")
+    @ApiResponse(responseCode = "200", description = "Приглашение успешно принято")
+    @ApiResponse(responseCode = "400", description = "Ошибка на стороне клиента")
     @ResponseStatus(HttpStatus.OK)
     public void acceptGoalInvitation(@Min(1) @PathVariable long id) {
         goalInvitationService.acceptGoalInvitation(id);
     }
-
+  
     @PutMapping("/{id}/reject")
+    @Operation(summary = "Отклонить приглашение", description = "Отклонить приглашение по идентификатору")
+    @ApiResponse(responseCode = "200", description = "Приглашение успешно отклонено")
+    @ApiResponse(responseCode = "400", description = "Ошибка на стороне клиента")
     @ResponseStatus(HttpStatus.OK)
     public void rejectGoalInvitation(@Min(1) @PathVariable long id) {
         goalInvitationService.rejectGoalInvitation(id);
     }
 
     @GetMapping()
+    @Operation(summary = "Получить приглашения", description = "Получить список всех приглашений на основе фильтра")
+    @ApiResponse(responseCode = "200", description = "Список приглашений получен")
+    @ApiResponse(responseCode = "400", description = "Ошибка на стороне клиента")
     @ResponseStatus(HttpStatus.OK)
     public List<GoalInvitationDto> getInvitations(@RequestBody InvitationFilterDto filter) {
         return goalInvitationService.getInvitations(filter);

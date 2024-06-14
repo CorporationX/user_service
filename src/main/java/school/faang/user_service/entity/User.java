@@ -18,6 +18,7 @@ import school.faang.user_service.entity.recommendation.Recommendation;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 
 @Data
 @Builder
@@ -139,6 +140,9 @@ public class User {
 
     @OneToOne(mappedBy = "user")
     private ContactPreference contactPreference;
+
+    @Column(name = "locale")
+    private String preferredLocale;
 
     @OneToOne(mappedBy = "user")
     private Premium premium;

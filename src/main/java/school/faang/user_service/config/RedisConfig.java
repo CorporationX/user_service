@@ -24,6 +24,9 @@ public class RedisConfig {
     @Value("${spring.data.redis.channels.mentorship_requested_channel.name}")
     private String mentorshipRequestedChannel;
 
+    @Value("${spring.data.redis.channels.mentorship_accepted_channel.name}")
+    private String mentorshipAcceptedChannel;
+
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
@@ -38,6 +41,16 @@ public class RedisConfig {
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(mapper, MessageEvent.class));
         return redisTemplate;
+    }
+
+    @Bean
+    ChannelTopic topic() {
+        return new ChannelTopic(mentorshipRequestedChannel);
+    }
+
+    @Bean
+    ChannelTopic mentorshipAcceptedTopic() {
+        return new ChannelTopic(mentorshipAcceptedChannel);
     }
 
     @Bean

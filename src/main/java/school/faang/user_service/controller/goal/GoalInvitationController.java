@@ -18,8 +18,8 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Validated
-@RequestMapping("/goal-invitations")
 @Tag(name = "GoalInvitation Controller", description = "Контроллер для приглашений на цель")
+@RequestMapping("/goal-invitations")
 public class GoalInvitationController {
 
     private final GoalInvitationService goalInvitationService;

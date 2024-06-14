@@ -24,40 +24,38 @@ public class GoalInvitationController {
 
     private final GoalInvitationService goalInvitationService;
 
-
-    @PostMapping()
     @Operation(summary = "Создать приглашение", description = "Создать новое приглашение для цели")
     @ApiResponse(responseCode = "201", description = "Приглашение успешно создано")
     @ApiResponse(responseCode = "400", description = "Ошибка на стороне клиента")
     @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping()
     public GoalInvitationDto createInvitation(@Valid @RequestBody GoalInvitationDto invitation) {
         return goalInvitationService.createInvitation(invitation);
     }
 
-
-    @PutMapping("/{id}/accept")
     @Operation(summary = "Принять приглашение", description = "Принять приглашение по идентификатору")
     @ApiResponse(responseCode = "200", description = "Приглашение успешно принято")
     @ApiResponse(responseCode = "400", description = "Ошибка на стороне клиента")
     @ResponseStatus(HttpStatus.OK)
+    @PutMapping("/{id}/accept")
     public void acceptGoalInvitation(@Min(1) @PathVariable long id) {
         goalInvitationService.acceptGoalInvitation(id);
     }
-  
-    @PutMapping("/{id}/reject")
+
     @Operation(summary = "Отклонить приглашение", description = "Отклонить приглашение по идентификатору")
     @ApiResponse(responseCode = "200", description = "Приглашение успешно отклонено")
     @ApiResponse(responseCode = "400", description = "Ошибка на стороне клиента")
     @ResponseStatus(HttpStatus.OK)
+    @PutMapping("/{id}/reject")
     public void rejectGoalInvitation(@Min(1) @PathVariable long id) {
         goalInvitationService.rejectGoalInvitation(id);
     }
 
-    @GetMapping()
     @Operation(summary = "Получить приглашения", description = "Получить список всех приглашений на основе фильтра")
     @ApiResponse(responseCode = "200", description = "Список приглашений получен")
     @ApiResponse(responseCode = "400", description = "Ошибка на стороне клиента")
     @ResponseStatus(HttpStatus.OK)
+    @GetMapping()
     public List<GoalInvitationDto> getInvitations(@RequestBody InvitationFilterDto filter) {
         return goalInvitationService.getInvitations(filter);
     }

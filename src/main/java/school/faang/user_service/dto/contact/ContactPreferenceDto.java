@@ -12,7 +12,7 @@ import school.faang.user_service.entity.contact.PreferredContact;
 @Jacksonized
 public class ContactPreferenceDto {
 
-    private long id;
+    private Long id;
 
     @NotNull(message = "UserId should not be null")
     @Positive(message = "UserId should be positive")

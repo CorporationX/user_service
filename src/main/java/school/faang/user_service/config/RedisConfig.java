@@ -29,7 +29,6 @@ public class RedisConfig {
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
-        System.out.println(port);
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
         return new JedisConnectionFactory(config);
     }
@@ -52,5 +51,10 @@ public class RedisConfig {
     @Bean
     ChannelTopic mentorshipAcceptedTopic() {
         return new ChannelTopic(mentorshipAcceptedChannel);
+    }
+
+    @Bean
+    ChannelTopic mentorshipRequestedChannel() {
+        return new ChannelTopic(mentorshipRequestedChannel);
     }
 }

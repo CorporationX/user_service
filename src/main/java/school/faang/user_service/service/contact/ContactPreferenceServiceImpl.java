@@ -22,7 +22,7 @@ public class ContactPreferenceServiceImpl implements ContactPreferenceService {
     @Transactional(readOnly = true)
     public ContactPreferenceDto getContact(String username) {
         ContactPreference contactPreference = contactRepository.findByUserUsername(username)
-                .orElseThrow(() -> new NotFoundException("Contact not found"));
+                .orElseThrow(() -> new NotFoundException("Contact with username " + username + " not found"));
 
         return contactPreferenceMapper.toDto(contactPreference);
     }

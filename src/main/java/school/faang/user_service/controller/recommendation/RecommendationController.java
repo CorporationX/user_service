@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.recommendation;
 
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,6 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/recommendations")
 @RequiredArgsConstructor
+@Validated
 public class RecommendationController {
     private final RecommendationService recommendationService;
 
@@ -32,17 +34,17 @@ public class RecommendationController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public RecommendationDto deleteRecommendation(@PathVariable long id) {
+    public RecommendationDto deleteRecommendation(@Positive @PathVariable long id) {
         return recommendationService.delete(id);
     }
 
     @GetMapping("/receiver/{receiverId}")
-    public List<RecommendationDto> getAllUserRecommendations(@PathVariable long receiverId) {
+    public List<RecommendationDto> getAllUserRecommendations(@Positive @PathVariable long receiverId) {
         return recommendationService.getAllUserRecommendations(receiverId);
     }
 
     @GetMapping("/author/{authorId}")
-    public List<RecommendationDto> getAllGivenRecommendations(@PathVariable long authorId) {
+    public List<RecommendationDto> getAllGivenRecommendations(@Positive @PathVariable long authorId) {
         return recommendationService.getAllGivenRecommendations(authorId);
     }
 }

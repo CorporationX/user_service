@@ -1,5 +1,6 @@
 package school.faang.user_service.service.user;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,7 +56,6 @@ public class UserServiceImpl implements UserService {
                 goalService.delete(goal);
             }
         });
-
         eventService.deleteAll(user.getOwnedEvents());
         mentorshipService.deleteMentorFromMentee(user);
 
@@ -65,9 +65,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getUsersByIds(List<Long> ids) {
-        return userRepository.findAllById(ids)
-                .stream()
+        return userRepository.findAllById(ids).stream()
                 .map(userMapper::toDto)
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public UserDto createUser(@Valid UserDto userDto) {
+        User user = userMapper.toEntity(userDto);
+        user.setActive(true);
+        User saved = userRepository.save(user);
+        return userMapper.toDto(saved);
     }
 }

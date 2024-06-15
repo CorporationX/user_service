@@ -302,9 +302,9 @@ public class MentorshipRequestServiceFilterTest {
     public void testGetRequestsFiltersEntitiesByRequesterIdAndStatusPending() {
         filterDto.setRequesterIdPattern(userId3);
         filterDto.setStatusPattern(RequestStatus.PENDING);
-        var mentorshipRequestService = setUp();
-        var actual = mentorshipRequestService.getRequests(filterDto);
-        var expected = List.of(mrDtoWithId1, mrDtoWithId3);
+        MentorshipRequestService mentorshipRequestService = setUp();
+        List<MentorshipRequestDto> actual = mentorshipRequestService.getRequests(filterDto);
+        List<MentorshipRequestDto> expected = List.of(mrDtoWithId1, mrDtoWithId3);
 
         assertEquals(expected, actual);
     }

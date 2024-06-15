@@ -4,13 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.event.mentorship.MentorshipStartEvent;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.dto.mentorship.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.event.mentorship.MentorshipStartEvent;
+import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.publisher.mentorship.MentorshipStartPublisher;
 import school.faang.user_service.repository.UserRepository;
@@ -20,7 +21,6 @@ import school.faang.user_service.service.mentorship.filter.MentorshipRequestFilt
 import school.faang.user_service.validator.mentorship.MentorshipRequestValidator;
 import school.faang.user_service.validator.user.UserValidator;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -38,17 +38,22 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     @Override
     @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto dto) {
-        var userList = userValidator.validateUsersExistence(List.of(dto.getRequesterId(), dto.getReceiverId()));
+        userValidator.validateUsersExistence(List.of(dto.getRequesterId(), dto.getReceiverId()));
         mentorshipRequestValidator.validateMentorshipRequest(dto);
 
         MentorshipRequest entity = mentorshipRequestMapper.toEntity(dto);
-        User requesterEntity = getUser(userList, dto.getRequesterId());
-        User receiverEntity = getUser(userList, dto.getReceiverId());
+        User requesterEntity = findById(dto.getRequesterId());
+        User receiverEntity = findById(dto.getReceiverId());
         entity.setRequester(requesterEntity);
         entity.setReceiver(receiverEntity);
         MentorshipRequest entityFromDB = mentorshipRequestRepository.save(entity);
 
         return mentorshipRequestMapper.toDto(entityFromDB);
+    }
+
+    private User findById(long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(String.format("User with id %d not found", id)));
     }
 
     @Override
@@ -87,13 +92,6 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         entity = mentorshipRequestRepository.save(entity);
 
         return mentorshipRequestMapper.toDto(entity);
-    }
-
-    private User getUser(List<User> list, Long userId) {
-        return list.stream()
-                .filter(user -> user.getId() == userId)
-                .findAny()
-                .orElseThrow();
     }
 
     private void addMentor(MentorshipRequest entity) {

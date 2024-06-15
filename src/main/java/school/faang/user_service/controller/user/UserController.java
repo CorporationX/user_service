@@ -18,19 +18,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.dto.event.profile.ProfileViewEvent;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.publisher.profile.ProfileViewEventPublisher;
 import school.faang.user_service.service.avatar.ProfilePicService;
 import school.faang.user_service.service.csv.CSVFileService;
 import school.faang.user_service.service.csv.CsvFileConverter;
 import school.faang.user_service.service.user.UserService;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -41,11 +35,8 @@ import java.util.List;
 public class UserController {
     private final ProfilePicService profilePicService;
     private final UserService userService;
-    private final UserMapper userMapper;
     private final CSVFileService csvFileService;
     private final CsvFileConverter converter;
-    private final ProfileViewEventPublisher profileViewEventPublisher;
-    private final UserContext userContext;
 
     @Operation(summary = "Get premium users")
     @PostMapping("premium")
@@ -56,11 +47,7 @@ public class UserController {
     @GetMapping("{userId}")
     @Operation(summary = "Get user by ID")
     public UserDto getUserById(@PathVariable("userId") long userId) {
-        User user = userService.findUserById(userId);
-        long viewerId = userContext.getUserId();
-        ProfileViewEvent event = new ProfileViewEvent(userId, viewerId, LocalDateTime.now());
-        profileViewEventPublisher.publish(event);
-        return userMapper.toDto(user);
+        return userService.getUserById(userId);
     }
 
     @Operation(summary = "Deactivate user")

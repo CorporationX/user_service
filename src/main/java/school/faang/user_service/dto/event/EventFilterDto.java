@@ -1,5 +1,6 @@
 package school.faang.user_service.dto.event;
 
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +20,10 @@ public class EventFilterDto {
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private List<SkillDto> relatedSkills;
+
+    @Size(max = 128, message = "location should be less than 129 symbols")
     private String location;
+
     private EventType type;
     private EventStatus status;
 }

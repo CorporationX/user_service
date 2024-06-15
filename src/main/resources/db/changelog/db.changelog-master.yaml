@@ -13,3 +13,45 @@ databaseChangeLog:
       file: db/changelog/changeset/user_V006__insert_users.sql
   - include:
       file: db/changelog/changeset/user_V007__user_premium.sql
+  - include:
+      file: db/changelog/changeset/user_V008__insert_contacts.sql
+  - include:
+      file: db/changelog/changeset/user_V009__insert_skills.sql
+  - include:
+      file: db/changelog/changeset/user_V010__insert_events.sql
+  - include:
+      file: db/changelog/changeset/user_V011__insert_goals.sql
+  - include:
+      file: db/changelog/changeset/user_V012__insert_contact_preference.sql
+  - include:
+      file: db/changelog/changeset/user_V013__insert_event_skill.sql
+  - include:
+      file: db/changelog/changeset/user_V014__insert_goal_invitation.sql
+  - include:
+      file: db/changelog/changeset/user_V015__insert_event_skill.sql
+  - include:
+      file: db/changelog/changeset/user_V016__insert_mentorships.sql
+  - include:
+      file: db/changelog/changeset/user_V017__insert_mentorship_requests.sql
+  - include:
+      file: db/changelog/changeset/user_V018__insert_ratings.sql
+  - include:
+      file: db/changelog/changeset/user_V019__insert_recommendations.sql
+  - include:
+      file: db/changelog/changeset/user_V020__insert_recommendation_requests.sql
+  - include:
+      file: db/changelog/changeset/user_V021__insert_skill_offers.sql
+  - include:
+      file: db/changelog/changeset/user_V022__insert_skill_requests.sql
+  - include:
+      file: db/changelog/changeset/user_V023__subscriptions.sql
+  - include:
+      file: db/changelog/changeset/user_V024__user_event.sql
+  - include:
+      file: db/changelog/changeset/user_V025__user_goals.sql
+  - include:
+      file: db/changelog/changeset/user_V026__user_premiums.sql
+  - include:
+      file: db/changelog/changeset/user_V027__user_skills.sql
+  - include:
+      file: db/changelog/changeset/user_V028__user_skill_guarantees.sql

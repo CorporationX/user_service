@@ -5,15 +5,21 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,6 +38,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "Users")
 @Slf4j
+@Validated
 public class UserController {
     private final ProfilePicService profilePicService;
     private final UserService userService;
@@ -40,7 +47,7 @@ public class UserController {
 
     @Operation(summary = "Get premium users")
     @PostMapping("premium")
-    public List<UserDto> getPremiumUsers(@ParameterObject @RequestBody(required = false) UserFilterDto filter) {
+    public List<UserDto> getPremiumUsers(@Valid @ParameterObject @RequestBody(required = false) UserFilterDto filter) {
         return userService.findPremiumUsers(filter);
     }
 
@@ -52,13 +59,13 @@ public class UserController {
 
     @Operation(summary = "Deactivate user")
     @PostMapping("deactivation/{id}")
-    public void deactivateUser(@Parameter @PathVariable Long id) {
+    public void deactivateUser(@Positive @Parameter @PathVariable Long id) {
         userService.deactivateUserById(id);
     }
 
     @Operation(summary = "Get users by ids")
     @PostMapping
-    public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) {
+    public List<UserDto> getUsersByIds(@NotNull @RequestBody List<Long> ids) {
         return userService.getUsersByIds(ids);
     }
 

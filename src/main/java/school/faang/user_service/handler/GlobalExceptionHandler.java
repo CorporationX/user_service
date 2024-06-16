@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
-import school.faang.user_service.exception.ConversionException;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.NoAccessException;
 import school.faang.user_service.exception.NotFoundException;
@@ -56,9 +55,9 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleMaxUploadSizeExceededException(NotFoundException e, HttpServletRequest request) {
-        log.error("The maximum file size is overestimated: {}", e.getMessage());
+    @ResponseStatus(HttpStatus.REQUEST_ENTITY_TOO_LARGE)
+    public ErrorResponse handleMaxUploadSizeExceededException(RuntimeException e, HttpServletRequest request) {
+        log.error("Max upload size exceeded exception: {}", e.getMessage(), e);
         return buildErrorResponse(e, request);
     }
 

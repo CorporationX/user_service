@@ -22,4 +22,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             WHERE ue.user_id = :userId
             """)
     List<Event> findParticipatedEventsByUserId(long userId);
+
+    @Query("SELECT e.id FROM Event e WHERE e.status = 'COMPLETED' OR e.status = 'CANCELED'")
+    List<Long> findCompletedOrCanceledEventIds();
 }

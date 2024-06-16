@@ -32,8 +32,15 @@ spring:
   profiles:
     active: test
 
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
 server:
   port: 8080
+  servlet:
+    context-path: /api/v1
 
 logging:
   level:
@@ -52,14 +59,6 @@ aws:
   secretKey: secret_key
   region: bucket_region
 
-services:
-  s3:
-    endpoint: http://localhost:9000
-    accessKey: user
-    secretKey: password
-    bucket-name: user_backet
-    isMocked: true
-
 goals:
   limit:
     max-per-user: 3
@@ -72,3 +71,12 @@ mentorship:
 
 spring.servlet.multipart.max-file-size: 10KB
 
+scheduler:
+  clearEvents:
+    cronExpression: "0 0 0 * * ?" # Каждый день в полночь
+
+batchSize:
+  eventDeletion: 1000
+
+randomAvatar:
+  url: https://api.dicebear.com/8.x/pixel-art/jpg?seed=

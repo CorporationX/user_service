@@ -1,34 +1,29 @@
 package school.faang.user_service.service.csv;
 
+import com.json.student.Person;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.web.multipart.MultipartFile;
-import school.faang.user_service.entity.Country;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.person.PersonMapper;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.validator.csv.CsvValidator;
 
 import java.lang.reflect.Method;
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
-public class CSVFileServiceTest {
-
-    @InjectMocks
-    private CSVFileServiceImpl csvFileService;
+public class CSVFileServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
@@ -43,28 +38,24 @@ public class CSVFileServiceTest {
     private PersonMapper personMapper;
 
     @Mock
-    @Qualifier("threadPoolForConvertCsvFile")
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
-    @Mock
-    private MultipartFile file;
+    @InjectMocks
+    private CSVFileServiceImpl csvFileService;
 
-    @Mock
     private ExecutorService executorService;
 
+    @BeforeEach
+    public void setUp() {
+        executorService = mock(ExecutorService.class);
+    }
+
     @Test
-    public void testSetUpAndSaveToDB() {
-        User user = new User();
-        Country country = new Country();
-        country.setTitle("TestCountry");
-        user.setCountry(country);
+    public void testProcessPersonAsync_ValidationFailed() {
+        Person person = new Person();
+        doThrow(new IllegalArgumentException()).when(csvValidator).validate(person);
 
-        when(countryRepository.findByName("TestCountry")).thenReturn(Optional.of(country));
-
-        csvFileService.setUpAndSaveToDB(user);
-
-        assertNotNull(user.getPassword());
-        verify(userRepository).save(user);
+        assertThrows(IllegalArgumentException.class, () -> csvFileService.processPersonAsync(person, executorService));
     }
 
     @Test

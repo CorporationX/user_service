@@ -1,6 +1,6 @@
 package school.faang.user_service.controller.event;
 
-import lombok.NonNull;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.exception.DataValidationException;
@@ -15,7 +15,7 @@ import static school.faang.user_service.exception.message.ExceptionMessage.NULL_
 
 @Component
 class EventControllerValidation {
-    public void validateEvent(@NonNull EventDto event) {
+    public void validateEvent(@NotNull EventDto event) {
 
         if (event.getTitle() == null || event.getTitle().isBlank()) {
             throw new DataValidationException(NULL_OR_BLANK_EVENT_TITLE_EXCEPTION.getMessage());
@@ -34,7 +34,7 @@ class EventControllerValidation {
         }
     }
 
-    public void validateEventId(EventDto event) {
+    public void validateEventId(@NotNull EventDto event) {
         if (event.getId() == null) {
             throw new DataValidationException(NULL_EVENT_ID_EXCEPTION.getMessage());
         }

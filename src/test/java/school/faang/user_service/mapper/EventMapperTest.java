@@ -9,12 +9,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
-import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.testData.TestData;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,43 +31,11 @@ class EventMapperTest {
 
     @BeforeEach
     void setUp() {
-        nadir = new User();
-        nadir.setId(1L);
-        nadir.setUsername("nadir");
-        nadir.setEmail("nadir@gmail.com");
-        nadir.setCity("Moscow");
+        TestData testData = new TestData();
 
-        var skillA = new Skill();
-        skillA.setTitle("SQL");
-        var skillB = new Skill();
-        skillB.setTitle("Java");
-        nadir.setSkills(List.of(skillA, skillB));
-
-
-        event = new Event();
-        event.setTitle("Title");
-        LocalDateTime startDate = LocalDateTime.of(2024, 6, 12, 12, 12);
-        event.setStartDate(startDate);
-        event.setOwner(nadir);
-        event.setDescription("Description");
-        event.setRelatedSkills(List.of(skillA, skillB));
-        event.setLocation("Location");
-        event.setMaxAttendees(10);
-
-
-        eventDto = new EventDto();
-        eventDto.setTitle("Title");
-        eventDto.setStartDate(startDate);
-        eventDto.setOwnerId(1L);
-        eventDto.setDescription("Description");
-
-        var skillADto = new SkillDto();
-        skillADto.setTitle("SQL");
-        var skillBDto = new SkillDto();
-        skillBDto.setTitle("Java");
-        eventDto.setRelatedSkills(List.of(skillADto, skillBDto));
-        eventDto.setLocation("Location");
-        eventDto.setMaxAttendees(10);
+        nadir = testData.getUser();
+        event = testData.getEvent();
+        eventDto = testData.getEventDto();
     }
 
     @DisplayName("should map event dto to event entity")

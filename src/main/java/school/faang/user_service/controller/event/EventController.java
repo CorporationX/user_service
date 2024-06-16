@@ -1,8 +1,8 @@
 package school.faang.user_service.controller.event;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.NonNull;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,7 +38,7 @@ public class EventController {
     }
 
     @PostMapping("/filtered")
-    public List<EventDto> getEventsByFilter(@RequestBody EventFilterDto filter) {
+    public List<EventDto> getEventsByFilter(@NotNull @RequestBody EventFilterDto filter) {
         return eventService.getEventsByFilter(filter);
     }
 
@@ -48,16 +48,15 @@ public class EventController {
     }
 
     @PutMapping()
-    public EventDto updateEvent(@RequestBody EventDto event) {
+    public EventDto update(@RequestBody EventDto event) {
         eventControllerValidation.validateEventId(event);
-
         eventControllerValidation.validateEvent(event);
 
         return eventService.updateEvent(event);
     }
 
     @GetMapping()
-    public List<EventDto> getEvents(@NonNull @RequestParam Long userId, @RequestParam boolean isOwner) {
+    public List<EventDto> getEvents(@NotNull @RequestParam Long userId, @RequestParam boolean isOwner) {
         if (isOwner) {
             return eventService.getOwnedEvents(userId);
         }

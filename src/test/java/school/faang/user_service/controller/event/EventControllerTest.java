@@ -13,12 +13,9 @@ import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.filter.EventFilterDto;
 import school.faang.user_service.service.event.EventService;
 
-import java.util.concurrent.locks.Lock;
-
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -27,7 +24,6 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class EventControllerTest {
-    //TODO:исправить тесты
     @Spy
     @InjectMocks
     private EventController eventController;
@@ -83,10 +79,9 @@ class EventControllerTest {
         @DisplayName("should call eventService.updateEvent() when eventDto is valid")
         @Test
         void shouldUpdateEventWhenDtoIsValid() {
-            doNothing().when(eventControllerValidation).validateEvent(eventDto);
             ArgumentCaptor<EventDto> eventDtoArgumentCaptor = ArgumentCaptor.forClass(EventDto.class);
 
-            assertDoesNotThrow(() -> eventController.updateEvent(eventDto));
+            assertDoesNotThrow(() -> eventController.update(eventDto));
 
             verify(eventService).updateEvent(eventDtoArgumentCaptor.capture());
             assertEquals(eventDto, eventDtoArgumentCaptor.getValue());
@@ -94,19 +89,20 @@ class EventControllerTest {
 
         @DisplayName("should call eventService.getOwnedEvents()")
         @Test
-        void shouldReturnOwnedEvents() {
-            eventController.getEvents(anyLong());
+        void shouldReturnOwnedEventsWhenIsOwnerIsTrue() {
+            eventController.getEvents(1L, true);
 
             verify(eventService).getOwnedEvents(anyLong());
+            verify(eventService, times(0)).getParticipatedEvents(anyLong());
         }
 
         @DisplayName("should call eventService.getParticipatedEvents()")
         @Test
-        void shouldReturnParticipatedEvents() {
-            new Lock().
-                    eventController.getParticipatedEvents(anyLong());
+        void shouldReturnParticipatedEventsWhenIsOwnerIsFalse() {
+            eventController.getEvents(1L, false);
 
             verify(eventService).getParticipatedEvents(anyLong());
+            verify(eventService, times(0)).getOwnedEvents(anyLong());
         }
     }
 
@@ -122,12 +118,14 @@ class EventControllerTest {
             verify(eventService, times(0)).create(eventDto);
         }
 
-        @DisplayName("should throw exception when filter is null")
+        @DisplayName("Should throw exception when event dto to be updated doesn't have id")
         @Test
-        void shouldThrowExceptionWhenFilterIsNull() {
-            assertThrows(NullPointerException.class, () -> eventController.getEventsByFilter(null));
+        void shouldThrowExceptionWhenEventDtoToBeUpdatedDoesntHaveId() {
+            doThrow(new RuntimeException()).when(eventControllerValidation).validateEventId(eventDto);
 
-            verify(eventService, times(0)).getEventsByFilter(any(EventFilterDto.class));
+            assertThrows(RuntimeException.class, () -> eventController.update(eventDto));
+
+            verify(eventService, times(0)).create(eventDto);
         }
 
         @DisplayName("Should throw exception when event dto to be updated is invalid (watch validation tests)")
@@ -135,7 +133,7 @@ class EventControllerTest {
         void shouldThrowExceptionWhenEventDtoToBeUpdatedIsInvalid() {
             doThrow(new RuntimeException()).when(eventControllerValidation).validateEvent(eventDto);
 
-            assertThrows(RuntimeException.class, () -> eventController.create(eventDto));
+            assertThrows(RuntimeException.class, () -> eventController.update(eventDto));
 
             verify(eventService, times(0)).create(eventDto);
         }

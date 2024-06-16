@@ -8,11 +8,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import school.faang.user_service.dto.event.EventDto;
-import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.testData.TestData;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,19 +27,7 @@ class EventControllerValidationTest {
 
     @BeforeEach
     void setUp() {
-        eventDto = new EventDto();
-        eventDto.setTitle("Title");
-        eventDto.setStartDate(LocalDateTime.of(3024, 6, 12, 12, 12));
-        eventDto.setOwnerId(1L);
-        eventDto.setDescription("Description");
-
-        var skillADto = new SkillDto();
-        skillADto.setTitle("SQL");
-        var skillBDto = new SkillDto();
-        skillBDto.setTitle("Java");
-        eventDto.setRelatedSkills(List.of(skillADto, skillBDto));
-        eventDto.setLocation("Location");
-        eventDto.setMaxAttendees(10);
+        eventDto = new TestData().getEventDto();
     }
 
     @Nested
@@ -103,7 +90,7 @@ class EventControllerValidationTest {
         @DisplayName("Should throw exception when events end date is earlier than start date")
         @Test
         void shouldThrowExceptionWhenEndDateIsEarlierThanStartDate() {
-            eventDto.setEndDate(LocalDateTime.of(2024, 6, 10, 12, 12));
+            eventDto.setEndDate(LocalDateTime.of(3024, 6, 10, 12, 12));
 
             DataValidationException exception = assertThrows(DataValidationException.class,
                     () -> eventControllerValidation.validateEvent(eventDto));

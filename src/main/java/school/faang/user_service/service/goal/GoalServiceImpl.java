@@ -8,14 +8,18 @@ import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.event.GoalCompletedEvent;
 import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.filter.goal.GoalFilter;
 import school.faang.user_service.mapper.GoalMapper;
+import school.faang.user_service.publisher.CompletedGoalPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.validator.GoalValidator;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -30,6 +34,7 @@ public class GoalServiceImpl implements GoalService {
     private final GoalMapper goalMapper;
     private final GoalValidator goalValidator;
     private final List<GoalFilter> goalFilters;
+    private final CompletedGoalPublisher completedGoalPublisher;
 
     @Override
     @Transactional
@@ -41,6 +46,7 @@ public class GoalServiceImpl implements GoalService {
         return applyFilters(goalStream, goalFilterDto);
     }
 
+    @Override
     @Transactional
     public List<GoalDto> getSubtasksByGoalId(long goalId, GoalFilterDto filter) {
         goalValidator.validateGoalId(goalId);
@@ -62,6 +68,7 @@ public class GoalServiceImpl implements GoalService {
         return goalRepository.countActiveGoalsPerUser(id);
     }
 
+    @Override
     @Transactional
     public GoalDto createGoal(Long userId, GoalDto goalDto) {
 
@@ -79,8 +86,9 @@ public class GoalServiceImpl implements GoalService {
         return goalMapper.toDto(goal);
     }
 
+    @Override
     @Transactional
-    public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
+    public GoalDto updateGoal(long userId, Long goalId, GoalDto goalDto) {
         Goal goalToUpdate = goalRepository.findById(goalId)
                 .orElseThrow(() -> new NotFoundException("Goal with id: " + goalId + " not found"));
 
@@ -90,6 +98,10 @@ public class GoalServiceImpl implements GoalService {
         goalMapper.update(goalDto, updatedGoal);
         goalMapper.convertDtoIdsToEntity(goalDto, updatedGoal);
         assignSkills(goalToUpdate);
+
+        if (updatedGoal.getStatus().equals(GoalStatus.COMPLETED)) {
+            completedGoalPublisher.publish(new GoalCompletedEvent(userId, updatedGoal.getId(), LocalDateTime.now()));
+        }
 
         goalRepository.save(updatedGoal);
         return goalDto;
@@ -108,6 +120,12 @@ public class GoalServiceImpl implements GoalService {
         goalRepository.delete(goal);
 
         return goalMapper.toDto(goal);
+    }
+
+    @Override
+    @Transactional
+    public void delete(Goal goal) {
+        goalRepository.delete(goal);
     }
 
     private List<GoalDto> applyFilters(Stream<Goal> goalStream, GoalFilterDto filter) {
@@ -139,11 +157,5 @@ public class GoalServiceImpl implements GoalService {
                 skills.forEach(skill -> skillRepository.assignSkillToUser(skill.getId(), user.getId()));
             }
         }
-    }
-
-    @Override
-    @Transactional
-    public void delete(Goal goal) {
-        goalRepository.delete(goal);
     }
 }

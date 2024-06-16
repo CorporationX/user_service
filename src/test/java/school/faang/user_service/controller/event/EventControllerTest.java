@@ -13,6 +13,8 @@ import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.filter.EventFilterDto;
 import school.faang.user_service.service.event.EventService;
 
+import java.util.concurrent.locks.Lock;
+
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -25,6 +27,7 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class EventControllerTest {
+    //TODO:исправить тесты
     @Spy
     @InjectMocks
     private EventController eventController;
@@ -92,7 +95,7 @@ class EventControllerTest {
         @DisplayName("should call eventService.getOwnedEvents()")
         @Test
         void shouldReturnOwnedEvents() {
-            eventController.getOwnedEvents(anyLong());
+            eventController.getEvents(anyLong());
 
             verify(eventService).getOwnedEvents(anyLong());
         }
@@ -100,7 +103,8 @@ class EventControllerTest {
         @DisplayName("should call eventService.getParticipatedEvents()")
         @Test
         void shouldReturnParticipatedEvents() {
-            eventController.getParticipatedEvents(anyLong());
+            new Lock().
+                    eventController.getParticipatedEvents(anyLong());
 
             verify(eventService).getParticipatedEvents(anyLong());
         }

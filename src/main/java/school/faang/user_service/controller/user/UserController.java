@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +27,7 @@ import static school.faang.user_service.exception.message.ExceptionMessage.AVATA
 @Slf4j
 @RestController
 @RequestMapping("/users")
+@Validated
 @RequiredArgsConstructor
 public class UserController {
     private static final double MAX_AVATAR_SIZE = 5_242_880L;
@@ -38,7 +40,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    UserDto getUser(@Min(1) @PathVariable long userId) {
+    UserDto getUser(@Valid @Min(1) @PathVariable long userId) {
         return userService.getUser(userId);
     }
 

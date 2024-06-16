@@ -68,7 +68,6 @@ class EventServiceTest {
         skillBDto.setTitle("Java");
         eventDto.setRelatedSkills(List.of(skillADto, skillBDto));
         eventDto.setLocation("Location");
-        eventDto.setMaxAttendees(10);
 
         event = new Event();
         event.setTitle("Title");
@@ -84,7 +83,6 @@ class EventServiceTest {
         skillB.setTitle("Java");
         event.setRelatedSkills(List.of(skillA, skillB));
         event.setLocation("Location");
-        event.setMaxAttendees(10);
 
 
         EventFilter filterA = mock(EventFilter.class);

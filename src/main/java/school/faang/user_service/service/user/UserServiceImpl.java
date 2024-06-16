@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.UserDTO;
+import school.faang.user_service.dto.notification.UserNotificationDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
@@ -68,6 +69,11 @@ public class UserServiceImpl implements UserService {
         updatedUser.setUpdatedAt(LocalDateTime.now());
         userRepository.save(updatedUser);
         return userDto;
+    }
+
+    @Override
+    public UserNotificationDto getDtoForNotification(long userId) {
+        return userMapper.toNotificationDto(findUserById(userId));
     }
 
     @Override

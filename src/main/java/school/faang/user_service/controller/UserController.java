@@ -3,6 +3,7 @@ package school.faang.user_service.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.UserDTO;
+import school.faang.user_service.dto.notification.UserNotificationDto;
 import school.faang.user_service.service.user.UserService;
 import java.util.List;
 
@@ -30,5 +31,10 @@ public class UserController {
     @PutMapping("/deactivate/{id}")
     public void deactivateUser(@PathVariable(name = "id") long userId) {
         userService.deactivateUser(userId);
+    }
+
+    @GetMapping("/notify/{id}")
+    public UserNotificationDto getDtoForNotification(@PathVariable("id") long userId) {
+        return userService.getDtoForNotification(userId);
     }
 }

@@ -26,6 +26,9 @@ public class RedisConfig {
     @Value("${spring.data.redis.channels.follower-event-channel.name}")
     private String followerTopicName;
 
+    @Value("${spring.data.redis.channels.project-follower-channel.name}")
+    private String projectFollowerName;
+
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
         log.info("redis start work at port {}", port);
@@ -50,5 +53,10 @@ public class RedisConfig {
     @Bean
     public ChannelTopic followerTopic() {
         return new ChannelTopic(followerTopicName);
+    }
+
+    @Bean
+    public ChannelTopic projectFollowerTopic() {
+        return new ChannelTopic(projectFollowerName);
     }
 }

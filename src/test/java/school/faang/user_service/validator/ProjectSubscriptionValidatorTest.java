@@ -17,12 +17,9 @@ import static org.assertj.core.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class ProjectSubscriptionValidatorTest {
     private static final long USER_ID = 1L;
-    private static final long PROJECT_ID = 2L;
 
     @Mock
     private UserService userService;
-    @Mock
-    private ProjectSubscriptionRepository projectSubscriptionRepository;
     @InjectMocks
     private ProjectSubscriptionValidator projectSubscriptionValidator;
 
@@ -30,14 +27,6 @@ class ProjectSubscriptionValidatorTest {
     public void whenValidateProjectSubscriptionAnsUserNotExistThenThrowsException() {
         when(userService.existsById(USER_ID)).thenThrow(NoSuchElementException.class);
         Assert.assertThrows(NoSuchElementException.class,
-                () -> projectSubscriptionValidator.validateProjectSubscription(USER_ID, PROJECT_ID));
-    }
-
-    @Test
-    public void whenValidateProjectSubscriptionAnsProjectNotExistThenThrowsException() {
-        when(userService.existsById(USER_ID)).thenReturn(true);
-        when(projectSubscriptionRepository.existsById(PROJECT_ID)).thenReturn(false);
-        Assert.assertThrows(NoSuchElementException.class,
-                () -> projectSubscriptionValidator.validateProjectSubscription(USER_ID, PROJECT_ID));
+                () -> projectSubscriptionValidator.validateProjectSubscription(USER_ID));
     }
 }

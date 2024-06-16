@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserDTO;
+import school.faang.user_service.dto.notification.UserNotificationDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
@@ -54,6 +55,7 @@ class UserServiceImplTest {
     private UserServiceImpl userService;
     private User user;
     private UserDTO userDto;
+    private UserNotificationDto userNotificationDto;
 
     @BeforeEach
     public void setUp() {
@@ -63,6 +65,9 @@ class UserServiceImplTest {
         userDto.setId(USER_ID);
         userDto.setCountryId(COUNTRY_ID);
         userDto.setParticipatedEventIds(List.of(EVENT_ID));
+        userNotificationDto = new UserNotificationDto();
+        userNotificationDto.setId(USER_ID);
+
     }
 
     @Test
@@ -131,4 +136,21 @@ class UserServiceImplTest {
         userService.deactivateUser(USER_ID);
         verify(mentorshipService).stopMentorship(USER_ID);
     }
+
+    @Test
+    public void whenGetDtoForNotificationThenGetUserNotificationDto() {
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+        when(userMapper.toNotificationDto(user)).thenReturn(userNotificationDto);
+        UserNotificationDto actual = userService.getDtoForNotification(USER_ID);
+        assertThat(actual).isEqualTo(userNotificationDto);
+    }
+
+    @Test
+    public void whenGetDtoForNotificationThenThrowsException() {
+        when(userRepository.findById(any())).thenReturn(Optional.empty());
+        Assert.assertThrows(EntityNotFoundException.class,
+                () -> userService.getDtoForNotification(USER_ID));
+    }
+
+
 }

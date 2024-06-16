@@ -8,14 +8,14 @@ import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.service.project_subscription.ProjectSubscriptionService;
 
 @RestController
-@RequestMapping("/api/v1/project")
+@RequestMapping("/api/v1/user/project")
 @AllArgsConstructor
 public class ProjectSubscriptionController {
     private final ProjectSubscriptionService projectSubscriptionService;
 
     @PostMapping("/subscribe")
-    public void followUser(@RequestParam(name = "followerId") long followerId,
-                           @RequestParam(name = "projectId") long projectId) {
+    public void followProject(@RequestParam(name = "followerId") Long followerId,
+                           @RequestParam(name = "projectId") Long projectId) {
         projectSubscriptionService.followProject(followerId, projectId);
     }
 }

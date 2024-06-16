@@ -25,6 +25,8 @@ spring:
           name: mentorship_channel
         follower-event-channel:
           name: follower_event
+        project-follower-channel:
+          name: project_follower
 
 server:
   port: 8080
@@ -33,8 +35,9 @@ logging:
   level:
     root: info
 
+
 project-service:
-  host: localhost
+  host: http://localhost
   port: 8082
 
 payment-service:

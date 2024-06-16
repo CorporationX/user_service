@@ -5,6 +5,7 @@ import org.mapstruct.Named;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.UserDTO;
+import school.faang.user_service.dto.notification.UserNotificationDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 
@@ -20,6 +21,9 @@ public interface UserMapper {
     @Mapping(source = "mentorIds", target = "mentors", qualifiedByName = "mapUserIdsToUserDtos")
     @Mapping(source = "menteeIds", target = "mentees", qualifiedByName = "mapUserIdsToUserDtos")
     User toEntity(UserDTO userDTO);
+
+    @Mapping(source = "contactPreference.preference", target = "preference")
+    UserNotificationDto toNotificationDto(User user);
 
     List<UserDTO> toDTOList(List<User> userList);
 

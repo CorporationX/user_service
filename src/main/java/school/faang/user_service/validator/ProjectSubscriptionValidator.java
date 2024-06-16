@@ -11,20 +11,8 @@ import java.util.NoSuchElementException;
 @AllArgsConstructor
 public class ProjectSubscriptionValidator {
     private final UserService userService;
-    private final ProjectSubscriptionRepository projectSubscriptionRepository;
 
-    public void validateProjectSubscription(long userId, long projectId) {
-        checkUserExists(userId);
-        checkProjectExists(projectId);
-    }
-
-    private void checkUserExists(long userId) {
+    public void validateProjectSubscription(long userId) {
         userService.existsById(userId);
-    }
-
-    private void checkProjectExists(long projectId) {
-        if (!projectSubscriptionRepository.existsById(projectId)) {
-            throw new NoSuchElementException(String.format("project with id: %d is not exists", projectId));
-        }
     }
 }

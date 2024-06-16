@@ -10,10 +10,8 @@ import school.faang.user_service.repository.SkillRepository;
 @RequiredArgsConstructor
 public class SkillValidator {
     private final SkillRepository skillRepository;
-    public void validateSkill(SkillDto skill) {
-        if(skill.getTitle().isBlank()) {
-            throw new DataValidationException("title is empty");
-        } else if (skill.getTitle() == null) {
+    public void validateSkill(SkillDto skill){
+        if(skill.getTitle() == null || skill.getTitle().isBlank()) {
             throw new DataValidationException("title can't be null");
         } else if (skillRepository.existsByTitle(skill.getTitle())) {
             throw new DataValidationException("the skill already exists");

@@ -25,7 +25,6 @@ public class SkillService {
     public SkillDto create(SkillDto skill) {
         skillValidator.validateSkill(skill);
         Skill skillEntity = skillMapper.toEntity(skill);
-        skillEntity.setUsers(userRepository.findAllById(skill.getUserIds()));
         return skillMapper.toDto(skillRepository.save(skillEntity));
     }
 }

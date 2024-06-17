@@ -37,7 +37,7 @@ public class EventController {
         return eventService.getEvent(eventId);
     }
 
-    @PostMapping("/filtered")
+    @PostMapping("/filter")
     public List<EventDto> getEventsByFilter(@NotNull @RequestBody EventFilterDto filter) {
         return eventService.getEventsByFilter(filter);
     }
@@ -47,7 +47,7 @@ public class EventController {
         eventService.deleteEvent(eventId);
     }
 
-    @PutMapping()
+    @PutMapping
     public EventDto update(@RequestBody EventDto event) {
         eventControllerValidation.validateEventId(event);
         eventControllerValidation.validateEventDates(event);
@@ -55,7 +55,7 @@ public class EventController {
         return eventService.updateEvent(event);
     }
 
-    @GetMapping()
+    @GetMapping
     public List<EventDto> getEvents(@NotNull @RequestParam Long userId, @RequestParam boolean isOwner) {
         if (isOwner) {
             return eventService.getOwnedEvents(userId);

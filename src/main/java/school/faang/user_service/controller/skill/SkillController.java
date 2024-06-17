@@ -21,7 +21,7 @@ public class SkillController {
         return skillService.create(skillDto);
     }
 
-    @GetMapping("/users/{userId}")
+    @GetMapping("/users")
     public List<?> getUserSkills(@PathVariable("userId") long userId,
                                  @RequestParam(name = "isOffered", required = false, defaultValue = "false") boolean isOffered) {
         if (isOffered) {
@@ -30,7 +30,7 @@ public class SkillController {
         return skillService.getUserSkills(userId);
     }
 
-    @PostMapping ("/{userId}/offered/{skillId}")
+    @PostMapping ("/offered")
     public SkillDto acquireSkillFromOffers(@PathVariable("userId") long userId, @PathVariable("skillId") long skillId) {
         return skillService.acquireSkillFromOffers(skillId, userId);
     }

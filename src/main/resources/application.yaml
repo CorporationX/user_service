@@ -46,6 +46,11 @@ logging:
   level:
     root: info
 
+premium:
+  scheduler:
+    expired-premium-remover:
+      cron: 0 0 * * *
+
 project-service:
   host: localhost
   port: 8082

@@ -34,6 +34,8 @@ public class TestData {
         createBufferedImagesHolder();
         createEventDto();
         createEvent();
+        event.setStartDate(eventDto.getStartDate());
+        event.setEndDate(eventDto.getEndDate());
     }
 
     private void createEvent() {

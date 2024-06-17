@@ -6,13 +6,12 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.MessageEvent;
-import school.faang.user_service.service.MessagePublisher;
+import school.faang.user_service.dto.event.MessageEvent;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MentorshipAcceptedEventPublisher implements MessagePublisher {
+public class MentorshipAcceptedEventPublisher implements MessagePublisher<MessageEvent> {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final ChannelTopic mentorshipAcceptedTopic;

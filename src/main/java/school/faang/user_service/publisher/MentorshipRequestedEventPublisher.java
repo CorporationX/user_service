@@ -5,12 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.MessageEvent;
+import school.faang.user_service.dto.event.MessageEvent;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MentorshipRequestedEventPublisher implements MessagePublisher {
+public class MentorshipRequestedEventPublisher implements MessagePublisher<MessageEvent> {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final ChannelTopic mentorshipRequestedChannel;

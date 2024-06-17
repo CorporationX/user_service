@@ -26,8 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
-import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.service.avatar.ProfilePicService;
 import school.faang.user_service.service.csv.CSVFileService;
 import school.faang.user_service.service.csv.CsvFileConverter;
@@ -44,7 +42,6 @@ import java.util.List;
 public class UserController {
     private final ProfilePicService profilePicService;
     private final UserService userService;
-    private final UserMapper userMapper;
     private final CSVFileService csvFileService;
     private final CsvFileConverter converter;
 
@@ -56,9 +53,8 @@ public class UserController {
 
     @GetMapping("{userId}")
     @Operation(summary = "Get user by ID")
-    public UserDto getUserById(@PathVariable long userId) {
-        User user = userService.findUserById(userId);
-        return userMapper.toDto(user);
+    public UserDto getUserById(@PathVariable("userId") long userId) {
+        return userService.getUserById(userId);
     }
 
     @Operation(summary = "Deactivate user")

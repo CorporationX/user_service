@@ -18,7 +18,9 @@ public enum ExceptionMessage {
     USER_AVATAR_ABSENCE_EXCEPTION("User doesn't have avatar."),
     REPEATED_USER_CREATION_EXCEPTION("User with such id already exists in system."),
     RANDOM_AVATAR_GETTING_EXCEPTION("Getting random avatar failed."),
-    NO_SUCH_COUNTRY_EXCEPTION("Database doesn't contain country with such id.");
+    NO_SUCH_COUNTRY_EXCEPTION("Database doesn't contain country with such id."),
+    SKILL_ALREADY_EXIST("This skill already added"),
+    USER_SKILL_NOT_FOUND("The user does not have this skill");
 
     private final String message;
 

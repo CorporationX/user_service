@@ -5,14 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
-@Data
 @Builder
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
-public class SkillDto {
-    private Long id;
-    private String title;
-    private List<Long> userIds;
+@AllArgsConstructor
+public class SkillCandidateDto {
+    private SkillDto skillDto;
+    private long offersAmount;
 }

@@ -21,16 +21,18 @@ class SkillMapperTest {
         skill = new Skill();
         skill.setId(0);
         skill.setTitle("SQL");
+        skill.setUsers(List.of());
 
         skillDto = new SkillDto();
         skillDto.setId(0L);
         skillDto.setTitle("SQL");
+        skillDto.setUserIds(List.of());
     }
 
     @DisplayName("should map skill entity to skill dto")
     @Test
     void shouldMapSkillEntityToDto() {
-        SkillDto actualSkillDto = skillMapper.toDtoList(skill);
+        SkillDto actualSkillDto = skillMapper.skillToDto(skill);
 
         assertEquals(skillDto, actualSkillDto);
     }
@@ -42,7 +44,7 @@ class SkillMapperTest {
         List<SkillDto> skillDtos = List.of(skillDto);
 
 
-        List<SkillDto> actualSkillDtos = skillMapper.toDtoList(skills);
+        List<SkillDto> actualSkillDtos = skillMapper.skillToDto(skills);
 
 
         assertEquals(skillDtos, actualSkillDtos);

@@ -44,10 +44,10 @@ class SkillServiceTest {
         void shouldReturnUserSkillsWhenSuchUserExists() {
             when(userRepository.findById(anyLong())).thenReturn(Optional.of(new User()));
             when(skillRepository.findAllByUserId(anyLong())).thenReturn(List.of());
-            when(skillMapper.toDtoList(anyList())).thenReturn(List.of());
+            when(skillMapper.skillToDto(anyList())).thenReturn(List.of());
 
             assertDoesNotThrow(() -> skillService.getUserSkills(anyLong()));
-            verify(skillMapper).toDtoList(anyList());
+            verify(skillMapper).skillToDto(anyList());
         }
     }
 

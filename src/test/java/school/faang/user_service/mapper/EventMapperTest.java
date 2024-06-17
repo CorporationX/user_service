@@ -65,8 +65,10 @@ class EventMapperTest {
 
         var skillADto = new SkillDto();
         skillADto.setTitle("SQL");
+        skillADto.setUserIds(List.of());
         var skillBDto = new SkillDto();
         skillBDto.setTitle("Java");
+        skillBDto.setUserIds(List.of());
         eventDto.setRelatedSkills(List.of(skillADto, skillBDto));
         eventDto.setLocation("Location");
         eventDto.setMaxAttendees(10);

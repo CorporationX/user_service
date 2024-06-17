@@ -15,6 +15,7 @@ import school.faang.user_service.service.user.image.BufferedImagesHolder;
 
 import java.awt.image.BufferedImage;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Getter
@@ -37,8 +38,10 @@ public class TestData {
 
     private void createEvent() {
         event = new Event();
+        event.setId(1L);
         event.setTitle("Title");
-        event.setStartDate(LocalDateTime.of(3024, 6, 12, 12, 12));
+        event.setStartDate(LocalDateTime.now().plus(1, ChronoUnit.DAYS));
+        event.setEndDate(LocalDateTime.now().plus(3, ChronoUnit.DAYS));
         var owner = new User();
         owner.setId(1L);
         event.setOwner(owner);
@@ -93,8 +96,10 @@ public class TestData {
 
     private void createEventDto() {
         eventDto = new EventDto();
+        eventDto.setId(1L);
         eventDto.setTitle("Title");
-        eventDto.setStartDate(LocalDateTime.of(3024, 6, 12, 12, 12));
+        eventDto.setStartDate(LocalDateTime.now().plus(1, ChronoUnit.DAYS));
+        eventDto.setEndDate(LocalDateTime.now().plus(3, ChronoUnit.DAYS));
         eventDto.setOwnerId(1L);
         eventDto.setDescription("Description");
 

@@ -52,7 +52,6 @@ class EventMapperTest {
     @DisplayName("should map event entity to event dto")
     @Test
     void shouldMapEntityToDto() {
-        eventDto.setId(0L);
         eventDto.getRelatedSkills().forEach(skill -> skill.setId(0L));
 
         EventDto actualEventDto = eventMapper.toDto(event);
@@ -71,7 +70,6 @@ class EventMapperTest {
     @DisplayName("should map list of event entities to list of event dto")
     @Test
     void shouldMapEntityListToDtoList() {
-        eventDto.setId(0L);
         eventDto.getRelatedSkills().forEach(skill -> skill.setId(0L));
 
         var actualEventDtoList = eventMapper.toDtoList(List.of(event));

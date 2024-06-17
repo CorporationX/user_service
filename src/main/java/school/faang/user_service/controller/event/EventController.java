@@ -27,7 +27,7 @@ public class EventController {
 
     @PostMapping
     public EventDto create(@Valid @RequestBody EventDto event) {
-        eventControllerValidation.validateEvent(event);
+        eventControllerValidation.validateEventDates(event);
 
         return eventService.create(event);
     }
@@ -50,7 +50,7 @@ public class EventController {
     @PutMapping()
     public EventDto update(@RequestBody EventDto event) {
         eventControllerValidation.validateEventId(event);
-        eventControllerValidation.validateEvent(event);
+        eventControllerValidation.validateEventDates(event);
 
         return eventService.updateEvent(event);
     }

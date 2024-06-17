@@ -39,7 +39,7 @@ class EventControllerTest {
         @DisplayName("should call eventService.create() when eventDto is valid")
         @Test
         void shouldCreateEventWhenDtoIsValid() {
-            doNothing().when(eventControllerValidation).validateEvent(eventDto);
+            doNothing().when(eventControllerValidation).validateEventDates(eventDto);
             ArgumentCaptor<EventDto> eventDtoArgumentCaptor = ArgumentCaptor.forClass(EventDto.class);
 
             assertDoesNotThrow(() -> eventController.create(eventDto));
@@ -111,7 +111,7 @@ class EventControllerTest {
         @DisplayName("Should throw exception when event dto to be created is invalid (watch validation tests)")
         @Test
         void shouldThrowExceptionWhenEventDtoToBeCreatedIsInvalid() {
-            doThrow(new RuntimeException()).when(eventControllerValidation).validateEvent(eventDto);
+            doThrow(new RuntimeException()).when(eventControllerValidation).validateEventDates(eventDto);
 
             assertThrows(RuntimeException.class, () -> eventController.create(eventDto));
 
@@ -131,7 +131,7 @@ class EventControllerTest {
         @DisplayName("Should throw exception when event dto to be updated is invalid (watch validation tests)")
         @Test
         void shouldThrowExceptionWhenEventDtoToBeUpdatedIsInvalid() {
-            doThrow(new RuntimeException()).when(eventControllerValidation).validateEvent(eventDto);
+            doThrow(new RuntimeException()).when(eventControllerValidation).validateEventDates(eventDto);
 
             assertThrows(RuntimeException.class, () -> eventController.update(eventDto));
 

@@ -1,8 +1,5 @@
 package school.faang.user_service.dto.user;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -10,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.entity.contact.PreferredContact;
 
 @Data
 @Builder
@@ -31,5 +29,8 @@ public class UserDto {
     private String password;
     private Long countryId;
     private boolean active;
+
     private UserProfilePic userProfilePic;
+
+    private PreferredContact preferredContact;
 }

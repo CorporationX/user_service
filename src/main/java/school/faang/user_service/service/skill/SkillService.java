@@ -13,7 +13,6 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.message.ExceptionMessage;
 import school.faang.user_service.mapper.SkillMapper;
-import school.faang.user_service.mapper.SkillCandidateMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
@@ -23,25 +22,24 @@ import school.faang.user_service.validation.skill.SkillValidator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static school.faang.user_service.exception.message.ExceptionMessage.NO_SUCH_USER_EXCEPTION;
-
 
 @Service
 @RequiredArgsConstructor
 public class SkillService {
     private final SkillRepository skillRepository;
     private final SkillMapper skillMapper;
-    private final SkillCandidateMapper skillCandidateMapper;
-    private final SkillValidator skillValidate;
+    private final SkillValidator skillValidator;
     private final SkillOfferRepository skillOfferRepository;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final UserRepository userRepository;
 
     @Transactional
     public SkillDto create(SkillDto skillDto) {
-        skillValidate.validateSkill(skillDto);
+        skillValidator.validateSkill(skillDto);
         Skill skillEntity = skillMapper.dtoToSkill(skillDto);
         return skillMapper.skillToDto(skillRepository.save(skillEntity));
     }
@@ -63,30 +61,27 @@ public class SkillService {
 
         List<Skill> skillsOfferedToUser = skillRepository.findSkillsOfferedToUser(userId);
 
-        Map<Long, Long> skillCountMap = skillsOfferedToUser.stream()
-                .collect(Collectors.groupingBy(Skill::getId, Collectors.counting()));
+        Map<Skill, Long> skillCountMap = skillsOfferedToUser.stream()
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
-        return skillsOfferedToUser.stream()
-                .distinct()
-                .map(skillCandidateMapper::toDto)
-                .peek((skillCandidateDto -> {
-                    long countSkill = skillCountMap.get(skillCandidateDto.getSkillDto().getId());
-                    skillCandidateDto.setOffersAmount(countSkill);
-                }))
+        return skillCountMap.entrySet().stream()
+                .map(entry -> SkillCandidateDto.builder()
+                        .skillDto(skillMapper.skillToDto(entry.getKey()))
+                        .offersAmount(entry.getValue())
+                        .build())
                 .toList();
     }
 
     @Transactional
     public SkillDto acquireSkillFromOffers(Long skillId, Long userId) {
-
-        skillValidate.validateSkillPresent(skillId, userId);
+        skillValidator.validateSkillPresent(skillId, userId);
 
         Skill skillUser = skillRepository.findUserSkill(skillId, userId)
                 .orElseThrow(() -> new ValidationException(ExceptionMessage.USER_SKILL_NOT_FOUND.getMessage()));
 
         List<SkillOffer> skillOffers = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
 
-        skillValidate.validateMinSkillOffers(skillOffers.size(), skillId, userId);
+        skillValidator.validateMinSkillOffers(skillOffers.size(), skillId, userId);
 
         skillRepository.assignSkillToUser(skillId, userId);
         addUserSkillGuarantee(skillUser, skillOffers);
@@ -103,6 +98,16 @@ public class SkillService {
                         .guarantor(skillOffer.getRecommendation().getAuthor())
                         .build())
                 .forEach(userSkillGuaranteeRepository::save);
+    }
+
+    @Transactional
+    public boolean skillExistsByTitle(String title) {
+        return skillRepository.existsByTitle(title);
+    }
+
+    @Transactional
+    public Optional<Skill> findUserSkill(long skillId, long userId) {
+        return skillRepository.findUserSkill(skillId, userId);
     }
 }
 

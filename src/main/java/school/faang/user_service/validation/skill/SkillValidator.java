@@ -6,29 +6,24 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.exception.message.ExceptionMessage;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.service.skill.SkillService;
+
 import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-
 public class SkillValidator {
     private static final int MIN_SKILL_OFFERS = 3;
-    private final SkillRepository skillRepository;
+    private final SkillService skillService;
 
     public void validateSkill(SkillDto skillDto) {
-        if (skillRepository.existsByTitle(skillDto.getTitle())) {
-            throw new DataValidationException("Skill with title: " + skillDto.getTitle() + " alredy exist.");
-        }
-    }
-
-    public void validateSkillTitle(SkillDto skillDto) {
-        if (skillDto.getTitle().isBlank()) {
-            throw new DataValidationException(ExceptionMessage.TITLE_EMPTY_EXCEPTION.getMessage());
+        if (skillService.skillExistsByTitle(skillDto.getTitle())) {
+            throw new DataValidationException("Skill with title: " + skillDto.getTitle() + " already exists.");
         }
     }
 
     public void validateSkillPresent(long skillId, long userId) {
-        Optional<Skill> userSkill = skillRepository.findUserSkill(skillId, userId);
+        Optional<Skill> userSkill = skillService.findUserSkill(skillId, userId);
         if (userSkill.isPresent()) {
             throw new DataValidationException("User " + userId + " already has skill with ID: " + skillId);
         }

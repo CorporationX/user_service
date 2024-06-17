@@ -24,8 +24,12 @@ public interface SkillMapper {
 
     @Named("usersToIds")
     default List<Long> convertUsersToIds (List<User> users) {
-        return users != null
-                ? users.stream().map(User::getId).toList()
-                : Collections.emptyList();
+        if(users == null) {
+            return List.of();
+        }
+
+        return users.stream()
+                .map(User::getId)
+                .toList();
     }
 }

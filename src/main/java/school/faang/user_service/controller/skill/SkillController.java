@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.skill;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -11,29 +12,25 @@ import school.faang.user_service.validation.skill.SkillValidator;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class SkillController {
-
     private final SkillService skillService;
-    private final SkillValidator skillValidator;
 
-    @PostMapping
+    @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public SkillDto create(@RequestBody SkillDto skillDto)
+    public SkillDto create(@Valid @RequestBody SkillDto skillDto)
     {
-        skillValidator.validateSkillTitle(skillDto);
         return skillService.create(skillDto);
     }
 
-    @GetMapping ("/user/{userId}")
-    public List<SkillDto> getUserSkills(@PathVariable("userId") long userId) {
+    @GetMapping("/users/{userId}")
+    public List<?> getUserSkills(@PathVariable("userId") long userId,
+                                 @RequestParam(name = "isOffered", required = false, defaultValue = "false") boolean isOffered) {
+        if (isOffered) {
+            return skillService.getOfferedSkills(userId);
+        }
         return skillService.getUserSkills(userId);
-    }
-
-    @GetMapping ("/offered/user/{userId}")
-    public List<SkillCandidateDto> getOfferedSkills(@PathVariable("userId") long userId) {
-        return skillService.getOfferedSkills(userId);
     }
 
     @PostMapping ("/{userId}/offered/{skillId}")

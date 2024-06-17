@@ -3,12 +3,9 @@ package school.faang.user_service.controller.skill;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.service.skill.SkillService;
-import school.faang.user_service.validation.skill.SkillValidator;
 
 import java.util.List;
 

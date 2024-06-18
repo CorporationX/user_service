@@ -2,11 +2,17 @@ package school.faang.user_service.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.dto.SkillAcquiredEvent;
 import school.faang.user_service.dto.recommendation.RecommendationDto;
-import school.faang.user_service.publisher.SkillAcquiredEventPublisher;
 import school.faang.user_service.service.RecommendationService;
 import school.faang.user_service.validator.RecommendationValidator;
 
@@ -17,7 +23,6 @@ public class RecommendationController {
     private final RecommendationService recommendationService;
     private final RecommendationValidator recommendationValidator;
     private final UserContext userContext;
-    private final SkillAcquiredEventPublisher skillAcquiredEventPublisher;
 
     @PostMapping
     public RecommendationDto giveRecommendation(@RequestBody RecommendationDto recommendationDto) {
@@ -59,10 +64,5 @@ public class RecommendationController {
                                                         @RequestParam(name = "page_size") int pageSize) {
         recommendationValidator.validateId(authorId);
         return recommendationService.getAllRecommendation(authorId, pageNum, pageSize);
-    }
-
-    @GetMapping("/skill/publish/{id}")
-    public void skillPublish(@PathVariable long id) {
-        skillAcquiredEventPublisher.publish(new SkillAcquiredEvent(id, 2, 3L));
     }
 }

@@ -1,4 +1,4 @@
-package school.faang.user_service.service.user;
+package school.faang.user_service.service.user.parse;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.Country;
@@ -7,7 +7,7 @@ import school.faang.user_service.entity.User;
 import java.util.Random;
 
 @Component
-public class Adder {
+public class AddCountryAndPassword {
 
     private final String COMBINATION = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890!@#$%^&*()_+{}:<>?";
 

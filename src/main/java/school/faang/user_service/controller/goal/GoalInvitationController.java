@@ -28,7 +28,7 @@ public class GoalInvitationController {
     @ApiResponse(responseCode = "201", description = "Приглашение успешно создано")
     @ApiResponse(responseCode = "400", description = "Ошибка на стороне клиента")
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping()
+    @PostMapping
     public GoalInvitationDto createInvitation(@Valid @RequestBody GoalInvitationDto invitation) {
         return goalInvitationService.createInvitation(invitation);
     }
@@ -55,7 +55,7 @@ public class GoalInvitationController {
     @ApiResponse(responseCode = "200", description = "Список приглашений получен")
     @ApiResponse(responseCode = "400", description = "Ошибка на стороне клиента")
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping()
+    @GetMapping
     public List<GoalInvitationDto> getInvitations(@RequestBody InvitationFilterDto filter) {
         return goalInvitationService.getInvitations(filter);
     }

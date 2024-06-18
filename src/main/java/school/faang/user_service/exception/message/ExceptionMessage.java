@@ -20,7 +20,8 @@ public enum ExceptionMessage {
     RANDOM_AVATAR_GETTING_EXCEPTION("Getting random avatar failed."),
     NO_SUCH_COUNTRY_EXCEPTION("Database doesn't contain country with such id."),
     NO_FILE_IN_REQUEST("There is no file send"),
-    INPUT_OUTPUT_EXCEPTION("Something wrong with input or output");
+    INPUT_OUTPUT_EXCEPTION("Something wrong with input or output"),
+    INPUT_IS_EMPTY("Input should not be empty");
 
     private final String message;
 

@@ -15,6 +15,7 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.service.user.image.ImageProcessor;
+import school.faang.user_service.service.user.parse.DataFromFileService;
 
 import java.io.IOException;
 import java.util.List;
@@ -33,6 +34,8 @@ public class UserController {
     private final UserService userService;
 
     private final ImageProcessor imageProcessor;
+
+    private final DataFromFileService dataFromFileService;
 
     @PostMapping
     public UserDto createUser(@Valid @RequestBody UserDto userDto) {
@@ -77,7 +80,7 @@ public class UserController {
             throw new DataValidationException(NO_FILE_IN_REQUEST.getMessage());
         }
         try {
-            return userService.saveUsersFromFile(multipartFile.getInputStream());
+            return dataFromFileService.saveUsersFromFile(multipartFile.getInputStream());
         } catch (IOException e) {
             throw new DataValidationException(INPUT_OUTPUT_EXCEPTION.getMessage());
         }

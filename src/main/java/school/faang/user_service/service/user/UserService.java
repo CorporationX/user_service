@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.Country;
-import school.faang.user_service.entity.Person;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.exception.DataGettingException;
@@ -23,9 +22,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import static school.faang.user_service.exception.message.ExceptionMessage.*;
 
@@ -51,10 +47,6 @@ public class UserService {
     private UserMapper userMapper;
 
     private CountryRepository countryRepository;
-
-    private Converter converter;
-
-    private Parser parser;
 
     @Transactional
     public UserDto createUser(UserDto userDto) {
@@ -163,27 +155,5 @@ public class UserService {
         Country country = countryRepository.findById(countryId)
                 .orElseThrow(() -> new DataGettingException(NO_SUCH_COUNTRY_EXCEPTION.getMessage()));
         userToBeCreated.setCountry(country);
-    }
-
-    public List<UserDto> saveUsersFromFile(InputStream inputStream) throws IOException {
-        List<CSVPart> csvParts = converter.convertToCsvList(inputStream);
-        List<InputStream> inputStreamParts = converter.convertToInputStreamList(csvParts);
-        List<Person> allPersons = parser.multiParser(inputStreamParts);
-        List<User> allUsers = converter.convertToUserList(allPersons);
-
-        List<User> updatedUsers = new ArrayList<>(allUsers);
-        Iterable<User> iterableForExistingUsers = userRepository.findAll();
-
-        for (User existingUser : iterableForExistingUsers) {
-            for (User user : allUsers) {
-                if (existingUser.getUsername().equals(user.getUsername())
-                        || existingUser.getEmail().equals(user.getEmail())
-                        || existingUser.getPhone().equals(user.getPhone())) {
-                    updatedUsers.remove(user);
-                }
-            }
-        }
-        userRepository.saveAll(updatedUsers);
-        return userMapper.toDto(updatedUsers);
     }
 }

@@ -16,9 +16,8 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(DataValidationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleDataValidationException(DataValidationException dataValidationException) {
-        return new ErrorResponse(dataValidationException.getMessage());
+    public ResponseEntity<String> handleDataValidationException(DataValidationException dataValidationException) {
+        return ResponseEntity.badRequest().body(dataValidationException.getMessage());
     }
 
     @ExceptionHandler(DataGettingException.class)

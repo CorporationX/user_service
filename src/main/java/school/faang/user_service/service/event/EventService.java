@@ -23,4 +23,6 @@ public interface EventService {
     EventDto create(EventDto event);
 
     void deleteAll(List<Event> events);
+
+    void clearEvents();
 }

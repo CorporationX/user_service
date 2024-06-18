@@ -20,6 +20,7 @@ public class RedisConfig {
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
+        System.out.println(port);
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
         return new JedisConnectionFactory(config);
     }
@@ -35,6 +36,16 @@ public class RedisConfig {
 
     @Bean
     ChannelTopic premiumBoughtChannel(@Value("${spring.data.redis.channels.premium_bought_channel.name}") String topicName) {
+        return new ChannelTopic(topicName);
+    }
+
+    @Bean
+    ChannelTopic completedGoalTopic(@Value("${spring.data.redis.channels.goal_complete_channel.name}") String topicName) {
+        return new ChannelTopic(topicName);
+    }
+
+    @Bean
+    ChannelTopic profileViewTopic(@Value("${spring.data.redis.channels.profile_view_channel.name}") String topicName) {
         return new ChannelTopic(topicName);
     }
 }

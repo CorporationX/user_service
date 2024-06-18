@@ -21,6 +21,9 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}")
     private int port;
 
+    @Value("${spring.data.redis.channels.skill_channel.name}")
+    private String skillChannel;
+
     @Value("${spring.data.redis.channels.mentorship_requested_channel.name}")
     private String mentorshipRequestedChannel;
 
@@ -41,6 +44,11 @@ public class RedisConfig {
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(mapper, MessageEvent.class));
         return redisTemplate;
+    }
+
+    @Bean
+    ChannelTopic skillTopic() {
+        return new ChannelTopic(skillChannel);
     }
 
     @Bean

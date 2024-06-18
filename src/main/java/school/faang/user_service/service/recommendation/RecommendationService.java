@@ -46,15 +46,8 @@ public class RecommendationService {
                 recommendationDto.getReceiverId(),
                 recommendationDto.getContent());
         saveSkillOffers(recommendationDto, recommendationId);
+        sendNotification(recommendationId, recommendationDto);
 
-        RecommendationEventDto recommendationEventDto = RecommendationEventDto.builder()
-                .id(recommendationId)
-                .authorId(recommendationDto.getAuthorId())
-                .receiverId(recommendationDto.getReceiverId())
-                .createdAt(recommendationDto.getCreateAt())
-                .build();
-
-        recommendationRequestedEventPublisher.publish(recommendationEventDto);
         return recommendationMapper.toDto(recommendation);
     }
 
@@ -161,5 +154,16 @@ public class RecommendationService {
                 .orElseThrow(() -> new DataValidationException(("Author not found"))));
 
         return recommendation;
+    }
+
+    private void sendNotification(Long idRecommendation, RecommendationDto recommendationDto) {
+        RecommendationEventDto recommendationEventDto = RecommendationEventDto.builder()
+                .id(idRecommendation)
+                .authorId(recommendationDto.getAuthorId())
+                .receiverId(recommendationDto.getReceiverId())
+                .createdAt(recommendationDto.getCreateAt())
+                .build();
+
+        recommendationRequestedEventPublisher.convertAndSend(recommendationEventDto);
     }
 }

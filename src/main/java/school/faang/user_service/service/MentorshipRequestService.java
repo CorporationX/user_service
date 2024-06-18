@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.MentorshipAcceptedEvent;
+import school.faang.user_service.dto.MentorshipRequestedEvent;
 import school.faang.user_service.dto.mentorship_request.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship_request.MentorshipResponseDto;
 import school.faang.user_service.dto.mentorship_request.MentorshipRequestFilterDto;
@@ -13,10 +15,13 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.EntityNotFoundException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipAcceptedEventPublisher;
+import school.faang.user_service.publisher.MentorshipRequestedEventPublisher;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.filter.mentorship_request.MentorshipRequestFilter;
 import school.faang.user_service.validator.MentorshipRequestValidator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -31,6 +36,8 @@ public class MentorshipRequestService {
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final MentorshipRequestValidator mentorshipRequestValidator;
     private final List<MentorshipRequestFilter> mentorshipRequestFilters;
+    private final MentorshipRequestedEventPublisher mentorshipRequestedEventPublisher;
+    private final MentorshipAcceptedEventPublisher mentorshipAcceptedEventPublisher;
 
     @Transactional
     public MentorshipResponseDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
@@ -48,6 +55,7 @@ public class MentorshipRequestService {
 
         MentorshipRequest resultRequest = mentorshipRequestRepository.create(requesterId, receiverId, mentorshipRequestDto.getDescription());
         log.info("Mentorship request with ID: {} and with status: {} was created", resultRequest.getId(), resultRequest.getStatus());
+        mentorshipRequestedEventPublisher.publish(new MentorshipRequestedEvent(requesterId, receiverId, LocalDateTime.now()));
         return mentorshipRequestMapper.mentorshipRequestToResponseDto(resultRequest);
     }
 
@@ -73,7 +81,7 @@ public class MentorshipRequestService {
 
         requester.getMentors().add(receiver);
         request.setStatus(RequestStatus.ACCEPTED);
-
+        mentorshipAcceptedEventPublisher.publish(new MentorshipAcceptedEvent(requester.getId(), receiver.getId(), id));
         return mentorshipRequestMapper.mentorshipRequestToResponseDto(request);
     }
 

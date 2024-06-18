@@ -26,6 +26,10 @@ spring:
           name: follower_channel
         profile_view_channel:
           name: profile_view_channel
+        mentorship_requested_channel:
+          name: mentorship_requested_channel
+        mentorship_accepted_channel:
+          name: mentorship_accepted_channel
         skill_channel:
           name: skill_channel
 

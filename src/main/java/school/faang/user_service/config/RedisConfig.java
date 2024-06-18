@@ -24,9 +24,14 @@ public class RedisConfig {
     @Value("${spring.data.redis.channels.skill_channel.name}")
     private String skillChannel;
 
+    @Value("${spring.data.redis.channels.mentorship_requested_channel.name}")
+    private String mentorshipRequestedChannel;
+
+    @Value("${spring.data.redis.channels.mentorship_accepted_channel.name}")
+    private String mentorshipAcceptedChannel;
+
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
-        System.out.println(port);
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
         return new JedisConnectionFactory(config);
     }
@@ -44,5 +49,20 @@ public class RedisConfig {
     @Bean
     ChannelTopic skillTopic() {
         return new ChannelTopic(skillChannel);
+    }
+
+    @Bean
+    ChannelTopic topic() {
+        return new ChannelTopic(mentorshipRequestedChannel);
+    }
+
+    @Bean
+    ChannelTopic mentorshipAcceptedTopic() {
+        return new ChannelTopic(mentorshipAcceptedChannel);
+    }
+
+    @Bean
+    ChannelTopic mentorshipRequestedChannel() {
+        return new ChannelTopic(mentorshipRequestedChannel);
     }
 }

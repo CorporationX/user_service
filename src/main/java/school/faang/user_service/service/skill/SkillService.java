@@ -20,7 +20,6 @@ import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -29,13 +28,12 @@ import static school.faang.user_service.exception.message.ExceptionMessage.NO_SU
 @Service
 @RequiredArgsConstructor
 public class SkillService {
+    private static final int MIN_SKILL_OFFERS = 3;
     private final SkillRepository skillRepository;
     private final SkillMapper skillMapper;
     private final SkillOfferRepository skillOfferRepository;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final UserRepository userRepository;
-    private static final int MIN_SKILL_OFFERS = 3;
-
 
     @Transactional
     public SkillDto create(SkillDto skillDto) {
@@ -46,11 +44,8 @@ public class SkillService {
 
     @Transactional
     public List<SkillDto> getUserSkills(long userId) {
-        Optional<User> user = userRepository.findById(userId);
-
-        if (user.isEmpty()) {
-            throw new DataValidationException(NO_SUCH_USER_EXCEPTION.getMessage());
-        }
+        User user  = userRepository.findById(userId)
+                .orElseThrow(() -> new DataValidationException(NO_SUCH_USER_EXCEPTION.getMessage()));
 
         List<Skill> ownerSkillsList = skillRepository.findAllByUserId(userId);
         return skillMapper.skillToDto(ownerSkillsList);
@@ -58,7 +53,6 @@ public class SkillService {
 
     @Transactional
     public List<SkillCandidateDto> getOfferedSkills(long userId) {
-
         List<Skill> skillsOfferedToUser = skillRepository.findSkillsOfferedToUser(userId);
 
         Map<Skill, Long> skillCountMap = skillsOfferedToUser.stream()
@@ -74,9 +68,7 @@ public class SkillService {
 
     @Transactional
     public SkillDto acquireSkillFromOffers(Long skillId, Long userId) {
-        validateSkillPresent(skillId, userId);
-
-        Skill skillUser = skillRepository.findUserSkill(skillId, userId)
+        Skill userSkill = skillRepository.findUserSkill(skillId, userId)
                 .orElseThrow(() -> new ValidationException(ExceptionMessage.USER_SKILL_NOT_FOUND.getMessage()));
 
         List<SkillOffer> skillOffers = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
@@ -84,9 +76,9 @@ public class SkillService {
         validateMinSkillOffers(skillOffers.size(), skillId, userId);
 
         skillRepository.assignSkillToUser(skillId, userId);
-        addUserSkillGuarantee(skillUser, skillOffers);
+        addUserSkillGuarantee(userSkill, skillOffers);
 
-        return skillMapper.skillToDto(skillUser);
+        return skillMapper.skillToDto(userSkill);
     }
 
 
@@ -102,20 +94,13 @@ public class SkillService {
 
     public void validateSkill(SkillDto skillDto) {
         if (skillRepository.existsByTitle(skillDto.getTitle())) {
-            throw new DataValidationException("Skill with title: " + skillDto.getTitle() + " already exists.");
-        }
-    }
-
-    public void validateSkillPresent(long skillId, long userId) {
-        Optional<Skill> userSkill = skillRepository.findUserSkill(skillId, userId);
-        if (userSkill.isPresent()) {
-            throw new DataValidationException("User " + userId + " already has skill with ID: " + skillId);
+            throw new DataValidationException(String.format("Skill with title: %s already exists.", skillDto.getTitle()));
         }
     }
 
     public void validateMinSkillOffers(long countOffersSkill, long skillId, long userId) {
         if (countOffersSkill < MIN_SKILL_OFFERS) {
-            throw new DataValidationException("Skill with ID: " + skillId + " hasn't enough offers for user with ID: " + userId);
+            throw new DataValidationException(String.format("Skill with ID: %d hasn't enough offers for user with ID: %d", skillId, userId));
         }
     }
 }

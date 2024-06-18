@@ -11,17 +11,18 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("skills/")
 public class SkillController {
     private final SkillService skillService;
 
-    @PostMapping("/create")
+    @PostMapping("/addSkill")
     @ResponseStatus(HttpStatus.CREATED)
     public SkillDto create(@Valid @RequestBody SkillDto skillDto)
     {
         return skillService.create(skillDto);
     }
 
-    @GetMapping("/users")
+    @GetMapping("/users/{userId}")
     public List<?> getUserSkills(@PathVariable("userId") long userId,
                                  @RequestParam(name = "isOffered", required = false, defaultValue = "false") boolean isOffered) {
         if (isOffered) {
@@ -30,7 +31,7 @@ public class SkillController {
         return skillService.getUserSkills(userId);
     }
 
-    @PostMapping ("/offered")
+    @PostMapping ("/offered/{userId}/{skillId}")
     public SkillDto acquireSkillFromOffers(@PathVariable("userId") long userId, @PathVariable("skillId") long skillId) {
         return skillService.acquireSkillFromOffers(skillId, userId);
     }

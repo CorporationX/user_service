@@ -24,17 +24,11 @@ import static school.faang.user_service.exception.message.MessageForGoalInvitati
 @AllArgsConstructor
 @Data
 public class GoalInvitationService {
-
     private GoalInvitationRepository goalInvitationRepository;
-
     private GoalRepository goalRepository;
-
     private UserRepository userRepository;
-
     private GoalInvitationServiceValidator goalInvitationServiceValidator;
-
     private GoalInvitationMapper goalInvitationMapper;
-
     private List<InvitationFilter> invitationFilters;
 
     public GoalInvitationDto createInvitation(GoalInvitationDto goalInvitationDto) {
@@ -90,7 +84,7 @@ public class GoalInvitationService {
                         .stream()
                         .filter(filter -> filter.isApplicable(filters))
                         .flatMap(filter -> filter.apply(goalInvitation, filters))
-                        .toList().size() == invitationFilters.size())
+                        .count() == invitationFilters.stream().filter(filter -> filter.isApplicable(filters)).count())
                 .map(goalInvitation -> goalInvitationMapper.toDto(goalInvitation))
                 .toList();
     }

@@ -67,8 +67,12 @@ public class UserService {
     }
 
     public UserDto getUser(long userId) {
-        return userMapper.toDto(userRepository.findById(userId).orElseThrow(()
-                -> new DataValidationException(NO_SUCH_USER_EXCEPTION.getMessage())));
+        return userMapper.toDto(getUserEntity(userId));
+    }
+
+    public User getUserEntity(long userId) {
+        return userRepository.findById(userId).orElseThrow(()
+                -> new DataValidationException(NO_SUCH_USER_EXCEPTION.getMessage()));
     }
 
     @Transactional

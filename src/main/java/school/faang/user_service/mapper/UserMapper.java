@@ -13,9 +13,11 @@ import java.util.List;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper {
     @Mapping(source = "country.id", target = "countryId")
+    @Mapping(source = "contactPreference.preference", target = "preference")
     UserDto toDto(User user);
 
     @Mapping(target = "country", ignore = true)
+    @Mapping(target = "contactPreference", ignore = true)
     User toEntity(UserDto user);
 
     List<UserDto> toDto(List<User> users);

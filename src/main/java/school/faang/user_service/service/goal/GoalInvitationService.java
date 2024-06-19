@@ -30,7 +30,6 @@ public class GoalInvitationService {
     private GoalInvitationServiceValidator goalInvitationServiceValidator;
     private GoalInvitationMapper goalInvitationMapper;
     private List<InvitationFilter> invitationFilters;
-    static final int SETGOAL_SIZE = 3;
 
     public GoalInvitationDto createInvitation(GoalInvitationDto goalInvitationDto) {
         goalInvitationServiceValidator.validateForCreateInvitation(goalInvitationDto);

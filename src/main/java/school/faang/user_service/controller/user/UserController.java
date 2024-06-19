@@ -25,6 +25,7 @@ import static school.faang.user_service.exception.message.ExceptionMessage.*;
 @Slf4j
 @RestController
 @RequestMapping("/users")
+@Validated
 @RequiredArgsConstructor
 @Validated
 public class UserController {
@@ -43,7 +44,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    UserDto getUser(@Min(1) @PathVariable long userId) {
+    UserDto getUser(@Valid @Min(1) @PathVariable long userId) {
         return userService.getUser(userId);
     }
 

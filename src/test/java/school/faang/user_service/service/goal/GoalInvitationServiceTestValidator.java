@@ -22,8 +22,10 @@ import static school.faang.user_service.exception.message.MessageForGoalInvitati
 
 @ExtendWith(MockitoExtension.class)
 public class GoalInvitationServiceTestValidator {
+
     @InjectMocks
     private GoalInvitationServiceValidator goalInvitationServiceValidator;
+
     private final TestData testData = new TestData();
 
     @Test

@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 @Component
 public class InvitedNamePatternFilter implements InvitationFilter {
+
     @Override
     public boolean isApplicable(InvitationFilterDto filters) {
         return filters.getInvitedNamePattern() != null;

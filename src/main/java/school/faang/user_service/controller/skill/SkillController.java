@@ -15,10 +15,8 @@ import java.util.List;
 public class SkillController {
     private final SkillService skillService;
 
-    @PostMapping("/addSkill")
     @ResponseStatus(HttpStatus.CREATED)
-    public SkillDto create(@Valid @RequestBody SkillDto skillDto)
-    {
+    public SkillDto create(@Valid @RequestBody SkillDto skillDto) {
         return skillService.create(skillDto);
     }
 
@@ -31,7 +29,7 @@ public class SkillController {
         return skillService.getUserSkills(userId);
     }
 
-    @PostMapping ("/offered/{userId}/{skillId}")
+    @PostMapping ("/{skillId}/offered/{userId}")
     public SkillDto acquireSkillFromOffers(@PathVariable("userId") long userId, @PathVariable("skillId") long skillId) {
         return skillService.acquireSkillFromOffers(skillId, userId);
     }

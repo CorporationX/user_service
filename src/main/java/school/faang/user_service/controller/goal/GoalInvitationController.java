@@ -21,7 +21,6 @@ import java.util.List;
 @Tag(name = "GoalInvitation Controller", description = "Контроллер для приглашений на цель")
 @RequestMapping("/goal-invitations")
 public class GoalInvitationController {
-
     private final GoalInvitationService goalInvitationService;
 
     @Operation(summary = "Создать приглашение", description = "Создать новое приглашение для цели")

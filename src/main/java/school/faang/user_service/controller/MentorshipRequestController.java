@@ -13,11 +13,6 @@ public class MentorshipRequestController {
     private final MentorshipRequestService mentorshipRequestService;
     private final MentorshipRequestValidator mentorshipRequestValidator;
 
-    //    public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
-//        if (mentorshipRequestValidator.validateRequest(mentorshipRequestDto))
-//            mentorshipRequestService.requestMentorship(mentorshipRequestDto.getUserId(), mentorshipRequestDto.getMentorId(), mentorshipRequestDto.getDescription(), mentorshipRequestDto.getId(), mentorshipRequestDto.getCreatedAt());
-//        return mentorshipRequestDto;
-//    }
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         if (mentorshipRequestValidator.validateRequest(mentorshipRequestDto))
             mentorshipRequestService.requestMentorship(mentorshipRequestDto);

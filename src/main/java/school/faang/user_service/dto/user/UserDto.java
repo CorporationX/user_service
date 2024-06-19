@@ -6,8 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.UserProfilePic;
+import school.faang.user_service.entity.contact.PreferredContact;
 
 @Data
 @Builder
@@ -27,9 +27,10 @@ public class UserDto {
     @NotBlank
     @Size(max = 128, message = "password should be less than 129 symbols")
     private String password;
-
-    private Country country;
-
+    private Long countryId;
     private boolean active;
+
     private UserProfilePic userProfilePic;
+
+    private PreferredContact preferredContact;
 }

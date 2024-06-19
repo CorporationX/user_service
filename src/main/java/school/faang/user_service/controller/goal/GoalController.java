@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.goal.GoalDto;
 import school.faang.user_service.dto.goal.GoalFilterDto;
 import school.faang.user_service.service.goal.GoalService;
@@ -25,7 +26,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 public class GoalController {
+
     private final GoalService goalService;
+    private final UserContext userContext;
 
     @PostMapping("/user/{userId}")
     @ResponseStatus(HttpStatus.CREATED)
@@ -38,7 +41,8 @@ public class GoalController {
     @ResponseStatus(HttpStatus.OK)
     public GoalDto updateGoal(@Positive @PathVariable("goalId") Long goalId,
                               @Valid @RequestBody GoalDto goal) {
-        return goalService.updateGoal(goalId, goal);
+        long userId = userContext.getUserId();
+        return goalService.updateGoal(userId, goalId, goal);
     }
 
     @DeleteMapping("/delete/{goalId}")

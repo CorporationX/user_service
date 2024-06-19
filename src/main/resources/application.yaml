@@ -28,6 +28,8 @@ spring:
           name: profile_view_channel
         mentorship_channel:
           name: mentorship_channel
+        goal_complete_channel:
+          name: goal_complete_channel
 
   profiles:
     active: test
@@ -45,6 +47,11 @@ server:
 logging:
   level:
     root: info
+
+premium:
+  scheduler:
+    expired-premium-remover:
+      cron: 0 0 * * *
 
 project-service:
   host: localhost
@@ -68,6 +75,15 @@ goals:
 mentorship:
   request:
     time-period-for-single-request: 3
+
+spring.servlet.multipart.max-file-size: 10KB
+
+scheduler:
+  clearEvents:
+    cronExpression: "0 0 0 * * ?" # Каждый день в полночь
+
+batchSize:
+  eventDeletion: 1000
 
 randomAvatar:
   url: https://api.dicebear.com/8.x/pixel-art/jpg?seed=

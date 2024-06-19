@@ -1,5 +1,7 @@
 package school.faang.user_service.service.mentorship;
 
+import school.faang.user_service.dto.MentorshipRequestDto;
+
 public interface MentorshipRequestService {
-    Boolean requestMentorship(Long userId, Long mentorId, String description);
+    MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDton);
 }

@@ -1,43 +1,45 @@
 package school.faang.user_service.service.mentorship;
 
-import io.swagger.v3.oas.annotations.servers.Server;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
-import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.mentorship.MentorshipRepository;
+import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+import school.faang.user_service.validator.MentorshipRequestValidator;
 
-import java.time.LocalDateTime;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 
 @Service
 @AllArgsConstructor
+//@RequiredArgsConstructor
 public class MentorshipRequestServiceImpl implements MentorshipRequestService {
 
     private final MentorshipRequestRepository mentorshipRequestRepository;
-    private final UserRepository userRepository;
+    private final MentorshipRequestValidator mentorshipRequestValidator;
+    private final MentorshipRequestMapper mentorshipRequestMapper;
 
     @Override
-    public Boolean requestMentorship(Long userId, Long mentorId, String description) {
-        if (!userRepository.existsById(userId) || !userRepository.existsById(mentorId))
-            return false;
-        Optional<MentorshipRequest> optional = mentorshipRequestRepository.findLatestRequest(userId, mentorId);
-        boolean is1 = optional.isEmpty() && !userId.equals(mentorId);
-        boolean is2 = optional.isPresent() && moreThanThreeMonths(optional.get());
-        if (is1 || is2) {
-            mentorshipRequestRepository.create(userId, mentorId, description);
-            return true;
+    public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
+        Long userId = mentorshipRequestDto.getUserId();
+        Long mentorId = mentorshipRequestDto.getMentorId();
+        String description = mentorshipRequestDto.getDescription();
+        if (!mentorshipRequestValidator.checkUserAndMentorExists(userId, mentorId)) {
+            return null;
         }
-        return false;
+        MentorshipRequestDto latestRequestDto = findLatestRequestDTO(userId, mentorId);
+        if (latestRequestDto == null || mentorshipRequestValidator.checkIdAndDates(latestRequestDto)) {
+            return mentorshipRequestMapper.toDto(mentorshipRequestRepository.create(userId, mentorId, description));
+        }
+        return null;
     }
 
-    private boolean moreThanThreeMonths(MentorshipRequest mentorshipRequest){
-        LocalDateTime timeNow = LocalDateTime.now();
-        LocalDateTime timeRequest = mentorshipRequest.getCreatedAt();
-        int compareResult = timeRequest.plusMonths(3).compareTo(timeNow);
-        return compareResult <= 0;
+    private MentorshipRequestDto findLatestRequestDTO(Long userId, Long mentorId) {
+        Optional<MentorshipRequest> optional = mentorshipRequestRepository.findLatestRequest(userId, mentorId);
+        if (optional.isEmpty()) {
+            return null;
+        }
+        return mentorshipRequestMapper.toDto(optional.get());
     }
 }

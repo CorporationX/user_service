@@ -1,12 +1,18 @@
 package school.faang.user_service.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.*;
 
-@Getter
+import java.time.LocalDateTime;
+
+//@Getter
+//@EqualsAndHashCode
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class MentorshipRequestDto {
-    private final String description;
-    private final Long userId;
-    private final Long mentorId;
+    private Long id;
+    private String description;
+    private Long userId;
+    private Long mentorId;
+    private LocalDateTime createdAt;
 }

@@ -18,16 +18,12 @@ import school.faang.user_service.service.goal.filter.InvitationFilter;
 
 import java.util.List;
 
-import static school.faang.user_service.exception.message.MessageForGoalInvitationService.NO_GOAL_INVITATION_IN_DB;
-import static school.faang.user_service.exception.message.MessageForGoalInvitationService.NO_GOAL_IN_DB;
-import static school.faang.user_service.exception.message.MessageForGoalInvitationService.NO_INVITED_IN_DB;
-import static school.faang.user_service.exception.message.MessageForGoalInvitationService.NO_INVITER_IN_DB;
+import static school.faang.user_service.exception.message.MessageForGoalInvitationService.*;
 
 @Service
 @AllArgsConstructor
 @Data
 public class GoalInvitationService {
-
     private GoalInvitationRepository goalInvitationRepository;
     private GoalRepository goalRepository;
     private UserRepository userRepository;
@@ -35,7 +31,6 @@ public class GoalInvitationService {
     private GoalInvitationMapper goalInvitationMapper;
     private List<InvitationFilter> invitationFilters;
     static final int SETGOAL_SIZE = 3;
-
 
     public GoalInvitationDto createInvitation(GoalInvitationDto goalInvitationDto) {
         goalInvitationServiceValidator.validateForCreateInvitation(goalInvitationDto);
@@ -90,7 +85,7 @@ public class GoalInvitationService {
                         .stream()
                         .filter(filter -> filter.isApplicable(filters))
                         .flatMap(filter -> filter.apply(goalInvitation, filters))
-                        .toList().size() == invitationFilters.size())
+                        .count() == invitationFilters.stream().filter(filter -> filter.isApplicable(filters)).count())
                 .map(goalInvitation -> goalInvitationMapper.toDto(goalInvitation))
                 .toList();
     }

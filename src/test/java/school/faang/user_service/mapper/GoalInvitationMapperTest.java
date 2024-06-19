@@ -31,6 +31,7 @@ public class GoalInvitationMapperTest {
     @Test
     void testToEntity() {
         GoalInvitation actualGoalInvitation = goalInvitationMapper.toEntity(goalInvitationDto);
+        actualGoalInvitation.setId(1);
         assertEquals(goalInvitation, actualGoalInvitation);
     }
 

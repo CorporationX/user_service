@@ -44,18 +44,25 @@ import static school.faang.user_service.exception.message.MessageForGoalInvitati
 
 @ExtendWith(MockitoExtension.class)
 public class GoalInvitationServiceTest {
+
     @InjectMocks
     private GoalInvitationService goalInvitationService;
+
     @Mock
     private GoalInvitationRepository goalInvitationRepository;
+
     @Spy
     private GoalInvitationMapper goalInvitationMapper = Mappers.getMapper(GoalInvitationMapper.class);
+
     @Mock
     private GoalRepository goalRepository;
+
     @Mock
     private UserRepository userRepository;
+
     @Mock
     private GoalInvitationServiceValidator goalInvitationServiceValidator;
+
     @Captor
     private ArgumentCaptor<GoalInvitation> captor;
 

@@ -14,9 +14,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 public class InviterNamePatternFilterTest {
+
     @InjectMocks
     private InviterNamePatternFilter inviterNamePatternFilter;
+
     private InvitationFilterDto invitationFilterDto;
+
     private TestData testData;
 
     @BeforeEach
@@ -24,7 +27,6 @@ public class InviterNamePatternFilterTest {
         testData = new TestData();
         invitationFilterDto = testData.prepareInvitationFilterDto();
     }
-
 
     @Test
     void testIsApplicableFalse() {

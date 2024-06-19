@@ -5,18 +5,21 @@ import lombok.Setter;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.filter.EventFilterDto;
+import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.service.event.filter.EventFilter;
 import school.faang.user_service.service.skill.SkillService;
+import school.faang.user_service.service.user.UserService;
 
 import java.util.HashSet;
 import java.util.List;
 
-import static school.faang.user_service.exception.ExceptionMessage.INAPPROPRIATE_OWNER_SKILLS_EXCEPTION;
-import static school.faang.user_service.exception.ExceptionMessage.NO_SUCH_EVENT_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.INAPPROPRIATE_OWNER_SKILLS_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.NO_SUCH_EVENT_EXCEPTION;
+
 
 @Service
 @AllArgsConstructor
@@ -25,6 +28,7 @@ public class EventService {
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
     private final SkillService skillService;
+    private final UserService userService;
     private List<EventFilter> filters;
 
 
@@ -75,13 +79,18 @@ public class EventService {
     }
 
     private EventDto saveEvent(EventDto event) {
-        return eventMapper.toDto(eventRepository.save(eventMapper.toEntity(event)));
+        Event eventToBeSaved = eventMapper.toEntity(event);
+
+        eventToBeSaved.setOwner(userService.getUserEntity(event.getOwnerId()));
+
+        return eventMapper.toDto(eventRepository.save(eventToBeSaved));
     }
 
     private void doesOwnerHaveEventRelatedSkills(EventDto event) {
         var ownerSkills = new HashSet<>(skillService.getUserSkills(event.getOwnerId()));
+        List<SkillDto> eventRelatedSkills = event.getRelatedSkills();
 
-        if (!ownerSkills.containsAll(event.getRelatedSkills())) {
+        if (eventRelatedSkills == null || !ownerSkills.containsAll(eventRelatedSkills)) {
             throw new DataValidationException(INAPPROPRIATE_OWNER_SKILLS_EXCEPTION.getMessage());
         }
     }

@@ -6,7 +6,7 @@ on:
       - 'phoenix-master-bc4'
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -17,5 +17,19 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Set up Docker
+        uses: docker-practice/actions-setup-docker@master
+      - name: Run Docker
+        run: |
+          set -x
+          
+          sudo chmod 755 run.sh
+          sudo chmod 755 stop.sh
+          
+          ./run.sh
+
       - name: Tests
         run: ./gradlew test
+
+      - name: Stop Docker
+        run: ./stop.sh

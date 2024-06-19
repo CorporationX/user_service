@@ -24,11 +24,17 @@ import static school.faang.user_service.exception.message.MessageForGoalInvitati
 @AllArgsConstructor
 @Data
 public class GoalInvitationService {
+
     private GoalInvitationRepository goalInvitationRepository;
+
     private GoalRepository goalRepository;
+
     private UserRepository userRepository;
+
     private GoalInvitationServiceValidator goalInvitationServiceValidator;
+
     private GoalInvitationMapper goalInvitationMapper;
+
     private List<InvitationFilter> invitationFilters;
 
     public GoalInvitationDto createInvitation(GoalInvitationDto goalInvitationDto) {

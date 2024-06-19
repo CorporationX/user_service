@@ -12,6 +12,7 @@ import static school.faang.user_service.exception.message.MessageForGoalInvitati
 
 @Component
 public class GoalInvitationServiceValidator {
+
     static final int SETGOAL_SIZE = 3;
 
     void validateForCreateInvitation(GoalInvitationDto goalInvitationDto) {

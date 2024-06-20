@@ -13,9 +13,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 public class InvitedIdFilterTest {
+
     @InjectMocks
     private InvitedIdFilter invitedIdFilter;
+
     private InvitationFilterDto invitationFilterDto;
+
     private TestData testData;
 
     @BeforeEach

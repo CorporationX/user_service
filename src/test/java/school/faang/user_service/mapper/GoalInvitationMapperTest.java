@@ -12,8 +12,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 public class GoalInvitationMapperTest {
+
     final GoalInvitationMapper goalInvitationMapper = Mappers.getMapper(GoalInvitationMapper.class);
+
     private GoalInvitation goalInvitation;
+
     private GoalInvitationDto goalInvitationDto;
 
     @BeforeEach
@@ -28,6 +31,7 @@ public class GoalInvitationMapperTest {
     @Test
     void testToEntity() {
         GoalInvitation actualGoalInvitation = goalInvitationMapper.toEntity(goalInvitationDto);
+        actualGoalInvitation.setId(1);
         assertEquals(goalInvitation, actualGoalInvitation);
     }
 

@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import school.faang.user_service.entity.contact.PreferredContact;
 
 @Data
 @NoArgsConstructor
@@ -20,7 +21,10 @@ public class UserDto {
     private String password;
     @Email
     private String email;
+    @NotNull
+    private String phone;
     private boolean active;
     @NotNull
     private Long countryId;
+    private PreferredContact preference;
 }

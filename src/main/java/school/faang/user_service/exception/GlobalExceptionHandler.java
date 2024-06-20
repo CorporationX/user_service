@@ -16,18 +16,18 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(DataValidationException.class)
-    public ResponseEntity<String> handleDataValidationException(DataValidationException dataValidationException) {
-        return ResponseEntity.badRequest().body(dataValidationException.getMessage());
+    public ResponseEntity<Map<String, String>> handleDataValidationException(DataValidationException e) {
+        return ResponseEntity.badRequest().body(buildExceptionMessage(e.getMessage()));
     }
 
     @ExceptionHandler(DataGettingException.class)
-    public ResponseEntity<String> handleRuntimeException(DataGettingException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
+    public ResponseEntity<Map<String, String>> handleRuntimeException(DataGettingException e) {
+        return ResponseEntity.badRequest().body(buildExceptionMessage(e.getMessage()));
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleRuntimeException(RuntimeException e) {
-        return ResponseEntity.internalServerError().body(e.getMessage());
+    public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException e) {
+        return ResponseEntity.internalServerError().body(buildExceptionMessage(e.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -44,5 +44,9 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleConstraintViolationException(ConstraintViolationException constraintViolationException) {
         return new ErrorResponse(constraintViolationException.getMessage());
+    }
+
+    private Map<String, String> buildExceptionMessage(String message) {
+        return Map.of("description", message);
     }
 }

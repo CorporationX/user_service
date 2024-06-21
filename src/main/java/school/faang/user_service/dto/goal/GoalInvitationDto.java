@@ -16,7 +16,7 @@ public class GoalInvitationDto {
     private Long id;
 
     @NotNull(message = "inviterId shouldn't be null")
-    @Schema(description = "Идентификатор приглашеющего пользователя")
+    @Schema(description = "Идентификатор приглашающего пользователя")
     private Long inviterId;
 
     @NotNull(message = "invitedUserId shouldn't be null")

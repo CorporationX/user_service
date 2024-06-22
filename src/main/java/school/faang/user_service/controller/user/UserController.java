@@ -2,6 +2,7 @@ package school.faang.user_service.controller.user;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -75,13 +76,15 @@ public class UserController {
     }
 
     @PostMapping("/bulk-data")
-    List<UserDto> uploadData(@RequestParam("file") MultipartFile multipartFile) {
+    List<UserDto> uploadData(@NotNull(message = "The file must not be null") @RequestParam("file") MultipartFile multipartFile) {
         if (multipartFile.isEmpty()) {
+            log.error(NO_FILE_IN_REQUEST.getMessage());
             throw new DataValidationException(NO_FILE_IN_REQUEST.getMessage());
         }
         try {
             return dataFromFileService.saveUsersFromFile(multipartFile.getInputStream());
         } catch (IOException e) {
+            log.error(INPUT_OUTPUT_EXCEPTION.getMessage());
             throw new DataValidationException(INPUT_OUTPUT_EXCEPTION.getMessage());
         }
     }

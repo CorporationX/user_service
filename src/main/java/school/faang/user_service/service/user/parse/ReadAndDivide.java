@@ -1,5 +1,6 @@
 package school.faang.user_service.service.user.parse;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.exception.DataValidationException;
 
@@ -13,10 +14,31 @@ import java.util.List;
 import static school.faang.user_service.exception.message.ExceptionMessage.INPUT_IS_EMPTY;
 import static school.faang.user_service.exception.message.ExceptionMessage.INPUT_OUTPUT_EXCEPTION;
 
+@Slf4j
 @Component
-public class ToCsvListConverter {
+public class ReadAndDivide {
 
-    public List<CSVPart> convertToCsvList(InputStream inputStream) {
+    private static final int AMOUNT_OF_PARTS = 4;
+
+    public List<CsvPart> toCsvPartDivider(InputStream inputStream) {
+        List<String> lines = readInput(inputStream);
+        String header = lines.remove(0);
+        int totalLines = lines.size();
+        int linesPerPart = totalLines / AMOUNT_OF_PARTS;
+        List<CsvPart> parts = new ArrayList<>();
+
+        for (int i = 0; i < AMOUNT_OF_PARTS; i++) {
+            int start = i * linesPerPart;
+            int end = (i == AMOUNT_OF_PARTS - 1) ? totalLines : (start + linesPerPart);
+            List<String> partLines = new ArrayList<>();
+            partLines.add(header);
+            partLines.addAll(lines.subList(start, end));
+            parts.add(new CsvPart(partLines));
+        }
+        return parts;
+    }
+
+    private List<String> readInput(InputStream inputStream) {
         List<String> lines = new ArrayList<>();
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
@@ -25,38 +47,13 @@ public class ToCsvListConverter {
                 lines.add(line);
             }
         } catch (IOException e) {
+            log.error(INPUT_OUTPUT_EXCEPTION.getMessage());
             throw new DataValidationException(INPUT_OUTPUT_EXCEPTION.getMessage());
         }
         if (lines.isEmpty()) {
+            log.error(INPUT_IS_EMPTY.getMessage());
             throw new DataValidationException(INPUT_IS_EMPTY.getMessage());
         }
-        String header = lines.get(0);
-        lines.remove(0);
-        int totalLines = lines.size();
-        int amountOfParts = 4;
-        int linesPerPart = totalLines / amountOfParts;
-        int lineCount = 0;
-        int partCount = 0;
-        List<String> currentPartLines = new ArrayList<>();
-        List<CSVPart> parts = new ArrayList<>();
-
-        for (String currentLine : lines) {
-            currentPartLines.add(header);
-            currentPartLines.add(currentLine);
-            lineCount++;
-
-            if (amountOfParts == partCount && totalLines > partCount) {
-                parts.add(new CSVPart(currentPartLines));
-                break;
-            }
-
-            if (lineCount == linesPerPart) {
-                parts.add(new CSVPart(currentPartLines));
-                currentPartLines = new ArrayList<>();
-                lineCount = 0;
-                partCount++;
-            }
-        }
-        return parts;
+        return lines;
     }
 }

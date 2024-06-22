@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @Component
-public class CSVPart {
+public class CsvPart {
 
     private List<String> lines;
 }

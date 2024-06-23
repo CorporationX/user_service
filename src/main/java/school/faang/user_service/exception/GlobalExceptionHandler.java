@@ -5,45 +5,41 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler(DataValidationException.class)
+    @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleDataValidationException(DataValidationException dataValidationException) {
-        return new ErrorResponse(dataValidationException.getMessage());
-    }
-
-    @ExceptionHandler(DataGettingException.class)
-    public ResponseEntity<String> handleRuntimeException(DataGettingException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
+    public ResponseEntity<String> handleEntityNotFoundException(EntityNotFoundException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleRuntimeException(RuntimeException e) {
-        return ResponseEntity.internalServerError().body(e.getMessage());
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
+        return ResponseEntity.internalServerError().body(ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleMethodArgumentNotValidException(MethodArgumentNotValidException methodArgumentNotValidException) {
-        return methodArgumentNotValidException.getBindingResult().getAllErrors().stream()
+    public ResponseEntity<Map<String, String>> handleMethodArgumentNotValidException(MethodArgumentNotValidException methodArgumentNotValidException) {
+        Map<String, String> exceptionMap = methodArgumentNotValidException.getBindingResult().getAllErrors().stream()
                 .collect(Collectors.toMap(
                         error -> ((FieldError) error).getField(),
                         error -> Objects.requireNonNullElse(error.getDefaultMessage(), "")
                 ));
+        return ResponseEntity.badRequest().body(exceptionMap);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleConstraintViolationException(ConstraintViolationException constraintViolationException) {
-        return new ErrorResponse(constraintViolationException.getMessage());
+    public ResponseEntity<String> handleConstraintViolationException(ConstraintViolationException constraintViolationException) {
+        return ResponseEntity.badRequest().body(constraintViolationException.getMessage());
     }
 }

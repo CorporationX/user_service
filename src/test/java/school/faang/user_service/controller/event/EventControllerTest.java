@@ -16,7 +16,6 @@ import school.faang.user_service.service.event.EventService;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -40,7 +39,7 @@ class EventControllerTest {
         @DisplayName("should call eventService.create() when eventDto is valid")
         @Test
         void shouldCreateEventWhenDtoIsValid() {
-            doNothing().when(eventControllerValidation).validateEvent(eventDto);
+            doNothing().when(eventControllerValidation).validateEventDates(eventDto);
             ArgumentCaptor<EventDto> eventDtoArgumentCaptor = ArgumentCaptor.forClass(EventDto.class);
 
             assertDoesNotThrow(() -> eventController.create(eventDto));
@@ -80,10 +79,9 @@ class EventControllerTest {
         @DisplayName("should call eventService.updateEvent() when eventDto is valid")
         @Test
         void shouldUpdateEventWhenDtoIsValid() {
-            doNothing().when(eventControllerValidation).validateEvent(eventDto);
             ArgumentCaptor<EventDto> eventDtoArgumentCaptor = ArgumentCaptor.forClass(EventDto.class);
 
-            assertDoesNotThrow(() -> eventController.updateEvent(eventDto));
+            assertDoesNotThrow(() -> eventController.update(eventDto));
 
             verify(eventService).updateEvent(eventDtoArgumentCaptor.capture());
             assertEquals(eventDto, eventDtoArgumentCaptor.getValue());
@@ -91,18 +89,20 @@ class EventControllerTest {
 
         @DisplayName("should call eventService.getOwnedEvents()")
         @Test
-        void shouldReturnOwnedEvents() {
-            eventController.getOwnedEvents(anyLong());
+        void shouldReturnOwnedEventsWhenIsOwnerIsTrue() {
+            eventController.getEvents(1L, true);
 
             verify(eventService).getOwnedEvents(anyLong());
+            verify(eventService, times(0)).getParticipatedEvents(anyLong());
         }
 
         @DisplayName("should call eventService.getParticipatedEvents()")
         @Test
-        void shouldReturnParticipatedEvents() {
-            eventController.getParticipatedEvents(anyLong());
+        void shouldReturnParticipatedEventsWhenIsOwnerIsFalse() {
+            eventController.getEvents(1L, false);
 
             verify(eventService).getParticipatedEvents(anyLong());
+            verify(eventService, times(0)).getOwnedEvents(anyLong());
         }
     }
 
@@ -111,27 +111,29 @@ class EventControllerTest {
         @DisplayName("Should throw exception when event dto to be created is invalid (watch validation tests)")
         @Test
         void shouldThrowExceptionWhenEventDtoToBeCreatedIsInvalid() {
-            doThrow(new RuntimeException()).when(eventControllerValidation).validateEvent(eventDto);
+            doThrow(new RuntimeException()).when(eventControllerValidation).validateEventDates(eventDto);
 
             assertThrows(RuntimeException.class, () -> eventController.create(eventDto));
 
             verify(eventService, times(0)).create(eventDto);
         }
 
-        @DisplayName("should throw exception when filter is null")
+        @DisplayName("Should throw exception when event dto to be updated doesn't have id")
         @Test
-        void shouldThrowExceptionWhenFilterIsNull() {
-            assertThrows(NullPointerException.class, () -> eventController.getEventsByFilter(null));
+        void shouldThrowExceptionWhenEventDtoToBeUpdatedDoesntHaveId() {
+            doThrow(new RuntimeException()).when(eventControllerValidation).validateEventId(eventDto);
 
-            verify(eventService, times(0)).getEventsByFilter(any(EventFilterDto.class));
+            assertThrows(RuntimeException.class, () -> eventController.update(eventDto));
+
+            verify(eventService, times(0)).create(eventDto);
         }
 
         @DisplayName("Should throw exception when event dto to be updated is invalid (watch validation tests)")
         @Test
         void shouldThrowExceptionWhenEventDtoToBeUpdatedIsInvalid() {
-            doThrow(new RuntimeException()).when(eventControllerValidation).validateEvent(eventDto);
+            doThrow(new RuntimeException()).when(eventControllerValidation).validateEventDates(eventDto);
 
-            assertThrows(RuntimeException.class, () -> eventController.create(eventDto));
+            assertThrows(RuntimeException.class, () -> eventController.update(eventDto));
 
             verify(eventService, times(0)).create(eventDto);
         }

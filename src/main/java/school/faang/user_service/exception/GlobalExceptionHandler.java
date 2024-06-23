@@ -52,4 +52,3 @@ public class GlobalExceptionHandler {
     private Map<String, String> buildExceptionMessage(String message) {
         return Map.of("description", message);
     }
-}

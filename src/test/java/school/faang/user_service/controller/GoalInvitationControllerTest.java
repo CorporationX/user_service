@@ -18,16 +18,22 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class GoalInvitationControllerTest {
+
     @Mock
     private GoalInvitationService goalInvitationService;
+
     @InjectMocks
     private GoalInvitationController goalInvitationController;
+
     @Captor
     private ArgumentCaptor<GoalInvitationDto> goalInvitationDtoCapture;
+
     @Captor
     private ArgumentCaptor<Long> longCaptor;
+
     @Captor
     private ArgumentCaptor<InvitationFilterDto> invitationFilterDtoCapture;
+
     final long id = 1L;
 
     @Test

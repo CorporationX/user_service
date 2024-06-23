@@ -15,31 +15,41 @@ import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler(EntityNotFoundException.class)
+    @ExceptionHandler(DataValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<String> handleEntityNotFoundException(EntityNotFoundException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
+    public ResponseEntity<Map<String, String>> handleDataValidationException(DataValidationException e) {
+        return ResponseEntity.badRequest().body(buildExceptionMessage(e.getMessage()));
+    }
+
+    @ExceptionHandler(DataGettingException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Map<String, String>> handleRuntimeException(DataGettingException e) {
+        return ResponseEntity.badRequest().body(buildExceptionMessage(e.getMessage()));
     }
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
-        return ResponseEntity.internalServerError().body(ex.getMessage());
+    public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException e) {
+        return ResponseEntity.internalServerError().body(buildExceptionMessage(e.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Map<String, String>> handleMethodArgumentNotValidException(MethodArgumentNotValidException methodArgumentNotValidException) {
-        Map<String, String> exceptionMap = methodArgumentNotValidException.getBindingResult().getAllErrors().stream()
+    public Map<String, String> handleMethodArgumentNotValidException(MethodArgumentNotValidException methodArgumentNotValidException) {
+        return methodArgumentNotValidException.getBindingResult().getAllErrors().stream()
                 .collect(Collectors.toMap(
                         error -> ((FieldError) error).getField(),
                         error -> Objects.requireNonNullElse(error.getDefaultMessage(), "")
                 ));
-        return ResponseEntity.badRequest().body(exceptionMap);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<String> handleConstraintViolationException(ConstraintViolationException constraintViolationException) {
-        return ResponseEntity.badRequest().body(constraintViolationException.getMessage());
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleConstraintViolationException(ConstraintViolationException constraintViolationException) {
+        return new ErrorResponse(constraintViolationException.getMessage());
+    }
+
+    private Map<String, String> buildExceptionMessage(String message) {
+        return Map.of("description", message);
     }
 }

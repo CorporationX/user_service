@@ -16,6 +16,7 @@ import school.faang.user_service.filter.mentorship.MentorshipRequestReceiverIdFi
 import school.faang.user_service.filter.mentorship.MentorshipRequestRequesterIdFilter;
 import school.faang.user_service.filter.mentorship.MentorshipRequestStatusFilter;
 import school.faang.user_service.mapper.MentorshipRequestMapperImpl;
+import school.faang.user_service.publisher.mentorship.MentorshipStartPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
@@ -87,6 +88,8 @@ public class MentorshipRequestServiceFilterTest {
     private UserRepository userRepository;
     @Spy
     private MentorshipRequestMapperImpl mapper;
+    @Mock
+    private MentorshipStartPublisher mentorshipStartPublisher;
 
     @BeforeEach
     public void init() {
@@ -266,7 +269,8 @@ public class MentorshipRequestServiceFilterTest {
                 mentorshipRequestValidator,
                 mapper,
                 userRepository,
-                userValidator
+                userValidator,
+                mentorshipStartPublisher
         );
     }
 

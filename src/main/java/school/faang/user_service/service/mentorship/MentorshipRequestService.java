@@ -7,7 +7,7 @@ import school.faang.user_service.dto.mentorship.RequestFilterDto;
 import java.util.List;
 
 public interface MentorshipRequestService {
-    MentorshipRequestDto requestMentorship(Long requesterId, Long receiverId, MentorshipRequestDto dto);
+    MentorshipRequestDto requestMentorship(MentorshipRequestDto dto);
 
     List<MentorshipRequestDto> getRequests(RequestFilterDto requestFilterDto);
 

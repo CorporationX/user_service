@@ -63,7 +63,7 @@ public class MentorshipRequestValidatorImpl implements MentorshipRequestValidato
     }
 
     @Transactional(readOnly = true)
-    private void validateFrequencyOfMentorshipRequest(MentorshipRequestDto dto) {
+    public void validateFrequencyOfMentorshipRequest(MentorshipRequestDto dto) {
         var optional = mentorshipRequestRepository.findLatestRequest(dto.getRequesterId(), dto.getReceiverId());
 
         optional.ifPresent(this::validateItIsFirstMentorshipRequestInLastThreeMonth);

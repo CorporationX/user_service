@@ -77,7 +77,6 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
 
         MentorshipStartEvent event = mentorshipRequestMapper.toEvent(request);
         mentorshipStartPublisher.publish(event);
-        log.info("Published mentorship start event");
 
         return mentorshipRequestMapper.toDto(request);
     }

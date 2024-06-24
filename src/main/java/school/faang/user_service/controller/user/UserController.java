@@ -70,4 +70,9 @@ public class UserController {
 
         userService.deleteUserAvatar(userId);
     }
+
+    @GetMapping("/{userId}/exists")
+    public boolean existsById(@PathVariable long userId) {
+        return userService.existsById(userId);
+    }
 }

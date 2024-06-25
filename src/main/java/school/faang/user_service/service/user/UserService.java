@@ -136,6 +136,11 @@ public class UserService {
         log.info("User's avatar images were deleted successfully.");
     }
 
+    @Transactional
+    public boolean existsById(long userId) {
+        return userRepository.existsById(userId);
+    }
+
     private User getUserEntity(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> {

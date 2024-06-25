@@ -9,9 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.converter.starter.ConverterCsvToPerson;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.validator.UserFilterDtoValidator;
 import school.faang.user_service.validator.UserValidator;
@@ -28,12 +26,10 @@ public class UserController {
     private final UserValidator userValidator;
     private final ConverterCsvToPerson converterCsvToPerson;
     private final UserMapper userMapper;
-    private final UserRepository userRepository;
 
     @GetMapping("/{userId}")
     public UserDto getUser(@PathVariable("userId") long userId) {
-        return userMapper.toDto(userRepository.findById(userId)
-                .orElseThrow(() -> new DataValidationException("Пользователя с id: " + userId + " нет в базе данных")));
+        return userMapper.toDto(userService.getById(userId));
     }
 
     @PostMapping("/premium")

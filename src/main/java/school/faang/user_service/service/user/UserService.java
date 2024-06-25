@@ -9,8 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.cache.HashMapCountry;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
@@ -23,10 +23,10 @@ import school.faang.user_service.mapper.PersonMapper;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.amazonS3.S3Service;
-import school.faang.user_service.service.user.pic.PicProcessor;
-import school.faang.user_service.validator.UserValidator;
 import school.faang.user_service.service.country.CountryService;
+import school.faang.user_service.service.user.pic.PicProcessor;
 import school.faang.user_service.threadPool.ThreadPoolForConvertCsvFile;
+import school.faang.user_service.validator.UserValidator;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -58,7 +58,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public User getById(long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() ->{
+                .orElseThrow(() -> {
                     log.debug("The user with id not found. id: {}", userId);
                     return new DataValidationException("Пользователь с id " + userId + " не найден");
                 });
@@ -196,7 +196,7 @@ public class UserService {
         if (hashMapCountry.isContainsKey(user.getCountry().getTitle())) {
             readyUser = countryService.setCountryForUser(user);
         } else {
-           readyUser = countryService.saveCountry(user.getCountry(), user);
+            readyUser = countryService.saveCountry(user.getCountry(), user);
         }
         saveUser(readyUser);
     }

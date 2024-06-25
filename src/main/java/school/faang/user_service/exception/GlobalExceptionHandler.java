@@ -16,16 +16,19 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(DataValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Map<String, String>> handleDataValidationException(DataValidationException e) {
         return ResponseEntity.badRequest().body(buildExceptionMessage(e.getMessage()));
     }
 
     @ExceptionHandler(DataGettingException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Map<String, String>> handleRuntimeException(DataGettingException e) {
         return ResponseEntity.badRequest().body(buildExceptionMessage(e.getMessage()));
     }
 
     @ExceptionHandler(RuntimeException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException e) {
         return ResponseEntity.internalServerError().body(buildExceptionMessage(e.getMessage()));
     }

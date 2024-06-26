@@ -45,11 +45,9 @@ public class MentorshipRequestService {
     }
 
     public List<MentorshipRequestDto> findAll(RequestFilterDto requestFilterDto) {
-        List<MentorshipRequest> mentorshipRequests = StreamSupport
+        return StreamSupport
                 .stream(mentorshipRequestRepository.findAll().spliterator(), false)
-                .toList();
-
-        return mentorshipRequests
+                .toList()
                 .stream()
                 .filter(mentorshipRequest -> requestFilters
                         .stream()

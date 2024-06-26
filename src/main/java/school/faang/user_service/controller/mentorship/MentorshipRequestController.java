@@ -33,7 +33,7 @@ public class MentorshipRequestController {
     }
 
     @GetMapping
-    public List<MentorshipRequestDto> findAll(RequestFilterDto requestFilterDto) {
+    public List<MentorshipRequestDto> findAll(@RequestBody RequestFilterDto requestFilterDto) {
         return mentorshipRequestService.findAll(requestFilterDto);
     }
 }

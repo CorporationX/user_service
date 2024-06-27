@@ -13,9 +13,11 @@ import school.faang.user_service.dto.payment.types.Currency;
 import school.faang.user_service.dto.payment.types.PaymentStatus;
 import school.faang.user_service.dto.types.PremiumPeriod;
 import school.faang.user_service.entity.premium.Premium;
+import school.faang.user_service.event.premium.PremiumBoughtEvent;
 import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.exception.PaymentException;
 import school.faang.user_service.mapper.PremiumMapper;
+import school.faang.user_service.publisher.premium.PremiumBoughtEventPublisher;
 import school.faang.user_service.repository.premium.PremiumRepository;
 
 import java.time.LocalDateTime;
@@ -28,6 +30,7 @@ public class PremiumServiceImpl implements PremiumService {
     private final PremiumRepository premiumRepository;
     private final PremiumMapper premiumMapper;
     private final PaymentServiceClient paymentServiceClient;
+    private final PremiumBoughtEventPublisher premiumBoughtEventPublisher;
 
     @Override
     @Transactional
@@ -58,6 +61,14 @@ public class PremiumServiceImpl implements PremiumService {
                             premiumRepository.save(premium);
                         }
                 );
+
+        PremiumBoughtEvent event = PremiumBoughtEvent.builder()
+                .userId(userId)
+                .amount(premiumPeriod.getPrice())
+                .premiumPeriod(premiumPeriod.getDays())
+                .boughtAt(LocalDateTime.now())
+                .build();
+        premiumBoughtEventPublisher.publish(event);
     }
 
     @Override

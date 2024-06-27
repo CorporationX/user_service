@@ -26,6 +26,8 @@ spring:
           name: follower_channel
         profile_view_channel:
           name: profile_view_channel
+        premium_bought_channel:
+          name: premium_bought_channel
         mentorship_channel:
           name: mentorship_channel
         goal_complete_channel:
@@ -65,6 +67,17 @@ aws:
   accessKey: access_key
   secretKey: secret_key
   region: bucket_region
+
+services:
+  s3:
+    endpoint: http://localhost:9000
+    accessKey: user
+    secretKey: password
+    bucketName: user-bucket
+    isMocked: true
+    maxSizeBytes: 5242880
+    smallSize: 170
+    largeSize: 1080
 
 goals:
   limit:

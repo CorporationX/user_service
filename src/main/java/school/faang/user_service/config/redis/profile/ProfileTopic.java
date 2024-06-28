@@ -9,7 +9,7 @@ import org.springframework.data.redis.listener.ChannelTopic;
 public class ProfileTopic {
 
     @Bean
-    ChannelTopic profileViewTopic(@Value("${spring.data.redis.channels.profile_view_channel.name}") String topicName) {
+    ChannelTopic profileViewTopic(@Value("${spring.data.channel.profile_view.name}") String topicName) {
         return new ChannelTopic(topicName);
     }
 }

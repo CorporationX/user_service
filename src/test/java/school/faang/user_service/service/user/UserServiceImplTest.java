@@ -12,7 +12,6 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.dto.event.profile.ProfileViewEvent;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
@@ -81,7 +80,7 @@ class UserServiceImplTest {
     }
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
         user = User.builder().username("name").email("test@mail.ru").password("password").build();
     }
 
@@ -141,7 +140,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    public void testCreateUser(){
+    public void testCreateUser() {
         when(userRepository.save(any(User.class))).thenReturn(user);
         UserDto userDto = UserDto.builder().username("name").email("test@mail.ru").password("password").build();
         UserDto result = userServiceImpl.createUser(userDto);
@@ -166,15 +165,12 @@ class UserServiceImplTest {
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(userMapper.toDto(user)).thenReturn(userDto);
-        when(userContext.getUserId()).thenReturn(2L);
 
         UserDto result = userServiceImpl.getUserById(1L);
 
         assertEquals(userDto, result);
         verify(userRepository, times(1)).findById(1L);
         verify(userMapper, times(1)).toDto(user);
-        verify(userContext, times(1)).getUserId();
-        verify(profileViewEventPublisher, times(1)).publish(any(ProfileViewEvent.class));
     }
 
     @Test

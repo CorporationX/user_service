@@ -21,15 +21,20 @@ spring:
     redis:
       port: 6379
       host: localhost
-      channels:
-        follower_channel:
-          name: follower_channel
-        profile_view_channel:
-          name: profile_view_channel
-        mentorship_channel:
-          name: mentorship_channel
-        goal_complete_channel:
-          name: goal_complete_channel
+
+    kafka:
+      port: 9092
+      host: localhost
+
+    channel:
+      follower:
+        name: follower_channel
+      mentorship:
+        name: mentorship_channel
+      goal_complete:
+        name: goal_complete_channel
+      profile_view:
+        name: profile_view_channel
 
   profiles:
     active: test

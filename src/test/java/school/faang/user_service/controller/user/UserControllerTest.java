@@ -63,7 +63,7 @@ public class UserControllerTest {
     public void setUp() {
         user = User.builder().id(1L).build();
         mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
-        userDto = UserDto.builder().username("name").email("test@mail.ru").password("password").build();
+        userDto = UserDto.builder().username("name").phone("56891234").email("test@mail.ru").password("password").build();
     }
 
     @Test
@@ -81,16 +81,19 @@ public class UserControllerTest {
     public void testCreateUser() throws Exception {
         when(userService.createUser(any(UserDto.class))).thenReturn(userDto);
         doNothing().when(profilePicService).generateAndSetPic(any(UserDto.class));
-        String json = "{" + "\n\"username\": \"" + userDto.getUsername() +
-                "\",\n" + "\"email\": \"" + userDto.getEmail() + "\",\n" +
-                "\"password\": \"" + userDto.getPassword() + "\"\n}";
+        String json = "{"
+                      + "\n\"username\": \"" + userDto.getUsername() + "\","
+                      + "\n\"email\": \"" + userDto.getEmail() + "\","
+                      + "\n\"phone\": \"" + userDto.getPhone() + "\","
+                      + "\n\"password\": \"" + userDto.getPassword() + "\"\n}";
 
         mockMvc.perform(post("/users/creature")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.username").value(userDto.getUsername()))
                 .andExpect(jsonPath("$.email").value(userDto.getEmail()))
+                .andExpect(jsonPath("$.phone").value(userDto.getPhone()))
                 .andExpect(jsonPath("$.password").value(userDto.getPassword()));
 
         verify(userService, times(1)).createUser(userDto);

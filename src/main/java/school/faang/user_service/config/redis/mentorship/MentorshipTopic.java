@@ -9,7 +9,7 @@ import org.springframework.data.redis.listener.ChannelTopic;
 public class MentorshipTopic {
 
     @Bean
-    ChannelTopic mentorshipStartTopic(@Value("${spring.data.redis.channels.mentorship_channel.name}") String topicName) {
+    ChannelTopic mentorshipStartTopic(@Value("${spring.data.channel.mentorship.name}") String topicName) {
         return new ChannelTopic(topicName);
     }
 }

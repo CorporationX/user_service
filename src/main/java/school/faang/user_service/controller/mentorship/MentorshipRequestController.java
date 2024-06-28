@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/requests")
+@RequestMapping("/mentorship/requests")
 public class MentorshipRequestController {
 
     private final MentorshipRequestService mentorshipRequestService;

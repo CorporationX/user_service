@@ -37,6 +37,7 @@ public class MentorshipRequestService {
 
     private final List<RequestFilter> requestFilters;
 
+    @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         mentorshipRequestValidator.validateMentorshipRequest(mentorshipRequestDto);
 
@@ -44,6 +45,7 @@ public class MentorshipRequestService {
         return mentorshipRequestMapper.toDto(mentorshipRequestRepository.save(mentorshipRequestMapper.toEntity(mentorshipRequestDto)));
     }
 
+    @Transactional(readOnly = true)
     public List<MentorshipRequestDto> findAll(RequestFilterDto requestFilterDto) {
         return StreamSupport
                 .stream(mentorshipRequestRepository.findAll().spliterator(), false)

@@ -22,6 +22,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import static school.faang.user_service.exception.message.ExceptionMessage.FILE_PROCESSING_EXCEPTION;
 import static school.faang.user_service.exception.message.ExceptionMessage.NO_SUCH_COUNTRY_EXCEPTION;
@@ -68,6 +69,13 @@ public class UserService {
     public User getUserEntity(long userId) {
         return userRepository.findById(userId).orElseThrow(()
                 -> new DataValidationException(NO_SUCH_USER_EXCEPTION.getMessage()));
+    }
+
+    public List<UserDto> getUsersByIds(List<Long> ids) {
+        return userRepository.findAllById(ids)
+                .stream()
+                .map(userMapper::toDto)
+                .toList();
     }
 
     @Transactional

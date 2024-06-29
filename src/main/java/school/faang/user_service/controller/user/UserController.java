@@ -22,6 +22,8 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.service.user.image.ImageProcessor;
 
+import java.util.List;
+
 import static school.faang.user_service.exception.message.ExceptionMessage.AVATAR_FILE_SIZE_EXCEPTION;
 
 @Slf4j
@@ -43,6 +45,9 @@ public class UserController {
     UserDto getUser(@Valid @Min(1) @PathVariable long userId) {
         return userService.getUser(userId);
     }
+
+    @PostMapping ("/Ids")
+    public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) { return userService.getUsersByIds(ids); }
 
     @PostMapping("/{userId}/avatar")
     public UserDto uploadUserAvatar(@PathVariable Long userId, MultipartFile file) {

@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.webjars.NotFoundException;
 import org.springframework.web.multipart.MultipartFile;
 import school.faang.user_service.cache.HashMapCountry;
 import school.faang.user_service.dto.user.UserDto;
@@ -199,5 +200,11 @@ public class UserService {
             readyUser = countryService.saveCountry(user.getCountry(), user);
         }
         saveUser(readyUser);
+    }
+
+    @Transactional(readOnly = true)
+    public UserDto getUser(long id) {
+        User foundUser = userRepository.findById(id).orElseThrow(() -> new NotFoundException("No found user with id: " + id));
+        return userMapper.toDto(foundUser);
     }
 }

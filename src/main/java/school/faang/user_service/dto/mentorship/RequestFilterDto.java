@@ -1,11 +1,15 @@
 package school.faang.user_service.dto.mentorship;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import org.springframework.stereotype.Component;
+import lombok.NoArgsConstructor;
 import school.faang.user_service.entity.RequestStatus;
 
-@Component
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class RequestFilterDto {
 
     private String description;

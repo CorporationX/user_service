@@ -9,5 +9,5 @@ public interface RequestFilter {
 
     boolean isApplicable(RequestFilterDto filters);
 
-    Stream<MentorshipRequest> apply(MentorshipRequest requests, RequestFilterDto filters);
+    Stream<MentorshipRequest> apply(MentorshipRequest request, RequestFilterDto filters);
 }

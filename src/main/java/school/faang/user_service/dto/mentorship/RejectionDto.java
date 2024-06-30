@@ -9,5 +9,5 @@ public class RejectionDto {
 
     @NotNull(message = "Reason of rejection shouldn't be null")
     @NotBlank(message = "Message can not be blank")
-    String rejectionReason;
+    private String rejectionReason;
 }

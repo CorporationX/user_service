@@ -15,7 +15,7 @@ public class StatusFilter implements RequestFilter{
     }
 
     @Override
-    public Stream<MentorshipRequest> apply(MentorshipRequest requests, RequestFilterDto filters) {
-        return Stream.of(requests).filter(request -> request.getStatus().equals(filters.getStatus()));
+    public Stream<MentorshipRequest> apply(MentorshipRequest request, RequestFilterDto filters) {
+        return Stream.of(request).filter(r -> r.getStatus().equals(filters.getStatus()));
     }
 }

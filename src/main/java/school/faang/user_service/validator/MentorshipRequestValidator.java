@@ -55,9 +55,8 @@ public class MentorshipRequestValidator {
     }
 
     private void validateDate(MentorshipRequest mentorshipRequest) {
-        LocalDateTime dateBeforeWhichLastRequestShouldBe = LocalDateTime.now().minusMonths(MONTHS);
-        LocalDateTime mentorshipRequestCreatedDate = mentorshipRequest.getCreatedAt();
-        if (mentorshipRequestCreatedDate.isAfter(dateBeforeWhichLastRequestShouldBe)) {
+        LocalDateTime thresholdDate = LocalDateTime.now().minusMonths(MONTHS);
+        if (mentorshipRequest.getCreatedAt().isAfter(thresholdDate)) {
             throw new DataValidationException(TOO_MUCH_REQUESTS.getMessage());
         }
     }

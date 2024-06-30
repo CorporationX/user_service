@@ -1,6 +1,7 @@
 package school.faang.user_service.service.mentorship;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
@@ -24,18 +25,19 @@ import static school.faang.user_service.exception.message.ExceptionMessage.USER_
 import static school.faang.user_service.exception.message.MessageForGoalInvitationService.NO_USER_IN_DB;
 
 @Service
-@RequiredArgsConstructor
+@Data
+@AllArgsConstructor
 public class MentorshipRequestService {
 
-    private final MentorshipRequestRepository mentorshipRequestRepository;
+    private MentorshipRequestRepository mentorshipRequestRepository;
 
-    private final MentorshipRequestValidator mentorshipRequestValidator;
+    private MentorshipRequestValidator mentorshipRequestValidator;
 
-    private final MentorshipRequestMapper mentorshipRequestMapper;
+    private MentorshipRequestMapper mentorshipRequestMapper;
 
-    private final UserRepository userRepository;
+    private UserRepository userRepository;
 
-    private final List<RequestFilter> requestFilters;
+    private List<RequestFilter> requestFilters;
 
     @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
@@ -49,13 +51,7 @@ public class MentorshipRequestService {
     public List<MentorshipRequestDto> findAll(RequestFilterDto requestFilterDto) {
         return StreamSupport
                 .stream(mentorshipRequestRepository.findAll().spliterator(), false)
-                .toList()
-                .stream()
-                .filter(mentorshipRequest -> requestFilters
-                        .stream()
-                        .filter(filter -> filter.isApplicable(requestFilterDto))
-                        .flatMap(filter -> filter.apply(mentorshipRequest, requestFilterDto))
-                        .count() == requestFilters.stream().filter(filter -> filter.isApplicable(requestFilterDto)).count())
+                .filter(mentorshipRequest -> isRequestApplicable(mentorshipRequest, requestFilterDto))
                 .map(mentorshipRequestMapper::toDto)
                 .toList();
     }
@@ -63,19 +59,19 @@ public class MentorshipRequestService {
     @Transactional
     public void acceptRequest(long id) {
         MentorshipRequest mentorshipRequest = getMentorshipRequest(id);
-        long receiverId = mentorshipRequest.getReceiver().getId();
 
         User user = userRepository.findById(mentorshipRequest.getRequester().getId())
                 .orElseThrow(() -> new DataValidationException(NO_USER_IN_DB.getMessage()));
-        List<User> mentors = user.getMentors();
 
-        for (User mentor : mentors) {
-            if (mentor.getId() == receiverId) {
-                throw new DataValidationException(USER_ALREADY_HAS_SUCH_MENTOR.getMessage());
-            } else {
-                mentors.add(userRepository.findById(receiverId).get());
-            }
+        List<User> mentors = user.getMentors();
+        long receiverId = mentorshipRequest.getReceiver().getId();
+
+        if (mentors.stream().anyMatch(mentor -> mentor.getId() == receiverId)) {
+            throw new DataValidationException(USER_ALREADY_HAS_SUCH_MENTOR.getMessage());
         }
+        mentors.add(userRepository.findById(receiverId)
+                .orElseThrow(() -> new DataValidationException(NO_USER_IN_DB.getMessage())));
+
         mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
         mentorshipRequestRepository.save(mentorshipRequest);
     }
@@ -87,6 +83,17 @@ public class MentorshipRequestService {
         mentorshipRequest.setStatus(RequestStatus.REJECTED);
         mentorshipRequest.setRejectionReason(rejectionDto.getRejectionReason());
         mentorshipRequestRepository.save(mentorshipRequest);
+    }
+
+    private boolean isRequestApplicable(MentorshipRequest mentorshipRequest, RequestFilterDto requestFilterDto) {
+        long applicableCount = requestFilters.stream()
+                .filter(filter -> filter.isApplicable(requestFilterDto))
+                .count();
+        long matchCount = requestFilters.stream()
+                .filter(filter -> filter.isApplicable(requestFilterDto))
+                .flatMap(filter -> filter.apply(mentorshipRequest, requestFilterDto))
+                .count();
+        return matchCount == applicableCount;
     }
 
     private MentorshipRequest getMentorshipRequest(long id) {

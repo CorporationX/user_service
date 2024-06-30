@@ -46,7 +46,7 @@ public class UserController {
         return userService.getUser(userId);
     }
 
-    @GetMapping ("/Ids")
+    @PostMapping ("/Ids")
     public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) { return userService.getUsersByIds(ids); }
 
     @PostMapping("/{userId}/avatar")

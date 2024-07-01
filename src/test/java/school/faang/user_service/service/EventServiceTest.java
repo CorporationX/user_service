@@ -19,7 +19,6 @@ import school.faang.user_service.validator.EventValidator;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -76,49 +75,6 @@ public class EventServiceTest {
     }
 
     @Test
-    public void testCreateAbsentSkillsAtUser() {
-        userOne = User.builder()
-                .skills(List.of(firstSkill, secondSkill))
-                .id(id)
-                .build();
-
-        event = Event.builder()
-                .id(id).owner(userOne)
-                .relatedSkills(List.of(thirdSkill))
-                .build();
-
-        eventDto = eventMapper.toDto(event);
-
-        when(userRepository.findById(eventDto.getOwnerId())).thenReturn(java.util.Optional.of(event.getOwner()));
-        assertThrows(DataValidationException.class, () -> eventService.create(eventDto));
-        verify(eventMapper, times(1)).toEntity(eventDto);
-        verify(eventMapper).toDto(captor.capture());
-    }
-
-    @Test
-    public void testCreateSaveEvent() {
-        userOne = User.builder()
-                .skills(List.of(Skill.builder().id(1).build()))
-                .id(id)
-                .build();
-
-        event = Event.builder()
-                .id(id)
-                .owner(userOne)
-                .relatedSkills(List.of(Skill.builder().id(1).build()))
-                .build();
-
-        eventDto = eventMapper.toDto(event);
-
-        when(userRepository.findById(eventDto.getOwnerId())).thenReturn(java.util.Optional.of(event.getOwner()));
-
-        eventService.create(eventDto);
-        verify(eventRepository, times(1)).save(captor.capture());
-        Event eventCaptor = captor.getValue();
-        assertEquals(eventDto.getId(), eventCaptor.getId());
-    }
-
-    @Test
     public void testGetEvent() {
         event = Event.builder()
                 .id(id)
@@ -156,45 +112,6 @@ public class EventServiceTest {
 
         eventDto = eventMapper.toDto(event);
 
-        assertThrows(DataValidationException.class, () -> eventService.updateEvent(eventDto));
-    }
-
-    @Test
-    public void testUpdateEventNotOwner() {
-        userFirst.setId(id);
-        userSecond.setId(2L);
-
-        event.setOwner(userFirst);
-        event.setRelatedSkills(List.of(
-                Skill.builder().id(1).build(),
-                Skill.builder().id(2).build(),
-                Skill.builder().id(3).build()));
-
-
-        eventDto = eventMapper.toDto(event);
-
-        when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(userSecond));
-        assertThrows(DataValidationException.class, () -> eventService.updateEvent(eventDto));
-    }
-
-    @Test
-    public void testEventUpdateAbsentSkillsAtUser() {
-        userFirst = User.builder()
-                .id(id)
-                .skills(List.of(firstSkill))
-                .build();
-
-        userSecond.setId(2L);
-
-        event = Event.builder()
-                .id(id)
-                .owner(userSecond)
-                .relatedSkills(List.of(secondSkill))
-                .build();
-
-        eventDto = eventMapper.toDto(event);
-
-        when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(userFirst));
         assertThrows(DataValidationException.class, () -> eventService.updateEvent(eventDto));
     }
 

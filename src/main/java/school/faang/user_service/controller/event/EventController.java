@@ -1,49 +1,57 @@
 package school.faang.user_service.controller.event;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.service.event.EventService;
-import school.faang.user_service.validator.EventValidator;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("/events")
+@Validated
 public class EventController {
 
     private final EventService eventService;
-    private final EventValidator eventValidator;
 
-    public EventDto create(EventDto eventDto) {
-        eventValidator.validByTitleStartDateOwner(eventDto);
+    @PostMapping("/event")
+    public EventDto create(@RequestBody @Valid EventDto eventDto) {
         return eventService.create(eventDto);
     }
 
-    public EventDto getEvent(long eventId) {
+    @GetMapping("/{id}")
+    public EventDto getEvent(@PathVariable("id") Long eventId) {
         return eventService.getEvent(eventId);
     }
 
-    public List<EventDto> getEventsByFilter(EventFilterDto filter) {
-        return eventService.getEventsByFilter(filter);
+
+    @GetMapping("/filter")
+    public List<EventDto> getEventsByFilter(@RequestBody @Valid EventFilterDto eventFilterDto) {
+        return eventService.getEventsByFilter(eventFilterDto);
     }
 
-    public void deleteEvent(long eventId) {
+    @DeleteMapping("/{id}")
+    public void deleteEvent(@PathVariable("id") Long eventId) {
         eventService.deleteEvent(eventId);
     }
 
-    public EventDto updateEvent(EventDto eventDto) {
-        eventValidator.validByTitleStartDateOwner(eventDto);
+    @PutMapping("/event")
+    public EventDto updateEvent(@RequestBody @Valid EventDto eventDto) {
         return eventService.updateEvent(eventDto);
     }
 
-    public List<Event> getOwnedEvents(long userId) {
+    @GetMapping("/owned/{userId}")
+    public List<Event> getOwnedEvents(@PathVariable Long userId) {
         return eventService.getOwnedEvents(userId);
     }
 
-    public List<Event> getParticipatedEvents(long userId) {
+    @GetMapping("/participated/{userId}")
+    public List<Event> getParticipatedEvents(@PathVariable Long userId) {
         return eventService.getParticipatedEvents(userId);
     }
 }

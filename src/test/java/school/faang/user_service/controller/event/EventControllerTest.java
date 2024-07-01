@@ -11,13 +11,11 @@ import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.validator.EventValidator;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -44,28 +42,6 @@ public class EventControllerTest {
         eventDto = new EventDto();
         user = new User();
         id = 1L;
-    }
-
-    @Test
-    public void testCreateEventNullOrBlank() {
-        assertThrows(DataValidationException.class, () -> eventController.create(eventDto));
-    }
-
-    @Test
-    public void testCreateWithNullStartDate() {
-        eventDto.setTitle("Title");
-
-        assertThrows(DataValidationException.class, () -> eventController.create(eventDto));
-    }
-
-    @Test
-    public void testCreateWithNullOwnerId() {
-        eventDto = EventDto.builder()
-                .title("Title")
-                .startDate(LocalDateTime.of(2014, 9, 19, 14, 5))
-                .build();
-
-        assertThrows(DataValidationException.class, () -> eventController.create(eventDto));
     }
 
     @Test

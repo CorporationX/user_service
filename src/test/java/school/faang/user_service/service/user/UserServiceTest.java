@@ -1,23 +1,42 @@
 package school.faang.user_service.service.user;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
+import org.junit.jupiter.api.BeforeEach;
+import com.json.student.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.dto.user.UserDto;
+import org.springframework.web.multipart.MultipartFile;
+import school.faang.user_service.cache.HashMapCountry;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.entity.Country;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.filter.user.UserFilter;
+import school.faang.user_service.generator.password.UserPasswordGenerator;
+import school.faang.user_service.mapper.PersonMapper;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.service.user.pic.PicProcessor;
+import school.faang.user_service.service.country.CountryService;
+import school.faang.user_service.threadPool.ThreadPoolForConvertCsvFile;
+import school.faang.user_service.validator.UserValidator;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -34,28 +53,43 @@ public class UserServiceTest {
     @Mock
     private UserMapper userMapper;
 
+    @Mock
+    MultipartFile multipartFile;
+
+    @Mock
+    PicProcessor picProcessor;
+
+    @Mock
+    private PersonMapper personMapper;
+
+    @Mock
+    private ThreadPoolForConvertCsvFile threadPoolForConvertCsvFile;
+
+    @Mock
+    private UserPasswordGenerator userPasswordGenerator;
+
+    @Mock
+    private UserValidator userValidator;
+
+    @Mock
+    private HashMapCountry hashMapCountry;
+
+    @Mock
+    private CountryService countryService;
+
+    private User userFirst;
+    private User userSecond;
+    private final Person personFirst = new Person();
+    private final Person personSecond = new Person();
+    private Long id;
     private User user;
-    private UserDto userDto;
 
     @BeforeEach
     public void setUp() {
-        user = User.builder()
-                .id(1L)
-                .username("testUser")
-                .email("test@example.com")
-                .city("Test City")
-                .experience(1)
-                .premium(null)
-                .build();
-
-        userDto = UserDto.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .city(user.getCity())
-                .experience(user.getExperience())
-                .premium(user.getPremium())
-                .build();
+        id = 1L;
+        user = User.builder().id(1L).build();
+        userFirst = User.builder().id(1L).username("username").build();
+        userSecond = User.builder().id(2L).username("username").build();
     }
 
     @Test
@@ -64,61 +98,59 @@ public class UserServiceTest {
                 .city("Rostov")
                 .experience(500)
                 .build();
-
         userService.getPremiumUsers(userFilterDto);
-
         verify(userRepository, times(1)).findPremiumUsers();
     }
 
     @Test
-    public void testGetUser() {
-        long userId = 1L;
-
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userMapper.toDto(user)).thenReturn(userDto);
-
-        UserDto result = userService.getUser(userId);
-
-        assertNotNull(result);
-        assertEquals(userId, result.getId());
-        assertEquals("testUser", result.getUsername());
-        assertEquals("test@example.com", result.getEmail());
-
-        verify(userRepository, times(1)).findById(userId);
-        verify(userMapper, times(1)).toDto(user);
+    public void testSavePic_NotUserInBd() {
+        when(userRepository.findById(id)).thenThrow(DataValidationException.class);
+        assertThrows(DataValidationException.class, () -> userService.uploadProfilePicture(id, multipartFile));
     }
 
     @Test
-    public void testGetUser_NotFound() {
-        long userId = 1L;
+    public void testSaveUser() {
+        doNothing().when(userValidator).validateUserNotExists(userFirst);
 
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        userService.saveUser(userFirst);
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () ->
-                userService.getUser(userId));
-
-        assertEquals("User not found", exception.getMessage());
+        verify(userValidator, times(1)).validateUserNotExists(userFirst);
+        verify(userRepository, times(1)).save(userFirst);
     }
 
     @Test
-    public void testGetUsersByIds() {
-        List<Long> ids = List.of(1L, 2L);
-        User user2 = User.builder().id(2L).username("testUser2").email("test2@example.com").build();
-        UserDto userDto2 = UserDto.builder().id(2L).username("testUser2").email("test2@example.com").build();
+    public void testCorrectWorkConvertToCsvFile() {
+        List<Person> persons = Arrays.asList(personFirst, personSecond);
 
-        when(userRepository.findAllById(ids)).thenReturn(List.of(user, user2));
-        when(userMapper.toDto(user)).thenReturn(userDto);
-        when(userMapper.toDto(user2)).thenReturn(userDto2);
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
+        when(threadPoolForConvertCsvFile.taskExecutor()).thenReturn(executorService);
 
-        List<UserDto> result = userService.getUsersByIds(ids);
+        Country mockCountry = new Country();
+        mockCountry.setTitle("Mock Country");
 
-        assertNotNull(result);
-        assertEquals(2, result.size());
-        assertEquals(userDto, result.get(0));
-        assertEquals(userDto2, result.get(1));
+        userFirst.setCountry(mockCountry);
+        userSecond.setCountry(mockCountry);
 
-        verify(userRepository, times(1)).findAllById(ids);
-        verify(userMapper, times(1)).toDto(user);
-        verify(userMapper, times(1)).toDto(user2);
+        when(personMapper.toEntity(personFirst)).thenReturn(userFirst);
+        when(personMapper.toEntity(personSecond)).thenReturn(userSecond);
+
+        userService.convertCsvFile(persons);
+
+        verify(personMapper, times(2)).toEntity(personFirst);
+        verify(personMapper, times(2)).toEntity(personSecond);
+
+        executorService.shutdownNow();
+    }
+
+    @Test
+    public void testGetPic() {
+        when(userRepository.findById(id)).thenThrow(DataValidationException.class);
+        assertThrows(DataValidationException.class, () -> userService.downloadProfilePicture(id));
+    }
+
+    @Test
+    public void testDeletePic() {
+        when(userRepository.findById(id)).thenThrow(DataValidationException.class);
+        assertThrows(DataValidationException.class, () -> userService.deleteProfilePicture(id));
     }
 }

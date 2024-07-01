@@ -14,12 +14,19 @@ import school.faang.user_service.service.GoalInvitationService;
 @RequiredArgsConstructor
 public class GoalInvitationController {
     private final GoalInvitationService goalInvitationService;
+
     @PostMapping
-    public ResponseEntity<GoalInvitationDto> createInvitation(GoalInvitationDto invitation){
+    public ResponseEntity<GoalInvitationDto> createInvitation(GoalInvitationDto invitation) {
         return ResponseEntity.ok(goalInvitationService.createInvitation(invitation));
     }
-    @PatchMapping  ("/accept")
-    public ResponseEntity<GoalInvitationDto> acceptGoalInvitation(long id){
-        return ResponseEntity.ok(goalInvitationService.acceptGoalInvitation(id))      ;
+
+    @PatchMapping("/accept")
+    public ResponseEntity<GoalInvitationDto> acceptGoalInvitation(long id) {
+        return ResponseEntity.ok(goalInvitationService.acceptGoalInvitation(id));
     }
+    @PatchMapping("/reject")
+    public ResponseEntity<GoalInvitationDto> rejectGoalInvitation(long id) {
+        return ResponseEntity.ok(goalInvitationService.rejectGoalInvitation(id));
+    }
+
 }

@@ -45,6 +45,14 @@ public class GoalInvitationServiceTest {
     private GoalInvitationDto goalInvitationDto;
     private GoalInvitation goalInvitation;
 
+    private GoalInvitationDto goalInvitationDtoAccept;
+    private GoalInvitation goalInvitationAccept;
+    private User invitedUser;
+
+    private GoalInvitationDto goalInvitationDtoReject;
+    private GoalInvitation goalInvitationReject;
+
+
     @BeforeEach
     public void setUp() {
         // for createInvitation
@@ -64,8 +72,29 @@ public class GoalInvitationServiceTest {
         goalInvitation.setInviter(user1);
         goalInvitation.setInvited(user2);
         goalInvitation.setGoal(goal);
+
+        goalInvitationAccept = new GoalInvitation();
+        goalInvitationAccept.setId(1L);
+        goalInvitationAccept.setStatus(RequestStatus.PENDING);
         user2.setReceivedGoalInvitations(List.of(new GoalInvitation(), new GoalInvitation()));
-        goalInvitationDto.setStatus(RequestStatus.ACCEPTED);
+
+        invitedUser = new User();
+        goalInvitationAccept.setInvited(invitedUser);
+
+        goalInvitationDtoAccept = new GoalInvitationDto();
+        goalInvitationDtoAccept.setId(1L);
+        goalInvitationDtoAccept.setStatus(RequestStatus.ACCEPTED);
+
+        goalInvitationReject = new GoalInvitation();
+        goalInvitationReject.setId(1L);
+        goalInvitationReject.setStatus(RequestStatus.PENDING);
+
+        goal = new Goal();
+        goalInvitationReject.setGoal(goal);
+
+        goalInvitationDtoReject = new GoalInvitationDto();
+        goalInvitationDtoReject.setId(1L);
+        goalInvitationDtoReject.setStatus(RequestStatus.REJECTED);
 
     }
     //for createInvitation
@@ -132,12 +161,12 @@ public class GoalInvitationServiceTest {
         assertEquals("User with id:2 doesn't exist!", exception.getMessage());
     }
 
-// for acceptGoalInvitation
+    // for acceptGoalInvitation
     @Test
     public void testAcceptGoalInvitationSuccess() {
-        when(goalInvitationRepository.findById(1L)).thenReturn(Optional.of(goalInvitation));
-        when(goalInvitationRepository.save(goalInvitation)).thenReturn(goalInvitation);
-        when(goalInvitationMapper.toDto(goalInvitation)).thenReturn(goalInvitationDto);
+        when(goalInvitationRepository.findById(1L)).thenReturn(Optional.of(goalInvitationAccept));
+        when(goalInvitationRepository.save(goalInvitationAccept)).thenReturn(goalInvitationAccept);
+        when(goalInvitationMapper.toDto(goalInvitationAccept)).thenReturn(goalInvitationDtoAccept);
 
         GoalInvitationDto result = goalInvitationService.acceptGoalInvitation(1L);
 
@@ -156,4 +185,27 @@ public class GoalInvitationServiceTest {
         assertEquals("No such goal invitation with id:1", exception.getMessage());
     }
 
+    // for rejectGoalInvitation
+    @Test
+    public void testRejectGoalInvitationSuccess() {
+        when(goalInvitationRepository.findById(1L)).thenReturn(Optional.of(goalInvitationReject));
+        when(goalInvitationRepository.save(goalInvitationReject)).thenReturn(goalInvitationReject);
+        when(goalInvitationMapper.toDto(goalInvitationReject)).thenReturn(goalInvitationDtoReject);
+
+        GoalInvitationDto result = goalInvitationService.rejectGoalInvitation(1L);
+
+        assertNotNull(result);
+        assertEquals(RequestStatus.REJECTED, result.getStatus());
+    }
+
+    @Test
+    public void testRejectGoalInvitationNotFound() {
+        when(goalInvitationRepository.findById(1L)).thenReturn(Optional.empty());
+
+        NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> {
+            goalInvitationService.rejectGoalInvitation(1L);
+        });
+
+        assertEquals("No such goal invitation with id:1", exception.getMessage());
+    }
 }

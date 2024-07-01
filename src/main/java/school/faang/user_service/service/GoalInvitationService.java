@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.mapper.GoalInvitationMapper;
 import school.faang.user_service.repository.UserRepository;
@@ -11,6 +13,7 @@ import school.faang.user_service.repository.goal.GoalInvitationRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +38,19 @@ public class GoalInvitationService {
         }
         GoalInvitation savedInvitation = goalInvitationRepository.save(goalInvitationMapper.toEntity(goalInvitationDto));
 
+        return goalInvitationMapper.toDto(savedInvitation);
+    }
+    public GoalInvitationDto acceptGoalInvitation(long id){
+        GoalInvitation savedInvitation = goalInvitationRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("No such goal invitation with id:"+id));
+
+        User invited = savedInvitation.getInvited();
+
+        if(invited.getReceivedGoalInvitations().size()>3)
+            throw new IllegalArgumentException("Exception invited user can`t have more than 3 goal invitations");
+
+        savedInvitation.setStatus(RequestStatus.ACCEPTED);
+        goalInvitationRepository.save(savedInvitation);
         return goalInvitationMapper.toDto(savedInvitation);
     }
 }

@@ -52,6 +52,7 @@ public class GoalInvitation {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        status = RequestStatus.PENDING;
     }
 
     @PreUpdate

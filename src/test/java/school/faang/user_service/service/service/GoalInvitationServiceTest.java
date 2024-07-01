@@ -3,6 +3,7 @@ package school.faang.user_service.service.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -13,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.goal.GoalInvitationDto;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
@@ -45,6 +47,7 @@ public class GoalInvitationServiceTest {
 
     @BeforeEach
     public void setUp() {
+        // for createInvitation
         goalInvitationDto = new GoalInvitationDto();
         goalInvitationDto.setInviterId(1L);
         goalInvitationDto.setInvitedUserId(2L);
@@ -61,7 +64,11 @@ public class GoalInvitationServiceTest {
         goalInvitation.setInviter(user1);
         goalInvitation.setInvited(user2);
         goalInvitation.setGoal(goal);
+        user2.setReceivedGoalInvitations(List.of(new GoalInvitation(), new GoalInvitation()));
+        goalInvitationDto.setStatus(RequestStatus.ACCEPTED);
+
     }
+    //for createInvitation
 
     @Test
     public void testCreateInvitationSuccess() {
@@ -124,4 +131,29 @@ public class GoalInvitationServiceTest {
 
         assertEquals("User with id:2 doesn't exist!", exception.getMessage());
     }
+
+// for acceptGoalInvitation
+    @Test
+    public void testAcceptGoalInvitationSuccess() {
+        when(goalInvitationRepository.findById(1L)).thenReturn(Optional.of(goalInvitation));
+        when(goalInvitationRepository.save(goalInvitation)).thenReturn(goalInvitation);
+        when(goalInvitationMapper.toDto(goalInvitation)).thenReturn(goalInvitationDto);
+
+        GoalInvitationDto result = goalInvitationService.acceptGoalInvitation(1L);
+
+        assertNotNull(result);
+        assertEquals(RequestStatus.ACCEPTED, result.getStatus());
+    }
+
+    @Test
+    public void testAcceptGoalInvitationNotFound() {
+        when(goalInvitationRepository.findById(1L)).thenReturn(Optional.empty());
+
+        NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> {
+            goalInvitationService.acceptGoalInvitation(1L);
+        });
+
+        assertEquals("No such goal invitation with id:1", exception.getMessage());
+    }
+
 }

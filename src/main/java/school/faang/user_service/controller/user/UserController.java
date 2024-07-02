@@ -88,4 +88,9 @@ public class UserController {
             throw new DataValidationException(INPUT_OUTPUT_EXCEPTION.getMessage());
         }
     }
+
+    @GetMapping("/{userId}/exists")
+    public boolean existsById(@PathVariable long userId) {
+        return userService.existsById(userId);
+    }
 }

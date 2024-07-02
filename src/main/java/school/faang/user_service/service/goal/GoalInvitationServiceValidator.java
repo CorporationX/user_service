@@ -37,7 +37,6 @@ public class GoalInvitationServiceValidator {
         if (setGoals.contains(goal)) {
             throw new DataValidationException(INVITED_HAS_GOAL.getMessage());
         }
-
         return setGoals;
     }
 }

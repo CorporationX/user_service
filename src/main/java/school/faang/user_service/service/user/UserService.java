@@ -32,6 +32,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.*;
 import java.util.stream.Stream;
 
@@ -199,5 +200,10 @@ public class UserService {
             readyUser = countryService.saveCountry(user.getCountry(), user);
         }
         saveUser(readyUser);
+    }
+
+    @Transactional(readOnly = true)
+    public Long authorizeUser(String userEmail, String userPassword) {
+        return userRepository.findIdByEmailAndPassword(userEmail, userPassword);
     }
 }

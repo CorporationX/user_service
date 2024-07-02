@@ -9,7 +9,7 @@ public class ContactInfo {
     private String email;
 
     private String phone;
+
     @JsonUnwrapped
     private Address address;
-
 }

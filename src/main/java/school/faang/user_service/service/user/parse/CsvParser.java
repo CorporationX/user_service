@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static school.faang.user_service.exception.message.ExceptionMessage.INPUT_OUTPUT_EXCEPTION;
 
@@ -31,19 +32,33 @@ public class CsvParser {
         List<Person> allPersons = Collections.synchronizedList(new ArrayList<>());
         ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
         CountDownLatch latch = new CountDownLatch(parts.size());
+        AtomicReference<Throwable> exceptionHolder = new AtomicReference<>();
 
         for (InputStream part : parts) {
             executorService.submit(() -> {
-                allPersons.addAll(parseCsv(part));
-                latch.countDown();
+                try {
+                    allPersons.addAll(parseCsv(part));
+                } catch (Throwable e) {
+                    exceptionHolder.set(e);
+                    while (latch.getCount() > 0) {
+                        latch.countDown();
+                    }
+                } finally {
+                    latch.countDown();
+                }
             });
         }
 
         try {
             latch.await();
+            if (exceptionHolder.get() != null) {
+                throw exceptionHolder.get();
+            }
         } catch (InterruptedException e) {
-            log.error(e.getMessage());
+            Thread.currentThread().interrupt();
             throw new RuntimeException(e.getMessage());
+        } catch (Throwable e) {
+            throw new DataValidationException(INPUT_OUTPUT_EXCEPTION.getMessage());
         }
         executorService.shutdown();
 

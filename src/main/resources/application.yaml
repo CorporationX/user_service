@@ -29,10 +29,10 @@ spring:
 
 thread:
   pool:
-   size: 4
+    size: 4
 
 server:
-  port: 8081
+  port: 8080
 
 logging:
   level:

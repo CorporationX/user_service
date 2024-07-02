@@ -14,5 +14,4 @@ public class Education {
 
     @JsonProperty("GPA")
     private Float gpa;
-
 }

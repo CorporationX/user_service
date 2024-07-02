@@ -12,7 +12,7 @@ import java.util.List;
 public interface EventParticipationRepository extends CrudRepository<User, Long> {
 
     @Modifying
-    @Query(nativeQuery = true, value = "INSERT INTO user_event (event_id, user_id) VALUES (:eventId, :userId")
+    @Query(nativeQuery = true, value = "INSERT INTO user_event (event_id, user_id) VALUES (:eventId, :userId)")
     void register(long eventId, long userId);
 
     @Modifying
@@ -31,4 +31,10 @@ public interface EventParticipationRepository extends CrudRepository<User, Long>
             WHERE ue.event_id = :eventId
             """)
     int countParticipants(long eventId);
+
+    @Query(nativeQuery = true, value = """
+            SELECT COUNT(ue.id) FROM user_event ue
+            WHERE ue.event_id = :eventId AND ue.user_id = :userId
+            """)
+    int checkParticipantAtEvent(long eventId, long userId);
 }

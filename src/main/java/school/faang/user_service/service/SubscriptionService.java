@@ -73,11 +73,11 @@ public class SubscriptionService {
                 .toList();
     }
 
-    public long getFollowersCount(long followeeId) {
+    public int getFollowersCount(long followeeId) {
         return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
     }
 
-    public long getFollowessCount(long followerId) {
+    public int getFolloweesCount(long followerId) {
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
     }
 }

@@ -56,4 +56,12 @@ class MentorshipRequestControllerTest {
         verify(mentorshipRequestService, times(1))
                 .getRequests(mentorshipRequestFilterDto);
     }
+
+    @Test
+    public void testAcceptRequestServiceExecution() {
+        long requestId = 1L;
+
+        mentorshipRequestController.acceptRequest(requestId);
+        verify(mentorshipRequestService, times(1)).acceptRequest(requestId);
+    }
 }

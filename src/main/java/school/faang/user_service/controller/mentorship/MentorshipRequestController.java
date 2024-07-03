@@ -23,4 +23,8 @@ public class MentorshipRequestController {
     public List<MentorshipRequestDto> getRequests(MentorshipRequestFilterDto filters) {
         return mentorshipRequestService.getRequests(filters);
     }
+
+    public MentorshipRequestDto acceptRequest(long id) {
+        return mentorshipRequestService.acceptRequest(id);
+    }
 }

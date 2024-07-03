@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.entity.MentorshipRequest;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
@@ -49,6 +50,16 @@ public class MentorshipRequestValidator {
                 .isAfter(mentorshipCreationDate)) {
             throw new IllegalArgumentException("MentorshipRequest can be sent once in "
                     + MENTORSHIP_REQUEST_FREQUENCY_IN_DAYS + " days");
+        }
+    }
+
+    public void validateRequestStatusIsPending(RequestStatus requestStatus) {
+        if (requestStatus == RequestStatus.ACCEPTED) {
+            throw new IllegalStateException("Mentorship Request is already accepted");
+        } else if (requestStatus == RequestStatus.REJECTED) {
+            throw new IllegalStateException("Mentorship Request is already rejected");
+        } else if (requestStatus != RequestStatus.PENDING) {
+            throw new IllegalStateException("Mentorship Request must be in pending mode");
         }
     }
 }

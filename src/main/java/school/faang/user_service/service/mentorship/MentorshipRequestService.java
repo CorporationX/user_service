@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
@@ -41,11 +42,23 @@ public class MentorshipRequestService {
     }
 
     private List<MentorshipRequest> selectAllMatchedRequestsAndFilter(MentorshipRequestFilterDto filtersDto) {
-        List<MentorshipRequestFilter> mentorshipRequestApplicableFilters
-                = mentorshipRequestFilterList.stream().filter(filter -> filter.isApplicable(filtersDto)).toList();
+        List<MentorshipRequestFilter> mentorshipRequestApplicableFilters =
+                mentorshipRequestFilterList.stream().filter(filter -> filter.isApplicable(filtersDto)).toList();
         List<MentorshipRequest> allMentorshipRequests =
                 StreamSupport.stream(mentorshipRequestRepository.findAll().spliterator(), false).toList();
         return allMentorshipRequests.stream().filter(request -> mentorshipRequestApplicableFilters.stream()
                 .allMatch(filter -> filter.filter(request, filtersDto))).toList();
+    }
+
+    public MentorshipRequestDto acceptRequest(long id) {
+        return mentorshipRequestRepository.findById(id).map(mentorshipRequest -> {
+            RequestStatus mentorshipRequestStatus = mentorshipRequest.getStatus();
+
+            mentorshipRequestValidator.validateRequestStatusIsPending(mentorshipRequestStatus);
+            mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
+            mentorshipRequestRepository.save(mentorshipRequest);
+            return mentorshipRequestMapper.toDto(mentorshipRequest);
+        }).orElseThrow(
+                () -> new IllegalArgumentException("Could not find Mentorship Request in database by id: " + id));
     }
 }

@@ -1,19 +1,20 @@
 package school.faang.user_service.validator;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.entity.MentorshipRequest;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
@@ -59,7 +60,7 @@ class MentorshipRequestValidatorTest {
         IllegalArgumentException absenceException = assertThrows(IllegalArgumentException.class,
                 () -> mentorshipRequestValidator
                         .validateMentorshipRequestReceiverAndRequesterExistence(requesterId, receiverId));
-        Assertions.assertEquals(exceptionMessage, absenceException.getMessage());
+        assertEquals(exceptionMessage, absenceException.getMessage());
     }
 
     @Test
@@ -67,7 +68,7 @@ class MentorshipRequestValidatorTest {
         long requesterId = 1L;
         IllegalArgumentException reflectionException = assertThrows(IllegalArgumentException.class,
                 () -> mentorshipRequestValidator.validateReflection(requesterId, requesterId));
-        Assertions.assertEquals("MentorshipRequest sender cannot be equal to receiver",
+        assertEquals("MentorshipRequest sender cannot be equal to receiver",
                 reflectionException.getMessage());
     }
 
@@ -86,5 +87,32 @@ class MentorshipRequestValidatorTest {
 
         assertThrows(IllegalArgumentException.class, () -> mentorshipRequestValidator
                 .validateMentorshipRequestFrequency(requesterId, receiverId, currentDate));
+    }
+
+    @Test
+    public void testValidationRequestStatusIsPendingWithAcceptedStatus() {
+        RequestStatus requestStatus = RequestStatus.ACCEPTED;
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> mentorshipRequestValidator.validateRequestStatusIsPending(requestStatus));
+        assertEquals("Mentorship Request is already accepted", exception.getMessage());
+    }
+
+    @Test
+    public void testValidationRequestStatusIsPendingWithRejectedStatus() {
+        RequestStatus requestStatus = RequestStatus.REJECTED;
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> mentorshipRequestValidator.validateRequestStatusIsPending(requestStatus));
+        assertEquals("Mentorship Request is already rejected", exception.getMessage());
+    }
+
+    @Test
+    public void testValidationRequestStatusIsPendingWithNonPendingStatus() {
+        RequestStatus requestStatus = null;
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> mentorshipRequestValidator.validateRequestStatusIsPending(requestStatus));
+        assertEquals("Mentorship Request must be in pending mode", exception.getMessage());
     }
 }

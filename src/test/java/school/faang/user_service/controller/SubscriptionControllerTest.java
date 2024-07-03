@@ -20,7 +20,7 @@ class SubscriptionControllerTest {
     private SubscriptionService subscriptionService;
 
     @Test
-    void followUser_valid() {
+    void testFollowUser_valid() {
         long followerId = 1;
         long followeeId = 2;
 
@@ -32,7 +32,7 @@ class SubscriptionControllerTest {
     }
 
     @Test
-    void followUser_sameIds() {
+    void testFollowUser_sameIds() {
         long followerId = 1;
         long followeeId = 1;
 
@@ -41,6 +41,32 @@ class SubscriptionControllerTest {
                 () -> subscriptionController.followUser(followerId, followeeId)
         );
         assertEquals("Unable to follow yourself", e.getMessage());
+
+        Mockito.verifyNoInteractions(subscriptionService);
+    }
+
+    @Test
+    void testUnfollowUser_valid() {
+        long followerId = 1;
+        long followeeId = 2;
+
+        subscriptionController.unfollowUser(followerId, followeeId);
+
+        Mockito.verify(subscriptionService, Mockito.times(1))
+                .unfollowUser(followerId, followeeId);
+        Mockito.verifyNoMoreInteractions(subscriptionService);
+    }
+
+    @Test
+    void testUnfollowUser_sameIds() {
+        long followerId = 1;
+        long followeeId = 1;
+
+        DataValidationException e = assertThrows(
+                DataValidationException.class,
+                () -> subscriptionController.unfollowUser(followerId, followeeId)
+        );
+        assertEquals("Unable to unfollow yourself", e.getMessage());
 
         Mockito.verifyNoInteractions(subscriptionService);
     }

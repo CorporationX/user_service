@@ -3,6 +3,7 @@ package school.faang.user_service.controller;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +26,15 @@ public class SubscriptionController {
         }
 
         subscriptionService.followUser(followerId, followeeId);
+    }
+
+    @DeleteMapping("/{followerId}")
+    public void unfollowUser(@PathVariable @Positive long followerId, @PathVariable("userId") @Positive long followeeId) {
+        if (followerId == followeeId) {
+            throw new DataValidationException("Unable to unfollow yourself");
+        }
+
+        subscriptionService.unfollowUser(followerId, followeeId);
     }
 
 }

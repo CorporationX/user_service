@@ -60,7 +60,7 @@ public class SkillControllerTest {
 
         when(skillService.getUserSkills(userId)).thenReturn(skillDtos);
 
-        List<SkillDto> returnedSkillDtos = skillService.getUserSkills(userId);
+        List<SkillDto> returnedSkillDtos = skillController.getUserSkills(userId);
 
         verify(skillService, times(1)).getUserSkills(userId);
         assertEquals(skillDtos, returnedSkillDtos);

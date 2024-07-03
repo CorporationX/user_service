@@ -58,7 +58,7 @@ class MentorshipRequestValidatorTest {
 
     @Test
     public void testValidationWithReceiverAbsence() {
-        requesterAndReceiverExistenceTest(true, false, 1L, 2L,
+        requesterAndReceiverExistenceTest(true, false, 3L, 4L,
                 "MentorshipRequest receiver is not registered in Data Base");
     }
 
@@ -89,12 +89,11 @@ class MentorshipRequestValidatorTest {
         LocalDateTime currentDate = LocalDateTime.now();
         LocalDateTime lastMentorshipRequestDate =
                 currentDate.minusDays(mentorshipRequestValidator.getMENTORSHIP_REQUEST_FREQUENCY_IN_DAYS() - 1);
-        MentorshipRequest mentorshipRequest = new MentorshipRequest();
-        mentorshipRequest.setCreatedAt(lastMentorshipRequestDate);
+        MentorshipRequest mentorshipRequest = MentorshipRequest.builder()
+                .createdAt(lastMentorshipRequestDate).build();
 
         when(mentorshipRequestRepository.findLatestRequest(requesterId, receiverId))
                 .thenReturn(Optional.of(mentorshipRequest));
-
         assertThrows(IllegalArgumentException.class, () -> mentorshipRequestValidator
                 .validateMentorshipRequestFrequency(requesterId, receiverId, currentDate));
     }
@@ -119,10 +118,8 @@ class MentorshipRequestValidatorTest {
 
     @Test
     public void testValidationRequestStatusIsPendingWithNonPendingStatus() {
-        RequestStatus requestStatus = null;
-
         IllegalStateException exception = assertThrows(IllegalStateException.class,
-                () -> mentorshipRequestValidator.validateRequestStatusIsPending(requestStatus));
+                () -> mentorshipRequestValidator.validateRequestStatusIsPending(null));
         assertEquals("Mentorship Request must be in pending mode", exception.getMessage());
     }
 }

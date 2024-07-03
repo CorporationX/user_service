@@ -31,27 +31,19 @@ class MentorshipRequestDescriptionFilterTest {
 
     @Test
     public void testFilterWithAppropriateValue() {
-        MentorshipRequestFilterDto mentorshipRequestFilterDto = getMentorshipRequestFilterDtoWithDescription("take");
-        MentorshipRequest mentorshipRequest = getMentorshipRequestWithDescription("RETAKE");
+        MentorshipRequestFilterDto mentorshipRequestFilterDto = MentorshipRequestFilterDto.builder()
+                .description("take").build();
+        MentorshipRequest mentorshipRequest = MentorshipRequest.builder()
+                .description("RETAKE").build();
         assertTrue(mentorshipRequestDescriptionFilter.filter(mentorshipRequest, mentorshipRequestFilterDto));
     }
 
     @Test
     public void testFilterWithNonAppropriateValue() {
-        MentorshipRequestFilterDto mentorshipRequestFilterDto = getMentorshipRequestFilterDtoWithDescription("got");
-        MentorshipRequest mentorshipRequest = getMentorshipRequestWithDescription("FORGET");
+        MentorshipRequestFilterDto mentorshipRequestFilterDto = MentorshipRequestFilterDto.builder()
+                .description("got").build();
+        MentorshipRequest mentorshipRequest = MentorshipRequest.builder()
+                .description("FORGET").build();
         assertFalse(mentorshipRequestDescriptionFilter.filter(mentorshipRequest, mentorshipRequestFilterDto));
-    }
-
-    private MentorshipRequestFilterDto getMentorshipRequestFilterDtoWithDescription(String description) {
-        MentorshipRequestFilterDto mentorshipRequestFilterDto = new MentorshipRequestFilterDto();
-        mentorshipRequestFilterDto.setDescription(description);
-        return mentorshipRequestFilterDto;
-    }
-
-    private MentorshipRequest getMentorshipRequestWithDescription(String description) {
-        MentorshipRequest mentorshipRequest = new MentorshipRequest();
-        mentorshipRequest.setDescription(description);
-        return mentorshipRequest;
     }
 }

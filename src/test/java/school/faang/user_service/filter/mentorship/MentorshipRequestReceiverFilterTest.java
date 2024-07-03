@@ -1,6 +1,5 @@
 package school.faang.user_service.filter.mentorship;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,11 +21,6 @@ class MentorshipRequestReceiverFilterTest {
     @InjectMocks
     private MentorshipRequestReceiverFilter mentorshipRequestReceiverFilter;
 
-    @BeforeEach
-    public void setUp() {
-        mentorshipRequestReceiverFilter = new MentorshipRequestReceiverFilter();
-    }
-
     @Test
     public void testIsApplicableWithNullDescription() {
         MentorshipRequestFilterDto mentorshipRequestFilterDto = new MentorshipRequestFilterDto();
@@ -42,29 +36,21 @@ class MentorshipRequestReceiverFilterTest {
 
     @Test
     public void testFilterWithAppropriateValue() {
-        MentorshipRequestFilterDto mentorshipRequestFilterDto = getMentorshipRequestFilterDtoWithReceiverId(1L);
-        User user = getUserWithId(1L);
+        MentorshipRequestFilterDto mentorshipRequestFilterDto = MentorshipRequestFilterDto.builder()
+                .receiverId(1L).build();
+        User user = User.builder()
+                .id(1L).build();
         when(mentorshipRequest.getReceiver()).thenReturn(user);
         assertTrue(mentorshipRequestReceiverFilter.filter(mentorshipRequest, mentorshipRequestFilterDto));
     }
 
     @Test
     public void testFilterWithNonAppropriateValue() {
-        MentorshipRequestFilterDto mentorshipRequestFilterDto = getMentorshipRequestFilterDtoWithReceiverId(10L);
-        User user = getUserWithId(20L);
+        MentorshipRequestFilterDto mentorshipRequestFilterDto = MentorshipRequestFilterDto.builder()
+                .receiverId(1L).build();
+        User user = User.builder()
+                .id(2L).build();
         when(mentorshipRequest.getReceiver()).thenReturn(user);
         assertFalse(mentorshipRequestReceiverFilter.filter(mentorshipRequest, mentorshipRequestFilterDto));
-    }
-
-    private MentorshipRequestFilterDto getMentorshipRequestFilterDtoWithReceiverId(long receiverId) {
-        MentorshipRequestFilterDto mentorshipRequestFilterDto = new MentorshipRequestFilterDto();
-        mentorshipRequestFilterDto.setReceiverId(receiverId);
-        return mentorshipRequestFilterDto;
-    }
-
-    private User getUserWithId(long userId) {
-        User user = new User();
-        user.setId(userId);
-        return user;
     }
 }

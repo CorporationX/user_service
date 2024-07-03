@@ -25,36 +25,26 @@ class MentorshipRequestStatusFilterTest {
 
     @Test
     public void testIsApplicableWithNonNullDescription() {
-        MentorshipRequestFilterDto mentorshipRequestFilterDto = new MentorshipRequestFilterDto();
-        mentorshipRequestFilterDto.setStatus(RequestStatus.PENDING);
+        MentorshipRequestFilterDto mentorshipRequestFilterDto = MentorshipRequestFilterDto.builder()
+                .status(RequestStatus.PENDING).build();
         assertTrue(mentorshipRequestStatusFilter.isApplicable(mentorshipRequestFilterDto));
     }
 
     @Test
     public void testFilterWithAppropriateValue() {
-        MentorshipRequestFilterDto mentorshipRequestFilterDto =
-                getMentorshipRequestFilterDtoWithStatus(RequestStatus.PENDING);
-        MentorshipRequest mentorshipRequest = getMentorshipRequestWithDescription(RequestStatus.PENDING);
+        MentorshipRequestFilterDto mentorshipRequestFilterDto = MentorshipRequestFilterDto.builder()
+                .status(RequestStatus.PENDING).build();
+        MentorshipRequest mentorshipRequest = MentorshipRequest.builder()
+                .status(RequestStatus.PENDING).build();
         assertTrue(mentorshipRequestStatusFilter.filter(mentorshipRequest, mentorshipRequestFilterDto));
     }
 
     @Test
     public void testFilterWithNonAppropriateValue() {
-        MentorshipRequestFilterDto mentorshipRequestFilterDto =
-                getMentorshipRequestFilterDtoWithStatus(RequestStatus.ACCEPTED);
-        MentorshipRequest mentorshipRequest = getMentorshipRequestWithDescription(RequestStatus.REJECTED);
+        MentorshipRequestFilterDto mentorshipRequestFilterDto = MentorshipRequestFilterDto.builder()
+                .status(RequestStatus.ACCEPTED).build();
+        MentorshipRequest mentorshipRequest = MentorshipRequest.builder()
+                .status(RequestStatus.REJECTED).build();
         assertFalse(mentorshipRequestStatusFilter.filter(mentorshipRequest, mentorshipRequestFilterDto));
-    }
-
-    private MentorshipRequestFilterDto getMentorshipRequestFilterDtoWithStatus(RequestStatus requestStatus) {
-        MentorshipRequestFilterDto mentorshipRequestFilterDto = new MentorshipRequestFilterDto();
-        mentorshipRequestFilterDto.setStatus(requestStatus);
-        return mentorshipRequestFilterDto;
-    }
-
-    private MentorshipRequest getMentorshipRequestWithDescription(RequestStatus requestStatus) {
-        MentorshipRequest mentorshipRequest = new MentorshipRequest();
-        mentorshipRequest.setStatus(requestStatus);
-        return mentorshipRequest;
     }
 }

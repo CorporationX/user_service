@@ -1,10 +1,10 @@
 package school.faang.user_service.service.mentorship;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-import school.faang.user_service.controller.mentorship.RejectionDto;
+import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
+import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class MentorshipRequestService {
     private final MentorshipRequestMapper mentorshipRequestMapper;
@@ -67,7 +67,8 @@ public class MentorshipRequestService {
         return mentorshipRequestMapper.toDto(mentorshipRequest);
     }
 
-    private MentorshipRequest setRequestStatusAndSaveToDataBase(MentorshipRequest mentorshipRequest, RequestStatus requestStatus) {
+    private MentorshipRequest setRequestStatusAndSaveToDataBase(MentorshipRequest mentorshipRequest,
+                                                                RequestStatus requestStatus) {
         mentorshipRequest.setStatus(requestStatus);
         mentorshipRequest.setUpdatedAt(LocalDateTime.now());
         return mentorshipRequestRepository.save(mentorshipRequest);

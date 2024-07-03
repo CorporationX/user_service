@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
+import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
 import school.faang.user_service.validator.MentorshipRequestValidator;
 
@@ -26,7 +27,8 @@ class MentorshipRequestControllerTest {
 
     @Test
     public void testRequestMentorshipValidationExecution() {
-        MentorshipRequestDto mentorshipRequestDto = getMentorshipRequestDtoWithDescription("some value");
+        MentorshipRequestDto mentorshipRequestDto = MentorshipRequestDto.builder()
+                .description("description").build();
 
         mentorshipRequestController.requestMentorship(mentorshipRequestDto);
         verify(mentorshipRequestValidator, times(1))
@@ -35,17 +37,12 @@ class MentorshipRequestControllerTest {
 
     @Test
     public void testRequestMentorshipServiceExecution() {
-        MentorshipRequestDto mentorshipRequestDto = getMentorshipRequestDtoWithDescription("description");
+        MentorshipRequestDto mentorshipRequestDto = MentorshipRequestDto.builder()
+                .description("description").build();
 
         mentorshipRequestController.requestMentorship(mentorshipRequestDto);
         verify(mentorshipRequestService, times(1))
                 .requestMentorship(mentorshipRequestDto);
-    }
-
-    private MentorshipRequestDto getMentorshipRequestDtoWithDescription(String description) {
-        MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto();
-        mentorshipRequestDto.setDescription(description);
-        return mentorshipRequestDto;
     }
 
     @Test

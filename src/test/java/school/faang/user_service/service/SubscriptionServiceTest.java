@@ -101,12 +101,12 @@ class SubscriptionServiceTest {
         long followeeId = 1;
         UserFilterDto filter = new UserFilterDto();
         User user1 = User.builder()
-                .id(1)
+                .id(1L)
                 .username("name1")
                 .email("mail1.ru")
                 .build();
         User user2 = User.builder()
-                .id(1)
+                .id(2L)
                 .username("name2")
                 .email("mail2.ru")
                 .build();
@@ -133,12 +133,12 @@ class SubscriptionServiceTest {
                 .namePattern("1")
                 .build();
         User user1 = User.builder()
-                .id(1)
+                .id(1L)
                 .username("name1")
                 .email("mail1.ru")
                 .build();
         User user2 = User.builder()
-                .id(1)
+                .id(2L)
                 .username("name2")
                 .email("mail2.ru")
                 .build();
@@ -151,6 +151,36 @@ class SubscriptionServiceTest {
         assertEquals(1, resultList.size());
         Mockito.verify(subscriptionRepository, Mockito.times(1))
                 .findByFolloweeId(followeeId);
+        Mockito.verifyNoMoreInteractions(subscriptionRepository);
+    }
+
+    @Test
+    void testGetFollowersCount() {
+        long followeeId = 1;
+        int expectedCount = 10;
+        Mockito.when(subscriptionRepository.findFollowersAmountByFolloweeId(followeeId))
+                .thenReturn(expectedCount);
+
+        int followersCount = subscriptionService.getFollowersCount(followeeId);
+
+        assertEquals(expectedCount, followersCount);
+        Mockito.verify(subscriptionRepository, Mockito.times(1))
+                .findFollowersAmountByFolloweeId(followeeId);
+        Mockito.verifyNoMoreInteractions(subscriptionRepository);
+    }
+
+    @Test
+    void testGetFolloweesCount() {
+        long followerId = 1;
+        int expectedCount = 5;
+        Mockito.when(subscriptionRepository.findFolloweesAmountByFollowerId(followerId))
+                .thenReturn(expectedCount);
+
+        int followeesCount = subscriptionService.getFolloweesCount(followerId);
+
+        assertEquals(expectedCount, followeesCount);
+        Mockito.verify(subscriptionRepository, Mockito.times(1))
+                .findFolloweesAmountByFollowerId(followerId);
         Mockito.verifyNoMoreInteractions(subscriptionRepository);
     }
 }

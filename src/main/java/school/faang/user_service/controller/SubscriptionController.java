@@ -48,12 +48,12 @@ public class SubscriptionController {
     }
 
     @GetMapping("/count")
-    public long getFollowersCount(@PathVariable("userId") @Positive long followeeId) {
+    public int getFollowersCount(@PathVariable("userId") @Positive long followeeId) {
         return subscriptionService.getFollowersCount(followeeId);
     }
 
     @GetMapping("/count-followees")
-    public long getFolloweesCount(@PathVariable("userId") @Positive long followerId) {
-        return subscriptionService.getFollowessCount(followerId);
+    public int getFolloweesCount(@PathVariable("userId") @Positive long followerId) {
+        return subscriptionService.getFolloweesCount(followerId);
     }
 }

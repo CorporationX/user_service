@@ -1,6 +1,5 @@
 package school.faang.user_service.service.mentorship;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -62,16 +61,6 @@ public class MentorshipRequestServiceTest {
     private final MentorshipRequest request = getRequest();
 
     private static final long REQUEST_ID = 5L;
-
-    @BeforeEach
-    void init() {
-        DescriptionFilter descriptionFilter = Mockito.spy(DescriptionFilter.class);
-        ReceiverIdFilter receiverIdFilter = Mockito.spy(ReceiverIdFilter.class);
-        RequesterIdFilter requesterIdFilter = Mockito.spy(RequesterIdFilter.class);
-        StatusFilter statusFilter = Mockito.spy(StatusFilter.class);
-        List<RequestFilter> filters = List.of(descriptionFilter, receiverIdFilter, requesterIdFilter, statusFilter);
-        mentorshipRequestService.setRequestFilters(filters);
-    }
 
     @Nested
     class PositiveTests {

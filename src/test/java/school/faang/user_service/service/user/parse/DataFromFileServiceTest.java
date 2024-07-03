@@ -58,28 +58,24 @@ public class DataFromFileServiceTest {
     @Nested
     class PositiveTests {
 
-        @DisplayName("should return data with 4 elements")
+        @DisplayName("should return data with 4 elements when passed")
         @Test
-        void testForSaveUsersFromFilet() throws FileNotFoundException {
+        void saveUsersFromFileTest() throws FileNotFoundException {
             assertEquals(4, dataFromFileService.saveUsersFromFile(getInputStream()).size());
         }
-    }
 
-    @Nested
-    class NegativeTests {
-
-        @DisplayName("should return data with 4 elements")
+        @DisplayName("should return data with 4 elements when passed")
         @Test
-        void testForSaveUsersFromFileCheckCsvParserOnClick() throws IOException {
+        void saveUsersFromFileCheckCsvParserOnClickTest() throws IOException {
             dataFromFileService.saveUsersFromFile(getInputStream());
 
             verify(csvParser).multiParseCsv(inputStreamArgumentCaptor.capture());
             assertEquals(4, inputStreamArgumentCaptor.getValue().size());
         }
 
-        @DisplayName("should return data with 4 elements")
+        @DisplayName("should return data with 4 elements when passed")
         @Test
-        void testForSaveUsersFromFileCheckUserRepositoryOnClick() throws FileNotFoundException {
+        void saveUsersFromFileCheckUserRepositoryOnClickTest() throws FileNotFoundException {
             dataFromFileService.saveUsersFromFile(getInputStream());
 
             verify(userRepository).saveAll(userArgumentCaptor.capture());

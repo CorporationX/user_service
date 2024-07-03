@@ -33,9 +33,9 @@ public class CsvParserTest {
     @Nested
     class NegativeTests {
 
-        @DisplayName("should return empty list")
+        @DisplayName("should return empty list when passed")
         @Test
-        void testMultiParseCsvWithEmptyList() {
+        void multiParseCsvWhenEmptyListTest() {
             List<InputStream> parts = Collections.emptyList();
             List<Person> result = csvParser.multiParseCsv(parts);
             assertTrue(result.isEmpty());
@@ -43,7 +43,7 @@ public class CsvParserTest {
 
         @DisplayName("should throw exception when thread interrupted")
         @Test
-        public void testMultiParseCsvWithInterruptedThread() {
+        public void multiParseCsvWhenInterruptedThreadTest() {
             List<InputStream> parts = Collections.singletonList(new ByteArrayInputStream(new byte[0]));
             Thread.currentThread().interrupt();
             assertThrows(RuntimeException.class,
@@ -52,7 +52,7 @@ public class CsvParserTest {
 
         @DisplayName("should throw exception when data is not appropriate for csv format")
         @Test
-        public void testMultiParseCsvWithCorruptedStream() {
+        public void multiParseCsvWhenCorruptedStreamTest() {
             InputStream corruptedStream = new ByteArrayInputStream("некорректные данные".getBytes());
             List<InputStream> parts = List.of(corruptedStream);
 

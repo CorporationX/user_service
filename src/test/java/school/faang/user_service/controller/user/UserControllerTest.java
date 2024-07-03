@@ -102,9 +102,9 @@ class UserControllerTest {
             verify(userService).deleteUserAvatar(anyLong());
         }
 
-        @DisplayName("should call dataFromFileService.saveUsersFromFile")
+        @DisplayName("should call dataFromFileService.saveUsersFromFile when passed")
         @Test
-        void testForUploadData() throws IOException {
+        void uploadDataTest() throws IOException {
             when(multipartFile.isEmpty()).thenReturn(false);
             when(multipartFile.getInputStream()).thenReturn(inputStream);
 
@@ -129,18 +129,18 @@ class UserControllerTest {
             verifyNoInteractions(userService);
         }
 
-        @DisplayName("should throw exception when file is empty ")
+        @DisplayName("should throw exception when multipartFile.isEmpty() == true")
         @Test
-        void testForUploadDataWithEmptyFile() {
+        void uploadDataWhenEmptyFileTest() {
             when(multipartFile.isEmpty()).thenReturn(true);
             DataValidationException exception = assertThrows(DataValidationException.class,
                     () -> userController.uploadData(multipartFile));
             assertEquals(NO_FILE_IN_REQUEST.getMessage(), exception.getMessage());
         }
 
-        @DisplayName("should throw exception when something wrong with input or output ")
+        @DisplayName("should throw exception when multipartFile.getInputStream()")
         @Test
-        void testForUploadDataWithIOException() throws IOException {
+        void uploadDataWhenIOExceptionTest() throws IOException {
             when(multipartFile.isEmpty()).thenReturn(false);
             when(multipartFile.getInputStream()).thenThrow(new IOException());
             DataValidationException exception = assertThrows(DataValidationException.class,

@@ -1,5 +1,7 @@
 package school.faang.user_service.controller.mentorship;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -39,46 +41,54 @@ public class MentorshipRequestControllerTest {
 
     private static final long ID = 1L;
 
-    @Test
-    void testForRequestMentorship() {
-        MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto();
-        mentorshipRequestDto.setStatus(RequestStatus.PENDING);
+    @Nested
+    class PositiveTests {
 
-        mentorshipRequestController.requestMentorship(mentorshipRequestDto);
+        @DisplayName("should return mentorshipRequestDto with PENDING when passed")
+        @Test
+        void requestMentorshipTest() {
+            MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto();
+            mentorshipRequestDto.setStatus(RequestStatus.PENDING);
 
-        verify(mentorshipRequestService).requestMentorship(requestDtoArgumentCaptor.capture());
-        assertEquals(mentorshipRequestDto.getStatus(), requestDtoArgumentCaptor.getValue().getStatus());
-    }
+            mentorshipRequestController.requestMentorship(mentorshipRequestDto);
 
-    @Test
-    void testForAcceptRequest() {
-        mentorshipRequestController.acceptRequest(ID);
+            verify(mentorshipRequestService).requestMentorship(requestDtoArgumentCaptor.capture());
+            assertEquals(mentorshipRequestDto.getStatus(), requestDtoArgumentCaptor.getValue().getStatus());
+        }
 
-        verify(mentorshipRequestService).acceptRequest(longArgumentCaptor.capture());
+        @DisplayName("should return ID with 1L when passed")
+        @Test
+        void acceptRequestTest() {
+            mentorshipRequestController.acceptRequest(ID);
 
-        assertEquals(ID, longArgumentCaptor.getValue());
-    }
+            verify(mentorshipRequestService).acceptRequest(longArgumentCaptor.capture());
 
-    @Test
-    void testForRejectRequest() {
-        RejectionDto rejection = new RejectionDto();
-        rejection.setRejectionReason("Some reason");
-        mentorshipRequestController.rejectRequest(ID, rejection);
+            assertEquals(ID, longArgumentCaptor.getValue());
+        }
 
-        verify(mentorshipRequestService).rejectRequest(longArgumentCaptor.capture(), rejectionDtoArgumentCaptor.capture());
+        @DisplayName("should return ID with 1L & rejection with Some reason when passed")
+        @Test
+        void rejectRequestTest() {
+            RejectionDto rejection = new RejectionDto();
+            rejection.setRejectionReason("Some reason");
+            mentorshipRequestController.rejectRequest(ID, rejection);
 
-        assertEquals(ID, longArgumentCaptor.getValue());
-        assertEquals(rejection, rejectionDtoArgumentCaptor.getValue());
-    }
+            verify(mentorshipRequestService).rejectRequest(longArgumentCaptor.capture(), rejectionDtoArgumentCaptor.capture());
 
-    @Test
-    void testForFindAll() {
-        RequestFilterDto requestFilterDto = new RequestFilterDto();
-        requestFilterDto.setStatus(RequestStatus.ACCEPTED);
+            assertEquals(ID, longArgumentCaptor.getValue());
+            assertEquals(rejection, rejectionDtoArgumentCaptor.getValue());
+        }
 
-        mentorshipRequestController.findAll(requestFilterDto);
+        @DisplayName("should return requestFilterDto with ACCEPTED when passed")
+        @Test
+        void findAllTest() {
+            RequestFilterDto requestFilterDto = new RequestFilterDto();
+            requestFilterDto.setStatus(RequestStatus.ACCEPTED);
 
-        verify(mentorshipRequestService).findAll(requestFilterDtoArgumentCaptor.capture());
-        assertEquals(requestFilterDto.getStatus(), requestFilterDtoArgumentCaptor.getValue().getStatus());
+            mentorshipRequestController.findAll(requestFilterDto);
+
+            verify(mentorshipRequestService).findAll(requestFilterDtoArgumentCaptor.capture());
+            assertEquals(requestFilterDto.getStatus(), requestFilterDtoArgumentCaptor.getValue().getStatus());
+        }
     }
 }

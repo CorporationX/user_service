@@ -1,6 +1,8 @@
 package school.faang.user_service.service.mentorship.filter;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,25 +31,37 @@ public class StatusFilterTest {
         mentorshipRequest.setStatus(RequestStatus.PENDING);
     }
 
-    @Test
-    void testIsApplicableFalse() {
-        requestFilterDto.setStatus(null);
-        assertFalse(statusFilter.isApplicable(requestFilterDto));
+    @Nested
+    class PositiveTests {
+
+        @DisplayName("should return true when status in requestFilerDto != null")
+        @Test
+        void applicableTest() {
+            assertTrue(statusFilter.isApplicable(requestFilterDto));
+        }
+
+        @DisplayName("should return 1 when status has the same value in both parameters of apply method")
+        @Test
+        void applyTest() {
+            assertEquals(1, statusFilter.apply(mentorshipRequest, requestFilterDto).toList().size());
+        }
     }
 
-    @Test
-    void testIsApplicableTrue() {
-        assertTrue(statusFilter.isApplicable(requestFilterDto));
-    }
+    @Nested
+    class NegativeTests {
 
-    @Test
-    void testApplyWithRequest() {
-        assertEquals(1, statusFilter.apply(mentorshipRequest, requestFilterDto).toList().size());
-    }
+        @DisplayName("should return false when status in requestFilerDto == null")
+        @Test
+        void applicableTest() {
+            requestFilterDto.setStatus(null);
+            assertFalse(statusFilter.isApplicable(requestFilterDto));
+        }
 
-    @Test
-    void testApplyWithoutRequest() {
-        requestFilterDto.setStatus(RequestStatus.REJECTED);
-        assertEquals(0, statusFilter.apply(mentorshipRequest, requestFilterDto).toList().size());
+        @DisplayName("should return 0 when status hasn't the same value in both parameters of apply method")
+        @Test
+        void applyTest() {
+            requestFilterDto.setStatus(RequestStatus.REJECTED);
+            assertEquals(0, statusFilter.apply(mentorshipRequest, requestFilterDto).toList().size());
+        }
     }
 }

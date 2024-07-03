@@ -1,6 +1,8 @@
 package school.faang.user_service.service.mentorship;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -71,113 +73,131 @@ public class MentorshipRequestServiceTest {
         mentorshipRequestService.setRequestFilters(filters);
     }
 
-    @Test
-    void testForRequestMentorshipTrue() {
-        MentorshipRequestDto mentorshipRequestDto = MentorshipRequestDto.builder()
-                .status(RequestStatus.PENDING)
-                .build();
+    @Nested
+    class PositiveTests {
 
-        mentorshipRequestService.requestMentorship(mentorshipRequestDto);
+        @DisplayName("should return MentorshipRequestDto with PENDING status when validation passed")
+        @Test
+        void requestMentorshipTest() {
+            MentorshipRequestDto mentorshipRequestDto = MentorshipRequestDto.builder()
+                    .status(RequestStatus.PENDING)
+                    .build();
 
-        verify(mentorshipRequestRepository).save(captor.capture());
-        MentorshipRequest mentorshipRequest = captor.getValue();
+            mentorshipRequestService.requestMentorship(mentorshipRequestDto);
 
-        assertEquals(mentorshipRequestDto.getStatus(), mentorshipRequest.getStatus());
+            verify(mentorshipRequestRepository).save(captor.capture());
+            MentorshipRequest mentorshipRequest = captor.getValue();
+
+            assertEquals(mentorshipRequestDto.getStatus(), mentorshipRequest.getStatus());
+        }
+
+        @DisplayName("should return 1 when mentorshipRequestRepository.findAll()")
+        @Test
+        void findAllTest() {
+            RequestFilterDto requestFilterDto = RequestFilterDto.builder()
+                    .description("Something")
+                    .requesterId(3L)
+                    .receiverId(4L)
+                    .status(RequestStatus.PENDING)
+                    .build();
+            List<MentorshipRequest> requests = List.of(getRequest());
+
+            when(mentorshipRequestRepository.findAll()).thenReturn(List.of(getRequest()));
+
+            assertEquals(1, requests.size());
+            assertEquals(1, mentorshipRequestService.findAll(requestFilterDto).size());
+        }
+
+        @DisplayName("should set ACCEPTED status when mentorshipRequest in DB")
+        @Test
+        void acceptRequestTest() {
+            User mentor = new User();
+            mentor.setId(1L);
+            request.getRequester().setMentors(getMentors());
+
+            when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(Optional.of(request));
+            when(userRepository.findById(request.getRequester().getId())).thenReturn(Optional.of(request.getRequester()));
+            when(userRepository.findById(request.getReceiver().getId())).thenReturn(Optional.of(mentor));
+
+            mentorshipRequestService.acceptRequest(REQUEST_ID);
+            verify(mentorshipRequestRepository).save(captor.capture());
+            assertEquals(request.getRequester().getMentors().get(0), captor.getValue().getRequester().getMentors().get(0));
+        }
+
+        @DisplayName("should set REJECTED status & rejectionReason when mentorshipRequest in DB")
+        @Test
+        void rejectRequestTest() {
+            request.setStatus(RequestStatus.REJECTED);
+            when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(Optional.of(request));
+
+            mentorshipRequestService.rejectRequest(REQUEST_ID, rejectionDto);
+            verify(mentorshipRequestRepository).save(captor.capture());
+            assertEquals(request.getStatus(), captor.getValue().getStatus());
+            assertEquals(request.getRejectionReason(), captor.getValue().getRejectionReason());
+        }
     }
 
-    @Test
-    void testForFindAllWithFilters() {
-        RequestFilterDto requestFilterDto = RequestFilterDto.builder()
-                .description("Something")
-                .requesterId(3L)
-                .receiverId(4L)
-                .status(RequestStatus.PENDING)
-                .build();
-        List<MentorshipRequest> requests = List.of(getRequest());
+    @Nested
+    class NegativeTests {
 
-        when(mentorshipRequestRepository.findAll()).thenReturn(List.of(getRequest()));
+        @DisplayName("should throw exception when mentorshipRequestRepository.findById(id)")
+        @Test
+        void acceptRequestWhenNoRequestInDBTest() {
+            when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(Optional.empty());
 
-        assertEquals(requests.size(), 1);
-        assertEquals(mentorshipRequestService.findAll(requestFilterDto).size(), 1);
-    }
+            DataValidationException exception = assertThrows(DataValidationException.class,
+                    () -> mentorshipRequestService.acceptRequest(REQUEST_ID));
+            assertEquals(NO_REQUEST_IN_DB.getMessage(), exception.getMessage());
+        }
 
-    @Test
-    void testForAcceptRequestWithoutRequest() {
-        when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(Optional.empty());
+        @DisplayName("should throw exception when userRepository.findById(mentorshipRequest.getRequester().getId())")
+        @Test
+        void acceptRequestWhenNoRequesterInDBTest() {
+            when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(Optional.of(request));
+            when(userRepository.findById(request.getRequester().getId())).thenReturn(Optional.empty());
 
-        DataValidationException exception = assertThrows(DataValidationException.class,
-                () -> mentorshipRequestService.acceptRequest(REQUEST_ID));
-        assertEquals(NO_REQUEST_IN_DB.getMessage(), exception.getMessage());
-    }
+            DataValidationException exception = assertThrows(DataValidationException.class,
+                    () -> mentorshipRequestService.acceptRequest(REQUEST_ID));
 
-    @Test
-    void testForAcceptRequestWithoutRequester() {
-        when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(Optional.of(request));
-        when(userRepository.findById(request.getRequester().getId())).thenReturn(Optional.empty());
+            assertEquals(NO_USER_IN_DB.getMessage(), exception.getMessage());
+        }
 
-        DataValidationException exception = assertThrows(DataValidationException.class,
-                () -> mentorshipRequestService.acceptRequest(REQUEST_ID));
+        @DisplayName("should throw exception when mentor.getId() == receiverId")
+        @Test
+        void acceptRequestWhenUserHasSuchMentorTest() {
+            when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(Optional.of(request));
+            when(userRepository.findById(request.getRequester().getId())).thenReturn(Optional.of(request.getRequester()));
 
-        assertEquals(NO_USER_IN_DB.getMessage(), exception.getMessage());
-    }
+            DataValidationException exception = assertThrows(DataValidationException.class,
+                    () -> mentorshipRequestService.acceptRequest(REQUEST_ID));
 
-    @Test
-    void testForAcceptRequestWhenUserHasSuchMentor() {
-        when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(Optional.of(request));
-        when(userRepository.findById(request.getRequester().getId())).thenReturn(Optional.of(request.getRequester()));
+            assertEquals(USER_ALREADY_HAS_SUCH_MENTOR.getMessage(), exception.getMessage());
+        }
 
-        DataValidationException exception = assertThrows(DataValidationException.class,
-                () -> mentorshipRequestService.acceptRequest(REQUEST_ID));
+        @DisplayName("should throw exception when userRepository.findById(receiverId)")
+        @Test
+        void acceptRequestWhenNoReceiverInDBTest() {
+            request.getRequester().setMentors(getMentors());
 
-        assertEquals(USER_ALREADY_HAS_SUCH_MENTOR.getMessage(), exception.getMessage());
-    }
+            when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(Optional.of(request));
+            when(userRepository.findById(request.getRequester().getId())).thenReturn(Optional.of(request.getRequester()));
+            when(userRepository.findById(request.getReceiver().getId())).thenReturn(Optional.empty());
 
-    @Test
-    void testForAcceptRequestWithoutReceiver() {
-        request.getRequester().setMentors(getMentors());
+            DataValidationException exception = assertThrows(DataValidationException.class,
+                    () -> mentorshipRequestService.acceptRequest(REQUEST_ID));
 
-        when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(Optional.of(request));
-        when(userRepository.findById(request.getRequester().getId())).thenReturn(Optional.of(request.getRequester()));
-        when(userRepository.findById(request.getReceiver().getId())).thenReturn(Optional.empty());
+            assertEquals(NO_USER_IN_DB.getMessage(), exception.getMessage());
+        }
 
-        DataValidationException exception = assertThrows(DataValidationException.class,
-                () -> mentorshipRequestService.acceptRequest(REQUEST_ID));
+        @DisplayName("should throw exception when mentorshipRequestRepository.findById(id)")
+        @Test
+        void rejectRequestWhenNoRequestInDBTest() {
+            when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(Optional.empty());
 
-        assertEquals(NO_USER_IN_DB.getMessage(), exception.getMessage());
-    }
-
-    @Test
-    void testForAcceptRequestWithReceiver() {
-        User mentor = new User();
-        mentor.setId(1L);
-        request.getRequester().setMentors(getMentors());
-
-        when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(Optional.of(request));
-        when(userRepository.findById(request.getRequester().getId())).thenReturn(Optional.of(request.getRequester()));
-        when(userRepository.findById(request.getReceiver().getId())).thenReturn(Optional.of(mentor));
-
-        mentorshipRequestService.acceptRequest(REQUEST_ID);
-        verify(mentorshipRequestRepository).save(captor.capture());
-        assertEquals(request.getRequester().getMentors().get(0), captor.getValue().getRequester().getMentors().get(0));
-    }
-
-    @Test
-    void testForRejectWithoutUser() {
-        when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(Optional.empty());
-
-        DataValidationException exception = assertThrows(DataValidationException.class,
-                () -> mentorshipRequestService.rejectRequest(REQUEST_ID, rejectionDto));
-        assertEquals(NO_REQUEST_IN_DB.getMessage(), exception.getMessage());
-    }
-
-    @Test
-    void testForRejectWithUser() {
-        request.setStatus(RequestStatus.REJECTED);
-        when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(Optional.of(request));
-
-        mentorshipRequestService.rejectRequest(REQUEST_ID, rejectionDto);
-        verify(mentorshipRequestRepository).save(captor.capture());
-        assertEquals(request.getStatus(), captor.getValue().getStatus());
+            DataValidationException exception = assertThrows(DataValidationException.class,
+                    () -> mentorshipRequestService.rejectRequest(REQUEST_ID, rejectionDto));
+            assertEquals(NO_REQUEST_IN_DB.getMessage(), exception.getMessage());
+        }
     }
 
     private MentorshipRequest getRequest() {

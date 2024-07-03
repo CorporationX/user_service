@@ -28,7 +28,7 @@ public class GoalInvitationController {
     public ResponseEntity<GoalInvitationDto> rejectGoalInvitation(long id) {
         return ResponseEntity.ok(goalInvitationService.rejectGoalInvitation(id));
     }
-    @GetMapping("/filter")
+    @GetMapping
     public ResponseEntity<List<GoalInvitationDto>> getInvitations(InvitationFilterDto filter){
         return ResponseEntity.ok(goalInvitationService.getInvitations(filter));
     }

@@ -3,6 +3,7 @@ package school.faang.user_service.service.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -73,6 +74,7 @@ public class GoalInvitationServiceTest {
         goalInvitation.setInvited(user2);
         goalInvitation.setGoal(goal);
 
+
         goalInvitationAccept = new GoalInvitation();
         goalInvitationAccept.setId(1L);
         goalInvitationAccept.setStatus(RequestStatus.PENDING);
@@ -80,6 +82,12 @@ public class GoalInvitationServiceTest {
 
         User invitedUser = new User();
         goalInvitationAccept.setInvited(invitedUser);
+
+        User invited = goalInvitationAccept.getInvited();
+        invited.setGoals(new ArrayList<>(List.of(new Goal())));
+        invited.setReceivedGoalInvitations(new ArrayList<>(List.of(new GoalInvitation())));
+
+        goalInvitationAccept.setGoal(new Goal());
 
         goalInvitationDtoAccept = new GoalInvitationDto();
         goalInvitationDtoAccept.setId(1L);
@@ -158,7 +166,7 @@ public class GoalInvitationServiceTest {
             goalInvitationService.createInvitation(goalInvitationDto);
         });
 
-        assertEquals("User with id:2 doesn't exist!", exception.getMessage());
+        assertEquals("Goal with id:1 doesn't exist!", exception.getMessage());
     }
 
     // for acceptGoalInvitation

@@ -35,7 +35,7 @@ public class GoalInvitationService {
             throw new NoSuchElementException("User with id:" + goalInvitationDto.getInvitedUserId() + " doesn't exist!");
         }
         if (!goalRepository.existsById(goalInvitationDto.getGoalId())) {
-            throw new NoSuchElementException("User with id:" + goalInvitationDto.getInvitedUserId() + " doesn't exist!");
+            throw new NoSuchElementException("Goal with id:" + goalInvitationDto.getGoalId() + " doesn't exist!");
         }
         GoalInvitation savedInvitation = goalInvitationRepository.save(goalInvitationMapper.toEntity(goalInvitationDto));
 
@@ -47,11 +47,11 @@ public class GoalInvitationService {
                 .orElseThrow(() -> new NoSuchElementException("No such goal invitation with id:" + id));
 
         User invited = savedInvitation.getInvited();
-        invited.setReceivedGoalInvitations(List.of(new GoalInvitation()));
         if (invited.getReceivedGoalInvitations().size() > 3)
             throw new IllegalArgumentException("Exception invited user can`t have more than 3 goal invitations");
-
+        invited.getGoals().add(savedInvitation.getGoal());
         savedInvitation.setStatus(RequestStatus.ACCEPTED);
+        userRepository.save(invited);
         goalInvitationRepository.save(savedInvitation);
         return goalInvitationMapper.toDto(savedInvitation);
     }

@@ -25,4 +25,8 @@ public interface UserRepository extends CrudRepository<User, Long> {
             WHERE up.end_date > NOW()
             """)
     Stream<User> findPremiumUsers();
+
+
+
+
 }

@@ -1,9 +1,15 @@
 package school.faang.user_service.dto;
 
 import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserFilterDto {
     private String namePattern;
     private String aboutPattern;
@@ -18,7 +24,9 @@ public class UserFilterDto {
     @Positive
     private Integer experienceMax;
     @Positive
+    @Builder.Default
     private int page = 1; //default value
     @Positive
+    @Builder.Default
     private int pageSize = 10; //default value
 }

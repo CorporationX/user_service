@@ -70,6 +70,13 @@ public class UserController {
         return userService.getFollowers(userId);
     }
 
+    @Operation(summary = "Get list id followers of user's by userID")
+    @GetMapping("/followers/{id}")
+    List<Long> getFollowerIdsById(@PathVariable("id") long id){
+
+        return null;
+    }
+
     @Operation(summary = "Save user's Jira account info")
     @PutMapping("/jira")
     public UserDto saveJiraAccountInfo(@RequestBody JiraAccountDto jiraAccountDto) {

@@ -1,5 +1,6 @@
 package school.faang.user_service.service.user.parse;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,6 +28,7 @@ public class ReadAndDivideTest {
     @Nested
     class PositiveTests {
 
+        @DisplayName("should return data with 4 elements when passed")
         @Test
         void testForToCsvPartDivider() throws FileNotFoundException {
             assertEquals(4, readAndDivide.toCsvPartDivider(getInputStream()).size());
@@ -36,8 +38,9 @@ public class ReadAndDivideTest {
     @Nested
     class NegativeTests {
 
+        @DisplayName("should throw exception when reader.readLine()")
         @Test
-        void testForToCsvPartDividerIfInputStreamIsClose() throws IOException {
+        void toCsvPartDividerIfInputStreamIsCloseTest() throws IOException {
             InputStream inputStream = getInputStream();
             inputStream.close();
             DataValidationException exception = assertThrows(DataValidationException.class,
@@ -45,15 +48,17 @@ public class ReadAndDivideTest {
             assertEquals(INPUT_OUTPUT_EXCEPTION.getMessage(), exception.getMessage());
         }
 
+        @DisplayName("should throw exception when lines.isEmpty()")
         @Test
-        void testForToCsvPartDividerIfInputIsEmpty() {
+        void toCsvPartDividerIfInputIsEmptyTest() {
             DataValidationException exception = assertThrows(DataValidationException.class,
                     () -> readAndDivide.toCsvPartDivider(new ByteArrayInputStream(new byte[0])));
             assertEquals(INPUT_IS_EMPTY.getMessage(), exception.getMessage());
         }
 
+        @DisplayName("should throw exception when inputStream == null")
         @Test
-        void testForToCsvPartDividerIfInputIsNull() {
+        void toCsvPartDividerIfInputIsNullTest() {
             assertThrows(RuntimeException.class,
                     () -> readAndDivide.toCsvPartDivider(null));
         }

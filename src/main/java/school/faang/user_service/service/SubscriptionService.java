@@ -72,4 +72,12 @@ public class SubscriptionService {
                 .limit(filter.getPageSize())
                 .toList();
     }
+
+    public long getFollowersCount(long followeeId) {
+        return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
+    }
+
+    public long getFollowessCount(long followerId) {
+        return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
+    }
 }

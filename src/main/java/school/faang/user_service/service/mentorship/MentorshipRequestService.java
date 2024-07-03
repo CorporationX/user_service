@@ -3,19 +3,24 @@ package school.faang.user_service.service.mentorship;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
+import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.mapper.mentorship.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.validator.MentorshipRequestValidator;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.StreamSupport;
 
 @Component
 @RequiredArgsConstructor
 public class MentorshipRequestService {
-    private final MentorshipRequestRepository mentorshipRequestRepository;
-    private final MentorshipRequestValidator mentorshipRequestValidator;
     private final MentorshipRequestMapper mentorshipRequestMapper;
+    private final MentorshipRequestValidator mentorshipRequestValidator;
+    private final MentorshipRequestRepository mentorshipRequestRepository;
+    private final List<MentorshipRequestFilter> mentorshipRequestFilterList;
 
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         long requesterId = mentorshipRequestDto.getRequesterId();
@@ -23,14 +28,24 @@ public class MentorshipRequestService {
         String description = mentorshipRequestDto.getDescription();
         LocalDateTime mentorshipCreationDate = mentorshipRequestDto.getCreatedAt();
 
-        validateMentorshipRequest(requesterId, receiverId, mentorshipCreationDate);
+        mentorshipRequestValidator.validateMentorshipRequestReceiverAndRequesterExistence(requesterId, receiverId);
+        mentorshipRequestValidator.validateReflection(requesterId, receiverId);
+        mentorshipRequestValidator.validateMentorshipRequestFrequency(requesterId, receiverId, mentorshipCreationDate);
         MentorshipRequest mentorshipRequest = mentorshipRequestRepository.create(requesterId, receiverId, description);
         return mentorshipRequestMapper.toDto(mentorshipRequest);
     }
 
-    private void validateMentorshipRequest(long requesterId, long receiverId, LocalDateTime mentorshipCreationDate) {
-        mentorshipRequestValidator.validateMentorshipRequestReceiverAndRequesterExistence(requesterId, receiverId);
-        mentorshipRequestValidator.validateReflection(requesterId, receiverId);
-        mentorshipRequestValidator.validateMentorshipRequestFrequency(requesterId, receiverId, mentorshipCreationDate);
+    public List<MentorshipRequestDto> getRequests(MentorshipRequestFilterDto filtersDto) {
+        List<MentorshipRequest> allMatchedRequests = selectAllMatchedRequestsAndFilter(filtersDto);
+        return allMatchedRequests.stream().map(mentorshipRequestMapper::toDto).toList();
+    }
+
+    private List<MentorshipRequest> selectAllMatchedRequestsAndFilter(MentorshipRequestFilterDto filtersDto) {
+        List<MentorshipRequestFilter> mentorshipRequestApplicableFilters
+                = mentorshipRequestFilterList.stream().filter(filter -> filter.isApplicable(filtersDto)).toList();
+        List<MentorshipRequest> allMentorshipRequests =
+                StreamSupport.stream(mentorshipRequestRepository.findAll().spliterator(), false).toList();
+        return allMentorshipRequests.stream().filter(request -> mentorshipRequestApplicableFilters.stream()
+                .allMatch(filter -> filter.filter(request, filtersDto))).toList();
     }
 }

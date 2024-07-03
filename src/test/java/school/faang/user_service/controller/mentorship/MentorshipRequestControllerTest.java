@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
 import school.faang.user_service.validator.MentorshipRequestValidator;
 
@@ -45,5 +46,14 @@ class MentorshipRequestControllerTest {
         MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto();
         mentorshipRequestDto.setDescription("description");
         return mentorshipRequestDto;
+    }
+
+    @Test
+    public void testGetRequestsServiceExecution() {
+        MentorshipRequestFilterDto mentorshipRequestFilterDto = new MentorshipRequestFilterDto();
+
+        mentorshipRequestController.getRequests(mentorshipRequestFilterDto);
+        verify(mentorshipRequestService, times(1))
+                .getRequests(mentorshipRequestFilterDto);
     }
 }

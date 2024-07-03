@@ -9,9 +9,13 @@ import school.faang.user_service.controller.SkillController;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
 
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class SkillControllerTest {
@@ -45,6 +49,20 @@ public class SkillControllerTest {
         skillDto.setTitle("Title");
 
         skillController.create(skillDto);
+
         verify(skillService, times(1)).create(skillDto);
+    }
+
+    @Test
+    void testGetUserSkills() {
+        List<SkillDto> skillDtos = List.of(new SkillDto(), new SkillDto());
+        long userId = 1;
+
+        when(skillService.getUserSkills(userId)).thenReturn(skillDtos);
+
+        List<SkillDto> returnedSkillDtos = skillService.getUserSkills(userId);
+
+        verify(skillService, times(1)).getUserSkills(userId);
+        assertEquals(skillDtos, returnedSkillDtos);
     }
 }

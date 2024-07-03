@@ -1,6 +1,5 @@
 package school.faang.user_service.service;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -10,10 +9,14 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,9 +34,18 @@ public class SkillServiceTest {
     SkillMapper skillMapper = Mappers.getMapper(SkillMapper.class);
 
     @Test
+    void testCreateWhenExistsByTitle() {
+        SkillDto skillDto = new SkillDto();
+        skillDto.setTitle("Title");
+
+        when(skillRepository.existsByTitle(skillDto.getTitle())).thenReturn(true);
+
+        assertThrows(DataValidationException.class, () -> skillService.create(skillDto));
+    }
+
+    @Test
     void testCreateSaveToDb() {
         SkillDto skillDto = new SkillDto(0L, "Title");
-
         Skill skill = skillMapper.toEntity(skillDto);
 
         when(skillRepository.existsByTitle(skillDto.getTitle())).thenReturn(false);
@@ -43,5 +55,19 @@ public class SkillServiceTest {
 
         verify(skillRepository, times(1)).existsByTitle(skillDto.getTitle());
         verify(skillRepository, times(1)).save(skill);
+    }
+
+    @Test
+    void testGetUserSkills() {
+        long userId = 1;
+        Skill skill = new Skill();
+        List<SkillDto> skillDtos = List.of(skillMapper.toDto(skill));
+
+        when(skillRepository.findAllByUserId(userId)).thenReturn(List.of(skill));
+
+        List<SkillDto> returnedSkillDtos = skillService.getUserSkills(userId);
+
+        verify(skillRepository, times(1)).findAllByUserId(userId);
+        assertEquals(skillDtos, returnedSkillDtos);
     }
 }

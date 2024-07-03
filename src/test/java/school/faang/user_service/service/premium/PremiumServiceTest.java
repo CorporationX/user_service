@@ -14,7 +14,9 @@ import school.faang.user_service.dto.premium.PremiumDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.premium.PremiumPeriod;
+import school.faang.user_service.event.UserPremiumBoughtEvent;
 import school.faang.user_service.mapper.premium.PremiumMapperImpl;
+import school.faang.user_service.publisher.PremiumBoughtEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.premium.PremiumRepository;
 import school.faang.user_service.validation.premium.PremiumValidator;
@@ -51,6 +53,9 @@ class PremiumServiceTest {
     private PremiumValidator premiumValidator;
 
     @Mock
+    private PremiumBoughtEventPublisher premiumBoughtEventPublisher;
+
+    @Mock
     private ExecutorService executorService;
 
     @InjectMocks
@@ -74,6 +79,7 @@ class PremiumServiceTest {
         verify(premiumRepository, times(1)).save(any(Premium.class));
         verify(premiumMapper, times(1)).toDto(any(Premium.class));
         verify(paymentService, times(1)).sendPayment(any(PaymentRequest.class));
+        verify(premiumBoughtEventPublisher, times(1)).publish(any(UserPremiumBoughtEvent.class));
     }
 
     @Test

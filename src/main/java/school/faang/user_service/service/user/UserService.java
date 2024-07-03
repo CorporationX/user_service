@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.jira.JiraAccountDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
@@ -15,6 +14,7 @@ import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.jira.JiraAccount;
 import school.faang.user_service.mapper.jira.JiraAccountMapper;
 import school.faang.user_service.mapper.user.UserMapper;
+import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.jira.JiraAccountRepository;
 import school.faang.user_service.service.user.filter.UserFilter;
@@ -29,6 +29,7 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final SubscriptionRepository subscriptionRepository;
     private final UserMapper userMapper;
     private final List<UserFilter> userFilters;
     private final UserValidator userValidator;
@@ -111,5 +112,9 @@ public class UserService {
                 .fileId(avatar + uuid)
                 .smallFileId(smallAvatar + uuid)
                 .build());
+    }
+
+    public List<Long> getFollowerIdsById(long id) {
+        return subscriptionRepository.findFollowerIdsById(id);
     }
 }

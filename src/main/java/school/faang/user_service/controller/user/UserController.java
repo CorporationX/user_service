@@ -72,9 +72,8 @@ public class UserController {
 
     @Operation(summary = "Get list id followers of user's by userID")
     @GetMapping("/followers/{id}")
-    List<Long> getFollowerIdsById(@PathVariable("id") long id){
-
-        return null;
+    List<Long> getFollowerIdsById(@PathVariable("id") long id) {
+        return userService.getFollowerIdsById(id);
     }
 
     @Operation(summary = "Save user's Jira account info")

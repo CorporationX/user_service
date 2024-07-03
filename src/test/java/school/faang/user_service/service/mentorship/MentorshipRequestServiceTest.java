@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.controller.mentorship.RejectionDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
@@ -35,6 +36,8 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipRequestServiceTest {
+    @Captor
+    private ArgumentCaptor<RequestStatus> requestStatusCaptor;
     @Captor
     private ArgumentCaptor<MentorshipRequest> mentorshipRequestCaptor;
     @Spy
@@ -153,22 +156,22 @@ class MentorshipRequestServiceTest {
         long requestId = 1L;
 
         when(mentorshipRequestRepository.findById(requestId)).thenReturn(Optional.empty());
-        IllegalArgumentException exception =
-                assertThrows(IllegalArgumentException.class, () -> mentorshipRequestService.acceptRequest(1L));
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> mentorshipRequestService.acceptRequest(requestId));
         assertEquals("Could not find Mentorship Request in database by id: " + requestId,
                 exception.getMessage());
     }
 
     @Test
     public void testAcceptRequestWithValidatorExecutionVerification() {
-        MentorshipRequest mentorshipRequest = getMentorshipRequest(1L, RequestStatus.ACCEPTED);
+        MentorshipRequest mentorshipRequest = getMentorshipRequest(1L, RequestStatus.PENDING);
 
         when(mentorshipRequestRepository.findById(mentorshipRequest.getId()))
                 .thenReturn(Optional.of(mentorshipRequest));
 
         mentorshipRequestService.acceptRequest(mentorshipRequest.getId());
         verify(mentorshipRequestValidator, times(1))
-                .validateRequestStatusIsPending(mentorshipRequest.getStatus());
+                .validateRequestStatusIsPending(requestStatusCaptor.capture());
     }
 
     @Test
@@ -190,7 +193,61 @@ class MentorshipRequestServiceTest {
                 .thenReturn(Optional.of(mentorshipRequest));
 
         mentorshipRequestService.acceptRequest(mentorshipRequest.getId());
-        verify(mentorshipRequestMapper, times(1)).toDto(mentorshipRequest);
+        verify(mentorshipRequestMapper, times(1)).toDto(mentorshipRequestCaptor.capture());
+    }
+
+    @Test
+    public void testRejectRequestWithNonExistingMentorshipRequest() {
+        long requestId = 1L;
+        RejectionDto rejectionDto = getRejectionDto("Some reason");
+
+        when(mentorshipRequestRepository.findById(requestId)).thenReturn(Optional.empty());
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> mentorshipRequestService.rejectRequest(requestId, rejectionDto));
+        assertEquals("Could not find Mentorship Request in database by id: " + requestId,
+                exception.getMessage());
+    }
+
+    @Test
+    public void testRejectionRequestWithValidationRequestExecution() {
+        MentorshipRequest mentorshipRequest = getMentorshipRequest(1L, RequestStatus.PENDING);
+        RejectionDto rejectionDto = getRejectionDto("Rejection Reason");
+
+        when(mentorshipRequestRepository.findById(mentorshipRequest.getId()))
+                .thenReturn(Optional.of(mentorshipRequest));
+        mentorshipRequestService.rejectRequest(mentorshipRequest.getId(), rejectionDto);
+        verify(mentorshipRequestValidator, times(1))
+                .validateRequestStatusIsPending(requestStatusCaptor.capture());
+    }
+
+    @Test
+    public void testRejectionRequestWithRepositorySaveExecution() {
+        MentorshipRequest mentorshipRequest = getMentorshipRequest(1L, RequestStatus.PENDING);
+        RejectionDto rejectionDto = getRejectionDto("Rejection Reason");
+
+        when(mentorshipRequestRepository.findById(mentorshipRequest.getId()))
+                .thenReturn(Optional.of(mentorshipRequest));
+        mentorshipRequestService.rejectRequest(mentorshipRequest.getId(), rejectionDto);
+        verify(mentorshipRequestRepository, times(1))
+                .save(mentorshipRequestCaptor.capture());
+    }
+
+    @Test
+    public void testRejectionRequestWithToDtoExecution() {
+        MentorshipRequest mentorshipRequest = getMentorshipRequest(1L, RequestStatus.PENDING);
+        RejectionDto rejectionDto = getRejectionDto("Rejection Reason");
+
+        when(mentorshipRequestRepository.findById(mentorshipRequest.getId()))
+                .thenReturn(Optional.of(mentorshipRequest));
+        mentorshipRequestService.rejectRequest(mentorshipRequest.getId(), rejectionDto);
+        verify(mentorshipRequestMapper, times(1))
+                .toDto(mentorshipRequestCaptor.capture());
+    }
+
+    private RejectionDto getRejectionDto(String rejectionReason) {
+        RejectionDto rejectionDto = new RejectionDto();
+        rejectionDto.setRejectionReason(rejectionReason);
+        return rejectionDto;
     }
 
     private MentorshipRequestFilterDto getMentorshipRequestFilterDto(long requesterId, long receiverId,

@@ -12,6 +12,7 @@ import school.faang.user_service.repository.mentorship.MentorshipRequestReposito
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -38,6 +39,15 @@ class MentorshipRequestValidatorTest {
     public void testValidationWithBlankDescription() {
         assertThrows(IllegalArgumentException.class,
                 () -> mentorshipRequestValidator.validateMentorshipRequestDescription("   "));
+    }
+
+    @Test
+    public void testValidationWithTooLongDescription() {
+        StringBuilder description = new StringBuilder();
+        IntStream.range(0, 4097).forEach(i -> description.append("a"));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> mentorshipRequestValidator.validateMentorshipRequestDescription(description.toString()));
     }
 
     @Test

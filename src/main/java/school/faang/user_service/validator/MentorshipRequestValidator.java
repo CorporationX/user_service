@@ -24,6 +24,8 @@ public class MentorshipRequestValidator {
     public void validateMentorshipRequestDescription(String description) {
         if (description == null || description.isBlank()) {
             throw new IllegalArgumentException("There should be description");
+        } else if (description.length() > 4096) {
+            throw new IllegalArgumentException("Description length should be not greater than 4096 characters");
         }
     }
 

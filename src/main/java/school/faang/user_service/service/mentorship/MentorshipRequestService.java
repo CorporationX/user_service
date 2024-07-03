@@ -2,6 +2,7 @@ package school.faang.user_service.service.mentorship;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import school.faang.user_service.controller.mentorship.RejectionDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
@@ -37,11 +38,11 @@ public class MentorshipRequestService {
     }
 
     public List<MentorshipRequestDto> getRequests(MentorshipRequestFilterDto filtersDto) {
-        List<MentorshipRequest> allMatchedRequests = selectAllMatchedRequestsAndFilter(filtersDto);
+        List<MentorshipRequest> allMatchedRequests = selectAllMentorshipRequestsAndFilter(filtersDto);
         return allMatchedRequests.stream().map(mentorshipRequestMapper::toDto).toList();
     }
 
-    private List<MentorshipRequest> selectAllMatchedRequestsAndFilter(MentorshipRequestFilterDto filtersDto) {
+    private List<MentorshipRequest> selectAllMentorshipRequestsAndFilter(MentorshipRequestFilterDto filtersDto) {
         List<MentorshipRequestFilter> mentorshipRequestApplicableFilters =
                 mentorshipRequestFilterList.stream().filter(filter -> filter.isApplicable(filtersDto)).toList();
         List<MentorshipRequest> allMentorshipRequests =
@@ -50,15 +51,31 @@ public class MentorshipRequestService {
                 .allMatch(filter -> filter.filter(request, filtersDto))).toList();
     }
 
-    public MentorshipRequestDto acceptRequest(long id) {
-        return mentorshipRequestRepository.findById(id).map(mentorshipRequest -> {
-            RequestStatus mentorshipRequestStatus = mentorshipRequest.getStatus();
+    public MentorshipRequestDto acceptRequest(long requestId) {
+        MentorshipRequest mentorshipRequest = getMentorshipRequestByIdOrThrowException(requestId);
+        mentorshipRequestValidator.validateRequestStatusIsPending(mentorshipRequest.getStatus());
+        MentorshipRequest savedMentorshipRequest =
+                setRequestStatusAndSaveToDataBase(mentorshipRequest, RequestStatus.ACCEPTED);
+        return mentorshipRequestMapper.toDto(savedMentorshipRequest);
+    }
 
-            mentorshipRequestValidator.validateRequestStatusIsPending(mentorshipRequestStatus);
-            mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
-            mentorshipRequestRepository.save(mentorshipRequest);
-            return mentorshipRequestMapper.toDto(mentorshipRequest);
-        }).orElseThrow(
-                () -> new IllegalArgumentException("Could not find Mentorship Request in database by id: " + id));
+    public MentorshipRequestDto rejectRequest(long requestId, RejectionDto rejectionDto) {
+        MentorshipRequest mentorshipRequest = getMentorshipRequestByIdOrThrowException(requestId);
+        mentorshipRequestValidator.validateRequestStatusIsPending(mentorshipRequest.getStatus());
+        mentorshipRequest.setRejectionReason(rejectionDto.getRejectionReason());
+        setRequestStatusAndSaveToDataBase(mentorshipRequest, RequestStatus.REJECTED);
+        return mentorshipRequestMapper.toDto(mentorshipRequest);
+    }
+
+    private MentorshipRequest setRequestStatusAndSaveToDataBase(MentorshipRequest mentorshipRequest, RequestStatus requestStatus) {
+        mentorshipRequest.setStatus(requestStatus);
+        mentorshipRequest.setUpdatedAt(LocalDateTime.now());
+        return mentorshipRequestRepository.save(mentorshipRequest);
+    }
+
+    private MentorshipRequest getMentorshipRequestByIdOrThrowException(long requestId) {
+        return mentorshipRequestRepository.findById(requestId).orElseThrow(
+                () -> new IllegalArgumentException("Could not find Mentorship Request in database by id: " + requestId)
+        );
     }
 }

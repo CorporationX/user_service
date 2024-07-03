@@ -27,4 +27,8 @@ public class MentorshipRequestController {
     public MentorshipRequestDto acceptRequest(long id) {
         return mentorshipRequestService.acceptRequest(id);
     }
+
+    public MentorshipRequestDto rejectRequest(long id, RejectionDto rejection) {
+        return mentorshipRequestService.rejectRequest(id, rejection);
+    }
 }

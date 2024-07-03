@@ -26,7 +26,7 @@ class MentorshipRequestControllerTest {
 
     @Test
     public void testRequestMentorshipValidationExecution() {
-        MentorshipRequestDto mentorshipRequestDto = getMentorshipRequestDto();
+        MentorshipRequestDto mentorshipRequestDto = getMentorshipRequestDtoWithDescription("some value");
 
         mentorshipRequestController.requestMentorship(mentorshipRequestDto);
         verify(mentorshipRequestValidator, times(1))
@@ -35,16 +35,16 @@ class MentorshipRequestControllerTest {
 
     @Test
     public void testRequestMentorshipServiceExecution() {
-        MentorshipRequestDto mentorshipRequestDto = getMentorshipRequestDto();
+        MentorshipRequestDto mentorshipRequestDto = getMentorshipRequestDtoWithDescription("description");
 
         mentorshipRequestController.requestMentorship(mentorshipRequestDto);
         verify(mentorshipRequestService, times(1))
                 .requestMentorship(mentorshipRequestDto);
     }
 
-    private MentorshipRequestDto getMentorshipRequestDto() {
+    private MentorshipRequestDto getMentorshipRequestDtoWithDescription(String description) {
         MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto();
-        mentorshipRequestDto.setDescription("description");
+        mentorshipRequestDto.setDescription(description);
         return mentorshipRequestDto;
     }
 
@@ -63,5 +63,15 @@ class MentorshipRequestControllerTest {
 
         mentorshipRequestController.acceptRequest(requestId);
         verify(mentorshipRequestService, times(1)).acceptRequest(requestId);
+    }
+
+    @Test
+    public void testRejectRequestServiceExecution() {
+        long requestId = 1L;
+        RejectionDto rejectionDto = new RejectionDto();
+        rejectionDto.setRejectionReason("rejection reason");
+
+        mentorshipRequestController.rejectRequest(requestId, rejectionDto);
+        verify(mentorshipRequestService, times(1)).rejectRequest(requestId, rejectionDto);
     }
 }

@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.exception.DataValidationException;
@@ -64,10 +65,22 @@ public class SkillServiceTest {
         List<SkillDto> skillDtos = List.of(skillMapper.toDto(skill));
 
         when(skillRepository.findAllByUserId(userId)).thenReturn(List.of(skill));
-
         List<SkillDto> returnedSkillDtos = skillService.getUserSkills(userId);
 
         verify(skillRepository, times(1)).findAllByUserId(userId);
         assertEquals(skillDtos, returnedSkillDtos);
+    }
+
+    @Test
+    void testGetOfferedSkills() {
+        long userId = 1;
+        Skill skill = new Skill();
+        List<SkillCandidateDto> skillCandidateDtos = List.of(skillMapper.toSkillCandidateDto(skill));
+
+        when(skillRepository.findSkillsOfferedToUser(userId)).thenReturn(List.of(skill));
+        List<SkillCandidateDto> returnedSkillCandidateDtos = skillService.getOfferedSkills(userId);
+
+        verify(skillRepository, times(1)).findSkillsOfferedToUser(userId);
+        assertEquals(skillCandidateDtos, returnedSkillCandidateDtos);
     }
 }

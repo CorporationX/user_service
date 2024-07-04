@@ -18,7 +18,6 @@ import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.List;
 

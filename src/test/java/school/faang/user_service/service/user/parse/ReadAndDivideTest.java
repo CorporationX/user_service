@@ -10,13 +10,10 @@ import school.faang.user_service.exception.DataValidationException;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static school.faang.user_service.exception.message.ExceptionMessage.INPUT_IS_EMPTY;
-import static school.faang.user_service.exception.message.ExceptionMessage.INPUT_OUTPUT_EXCEPTION;
 
 @ExtendWith(MockitoExtension.class)
 public class ReadAndDivideTest {

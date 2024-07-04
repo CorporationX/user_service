@@ -19,14 +19,14 @@ public class UserFilterDto {
     private String cityPattern;
     private String phonePattern;
     private String skillPattern;
-    @Positive
+    @Positive(message = "Value should be positive")
     private Integer experienceMin;
-    @Positive
+    @Positive(message = "Value should be positive")
     private Integer experienceMax;
-    @Positive
+    @Positive(message = "Value should be positive")
     @Builder.Default
     private int page = 1; //default value
-    @Positive
+    @Positive(message = "Value should be positive")
     @Builder.Default
     private int pageSize = 10; //default value
 }

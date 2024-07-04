@@ -2,29 +2,32 @@ package school.faang.user_service.service.user.parse;
 
 import school.faang.user_service.entity.*;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Util {
 
-    public InputStream getInputStream() throws FileNotFoundException {
-        return new FileInputStream("C:\\Users\\vladi\\Desktop\\Programming\\Faang-school\\Module 2,3,4\\CorporationX" +
-                "\\user_service\\src\\main\\resources\\files\\studentsForTests.csv");
+    private final String header = "firstName,lastName,yearOfBirth,group,studentID,email,phone,street,city,state,country" +
+            ",postalCode,faculty,yearOfStudy,major,GPA,status,admissionDate,graduationDate,degree,institution" +
+            ",completionYear,scholarship,employer\n";
+
+    private final String line = "John,Doe,1998,A,123456,johndoe@example.com,+1-123-456-7890,123 Main Street,New York,NY,USA" +
+            ",10001,Computer Science,3,Software Engineering,3.8,Active,2016-09-01,2020-05-30,High School Diploma" +
+            ",XYZ High School,2016,true,XYZ Technologies";
+
+    public InputStream getInputStream() {
+        String data = header + line;
+        return new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8));
     }
 
     public List<CsvPart> getCsvParts() {
-        String header = "firstName,lastName,yearOfBirth,group,studentID,email,phone,street,city,state,country" +
-                ",postalCode,faculty,yearOfStudy,major,GPA,status,admissionDate,graduationDate,degree,institution" +
-                ",completionYear,scholarship,employer\n";
         CsvPart part = new CsvPart();
         part.setLines(List.of(
                 header,
-                "John,Doe,1998,A,123456,johndoe@example.com,+1-123-456-7890,123 Main Street,New York,NY,USA" +
-                        ",10001,Computer Science,3,Software Engineering,3.8,Active,2016-09-01,2020-05-30,High School Diploma" +
-                        ",XYZ High School,2016,true,XYZ Technologies"
+                line
         ));
         List<CsvPart> parts = new ArrayList<>();
         parts.add(part);

@@ -62,7 +62,7 @@ public class DataFromFileServiceTest {
 
         @DisplayName("should return data with Country when passed")
         @Test
-        void saveUsersFromFileTest() throws FileNotFoundException {
+        void saveUsersFromFileTest() {
             Util util = new Util();
             InputStream inputStream = util.getInputStream();
             List<CsvPart> csvParts = util.getCsvParts();

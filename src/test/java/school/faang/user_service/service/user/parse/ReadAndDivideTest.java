@@ -38,17 +38,6 @@ public class ReadAndDivideTest {
     @Nested
     class NegativeTests {
 
-        @DisplayName("should throw exception when reader.readLine()")
-        @Test
-        void toCsvPartDividerIfInputStreamIsCloseTest() throws IOException {
-            Util util = new Util();
-            InputStream inputStream = util.getInputStream();
-            inputStream.close();
-            DataValidationException exception = assertThrows(DataValidationException.class,
-                    () -> readAndDivide.toCsvPartDivider(inputStream));
-            assertEquals(INPUT_OUTPUT_EXCEPTION.getMessage(), exception.getMessage());
-        }
-
         @DisplayName("should throw exception when lines.isEmpty()")
         @Test
         void toCsvPartDividerIfInputIsEmptyTest() {

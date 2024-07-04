@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.EventDto;
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.service.eventServiceImpl.EventParticipationServiceImpl;
+import school.faang.user_service.service.eventService.EventParticipationServiceImpl;
 
 import java.util.List;
 

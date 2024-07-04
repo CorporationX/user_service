@@ -1,9 +1,8 @@
 package school.faang.user_service.dto;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,8 +17,7 @@ public class UserDto {
     private long id;
 
     @NotBlank
-    @Min(3)
-    @Max(64)
+    @Size(min = 3, max = 64)
     private String username;
 
     @NotBlank

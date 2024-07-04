@@ -7,9 +7,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.Validate.ParticipantOnEventValidator;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
-import school.faang.user_service.service.eventServiceImpl.EventParticipationServiceImpl;
+import school.faang.user_service.service.eventService.EventParticipationServiceImpl;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -23,20 +24,23 @@ public class EventParticipationServiceImplTest {
     @Mock
     private EventParticipationRepository eventParticipationRepository;
 
+    @Mock
+    private ParticipantOnEventValidator participantOnEventValidator;
+
     @Spy
     private UserMapper userMapper;
 
     @Test
     @DisplayName("Test register existing user on event")
     public void testRegisterWithExistingUserAndEvent() {
-        when(eventParticipationRepository.checkParticipantAtEvent(anyLong(), anyLong())).thenReturn(1);
+        when(participantOnEventValidator.checkParticipantAtEvent(anyLong(), anyLong())).thenReturn(true);
         assertThrows(IllegalArgumentException.class, () -> eventParticipationService.registerParticipant(1L, 2L));
     }
 
     @Test
     @DisplayName("Test register user on event")
     public void testRegisterUserOnEvent() {
-        when(eventParticipationRepository.checkParticipantAtEvent(1L, 2L)).thenReturn(0);
+        when(participantOnEventValidator.checkParticipantAtEvent(1L, 2L)).thenReturn(false);
         eventParticipationService.registerParticipant(1L, 2L);
         verify(eventParticipationRepository, times(1)).register(1L, 2L);
     }
@@ -44,7 +48,7 @@ public class EventParticipationServiceImplTest {
     @Test
     @DisplayName("Test unregister existing user on event")
     public void testUnregisterExistingUserOnEvent() {
-        when(eventParticipationRepository.checkParticipantAtEvent(1L, 2L)).thenReturn(1);
+        when(participantOnEventValidator.checkParticipantAtEvent(1L, 2L)).thenReturn(true);
         eventParticipationService.unregisterParticipant(1L, 2L);
         verify(eventParticipationRepository, times(1)).unregister(1L, 2L);
     }
@@ -52,7 +56,7 @@ public class EventParticipationServiceImplTest {
     @Test
     @DisplayName("Test unregister user on event")
     public void testUnregisterUserOnEvent() {
-        when(eventParticipationRepository.checkParticipantAtEvent(1L, 2L)).thenReturn(0);
+        when(participantOnEventValidator.checkParticipantAtEvent(1L, 2L)).thenReturn(false);
         assertThrows(IllegalArgumentException.class, () -> eventParticipationService.unregisterParticipant(1L, 2L));
     }
 

@@ -1,15 +1,15 @@
 package school.faang.user_service.repository.event;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
 
 @Repository
-public interface EventParticipationRepository extends CrudRepository<User, Long> {
+public interface EventParticipationRepository extends JpaRepository<User, Long> {
 
     @Modifying
     @Query(nativeQuery = true, value = "INSERT INTO user_event (event_id, user_id) VALUES (:eventId, :userId)")
@@ -31,10 +31,4 @@ public interface EventParticipationRepository extends CrudRepository<User, Long>
             WHERE ue.event_id = :eventId
             """)
     int countParticipants(long eventId);
-
-    @Query(nativeQuery = true, value = """
-            SELECT COUNT(ue.id) FROM user_event ue
-            WHERE ue.event_id = :eventId AND ue.user_id = :userId
-            """)
-    int checkParticipantAtEvent(long eventId, long userId);
 }

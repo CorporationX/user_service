@@ -57,3 +57,5 @@ databaseChangeLog:
       file: db/changelog/changeset/user_V028__user_skill_guarantees.sql
   - include:
       file: db/changelog/changeset/user_V029_jira_account.sql
+  - include:
+      file: db/changelog/changeset/V030__add_user_ban_field.sql

@@ -9,10 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
-import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.exception.NoAccessException;
-import school.faang.user_service.exception.NotFoundException;
-import school.faang.user_service.exception.ErrorResponse;
+import school.faang.user_service.exception.*;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -66,6 +63,13 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleRuntimeException(RuntimeException e, HttpServletRequest request) {
         log.error("Runtime exception: {}", e.getMessage(), e);
         return buildErrorResponse(e, request);
+    }
+
+    @ExceptionHandler(DeserializeException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleDeserializeException(DeserializeException ex, HttpServletRequest request) {
+        log.warn("DeserializeException: ", ex);
+        return buildErrorResponse(ex, request);
     }
 
     private ErrorResponse buildErrorResponse(Exception e, HttpServletRequest request) {

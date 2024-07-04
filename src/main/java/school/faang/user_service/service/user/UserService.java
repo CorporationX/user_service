@@ -20,4 +20,6 @@ public interface UserService {
     List<UserDto> getUsersByIds(List<Long> ids);
 
     UserDto getUserById(long userId);
+
+    void banUserByIds(List<Long> userIds);
 }

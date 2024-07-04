@@ -6,7 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.AlreadyExistsException;
+import school.faang.user_service.exception.MessageError;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
 
@@ -22,9 +23,9 @@ public class SubscriptionService {
     private final UserMapper userMapper;
 
     public void followUser(long followerId, long followeeId) {
-        boolean isAlreadyFollow = subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
-        if (isAlreadyFollow) {
-            throw new DataValidationException("Following already exists");
+        boolean followingExists = subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
+        if (followingExists) {
+            throw new AlreadyExistsException(MessageError.FOLLOWING_EXISTS);
         }
         // нужно ли проверять существуют ли вообще такие пользователи? типо userRepository.existsById
 
@@ -32,9 +33,9 @@ public class SubscriptionService {
     }
 
     public void unfollowUser(long followerId, long followeeId) {
-        boolean isAlreadyFollow = subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
-        if (!isAlreadyFollow) {
-            throw new DataValidationException("Following does not exist");
+        boolean followingExists = subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
+        if (!followingExists) {
+            throw new AlreadyExistsException(MessageError.FOLLOWING_DOESNT_EXIST);
         }
 
         subscriptionRepository.unfollowUser(followerId, followeeId);

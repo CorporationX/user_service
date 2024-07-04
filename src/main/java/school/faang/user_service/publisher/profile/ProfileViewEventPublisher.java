@@ -28,7 +28,6 @@ public class ProfileViewEventPublisher implements MessagePublisher<ProfileViewEv
 
     @Override
     public void publish(ProfileViewEvent event) {
-        publishToRedis(event);
         publishToKafka(event);
     }
 

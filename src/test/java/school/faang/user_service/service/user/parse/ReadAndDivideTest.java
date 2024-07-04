@@ -17,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static school.faang.user_service.exception.message.ExceptionMessage.INPUT_IS_EMPTY;
 import static school.faang.user_service.exception.message.ExceptionMessage.INPUT_OUTPUT_EXCEPTION;
-import static school.faang.user_service.service.user.parse.Util.getInputStream;
 
 @ExtendWith(MockitoExtension.class)
 public class ReadAndDivideTest {
@@ -31,7 +30,8 @@ public class ReadAndDivideTest {
         @DisplayName("should return data with 4 elements when passed")
         @Test
         void testForToCsvPartDivider() throws FileNotFoundException {
-            assertEquals(4, readAndDivide.toCsvPartDivider(getInputStream()).size());
+            Util util = new Util();
+            assertEquals(4, readAndDivide.toCsvPartDivider(util.getInputStream()).size());
         }
     }
 
@@ -41,7 +41,8 @@ public class ReadAndDivideTest {
         @DisplayName("should throw exception when reader.readLine()")
         @Test
         void toCsvPartDividerIfInputStreamIsCloseTest() throws IOException {
-            InputStream inputStream = getInputStream();
+            Util util = new Util();
+            InputStream inputStream = util.getInputStream();
             inputStream.close();
             DataValidationException exception = assertThrows(DataValidationException.class,
                     () -> readAndDivide.toCsvPartDivider(inputStream));

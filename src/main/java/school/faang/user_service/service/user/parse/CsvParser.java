@@ -61,7 +61,6 @@ public class CsvParser {
             throw new DataValidationException(INPUT_OUTPUT_EXCEPTION.getMessage());
         }
         executorService.shutdown();
-
         return allPersons;
     }
 

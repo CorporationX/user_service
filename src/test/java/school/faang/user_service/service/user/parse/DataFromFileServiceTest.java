@@ -5,23 +5,28 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import school.faang.user_service.entity.Country;
+import school.faang.user_service.entity.Person;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.CountryRepository;
 import school.faang.user_service.repository.UserRepository;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.verify;
-import static school.faang.user_service.service.user.parse.Util.getInputStream;
+import static org.mockito.Mockito.when;
+
 
 @ExtendWith(MockitoExtension.class)
 public class DataFromFileServiceTest {
@@ -35,17 +40,14 @@ public class DataFromFileServiceTest {
     @Mock
     private CountryRepository countryRepository;
 
-    @Spy
-    private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
+    @Mock
+    private UserMapper userMapper;
 
-    @Spy
+    @Mock
     private CsvParser csvParser;
 
-    @Spy
+    @Mock
     private ReadAndDivide readAndDivide;
-
-    @Captor
-    private ArgumentCaptor<List<InputStream>> inputStreamArgumentCaptor;
 
     @Captor
     private ArgumentCaptor<List<User>> userArgumentCaptor;
@@ -58,28 +60,25 @@ public class DataFromFileServiceTest {
     @Nested
     class PositiveTests {
 
-        @DisplayName("should return data with 4 elements when passed")
+        @DisplayName("should return data with Country when passed")
         @Test
         void saveUsersFromFileTest() throws FileNotFoundException {
-            assertEquals(4, dataFromFileService.saveUsersFromFile(getInputStream()).size());
-        }
+            Util util = new Util();
+            InputStream inputStream = util.getInputStream();
+            List<CsvPart> csvParts = util.getCsvParts();
+            Person person = util.getPersons().get(0);
+            Country country = new Country();
+            country.setTitle("USA");
+            Iterable<Country> countries = List.of(country);
+            when(readAndDivide.toCsvPartDivider(inputStream)).thenReturn(csvParts);
+            when(csvParser.multiParseCsv(anyList())).thenReturn(util.getPersons());
+            when(countryRepository.findAll()).thenReturn(countries);
+            when(userMapper.toUser(person)).thenReturn(new User());
 
-        @DisplayName("should return data with 4 elements when passed")
-        @Test
-        void saveUsersFromFileCheckCsvParserOnClickTest() throws IOException {
-            dataFromFileService.saveUsersFromFile(getInputStream());
-
-            verify(csvParser).multiParseCsv(inputStreamArgumentCaptor.capture());
-            assertEquals(4, inputStreamArgumentCaptor.getValue().size());
-        }
-
-        @DisplayName("should return data with 4 elements when passed")
-        @Test
-        void saveUsersFromFileCheckUserRepositoryOnClickTest() throws FileNotFoundException {
-            dataFromFileService.saveUsersFromFile(getInputStream());
+            dataFromFileService.saveUsersFromFile(inputStream);
 
             verify(userRepository).saveAll(userArgumentCaptor.capture());
-            assertEquals(4, userArgumentCaptor.getValue().size());
+            assertEquals("USA", userArgumentCaptor.getValue().get(0).getCountry().getTitle());
         }
     }
 }

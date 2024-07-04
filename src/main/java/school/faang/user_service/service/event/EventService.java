@@ -57,4 +57,13 @@ public class EventService {
                 .map(eventReadMapper::map);
     }
 
+    public boolean delete(Long id) {
+        return repository.findById(id)
+                .map(entity -> {
+                    repository.delete(entity);
+                    repository.flush();
+                    return true;
+                })
+                .orElse(false);
+    }
 }

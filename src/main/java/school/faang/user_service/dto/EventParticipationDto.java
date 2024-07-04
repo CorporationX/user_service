@@ -1,7 +1,5 @@
 package school.faang.user_service.dto;
 
-import jakarta.persistence.Column;
-
 import java.time.LocalDateTime;
 
 public class EventParticipationDto {

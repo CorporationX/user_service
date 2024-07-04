@@ -13,6 +13,7 @@ import school.faang.user_service.exception.DataValidationException;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -54,7 +55,8 @@ public class CsvParserTest {
         @Test
         public void multiParseCsvWhenCorruptedStreamTest() {
             InputStream corruptedStream = new ByteArrayInputStream("некорректные данные".getBytes());
-            List<InputStream> parts = List.of(corruptedStream);
+            List<InputStream> parts = new ArrayList<>();
+            parts.add(corruptedStream);
 
             DataValidationException exception = assertThrows(DataValidationException.class,
                     () -> csvParser.multiParseCsv(parts));

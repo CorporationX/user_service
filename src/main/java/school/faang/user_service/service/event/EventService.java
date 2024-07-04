@@ -16,6 +16,7 @@ import school.faang.user_service.valitator.event.EventCreateEditValidator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -50,4 +51,10 @@ public class EventService {
                 .map(eventReadMapper::map)
                 .toList();
     }
+
+    public Optional<EventReadDto> findById(Long id) {
+        return repository.findById(id)
+                .map(eventReadMapper::map);
+    }
+
 }

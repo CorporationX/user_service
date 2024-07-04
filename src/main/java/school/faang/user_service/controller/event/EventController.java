@@ -1,7 +1,9 @@
 package school.faang.user_service.controller.event;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.server.ResponseStatusException;
 import school.faang.user_service.dto.event.EventCreateEditDto;
 import school.faang.user_service.dto.event.EventReadDto;
 import school.faang.user_service.filter.event.EventFilterDto;
@@ -19,7 +21,12 @@ public class EventController {
         return eventService.create(eventCreateEditDto);
     }
 
-    public List<EventReadDto> getEventsByFilter(EventFilterDto filter){
+    public List<EventReadDto> getEventsByFilter(EventFilterDto filter) {
         return eventService.findAll(filter);
+    }
+
+    public EventReadDto getEvent(Long id) {
+        return eventService.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 }

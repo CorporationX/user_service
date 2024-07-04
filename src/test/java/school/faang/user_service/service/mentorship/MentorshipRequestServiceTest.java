@@ -4,8 +4,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.dto.mentorship.RejectionDto;
@@ -17,7 +19,7 @@ import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-import school.faang.user_service.service.mentorship.filter.*;
+import school.faang.user_service.service.mentorship.filter.RequestFilter;
 import school.faang.user_service.validator.MentorshipRequestValidator;
 
 import java.util.ArrayList;
@@ -44,8 +46,8 @@ public class MentorshipRequestServiceTest {
     @Mock
     private MentorshipRequestValidator mentorshipRequestValidator;
 
-    @Spy
-    private final MentorshipRequestMapper mentorshipRequestMapper = Mappers.getMapper(MentorshipRequestMapper.class);
+    @Mock
+    private MentorshipRequestMapper mentorshipRequestMapper;
 
     @Mock
     private UserRepository userRepository;
@@ -60,6 +62,8 @@ public class MentorshipRequestServiceTest {
 
     private final MentorshipRequest request = getRequest();
 
+    private final MentorshipRequestDto mentorshipRequestDto = getMentorshipRequestDto();
+
     private static final long REQUEST_ID = 5L;
 
     @Nested
@@ -68,14 +72,15 @@ public class MentorshipRequestServiceTest {
         @DisplayName("should return MentorshipRequestDto with PENDING status when validation passed")
         @Test
         void requestMentorshipTest() {
-            MentorshipRequestDto mentorshipRequestDto = MentorshipRequestDto.builder()
-                    .status(RequestStatus.PENDING)
-                    .build();
+            MentorshipRequest mentorshipRequest = new MentorshipRequest();
+            mentorshipRequest.setStatus(RequestStatus.PENDING);
 
+            when(mentorshipRequestMapper.toEntity(mentorshipRequestDto)).thenReturn(mentorshipRequest);
+            when(mentorshipRequestMapper.toDto(mentorshipRequest)).thenReturn(mentorshipRequestDto);
             mentorshipRequestService.requestMentorship(mentorshipRequestDto);
 
             verify(mentorshipRequestRepository).save(captor.capture());
-            MentorshipRequest mentorshipRequest = captor.getValue();
+            mentorshipRequest = captor.getValue();
 
             assertEquals(mentorshipRequestDto.getStatus(), mentorshipRequest.getStatus());
         }
@@ -91,7 +96,8 @@ public class MentorshipRequestServiceTest {
                     .build();
             List<MentorshipRequest> requests = List.of(getRequest());
 
-            when(mentorshipRequestRepository.findAll()).thenReturn(List.of(getRequest()));
+            when(mentorshipRequestRepository.findAll()).thenReturn(List.of(request));
+            when(mentorshipRequestMapper.toDto(request)).thenReturn(mentorshipRequestDto);
 
             assertEquals(1, requests.size());
             assertEquals(1, mentorshipRequestService.findAll(requestFilterDto).size());
@@ -224,5 +230,11 @@ public class MentorshipRequestServiceTest {
         rejectionDto = new RejectionDto();
         rejectionDto.setRejectionReason("Some reason");
         return rejectionDto;
+    }
+
+    private MentorshipRequestDto getMentorshipRequestDto() {
+        return MentorshipRequestDto.builder()
+                .status(RequestStatus.PENDING)
+                .build();
     }
 }

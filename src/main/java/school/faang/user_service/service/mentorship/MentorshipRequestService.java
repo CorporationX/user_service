@@ -44,7 +44,10 @@ public class MentorshipRequestService {
         mentorshipRequestValidator.validateMentorshipRequest(mentorshipRequestDto);
 
         mentorshipRequestDto.setStatus(RequestStatus.PENDING);
-        return mentorshipRequestMapper.toDto(mentorshipRequestRepository.save(mentorshipRequestMapper.toEntity(mentorshipRequestDto)));
+        MentorshipRequest request = mentorshipRequestMapper.toEntity(mentorshipRequestDto);
+
+        mentorshipRequestRepository.save(request);
+        return mentorshipRequestMapper.toDto(request);
     }
 
     @Transactional(readOnly = true)

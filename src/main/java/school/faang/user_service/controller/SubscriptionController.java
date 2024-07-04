@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.MessageError;
 import school.faang.user_service.service.SubscriptionService;
 
 import java.util.List;
@@ -25,9 +26,13 @@ public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
     @PostMapping("/{followerId}")
-    public void followUser(@PathVariable @Positive long followerId, @PathVariable("userId") @Positive long followeeId) {
+    public void followUser(@PathVariable @Positive(message = "Id should be positive")
+                           long followerId,
+                           @PathVariable("userId") @Positive(message = "Id should be positive")
+                           long followeeId) {
+
         if (followerId == followeeId) {
-            throw new DataValidationException("Unable to follow yourself");
+            throw new DataValidationException(MessageError.SELF_FOLLOWING);
         }
 
         subscriptionService.followUser(followerId, followeeId);
@@ -36,7 +41,7 @@ public class SubscriptionController {
     @DeleteMapping("/{followerId}")
     public void unfollowUser(@PathVariable @Positive long followerId, @PathVariable("userId") @Positive long followeeId) {
         if (followerId == followeeId) {
-            throw new DataValidationException("Unable to unfollow yourself");
+            throw new DataValidationException(MessageError.SELF_FOLLOWING);
         }
 
         subscriptionService.unfollowUser(followerId, followeeId);

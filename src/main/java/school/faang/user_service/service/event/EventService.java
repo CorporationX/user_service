@@ -1,15 +1,21 @@
 package school.faang.user_service.service.event;
 
+import jakarta.persistence.criteria.Predicate;
+import liquibase.util.StringUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.event.EventCreateEditDto;
 import school.faang.user_service.dto.event.EventReadDto;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.filter.event.EventFilterDto;
 import school.faang.user_service.mapper.event.EventCreateEditMapper;
 import school.faang.user_service.mapper.event.EventReadMapper;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.valitator.event.EventCreateEditValidator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +26,9 @@ public class EventService {
     private final EventCreateEditMapper createEditMapper;
     private final EventReadMapper readMapper;
     private final EventCreateEditValidator validator;
+    private final EventReadMapper eventReadMapper;
 
+    @Transactional
     public EventReadDto create(EventCreateEditDto eventDto) {
         var validationResult = validator.validate(eventDto);
         if (validationResult.hasErrors()) {
@@ -31,4 +39,15 @@ public class EventService {
         return readMapper.map(event);
     }
 
+    public List<EventReadDto> findAll(EventFilterDto filter) {
+        return repository.findAll((root, cq, cb) -> {
+                    List<Predicate> predicates = new ArrayList<>();
+                    if (StringUtil.isNotEmpty(filter.getTitle())) {
+                        predicates.add(cb.like(root.get("title"), "%" + filter.getTitle() + "%"));
+                    }
+                    return cb.and(predicates.toArray(new Predicate[predicates.size()]));
+                }).stream()
+                .map(eventReadMapper::map)
+                .toList();
+    }
 }

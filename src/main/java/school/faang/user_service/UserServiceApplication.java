@@ -10,14 +10,9 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.support.TransactionTemplate;
-import school.faang.user_service.dto.event.EventCreateEditDto;
-import school.faang.user_service.entity.event.EventStatus;
-import school.faang.user_service.entity.event.EventType;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.dto.event.EventReadDto;
+import school.faang.user_service.filter.event.EventFilterDto;
 import school.faang.user_service.service.event.EventService;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @SpringBootApplication
 @EnableFeignClients("school.faang.user_service.client")
@@ -31,23 +26,11 @@ public class UserServiceApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(UserServiceApplication.class, args);
         context.getBean(TransactionTemplate.class).executeWithoutResult(tx -> {
-            try {
-                context.getBean(EventService.class).create(new EventCreateEditDto(
-                        "title",
-                        LocalDateTime.now(),
-                        LocalDateTime.now(),
-                        1L,
-                        "description",
-                        List.of(1L, 2L),
-                        "location",
-                        1,
-                        EventType.POLL,
-                        EventStatus.PLANNED
-                ));
-            } catch (DataValidationException ex) {
-                ex.getErrors().forEach(System.err::println);
-            }
-
+            context.getBean(EventService.class).findAll(new EventFilterDto(
+                            "title"
+                    )).stream()
+                    .map(EventReadDto::getTitle)
+                    .forEach(System.out::println);
         });
     }
 

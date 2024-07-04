@@ -9,11 +9,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.exception.DataValidationException;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileNotFoundException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static school.faang.user_service.exception.message.ExceptionMessage.INPUT_IS_EMPTY;
+import static school.faang.user_service.service.user.parse.Util.getInputStream;
 
 @ExtendWith(MockitoExtension.class)
 public class ReadAndDivideTest {
@@ -26,9 +26,8 @@ public class ReadAndDivideTest {
 
         @DisplayName("should return data with 4 elements when passed")
         @Test
-        void testForToCsvPartDivider() throws FileNotFoundException {
-            Util util = new Util();
-            assertEquals(4, readAndDivide.toCsvPartDivider(util.getInputStream()).size());
+        void testForToCsvPartDivider() {
+            assertEquals(4, readAndDivide.toCsvPartDivider(getInputStream()).size());
         }
     }
 

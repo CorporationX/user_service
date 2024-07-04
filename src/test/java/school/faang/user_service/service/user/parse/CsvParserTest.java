@@ -55,8 +55,7 @@ public class CsvParserTest {
         @Test
         public void multiParseCsvWhenCorruptedStreamTest() {
             InputStream corruptedStream = new ByteArrayInputStream("\n\\n".getBytes());
-            List<InputStream> parts = new ArrayList<>();
-            parts.add(corruptedStream);
+            List<InputStream> parts = List.of(corruptedStream);
 
             DataValidationException exception = assertThrows(DataValidationException.class,
                     () -> csvParser.multiParseCsv(parts));

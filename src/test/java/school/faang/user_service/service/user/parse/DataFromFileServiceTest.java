@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static school.faang.user_service.service.user.parse.Util.*;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -62,15 +63,14 @@ public class DataFromFileServiceTest {
         @DisplayName("should return data with Country when passed")
         @Test
         void saveUsersFromFileTest() {
-            Util util = new Util();
-            InputStream inputStream = util.getInputStream();
-            List<CsvPart> csvParts = util.getCsvParts();
-            Person person = util.getPersons().get(0);
+            InputStream inputStream = getInputStream();
+            List<CsvPart> csvParts = getCsvParts();
+            Person person = getPersons().get(0);
             Country country = new Country();
             country.setTitle("USA");
             Iterable<Country> countries = List.of(country);
             when(readAndDivide.toCsvPartDivider(inputStream)).thenReturn(csvParts);
-            when(csvParser.multiParseCsv(anyList())).thenReturn(util.getPersons());
+            when(csvParser.multiParseCsv(anyList())).thenReturn(getPersons());
             when(countryRepository.findAll()).thenReturn(countries);
             when(userMapper.toUser(person)).thenReturn(new User());
 

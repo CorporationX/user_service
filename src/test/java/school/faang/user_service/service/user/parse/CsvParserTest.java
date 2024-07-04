@@ -54,7 +54,7 @@ public class CsvParserTest {
         @DisplayName("should throw exception when data is not appropriate for csv format")
         @Test
         public void multiParseCsvWhenCorruptedStreamTest() {
-            InputStream corruptedStream = new ByteArrayInputStream("некорректные данные".getBytes());
+            InputStream corruptedStream = new ByteArrayInputStream("\n\\n".getBytes());
             List<InputStream> parts = new ArrayList<>();
             parts.add(corruptedStream);
 

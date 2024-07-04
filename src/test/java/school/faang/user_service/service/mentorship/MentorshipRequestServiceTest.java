@@ -74,15 +74,13 @@ public class MentorshipRequestServiceTest {
         void requestMentorshipTest() {
             MentorshipRequest mentorshipRequest = new MentorshipRequest();
             mentorshipRequest.setStatus(RequestStatus.PENDING);
-
             when(mentorshipRequestMapper.toEntity(mentorshipRequestDto)).thenReturn(mentorshipRequest);
             when(mentorshipRequestMapper.toDto(mentorshipRequest)).thenReturn(mentorshipRequestDto);
-            mentorshipRequestService.requestMentorship(mentorshipRequestDto);
+
+            mentorshipRequestService.requestMentorship(new MentorshipRequestDto());
 
             verify(mentorshipRequestRepository).save(captor.capture());
-            mentorshipRequest = captor.getValue();
-
-            assertEquals(mentorshipRequestDto.getStatus(), mentorshipRequest.getStatus());
+            assertEquals(RequestStatus.PENDING, captor.getValue().getStatus());
         }
 
         @DisplayName("should return 1 when mentorshipRequestRepository.findAll()")
@@ -94,8 +92,8 @@ public class MentorshipRequestServiceTest {
                     .receiverId(4L)
                     .status(RequestStatus.PENDING)
                     .build();
-            List<MentorshipRequest> requests = List.of(getRequest());
 
+            List<MentorshipRequest> requests = List.of(getRequest());
             when(mentorshipRequestRepository.findAll()).thenReturn(List.of(request));
             when(mentorshipRequestMapper.toDto(request)).thenReturn(mentorshipRequestDto);
 
@@ -109,14 +107,15 @@ public class MentorshipRequestServiceTest {
             User mentor = new User();
             mentor.setId(1L);
             request.getRequester().setMentors(getMentors());
-
             when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(Optional.of(request));
             when(userRepository.findById(request.getRequester().getId())).thenReturn(Optional.of(request.getRequester()));
             when(userRepository.findById(request.getReceiver().getId())).thenReturn(Optional.of(mentor));
 
             mentorshipRequestService.acceptRequest(REQUEST_ID);
+
             verify(mentorshipRequestRepository).save(captor.capture());
             assertEquals(request.getRequester().getMentors().get(0), captor.getValue().getRequester().getMentors().get(0));
+            assertEquals(RequestStatus.ACCEPTED, captor.getValue().getStatus());
         }
 
         @DisplayName("should set REJECTED status & rejectionReason when mentorshipRequest in DB")
@@ -126,9 +125,10 @@ public class MentorshipRequestServiceTest {
             when(mentorshipRequestRepository.findById(REQUEST_ID)).thenReturn(Optional.of(request));
 
             mentorshipRequestService.rejectRequest(REQUEST_ID, rejectionDto);
+
             verify(mentorshipRequestRepository).save(captor.capture());
-            assertEquals(request.getStatus(), captor.getValue().getStatus());
-            assertEquals(request.getRejectionReason(), captor.getValue().getRejectionReason());
+            assertEquals(RequestStatus.REJECTED, captor.getValue().getStatus());
+            assertEquals(rejectionDto.getRejectionReason(), captor.getValue().getRejectionReason());
         }
     }
 
@@ -142,6 +142,7 @@ public class MentorshipRequestServiceTest {
 
             DataValidationException exception = assertThrows(DataValidationException.class,
                     () -> mentorshipRequestService.acceptRequest(REQUEST_ID));
+
             assertEquals(NO_REQUEST_IN_DB.getMessage(), exception.getMessage());
         }
 

@@ -39,6 +39,7 @@ public class MentorshipRequestValidatorTest {
             .requesterId(1L)
             .receiverId(2L)
             .build();
+
     @Nested
     class PositiveTests {
 

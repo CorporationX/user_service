@@ -81,7 +81,6 @@ public class GoalInvitationServiceTest {
 
     @Test
     void testForCreateInvitationWhenThereIsNoInviterInDB() {
-
         GoalInvitationDto goalInvitationDto = testData.setupForCreateInvitation();
 
         when(userRepository.findById(goalInvitationDto.getInviterId())).thenReturn(Optional.empty());
@@ -94,7 +93,6 @@ public class GoalInvitationServiceTest {
 
     @Test
     void testForCreateInvitationWhenThereIsNoInvitedInDB() {
-
         GoalInvitationDto goalInvitationDto = testData.setupForCreateInvitation();
 
         when(userRepository.findById(goalInvitationDto.getInviterId())).thenReturn(Optional.of(new User()));
@@ -108,7 +106,6 @@ public class GoalInvitationServiceTest {
 
     @Test
     void testForCreateInvitationWhenThereIsNoGoalInDB() {
-
         GoalInvitationDto goalInvitationDto = testData.setupForCreateInvitation();
 
         when(userRepository.findById(goalInvitationDto.getInviterId())).thenReturn(Optional.of(new User()));

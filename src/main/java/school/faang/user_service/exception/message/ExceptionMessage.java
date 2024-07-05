@@ -15,7 +15,12 @@ public enum ExceptionMessage {
     USER_AVATAR_ABSENCE_EXCEPTION("User doesn't have avatar."),
     REPEATED_USER_CREATION_EXCEPTION("User with such id already exists in system."),
     RANDOM_AVATAR_GETTING_EXCEPTION("Getting random avatar failed."),
-    NO_SUCH_COUNTRY_EXCEPTION("Database doesn't contain country with such id.");
+    NO_SUCH_COUNTRY_EXCEPTION("Database doesn't contain country with such id."),
+    REQUESTER_ID_EQUALS_RECEIVER_ID("Requester can not be the same as receiver"),
+    REQUEST_ALREADY_HAS_STATUS("To get new status, status should be null"),
+    NO_REQUEST_IN_DB("No such request in database"),
+    USER_ALREADY_HAS_SUCH_MENTOR("User can not send request to mentor twice"),
+    TOO_MUCH_REQUESTS("Requests are made ones per 3 months");
 
     private final String message;
 

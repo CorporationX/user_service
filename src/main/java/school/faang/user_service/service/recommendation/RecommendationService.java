@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.recommendation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -6,13 +6,15 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.RecommendationDto;
+import school.faang.user_service.dto.SkillOfferDto;
+import school.faang.user_service.dto.event.RecommendationEventDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
-import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.RecommendationMapper;
+import school.faang.user_service.publisher.RecommendationRequestedEventPublisher;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
@@ -32,14 +34,19 @@ public class RecommendationService {
     private final SkillRepository skillRepository;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final RecommendationMapper recommendationMapper;
+    private final RecommendationRequestedEventPublisher recommendationRequestedEventPublisher;
     private static final int FILTER_MONTH = 6;
 
     public RecommendationDto create(RecommendationDto recommendationDto) {
         validationData(recommendationDto);
         Recommendation recommendation = fillEntityRecommendation(recommendationDto);
 
-        recommendationRepository.save(recommendation);
-        saveSkillOffers(recommendation);
+        Long recommendationId = recommendationRepository.create(
+                recommendationDto.getAuthorId(),
+                recommendationDto.getReceiverId(),
+                recommendationDto.getContent());
+        saveSkillOffers(recommendationDto, recommendationId);
+        sendNotification(recommendationId, recommendationDto);
 
         return recommendationMapper.toDto(recommendation);
     }
@@ -49,7 +56,7 @@ public class RecommendationService {
 
         Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
         skillOfferRepository.deleteAllByRecommendationId(recommendation.getId());
-        saveSkillOffers(recommendation);
+        saveSkillOffers(recommendationDto, recommendationDto.getId());
 
         recommendationRepository.save(recommendation);
         return recommendationMapper.toDto(recommendation);
@@ -72,22 +79,22 @@ public class RecommendationService {
         return authorRecommendation.map(recommendationMapper::toDto);
     }
 
-    private void saveSkillOffers(Recommendation recommendation) {
-        long authorId = recommendation.getAuthor().getId();
-        long receiverId = recommendation.getReceiver().getId();
+    private void saveSkillOffers(RecommendationDto recommendation, Long recommendationId) {
+        long authorId = recommendation.getAuthorId();
+        long receiverId = recommendation.getAuthorId();
         User user = getUserById(receiverId);
         User guarantee = getUserById(authorId);
 
-        List<SkillOffer> skillOffers = recommendation.getSkillOffers();
-        List<Skill> userSkills = getUserSkillsById(receiverId);
+        List<SkillOfferDto> skillOffers = recommendation.getSkillOffers();
+        List<Long> userSkills = getUserSkillsById(receiverId);
 
         skillOffers.forEach(skillOffer -> {
-            long skillId = skillOffer.getSkill().getId();
-            if (userSkills.contains(skillOffer.getSkill()) && !userSkillGuaranteeRepository.existsById(authorId)) {
+            long skillId = skillOffer.getSkillId();
+            if (userSkills.contains(skillId) && !userSkillGuaranteeRepository.existsById(authorId)) {
 
                 addNewGuarantee(user, guarantee, skillId);
             } else {
-                skillOfferRepository.save(skillOffer);
+                skillOfferRepository.create(skillId, recommendationId);
             }
         });
     }
@@ -95,13 +102,16 @@ public class RecommendationService {
     private void validationData(RecommendationDto recommendation) {
         LocalDate currentDate = LocalDate.now();
         boolean skillInSystem = recommendation.getSkillOffers().stream()
-                .allMatch(skill -> skillOfferRepository.existsById(skill.getId()));
+                .allMatch(skill -> skillRepository.existsById(skill.getSkillId()));
         if (!skillInSystem) {
             throw new DataValidationException("Skill was not found");
         }
-        if (ChronoUnit.MONTHS.between(recommendation.getCreateAt().toLocalDate(), currentDate) <= FILTER_MONTH) {
-            throw new DataValidationException("It has been less than 6 months since the last recommendation");
-        }
+        recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(
+                recommendation.getAuthorId(), recommendation.getReceiverId()).ifPresent(lastRecommendation -> {
+            if (ChronoUnit.MONTHS.between(lastRecommendation.getCreatedAt().toLocalDate(), currentDate) <= FILTER_MONTH) {
+                throw new DataValidationException("It has been less than 6 months since the last recommendation");
+            }
+        });
     }
 
     private void validationBeforeDelete(long id) {
@@ -122,10 +132,12 @@ public class RecommendationService {
         userSkillGuaranteeRepository.save(guaranteeSkill);
     }
 
-    private List<Skill> getUserSkillsById(Long id) {
+    private List<Long> getUserSkillsById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new DataValidationException("Skills not found"))
-                .getSkills();
+                .getSkills().stream()
+                .map(Skill::getId)
+                .toList();
     }
 
     private User getUserById(Long id) {
@@ -142,5 +154,16 @@ public class RecommendationService {
                 .orElseThrow(() -> new DataValidationException(("Author not found"))));
 
         return recommendation;
+    }
+
+    private void sendNotification(Long idRecommendation, RecommendationDto recommendationDto) {
+        RecommendationEventDto recommendationEventDto = RecommendationEventDto.builder()
+                .id(idRecommendation)
+                .authorId(recommendationDto.getAuthorId())
+                .receiverId(recommendationDto.getReceiverId())
+                .createdAt(recommendationDto.getCreateAt())
+                .build();
+
+        recommendationRequestedEventPublisher.convertAndSend(recommendationEventDto);
     }
 }

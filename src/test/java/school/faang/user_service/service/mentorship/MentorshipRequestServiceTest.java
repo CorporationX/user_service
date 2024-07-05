@@ -62,15 +62,7 @@ class MentorshipRequestServiceTest {
 
         mentorshipRequestService.requestMentorship(mentorshipRequestDto);
         verify(mentorshipRequestValidator, times(1))
-                .validateMentorshipRequestReceiverAndRequesterExistence(
-                        mentorshipRequestDto.getRequesterId(),
-                        mentorshipRequestDto.getReceiverId());
-        verify(mentorshipRequestValidator, times(1))
-                .validateReflection(
-                        mentorshipRequestDto.getRequesterId(),
-                        mentorshipRequestDto.getReceiverId());
-        verify(mentorshipRequestValidator, times(1))
-                .validateMentorshipRequestFrequency(
+                .validateParticipantsAndRequestFrequency(
                         mentorshipRequestDto.getRequesterId(),
                         mentorshipRequestDto.getReceiverId(),
                         mentorshipRequestDto.getCreatedAt());

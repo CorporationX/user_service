@@ -17,19 +17,22 @@ public class MentorshipRequestController {
     private final MentorshipRequestValidator mentorshipRequestValidator;
 
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
-        mentorshipRequestValidator.validateMentorshipRequestDescription(mentorshipRequestDto.getDescription());
+        mentorshipRequestValidator.validateMentorshipRequestDto(mentorshipRequestDto);
         return mentorshipRequestService.requestMentorship(mentorshipRequestDto);
     }
 
     public List<MentorshipRequestDto> getRequests(MentorshipRequestFilterDto filters) {
+        mentorshipRequestValidator.validateMentorshipRequestFilterDto(filters);
         return mentorshipRequestService.getRequests(filters);
     }
 
-    public MentorshipRequestDto acceptRequest(long id) {
-        return mentorshipRequestService.acceptRequest(id);
+    public MentorshipRequestDto acceptRequest(long mentorshipRequestId) {
+        mentorshipRequestValidator.validateMentorshipRequestId(mentorshipRequestId);
+        return mentorshipRequestService.acceptRequest(mentorshipRequestId);
     }
 
     public MentorshipRequestDto rejectRequest(long id, RejectionDto rejection) {
+        mentorshipRequestValidator.validateMentorshipRejectionDto(rejection);
         return mentorshipRequestService.rejectRequest(id, rejection);
     }
 }

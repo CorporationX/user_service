@@ -30,9 +30,8 @@ public class MentorshipRequestService {
         String description = mentorshipRequestDto.getDescription();
         LocalDateTime mentorshipCreationDate = mentorshipRequestDto.getCreatedAt();
 
-        mentorshipRequestValidator.validateMentorshipRequestReceiverAndRequesterExistence(requesterId, receiverId);
-        mentorshipRequestValidator.validateReflection(requesterId, receiverId);
-        mentorshipRequestValidator.validateMentorshipRequestFrequency(requesterId, receiverId, mentorshipCreationDate);
+        mentorshipRequestValidator.validateParticipantsAndRequestFrequency(requesterId, receiverId,
+                mentorshipCreationDate);
         MentorshipRequest mentorshipRequest = mentorshipRequestRepository.create(requesterId, receiverId, description);
         return mentorshipRequestMapper.toDto(mentorshipRequest);
     }
@@ -52,19 +51,26 @@ public class MentorshipRequestService {
     }
 
     public MentorshipRequestDto acceptRequest(long requestId) {
-        MentorshipRequest mentorshipRequest = getMentorshipRequestByIdOrThrowException(requestId);
-        mentorshipRequestValidator.validateRequestStatusIsPending(mentorshipRequest.getStatus());
+        MentorshipRequest mentorshipRequest = getMentorshipRequestAndValidateStatusIsPending(requestId);
         MentorshipRequest savedMentorshipRequest =
                 setRequestStatusAndSaveToDataBase(mentorshipRequest, RequestStatus.ACCEPTED);
         return mentorshipRequestMapper.toDto(savedMentorshipRequest);
     }
 
     public MentorshipRequestDto rejectRequest(long requestId, RejectionDto rejectionDto) {
-        MentorshipRequest mentorshipRequest = getMentorshipRequestByIdOrThrowException(requestId);
-        mentorshipRequestValidator.validateRequestStatusIsPending(mentorshipRequest.getStatus());
+        MentorshipRequest mentorshipRequest = getMentorshipRequestAndValidateStatusIsPending(requestId);
         mentorshipRequest.setRejectionReason(rejectionDto.getRejectionReason());
-        setRequestStatusAndSaveToDataBase(mentorshipRequest, RequestStatus.REJECTED);
-        return mentorshipRequestMapper.toDto(mentorshipRequest);
+        MentorshipRequest savedMentorshipRequest =
+                setRequestStatusAndSaveToDataBase(mentorshipRequest, RequestStatus.REJECTED);
+        return mentorshipRequestMapper.toDto(savedMentorshipRequest);
+    }
+
+    private MentorshipRequest getMentorshipRequestAndValidateStatusIsPending(long requestId) {
+        MentorshipRequest mentorshipRequest = mentorshipRequestRepository.findById(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("Could not find Mentorship Request in database by id: "
+                        + requestId));
+        mentorshipRequestValidator.validateRequestStatusIsPending(mentorshipRequest.getStatus());
+        return mentorshipRequest;
     }
 
     private MentorshipRequest setRequestStatusAndSaveToDataBase(MentorshipRequest mentorshipRequest,
@@ -72,11 +78,5 @@ public class MentorshipRequestService {
         mentorshipRequest.setStatus(requestStatus);
         mentorshipRequest.setUpdatedAt(LocalDateTime.now());
         return mentorshipRequestRepository.save(mentorshipRequest);
-    }
-
-    private MentorshipRequest getMentorshipRequestByIdOrThrowException(long requestId) {
-        return mentorshipRequestRepository.findById(requestId).orElseThrow(
-                () -> new IllegalArgumentException("Could not find Mentorship Request in database by id: " + requestId)
-        );
     }
 }

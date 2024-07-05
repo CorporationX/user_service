@@ -13,10 +13,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class MentorshipRequestDto {
-    private Long id;
+    private long id;
     private String description;
-    private Long requesterId;
-    private Long receiverId;
+    private long requesterId;
+    private long receiverId;
     private RequestStatus status;
     private String rejectionReason;
     private LocalDateTime createdAt;

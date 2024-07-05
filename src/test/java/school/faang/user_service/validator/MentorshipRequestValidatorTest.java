@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.repository.UserRepository;
@@ -30,21 +31,78 @@ class MentorshipRequestValidatorTest {
     private MentorshipRequestValidator mentorshipRequestValidator;
 
     @Test
-    public void testValidationWithNullDescription() {
-        assertThrows(IllegalArgumentException.class,
-                () -> mentorshipRequestValidator.validateMentorshipRequestDescription(null));
+    public void testMentorshipRequestDtoWithNullValue() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> mentorshipRequestValidator.validateMentorshipRequestDto(null));
+        assertEquals("Mentorship request cannot be null", exception.getMessage());
+    }
+
+    @Test
+    public void testMentorshipRequestDtoWithDescriptionNullValue() {
+        MentorshipRequestDto mentorshipRequestDto = new MentorshipRequestDto();
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> mentorshipRequestValidator.validateMentorshipRequestDto(mentorshipRequestDto));
+        assertEquals("Mentorship request description cannot be null", exception.getMessage());
+    }
+
+    @Test
+    public void testMentorshipRequestDtoWithLessThanMinimalRequesterId() {
+        MentorshipRequestDto mentorshipRequestDto = MentorshipRequestDto.builder()
+                .description("description").build();
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> mentorshipRequestValidator.validateMentorshipRequestDto(mentorshipRequestDto));
+        assertEquals("Mentorship requester id cannot be less than " +
+                mentorshipRequestValidator.getMIN_USER_ID(), exception.getMessage());
+    }
+
+    @Test
+    public void testMentorshipRequestDtoWithLessThanMinimalReceiverId() {
+        MentorshipRequestDto mentorshipRequestDto = MentorshipRequestDto.builder()
+                .description("description")
+                .requesterId(1).build();
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> mentorshipRequestValidator.validateMentorshipRequestDto(mentorshipRequestDto));
+        assertEquals("Mentorship receiver id cannot be less than " +
+                mentorshipRequestValidator.getMIN_USER_ID(), exception.getMessage());
+    }
+
+
+    @Test
+    public void testMentorshipRequestFilterDtoWithNullValue() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> mentorshipRequestValidator.validateMentorshipRequestFilterDto(null));
+        assertEquals("Mentorship request filter cannot be null", exception.getMessage());
+    }
+
+
+    @Test
+    public void testMentorshipRequestRejectionDtoWithNullValue() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> mentorshipRequestValidator.validateMentorshipRejectionDto(null));
+        assertEquals("Rejection reason cannot be null", exception.getMessage());
+    }
+
+
+    @Test
+    public void testMentorshipRequestRejectionDtoWithLessThanMinimalRequestId() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> mentorshipRequestValidator.validateMentorshipRequestId(0));
+        assertEquals("Mentorship request id cannot be less than " +
+                mentorshipRequestValidator.getMIN_REQUEST_ID(), exception.getMessage());
     }
 
     @Test
     public void testValidationWithBlankDescription() {
-        assertThrows(IllegalArgumentException.class,
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> mentorshipRequestValidator.validateMentorshipRequestDescription("   "));
+        assertEquals("Description cannot ve blank", exception.getMessage());
     }
 
     @Test
     public void testValidationWithTooLongDescription() {
         StringBuilder description = new StringBuilder();
-        IntStream.range(0, 4097).forEach(i -> description.append("a"));
+        IntStream.range(0, mentorshipRequestValidator.getMAX_DESCRIPTION_LENGTH() + 1)
+                .forEach(i -> description.append("a"));
 
         assertThrows(IllegalArgumentException.class,
                 () -> mentorshipRequestValidator.validateMentorshipRequestDescription(description.toString()));
@@ -53,13 +111,13 @@ class MentorshipRequestValidatorTest {
     @Test
     public void testValidationWithRequesterAbsence() {
         requesterAndReceiverExistenceTest(false, true, 1L, 2L,
-                "MentorshipRequest sender is not registered in Data Base");
+                "MentorshipRequest sender is not registered in Database");
     }
 
     @Test
     public void testValidationWithReceiverAbsence() {
         requesterAndReceiverExistenceTest(true, false, 3L, 4L,
-                "MentorshipRequest receiver is not registered in Data Base");
+                "MentorshipRequest receiver is not registered in Database");
     }
 
     private void requesterAndReceiverExistenceTest(boolean requesterExistence, boolean receiverExistence,
@@ -69,15 +127,15 @@ class MentorshipRequestValidatorTest {
 
         IllegalArgumentException absenceException = assertThrows(IllegalArgumentException.class,
                 () -> mentorshipRequestValidator
-                        .validateMentorshipRequestReceiverAndRequesterExistence(requesterId, receiverId));
+                        .validateMentorshipRequestParticipantsExistence(requesterId, receiverId));
         assertEquals(exceptionMessage, absenceException.getMessage());
     }
 
     @Test
-    public void testValidationWithReflection() {
+    public void testValidationWithEqualParticipants() {
         long requesterId = 1L;
         IllegalArgumentException reflectionException = assertThrows(IllegalArgumentException.class,
-                () -> mentorshipRequestValidator.validateReflection(requesterId, requesterId));
+                () -> mentorshipRequestValidator.validateRequesterNotEqualToReceiver(requesterId, requesterId));
         assertEquals("MentorshipRequest sender cannot be equal to receiver",
                 reflectionException.getMessage());
     }

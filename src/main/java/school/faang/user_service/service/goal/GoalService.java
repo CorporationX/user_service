@@ -83,4 +83,12 @@ public class GoalService {
 
         return savedGoal;
     }
+
+    public void deleteGoal(long goalId) {
+        Goal goal = goalRepository.findById(goalId)
+                .orElseThrow(() -> new IllegalArgumentException("Goal not found"));
+
+        goalRepository.removeSkillsFromGoal(goalId);
+        goalRepository.deleteById(goalId);
+    }
 }

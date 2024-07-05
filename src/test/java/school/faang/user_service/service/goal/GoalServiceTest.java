@@ -254,4 +254,15 @@ class GoalServiceTest {
         verify(skillService).assignSkillToUser(2L, 1L);
         verify(skillService).assignSkillToUser(2L, 2L);
     }
+
+    // test for deleteGoal
+    @Test
+    void deleteGoal_Success() {
+        long goalId = 1L;
+
+        goalService.deleteGoal(goalId);
+
+        verify(goalRepository).removeSkillsFromGoal(goalId);
+        verify(goalRepository).deleteById(goalId);
+    }
 }

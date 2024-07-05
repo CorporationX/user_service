@@ -3,6 +3,7 @@ package school.faang.user_service.controller.goal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.GoalDto;
@@ -28,6 +29,12 @@ public class GoalController {
     public ResponseEntity<Goal> updateGoal(Long goalId, GoalDto goalDto) {
         Goal updatedGoal = goalService.updateGoal(goalId, goalDto);
         return ResponseEntity.ok(updatedGoal);
+    }
+
+    @DeleteMapping("")
+    public ResponseEntity<Void> deleteGoal(long goalId) {
+        goalService.deleteGoal(goalId);
+        return ResponseEntity.noContent().build();
     }
 }
 

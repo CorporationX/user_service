@@ -13,7 +13,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
-import school.faang.user_service.publisher.RedisMessagePublisher;
+import school.faang.user_service.publisher.MentorshipStartEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.mentorship.filter.RequestFilter;
@@ -41,7 +41,7 @@ public class MentorshipRequestService {
 
     private List<RequestFilter> requestFilters;
 
-    private RedisMessagePublisher redisMessagePublisher;
+    private MentorshipStartEventPublisher mentorshipStartEventPublisher;
 
     @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
@@ -81,7 +81,7 @@ public class MentorshipRequestService {
 
         mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
 
-        redisMessagePublisher.publishMessage("Topic name",new MentorshipStartEvent(mentorshipRequest.getRequester().getId()
+        mentorshipStartEventPublisher.convertAndSend(new MentorshipStartEvent(mentorshipRequest.getRequester().getId()
                 , mentorshipRequest.getReceiver().getId()));
 
         mentorshipRequestRepository.save(mentorshipRequest);

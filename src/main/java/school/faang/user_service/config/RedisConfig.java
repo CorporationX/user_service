@@ -20,6 +20,9 @@ public class RedisConfig {
     @Value("${spring.data.redis.channels.recommendationChannel}")
     private String recommendationChannelName;
 
+    @Value("${spring.data.redis.channels.mentorshipChannel}")
+    private String mentorshipChannelName;
+
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
@@ -42,4 +45,8 @@ public class RedisConfig {
         return new ChannelTopic(recommendationChannelName);
     }
 
+    @Bean
+    public ChannelTopic mentorshipTopic() {
+        return new ChannelTopic(mentorshipChannelName);
+    }
 }

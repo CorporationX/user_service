@@ -1,4 +1,4 @@
-package school.faang.user_service.config;
+package school.faang.user_service.config.redis;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;

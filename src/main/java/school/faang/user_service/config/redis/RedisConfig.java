@@ -1,4 +1,4 @@
-package school.faang.user_service.config;
+package school.faang.user_service.config.redis;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

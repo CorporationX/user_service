@@ -14,20 +14,22 @@ import java.util.List;
 public class RecommendationRequestController {
     private final RecommendationRequestService recommendationRequestService;
 
-    public RecommendationRequestDto requestRecommendation(RecommendationRequestDto recommendationRequest){
-        if (recommendationRequest.getMessage().isBlank()){
-            return recommendationRequestService.create(recommendationRequest);
-        } else {
+    public RecommendationRequestDto requestRecommendation(RecommendationRequestDto recommendationRequest) {
+        if (recommendationRequest.getMessage().isBlank()) {
             throw new IllegalArgumentException("The request contains an empty message");
         }
+        return recommendationRequestService.create(recommendationRequest);
     }
-    public List<RecommendationRequestDto> getRecommendationRequests(RequestFilterDto filter){
+
+    public List<RecommendationRequestDto> getRecommendationRequests(RequestFilterDto filter) {
         return recommendationRequestService.getRequests(filter);
     }
-    public RecommendationRequestDto getRecommendationRequest(long id){
+
+    public RecommendationRequestDto getRecommendationRequest(long id) {
         return recommendationRequestService.getRequest(id);
     }
-    public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection){
+
+    public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
         return recommendationRequestService.rejectRequest(id, rejection);
     }
 }

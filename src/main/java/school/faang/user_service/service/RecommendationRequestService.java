@@ -49,12 +49,14 @@ public class RecommendationRequestService {
 
         List<Long> skillsId = recommendationRequestDto.getSkillsId();
         List<Skill> skills = skillRepository.findAllById(skillsId);
-        if (skills.size() != skillsId.size()) {
+        boolean result = skills.stream().map(Skill::getId).allMatch(skillsId::contains);
+        if (!result) {
             throw new IllegalArgumentException("One or more requested skills do not exist in the database");
         }
 
-        RecommendationRequest newRequest = recommendationRequestRepository
-                .save(recommendationRequestMapper.toEntity(recommendationRequestDto));
+        RecommendationRequest newRequest = recommendationRequestMapper.toEntity(recommendationRequestDto);
+        recommendationRequestRepository.save(newRequest);
+
         skills.forEach(skill -> skillRequestRepository.create(newRequest.getId(), skill.getId()));
 
         return recommendationRequestMapper.toDto(newRequest);

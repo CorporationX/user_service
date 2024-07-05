@@ -2,27 +2,33 @@ package school.faang.user_service.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.RecommendationRequestDto;
+import school.faang.user_service.dto.RejectionDto;
+import school.faang.user_service.dto.RequestFilterDto;
+import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
+import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.mapper.RecommendationRequestMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
-
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 class RecommendationRequestServiceTest {
@@ -30,8 +36,10 @@ class RecommendationRequestServiceTest {
     private RecommendationRequestService recommendationRequestService;
     @Mock
     private RecommendationRequestRepository recommendationRequestRepository;
-    @Spy
+    @Mock
     private RecommendationRequestMapper recommendationRequestMapper;
+    @Mock
+    private RequestFilterDto requestFilterDto;
     @Mock
     private UserRepository userRepository;
     @Mock
@@ -40,51 +48,91 @@ class RecommendationRequestServiceTest {
     private SkillRequestRepository skillRequestRepository;
     @Mock
     private List<RequestFilter> requestFilter;
-    @Captor
-    private ArgumentCaptor<RecommendationRequest> captor;
 
     @Test
     public void testCreateWithFindByIdRequesterAndReceiver() {
-        RecommendationRequestDto requestDto = processExceptionWithFindingIdRequesterAndReceiver(true);
-
-        assertThrows(IllegalArgumentException.class, () -> recommendationRequestService.create(requestDto));
+        RecommendationRequestDto requestDto = new RecommendationRequestDto();
+        when(userRepository.findById(any()))
+                .thenReturn(Optional.empty());
+        assertThrows(IllegalArgumentException.class,
+                () -> recommendationRequestService.create(requestDto));
     }
 
     @Test
     public void testCreateBelieveTheRequestToSendNotMoreThanSixMonths() {
-        RecommendationRequestDto requestDto = processExceptionWithFindingIdRequesterAndReceiver(false);
+        RecommendationRequestDto requestDto = new RecommendationRequestDto();
+        requestDto.setRequesterId(1L);
+        requestDto.setRecieverId(1L);
+
+        when(userRepository.findById(requestDto.getRequesterId()))
+                .thenReturn(Optional.of(new User()));
+        when(userRepository.findById(requestDto.getRecieverId()))
+                .thenReturn(Optional.of(new User()));
+
         checkLastRequest(requestDto, LocalDateTime.now());
 
-        assertThrows(IllegalArgumentException.class, () -> recommendationRequestService.create(requestDto));
+        assertThrows(IllegalArgumentException.class,
+                () -> recommendationRequestService.create(requestDto));
     }
 
     @Test
     public void testCreateCheckTheExistenceOfSkillsInTheDatabase() {
-        RecommendationRequestDto requestDto = processExceptionWithFindingIdRequesterAndReceiver(false);
+        RecommendationRequestDto requestDto = new RecommendationRequestDto();
+        requestDto.setRequesterId(1L);
+        requestDto.setRecieverId(1L);
+        requestDto.setSkillsId(Arrays.asList(1L, 2L, 3L));
+
+        when(userRepository.findById(requestDto.getRequesterId()))
+                .thenReturn(Optional.of(new User()));
+        when(userRepository.findById(requestDto.getRecieverId()))
+                .thenReturn(Optional.of(new User()));
+
         checkLastRequest(requestDto, LocalDateTime.now().minus(7, ChronoUnit.MONTHS));
-        checkSkills(3);
-        assertThrows(IllegalArgumentException.class, () -> recommendationRequestService.create(requestDto));
+        when(skillRepository.findAllById(requestDto.getSkillsId()))
+                .thenReturn(Arrays.asList(new Skill(), new Skill()));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> recommendationRequestService.create(requestDto));
     }
 
     @Test
     public void testCreateSave() {
-        RecommendationRequestDto requestDto = processExceptionWithFindingIdRequesterAndReceiver(false);
+        RecommendationRequestDto requestDto = new RecommendationRequestDto();
+        requestDto.setRequesterId(1L);
+        requestDto.setRecieverId(1L);
+        requestDto.setSkillsId(Arrays.asList(1L, 2L, 3L));
+
+        when(userRepository.findById(requestDto.getRequesterId()))
+                .thenReturn(Optional.of(new User()));
+        when(userRepository.findById(requestDto.getRecieverId()))
+                .thenReturn(Optional.of(new User()));
+
         checkLastRequest(requestDto, LocalDateTime.now().minus(7, ChronoUnit.MONTHS));
-        checkSkills(2);
+        when(skillRepository.findAllById(requestDto.getSkillsId()))
+                .thenReturn(Arrays.asList(
+                        new Skill(1L, null, null, null, null, null, null, null),
+                        new Skill(2L, null, null, null, null, null, null, null),
+                        new Skill(3L, null, null, null, null, null, null, null)));
+
+        RecommendationRequest request = new RecommendationRequest();
+        request.setRequester(new User());
+        request.setReceiver(new User());
+        request.setSkills(List.of(
+                new SkillRequest(),
+                new SkillRequest(),
+                new SkillRequest()));
+
+        when(recommendationRequestMapper.toEntity(requestDto))
+                .thenReturn(request);
+        when(recommendationRequestRepository.save(any(RecommendationRequest.class)))
+                .thenReturn(request);
+
         recommendationRequestService.create(requestDto);
 
-        verify(recommendationRequestRepository, times(1)).save(captor.capture());
-    }
-
-    private RecommendationRequestDto processExceptionWithFindingIdRequesterAndReceiver(boolean existsById) {
-        RecommendationRequestDto requestDto = new RecommendationRequestDto();
-        requestDto.setRequesterId(1);
-        requestDto.setRecieverId(1);
-
-        when(userRepository.findById(requestDto.getRequesterId()).isEmpty()).thenReturn(existsById);
-        when(userRepository.findById(requestDto.getRecieverId()).isEmpty()).thenReturn(existsById);
-
-        return requestDto;
+        verify(recommendationRequestMapper, times(1))
+                .toEntity(requestDto);
+        verify(recommendationRequestRepository, times(1))
+                .save(request);
     }
 
     private void checkLastRequest(RecommendationRequestDto requestDto, LocalDateTime localDateTime) {
@@ -96,8 +144,99 @@ class RecommendationRequestServiceTest {
                 .thenReturn(Optional.of(request));
     }
 
-    private void checkSkills(int id) {
-        List<Long> skillsId = new ArrayList<>(id);
-        when(skillRepository.findAllById(skillsId)).thenReturn(List.of(new Skill(), new Skill()));
+    @Test
+    public void testGetRequestsFindAll() {
+        List<RecommendationRequest> requestList = List.of(
+                new RecommendationRequest(),
+                new RecommendationRequest());
+        when(recommendationRequestRepository.findAll())
+                .thenReturn(requestList);
+
+        List<RecommendationRequestDto> resultList = recommendationRequestService.getRequests(requestFilterDto);
+
+        assertEquals(requestList.size(), resultList.size());
+
+        verify(recommendationRequestRepository, times(1))
+                .findAll();
+    }
+
+    @Test
+    public void testGetRequestsFilters() {
+
+    }
+
+    @Test
+    public void testGetRequestFundRequest() {
+        long id = 1;
+        when(recommendationRequestRepository.findById(id))
+                .thenReturn(Optional.empty());
+        assertThrows(NoSuchElementException.class,
+                () -> recommendationRequestService.getRequest(id));
+    }
+
+    @Test
+    public void testGetRequestToDto() {
+        RecommendationRequestDto requestDto = new RecommendationRequestDto();
+        requestDto.setId(1);
+        RecommendationRequest request = new RecommendationRequest();
+        request.setId(1);
+        long id = 1;
+        when(recommendationRequestRepository.findById(id))
+                .thenReturn(Optional.of(request));
+        when(recommendationRequestMapper.toDto(request))
+                .thenReturn(requestDto);
+        // Проверка, что все поля не пустые
+        recommendationRequestService.getRequest(id);
+        verify(recommendationRequestMapper, times(1))
+                .toDto(request);
+    }
+
+    @Test
+    public void testRejectRequestFindById() {
+        long id = 1;
+        RejectionDto rejectionDto = new RejectionDto();
+        when(recommendationRequestRepository.findById(id))
+                .thenReturn(Optional.empty());
+        assertThrows(IllegalArgumentException.class,
+                () -> recommendationRequestService.rejectRequest(id, rejectionDto));
+    }
+
+    @Test
+    public void testRejectRequestGetStatus() {
+        long id = 1;
+        RejectionDto rejectionDto = new RejectionDto();
+        rejectionDto.setReason("Отказано");
+        RecommendationRequest request = new RecommendationRequest();
+        request.setStatus(RequestStatus.ACCEPTED);
+
+        when(recommendationRequestRepository.findById(id))
+                .thenReturn(Optional.of(request));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> recommendationRequestService.rejectRequest(id, rejectionDto));
+    }
+
+    @Test
+    public void testRejectRequestSave() {
+        long id = 1;
+        RejectionDto rejectionDto = new RejectionDto();
+        rejectionDto.setReason("Отказано");
+        RecommendationRequest request = new RecommendationRequest();
+        request.setStatus(RequestStatus.PENDING);
+        RecommendationRequestDto requestDto = new RecommendationRequestDto();
+
+        when(recommendationRequestRepository.findById(id))
+                .thenReturn(Optional.of(request));
+
+        when(recommendationRequestRepository.save(any(RecommendationRequest.class)))
+                .thenReturn(request);
+        when(recommendationRequestMapper.toDto(request))
+                .thenReturn(requestDto);
+        recommendationRequestService.rejectRequest(id, rejectionDto);
+
+        verify(recommendationRequestRepository, times(1))
+                .save(request);
+        verify(recommendationRequestMapper, times(1))
+                .toDto(request);
     }
 }

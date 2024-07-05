@@ -16,28 +16,30 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(DataValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Map<String, String>> handleDataValidationException(DataValidationException e) {
         return ResponseEntity.badRequest().body(buildExceptionMessage(e.getMessage()));
     }
 
     @ExceptionHandler(DataGettingException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Map<String, String>> handleRuntimeException(DataGettingException e) {
         return ResponseEntity.badRequest().body(buildExceptionMessage(e.getMessage()));
     }
 
     @ExceptionHandler(RuntimeException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException e) {
         return ResponseEntity.internalServerError().body(buildExceptionMessage(e.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleMethodArgumentNotValidException(MethodArgumentNotValidException methodArgumentNotValidException) {
-        return methodArgumentNotValidException.getBindingResult().getAllErrors().stream()
-                .collect(Collectors.toMap(
-                        error -> ((FieldError) error).getField(),
-                        error -> Objects.requireNonNullElse(error.getDefaultMessage(), "")
-                ));
+    public Map<String, String> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
+        return exception.getBindingResult().getFieldErrors().stream()
+                .collect(Collectors.groupingBy(FieldError::getField,
+                        Collectors.mapping(FieldError::getDefaultMessage,
+                                Collectors.joining(" and "))));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)

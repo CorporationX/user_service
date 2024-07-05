@@ -8,6 +8,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.filter.GoalFilterDto;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.skill.SkillService;
 
@@ -104,4 +105,23 @@ public class GoalService {
 
         return subtasks;
     }
+
+    public List<Goal> getGoalsByUser(Long userId, GoalFilterDto filter) {
+        List<Goal> goals = goalRepository.findGoalsByUserId(userId).collect(Collectors.toList());
+
+        if (filter.getTitle() != null) {
+            goals = goals.stream()
+                    .filter(goal -> goal.getTitle().contains(filter.getTitle()))
+                    .collect(Collectors.toList());
+        }
+
+        if (filter.getStatus() != null) {
+            goals = goals.stream()
+                    .filter(goal -> goal.getStatus() == filter.getStatus())
+                    .collect(Collectors.toList());
+        }
+
+        return goals;
+    }
+
 }

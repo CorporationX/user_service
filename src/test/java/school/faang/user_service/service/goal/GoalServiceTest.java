@@ -10,6 +10,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
+import school.faang.user_service.filter.GoalFilterDto;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.skill.SkillService;
 
@@ -302,6 +303,85 @@ class GoalServiceTest {
 
         assertEquals(1, completedSubtasks.size());
         assertEquals(completedSubtask.getId(), completedSubtasks.get(0).getId());
+    }
+
+    // test for getGoalsByUser
+    @Test
+    void getGoalsByUser_FiltersByTitle() {
+        Long userId = 1L;
+        Goal goal1 = new Goal();
+        goal1.setId(1L);
+        goal1.setTitle("Goal 1");
+        goal1.setStatus(GoalStatus.ACTIVE);
+        Goal goal2 = new Goal();
+        goal2.setId(2L);
+        goal2.setTitle("Goal 2");
+        goal2.setStatus(GoalStatus.COMPLETED);
+        Goal goal3 = new Goal();
+        goal3.setId(3L);
+        goal3.setTitle("Another goal");
+        goal3.setStatus(GoalStatus.ACTIVE);
+
+        when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.of(goal1, goal2, goal3));
+
+        GoalFilterDto filter = new GoalFilterDto("Goal", null);
+        List<Goal> goals = goalService.getGoalsByUser(userId, filter);
+
+        assertEquals(2, goals.size());
+        assertEquals("Goal 1", goals.get(0).getTitle());
+        assertEquals("Goal 2", goals.get(1).getTitle());
+    }
+
+    @Test
+    void getGoalsByUser_FiltersByStatus() {
+        Long userId = 1L;
+        Goal goal1 = new Goal();
+        goal1.setId(1L);
+        goal1.setTitle("Goal 1");
+        goal1.setStatus(GoalStatus.ACTIVE);
+        Goal goal2 = new Goal();
+        goal2.setId(2L);
+        goal2.setTitle("Goal 2");
+        goal2.setStatus(GoalStatus.COMPLETED);
+        Goal goal3 = new Goal();
+        goal3.setId(3L);
+        goal3.setTitle("Another goal");
+        goal3.setStatus(GoalStatus.ACTIVE);
+
+        when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.of(goal1, goal2, goal3));
+
+        GoalFilterDto filter = new GoalFilterDto(null, GoalStatus.ACTIVE);
+        List<Goal> goals = goalService.getGoalsByUser(userId, filter);
+
+        assertEquals(2, goals.size());
+        assertEquals(GoalStatus.ACTIVE, goals.get(0).getStatus());
+        assertEquals(GoalStatus.ACTIVE, goals.get(1).getStatus());
+    }
+
+    @Test
+    void getGoalsByUser_FiltersByTitleAndStatus() {
+        Long userId = 1L;
+        Goal goal1 = new Goal();
+        goal1.setId(1L);
+        goal1.setTitle("Goal 1");
+        goal1.setStatus(GoalStatus.ACTIVE);
+        Goal goal2 = new Goal();
+        goal2.setId(2L);
+        goal2.setTitle("Goal 2");
+        goal2.setStatus(GoalStatus.COMPLETED);
+        Goal goal3 = new Goal();
+        goal3.setId(3L);
+        goal3.setTitle("Another goal");
+        goal3.setStatus(GoalStatus.ACTIVE);
+
+        when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.of(goal1, goal2, goal3));
+
+        GoalFilterDto filter = new GoalFilterDto("Goal", GoalStatus.ACTIVE);
+        List<Goal> goals = goalService.getGoalsByUser(userId, filter);
+
+        assertEquals(1, goals.size());
+        assertEquals("Goal 1", goals.get(0).getTitle());
+        assertEquals(GoalStatus.ACTIVE, goals.get(0).getStatus());
     }
 
 }

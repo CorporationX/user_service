@@ -4,10 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.entity.goal.Goal;
+import school.faang.user_service.filter.GoalFilterDto;
 import school.faang.user_service.service.goal.GoalService;
 
 import java.util.List;
@@ -39,9 +41,14 @@ public class GoalController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("")
+    @GetMapping("")
     public List<Goal> findSubtasksByGoalId(long goalId, String filter) {
         return goalService.findSubtasksByGoalId(goalId, filter);
+    }
+
+    @GetMapping("")
+    public List<Goal> getGoalsByUser(Long userId, GoalFilterDto filter) {
+        return goalService.getGoalsByUser(userId, filter);
     }
 }
 

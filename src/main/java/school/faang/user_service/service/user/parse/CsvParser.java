@@ -21,6 +21,11 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static school.faang.user_service.exception.message.ExceptionMessage.INPUT_OUTPUT_EXCEPTION;
 
+/**
+ * Класс для преобразования List<InputStream> в List<Person>.
+ * В методе multiParseCsv создается заданное количество потоков, в каждый поток передается InputStream из List<InputStream>.
+ * В методе parseCsv InputStream преобразуется в Person.
+ */
 @Slf4j
 @Component
 public class CsvParser {

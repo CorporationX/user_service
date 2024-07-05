@@ -14,6 +14,12 @@ import java.util.List;
 import static school.faang.user_service.exception.message.ExceptionMessage.INPUT_IS_EMPTY;
 import static school.faang.user_service.exception.message.ExceptionMessage.INPUT_OUTPUT_EXCEPTION;
 
+/**
+ * Класс для преобразования InputStream в List<CsvPart>.
+ * В методе readInput читается InputStream построчно и каждая строка заносится в List<String>.
+ * В методе toCsvPartDivider количество строк делится на количество частей, на которые нужно поделить InputStream,
+ * В каждую часть заносится заголовок.
+ */
 @Slf4j
 @Component
 public class ReadAndDivide {

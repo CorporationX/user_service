@@ -7,6 +7,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * Класс олицетворяющий часть файла.
+ * Каждый List<String> включает строки файла.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

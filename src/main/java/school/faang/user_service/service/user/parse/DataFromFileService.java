@@ -20,6 +20,15 @@ import java.util.stream.StreamSupport;
 
 import static school.faang.user_service.service.user.util.PasswordGenerator.generate;
 
+/**
+ * Класс для преобразования InputStream в List<UserDto>.
+ * 46. InputStream методом toCsvPartDivider и объектом ReadAndDivide преобразуется в List<CsvPart>.
+ * 47. List<CsvPart>, методом convertToInputStreamList преобразуется в List<InputStream>.
+ * 48. List<InputStream> методом multiParseCsv и объектом CsvParser преобразуются в List<Person>.
+ * 49. List<Person> методом convertToUserList преобразуются в List<User>.
+ * 50. List<User> методом filter фильтруются, отсеиваются те пользователи, которые есть в базе данных,
+ * 52.53. После этого объекты User сохраняются в базу данных, проеобразуются в DTO и возвращаются.
+ */
 @Service
 @AllArgsConstructor
 public class DataFromFileService {

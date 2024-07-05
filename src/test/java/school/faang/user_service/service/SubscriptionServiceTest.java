@@ -10,10 +10,21 @@ import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.ConflictException;
+import school.faang.user_service.exception.MessageError;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.SubscriptionRepository;
+import school.faang.user_service.util.filter.user.UserAboutFilter;
+import school.faang.user_service.util.filter.user.UserCityFilter;
+import school.faang.user_service.util.filter.user.UserContactFilter;
+import school.faang.user_service.util.filter.user.UserCountryFilter;
+import school.faang.user_service.util.filter.user.UserEmailFilter;
+import school.faang.user_service.util.filter.user.UserExpMaxFilter;
+import school.faang.user_service.util.filter.user.UserExpMinFilter;
+import school.faang.user_service.util.filter.user.UserNameFilter;
+import school.faang.user_service.util.filter.user.UserPhoneFilter;
+import school.faang.user_service.util.filter.user.UserSkillFilter;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -51,11 +62,11 @@ class SubscriptionServiceTest {
         Mockito.when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId))
                 .thenReturn(true);
 
-        DataValidationException exception = assertThrows(
-                DataValidationException.class,
+        ConflictException exception = assertThrows(
+                ConflictException.class,
                 () -> subscriptionService.followUser(followerId, followeeId)
         );
-        assertEquals("Following already exists", exception.getMessage());
+        assertEquals(MessageError.FOLLOWING_EXISTS.getMessage(), exception.getMessage());
         Mockito.verify(subscriptionRepository, Mockito.times(1))
                 .existsByFollowerIdAndFolloweeId(Mockito.anyLong(), Mockito.anyLong());
     }
@@ -84,11 +95,11 @@ class SubscriptionServiceTest {
         Mockito.when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId))
                 .thenReturn(false);
 
-        DataValidationException exception = assertThrows(
-                DataValidationException.class,
+        ConflictException exception = assertThrows(
+                ConflictException.class,
                 () -> subscriptionService.unfollowUser(followerId, followeeId)
         );
-        assertEquals("Following does not exist", exception.getMessage());
+        assertEquals(MessageError.FOLLOWING_DOESNT_EXIST.getMessage(), exception.getMessage());
         Mockito.verify(subscriptionRepository, Mockito.times(1))
                 .existsByFollowerIdAndFolloweeId(Mockito.anyLong(), Mockito.anyLong());
     }
@@ -97,6 +108,19 @@ class SubscriptionServiceTest {
     void testGetFollowers_valid_noFilters() {
         UserMapper userMapper = new UserMapperImpl();
         ReflectionTestUtils.setField(subscriptionService, "userMapper", userMapper);
+        ReflectionTestUtils.setField(subscriptionService, "userFilters",
+                List.of(
+                        new UserNameFilter(),
+                        new UserAboutFilter(),
+                        new UserEmailFilter(),
+                        new UserContactFilter(),
+                        new UserCountryFilter(),
+                        new UserCityFilter(),
+                        new UserPhoneFilter(),
+                        new UserSkillFilter(),
+                        new UserExpMinFilter(),
+                        new UserExpMaxFilter()
+                ));
 
         long followeeId = 1;
         UserFilterDto filter = new UserFilterDto();
@@ -127,6 +151,19 @@ class SubscriptionServiceTest {
     void testGetFollowers_valid_nameFilter() {
         UserMapper userMapper = new UserMapperImpl();
         ReflectionTestUtils.setField(subscriptionService, "userMapper", userMapper);
+        ReflectionTestUtils.setField(subscriptionService, "userFilters",
+                List.of(
+                        new UserNameFilter(),
+                        new UserAboutFilter(),
+                        new UserEmailFilter(),
+                        new UserContactFilter(),
+                        new UserCountryFilter(),
+                        new UserCityFilter(),
+                        new UserPhoneFilter(),
+                        new UserSkillFilter(),
+                        new UserExpMinFilter(),
+                        new UserExpMaxFilter()
+                ));
 
         long followeeId = 1;
         UserFilterDto filter = UserFilterDto.builder()

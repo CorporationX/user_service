@@ -4,12 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.AlreadyExistsException;
 import school.faang.user_service.exception.MessageError;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
+import school.faang.user_service.util.filter.Filter;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -21,6 +22,7 @@ public class SubscriptionService {
 
     private final SubscriptionRepository subscriptionRepository;
     private final UserMapper userMapper;
+    private final List<Filter<UserFilterDto, User>> userFilters;
 
     public void followUser(long followerId, long followeeId) {
         boolean followingExists = subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
@@ -43,35 +45,22 @@ public class SubscriptionService {
 
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filter) {
         Stream<User> followersStream = subscriptionRepository.findByFolloweeId(followeeId);
-        List<User> filteredFollowers = filterUsers(followersStream, filter);
+        List<User> filteredFollowers = filterUsers(followersStream, filter).toList();
 
         return userMapper.toDtoList(filteredFollowers);
     }
 
-    private List<User> filterUsers(Stream<User> userStream, UserFilterDto filter) {
-        // мне такой вариант реализации фильтров не нравится, но так же и не нравится как Влад
-        // предлагает реализовать фильтр, есть другие варианты?
-        return userStream
-                .filter(user -> filter.getNamePattern() == null || user.getUsername().contains(filter.getNamePattern()))
-                .filter(user -> filter.getAboutPattern() == null || user.getAboutMe().contains(filter.getAboutPattern()))
-                .filter(user -> filter.getEmailPattern() == null || user.getEmail().contains(filter.getEmailPattern()))
-                .filter(user -> filter.getContactPattern() == null
-                        || user.getContacts().stream()
-                        .anyMatch(contact -> contact.getContact().contains(filter.getContactPattern())))
-                .filter(user -> filter.getCountryPattern() == null || user.getCountry().getTitle().contains(filter.getCountryPattern()))
-                .filter(user -> filter.getCityPattern() == null || user.getCity().contains(filter.getCityPattern()))
-                .filter(user -> filter.getPhonePattern() == null || user.getPhone().contains(filter.getPhonePattern()))
-                .filter(user -> filter.getSkillPattern() == null
-                        || user.getSkills().stream()
-                        .anyMatch(skill -> skill.getTitle().contains(filter.getSkillPattern())))
-                .filter(user -> filter.getExperienceMin() == null || user.getExperience() >= filter.getExperienceMin())
-                .filter(user -> filter.getExperienceMax() == null || user.getExperience() <= filter.getExperienceMax())
+    private Stream<User> filterUsers(Stream<User> userStream, UserFilterDto filter) {
+        return userFilters.stream()
+                .filter(userFilter -> userFilter.isApplicable(filter))
+                .reduce(userStream,
+                        (userStream1, userFilter) -> userFilter.apply(userStream1, filter),
+                        ((userStream1, userStream2) -> userStream2))
                 // полагаю что номер страницы приходит в пользовательком формате (начиная с 1)
-                // default - 1
+                // default - 1 (валидация на уровне контроллера)
                 .skip( (long) (filter.getPage() - 1) * filter.getPageSize())
                 // default - 10
-                .limit(filter.getPageSize())
-                .toList();
+                .limit(filter.getPageSize());
     }
 
     public int getFollowersCount(long followeeId) {

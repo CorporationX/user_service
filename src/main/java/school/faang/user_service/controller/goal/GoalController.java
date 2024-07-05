@@ -10,6 +10,8 @@ import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.service.goal.GoalService;
 
+import java.util.List;
+
 @RestController
 public class GoalController {
     private final GoalService goalService;
@@ -35,6 +37,11 @@ public class GoalController {
     public ResponseEntity<Void> deleteGoal(long goalId) {
         goalService.deleteGoal(goalId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("")
+    public List<Goal> findSubtasksByGoalId(long goalId, String filter) {
+        return goalService.findSubtasksByGoalId(goalId, filter);
     }
 }
 

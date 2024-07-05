@@ -15,12 +15,13 @@ import school.faang.user_service.service.skill.SkillService;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class GoalServiceTest {
     @Mock
@@ -265,4 +266,42 @@ class GoalServiceTest {
         verify(goalRepository).removeSkillsFromGoal(goalId);
         verify(goalRepository).deleteById(goalId);
     }
+
+    // test for findSubtasksByGoalId
+    @Test
+    void findSubtasksByGoalId_FiltersActiveSubtasks() {
+        long goalId = 1L;
+        Goal activeSubtask = new Goal();
+        activeSubtask.setId(2L);
+        activeSubtask.setStatus(GoalStatus.ACTIVE);
+        Goal completedSubtask = new Goal();
+        completedSubtask.setId(3L);
+        completedSubtask.setStatus(GoalStatus.COMPLETED);
+
+        when(goalRepository.findByParent(goalId)).thenReturn(Stream.of(activeSubtask, completedSubtask));
+
+        List<Goal> activeSubtasks = goalService.findSubtasksByGoalId(goalId, "active");
+
+        assertEquals(1, activeSubtasks.size());
+        assertEquals(activeSubtask.getId(), activeSubtasks.get(0).getId());
+    }
+
+    @Test
+    void findSubtasksByGoalId_FiltersCompletedSubtasks() {
+        long goalId = 1L;
+        Goal activeSubtask = new Goal();
+        activeSubtask.setId(2L);
+        activeSubtask.setStatus(GoalStatus.ACTIVE);
+        Goal completedSubtask = new Goal();
+        completedSubtask.setId(3L);
+        completedSubtask.setStatus(GoalStatus.COMPLETED);
+
+        when(goalRepository.findByParent(goalId)).thenReturn(Stream.of(activeSubtask, completedSubtask));
+
+        List<Goal> completedSubtasks = goalService.findSubtasksByGoalId(goalId, "completed");
+
+        assertEquals(1, completedSubtasks.size());
+        assertEquals(completedSubtask.getId(), completedSubtasks.get(0).getId());
+    }
+
 }

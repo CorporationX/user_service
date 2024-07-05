@@ -12,6 +12,7 @@ import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.skill.SkillService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -90,5 +91,17 @@ public class GoalService {
 
         goalRepository.removeSkillsFromGoal(goalId);
         goalRepository.deleteById(goalId);
+    }
+
+    public List<Goal> findSubtasksByGoalId(long goalId, String filter) {
+        List<Goal> subtasks = goalRepository.findByParent(goalId).collect(Collectors.toList());
+
+        if ("active".equals(filter)) {
+            subtasks.removeIf(goal -> goal.getStatus() == GoalStatus.COMPLETED);
+        } else if ("completed".equals(filter)) {
+            subtasks.removeIf(goal -> goal.getStatus() != GoalStatus.COMPLETED);
+        }
+
+        return subtasks;
     }
 }

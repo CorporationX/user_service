@@ -18,6 +18,7 @@ public class RedisConfig {
 
     @Value("${spring.data.redis.host}")
     private String host;
+
     @Value("${spring.data.redis.port}")
     private int port;
 
@@ -33,6 +34,9 @@ public class RedisConfig {
     @Value("${spring.data.redis.channels.follower_channel.name}")
     private String followerChanel;
 
+    @Value("${spring.data.redis.channels.profile_pic_channel.name}")
+    private String profilePicChannel;
+
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
@@ -47,6 +51,11 @@ public class RedisConfig {
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(mapper, MessageEvent.class));
         return redisTemplate;
+    }
+
+    @Bean
+    ChannelTopic profilePicTopic() {
+        return new ChannelTopic(profilePicChannel);
     }
 
     @Bean

@@ -5,17 +5,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import school.faang.user_service.dto.event.ProfilePicEvent;
 import school.faang.user_service.dto.user.UserAvatarDto;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.jpa.UserJpaRepository;
+import school.faang.user_service.publisher.ProfilePicEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.dicebear.DiceBearService;
 import school.faang.user_service.service.s3.S3Service;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 
 @Slf4j
@@ -28,6 +31,7 @@ public class UserService {
     private final GoalRepository goalRepository;
     private final S3Service s3Service;
     private final DiceBearService diceBearService;
+    private final ProfilePicEventPublisher profilePicEventPublisher;
 
     @Value("${images.avatar_dicebear_format}")
     private String avatarFormat;
@@ -87,6 +91,16 @@ public class UserService {
         user.setUserProfilePic(userProfilePic);
 
         userJpaRepository.save(user);
+        addProfilePicEvent(userId);
         return new UserAvatarDto(imageKey, avatarFormat);
+    }
+
+    private void addProfilePicEvent(long userId) {
+        ProfilePicEvent profilePicEvent = ProfilePicEvent.builder()
+                .userId(userId)
+                .loadedAt(LocalDateTime.now())
+                .build();
+
+        profilePicEventPublisher.publish(profilePicEvent);
     }
 }

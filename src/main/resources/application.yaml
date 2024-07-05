@@ -32,6 +32,8 @@ spring:
           name: mentorship_accepted_channel
         skill_channel:
           name: skill_channel
+        profile_pic_channel:
+          name: profile_pic_channel
 
 server:
   port: 8080

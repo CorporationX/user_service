@@ -21,6 +21,13 @@ repositories {
 }
 
 dependencies {
+
+    /**
+     * My implementations
+     */
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    implementation("org.apache.commons:commons-lang3:3.14.0")
+
     /**
      * Spring boot starters
      */

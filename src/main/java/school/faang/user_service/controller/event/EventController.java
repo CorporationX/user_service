@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.exception.event.DataValidationException;
 import school.faang.user_service.service.event.EventService;
+import org.apache.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,6 +19,11 @@ public class EventController {
             throw new DataValidationException("Не удалось создать событие!" +
                     " Введены не верные данные.");
         }
+    }
+
+    // получить событие
+    public EventDto getEvent(long eventId) {
+        return eventService.getEvent(eventId);
     }
 
     public boolean validateEventDto(EventDto event) {

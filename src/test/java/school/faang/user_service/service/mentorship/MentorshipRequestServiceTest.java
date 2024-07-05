@@ -17,6 +17,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.publisher.MentorshipStartEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.mentorship.filter.RequestFilter;
@@ -54,6 +55,9 @@ public class MentorshipRequestServiceTest {
 
     @Mock
     private List<RequestFilter> requestFilters;
+
+    @Mock
+    private MentorshipStartEventPublisher mentorshipStartEventPublisher;
 
     @Captor
     private ArgumentCaptor<MentorshipRequest> captor;

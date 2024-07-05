@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.exception.AlreadyExistsException;
+import school.faang.user_service.exception.ConflictException;
 import school.faang.user_service.exception.MessageError;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
@@ -27,7 +27,7 @@ public class SubscriptionService {
     public void followUser(long followerId, long followeeId) {
         boolean followingExists = subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
         if (followingExists) {
-            throw new AlreadyExistsException(MessageError.FOLLOWING_EXISTS);
+            throw new ConflictException(MessageError.FOLLOWING_EXISTS);
         }
         // нужно ли проверять существуют ли вообще такие пользователи? типо userRepository.existsById
 
@@ -37,7 +37,7 @@ public class SubscriptionService {
     public void unfollowUser(long followerId, long followeeId) {
         boolean followingExists = subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
         if (!followingExists) {
-            throw new AlreadyExistsException(MessageError.FOLLOWING_DOESNT_EXIST);
+            throw new ConflictException(MessageError.FOLLOWING_DOESNT_EXIST);
         }
 
         subscriptionRepository.unfollowUser(followerId, followeeId);
@@ -53,6 +53,7 @@ public class SubscriptionService {
     private Stream<User> filterUsers(Stream<User> userStream, UserFilterDto filter) {
         return userFilters.stream()
                 .filter(userFilter -> userFilter.isApplicable(filter))
+                // по цепочке применяем фильтры к userStream
                 .reduce(userStream,
                         (userStream1, userFilter) -> userFilter.apply(userStream1, filter),
                         ((userStream1, userStream2) -> userStream2))

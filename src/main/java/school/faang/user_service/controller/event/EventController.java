@@ -45,4 +45,8 @@ public class EventController {
        return eventService.findAllByUserId(userId);
     }
 
+    public List<EventReadDto> getParticipatedEvents(long userId) {
+        return eventService.findParticipatedEventsByUserId(userId);
+    }
+
 }

@@ -86,4 +86,10 @@ public class EventService {
                 .map(eventReadMapper::map)
                 .toList();
     }
+
+    public List<EventReadDto> findParticipatedEventsByUserId(long userId) {
+        return repository.findParticipatedEventsByUserId(userId).stream()
+                .map(eventReadMapper::map)
+                .toList();
+    }
 }

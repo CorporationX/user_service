@@ -16,6 +16,12 @@ public class EventCreateEditMapper implements Mapper<EventCreateEditDto, Event> 
     private final SkillRepository skillRepository;
 
     @Override
+    public Event map(EventCreateEditDto fromObject, Event toObject) {
+        copy(fromObject, toObject);
+        return toObject;
+    }
+
+    @Override
     public Event map(EventCreateEditDto object) {
         Event event = new Event();
         copy(object, event);

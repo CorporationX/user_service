@@ -31,10 +31,7 @@ public class EventService {
 
     @Transactional
     public EventReadDto create(EventCreateEditDto eventDto) {
-        var validationResult = validator.validate(eventDto);
-        if (validationResult.hasErrors()) {
-            throw new DataValidationException(validationResult.getErrors());
-        }
+        validate(eventDto);
         var event = createEditMapper.map(eventDto);
         repository.save(event);
         return readMapper.map(event);
@@ -57,6 +54,7 @@ public class EventService {
                 .map(eventReadMapper::map);
     }
 
+    @Transactional
     public boolean delete(Long id) {
         return repository.findById(id)
                 .map(entity -> {
@@ -65,5 +63,27 @@ public class EventService {
                     return true;
                 })
                 .orElse(false);
+    }
+
+    @Transactional
+    public Optional<EventReadDto> update(Long id, EventCreateEditDto eventDto) {
+        this.validate(eventDto);
+        return repository.findById(id)
+                .map(entity -> createEditMapper.map(eventDto, entity))
+                .map(repository::saveAndFlush)
+                .map(readMapper::map);
+    }
+
+    private void validate(EventCreateEditDto eventDto) {
+        var validationResult = validator.validate(eventDto);
+        if (validationResult.hasErrors()) {
+            throw new DataValidationException(validationResult.getErrors());
+        }
+    }
+
+    public List<EventReadDto> findAllByUserId(long userId) {
+        return repository.findAllByUserId(userId).stream()
+                .map(eventReadMapper::map)
+                .toList();
     }
 }

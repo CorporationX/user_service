@@ -3,7 +3,6 @@ package school.faang.user_service.controller.event;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.server.ResponseStatusException;
 import school.faang.user_service.dto.event.EventCreateEditDto;
 import school.faang.user_service.dto.event.EventReadDto;
@@ -35,6 +34,15 @@ public class EventController {
         if (!eventService.delete(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
+    }
+
+    public EventReadDto update(Long id, EventCreateEditDto editDto) {
+        return eventService.update(id, editDto)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    public List<EventReadDto> getOwnedEvents(long userId) {
+       return eventService.findAllByUserId(userId);
     }
 
 }

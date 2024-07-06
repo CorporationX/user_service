@@ -33,6 +33,13 @@ public class CsvParser {
     @Value("${thread.pool.size}")
     private int THREAD_POOL_SIZE;
 
+    /**
+     * Параллельный разбор нескольких частей CSV и агрегация результатов в один список.
+     *
+     * @param parts Список InputStream, каждый из которых представляет часть CSV-файла.
+     * @return Список объектов Person, полученных в результате разбора всех частей CSV.
+     * @throws DataValidationException если во время разбора произошла ошибка.
+     */
     public List<Person> multiParseCsv(List<InputStream> parts) {
         List<Person> allPersons = Collections.synchronizedList(new ArrayList<>());
         ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
@@ -69,6 +76,13 @@ public class CsvParser {
         return allPersons;
     }
 
+    /**
+     * Разбор одной части CSV в список объектов Person.
+     *
+     * @param part InputStream, представляющий часть CSV-файла.
+     * @return Список объектов Person, полученных в результате разбора части CSV.
+     * @throws DataValidationException если во время разбора произошла ошибка.
+     */
     private List<Person> parseCsv(InputStream part) {
         try (part) {
             CsvMapper mapper = new CsvMapper();

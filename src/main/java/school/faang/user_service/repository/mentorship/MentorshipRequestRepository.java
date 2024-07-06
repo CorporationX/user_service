@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.MentorshipRequest;
+import school.faang.user_service.entity.RequestStatus;
 
 import java.util.Optional;
 
@@ -31,4 +32,13 @@ public interface MentorshipRequestRepository extends CrudRepository<MentorshipRe
             LIMIT 1
             """)
     Optional<MentorshipRequest> findLatestRequestByRequester(long requesterId);
+
+    @Query(nativeQuery = true, value = """
+            SELECT * FROM mentorship_request WHERE
+            (:description IS NULL OR description = :description) AND
+            (:requesterId IS NULL OR requester_id = :requesterId) AND
+            (:receiverId IS NULL OR receiver_id = :receiverId) AND
+            (:status IS NULL OR status = :status)
+            """)
+    Iterable<MentorshipRequest> findAllByFilter(String description, Long requesterId, Long receiverId, RequestStatus status);
 }

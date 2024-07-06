@@ -94,16 +94,19 @@ public class RecommendationService {
         return recommendationMapper.toDto(updatedRecommendation.get());
     }
 
+    @Transactional
     public void delete(Long recommendationId) {
         recommendationRepository.deleteById(recommendationId);
     }
 
+    @Transactional
     public List<RecommendationDto> getAllUserRecommendations(Long receiverId) {
         Page<Recommendation> recommendations = recommendationRepository.findAllByReceiverId(receiverId, Pageable.unpaged());
 
         return recommendations.get().map(recommendationMapper::toDto).toList();
     }
 
+    @Transactional
     public List<RecommendationDto> getAllGivenRecommendations(Long authorId) {
         Page<Recommendation> recommendations = recommendationRepository.findAllByAuthorId(authorId, Pageable.unpaged());
 

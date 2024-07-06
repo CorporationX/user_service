@@ -1,4 +1,4 @@
-package school.faang.user_service.service.filter.userFilter;
+package school.faang.user_service.filter.userFilter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,11 +7,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.contact.Contact;
-import school.faang.user_service.service.userFilter.UserContactFilter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -61,10 +59,11 @@ public class UserContactFilterTest {
         secondContacts.add(anotherContact);
         when(secondUser.getContacts()).thenReturn(secondContacts);
 
-        List<User> users = List.of(firstUser, secondUser);
-        Stream<User> userStream = users.stream();
+        List<User> users = new ArrayList<>();
+        users.add(firstUser);
+        users.add(secondUser);
 
-        userContactFilter.apply(userStream, userFilterDto);
+        List<User> usersForApply = userContactFilter.apply(users, userFilterDto);
 
         List<User> filteredUsers = users.stream()
                         .filter(user -> user.getContacts().stream()
@@ -72,6 +71,7 @@ public class UserContactFilterTest {
 
         assertEquals(1, filteredUsers.size());
         assertEquals("test", filteredUsers.get(0).getContacts().get(0).getContact());
+        assertEquals(filteredUsers, usersForApply);
     }
 
     @Test
@@ -94,10 +94,11 @@ public class UserContactFilterTest {
         secondContacts.add(anotherContact);
         when(secondUser.getContacts()).thenReturn(secondContacts);
 
-        List<User> users = List.of(firstUser, secondUser);
-        Stream<User> userStream = users.stream();
+        List<User> users = new ArrayList<>();
+        users.add(firstUser);
+        users.add(secondUser);
 
-        userContactFilter.apply(userStream, userFilterDto);
+        List<User> usersForApply = userContactFilter.apply(users, userFilterDto);
 
         List<User> filteredUsers = users.stream()
                 .filter(user -> user.getContacts().stream()
@@ -105,5 +106,6 @@ public class UserContactFilterTest {
                 .toList();
 
         assertEquals(0, filteredUsers.size());
+        assertEquals(filteredUsers, usersForApply);
     }
 }

@@ -1,4 +1,4 @@
-package school.faang.user_service.service.filter.userFilter;
+package school.faang.user_service.filter.userFilter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,13 +7,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.service.userFilter.UserCountryFilter;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -56,10 +54,11 @@ public class UserCountryFilterTest {
         when(secondCountry.getTitle()).thenReturn("Another country");
         when(secondUser.getCountry()).thenReturn(secondCountry);
 
-        List<User> users = Stream.of(firstUser, secondUser).toList();
-        Stream<User> userStream = users.stream();
+        List<User> users = new ArrayList<>();
+        users.add(firstUser);
+        users.add(secondUser);
 
-        userCountryFilter.apply(userStream, userFilterDto);
+        List<User> usersForApply = userCountryFilter.apply(users, userFilterDto);
 
         List<User> filteredUsers = users.stream()
                 .filter(user -> user.getCountry().getTitle().matches(userFilterDto.getCountryPattern()))
@@ -67,6 +66,7 @@ public class UserCountryFilterTest {
 
         assertEquals(1, filteredUsers.size());
         assertEquals("This is a test country", filteredUsers.get(0).getCountry().getTitle());
+        assertEquals(filteredUsers, usersForApply);
     }
 
     @Test
@@ -84,15 +84,17 @@ public class UserCountryFilterTest {
         when(secondCountry.getTitle()).thenReturn("Another country");
         when(secondUser.getCountry()).thenReturn(secondCountry);
 
-        List<User> users = Stream.of(firstUser, secondUser).toList();
-        Stream<User> userStream = users.stream();
+        List<User> users = new ArrayList<>();
+        users.add(firstUser);
+        users.add(secondUser);
 
-        userCountryFilter.apply(userStream, userFilterDto);
+        List<User> usersForApply = userCountryFilter.apply(users, userFilterDto);
 
         List<User> filteredUsers = users.stream()
                 .filter(user -> user.getCountry().getTitle().matches(userFilterDto.getCountryPattern()))
                 .toList();
 
         assertEquals(0, filteredUsers.size());
+        assertEquals(filteredUsers, usersForApply);
     }
 }

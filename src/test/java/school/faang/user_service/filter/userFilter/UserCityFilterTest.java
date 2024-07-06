@@ -1,13 +1,12 @@
-package school.faang.user_service.service.filter.userFilter;
+package school.faang.user_service.filter.userFilter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.service.userFilter.UserCityFilter;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -47,10 +46,11 @@ public class UserCityFilterTest {
         User secondUser = mock(User.class);
         when(secondUser.getCity()).thenReturn("Another city");
 
-        List<User> users = Stream.of(firstUser, secondUser).toList();
-        Stream<User> userStream = users.stream();
+        List<User> users = new ArrayList<>();
+        users.add(firstUser);
+        users.add(secondUser);
 
-        userCityFilter.apply(userStream, userFilterDto);
+        List<User> usersForApply = userCityFilter.apply(users, userFilterDto);
 
         List<User> filteredUsers = users.stream()
                 .filter(user -> user.getCity().matches(userFilterDto.getCityPattern()))
@@ -58,6 +58,7 @@ public class UserCityFilterTest {
 
         assertEquals(1, filteredUsers.size());
         assertEquals("This is a test city", filteredUsers.get(0).getCity());
+        assertEquals(filteredUsers, usersForApply);
     }
 
     @Test
@@ -71,15 +72,17 @@ public class UserCityFilterTest {
         User secondUser = mock(User.class);
         when(secondUser.getCity()).thenReturn("Another city");
 
-        List<User> users = Stream.of(firstUser, secondUser).toList();
-        Stream<User> userStream = users.stream();
+        List<User> users = new ArrayList<>();
+        users.add(firstUser);
+        users.add(secondUser);
 
-        userCityFilter.apply(userStream, userFilterDto);
+        List<User> usersForApply = userCityFilter.apply(users, userFilterDto);
 
         List<User> filteredUsers = users.stream()
                 .filter(user -> user.getCity().matches(userFilterDto.getCityPattern()))
                 .toList();
 
         assertEquals(0, filteredUsers.size());
+        assertEquals(filteredUsers, usersForApply);
     }
 }

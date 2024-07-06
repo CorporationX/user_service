@@ -1,10 +1,10 @@
-package school.faang.user_service.service.userFilter;
+package school.faang.user_service.filter.userFilter;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 
-import java.util.stream.Stream;
+import java.util.List;
 
 @Component
 public class UserCityFilter implements UserFilter {
@@ -14,7 +14,7 @@ public class UserCityFilter implements UserFilter {
     }
 
     @Override
-    public void apply(Stream<User> users, UserFilterDto userFilter) {
-        users.filter(user -> user.getCity().matches(userFilter.getCityPattern()));
+    public List<User> apply(List<User> users, UserFilterDto userFilter) {
+        return users.stream().filter(user -> user.getCity().matches(userFilter.getCityPattern())).toList();
     }
 }

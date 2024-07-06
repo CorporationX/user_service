@@ -6,15 +6,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.SubscriptionRepository;
-import school.faang.user_service.service.userFilter.UserFilter;
+import school.faang.user_service.filter.userFilter.UserFilter;
+import school.faang.user_service.validator.SubscriptionServiceValidator;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class SubscriptionServiceTest {
@@ -27,181 +30,201 @@ public class SubscriptionServiceTest {
     @Mock
     private List<UserFilter> userFilters;
 
-    @Spy
+    @Mock
     private UserMapper userMapper;
+
+    @Mock
+    private SubscriptionServiceValidator subscriptionServiceValidator;
 
     @Test
     public void testFollowUserFollowerSubscribedFollowee() {
-        Mockito.when(subscriptionRepository.existsByFollowerIdAndFolloweeId(1L, 2L))
-                .thenReturn(false);
+        long followerId = 1L;
+        long followeeId = 2L;
 
-        Assert.assertThrows(DataValidationException.class, () -> {
-            subscriptionService.followUser(1L, 2L);
+        doThrow(new DataValidationException("User id: " + followerId
+                + " already followed to the user id: " + followeeId))
+                .when(subscriptionServiceValidator).validFollowUser(followerId, followeeId);
+
+        assertThrows(DataValidationException.class, () -> {
+            subscriptionService.followUser(followerId, followeeId);
         });
     }
 
     @Test
     public void testFollowUserFollowerOrFolloweeNotFound() {
-        Mockito.when(subscriptionRepository.existsByFollowerIdAndFolloweeId(1L, 2L))
-                .thenReturn(true);
-        Mockito.when(subscriptionRepository.existsById(1L))
-                .thenReturn(false);
+        long followerId = 1L;
+        long followeeId = 2L;
 
-        Assert.assertThrows(DataValidationException.class, () -> {
-            subscriptionService.followUser(1L, 2L);
+        doThrow(new DataValidationException("User " + followeeId + " not found"))
+                .when(subscriptionServiceValidator).validFollowUser(followerId, followeeId);
+
+        assertThrows(DataValidationException.class, () -> {
+            subscriptionService.followUser(followerId, followeeId);
         });
     }
 
     @Test
     public void testFollowUserIsFollow() {
-        Mockito.when(subscriptionRepository.existsByFollowerIdAndFolloweeId(1L, 2L))
-                .thenReturn(true);
-        Mockito.when(subscriptionRepository.existsById(1L))
-                .thenReturn(true);
-        Mockito.when(subscriptionRepository.existsById(2L))
-                .thenReturn(true);
-        subscriptionService.followUser(1L, 2L);
+        long followerId = 1L;
+        long followeeId = 2L;
 
-        Mockito.verify(subscriptionRepository, Mockito.times(1))
-                .followUser(1L, 2L);
+        doNothing().when(subscriptionServiceValidator).validFollowUser(followerId, followeeId);
+
+        subscriptionService.followUser(followerId, followeeId);
+
+        verify(subscriptionRepository, Mockito.times(1))
+                .followUser(followerId, followeeId);
     }
 
     @Test
     public void testUnfollowUserUsersAreNotSubscribedToEachOther() {
-        Mockito.when(subscriptionRepository.existsByFollowerIdAndFolloweeId(1L, 2L))
-                .thenReturn(false);
+        long followerId = 1L;
+        long followeeId = 2L;
 
-        Assert.assertThrows(DataValidationException.class, () -> {
-            subscriptionService.unfollowUser(1L, 2L);
+        doThrow(new DataValidationException("User id: " + followerId
+                + " already followed to the user id: " + followeeId))
+                .when(subscriptionServiceValidator).validUnfollowUser(followerId, followeeId);
+
+        assertThrows(DataValidationException.class, () -> {
+            subscriptionService.unfollowUser(followerId, followeeId);
         });
     }
 
     @Test
     public void testUnfollowUserFollowerOrFolloweeNotFound() {
-        Mockito.when(subscriptionRepository.existsByFollowerIdAndFolloweeId(1L, 2L))
-                .thenReturn(true);
-        Mockito.when(subscriptionRepository.existsById(1L))
-                .thenReturn(false);
+        long followerId = 1L;
+        long followeeId = 2L;
 
-        Assert.assertThrows(DataValidationException.class, () -> {
-            subscriptionService.followUser(1L, 2L);
+        doThrow(new DataValidationException("User " + followeeId + " not found"))
+                .when(subscriptionServiceValidator).validUnfollowUser(followerId, followeeId);
+
+        assertThrows(DataValidationException.class, () -> {
+            subscriptionService.unfollowUser(followerId, followeeId);
         });
     }
 
     @Test
     public void testUnfollowUserIsUnfollow() {
-        Mockito.when(subscriptionRepository.existsByFollowerIdAndFolloweeId(1L, 2L))
-                .thenReturn(true);
-        Mockito.when(subscriptionRepository.existsById(1L))
-                .thenReturn(true);
-        Mockito.when(subscriptionRepository.existsById(2L))
-                .thenReturn(true);
+        long followerId = 1L;
+        long followeeId = 2L;
 
-        subscriptionService.unfollowUser(1L, 2L);
+        doNothing().when(subscriptionServiceValidator).validUnfollowUser(followerId, followeeId);
 
-        Mockito.verify(subscriptionRepository, Mockito.times(1))
-                .unfollowUser(1L, 2L);
+        subscriptionService.unfollowUser(followerId, followeeId);
+
+        verify(subscriptionRepository, Mockito.times(1))
+                .unfollowUser(followerId, followeeId);
     }
 
     @Test
     public void testGetFollowersFolloweeNotFound() {
-        Mockito.when(subscriptionRepository.existsById(1L))
-                .thenReturn(false);
+        long followerId = 1L;
+        UserFilterDto userFilterDto = new UserFilterDto();
 
-        Assert.assertThrows(DataValidationException.class, () -> {
-            subscriptionService.getFollowers(1L, new UserFilterDto());
+        doThrow(new DataValidationException("User " + followerId + " not found"))
+                .when(subscriptionServiceValidator).validGetFollowers(followerId, userFilterDto);
+
+        assertThrows(DataValidationException.class, () -> {
+            subscriptionService.getFollowers(followerId, userFilterDto);
         });
     }
 
     @Test
     public void testGetFollowersUserFilterDtoIsNull() {
-        Mockito.when(subscriptionRepository.existsById(1L))
-                .thenReturn(true);
+        long followerId = 1L;
 
-        Assert.assertThrows(DataValidationException.class, () -> {
-            subscriptionService.getFollowers(1L, null);
+        doThrow(new IllegalArgumentException("UserFilterDto cannot be null"))
+                .when(subscriptionServiceValidator).validGetFollowers(followerId, null);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            subscriptionService.getFollowers(followerId, null);
         });
     }
 
     @Test
     public void testGetFollowersReturnedUsersDto() {
-        Mockito.when(subscriptionRepository.existsById(1L))
-                .thenReturn(true);
         subscriptionService.getFollowers(1L, new UserFilterDto());
 
-        Mockito.verify(subscriptionRepository, Mockito.times(1))
+        verify(subscriptionRepository, Mockito.times(1))
                 .findByFolloweeId(1L);
     }
 
     @Test
     public void testGetFollowersCountUserNotFound() {
-        Mockito.when(subscriptionRepository.existsById(1L))
-                .thenReturn(false);
+        long followerId = 1L;
 
-        Assert.assertThrows(DataValidationException.class, () -> {
-            subscriptionService.getFollowersCount(1L);
+        doThrow(new DataValidationException("User " + followerId + " not found"))
+                .when(subscriptionServiceValidator).validGetFollowersCount(followerId);
+
+        assertThrows(DataValidationException.class, () -> {
+            subscriptionService.getFollowersCount(followerId);
         });
     }
 
     @Test
     public void testGetFollowersCountReturnedUsersCount() {
-        Mockito.when(subscriptionRepository.existsById(1L))
-                .thenReturn(true);
+        long followerId = 1L;
 
-        subscriptionService.getFollowersCount(1L);
+        subscriptionService.getFollowersCount(followerId);
 
-        Mockito.verify(subscriptionRepository, Mockito.times(1))
-                .findFollowersAmountByFolloweeId(1L);
+        verify(subscriptionRepository, Mockito.times(1))
+                .findFollowersAmountByFolloweeId(followerId);
     }
 
     @Test
     public void testGetFollowingUserNotFound() {
-        Mockito.when(subscriptionRepository.existsById(1L))
-                .thenReturn(false);
+        long followerId = 1L;
+        UserFilterDto userFilterDto = new UserFilterDto();
 
-        Assert.assertThrows(DataValidationException.class, () -> {
-            subscriptionService.getFollowing(1L, new UserFilterDto());
+        doThrow(new DataValidationException("User " + followerId + " not found"))
+                .when(subscriptionServiceValidator).validGetFollowing(followerId, userFilterDto);
+
+        assertThrows(DataValidationException.class, () -> {
+            subscriptionService.getFollowing(followerId, new UserFilterDto());
         });
     }
 
     @Test
     public void testGetFollowingUserFilterDtoIsNull() {
-        Mockito.when(subscriptionRepository.existsById(1L))
-                .thenReturn(true);
+        long followerId = 1L;
 
-        Assert.assertThrows(DataValidationException.class, () -> {
-            subscriptionService.getFollowing(1L, null);
+        doThrow(new IllegalArgumentException("UserFilterDto cannot be null"))
+                .when(subscriptionServiceValidator).validGetFollowing(followerId, null);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            subscriptionService.getFollowing(followerId, null);
         });
     }
 
     @Test
     public void testGetFollowingReturnedUsersDto() {
-        Mockito.when(subscriptionRepository
-                .existsById(1L)).thenReturn(true);
-        subscriptionService.getFollowing(1L, new UserFilterDto());
+        long followeeId = 1L;
+        UserFilterDto userFilterDto = new UserFilterDto();
 
-        Mockito.verify(subscriptionRepository, Mockito.times(1))
-                .findByFolloweeId(1L);
+        subscriptionService.getFollowing(followeeId, userFilterDto);
+
+        verify(subscriptionServiceValidator).validGetFollowing(followeeId, userFilterDto);
     }
 
     @Test
     public void testGetFollowingCountUserNotFound() {
-        Mockito.when(subscriptionRepository.existsById(1L))
-                .thenReturn(false);
+        long followerId = 1L;
+
+        doThrow(new DataValidationException("User " + followerId + " not found"))
+                .when(subscriptionServiceValidator).validGetFollowingCount(followerId);
 
         Assert.assertThrows(DataValidationException.class, () -> {
-            subscriptionService.getFollowersCount(1L);
+            subscriptionService.getFollowingCount(followerId);
         });
     }
 
     @Test
     public void testGetFollowingCountReturnedUsersCount() {
-        Mockito.when(subscriptionRepository.existsById(1L))
-                .thenReturn(true);
+        long followerId = 1L;
 
-        subscriptionService.getFollowingCount(1L);
+        subscriptionService.getFollowingCount(followerId);
 
-        Mockito.verify(subscriptionRepository, Mockito.times(1))
-                .findFolloweesAmountByFollowerId(1L);
+        verify(subscriptionRepository, Mockito.times(1))
+                .findFolloweesAmountByFollowerId(followerId);
     }
 }

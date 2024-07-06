@@ -1,13 +1,12 @@
-package school.faang.user_service.service.filter.userFilter;
+package school.faang.user_service.filter.userFilter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.service.userFilter.UserPhoneFilter;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -47,10 +46,11 @@ public class UserPhoneFilterTest {
         User secondUser = mock(User.class);
         when(secondUser.getPhone()).thenReturn("Another phone");
 
-        List<User> users = Stream.of(firstUser, secondUser).toList();
-        Stream<User> userStream = users.stream();
+        List<User> users = new ArrayList<>();
+        users.add(firstUser);
+        users.add(secondUser);
 
-        userPhoneFilter.apply(userStream, userFilterDto);
+        List<User> usersForApply = userPhoneFilter.apply(users, userFilterDto);
 
         List<User> filteredUsers = users.stream()
                 .filter(user -> user.getPhone().matches(userFilterDto.getPhonePattern()))
@@ -58,6 +58,7 @@ public class UserPhoneFilterTest {
 
         assertEquals(1, filteredUsers.size());
         assertEquals("This is a test phone", filteredUsers.get(0).getPhone());
+        assertEquals(filteredUsers, usersForApply);
     }
 
     @Test
@@ -71,15 +72,17 @@ public class UserPhoneFilterTest {
         User secondUser = mock(User.class);
         when(secondUser.getPhone()).thenReturn("Another phone");
 
-        List<User> users = Stream.of(firstUser, secondUser).toList();
-        Stream<User> userStream = users.stream();
+        List<User> users = new ArrayList<>();
+        users.add(firstUser);
+        users.add(secondUser);
 
-        userPhoneFilter.apply(userStream, userFilterDto);
+        List<User> usersForApply = userPhoneFilter.apply(users, userFilterDto);
 
         List<User> filteredUsers = users.stream()
                 .filter(user -> user.getPhone().matches(userFilterDto.getPhonePattern()))
                 .toList();
 
         assertEquals(0, filteredUsers.size());
+        assertEquals(filteredUsers, usersForApply);
     }
 }

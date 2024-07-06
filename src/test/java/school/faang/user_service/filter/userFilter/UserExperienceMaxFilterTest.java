@@ -1,4 +1,4 @@
-package school.faang.user_service.service.filter.userFilter;
+package school.faang.user_service.filter.userFilter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -6,14 +6,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.service.userFilter.UserExperienceMaxFilter;
 
-
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -52,10 +49,11 @@ public class UserExperienceMaxFilterTest {
         User secondUser = mock(User.class);
         when(secondUser.getExperience()).thenReturn(11);
 
-        List<User> users = Stream.of(firstUser, secondUser).toList();
-        Stream<User> userStream = users.stream();
+        List<User> users = new ArrayList<>();
+        users.add(firstUser);
+        users.add(secondUser);
 
-        userExperienceMaxFilter.apply(userStream, userFilterDto);
+        List<User> usersForApply = userExperienceMaxFilter.apply(users, userFilterDto);
 
         List<User> filteredUsers = users.stream()
                 .filter(user -> user.getExperience() <= userFilterDto.getExperienceMax())
@@ -63,6 +61,7 @@ public class UserExperienceMaxFilterTest {
 
         assertEquals(1, filteredUsers.size());
         assertEquals(9, filteredUsers.get(0).getExperience());
+        assertEquals(filteredUsers, usersForApply);
     }
 
     @Test
@@ -76,15 +75,17 @@ public class UserExperienceMaxFilterTest {
         User secondUser = mock(User.class);
         when(secondUser.getExperience()).thenReturn(11);
 
-        List<User> users = Stream.of(firstUser, secondUser).toList();
-        Stream<User> userStream = users.stream();
+        List<User> users = new ArrayList<>();
+        users.add(firstUser);
+        users.add(secondUser);
 
-        userExperienceMaxFilter.apply(userStream, userFilterDto);
+        List<User> usersForApply = userExperienceMaxFilter.apply(users, userFilterDto);
 
         List<User> filteredUsers = users.stream()
                 .filter(user -> user.getExperience() <= userFilterDto.getExperienceMax())
                 .toList();
 
         assertEquals(0, filteredUsers.size());
+        assertEquals(filteredUsers, usersForApply);
     }
 }

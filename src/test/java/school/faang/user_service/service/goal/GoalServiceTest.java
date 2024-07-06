@@ -261,7 +261,10 @@ class GoalServiceTest {
     @Test
     void deleteGoal_Success() {
         long goalId = 1L;
+        Goal goal = new Goal();
+        goal.setId(goalId);
 
+        when(goalRepository.findById(goalId)).thenReturn(Optional.of(goal));
         goalService.deleteGoal(goalId);
 
         verify(goalRepository).removeSkillsFromGoal(goalId);

@@ -6,7 +6,6 @@ import org.mapstruct.Named;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
 @Mapper(componentModel = "spring")
 public interface MentorshipRequestMapper {

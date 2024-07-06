@@ -25,4 +25,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String,String>> handleValidationException(ValidationException ex) {
         return new ResponseEntity<>(Map.of("message",ex.getMessage(),"status",HttpStatus.BAD_REQUEST.toString()), HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<Map<String,String>> handleEntityNotFoundException(EntityNotFoundException ex) {
+        return new ResponseEntity<>(Map.of("message",ex.getMessage(),"status",HttpStatus.NOT_FOUND.toString()), HttpStatus.NOT_FOUND);
+    }
 }

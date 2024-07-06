@@ -12,7 +12,7 @@ public class RecommendationRequestController {
 
     public RecommendationRequestDto requestRecommendation (RecommendationRequestDto recommendationRequest){
     validateRequestNotEmpty(recommendationRequest);
-    recommendationRequestService.create(recommendationRequest);
+    return recommendationRequestService.create(recommendationRequest);
     }
 
     private void validateRequestNotEmpty(RecommendationRequestDto recommendationRequest){

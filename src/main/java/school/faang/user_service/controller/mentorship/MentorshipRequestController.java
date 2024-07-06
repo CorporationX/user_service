@@ -23,9 +23,12 @@ public class MentorshipRequestController {
 
     @GetMapping
     public ResponseEntity<?> getRequests(RequestFilterDto filter) {
-        System.out.println(filter);
         try {
-            return ResponseEntity.ok(mentorshipRequestService.getRequests(filter));
+            List<MentorshipRequest> requests = mentorshipRequestService.getRequests(filter);
+            List<MentorshipRequestDto> requestsDto = requests.stream()
+                    .map(mentorshipRequestMapper::toDto)
+                    .toList();
+            return ResponseEntity.ok(requestsDto);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -38,7 +41,8 @@ public class MentorshipRequestController {
             MentorshipRequestDto mentorshipRequestResponseDto = mentorshipRequestMapper.toDto(mentorshipRequestResponse);
             return ResponseEntity.ok(mentorshipRequestResponseDto);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(e.getMessage());
         }
     }
 
@@ -49,7 +53,8 @@ public class MentorshipRequestController {
             MentorshipRequestDto mentorshipRequestResponseDto = mentorshipRequestMapper.toDto(mentorshipRequestResponse);
             return ResponseEntity.ok(mentorshipRequestResponseDto);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(e.getMessage());
         }
     }
 
@@ -62,7 +67,8 @@ public class MentorshipRequestController {
             MentorshipRequestDto mentorshipRequestResponseDto = mentorshipRequestMapper.toDto(mentorshipRequestResponse);
             return ResponseEntity.ok(mentorshipRequestResponseDto);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(e.getMessage());
         }
     }
 }

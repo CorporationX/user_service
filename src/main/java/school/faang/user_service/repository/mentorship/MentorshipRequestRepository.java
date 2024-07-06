@@ -40,5 +40,5 @@ public interface MentorshipRequestRepository extends CrudRepository<MentorshipRe
             (:receiverId IS NULL OR receiver_id = :receiverId) AND
             (:status IS NULL OR status = :status)
             """)
-    Iterable<MentorshipRequest> findAllByFilter(String description, Long requesterId, Long receiverId, RequestStatus status);
+    Iterable<MentorshipRequest> findAllByFilter(String description, Long requesterId, Long receiverId, Integer status);
 }

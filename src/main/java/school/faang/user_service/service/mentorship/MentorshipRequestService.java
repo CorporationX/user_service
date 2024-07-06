@@ -14,7 +14,7 @@ import school.faang.user_service.validator.MentorshipRequestValidator;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.StreamSupport;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -37,17 +37,15 @@ public class MentorshipRequestService {
     }
 
     public List<MentorshipRequestDto> getRequests(MentorshipRequestFilterDto filtersDto) {
-        List<MentorshipRequest> allMatchedRequests = selectAllMentorshipRequestsAndFilter(filtersDto);
-        return allMatchedRequests.stream().map(mentorshipRequestMapper::toDto).toList();
-    }
-
-    private List<MentorshipRequest> selectAllMentorshipRequestsAndFilter(MentorshipRequestFilterDto filtersDto) {
-        List<MentorshipRequestFilter> mentorshipRequestApplicableFilters =
+        Stream<MentorshipRequest> allMatchedMentorshipRequests = mentorshipRequestRepository.findAll().stream();
+        List<MentorshipRequestFilter> applicableMentorshipRequestFilters =
                 mentorshipRequestFilterList.stream().filter(filter -> filter.isApplicable(filtersDto)).toList();
-        List<MentorshipRequest> allMentorshipRequests =
-                StreamSupport.stream(mentorshipRequestRepository.findAll().spliterator(), false).toList();
-        return allMentorshipRequests.stream().filter(request -> mentorshipRequestApplicableFilters.stream()
-                .allMatch(filter -> filter.filter(request, filtersDto))).toList();
+
+        for (MentorshipRequestFilter mentorshipRequestFilter : applicableMentorshipRequestFilters) {
+            allMatchedMentorshipRequests = mentorshipRequestFilter.filter(allMatchedMentorshipRequests, filtersDto);
+        }
+
+        return mentorshipRequestMapper.toDtoList(allMatchedMentorshipRequests.toList());
     }
 
     public MentorshipRequestDto acceptRequest(long requestId) {

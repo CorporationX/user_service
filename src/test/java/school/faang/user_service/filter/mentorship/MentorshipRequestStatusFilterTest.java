@@ -6,6 +6,10 @@ import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 
+import java.util.List;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -36,7 +40,11 @@ class MentorshipRequestStatusFilterTest {
                 .status(RequestStatus.PENDING).build();
         MentorshipRequest mentorshipRequest = MentorshipRequest.builder()
                 .status(RequestStatus.PENDING).build();
-        assertTrue(mentorshipRequestStatusFilter.filter(mentorshipRequest, mentorshipRequestFilterDto));
+
+
+        Stream<MentorshipRequest> filteredStream =
+                mentorshipRequestStatusFilter.filter(Stream.of(mentorshipRequest), mentorshipRequestFilterDto);
+        assertEquals(List.of(mentorshipRequest), filteredStream.toList());
     }
 
     @Test
@@ -45,6 +53,9 @@ class MentorshipRequestStatusFilterTest {
                 .status(RequestStatus.ACCEPTED).build();
         MentorshipRequest mentorshipRequest = MentorshipRequest.builder()
                 .status(RequestStatus.REJECTED).build();
-        assertFalse(mentorshipRequestStatusFilter.filter(mentorshipRequest, mentorshipRequestFilterDto));
+
+        Stream<MentorshipRequest> filteredStream =
+                mentorshipRequestStatusFilter.filter(Stream.of(mentorshipRequest), mentorshipRequestFilterDto);
+        assertTrue(filteredStream.findAny().isEmpty());
     }
 }

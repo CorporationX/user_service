@@ -6,6 +6,8 @@ import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring", unmappedSourcePolicy = ReportingPolicy.IGNORE)
 public interface MentorshipRequestMapper {
 
@@ -16,4 +18,6 @@ public interface MentorshipRequestMapper {
     @Mapping(source = "requesterId", target = "requester.id")
     @Mapping(source = "receiverId", target = "receiver.id")
     MentorshipRequest toEntity(MentorshipRequestDto mentorshipRequestDto);
+
+    List<MentorshipRequestDto> toDtoList(List<MentorshipRequest> mentorshipRequestList);
 }

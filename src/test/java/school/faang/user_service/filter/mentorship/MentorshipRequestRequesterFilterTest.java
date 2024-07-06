@@ -1,25 +1,28 @@
 package school.faang.user_service.filter.mentorship;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
 
+import java.util.List;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipRequestRequesterFilterTest {
-    @Mock
-    private MentorshipRequest mentorshipRequest;
-
-    @InjectMocks
     private MentorshipRequestRequesterFilter mentorshipRequestRequesterFilter;
+
+    @BeforeEach
+    public void setUp() {
+        mentorshipRequestRequesterFilter = new MentorshipRequestRequesterFilter();
+    }
 
     @Test
     public void testIsApplicableWithNullDescription() {
@@ -40,8 +43,12 @@ class MentorshipRequestRequesterFilterTest {
                 .requesterId(1L).build();
         User user = User.builder()
                 .id(1L).build();
-        when(mentorshipRequest.getRequester()).thenReturn(user);
-        assertTrue(mentorshipRequestRequesterFilter.filter(mentorshipRequest, mentorshipRequestFilterDto));
+        MentorshipRequest mentorshipRequest = MentorshipRequest.builder()
+                .requester(user).build();
+
+        Stream<MentorshipRequest> filteredStream =
+                mentorshipRequestRequesterFilter.filter(Stream.of(mentorshipRequest), mentorshipRequestFilterDto);
+        assertEquals(List.of(mentorshipRequest), filteredStream.toList());
     }
 
     @Test
@@ -50,7 +57,11 @@ class MentorshipRequestRequesterFilterTest {
                 .requesterId(1L).build();
         User user = User.builder()
                 .id(2L).build();
-        when(mentorshipRequest.getRequester()).thenReturn(user);
-        assertFalse(mentorshipRequestRequesterFilter.filter(mentorshipRequest, mentorshipRequestFilterDto));
+        MentorshipRequest mentorshipRequest = MentorshipRequest.builder()
+                .requester(user).build();
+
+        Stream<MentorshipRequest> filteredStream =
+                mentorshipRequestRequesterFilter.filter(Stream.of(mentorshipRequest), mentorshipRequestFilterDto);
+        assertTrue(filteredStream.findAny().isEmpty());
     }
 }

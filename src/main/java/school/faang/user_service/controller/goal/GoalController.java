@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.filter.GoalFilterDto;
+import school.faang.user_service.service.goal.filter.GoalFilterDto;
 import school.faang.user_service.service.goal.GoalService;
 
 import java.util.List;

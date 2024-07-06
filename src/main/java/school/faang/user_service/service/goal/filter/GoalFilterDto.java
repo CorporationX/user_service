@@ -1,4 +1,4 @@
-package school.faang.user_service.filter;
+package school.faang.user_service.service.goal.filter;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

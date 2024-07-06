@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,15 +23,22 @@ import static org.mockito.Mockito.when;
 public class SkillControllerTest {
 
     @InjectMocks
-    SkillController skillController;
+    private SkillController skillController;
 
     @Mock
-    SkillService skillService;
+    private SkillService skillService;
 
+    private SkillDto skillDto;
+    private long userId = 1;
+    private long skillId = 1;
+
+    @BeforeEach
+    void setUp() {
+        skillDto = new SkillDto();
+    }
 
     @Test
     void testCreateWithNullTitle() {
-        SkillDto skillDto = new SkillDto();
         skillDto.setTitle(null);
 
         assertThrows(DataValidationException.class, () -> skillController.create(skillDto));
@@ -38,7 +46,6 @@ public class SkillControllerTest {
 
     @Test
     void testCreateWithBlankTitle() {
-        SkillDto skillDto = new SkillDto();
         skillDto.setTitle(" ");
 
         assertThrows(DataValidationException.class, () -> skillController.create(skillDto));
@@ -46,7 +53,6 @@ public class SkillControllerTest {
 
     @Test
     void testCreateWhenAccess() {
-        SkillDto skillDto = new SkillDto();
         skillDto.setTitle("Title");
 
         skillController.create(skillDto);
@@ -56,7 +62,6 @@ public class SkillControllerTest {
 
     @Test
     void testGetUserSkills() {
-        long userId = 1;
         List<SkillDto> skillDtos = List.of(new SkillDto(), new SkillDto());
 
         when(skillService.getUserSkills(userId)).thenReturn(skillDtos);
@@ -68,7 +73,6 @@ public class SkillControllerTest {
 
     @Test
     void testGetOfferedSkills() {
-        long userId = 1;
         List<SkillCandidateDto> skillCandidateDtos = List.of(new SkillCandidateDto(), new SkillCandidateDto());
 
         when(skillService.getOfferedSkills(userId)).thenReturn(skillCandidateDtos);
@@ -76,5 +80,17 @@ public class SkillControllerTest {
 
         verify(skillService, times(1)).getOfferedSkills(userId);
         assertEquals(skillCandidateDtos, returnedSkillCandidateDtos);
+    }
+
+    @Test
+    void testGetAcquireSkillFromOffer() {
+        skillDto.setId(1L);
+
+        when(skillService.acquireSkillFromOffer(skillId, userId)).thenReturn(skillDto);
+
+        SkillDto returnedSkillDto = skillController.acquireSkillFromOffer(skillId, userId);
+
+        verify(skillService, times(1)).acquireSkillFromOffer(skillId, userId);
+        assertEquals(skillDto, returnedSkillDto);
     }
 }

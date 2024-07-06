@@ -9,13 +9,19 @@ import school.faang.user_service.entity.User;
 
 @Mapper(componentModel = "spring")
 public interface MentorshipRequestMapper {
-    @Mapping( source = "requester",target = "requesterId",qualifiedByName = "map")
+    @Mapping(source = "requester", target = "requesterId", qualifiedByName = "requesterMap")
+    @Mapping(source = "receiver", target = "receiverId", qualifiedByName = "receiverMap")
     MentorshipRequestDto toDto(MentorshipRequest mentorshipRequest);
 
     MentorshipRequest toEntity(MentorshipRequestDto mentorshipRequestDto);
 
-    @Named("map")
-    default Long map(User user) {
+    @Named("requesterMap")
+    default Long requesterMap(User user) {
+        return user.getId();
+    }
+
+    @Named("receiverMap")
+    default Long receiverMap(User user) {
         return user.getId();
     }
 }

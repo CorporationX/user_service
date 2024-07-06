@@ -2,17 +2,23 @@ package school.faang.user_service.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.apachecommons.CommonsLog;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.AcceptMentorshipRequestDto;
 import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.MentorshipRequestFilterDto;
+import school.faang.user_service.dto.RejectRequestDto;
 import school.faang.user_service.exceptions.ValidationException;
 import school.faang.user_service.service.MentorshipRequestService;
 
+import java.util.List;
 import java.util.Map;
 
 
+@CommonsLog
 @RestController
 @Component
 @RequestMapping("/api/mentorship-request")
@@ -37,8 +43,13 @@ public class MentorshipRequestController {
         return mentorshipRequestService.acceptRequest(acceptMentorshipRequestDto);
     }
 
-    @PostMapping(value = "/reject/{id}")
-    public ResponseEntity<Map<String, String>> rejectRequest(@PathVariable Long id, @RequestBody String reason) {
-        return mentorshipRequestService.rejectRequest(id,reason);
+    @PostMapping(value = "/reject")
+    public ResponseEntity<Map<String, String>> rejectRequest(@Valid @RequestBody RejectRequestDto rejectRequestDto) {
+        return mentorshipRequestService.rejectRequest(rejectRequestDto);
+    }
+    @PostMapping(value ="/all")
+    public ResponseEntity<List<MentorshipRequestDto>> getAllMentorshipRequests(@RequestBody MentorshipRequestFilterDto filterDto) {
+        log.info(filterDto.toString());
+        return mentorshipRequestService.getAllMentorshipRequests(filterDto);
     }
 }

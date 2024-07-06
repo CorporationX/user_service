@@ -124,15 +124,18 @@ public class RecommendationService {
             return;
         }
 
-        List<Long> allReceiverSkillIds = skillRepository.findAllByUserId(recommendation.getReceiver().getId()).stream()
+        long receiverId = recommendation.getReceiver().getId();
+        long authorId = recommendation.getAuthor().getId();
+
+        List<Long> allReceiverSkillIds = skillRepository.findAllByUserId(receiverId).stream()
                 .map(Skill::getId)
                 .toList();
         List<Long> existedReceiverSkillsIds = offeredSkillIds.stream()
                 .filter(allReceiverSkillIds::contains)
                 .toList();
 
-        List<Long> receiverGuaranteeSkillIds = userSkillGuaranteeRepository.findAllByUserId(recommendation.getReceiver().getId()).stream()
-                .filter(userSkillGuarantee -> userSkillGuarantee.getGuarantor().getId() == recommendation.getAuthor().getId())
+        List<Long> receiverGuaranteeSkillIds = userSkillGuaranteeRepository.findAllByUserId(receiverId).stream()
+                .filter(userSkillGuarantee -> userSkillGuarantee.getGuarantor().getId() == authorId)
                 .map(UserSkillGuarantee::getSkill)
                 .map(Skill::getId)
                 .toList();
@@ -142,7 +145,7 @@ public class RecommendationService {
                 .toList();
 
         skillIdsToGuarantee.forEach(skillId -> {
-            userSkillGuaranteeRepository.create(recommendation.getReceiver().getId(), skillId, recommendation.getAuthor().getId());
+            userSkillGuaranteeRepository.create(receiverId, skillId, authorId);
         });
     }
 

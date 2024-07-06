@@ -25,6 +25,14 @@ public class RecommendationValidator {
 
     @Transactional
     public void validate(Recommendation recommendation) {
+        validateFieldsExistence(recommendation);
+
+        validateLastRecommendationDate(recommendation);
+
+        validateSkillOffersExistence(recommendation);
+    }
+
+    private void validateFieldsExistence(Recommendation recommendation) {
         if (recommendation == null) {
             throw new DataValidationException("Recommendation cannot be empty");
         }
@@ -48,7 +56,9 @@ public class RecommendationValidator {
         if (recommendation.getCreatedAt() == null) {
             throw new DataValidationException("Created date cannot be empty");
         }
+    }
 
+    private void validateLastRecommendationDate(Recommendation recommendation) {
         if (!userRepository.existsById(recommendation.getReceiver().getId())) {
             throw new DataValidationException("Receiver not found");
         }
@@ -71,7 +81,9 @@ public class RecommendationValidator {
                 throw new DataValidationException("The last recommendation was less than 6 months ago");
             }
         }
+    }
 
+    private void validateSkillOffersExistence(Recommendation recommendation) {
         List<SkillOffer> skillOffers = recommendation.getSkillOffers();
 
         if (!skillOffers.isEmpty()) {

@@ -153,13 +153,13 @@ public class RecommendationServiceTest {
     }
 
     private Page<Recommendation> createRecommendationPage() {
-        Recommendation recommendation1 = new Recommendation();
-        recommendation1.setId(1L);
+        Recommendation firstRecommendation = new Recommendation();
+        firstRecommendation.setId(1L);
 
-        Recommendation recommendation2 = new Recommendation();
-        recommendation2.setId(2L);
+        Recommendation secondRecommendation = new Recommendation();
+        secondRecommendation.setId(2L);
 
-        return new PageImpl<>(List.of(recommendation1, recommendation2));
+        return new PageImpl<>(List.of(firstRecommendation, secondRecommendation));
     }
 
     private List<RecommendationDto> createRecommendationPageDto() {

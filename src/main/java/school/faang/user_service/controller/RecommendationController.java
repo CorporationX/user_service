@@ -10,25 +10,25 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class RecommendationController {
-    private final RecommendationService recommendationService;
+    private final RecommendationService service;
 
     public RecommendationDto giveRecommendation(RecommendationDto recommendation) {
-        return recommendationService.create(recommendation);
+        return service.create(recommendation);
     }
 
     public RecommendationDto updateRecommendation(RecommendationDto recommendation) {
-        return recommendationService.update(recommendation);
+        return service.update(recommendation);
     }
 
     public void deleteRecommendation(Long recommendationId) {
-        recommendationService.delete(recommendationId);
+        service.delete(recommendationId);
     }
 
     public List<RecommendationDto> getAllUserRecommendations(Long receiverId) {
-        return recommendationService.getAllUserRecommendations(receiverId);
+        return service.getAllUserRecommendations(receiverId);
     }
 
     public List<RecommendationDto> getAllGivenRecommendations(Long authorId) {
-        return recommendationService.getAllUserRecommendations(authorId);
+        return service.getAllUserRecommendations(authorId);
     }
 }

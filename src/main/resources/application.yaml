@@ -25,6 +25,10 @@ spring:
         recommendationChannel: recommendation_channel
 
 
+thread:
+  pool:
+    size: 4
+
 server:
   port: 8080
 

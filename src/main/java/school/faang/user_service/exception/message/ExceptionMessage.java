@@ -20,7 +20,10 @@ public enum ExceptionMessage {
     REQUEST_ALREADY_HAS_STATUS("To get new status, status should be null"),
     NO_REQUEST_IN_DB("No such request in database"),
     USER_ALREADY_HAS_SUCH_MENTOR("User can not send request to mentor twice"),
-    TOO_MUCH_REQUESTS("Requests are made ones per 3 months");
+    TOO_MUCH_REQUESTS("Requests are made ones per 3 months"),
+      NO_FILE_IN_REQUEST("There is no file send"),
+    INPUT_OUTPUT_EXCEPTION("Something wrong with input or output"),
+    INPUT_IS_EMPTY("Input should not be empty");
 
     private final String message;
 
@@ -31,5 +34,4 @@ public enum ExceptionMessage {
     public String getMessage() {
         return message;
     }
-
 }

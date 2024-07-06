@@ -1,5 +1,9 @@
 package school.faang.user_service.service.goal;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -9,18 +13,16 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.dto.filter.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.UserMapper;
+import school.faang.user_service.publisher.AbstractEventPublisher;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.subscription.SubscriptionService;
 import school.faang.user_service.service.user.filter.UserFilter;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -36,6 +38,8 @@ class SubscriptionServiceTest {
     private SubscriptionRepository subscriptionRepo;
     @Mock
     private UserMapper userMapper;
+    @Mock
+    private AbstractEventPublisher eventPublisher;
     @InjectMocks
     private SubscriptionService subscriptionService;
 

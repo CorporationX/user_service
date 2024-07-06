@@ -1,30 +1,38 @@
 package school.faang.user_service.service.event;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.UserReadDto;
 import school.faang.user_service.dto.event.EventCreateEditDto;
 import school.faang.user_service.dto.event.EventReadDto;
-import school.faang.user_service.dto.UserReadDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.event.EventStatus;
 import school.faang.user_service.entity.event.EventType;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.filter.event.EventFilter;
+import school.faang.user_service.filter.event.EventFilterDto;
+import school.faang.user_service.filter.event.EventStartDateAfterFilter;
+import school.faang.user_service.filter.event.EventTitleFilter;
 import school.faang.user_service.mapper.event.EventCreateEditMapper;
 import school.faang.user_service.mapper.event.EventReadMapper;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.valitator.Error;
-import school.faang.user_service.valitator.event.EventCreateEditValidator;
 import school.faang.user_service.valitator.ValidationResult;
+import school.faang.user_service.valitator.event.EventCreateEditValidator;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -41,8 +49,16 @@ public class EventServiceTest {
     private EventReadMapper readMapper;
     @Mock
     private EventRepository repository;
-    @InjectMocks
+
     private EventService eventService;
+
+    private final LocalDateTime DATE_NOW = LocalDateTime.now();
+
+    @BeforeEach
+    void init() {
+        List<EventFilter> eventFilters = List.of(new EventTitleFilter(), new EventStartDateAfterFilter());
+        eventService = new EventService(repository, createEditMapper, readMapper, createEditValidator, readMapper, eventFilters);
+    }
 
     @Test
     void create() {
@@ -55,9 +71,25 @@ public class EventServiceTest {
 
         EventReadDto actualResult = eventService.create(eventCreateEditDto);
 
-        Assertions.assertThat(actualResult).isEqualTo(eventReadDto);
+        assertThat(actualResult).isEqualTo(eventReadDto);
         verify(repository).save(event);
     }
+
+    @Test
+    void findAllBy() {
+        EventFilterDto eventFilterDto = new EventFilterDto("2", DATE_NOW.minusDays(1));
+        List<EventReadDto> expectedResult = List.of(getEventReadDto("title2"), getEventReadDto("a2"));
+        List<Event> events = List.of(getEvent("title"), getEvent("title2"), getEvent("atitle"), getEvent("a2"));
+        doReturn(events).when(repository).findAll();
+        doReturn(expectedResult.get(0)).when(readMapper).map(events.get(1));
+        doReturn(expectedResult.get(1)).when(readMapper).map(events.get(3));
+
+        List<EventReadDto> actualResult = eventService.findAllBy(eventFilterDto);
+
+        assertThat(actualResult.size()).isEqualTo(2);
+        assertThat(actualResult).isEqualTo(expectedResult);
+    }
+
 
     @Test
     void shouldThrowExceptionIfDtoInvalid() {
@@ -70,12 +102,18 @@ public class EventServiceTest {
         verifyNoInteractions(repository, createEditMapper, readMapper);
     }
 
+    private Event getEvent(String title) {
+        Event event = getEvent();
+        event.setTitle(title);
+        return event;
+    }
+
+
     private Event getEvent() {
-        var dateNow = LocalDateTime.now();
         return Event.builder()
                 .title("title")
-                .startDate(dateNow)
-                .endDate(dateNow.plusDays(1))
+                .startDate(DATE_NOW)
+                .endDate(DATE_NOW.plusDays(1))
                 .owner(getUser(1L))
                 .description("description")
                 .relatedSkills(Stream.of(1L, 2L)
@@ -102,6 +140,20 @@ public class EventServiceTest {
                 event.getMaxAttendees(),
                 event.getType(),
                 event.getStatus()
+        );
+    }
+
+    private EventReadDto getEventReadDto(String title) {
+        Event event = getEvent(title);
+        return new EventReadDto(
+                event.getId(),
+                event.getTitle(),
+                event.getStartDate(),
+                event.getEndDate(),
+                getUserReadDto(event.getOwner().getId()),
+                event.getDescription(),
+                event.getLocation(),
+                event.getMaxAttendees()
         );
     }
 

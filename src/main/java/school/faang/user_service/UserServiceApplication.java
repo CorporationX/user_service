@@ -24,14 +24,7 @@ import school.faang.user_service.service.event.EventService;
 public class UserServiceApplication {
 
     public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(UserServiceApplication.class, args);
-        context.getBean(TransactionTemplate.class).executeWithoutResult(tx -> {
-            context.getBean(EventService.class).findAll(new EventFilterDto(
-                            "title"
-                    )).stream()
-                    .map(EventReadDto::getTitle)
-                    .forEach(System.out::println);
-        });
+        SpringApplication.run(UserServiceApplication.class, args);
     }
 
     @Bean

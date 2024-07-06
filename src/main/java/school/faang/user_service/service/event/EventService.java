@@ -1,20 +1,18 @@
 package school.faang.user_service.service.event;
 
-import jakarta.persistence.criteria.Predicate;
-import liquibase.util.StringUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.event.EventCreateEditDto;
 import school.faang.user_service.dto.event.EventReadDto;
 import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.filter.event.EventFilter;
 import school.faang.user_service.filter.event.EventFilterDto;
 import school.faang.user_service.mapper.event.EventCreateEditMapper;
 import school.faang.user_service.mapper.event.EventReadMapper;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.valitator.event.EventCreateEditValidator;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +26,7 @@ public class EventService {
     private final EventReadMapper readMapper;
     private final EventCreateEditValidator validator;
     private final EventReadMapper eventReadMapper;
+    private final List<EventFilter> eventFilters;
 
     @Transactional
     public EventReadDto create(EventCreateEditDto eventDto) {
@@ -37,15 +36,11 @@ public class EventService {
         return readMapper.map(event);
     }
 
-    public List<EventReadDto> findAll(EventFilterDto filter) {
-        return repository.findAll((root, cq, cb) -> {
-                    List<Predicate> predicates = new ArrayList<>();
-                    if (StringUtil.isNotEmpty(filter.getTitle())) {
-                        predicates.add(cb.like(root.get("title"), "%" + filter.getTitle() + "%"));
-                    }
-                    return cb.and(predicates.toArray(new Predicate[predicates.size()]));
-                }).stream()
-                .map(eventReadMapper::map)
+    public List<EventReadDto> findAllBy(EventFilterDto filter) {
+        return repository.findAll().stream()
+                .filter(event -> eventFilters.stream()
+                        .allMatch(filterField -> filterField.apply(event, filter)))
+                .map(readMapper::map)
                 .toList();
     }
 

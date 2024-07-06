@@ -22,7 +22,7 @@ public class EventController {
     }
 
     public List<EventReadDto> getEventsByFilter(EventFilterDto filter) {
-        return eventService.findAll(filter);
+        return eventService.findAllBy(filter);
     }
 
     public EventReadDto getEvent(Long id) {

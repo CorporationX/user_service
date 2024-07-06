@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.controller.mentorship.MentorshipRequestController;
 import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.service.MentorshipRequestService;
 
@@ -37,6 +38,9 @@ public class MentorshipRequestControllerTest {
 
     @Captor
     ArgumentCaptor<MentorshipRequestDto> captor;
+
+    @Captor
+    ArgumentCaptor<RequestFilterDto> captorFilter;
 
     @BeforeEach
     public void initializeDto() {
@@ -68,5 +72,24 @@ public class MentorshipRequestControllerTest {
 
         Assertions.assertEquals(returnDto, captor.getValue());
         Assertions.assertEquals(returnDto, returnDtoFromMethod);
+    }
+
+    @Test
+    public void testGetRequests() {
+        RequestFilterDto filter = RequestFilterDto.builder()
+                .descriptionPattern("123")
+                .requesterId(1L)
+                .receiverId(1L)
+                .status(RequestStatus.PENDING)
+                .build();
+        RequestFilterDto returnFilter = RequestFilterDto.builder()
+                .descriptionPattern("123")
+                .requesterId(1L)
+                .receiverId(1L)
+                .status(RequestStatus.PENDING)
+                .build();
+        mentorshipRequestController.getRequests(filter);
+        verify(mentorshipRequestService, times(1)).getRequests(captorFilter.capture());
+        Assertions.assertEquals(returnFilter, captorFilter.getValue());
     }
 }

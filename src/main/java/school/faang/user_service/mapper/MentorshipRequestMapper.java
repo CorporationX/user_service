@@ -7,6 +7,7 @@ import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
+import java.util.List;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface MentorshipRequestMapper {
@@ -35,4 +36,5 @@ public interface MentorshipRequestMapper {
         return User.builder().id(id).build();
     }
 
+    List<MentorshipRequestDto> toDto(List<MentorshipRequest> request);
 }

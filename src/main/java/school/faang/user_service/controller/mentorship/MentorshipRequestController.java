@@ -1,10 +1,10 @@
 package school.faang.user_service.controller.mentorship;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.MentorshipRequestDto;
-import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.dto.RequestFilterDto;
+import java.util.List;
 import school.faang.user_service.service.MentorshipRequestService;
 
 @Component
@@ -16,6 +16,10 @@ public class MentorshipRequestController {
         validateRequestMentorship(mentorshipRequestDto);
         return mentorshipRequestService.requestMentorship(mentorshipRequestDto);
 
+    }
+
+    public List<MentorshipRequestDto> getRequests(RequestFilterDto filter) {
+        return mentorshipRequestService.getRequests(filter);
     }
 
     private void validateRequestMentorship(MentorshipRequestDto mentorshipRequestDto) {

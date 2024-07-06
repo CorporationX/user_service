@@ -15,20 +15,25 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+import school.faang.user_service.service.mentorship_request_filter.MentorshipRequestDescrFilter;
+import school.faang.user_service.service.mentorship_request_filter.MentorshipRequestFilter;
+import school.faang.user_service.service.mentorship_request_filter.MentorshipRequestReceiverFilter;
+import school.faang.user_service.service.mentorship_request_filter.MentorshipRequestRequesterFilter;
+import school.faang.user_service.service.mentorship_request_filter.MentorshipRequestStatusFilter;
 
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.Mockito.calls;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -46,9 +51,19 @@ public class MentorshipRequestServiceTest {
     private UserRepository userRepository;
     @Spy
     private MentorshipRequestMapper mentorshipRequestMapper = Mappers.getMapper(MentorshipRequestMapper.class);
-
+    @Spy
+    private List<MentorshipRequestFilter> requestFilters = new ArrayList<>(
+            List.of(
+                    new MentorshipRequestDescrFilter(),
+                    new MentorshipRequestReceiverFilter(),
+                    new MentorshipRequestRequesterFilter(),
+                    new MentorshipRequestStatusFilter()
+            )
+    );
     @Captor
     private ArgumentCaptor<MentorshipRequest> requestCaptor;
+    @Captor
+    private ArgumentCaptor<MentorshipRequest> mapperCaptor;
     private MentorshipRequestDto dto;
     private MentorshipRequestDto requestDto;
     private MentorshipRequest entity;
@@ -166,4 +181,35 @@ public class MentorshipRequestServiceTest {
 
     }
 
+    @Test
+    public void testGetRequestsFilter() {
+        List<MentorshipRequest> mentorshipRequests = new ArrayList<>(List.of(
+                new MentorshipRequest(1L, "desc123", User.builder().id(1L).build(), User.builder().id(2L).build(),
+                        RequestStatus.ACCEPTED, "reason",LocalDateTime.of(2024,
+                        Month.AUGUST, 8, 19, 30, 40),
+                        LocalDateTime.of(2024, Month.AUGUST, 8, 19, 30, 40)),
+                new MentorshipRequest(2L, "desc", User.builder().id(1L).build(), User.builder().id(2L).build(),
+                        RequestStatus.ACCEPTED, "reason",LocalDateTime.of(2024,
+                        Month.AUGUST, 8, 19, 30, 40),
+                        LocalDateTime.of(2024, Month.AUGUST, 8, 19, 30, 42)),
+                new MentorshipRequest(3L, "desc123", User.builder().id(3L).build(), User.builder().id(2L).build(),
+                        RequestStatus.ACCEPTED, "reason",LocalDateTime.of(2024,
+                        Month.AUGUST, 8, 19, 30, 40),
+                        LocalDateTime.of(2024, Month.AUGUST, 8, 19, 30, 44)),
+                new MentorshipRequest(4L, "desc123", User.builder().id(1L).build(), User.builder().id(4L).build(),
+                        RequestStatus.ACCEPTED, "reason",LocalDateTime.of(2024,
+                        Month.AUGUST, 8, 19, 30, 40),
+                        LocalDateTime.of(2024, Month.AUGUST, 8, 19, 30, 46)),
+                new MentorshipRequest(5L, "desc123", User.builder().id(1L).build(), User.builder().id(2L).build(),
+                        RequestStatus.PENDING, "reason",LocalDateTime.of(2024,
+                        Month.AUGUST, 8, 19, 30, 40),
+                        LocalDateTime.of(2024, Month.AUGUST, 8, 19, 30, 40))
+        ));
+
+        when(mentorshipRequestRepository.findAll()).thenReturn(mentorshipRequests);
+        RequestFilterDto requestFilter = new RequestFilterDto("123", 1L,2L, RequestStatus.ACCEPTED);
+        List<MentorshipRequestDto> requestDtos = mentorshipRequestService.getRequests(requestFilter);
+        List<MentorshipRequestDto> expectedDtos = mentorshipRequestMapper.toDto(new ArrayList<>(List.of(mentorshipRequests.get(0))));
+        Assertions.assertEquals(expectedDtos, requestDtos);
+    }
 }

@@ -3,7 +3,6 @@ package school.faang.user_service.dto;
 import lombok.*;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.recommendation.Recommendation;
-import school.faang.user_service.entity.recommendation.SkillRequest;
 
 import java.util.List;
 

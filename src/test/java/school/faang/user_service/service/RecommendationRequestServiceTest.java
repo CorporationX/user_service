@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.lang.Long.*;
-import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.*;
@@ -93,6 +92,30 @@ class RecommendationRequestServiceTest {
                 .build();
     }
 
+    private void assertRecommendationRequest(RecommendationRequestDto actualResult, RecommendationRequest recommendationRequest) {
+        assertThat(actualResult.getId()).isEqualTo(recommendationRequest.getId());
+        assertThat(actualResult.getMessage()).isEqualTo(recommendationRequest.getMessage());
+        assertThat(actualResult.getStatus()).isEqualTo(recommendationRequest.getStatus());
+
+        assertThat(actualResult.getSkills())
+                .hasSize(recommendationRequest.getSkills().size())
+                .allSatisfy(skillRequestDto -> {
+                    SkillRequest skillRequest = recommendationRequest.getSkills().stream()
+                            .filter(req -> req.getId() == skillRequestDto.getId())
+                            .findFirst()
+                            .orElse(null);
+                    assertThat(skillRequest).isNotNull();
+                    assertThat(skillRequestDto.getSkillDto().getId()).isEqualTo(skillRequest.getSkill().getId());
+                    assertThat(skillRequestDto.getSkillDto().getTitle()).isEqualTo(skillRequest.getSkill().getTitle());
+                });
+
+        assertThat(actualResult.getRequesterId()).isEqualTo(recommendationRequest.getRequester().getId());
+        assertThat(actualResult.getReceiverId()).isEqualTo(recommendationRequest.getReceiver().getId());
+
+        assertThat(actualResult.getCreatedAt()).isEqualTo(recommendationRequest.getCreatedAt());
+        assertThat(actualResult.getUpdatedAt()).isEqualTo(recommendationRequest.getUpdatedAt());
+    }
+
     @DisplayName("Unit test for create method - positive scenario.")
     @Test
     void givenRecommendationRequestWhenCreateThenReturnRecommendationRequest() {
@@ -111,27 +134,7 @@ class RecommendationRequestServiceTest {
 
         var actualResult = recommendationRequestService.create(recommendationRequestDto);
 
-        assertThat(recommendationRequestDto.getId()).isEqualTo(recommendationRequest.getId());
-        assertThat(recommendationRequestDto.getMessage()).isEqualTo(recommendationRequest.getMessage());
-        assertThat(recommendationRequestDto.getStatus()).isEqualTo(recommendationRequest.getStatus());
-
-        assertThat(recommendationRequestDto.getSkills())
-                .hasSize(recommendationRequest.getSkills().size())
-                .allSatisfy(skillRequestDto -> {
-                    SkillRequest skillRequest = recommendationRequest.getSkills().stream()
-                            .filter(req -> req.getId() == skillRequestDto.getId())
-                            .findFirst()
-                            .orElse(null);
-                    assertThat(skillRequest).isNotNull();
-                    assertThat(skillRequestDto.getSkillDto().getId()).isEqualTo(skillRequest.getSkill().getId());
-                    assertThat(skillRequestDto.getSkillDto().getTitle()).isEqualTo(skillRequest.getSkill().getTitle());
-                });
-
-        assertThat(recommendationRequestDto.getRequesterId()).isEqualTo(recommendationRequest.getRequester().getId());
-        assertThat(recommendationRequestDto.getReceiverId()).isEqualTo(recommendationRequest.getReceiver().getId());
-
-        assertThat(recommendationRequestDto.getCreatedAt()).isEqualTo(recommendationRequest.getCreatedAt());
-        assertThat(recommendationRequestDto.getUpdatedAt()).isEqualTo(recommendationRequest.getUpdatedAt());
+        assertRecommendationRequest(actualResult, recommendationRequest);
     }
 
     @DisplayName("Unit test for create method with requester that not exists in database - negative scenario.")
@@ -179,6 +182,7 @@ class RecommendationRequestServiceTest {
     @Test
     void givenRequestFilterWhenGetRequestsThenReturnFilteredRequests() {
         var requestFilterDto = createRequestFilterDto();
+        requestFilterDto.setSkills(null);
         var recommendationRequestDto = createRecommendationRequestDto();
         var recommendationRequest = createRecommendationRequest(recommendationRequestDto);
         var recommendationRequestDtoList = Arrays.asList(recommendationRequestDto);
@@ -219,27 +223,7 @@ class RecommendationRequestServiceTest {
 
         var actualResult = recommendationRequestService.getRequest(id);
 
-        assertThat(actualResult.getId()).isEqualTo(recommendationRequest.getId());
-        assertThat(actualResult.getMessage()).isEqualTo(recommendationRequest.getMessage());
-        assertThat(actualResult.getStatus()).isEqualTo(recommendationRequest.getStatus());
-
-        assertThat(actualResult.getSkills())
-                .hasSize(recommendationRequest.getSkills().size())
-                .allSatisfy(skillRequestDto -> {
-                    SkillRequest skillRequest = recommendationRequest.getSkills().stream()
-                            .filter(req -> req.getId() == skillRequestDto.getId())
-                            .findFirst()
-                            .orElse(null);
-                    assertThat(skillRequest).isNotNull();
-                    assertThat(skillRequestDto.getSkillDto().getId()).isEqualTo(skillRequest.getSkill().getId());
-                    assertThat(skillRequestDto.getSkillDto().getTitle()).isEqualTo(skillRequest.getSkill().getTitle());
-                });
-
-        assertThat(actualResult.getRequesterId()).isEqualTo(recommendationRequest.getRequester().getId());
-        assertThat(actualResult.getReceiverId()).isEqualTo(recommendationRequest.getReceiver().getId());
-
-        assertThat(actualResult.getCreatedAt()).isEqualTo(recommendationRequest.getCreatedAt());
-        assertThat(actualResult.getUpdatedAt()).isEqualTo(recommendationRequest.getUpdatedAt());
+        assertRecommendationRequest(actualResult, recommendationRequest);
     }
 
     @DisplayName("Unit test for getRequest method - negative scenario.")
@@ -259,6 +243,7 @@ class RecommendationRequestServiceTest {
     @Test
     void givenRequestFilterWhenGetRequestThenReturnRequest(){
         var requestFilterDto = createRequestFilterDto();
+        requestFilterDto.setSkills(null);
         var recommendationRequestDto = createRecommendationRequestDto();
         var recommendationRequest = createRecommendationRequest(recommendationRequestDto);
         var id = requestFilterDto.getId();
@@ -268,30 +253,8 @@ class RecommendationRequestServiceTest {
 
         var actualResult = recommendationRequestService.getRequest(requestFilterDto);
 
-        assertThat(actualResult.getId()).isEqualTo(recommendationRequest.getId());
-        assertThat(actualResult.getMessage()).isEqualTo(recommendationRequest.getMessage());
-        assertThat(actualResult.getStatus()).isEqualTo(recommendationRequest.getStatus());
-
-        assertThat(actualResult.getSkills())
-                .hasSize(recommendationRequest.getSkills().size())
-                .allSatisfy(skillRequestDto -> {
-                    SkillRequest skillRequest = recommendationRequest.getSkills().stream()
-                            .filter(req -> req.getId() == skillRequestDto.getId())
-                            .findFirst()
-                            .orElse(null);
-                    assertThat(skillRequest).isNotNull();
-                    assertThat(skillRequestDto.getSkillDto().getId()).isEqualTo(skillRequest.getSkill().getId());
-                    assertThat(skillRequestDto.getSkillDto().getTitle()).isEqualTo(skillRequest.getSkill().getTitle());
-                });
-
-        assertThat(actualResult.getRequesterId()).isEqualTo(recommendationRequest.getRequester().getId());
-        assertThat(actualResult.getReceiverId()).isEqualTo(recommendationRequest.getReceiver().getId());
-
-        assertThat(actualResult.getCreatedAt()).isEqualTo(recommendationRequest.getCreatedAt());
-        assertThat(actualResult.getUpdatedAt()).isEqualTo(recommendationRequest.getUpdatedAt());
+        assertRecommendationRequest(actualResult, recommendationRequest);
     }
-
-
 
     @DisplayName("Unit test for getRequest method - negative scenario.")
     @Test

@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.StreamSupport;
 
-import static java.lang.String.format;
 import static java.time.LocalDateTime.now;
 import static java.time.temporal.ChronoUnit.*;
 
@@ -89,7 +88,7 @@ public class RecommendationRequestService {
 
     public List<RecommendationRequestDto> getRequests(RequestFilterDto filter) {
         return StreamSupport.stream(recommendationRequestRepository.findAll().spliterator(), false)
-                .filter(recommendationRequest -> recommendationRequest.getRequester().getId() == filter.getRequesterId())
+                .filter(recommendationRequest -> matchesFilter(recommendationRequest, filter))
                 .map(RecommendationRequestMapper.INSTANCE::entityToDto)
                 .toList();
     }

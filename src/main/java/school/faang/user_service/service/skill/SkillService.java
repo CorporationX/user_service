@@ -38,8 +38,8 @@ public class SkillService {
     @Transactional
     public SkillDto create(SkillDto skillDto) {
         validateSkill(skillDto);
-        Skill skillEntity = skillMapper.dtoToSkill(skillDto);
-        return skillMapper.skillToDto(skillRepository.save(skillEntity));
+        Skill skillEntity = skillMapper.toEntity(skillDto);
+        return skillMapper.toDtoList(skillRepository.save(skillEntity));
     }
 
     @Transactional
@@ -48,7 +48,7 @@ public class SkillService {
                 .orElseThrow(() -> new DataValidationException(NO_SUCH_USER_EXCEPTION.getMessage()));
 
         List<Skill> ownerSkillsList = skillRepository.findAllByUserId(userId);
-        return skillMapper.skillToDto(ownerSkillsList);
+        return skillMapper.toDtoList(ownerSkillsList);
     }
 
     @Transactional
@@ -60,7 +60,7 @@ public class SkillService {
 
         return skillCountMap.entrySet().stream()
                 .map(entry -> SkillCandidateDto.builder()
-                        .skillDto(skillMapper.skillToDto(entry.getKey()))
+                        .skillDto(skillMapper.toDtoList(entry.getKey()))
                         .offersAmount(entry.getValue())
                         .build())
                 .toList();
@@ -78,7 +78,7 @@ public class SkillService {
         skillRepository.assignSkillToUser(skillId, userId);
         addUserSkillGuarantee(userSkill, skillOffers);
 
-        return skillMapper.skillToDto(userSkill);
+        return skillMapper.toDtoList(userSkill);
     }
 
 

@@ -13,8 +13,8 @@ import school.faang.user_service.entity.Skill;
 )
 
 public interface SkillCandidateMapper {
-    @Mapping(source = "id", target = "skillDto.id")
-    @Mapping(source = "title", target = "skillDto.title")
+    @Mapping(source = "skill.id", target = "skillDto.id")
+    @Mapping(source = "skill.title", target = "skillDto.title")
     @Mapping(target = "offersAmount", ignore = true)
-    SkillCandidateDto toDto(Skill skill);
+    SkillCandidateDto toDto(Skill skill, long offersAmount);
 }

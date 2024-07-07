@@ -32,7 +32,7 @@ class SkillMapperTest {
     @DisplayName("should map skill entity to skill dto")
     @Test
     void shouldMapSkillEntityToDto() {
-        SkillDto actualSkillDto = skillMapper.skillToDto(skill);
+        SkillDto actualSkillDto = skillMapper.toDtoList(skill);
 
         assertEquals(skillDto, actualSkillDto);
     }
@@ -44,7 +44,7 @@ class SkillMapperTest {
         List<SkillDto> skillDtos = List.of(skillDto);
 
 
-        List<SkillDto> actualSkillDtos = skillMapper.skillToDto(skills);
+        List<SkillDto> actualSkillDtos = skillMapper.toDtoList(skills);
 
 
         assertEquals(skillDtos, actualSkillDtos);

@@ -4,9 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.service.MentorshipRequestService;
 
 @Controller
@@ -31,4 +33,17 @@ public class MentorshipRequestController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating mentorship request: " + e.getMessage());
         }
     }
+
+    @PostMapping("/{id}/accept")
+    public ResponseEntity<Void> acceptRequest(@PathVariable long id) {
+        mentorshipRequestService.acceptRequest(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/reject")
+    public ResponseEntity<Void> rejectRequest(@PathVariable long id, @RequestBody RejectionDto rejection) {
+        mentorshipRequestService.rejectRequest(id, rejection);
+        return ResponseEntity.ok().build();
+    }
+
 }

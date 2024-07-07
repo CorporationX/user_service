@@ -1,28 +1,31 @@
 package school.faang.user_service.controller.recommendation;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
+import school.faang.user_service.dto.recommendation.RejectionDto;
+import school.faang.user_service.dto.recommendation.RequestFilterDto;
 import school.faang.user_service.service.recommendation.RecommendationRequestService;
 
-@Slf4j
+import java.util.List;
+
+@RequiredArgsConstructor
 @RestController
 public class RecommendationRequestController {
     public final RecommendationRequestService recommendationRequestService;
 
-    @Autowired
-    public RecommendationRequestController(RecommendationRequestService recommendationRequestService) {
-        this.recommendationRequestService = recommendationRequestService;
+    public RecommendationRequestDto requestRecommendation(RecommendationRequestDto recommendationRequestDto) {
+        return recommendationRequestService.create(recommendationRequestDto);
     }
 
-    public RecommendationRequestDto requestRecommendation(RecommendationRequestDto recommendationRequestDto) {
-        if (recommendationRequestDto.getMessage().isEmpty()) {
-            log.error(".getMessage() in requestRecommendation return empty value");
-            throw new IllegalArgumentException("recommendation message can't be empty");
-        }
+    public List<RecommendationRequestDto> getRecommendationRequests(RequestFilterDto filter) {
+        return recommendationRequestService.getRequests(filter);
+    }
 
-        recommendationRequestService.create(recommendationRequestDto);
-        return recommendationRequestDto;
+    public RecommendationRequestDto getRecommendationRequest(long id) {
+        return recommendationRequestService.getRequest(id);
+    }
+    public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
+        return recommendationRequestService.rejectRequest(id, rejection);
     }
 }

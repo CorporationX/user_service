@@ -55,4 +55,7 @@ public interface GoalRepository extends CrudRepository<Goal, Long> {
             """)
     List<String> findAllGoalTitles();
 
+    @Query(nativeQuery = true, value = "DELETE FROM goal WHERE id = :goalId")
+    void deleteByGoalId(long goalId);
+
 }

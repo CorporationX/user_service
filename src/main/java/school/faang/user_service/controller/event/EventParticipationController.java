@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.EventDto;
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.service.eventService.EventParticipationServiceImpl;
+import school.faang.user_service.service.eventService.EventParticipationService;
 
 import java.util.List;
 
@@ -13,22 +13,22 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EventParticipationController {
 
-    private final EventParticipationServiceImpl eventParticipationServiceImpl;
+    private final EventParticipationService eventParticipationService;
 
     public void registerParticipant(@Valid UserDto userDTO, @Valid EventDto eventDto) {
-        eventParticipationServiceImpl.registerParticipant(userDTO.getId(), eventDto.getId());
+        eventParticipationService.registerParticipant(userDTO.getId(), eventDto.getId());
     }
 
     public void unregisterParticipant(@Valid UserDto userDTO, @Valid EventDto eventDto) {
-        eventParticipationServiceImpl.unregisterParticipant(userDTO.getId(), eventDto.getId());
+        eventParticipationService.unregisterParticipant(userDTO.getId(), eventDto.getId());
     }
 
     public void getParticipant(@Valid EventDto eventDto) {
-        List<UserDto> eventUsers = eventParticipationServiceImpl.getParticipant(eventDto.getId());
+        List<UserDto> eventUsers = eventParticipationService.getParticipant(eventDto.getId());
     }
 
     public void getParticipantsCount(@Valid EventDto eventDto) {
-        int countEventUsers = eventParticipationServiceImpl.getParticipantsCount(eventDto.getId());
+        int countEventUsers = eventParticipationService.getParticipantsCount(eventDto.getId());
     }
 
 }

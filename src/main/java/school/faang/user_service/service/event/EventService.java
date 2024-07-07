@@ -19,10 +19,11 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+
 public class EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
-    private final SkillMapper skillMapper;
+//    private final SkillMapper skillMapper;
     private final EventMapper eventMapper;
     private final EventFilterMapper eventFilterMapper;
 

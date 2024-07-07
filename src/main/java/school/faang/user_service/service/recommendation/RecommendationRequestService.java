@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -62,7 +63,7 @@ public class RecommendationRequestService {
         LocalDateTime latestRequestTime = recommendationRequestRepository.findLatestPendingRequest(recommendationRequestDto.getRequesterId(),
                 recommendationRequestDto.getReceiverId()).get().getCreatedAt();
 
-        if (ChronoUnit.MONTHS.between(currentRequestTime, latestRequestTime) > 6) {
+        if (ChronoUnit.MONTHS.between(currentRequestTime, latestRequestTime) < 6) {
             throw new IllegalArgumentException("Sorry, but you can create recommendation request only once every 6 months.\n" +
                     "Your latest recommendation request create time: " + latestRequestTime);
         }
@@ -89,11 +90,12 @@ public class RecommendationRequestService {
     }
 
     public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
-        if (recommendationRequestRepository.findById(id).isPresent()) {
+        Optional<RecommendationRequest> recommendationRequestOptional = recommendationRequestRepository.findById(id);
+        if (recommendationRequestOptional.isPresent()) {
             throw new NoSuchElementException("There is no recommendation request with id " + id);
         }
 
-        RecommendationRequest recommendationRequest = recommendationRequestRepository.findById(id).get();
+        RecommendationRequest recommendationRequest = recommendationRequestOptional.get();
 
         if (recommendationRequest.getStatus() != PENDING) {
             throw new RuntimeException("Recommendation request with id " + id

@@ -1,20 +1,20 @@
-package school.faang.user_service.service;
+package school.faang.user_service.controller.skill;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.controller.SkillController;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.service.skill.SkillService;
+import school.faang.user_service.service.skill.SkillValidator;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,6 +28,9 @@ public class SkillControllerTest {
     @Mock
     private SkillService skillService;
 
+    @Spy
+    private SkillValidator skillValidator;
+
     private SkillDto skillDto;
     private long userId = 1;
     private long skillId = 1;
@@ -38,26 +41,13 @@ public class SkillControllerTest {
     }
 
     @Test
-    void testCreateWithNullTitle() {
-        skillDto.setTitle(null);
-
-        assertThrows(DataValidationException.class, () -> skillController.create(skillDto));
-    }
-
-    @Test
-    void testCreateWithBlankTitle() {
-        skillDto.setTitle(" ");
-
-        assertThrows(DataValidationException.class, () -> skillController.create(skillDto));
-    }
-
-    @Test
     void testCreateWhenAccess() {
         skillDto.setTitle("Title");
 
         skillController.create(skillDto);
 
         verify(skillService, times(1)).create(skillDto);
+        verify(skillValidator, times(1)).validateSkill(skillDto);
     }
 
     @Test

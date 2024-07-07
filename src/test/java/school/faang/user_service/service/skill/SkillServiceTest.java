@@ -1,9 +1,8 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.skill;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -18,7 +17,7 @@ import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.SkillMapper;
+import school.faang.user_service.mapper.skill.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
@@ -49,7 +48,7 @@ public class SkillServiceTest {
     private UserSkillGuaranteeRepository skillGuaranteeRepository;
 
     @Spy
-    private SkillMapper skillMapper = Mappers.getMapper(SkillMapper.class);
+    private SkillMapperImpl skillMapper;
 
     @Captor
     private ArgumentCaptor<List<UserSkillGuarantee>> captor;

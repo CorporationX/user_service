@@ -1,15 +1,14 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.skill;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
-import school.faang.user_service.mapper.SkillMapper;
+import school.faang.user_service.mapper.skill.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
@@ -55,7 +54,8 @@ public class SkillService {
             return skillMapper.toDto(offeredSkill);
         }
 
-        Skill skill = skillRepository.findById(skillId).orElseThrow(() -> new NoSuchElementException("Skill with " + skillId + " id not exists"));
+        Skill skill = skillRepository.findById(skillId)
+                .orElseThrow(() -> new NoSuchElementException("Skill with " + skillId + " id not exists"));
 
         List<SkillOffer> offers = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
         if (offers.size() < MIN_SKILL_OFFERS) {
@@ -73,10 +73,11 @@ public class SkillService {
         List<UserSkillGuarantee> guarantees = new ArrayList<>();
 
         skillOffers.forEach(skillOffer -> {
-            User author = skillOffer.getRecommendation().getAuthor();
-            User receiver = skillOffer.getRecommendation().getReceiver();
-            UserSkillGuarantee guarantee = new UserSkillGuarantee(null, receiver, skill, author);
-            guarantees.add(guarantee);
+            UserSkillGuarantee userSkillGuarantee = UserSkillGuarantee.builder()
+                    .guarantor(skillOffer.getRecommendation().getAuthor())
+                    .user(skillOffer.getRecommendation().getReceiver())
+                    .skill(skill).build();
+            guarantees.add(userSkillGuarantee);
         });
 
         return guarantees;

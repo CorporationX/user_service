@@ -34,7 +34,7 @@ public class MentorshipRequestControllerTest {
     @InjectMocks
     private MentorshipRequestController mentorshipRequestController;
     @Mock
-    private MentorshipRequestService mentorshipRequestService;
+    private MentorshipRequestService service;
 
     @Captor
     ArgumentCaptor<MentorshipRequestDto> captor;
@@ -66,9 +66,9 @@ public class MentorshipRequestControllerTest {
 
     @Test
     public void testServiceRequestMentorship() {
-        when(mentorshipRequestService.requestMentorship(dto)).thenReturn(returnDto);
+        when(service.requestMentorship(dto)).thenReturn(returnDto);
         MentorshipRequestDto returnDtoFromMethod = mentorshipRequestController.requestMentorship(dto);
-        verify(mentorshipRequestService, times(1)).requestMentorship(captor.capture());
+        verify(service, times(1)).requestMentorship(captor.capture());
 
         Assertions.assertEquals(returnDto, captor.getValue());
         Assertions.assertEquals(returnDto, returnDtoFromMethod);
@@ -89,7 +89,7 @@ public class MentorshipRequestControllerTest {
                 .status(RequestStatus.PENDING)
                 .build();
         mentorshipRequestController.getRequests(filter);
-        verify(mentorshipRequestService, times(1)).getRequests(captorFilter.capture());
+        verify(service, times(1)).getRequests(captorFilter.capture());
         Assertions.assertEquals(returnFilter, captorFilter.getValue());
     }
 }

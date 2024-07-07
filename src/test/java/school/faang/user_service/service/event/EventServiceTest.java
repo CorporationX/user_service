@@ -11,6 +11,7 @@ import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.EventMapper;
+import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
 import java.util.Collections;
@@ -32,8 +33,7 @@ public class EventServiceTest {
     @Mock
     private EventRepository eventRepository;
     @Mock
-    private UserService userService;
-
+    private UserRepository userRepository;
     @Mock
     private EventMapper eventMapper;
 
@@ -46,8 +46,8 @@ public class EventServiceTest {
         User user = new User();
         user.setSkills(Collections.emptyList());
 
-        when(userService.findUserById(eventDto.getOwnerId())).thenReturn(user);
-        when(eventMapper.toEntity(eventDto, userService)).thenReturn(event);
+        when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(user));
+        when(eventMapper.toEntity(eventDto, userRepository)).thenReturn(event);
 
         DataValidationException exception =
                 assertThrows(DataValidationException.class, () -> eventService.create(eventDto));
@@ -65,8 +65,8 @@ public class EventServiceTest {
         User user = new User();
         user.setSkills(List.of(skill));
 
-        when(userService.findUserById(eventDto.getOwnerId())).thenReturn(user);
-        when(eventMapper.toEntity(eventDto, userService)).thenReturn(event);
+        when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(user));
+        when(eventMapper.toEntity(eventDto, userRepository)).thenReturn(event);
         when(eventMapper.toDto(event)).thenReturn(eventDto);
         when(eventRepository.save(event)).thenReturn(event);
 

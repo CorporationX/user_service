@@ -7,7 +7,8 @@ import org.mapstruct.Named;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
-import school.faang.user_service.service.event.UserService;
+import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.repository.UserRepository;
 
 @Mapper(componentModel = "spring",
         uses = SkillMapper.class,
@@ -17,10 +18,10 @@ public interface EventMapper {
     EventDto toDto(Event event);
 
     @Mapping(source = "ownerId", target = "owner", qualifiedByName = "getUserById")
-    Event toEntity(EventDto eventDto, @Context UserService userService);
+    Event toEntity(EventDto eventDto, @Context UserRepository userRepository);
 
     @Named("getUserById")
-    default User getUserById(Long id, @Context UserService userService) {
-        return userService.findUserById(id);
+    default User getUserById(Long id, @Context UserRepository userRepository) {
+        return userRepository.findById(id).orElseThrow(() -> new DataValidationException("User not found"));
     }
 }

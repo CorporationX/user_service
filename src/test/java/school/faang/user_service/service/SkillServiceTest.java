@@ -1,5 +1,6 @@
 package school.faang.user_service.service;
 
+import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,10 +12,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.ListOfSkillsCandidateMapperImpl;
 import school.faang.user_service.mapper.SkillCandidateMapperImpl;
 import school.faang.user_service.mapper.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
+import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.validator.SkillValidator;
 
 import java.util.ArrayList;
@@ -34,11 +37,11 @@ public class SkillServiceTest {
     @Spy
     private SkillCandidateMapperImpl skillCandidateMapper;
 
+    @Mock
+    private SkillOfferRepository skillOfferRepository;
+
     @Spy
     private ListOfSkillsCandidateMapperImpl listOfSkillsCandidateMapper;
-
-    @Mock
-    private SkillValidator skillValidator;
 
     @InjectMocks
     private SkillService skillService;
@@ -116,5 +119,4 @@ public class SkillServiceTest {
         expected.add(skillCandidateDto);
         Assertions.assertEquals(expected, actual);
     }
-
 }

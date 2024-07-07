@@ -66,7 +66,6 @@ public class UserService {
                 });
     }
 
-
     @Transactional
     public void saveUser(User user) {
         userValidator.validateUserNotExists(user);

@@ -1,20 +1,16 @@
 package school.faang.user_service.controller.goal;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.GoalDto;
-import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.service.goal.filter.GoalFilterDto;
+import school.faang.user_service.dto.filter.GoalFilterDto;
 import school.faang.user_service.service.goal.GoalService;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/goals")
 public class GoalController {
     private final GoalService goalService;
 
@@ -23,31 +19,29 @@ public class GoalController {
         this.goalService = goalService;
     }
 
-    @PostMapping("")
-    public ResponseEntity<Goal> createGoal(Long userId, Goal goal) {
-        Goal createdGoal = goalService.createGoal(userId, goal);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdGoal);
+    @PostMapping("/create")
+    public GoalDto createGoal(@RequestParam Long userId, @RequestBody GoalDto goalDto) {
+        return goalService.createGoal(userId, goalDto);
     }
 
-    @PostMapping("")
-    public ResponseEntity<Goal> updateGoal(Long goalId, GoalDto goalDto) {
-        Goal updatedGoal = goalService.updateGoal(goalId, goalDto);
-        return ResponseEntity.ok(updatedGoal);
+    @PutMapping("/update/{goalId}")
+    public GoalDto updateGoal(@PathVariable Long goalId, @RequestBody GoalDto goalDto) {
+        return goalService.updateGoal(goalId, goalDto);
     }
 
-    @DeleteMapping("")
-    public ResponseEntity<Void> deleteGoal(long goalId) {
+    @DeleteMapping("/delete/{goalId}")
+    public ResponseEntity<Void> deleteGoal(@PathVariable Long goalId) {
         goalService.deleteGoal(goalId);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("")
-    public List<Goal> findSubtasksByGoalId(long goalId, String filter) {
-        return goalService.findSubtasksByGoalId(goalId, filter);
+    @GetMapping("/{goalId}/subtasks")
+    public List<GoalDto> findSubtasksByGoalId(@PathVariable Long goalId, @RequestBody GoalFilterDto filters) {
+        return goalService.findSubtasksByGoalId(goalId, filters);
     }
 
-    @GetMapping("")
-    public List<Goal> getGoalsByUser(Long userId, GoalFilterDto filter) {
+    @GetMapping("/user/{userId}")
+    public List<GoalDto> getGoalsByUser(@PathVariable Long userId, @RequestBody GoalFilterDto filter) {
         return goalService.getGoalsByUser(userId, filter);
     }
 }

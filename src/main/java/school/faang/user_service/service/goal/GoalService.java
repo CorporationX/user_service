@@ -4,124 +4,87 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.GoalDto;
-import school.faang.user_service.entity.Skill;
+import school.faang.user_service.dto.filter.GoalFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
-import school.faang.user_service.entity.goal.GoalStatus;
-import school.faang.user_service.service.goal.filter.GoalFilterDto;
+import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.goal.GoalRepository;
+import school.faang.user_service.service.goal.filter.GoalFilter;
 import school.faang.user_service.service.skill.SkillService;
+import school.faang.user_service.validator.goal.GoalValidator;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Transactional
 public class GoalService {
     private final GoalRepository goalRepository;
     private final SkillService skillService;
-
+    private final GoalValidator goalValidator;
+    private final GoalMapper goalMapper;
+    private final List<GoalFilter> goalFilters;
     @Autowired
-    public GoalService(GoalRepository goalRepository, SkillService skillService) {
+    public GoalService(GoalRepository goalRepository, SkillService skillService, GoalValidator goalValidator, GoalMapper goalMapper, List<GoalFilter> goalFilters) {
         this.goalRepository = goalRepository;
         this.skillService = skillService;
+        this.goalValidator = goalValidator;
+        this.goalMapper = goalMapper;
+        this.goalFilters = goalFilters;
     }
 
-    public Goal createGoal(Long userId, Goal goal) {
-        if (goal.getTitle() == null || goal.getTitle().isEmpty()) {
-            throw new IllegalArgumentException("Goal must have a title");
-        }
+    public GoalDto createGoal(Long userId, GoalDto goalDto) {
+        goalValidator.createGoalValidator(userId, goalDto);
 
-        if (goalRepository.countActiveGoalsPerUser(userId) >= 3) {
-            throw new IllegalArgumentException("User cannot have more than 3 active goals");
-        }
+        Goal saveGoal = goalRepository.create(goalDto.getTitle(), goalDto.getDescription(), goalDto.getParentGoalId());
 
-        List<Long> skillIds = goal.getSkillsToAchieve().stream()
-                .map(Skill::getId)
-                .toList();
-        if (skillService.countExisting(skillIds) != skillIds.size()) {
-            throw new IllegalArgumentException("One or more skills do not exist.");
-        }
-
-        Goal savedGoal = goalRepository.create(goal.getTitle(), goal.getDescription(), goal.getParent().getId());
-
-        skillIds.forEach(skillId -> goalRepository.addSkillToGoal(savedGoal.getId(), skillId));
-        return savedGoal;
+        goalDto.getSkillIds().forEach(skillId -> goalRepository.addSkillToGoal(saveGoal.getId(), skillId));
+        return goalMapper.toDto(saveGoal);
     }
 
-    public Goal updateGoal(Long goalId, GoalDto goalDto) {
-        Goal goal = goalRepository.findById(goalId)
-                .orElseThrow(() -> new IllegalArgumentException("Goal not found"));
+    public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
+        goalValidator.updateGoalValidator(goalId, goalDto);
 
-        if (goal.getStatus() == GoalStatus.COMPLETED) {
-            throw new IllegalArgumentException("Cannot update a completed goal");
-        }
-
-        if (goalDto.getTitle() == null || goalDto.getTitle().isEmpty()) {
-            throw new IllegalArgumentException("Goal must have a title");
-        }
-
-        List<Long> skillIds = goal.getSkillsToAchieve().stream()
-                .map(Skill::getId)
-                .toList();
-
-        if (skillService.countExisting(skillIds) != skillIds.size()) {
-            throw new IllegalArgumentException("One or more skills do not exist");
-        }
-
-        goal.setTitle(goalDto.getTitle());
-        goal.setDescription(goalDto.getDescription());
-        goal.setStatus(goalDto.getStatus());
+        Goal goal = goalMapper.toEntity(goalDto);
 
         Goal savedGoal = goalRepository.save(goal);
 
         goalRepository.removeSkillsFromGoal(goalId);
-        skillIds.forEach(skillId -> goalRepository.addSkillToGoal(savedGoal.getId(), skillId));
+        goalDto.getSkillIds().forEach(skillId -> goalRepository.addSkillToGoal(savedGoal.getId(), skillId));
 
-        if (goalDto.getStatus() == GoalStatus.COMPLETED) {
+        if (goalDto.getStatus().equals("completed")) {
             List<User> users = goalRepository.findUsersByGoalId(goalId);
-            users.forEach(user -> skillIds.forEach(skillId -> skillService.assignSkillToUser(skillId, user.getId())));
+            users.forEach(user -> goalDto.getSkillIds().forEach(skillId -> skillService.assignSkillToUser(skillId, user.getId())));
         }
 
-        return savedGoal;
+        return goalMapper.toDto(savedGoal);
     }
 
     public void deleteGoal(long goalId) {
-        Goal goal = goalRepository.findById(goalId)
-                .orElseThrow(() -> new IllegalArgumentException("Goal not found"));
+        goalValidator.deleteGoalValidator(goalId);
 
         goalRepository.removeSkillsFromGoal(goalId);
         goalRepository.deleteById(goalId);
     }
 
-    public List<Goal> findSubtasksByGoalId(long goalId, String filter) {
-        List<Goal> subtasks = goalRepository.findByParent(goalId).collect(Collectors.toList());
+    public List<GoalDto> findSubtasksByGoalId(Long goalId, GoalFilterDto filters) {
+        Stream<Goal> subtasks = goalRepository.findByParent(goalId);
 
-        if ("active".equals(filter)) {
-            subtasks.removeIf(goal -> goal.getStatus() == GoalStatus.COMPLETED);
-        } else if ("completed".equals(filter)) {
-            subtasks.removeIf(goal -> goal.getStatus() != GoalStatus.COMPLETED);
-        }
-
-        return subtasks;
+        return goalFilters.stream()
+                .filter(filter -> filter.isApplicable(filters))
+                .flatMap(filter -> filter.apply(subtasks, filters))
+                .map(goalMapper::toDto)
+                .toList();
     }
 
-    public List<Goal> getGoalsByUser(Long userId, GoalFilterDto filter) {
-        List<Goal> goals = goalRepository.findGoalsByUserId(userId).collect(Collectors.toList());
+    public List<GoalDto> getGoalsByUser(Long userId, GoalFilterDto filters) {
+        Stream<Goal> goals = goalRepository.findGoalsByUserId(userId);
 
-        if (filter.getTitle() != null) {
-            goals = goals.stream()
-                    .filter(goal -> goal.getTitle().contains(filter.getTitle()))
-                    .collect(Collectors.toList());
-        }
-
-        if (filter.getStatus() != null) {
-            goals = goals.stream()
-                    .filter(goal -> goal.getStatus() == filter.getStatus())
-                    .collect(Collectors.toList());
-        }
-
-        return goals;
+        return goalFilters.stream()
+                .filter(filter -> filter.isApplicable(filters))
+                .flatMap(filter -> filter.apply(goals, filters))
+                .map(goalMapper::toDto)
+                .toList();
     }
 
 }

@@ -10,15 +10,14 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalStatus;
-import school.faang.user_service.service.goal.filter.GoalFilterDto;
+import school.faang.user_service.mapper.GoalMapper;
 import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.service.skill.SkillService;
+import school.faang.user_service.validator.goal.GoalValidator;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -31,6 +30,10 @@ class GoalServiceTest {
     @Mock
     private SkillService skillService;
 
+    @Mock
+    private GoalMapper goalMapper;
+    @Mock
+    private GoalValidator goalValidator;
     @InjectMocks
     private GoalService goalService;
 
@@ -42,37 +45,35 @@ class GoalServiceTest {
     // test for createGoal
     @Test
     void createGoal_Success() {
-        Goal goal = new Goal();
-        goal.setTitle("New Goal");
-        goal.setDescription("Goal Description");
-        goal.setId(2L);
-        Goal parentGoal = new Goal();
-        parentGoal.setId(1L);
-        goal.setParent(parentGoal);
-        Skill skill1 = new Skill();
-        skill1.setId(1L);
-        Skill skill2 = new Skill();
-        skill2.setId(2L);
-        goal.setSkillsToAchieve(Arrays.asList(skill1, skill2));
+        GoalDto goalDto = new GoalDto();
+        goalDto.setTitle("New Goal");
+        goalDto.setDescription("Goal Description");
+        goalDto.setParentGoalId(1L);
+        goalDto.setSkillIds(Arrays.asList(1L, 2L));
 
-        when(goalRepository.countActiveGoalsPerUser(any(Long.class))).thenReturn(2);
-        when(skillService.countExisting(anyList())).thenReturn(2);
-        when(goalRepository.create(anyString(), anyString(), any(Long.class))).thenReturn(goal);
+        Goal savedGoal = new Goal();
+        savedGoal.setId(2L);
+        when(goalRepository.create(anyString(), anyString(), any(Long.class))).thenReturn(savedGoal);
+        when(goalMapper.toDto(savedGoal)).thenReturn(goalDto);
 
-        Goal createdGoal = goalService.createGoal(1L, goal);
+        GoalDto createdGoalDto = goalService.createGoal(1L, goalDto);
 
-        assertNotNull(createdGoal);
-        verify(goalRepository).create(goal.getTitle(), goal.getDescription(), goal.getParent().getId());
-        verify(goalRepository).addSkillToGoal(createdGoal.getId(), 1L);
-        verify(goalRepository).addSkillToGoal(createdGoal.getId(), 2L);
+        assertNotNull(createdGoalDto);
+        verify(goalValidator).createGoalValidator(1L, goalDto);
+        verify(goalRepository).create(goalDto.getTitle(), goalDto.getDescription(), goalDto.getParentGoalId());
+        verify(goalRepository).addSkillToGoal(savedGoal.getId(), 1L);
+        verify(goalRepository).addSkillToGoal(savedGoal.getId(), 2L);
     }
 
     @Test
     void createGoal_ThrowsException_WhenTitleIsNull() {
-        Goal goal = new Goal();
+        GoalDto goalDto = new GoalDto();
+
+        doThrow(new IllegalArgumentException("Goal must have a title"))
+                .when(goalValidator).createGoalValidator(any(Long.class), any(GoalDto.class));
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            goalService.createGoal(1L, goal);
+            goalService.createGoal(1L, goalDto);
         });
 
         assertEquals("Goal must have a title", exception.getMessage());
@@ -80,13 +81,14 @@ class GoalServiceTest {
 
     @Test
     void createGoal_ThrowsException_WhenTooManyActiveGoals() {
-        Goal goal = new Goal();
-        goal.setTitle("New Goal");
+        GoalDto goalDto = new GoalDto();
+        goalDto.setTitle("New Goal");
 
-        when(goalRepository.countActiveGoalsPerUser(any(Long.class))).thenReturn(3);
+        doThrow(new IllegalArgumentException("User cannot have more than 3 active goals"))
+                .when(goalValidator).createGoalValidator(any(Long.class), any(GoalDto.class));
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            goalService.createGoal(1L, goal);
+            goalService.createGoal(1L, goalDto);
         });
 
         assertEquals("User cannot have more than 3 active goals", exception.getMessage());
@@ -94,17 +96,15 @@ class GoalServiceTest {
 
     @Test
     void createGoal_ThrowsException_WhenSkillsDoNotExist() {
-        Goal goal = new Goal();
-        goal.setTitle("New Goal");
-        Skill skill = new Skill();
-        skill.setId(1L);
-        goal.setSkillsToAchieve(Collections.singletonList(skill));
+        GoalDto goalDto = new GoalDto();
+        goalDto.setTitle("New Goal");
+        goalDto.setSkillIds(Collections.singletonList(1L));
 
-        when(goalRepository.countActiveGoalsPerUser(any(Long.class))).thenReturn(1);
-        when(skillService.countExisting(anyList())).thenReturn(0);
+        doThrow(new IllegalArgumentException("One or more skills do not exist."))
+                .when(goalValidator).createGoalValidator(any(Long.class), any(GoalDto.class));
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            goalService.createGoal(1L, goal);
+            goalService.createGoal(1L, goalDto);
         });
 
         assertEquals("One or more skills do not exist.", exception.getMessage());
@@ -127,19 +127,23 @@ class GoalServiceTest {
         GoalDto goalDto = new GoalDto();
         goalDto.setTitle("New Title");
         goalDto.setDescription("New Description");
-        goalDto.setStatus(GoalStatus.ACTIVE);
+        goalDto.setStatus("active");
+        goalDto.setSkillIds(Arrays.asList(1L, 2L));
 
         when(goalRepository.findById(1L)).thenReturn(Optional.of(goal));
         when(skillService.countExisting(anyList())).thenReturn(2);
+        when(goalMapper.toEntity(goalDto)).thenReturn(goal);
         when(goalRepository.save(any(Goal.class))).thenReturn(goal);
+        when(goalMapper.toDto(goal)).thenReturn(goalDto);
 
-        Goal updatedGoal = goalService.updateGoal(1L, goalDto);
+        GoalDto updatedGoalDto = goalService.updateGoal(1L, goalDto);
 
-        assertNotNull(updatedGoal);
-        assertEquals("New Title", updatedGoal.getTitle());
-        assertEquals("New Description", updatedGoal.getDescription());
-        assertEquals(GoalStatus.ACTIVE, updatedGoal.getStatus());
+        assertNotNull(updatedGoalDto);
+        assertEquals("New Title", updatedGoalDto.getTitle());
+        assertEquals("New Description", updatedGoalDto.getDescription());
+        assertEquals("active", updatedGoalDto.getStatus());
 
+        verify(goalValidator).updateGoalValidator(1L, goalDto);
         verify(goalRepository).save(goal);
         verify(goalRepository).removeSkillsFromGoal(1L);
         verify(goalRepository).addSkillToGoal(1L, 1L);
@@ -151,7 +155,8 @@ class GoalServiceTest {
         GoalDto goalDto = new GoalDto();
         goalDto.setTitle("New Title");
 
-        when(goalRepository.findById(any(Long.class))).thenReturn(Optional.empty());
+        doThrow(new IllegalArgumentException("Goal not found"))
+                .when(goalValidator).updateGoalValidator(any(Long.class), any(GoalDto.class));
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             goalService.updateGoal(1L, goalDto);
@@ -169,7 +174,8 @@ class GoalServiceTest {
         GoalDto goalDto = new GoalDto();
         goalDto.setTitle("New Title");
 
-        when(goalRepository.findById(1L)).thenReturn(Optional.of(goal));
+        doThrow(new IllegalArgumentException("Cannot update a completed goal"))
+                .when(goalValidator).updateGoalValidator(any(Long.class), any(GoalDto.class));
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             goalService.updateGoal(1L, goalDto);
@@ -186,7 +192,8 @@ class GoalServiceTest {
 
         GoalDto goalDto = new GoalDto();
 
-        when(goalRepository.findById(1L)).thenReturn(Optional.of(goal));
+        doThrow(new IllegalArgumentException("Goal must have a title"))
+                .when(goalValidator).updateGoalValidator(any(Long.class), any(GoalDto.class));
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             goalService.updateGoal(1L, goalDto);
@@ -206,9 +213,10 @@ class GoalServiceTest {
 
         GoalDto goalDto = new GoalDto();
         goalDto.setTitle("New Title");
+        goalDto.setSkillIds(Collections.singletonList(1L));
 
-        when(goalRepository.findById(1L)).thenReturn(Optional.of(goal));
-        when(skillService.countExisting(anyList())).thenReturn(0);
+        doThrow(new IllegalArgumentException("One or more skills do not exist"))
+                .when(goalValidator).updateGoalValidator(any(Long.class), any(GoalDto.class));
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             goalService.updateGoal(1L, goalDto);
@@ -230,7 +238,8 @@ class GoalServiceTest {
 
         GoalDto goalDto = new GoalDto();
         goalDto.setTitle("New Title");
-        goalDto.setStatus(GoalStatus.COMPLETED);
+        goalDto.setStatus("completed");
+        goalDto.setSkillIds(Arrays.asList(1L, 2L));
 
         User user1 = new User();
         user1.setId(1L);
@@ -239,14 +248,17 @@ class GoalServiceTest {
 
         when(goalRepository.findById(1L)).thenReturn(Optional.of(goal));
         when(skillService.countExisting(anyList())).thenReturn(2);
+        when(goalMapper.toEntity(goalDto)).thenReturn(goal);
         when(goalRepository.save(any(Goal.class))).thenReturn(goal);
+        when(goalMapper.toDto(goal)).thenReturn(goalDto);
         when(goalRepository.findUsersByGoalId(1L)).thenReturn(Arrays.asList(user1, user2));
 
-        Goal updatedGoal = goalService.updateGoal(1L, goalDto);
+        GoalDto updatedGoalDto = goalService.updateGoal(1L, goalDto);
 
-        assertNotNull(updatedGoal);
-        assertEquals(GoalStatus.COMPLETED, updatedGoal.getStatus());
+        assertNotNull(updatedGoalDto);
+        assertEquals("completed", updatedGoalDto.getStatus());
 
+        verify(goalValidator).updateGoalValidator(1L, goalDto);
         verify(goalRepository).save(goal);
         verify(goalRepository).removeSkillsFromGoal(1L);
         verify(goalRepository).addSkillToGoal(1L, 1L);
@@ -271,120 +283,5 @@ class GoalServiceTest {
         verify(goalRepository).deleteById(goalId);
     }
 
-    // test for findSubtasksByGoalId
-    @Test
-    void findSubtasksByGoalId_FiltersActiveSubtasks() {
-        long goalId = 1L;
-        Goal activeSubtask = new Goal();
-        activeSubtask.setId(2L);
-        activeSubtask.setStatus(GoalStatus.ACTIVE);
-        Goal completedSubtask = new Goal();
-        completedSubtask.setId(3L);
-        completedSubtask.setStatus(GoalStatus.COMPLETED);
-
-        when(goalRepository.findByParent(goalId)).thenReturn(Stream.of(activeSubtask, completedSubtask));
-
-        List<Goal> activeSubtasks = goalService.findSubtasksByGoalId(goalId, "active");
-
-        assertEquals(1, activeSubtasks.size());
-        assertEquals(activeSubtask.getId(), activeSubtasks.get(0).getId());
-    }
-
-    @Test
-    void findSubtasksByGoalId_FiltersCompletedSubtasks() {
-        long goalId = 1L;
-        Goal activeSubtask = new Goal();
-        activeSubtask.setId(2L);
-        activeSubtask.setStatus(GoalStatus.ACTIVE);
-        Goal completedSubtask = new Goal();
-        completedSubtask.setId(3L);
-        completedSubtask.setStatus(GoalStatus.COMPLETED);
-
-        when(goalRepository.findByParent(goalId)).thenReturn(Stream.of(activeSubtask, completedSubtask));
-
-        List<Goal> completedSubtasks = goalService.findSubtasksByGoalId(goalId, "completed");
-
-        assertEquals(1, completedSubtasks.size());
-        assertEquals(completedSubtask.getId(), completedSubtasks.get(0).getId());
-    }
-
-    // test for getGoalsByUser
-    @Test
-    void getGoalsByUser_FiltersByTitle() {
-        Long userId = 1L;
-        Goal goal1 = new Goal();
-        goal1.setId(1L);
-        goal1.setTitle("Goal 1");
-        goal1.setStatus(GoalStatus.ACTIVE);
-        Goal goal2 = new Goal();
-        goal2.setId(2L);
-        goal2.setTitle("Goal 2");
-        goal2.setStatus(GoalStatus.COMPLETED);
-        Goal goal3 = new Goal();
-        goal3.setId(3L);
-        goal3.setTitle("Another goal");
-        goal3.setStatus(GoalStatus.ACTIVE);
-
-        when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.of(goal1, goal2, goal3));
-
-        GoalFilterDto filter = new GoalFilterDto("Goal", null);
-        List<Goal> goals = goalService.getGoalsByUser(userId, filter);
-
-        assertEquals(2, goals.size());
-        assertEquals("Goal 1", goals.get(0).getTitle());
-        assertEquals("Goal 2", goals.get(1).getTitle());
-    }
-
-    @Test
-    void getGoalsByUser_FiltersByStatus() {
-        Long userId = 1L;
-        Goal goal1 = new Goal();
-        goal1.setId(1L);
-        goal1.setTitle("Goal 1");
-        goal1.setStatus(GoalStatus.ACTIVE);
-        Goal goal2 = new Goal();
-        goal2.setId(2L);
-        goal2.setTitle("Goal 2");
-        goal2.setStatus(GoalStatus.COMPLETED);
-        Goal goal3 = new Goal();
-        goal3.setId(3L);
-        goal3.setTitle("Another goal");
-        goal3.setStatus(GoalStatus.ACTIVE);
-
-        when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.of(goal1, goal2, goal3));
-
-        GoalFilterDto filter = new GoalFilterDto(null, GoalStatus.ACTIVE);
-        List<Goal> goals = goalService.getGoalsByUser(userId, filter);
-
-        assertEquals(2, goals.size());
-        assertEquals(GoalStatus.ACTIVE, goals.get(0).getStatus());
-        assertEquals(GoalStatus.ACTIVE, goals.get(1).getStatus());
-    }
-
-    @Test
-    void getGoalsByUser_FiltersByTitleAndStatus() {
-        Long userId = 1L;
-        Goal goal1 = new Goal();
-        goal1.setId(1L);
-        goal1.setTitle("Goal 1");
-        goal1.setStatus(GoalStatus.ACTIVE);
-        Goal goal2 = new Goal();
-        goal2.setId(2L);
-        goal2.setTitle("Goal 2");
-        goal2.setStatus(GoalStatus.COMPLETED);
-        Goal goal3 = new Goal();
-        goal3.setId(3L);
-        goal3.setTitle("Another goal");
-        goal3.setStatus(GoalStatus.ACTIVE);
-
-        when(goalRepository.findGoalsByUserId(userId)).thenReturn(Stream.of(goal1, goal2, goal3));
-
-        GoalFilterDto filter = new GoalFilterDto("Goal", GoalStatus.ACTIVE);
-        List<Goal> goals = goalService.getGoalsByUser(userId, filter);
-
-        assertEquals(1, goals.size());
-        assertEquals("Goal 1", goals.get(0).getTitle());
-        assertEquals(GoalStatus.ACTIVE, goals.get(0).getStatus());
-    }
-
+    // look for method tests for filters in the FilterTest class
 }

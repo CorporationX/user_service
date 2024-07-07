@@ -3,12 +3,10 @@ package school.faang.user_service.validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.recomendation.RecommendationDto;
-import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -38,17 +36,16 @@ public class RecommendationValidator {
         }
     }
 
-
-
     private void validateContent(String content) {
-        if (content.isBlank()) {
-            log.error(CONTENT_IS_BLANK);
-            throw new DataValidationException(CONTENT_IS_BLANK);
-        }
         if (content == null) {
             log.error(CONTENT_IS_NULL);
             throw new DataValidationException(CONTENT_IS_NULL);
         }
+        if (content.isBlank()) {
+            log.error(CONTENT_IS_BLANK);
+            throw new DataValidationException(CONTENT_IS_BLANK);
+        }
+
     }
 
    public void validateId(long id) {

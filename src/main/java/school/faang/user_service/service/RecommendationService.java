@@ -34,7 +34,7 @@ public class RecommendationService {
     private final RecommendationMapper recommendationMapper;
     private final UserRepository userRepository;
 
-
+    @Transactional
     public RecommendationDto create(RecommendationDto recommendationDto) {
         recommendationValidator.validateRecommendationDto(recommendationDto);
         var previousRecommendation = recommendationRepository
@@ -48,7 +48,7 @@ public class RecommendationService {
         return recommendationMapper.toDto(recommendation);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public RecommendationDto update(RecommendationDto updated) {
         existsById(updated.getId());
         recommendationValidator.validateRecommendationDto(updated);
@@ -63,11 +63,13 @@ public class RecommendationService {
         return recommendationMapper.toDto(updatedEntity);
     }
 
+    @Transactional
     public void delete(Long id) {
         existsById(id);
         recommendationRepository.deleteById(id);
     }
 
+    @Transactional(readOnly = true)
     public List<RecommendationDto> getAllUserRecommendations(long receiverId, Pageable pageable) {
         recommendationValidator.validateId(receiverId);
         List<Recommendation> allUserRecommendation = recommendationRepository
@@ -78,6 +80,7 @@ public class RecommendationService {
         return recommendationMapper.recommendationToRecommendationDto(allUserRecommendation);
     }
 
+    @Transactional(readOnly = true)
     public List<RecommendationDto> getAllGivenRecommendations(long authorId, Pageable pageable) {
         recommendationValidator.validateId(authorId);
         List<Recommendation> allUserRecommendation = recommendationRepository
@@ -112,13 +115,16 @@ public class RecommendationService {
     }
 
     public void saveGuaranteeUserSkill(List<SkillOfferDto> skillOfferDto, User user, User guarantor) {
-        UserSkillGuarantee userSkillGuarantee = new UserSkillGuarantee();
         List<Skill> userSkills = skillRepository.findAllByUserId(user.getId());
-        if (skillOfferDto == null || skillOfferDto.size() == 0) {
+        if (skillOfferDto == null || skillOfferDto.isEmpty()) {
             userSkills.stream().forEach(skill -> {
                 skillOfferDto.stream().forEach(skillOffer -> {
                             if (skillOffer.getSkillId() == skill.getId() && !skill.getGuarantees().contains(guarantor)) {
-                                userSkillGuarantee.builder().user(user).guarantor(user).skill(skill);
+                                UserSkillGuarantee userSkillGuarantee =
+                                        UserSkillGuarantee.builder()
+                                                .user(user)
+                                                .guarantor(user)
+                                                 .skill(skill).build();
                                 userSkillGuaranteeRepository.save(userSkillGuarantee);
                             }
                         }

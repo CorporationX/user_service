@@ -5,6 +5,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import school.faang.user_service.controller.BaseControllerTest;
+import school.faang.user_service.dto.DtoValidationConstraints;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
@@ -59,6 +60,8 @@ class MentorshipRequestControllerTest extends BaseControllerTest {
                         .content(objectMapper.writeValueAsString(dto))
                         .header(BaseControllerTest.USER_HEADER, BaseControllerTest.DEFAULT_HEADER_VALUE))
                 .andExpect(status().isBadRequest())
-                .andDo(print());
+                .andDo(print())
+                .andExpect(jsonPath("$.message").value(DtoValidationConstraints.VALIDATION_FAILED))
+                .andExpect(jsonPath("$.details").exists());
     }
 }

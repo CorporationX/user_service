@@ -1,4 +1,4 @@
-package school.faang.validate.eventParticipantValidator;
+package school.faang.user_service.validate.eventParticipantValidator;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

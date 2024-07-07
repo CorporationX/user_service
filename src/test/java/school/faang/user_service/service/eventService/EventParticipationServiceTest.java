@@ -1,4 +1,4 @@
-package school.faang.service.eventService;
+package school.faang.user_service.service.eventService;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.Validate.EventParticipantValidator;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
-import school.faang.user_service.service.eventService.EventParticipationService;
 
 import static org.mockito.Mockito.*;
 

@@ -33,24 +33,16 @@ import java.util.stream.StreamSupport;
 @RequiredArgsConstructor
 public class MentorshipRequestService {
     private final MentorshipRequestRepository mentorshipRequestRepository;
-    private final MentorshipRequestMapper mentorshipRequestMapper;
+    private final MentorshipRequestMapper mapper;
     private final UserRepository userRepository;
-    // Написал так, потому что тесты не работали - requestFilters был пустым
-    private final List<MentorshipRequestFilter> requestFilters = new ArrayList<>(
-            List.of(
-                    new MentorshipRequestDescrFilter(),
-                    new MentorshipRequestReceiverFilter(),
-                    new MentorshipRequestRequesterFilter(),
-                    new MentorshipRequestStatusFilter()
-            )
-    );
+    private final List<MentorshipRequestFilter> requestFilters;
     private final MentorshipRepository mentorshipRepository;
 
     @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
         validateMentorshipRequest(mentorshipRequestDto);
-        MentorshipRequest mentorshipRequestEntity = mentorshipRequestMapper.toEntity(mentorshipRequestDto);
-        return mentorshipRequestMapper.toDto(mentorshipRequestRepository.save(mentorshipRequestEntity));
+        MentorshipRequest entity = mapper.toEntity(mentorshipRequestDto);
+        return mapper.toDto(mentorshipRequestRepository.save(entity));
     }
 
     @Transactional
@@ -67,7 +59,7 @@ public class MentorshipRequestService {
             filteredMentorshipRequest = (filter.apply(filteredMentorshipRequest, requestFilter));
         }
         return filteredMentorshipRequest.stream()
-                .map(mentorshipRequestMapper::toDto)
+                .map(mapper::toDto)
                 .toList();
     }
 
@@ -94,7 +86,7 @@ public class MentorshipRequestService {
         user.getMentors().add(mentor);
         mentorshipRepository.save(user);
         requestFromDb.setStatus(RequestStatus.ACCEPTED);
-        return mentorshipRequestMapper.toDto(requestFromDb);
+        return mapper.toDto(requestFromDb);
     }
 
     public MentorshipRequestDto rejectRequest(long id, RejectionDto rejection) {
@@ -107,7 +99,7 @@ public class MentorshipRequestService {
         }
         request.setStatus(RequestStatus.REJECTED);
         request.setRejectionReason(rejection.getReason());
-        return mentorshipRequestMapper.toDto(mentorshipRequestRepository.save(request));
+        return mapper.toDto(mentorshipRequestRepository.save(request));
     }
 
     private void validateMentorshipRequest(MentorshipRequestDto mentorshipRequestDto) {

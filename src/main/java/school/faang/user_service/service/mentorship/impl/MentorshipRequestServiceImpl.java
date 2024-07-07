@@ -1,6 +1,7 @@
 package school.faang.user_service.service.mentorship.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
@@ -9,7 +10,10 @@ import school.faang.user_service.dto.mentorship.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.event.mentorship.MentorshipStartEvent;
+import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
+import school.faang.user_service.publisher.mentorship.MentorshipStartPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
@@ -19,6 +23,7 @@ import school.faang.user_service.validator.user.UserValidator;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MentorshipRequestServiceImpl implements MentorshipRequestService {
@@ -28,22 +33,27 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     private final MentorshipRequestMapper mentorshipRequestMapper;
     private final UserRepository userRepository;
     private final UserValidator userValidator;
-
+    private final MentorshipStartPublisher mentorshipStartPublisher;
 
     @Override
     @Transactional
-    public MentorshipRequestDto requestMentorship(Long requesterId, Long receiverId, MentorshipRequestDto dto) {
-        var userList = userValidator.validateUsersExistence(List.of(requesterId, receiverId));
+    public MentorshipRequestDto requestMentorship(MentorshipRequestDto dto) {
+        userValidator.validateUsersExistence(List.of(dto.getRequesterId(), dto.getReceiverId()));
         mentorshipRequestValidator.validateMentorshipRequest(dto);
 
         MentorshipRequest entity = mentorshipRequestMapper.toEntity(dto);
-        User requesterEntity = getUser(userList, requesterId);
-        User receiverEntity = getUser(userList, receiverId);
+        User requesterEntity = findById(dto.getRequesterId());
+        User receiverEntity = findById(dto.getReceiverId());
         entity.setRequester(requesterEntity);
         entity.setReceiver(receiverEntity);
         MentorshipRequest entityFromDB = mentorshipRequestRepository.save(entity);
 
         return mentorshipRequestMapper.toDto(entityFromDB);
+    }
+
+    private User findById(long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(String.format("User with id %d not found", id)));
     }
 
     @Override
@@ -59,13 +69,16 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
     @Override
     @Transactional
     public MentorshipRequestDto acceptRequest(Long id) {
-        var entity = mentorshipRequestValidator.validateMentorshipRequestExistence(id);
+        MentorshipRequest request = mentorshipRequestValidator.validateMentorshipRequestExistence(id);
 
-        addMentor(entity);
-        entity.setStatus(RequestStatus.ACCEPTED);
-        entity = mentorshipRequestRepository.save(entity);
+        addMentor(request);
+        request.setStatus(RequestStatus.ACCEPTED);
+        mentorshipRequestRepository.save(request);
 
-        return mentorshipRequestMapper.toDto(entity);
+        MentorshipStartEvent event = mentorshipRequestMapper.toEvent(request);
+        mentorshipStartPublisher.publish(event);
+
+        return mentorshipRequestMapper.toDto(request);
     }
 
     @Override
@@ -80,19 +93,11 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         return mentorshipRequestMapper.toDto(entity);
     }
 
-    private User getUser(List<User> list, Long userId) {
-        return list.stream()
-                .filter(user -> user.getId() == userId)
-                .findAny()
-                .orElseThrow();
-    }
-
     private void addMentor(MentorshipRequest entity) {
         mentorshipRequestValidator.validateMentor(entity);
         var requester = entity.getRequester();
         var receiver = entity.getReceiver();
         requester.getMentors().add(receiver);
-
         userRepository.save(requester);
     }
 }

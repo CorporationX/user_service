@@ -2,6 +2,10 @@ package school.faang.user_service.service.event;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.ListUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.event.EventDto;
@@ -22,6 +26,8 @@ public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final EventFilterService eventFilterService;
     private final EventMapper mapper;
+    @Value("${batchSize.eventDeletion}")
+    private int batchSize;
 
     @Override
     @Transactional
@@ -96,5 +102,24 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public void deleteAll(List<Event> events) {
         eventRepository.deleteAll(events);
+    }
+
+    @Scheduled(cron = "${scheduler.clearEvents.cronExpression}")
+    public void clearEvents() {
+        List<Long> ids = eventRepository.findCompletedOrCanceledEventIds();
+
+        if (ids.isEmpty()) {
+            return;
+        }
+
+        List<List<Long>> partitions = ListUtils.partition(ids, batchSize);
+        for (List<Long> partition : partitions) {
+            clearEventsAsync(partition);
+        }
+    }
+
+    @Async("threadPoolForEventProcessing")
+    void clearEventsAsync(List<Long> partition) {
+        eventRepository.deleteAllById(partition);
     }
 }

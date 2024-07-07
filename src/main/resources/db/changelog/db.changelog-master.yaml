@@ -55,3 +55,5 @@ databaseChangeLog:
       file: db/changelog/changeset/user_V027__user_skills.sql
   - include:
       file: db/changelog/changeset/user_V028__user_skill_guarantees.sql
+  - include:
+      file: db/changelog/changeset/user_V029_jira_account.sql

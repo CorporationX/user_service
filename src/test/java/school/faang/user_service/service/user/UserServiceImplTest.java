@@ -11,13 +11,16 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.config.context.UserContext;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.premium.Premium;
+import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.mapper.UserMapperImpl;
+import school.faang.user_service.publisher.profile.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.goal.GoalService;
@@ -31,11 +34,14 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -58,6 +64,13 @@ class UserServiceImplTest {
     private ArgumentCaptor<User> captor;
     private User user;
 
+    @Mock
+    private UserContext userContext;
+
+    @Mock
+    private ProfileViewEventPublisher profileViewEventPublisher;
+    private UserDto userDto;
+
     private List<User> getUsers() {
         return new ArrayList<>(List.of(
                 User.builder().id(1L).premium(new Premium()).build(),
@@ -67,7 +80,7 @@ class UserServiceImplTest {
     }
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
         user = User.builder().username("name").email("test@mail.ru").password("password").build();
     }
 
@@ -115,7 +128,7 @@ class UserServiceImplTest {
         long userId = 1L;
         Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(new User()));
         userServiceImpl.findUserById(userId);
-        Mockito.verify(userRepository).findById(userId);
+        verify(userRepository).findById(userId);
     }
 
     @Test
@@ -123,11 +136,11 @@ class UserServiceImplTest {
         List<Long> ids = List.of(1L, 2L, 3L);
         Mockito.when(userRepository.findAllById(ids)).thenReturn(List.of(new User(), new User()));
         userServiceImpl.getUsersByIds(ids);
-        Mockito.verify(userRepository).findAllById(ids);
+        verify(userRepository).findAllById(ids);
     }
 
     @Test
-    public void testCreateUser(){
+    public void testCreateUser() {
         when(userRepository.save(any(User.class))).thenReturn(user);
         UserDto userDto = UserDto.builder().username("name").email("test@mail.ru").password("password").build();
         UserDto result = userServiceImpl.createUser(userDto);
@@ -140,5 +153,39 @@ class UserServiceImplTest {
         assertEquals(result.getUsername(), userDto.getUsername());
         assertEquals(result.getEmail(), userDto.getEmail());
         assertEquals(result.getPassword(), userDto.getPassword());
+    }
+
+    @Test
+    public void testGetUserById_Success() {
+        user = new User();
+        user.setId(1L);
+
+        userDto = new UserDto();
+        userDto.setId(1L);
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userMapper.toDto(user)).thenReturn(userDto);
+
+        UserDto result = userServiceImpl.getUserById(1L);
+
+        assertEquals(userDto, result);
+        verify(userRepository, times(1)).findById(1L);
+        verify(userMapper, times(1)).toDto(user);
+    }
+
+    @Test
+    public void testGetUserById_UserNotFound() {
+        user = new User();
+        user.setId(1L);
+
+        userDto = new UserDto();
+        userDto.setId(1L);
+
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> userServiceImpl.getUserById(1L));
+
+        verify(userRepository, times(1)).findById(1L);
+        verifyNoInteractions(userMapper, userContext, profileViewEventPublisher);
     }
 }

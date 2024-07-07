@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.UserProfilePic;
 import school.faang.user_service.entity.contact.PreferredContact;
 
@@ -26,13 +25,14 @@ public class UserDto {
     private String email;
 
     @NotBlank
+    @Size(max = 32, message = "phone should be less than 32 symbols")
+    private String phone;
+
+    @NotBlank
     @Size(max = 128, message = "password should be less than 129 symbols")
     private String password;
 
-    @NotBlank
-    private String phone;
-
-    private Country country;
+    private Long countryId;
 
     private boolean active;
 

@@ -13,6 +13,7 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
 import school.faang.user_service.entity.event.Rating;
+import school.faang.user_service.entity.jira.JiraAccount;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.recommendation.Recommendation;
 
@@ -48,6 +49,9 @@ public class User {
 
     @Column(name = "about_me", length = 4096)
     private String aboutMe;
+
+    @OneToOne(mappedBy = "user")
+    private JiraAccount jiraAccount;
 
     @ManyToOne
     @JoinColumn(name = "country_id", nullable = false)

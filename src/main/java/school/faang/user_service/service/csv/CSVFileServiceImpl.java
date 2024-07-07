@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class CSVFileServiceImpl implements CSVFileService{
+public class CSVFileServiceImpl implements CSVFileService {
 
     private static final SecureRandom RANDOM = new SecureRandom();
     private final UserRepository userRepository;
@@ -104,11 +104,14 @@ public class CSVFileServiceImpl implements CSVFileService{
     public void assignCountryToUser(User user) {
         String countryName = user.getCountry().getTitle();
         Country country = countryRepository.findByName(countryName)
-                .orElseGet(() -> countryRepository.save(Country.builder()
-                        .title(countryName)
-                        .residents(Collections.singletonList(user))
-                        .build()));
+                .orElseGet(() -> countryRepository.save(Country.builder().title(countryName).build()));
+
+        country.getResidents().add(user);
         user.setCountry(country);
+
+        if (country.getId() == 0) {
+            countryRepository.save(country);
+        }
     }
 
     private String generatePassword() {

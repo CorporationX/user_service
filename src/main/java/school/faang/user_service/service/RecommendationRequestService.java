@@ -31,25 +31,28 @@ public class RecommendationRequestService {
     private final UserRepository userRepository;
 
     public void create(RecommendationRequest recommendationRequest) {
+        validationRecommendationRequestForCreateMethod(recommendationRequest);
+        saveRecommendationRequest(recommendationRequest);
+        recommendationRequest.getSkills()
+                .forEach(skillRequest -> skillRequestRepository
+                        .create(recommendationRequest.getId(), skillRequest.getId()));
+    }
+
+    private void validationRecommendationRequestForCreateMethod(RecommendationRequest recommendationRequest) {
         if (getById(recommendationRequest.getRequester()).isEmpty() ||
                 getById(recommendationRequest.getReceiver()).isEmpty()) {
             throw new IllegalArgumentException();
         }
         Optional<RecommendationRequest> latestPendingRequest = getLatestRecommendationRequest(recommendationRequest);
-        if (allSkillsPresent(recommendationRequest)) {
-            if (latestPendingRequest.isPresent()) {
-                if (DAYS.between(latestPendingRequest.get().getCreatedAt(),
-                        LocalDateTime.now()) < SIX_MONTHS_IN_DAYS) {
-                    throw new IllegalArgumentException();
-                }
-            }
-            saveRecommendationRequest(recommendationRequest);
-        } else {
+        if (!allSkillsPresent(recommendationRequest)) {
             throw new IllegalArgumentException();
         }
-        recommendationRequest.getSkills()
-                .forEach(skillRequest -> skillRequestRepository
-                        .create(recommendationRequest.getId(), skillRequest.getId()));
+        if (latestPendingRequest.isPresent()) {
+            if (DAYS.between(latestPendingRequest.get().getCreatedAt(),
+                    LocalDateTime.now()) < SIX_MONTHS_IN_DAYS) {
+                throw new IllegalArgumentException();
+            }
+        }
     }
 
     private void saveRecommendationRequest(RecommendationRequest recommendationRequest) {
@@ -89,13 +92,17 @@ public class RecommendationRequestService {
         List<RecommendationRequest> recommendationRequests =
                 (List<RecommendationRequest>) recommendationRequestRepository.findAll();
         return recommendationRequests.stream()
-                .filter(request -> request.getCreatedAt() == filter.getCreatedAt())
-                .filter(request -> request.getRequester().getId() == filter.getRequesterId())
-                .filter(request -> request.getReceiver().getId() == filter.getReceiverId())
-                .filter(request -> request.getStatus() == filter.getStatus())
-                .filter(request -> request.getRejectionReason().equals(filter.getRejectionReason()))
-                .filter(request -> request.getRecommendation().getId() == filter.getRecommendationId())
+                .filter(request -> applyFilterToRequest(request, filter))
                 .toList();
+    }
+
+    private boolean applyFilterToRequest(RecommendationRequest request, RequestFilterDto filter) {
+        return request.getCreatedAt() == filter.getCreatedAt()
+                && request.getRequester().getId() == filter.getRequesterId()
+                && request.getReceiver().getId() == filter.getReceiverId()
+                && request.getStatus() == filter.getStatus()
+                && request.getRejectionReason().equals(filter.getRejectionReason())
+                && request.getRecommendation().getId() == filter.getRecommendationId();
     }
 
     public RecommendationRequest getRequest(long id) {

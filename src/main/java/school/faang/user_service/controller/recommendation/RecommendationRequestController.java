@@ -14,35 +14,35 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class RecommendationRequestController {
-    private final RecommendationRequestService recommendationRequestService;
-    private final RecommendationRequestMapper recommendationRequestMapper;
+    private final RecommendationRequestService service;
+    private final RecommendationRequestMapper mapper;
 
     public RecommendationRequestDto requestRecommendation(RecommendationRequestDto recommendationRequest) {
         if (recommendationRequest == null) {
             throw new NullPointerException("Empty request");
         }
-        RecommendationRequest entity = recommendationRequestMapper.toEntry(recommendationRequest);
-        recommendationRequestService.create(entity);
-        return recommendationRequestMapper.toDto(entity);
+        RecommendationRequest entity = mapper.toEntry(recommendationRequest);
+        service.create(entity);
+        return mapper.toDto(entity);
     }
 
     public List<RecommendationRequestDto> getRecommendationRequests(RequestFilterDto filter) {
         if (filter == null) {
             throw new NullPointerException("Empty filter");
         }
-        return recommendationRequestService.getRequests(filter).stream()
-                .map(recommendationRequestMapper::toDto)
+        return service.getRequests(filter).stream()
+                .map(mapper::toDto)
                 .toList();
     }
 
     public RecommendationRequestDto getRecommendationRequest(long id) {
-        return recommendationRequestMapper.toDto(recommendationRequestService.getRequest(id));
+        return mapper.toDto(service.getRequest(id));
     }
 
     public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
         if (rejection == null || rejection.getReason().isBlank() || rejection.getReason().isEmpty()) {
             throw new NullPointerException("Empty rejection");
         }
-        return recommendationRequestMapper.toDto(recommendationRequestService.rejectRequest(id, rejection));
+        return mapper.toDto(service.rejectRequest(id, rejection));
     }
 }

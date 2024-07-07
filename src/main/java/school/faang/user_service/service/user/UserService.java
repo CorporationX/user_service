@@ -24,24 +24,29 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import static school.faang.user_service.exception.message.ExceptionMessage.FILE_PROCESSING_EXCEPTION;
-import static school.faang.user_service.exception.message.ExceptionMessage.NO_SUCH_COUNTRY_EXCEPTION;
-import static school.faang.user_service.exception.message.ExceptionMessage.NO_SUCH_USER_EXCEPTION;
-import static school.faang.user_service.exception.message.ExceptionMessage.REPEATED_USER_CREATION_EXCEPTION;
-import static school.faang.user_service.exception.message.ExceptionMessage.USER_AVATAR_ABSENCE_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.*;
 
 @Slf4j
 @Service
 @AllArgsConstructor
 public class UserService {
+
     public static final String BIG_AVATAR_PICTURE_NAME = "bigPicture";
+
     public static final String SMALL_AVATAR_PICTURE_NAME = "smallPicture";
+
     public static final String FOLDER_PREFIX = "user";
+
     private S3Service s3Service;
+
     private AvatarGeneratorService avatarGeneratorService;
+
     private ImageProcessor imageProcessor;
+
     private UserRepository userRepository;
+
     private UserMapper userMapper;
+
     private CountryRepository countryRepository;
 
     @Transactional

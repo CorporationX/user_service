@@ -3,6 +3,10 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.IterableUtils;
+import school.faang.user_service.dto.RejectionDto;
+import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.service.mentorship_request_filter.MentorshipRequestDescrFilter;
 import school.faang.user_service.service.mentorship_request_filter.MentorshipRequestFilter;
 import org.springframework.stereotype.Component;
@@ -21,8 +25,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;;
+import java.util.Optional;
+import java.util.stream.StreamSupport;
+
 
 @Component
 @RequiredArgsConstructor
@@ -38,7 +43,8 @@ public class MentorshipRequestService {
                     new MentorshipRequestRequesterFilter(),
                     new MentorshipRequestStatusFilter()
             )
-    );;
+    );
+    private final MentorshipRepository mentorshipRepository;
 
     @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
@@ -63,6 +69,45 @@ public class MentorshipRequestService {
         return filteredMentorshipRequest.stream()
                 .map(mentorshipRequestMapper::toDto)
                 .toList();
+    }
+
+    public MentorshipRequestDto acceptRequest(long id) {
+        MentorshipRequest requestFromDb = mentorshipRequestRepository.findById(id).orElse(null);
+        if (requestFromDb == null) {
+            throw new IllegalArgumentException("Запроса на менторство нет в БД");
+        }
+        Optional<MentorshipRequest> lastRequests = mentorshipRequestRepository.findRequests(
+                requestFromDb.getRequester().getId(), requestFromDb.getReceiver().getId()
+        );
+        if (lastRequests.isPresent()) {
+            throw new IllegalArgumentException("Пользователь уже является ментором для данного пользователя");
+        }
+        // Не уверен, что это будет поиск по Id пользователя
+        User user = mentorshipRepository.findById(requestFromDb.getRequester().getId()).orElse(null);
+        if (user == null) {
+            throw new IllegalArgumentException("Пользователя нет в таблице пользователей");
+        }
+        User mentor = mentorshipRepository.findById(requestFromDb.getReceiver().getId()).orElse(null);
+        if (mentor == null) {
+            throw new IllegalArgumentException("Ментора нет в таблице пользователей");
+        }
+        user.getMentors().add(mentor);
+        mentorshipRepository.save(user);
+        requestFromDb.setStatus(RequestStatus.ACCEPTED);
+        return mentorshipRequestMapper.toDto(requestFromDb);
+    }
+
+    public MentorshipRequestDto rejectRequest(long id, RejectionDto rejection) {
+        if (rejection == null || rejection.getReason().isBlank()) {
+            throw new IllegalArgumentException("Пустая причина отказа");
+        }
+        MentorshipRequest request = mentorshipRequestRepository.findById(id).orElse(null);
+        if (request == null) {
+            throw new IllegalArgumentException("Переданного запроса нет в базе");
+        }
+        request.setStatus(RequestStatus.REJECTED);
+        request.setRejectionReason(rejection.getReason());
+        return mentorshipRequestMapper.toDto(mentorshipRequestRepository.save(request));
     }
 
     private void validateMentorshipRequest(MentorshipRequestDto mentorshipRequestDto) {

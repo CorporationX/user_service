@@ -4,12 +4,13 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
+import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
 import java.util.List;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface MentorshipRequestMapper {
 
     @Mapping(source = "id", target = "id")

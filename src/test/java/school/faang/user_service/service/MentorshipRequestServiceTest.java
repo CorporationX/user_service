@@ -15,12 +15,14 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.MentorshipRequestDto;
+import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
+import school.faang.user_service.repository.mentorship.MentorshipRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.service.mentorship_request_filter.MentorshipRequestDescrFilter;
 import school.faang.user_service.service.mentorship_request_filter.MentorshipRequestFilter;
@@ -49,6 +51,8 @@ public class MentorshipRequestServiceTest {
     private MentorshipRequestRepository mentorshipRequestRepository;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private MentorshipRepository mentorshipRepository;
     @Spy
     private MentorshipRequestMapper mentorshipRequestMapper = Mappers.getMapper(MentorshipRequestMapper.class);
     @Spy
@@ -63,7 +67,7 @@ public class MentorshipRequestServiceTest {
     @Captor
     private ArgumentCaptor<MentorshipRequest> requestCaptor;
     @Captor
-    private ArgumentCaptor<MentorshipRequest> mapperCaptor;
+    private ArgumentCaptor<User> userCaptor;
     private MentorshipRequestDto dto;
     private MentorshipRequestDto requestDto;
     private MentorshipRequest entity;
@@ -211,5 +215,191 @@ public class MentorshipRequestServiceTest {
         List<MentorshipRequestDto> requestDtos = mentorshipRequestService.getRequests(requestFilter);
         List<MentorshipRequestDto> expectedDtos = mentorshipRequestMapper.toDto(new ArrayList<>(List.of(mentorshipRequests.get(0))));
         Assertions.assertEquals(expectedDtos, requestDtos);
+    }
+
+    @Test
+    public void testAcceptRequestNull() {
+        long id = 1L;
+        when(mentorshipRequestRepository.findById(id)).thenReturn(Optional.empty());
+        Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> mentorshipRequestService.acceptRequest(id));
+        Assertions.assertEquals("Запроса на менторство нет в БД", exception.getMessage());
+    }
+
+    @Test
+    public void testAcceptRequestUserAlreadyHaveThisMentor() {
+        long id = 1L;
+        long userId = 1L;
+        MentorshipRequest mentorshipRequest =  new MentorshipRequest();
+        mentorshipRequest.setRequester(User.builder().id(userId).build());
+        mentorshipRequest.setReceiver(User.builder().id(userId).build());
+        when(mentorshipRequestRepository.findById(id)).thenReturn(Optional.of(mentorshipRequest));
+        when(mentorshipRequestRepository.findRequests(userId, userId)).thenReturn(Optional.of( new MentorshipRequest()));
+
+        Exception exception = Assertions.assertThrows(IllegalArgumentException.class,() -> {
+            mentorshipRequestService.acceptRequest(id);
+        });
+        Assertions.assertEquals("Пользователь уже является ментором для данного пользователя", exception.getMessage());
+    }
+
+    @Test
+    public void testAcceptRequestRequesterHaveNotInDb() {
+        long id = 1L;
+        long userId = 1L;
+        MentorshipRequest mentorshipRequest =  new MentorshipRequest();
+        mentorshipRequest.setRequester(User.builder().id(userId).build());
+        mentorshipRequest.setReceiver(User.builder().id(userId).build());
+        when(mentorshipRequestRepository.findById(id)).thenReturn(Optional.of(mentorshipRequest));
+        when(mentorshipRequestRepository.findRequests(userId, userId)).thenReturn(Optional.empty());
+
+        when(mentorshipRepository.findById(userId)).thenReturn(Optional.empty());
+        Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> mentorshipRequestService.acceptRequest(id));
+        Assertions.assertEquals("Пользователя нет в таблице пользователей", exception.getMessage());
+    }
+
+    @Test
+    public void testAcceptRequestMentorHaveNotInDb() {
+        long id = 1L;
+        long userId = 1L;
+        long receiverId = 2L;
+        MentorshipRequest mentorshipRequest =  new MentorshipRequest();
+        mentorshipRequest.setRequester(User.builder().id(userId).build());
+        mentorshipRequest.setReceiver(User.builder().id(receiverId).build());
+        when(mentorshipRequestRepository.findById(id)).thenReturn(Optional.of(mentorshipRequest));
+        when(mentorshipRequestRepository.findRequests(userId, receiverId)).thenReturn(Optional.empty());
+
+        when(mentorshipRepository.findById(userId)).thenReturn(Optional.of(new User()));
+        lenient().when(mentorshipRepository.findById(receiverId)).thenReturn(Optional.empty());
+        Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> mentorshipRequestService.acceptRequest(id));
+        Assertions.assertEquals("Ментора нет в таблице пользователей", exception.getMessage());
+
+    }
+    @Test
+    public void testAcceptRequestSaveToDb() {
+        long id = 1L;
+        long userId = 1L;
+        long receiverId = 2L;
+        MentorshipRequest mentorshipRequest =  new MentorshipRequest();
+        mentorshipRequest.setRequester(User.builder().id(userId).build());
+        mentorshipRequest.setReceiver(User.builder().id(receiverId).build());
+        when(mentorshipRequestRepository.findById(id)).thenReturn(Optional.of(mentorshipRequest));
+        lenient().when(mentorshipRequestRepository.findRequests(userId, receiverId)).thenReturn(Optional.empty());
+
+        User user = User.builder()
+                .id(10L)
+                .mentors(new ArrayList<>(List.of(User.builder().id(3L).build())))
+                .build();
+        User saveUser = User.builder()
+                .id(10L)
+                .mentors(new ArrayList<>(List.of(
+                        User.builder().id(3L).build(),
+                        User.builder().id(receiverId).build()
+                )))
+                .build();
+        when(mentorshipRepository.findById(userId)).thenReturn(Optional.of(user));
+        lenient().when(mentorshipRepository.findById(receiverId)).thenReturn(Optional.of(User.builder().id(receiverId).build()));
+        mentorshipRequestService.acceptRequest(id);
+        verify(mentorshipRepository, times(1)).save(userCaptor.capture());
+        Assertions.assertEquals(saveUser, userCaptor.getValue());
+
+    }
+
+
+    @Test
+    public void testAcceptRequestReturn() {
+        long id = 1L;
+        long userId = 1L;
+        long receiverId = 2L;
+        MentorshipRequest mentorshipRequest =  new MentorshipRequest();
+        mentorshipRequest.setId(100L);
+        mentorshipRequest.setStatus(RequestStatus.PENDING);
+        mentorshipRequest.setRequester(User.builder().id(userId).build());
+        mentorshipRequest.setReceiver(User.builder().id(receiverId).build());
+        when(mentorshipRequestRepository.findById(id)).thenReturn(Optional.of(mentorshipRequest));
+        lenient().when(mentorshipRequestRepository.findRequests(userId, receiverId)).thenReturn(Optional.empty());
+
+        User user = User.builder()
+                .id(10L)
+                .mentors(new ArrayList<>(List.of(User.builder().id(3L).build())))
+                .build();
+
+        when(mentorshipRepository.findById(userId)).thenReturn(Optional.of(user));
+        lenient().when(mentorshipRepository.findById(receiverId)).thenReturn(Optional.of(User.builder().id(receiverId).build()));
+        MentorshipRequestDto dto = mentorshipRequestService.acceptRequest(id);
+
+        MentorshipRequest mentorshipRequestEtalon =  new MentorshipRequest();
+        mentorshipRequestEtalon.setId(100L);
+        mentorshipRequestEtalon.setStatus(RequestStatus.ACCEPTED);
+        mentorshipRequestEtalon.setRequester(User.builder().id(userId).build());
+        mentorshipRequestEtalon.setReceiver(User.builder().id(receiverId).build());
+        MentorshipRequestDto dtoEtalon = mentorshipRequestMapper.toDto(mentorshipRequestEtalon);
+        Assertions.assertEquals(dtoEtalon, dto);
+    }
+
+    @Test
+    public void testRejectRequestRejectionNull() {
+        long id = 1;
+        RejectionDto rejection = null;
+        Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            mentorshipRequestService.rejectRequest(id, rejection);
+        });
+        Assertions.assertEquals("Пустая причина отказа", exception.getMessage());
+    }
+
+    @Test
+    public void testRejectRequestReasonNull() {
+        long id = 1;
+        RejectionDto rejection = new RejectionDto(1L, "  ");
+        Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            mentorshipRequestService.rejectRequest(id, rejection);
+        });
+        Assertions.assertEquals("Пустая причина отказа", exception.getMessage());
+    }
+
+    @Test
+    public void testRejectRequestNull() {
+        long id = 1;
+        RejectionDto rejection = new RejectionDto(2L, "asd");
+        when(mentorshipRequestRepository.findById(id)).thenReturn(Optional.empty());
+        Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            mentorshipRequestService.rejectRequest(id, rejection);
+        });
+        Assertions.assertEquals("Переданного запроса нет в базе", exception.getMessage());
+    }
+
+    @Test
+    public void testRejectRequestSaveToDb() {
+        long id = 1;
+        RejectionDto rejection = new RejectionDto(2L, "Занят");
+        MentorshipRequest mentorshipRequest = new MentorshipRequest();
+        mentorshipRequest.setId(1L);
+        mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
+        MentorshipRequest mentorshipRequestEtalon = new MentorshipRequest();
+        mentorshipRequestEtalon.setId(1L);
+        mentorshipRequestEtalon.setStatus(RequestStatus.REJECTED);
+        mentorshipRequestEtalon.setRejectionReason("Занят");
+        when(mentorshipRequestRepository.findById(id)).thenReturn(Optional.of(mentorshipRequest));
+
+        mentorshipRequestService.rejectRequest(id, rejection);
+        verify(mentorshipRequestRepository, times(1)).save(requestCaptor.capture());
+        Assertions.assertEquals(mentorshipRequestEtalon, requestCaptor.getValue());
+    }
+
+    @Test
+    public void testRejectRequestReturn() {
+        long id = 1;
+        RejectionDto rejection = new RejectionDto(2L, "Занят");
+        MentorshipRequest mentorshipRequest = new MentorshipRequest();
+        mentorshipRequest.setId(1L);
+        mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
+        MentorshipRequest mentorshipRequestEtalon = new MentorshipRequest();
+        mentorshipRequestEtalon.setId(1L);
+        mentorshipRequestEtalon.setStatus(RequestStatus.REJECTED);
+        mentorshipRequestEtalon.setRejectionReason("Занят");
+        MentorshipRequestDto mentorshipRequestDtoEtalon = mentorshipRequestMapper.toDto(mentorshipRequestEtalon);
+
+        when(mentorshipRequestRepository.findById(id)).thenReturn(Optional.of(mentorshipRequest));
+        when(mentorshipRequestRepository.save(mentorshipRequestEtalon)).thenReturn(mentorshipRequestEtalon);
+        MentorshipRequestDto dto = mentorshipRequestService.rejectRequest(id, rejection);
+        Assertions.assertEquals(mentorshipRequestDtoEtalon, dto);
     }
 }

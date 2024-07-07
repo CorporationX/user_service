@@ -3,6 +3,8 @@ package school.faang.user_service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.ListOfSkillsCandidateMapper;
@@ -61,9 +63,12 @@ public class SkillService {
         }
     }
 
-    private static void addGuarantee(List<SkillOffer> skillOffers) {
+    private void addGuarantee(List<SkillOffer> skillOffers) {
         for (SkillOffer skillOffer : skillOffers) {
-
+            User receiver = skillOffer.getRecommendation().getReceiver();
+            User author = skillOffer.getRecommendation().getAuthor();
+            userSkillGuaranteeRepository.save(UserSkillGuarantee.builder()
+                            .user(receiver).guarantor(author).skill(skillOffer.getSkill()).build());
         }
     }
 

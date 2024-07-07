@@ -21,20 +21,20 @@ public class SubscriptionService {
     private final SubscriptionServiceValidator subscriptionServiceValidator;
 
     public void followUser(long followerId, long followeeId) {
-        subscriptionServiceValidator.validFollowUser(followerId, followeeId);
+        subscriptionServiceValidator.validateFollowUnfollowUser(followerId, followeeId);
 
         subscriptionRepository.followUser(followerId, followeeId);
     }
 
     public void unfollowUser(long followerId, long followeeId) {
-        subscriptionServiceValidator.validUnfollowUser(followerId, followeeId);
+        subscriptionServiceValidator.validateFollowUnfollowUser(followerId, followeeId);
 
         subscriptionRepository.unfollowUser(followerId, followeeId);
     }
 
 
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filterDto) {
-        subscriptionServiceValidator.validGetFollowers(followeeId, filterDto);
+        subscriptionServiceValidator.validateGetFollowers(followeeId, filterDto);
 
         List<User> followers = subscriptionRepository.findByFolloweeId(followeeId).toList();
 
@@ -47,13 +47,13 @@ public class SubscriptionService {
     }
 
     public Integer getFollowersCount(long followeeId) {
-        subscriptionServiceValidator.validGetFollowersCount(followeeId);
+        subscriptionServiceValidator.validateExistsById(followeeId);
 
         return subscriptionRepository.findFollowersAmountByFolloweeId(followeeId);
     }
 
     public List<UserDto> getFollowing(long followeeId, UserFilterDto filterDto) {
-        subscriptionServiceValidator.validGetFollowing(followeeId, filterDto);
+        subscriptionServiceValidator.validateGetFollowing(followeeId, filterDto);
 
         List<User> followings = subscriptionRepository.findByFolloweeId(followeeId).toList();
 
@@ -66,7 +66,7 @@ public class SubscriptionService {
     }
 
     public Integer getFollowingCount(long followerId) {
-        subscriptionServiceValidator.validGetFollowingCount(followerId);
+        subscriptionServiceValidator.validateExistsById(followerId);
 
         return subscriptionRepository.findFolloweesAmountByFollowerId(followerId);
     }

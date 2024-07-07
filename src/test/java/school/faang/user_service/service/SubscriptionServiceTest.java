@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 import org.junit.Assert;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -37,13 +38,14 @@ public class SubscriptionServiceTest {
     private SubscriptionServiceValidator subscriptionServiceValidator;
 
     @Test
+    @DisplayName("Test when follower is already subscribed to followee")
     public void testFollowUserFollowerSubscribedFollowee() {
         long followerId = 1L;
         long followeeId = 2L;
 
         doThrow(new DataValidationException("User id: " + followerId
                 + " already followed to the user id: " + followeeId))
-                .when(subscriptionServiceValidator).validFollowUser(followerId, followeeId);
+                .when(subscriptionServiceValidator).validateFollowUnfollowUser(followerId, followeeId);
 
         assertThrows(DataValidationException.class, () -> {
             subscriptionService.followUser(followerId, followeeId);
@@ -51,12 +53,27 @@ public class SubscriptionServiceTest {
     }
 
     @Test
+    @DisplayName("Test when follower ID is identical to followee ID")
+    public void testFollowUserIdenticalIDs() {
+        long followerId = 1L;
+        long followeeId = 2L;
+
+        doThrow(new DataValidationException("User cannot follow to himself"))
+                .when(subscriptionServiceValidator).validateFollowUnfollowUser(followerId, followeeId);
+
+        assertThrows(DataValidationException.class, () -> {
+            subscriptionService.followUser(followerId, followeeId);
+        });
+    }
+
+    @Test
+    @DisplayName("Test when follower or followee is not found")
     public void testFollowUserFollowerOrFolloweeNotFound() {
         long followerId = 1L;
         long followeeId = 2L;
 
         doThrow(new DataValidationException("User " + followeeId + " not found"))
-                .when(subscriptionServiceValidator).validFollowUser(followerId, followeeId);
+                .when(subscriptionServiceValidator).validateFollowUnfollowUser(followerId, followeeId);
 
         assertThrows(DataValidationException.class, () -> {
             subscriptionService.followUser(followerId, followeeId);
@@ -64,11 +81,12 @@ public class SubscriptionServiceTest {
     }
 
     @Test
+    @DisplayName("Test successful follow operation")
     public void testFollowUserIsFollow() {
         long followerId = 1L;
         long followeeId = 2L;
 
-        doNothing().when(subscriptionServiceValidator).validFollowUser(followerId, followeeId);
+        doNothing().when(subscriptionServiceValidator).validateFollowUnfollowUser(followerId, followeeId);
 
         subscriptionService.followUser(followerId, followeeId);
 
@@ -77,13 +95,14 @@ public class SubscriptionServiceTest {
     }
 
     @Test
+    @DisplayName("Test when users are not subscribed to each other")
     public void testUnfollowUserUsersAreNotSubscribedToEachOther() {
         long followerId = 1L;
         long followeeId = 2L;
 
         doThrow(new DataValidationException("User id: " + followerId
                 + " already followed to the user id: " + followeeId))
-                .when(subscriptionServiceValidator).validUnfollowUser(followerId, followeeId);
+                .when(subscriptionServiceValidator).validateFollowUnfollowUser(followerId, followeeId);
 
         assertThrows(DataValidationException.class, () -> {
             subscriptionService.unfollowUser(followerId, followeeId);
@@ -91,12 +110,13 @@ public class SubscriptionServiceTest {
     }
 
     @Test
+    @DisplayName("Test when follower or followee is not found during unfollow")
     public void testUnfollowUserFollowerOrFolloweeNotFound() {
         long followerId = 1L;
         long followeeId = 2L;
 
         doThrow(new DataValidationException("User " + followeeId + " not found"))
-                .when(subscriptionServiceValidator).validUnfollowUser(followerId, followeeId);
+                .when(subscriptionServiceValidator).validateFollowUnfollowUser(followerId, followeeId);
 
         assertThrows(DataValidationException.class, () -> {
             subscriptionService.unfollowUser(followerId, followeeId);
@@ -104,11 +124,26 @@ public class SubscriptionServiceTest {
     }
 
     @Test
+    @DisplayName("Test when follower ID is identical to followee ID during unfollow")
+    public void testUnfollowUserIdenticalIDs() {
+        long followerId = 1L;
+        long followeeId = 2L;
+
+        doThrow(new DataValidationException("User cannot follow to himself"))
+                .when(subscriptionServiceValidator).validateFollowUnfollowUser(followerId, followeeId);
+
+        assertThrows(DataValidationException.class, () -> {
+            subscriptionService.unfollowUser(followerId, followeeId);
+        });
+    }
+
+    @Test
+    @DisplayName("Test successful unfollow operation")
     public void testUnfollowUserIsUnfollow() {
         long followerId = 1L;
         long followeeId = 2L;
 
-        doNothing().when(subscriptionServiceValidator).validUnfollowUser(followerId, followeeId);
+        doNothing().when(subscriptionServiceValidator).validateFollowUnfollowUser(followerId, followeeId);
 
         subscriptionService.unfollowUser(followerId, followeeId);
 
@@ -117,12 +152,13 @@ public class SubscriptionServiceTest {
     }
 
     @Test
+    @DisplayName("Test getting followers when followee not found")
     public void testGetFollowersFolloweeNotFound() {
         long followerId = 1L;
         UserFilterDto userFilterDto = new UserFilterDto();
 
         doThrow(new DataValidationException("User " + followerId + " not found"))
-                .when(subscriptionServiceValidator).validGetFollowers(followerId, userFilterDto);
+                .when(subscriptionServiceValidator).validateGetFollowers(followerId, userFilterDto);
 
         assertThrows(DataValidationException.class, () -> {
             subscriptionService.getFollowers(followerId, userFilterDto);
@@ -130,11 +166,12 @@ public class SubscriptionServiceTest {
     }
 
     @Test
+    @DisplayName("Test getting followers when UserFilterDto is null")
     public void testGetFollowersUserFilterDtoIsNull() {
         long followerId = 1L;
 
         doThrow(new IllegalArgumentException("UserFilterDto cannot be null"))
-                .when(subscriptionServiceValidator).validGetFollowers(followerId, null);
+                .when(subscriptionServiceValidator).validateGetFollowers(followerId, null);
 
         assertThrows(IllegalArgumentException.class, () -> {
             subscriptionService.getFollowers(followerId, null);
@@ -142,6 +179,7 @@ public class SubscriptionServiceTest {
     }
 
     @Test
+    @DisplayName("Test getting followers returns UserDto list")
     public void testGetFollowersReturnedUsersDto() {
         subscriptionService.getFollowers(1L, new UserFilterDto());
 
@@ -150,11 +188,12 @@ public class SubscriptionServiceTest {
     }
 
     @Test
+    @DisplayName("Test getting followers count when user not found")
     public void testGetFollowersCountUserNotFound() {
         long followerId = 1L;
 
         doThrow(new DataValidationException("User " + followerId + " not found"))
-                .when(subscriptionServiceValidator).validGetFollowersCount(followerId);
+                .when(subscriptionServiceValidator).validateExistsById(followerId);
 
         assertThrows(DataValidationException.class, () -> {
             subscriptionService.getFollowersCount(followerId);
@@ -162,6 +201,7 @@ public class SubscriptionServiceTest {
     }
 
     @Test
+    @DisplayName("Test getting followers count returns correct count")
     public void testGetFollowersCountReturnedUsersCount() {
         long followerId = 1L;
 
@@ -172,12 +212,13 @@ public class SubscriptionServiceTest {
     }
 
     @Test
+    @DisplayName("Test getting following when user not found")
     public void testGetFollowingUserNotFound() {
         long followerId = 1L;
         UserFilterDto userFilterDto = new UserFilterDto();
 
         doThrow(new DataValidationException("User " + followerId + " not found"))
-                .when(subscriptionServiceValidator).validGetFollowing(followerId, userFilterDto);
+                .when(subscriptionServiceValidator).validateGetFollowing(followerId, userFilterDto);
 
         assertThrows(DataValidationException.class, () -> {
             subscriptionService.getFollowing(followerId, new UserFilterDto());
@@ -185,11 +226,12 @@ public class SubscriptionServiceTest {
     }
 
     @Test
+    @DisplayName("Test getting following when UserFilterDto is null")
     public void testGetFollowingUserFilterDtoIsNull() {
         long followerId = 1L;
 
         doThrow(new IllegalArgumentException("UserFilterDto cannot be null"))
-                .when(subscriptionServiceValidator).validGetFollowing(followerId, null);
+                .when(subscriptionServiceValidator).validateGetFollowing(followerId, null);
 
         assertThrows(IllegalArgumentException.class, () -> {
             subscriptionService.getFollowing(followerId, null);
@@ -197,21 +239,23 @@ public class SubscriptionServiceTest {
     }
 
     @Test
+    @DisplayName("Test getting following returns UserDto list")
     public void testGetFollowingReturnedUsersDto() {
         long followeeId = 1L;
         UserFilterDto userFilterDto = new UserFilterDto();
 
         subscriptionService.getFollowing(followeeId, userFilterDto);
 
-        verify(subscriptionServiceValidator).validGetFollowing(followeeId, userFilterDto);
+        verify(subscriptionServiceValidator).validateGetFollowing(followeeId, userFilterDto);
     }
 
     @Test
+    @DisplayName("Test getting following count when user not found")
     public void testGetFollowingCountUserNotFound() {
         long followerId = 1L;
 
         doThrow(new DataValidationException("User " + followerId + " not found"))
-                .when(subscriptionServiceValidator).validGetFollowingCount(followerId);
+                .when(subscriptionServiceValidator).validateExistsById(followerId);
 
         Assert.assertThrows(DataValidationException.class, () -> {
             subscriptionService.getFollowingCount(followerId);
@@ -219,6 +263,7 @@ public class SubscriptionServiceTest {
     }
 
     @Test
+    @DisplayName("Test getting following count returns correct count")
     public void testGetFollowingCountReturnedUsersCount() {
         long followerId = 1L;
 

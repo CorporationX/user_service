@@ -11,49 +11,45 @@ import school.faang.user_service.repository.SubscriptionRepository;
 public class SubscriptionServiceValidator {
     private final SubscriptionRepository subscriptionRepository;
 
-    public void validFollowUser(long followerId, long followeeId) {
-        validExistsById(followerId);
-        validExistsById(followeeId);
-        validExistsByFollowerIdAndFolloweeId(followerId, followeeId);
+    public void validateFollowUnfollowUser(long followerId, long followeeId) {
+        validateExistsById(followerId);
+        validateExistsById(followeeId);
+        validateIdenticalUserIDs(followerId, followeeId);
+        validateExistsByFollowerIdAndFolloweeId(followerId, followeeId);
     }
 
-    public void validUnfollowUser(long followerId, long followeeId) {
-        validExistsById(followerId);
-        validExistsById(followeeId);
-        validExistsByFollowerIdAndFolloweeId(followerId, followeeId);
+    public void validateGetFollowers(long followeeId, UserFilterDto filterDto) {
+        validateExistsById(followeeId);
+        validateUserFilterDtoByNull(filterDto);
     }
 
-    public void validGetFollowers(long followeeId, UserFilterDto filterDto) {
-        validExistsById(followeeId);
-        validUserFilterDtoByNull(filterDto);
+    public void validateGetFollowing(long followeeId, UserFilterDto filterDto) {
+        validateExistsById(followeeId);
+        validateUserFilterDtoByNull(filterDto);
     }
 
-    public void validGetFollowersCount(long followeeId) {
-        validExistsById(followeeId);
-    }
-    public void validGetFollowing(long followeeId, UserFilterDto filterDto) {
-        validExistsById(followeeId);
-        validUserFilterDtoByNull(filterDto);
+    public void validateExistsById(long id) {
+        if (!subscriptionRepository.existsById(id)) {
+            throw new DataValidationException("User " + id + " not found");
+        }
     }
 
-    public void validGetFollowingCount(long followerId) {
-        validExistsById(followerId);
-    }
-    private void validUserFilterDtoByNull(UserFilterDto filterDto) {
+    private void validateUserFilterDtoByNull(UserFilterDto filterDto) {
         if (filterDto == null) {
             throw new IllegalArgumentException("UserFilterDto cannot be null");
         }
     }
-    private void validExistsByFollowerIdAndFolloweeId(long followerId, long followeeId) {
+
+    private void validateExistsByFollowerIdAndFolloweeId(long followerId, long followeeId) {
         if (!subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             throw new DataValidationException("User id: " + followerId
                     + " already followed to the user id: " + followeeId);
         }
     }
 
-    private void validExistsById(long id) {
-        if (!subscriptionRepository.existsById(id)) {
-            throw new DataValidationException("User " + id + " not found");
+    private void validateIdenticalUserIDs(long followerId, long followeeId) {
+        if (followerId == followeeId) {
+            throw new DataValidationException("User cannot follow to himself");
         }
     }
 }

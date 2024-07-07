@@ -12,16 +12,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.ListOfSkillsCandidateMapperImpl;
 import school.faang.user_service.mapper.SkillCandidateMapperImpl;
 import school.faang.user_service.mapper.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
-import school.faang.user_service.validator.SkillValidator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -71,6 +70,22 @@ public class SkillServiceTest {
         Mockito.when(skillRepository.findSkillsOfferedToUser(userId)).thenReturn(listOfOneSkill);
         skillService.getOfferedSkills(userId);
         Mockito.verify(skillRepository, Mockito.times(1)).findSkillsOfferedToUser(userId);
+    }
+
+    @Test
+    public void testGetSkillByIdThrowsException() {
+        Optional<Skill> skill = Optional.empty();
+        Mockito.when(skillRepository.findById(1L)).thenReturn(skill);
+        Assert.assertThrows(IllegalArgumentException.class, ()->skillService.getSkillById(1L));
+    }
+
+    @Test
+    public void testGetSkillById() {
+        Skill skill = new Skill();
+        skill.setId(1L);
+        Optional<Skill> someSkill = Optional.of(skill);
+        Mockito.when(skillRepository.findById(1L)).thenReturn(someSkill);
+        Assert.assertEquals(skillMapper.toDto(skill), skillService.getSkillById(1L));
     }
 
     @Test

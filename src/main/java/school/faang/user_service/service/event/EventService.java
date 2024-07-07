@@ -31,4 +31,9 @@ public class EventService {
     private boolean hasRequiredSkills(User owner, Event event) {
         return owner.getSkills().containsAll(event.getRelatedSkills());
     }
+
+    public EventDto getEvent(long eventId) {
+        return eventMapper.toDto(eventRepository.findById(eventId)
+                .orElseThrow(() -> new DataValidationException("Event not found for ID: " + eventId)));
+    }
 }

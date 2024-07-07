@@ -1,5 +1,6 @@
 package school.faang.user_service.controller.event;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,7 +24,6 @@ public class EventControllerTest {
     private EventController eventController;
     @Mock
     private EventService eventService;
-
 
     @Test
     public void testCreateWithNullTitle() {
@@ -85,5 +85,14 @@ public class EventControllerTest {
         Mockito.verify(eventService, times(1)).create(eventDto);
     }
 
+    @Test
+    public void testGetEvent() {
+        long eventId = 1L;
+        when(eventService.getEvent(eventId)).thenReturn(new EventDto());
+
+        eventController.getEvent(eventId);
+
+        Mockito.verify(eventService, times(1)).getEvent(eventId);
+    }
 
 }

@@ -15,9 +15,12 @@ import school.faang.user_service.repository.event.EventRepository;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -29,9 +32,10 @@ public class EventServiceTest {
     @Mock
     private EventRepository eventRepository;
     @Mock
-    private EventMapper eventMapper;
-    @Mock
     private UserService userService;
+
+    @Mock
+    private EventMapper eventMapper;
 
     @Test
     public void testCreateWithoutUserSkills() {
@@ -69,6 +73,37 @@ public class EventServiceTest {
         eventService.create(eventDto);
 
         verify(eventRepository, times(1)).save(event);
+    }
+
+    @Test
+    public void getEventNotExisting() {
+        long eventId = 1L;
+        when(eventRepository.findById(eventId)).thenReturn(Optional.empty());
+
+        DataValidationException exception =
+                assertThrows(DataValidationException.class, () -> eventService.getEvent(eventId));
+        assertEquals("Event not found for ID: " + eventId, exception.getMessage());
+    }
+
+    @Test
+    public void getEventExisting() {
+        long eventId = 1L;
+        User owner = new User();
+        long ownerId = 2L;
+        owner.setId(ownerId);
+        Event event = new Event();
+        event.setId(eventId);
+        event.setOwner(owner);
+        EventDto eventDto = new EventDto();
+        eventDto.setId(eventId);
+        when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
+        when(eventMapper.toDto(any(Event.class))).thenReturn(eventDto);
+
+        EventDto result = eventService.getEvent(eventId);
+
+        assertNotNull(result);
+        assertEquals(eventId, result.getId());
+        verify(eventRepository, times(1)).findById(eventId);
     }
 
 }

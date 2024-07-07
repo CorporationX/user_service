@@ -18,7 +18,7 @@ public class EventService {
 
     public EventDto create(EventDto eventDto) {
         User owner = userService.findUserById(eventDto.getOwnerId());
-        Event event = eventMapper.toEntity(eventDto);
+        Event event = eventMapper.toEntity(eventDto, userService);
         event.setOwner(owner);
 
         if (!hasRequiredSkills(owner, event)) {

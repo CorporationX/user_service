@@ -1,8 +1,10 @@
 package school.faang.user_service.dto.event;
 
 import lombok.Data;
+import school.faang.user_service.dto.skill.SkillDto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class EventDto {
@@ -14,5 +16,5 @@ public class EventDto {
     private String location;
     private int maxAttendees;
     private long ownerId;
-    // private List<SkillDto> relatedSkills;
+    private List<SkillDto> relatedSkills;
 }

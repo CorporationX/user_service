@@ -16,11 +16,11 @@ public interface EventMapper {
     @Mapping(source = "owner.id", target = "ownerId")
     EventDto toDto(Event event);
 
-    @Mapping(source = "ownerId", target = "owner", qualifiedByName = "getUserFromId")
-    Event toEntity(EventDto eventDto);
+    @Mapping(source = "ownerId", target = "owner", qualifiedByName = "getUserById")
+    Event toEntity(EventDto eventDto, @Context UserService userService);
 
-    @Named("getUserFromId")
-    default User getUserFromId(Long id, @Context UserService userService) {
-        return (id != null) ? userService.findUserById(id) : null;
+    @Named("getUserById")
+    default User getUserById(Long id, @Context UserService userService) {
+        return userService.findUserById(id);
     }
 }

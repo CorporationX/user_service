@@ -26,7 +26,7 @@ public class EventController {
         } else if (eventDto.getStartDate() == null) {
             throw new DataValidationException("getStartDate can't be null");
         } else if (eventDto.getOwnerId() == 0) {
-            throw new DataValidationException("OwnerId can't be 0");
+            throw new DataValidationException("ownerId can't be 0");
         }
     }
 }

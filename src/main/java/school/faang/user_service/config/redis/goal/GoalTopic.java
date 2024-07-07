@@ -9,7 +9,7 @@ import org.springframework.data.redis.listener.ChannelTopic;
 public class GoalTopic {
 
     @Bean
-    ChannelTopic completedGoalTopic(@Value("${spring.data.redis.channels.goal_complete_channel.name}") String topicName) {
+    ChannelTopic completedGoalTopic(@Value("${spring.data.channel.goal_complete.name}") String topicName) {
         return new ChannelTopic(topicName);
     }
 }

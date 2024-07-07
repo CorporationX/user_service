@@ -2,26 +2,24 @@ package school.faang.user_service.service.user;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import school.faang.user_service.config.context.UserContext;
-import school.faang.user_service.dto.event.profile.ProfileViewEvent;
 import school.faang.user_service.dto.user.UserDto;
 import school.faang.user_service.dto.user.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.exception.NotFoundException;
 import school.faang.user_service.mapper.UserMapper;
-import school.faang.user_service.publisher.profile.ProfileViewEventPublisher;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.service.event.EventService;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.service.user.filter.UserFilterService;
 import school.faang.user_service.service.user.mentorship.MentorshipService;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -32,8 +30,6 @@ public class UserServiceImpl implements UserService {
     private final GoalService goalService;
     private final EventService eventService;
     private final MentorshipService mentorshipService;
-    private final UserContext userContext;
-    private final ProfileViewEventPublisher profileViewEventPublisher;
 
     @Override
     @Transactional
@@ -80,9 +76,6 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDto getUserById(long userId) {
         User user = findUserById(userId);
-        long viewerId = userContext.getUserId();
-        ProfileViewEvent event = new ProfileViewEvent(userId, viewerId, LocalDateTime.now());
-        profileViewEventPublisher.publish(event);
         return userMapper.toDto(user);
     }
 
@@ -92,6 +85,7 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.toEntity(userDto);
         user.setActive(true);
         User saved = userRepository.save(user);
+        log.info("Created new user {}", saved.getId());
         return userMapper.toDto(saved);
     }
 }

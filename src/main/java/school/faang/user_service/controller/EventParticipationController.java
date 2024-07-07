@@ -20,4 +20,8 @@ public class EventParticipationController {
     public void getParticipant(long eventId) {
         participationService.getParticipant(eventId);
     }
+
+    public void getParticipantsCount(long eventId) {
+        participationService.getParticipantCount(eventId);
+    }
 }

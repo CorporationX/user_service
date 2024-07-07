@@ -48,6 +48,9 @@ public class UserController {
         return userService.getUser(userId);
     }
 
+    @PostMapping ("/ids")
+    public List<UserDto> getUsersByIds(@RequestBody List<Long> ids) { return userService.getUsersByIds(ids); }
+
     @PostMapping("/{userId}/avatar")
     public UserDto uploadUserAvatar(@PathVariable Long userId, MultipartFile file) {
         if (file.getSize() > MAX_AVATAR_SIZE) {

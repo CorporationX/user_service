@@ -23,8 +23,6 @@ import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 
-import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -74,18 +72,14 @@ public class MentorshipRequestServiceTest {
     public void testRequestMentorship_UserNotFound() {
         when(userRepository.existsById(1L)).thenReturn(false);
 
-        assertThrows(Exception.class, () -> {
-            mentorshipRequestService.requestMentorship(requestDto);
-        });
+        assertThrows(Exception.class, () -> mentorshipRequestService.requestMentorship(requestDto));
 
         verify(mentorshipRequestRepository, never()).save(any(MentorshipRequest.class));
     }
 
     @Test
     public void testRequestMentorship_SelfRequest() {
-        assertThrows(Exception.class, () -> {
-            mentorshipRequestService.requestMentorship(requestDto);
-        });
+        assertThrows(Exception.class, () -> mentorshipRequestService.requestMentorship(requestDto));
 
         verify(mentorshipRequestRepository, never()).save(any(MentorshipRequest.class));
     }
@@ -93,9 +87,7 @@ public class MentorshipRequestServiceTest {
     @Test
     public void testRequestMentorship_ExistingRequest() {
         when(mentorshipRequestRepository.findLatestRequest(anyLong(), anyLong()));
-        assertThrows(Exception.class, () -> {
-            mentorshipRequestService.requestMentorship(requestDto);
-        });
+        assertThrows(Exception.class, () -> mentorshipRequestService.requestMentorship(requestDto));
 
         verify(mentorshipRequestRepository, never()).save(any(MentorshipRequest.class));
     }
@@ -167,19 +159,19 @@ public class MentorshipRequestServiceTest {
         when(mentorshipRequestRepository.findById(1L)).thenReturn(Optional.of(mentorshipRequest));
 
         assertThrows(RuntimeException.class,
-                ()->mentorshipRequestService.rejectRequest(1L,rejectionDto),"Запрос уже отклонен");
-        verify(mentorshipRequestRepository,times(0)).save(any());
+                () -> mentorshipRequestService.rejectRequest(1L, rejectionDto), "Запрос уже отклонен");
+        verify(mentorshipRequestRepository, times(0)).save(any());
     }
 
     @Test
-    public void testGetRequest_Success(){
+    public void testGetRequest_Success() {
         mentorshipRequest.setStatus(RequestStatus.PENDING);
         when(mentorshipRequestRepository.findAll()).thenReturn(Collections.singletonList(mentorshipRequest));
         when(mentorshipRequestMapper.toDto(mentorshipRequest)).thenReturn(requestDto);
 
         RequestFilterDto filterDto = new RequestFilterDto();
-        List<MentorshipRequestDto> result=mentorshipRequestService.getRequests(filterDto);
-        assertEquals(1,result.size());
-        assertEquals(requestDto,result.get(0));
+        List<MentorshipRequestDto> result = mentorshipRequestService.getRequests(filterDto);
+        assertEquals(1, result.size());
+        assertEquals(requestDto, result.get(0));
     }
 }

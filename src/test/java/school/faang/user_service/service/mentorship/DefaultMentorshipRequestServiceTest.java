@@ -24,8 +24,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -106,32 +104,27 @@ class DefaultMentorshipRequestServiceTest {
         User receiver = new User();
         receiver.setId(2L);
 
-        MentorshipRequestDto dto = new MentorshipRequestDto();
-        dto.setRequesterId(requester.getId());
-        dto.setReceiverId(receiver.getId());
-        dto.setDescription("Sample description");
+        MentorshipRequestDto incomingDto = new MentorshipRequestDto();
+        incomingDto.setRequesterId(requester.getId());
+        incomingDto.setReceiverId(receiver.getId());
+        incomingDto.setDescription("Sample description");
 
         MentorshipRequest request = new MentorshipRequest();
         request.setRequester(requester);
         request.setReceiver(receiver);
-        request.setDescription("Sample description");
-        request.setCreatedAt(LocalDateTime.now());
-        request.setUpdatedAt(LocalDateTime.now());
+        request.setStatus(RequestStatus.PENDING);
 
-        when(userRepository.existsById(dto.getReceiverId())).thenReturn(true);
-        when(userRepository.existsById(dto.getRequesterId())).thenReturn(true);
-        when(mentorshipRequestRepository.findLatestRequest(dto.getRequesterId(), dto.getReceiverId())).thenReturn(Optional.empty());
-        when(mapper.toEntity(dto)).thenReturn(request);
-        when(mentorshipRequestRepository.save(request)).thenReturn(request);
-        when(mapper.toDto(request)).thenReturn(dto);
+        when(userRepository.existsById(incomingDto.getReceiverId())).thenReturn(true);
+        when(userRepository.existsById(incomingDto.getRequesterId())).thenReturn(true);
+        when(mentorshipRequestRepository.findLatestRequest(incomingDto.getRequesterId(), incomingDto.getReceiverId())).thenReturn(Optional.empty());
+        when(mentorshipRequestRepository.create(requester.getId(), receiver.getId(), incomingDto.getDescription())).thenReturn(request);
+        when(mapper.toDto(request)).thenReturn(incomingDto);
 
-        var result = sut.requestMentorship(dto);
+        var resultingDto = sut.requestMentorship(incomingDto);
 
-        verify(mapper, times(1)).toEntity(dtoCaptor.capture());
-        assertNotNull(result);
-        assertEquals(RequestStatus.PENDING, dtoCaptor.getValue().getRequestStatus());
-        assertEquals(RequestStatus.PENDING, result.getRequestStatus());
-        assertEquals(dto.getRequesterId(), result.getRequesterId());
-        assertEquals(dto.getReceiverId(), result.getReceiverId());
+        assertNotNull(resultingDto);
+        assertEquals(incomingDto.getReceiverId(), resultingDto.getReceiverId());
+        assertEquals(incomingDto.getRequesterId(), resultingDto.getRequesterId());
+        assertEquals(incomingDto.getDescription(), resultingDto.getDescription());
     }
 }

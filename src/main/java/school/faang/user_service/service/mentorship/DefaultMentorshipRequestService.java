@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
-import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.exception.ExceptionMessages;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
@@ -28,8 +27,7 @@ public class DefaultMentorshipRequestService implements MentorshipRequestService
         validateSelfMentorship(receiverId, requesterId);
         validateUsersExistence(receiverId, requesterId);
         validateEligibilityForMentorship(requesterId, receiverId);
-        mentorshipRequestDto.setRequestStatus(RequestStatus.PENDING);
-        return mapper.toDto(mentorshipRequestRepository.save(mapper.toEntity(mentorshipRequestDto)));
+        return mapper.toDto(mentorshipRequestRepository.create(requesterId, receiverId, mentorshipRequestDto.getDescription()));
     }
 
     private void validateSelfMentorship(Long receiverId, Long requesterId) {

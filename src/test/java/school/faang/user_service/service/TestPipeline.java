@@ -8,6 +8,6 @@ public class TestPipeline {
     @Test
     public void test() {
         String expected = "expected";
-        Assertions.assertEquals(expected, "expected");
+        Assertions.assertEquals(expected, "failString");
     }
 }

@@ -1,6 +1,7 @@
 package school.faang.user_service.filter.mentorship;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
@@ -22,19 +23,22 @@ class MentorshipRequestStatusFilterTest {
     }
 
     @Test
-    public void testIsApplicableWithNullDescription() {
+    @DisplayName("testing isApplicable with null status filter")
+    public void testIsApplicableWithNullStatusFilter() {
         MentorshipRequestFilterDto mentorshipRequestFilterDto = new MentorshipRequestFilterDto();
         assertFalse(mentorshipRequestStatusFilter.isApplicable(mentorshipRequestFilterDto));
     }
 
     @Test
-    public void testIsApplicableWithNonNullDescription() {
+    @DisplayName("testing isApplicable with non-null status filter")
+    public void testIsApplicableWithNonNullStatusFilter() {
         MentorshipRequestFilterDto mentorshipRequestFilterDto = MentorshipRequestFilterDto.builder()
                 .status(RequestStatus.PENDING).build();
         assertTrue(mentorshipRequestStatusFilter.isApplicable(mentorshipRequestFilterDto));
     }
 
     @Test
+    @DisplayName("testing filter with appropriate status filter")
     public void testFilterWithAppropriateValue() {
         MentorshipRequestFilterDto mentorshipRequestFilterDto = MentorshipRequestFilterDto.builder()
                 .status(RequestStatus.PENDING).build();
@@ -48,6 +52,7 @@ class MentorshipRequestStatusFilterTest {
     }
 
     @Test
+    @DisplayName("testing filter with non-appropriate status filter")
     public void testFilterWithNonAppropriateValue() {
         MentorshipRequestFilterDto mentorshipRequestFilterDto = MentorshipRequestFilterDto.builder()
                 .status(RequestStatus.ACCEPTED).build();

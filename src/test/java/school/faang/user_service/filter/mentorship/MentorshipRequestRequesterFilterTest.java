@@ -1,9 +1,8 @@
 package school.faang.user_service.filter.mentorship;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.User;
@@ -15,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith(MockitoExtension.class)
 class MentorshipRequestRequesterFilterTest {
     private MentorshipRequestRequesterFilter mentorshipRequestRequesterFilter;
 
@@ -25,19 +23,22 @@ class MentorshipRequestRequesterFilterTest {
     }
 
     @Test
-    public void testIsApplicableWithNullDescription() {
+    @DisplayName("testing isApplicable with null requester filter")
+    public void testIsApplicableWithNullRequesterFilter() {
         MentorshipRequestFilterDto mentorshipRequestFilterDto = new MentorshipRequestFilterDto();
         assertFalse(mentorshipRequestRequesterFilter.isApplicable(mentorshipRequestFilterDto));
     }
 
     @Test
-    public void testIsApplicableWithNonNullDescription() {
+    @DisplayName("testing isApplicable with non-null requester filter")
+    public void testIsApplicableWithNonNullRequesterFilter() {
         MentorshipRequestFilterDto mentorshipRequestFilterDto = new MentorshipRequestFilterDto();
         mentorshipRequestFilterDto.setRequesterId(1L);
         assertTrue(mentorshipRequestRequesterFilter.isApplicable(mentorshipRequestFilterDto));
     }
 
     @Test
+    @DisplayName("testing filter with appropriate requester value")
     public void testFilterWithAppropriateValue() {
         MentorshipRequestFilterDto mentorshipRequestFilterDto = MentorshipRequestFilterDto.builder()
                 .requesterId(1L).build();
@@ -52,6 +53,7 @@ class MentorshipRequestRequesterFilterTest {
     }
 
     @Test
+    @DisplayName("testing filter with non-appropriate requester value")
     public void testFilterWithNonAppropriateValue() {
         MentorshipRequestFilterDto mentorshipRequestFilterDto = MentorshipRequestFilterDto.builder()
                 .requesterId(1L).build();

@@ -1,6 +1,7 @@
 package school.faang.user_service.service.mentorship;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -25,6 +26,7 @@ import school.faang.user_service.repository.mentorship.MentorshipRequestReposito
 import school.faang.user_service.validator.MentorshipRequestValidator;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -61,6 +63,7 @@ class MentorshipRequestServiceTest {
     }
 
     @Test
+    @DisplayName("testing requestMentorship validator validateParticipantsAndRequestFrequency() method execution")
     public void testRequestMentorshipValidatorExecution() {
         MentorshipRequestDto mentorshipRequestDto = MentorshipRequestDto.builder()
                 .requesterId(1L)
@@ -77,6 +80,7 @@ class MentorshipRequestServiceTest {
     }
 
     @Test
+    @DisplayName("testing requestMentorship repository create() method execution")
     public void testRequestMentorshipRepositoryCreateExecution() {
         MentorshipRequestDto mentorshipRequestDto = MentorshipRequestDto.builder()
                 .requesterId(1L)
@@ -92,25 +96,7 @@ class MentorshipRequestServiceTest {
     }
 
     @Test
-    public void testRequestMentorshipMapperToDtoExecution() {
-        MentorshipRequestDto mentorshipRequestDto = MentorshipRequestDto.builder()
-                .requesterId(1L)
-                .receiverId(2L)
-                .description("description").build();
-
-        MentorshipRequest mentorshipRequestAfterCreation = mentorshipRequestMapper.toEntity(mentorshipRequestDto);
-        when(mentorshipRequestRepository.create(
-                mentorshipRequestDto.getRequesterId(),
-                mentorshipRequestDto.getReceiverId(),
-                mentorshipRequestDto.getDescription()))
-                .thenReturn(mentorshipRequestAfterCreation);
-
-        mentorshipRequestService.requestMentorship(mentorshipRequestDto);
-        verify(mentorshipRequestMapper, times(1))
-                .toDto(mentorshipRequestCaptor.capture());
-    }
-
-    @Test
+    @DisplayName("testing getRequests repository findAll() method execution")
     public void testGetRequestsRepositorySelectionExecution() {
         MentorshipRequestFilterDto mentorshipRequestFilterDto = new MentorshipRequestFilterDto();
 
@@ -120,6 +106,7 @@ class MentorshipRequestServiceTest {
     }
 
     @Test
+    @DisplayName("testing getRequests with appropriate request selection")
     public void testGetRequestsWithAppropriateRequestSelection() {
         MentorshipRequestFilterDto mentorshipRequestFilterDto = MentorshipRequestFilterDto.builder()
                 .requesterId(1L)
@@ -138,6 +125,121 @@ class MentorshipRequestServiceTest {
 
         assertEquals(1, resultRequests.size());
         assertEquals(mentorshipRequestMapperImpl.toDto(mentorshipRequestList.get(0)), resultRequests.get(0));
+    }
+
+    @Test
+    @DisplayName("testing acceptRequest with non existing mentorship request")
+    public void testAcceptRequestWithNonExistingMentorshipRequest() {
+        long requestId = 1L;
+
+        when(mentorshipRequestRepository.findById(requestId)).thenReturn(Optional.empty());
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> mentorshipRequestService.acceptRequest(requestId));
+        assertEquals("Could not find Mentorship Request in database by id: " + requestId,
+                exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("test acceptRequest validator validateRequestStatusIsPending() method execution")
+    public void testAcceptRequestValidatorExecution() {
+        long requestId = 1L;
+        User requester = User.builder().mentors(new ArrayList<>()).build();
+        User receiver = User.builder().mentees(new ArrayList<>()).build();
+        MentorshipRequest mentorshipRequest = MentorshipRequest.builder()
+                .id(requestId)
+                .requester(requester)
+                .receiver(receiver)
+                .status(RequestStatus.PENDING).build();
+
+        when(mentorshipRequestRepository.findById(mentorshipRequest.getId()))
+                .thenReturn(Optional.of(mentorshipRequest));
+
+        mentorshipRequestService.acceptRequest(mentorshipRequest.getId());
+        verify(mentorshipRequestValidator, times(1))
+                .validateRequestStatusIsPending(requestStatusCaptor.capture());
+    }
+
+    @Test
+    @DisplayName("test acceptRequest validator validateReceiverIsNotMentorOfRequester() method execution")
+    public void testAcceptRequestValidatorReceiverIsNotMentorExecution() {
+        long requestId = 1L;
+        User requester = User.builder().mentors(new ArrayList<>()).build();
+        User receiver = User.builder().mentees(new ArrayList<>()).build();
+        MentorshipRequest mentorshipRequest = MentorshipRequest.builder()
+                .id(requestId)
+                .requester(requester)
+                .receiver(receiver)
+                .status(RequestStatus.PENDING).build();
+
+        when(mentorshipRequestRepository.findById(requestId)).thenReturn(Optional.of(mentorshipRequest));
+        mentorshipRequestService.acceptRequest(requestId);
+        verify(mentorshipRequestValidator, times(1))
+                .validateReceiverIsNotMentorOfRequester(requester, receiver);
+    }
+
+    @Test
+    @DisplayName("testing acceptRequest repository save() method execution")
+    public void testAcceptRequestRepositorySaveExecution() {
+        long requestId = 1L;
+        User requester = User.builder().mentors(new ArrayList<>()).build();
+        User receiver = User.builder().mentees(new ArrayList<>()).build();
+        MentorshipRequest mentorshipRequest = MentorshipRequest.builder()
+                .id(requestId)
+                .requester(requester)
+                .receiver(receiver)
+                .status(RequestStatus.PENDING).build();
+
+        when(mentorshipRequestRepository.findById(mentorshipRequest.getId()))
+                .thenReturn(Optional.of(mentorshipRequest));
+
+        mentorshipRequestService.acceptRequest(mentorshipRequest.getId());
+        verify(mentorshipRequestRepository, times(1)).save(mentorshipRequest);
+    }
+
+    @Test
+    @DisplayName("test rejectRequest with non existing mentorship request")
+    public void testRejectRequestWithNonExistingMentorshipRequest() {
+        long requestId = 1L;
+        RejectionDto rejectionDto = RejectionDto.builder()
+                .rejectionReason("rejection reason").build();
+
+        when(mentorshipRequestRepository.findById(requestId)).thenReturn(Optional.empty());
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> mentorshipRequestService.rejectRequest(requestId, rejectionDto));
+        assertEquals("Could not find Mentorship Request in database by id: " + requestId,
+                exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("testing rejectionRequest validator validateRequestStatusIsPending() method execution")
+    public void testRejectionRequestValidatorExecution() {
+        MentorshipRequest mentorshipRequest = MentorshipRequest.builder()
+                .id(1L)
+                .status(RequestStatus.PENDING).build();
+        RejectionDto rejectionDto = RejectionDto.builder()
+                .rejectionReason("rejection reason").build();
+
+        when(mentorshipRequestRepository.findById(mentorshipRequest.getId()))
+                .thenReturn(Optional.of(mentorshipRequest));
+        mentorshipRequestService.rejectRequest(mentorshipRequest.getId(), rejectionDto);
+        verify(mentorshipRequestValidator, times(1))
+                .validateRequestStatusIsPending(requestStatusCaptor.capture());
+    }
+
+    @Test
+    @DisplayName("testing rejectionRequest repository save() method execution")
+    public void testRejectionRequestRepositorySaveExecution() {
+        MentorshipRequest mentorshipRequest = MentorshipRequest.builder()
+                .id(1L)
+                .status(RequestStatus.PENDING).build();
+        RejectionDto rejectionDto = RejectionDto.builder()
+                .rejectionReason("rejection reason").build();
+
+        when(mentorshipRequestRepository.findById(mentorshipRequest.getId()))
+                .thenReturn(Optional.of(mentorshipRequest));
+        mentorshipRequestService.rejectRequest(mentorshipRequest.getId(), rejectionDto);
+        verify(mentorshipRequestRepository, times(1))
+                .save(mentorshipRequestCaptor.capture());
     }
 
     private Stream<MentorshipRequestFilter> getAllFilters() {
@@ -166,114 +268,5 @@ class MentorshipRequestServiceTest {
                 .description(description)
                 .status(requestStatus)
                 .build();
-    }
-
-    @Test
-    public void testAcceptRequestWithNonExistingMentorshipRequest() {
-        long requestId = 1L;
-
-        when(mentorshipRequestRepository.findById(requestId)).thenReturn(Optional.empty());
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> mentorshipRequestService.acceptRequest(requestId));
-        assertEquals("Could not find Mentorship Request in database by id: " + requestId,
-                exception.getMessage());
-    }
-
-    @Test
-    public void testAcceptRequestWithValidatorExecutionVerification() {
-        MentorshipRequest mentorshipRequest = MentorshipRequest.builder()
-                .id(1L)
-                .status(RequestStatus.PENDING).build();
-
-        when(mentorshipRequestRepository.findById(mentorshipRequest.getId()))
-                .thenReturn(Optional.of(mentorshipRequest));
-
-        mentorshipRequestService.acceptRequest(mentorshipRequest.getId());
-        verify(mentorshipRequestValidator, times(1))
-                .validateRequestStatusIsPending(requestStatusCaptor.capture());
-    }
-
-    @Test
-    public void testAcceptRequestWithRepositorySaveExecutionVerification() {
-        MentorshipRequest mentorshipRequest = MentorshipRequest.builder()
-                .id(1L)
-                .status(RequestStatus.PENDING).build();
-
-        when(mentorshipRequestRepository.findById(mentorshipRequest.getId()))
-                .thenReturn(Optional.of(mentorshipRequest));
-
-        mentorshipRequestService.acceptRequest(mentorshipRequest.getId());
-        verify(mentorshipRequestRepository, times(1)).save(mentorshipRequest);
-    }
-
-    @Test
-    public void testAcceptRequestWithToDtoExecutionVerification() {
-        MentorshipRequest mentorshipRequest = MentorshipRequest.builder()
-                .id(1L)
-                .status(RequestStatus.PENDING).build();
-
-        when(mentorshipRequestRepository.findById(mentorshipRequest.getId()))
-                .thenReturn(Optional.of(mentorshipRequest));
-
-        mentorshipRequestService.acceptRequest(mentorshipRequest.getId());
-        verify(mentorshipRequestMapper, times(1)).toDto(mentorshipRequestCaptor.capture());
-    }
-
-    @Test
-    public void testRejectRequestWithNonExistingMentorshipRequest() {
-        long requestId = 1L;
-        RejectionDto rejectionDto = RejectionDto.builder()
-                .rejectionReason("rejection reason").build();
-
-        when(mentorshipRequestRepository.findById(requestId)).thenReturn(Optional.empty());
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> mentorshipRequestService.rejectRequest(requestId, rejectionDto));
-        assertEquals("Could not find Mentorship Request in database by id: " + requestId,
-                exception.getMessage());
-    }
-
-    @Test
-    public void testRejectionRequestWithValidationRequestExecutionVerification() {
-        MentorshipRequest mentorshipRequest = MentorshipRequest.builder()
-                .id(1L)
-                .status(RequestStatus.PENDING).build();
-        RejectionDto rejectionDto = RejectionDto.builder()
-                .rejectionReason("rejection reason").build();
-
-        when(mentorshipRequestRepository.findById(mentorshipRequest.getId()))
-                .thenReturn(Optional.of(mentorshipRequest));
-        mentorshipRequestService.rejectRequest(mentorshipRequest.getId(), rejectionDto);
-        verify(mentorshipRequestValidator, times(1))
-                .validateRequestStatusIsPending(requestStatusCaptor.capture());
-    }
-
-    @Test
-    public void testRejectionRequestWithRepositorySaveExecutionVerification() {
-        MentorshipRequest mentorshipRequest = MentorshipRequest.builder()
-                .id(1L)
-                .status(RequestStatus.PENDING).build();
-        RejectionDto rejectionDto = RejectionDto.builder()
-                .rejectionReason("rejection reason").build();
-
-        when(mentorshipRequestRepository.findById(mentorshipRequest.getId()))
-                .thenReturn(Optional.of(mentorshipRequest));
-        mentorshipRequestService.rejectRequest(mentorshipRequest.getId(), rejectionDto);
-        verify(mentorshipRequestRepository, times(1))
-                .save(mentorshipRequestCaptor.capture());
-    }
-
-    @Test
-    public void testRejectionRequestWithToDtoExecutionVerification() {
-        MentorshipRequest mentorshipRequest = MentorshipRequest.builder()
-                .id(1L)
-                .status(RequestStatus.PENDING).build();
-        RejectionDto rejectionDto = RejectionDto.builder()
-                .rejectionReason("rejection reason").build();
-
-        when(mentorshipRequestRepository.findById(mentorshipRequest.getId()))
-                .thenReturn(Optional.of(mentorshipRequest));
-        mentorshipRequestService.rejectRequest(mentorshipRequest.getId(), rejectionDto);
-        verify(mentorshipRequestMapper, times(1))
-                .toDto(mentorshipRequestCaptor.capture());
     }
 }

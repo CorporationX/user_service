@@ -1,6 +1,7 @@
 package school.faang.user_service.filter.mentorship;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.mentorship.MentorshipRequestFilterDto;
 import school.faang.user_service.entity.MentorshipRequest;
@@ -21,12 +22,14 @@ class MentorshipRequestDescriptionFilterTest {
     }
 
     @Test
+    @DisplayName("testing isApplicable with null description")
     public void testIsApplicableWithNullDescription() {
         MentorshipRequestFilterDto mentorshipRequestFilterDto = new MentorshipRequestFilterDto();
         assertFalse(mentorshipRequestDescriptionFilter.isApplicable(mentorshipRequestFilterDto));
     }
 
     @Test
+    @DisplayName("testing isApplicable with non-null description")
     public void testIsApplicableWithNonNullDescription() {
         MentorshipRequestFilterDto mentorshipRequestFilterDto = new MentorshipRequestFilterDto();
         mentorshipRequestFilterDto.setDescription("description");
@@ -34,6 +37,7 @@ class MentorshipRequestDescriptionFilterTest {
     }
 
     @Test
+    @DisplayName("testing filter with appropriate testing value")
     public void testFilterWithAppropriateValue() {
         MentorshipRequestFilterDto mentorshipRequestFilterDto = MentorshipRequestFilterDto.builder()
                 .description("take").build();
@@ -46,6 +50,7 @@ class MentorshipRequestDescriptionFilterTest {
     }
 
     @Test
+    @DisplayName("testing filter with non-appropriate testing value")
     public void testFilterWithNonAppropriateValue() {
         MentorshipRequestFilterDto mentorshipRequestFilterDto = MentorshipRequestFilterDto.builder()
                 .description("got").build();

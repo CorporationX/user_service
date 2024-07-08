@@ -6,6 +6,8 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.SkillService;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class SkillController {
@@ -20,5 +22,9 @@ public class SkillController {
         if (skillDto.getTitle() == null || skillDto.getTitle().trim().isEmpty()) {
             throw new DataValidationException("Skill title cant be empty or null");
         }
+    }
+
+    public List<SkillDto> getUserSkills(long userId) {
+        return skillService.getUserSkills(userId);
     }
 }

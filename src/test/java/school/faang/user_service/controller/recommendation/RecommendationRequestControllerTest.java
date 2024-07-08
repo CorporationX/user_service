@@ -40,7 +40,7 @@ class RecommendationRequestControllerTest {
         RecommendationRequestDto result = recommendationRequestController.requestRecommendation(requestDto);
 
         assertEquals(responseDto, result);
-        verify(recommendationRequestService, times(1)).create(requestDto);
+        verify(recommendationRequestService).create(requestDto);
     }
 
     @Test
@@ -52,7 +52,7 @@ class RecommendationRequestControllerTest {
         List<RecommendationRequestDto> result = recommendationRequestController.getRecommendationRequests(filter);
 
         assertEquals(requests, result);
-        verify(recommendationRequestService, times(1)).getRequests(filter);
+        verify(recommendationRequestService).getRequests(filter);
     }
 
     @Test
@@ -64,7 +64,7 @@ class RecommendationRequestControllerTest {
         RecommendationRequestDto result = recommendationRequestController.getRecommendationRequest(id);
 
         assertEquals(requestDto, result);
-        verify(recommendationRequestService, times(1)).getRequest(id);
+        verify(recommendationRequestService).getRequest(id);
     }
 
     @Test
@@ -77,6 +77,6 @@ class RecommendationRequestControllerTest {
         RecommendationRequestDto result = recommendationRequestController.rejectRequest(id, rejection);
 
         assertEquals(responseDto, result);
-        verify(recommendationRequestService, times(1)).rejectRequest(id, rejection);
+        verify(recommendationRequestService).rejectRequest(id, rejection);
     }
 }

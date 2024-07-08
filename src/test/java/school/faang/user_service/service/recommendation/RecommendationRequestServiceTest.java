@@ -1,6 +1,5 @@
 package school.faang.user_service.service.recommendation;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -9,27 +8,24 @@ import org.mockito.MockitoAnnotations;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.dto.recommendation.RequestFilterDto;
-import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
-import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static school.faang.user_service.entity.RequestStatus.ACCEPTED;
 
@@ -38,22 +34,16 @@ class RecommendationRequestServiceTest {
     private RecommendationRequestRepository recommendationRequestRepository;
 
     @Mock
-    private RecommendationRepository recommendationRepository;
-
-    @Mock
     private SkillRequestRepository skillRequestRepository;
-
-    @Mock
-    private SkillRepository skillRepository;
 
     @Mock
     private RecommendationRequestMapper recommendationRequestMapper;
 
     @Mock
-    private UserRepository userRepository;
+    private RecommendationRequestDtoValidator recommendationRequestDtoValidator;
 
     @Mock
-    private List<RequestFilter> requestFilters;
+    public List<RequestFilter> requestFilters;
 
     @InjectMocks
     private RecommendationRequestService recommendationRequestService;
@@ -64,85 +54,36 @@ class RecommendationRequestServiceTest {
     }
 
     @Test
-    public void testCreateEmplyMessage() {
+    public void testCreateValidationTrue() {
+        Long id = 1L;
         RecommendationRequestDto recommendationRequestDto = new RecommendationRequestDto();
-        recommendationRequestDto.setMessage("");
+        SkillRequest skillRequest = new SkillRequest();
+        skillRequest.setId(id);
+        recommendationRequestDto.setSkills(List.of(skillRequest));
 
-        assertThrows(IllegalArgumentException.class, () -> recommendationRequestService.create(recommendationRequestDto));
-    }
+        doNothing().when(recommendationRequestDtoValidator).validateRecommendationRequestDto(any());
 
-    @Test
-    public void testCreateNotExistIds() {
-        RecommendationRequestDto recommendationRequestDto = new RecommendationRequestDto();
-        recommendationRequestDto.setMessage("Test message");
-        recommendationRequestDto.setReceiverId(1L);
-        recommendationRequestDto.setRequesterId(1L);
+        when(recommendationRequestMapper.toEntity(any(), any())).thenReturn(new RecommendationRequest());
+        when(recommendationRequestRepository.create(any(), any(), any())).thenReturn(id);
+        when(skillRequestRepository.create(id, id)).thenReturn(new SkillRequest());
+        when(recommendationRequestMapper.toDto(any(), any())).thenReturn(recommendationRequestDto);
 
-        when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(recommendationRequestDto.getRequesterId(),
-                recommendationRequestDto.getReceiverId())).thenReturn(Optional.empty());
+        recommendationRequestService.create(recommendationRequestDto);
 
-        assertThrows(EntityNotFoundException.class, () -> recommendationRequestService.create(recommendationRequestDto));
-    }
-
-    @Test
-    public void testTimeRequestDiference() {
-        RecommendationRequestDto recommendationRequestDto = new RecommendationRequestDto();
-        recommendationRequestDto.setMessage("Test message");
-        recommendationRequestDto.setReceiverId(1L);
-        recommendationRequestDto.setRequesterId(1L);
-
-        Recommendation recommendation = new Recommendation();
-        recommendation.setId(1L);
-
-        LocalDateTime currentRequestTime = LocalDateTime.now();
-        LocalDateTime latestRequestTime = currentRequestTime.plusMonths(5);
-        RecommendationRequest recommendationRequest = new RecommendationRequest();
-        recommendationRequestDto.setCreatedAt(currentRequestTime);
-        recommendationRequest.setCreatedAt(latestRequestTime);
-
-        when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(anyLong(), anyLong()))
-                .thenReturn(Optional.of(recommendation));
-
-        when(recommendationRequestRepository.findLatestPendingRequest(anyLong(), anyLong()))
-                .thenReturn(Optional.of(recommendationRequest));
-
-        assertThrows(IllegalArgumentException.class, () -> recommendationRequestService.create(recommendationRequestDto));
-    }
-
-    @Test
-    public void testAllSkillExists() {
-        RecommendationRequestDto recommendationRequestDto = new RecommendationRequestDto();
-        recommendationRequestDto.setMessage("Test message");
-        recommendationRequestDto.setReceiverId(1L);
-        recommendationRequestDto.setRequesterId(1L);
-        Skill skill = new Skill();
-        skill.setTitle("Test title");
-        recommendationRequestDto.setSkills(List.of(new SkillRequest(1L, new RecommendationRequest(), skill)));
-
-        Recommendation recommendation = new Recommendation();
-        recommendation.setId(1L);
-
-        LocalDateTime currentRequestTime = LocalDateTime.now();
-        LocalDateTime latestRequestTime = currentRequestTime.plusMonths(7);
-        RecommendationRequest recommendationRequest = new RecommendationRequest();
-        recommendationRequestDto.setCreatedAt(currentRequestTime);
-        recommendationRequest.setCreatedAt(latestRequestTime);
-
-        when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(anyLong(), anyLong()))
-                .thenReturn(Optional.of(recommendation));
-
-        when(recommendationRequestRepository.findLatestPendingRequest(anyLong(), anyLong()))
-                .thenReturn(Optional.of(recommendationRequest));
-
-        when(skillRepository.existsByTitle(anyString())).thenReturn(false);
-
-        assertThrows(IllegalArgumentException.class, () -> recommendationRequestService.create(recommendationRequestDto));
+        verify(recommendationRequestMapper).toEntity(any(), any());
+        verify(recommendationRequestRepository).create(any(), any(), any());
+        verify(skillRequestRepository).create(id, id);
+        verify(recommendationRequestMapper).toDto(any(), any());
     }
 
     @Test
     public void testGetZeroRequests() {
         RequestFilterDto requestFilterDto = new RequestFilterDto();
+        List<RequestFilter> requestFilterList = new ArrayList<>();
+        Stream<RequestFilter> requestFilterStream = StreamSupport.stream(requestFilterList.spliterator(), false);
         List<RecommendationRequestDto> emptyList = new ArrayList<>();
+
+        when(requestFilters.stream()).thenReturn(requestFilterStream);
 
         assertEquals(emptyList, recommendationRequestService.getRequests(requestFilterDto));
     }

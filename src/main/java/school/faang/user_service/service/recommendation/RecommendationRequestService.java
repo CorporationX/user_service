@@ -34,9 +34,10 @@ public class RecommendationRequestService {
     public final RecommendationRequestMapper recommendationRequestMapper;
     public final UserRepository userRepository;
     public final List<RequestFilter> requestFilters;
+    public final RecommendationRequestDtoValidator recommendationRequestDtoValidator;
 
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
-        validateRecommendationRequestDto(recommendationRequestDto);
+        recommendationRequestDtoValidator.validateRecommendationRequestDto(recommendationRequestDto);
 
         RecommendationRequest recommendationRequest = recommendationRequestMapper.toEntity(recommendationRequestDto, userRepository);
 
@@ -47,31 +48,6 @@ public class RecommendationRequestService {
         recommendationRequestDto.getSkills().forEach(skill -> skillRequestRepository.create(Id, skill.getId()));
 
         return recommendationRequestMapper.toDto(recommendationRequest, userRepository);
-    }
-
-    private void validateRecommendationRequestDto(RecommendationRequestDto recommendationRequestDto) {
-        if (recommendationRequestDto.getMessage().isEmpty()) {
-            throw new IllegalArgumentException("recommendation message can't be empty");
-        }
-
-        if (recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(recommendationRequestDto.getRequesterId(),
-                recommendationRequestDto.getReceiverId()).isEmpty()) {
-            throw new EntityNotFoundException("requesterId and recieverId must be in the database");
-        }
-
-        LocalDateTime currentRequestTime = recommendationRequestDto.getCreatedAt();
-        LocalDateTime latestRequestTime = recommendationRequestRepository.findLatestPendingRequest(recommendationRequestDto.getRequesterId(),
-                recommendationRequestDto.getReceiverId()).get().getCreatedAt();
-
-        if (ChronoUnit.MONTHS.between(currentRequestTime, latestRequestTime) < 6) {
-            throw new IllegalArgumentException("Sorry, but you can create recommendation request only once every 6 months.\n" +
-                    "Your latest recommendation request create time: " + latestRequestTime);
-        }
-
-        if (!recommendationRequestDto.getSkills().stream()
-                .map(requestSkill -> requestSkill.getSkill().getTitle()).allMatch(skillRepository::existsByTitle)) {
-            throw new IllegalArgumentException("Not all requested skill exists");
-        }
     }
 
     public List<RecommendationRequestDto> getRequests(RequestFilterDto filter) {

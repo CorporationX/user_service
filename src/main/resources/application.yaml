@@ -41,6 +41,9 @@ project-service:
 payment-service:
   host: localhost
   port: 9080
+  currency: USD
+  api: /api
+  sendPayment: /payment
 
 aws:
   accessKey: access_key

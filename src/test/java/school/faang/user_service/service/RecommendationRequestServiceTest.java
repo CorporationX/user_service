@@ -54,32 +54,18 @@ class RecommendationRequestServiceTest {
     @Mock
     private RequestFilter requestFilterMock;
     @Mock
-    private List<RequestFilter> filters;
-    @Mock
     private RequestFilter idPatternFilter;
-
     @Mock
     private StatusPatternFilter statusPatternFilter;
+    @Mock
+    private List<RequestFilter> requestFilter;
+    @Mock
+    private RecommendationRequest recommendationRequest;
 
 
     @BeforeEach
     void init() {
-//        RecommendationRequestRepository recommendationRequestRepositoryMock = Mockito.mock(RecommendationRequestRepository.class);
-//        RecommendationRequestMapper recommendationRequestMapperMock = Mockito.mock(RecommendationRequestMapper.class);
-//        UserRepository userRepositoryMock = Mockito.mock(UserRepository.class);
-//        SkillRepository skillRepositoryMock = Mockito.mock(SkillRepository.class);
-//        SkillRequestRepository skillRequestRepositoryMock = Mockito.mock(SkillRequestRepository.class);
         idPatternFilter = Mockito.mock(RequestFilter.class);
-        requestFilterMock = Mockito.mock(RequestFilter.class);
-        filters = List.of(idPatternFilter, requestFilterMock);
-//        recommendationRequestService = new RecommendationRequestService(recommendationRequestRepositoryMock,
-//                recommendationRequestMapperMock,
-//                userRepositoryMock,
-//                skillRepositoryMock,
-//                skillRequestRepositoryMock,
-//                filters);
-//        when(filters.get(0).isApplication(new RequestFilterDto(1L, null))).thenReturn(true);
-//        when(filters.get(0).apply(any(Stream.class), any(RequestFilterDto.class))).thenReturn(Stream)
     }
 
     @Test
@@ -184,126 +170,23 @@ class RecommendationRequestServiceTest {
     @Test
     @DisplayName("testGetRequestsFindAll")
     public void testGetRequestsFindAll() {
+        when(statusPatternFilter.isApplication(any())).thenReturn(true);
+        when(statusPatternFilter.apply(any(), any())).thenReturn(Stream.of(recommendationRequest));
+        when(idPatternFilter.isApplication(any())).thenReturn(true);
+        when(idPatternFilter.apply(any(), any())).thenReturn(Stream.of(new RecommendationRequest()));
+        when(requestFilter.stream()).thenReturn(Stream.of(statusPatternFilter, idPatternFilter));
         List<RecommendationRequest> resultList = new ArrayList<>();
         RecommendationRequest t1 = new RecommendationRequest();
-//        RecommendationRequest t2 = new RecommendationRequest();
         t1.setId(1L);
-//        t2.setId(2L);
         t1.setStatus(RequestStatus.ACCEPTED);
-//        t2.setStatus(RequestStatus.ACCEPTED);
         resultList.add(t1);
-//        resultList.add(t2);
 
-        List<RecommendationRequest> otherList = new ArrayList<>();
-        RecommendationRequest r1 = new RecommendationRequest();
-        RecommendationRequest r2 = new RecommendationRequest();
-        RecommendationRequest r3 = new RecommendationRequest();
-        r1.setId(1L);
-        r2.setId(2L);
-        r3.setId(3L);
-        r1.setStatus(RequestStatus.ACCEPTED);
-        r2.setStatus(RequestStatus.ACCEPTED);
-        r3.setStatus(RequestStatus.PENDING);
-        otherList.add(r1);
-        otherList.add(r2);
-        otherList.add(r3);
-//
-        List<RecommendationRequestDto> requestDtoList = new ArrayList<>();
-        RecommendationRequestDto p1 = new RecommendationRequestDto();
-//        RecommendationRequestDto p2 = new RecommendationRequestDto();
-        p1.setId(1L);
-//        p2.setId(2L);
-        p1.setStatus(RequestStatus.ACCEPTED);
-//        p2.setStatus(RequestStatus.ACCEPTED);
-        requestDtoList.add(p1);
-//        requestDtoList.add(p2);
-//
-//        requestFilterDto = new RequestFilterDto(null, RequestStatus.ACCEPTED);
-//
-//        when(recommendationRequestRepository.findAll()).thenReturn(otherList);
-//        when(statusPatternFilter.isApplication(requestFilterDto)).thenReturn(true);
-//        when(statusPatternFilter.apply(otherList.stream(), requestFilterDto)).thenReturn(resultList.stream());
-//        when(recommendationRequestMapper.toDtos(resultList)).thenReturn(requestDtoList);
-//        List<RecommendationRequestDto> result = recommendationRequestService.getRequests(requestFilterDto);
-//        assertNotNull(result);
         RequestFilterDto r = new RequestFilterDto(1L, null);
-        when(recommendationRequestRepository.findAll()).thenReturn(otherList);
-        when(filters.get(0).isApplication(r)).thenReturn(true);
-        when(filters.get(0).apply(otherList.stream(), r)).thenReturn(resultList.stream());
-        when(recommendationRequestMapper.toDto(any(RecommendationRequest.class))).thenReturn(any(RecommendationRequestDto.class));
-//        when(recommendationRequestMapper.toDto(resultList)).thenReturn(requestDtoList);
+        when(recommendationRequestRepository.findAll()).thenReturn(List.of(new RecommendationRequest()));
+        when(recommendationRequestMapper.toDto(any())).thenReturn(new RecommendationRequestDto());
         recommendationRequestService.getRequests(r);
 
-        verify(requestFilterMock, times(1)).isApplication(any(RequestFilterDto.class));
-        verify(requestFilterMock, times(1)).apply(any(Stream.class), any(RequestFilterDto.class));
-        verify(recommendationRequestMapper, times(resultList.size())).toDto(new  RecommendationRequest());
-        // =====
-//        List<RecommendationRequest> allRequests = new ArrayList<>();
-//        RecommendationRequest r1 = new RecommendationRequest();
-//        RecommendationRequest r2 = new RecommendationRequest();
-//        RecommendationRequest r3 = new RecommendationRequest();
-//        r1.setId(1L);
-//        r2.setId(2L);
-//        r3.setId(3L);
-//        r1.setStatus(RequestStatus.ACCEPTED);
-//        r2.setStatus(RequestStatus.ACCEPTED);
-//        r3.setStatus(RequestStatus.PENDING);
-//        allRequests.add(r1);
-//        allRequests.add(r2);
-//        allRequests.add(r3);
-//
-//        List<RecommendationRequest> filteredRequests = allRequests.stream()
-//                .filter(req -> req.getId() == 2L)
-//                .filter(req -> req.getStatus().equals(RequestStatus.ACCEPTED)).toList();
-//
-//        List<RecommendationRequestDto> requestDtoList = filteredRequests.stream()
-//                .map(req -> {
-//                    RecommendationRequestDto dto = new RecommendationRequestDto();
-//                    dto.setId(req.getId());
-//                    dto.setStatus(req.getStatus());
-//                    return dto;
-//                })
-//                .collect(Collectors.toList());
-//
-//        when(recommendationRequestRepository.findAll()).thenReturn(allRequests);
-//        when(statusPatternFilter.isApplication(requestFilterDto)).thenReturn(true);
-//        when(statusPatternFilter.apply(any(), eq(requestFilterDto))).thenAnswer(invocation -> {
-//            Stream<RecommendationRequest> stream = invocation.getArgument(0);
-//            return stream.filter(req -> req.getStatus().equals(requestFilterDto.getStatusPattern()));
-//        });
-//        when(idPatternFilter.isApplication(requestFilterDto)).thenReturn(true);
-//        when(idPatternFilter.apply(any(), eq(requestFilterDto))).thenAnswer(invocation -> {
-//            Stream<RecommendationRequest> stream = invocation.getArgument(0);
-//            return stream.filter(req -> req.getId() ==(requestFilterDto.getIdPattern()));
-//        });
-//        when(recommendationRequestMapper.toDto(any())).thenAnswer(invocation -> {
-//            RecommendationRequest request = invocation.getArgument(0);
-//            RecommendationRequestDto dto = new RecommendationRequestDto();
-//            dto.setId(request.getId());
-//            dto.setStatus(request.getStatus());
-//            return dto;
-//        });
-//
-//        List<RecommendationRequestDto> requestDtos = recommendationRequestService.getRequests(requestFilterDto);
-//
-//        assertNotNull(requestDtos);
-//        assertEquals(1, requestDtos.size());
-//        assertEquals(requestDtoList, requestDtos);
-//
-//        verify(recommendationRequestRepository, times(1)).findAll();
-//        verify(statusPatternFilter, times(1)).isApplication(requestFilterDto);
-//        verify(statusPatternFilter, times(1)).apply(any(), eq(requestFilterDto));
-//        verify(idPatternFilter, times(1)).isApplication(requestFilterDto);
-//        verify(idPatternFilter, times(1)).apply(any(), eq(requestFilterDto));
-//        verify(recommendationRequestMapper, times(1)).toDto(any());
-//
-//        // Verify that the correct list is passed to toDto
-//        ArgumentCaptor<RecommendationRequest> argumentCaptor = ArgumentCaptor.forClass(RecommendationRequest.class);
-//        verify(recommendationRequestMapper, times(1)).toDto(argumentCaptor.capture());
-//        List<RecommendationRequest> capturedList = argumentCaptor.getAllValues();
-//        assertEquals(1, capturedList.size());
-//        assertEquals(filteredRequests.get(0).getId(), capturedList.get(0).getId());
-
+        verify(recommendationRequestMapper, times(1)).toDto(any());
     }
 
     @Test

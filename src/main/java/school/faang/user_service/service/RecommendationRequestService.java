@@ -68,7 +68,8 @@ public class RecommendationRequestService {
                 .toList();
         List<RecommendationRequest> recommendationRequestsAll = recommendationRequestRepository.findAll();
         for (RequestFilter requestFilterItem : requestFilterTrue) {
-            recommendationRequestsAll = requestFilterItem.apply(recommendationRequestsAll.stream(), filter)
+            recommendationRequestsAll = requestFilterItem
+                    .apply(recommendationRequestsAll.stream(), filter)
                     .toList();
         }
         return recommendationRequestsAll.stream()

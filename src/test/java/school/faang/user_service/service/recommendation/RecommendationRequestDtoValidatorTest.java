@@ -46,7 +46,7 @@ public class RecommendationRequestDtoValidatorTest {
     private RecommendationRequest recommendationRequest = new RecommendationRequest();
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         requesterId = 1L;
         receiverId = 2L;
         emptyMessage = "";

@@ -35,6 +35,7 @@ public class RecommendationRequestService {
     public final UserRepository userRepository;
     public final List<RequestFilter> requestFilters;
     public final RecommendationRequestDtoValidator recommendationRequestDtoValidator;
+    public final RecommendationRequestRepositoryValidator recommendationRequestRepositoryValidator;
 
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
         recommendationRequestDtoValidator.validateAll(recommendationRequestDto);
@@ -52,27 +53,24 @@ public class RecommendationRequestService {
 
     public List<RecommendationRequestDto> getRequests(RequestFilterDto filter) {
         Stream<RecommendationRequest> recommendations = StreamSupport.stream(recommendationRequestRepository.findAll().spliterator(), false);
+
         requestFilters.stream()
                 .filter(requestFilter -> requestFilter.isApplicable(filter))
                 .forEach(requestFilter -> requestFilter.apply(recommendations, filter));
+
         return recommendations.map(recommendation -> recommendationRequestMapper.toDto(recommendation, userRepository)).toList();
     }
 
     public RecommendationRequestDto getRequest(long id) {
+        recommendationRequestRepositoryValidator.validateId(id);
 
-        if (recommendationRequestRepository.findById(id).isPresent()) {
-            throw new NoSuchElementException("There is no recommendation request with id " + id);
-        }
         return recommendationRequestMapper.toDto(recommendationRequestRepository.findById(id).get(), userRepository);
     }
 
     public RecommendationRequestDto rejectRequest(long id, RejectionDto rejection) {
-        Optional<RecommendationRequest> recommendationRequestOptional = recommendationRequestRepository.findById(id);
-        if (recommendationRequestOptional.isPresent()) {
-            throw new NoSuchElementException("There is no recommendation request with id " + id);
-        }
+        recommendationRequestRepositoryValidator.validateId(id);
 
-        RecommendationRequest recommendationRequest = recommendationRequestOptional.get();
+        RecommendationRequest recommendationRequest = recommendationRequestRepository.findById(id).get();
 
         if (recommendationRequest.getStatus() != PENDING) {
             throw new RuntimeException("Recommendation request with id " + id

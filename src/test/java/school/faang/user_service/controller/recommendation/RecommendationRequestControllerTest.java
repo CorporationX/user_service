@@ -33,7 +33,7 @@ class RecommendationRequestControllerTest {
     private RejectionDto rejection = new RejectionDto();
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         id = 1L;
 
         rejection = new RejectionDto();

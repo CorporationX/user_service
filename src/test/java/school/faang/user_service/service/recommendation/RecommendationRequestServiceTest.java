@@ -59,7 +59,7 @@ class RecommendationRequestServiceTest {
 
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         id = 1L;
 
         requestFilterDto = new RequestFilterDto();

@@ -3,7 +3,7 @@ name: test-BJS2-15586
 on:
   pull_request:
     branches:
-      - feature/pipeline-test-BC-BJS2-15586
+      - feature/pipeline-BC-BJS2-15586
 
 jobs:
   check_tests:

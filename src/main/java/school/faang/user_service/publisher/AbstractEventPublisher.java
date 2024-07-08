@@ -8,20 +8,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import school.faang.user_service.dto.event.redis.Event;
 
 @Data
 @Slf4j
-public abstract class AbstractEventPublisher<T> {
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
-    @Autowired
-    private ObjectMapper objectMapper;
-    private ChannelTopic topic;
-    
-    public AbstractEventPublisher(ChannelTopic topic) {
-        this.topic = topic;
-    }
+@RequiredArgsConstructor
+public abstract class AbstractEventPublisher<T extends Event> {
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final ObjectMapper objectMapper;
+    private final ChannelTopic topic;
     
     public void convertAndSend(T event) {
         try {

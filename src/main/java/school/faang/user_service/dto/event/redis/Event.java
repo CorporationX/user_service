@@ -8,7 +8,6 @@ import lombok.Data;
 
 @Data
 public abstract class Event {
-    private Long id;
     @JsonFormat(shape = JsonFormat.Shape.STRING,pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdAt = LocalDateTime.now();
+    protected LocalDateTime createdAt = LocalDateTime.now();
 }

@@ -159,10 +159,9 @@ public class RecommendationService {
 
     private void sendNotification(Long idRecommendation, RecommendationDto recommendationDto) {
         RecommendationEventDto recommendationEventDto = RecommendationEventDto.builder()
-                .id(idRecommendation)
+                .recommendationId(idRecommendation)
                 .authorId(recommendationDto.getAuthorId())
                 .receiverId(recommendationDto.getReceiverId())
-                .createdAt(recommendationDto.getCreateAt())
                 .build();
 
         recommendationRequestedEventPublisher.convertAndSend(recommendationEventDto);

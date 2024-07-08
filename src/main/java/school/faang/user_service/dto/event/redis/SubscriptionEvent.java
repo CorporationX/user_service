@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SubscriptionEvent extends Event {
-    private Long projectId;
     private Long followerId;
     private Long followeeId;
     private SubscriptionEventType eventType;

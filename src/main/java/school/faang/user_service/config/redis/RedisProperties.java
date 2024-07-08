@@ -5,17 +5,17 @@ import org.springframework.context.annotation.Configuration;
 
 import lombok.Data;
 
+@Data
 @Configuration
 @ConfigurationProperties(prefix = "spring.data.redis")
-@Data
 public class RedisProperties {
     private String host;
     private int port;
-    private Channel channels;
+    private Channels channels;
 }
 
 @Data
-class Channel{
+class Channels {
     private String recommendationChannel;
     private String subscriptionChannel;
 }

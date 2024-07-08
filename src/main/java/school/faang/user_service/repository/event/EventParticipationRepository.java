@@ -20,7 +20,7 @@ public interface EventParticipationRepository extends CrudRepository<User, Long>
     void unregister(long eventId, long userId);
 
     @Query(nativeQuery = true, value = """
-            SELECT u.* FROM user u
+            SELECT u.* FROM users u
             JOIN user_event ue ON u.id = ue.user_id
             WHERE ue.event_id = :eventId
             """)
@@ -28,7 +28,7 @@ public interface EventParticipationRepository extends CrudRepository<User, Long>
 
     //добавит метод findParticipant(long eventId, long userId)
     @Query(nativeQuery = true, value = """
-            SELECT u.* FROM user u
+            SELECT u.* FROM users u
             JOIN user_event ue ON u.id = ue.user_id
             WHERE ue.event_id = :eventId and ue.user_id = :userId
             """)

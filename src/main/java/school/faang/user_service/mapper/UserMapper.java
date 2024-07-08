@@ -14,24 +14,7 @@ import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper {
-
-//    @Mapping(target = "id", qualifiedByName = "mapUser")
-//    UserDto toDto(User user);
-//
-//    User toEntity(UserDto userDto);
-
-    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
-
-    @Mapping(source = "id", target = "id")
-    @Mapping(source = "username", target = "username")
     UserDto toDto(User user);
 
-    @Mapping(source = "id", target = "id")
-    @Mapping(source = "username", target = "username")
     List<UserDto> toDtoList(List<User> users);
-
-//    @Named("mapUser")
-//    default List<Long> mapUser(List<User> users) {
-//        return users != null ? users.stream().map(User::getId).toList() : Collections.emptyList();
-//    }
 }

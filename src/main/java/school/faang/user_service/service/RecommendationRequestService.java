@@ -13,6 +13,7 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
+import school.faang.user_service.service.filer.RequestFilter;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -20,7 +21,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 @Component
 @RequiredArgsConstructor
@@ -63,13 +63,23 @@ public class RecommendationRequestService {
     }
 
     public List<RecommendationRequestDto> getRequests(RequestFilterDto filter) {
-        Stream<RecommendationRequest> recommendationRequestsAll = StreamSupport
-                .stream(recommendationRequestRepository.findAll().spliterator(), false);
+        List<RequestFilter> requestFilterTrue = requestFilter.stream()
+                .filter(filterOne -> filterOne.isApplication(filter))
+                .toList();
+        List<RecommendationRequest> recommendationRequestsAll = recommendationRequestRepository.findAll();
+        for (RequestFilter requestFilterItem : requestFilterTrue) {
+            recommendationRequestsAll = requestFilterItem.apply(recommendationRequestsAll.stream(), filter)
+                    .toList();
+        }
+        return recommendationRequestsAll.stream()
+                .map(recommendationRequestMapper::toDto)
+                .toList();
 
-        requestFilter.stream()
-                .filter(requestFilter -> requestFilter.isApplication(filter))
-                .forEach(requestFilter -> requestFilter.apply(recommendationRequestsAll, filter));
-        return recommendationRequestsAll.map(recommendationRequestMapper::toDto).toList();
+//        Stream<RecommendationRequest> recommendationRequestsAll = recommendationRequestRepository.findAll().stream();
+//        requestFilter.stream()
+//                .filter(requestFilter -> requestFilter.isApplication(filter))
+//                .forEach(requestFilter -> requestFilter.apply(recommendationRequestsAll, filter));
+//        return recommendationRequestsAll.map(recommendationRequestMapper::toDto).toList();
     }
 
     public RecommendationRequestDto getRequest(long id) {

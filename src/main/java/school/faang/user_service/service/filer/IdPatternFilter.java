@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.filer;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.RequestFilterDto;
@@ -14,7 +14,12 @@ public class IdPatternFilter implements RequestFilter {
 
     @Override
     public Stream<RecommendationRequest> apply(Stream<RecommendationRequest> requestStream, RequestFilterDto requestFilterDto) {
-        return requestStream
-                .filter(recommendationRequest -> recommendationRequest.getId() == requestFilterDto.getIdPattern());
+        return requestStream.filter(request -> request.getId() == requestFilterDto.getIdPattern());
+//        requestStream.removeIf(request -> request.getId() != requestFilterDto.getIdPattern());
+//        List<RecommendationRequest> requestList = requestStream.stream()
+//                .filter(recommendationRequest -> recommendationRequest.getId() == requestFilterDto.getIdPattern())
+//                .toList();
+//        requestStream.clear();
+//        requestStream.addAll(requestList);
     }
 }

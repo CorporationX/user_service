@@ -1,9 +1,13 @@
 package school.faang.user_service.service;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RejectionDto;
@@ -18,16 +22,17 @@ import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
+import school.faang.user_service.service.filer.IdPatternFilter;
+import school.faang.user_service.service.filer.RequestFilter;
+import school.faang.user_service.service.filer.StatusPatternFilter;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -47,9 +52,38 @@ class RecommendationRequestServiceTest {
     @Mock
     private SkillRequestRepository skillRequestRepository;
     @Mock
-    private List<RequestFilter> requestFilter;
+    private RequestFilter requestFilterMock;
+    @Mock
+    private List<RequestFilter> filters;
+    @Mock
+    private RequestFilter idPatternFilter;
+
+    @Mock
+    private StatusPatternFilter statusPatternFilter;
+
+
+    @BeforeEach
+    void init() {
+//        RecommendationRequestRepository recommendationRequestRepositoryMock = Mockito.mock(RecommendationRequestRepository.class);
+//        RecommendationRequestMapper recommendationRequestMapperMock = Mockito.mock(RecommendationRequestMapper.class);
+//        UserRepository userRepositoryMock = Mockito.mock(UserRepository.class);
+//        SkillRepository skillRepositoryMock = Mockito.mock(SkillRepository.class);
+//        SkillRequestRepository skillRequestRepositoryMock = Mockito.mock(SkillRequestRepository.class);
+        idPatternFilter = Mockito.mock(RequestFilter.class);
+        requestFilterMock = Mockito.mock(RequestFilter.class);
+        filters = List.of(idPatternFilter, requestFilterMock);
+//        recommendationRequestService = new RecommendationRequestService(recommendationRequestRepositoryMock,
+//                recommendationRequestMapperMock,
+//                userRepositoryMock,
+//                skillRepositoryMock,
+//                skillRequestRepositoryMock,
+//                filters);
+//        when(filters.get(0).isApplication(new RequestFilterDto(1L, null))).thenReturn(true);
+//        when(filters.get(0).apply(any(Stream.class), any(RequestFilterDto.class))).thenReturn(Stream)
+    }
 
     @Test
+    @DisplayName("testCreateWithFindByIdRequesterAndReceiver")
     public void testCreateWithFindByIdRequesterAndReceiver() {
         RecommendationRequestDto requestDto = new RecommendationRequestDto();
         when(userRepository.findById(any()))
@@ -59,6 +93,7 @@ class RecommendationRequestServiceTest {
     }
 
     @Test
+    @DisplayName("testCreateBelieveTheRequestToSendNotMoreThanSixMonths")
     public void testCreateBelieveTheRequestToSendNotMoreThanSixMonths() {
         RecommendationRequestDto requestDto = new RecommendationRequestDto();
         requestDto.setRequesterId(1L);
@@ -76,6 +111,7 @@ class RecommendationRequestServiceTest {
     }
 
     @Test
+    @DisplayName("testCreateCheckTheExistenceOfSkillsInTheDatabase")
     public void testCreateCheckTheExistenceOfSkillsInTheDatabase() {
         RecommendationRequestDto requestDto = new RecommendationRequestDto();
         requestDto.setRequesterId(1L);
@@ -96,6 +132,7 @@ class RecommendationRequestServiceTest {
     }
 
     @Test
+    @DisplayName("testCreateSave")
     public void testCreateSave() {
         RecommendationRequestDto requestDto = new RecommendationRequestDto();
         requestDto.setRequesterId(1L);
@@ -128,7 +165,7 @@ class RecommendationRequestServiceTest {
                 .thenReturn(request);
 
         recommendationRequestService.create(requestDto);
-
+        // проверить DTO и Entity (по полям)
         verify(recommendationRequestMapper, times(1))
                 .toEntity(requestDto);
         verify(recommendationRequestRepository, times(1))
@@ -145,27 +182,132 @@ class RecommendationRequestServiceTest {
     }
 
     @Test
+    @DisplayName("testGetRequestsFindAll")
     public void testGetRequestsFindAll() {
-        List<RecommendationRequest> requestList = List.of(
-                new RecommendationRequest(),
-                new RecommendationRequest());
-        when(recommendationRequestRepository.findAll())
-                .thenReturn(requestList);
+//        List<RecommendationRequest> resultList = new ArrayList<>();
+//        RecommendationRequest t1 = new RecommendationRequest();
+////        RecommendationRequest t2 = new RecommendationRequest();
+//        t1.setId(1L);
+////        t2.setId(2L);
+//        t1.setStatus(RequestStatus.ACCEPTED);
+////        t2.setStatus(RequestStatus.ACCEPTED);
+//        resultList.add(t1);
+////        resultList.add(t2);
+//
+//        List<RecommendationRequest> otherList = new ArrayList<>();
+//        RecommendationRequest r1 = new RecommendationRequest();
+//        RecommendationRequest r2 = new RecommendationRequest();
+//        RecommendationRequest r3 = new RecommendationRequest();
+//        r1.setId(1L);
+//        r2.setId(2L);
+//        r3.setId(3L);
+//        r1.setStatus(RequestStatus.ACCEPTED);
+//        r2.setStatus(RequestStatus.ACCEPTED);
+//        r3.setStatus(RequestStatus.PENDING);
+//        otherList.add(r1);
+//        otherList.add(r2);
+//        otherList.add(r3);
+////
+//        List<RecommendationRequestDto> requestDtoList = new ArrayList<>();
+//        RecommendationRequestDto p1 = new RecommendationRequestDto();
+////        RecommendationRequestDto p2 = new RecommendationRequestDto();
+//        p1.setId(1L);
+////        p2.setId(2L);
+//        p1.setStatus(RequestStatus.ACCEPTED);
+////        p2.setStatus(RequestStatus.ACCEPTED);
+//        requestDtoList.add(p1);
+////        requestDtoList.add(p2);
+////
+////        requestFilterDto = new RequestFilterDto(null, RequestStatus.ACCEPTED);
+////
+////        when(recommendationRequestRepository.findAll()).thenReturn(otherList);
+////        when(statusPatternFilter.isApplication(requestFilterDto)).thenReturn(true);
+////        when(statusPatternFilter.apply(otherList.stream(), requestFilterDto)).thenReturn(resultList.stream());
+////        when(recommendationRequestMapper.toDtos(resultList)).thenReturn(requestDtoList);
+////        List<RecommendationRequestDto> result = recommendationRequestService.getRequests(requestFilterDto);
+////        assertNotNull(result);
+//        RequestFilterDto r = new RequestFilterDto(1L, null);
+//        when(recommendationRequestRepository.findAll()).thenReturn(otherList);
+//        when(filters.get(0).isApplication(r)).thenReturn(true);
+//        when(filters.get(0).apply(otherList.stream(), r)).thenReturn(resultList.stream());
+//        when(recommendationRequestMapper.toDto(any(RecommendationRequest.class))).thenReturn(any(RecommendationRequestDto.class));
+////        when(recommendationRequestMapper.toDto(resultList)).thenReturn(requestDtoList);
+//        recommendationRequestService.getRequests(r);
+//
+//        verify(requestFilterMock, times(1)).isApplication(any(RequestFilterDto.class));
+//        verify(requestFilterMock, times(1)).apply(any(Stream.class), any(RequestFilterDto.class));
+//        verify(recommendationRequestMapper, times(resultList.size())).toDto(new  RecommendationRequest());
 
-        List<RecommendationRequestDto> resultList = recommendationRequestService.getRequests(requestFilterDto);
+        List<RecommendationRequest> allRequests = new ArrayList<>();
+        RecommendationRequest r1 = new RecommendationRequest();
+        RecommendationRequest r2 = new RecommendationRequest();
+        RecommendationRequest r3 = new RecommendationRequest();
+        r1.setId(1L);
+        r2.setId(2L);
+        r3.setId(3L);
+        r1.setStatus(RequestStatus.ACCEPTED);
+        r2.setStatus(RequestStatus.ACCEPTED);
+        r3.setStatus(RequestStatus.PENDING);
+        allRequests.add(r1);
+        allRequests.add(r2);
+        allRequests.add(r3);
 
-        assertEquals(requestList.size(), resultList.size());
+        List<RecommendationRequest> filteredRequests = allRequests.stream()
+                .filter(req -> req.getId() == 2L)
+                .filter(req -> req.getStatus().equals(RequestStatus.ACCEPTED)).toList();
 
-        verify(recommendationRequestRepository, times(1))
-                .findAll();
+        List<RecommendationRequestDto> requestDtoList = filteredRequests.stream()
+                .map(req -> {
+                    RecommendationRequestDto dto = new RecommendationRequestDto();
+                    dto.setId(req.getId());
+                    dto.setStatus(req.getStatus());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+
+        when(recommendationRequestRepository.findAll()).thenReturn(allRequests);
+        when(statusPatternFilter.isApplication(requestFilterDto)).thenReturn(true);
+        when(statusPatternFilter.apply(any(), eq(requestFilterDto))).thenAnswer(invocation -> {
+            Stream<RecommendationRequest> stream = invocation.getArgument(0);
+            return stream.filter(req -> req.getStatus().equals(requestFilterDto.getStatusPattern()));
+        });
+        when(idPatternFilter.isApplication(requestFilterDto)).thenReturn(true);
+        when(idPatternFilter.apply(any(), eq(requestFilterDto))).thenAnswer(invocation -> {
+            Stream<RecommendationRequest> stream = invocation.getArgument(0);
+            return stream.filter(req -> req.getId() ==(requestFilterDto.getIdPattern()));
+        });
+        when(recommendationRequestMapper.toDto(any())).thenAnswer(invocation -> {
+            RecommendationRequest request = invocation.getArgument(0);
+            RecommendationRequestDto dto = new RecommendationRequestDto();
+            dto.setId(request.getId());
+            dto.setStatus(request.getStatus());
+            return dto;
+        });
+
+        List<RecommendationRequestDto> requestDtos = recommendationRequestService.getRequests(requestFilterDto);
+
+        assertNotNull(requestDtos);
+        assertEquals(1, requestDtos.size());
+        assertEquals(requestDtoList, requestDtos);
+
+        verify(recommendationRequestRepository, times(1)).findAll();
+        verify(statusPatternFilter, times(1)).isApplication(requestFilterDto);
+        verify(statusPatternFilter, times(1)).apply(any(), eq(requestFilterDto));
+        verify(idPatternFilter, times(1)).isApplication(requestFilterDto);
+        verify(idPatternFilter, times(1)).apply(any(), eq(requestFilterDto));
+        verify(recommendationRequestMapper, times(1)).toDto(any());
+
+        // Verify that the correct list is passed to toDto
+        ArgumentCaptor<RecommendationRequest> argumentCaptor = ArgumentCaptor.forClass(RecommendationRequest.class);
+        verify(recommendationRequestMapper, times(1)).toDto(argumentCaptor.capture());
+        List<RecommendationRequest> capturedList = argumentCaptor.getAllValues();
+        assertEquals(1, capturedList.size());
+        assertEquals(filteredRequests.get(0).getId(), capturedList.get(0).getId());
+
     }
 
     @Test
-    public void testGetRequestsFilters() {
-
-    }
-
-    @Test
+    @DisplayName("testGetRequestFundRequest")
     public void testGetRequestFundRequest() {
         long id = 1;
         when(recommendationRequestRepository.findById(id))
@@ -175,6 +317,7 @@ class RecommendationRequestServiceTest {
     }
 
     @Test
+    @DisplayName("testGetRequestToDto")
     public void testGetRequestToDto() {
         RecommendationRequestDto requestDto = new RecommendationRequestDto();
         requestDto.setId(1);
@@ -192,6 +335,7 @@ class RecommendationRequestServiceTest {
     }
 
     @Test
+    @DisplayName("testRejectRequestFindById")
     public void testRejectRequestFindById() {
         long id = 1;
         RejectionDto rejectionDto = new RejectionDto();
@@ -202,6 +346,7 @@ class RecommendationRequestServiceTest {
     }
 
     @Test
+    @DisplayName("testRejectRequestGetStatus")
     public void testRejectRequestGetStatus() {
         long id = 1;
         RejectionDto rejectionDto = new RejectionDto();
@@ -217,6 +362,7 @@ class RecommendationRequestServiceTest {
     }
 
     @Test
+    @DisplayName("testRejectRequestSave")
     public void testRejectRequestSave() {
         long id = 1;
         RejectionDto rejectionDto = new RejectionDto();

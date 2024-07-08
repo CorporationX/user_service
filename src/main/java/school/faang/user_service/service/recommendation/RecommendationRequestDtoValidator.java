@@ -55,11 +55,4 @@ public class RecommendationRequestDtoValidator {
             throw new IllegalArgumentException("Not all requested skill exists");
         }
     }
-
-    public void validateRecommendationRequestDto(RecommendationRequestDto recommendationRequestDto) {
-        validateMessage(recommendationRequestDto.getMessage());
-        validateRequesterAndReceiverIds(recommendationRequestDto.getRequesterId(), recommendationRequestDto.getReceiverId());
-        validateRequestTimeDifference(recommendationRequestDto.getCreatedAt(), recommendationRequestDto.getRequesterId(), recommendationRequestDto.getReceiverId());
-        validateRequestedSkills(recommendationRequestDto.getSkills());
-    }
 }

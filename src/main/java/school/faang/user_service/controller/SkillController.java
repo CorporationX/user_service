@@ -1,6 +1,5 @@
 package school.faang.user_service.controller;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
@@ -10,13 +9,26 @@ import school.faang.user_service.service.SkillService;
 import java.util.List;
 
 @Component
-@RequiredArgsConstructor
-public class SkillController {
-    private final SkillService skillService;
-
+public record SkillController(SkillService skillService) {
     public SkillDto create(SkillDto skillDto) {
         validateSkill(skillDto);
         return skillService.create(skillDto);
+    }
+
+    public List<SkillDto> getUserSkills(long userId) {
+        validateId(userId);
+        return skillService.getUserSkills(userId);
+    }
+
+    public List<SkillCandidateDto> getOfferedSkills(long userId) {
+        validateId(userId);
+        return skillService.getOfferedSkills(userId);
+    }
+
+    public SkillDto acquireSkillFromOffers(long skillId, long userId) {
+        validateId(skillId);
+        validateId(userId);
+        return skillService.acquireSkillFromOffers(skillId, userId);
     }
 
     private void validateSkill(SkillDto skillDto) {
@@ -25,11 +37,9 @@ public class SkillController {
         }
     }
 
-    public List<SkillDto> getUserSkills(long userId) {
-        return skillService.getUserSkills(userId);
-    }
-
-    public List<SkillCandidateDto> getOfferedSkills(long userId) {
-        return skillService.getOfferedSkills(userId);
+    private void validateId(Long id) {
+        if (id == null) {
+            throw new DataValidationException("Incorrect id!");
+        }
     }
 }

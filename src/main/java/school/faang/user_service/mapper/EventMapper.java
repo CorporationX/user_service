@@ -10,12 +10,16 @@ import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.repository.UserRepository;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring",
         uses = SkillMapper.class,
         unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
 public interface EventMapper {
     @Mapping(source = "owner.id", target = "ownerId")
     EventDto toDto(Event event);
+
+    List<EventDto> toDto(List<Event> events);
 
     @Mapping(source = "ownerId", target = "owner", qualifiedByName = "getUserById")
     Event toEntity(EventDto eventDto, @Context UserRepository userRepository);

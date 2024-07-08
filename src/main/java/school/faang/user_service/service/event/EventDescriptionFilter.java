@@ -8,16 +8,16 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @Component
-public class EventStartDateFilter implements EventFilter {
+public class EventDescriptionFilter implements EventFilter {
     @Override
     public boolean isApplicable(EventFilterDto filters) {
-        return filters.getStartDate() != null;
+        return filters.getDescriptionPattern() != null;
     }
 
     @Override
     public List<Event> apply(Stream<Event> events, EventFilterDto filters) {
         return events
-                .filter(event -> event.getDescription().contains(filters.getDescription()))
+                .filter(event -> event.getDescription().contains(filters.getDescriptionPattern()))
                 .toList();
     }
 }

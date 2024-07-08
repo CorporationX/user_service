@@ -49,6 +49,11 @@ public class EventService {
         eventFilters.stream()
                 .filter(eventFilter -> eventFilter.isApplicable(filters))
                 .forEach(eventFilter -> eventFilter.apply(events, filters));
-        return events.map(eventMapper::toDto).toList();
+        return eventMapper.toDto(events.toList());
+//        return eventFilters.stream()
+//                .filter(eventFilter -> eventFilter.isApplicable(filters))
+//                .flatMap(eventFilter -> eventFilter.apply(events, filters))
+//                .map(eventMapper::toDto)
+//                .toList();
     }
 }

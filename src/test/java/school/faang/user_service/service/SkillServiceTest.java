@@ -13,7 +13,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.SkillOffer;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.skill.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -163,29 +163,24 @@ public class SkillServiceTest {
     public void testAcquireSkillFromOffersUserWithoutSkill() {
         long userId = 1L;
         long skillId = 1L;
-        Optional<SkillDto> expected = Optional.empty();
         when(userRepository.existsById(userId)).thenReturn(true);
         when(skillRepository.findById(skillId)).thenReturn(Optional.of(Skill.builder().build()));
         when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.of(Skill.builder().build()));
 
-        Optional<SkillDto> actual = skillService.acquireSkillFromOffers(skillId, userId);
-
-        assertEquals(expected, actual);
+        assertThrows(DataValidationException.class, () -> skillService.acquireSkillFromOffers(skillId, userId));
     }
-
     @Test
     public void testAcquireSkillFromOffersWithoutEnoughOffers() {
         long userId = 1L;
         long skillId = 1L;
-        Optional<SkillDto> expected = Optional.empty();
         when(userRepository.existsById(userId)).thenReturn(true);
         when(skillRepository.findById(skillId)).thenReturn(Optional.of(Skill.builder().build()));
         when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.empty());
         when(skillOfferRepository.findAllOffersOfSkill(userId, skillId)).thenReturn(List.of(SkillOffer.builder().build()));
 
-        Optional<SkillDto> actual = skillService.acquireSkillFromOffers(skillId, userId);
+        //Optional<SkillDto> actual = skillService.acquireSkillFromOffers(skillId, userId);
 
-        assertEquals(expected, actual);
+        assertThrows(DataValidationException.class, () -> skillService.acquireSkillFromOffers(skillId, userId));
     }
 
     @Test
@@ -206,10 +201,10 @@ public class SkillServiceTest {
         when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.empty());
         when(skillOfferRepository.findAllOffersOfSkill(userId, skillId)).thenReturn(offers);
 
-        Optional<SkillDto> actual = skillService.acquireSkillFromOffers(skillId, userId);
+        SkillDto actual = skillService.acquireSkillFromOffers(skillId, userId);
 
-        assertEquals(skill.getId(), actual.get().getId());
-        assertEquals(skill.getTitle(), actual.get().getTitle());
+        assertEquals(skill.getId(), actual.getId());
+        assertEquals(skill.getTitle(), actual.getTitle());
         verify(userSkillGuaranteeRepository, times(1)).saveAll(anyList());
     }
 }

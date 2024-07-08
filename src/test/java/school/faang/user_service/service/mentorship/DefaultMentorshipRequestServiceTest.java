@@ -2,6 +2,8 @@ package school.faang.user_service.service.mentorship;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -36,6 +38,9 @@ class DefaultMentorshipRequestServiceTest {
 
     @Mock
     private MentorshipRequestMapper mapper;
+
+    @Captor
+    private ArgumentCaptor<MentorshipRequestDto> dtoCaptor;
 
     @InjectMocks
     private DefaultMentorshipRequestService sut;

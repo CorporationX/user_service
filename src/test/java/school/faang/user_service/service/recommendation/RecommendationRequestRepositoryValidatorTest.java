@@ -1,7 +1,7 @@
 package school.faang.user_service.service.recommendation;
 
-import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -31,6 +31,7 @@ public class RecommendationRequestRepositoryValidatorTest {
     }
 
     @Test
+    @DisplayName("Test getting NoSuchElementException when there is no recommendation request with given id")
     public void testValidateId() {
         when(recommendationRequestRepository.findById(id)).thenReturn(Optional.empty());
 

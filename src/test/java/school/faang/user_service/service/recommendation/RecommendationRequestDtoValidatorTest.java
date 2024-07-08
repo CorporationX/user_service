@@ -2,6 +2,7 @@ package school.faang.user_service.service.recommendation;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -61,12 +62,14 @@ public class RecommendationRequestDtoValidatorTest {
     }
 
     @Test
+    @DisplayName("Test getting IllegalArgumentException when emptyMessage was given")
     public void testValidateMessage() {
         assertThrows(IllegalArgumentException.class, () ->
                 recommendationRequestDtoValidator.validateMessage(emptyMessage));
     }
 
     @Test
+    @DisplayName("Test getting EntityNotFoundException when there is no requester and receiver id in database")
     public void testValidateRequesterAndReceiverIds() {
         when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(requesterId, receiverId))
                 .thenReturn(Optional.empty());
@@ -76,6 +79,7 @@ public class RecommendationRequestDtoValidatorTest {
     }
 
     @Test
+    @DisplayName("Test getting IllegalArgumentException when time interval between last and new recommendation requests less than 6 months")
     public void testValidateRequestTimeDifference() {
         monthsDifference = 5;
         LocalDateTime createdAt = LocalDateTime.now();
@@ -90,6 +94,7 @@ public class RecommendationRequestDtoValidatorTest {
     }
 
     @Test
+    @DisplayName("Test getting IllegalArgumentException when there is no any of requested skills in database")
     public void testValidateRequestedSkills() {
         skill.setTitle("Test title");
         skillRequest.setSkill(skill);

@@ -1,6 +1,7 @@
 package school.faang.user_service.service.recommendation;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -75,6 +76,7 @@ class RecommendationRequestServiceTest {
     }
 
     @Test
+    @DisplayName("Test that create method runs successfully when there is no exceptions thrown by RecommendationRequestDtoValidator")
     public void testCreateValidationTrue() {
         skillRequest.setId(id);
         recommendationRequestDto.setSkills(List.of(skillRequest));
@@ -95,6 +97,7 @@ class RecommendationRequestServiceTest {
     }
 
     @Test
+    @DisplayName("Test that getRequests method returns empty list when empty list was given")
     public void testGetZeroRequests() {
         Stream<RequestFilter> requestFilterStream = StreamSupport.stream(requestFilterList.spliterator(), false);
 
@@ -104,6 +107,7 @@ class RecommendationRequestServiceTest {
     }
 
     @Test
+    @DisplayName("Test that getRequest method throws NoSuchElementException when there is no recommendation requests with given id in database")
     public void testGetRequestNoSuchElement() {
         when(recommendationRequestRepository.findById(id)).thenReturn(Optional.empty());
 
@@ -111,6 +115,7 @@ class RecommendationRequestServiceTest {
     }
 
     @Test
+    @DisplayName("Test that rejectRequest method throws NoSuchElementException when there is no recommendation requests with given id in database")
     public void testRejectRequestNoSuchElement() {
         when(recommendationRequestRepository.findById(id)).thenReturn(Optional.empty());
 
@@ -118,6 +123,7 @@ class RecommendationRequestServiceTest {
     }
 
     @Test
+    @DisplayName("Test getting RuntimeException when current recommendation request status is not equals PENDING")
     public void testRejectRequestWrongStatus() {
         recommendationRequest.setStatus(ACCEPTED);
         Optional<RecommendationRequest> recommendationRequestOptional = Optional.of(recommendationRequest);

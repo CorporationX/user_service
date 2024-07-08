@@ -14,8 +14,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class RecommendationRequestControllerTest {
 
@@ -48,7 +48,7 @@ class RecommendationRequestControllerTest {
 
     @Test
     void testRequestRecommendation() {
-        when(recommendationRequestService.create(any(RecommendationRequestDto.class))).thenReturn(responseDto);
+        when(recommendationRequestService.create(any())).thenReturn(responseDto);
 
         RecommendationRequestDto result = recommendationRequestController.requestRecommendation(requestDto);
 
@@ -58,7 +58,7 @@ class RecommendationRequestControllerTest {
 
     @Test
     void testGetRecommendationRequests() {
-        when(recommendationRequestService.getRequests(any(RequestFilterDto.class))).thenReturn(recommendtionRequestDtoList);
+        when(recommendationRequestService.getRequests(any())).thenReturn(recommendtionRequestDtoList);
 
         List<RecommendationRequestDto> result = recommendationRequestController.getRecommendationRequests(filter);
 
@@ -68,7 +68,7 @@ class RecommendationRequestControllerTest {
 
     @Test
     void testGetRecommendationRequest() {
-        when(recommendationRequestService.getRequest(eq(id))).thenReturn(requestDto);
+        when(recommendationRequestService.getRequest(id)).thenReturn(requestDto);
 
         RecommendationRequestDto result = recommendationRequestController.getRecommendationRequest(id);
 
@@ -78,7 +78,7 @@ class RecommendationRequestControllerTest {
 
     @Test
     void testRejectRequest() {
-        when(recommendationRequestService.rejectRequest(eq(id), any(RejectionDto.class))).thenReturn(responseDto);
+        when(recommendationRequestService.rejectRequest(id, any())).thenReturn(responseDto);
 
         RecommendationRequestDto result = recommendationRequestController.rejectRequest(id, rejection);
 

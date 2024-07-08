@@ -30,6 +30,9 @@ import static org.mockito.Mockito.when;
 import static school.faang.user_service.entity.RequestStatus.ACCEPTED;
 
 class RecommendationRequestServiceTest {
+    @InjectMocks
+    private RecommendationRequestService recommendationRequestService;
+
     @Mock
     private RecommendationRequestRepository recommendationRequestRepository;
 
@@ -45,23 +48,38 @@ class RecommendationRequestServiceTest {
     @Mock
     public List<RequestFilter> requestFilters;
 
-    @InjectMocks
-    private RecommendationRequestService recommendationRequestService;
+    private Long id;
+    private RequestFilterDto requestFilterDto;
+    private List<RequestFilter> requestFilterList;
+    private List<RecommendationRequestDto> emptyList;
+    private RejectionDto rejectionDto;
+    private RecommendationRequest recommendationRequest;
+    private RecommendationRequestDto recommendationRequestDto;
+    private SkillRequest skillRequest;
+
 
     @BeforeEach
     void setUp() {
+        id = 1L;
+
+        requestFilterDto = new RequestFilterDto();
+        rejectionDto = new RejectionDto();
+        recommendationRequest = new RecommendationRequest();
+        recommendationRequestDto = new RecommendationRequestDto();
+        skillRequest = new SkillRequest();
+
+        requestFilterList = new ArrayList<>();
+        emptyList = new ArrayList<>();
+
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
     public void testCreateValidationTrue() {
-        Long id = 1L;
-        RecommendationRequestDto recommendationRequestDto = new RecommendationRequestDto();
-        SkillRequest skillRequest = new SkillRequest();
         skillRequest.setId(id);
         recommendationRequestDto.setSkills(List.of(skillRequest));
 
-        doNothing().when(recommendationRequestDtoValidator).validateRecommendationRequestDto(any());
+        doNothing().when(recommendationRequestDtoValidator).validateAll(any());
 
         when(recommendationRequestMapper.toEntity(any(), any())).thenReturn(new RecommendationRequest());
         when(recommendationRequestRepository.create(any(), any(), any())).thenReturn(id);
@@ -78,10 +96,7 @@ class RecommendationRequestServiceTest {
 
     @Test
     public void testGetZeroRequests() {
-        RequestFilterDto requestFilterDto = new RequestFilterDto();
-        List<RequestFilter> requestFilterList = new ArrayList<>();
         Stream<RequestFilter> requestFilterStream = StreamSupport.stream(requestFilterList.spliterator(), false);
-        List<RecommendationRequestDto> emptyList = new ArrayList<>();
 
         when(requestFilters.stream()).thenReturn(requestFilterStream);
 
@@ -90,8 +105,6 @@ class RecommendationRequestServiceTest {
 
     @Test
     public void testGetRequestNoSuchElement() {
-        Long id = 1L;
-
         when(recommendationRequestRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThrows(NoSuchElementException.class, () -> recommendationRequestService.getRequest(id));
@@ -99,9 +112,6 @@ class RecommendationRequestServiceTest {
 
     @Test
     public void testRejectRequestNoSuchElement() {
-        Long id = 1L;
-        RejectionDto rejectionDto = new RejectionDto();
-
         when(recommendationRequestRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThrows(NoSuchElementException.class, () -> recommendationRequestService.rejectRequest(id, rejectionDto));
@@ -109,9 +119,6 @@ class RecommendationRequestServiceTest {
 
     @Test
     public void testRejectRequestWrongStatus() {
-        Long id = 1L;
-        RejectionDto rejectionDto = new RejectionDto();
-        RecommendationRequest recommendationRequest = new RecommendationRequest();
         recommendationRequest.setStatus(ACCEPTED);
         Optional<RecommendationRequest> recommendationRequestOptional = Optional.of(recommendationRequest);
 

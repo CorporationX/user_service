@@ -10,7 +10,6 @@ import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.dto.recommendation.RequestFilterDto;
 import school.faang.user_service.service.recommendation.RecommendationRequestService;
 
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,15 +25,29 @@ class RecommendationRequestControllerTest {
     @InjectMocks
     private RecommendationRequestController recommendationRequestController;
 
+    private Long id;
+    private RecommendationRequestDto requestDto;
+    private RecommendationRequestDto responseDto = new RecommendationRequestDto();
+    private RequestFilterDto filter;
+    private List<RecommendationRequestDto> recommendtionRequestDtoList;
+    private RejectionDto rejection = new RejectionDto();
+
     @BeforeEach
     void setUp() {
+        id = 1L;
+
+        rejection = new RejectionDto();
+        filter = new RequestFilterDto();
+        requestDto = new RecommendationRequestDto();
+        responseDto = new RecommendationRequestDto();
+
+        recommendtionRequestDtoList = List.of(new RecommendationRequestDto());
+
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
     void testRequestRecommendation() {
-        RecommendationRequestDto requestDto = new RecommendationRequestDto();
-        RecommendationRequestDto responseDto = new RecommendationRequestDto();
         when(recommendationRequestService.create(any(RecommendationRequestDto.class))).thenReturn(responseDto);
 
         RecommendationRequestDto result = recommendationRequestController.requestRecommendation(requestDto);
@@ -45,20 +58,16 @@ class RecommendationRequestControllerTest {
 
     @Test
     void testGetRecommendationRequests() {
-        RequestFilterDto filter = new RequestFilterDto();
-        List<RecommendationRequestDto> requests = Collections.singletonList(new RecommendationRequestDto());
-        when(recommendationRequestService.getRequests(any(RequestFilterDto.class))).thenReturn(requests);
+        when(recommendationRequestService.getRequests(any(RequestFilterDto.class))).thenReturn(recommendtionRequestDtoList);
 
         List<RecommendationRequestDto> result = recommendationRequestController.getRecommendationRequests(filter);
 
-        assertEquals(requests, result);
+        assertEquals(recommendtionRequestDtoList, result);
         verify(recommendationRequestService).getRequests(filter);
     }
 
     @Test
     void testGetRecommendationRequest() {
-        long id = 1L;
-        RecommendationRequestDto requestDto = new RecommendationRequestDto();
         when(recommendationRequestService.getRequest(eq(id))).thenReturn(requestDto);
 
         RecommendationRequestDto result = recommendationRequestController.getRecommendationRequest(id);
@@ -69,9 +78,6 @@ class RecommendationRequestControllerTest {
 
     @Test
     void testRejectRequest() {
-        long id = 1L;
-        RejectionDto rejection = new RejectionDto();
-        RecommendationRequestDto responseDto = new RecommendationRequestDto();
         when(recommendationRequestService.rejectRequest(eq(id), any(RejectionDto.class))).thenReturn(responseDto);
 
         RecommendationRequestDto result = recommendationRequestController.rejectRequest(id, rejection);

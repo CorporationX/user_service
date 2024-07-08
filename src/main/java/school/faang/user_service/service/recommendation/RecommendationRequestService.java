@@ -37,7 +37,7 @@ public class RecommendationRequestService {
     public final RecommendationRequestDtoValidator recommendationRequestDtoValidator;
 
     public RecommendationRequestDto create(RecommendationRequestDto recommendationRequestDto) {
-        recommendationRequestDtoValidator.validateRecommendationRequestDto(recommendationRequestDto);
+        recommendationRequestDtoValidator.validateAll(recommendationRequestDto);
 
         RecommendationRequest recommendationRequest = recommendationRequestMapper.toEntity(recommendationRequestDto, userRepository);
 
@@ -59,6 +59,7 @@ public class RecommendationRequestService {
     }
 
     public RecommendationRequestDto getRequest(long id) {
+
         if (recommendationRequestRepository.findById(id).isPresent()) {
             throw new NoSuchElementException("There is no recommendation request with id " + id);
         }

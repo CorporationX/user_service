@@ -6,9 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.repository.SkillRepository;
@@ -16,6 +14,7 @@ import school.faang.user_service.repository.recommendation.RecommendationReposit
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +24,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 public class RecommendationRequestDtoValidatorTest {
+    @InjectMocks
+    private RecommendationRequestDtoValidator recommendationRequestDtoValidator;
+
     @Mock
     private RecommendationRequestRepository recommendationRequestRepository;
 
@@ -34,96 +36,68 @@ public class RecommendationRequestDtoValidatorTest {
     @Mock
     private SkillRepository skillRepository;
 
-    @InjectMocks
-    private RecommendationRequestDtoValidator recommendationRequestDtoValidator;
+    private Long requesterId;
+    private Long receiverId;
+    private String emptyMessage;
+    private int monthsDifference;
+    private Skill skill;
+    private SkillRequest skillRequest;
+    private List<SkillRequest> skills;
+    private RecommendationRequest recommendationRequest = new RecommendationRequest();
 
     @BeforeEach
     void setUp() {
+        requesterId = 1L;
+        receiverId = 2L;
+        emptyMessage = "";
+
+        recommendationRequest = new RecommendationRequest();
+        skillRequest = new SkillRequest();
+
+        skill = new Skill();
+        skills = new ArrayList<>();
+
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testCreateEmplyMessage() {
-        RecommendationRequestDto recommendationRequestDto = new RecommendationRequestDto();
-        recommendationRequestDto.setMessage("");
-
+    public void testValidateMessage() {
         assertThrows(IllegalArgumentException.class, () ->
-                recommendationRequestDtoValidator.validateRecommendationRequestDto(recommendationRequestDto));
+                recommendationRequestDtoValidator.validateMessage(emptyMessage));
     }
 
     @Test
-    public void testCreateNotExistIds() {
-        Long id = 1L;
-        RecommendationRequestDto recommendationRequestDto = new RecommendationRequestDto();
-        recommendationRequestDto.setMessage("Test message");
-        recommendationRequestDto.setReceiverId(id);
-        recommendationRequestDto.setRequesterId(id);
-
-        when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(recommendationRequestDto.getRequesterId(),
-                recommendationRequestDto.getReceiverId())).thenReturn(Optional.empty());
+    public void testValidateRequesterAndReceiverIds() {
+        when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(requesterId, receiverId))
+                .thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () ->
-                recommendationRequestDtoValidator.validateRecommendationRequestDto(recommendationRequestDto));
+                recommendationRequestDtoValidator.validateRequesterAndReceiverIds(requesterId, receiverId));
     }
 
     @Test
-    public void testTimeRequestDiference() {
-        Long id  = 1L;
-        int monthsDifference = 5;
-        RecommendationRequestDto recommendationRequestDto = new RecommendationRequestDto();
-        recommendationRequestDto.setMessage("Test message");
-        recommendationRequestDto.setReceiverId(id);
-        recommendationRequestDto.setRequesterId(id);
-
-        Recommendation recommendation = new Recommendation();
-        recommendation.setId(id);
-
-        LocalDateTime currentRequestTime = LocalDateTime.now();
-        LocalDateTime latestRequestTime = currentRequestTime.plusMonths(monthsDifference);
-        RecommendationRequest recommendationRequest = new RecommendationRequest();
-        recommendationRequestDto.setCreatedAt(currentRequestTime);
+    public void testValidateRequestTimeDifference() {
+        monthsDifference = 5;
+        LocalDateTime createdAt = LocalDateTime.now();
+        LocalDateTime latestRequestTime = createdAt.plusMonths(monthsDifference);
         recommendationRequest.setCreatedAt(latestRequestTime);
-
-        when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(anyLong(), anyLong()))
-                .thenReturn(Optional.of(recommendation));
 
         when(recommendationRequestRepository.findLatestPendingRequest(anyLong(), anyLong()))
                 .thenReturn(Optional.of(recommendationRequest));
 
         assertThrows(IllegalArgumentException.class, () ->
-                recommendationRequestDtoValidator.validateRecommendationRequestDto(recommendationRequestDto));
+                recommendationRequestDtoValidator.validateRequestTimeDifference(createdAt, requesterId, receiverId));
     }
 
     @Test
-    public void testAllSkillExists() {
-        Long id = 1L;
-        int monthsDifference = 7;
-        RecommendationRequestDto recommendationRequestDto = new RecommendationRequestDto();
-        recommendationRequestDto.setMessage("Test message");
-        recommendationRequestDto.setReceiverId(id);
-        recommendationRequestDto.setRequesterId(id);
-        Skill skill = new Skill();
+    public void testValidateRequestedSkills() {
         skill.setTitle("Test title");
-        recommendationRequestDto.setSkills(List.of(new SkillRequest(id, new RecommendationRequest(), skill)));
-
-        Recommendation recommendation = new Recommendation();
-        recommendation.setId(id);
-
-        LocalDateTime currentRequestTime = LocalDateTime.now();
-        LocalDateTime latestRequestTime = currentRequestTime.plusMonths(monthsDifference);
-        RecommendationRequest recommendationRequest = new RecommendationRequest();
-        recommendationRequestDto.setCreatedAt(currentRequestTime);
-        recommendationRequest.setCreatedAt(latestRequestTime);
-
-        when(recommendationRepository.findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(anyLong(), anyLong()))
-                .thenReturn(Optional.of(recommendation));
-
-        when(recommendationRequestRepository.findLatestPendingRequest(anyLong(), anyLong()))
-                .thenReturn(Optional.of(recommendationRequest));
+        skillRequest.setSkill(skill);
+        skills.add(skillRequest);
 
         when(skillRepository.existsByTitle(anyString())).thenReturn(false);
 
         assertThrows(IllegalArgumentException.class, () ->
-                recommendationRequestDtoValidator.validateRecommendationRequestDto(recommendationRequestDto));
+                recommendationRequestDtoValidator.validateRequestedSkills(skills));
     }
 }

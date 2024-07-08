@@ -13,7 +13,7 @@ import static school.faang.user_service.exception.message.MessageForGoalInvitati
 @Component
 public class GoalInvitationServiceValidator {
 
-    static final int SETGOAL_SIZE = 3;
+    private static final int GOAL_SIZE = 3;
 
     void validateForCreateInvitation(GoalInvitationDto goalInvitationDto) {
         if (goalInvitationDto.getInviterId().equals(goalInvitationDto.getInvitedUserId())) {
@@ -31,13 +31,12 @@ public class GoalInvitationServiceValidator {
         if (setGoals == null) {
             throw new DataValidationException(SET_GOALS_IS_NULL.getMessage());
         }
-        if (setGoals.size() > SETGOAL_SIZE) {
+        if (setGoals.size() > GOAL_SIZE) {
             throw new DataValidationException(MORE_THEN_THREE_GOALS.getMessage());
         }
         if (setGoals.contains(goal)) {
             throw new DataValidationException(INVITED_HAS_GOAL.getMessage());
         }
-
         return setGoals;
     }
 }

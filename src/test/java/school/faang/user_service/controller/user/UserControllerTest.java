@@ -5,6 +5,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -14,18 +16,18 @@ import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.user.UserService;
 import school.faang.user_service.service.user.image.ImageProcessor;
+import school.faang.user_service.service.user.parse.DataFromFileService;
 import school.faang.user_service.testData.TestData;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static school.faang.user_service.exception.message.ExceptionMessage.INPUT_OUTPUT_EXCEPTION;
+import static school.faang.user_service.exception.message.ExceptionMessage.NO_FILE_IN_REQUEST;
 
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
@@ -35,6 +37,18 @@ class UserControllerTest {
     private UserService userService;
     @Mock
     private ImageProcessor imageProcessor;
+
+    @Mock
+    private DataFromFileService dataFromFileService;
+
+    @Captor
+    private ArgumentCaptor<InputStream> inputStreamArgumentCaptor;
+
+    @Mock
+    private MultipartFile multipartFile;
+
+    @Mock
+    private InputStream inputStream;
 
     private UserDto userDto;
     private BufferedImage bufferedImage;
@@ -87,6 +101,18 @@ class UserControllerTest {
 
             verify(userService).deleteUserAvatar(anyLong());
         }
+
+        @DisplayName("should call dataFromFileService.saveUsersFromFile when passed")
+        @Test
+        void uploadDataTest() throws IOException {
+            when(multipartFile.isEmpty()).thenReturn(false);
+            when(multipartFile.getInputStream()).thenReturn(inputStream);
+
+            userController.uploadData(multipartFile);
+
+            verify(dataFromFileService).saveUsersFromFile(inputStreamArgumentCaptor.capture());
+            assertEquals(inputStream, inputStreamArgumentCaptor.getValue());
+        }
     }
 
     @Nested
@@ -101,6 +127,25 @@ class UserControllerTest {
 
             verifyNoInteractions(imageProcessor);
             verifyNoInteractions(userService);
+        }
+
+        @DisplayName("should throw exception when multipartFile.isEmpty() == true")
+        @Test
+        void uploadDataWhenEmptyFileTest() {
+            when(multipartFile.isEmpty()).thenReturn(true);
+            DataValidationException exception = assertThrows(DataValidationException.class,
+                    () -> userController.uploadData(multipartFile));
+            assertEquals(NO_FILE_IN_REQUEST.getMessage(), exception.getMessage());
+        }
+
+        @DisplayName("should throw exception when multipartFile.getInputStream()")
+        @Test
+        void uploadDataWhenIOExceptionTest() throws IOException {
+            when(multipartFile.isEmpty()).thenReturn(false);
+            when(multipartFile.getInputStream()).thenThrow(new IOException());
+            DataValidationException exception = assertThrows(DataValidationException.class,
+                    () -> userController.uploadData(multipartFile));
+            assertEquals(INPUT_OUTPUT_EXCEPTION.getMessage(), exception.getMessage());
         }
     }
 }

@@ -26,6 +26,10 @@ spring:
         subscription-channel: subscription_channel
 
 
+thread:
+  pool:
+    size: 4
+
 server:
   port: 8080
 

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.*;
 import school.faang.user_service.testData.TestData;
 
 import java.util.List;
@@ -44,5 +44,46 @@ class UserMapperTest {
         List<UserDto> actualDtos = userMapper.toDto(users);
 
         assertEquals(userDtos, actualDtos);
+    }
+
+    @DisplayName("should map User to Person")
+    @Test
+    void testToUser() {
+        User actualUser = userMapper.toUser(returnPerson());
+        assertEquals(returnUser(), actualUser);
+    }
+
+    private User returnUser() {
+        User user = new User();
+        user.setUsername("VadimBlack");
+        user.setEmail("vladimirowitch.vadim@gmail.com");
+        user.setPhone("79165895532");
+        user.setCity("Moscow");
+        user.setAboutMe("I'm from Central, study at Computer Science, i'm 2013rd year student, my major is Some major, my employer is MIB");
+        return user;
+    }
+
+    private Person returnPerson() {
+        Education education = new Education();
+        education.setFaculty("Computer Science");
+        education.setYearOfStudy(2013);
+        education.setMajor("Some major");
+
+        Address address = new Address();
+        address.setCity("Moscow");
+        address.setState("Central");
+
+        ContactInfo contactInfo = new ContactInfo();
+        contactInfo.setEmail("vladimirowitch.vadim@gmail.com");
+        contactInfo.setPhone("79165895532");
+        contactInfo.setAddress(address);
+
+        Person person = new Person();
+        person.setFirstName("Vadim");
+        person.setLastName("Black");
+        person.setContactInfo(contactInfo);
+        person.setEmployer("MIB");
+        person.setEducation(education);
+        return person;
     }
 }

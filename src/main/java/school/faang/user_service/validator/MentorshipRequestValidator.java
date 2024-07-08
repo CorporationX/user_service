@@ -19,8 +19,6 @@ import java.util.Optional;
 public class MentorshipRequestValidator {
     @Getter
     private final int MENTORSHIP_REQUEST_FREQUENCY_IN_DAYS = 90;
-    @Getter
-    private final int MAX_DESCRIPTION_LENGTH = 4096;
 
     private final UserRepository userRepository;
     private final MentorshipRequestRepository mentorshipRequestRepository;

@@ -4,7 +4,6 @@ import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface SkillService {
 
@@ -14,5 +13,5 @@ public interface SkillService {
 
     List<SkillCandidateDto> getOfferedSkills(Long userId);
 
-    Optional<SkillDto> acquireSkillFromOffers(long skillId, long userId);
+    SkillDto acquireSkillFromOffers(long skillId, long userId);
 }

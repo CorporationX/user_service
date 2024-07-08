@@ -9,7 +9,7 @@ import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.SkillOffer;
-import school.faang.user_service.exception.DataValidationException;
+import school.faang.user_service.exception.skill.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
@@ -41,7 +41,7 @@ public class SkillServiceImpl implements SkillService, SkillValidation, UserVali
         }
 
         if (existByTitle(skill.getTitle())) {
-            throw new DataValidationException(String.format("Skill with %s doesn't exist", skill.getId()));
+            throw new DataValidationException(String.format("Skill with title %s has already exist", skill.getId()));
         }
 
         Skill savedSkill = skillRepository.save(skillMapper.toSkill(skill));
@@ -52,11 +52,9 @@ public class SkillServiceImpl implements SkillService, SkillValidation, UserVali
     @Transactional(readOnly = true)
     @Override
     public List<SkillDto> getUsersSkills(Long userId) {
-        if (userId == null) {
-            throw new IllegalArgumentException("Id can't be nullable");
+        if (!isUserExistsById(userId)) {
+            throw new DataValidationException(String.format("User with %s id doesn't exist", userId));
         }
-
-        isUserExistsById(userId);
 
         List<Skill> skillList = skillRepository.findAllByUserId(userId);
         return skillMapper.toSkillDtoList(skillList);
@@ -69,7 +67,9 @@ public class SkillServiceImpl implements SkillService, SkillValidation, UserVali
             throw new IllegalArgumentException("Id can't be nullable");
         }
 
-        isUserExistsById(userId);
+        if (!isUserExistsById(userId)) {
+            throw new DataValidationException(String.format("User with %s id doesn't exist", userId));
+        }
 
         List<Skill> skillsOfferedToUser = skillRepository.findSkillsOfferedToUser(userId);
 
@@ -78,20 +78,21 @@ public class SkillServiceImpl implements SkillService, SkillValidation, UserVali
 
     @Transactional
     @Override
-    public Optional<SkillDto> acquireSkillFromOffers(long skillId, long userId) {
-        isUserExistsById(userId);
+    public SkillDto acquireSkillFromOffers(long skillId, long userId) {
+        if (!isUserExistsById(userId)) {
+            throw new DataValidationException(String.format("User with %s id doesn't exist", userId));
+        }
 
         Optional<Skill> skill = skillRepository.findById(skillId);
 
-        if (!skill.isPresent()) {
+        if (skill.isEmpty()) {
             throw new DataValidationException(String.format("Skill with %s doesn't exist", skillId));
         }
 
         Optional<Skill> userSkillOptional = skillRepository.findUserSkill(skillId, userId);
 
         if (userSkillOptional.isPresent()) {
-            log.info("User {} already has {} skill", userId, skillId);
-            return Optional.empty();
+            throw new DataValidationException(String.format("User %s already has %s skill", userId, skillId));
         }
 
         List<SkillOffer> allOffersOfSkill = skillOfferRepository.findAllOffersOfSkill(skillId, userId);
@@ -110,10 +111,9 @@ public class SkillServiceImpl implements SkillService, SkillValidation, UserVali
 
             userSkillGuaranteeRepository.saveAll(userSkillGuarantees);
 
-            return Optional.of(skillMapper.toSkillDto(skill.get()));
+            return skillMapper.toSkillDto(skill.get());
         } else {
-            log.info("User doesn't have enough offers to acquire skill");
-            return Optional.empty();
+            throw new DataValidationException("User doesn't have enough offers to acquire skill");
         }
     }
 
@@ -128,9 +128,7 @@ public class SkillServiceImpl implements SkillService, SkillValidation, UserVali
     }
 
     @Override
-    public void isUserExistsById(long id) {
-        if (!userRepository.existsById(id)) {
-            throw new DataValidationException(String.format("User with %s id doesn't exist", id));
-        }
+    public boolean isUserExistsById(long id) {
+        return userRepository.existsById(id);
     }
 }

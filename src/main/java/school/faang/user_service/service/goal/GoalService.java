@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @Service
-@Transactional
 public class GoalService {
     private final GoalRepository goalRepository;
     private final SkillService skillService;
@@ -32,7 +31,7 @@ public class GoalService {
         this.goalMapper = goalMapper;
         this.goalFilters = goalFilters;
     }
-
+    @Transactional
     public GoalDto createGoal(Long userId, GoalDto goalDto) {
         goalValidator.createGoalValidator(userId, goalDto);
 
@@ -41,7 +40,7 @@ public class GoalService {
         goalDto.getSkillIds().forEach(skillId -> goalRepository.addSkillToGoal(saveGoal.getId(), skillId));
         return goalMapper.toDto(saveGoal);
     }
-
+    @Transactional
     public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
         goalValidator.updateGoalValidator(goalId, goalDto);
 
@@ -59,7 +58,7 @@ public class GoalService {
 
         return goalMapper.toDto(savedGoal);
     }
-
+    @Transactional
     public void deleteGoal(long goalId) {
         goalValidator.deleteGoalValidator(goalId);
 

@@ -10,7 +10,7 @@ import school.faang.user_service.service.goal.GoalService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/goals")
+@RequestMapping("/goals")
 public class GoalController {
     private final GoalService goalService;
 
@@ -19,17 +19,17 @@ public class GoalController {
         this.goalService = goalService;
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public GoalDto createGoal(@RequestParam Long userId, @RequestBody GoalDto goalDto) {
         return goalService.createGoal(userId, goalDto);
     }
 
-    @PutMapping("/update/{goalId}")
+    @PutMapping("/{goalId}")
     public GoalDto updateGoal(@PathVariable Long goalId, @RequestBody GoalDto goalDto) {
         return goalService.updateGoal(goalId, goalDto);
     }
 
-    @DeleteMapping("/delete/{goalId}")
+    @DeleteMapping("/{goalId}")
     public ResponseEntity<Void> deleteGoal(@PathVariable Long goalId) {
         goalService.deleteGoal(goalId);
         return ResponseEntity.noContent().build();

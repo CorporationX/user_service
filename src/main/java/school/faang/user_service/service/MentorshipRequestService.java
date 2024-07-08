@@ -78,7 +78,7 @@ public class MentorshipRequestService {
 
         MentorshipRequest request = requestOptional.get();
 
-        if (request.getStatus() == RequestStatus.ACCEPTED){
+        if (request.getStatus() == RequestStatus.ACCEPTED) {
             throw new RuntimeException("Запрос уже получен");
         }
 

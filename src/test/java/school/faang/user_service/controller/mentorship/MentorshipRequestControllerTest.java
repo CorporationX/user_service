@@ -70,6 +70,19 @@ class MentorshipRequestControllerTest extends BaseControllerTest {
     }
 
     @Test
+    void requestMentorship_should_return_bad_request_if_no_people_are_referenced() throws Exception {
+        MentorshipRequestDto dto = new MentorshipRequestDto();
+
+        mockMvc.perform(post(ApiPath.REQUEST_MENTORSHIP)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto))
+                        .header(BaseControllerTest.USER_HEADER, BaseControllerTest.DEFAULT_HEADER_VALUE))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(DtoValidationConstraints.VALIDATION_FAILED))
+                .andExpect(jsonPath("$.details").exists());
+    }
+
+    @Test
     void getRequests_should_return_filtered_requests() throws Exception {
         var requestFilterDto = new RequestFilterDto();
         requestFilterDto.setRequestStatusPattern("PENDING");

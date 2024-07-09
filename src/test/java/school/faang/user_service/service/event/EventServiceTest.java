@@ -14,6 +14,7 @@ import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -36,14 +37,35 @@ public class EventServiceTest {
     private UserRepository userRepository;
     @Mock
     private EventMapper eventMapper;
+    @Mock
+    private EventDescriptionFilter eventDescriptionFilter;
+    private List<EventFilter>
+
+    private Long eventId = 1L;
+    private Long ownerId = 2L;
+    private Skill skill = new Skill();
+    private User owner = User.builder()
+            .id(ownerId)
+            .build();
+    private Event event = Event.builder()
+            .id(eventId)
+            .relatedSkills(List.of(skill))
+            .owner(owner)
+            .build();
+    private EventDto eventDto = new EventDto();
+    {
+        eventDto.setOwnerId(ownerId);
+        eventDto.setId(eventId);
+    }
+
+    private User user = new User();
+
+
+
+
 
     @Test
     public void testCreateWithoutUserSkills() {
-        EventDto eventDto = new EventDto();
-        eventDto.setOwnerId(1L);
-        Event event = new Event();
-        event.setRelatedSkills(List.of(new Skill()));
-        User user = new User();
         user.setSkills(Collections.emptyList());
 
         when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(user));
@@ -57,12 +79,6 @@ public class EventServiceTest {
 
     @Test
     public void testCreateWithRelatedSkills() {
-        EventDto eventDto = new EventDto();
-        eventDto.setOwnerId(1L);
-        Event event = new Event();
-        Skill skill = new Skill();
-        event.setRelatedSkills(List.of(skill));
-        User user = new User();
         user.setSkills(List.of(skill));
 
         when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(user));
@@ -76,8 +92,7 @@ public class EventServiceTest {
     }
 
     @Test
-    public void getEventNotExisting() {
-        long eventId = 1L;
+    public void testGetEventNotExisting() {
         when(eventRepository.findById(eventId)).thenReturn(Optional.empty());
 
         DataValidationException exception =
@@ -86,16 +101,7 @@ public class EventServiceTest {
     }
 
     @Test
-    public void getEventExisting() {
-        long eventId = 1L;
-        User owner = new User();
-        long ownerId = 2L;
-        owner.setId(ownerId);
-        Event event = new Event();
-        event.setId(eventId);
-        event.setOwner(owner);
-        EventDto eventDto = new EventDto();
-        eventDto.setId(eventId);
+    public void testGetEventExisting() {
         when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
         when(eventMapper.toDto(any(Event.class))).thenReturn(eventDto);
 
@@ -106,4 +112,9 @@ public class EventServiceTest {
         verify(eventRepository, times(1)).findById(eventId);
     }
 
+    @Test
+    public void testGetEventsByFilter() {
+        List<Event> events = List.of(event);
+
+    }
 }

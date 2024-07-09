@@ -19,8 +19,6 @@ public interface EventMapper {
     @Mapping(source = "owner.id", target = "ownerId")
     EventDto toDto(Event event);
 
-    List<EventDto> toDto(List<Event> events);
-
     @Mapping(source = "ownerId", target = "owner", qualifiedByName = "getUserById")
     Event toEntity(EventDto eventDto, @Context UserRepository userRepository);
 

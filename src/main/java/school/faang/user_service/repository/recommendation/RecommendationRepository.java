@@ -8,6 +8,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.recommendation.Recommendation;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -27,8 +28,10 @@ public interface RecommendationRepository extends CrudRepository<Recommendation,
     void update(long authorId, long receiverId, String content);
 
     Page<Recommendation> findAllByReceiverId(long receiverId, Pageable pageable);
+    List<Recommendation> findAllByReceiverId(long receiverId);
 
     Page<Recommendation> findAllByAuthorId(long authorId, Pageable pageable);
+    List<Recommendation> findAllByAuthorId(long authorId);
 
     Optional<Recommendation> findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(long authorId, long receiverId);
 }

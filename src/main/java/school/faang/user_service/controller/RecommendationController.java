@@ -1,5 +1,6 @@
 package school.faang.user_service.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
@@ -14,11 +15,11 @@ import java.util.List;
 public class RecommendationController {
     private final RecommendationService recommendationService;
 
-    public RecommendationDto giveRecommendation(RecommendationDto recommendation) {
+    public RecommendationDto giveRecommendation(@Valid RecommendationDto recommendation) {
         return recommendationService.create(recommendation);
     }
 
-    public RecommendationDto updateRecommendation(RecommendationDto updated) {
+    public RecommendationDto updateRecommendation(@Valid RecommendationDto updated) {
         return recommendationService.update(updated);
     }
 
@@ -26,11 +27,11 @@ public class RecommendationController {
         recommendationService.delete(id);
     }
 
-    public List<RecommendationDto> getAllUserRecommendations(long receiverId, Pageable pageable) {
-      return   recommendationService.getAllUserRecommendations(receiverId, pageable);
+    public List<RecommendationDto> getAllUserRecommendations(long receiverId) {
+      return   recommendationService.getAllUserRecommendations(receiverId);
     }
 
-    public List<RecommendationDto> getAllGivenRecommendations(long authorId, Pageable pageable) {
-        return  recommendationService.getAllGivenRecommendations(authorId, pageable);
+    public List<RecommendationDto> getAllGivenRecommendations(long authorId) {
+        return  recommendationService.getAllGivenRecommendations(authorId);
     }
 }

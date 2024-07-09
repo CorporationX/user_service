@@ -30,11 +30,14 @@ public class RecommendationControllerTest {
 
     @Test
     void giveRecommendationTest() {
+        List<SkillOfferDto> skillOfferDtoList = List.of(SkillOfferDto.builder()
+                .id(2L)
+                .skillId(1L).build());
         RecommendationDto recommendationDto = RecommendationDto.builder()
                 .id(1L)
                 .authorId(3L)
                 .receiverId(12L)
-                .skillOffers(List.of(new SkillOfferDto()))
+                .skillOffers(skillOfferDtoList)
                 .build();
 
         when(service.create(recommendationDto)).thenReturn(recommendationDto);
@@ -46,11 +49,14 @@ public class RecommendationControllerTest {
 
     @Test
     void updateRecommendationTest() {
+        List<SkillOfferDto> skillOfferDtoList = List.of(SkillOfferDto.builder()
+                .id(2L)
+                .skillId(1L).build());
         RecommendationDto updateRecommendationDto = RecommendationDto.builder()
                 .id(2L)
                 .authorId(3L)
                 .receiverId(14L)
-                .skillOffers(List.of(new SkillOfferDto()))
+                .skillOffers(skillOfferDtoList)
                 .build();
 
         when(service.update(updateRecommendationDto)).thenReturn(updateRecommendationDto);
@@ -63,18 +69,20 @@ public class RecommendationControllerTest {
     @Test
     void getAllUserRecommendationTest() {
         long receiverId = 1L;
-        Pageable pageable = PageRequest.ofSize(10);
+        List<SkillOfferDto> skillOfferDtoList = List.of(SkillOfferDto.builder()
+                .id(2L)
+                .skillId(1L).build());
         List<RecommendationDto> recommendationDtos = List.of(
                 RecommendationDto.builder()
                         .id(1L)
                         .authorId(3L)
                         .receiverId(receiverId)
-                        .skillOffers(List.of(new SkillOfferDto()))
+                        .skillOffers(skillOfferDtoList)
                         .build());
 
-        when(service.getAllUserRecommendations(receiverId, pageable)).thenReturn(recommendationDtos);
-        List<RecommendationDto> result = controller.getAllUserRecommendations(receiverId, pageable);
-        verify(service).getAllUserRecommendations(receiverId, pageable);
+        when(service.getAllUserRecommendations(receiverId)).thenReturn(recommendationDtos);
+        List<RecommendationDto> result = controller.getAllUserRecommendations(receiverId);
+        verify(service).getAllUserRecommendations(receiverId);
         assertNotNull(result);
         assertEquals(recommendationDtos, result);
     }
@@ -82,18 +90,20 @@ public class RecommendationControllerTest {
     @Test
     void getAllGivenRecommendationsTest() {
         long authorId = 1L;
-        Pageable pageable = PageRequest.ofSize(10);
+        List<SkillOfferDto> skillOfferDtoList = List.of(SkillOfferDto.builder()
+                .id(2L)
+                .skillId(1L).build());
         List<RecommendationDto> recommendationDtos = List.of(
                 RecommendationDto.builder()
                         .id(1L)
                         .authorId(authorId)
                         .receiverId(14L)
-                        .skillOffers(List.of(new SkillOfferDto()))
+                        .skillOffers(skillOfferDtoList)
                         .build());
 
-        when(service.getAllUserRecommendations(authorId, pageable)).thenReturn(recommendationDtos);
-        List<RecommendationDto> result = controller.getAllUserRecommendations(authorId, pageable);
-        verify(service).getAllUserRecommendations(authorId, pageable);
+        when(service.getAllUserRecommendations(authorId)).thenReturn(recommendationDtos);
+        List<RecommendationDto> result = controller.getAllUserRecommendations(authorId);
+        verify(service).getAllUserRecommendations(authorId);
         assertNotNull(result);
         assertEquals(recommendationDtos, result);
     }

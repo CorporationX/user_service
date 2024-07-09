@@ -2,7 +2,6 @@ package school.faang.user_service.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.webjars.NotFoundException;
@@ -14,7 +13,6 @@ import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.mapper.RecommendationMapper;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.RecommendationRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
@@ -32,19 +30,19 @@ public class RecommendationService {
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
     private final RecommendationValidator recommendationValidator;
     private final RecommendationMapper recommendationMapper;
-    private final UserRepository userRepository;
 
     @Transactional
     public RecommendationDto create(RecommendationDto recommendationDto) {
         recommendationValidator.validateRecommendationDto(recommendationDto);
         var previousRecommendation = recommendationRepository
-                .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(recommendationDto.getAuthorId(), recommendationDto.getReceiverId());
+                .findFirstByAuthorIdAndReceiverIdOrderByCreatedAtDesc(
+                        recommendationDto.getAuthorId(), recommendationDto.getReceiverId());
         recommendationValidator.validateRecommendationDate(previousRecommendation);
         long IdRecommendation =
                 recommendationRepository.create(recommendationDto.getAuthorId(), recommendationDto.getReceiverId(), recommendationDto.getContent());
         saveSkillOffer(recommendationDto.getSkillOffers(), IdRecommendation);
         Recommendation recommendation = recommendationRepository.findById(IdRecommendation).orElse(null);
-        saveGuaranteeUserSkill(recommendationDto.getSkillOffers(), recommendation.getReceiver(), recommendation.getAuthor());
+        saveGuaranteeUserSkill(recommendationDto);
         return recommendationMapper.toDto(recommendation);
     }
 
@@ -59,7 +57,7 @@ public class RecommendationService {
         skillOfferRepository.deleteAllByRecommendationId(updated.getId());
         saveSkillOffer(updated.getSkillOffers(), updated.getReceiverId());
         Recommendation updatedEntity = recommendationRepository.findById(updated.getId()).orElse(null);
-        saveGuaranteeUserSkill(updated.getSkillOffers(), updatedEntity.getReceiver(), updatedEntity.getAuthor());
+        saveGuaranteeUserSkill(updated);
         return recommendationMapper.toDto(updatedEntity);
     }
 
@@ -70,34 +68,29 @@ public class RecommendationService {
     }
 
     @Transactional(readOnly = true)
-    public List<RecommendationDto> getAllUserRecommendations(long receiverId, Pageable pageable) {
+    public List<RecommendationDto> getAllUserRecommendations(long receiverId) {
         recommendationValidator.validateId(receiverId);
-        List<Recommendation> allUserRecommendation = recommendationRepository
-                .findAllByReceiverId(receiverId, pageable)
-                .stream()
-                .toList();
-        checkRecommendationList(allUserRecommendation, receiverId);
+        List<Recommendation> allUserRecommendation = recommendationRepository.findAllByReceiverId(receiverId);
+        if (allUserRecommendation != null || !allUserRecommendation.isEmpty()) {
+            recommendationValidator.checkRecommendationList(allUserRecommendation, receiverId);
+        } else {
+            throw new NotFoundException("Recommendation not found");
+        }
         return recommendationMapper.recommendationToRecommendationDto(allUserRecommendation);
     }
 
     @Transactional(readOnly = true)
-    public List<RecommendationDto> getAllGivenRecommendations(long authorId, Pageable pageable) {
+    public List<RecommendationDto> getAllGivenRecommendations(long authorId) {
         recommendationValidator.validateId(authorId);
-        List<Recommendation> allUserRecommendation = recommendationRepository
-                .findAllByAuthorId(authorId, pageable)
-                .stream()
-                .toList();
-        checkRecommendationList(allUserRecommendation, authorId);
+        List<Recommendation> allUserRecommendation = recommendationRepository.findAllByReceiverId(authorId);
+        if (allUserRecommendation != null || !allUserRecommendation.isEmpty()) {
+            recommendationValidator.checkRecommendationList(allUserRecommendation, authorId);
+        } else {
+            throw new NotFoundException("Recommendation not found");
+        }
         return recommendationMapper.recommendationToRecommendationDto(allUserRecommendation);
     }
 
-    private void checkRecommendationList(List<Recommendation> recommendations, long userId) {
-        if (recommendations.isEmpty()) {
-            String msg = "User id: %d recommendation not found!";
-            log.error(String.format(msg, userId));
-            throw new NotFoundException(String.format(msg, userId));
-        }
-    }
 
     private void existsById(Long id) {
         recommendationValidator.validateId(id);
@@ -108,28 +101,30 @@ public class RecommendationService {
         }
     }
 
-    public void saveSkillOffer(List<SkillOfferDto> skillOffers, long recommendationId) {
-        if (skillOffers == null || skillOffers.size() == 0) {
+    private void saveSkillOffer(List<SkillOfferDto> skillOffers, long recommendationId) {
+        if (skillOffers != null) {
             skillOffers.forEach(skillOffer -> skillOfferRepository.create(skillOffer.getSkillId(), recommendationId));
         }
     }
 
-    public void saveGuaranteeUserSkill(List<SkillOfferDto> skillOfferDto, User user, User guarantor) {
-        List<Skill> userSkills = skillRepository.findAllByUserId(user.getId());
-        if (skillOfferDto == null || skillOfferDto.isEmpty()) {
-            userSkills.stream().forEach(skill -> {
-                skillOfferDto.stream().forEach(skillOffer -> {
-                            if (skillOffer.getSkillId() == skill.getId() && !skill.getGuarantees().contains(guarantor)) {
-                                UserSkillGuarantee userSkillGuarantee =
-                                        UserSkillGuarantee.builder()
-                                                .user(user)
-                                                .guarantor(user)
-                                                 .skill(skill).build();
-                                userSkillGuaranteeRepository.save(userSkillGuarantee);
-                            }
-                        }
-                );
-            });
+    public void saveGuaranteeUserSkill(RecommendationDto recommendationDto) {
+        Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
+        List<Skill> userSkills = skillRepository.findAllByUserId(recommendation.getReceiver().getId());
+        if (recommendation.getSkillOffers() != null || !recommendation.getSkillOffers().isEmpty()) {
+            userSkills.stream()
+                    .forEach(skill -> {
+                       recommendationDto.getSkillOffers().stream()
+                                .forEach(skillOffer -> {
+                                    if (skillOffer.getSkillId() == skill.getId() && !skill.getGuarantees().contains(recommendation.getAuthor())) {
+                                        UserSkillGuarantee userSkillGuarantee =
+                                                UserSkillGuarantee.builder()
+                                                        .user(recommendation.getReceiver())
+                                                        .guarantor(recommendation.getReceiver())
+                                                        .skill(skill).build();
+                                        userSkillGuaranteeRepository.save(userSkillGuarantee);
+                                    }
+                                });
+                    });
         }
     }
 

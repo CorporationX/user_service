@@ -2,11 +2,13 @@ package school.faang.user_service.validator;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.webjars.NotFoundException;
 import school.faang.user_service.dto.recomendation.RecommendationDto;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.exception.DataValidationException;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -36,6 +38,14 @@ public class RecommendationValidator {
         }
     }
 
+    public void checkRecommendationList(List<Recommendation> recommendations, long userId) {
+        if (recommendations.isEmpty()) {
+            String msg = "User id: %d recommendation not found!";
+            log.error(String.format(msg, userId));
+            throw new NotFoundException(String.format(msg, userId));
+        }
+    }
+
     private void validateContent(String content) {
         if (content == null) {
             log.error(CONTENT_IS_NULL);
@@ -45,13 +55,13 @@ public class RecommendationValidator {
             log.error(CONTENT_IS_BLANK);
             throw new DataValidationException(CONTENT_IS_BLANK);
         }
-
     }
 
    public void validateId(long id) {
         if (id <= 0) {
             log.error(ID_MESSAGE);
-            throw new DataValidationException(ID_MESSAGE);
+            throw new IllegalArgumentException(ID_MESSAGE);
         }
     }
+
 }

@@ -19,6 +19,4 @@ public interface RecommendationMapper {
     Recommendation toEntity(RecommendationDto dto);
 
     List<RecommendationDto> recommendationToRecommendationDto(List<Recommendation> recommendations);
-
-    List<Recommendation> recommendationDtoToRecommendations(List<RecommendationDto> dtos);
 }

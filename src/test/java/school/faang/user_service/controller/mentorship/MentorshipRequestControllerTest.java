@@ -14,6 +14,7 @@ import school.faang.user_service.service.mentorship.MentorshipRequestService;
 
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -66,7 +67,7 @@ class MentorshipRequestControllerTest extends BaseControllerTest {
                         .header(BaseControllerTest.USER_HEADER, BaseControllerTest.DEFAULT_HEADER_VALUE))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(DtoValidationConstraints.VALIDATION_FAILED))
-                .andExpect(jsonPath("$.details").exists());
+                .andExpect(jsonPath("$.details").value(containsString(DtoValidationConstraints.MENTORSHIP_REQUEST_DESCRIPTION_CONSTRAINT)));
     }
 
     @Test
@@ -79,7 +80,8 @@ class MentorshipRequestControllerTest extends BaseControllerTest {
                         .header(BaseControllerTest.USER_HEADER, BaseControllerTest.DEFAULT_HEADER_VALUE))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(DtoValidationConstraints.VALIDATION_FAILED))
-                .andExpect(jsonPath("$.details").exists());
+                .andExpect(jsonPath("$.details").value(containsString(DtoValidationConstraints.MENTORSHIP_REQUEST_REQUESTER_ID_CONSTRAINT)))
+                .andExpect(jsonPath("$.details").value(containsString(DtoValidationConstraints.MENTORSHIP_REQUEST_RECEIVER_ID_CONSTRAINT)));
     }
 
     @Test

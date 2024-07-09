@@ -1,5 +1,6 @@
 package school.faang.user_service.controller;
 
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -31,24 +32,19 @@ public class SubscriptionController {
                            @PathVariable("userId") @Positive(message = "Id should be positive")
                            long followeeId) {
 
-        if (followerId == followeeId) {
-            throw new DataValidationException(MessageError.SELF_FOLLOWING);
-        }
-
+        validateSelfFollowing(followerId, followeeId);
         subscriptionService.followUser(followerId, followeeId);
     }
 
     @DeleteMapping("/{followerId}")
     public void unfollowUser(@PathVariable @Positive long followerId, @PathVariable("userId") @Positive long followeeId) {
-        if (followerId == followeeId) {
-            throw new DataValidationException(MessageError.SELF_FOLLOWING);
-        }
 
+        validateSelfFollowing(followerId, followeeId);
         subscriptionService.unfollowUser(followerId, followeeId);
     }
 
     @GetMapping
-    public List<UserDto> getFollowers(@PathVariable("userId") @Positive long followeeId, UserFilterDto filter) {
+    public List<UserDto> getFollowers(@PathVariable("userId") @Positive long followeeId, @NotNull UserFilterDto filter) {
         return subscriptionService.getFollowers(followeeId, filter);
     }
 
@@ -60,5 +56,11 @@ public class SubscriptionController {
     @GetMapping("/count-followees")
     public int getFolloweesCount(@PathVariable("userId") @Positive long followerId) {
         return subscriptionService.getFolloweesCount(followerId);
+    }
+
+    private void validateSelfFollowing(long followerId, long followeeId) {
+        if (followerId == followeeId) {
+            throw new DataValidationException(MessageError.SELF_FOLLOWING);
+        }
     }
 }

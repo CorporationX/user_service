@@ -59,7 +59,7 @@ public class SubscriptionService {
                         ((userStream1, userStream2) -> userStream2))
                 // полагаю что номер страницы приходит в пользовательком формате (начиная с 1)
                 // default - 1 (валидация на уровне контроллера)
-                .skip( (long) (filter.getPage() - 1) * filter.getPageSize())
+                .skip((long) (filter.getPage() - 1) * filter.getPageSize())
                 // default - 10
                 .limit(filter.getPageSize());
     }

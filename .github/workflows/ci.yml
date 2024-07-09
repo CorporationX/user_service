@@ -3,7 +3,7 @@ name: test-BJS2-15586
 on:
   pull_request:
     branches:
-      - dev
+      - titan-master-bc5
 
 jobs:
   check_tests:

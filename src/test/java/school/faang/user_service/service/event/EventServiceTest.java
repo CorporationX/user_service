@@ -1,26 +1,28 @@
 package school.faang.user_service.service.event;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exeption.event.DataValidationException;
+import school.faang.user_service.filter.EventFilter;
 import school.faang.user_service.filter.EventFilterDto;
+import school.faang.user_service.filter.impl.DescriptionPatternFilter;
+import school.faang.user_service.filter.impl.TitlePatternFilter;
 import school.faang.user_service.mapper.EventMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.validator.event.EventValidator;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,18 +37,28 @@ import static org.mockito.Mockito.when;
 public class EventServiceTest {
     @InjectMocks
     private EventService eventService;
-    @Mock
     private EventRepository eventRepository;
-    @Mock
     private SkillRepository skillRepository;
-    @Mock
     private UserRepository userRepository;
-    @Spy
     private EventMapperImpl eventMapper;
-    @Mock
     private EventValidator eventValidator;
     @Captor
     private ArgumentCaptor<Event> captorEvent;
+
+    @BeforeEach
+    void setUp() {
+        eventRepository = Mockito.mock(EventRepository.class);
+        skillRepository = Mockito.mock(SkillRepository.class);
+        userRepository = Mockito.mock(UserRepository.class);
+        eventMapper = Mockito.spy(EventMapperImpl.class);
+        eventValidator = Mockito.mock(EventValidator.class);
+        EventFilter titleFilters = Mockito.spy(TitlePatternFilter.class);
+        EventFilter descriptionFilters = Mockito.spy(DescriptionPatternFilter.class);
+        List<EventFilter> eventFilters = List.of(titleFilters, descriptionFilters);
+        eventService = new EventService(eventRepository, skillRepository, userRepository, eventMapper, eventValidator,
+                eventFilters);
+
+    }
 
     @Test
     public void testCreateWithNotExistUserId() {
@@ -157,18 +169,16 @@ public class EventServiceTest {
     @Test
     public void testGetEventsByFilter() {
         // Arrange
+        List<Event> events = prepareEventsForFiltering();
+
         EventFilterDto eventFilterDto = new EventFilterDto();
-        eventFilterDto.setTitle("filter");
+        eventFilterDto.setTitlePattern("filter");
+        eventFilterDto.setDescriptionPattern("filter");
 
-        Event firstEvent = new Event();
-        Event secondEvent = new Event();
-        firstEvent.setTitle("firstEvent");
-        secondEvent.setTitle("secondEvent filter");
-        List<Event> events = List.of(firstEvent, secondEvent);
-
-        List<EventDto> eventsDto = new ArrayList<>();
-        eventsDto.add(eventMapper.toDto(secondEvent));
-        int sizeFilteredEventsExp = eventsDto.size();
+        // ожидаем третье событие
+        EventDto eventDtoExp = eventMapper.toDto(events.get(2));
+        List<EventDto> eventsDtoExp = List.of(eventDtoExp);
+        int sizeFilteredEventsExp = eventsDtoExp.size();
         when(eventRepository.findAll()).thenReturn(events);
 
         // Action
@@ -177,7 +187,24 @@ public class EventServiceTest {
 
         // Assert
         assertEquals(sizeFilteredEventsExp, sizeFilteredEventsActual);
-        assertEquals(eventsDto, filteredEventsDto);
+        assertEquals(eventsDtoExp, filteredEventsDto);
+    }
+
+    private List<Event> prepareEventsForFiltering() {
+        Event eventFirst = new Event();
+        eventFirst.setTitle("title first");
+        eventFirst.setDescription("description first filter");
+        Event eventSecond = new Event();
+        eventSecond.setTitle("title second filter");
+        eventSecond.setDescription("description second");
+        Event eventThird = new Event();
+        eventThird.setTitle("title third filter");
+        eventThird.setDescription("description third filter");
+        Event eventFourth = new Event();
+        eventFourth.setTitle("title fourth filter");
+        eventFourth.setDescription("description fourth");
+
+        return List.of(eventFirst, eventSecond, eventThird, eventFourth);
     }
 
     @Test

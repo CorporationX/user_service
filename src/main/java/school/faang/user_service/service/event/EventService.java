@@ -7,6 +7,7 @@ import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
 import school.faang.user_service.exeption.event.DataValidationException;
+import school.faang.user_service.filter.EventFilter;
 import school.faang.user_service.filter.EventFilterDto;
 import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.SkillRepository;
@@ -15,7 +16,6 @@ import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.validator.event.EventValidator;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +25,7 @@ public class EventService {
     private final UserRepository userRepository;
     private final EventMapper eventMapper;
     private final EventValidator eventValidator;
+    private final List<EventFilter> eventFilters;
 
     public EventDto create(EventDto eventDto) {
         List<Skill> skills = checkExistenceSkill(eventDto);
@@ -41,14 +42,16 @@ public class EventService {
         return eventMapper.toDto(event);
     }
 
-
-    public List<EventDto> getEventsByFilter(EventFilterDto filter) {
+    public List<EventDto> getEventsByFilter(EventFilterDto filters) {
         List<Event> events = eventRepository.findAll();
-        List<Predicate<Event>> filters = filter.getFilters();
+
+        List<EventFilter> actualFilters = eventFilters.stream()
+                .filter(f -> f.isApplicable(filters))
+                .toList();
 
         return events.stream()
-                .filter(e -> filters.stream()
-                        .allMatch(f -> f.test(e)))
+                .filter(e -> actualFilters.stream()
+                        .allMatch(f -> f.test(e, filters)))
                 .map(eventMapper::toDto)
                 .toList();
     }
@@ -91,7 +94,6 @@ public class EventService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new DataValidationException("Пользователя с таким id не существует."));
         List<Event> participatedEvents = eventRepository.findParticipatedEventsByUserId(user.getId());
-        Event event = new Event();
 
         return participatedEvents.stream()
                 .map(eventMapper::toDto)

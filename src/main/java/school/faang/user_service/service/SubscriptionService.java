@@ -38,12 +38,10 @@ public class SubscriptionService {
 
         List<User> followers = subscriptionRepository.findByFolloweeId(followeeId).toList();
 
-        followers = userFilters.stream()
+        return userMapper.toDto(userFilters.stream()
                 .filter(filter -> filter.isApplicable(filterDto))
-                .reduce(followers, (currentFollowings, filter) ->
-                        filter.apply(currentFollowings, filterDto), (a, b) -> b);
-
-        return userMapper.toDto(followers);
+                .flatMap(filter -> filter.apply(followers, filterDto))
+                .toList());
     }
 
     public Integer getFollowersCount(long followeeId) {
@@ -57,12 +55,10 @@ public class SubscriptionService {
 
         List<User> followings = subscriptionRepository.findByFolloweeId(followeeId).toList();
 
-        followings = userFilters.stream()
+        return userMapper.toDto(userFilters.stream()
                 .filter(filter -> filter.isApplicable(filterDto))
-                .reduce(followings, (currentFollowings, filter) ->
-                        filter.apply(currentFollowings, filterDto), (a, b) -> b);
-
-        return userMapper.toDto(followings);
+                .flatMap(filter -> filter.apply(followings, filterDto))
+                .toList());
     }
 
     public Integer getFollowingCount(long followerId) {

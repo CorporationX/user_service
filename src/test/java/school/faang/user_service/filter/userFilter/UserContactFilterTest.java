@@ -67,15 +67,13 @@ public class UserContactFilterTest {
         users.add(firstUser);
         users.add(secondUser);
 
-        List<User> usersForApply = userContactFilter.apply(users, userFilterDto);
-
         List<User> filteredUsers = users.stream()
                         .filter(user -> user.getContacts().stream()
                 .anyMatch(contact -> contact.getContact().equals(userFilterDto.getContactPattern()))).toList();
 
         assertEquals(1, filteredUsers.size());
         assertEquals("test", filteredUsers.get(0).getContacts().get(0).getContact());
-        assertEquals(filteredUsers, usersForApply);
+        assertEquals(filteredUsers, userContactFilter.apply(users, userFilterDto).toList());
     }
 
     @Test
@@ -103,14 +101,12 @@ public class UserContactFilterTest {
         users.add(firstUser);
         users.add(secondUser);
 
-        List<User> usersForApply = userContactFilter.apply(users, userFilterDto);
-
         List<User> filteredUsers = users.stream()
                 .filter(user -> user.getContacts().stream()
                         .anyMatch(contact -> contact.getContact().equals(userFilterDto.getContactPattern())))
                 .toList();
 
         assertEquals(0, filteredUsers.size());
-        assertEquals(filteredUsers, usersForApply);
+        assertEquals(filteredUsers, userContactFilter.apply(users, userFilterDto).toList());
     }
 }

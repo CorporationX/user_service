@@ -62,15 +62,13 @@ public class UserCountryFilterTest {
         users.add(firstUser);
         users.add(secondUser);
 
-        List<User> usersForApply = userCountryFilter.apply(users, userFilterDto);
-
         List<User> filteredUsers = users.stream()
                 .filter(user -> user.getCountry().getTitle().matches(userFilterDto.getCountryPattern()))
                 .toList();
 
         assertEquals(1, filteredUsers.size());
         assertEquals("This is a test country", filteredUsers.get(0).getCountry().getTitle());
-        assertEquals(filteredUsers, usersForApply);
+        assertEquals(filteredUsers, userCountryFilter.apply(users, userFilterDto).toList());
     }
 
     @Test
@@ -93,13 +91,12 @@ public class UserCountryFilterTest {
         users.add(firstUser);
         users.add(secondUser);
 
-        List<User> usersForApply = userCountryFilter.apply(users, userFilterDto);
 
         List<User> filteredUsers = users.stream()
                 .filter(user -> user.getCountry().getTitle().matches(userFilterDto.getCountryPattern()))
                 .toList();
 
         assertEquals(0, filteredUsers.size());
-        assertEquals(filteredUsers, usersForApply);
+        assertEquals(filteredUsers, userCountryFilter.apply(users, userFilterDto).toList());
     }
 }

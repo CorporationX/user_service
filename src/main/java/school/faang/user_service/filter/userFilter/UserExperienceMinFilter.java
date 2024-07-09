@@ -5,6 +5,7 @@ import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @Component
 public class UserExperienceMinFilter implements UserFilter {
@@ -14,7 +15,7 @@ public class UserExperienceMinFilter implements UserFilter {
     }
 
     @Override
-    public List<User> apply(List<User> users, UserFilterDto userFilter) {
-        return users.stream().filter(user -> user.getExperience() >= userFilter.getExperienceMin()).toList();
+    public Stream<User> apply(List<User> users, UserFilterDto userFilter) {
+        return users.stream().filter(user -> user.getExperience() >= userFilter.getExperienceMin());
     }
 }

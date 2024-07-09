@@ -57,15 +57,13 @@ public class UserExperienceMinFilterTest {
         users.add(firstUser);
         users.add(secondUser);
 
-        List<User> usersForApply = userExperienceMinFilter.apply(users, userFilterDto);
-
         List<User> filteredUsers = users.stream()
                 .filter(user -> user.getExperience() >= userFilterDto.getExperienceMin())
                 .toList();
 
         assertEquals(1, filteredUsers.size());
         assertEquals(6, filteredUsers.get(0).getExperience());
-        assertEquals(filteredUsers, usersForApply);
+        assertEquals(filteredUsers, userExperienceMinFilter.apply(users, userFilterDto).toList());
     }
 
     @Test
@@ -84,13 +82,11 @@ public class UserExperienceMinFilterTest {
         users.add(firstUser);
         users.add(secondUser);
 
-        List<User> usersForApply = userExperienceMinFilter.apply(users, userFilterDto);
-
         List<User> filteredUsers = users.stream()
                 .filter(user -> user.getExperience() >= userFilterDto.getExperienceMin())
                 .toList();
 
         assertEquals(0, filteredUsers.size());
-        assertEquals(filteredUsers, usersForApply);
+        assertEquals(filteredUsers, userExperienceMinFilter.apply(users, userFilterDto).toList());
     }
 }

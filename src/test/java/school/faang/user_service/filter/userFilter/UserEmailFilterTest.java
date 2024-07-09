@@ -57,15 +57,13 @@ public class UserEmailFilterTest {
         users.add(firstUser);
         users.add(secondUser);
 
-        List<User> usersForApply = userEmailFilter.apply(users, userFilterDto);
-
         List<User> filteredUsers = users.stream()
                 .filter(user -> user.getEmail().matches(userFilterDto.getEmailPattern()))
                 .toList();
 
         assertEquals(1, filteredUsers.size());
         assertEquals("This is a test email", filteredUsers.get(0).getEmail());
-        assertEquals(filteredUsers, usersForApply);
+        assertEquals(filteredUsers, userEmailFilter.apply(users, userFilterDto).toList());
     }
 
     @Test
@@ -84,13 +82,11 @@ public class UserEmailFilterTest {
         users.add(firstUser);
         users.add(secondUser);
 
-        List<User> usersForApply = userEmailFilter.apply(users, userFilterDto);
-
         List<User> filteredUsers = users.stream()
                 .filter(user -> user.getEmail().matches(userFilterDto.getEmailPattern()))
                 .toList();
 
         assertEquals(0, filteredUsers.size());
-        assertEquals(filteredUsers, usersForApply);
+        assertEquals(filteredUsers, userEmailFilter.apply(users, userFilterDto).toList());
     }
 }

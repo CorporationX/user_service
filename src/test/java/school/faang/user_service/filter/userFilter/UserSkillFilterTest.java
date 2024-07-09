@@ -67,8 +67,6 @@ public class UserSkillFilterTest {
         users.add(firstUser);
         users.add(secondUser);
 
-        List<User> usersForApply = userSkillFilter.apply(users, userFilterDto);
-
         List<User> filteredUsers = users.stream()
                 .filter(user -> user.getSkills().stream()
                         .anyMatch(skill -> skill.getTitle().equals(userFilterDto.getSkillPattern())))
@@ -76,7 +74,7 @@ public class UserSkillFilterTest {
 
         assertEquals(1, filteredUsers.size());
         assertEquals("test", filteredUsers.get(0).getSkills().get(0).getTitle());
-        assertEquals(filteredUsers, usersForApply);
+        assertEquals(filteredUsers, userSkillFilter.apply(users, userFilterDto).toList());
     }
 
     @Test
@@ -104,14 +102,12 @@ public class UserSkillFilterTest {
         users.add(firstUser);
         users.add(secondUser);
 
-        List<User> usersForApply = userSkillFilter.apply(users, userFilterDto);
-
         List<User> filteredUsers = users.stream()
                 .filter(user -> user.getSkills().stream()
                         .anyMatch(skill -> skill.getTitle().equals(userFilterDto.getSkillPattern())))
                 .toList();
 
         assertEquals(0, filteredUsers.size());
-        assertEquals(filteredUsers, usersForApply);
+        assertEquals(filteredUsers, userSkillFilter.apply(users, userFilterDto).toList());
     }
 }

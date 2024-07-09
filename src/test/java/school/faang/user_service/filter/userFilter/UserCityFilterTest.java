@@ -54,15 +54,13 @@ public class UserCityFilterTest {
         users.add(firstUser);
         users.add(secondUser);
 
-        List<User> usersForApply = userCityFilter.apply(users, userFilterDto);
-
         List<User> filteredUsers = users.stream()
                 .filter(user -> user.getCity().matches(userFilterDto.getCityPattern()))
                 .toList();
 
         assertEquals(1, filteredUsers.size());
         assertEquals("This is a test city", filteredUsers.get(0).getCity());
-        assertEquals(filteredUsers, usersForApply);
+        assertEquals(filteredUsers, userCityFilter.apply(users, userFilterDto).toList());
     }
 
     @Test
@@ -81,13 +79,11 @@ public class UserCityFilterTest {
         users.add(firstUser);
         users.add(secondUser);
 
-        List<User> usersForApply = userCityFilter.apply(users, userFilterDto);
-
         List<User> filteredUsers = users.stream()
                 .filter(user -> user.getCity().matches(userFilterDto.getCityPattern()))
                 .toList();
 
         assertEquals(0, filteredUsers.size());
-        assertEquals(filteredUsers, usersForApply);
+        assertEquals(filteredUsers, userCityFilter.apply(users, userFilterDto).toList());
     }
 }

@@ -57,15 +57,13 @@ public class UserExperienceMaxFilterTest {
         users.add(firstUser);
         users.add(secondUser);
 
-        List<User> usersForApply = userExperienceMaxFilter.apply(users, userFilterDto);
-
         List<User> filteredUsers = users.stream()
                 .filter(user -> user.getExperience() <= userFilterDto.getExperienceMax())
                 .toList();
 
         assertEquals(1, filteredUsers.size());
         assertEquals(9, filteredUsers.get(0).getExperience());
-        assertEquals(filteredUsers, usersForApply);
+        assertEquals(filteredUsers, userExperienceMaxFilter.apply(users, userFilterDto).toList());
     }
 
     @Test
@@ -84,13 +82,11 @@ public class UserExperienceMaxFilterTest {
         users.add(firstUser);
         users.add(secondUser);
 
-        List<User> usersForApply = userExperienceMaxFilter.apply(users, userFilterDto);
-
         List<User> filteredUsers = users.stream()
                 .filter(user -> user.getExperience() <= userFilterDto.getExperienceMax())
                 .toList();
 
         assertEquals(0, filteredUsers.size());
-        assertEquals(filteredUsers, usersForApply);
+        assertEquals(filteredUsers, userExperienceMaxFilter.apply(users, userFilterDto).toList());
     }
 }

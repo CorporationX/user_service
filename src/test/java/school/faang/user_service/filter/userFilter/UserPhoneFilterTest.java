@@ -54,15 +54,13 @@ public class UserPhoneFilterTest {
         users.add(firstUser);
         users.add(secondUser);
 
-        List<User> usersForApply = userPhoneFilter.apply(users, userFilterDto);
-
         List<User> filteredUsers = users.stream()
                 .filter(user -> user.getPhone().matches(userFilterDto.getPhonePattern()))
                 .toList();
 
         assertEquals(1, filteredUsers.size());
         assertEquals("This is a test phone", filteredUsers.get(0).getPhone());
-        assertEquals(filteredUsers, usersForApply);
+        assertEquals(filteredUsers, userPhoneFilter.apply(users, userFilterDto).toList());
     }
 
     @Test
@@ -81,13 +79,12 @@ public class UserPhoneFilterTest {
         users.add(firstUser);
         users.add(secondUser);
 
-        List<User> usersForApply = userPhoneFilter.apply(users, userFilterDto);
 
         List<User> filteredUsers = users.stream()
                 .filter(user -> user.getPhone().matches(userFilterDto.getPhonePattern()))
                 .toList();
 
         assertEquals(0, filteredUsers.size());
-        assertEquals(filteredUsers, usersForApply);
+        assertEquals(filteredUsers, userPhoneFilter.apply(users, userFilterDto).toList());
     }
 }

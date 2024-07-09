@@ -5,6 +5,7 @@ import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @Component
 public class UserCountryFilter implements UserFilter {
@@ -14,7 +15,7 @@ public class UserCountryFilter implements UserFilter {
     }
 
     @Override
-    public List<User> apply(List<User> users, UserFilterDto userFilter) {
-        return users.stream().filter(user -> user.getCountry().getTitle().matches(userFilter.getCountryPattern())).toList();
+    public Stream<User> apply(List<User> users, UserFilterDto userFilter) {
+        return users.stream().filter(user -> user.getCountry().getTitle().matches(userFilter.getCountryPattern()));
     }
 }

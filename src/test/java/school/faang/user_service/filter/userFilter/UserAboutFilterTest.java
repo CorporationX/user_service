@@ -58,15 +58,13 @@ public class UserAboutFilterTest {
         users.add(firstUser);
         users.add(secondUser);
 
-        List<User> usersForApply = userAboutFilter.apply(users, userFilterDto);
-
         List<User> filteredUsers = users.stream()
                 .filter(user -> user.getAboutMe().matches(userFilterDto.getAboutPattern()))
                 .toList();
 
         assertEquals(1, filteredUsers.size());
         assertEquals("This is a test about", filteredUsers.get(0).getAboutMe());
-        assertEquals(filteredUsers, usersForApply);
+        assertEquals(filteredUsers, userAboutFilter.apply(users, userFilterDto).toList());
     }
 
     @Test
@@ -85,13 +83,11 @@ public class UserAboutFilterTest {
         users.add(firstUser);
         users.add(secondUser);
 
-        List<User> usersForApply = userAboutFilter.apply(users, userFilterDto);
-
         List<User> filteredUsers = users.stream()
                 .filter(user -> user.getAboutMe().matches(userFilterDto.getAboutPattern()))
                 .toList();
 
         assertEquals(0, filteredUsers.size());
-        assertEquals(filteredUsers, usersForApply);
+        assertEquals(filteredUsers, userAboutFilter.apply(users, userFilterDto).toList());
     }
 }

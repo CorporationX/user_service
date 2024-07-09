@@ -1,14 +1,7 @@
 package school.faang.user_service.controller.recommendation;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
 import school.faang.user_service.dto.RecommendationRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
@@ -16,9 +9,8 @@ import school.faang.user_service.service.RecommendationRequestService;
 
 import java.util.List;
 
-@RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/controller")
+@Component
 public class RecommendationRequestController {
     private final RecommendationRequestService recommendationRequestService;
 
@@ -31,15 +23,12 @@ public class RecommendationRequestController {
         }
         return recommendationRequestService.create(recommendationRequest);
     }
-@RequestMapping(value = "/getRecommendationRequests",
-        method = RequestMethod.GET,
-        produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<RecommendationRequestDto>> getRecommendationRequests(@RequestBody RequestFilterDto filter) {
 
-            return ResponseEntity.status(HttpStatus.OK).body(recommendationRequestService.getRequests(filter));
-//            throw new IllegalArgumentException("Фильтр пустой");
-
-//        return recommendationRequestService.getRequests(filter);
+    public List<RecommendationRequestDto> getRecommendationRequests(RequestFilterDto filter) {
+        if (filter == null) {
+            throw new IllegalArgumentException("Фильтр пустой");
+        }
+        return recommendationRequestService.getRequests(filter);
     }
 
     public RecommendationRequestDto getRecommendationRequest(long id) {

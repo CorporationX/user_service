@@ -20,7 +20,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 @Component
 @RequiredArgsConstructor
@@ -75,12 +74,6 @@ public class RecommendationRequestService {
         return recommendationRequestsAll.stream()
                 .map(recommendationRequestMapper::toDto)
                 .toList();
-
-//        Stream<RecommendationRequest> recommendationRequestsAll = recommendationRequestRepository.findAll().stream();
-//        requestFilter.stream()
-//                .filter(requestFilter -> requestFilter.isApplication(filter))
-//                .forEach(requestFilter -> requestFilter.apply(recommendationRequestsAll, filter));
-//        return recommendationRequestsAll.map(recommendationRequestMapper::toDto).toList();
     }
 
     public RecommendationRequestDto getRequest(long id) {

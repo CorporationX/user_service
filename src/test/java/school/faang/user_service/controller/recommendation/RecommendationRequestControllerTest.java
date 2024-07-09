@@ -90,26 +90,26 @@ class RecommendationRequestControllerTest {
         verify(recommendationRequestService, never()).create(nullMessageRequest);
     }
 
-//    @Test
-//    void testGetRecommendationRequestsValid() {
-//        List<RecommendationRequestDto> expectedRequests = new ArrayList<>();
-//        RecommendationRequestDto expectedOne = new RecommendationRequestDto();
-//        RecommendationRequestDto expectedTwo = new RecommendationRequestDto();
-//        expectedOne.setId(1L);
-//        expectedTwo.setId(2L);
-//        expectedRequests.add(expectedOne);
-//        expectedRequests.add(expectedTwo);
-//
-//        when(recommendationRequestService.getRequests(validRequestFilterDto)).thenReturn(expectedRequests);
-//
-//        List<RecommendationRequestDto> result = recommendationRequestController.getRecommendationRequests(validRequestFilterDto);
-//
-//        assertNotNull(result);
-//        assertEquals(expectedRequests.size(), result.size());
-//        assertEquals(expectedRequests, result);
-//
-//        verify(recommendationRequestService, times(1)).getRequests(validRequestFilterDto);
-//    }
+    @Test
+    void testGetRecommendationRequestsValid() {
+        List<RecommendationRequestDto> expectedRequests = new ArrayList<>();
+        RecommendationRequestDto expectedOne = new RecommendationRequestDto();
+        RecommendationRequestDto expectedTwo = new RecommendationRequestDto();
+        expectedOne.setId(1L);
+        expectedTwo.setId(2L);
+        expectedRequests.add(expectedOne);
+        expectedRequests.add(expectedTwo);
+
+        when(recommendationRequestService.getRequests(validRequestFilterDto)).thenReturn(expectedRequests);
+
+        List<RecommendationRequestDto> result = recommendationRequestController.getRecommendationRequests(validRequestFilterDto);
+
+        assertNotNull(result);
+        assertEquals(expectedRequests.size(), result.size());
+        assertEquals(expectedRequests, result);
+
+        verify(recommendationRequestService, times(1)).getRequests(validRequestFilterDto);
+    }
 
     @Test
     void testGetRecommendationRequestsNull() {

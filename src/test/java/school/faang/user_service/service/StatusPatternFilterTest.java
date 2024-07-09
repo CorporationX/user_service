@@ -12,11 +12,12 @@ import java.util.List;
 import java.util.stream.Stream;
 
 class StatusPatternFilterTest {
-    private final StatusPatternFilter statusPatternFilter = new StatusPatternFilter();
+    private StatusPatternFilter statusPatternFilter;
     private List<RecommendationRequest> OneTestList;
 
     @BeforeEach
     void init() {
+        statusPatternFilter = new StatusPatternFilter();
         RecommendationRequest requestOne = new RecommendationRequest();
         requestOne.setStatus(RequestStatus.ACCEPTED);
         RecommendationRequest requestTwo = new RecommendationRequest();

@@ -14,12 +14,13 @@ import java.util.stream.Stream;
 
 @ExtendWith(MockitoExtension.class)
 class IdPatternFilterTest {
-    private final IdPatternFilter idPatternFilter = new IdPatternFilter();
+    private IdPatternFilter idPatternFilter;
 
     private List<RecommendationRequest> oneTestList;
 
     @BeforeEach
     void init() {
+        idPatternFilter = new IdPatternFilter();
         RecommendationRequest requestOne = new RecommendationRequest();
         requestOne.setId(1L);
         RecommendationRequest requestTwo = new RecommendationRequest();

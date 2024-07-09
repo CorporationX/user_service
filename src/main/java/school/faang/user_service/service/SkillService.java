@@ -63,7 +63,8 @@ public class SkillService {
         }
     }
 
-    private void addGuarantee(List<SkillOffer> skillOffers) {
+    public void addGuarantee(List<SkillOffer> skillOffers) {
+        if (skillOffers.isEmpty()) throw new IllegalArgumentException("the list of offers is empty");
         for (SkillOffer skillOffer : skillOffers) {
             User receiver = skillOffer.getRecommendation().getReceiver();
             User author = skillOffer.getRecommendation().getAuthor();

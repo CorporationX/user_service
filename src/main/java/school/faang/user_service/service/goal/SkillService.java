@@ -17,7 +17,7 @@ public class SkillService {
         this.skillRepository = skillRepository;
     }
 
-    public boolean existsByTitle(List<Skill> skills)  {
+    public boolean existsByTitle(List<Skill> skills) {
         return skills.stream()
                 .map(Skill::getTitle)
                 .allMatch(skillRepository::existsByTitle);
@@ -27,7 +27,7 @@ public class SkillService {
         skills.stream()
                 .map(Skill::getId)
                 .forEach(skillId ->
-                skillRepository.assignSkillToUser(skillId, userId));
+                        skillRepository.assignSkillToUser(skillId, userId));
     }
 
     public List<Skill> findSkillsByGoalId(Long goalId) {
@@ -39,5 +39,4 @@ public class SkillService {
                 user.getSkills()
                         .addAll(findSkillsByGoalId(goalId)));
     }
-
 }

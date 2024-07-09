@@ -1,7 +1,6 @@
 package school.faang.user_service.service.goal;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.dto.GoalFilterDto;
@@ -12,11 +11,11 @@ import school.faang.user_service.repository.goal.GoalRepository;
 import school.faang.user_service.entity.Skill;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class GoalService {
     private final GoalRepository goalRepository;
@@ -29,11 +28,11 @@ public class GoalService {
         return goalRepository.findAllGoalTitles();
     }
 
-    public void createGoal(Long userId, Goal goal) {
+    public void createGoal(long userId, Goal goal) {
         List<Skill> skills = goal.getSkillsToAchieve();
 
         if (goalRepository.countActiveGoalsPerUser(userId) >= MAX_NUMBERS_GOAL_USER) {
-            log.error("This user" + userId + "has exceeded goal limit");
+            throw new IllegalStateException("This user " + userId + " has exceeded goal limit");
         } else if (existsByTitle(skills)) {
             goalRepository.create(goal.getTitle(), goal.getDescription(), goal.getParent().getId());
             skillService.create(skills, userId);
@@ -48,7 +47,7 @@ public class GoalService {
         Goal goal = goalMapper.toGoal(goalDto);
 
         if (status.equals("COMPLETED")) {
-            log.error("Goal has already been achieved");
+            throw new IllegalStateException("Goal has already been achieved");
         } else if (existsByTitle(goal.getSkillsToAchieve())) {
             skillService.addSkillToUsers(goalRepository.findUsersByGoalId(goalId), goalId);
         }
@@ -56,17 +55,17 @@ public class GoalService {
 
     private boolean existsByTitle(List<Skill> skills) {
         if (!skillService.existsByTitle(skills))
-            log.error("There is no skill with this name");
+            throw new IllegalArgumentException("There is no skill with this name");
 
         return true;
     }
 
     public void deleteGoal(Long goalId) {
         Optional<Goal> goal = goalRepository.findByParent(goalId).findFirst();
-        if (goal.isEmpty()) {
+        if (!goal.isEmpty()) {
             goalRepository.deleteByGoalId(goalId);
         } else {
-            log.error("A goal with this ID does not exist");
+            throw new NoSuchElementException("A goal with this ID does not exist");
         }
     }
 

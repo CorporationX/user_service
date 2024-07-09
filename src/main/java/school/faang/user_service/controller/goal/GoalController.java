@@ -3,7 +3,6 @@ package school.faang.user_service.controller.goal;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import school.faang.user_service.dto.GoalDto;
@@ -15,13 +14,12 @@ import java.util.List;
 
 
 @Controller
-@Slf4j
 @RequiredArgsConstructor
 @Validated
 public class GoalController {
     private final GoalService goalService;
 
-    public void createGoal(@NonNull Long userId, @NonNull Goal goal) {
+    public void createGoal(@NonNull Long userId, Goal goal) {
         String title = goal.getTitle();
         int MAX_LENGTH_TITLE = 64;
 
@@ -51,5 +49,4 @@ public class GoalController {
     public List<GoalDto> getGoalsByUser(@NonNull Long userId, GoalFilterDto filters) {
         return goalService.getGoalsByUser(userId, filters);
     }
-
 }

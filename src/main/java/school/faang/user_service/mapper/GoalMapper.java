@@ -9,13 +9,14 @@ import school.faang.user_service.entity.goal.Goal;
 
 import java.util.List;
 
-@Mapper (componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface GoalMapper {
 
     @Mapping(source = "parent.id", target = "parentId")
-    @Mapping(source = "skills", target = "skillIds", qualifiedByName = "map")
-    Goal toGoal(GoalDto goalDto);
+    @Mapping(source = "skillsToAchieve", target = "skillIds", qualifiedByName = "map")
     GoalDto toGoalDto(Goal goal);
+
+    Goal toGoal(GoalDto goalDto);
 
     default List<Long> map(List<Skill> skills) {
         return skills.stream().map(Skill::getId).toList();

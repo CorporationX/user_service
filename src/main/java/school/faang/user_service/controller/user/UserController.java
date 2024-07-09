@@ -69,4 +69,9 @@ public class UserController {
         log.info("Received Persons: {}", persons);
         userService.convertCsvFile(persons);
     }
+
+    @GetMapping("/authorize/{userEmail}/{userPassword}")
+    public Long authorizeUser(@PathVariable("userEmail") String userEmail, @PathVariable("userPassword") String userPassword){
+        return userService.authorizeUser(userEmail, userPassword);
+    }
 }

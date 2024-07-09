@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.doNothing;
@@ -152,5 +153,15 @@ public class UserServiceTest {
     public void testDeletePic() {
         when(userRepository.findById(id)).thenThrow(DataValidationException.class);
         assertThrows(DataValidationException.class, () -> userService.deleteProfilePicture(id));
+    }
+
+    @Test
+    public void testAuthorizeUser() {
+        when(userRepository.findIdByEmailAndPassword("email", "password")).thenReturn(1L);
+
+        Long result = userService.authorizeUser("email", "password");
+
+        assertEquals(result, 1L);
+        verify(userRepository, times(1)).findIdByEmailAndPassword("email", "password");
     }
 }

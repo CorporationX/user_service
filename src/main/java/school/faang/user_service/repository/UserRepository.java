@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import school.faang.user_service.entity.User;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Repository
@@ -40,4 +41,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
             select exists (select 1 from users where email = ?1)
             """)
     boolean existsUserByEmail(String email);
+
+    @Query(nativeQuery = true, value = "SELECT id  FROM users u WHERE u.email = ?1 AND u.password = ?2")
+    Long findIdByEmailAndPassword(String email, String password);
 }

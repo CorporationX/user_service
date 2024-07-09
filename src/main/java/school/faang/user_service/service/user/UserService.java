@@ -33,6 +33,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.*;
 import java.util.stream.Stream;
 
@@ -64,7 +65,6 @@ public class UserService {
                     return new DataValidationException("Пользователь с id " + userId + " не найден");
                 });
     }
-
 
     @Transactional
     public void saveUser(User user) {
@@ -206,5 +206,10 @@ public class UserService {
     public UserDto getUser(long id) {
         User foundUser = userRepository.findById(id).orElseThrow(() -> new NotFoundException("No found user with id: " + id));
         return userMapper.toDto(foundUser);
+    }
+
+    @Transactional(readOnly = true)
+    public Long authorizeUser(String userEmail, String userPassword) {
+        return userRepository.findIdByEmailAndPassword(userEmail, userPassword);
     }
 }

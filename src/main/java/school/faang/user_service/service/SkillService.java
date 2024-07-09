@@ -64,12 +64,10 @@ public record SkillService(SkillRepository skillRepository,
     }
 
     private void addSkillGuaranty(Skill userSkill, List<SkillOffer> offers) {
-        for (SkillOffer offer : offers) {
-            skillGuaranteeRepository.save(UserSkillGuarantee.builder()
-                    .user(offer.getRecommendation().getReceiver())
-                    .skill(userSkill)
-                    .guarantor(offer.getRecommendation().getAuthor())
-                    .build());
-        }
+        offers.forEach(offer -> skillGuaranteeRepository.save(UserSkillGuarantee.builder()
+                .user(offer.getRecommendation().getReceiver())
+                .skill(userSkill)
+                .guarantor(offer.getRecommendation().getAuthor())
+                .build()));
     }
 }

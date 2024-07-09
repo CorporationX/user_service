@@ -24,6 +24,7 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class RecommendationRequestService {
+    private static final int COUNT_MONTHS = 6;
     private final RecommendationRequestRepository recommendationRequestRepository;
     private final RecommendationRequestMapper recommendationRequestMapper;
     private final UserRepository userRepository;
@@ -40,7 +41,7 @@ public class RecommendationRequestService {
         Optional<RecommendationRequest> recommendationRequest = recommendationRequestRepository
                 .findLatestPendingRequest(recommendationRequestDto.getRequesterId(), recommendationRequestDto.getRecieverId());
         if (recommendationRequest.isPresent()) {
-            LocalDateTime localDateTime = LocalDateTime.now().minus(6, ChronoUnit.MONTHS);
+            LocalDateTime localDateTime = LocalDateTime.now().minus(COUNT_MONTHS, ChronoUnit.MONTHS);
             if (recommendationRequest.get().getUpdatedAt().isAfter(localDateTime)) {
                 throw new IllegalArgumentException("Recommendation request can only be sent once every 6 months");
             }

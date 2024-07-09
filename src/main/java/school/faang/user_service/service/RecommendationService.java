@@ -112,9 +112,10 @@ public class RecommendationService {
         if (recommendation.getSkillOffers() != null || !recommendation.getSkillOffers().isEmpty()) {
             userSkills.stream()
                     .forEach(skill -> {
-                       recommendationDto.getSkillOffers().stream()
+                        recommendationDto.getSkillOffers().stream()
                                 .forEach(skillOffer -> {
-                                    if (skillOffer.getSkillId() == skill.getId() && !skill.getGuarantees().contains(recommendation.getAuthor())) {
+                                    if (skillOffer.getSkillId() == skill.getId() &&
+                                            !skill.getGuarantees().contains(recommendation.getAuthor())) {
                                         UserSkillGuarantee userSkillGuarantee =
                                                 UserSkillGuarantee.builder()
                                                         .user(recommendation.getReceiver())

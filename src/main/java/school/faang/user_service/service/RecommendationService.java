@@ -8,7 +8,6 @@ import org.webjars.NotFoundException;
 import school.faang.user_service.dto.recomendation.RecommendationDto;
 import school.faang.user_service.dto.recomendation.SkillOfferDto;
 import school.faang.user_service.entity.Skill;
-import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.UserSkillGuarantee;
 import school.faang.user_service.entity.recommendation.Recommendation;
 import school.faang.user_service.repository.SkillRepository;

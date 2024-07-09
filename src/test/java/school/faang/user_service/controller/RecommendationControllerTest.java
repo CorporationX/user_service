@@ -5,8 +5,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import school.faang.user_service.dto.recomendation.RecommendationDto;
 import school.faang.user_service.dto.recomendation.SkillOfferDto;
 import school.faang.user_service.service.RecommendationService;

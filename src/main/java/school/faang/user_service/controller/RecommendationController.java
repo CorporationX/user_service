@@ -2,7 +2,6 @@ package school.faang.user_service.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import school.faang.user_service.dto.recomendation.RecommendationDto;
 import school.faang.user_service.service.RecommendationService;

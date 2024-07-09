@@ -7,14 +7,18 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.event.EventService;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -23,44 +27,41 @@ public class EventControllerTest {
     private EventController eventController;
     @Mock
     private EventService eventService;
+    private EventDto eventDto = new EventDto();
 
     @Test
     public void testCreateWithNullTitle() {
-        EventDto eventDto = new EventDto();
         eventDto.setTitle(null);
 
         DataValidationException exception =
                 assertThrows(DataValidationException.class, () -> eventController.create(eventDto));
         assertEquals("title can't be null or empty", exception.getMessage());
-        Mockito.verify(eventService, times(0)).create(eventDto);
+        verify(eventService, times(0)).create(eventDto);
     }
 
     @Test
     public void testCreateWithBlankTitle() {
-        EventDto eventDto = new EventDto();
         eventDto.setTitle("  ");
 
         DataValidationException exception =
                 assertThrows(DataValidationException.class, () -> eventController.create(eventDto));
         assertEquals("title can't be null or empty", exception.getMessage());
-        Mockito.verify(eventService, times(0)).create(eventDto);
+        verify(eventService, times(0)).create(eventDto);
     }
 
     @Test
     public void testCreateWithNullStartDate() {
-        EventDto eventDto = new EventDto();
         eventDto.setTitle("event");
         eventDto.setStartDate(null);
 
         DataValidationException exception =
                 assertThrows(DataValidationException.class, () -> eventController.create(eventDto));
         assertEquals("getStartDate can't be null", exception.getMessage());
-        Mockito.verify(eventService, times(0)).create(eventDto);
+        verify(eventService, times(0)).create(eventDto);
     }
 
     @Test
     public void testCreateWithNullOwnerId() {
-        EventDto eventDto = new EventDto();
         eventDto.setTitle("event");
         eventDto.setStartDate(LocalDateTime.now());
         eventDto.setOwnerId(0L);
@@ -68,12 +69,11 @@ public class EventControllerTest {
         DataValidationException exception =
                 assertThrows(DataValidationException.class, () -> eventController.create(eventDto));
         assertEquals("ownerId can't be 0", exception.getMessage());
-        Mockito.verify(eventService, times(0)).create(eventDto);
+        verify(eventService, times(0)).create(eventDto);
     }
 
     @Test
     public void testCreateUsingEventService() {
-        EventDto eventDto = new EventDto();
         eventDto.setTitle("event");
         eventDto.setStartDate(LocalDateTime.now());
         eventDto.setOwnerId(1L);
@@ -81,7 +81,7 @@ public class EventControllerTest {
 
         eventController.create(eventDto);
 
-        Mockito.verify(eventService, times(1)).create(eventDto);
+        verify(eventService, times(1)).create(eventDto);
     }
 
     @Test
@@ -91,7 +91,18 @@ public class EventControllerTest {
 
         eventController.getEvent(eventId);
 
-        Mockito.verify(eventService, times(1)).getEvent(eventId);
+        verify(eventService, times(1)).getEvent(eventId);
+    }
+
+    @Test
+    public void testGetEventsByFilter() {
+        EventFilterDto filters = new EventFilterDto();
+        when(eventService.getEventsByFilter(filters)).thenReturn(List.of(new EventDto()));
+
+        List<EventDto> result = eventController.getEventsByFilter(filters);
+
+        verify(eventService, times(1)).getEventsByFilter(filters);
+        assertNotNull(result);
     }
 
 }

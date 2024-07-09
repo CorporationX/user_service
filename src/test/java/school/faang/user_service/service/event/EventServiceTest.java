@@ -1,11 +1,12 @@
 package school.faang.user_service.service.event;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
+import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.event.Event;
@@ -14,7 +15,6 @@ import school.faang.user_service.mapper.EventMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -23,24 +23,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class EventServiceTest {
-    @InjectMocks
     private EventService eventService;
-    @Mock
     private EventRepository eventRepository;
-    @Mock
     private UserRepository userRepository;
-    @Mock
     private EventMapper eventMapper;
-    @Mock
     private EventDescriptionFilter eventDescriptionFilter;
-    private List<EventFilter>
-
+    private List<EventFilter> eventFilters;
     private Long eventId = 1L;
     private Long ownerId = 2L;
     private Skill skill = new Skill();
@@ -54,15 +49,21 @@ public class EventServiceTest {
             .build();
     private EventDto eventDto = new EventDto();
     {
-        eventDto.setOwnerId(ownerId);
         eventDto.setId(eventId);
+        eventDto.setOwnerId(ownerId);
     }
 
     private User user = new User();
 
-
-
-
+    @BeforeEach
+    void setUp() {
+        eventRepository = Mockito.mock(EventRepository.class);
+        userRepository = Mockito.mock(UserRepository.class);
+        eventMapper = Mockito.mock(EventMapper.class);
+        eventDescriptionFilter = Mockito.mock(EventDescriptionFilter.class);
+        eventFilters = List.of(eventDescriptionFilter);
+        eventService = new EventService(eventRepository, userRepository, eventMapper, eventFilters);
+    }
 
     @Test
     public void testCreateWithoutUserSkills() {
@@ -114,7 +115,20 @@ public class EventServiceTest {
 
     @Test
     public void testGetEventsByFilter() {
-        List<Event> events = List.of(event);
+        List<Event> events = List.of(event, new Event());
+        List<Event> eventsFiltered = List.of(event);
+        when(eventRepository.findAll()).thenReturn(events);
+        EventFilterDto filters = new EventFilterDto();
+        when(eventDescriptionFilter.isApplicable(filters)).thenReturn(true);
+        when(eventDescriptionFilter.apply(any(), eq(filters))).thenReturn(eventsFiltered.stream());
+        when(eventMapper.toDto(event)).thenReturn(eventDto);
 
+
+        List<EventDto> result = eventService.getEventsByFilter(filters);
+        List<EventDto> expected = List.of(eventDto);
+
+        verify(eventDescriptionFilter, times(1)).isApplicable(filters);
+        verify(eventDescriptionFilter, times(1)).apply(any(), eq(filters));
+        assertEquals(expected, result);
     }
 }

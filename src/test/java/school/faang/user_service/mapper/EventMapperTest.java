@@ -1,16 +1,9 @@
 package school.faang.user_service.mapper;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.User;
@@ -25,39 +18,36 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
 public class EventMapperTest {
-    @Autowired
-    private EventMapper eventMapper;
-    @MockBean
+    @InjectMocks
+    private EventMapperImpl eventMapper;
+    @Mock
     private UserRepository userRepository;
+    private long eventId = 1L;
+    private long ownerId = 2L;
+    User user = User.builder()
+            .id(ownerId)
+            .build();
 
     @Test
     public void testToEntityCreateEntity() {
-        long id = 1L;
         EventDto eventDto = new EventDto();
-        eventDto.setOwnerId(id);
-        User user = new User();
-        user.setId(id);
+        eventDto.setOwnerId(ownerId);
 
-        when(userRepository.findById(id)).thenReturn(Optional.of(user));
+        when(userRepository.findById(ownerId)).thenReturn(Optional.of(user));
 
         Event event = eventMapper.toEntity(eventDto, userRepository);
 
         assertNotNull(event.getOwner());
-        assertEquals(id, event.getOwner().getId());
-        verify(userRepository).findById(id);
+        assertEquals(ownerId, event.getOwner().getId());
+        verify(userRepository).findById(ownerId);
     }
 
     @Test
     public void testToDto() {
-        long eventId = 1L;
-        User owner = new User();
-        long ownerId = 2L;
-        owner.setId(ownerId);
         Event event = new Event();
         event.setId(eventId);
-        event.setOwner(owner);
+        event.setOwner(user);
 
         EventDto eventDto = eventMapper.toDto(event);
 

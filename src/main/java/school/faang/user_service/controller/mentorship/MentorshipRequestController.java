@@ -36,15 +36,15 @@ public class MentorshipRequestController {
         return mentorshipRequestService.getRequests(filters);
     }
 
-    @PutMapping("/accept/{id}")
+    @PutMapping("/accept/{requestId}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public MentorshipRequestDto acceptRequest(@PathVariable("id") Long mentorshipRequestId) {
-        return mentorshipRequestService.acceptRequest(mentorshipRequestId);
+    public MentorshipRequestDto acceptRequest(@PathVariable Long requestId) {
+        return mentorshipRequestService.acceptRequest(requestId);
     }
 
-    @PutMapping("/reject/{id}")
+    @PutMapping("/reject/{requestId}")
     @ResponseStatus(HttpStatus.OK)
-    public MentorshipRequestDto rejectRequest(@PathVariable("id") Long requestId,
+    public MentorshipRequestDto rejectRequest(@PathVariable Long requestId,
                                               @RequestBody @Valid RejectionDto rejection) {
         return mentorshipRequestService.rejectRequest(requestId, rejection);
     }

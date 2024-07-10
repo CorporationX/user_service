@@ -200,4 +200,12 @@ public class UserService {
         }
         saveUser(readyUser);
     }
+
+    @Transactional
+    public void banUser(Long userId) {
+        userRepository.findById(userId).ifPresent(user -> {
+            user.setBanned(true);
+            userRepository.save(user);
+        });
+    }
 }

@@ -18,4 +18,21 @@ public interface RecommendationRequestRepository extends CrudRepository<Recommen
             LIMIT 1
             """)
     Optional<RecommendationRequest> findLatestPendingRequest(long requesterId, long receiverId);
+    @Query(nativeQuery = true, value = """
+            select * from recommendation_request
+            where requester_id = ?1 and receiver_id = ?2
+            order by created_at desc
+            limit 1
+            """)
+    Optional<RecommendationRequest> findLatestRecommendationRequestFromRequesterToReceiver(
+            long requesterId,
+            long receiverId
+    );
+
+    @Query(nativeQuery = true, value = """
+                insert into recommendation_request (requester_id, receiver_id, message, status, created_at, updated_at)
+                values (:requesterId, :receiverId, :message, 0, now(), now())
+            """)
+    @Modifying
+    RecommendationRequest create(long requesterId, long receiverId, String message);
 }

@@ -14,9 +14,13 @@ import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.SubscriptionRepository;
 import school.faang.user_service.service.SubscriptionService;
+import school.faang.user_service.service.user.UserFilter;
 
 import java.util.List;
+import java.util.stream.Stream;
 import java.util.zip.DataFormatException;
+
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class SubscriptionServiceTest {
@@ -24,12 +28,19 @@ public class SubscriptionServiceTest {
     @Mock
     private SubscriptionRepository subscriptionRepository;
 
+    @Mock
+    private UserFilter aboutFilter;
+
+    @Mock
+    private UserFilter nameFilter;
+
     @InjectMocks
     private SubscriptionService subscriptionService;
 
     @BeforeEach
     public void setUp() {
-        subscriptionService = new SubscriptionService(subscriptionRepository);
+        List<UserFilter> userFilters = List.of(nameFilter, aboutFilter);
+        subscriptionService = new SubscriptionService(subscriptionRepository, userFilters);
     }
 
     //Positive test
@@ -42,7 +53,7 @@ public class SubscriptionServiceTest {
         long followeeId = 1L;
 
         //when
-        Mockito.when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId))
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId))
                 .thenReturn(true);
 
         //then
@@ -59,7 +70,7 @@ public class SubscriptionServiceTest {
         long followeeId = 1L;
 
         //when
-        Mockito.when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId))
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId))
                 .thenReturn(true);
         //then
         subscriptionService.unfollowUser(followerId, followeeId);
@@ -74,7 +85,7 @@ public class SubscriptionServiceTest {
         UserFilterDto filter = new UserFilterDto();
         filter.setNamePattern("John");
 
-        List<User> users = List.of();
+        Stream<User> users = Stream.of();
 
         //expect
 
@@ -90,23 +101,32 @@ public class SubscriptionServiceTest {
         //arrange
         UserFilterDto filter = new UserFilterDto();
         filter.setNamePattern("John");
+        filter.setAboutPattern("Smile");
 
         User fuser = new User();
         fuser.setId(0);
         fuser.setUsername("John");
+        fuser.setAboutMe("Smile");
         User suser = new User();
         suser.setId(1);
         suser.setUsername("John");
+        suser.setAboutMe("Cloud");
         User tuser = new User();
         tuser.setId(2);
         tuser.setUsername("Anna");
 
-        List<User> users = List.of(fuser, suser, tuser);
+        Stream<User> users = Stream.of(fuser, suser, tuser);
+
+        //then
+        when(nameFilter.isApplicable(filter)).thenReturn(true);
+        when(aboutFilter.isApplicable(filter)).thenReturn(true);
+
+        when(nameFilter.apply(users, filter)).thenReturn(Stream.of(fuser));
+        when(aboutFilter.apply(users, filter)).thenReturn(Stream.of());
 
         //expect
         UserDto fuserDto = new UserDto(0L, "John", null);
-        UserDto suserDto = new UserDto(1L, "John", null);
-        List<UserDto> userDtos = List.of(fuserDto, suserDto);
+        List<UserDto> userDtos = List.of(fuserDto);
 
         //assert
         Assertions.assertEquals(userDtos.hashCode(), subscriptionService.filterUsers(filter, users).hashCode());
@@ -125,7 +145,7 @@ public class SubscriptionServiceTest {
     @Test
     @DisplayName("подписки (отписки): нет user в бд")
     public void un_followUser_exitUserTest() {
-        Mockito.when(subscriptionRepository.existsByFollowerIdAndFolloweeId(0L, 1L)).thenReturn(false);
+        when(subscriptionRepository.existsByFollowerIdAndFolloweeId(0L, 1L)).thenReturn(false);
         Assertions.assertThrows(DataFormatException.class,
                 () -> subscriptionService.validateUsersSubs(0L, 1L)
         );
@@ -134,7 +154,7 @@ public class SubscriptionServiceTest {
     @Test
     @DisplayName("Подписчики, нет юзера в бд")
     public void validate_exitUserTest() {
-        Mockito.when(subscriptionRepository.existsById(0L)).thenReturn(false);
+        when(subscriptionRepository.existsById(0L)).thenReturn(false);
         Assertions.assertThrows(DataFormatException.class,
                 () -> subscriptionService.validateUser(0L)
         );

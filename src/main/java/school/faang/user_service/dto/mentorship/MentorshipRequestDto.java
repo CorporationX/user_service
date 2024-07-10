@@ -1,8 +1,8 @@
 package school.faang.user_service.dto.mentorship;
 
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import school.faang.user_service.entity.RequestStatus;
-import school.faang.user_service.entity.User;
 
 import java.time.LocalDateTime;
 
@@ -10,7 +10,9 @@ import java.time.LocalDateTime;
 public class MentorshipRequestDto {
     long id;
     String description;
+    @Positive
     long requesterId;
+    @Positive
     long receiverId;
     RequestStatus status;
     String rejectionReason;

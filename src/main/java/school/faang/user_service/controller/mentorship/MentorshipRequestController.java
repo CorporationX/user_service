@@ -21,7 +21,7 @@ public class MentorshipRequestController {
 
 
     @GetMapping
-    public List<MentorshipRequestDto> getRequests(@Valid RequestFilterDto filter) {
+    public List<MentorshipRequestDto> getRequests(@Valid @ModelAttribute RequestFilterDto filter) {
         return mentorshipRequestService.getRequests(filter);
     }
 

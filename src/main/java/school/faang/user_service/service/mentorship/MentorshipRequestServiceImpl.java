@@ -87,8 +87,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
 
     @Override
     public MentorshipRequestDto acceptRequest(long id) {
-        MentorshipRequest request = mentorshipRequestRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Mentorship request with id " + id + " doesnt exist"));
+        MentorshipRequest request = findMembershipById(id);
 
         if (request.getStatus() == RequestStatus.ACCEPTED) {
             throw new IllegalArgumentException("Mentorship request with id " + id + " already accepted");
@@ -112,8 +111,7 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
 
     @Override
     public MentorshipRequestDto rejectRequest(long id, RejectionDto rejection) {
-        MentorshipRequest request = mentorshipRequestRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Mentorship request with id " + id + " doesnt exist"));
+        MentorshipRequest request = findMembershipById(id);
         if (request.getStatus() == RequestStatus.ACCEPTED) {
             throw new IllegalArgumentException("Mentorship request with id " + id + " already accepted");
         } else if (request.getStatus() == RequestStatus.REJECTED) {
@@ -127,5 +125,10 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         System.out.println(response.getStatus());
         System.out.println(mentorshipRequestMapper.toDto(response));
         return mentorshipRequestMapper.toDto(response);
+    }
+
+    public MentorshipRequest findMembershipById(long id) {
+        return mentorshipRequestRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Mentorship request with id " + id + " doesnt exist"));
     }
 }

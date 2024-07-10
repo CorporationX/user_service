@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
@@ -74,9 +73,7 @@ public class EventControllerTest {
 
     @Test
     public void testCreateUsingEventService() {
-        eventDto.setTitle("event");
-        eventDto.setStartDate(LocalDateTime.now());
-        eventDto.setOwnerId(1L);
+        prepareForValidation(eventDto);
         when(eventService.create(eventDto)).thenReturn(new EventDto());
 
         eventController.create(eventDto);
@@ -111,6 +108,21 @@ public class EventControllerTest {
         eventController.deleteEvent(eventId);
 
         verify(eventService, times(1)).deleteEvent(eventId);
+    }
+
+    @Test
+    public void testUpdateEventAfterValidate() {
+        prepareForValidation(eventDto);
+
+        eventController.updateEvent(eventDto);
+
+        verify(eventService, times(1)).updateEvent(eventDto);
+    }
+
+    private void prepareForValidation(EventDto eventDto) {
+        eventDto.setTitle("event");
+        eventDto.setStartDate(LocalDateTime.now());
+        eventDto.setOwnerId(1L);
     }
 
 }

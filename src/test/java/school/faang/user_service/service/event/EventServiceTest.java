@@ -64,8 +64,6 @@ public class EventServiceTest {
         eventRepository = Mockito.mock(EventRepository.class);
         userRepository = Mockito.mock(UserRepository.class);
         eventMapper = Mockito.mock(EventMapper.class);
-//        eventDescriptionFilter = Mockito.mock(EventDescriptionFilter.class);
-//        eventOwnerFilter = Mockito.mock(EventOwnerFilter.class);
         eventFilters = List.of(eventDescriptionFilter, eventOwnerFilter);
         eventService = new EventService(eventRepository, userRepository, eventMapper, eventFilters);
     }
@@ -80,6 +78,7 @@ public class EventServiceTest {
         DataValidationException exception =
                 assertThrows(DataValidationException.class, () -> eventService.create(eventDto));
         assertEquals("User hasn't required skills", exception.getMessage());
+        verify(eventRepository, times(0)).save(event);
         verify(eventMapper, times(0)).toDto(eventRepository.save(event));
     }
 
@@ -155,4 +154,34 @@ public class EventServiceTest {
 
         verify(eventRepository, times(1)).deleteById(eventId);
     }
+
+    @Test
+    public void testUpdateWithoutUserSkills() {
+        user.setSkills(Collections.emptyList());
+
+        when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(user));
+        when(eventMapper.toEntity(eventDto, userRepository)).thenReturn(event);
+
+        DataValidationException exception =
+                assertThrows(DataValidationException.class, () -> eventService.updateEvent(eventDto));
+        assertEquals("User hasn't required skills", exception.getMessage());
+        verify(eventRepository, times(0)).save(event);
+        verify(eventMapper, times(0)).toDto(eventRepository.save(event));
+    }
+
+    @Test
+    public void testUpdateWithRelatedSkills() {
+        user.setSkills(List.of(skill));
+
+        when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(user));
+        when(eventMapper.toEntity(eventDto, userRepository)).thenReturn(event);
+        when(eventMapper.toDto(event)).thenReturn(eventDto);
+        when(eventRepository.save(event)).thenReturn(event);
+
+        eventService.updateEvent(eventDto);
+
+        verify(eventRepository, times(1)).save(event);
+
+    }
+
 }

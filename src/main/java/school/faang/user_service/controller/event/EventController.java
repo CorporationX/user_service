@@ -44,4 +44,11 @@ public class EventController {
     public void deleteEvent(long eventId) {
         eventService.deleteEvent(eventId);
     }
+
+    public EventDto updateEvent(EventDto eventDto) {
+        validate(eventDto);
+        return eventService.updateEvent(eventDto);
+    }
+
+
 }

@@ -16,69 +16,39 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class EventControllerTest {
-    @InjectMocks
-    private EventController eventController;
     @Mock
     private EventService eventService;
+    @Mock
+    private EventDtoValidator validator;
+    @InjectMocks
+    private EventController eventController;
     private EventDto eventDto = new EventDto();
     private long eventId = 1L;
 
+
     @Test
-    public void testCreateWithNullTitle() {
-        eventDto.setTitle(null);
+    public void testCreateUsingWrongData() {
+        String textException = "Wrong data";
+        doThrow(new DataValidationException(textException))
+                .when(validator).validate(eventDto);
 
         DataValidationException exception =
                 assertThrows(DataValidationException.class, () -> eventController.create(eventDto));
-        assertEquals("title can't be null or empty", exception.getMessage());
+        assertEquals(textException, exception.getMessage());
         verify(eventService, times(0)).create(eventDto);
     }
-
-    @Test
-    public void testCreateWithBlankTitle() {
-        eventDto.setTitle("  ");
-
-        DataValidationException exception =
-                assertThrows(DataValidationException.class, () -> eventController.create(eventDto));
-        assertEquals("title can't be null or empty", exception.getMessage());
-        verify(eventService, times(0)).create(eventDto);
-    }
-
-    @Test
-    public void testCreateWithNullStartDate() {
-        eventDto.setTitle("event");
-        eventDto.setStartDate(null);
-
-        DataValidationException exception =
-                assertThrows(DataValidationException.class, () -> eventController.create(eventDto));
-        assertEquals("getStartDate can't be null", exception.getMessage());
-        verify(eventService, times(0)).create(eventDto);
-    }
-
-    @Test
-    public void testCreateWithNullOwnerId() {
-        eventDto.setTitle("event");
-        eventDto.setStartDate(LocalDateTime.now());
-        eventDto.setOwnerId(0L);
-
-        DataValidationException exception =
-                assertThrows(DataValidationException.class, () -> eventController.create(eventDto));
-        assertEquals("ownerId can't be 0", exception.getMessage());
-        verify(eventService, times(0)).create(eventDto);
-    }
-
     @Test
     public void testCreateUsingEventService() {
-        prepareForValidation(eventDto);
-        when(eventService.create(eventDto)).thenReturn(new EventDto());
-
         eventController.create(eventDto);
 
+        verify(validator, times(1)).validate(eventDto);
         verify(eventService, times(1)).create(eventDto);
     }
 
@@ -112,17 +82,10 @@ public class EventControllerTest {
 
     @Test
     public void testUpdateEventAfterValidate() {
-        prepareForValidation(eventDto);
-
         eventController.updateEvent(eventDto);
 
+        verify(validator, times(1)).validate(eventDto);
         verify(eventService, times(1)).updateEvent(eventDto);
-    }
-
-    private void prepareForValidation(EventDto eventDto) {
-        eventDto.setTitle("event");
-        eventDto.setStartDate(LocalDateTime.now());
-        eventDto.setOwnerId(1L);
     }
 
     @Test

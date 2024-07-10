@@ -27,9 +27,7 @@ public class EventService {
         Event event = eventMapper.toEntity(eventDto, userRepository);
         event.setOwner(owner);
 
-        if (!hasRequiredSkills(owner, event)) {
-            throw new DataValidationException("User hasn't required skills");
-        }
+        hasRequiredSkills(owner, event);
 
         return eventMapper.toDto(eventRepository.save(event));
     }
@@ -39,8 +37,10 @@ public class EventService {
                 .orElseThrow(() -> new DataValidationException("User not found"));
     }
 
-    private boolean hasRequiredSkills(User owner, Event event) {
-        return owner.getSkills().containsAll(event.getRelatedSkills());
+    private void hasRequiredSkills(User owner, Event event) {
+        if (!owner.getSkills().containsAll(event.getRelatedSkills())) {
+            throw new DataValidationException("User hasn't required skills");
+        }
     }
 
     public EventDto getEvent(long eventId) {
@@ -70,9 +70,7 @@ public class EventService {
         Event event = eventMapper.toEntity(eventDto, userRepository);
         event.setOwner(owner);
 
-        if (!hasRequiredSkills(owner, event)) {
-            throw new DataValidationException("User hasn't required skills");
-        }
+        hasRequiredSkills(owner, event);
 
         return eventMapper.toDto(eventRepository.save(event));
     }

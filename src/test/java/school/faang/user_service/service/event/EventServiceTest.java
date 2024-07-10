@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -69,12 +70,19 @@ public class EventServiceTest {
         eventService = new EventService(eventRepository, userRepository, eventMapper, eventFilters);
     }
 
+    private void prepareMocks() {
+        lenient().when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(user));
+        lenient().when(eventMapper.toEntity(eventDto, userRepository)).thenReturn(event);
+        lenient().when(eventMapper.toDto(event)).thenReturn(eventDto);
+        lenient().when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
+        lenient().when(eventRepository.save(event)).thenReturn(event);
+    }
+
     @Test
     public void testCreateWithoutUserSkills() {
         user.setSkills(Collections.emptyList());
 
-        when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(user));
-        when(eventMapper.toEntity(eventDto, userRepository)).thenReturn(event);
+        prepareMocks();
 
         DataValidationException exception =
                 assertThrows(DataValidationException.class, () -> eventService.create(eventDto));
@@ -87,10 +95,7 @@ public class EventServiceTest {
     public void testCreateWithRelatedSkills() {
         user.setSkills(List.of(skill));
 
-        when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(user));
-        when(eventMapper.toEntity(eventDto, userRepository)).thenReturn(event);
-        when(eventMapper.toDto(event)).thenReturn(eventDto);
-        when(eventRepository.save(event)).thenReturn(event);
+        prepareMocks();
 
         eventService.create(eventDto);
 
@@ -108,8 +113,7 @@ public class EventServiceTest {
 
     @Test
     public void testGetEventExisting() {
-        when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
-        when(eventMapper.toDto(any(Event.class))).thenReturn(eventDto);
+        prepareMocks();
 
         EventDto result = eventService.getEvent(eventId);
 
@@ -160,8 +164,7 @@ public class EventServiceTest {
     public void testUpdateWithoutUserSkills() {
         user.setSkills(Collections.emptyList());
 
-        when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(user));
-        when(eventMapper.toEntity(eventDto, userRepository)).thenReturn(event);
+        prepareMocks();
 
         DataValidationException exception =
                 assertThrows(DataValidationException.class, () -> eventService.updateEvent(eventDto));
@@ -174,10 +177,7 @@ public class EventServiceTest {
     public void testUpdateWithRelatedSkills() {
         user.setSkills(List.of(skill));
 
-        when(userRepository.findById(eventDto.getOwnerId())).thenReturn(Optional.of(user));
-        when(eventMapper.toEntity(eventDto, userRepository)).thenReturn(event);
-        when(eventMapper.toDto(event)).thenReturn(eventDto);
-        when(eventRepository.save(event)).thenReturn(event);
+        prepareMocks();
 
         eventService.updateEvent(eventDto);
 
@@ -189,7 +189,7 @@ public class EventServiceTest {
         List<Event> events = List.of(event);
 
         when(eventRepository.findAllByUserId(ownerId)).thenReturn(events);
-        when(eventMapper.toDto(event)).thenReturn(eventDto);
+        prepareMocks();
 
         List<EventDto> result = eventService.getOwnedEvents(ownerId);
         List<EventDto> expected = List.of(eventDto);
@@ -203,7 +203,7 @@ public class EventServiceTest {
         List<Event> events = List.of(event);
 
         when(eventRepository.findParticipatedEventsByUserId(ownerId)).thenReturn(events);
-        when(eventMapper.toDto(event)).thenReturn(eventDto);
+        prepareMocks();
 
         List<EventDto> result = eventService.getParticipatedEvents(ownerId);
         List<EventDto> expected = List.of(eventDto);

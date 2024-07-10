@@ -27,6 +27,7 @@ public class EventControllerTest {
     @Mock
     private EventService eventService;
     private EventDto eventDto = new EventDto();
+    private long eventId = 1L;
 
     @Test
     public void testCreateWithNullTitle() {
@@ -83,7 +84,6 @@ public class EventControllerTest {
 
     @Test
     public void testGetEvent() {
-        long eventId = 1L;
         when(eventService.getEvent(eventId)).thenReturn(new EventDto());
 
         eventController.getEvent(eventId);
@@ -125,4 +125,17 @@ public class EventControllerTest {
         eventDto.setOwnerId(1L);
     }
 
+    @Test
+    public void testGetOwnedEvents() {
+        eventController.getOwnedEvents(eventId);
+
+        verify(eventService, times(1)).getOwnedEvents(eventId);
+    }
+
+    @Test
+    public void testGetParticipatedEvents() {
+        eventController.getParticipatedEvents(eventId);
+
+        verify(eventService, times(1)).getParticipatedEvents(eventId);
+    }
 }

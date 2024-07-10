@@ -76,4 +76,16 @@ public class EventService {
 
         return eventMapper.toDto(eventRepository.save(event));
     }
+
+    public List<EventDto> getOwnedEvents(long userId) {
+        return eventRepository.findAllByUserId(userId).stream()
+                .map(eventMapper::toDto)
+                .toList();
+    }
+
+    public List<EventDto> getParticipatedEvents(long userId) {
+        return eventRepository.findParticipatedEventsByUserId(userId).stream()
+                .map(eventMapper::toDto)
+                .toList();
+    }
 }

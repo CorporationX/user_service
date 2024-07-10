@@ -52,6 +52,7 @@ public class EventServiceTest {
             .owner(owner)
             .build();
     private EventDto eventDto = new EventDto();
+
     {
         eventDto.setId(eventId);
         eventDto.setOwnerId(ownerId);
@@ -181,7 +182,33 @@ public class EventServiceTest {
         eventService.updateEvent(eventDto);
 
         verify(eventRepository, times(1)).save(event);
-
     }
 
+    @Test
+    public void testGetOwnedEvents() {
+        List<Event> events = List.of(event);
+
+        when(eventRepository.findAllByUserId(ownerId)).thenReturn(events);
+        when(eventMapper.toDto(event)).thenReturn(eventDto);
+
+        List<EventDto> result = eventService.getOwnedEvents(ownerId);
+        List<EventDto> expected = List.of(eventDto);
+
+        verify(eventRepository, times(1)).findAllByUserId(ownerId);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void testGetParticipatedEvents() {
+        List<Event> events = List.of(event);
+
+        when(eventRepository.findParticipatedEventsByUserId(ownerId)).thenReturn(events);
+        when(eventMapper.toDto(event)).thenReturn(eventDto);
+
+        List<EventDto> result = eventService.getParticipatedEvents(ownerId);
+        List<EventDto> expected = List.of(eventDto);
+
+        verify(eventRepository, times(1)).findParticipatedEventsByUserId(ownerId);
+        assertEquals(expected, result);
+    }
 }

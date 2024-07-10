@@ -1,7 +1,7 @@
 package school.faang.user_service.service.event;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
 import school.faang.user_service.entity.User;
@@ -14,7 +14,7 @@ import school.faang.user_service.repository.event.EventRepository;
 import java.util.List;
 import java.util.stream.Stream;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class EventService {
     private final EventRepository eventRepository;

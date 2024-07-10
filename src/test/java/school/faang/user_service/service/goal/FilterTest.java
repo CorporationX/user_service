@@ -44,7 +44,44 @@ public class FilterTest {
         goalService = new GoalService(goalRepository, null, null, goalMapper, goalFilters);
     }
 
-    // test for findSubtasksByGoalId
+    private Goal createGoal(Long id, String title, String description, GoalStatus status) {
+        Goal goal = new Goal();
+        goal.setId(id);
+        goal.setTitle(title);
+        goal.setDescription(description);
+        goal.setStatus(status);
+        return goal;
+    }
+
+    private GoalDto createGoalDto(Long id, String title, String description, String status) {
+        GoalDto goalDto = new GoalDto();
+        goalDto.setId(id);
+        goalDto.setTitle(title);
+        goalDto.setDescription(description);
+        goalDto.setStatus(status);
+        return goalDto;
+    }
+
+    private List<Goal> createGoals() {
+        return List.of(
+                createGoal(1L, "Test Goal", "Description", GoalStatus.ACTIVE),
+                createGoal(2L, "Another Goal", "Description", GoalStatus.COMPLETED),
+                createGoal(3L, "Test Goal 2", "Description", GoalStatus.ACTIVE)
+        );
+    }
+
+    private void setupMocksForFindSubtasksByGoalId(List<Goal> goals, GoalFilterDto filter, List<Goal> filteredGoals, List<GoalDto> goalDtos) {
+        long goalId = 1L;
+        Stream<Goal> goalStream = goals.stream();
+        Stream<Goal> filteredGoalStream = filteredGoals.stream();
+
+        when(goalRepository.findByParent(goalId)).thenReturn(goalStream);
+        when(goalFilter.isApplicable(filter)).thenReturn(true);
+        when(goalFilter.apply(goalStream, filter)).thenReturn(filteredGoalStream);
+        for (int i = 0; i < filteredGoals.size(); i++) {
+            when(goalMapper.toDto(filteredGoals.get(i))).thenReturn(goalDtos.get(i));
+        }
+    }
 
     @Test
     void findSubtasksByGoalId_FilterByStatus() {
@@ -52,42 +89,20 @@ public class FilterTest {
         GoalFilterDto filter = new GoalFilterDto();
         filter.setStatus(GoalStatus.ACTIVE);
 
-        Goal goal1 = new Goal();
-        goal1.setStatus(GoalStatus.ACTIVE);
-        goal1.setId(1L);
+        List<Goal> goals = createGoals();
+        List<Goal> filteredGoals = List.of(goals.get(0), goals.get(2));
+        List<GoalDto> goalDtos = List.of(
+                createGoalDto(1L, "Test Goal", "Description", "active"),
+                createGoalDto(3L, "Test Goal 2", "Description", "active")
+        );
 
-        Goal goal2 = new Goal();
-        goal2.setStatus(GoalStatus.COMPLETED);
-        goal2.setId(2L);
-
-        Goal goal3 = new Goal();
-        goal3.setStatus(GoalStatus.ACTIVE);
-        goal3.setId(3L);
-
-        List<Goal> list = List.of(goal1, goal2, goal3);
-        Stream<Goal> goalStream = list.stream();
-        List<Goal> sortedList = List.of(goal1, goal3);
-        Stream<Goal> sortedGoalStream = sortedList.stream();
-
-        GoalDto goalDto1 = new GoalDto();
-        goalDto1.setId(1L);
-        goalDto1.setStatus("active");
-
-        GoalDto goalDto3 = new GoalDto();
-        goalDto3.setId(3L);
-        goalDto3.setStatus("active");
-
-        when(goalRepository.findByParent(goalId)).thenReturn(goalStream);
-        when(goalFilter.isApplicable(filter)).thenReturn(true);
-        when(goalFilter.apply(goalStream, filter)).thenReturn(sortedGoalStream);
-        when(goalMapper.toDto(goal1)).thenReturn(goalDto1);
-        when(goalMapper.toDto(goal3)).thenReturn(goalDto3);
+        setupMocksForFindSubtasksByGoalId(goals, filter, filteredGoals, goalDtos);
 
         List<GoalDto> result = goalService.findSubtasksByGoalId(goalId, filter);
 
         assertEquals(2, result.size());
-        assertEquals(goalDto1.getId(), result.get(0).getId());
-        assertEquals(goalDto3.getId(), result.get(1).getId());
+        assertEquals(goalDtos.get(0).getId(), result.get(0).getId());
+        assertEquals(goalDtos.get(1).getId(), result.get(1).getId());
     }
 
     @Test
@@ -96,32 +111,16 @@ public class FilterTest {
         GoalFilterDto filter = new GoalFilterDto();
         filter.setTitle("Another");
 
-        Goal mockGoal1 = new Goal();
-        mockGoal1.setId(1L);
-        mockGoal1.setTitle("Test Goal");
-        mockGoal1.setDescription("Description");
-        mockGoal1.setStatus(GoalStatus.ACTIVE);
+        Goal goal1 = createGoal(1L, "Test Goal", "Description", GoalStatus.ACTIVE);
+        Goal goal2 = createGoal(2L, "Another Goal", "Description", GoalStatus.COMPLETED);
+        Stream<Goal> stream = Stream.of(goal1, goal2);
 
-        Goal mockGoal2 = new Goal();
-        mockGoal2.setId(2L);
-        mockGoal2.setTitle("Another Goal");
-        mockGoal2.setDescription("Description");
-        mockGoal2.setStatus(GoalStatus.COMPLETED);
-        Stream<Goal> stream = Stream.of(mockGoal1, mockGoal2);
-
-        GoalDto goalDto1 = new GoalDto();
-        goalDto1.setId(2L);
-        goalDto1.setTitle("Another Goal");
-        goalDto1.setDescription("Description");
-        goalDto1.setStatus("completed");
-
-        List<Goal> resultList = List.of(mockGoal2);
-        Stream<Goal> resultStream = resultList.stream();
+        GoalDto goalDto1 = createGoalDto(2L, "Another Goal", "Description", "completed");
 
         when(goalRepository.findByParent(goalId)).thenReturn(stream);
         when(goalFilter.isApplicable(filter)).thenReturn(true);
-        when(goalFilter.apply(stream, filter)).thenReturn(resultStream);
-        when(goalMapper.toDto(mockGoal2)).thenReturn(goalDto1);
+        when(goalFilter.apply(stream, filter)).thenReturn(Stream.of(goal2));
+        when(goalMapper.toDto(goal2)).thenReturn(goalDto1);
 
         List<GoalDto> result = goalService.findSubtasksByGoalId(goalId, filter);
 
@@ -131,39 +130,23 @@ public class FilterTest {
         assertEquals(goalDto1.getStatus(), result.get(0).getStatus());
     }
 
-    // test for getGoalsByUser
     @Test
     public void getGoalsByUser_WithFilterByStatus() {
         long userId = 1L;
         GoalFilterDto filter = new GoalFilterDto();
         filter.setStatus(GoalStatus.ACTIVE);
 
-        Goal mockGoal1 = new Goal();
-        mockGoal1.setId(1L);
-        mockGoal1.setTitle("Test Goal");
-        mockGoal1.setDescription("Description");
-        mockGoal1.setStatus(GoalStatus.ACTIVE);
+        List<Goal> goals = createGoals();
+        Stream<Goal> stream = goals.stream();
+        List<Goal> filteredGoals = List.of(goals.get(0));
+        Stream<Goal> resultStream = filteredGoals.stream();
 
-        Goal mockGoal2 = new Goal();
-        mockGoal2.setId(2L);
-        mockGoal2.setTitle("Another Goal");
-        mockGoal2.setDescription("Description");
-        mockGoal2.setStatus(GoalStatus.COMPLETED);
-        Stream<Goal> stream = Stream.of(mockGoal1, mockGoal2);
-
-        GoalDto goalDto1 = new GoalDto();
-        goalDto1.setId(1L);
-        goalDto1.setTitle("Test Goal");
-        goalDto1.setDescription("Description");
-        goalDto1.setStatus("active");
-
-        List<Goal> resultList = List.of(mockGoal1);
-        Stream<Goal> resultStream = resultList.stream();
+        GoalDto goalDto1 = createGoalDto(1L, "Test Goal", "Description", "active");
 
         when(goalRepository.findGoalsByUserId(userId)).thenReturn(stream);
         when(goalFilter.isApplicable(filter)).thenReturn(true);
         when(goalFilter.apply(stream, filter)).thenReturn(resultStream);
-        when(goalMapper.toDto(mockGoal1)).thenReturn(goalDto1);
+        when(goalMapper.toDto(filteredGoals.get(0))).thenReturn(goalDto1);
 
         List<GoalDto> result = goalService.getGoalsByUser(userId, filter);
 
@@ -181,32 +164,15 @@ public class FilterTest {
         GoalFilterDto filter = new GoalFilterDto();
         filter.setTitle("Another");
 
-        Goal mockGoal1 = new Goal();
-        mockGoal1.setId(1L);
-        mockGoal1.setTitle("Test Goal");
-        mockGoal1.setDescription("Description");
-        mockGoal1.setStatus(GoalStatus.ACTIVE);
+        List<Goal> goals = createGoals();
+        Stream<Goal> stream = goals.stream();
 
-        Goal mockGoal2 = new Goal();
-        mockGoal2.setId(2L);
-        mockGoal2.setTitle("Another Goal");
-        mockGoal2.setDescription("Description");
-        mockGoal2.setStatus(GoalStatus.COMPLETED);
-        Stream<Goal> stream = Stream.of(mockGoal1, mockGoal2);
-
-        GoalDto goalDto1 = new GoalDto();
-        goalDto1.setId(2L);
-        goalDto1.setTitle("Another Goal");
-        goalDto1.setDescription("Description");
-        goalDto1.setStatus("completed");
-
-        List<Goal> resultList = List.of(mockGoal2);
-        Stream<Goal> resultStream = resultList.stream();
+        GoalDto goalDto1 = createGoalDto(2L, "Another Goal", "Description", "completed");
 
         when(goalRepository.findGoalsByUserId(userId)).thenReturn(stream);
         when(goalFilter.isApplicable(filter)).thenReturn(true);
-        when(goalFilter.apply(stream, filter)).thenReturn(resultStream);
-        when(goalMapper.toDto(mockGoal2)).thenReturn(goalDto1);
+        when(goalFilter.apply(stream, filter)).thenReturn(Stream.of(goals.get(1)));
+        when(goalMapper.toDto(goals.get(1))).thenReturn(goalDto1);
 
         List<GoalDto> result = goalService.getGoalsByUser(userId, filter);
 
@@ -217,5 +183,4 @@ public class FilterTest {
 
         verify(goalRepository, times(1)).findGoalsByUserId(userId);
     }
-
 }

@@ -17,6 +17,7 @@ import school.faang.user_service.validator.goal.GoalValidator;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,8 +33,10 @@ class GoalServiceTest {
 
     @Mock
     private GoalMapper goalMapper;
+
     @Mock
     private GoalValidator goalValidator;
+
     @InjectMocks
     private GoalService goalService;
 
@@ -42,19 +45,49 @@ class GoalServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    // test for createGoal
-    @Test
-    void createGoal_Success() {
+    private GoalDto createGoalDto(String title, String description, Long parentGoalId, List<Long> skillIds) {
         GoalDto goalDto = new GoalDto();
-        goalDto.setTitle("New Goal");
-        goalDto.setDescription("Goal Description");
-        goalDto.setParentGoalId(1L);
-        goalDto.setSkillIds(Arrays.asList(1L, 2L));
+        goalDto.setTitle(title);
+        goalDto.setDescription(description);
+        goalDto.setParentGoalId(parentGoalId);
+        goalDto.setSkillIds(skillIds);
+        return goalDto;
+    }
 
-        Goal savedGoal = new Goal();
-        savedGoal.setId(2L);
+    private Goal createGoal(Long id, String title, String description, GoalStatus status, List<Skill> skills) {
+        Goal goal = new Goal();
+        goal.setId(id);
+        goal.setTitle(title);
+        goal.setDescription(description);
+        goal.setStatus(status);
+        goal.setSkillsToAchieve(skills);
+        return goal;
+    }
+
+    private Skill createSkill(Long id) {
+        Skill skill = new Skill();
+        skill.setId(id);
+        return skill;
+    }
+
+    private User createUser(Long id) {
+        User user = new User();
+        user.setId(id);
+        return user;
+    }
+
+    private void setupMocksForCreateGoal(GoalDto goalDto, Goal savedGoal) {
         when(goalRepository.create(anyString(), anyString(), any(Long.class))).thenReturn(savedGoal);
         when(goalMapper.toDto(savedGoal)).thenReturn(goalDto);
+    }
+
+    @Test
+    void createGoal_Success() {
+        GoalDto goalDto = createGoalDto("New Goal", "Goal Description", 1L, Arrays.asList(1L, 2L));
+        Goal savedGoal = new Goal();
+        savedGoal.setId(2L);
+
+        setupMocksForCreateGoal(goalDto, savedGoal);
 
         GoalDto createdGoalDto = goalService.createGoal(1L, goalDto);
 
@@ -110,31 +143,22 @@ class GoalServiceTest {
         assertEquals("One or more skills do not exist.", exception.getMessage());
     }
 
-    // test for updateGoal
-    @Test
-    void updateGoal_Success() {
-        Goal goal = new Goal();
-        goal.setId(1L);
-        goal.setTitle("Old Title");
-        goal.setDescription("Old Description");
-        goal.setStatus(GoalStatus.ACTIVE);
-        Skill skill1 = new Skill();
-        skill1.setId(1L);
-        Skill skill2 = new Skill();
-        skill2.setId(2L);
-        goal.setSkillsToAchieve(Arrays.asList(skill1, skill2));
-
-        GoalDto goalDto = new GoalDto();
-        goalDto.setTitle("New Title");
-        goalDto.setDescription("New Description");
-        goalDto.setStatus("active");
-        goalDto.setSkillIds(Arrays.asList(1L, 2L));
-
+    private void setupMocksForUpdateGoal(Goal goal, GoalDto goalDto) {
         when(goalRepository.findById(1L)).thenReturn(Optional.of(goal));
         when(skillService.countExisting(anyList())).thenReturn(2);
         when(goalMapper.toEntity(goalDto)).thenReturn(goal);
         when(goalRepository.save(any(Goal.class))).thenReturn(goal);
         when(goalMapper.toDto(goal)).thenReturn(goalDto);
+    }
+
+    @Test
+    void updateGoal_Success() {
+        Goal goal = createGoal(1L, "Old Title", "Old Description", GoalStatus.ACTIVE,
+                Arrays.asList(createSkill(1L), createSkill(2L)));
+        GoalDto goalDto = createGoalDto("New Title", "New Description", null, Arrays.asList(1L, 2L));
+        goalDto.setStatus("active");
+
+        setupMocksForUpdateGoal(goal, goalDto);
 
         GoalDto updatedGoalDto = goalService.updateGoal(1L, goalDto);
 
@@ -167,10 +191,7 @@ class GoalServiceTest {
 
     @Test
     void updateGoal_ThrowsException_WhenGoalIsCompleted() {
-        Goal goal = new Goal();
-        goal.setId(1L);
-        goal.setStatus(GoalStatus.COMPLETED);
-
+        Goal goal = createGoal(1L, null, null, GoalStatus.COMPLETED, null);
         GoalDto goalDto = new GoalDto();
         goalDto.setTitle("New Title");
 
@@ -186,10 +207,7 @@ class GoalServiceTest {
 
     @Test
     void updateGoal_ThrowsException_WhenTitleIsNull() {
-        Goal goal = new Goal();
-        goal.setId(1L);
-        goal.setStatus(GoalStatus.ACTIVE);
-
+        Goal goal = createGoal(1L, null, null, GoalStatus.ACTIVE, null);
         GoalDto goalDto = new GoalDto();
 
         doThrow(new IllegalArgumentException("Goal must have a title"))
@@ -204,13 +222,7 @@ class GoalServiceTest {
 
     @Test
     void updateGoal_ThrowsException_WhenSkillsDoNotExist() {
-        Goal goal = new Goal();
-        goal.setId(1L);
-        goal.setStatus(GoalStatus.ACTIVE);
-        Skill skill = new Skill();
-        skill.setId(1L);
-        goal.setSkillsToAchieve(Collections.singletonList(skill));
-
+        Goal goal = createGoal(1L, null, null, GoalStatus.ACTIVE, Collections.singletonList(createSkill(1L)));
         GoalDto goalDto = new GoalDto();
         goalDto.setTitle("New Title");
         goalDto.setSkillIds(Collections.singletonList(1L));
@@ -227,30 +239,14 @@ class GoalServiceTest {
 
     @Test
     void updateGoal_CompletedStatus_AssignsSkillsToUsers() {
-        Goal goal = new Goal();
-        goal.setId(1L);
-        goal.setStatus(GoalStatus.ACTIVE);
-        Skill skill1 = new Skill();
-        skill1.setId(1L);
-        Skill skill2 = new Skill();
-        skill2.setId(2L);
-        goal.setSkillsToAchieve(Arrays.asList(skill1, skill2));
-
-        GoalDto goalDto = new GoalDto();
-        goalDto.setTitle("New Title");
+        Goal goal = createGoal(1L, null, null, GoalStatus.ACTIVE, Arrays.asList(createSkill(1L), createSkill(2L)));
+        GoalDto goalDto = createGoalDto("New Title", null, null, Arrays.asList(1L, 2L));
         goalDto.setStatus("completed");
-        goalDto.setSkillIds(Arrays.asList(1L, 2L));
 
-        User user1 = new User();
-        user1.setId(1L);
-        User user2 = new User();
-        user2.setId(2L);
+        User user1 = createUser(1L);
+        User user2 = createUser(2L);
 
-        when(goalRepository.findById(1L)).thenReturn(Optional.of(goal));
-        when(skillService.countExisting(anyList())).thenReturn(2);
-        when(goalMapper.toEntity(goalDto)).thenReturn(goal);
-        when(goalRepository.save(any(Goal.class))).thenReturn(goal);
-        when(goalMapper.toDto(goal)).thenReturn(goalDto);
+        setupMocksForUpdateGoal(goal, goalDto);
         when(goalRepository.findUsersByGoalId(1L)).thenReturn(Arrays.asList(user1, user2));
 
         GoalDto updatedGoalDto = goalService.updateGoal(1L, goalDto);
@@ -269,12 +265,10 @@ class GoalServiceTest {
         verify(skillService).assignSkillToUser(2L, 2L);
     }
 
-    // test for deleteGoal
     @Test
     void deleteGoal_Success() {
         long goalId = 1L;
-        Goal goal = new Goal();
-        goal.setId(goalId);
+        Goal goal = createGoal(goalId, null, null, null, null);
 
         when(goalRepository.findById(goalId)).thenReturn(Optional.of(goal));
         goalService.deleteGoal(goalId);
@@ -282,6 +276,4 @@ class GoalServiceTest {
         verify(goalRepository).removeSkillsFromGoal(goalId);
         verify(goalRepository).deleteById(goalId);
     }
-
-    // look for method tests for filters in the FilterTest class
 }

@@ -1,19 +1,25 @@
 package school.faang.user_service.Service.event;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.mapper.eventParticipations.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
+@RequiredArgsConstructor
 @Service
 public class EventParticipationService {
 
-    @Autowired
-    private EventParticipationRepository eventParticipationRepository;
+    private final EventParticipationRepository eventParticipationRepository;
 
-    public void registrParticipant(long userId , long eventId){
+    private final UserMapper userMapper;
+
+    public void registrParticipant(long eventId , long userId){
         if(eventParticipationRepository.findAllParticipantsByEventId(eventId).stream()
                 .anyMatch(user -> user.getId() == userId)){
             throw new RuntimeException("User is already registered for the event.");
@@ -22,7 +28,7 @@ public class EventParticipationService {
         }
     }
 
-    public void unregisterParticipant(long userId , long eventId){
+    public void unregisterParticipant(long eventId , long userId){
         if(eventParticipationRepository.findAllParticipantsByEventId(eventId).stream()
                 .anyMatch(user -> user.getId() == userId)){
             eventParticipationRepository.unregister(eventId , userId);
@@ -31,11 +37,14 @@ public class EventParticipationService {
         }
     }
 
-    public List<User> getPaticipant(long eventId){
-        return eventParticipationRepository.findAllParticipantsByEventId(eventId);
+    public List<UserDto> getPaticipant(long eventId){
+        List<UserDto> participants = eventParticipationRepository.findAllParticipantsByEventId(eventId).stream()
+                .map(user -> userMapper.toDto(user))
+                .toList();
+        return participants;
     }
 
     public int getParticipantCount(long eventId){
-    return eventParticipationRepository.countParticipants(eventId);
+        return eventParticipationRepository.countParticipants(eventId);
     }
 }

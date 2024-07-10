@@ -1,10 +1,10 @@
-package school.faang.user_service.validator.recommendation.requestvalidator;
+package school.faang.user_service.service.recommendation.request.validator.recommendation.requestvalidator;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.exception.ValidationException;
-import school.faang.user_service.validator.Validator;
+import school.faang.user_service.service.recommendation.request.validator.Validator;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package school.faang.user_service.validator.recommendation.requestvalidator;
+package school.faang.user_service.service.recommendation.request.validator.recommendation.requestvalidator;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -6,7 +6,7 @@ import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.exception.ExceptionMessage;
 import school.faang.user_service.exception.ValidationException;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
-import school.faang.user_service.validator.Validator;
+import school.faang.user_service.service.recommendation.request.validator.Validator;
 
 import java.time.LocalDateTime;
 import java.time.Period;

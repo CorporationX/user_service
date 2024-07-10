@@ -1,4 +1,4 @@
-package school.faang.user_service.validator.recommendation.requestvalidator;
+package school.faang.user_service.service.recommendation.request.validator.recommendation.requestvalidator;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

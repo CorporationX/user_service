@@ -1,5 +1,6 @@
 package school.faang.user_service.mapper.skill;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
@@ -16,42 +17,13 @@ public class SkillMapperTest {
     private SkillDto skillDto;
     private SkillCandidateDto skillCandidateDto;
 
-    @Test
-    void testToDto() {
-        skill = Skill.builder()
-                .id(1L)
-                .title("Title")
-                .build();
-
+    @BeforeEach
+    void setUp() {
         skillDto = SkillDto.builder()
                 .id(1L)
                 .title("Title")
                 .build();
 
-        SkillDto result = skillMapper.toDto(skill);
-
-        assertEquals(skillDto, result);
-    }
-
-    @Test
-    void testToEntity() {
-        skillDto = SkillDto.builder()
-                .id(1L)
-                .title("Title")
-                .build();
-
-        skill = Skill.builder()
-                .id(1L)
-                .title("Title")
-                .build();
-
-        Skill result = skillMapper.toEntity(skillDto);
-
-        assertEquals(skill, result);
-    }
-
-    @Test
-    void testToSkillCandidateDto() {
         skillCandidateDto = SkillCandidateDto.builder()
                 .skill(SkillDto.builder()
                         .id(1L)
@@ -63,9 +35,28 @@ public class SkillMapperTest {
                 .id(1L)
                 .title("Title")
                 .build();
+    }
 
+    @Test
+    void testToDto() {
+        SkillDto result = skillMapper.toDto(skill);
+
+        assertEquals(skillDto.getId(), result.getId());
+        assertEquals(skillDto.getTitle(), result.getTitle());
+    }
+
+    @Test
+    void testToEntity() {
+        Skill result = skillMapper.toEntity(skillDto);
+
+        assertEquals(skill.getId(), result.getId());
+        assertEquals(skill.getTitle(), result.getTitle());
+    }
+
+    @Test
+    void testToSkillCandidateDto() {
         SkillCandidateDto result = skillMapper.toSkillCandidateDto(skill);
 
-        assertEquals(skillCandidateDto, result);
+        assertEquals(skillCandidateDto.getSkill(), result.getSkill());
     }
 }

@@ -17,7 +17,8 @@ public interface RecommendationRequestRepository extends CrudRepository<Recommen
             ORDER BY created_at DESC
             LIMIT 1
             """)
-    Optional<RecommendationRequest> findLatestPendingRequest(long requesterId, long receiverId);
+    Optional<RecommendationRequest> findLatestAcceptedRequest(long requesterId, long receiverId);
+
     @Query(nativeQuery = true, value = """
             select * from recommendation_request
             where requester_id = ?1 and receiver_id = ?2

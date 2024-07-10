@@ -105,4 +105,12 @@ public class EventControllerTest {
         assertNotNull(result);
     }
 
+    @Test
+    public void testDeleteEvent() {
+        long eventId = 1L;
+        eventController.deleteEvent(eventId);
+
+        verify(eventService, times(1)).deleteEvent(eventId);
+    }
+
 }

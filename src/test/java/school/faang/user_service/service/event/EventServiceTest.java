@@ -148,4 +148,11 @@ public class EventServiceTest {
         verify(eventOwnerFilter, times(1)).apply(any(), eq(filters));
         assertEquals(expected, result);
     }
+
+    @Test
+    public void testDeleteEvent() {
+        eventService.deleteEvent(eventId);
+
+        verify(eventRepository, times(1)).deleteById(eventId);
+    }
 }

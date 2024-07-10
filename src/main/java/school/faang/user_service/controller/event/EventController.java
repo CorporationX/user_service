@@ -40,4 +40,8 @@ public class EventController {
     public List<EventDto> getEventsByFilter(EventFilterDto filter) {
         return eventService.getEventsByFilter(filter);
     }
+
+    public void deleteEvent(long eventId) {
+        eventService.deleteEvent(eventId);
+    }
 }

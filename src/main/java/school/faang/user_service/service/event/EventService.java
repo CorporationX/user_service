@@ -56,4 +56,8 @@ public class EventService {
                 .map(eventMapper::toDto)
                 .toList();
     }
+
+    public void deleteEvent(long eventId) {
+        eventRepository.deleteById(eventId);
+    }
 }

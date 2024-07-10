@@ -14,6 +14,7 @@ import org.mockito.quality.Strictness;
 import org.springframework.test.util.ReflectionTestUtils;
 import school.faang.user_service.dto.filter.RequestFilterDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
@@ -233,5 +234,36 @@ class DefaultMentorshipRequestServiceTest {
         when(mentorshipRequestRepository.findById(100L)).thenReturn(Optional.of(request));
 
         assertThrows(MentorshipIsAlreadyAgreedException.class, () -> sut.acceptRequest(100L), ExceptionMessages.MENTORSHIP_ALREADY_ONGOING);
+    }
+
+    @Test
+    void rejectRequest_successfully_updates_entity() {
+        User requester = new User();
+        requester.setId(1L);
+
+        User receiver = new User();
+        receiver.setId(2L);
+
+        MentorshipRequest request = new MentorshipRequest();
+        request.setId(100L);
+        request.setStatus(RequestStatus.PENDING);
+
+        RejectionDto rejectionDto = new RejectionDto("Not a good fit");
+        when(mentorshipRequestRepository.findById(100L)).thenReturn(Optional.of(request));
+        when(mapper.toDto(request)).thenReturn(new MentorshipRequestDto());
+
+        sut.rejectRequest(100L, rejectionDto);
+
+        verify(mentorshipRequestRepository, times(1)).save(request);
+        assertEquals(RequestStatus.REJECTED, request.getStatus());
+        assertEquals("Not a good fit", request.getRejectionReason());
+    }
+
+    @Test
+    void rejectRequest_request_not_found() {
+        RejectionDto rejectionDto = new RejectionDto("Not a good fit");
+        when(mentorshipRequestRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(NoSuchElementException.class, () -> sut.rejectRequest(100L, rejectionDto));
     }
 }

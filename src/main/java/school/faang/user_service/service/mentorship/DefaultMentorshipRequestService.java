@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.filter.RequestFilterDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.exception.ExceptionMessages;
@@ -61,8 +62,7 @@ public class DefaultMentorshipRequestService implements MentorshipRequestService
     @Override
     @Transactional
     public MentorshipRequestDto acceptRequest(long id) {
-        var request = mentorshipRequestRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException(ExceptionMessages.MENTORSHIP_REQUEST_NOT_FOUND));
+        var request = findMentorshipRequest(id);
         var requester = request.getRequester();
         var receiver = request.getReceiver();
         if (receiver.getMentees().contains(requester)) {
@@ -74,6 +74,14 @@ public class DefaultMentorshipRequestService implements MentorshipRequestService
             mentorshipRequestRepository.save(request);
         }
         return mapper.toDto(request);
+    }
+
+    @Override
+    public MentorshipRequestDto rejectRequest(long id, RejectionDto rejectionDto) {
+        var request = findMentorshipRequest(id);
+        request.setStatus(RequestStatus.REJECTED);
+        request.setRejectionReason(rejectionDto.reason());
+        return mapper.toDto(mentorshipRequestRepository.save(request));
     }
 
     private List<MentorshipRequest> getFilteredRequests(RequestFilterDto filters) {
@@ -90,5 +98,10 @@ public class DefaultMentorshipRequestService implements MentorshipRequestService
 
     private Stream<MentorshipRequest> applyFilter(Stream<MentorshipRequest> requestsStream, MentorshipRequestFilter filter, RequestFilterDto filters) {
         return filter.apply(requestsStream, filters);
+    }
+
+    private MentorshipRequest findMentorshipRequest(long id) {
+        return mentorshipRequestRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException(ExceptionMessages.MENTORSHIP_REQUEST_NOT_FOUND));
     }
 }

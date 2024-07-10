@@ -9,6 +9,7 @@ import school.faang.user_service.controller.BaseControllerTest;
 import school.faang.user_service.dto.DtoValidationConstraints;
 import school.faang.user_service.dto.filter.RequestFilterDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
+import school.faang.user_service.dto.mentorship.RejectionDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.exception.ExceptionMessages;
 import school.faang.user_service.exception.mentorship.MentorshipIsAlreadyAgreedException;
@@ -21,6 +22,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -148,7 +150,7 @@ class MentorshipRequestControllerTest extends BaseControllerTest {
 
         when(mentorshipRequestService.acceptRequest(1L)).thenReturn(dto);
 
-        mockMvc.perform(post(ApiPath.REQUEST_MENTORSHIP + "/1/accept")
+        mockMvc.perform(patch(ApiPath.REQUEST_MENTORSHIP + "/1/accept")
                         .header(BaseControllerTest.USER_HEADER, BaseControllerTest.DEFAULT_HEADER_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(dto.getId()))
@@ -159,9 +161,39 @@ class MentorshipRequestControllerTest extends BaseControllerTest {
     void acceptMentorship_should_return_bad_request_if_mentorship_is_already_agreed() throws Exception {
         when(mentorshipRequestService.acceptRequest(1L)).thenThrow(new MentorshipIsAlreadyAgreedException(ExceptionMessages.MENTORSHIP_ALREADY_ONGOING));
 
-        mockMvc.perform(post(ApiPath.REQUEST_MENTORSHIP + "/1/accept")
+        mockMvc.perform(patch(ApiPath.REQUEST_MENTORSHIP + "/1/accept")
                         .header(BaseControllerTest.USER_HEADER, BaseControllerTest.DEFAULT_HEADER_VALUE))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(ExceptionMessages.MENTORSHIP_ALREADY_ONGOING));
+    }
+
+    @Test
+    void rejectMentorship_should_return_bad_request_if_rejection_reason_is_empty() throws Exception {
+        var rejectionDto = new RejectionDto("");
+
+        mockMvc.perform(patch(ApiPath.REQUEST_MENTORSHIP + "/1/reject")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(rejectionDto))
+                        .header(BaseControllerTest.USER_HEADER, BaseControllerTest.DEFAULT_HEADER_VALUE))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(DtoValidationConstraints.VALIDATION_FAILED))
+                .andExpect(jsonPath("$.details").value(containsString(DtoValidationConstraints.MENTORSHIP_REJECTION_REASON_CONSTRAINT)));
+    }
+
+    @Test
+    void rejectMentorship_should_return_ok_status_with_valid_id_and_reason() throws Exception {
+        MentorshipRequestDto dto = new MentorshipRequestDto();
+        dto.setId(1L);
+        dto.setRequestStatus(RequestStatus.REJECTED);
+
+        when(mentorshipRequestService.rejectRequest(1L, new RejectionDto("Test Reason"))).thenReturn(dto);
+
+        mockMvc.perform(patch(ApiPath.REQUEST_MENTORSHIP + "/1/reject")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new RejectionDto("Test Reason")))
+                        .header(BaseControllerTest.USER_HEADER, BaseControllerTest.DEFAULT_HEADER_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(dto.getId()))
+                .andExpect(jsonPath("$.requestStatus").value("REJECTED"));
     }
 }

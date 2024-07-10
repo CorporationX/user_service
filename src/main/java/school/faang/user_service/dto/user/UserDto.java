@@ -19,4 +19,6 @@ public class UserDto {
     private String email;
     private String picId;
     private String smallPicId;
+    private String phone;
+    private String preferenceContact;
 }

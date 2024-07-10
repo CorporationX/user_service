@@ -1,5 +1,6 @@
 package school.faang.user_service.exception.handler;
 
+import jakarta.persistence.PersistenceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,6 +55,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleMessageNotReadable(Exception ex, WebRequest request) {
         log.error("Request body was not provided. Details: {}", ex.getMessage(), ex);
+        ErrorResponse errorResponse = new ErrorResponse(ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(PersistenceException.class)
+    public ResponseEntity<ErrorResponse> handlePersistenceException(Exception ex, WebRequest request) {
+        log.error("Error interacting with the database. Details: {}", ex.getMessage(), ex);
         ErrorResponse errorResponse = new ErrorResponse(ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }

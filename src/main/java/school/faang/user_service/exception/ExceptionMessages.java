@@ -2,7 +2,11 @@ package school.faang.user_service.exception;
 
 public final class ExceptionMessages {
 
+
     private ExceptionMessages() {}
+
+    public static final String FAILED_PERSISTENCE = "Unable to persist data into database. Please try again.";
+    public static final String FAILED_RETRIEVAL = "Unable to retrieve data from database. Please try again.";
 
     public static final String SELF_MENTORSHIP = "You cannot mentor yourself.";
     public static final String RECEIVER_NOT_FOUND = "Receiver cannot be found.";

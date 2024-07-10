@@ -1,5 +1,6 @@
 package school.faang.user_service.service.mentorship;
 
+import jakarta.persistence.PersistenceException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -48,6 +49,22 @@ class DefaultMentorshipRequestServiceTest {
     private DefaultMentorshipRequestService sut;
 
     @Test
+    void testRequestMentorship_throws_exception_when_database_write_fails() {
+        MentorshipRequestDto dto = new MentorshipRequestDto();
+        dto.setRequesterId(1L);
+        dto.setReceiverId(2L);
+
+        when(userRepository.existsById(dto.getReceiverId())).thenReturn(true);
+        when(userRepository.existsById(dto.getRequesterId())).thenReturn(true);
+        when(mapper.toEntity(dto)).thenReturn(new MentorshipRequest());
+        when(mentorshipRequestRepository.save(new MentorshipRequest())).thenThrow(new RuntimeException());
+
+        assertThatThrownBy(() -> sut.requestMentorship(dto))
+                .isInstanceOf(PersistenceException.class)
+                .hasMessage(ExceptionMessages.FAILED_PERSISTENCE);
+    }
+
+    @Test
     void testRequestMentorship_throws_exception_when_receiver_and_requester_ids_are_same() {
         MentorshipRequestDto dto = new MentorshipRequestDto();
 
@@ -61,6 +78,7 @@ class DefaultMentorshipRequestServiceTest {
         MentorshipRequestDto dto = new MentorshipRequestDto();
         dto.setRequesterId(1L);
         dto.setReceiverId(2L);
+
         when(userRepository.existsById(dto.getReceiverId())).thenReturn(false);
         when(userRepository.existsById(dto.getRequesterId())).thenReturn(true);
 
@@ -74,6 +92,7 @@ class DefaultMentorshipRequestServiceTest {
         MentorshipRequestDto dto = new MentorshipRequestDto();
         dto.setRequesterId(1L);
         dto.setReceiverId(2L);
+
         when(userRepository.existsById(dto.getReceiverId())).thenReturn(true);
         when(userRepository.existsById(dto.getRequesterId())).thenReturn(false);
 
@@ -86,9 +105,11 @@ class DefaultMentorshipRequestServiceTest {
     void testRequestMentorship_throws_exception_when_mentorship_request_recently_happened() {
         MentorshipRequest request = new MentorshipRequest();
         request.setCreatedAt(LocalDateTime.now().minusMonths(1));
+
         MentorshipRequestDto dto = new MentorshipRequestDto();
         dto.setRequesterId(1L);
         dto.setReceiverId(2L);
+
         when(userRepository.existsById(dto.getReceiverId())).thenReturn(true);
         when(userRepository.existsById(dto.getRequesterId())).thenReturn(true);
         when(mentorshipRequestRepository.findLatestRequest(dto.getRequesterId(), dto.getReceiverId())).thenReturn(Optional.of(request));
@@ -133,5 +154,14 @@ class DefaultMentorshipRequestServiceTest {
         assertEquals(RequestStatus.PENDING, result.getRequestStatus());
         assertEquals(dto.getRequesterId(), result.getRequesterId());
         assertEquals(dto.getReceiverId(), result.getReceiverId());
+    }
+
+    @Test
+    void testGetRequests_throws_exception_when_database_read_fails() {
+        when(mentorshipRequestRepository.findAll()).thenThrow(new RuntimeException());
+
+        assertThatThrownBy(() -> sut.getRequests(null))
+                .isInstanceOf(PersistenceException.class)
+                .hasMessage(ExceptionMessages.FAILED_RETRIEVAL);
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
+import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import school.faang.user_service.service.user.UserService;
 
@@ -20,6 +21,9 @@ public class RedisConfig {
     private String host;
     @Value("${spring.data.redis.port}")
     private int port;
+
+    @Value("${spring.data.redis.channels.mentorship_channel.name}")
+    private String mentorshipChannelName;
 
     @Bean
     public JedisConnectionFactory redisConnectionFactory() {
@@ -35,6 +39,11 @@ public class RedisConfig {
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new StringRedisSerializer());
         return redisTemplate;
+    }
+
+    @Bean
+    public ChannelTopic mentorshipChannel() {
+        return new ChannelTopic(mentorshipChannelName);
     }
 
     @Bean

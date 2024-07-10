@@ -8,3 +8,4 @@ public record UserDto(
     boolean isActive
 ) {
 }
+

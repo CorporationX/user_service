@@ -29,7 +29,7 @@ public class MentorshipRequestController {
     }
 
     @GetMapping
-    public ResponseEntity<List<MentorshipRequestDto>> getRequests(@RequestBody RequestFilterDto filters) {
+    public ResponseEntity<List<MentorshipRequestDto>> getRequests(@RequestBody(required = false) RequestFilterDto filters) {
         return ResponseEntity.status(HttpStatus.OK).body(mentorshipRequestService.getRequests(filters));
     }
 }

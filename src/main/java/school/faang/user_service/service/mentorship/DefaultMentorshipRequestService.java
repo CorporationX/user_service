@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @Slf4j
@@ -40,7 +41,7 @@ public class DefaultMentorshipRequestService implements MentorshipRequestService
         validateUsersExistence(receiverId, requesterId);
         validateEligibilityForMentorship(requesterId, receiverId);
         mentorshipRequestDto.setRequestStatus(RequestStatus.PENDING);
-        MentorshipRequest savedRequest = null;
+        MentorshipRequest savedRequest;
         try {
             var entityToBeSaved = mapper.toEntity(mentorshipRequestDto);
             savedRequest = mentorshipRequestRepository.save(entityToBeSaved);
@@ -53,19 +54,29 @@ public class DefaultMentorshipRequestService implements MentorshipRequestService
 
     @Override
     public List<MentorshipRequestDto> getRequests(RequestFilterDto filters) {
-        Iterable<MentorshipRequest> requests = null;
         try {
-            requests = mentorshipRequestRepository.findAll();
+            var requests = getFilteredRequests(filters);
+            return requests.stream().map(mapper::toDto).toList();
         } catch (Exception e) {
             log.error(ExceptionMessages.FAILED_RETRIEVAL, e);
             throw new PersistenceException(ExceptionMessages.FAILED_RETRIEVAL, e);
         }
-        var requestsStream = StreamSupport.stream(requests.spliterator(), false);
-        return mentorshipRequestFilters.stream()
-                .filter(filter -> filter.isApplicable(filters))
-                .flatMap(filter -> filter.apply(requestsStream, filters))
-                .map(mapper::toDto)
-                .toList();
+    }
+
+    private List<MentorshipRequest> getFilteredRequests(RequestFilterDto filters) {
+        var requestsStream = StreamSupport.stream(mentorshipRequestRepository.findAll().spliterator(), false);
+        if (filters == null) {
+            return requestsStream.toList();
+        } else {
+            return mentorshipRequestFilters.stream()
+                    .filter(filter -> filter.isApplicable(filters))
+                    .flatMap(filter -> applyFilter(requestsStream, filter, filters))
+                    .toList();
+        }
+    }
+
+    private Stream<MentorshipRequest> applyFilter(Stream<MentorshipRequest> requestsStream, MentorshipRequestFilter filter, RequestFilterDto filters) {
+        return filter.apply(requestsStream, filters);
     }
 
     private void validateSelfMentorship(Long receiverId, Long requesterId) {

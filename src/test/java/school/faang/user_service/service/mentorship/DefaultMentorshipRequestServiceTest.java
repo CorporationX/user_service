@@ -10,6 +10,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.test.util.ReflectionTestUtils;
+import school.faang.user_service.dto.filter.RequestFilterDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
@@ -18,13 +20,18 @@ import school.faang.user_service.exception.ExceptionMessages;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+import school.faang.user_service.service.filter.mentorship.MentorshipRequestStatusFilter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,6 +48,9 @@ class DefaultMentorshipRequestServiceTest {
 
     @Mock
     private MentorshipRequestMapper mapper;
+
+    @Mock
+    private MentorshipRequestStatusFilter statusFilter;
 
     @Captor
     private ArgumentCaptor<MentorshipRequestDto> dtoCaptor;
@@ -163,5 +173,46 @@ class DefaultMentorshipRequestServiceTest {
         assertThatThrownBy(() -> sut.getRequests(null))
                 .isInstanceOf(PersistenceException.class)
                 .hasMessage(ExceptionMessages.FAILED_RETRIEVAL);
+    }
+
+    @Test
+    void testGetRequests_should_return_all_requests_when_filter_is_null() {
+        var dto = new MentorshipRequestDto();
+        when(mentorshipRequestRepository.findAll()).thenReturn(List.of(new MentorshipRequest(),
+                new MentorshipRequest(), new MentorshipRequest()));
+        when(mapper.toDto(any(MentorshipRequest.class))).thenReturn(dto);
+
+        var result = sut.getRequests(null);
+
+        assertEquals(3, result.size());
+        assertEquals(dto, result.get(0));
+    }
+
+    @Test
+    void testGetRequests_should_return_filtered_requests_when_filters_apply() {
+        ReflectionTestUtils.setField(sut, "mentorshipRequestFilters", List.of(statusFilter));
+
+        var req1 = new MentorshipRequest();
+        req1.setStatus(RequestStatus.PENDING);
+        var req2 = new MentorshipRequest();
+        req2.setStatus(RequestStatus.ACCEPTED);
+        var req3 = new MentorshipRequest();
+        req3.setStatus(RequestStatus.PENDING);
+
+        var dto = new MentorshipRequestDto();
+        dto.setRequestStatus(RequestStatus.PENDING);
+
+        var filters = new RequestFilterDto();
+        filters.setRequestStatusPattern("PENDING");
+
+        when(mentorshipRequestRepository.findAll()).thenReturn(List.of());
+        when(statusFilter.isApplicable(filters)).thenReturn(true);
+        when(mapper.toDto(any(MentorshipRequest.class))).thenReturn(dto);
+        when(statusFilter.apply(any(Stream.class), eq(filters))).thenReturn(Stream.of(req1, req3));
+
+        var result = sut.getRequests(filters);
+
+        assertEquals(2, result.size());
+        assertEquals(dto, result.get(0));
     }
 }

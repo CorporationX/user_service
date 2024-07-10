@@ -85,7 +85,7 @@ class MentorshipRequestControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void getRequests_should_return_filtered_requests() throws Exception {
+    void getRequests_should_return_filtered_requests_applying_a_filter() throws Exception {
         var requestFilterDto = new RequestFilterDto();
         requestFilterDto.setRequestStatusPattern("PENDING");
 
@@ -97,8 +97,8 @@ class MentorshipRequestControllerTest extends BaseControllerTest {
         dto2.setRequestStatus(RequestStatus.PENDING);
         MentorshipRequestDto dto3 = new MentorshipRequestDto();
         dto3.setId(3L);
-        dto3.setRequestStatus(RequestStatus.PENDING);
-        var requests = List.of(dto1, dto2, dto3);
+        dto3.setRequestStatus(RequestStatus.ACCEPTED);
+        var requests = List.of(dto1, dto2);
 
         when(mentorshipRequestService.getRequests(requestFilterDto)).thenReturn(requests);
 
@@ -107,18 +107,34 @@ class MentorshipRequestControllerTest extends BaseControllerTest {
                         .content(objectMapper.writeValueAsString(requestFilterDto))
                         .header(BaseControllerTest.USER_HEADER, BaseControllerTest.DEFAULT_HEADER_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()", is(3)))
+                .andExpect(jsonPath("$.length()", is(2)))
                 .andExpect(jsonPath("$[0].id").value(dto1.getId()))
-                .andExpect(jsonPath("$[1].id").value(dto2.getId()))
-                .andExpect(jsonPath("$[2].id").value(dto3.getId()));
+                .andExpect(jsonPath("$[1].id").value(dto2.getId()));
     }
 
     @Test
-    void getRequests_should_return_bad_request_when_filter_dto_is_not_present() throws Exception {
+    void getRequests_should_return_all_requests_if_filter_is_omitted() throws Exception {
+        MentorshipRequestDto dto1 = new MentorshipRequestDto();
+        dto1.setId(1L);
+        dto1.setRequestStatus(RequestStatus.PENDING);
+        MentorshipRequestDto dto2 = new MentorshipRequestDto();
+        dto2.setId(2L);
+        dto2.setRequestStatus(RequestStatus.PENDING);
+        MentorshipRequestDto dto3 = new MentorshipRequestDto();
+        dto3.setId(3L);
+        dto3.setRequestStatus(RequestStatus.PENDING);
+        var requests = List.of(dto1, dto2, dto3);
+
+        when(mentorshipRequestService.getRequests(null)).thenReturn(requests);
+
         mockMvc.perform(get(ApiPath.REQUEST_MENTORSHIP)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(null))
                         .header(BaseControllerTest.USER_HEADER, BaseControllerTest.DEFAULT_HEADER_VALUE))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(3)))
+                .andExpect(jsonPath("$[0].id").value(dto1.getId()))
+                .andExpect(jsonPath("$[1].id").value(dto2.getId()))
+                .andExpect(jsonPath("$[2].id").value(dto3.getId()));
     }
 }

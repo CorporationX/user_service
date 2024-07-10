@@ -8,7 +8,7 @@ import school.faang.user_service.dto.recommendation.RejectionDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.exception.ExceptionMessage;
 import school.faang.user_service.exception.RejectRecommendationException;
-import school.faang.user_service.filter.Filter;
+import school.faang.user_service.service.recommendation.request.filter.Filter;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;

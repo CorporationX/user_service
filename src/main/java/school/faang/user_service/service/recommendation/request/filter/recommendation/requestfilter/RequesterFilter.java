@@ -1,19 +1,20 @@
-package school.faang.user_service.filter.recommendation.requestfilter;
+package school.faang.user_service.service.recommendation.request.filter.recommendation.requestfilter;
 
 import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RecommendationRequestFilterDto;
-import school.faang.user_service.filter.Filter;
+import school.faang.user_service.service.recommendation.request.filter.Filter;
 
 @Component
-public class SkillsFilter implements Filter<RecommendationRequestFilterDto, RecommendationRequestDto> {
+public class RequesterFilter implements Filter<RecommendationRequestFilterDto, RecommendationRequestDto> {
+
     @Override
     public boolean applyFilter(RecommendationRequestDto data, RecommendationRequestFilterDto filter) {
-        return data.getSkillIds().containsAll(filter.getSkillIds());
+        return data.getRequesterId().equals(filter.getRequesterId());
     }
 
     @Override
     public boolean isApplicable(RecommendationRequestFilterDto filter) {
-        return filter.getSkillIds() != null && (!filter.getSkillIds().isEmpty());
+        return filter.getRequesterId() != null;
     }
 }

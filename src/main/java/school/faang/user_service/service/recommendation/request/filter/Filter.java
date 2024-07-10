@@ -1,4 +1,4 @@
-package school.faang.user_service.filter;
+package school.faang.user_service.service.recommendation.request.filter;
 
 import java.util.stream.Stream;
 

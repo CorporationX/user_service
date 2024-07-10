@@ -1,6 +1,7 @@
 package school.faang.user_service.service.mentorship;
 
 import jakarta.persistence.PersistenceException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -18,22 +19,23 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.ExceptionMessages;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-import school.faang.user_service.service.filter.mentorship.MentorshipRequestStatusFilter;
+import school.faang.user_service.filter.mentorship.MentorshipRequestStatusFilter;
+import school.faang.user_service.validator.mentorship.SelfMentorshipValidator;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,13 +46,13 @@ class DefaultMentorshipRequestServiceTest {
     private MentorshipRequestRepository mentorshipRequestRepository;
 
     @Mock
-    private UserRepository userRepository;
-
-    @Mock
     private MentorshipRequestMapper mapper;
 
     @Mock
     private MentorshipRequestStatusFilter statusFilter;
+
+    @Mock
+    private SelfMentorshipValidator selfMentorshipValidator;
 
     @Captor
     private ArgumentCaptor<MentorshipRequestDto> dtoCaptor;
@@ -58,75 +60,38 @@ class DefaultMentorshipRequestServiceTest {
     @InjectMocks
     private DefaultMentorshipRequestService sut;
 
+    @BeforeEach
+    void setUp() {
+        ReflectionTestUtils.setField(sut, "mentorshipValidators", List.of(selfMentorshipValidator));
+    }
+
+    @Test
+    void testRequestMentorship_throws_exception_when_validation_fails() {
+        MentorshipRequestDto dto = new MentorshipRequestDto();
+        dto.setRequesterId(1L);
+        dto.setReceiverId(1L);
+
+        doThrow(new IllegalArgumentException(ExceptionMessages.SELF_MENTORSHIP)).when(selfMentorshipValidator).validate(dto);
+
+        assertThatThrownBy(() -> sut.requestMentorship(dto))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(ExceptionMessages.SELF_MENTORSHIP);
+        verifyNoInteractions(mentorshipRequestRepository, mapper);
+    }
+
     @Test
     void testRequestMentorship_throws_exception_when_database_write_fails() {
         MentorshipRequestDto dto = new MentorshipRequestDto();
         dto.setRequesterId(1L);
         dto.setReceiverId(2L);
 
-        when(userRepository.existsById(dto.getReceiverId())).thenReturn(true);
-        when(userRepository.existsById(dto.getRequesterId())).thenReturn(true);
+        doNothing().when(selfMentorshipValidator).validate(any(MentorshipRequestDto.class));
         when(mapper.toEntity(dto)).thenReturn(new MentorshipRequest());
         when(mentorshipRequestRepository.save(new MentorshipRequest())).thenThrow(new RuntimeException());
 
         assertThatThrownBy(() -> sut.requestMentorship(dto))
                 .isInstanceOf(PersistenceException.class)
                 .hasMessage(ExceptionMessages.FAILED_PERSISTENCE);
-    }
-
-    @Test
-    void testRequestMentorship_throws_exception_when_receiver_and_requester_ids_are_same() {
-        MentorshipRequestDto dto = new MentorshipRequestDto();
-
-        assertThatThrownBy(() -> sut.requestMentorship(dto))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(ExceptionMessages.SELF_MENTORSHIP);
-    }
-
-    @Test
-    void testRequestMentorship_throws_exception_when_receiver_not_found() {
-        MentorshipRequestDto dto = new MentorshipRequestDto();
-        dto.setRequesterId(1L);
-        dto.setReceiverId(2L);
-
-        when(userRepository.existsById(dto.getReceiverId())).thenReturn(false);
-        when(userRepository.existsById(dto.getRequesterId())).thenReturn(true);
-
-        assertThatThrownBy(() -> sut.requestMentorship(dto))
-                .isInstanceOf(NoSuchElementException.class)
-                .hasMessage(ExceptionMessages.RECEIVER_NOT_FOUND);
-    }
-
-    @Test
-    void testRequestMentorship_throws_exception_when_requester_not_found() {
-        MentorshipRequestDto dto = new MentorshipRequestDto();
-        dto.setRequesterId(1L);
-        dto.setReceiverId(2L);
-
-        when(userRepository.existsById(dto.getReceiverId())).thenReturn(true);
-        when(userRepository.existsById(dto.getRequesterId())).thenReturn(false);
-
-        assertThatThrownBy(() -> sut.requestMentorship(dto))
-                .isInstanceOf(NoSuchElementException.class)
-                .hasMessage(ExceptionMessages.REQUESTER_NOT_FOUND);
-    }
-
-    @Test
-    void testRequestMentorship_throws_exception_when_mentorship_request_recently_happened() {
-        MentorshipRequest request = new MentorshipRequest();
-        request.setCreatedAt(LocalDateTime.now().minusMonths(1));
-
-        MentorshipRequestDto dto = new MentorshipRequestDto();
-        dto.setRequesterId(1L);
-        dto.setReceiverId(2L);
-
-        when(userRepository.existsById(dto.getReceiverId())).thenReturn(true);
-        when(userRepository.existsById(dto.getRequesterId())).thenReturn(true);
-        when(mentorshipRequestRepository.findLatestRequest(dto.getRequesterId(), dto.getReceiverId())).thenReturn(Optional.of(request));
-
-        assertThatThrownBy(() -> sut.requestMentorship(dto))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage(ExceptionMessages.MENTORSHIP_FREQUENCY);
     }
 
     @Test
@@ -149,9 +114,6 @@ class DefaultMentorshipRequestServiceTest {
         request.setCreatedAt(LocalDateTime.now());
         request.setUpdatedAt(LocalDateTime.now());
 
-        when(userRepository.existsById(dto.getReceiverId())).thenReturn(true);
-        when(userRepository.existsById(dto.getRequesterId())).thenReturn(true);
-        when(mentorshipRequestRepository.findLatestRequest(dto.getRequesterId(), dto.getReceiverId())).thenReturn(Optional.empty());
         when(mapper.toEntity(dto)).thenReturn(request);
         when(mentorshipRequestRepository.save(request)).thenReturn(request);
         when(mapper.toDto(request)).thenReturn(dto);

@@ -1,4 +1,4 @@
-package school.faang.user_service.service.filter.mentorship;
+package school.faang.user_service.filter.mentorship;
 
 import static org.junit.jupiter.api.Assertions.*;
 

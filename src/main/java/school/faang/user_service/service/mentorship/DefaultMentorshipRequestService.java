@@ -11,14 +11,11 @@ import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.exception.ExceptionMessages;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
-import school.faang.user_service.service.filter.mentorship.MentorshipRequestFilter;
+import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
+import school.faang.user_service.validator.mentorship.MentorshipValidator;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -28,18 +25,14 @@ import java.util.stream.StreamSupport;
 public class DefaultMentorshipRequestService implements MentorshipRequestService {
 
     private final MentorshipRequestRepository mentorshipRequestRepository;
-    private final UserRepository userRepository;
     private final MentorshipRequestMapper mapper;
     private final List<MentorshipRequestFilter> mentorshipRequestFilters;
+    private final List<MentorshipValidator> mentorshipValidators;
 
     @Override
     @Transactional
     public MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto) {
-        var receiverId = mentorshipRequestDto.getReceiverId();
-        var requesterId = mentorshipRequestDto.getRequesterId();
-        validateSelfMentorship(receiverId, requesterId);
-        validateUsersExistence(receiverId, requesterId);
-        validateEligibilityForMentorship(requesterId, receiverId);
+        mentorshipValidators.forEach(validator -> validator.validate(mentorshipRequestDto));
         mentorshipRequestDto.setRequestStatus(RequestStatus.PENDING);
         MentorshipRequest savedRequest;
         try {
@@ -77,30 +70,5 @@ public class DefaultMentorshipRequestService implements MentorshipRequestService
 
     private Stream<MentorshipRequest> applyFilter(Stream<MentorshipRequest> requestsStream, MentorshipRequestFilter filter, RequestFilterDto filters) {
         return filter.apply(requestsStream, filters);
-    }
-
-    private void validateSelfMentorship(Long receiverId, Long requesterId) {
-        if (Objects.equals(receiverId, requesterId)) {
-            throw new IllegalArgumentException(ExceptionMessages.SELF_MENTORSHIP);
-        }
-    }
-
-    private void validateUsersExistence(Long receiverId, Long requesterId) {
-        if (!userRepository.existsById(receiverId)) {
-            throw new NoSuchElementException(ExceptionMessages.RECEIVER_NOT_FOUND);
-        }
-        if (!userRepository.existsById(requesterId)) {
-            throw new NoSuchElementException(ExceptionMessages.REQUESTER_NOT_FOUND);
-        }
-    }
-
-    private void validateEligibilityForMentorship(Long requesterId, Long receiverId) {
-        mentorshipRequestRepository.findLatestRequest(requesterId, receiverId)
-                .map(MentorshipRequest::getCreatedAt)
-                .ifPresent(creationDate -> {
-                    if (creationDate.isAfter(LocalDateTime.now().minusMonths(3))) {
-                        throw new IllegalStateException(ExceptionMessages.MENTORSHIP_FREQUENCY);
-                    }
-                });
     }
 }

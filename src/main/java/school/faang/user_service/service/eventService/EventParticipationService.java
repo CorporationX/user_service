@@ -2,7 +2,7 @@ package school.faang.user_service.service.eventService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.Validate.EventParticipantValidator;
+import school.faang.user_service.validator.EventParticipantValidator;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.mapper.UserMapper;

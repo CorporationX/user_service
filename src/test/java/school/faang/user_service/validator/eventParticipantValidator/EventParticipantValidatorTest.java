@@ -1,4 +1,4 @@
-package school.faang.user_service.validate.eventParticipantValidator;
+package school.faang.user_service.validator.eventParticipantValidator;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import school.faang.user_service.Validate.EventParticipantValidator;
+import school.faang.user_service.validator.EventParticipantValidator;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 

@@ -10,4 +10,6 @@ public interface MentorshipRequestService {
     MentorshipRequestDto requestMentorship(MentorshipRequestDto mentorshipRequestDto);
 
     List<MentorshipRequestDto> getRequests(RequestFilterDto filter);
+
+    MentorshipRequestDto acceptRequest(long id);
 }

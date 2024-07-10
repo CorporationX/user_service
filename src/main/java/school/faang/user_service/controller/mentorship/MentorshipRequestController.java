@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,5 +32,10 @@ public class MentorshipRequestController {
     @GetMapping
     public ResponseEntity<List<MentorshipRequestDto>> getRequests(@RequestBody(required = false) RequestFilterDto filters) {
         return ResponseEntity.status(HttpStatus.OK).body(mentorshipRequestService.getRequests(filters));
+    }
+
+    @PostMapping("/{id}/accept")
+    public ResponseEntity<MentorshipRequestDto> acceptMentorship(@PathVariable("id") long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(mentorshipRequestService.acceptRequest(id));
     }
 }

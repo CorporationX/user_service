@@ -10,6 +10,8 @@ import school.faang.user_service.dto.DtoValidationConstraints;
 import school.faang.user_service.dto.filter.RequestFilterDto;
 import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.entity.RequestStatus;
+import school.faang.user_service.exception.ExceptionMessages;
+import school.faang.user_service.exception.mentorship.MentorshipIsAlreadyAgreedException;
 import school.faang.user_service.service.mentorship.MentorshipRequestService;
 
 import java.util.List;
@@ -136,5 +138,30 @@ class MentorshipRequestControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("$[0].id").value(dto1.getId()))
                 .andExpect(jsonPath("$[1].id").value(dto2.getId()))
                 .andExpect(jsonPath("$[2].id").value(dto3.getId()));
+    }
+
+    @Test
+    void acceptMentorship_should_return_ok_status_with_valid_id() throws Exception {
+        MentorshipRequestDto dto = new MentorshipRequestDto();
+        dto.setId(1L);
+        dto.setRequestStatus(RequestStatus.ACCEPTED);
+
+        when(mentorshipRequestService.acceptRequest(1L)).thenReturn(dto);
+
+        mockMvc.perform(post(ApiPath.REQUEST_MENTORSHIP + "/1/accept")
+                        .header(BaseControllerTest.USER_HEADER, BaseControllerTest.DEFAULT_HEADER_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(dto.getId()))
+                .andExpect(jsonPath("$.requestStatus").value("ACCEPTED"));
+    }
+
+    @Test
+    void acceptMentorship_should_return_bad_request_if_mentorship_is_already_agreed() throws Exception {
+        when(mentorshipRequestService.acceptRequest(1L)).thenThrow(new MentorshipIsAlreadyAgreedException(ExceptionMessages.MENTORSHIP_ALREADY_ONGOING));
+
+        mockMvc.perform(post(ApiPath.REQUEST_MENTORSHIP + "/1/accept")
+                        .header(BaseControllerTest.USER_HEADER, BaseControllerTest.DEFAULT_HEADER_VALUE))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(ExceptionMessages.MENTORSHIP_ALREADY_ONGOING));
     }
 }

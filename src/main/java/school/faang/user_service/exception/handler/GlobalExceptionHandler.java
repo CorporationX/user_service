@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import school.faang.user_service.dto.DtoValidationConstraints;
+import school.faang.user_service.exception.mentorship.MentorshipIsAlreadyAgreedException;
 
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -55,6 +56,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleMessageNotReadable(Exception ex, WebRequest request) {
         log.error("Request body was not provided. Details: {}", ex.getMessage(), ex);
+        ErrorResponse errorResponse = new ErrorResponse(ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MentorshipIsAlreadyAgreedException.class)
+    public ResponseEntity<ErrorResponse> handleMentorshipIsAlreadyAgreedException(Exception ex, WebRequest request) {
+        log.error("This mentorship is already agreed. Details: {}", ex.getMessage(), ex);
         ErrorResponse errorResponse = new ErrorResponse(ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }

@@ -18,18 +18,24 @@ import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.ExceptionMessages;
+import school.faang.user_service.exception.mentorship.MentorshipIsAlreadyAgreedException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.filter.mentorship.MentorshipRequestStatusFilter;
 import school.faang.user_service.validator.mentorship.SelfMentorshipValidator;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -176,5 +182,56 @@ class DefaultMentorshipRequestServiceTest {
 
         assertEquals(2, result.size());
         assertEquals(dto, result.get(0));
+    }
+
+    @Test
+    void acceptRequest_should_successfully_update_entity_state() {
+        User requester = new User();
+        requester.setId(1L);
+        requester.setMentors(new ArrayList<>());
+        User receiver = new User();
+        receiver.setId(2L);
+        receiver.setMentees(new ArrayList<>());
+        MentorshipRequest request = new MentorshipRequest();
+        request.setId(100L);
+        request.setRequester(requester);
+        request.setReceiver(receiver);
+        request.setStatus(RequestStatus.PENDING);
+
+        when(mentorshipRequestRepository.findById(100L)).thenReturn(Optional.of(request));
+        when(mapper.toDto(request)).thenReturn(new MentorshipRequestDto());
+
+        sut.acceptRequest(100L);
+
+        verify(mentorshipRequestRepository, times(1)).save(request);
+        assertEquals(RequestStatus.ACCEPTED, request.getStatus());
+    }
+
+    @Test
+    void acceptRequest_Request_not_found() {
+        when(mentorshipRequestRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(NoSuchElementException.class, () -> sut.acceptRequest(100L));
+    }
+
+    @Test
+    void acceptRequest_request_already_accepted() {
+        User requester = new User();
+        requester.setId(1L);
+        User receiver = new User();
+        receiver.setId(2L);
+
+        requester.setMentors(Collections.singletonList(receiver));
+        receiver.setMentees(Collections.singletonList(requester));
+
+        MentorshipRequest request = new MentorshipRequest();
+        request.setId(100L);
+        request.setRequester(requester);
+        request.setReceiver(receiver);
+        request.setStatus(RequestStatus.ACCEPTED);
+
+        when(mentorshipRequestRepository.findById(100L)).thenReturn(Optional.of(request));
+
+        assertThrows(MentorshipIsAlreadyAgreedException.class, () -> sut.acceptRequest(100L), ExceptionMessages.MENTORSHIP_ALREADY_ONGOING);
     }
 }

@@ -31,7 +31,6 @@ class MentorshipParticipantsExistenceValidatorTest {
         dto.setRequesterId(1L);
 
         when(repository.existsById(dto.getReceiverId())).thenReturn(false);
-        when(repository.existsById(dto.getRequesterId())).thenReturn(true);
 
         assertThrows(NoSuchElementException.class, () -> validator.validate(dto), ExceptionMessages.RECEIVER_NOT_FOUND);
     }

@@ -10,12 +10,14 @@ import school.faang.user_service.dto.mentorship.MentorshipRequestDto;
 import school.faang.user_service.entity.MentorshipRequest;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.exception.ExceptionMessages;
+import school.faang.user_service.exception.mentorship.MentorshipIsAlreadyAgreedException;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
 import school.faang.user_service.filter.mentorship.MentorshipRequestFilter;
 import school.faang.user_service.validator.mentorship.MentorshipValidator;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -54,6 +56,24 @@ public class DefaultMentorshipRequestService implements MentorshipRequestService
             log.error(ExceptionMessages.FAILED_RETRIEVAL, e);
             throw new PersistenceException(ExceptionMessages.FAILED_RETRIEVAL, e);
         }
+    }
+
+    @Override
+    @Transactional
+    public MentorshipRequestDto acceptRequest(long id) {
+        var request = mentorshipRequestRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException(ExceptionMessages.MENTORSHIP_REQUEST_NOT_FOUND));
+        var requester = request.getRequester();
+        var receiver = request.getReceiver();
+        if (receiver.getMentees().contains(requester)) {
+            throw new MentorshipIsAlreadyAgreedException(ExceptionMessages.MENTORSHIP_ALREADY_ONGOING);
+        } else {
+            receiver.getMentees().add(requester);
+            requester.getMentors().add(receiver);
+            request.setStatus(RequestStatus.ACCEPTED);
+            mentorshipRequestRepository.save(request);
+        }
+        return mapper.toDto(request);
     }
 
     private List<MentorshipRequest> getFilteredRequests(RequestFilterDto filters) {

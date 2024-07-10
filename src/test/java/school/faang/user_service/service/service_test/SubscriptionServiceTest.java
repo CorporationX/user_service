@@ -64,7 +64,7 @@ public class SubscriptionServiceTest {
 
     @Test
     @DisplayName("успешная отписка")
-    public void un_followTest_goodsIDTest() throws DataFormatException {
+    public void unfollowTest_successfulTest() throws DataFormatException {
         //arrange
         long followerId = 0L;
         long followeeId = 1L;
@@ -136,7 +136,7 @@ public class SubscriptionServiceTest {
     //Negative tests
     @Test
     @DisplayName("подписки (отписки): одинаковые id")
-    public void un_followUser_throwIDTest() {
+    public void followUser_throwIDTest() {
         Assertions.assertThrows(DataFormatException.class,
                 () -> subscriptionService.validateUsersSubs(0L, 0L)
         );
@@ -144,7 +144,7 @@ public class SubscriptionServiceTest {
 
     @Test
     @DisplayName("подписки (отписки): нет user в бд")
-    public void un_followUser_exitUserTest() {
+    public void followUser_exitUserTest() {
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(0L, 1L)).thenReturn(false);
         Assertions.assertThrows(DataFormatException.class,
                 () -> subscriptionService.validateUsersSubs(0L, 1L)

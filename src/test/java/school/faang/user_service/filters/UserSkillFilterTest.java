@@ -71,7 +71,8 @@ class UserSkillFilterTest {
 
     @Test
     void apply() {
-        assertEquals(filter.apply(users, filterDtoNotNull).toList(), Stream.<User>builder()
-                .add(User.builder().skills(List.of(Skill.builder().title("skill").build())).build()).build().toList());
+        List<User> expectedUsers = List.of(User.builder().skills(List.of(Skill.builder().title("skill").build())).build());
+        List<User> actualResult = filter.apply(users, filterDtoNotNull).toList();
+        assertEquals(expectedUsers, actualResult);
     }
 }

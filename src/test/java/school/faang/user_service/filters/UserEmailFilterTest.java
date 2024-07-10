@@ -3,8 +3,10 @@ package school.faang.user_service.filters;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
@@ -70,7 +72,8 @@ class UserEmailFilterTest {
 
     @Test
     void apply() {
-        assertEquals(filter.apply(users, filterDtoNotNull).toList(), Stream.<User>builder()
-                .add(User.builder().email("asfjhaf@mail.ru").build()).build().toList());
+        List<User> expectedUsers = List.of(User.builder().email("asfjhaf@mail.ru").build());
+        List<User> actualResult = filter.apply(users, filterDtoNotNull).toList();
+        assertEquals(expectedUsers, actualResult);
     }
 }

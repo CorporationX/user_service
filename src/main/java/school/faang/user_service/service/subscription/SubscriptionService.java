@@ -1,4 +1,4 @@
-package school.faang.user_service.service;
+package school.faang.user_service.service.subscription;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageImpl;
@@ -19,18 +19,21 @@ import java.util.stream.Stream;
 public class SubscriptionService {
     private SubscriptionRepository subscriptionRepository;
     private UserMapper mapper;
-    private List<UserFilter> userFilters;
 
-    public SubscriptionService(SubscriptionRepository subscriptionRepository, UserMapper mapper, List<UserFilter> userFilters) {
+    private SubscriptionValidator validator;
+    private List<UserFilter<UserFilterDto, User>> userFilters;
+
+    public SubscriptionService(SubscriptionRepository subscriptionRepository,
+                               UserMapper mapper, List<UserFilter<UserFilterDto, User>> userFilters,
+                               SubscriptionValidator validator) {
         this.subscriptionRepository = subscriptionRepository;
         this.mapper = mapper;
         this.userFilters = userFilters;
+        this.validator = validator;
     }
 
     public void followUser(long followerId, long followeeId) {
-        if (subscriptionRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
-            throw new DataValidationException("Подписка уже существует");
-        }
+        validator.validateExistingSubscription(followerId, followeeId);
         subscriptionRepository.followUser(followerId, followeeId);
     }
 

@@ -9,7 +9,7 @@ import school.faang.user_service.entity.User;
 import java.util.stream.Stream;
 
 @Component
-public class UserSkillFilter implements UserFilter {
+public class UserSkillFilter implements UserFilter<UserFilterDto, User> {
     @Override
     public boolean isApplicable(UserFilterDto userFilterDto) {
         return userFilterDto.getSkillPattern() != null;

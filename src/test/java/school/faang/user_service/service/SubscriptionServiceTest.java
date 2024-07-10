@@ -20,6 +20,8 @@ import school.faang.user_service.filters.UserFilter;
 import school.faang.user_service.filters.UserNameFilter;
 import school.faang.user_service.mapper.UserMapperImpl;
 import school.faang.user_service.repository.SubscriptionRepository;
+import school.faang.user_service.service.subscription.SubscriptionService;
+import school.faang.user_service.service.subscription.SubscriptionValidator;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -32,10 +34,13 @@ class SubscriptionServiceTest {
     @Mock
     private SubscriptionRepository subscriptionRepository;
 
+    @Mock
+    private SubscriptionValidator validator;
+
     @Spy
     private UserMapperImpl mapper;
 
-    List<UserFilter> userFilters;
+    List<UserFilter<UserFilterDto, User>> userFilters;
 
     @InjectMocks
     private SubscriptionService subscriptionService;
@@ -45,7 +50,7 @@ class SubscriptionServiceTest {
 
     @BeforeEach
     void setUp() {
-        UserFilter usernameFilter = Mockito.mock(UserNameFilter.class);
+        UserFilter<UserFilterDto, User> usernameFilter = Mockito.mock(UserNameFilter.class);
         userFilters = List.of(usernameFilter);
         user = User.builder()
                 .id(2).username("vlad").email("vlad@email.ru")
@@ -69,7 +74,7 @@ class SubscriptionServiceTest {
                 1,
                 5
         );
-        subscriptionService = new SubscriptionService(subscriptionRepository, mapper, userFilters);
+        subscriptionService = new SubscriptionService(subscriptionRepository, mapper, userFilters, validator);
     }
 
     @Test
@@ -80,7 +85,7 @@ class SubscriptionServiceTest {
 
     @Test
     void followUserAlreadyFollowed() {
-        Mockito.when(subscriptionRepository.existsByFollowerIdAndFolloweeId(1, 2)).thenReturn(true);
+        Mockito.doThrow(new DataValidationException("Подписка уже существует")).when(validator).validateExistingSubscription(1, 2);
         assertThrows(DataValidationException.class, () -> subscriptionService.followUser(1, 2));
         Mockito.verify(subscriptionRepository, Mockito.times(0)).followUser(1, 2);
     }

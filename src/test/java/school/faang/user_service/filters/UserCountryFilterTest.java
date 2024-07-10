@@ -5,7 +5,9 @@ import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.Country;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.contact.Contact;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
@@ -70,7 +72,8 @@ class UserCountryFilterTest {
 
     @Test
     void apply() {
-        assertEquals(filter.apply(users, filterDtoNotNull).toList(), Stream.<User>builder()
-                .add(User.builder().country(Country.builder().title("Russia").build()).build()).build().toList());
+        List<User> expectedUsers = List.of(User.builder().country(Country.builder().title("Russia").build()).build());
+        List<User> actualResult = filter.apply(users, filterDtoNotNull).toList();
+        assertEquals(expectedUsers, actualResult);
     }
 }

@@ -8,7 +8,7 @@ import school.faang.user_service.entity.User;
 import java.util.stream.Stream;
 
 @Component
-public class UserEmailFilter implements UserFilter {
+public class UserEmailFilter implements UserFilter<UserFilterDto, User> {
     @Override
     public boolean isApplicable(UserFilterDto userFilterDto) {
         return userFilterDto.getEmailPattern() != null;

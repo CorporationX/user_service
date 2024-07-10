@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.UserFilterDto;
 import school.faang.user_service.entity.User;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
@@ -19,7 +20,6 @@ class UserCityFilterTest {
     private UserFilterDto filterDtoNull;
 
     Stream<User> users;
-
     @BeforeEach
     void setUp() {
         filter = new UserCityFilter();
@@ -69,7 +69,8 @@ class UserCityFilterTest {
 
     @Test
     void apply() {
-        assertEquals(filter.apply(users, filterDtoNotNull).toList(), Stream.<User>builder()
-                .add(User.builder().city("city").build()).build().toList());
+        List<User> expectedUsers = List.of(User.builder().city("city").build());
+        List<User> actualResult = filter.apply(users, filterDtoNotNull).toList();
+        assertEquals(actualResult, expectedUsers);
     }
 }

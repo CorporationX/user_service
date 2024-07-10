@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 
 @Component
 
-public class UserCountryFilter implements UserFilter {
+public class UserCountryFilter implements UserFilter<UserFilterDto, User> {
     @Override
     public boolean isApplicable(UserFilterDto userFilterDto) {
         return userFilterDto.getCountryPattern() != null;

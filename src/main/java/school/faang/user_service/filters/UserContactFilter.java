@@ -8,7 +8,7 @@ import school.faang.user_service.entity.contact.Contact;
 import java.util.stream.Stream;
 
 @Component
-public class UserContactFilter implements UserFilter {
+public class UserContactFilter implements UserFilter<UserFilterDto, User> {
     @Override
     public boolean isApplicable(UserFilterDto userFilterDto) {
         return userFilterDto.getContactPattern() != null;

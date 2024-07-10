@@ -71,7 +71,8 @@ class UserContactFilterTest {
 
     @Test
     void apply() {
-        assertEquals(filter.apply(users, filterDtoNotNull).toList(), Stream.<User>builder()
-                .add(User.builder().contacts(List.of(Contact.builder().contact("My contact").build())).build()).build().toList());
+        List<User> expectedUsers = List.of(User.builder().contacts(List.of(Contact.builder().contact("My contact").build())).build());
+        List<User> actualResult = filter.apply(users, filterDtoNotNull).toList();
+        assertEquals(expectedUsers, actualResult);
     }
 }

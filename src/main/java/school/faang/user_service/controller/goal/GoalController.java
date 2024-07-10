@@ -1,6 +1,7 @@
 package school.faang.user_service.controller.goal;
 
 
+import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -9,6 +10,7 @@ import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.service.goal.GoalService;
 import school.faang.user_service.dto.GoalFilterDto;
+import school.faang.user_service.validator.GoalControllerValidate;
 
 import java.util.List;
 
@@ -18,35 +20,29 @@ import java.util.List;
 @Validated
 public class GoalController {
     private final GoalService goalService;
+    private final GoalControllerValidate validate;
 
-    public void createGoal(@NonNull Long userId, Goal goal) {
-        String title = goal.getTitle();
-        int MAX_LENGTH_TITLE = 64;
-
-        if (title.isBlank()) {
-            throw new NullPointerException("Goal is null");
-        } else if (title.length() >= MAX_LENGTH_TITLE) {
-            throw new NullPointerException("The length of the goal name is longer than allowed");
-        } else if (goalService.findAllGoalTitles().contains(goal.getTitle())) {
-            throw new NullPointerException("A goal with the same name already exists");
-        } else {
-            goalService.createGoal(userId, goal);
-        }
+    public void createGoal(@NonNull Long userId, @Valid Goal goal) {
+        goalService.createGoal(userId, goal);
     }
 
-    public void updateGoal(@NonNull Long goalId, @NonNull GoalDto goal) {
+    public void updateGoal(long goalId, GoalDto goal) {
+        validate.validateId(goalId);
         goalService.updateGoal(goalId, goal);
     }
 
-    public void deleteGoal(@NonNull Long goalId) {
+    public void deleteGoal(long goalId) {
+        validate.validateId(goalId);
         goalService.deleteGoal(goalId);
     }
 
-    public List<GoalDto> getSubtasksByGoalId(@NonNull Long goalId, GoalFilterDto filters) {
+    public List<GoalDto> getSubtasksByGoalId(long goalId, GoalFilterDto filters) {
+        validate.validateId(goalId);
         return goalService.getSubtasksByGoalId(goalId, filters);
     }
 
-    public List<GoalDto> getGoalsByUser(@NonNull Long userId, GoalFilterDto filters) {
+    public List<GoalDto> getGoalsByUser(long userId, GoalFilterDto filters) {
+        validate.validateId(userId);
         return goalService.getGoalsByUser(userId, filters);
     }
 }

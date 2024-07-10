@@ -1,4 +1,4 @@
-package school.faang.user_service.service.controller.goal;
+package school.faang.user_service.service.service;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 public class SkillServiceTest {
 
     @InjectMocks
-    SkillService skillService;
+    private SkillService skillService;
 
     @Mock
     private SkillRepository skillRepository;

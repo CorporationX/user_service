@@ -32,13 +32,12 @@ public class SubscriptionService {
         subscriptionRepository.unfollowUser(followerId, followeeId);
     }
 
-
     public List<UserDto> getFollowers(long followeeId, UserFilterDto filterDto) {
         subscriptionServiceValidator.validateGetFollowers(followeeId, filterDto);
 
         List<User> followers = subscriptionRepository.findByFolloweeId(followeeId).toList();
 
-        return userMapper.toDto(userFilters.stream()
+        return userMapper.usersToUserDTOs(userFilters.stream()
                 .filter(filter -> filter.isApplicable(filterDto))
                 .flatMap(filter -> filter.apply(followers, filterDto))
                 .toList());
@@ -55,7 +54,7 @@ public class SubscriptionService {
 
         List<User> followings = subscriptionRepository.findByFolloweeId(followeeId).toList();
 
-        return userMapper.toDto(userFilters.stream()
+        return userMapper.usersToUserDTOs(userFilters.stream()
                 .filter(filter -> filter.isApplicable(filterDto))
                 .flatMap(filter -> filter.apply(followings, filterDto))
                 .toList());

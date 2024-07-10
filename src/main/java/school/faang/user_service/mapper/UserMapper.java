@@ -1,6 +1,7 @@
 package school.faang.user_service.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
@@ -13,5 +14,6 @@ public interface UserMapper {
 
     User toEntity(UserDto userDto);
 
-    List<UserDto> toDto(List<User> users);
+    @Mapping(source = "active", target = "isActive")
+    List<UserDto> usersToUserDTOs(List<User> users);
 }

@@ -14,18 +14,29 @@ public class InvintationDtoValidatorImpl implements InvintationDtoValidator {
     private final UserRepository userRepository;
     private final GoalRepository goalRepository;
 
+    @Override
     public void validate(final GoalInvitationDto goalInvitationDto) {
+        validateUserIsNotInvitingSelf(goalInvitationDto);
+        validateUserExists(goalInvitationDto.getInviterId(), "Inviter");
+        validateUserExists(goalInvitationDto.getInvitedUserId(), "Invited");
+        validateGoalExists(goalInvitationDto.getGoalId());
+    }
+
+    private void validateUserIsNotInvitingSelf(final GoalInvitationDto goalInvitationDto) {
         if (goalInvitationDto.getInvitedUserId().equals(goalInvitationDto.getInviterId())) {
-            throw new IllegalArgumentException("Exception invited user can`t be invitor ");
+            throw new IllegalArgumentException("Invited user cannot be the same as the inviter.");
         }
-        if (!userRepository.existsById(goalInvitationDto.getInviterId())) {
-            throw new NoSuchElementException("User with id:" + goalInvitationDto.getInviterId() + " doesn't exist!");
+    }
+
+    private void validateUserExists(final Long userId, final String userType) {
+        if (!userRepository.existsById(userId)) {
+            throw new NoSuchElementException(userType + " user with id: " + userId + " does not exist.");
         }
-        if (!userRepository.existsById(goalInvitationDto.getInvitedUserId())) {
-            throw new NoSuchElementException("User with id:" + goalInvitationDto.getInvitedUserId() + " doesn't exist!");
-        }
-        if (!goalRepository.existsById(goalInvitationDto.getGoalId())) {
-            throw new NoSuchElementException("Goal with id:" + goalInvitationDto.getGoalId() + " doesn't exist!");
+    }
+
+    private void validateGoalExists(final Long goalId) {
+        if (!goalRepository.existsById(goalId)) {
+            throw new NoSuchElementException("Goal with id: " + goalId + " does not exist.");
         }
     }
 }

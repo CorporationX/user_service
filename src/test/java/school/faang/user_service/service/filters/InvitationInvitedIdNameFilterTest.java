@@ -1,6 +1,7 @@
 package school.faang.user_service.service.filters;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
@@ -35,6 +36,7 @@ public class InvitationInvitedIdNameFilterTest {
     }
 
     @Test
+    @DisplayName("Test isAcceptable method with non-null invited ID")
     public void testIsAcceptable_withNonNullInvitedId() {
         InvitationFilterDto filters = new InvitationFilterDto();
         filters.setInvitedId(1L);
@@ -45,6 +47,7 @@ public class InvitationInvitedIdNameFilterTest {
     }
 
     @Test
+    @DisplayName("Test isAcceptable method with null invited ID")
     public void testIsAcceptable_withNullInvitedId() {
         InvitationFilterDto filters = new InvitationFilterDto();
         filters.setInvitedId(null);
@@ -55,6 +58,7 @@ public class InvitationInvitedIdNameFilterTest {
     }
 
     @Test
+    @DisplayName("Test apply method with matching invited ID")
     public void testApply_withMatchingInvitedId() {
         InvitationFilterDto filters = new InvitationFilterDto();
         filters.setInvitedId(1L);
@@ -78,6 +82,7 @@ public class InvitationInvitedIdNameFilterTest {
     }
 
     @Test
+    @DisplayName("Test apply method with no matching invited ID")
     public void testApply_withNoMatchingInvitedId() {
         InvitationFilterDto filters = new InvitationFilterDto();
         filters.setInvitedId(3L);

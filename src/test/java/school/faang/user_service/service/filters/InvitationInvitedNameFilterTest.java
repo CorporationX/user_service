@@ -1,6 +1,7 @@
 package school.faang.user_service.service.filters;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
@@ -43,34 +44,30 @@ public class InvitationInvitedNameFilterTest {
     }
 
     @Test
+    @DisplayName("Test isAcceptable method with empty pattern")
     public void testIsAcceptable_withEmptyPattern() {
-        // Arrange
         InvitationFilterDto filters = new InvitationFilterDto();
         filters.setInvitedNamePattern("");
 
-        // Act
         boolean result = filter.isAcceptable(filters);
 
-        // Assert
         assertFalse(result);
     }
 
     @Test
+    @DisplayName("Test isAcceptable method with blank pattern")
     public void testIsAcceptable_withBlankPattern() {
-        // Arrange
         InvitationFilterDto filters = new InvitationFilterDto();
         filters.setInvitedNamePattern("   ");
 
-        // Act
         boolean result = filter.isAcceptable(filters);
 
-        // Assert
         assertFalse(result);
     }
 
     @Test
+    @DisplayName("Test apply method with matching invited name")
     public void testApply_withMatchingInvitedName() {
-        // Arrange
         InvitationFilterDto filters = new InvitationFilterDto();
         filters.setInvitedNamePattern("User.*");
 
@@ -84,10 +81,8 @@ public class InvitationInvitedNameFilterTest {
 
         Stream<GoalInvitation> goalInvitations = Stream.of(invitation1, invitation2, invitation3);
 
-        // Act
         Stream<GoalInvitation> result = filter.apply(goalInvitations, filters);
 
-        // Assert
         List<GoalInvitation> resultList = result.toList();
         assertEquals(2, resultList.size());
         assertTrue(resultList.contains(invitation1));
@@ -95,8 +90,8 @@ public class InvitationInvitedNameFilterTest {
     }
 
     @Test
+    @DisplayName("Test apply method with no matching invited name")
     public void testApply_withNoMatchingInvitedName() {
-        // Arrange
         InvitationFilterDto filters = new InvitationFilterDto();
         filters.setInvitedNamePattern("Admin.*");
 
@@ -108,10 +103,8 @@ public class InvitationInvitedNameFilterTest {
 
         Stream<GoalInvitation> goalInvitations = Stream.of(invitation1, invitation2);
 
-        // Act
         Stream<GoalInvitation> result = filter.apply(goalInvitations, filters);
 
-        // Assert
         List<GoalInvitation> resultList = result.toList();
         assertEquals(0, resultList.size());
     }

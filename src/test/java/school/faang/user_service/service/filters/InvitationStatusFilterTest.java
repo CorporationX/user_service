@@ -1,6 +1,7 @@
 package school.faang.user_service.service.filters;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import school.faang.user_service.dto.goal.InvitationFilterDto;
@@ -24,34 +25,30 @@ public class InvitationStatusFilterTest {
     }
 
     @Test
+    @DisplayName("Test isAcceptable method with non-null status")
     public void testIsAcceptable_withNonNullStatus() {
-        // Arrange
         InvitationFilterDto filters = new InvitationFilterDto();
         filters.setStatus(PENDING);
 
-        // Act
         boolean result = filter.isAcceptable(filters);
 
-        // Assert
         assertTrue(result);
     }
 
     @Test
+    @DisplayName("Test isAcceptable method with null status")
     public void testIsAcceptable_withNullStatus() {
-        // Arrange
         InvitationFilterDto filters = new InvitationFilterDto();
         filters.setStatus(null);
 
-        // Act
         boolean result = filter.isAcceptable(filters);
 
-        // Assert
         assertFalse(result);
     }
 
     @Test
+    @DisplayName("Test apply method with matching status")
     public void testApply_withMatchingStatus() {
-        // Arrange
         InvitationFilterDto filters = new InvitationFilterDto();
         filters.setStatus(ACCEPTED);
 
@@ -65,10 +62,8 @@ public class InvitationStatusFilterTest {
 
         Stream<GoalInvitation> goalInvitations = Stream.of(invitation1, invitation2, invitation3);
 
-        // Act
         Stream<GoalInvitation> result = filter.apply(goalInvitations, filters);
 
-        // Assert
         List<GoalInvitation> resultList = result.toList();
         assertEquals(2, resultList.size());
         assertTrue(resultList.contains(invitation2));
@@ -76,8 +71,8 @@ public class InvitationStatusFilterTest {
     }
 
     @Test
+    @DisplayName("Test apply method with no matching status")
     public void testApply_withNoMatchingStatus() {
-        // Arrange
         InvitationFilterDto filters = new InvitationFilterDto();
         filters.setStatus(REJECTED);
 
@@ -89,10 +84,8 @@ public class InvitationStatusFilterTest {
 
         Stream<GoalInvitation> goalInvitations = Stream.of(invitation1, invitation2);
 
-        // Act
         Stream<GoalInvitation> result = filter.apply(goalInvitations, filters);
 
-        // Assert
         List<GoalInvitation> resultList = result.toList();
         assertEquals(0, resultList.size());
     }

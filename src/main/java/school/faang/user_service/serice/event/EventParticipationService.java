@@ -2,9 +2,11 @@ package school.faang.user_service.serice.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.CommonException;
 import school.faang.user_service.exception.OperationStatus;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
 import java.util.List;
@@ -14,6 +16,8 @@ import java.util.List;
 public class EventParticipationService {
 
     private final EventParticipationRepository eventParticipationRepository;
+
+    private final UserMapper userMapper;
 
     public void registerParticipant(long eventId, long userId) {
         User user = new User();
@@ -37,8 +41,9 @@ public class EventParticipationService {
         }
     }
 
-    public List<User> getParticipant(long eventId){
-        return eventParticipationRepository.findAllParticipantsByEventId(eventId);
+    public List<UserDto> getParticipant(long eventId){
+        List<User> users = eventParticipationRepository.findAllParticipantsByEventId(eventId);
+        return userMapper.userToUserDto(users);
     }
 
     public int getParticipantsCount(long eventId) {

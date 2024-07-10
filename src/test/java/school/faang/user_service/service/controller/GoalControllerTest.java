@@ -1,9 +1,11 @@
 package school.faang.user_service.service.controller;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import school.faang.user_service.controller.goal.GoalController;
 import school.faang.user_service.dto.GoalDto;
 import school.faang.user_service.dto.GoalFilterDto;
@@ -24,6 +26,11 @@ public class GoalControllerTest {
     private GoalService goalService;
     @Mock
     private GoalControllerValidate validate;
+
+    @BeforeEach
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
 
     @DisplayName("Если title пустой")
     @Test

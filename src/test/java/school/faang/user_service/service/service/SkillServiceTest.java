@@ -1,8 +1,10 @@
 package school.faang.user_service.service.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.repository.SkillRepository;
@@ -26,6 +28,11 @@ public class SkillServiceTest {
 
     @Mock
     private SkillRepository skillRepository;
+
+    @BeforeEach
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
 
     @Test
     public void testExistsByTitleIfTitleNotExist() {

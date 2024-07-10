@@ -1,9 +1,11 @@
 package school.faang.user_service.service.validator;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.service.goal.SkillService;
@@ -26,6 +28,11 @@ public class GoalServiceValidatorTest {
 
     @Mock
     private SkillService skillService;
+
+    @BeforeEach
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
 
     @DisplayName("Проверка дубликатов")
     @Test

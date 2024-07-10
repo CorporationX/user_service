@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.dto.event.EventFilterDto;
@@ -34,7 +35,10 @@ public class EventServiceTest {
     private EventRepository eventRepository;
     private UserRepository userRepository;
     private EventMapper eventMapper;
-    private EventDescriptionFilter eventDescriptionFilter;
+    @Spy
+    private EventDescriptionFilter eventDescriptionFilter = new EventDescriptionFilter();
+    @Spy
+    private EventOwnerFilter eventOwnerFilter = new EventOwnerFilter();
     private List<EventFilter> eventFilters;
     private Long eventId = 1L;
     private Long ownerId = 2L;
@@ -60,8 +64,9 @@ public class EventServiceTest {
         eventRepository = Mockito.mock(EventRepository.class);
         userRepository = Mockito.mock(UserRepository.class);
         eventMapper = Mockito.mock(EventMapper.class);
-        eventDescriptionFilter = Mockito.mock(EventDescriptionFilter.class);
-        eventFilters = List.of(eventDescriptionFilter);
+//        eventDescriptionFilter = Mockito.mock(EventDescriptionFilter.class);
+//        eventOwnerFilter = Mockito.mock(EventOwnerFilter.class);
+        eventFilters = List.of(eventDescriptionFilter, eventOwnerFilter);
         eventService = new EventService(eventRepository, userRepository, eventMapper, eventFilters);
     }
 
@@ -115,20 +120,32 @@ public class EventServiceTest {
 
     @Test
     public void testGetEventsByFilter() {
-        List<Event> events = List.of(event, new Event());
-        List<Event> eventsFiltered = List.of(event);
+        Event event1 = Event.builder()
+                .description("Event for IT-founders")
+                .owner(owner)
+                .build();
+        Event event2 = Event.builder()
+                .description("Event for IT-founders")
+                .build();
+        Event event3 = Event.builder()
+                .owner(owner)
+                .build();
+        List<Event> events = List.of(event1, event2, event3);
+
         when(eventRepository.findAll()).thenReturn(events);
         EventFilterDto filters = new EventFilterDto();
-        when(eventDescriptionFilter.isApplicable(filters)).thenReturn(true);
-        when(eventDescriptionFilter.apply(any(), eq(filters))).thenReturn(eventsFiltered.stream());
-        when(eventMapper.toDto(event)).thenReturn(eventDto);
+        filters.setOwnerId(ownerId);
+        filters.setDescriptionPattern("IT");
 
+        when(eventMapper.toDto(event1)).thenReturn(eventDto);
 
         List<EventDto> result = eventService.getEventsByFilter(filters);
         List<EventDto> expected = List.of(eventDto);
 
         verify(eventDescriptionFilter, times(1)).isApplicable(filters);
+        verify(eventOwnerFilter, times(1)).isApplicable(filters);
         verify(eventDescriptionFilter, times(1)).apply(any(), eq(filters));
+        verify(eventOwnerFilter, times(1)).apply(any(), eq(filters));
         assertEquals(expected, result);
     }
 }

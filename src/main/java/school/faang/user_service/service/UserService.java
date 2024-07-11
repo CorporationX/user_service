@@ -2,12 +2,12 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.faang.user_service.dto.UserDto;
-import school.faang.user_service.dto.UserFilterDto;
+import school.faang.user_service.dto.userDto.UserDto;
+import school.faang.user_service.dto.userDto.UserFilterDto;
 import school.faang.user_service.entity.User;
-import school.faang.user_service.mapper.UserPremiumMapper;
+import school.faang.user_service.mapper.userPremium.UserPremiumMapper;
 import school.faang.user_service.repository.UserRepository;
-import school.faang.user_service.service.filter.UserFilter;
+import school.faang.user_service.service.filter.userFilter.UserFilter;
 
 import java.util.ArrayList;
 import java.util.List;

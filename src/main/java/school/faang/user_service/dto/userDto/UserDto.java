@@ -1,10 +1,10 @@
-package school.faang.user_service.dto;
+package school.faang.user_service.dto.userDto;
 
 import lombok.Data;
-import school.faang.user_service.entity.Country;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
 @Data
 public class UserDto {
     private long id;

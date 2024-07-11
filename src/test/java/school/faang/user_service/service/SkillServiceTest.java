@@ -1,5 +1,7 @@
 package school.faang.user_service.service;
 
+import feign.Param;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -20,6 +22,8 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
 import school.faang.user_service.service.skillService.SkillServiceImpl;
+import school.faang.user_service.validation.skill.SkillValidator;
+import school.faang.user_service.validation.user.UserValidator;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,11 +49,11 @@ public class SkillServiceTest {
     private UserSkillGuaranteeRepository userSkillGuaranteeRepository;
 
     @Mock
-    private UserRepository userRepository;
-
+    private UserValidator userValidator;
+    @Mock
+    private SkillValidator skillValidator;
     @Spy
     private SkillMapper skillMapper = Mappers.getMapper(SkillMapper.class);
-
     @InjectMocks
     private SkillServiceImpl skillService;
 
@@ -61,18 +65,26 @@ public class SkillServiceTest {
     }
 
     @Test
+    @DisplayName(value = "Create method throws exception when title exists")
     public void testCreateWithExistingTitle() {
         SkillDto skill = SkillDto.builder().title("title").build();
-        when(skillRepository.existsByTitle(skill.getTitle())).thenReturn(true);
+        //when(skillRepository.existsByTitle(skill.getTitle())).thenReturn(true);
+//        when(skillRepository.existsByTitle(skill.getTitle())).thenReturn(true);
+        when(skillValidator.titleIsValid(skill.getTitle())).thenReturn(true);
+        when(skillValidator.existByTitle(skill.getTitle())).thenReturn(true);
 
        assertThrows(DataValidationException.class, () -> skillService.create(skill));
     }
 
     @Test
+    @DisplayName(value = "Create is completed successfully")
     public void testCreateSkillSuccessfully() {
         SkillDto skillDto = SkillDto.builder().title("title").build();
         Skill expectedSkill = Skill.builder().id(1L).title(skillDto.getTitle()).build();
-        when(skillRepository.existsByTitle(skillDto.getTitle())).thenReturn(false);
+       // when(skillRepository.existsByTitle(skillDto.getTitle())).thenReturn(false);
+        when(skillValidator.titleIsValid(skillDto.getTitle())).thenReturn(true);
+        when(skillValidator.existByTitle(skillDto.getTitle())).thenReturn(false);
+
         when(skillRepository.save(skillMapper.toSkill(skillDto))).thenReturn(expectedSkill);
 
         SkillDto actual = skillService.create(skillDto);
@@ -82,26 +94,34 @@ public class SkillServiceTest {
     }
 
     @Test
+    @DisplayName(value = "Get users method throws exception when user id is null")
     public void testGetUsersSkillsWithNullableUserId() {
         Long userId = null;
+        when(skillValidator.isNullableId(userId)).thenReturn(true);
 
         assertThrows(IllegalArgumentException.class, () -> skillService.getUsersSkills(userId));
     }
 
     @Test
+    @DisplayName(value = "Get users method throws exception when user doesn't exist by id")
     public void testGetUsersSkillsWithNotExistingUserId() {
         Long userId = 1L;
-        when(userRepository.existsById(userId)).thenReturn(false);
+        when(skillValidator.isNullableId(userId)).thenReturn(false);
+        //when(userRepository.existsById(userId)).thenReturn(false);
+        when(userValidator.doesUserExistsById(userId)).thenReturn(false);
 
         assertThrows(DataValidationException.class, () -> skillService.getUsersSkills(userId));
     }
 
     @Test
+    @DisplayName(value = "Get users method is completed successfully")
     public void testGetUsersSkillsSuccessfully() {
         Long userId = 2L;
         List<Skill> skillList = List.of(Skill.builder().id(2L).title("title").build());
         List<SkillDto> expectedList = List.of(SkillDto.builder().id(2L).title("title").build());
-        when(userRepository.existsById(userId)).thenReturn(true);
+        //when(userRepository.existsById(userId)).thenReturn(true);
+        when(skillValidator.isNullableId(userId)).thenReturn(false);
+        when(userValidator.doesUserExistsById(userId)).thenReturn(true);
         when(skillRepository.findAllByUserId(userId)).thenReturn(skillList);
 
         List<SkillDto> actualUserSkills = skillService.getUsersSkills(userId);
@@ -110,6 +130,7 @@ public class SkillServiceTest {
     }
 
     @Test
+    @DisplayName(value = "Get offered method throws exception when user id is null")
     public void testGetOfferedSkillsWithNullableUserId() {
         Long userId = null;
 
@@ -117,14 +138,17 @@ public class SkillServiceTest {
     }
 
     @Test
+    @DisplayName(value = "Get offered method throws exception when user doesn't exist by user id")
     public void getOfferedSkillWithNotExistingUserId() {
         Long userId = 1L;
-        when(userRepository.existsById(userId)).thenReturn(false);
+        //when(userRepository.existsById(userId)).thenReturn(false);
+        when(userValidator.doesUserExistsById(userId)).thenReturn(false);
 
         assertThrows(DataValidationException.class, () -> skillService.getOfferedSkills(userId));
     }
 
     @Test
+    @DisplayName(value = "Get offered method is completed successfully")
     public void getOfferedSkillsSuccessfully() {
         Long userId = 1L;
         List<Skill> foundedOfferedSkills = List.of(Skill.builder().id(1L).title("title").build());
@@ -132,7 +156,8 @@ public class SkillServiceTest {
                 .skill(SkillDto.builder().id(1L).title("title").build())
                 .offersAmount(1)
                 .build());
-        when(userRepository.existsById(userId)).thenReturn(true);
+        //when(userRepository.existsById(userId)).thenReturn(true);
+        when(userValidator.doesUserExistsById(userId)).thenReturn(true);
         when(skillRepository.findSkillsOfferedToUser(userId)).thenReturn(foundedOfferedSkills);
 
         List<SkillCandidateDto> actualSkillCandidate = skillService.getOfferedSkills(userId);
@@ -141,39 +166,47 @@ public class SkillServiceTest {
     }
 
     @Test
+    @DisplayName(value = "Acquire skill from offers method throws exception when user doesn't exist by id")
     public void testAcquireSkillFromOffersWithNotExistingUserId() {
         long userId = 1L;
         long skillId = 1L;
-        when(userRepository.existsById(userId)).thenReturn(false);
+        //when(userRepository.existsById(userId)).thenReturn(false);
+        when(userValidator.doesUserExistsById(userId)).thenReturn(false);
 
         assertThrows(DataValidationException.class, () -> skillService.acquireSkillFromOffers(userId, skillId));
     }
 
     @Test
+    @DisplayName(value = "Acquire skill from offers method throws exception when skill doesn't exist by id")
     public void testAcquireSkillFromOffersWithNoExistingSkillId() {
         long userId = 1L;
         long skillId = 1L;
-        when(userRepository.existsById(userId)).thenReturn(true);
+        //when(userRepository.existsById(userId)).thenReturn(true);
+        when(userValidator.doesUserExistsById(userId)).thenReturn(true);
         when(skillRepository.findById(skillId)).thenReturn(Optional.empty());
 
         assertThrows(DataValidationException.class, () -> skillService.acquireSkillFromOffers(skillId, userId));
     }
 
     @Test
+    @DisplayName(value = "Acquire skill from offers method throws exception when user already have this skill")
     public void testAcquireSkillFromOffersUserWithoutSkill() {
         long userId = 1L;
         long skillId = 1L;
-        when(userRepository.existsById(userId)).thenReturn(true);
+        //when(userRepository.existsById(userId)).thenReturn(true);
+        when(userValidator.doesUserExistsById(userId)).thenReturn(true);
         when(skillRepository.findById(skillId)).thenReturn(Optional.of(Skill.builder().build()));
         when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.of(Skill.builder().build()));
 
         assertThrows(DataValidationException.class, () -> skillService.acquireSkillFromOffers(skillId, userId));
     }
     @Test
+    @DisplayName(value = "Acquire skill from offers method when user doesn't have enought offers to acquire skill")
     public void testAcquireSkillFromOffersWithoutEnoughOffers() {
         long userId = 1L;
         long skillId = 1L;
-        when(userRepository.existsById(userId)).thenReturn(true);
+        //when(userRepository.existsById(userId)).thenReturn(true);
+        when(userValidator.doesUserExistsById(userId)).thenReturn(true);
         when(skillRepository.findById(skillId)).thenReturn(Optional.of(Skill.builder().build()));
         when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.empty());
         when(skillOfferRepository.findAllOffersOfSkill(userId, skillId)).thenReturn(List.of(SkillOffer.builder().build()));
@@ -184,6 +217,7 @@ public class SkillServiceTest {
     }
 
     @Test
+    @DisplayName(value = "Acquire skill from offers method is completed successfully")
     public void testAcquireSkillFromOffersWithtEnoughOffers() {
         long userId = 1L;
         long skillId = 1L;
@@ -196,7 +230,8 @@ public class SkillServiceTest {
         Recommendation recommendation3 = Recommendation.builder().id(3L).receiver(receiver).author(author3).build();
         Recommendation recommendation4 = Recommendation.builder().id(4L).receiver(receiver).author(author4).build();
         List<SkillOffer> offers = List.of(new SkillOffer(1L, skill, recommendation2), new SkillOffer(2L, skill, recommendation3), new SkillOffer(4L, skill, recommendation4));
-        when(userRepository.existsById(userId)).thenReturn(true);
+        //when(userRepository.existsById(userId)).thenReturn(true);
+        when(userValidator.doesUserExistsById(userId)).thenReturn(true);
         when(skillRepository.findById(skillId)).thenReturn(Optional.of(skill));
         when(skillRepository.findUserSkill(skillId, userId)).thenReturn(Optional.empty());
         when(skillOfferRepository.findAllOffersOfSkill(userId, skillId)).thenReturn(offers);

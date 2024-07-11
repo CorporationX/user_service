@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -42,21 +43,30 @@ public class RecommendationServiceTest {
     @InjectMocks
     private RecommendationService recommendationService;
 
-    @Test
-    void createTest() {
-        long authorId = 1L;
-        long receiverId = 2L;
-        String content = "some content";
-        List<SkillOfferDto> skillOfferDtoList = List.of(SkillOfferDto.builder()
+    private long authorId;
+    private long receiverId;
+    private String content;
+    private List<SkillOfferDto> skillOfferDtoList;
+    private RecommendationDto recommendationDto;
+    private Recommendation recommendation;
+    private List<RecommendationDto> recommendationsDto;
+
+
+    @BeforeEach
+    void init() {
+        authorId = 1L;
+        receiverId = 2L;
+        content = "some content";
+        skillOfferDtoList = List.of(SkillOfferDto.builder()
                 .id(2L)
                 .skillId(1L).build());
-        RecommendationDto recommendationDto = RecommendationDto.builder()
+        recommendationDto = RecommendationDto.builder()
                 .receiverId(receiverId)
                 .authorId(authorId)
                 .content(content)
                 .skillOffers(skillOfferDtoList)
                 .build();
-        Recommendation recommendation =
+        recommendation =
                 Recommendation.builder()
                         .id(1l)
                         .createdAt(LocalDateTime.now())
@@ -68,7 +78,12 @@ public class RecommendationServiceTest {
                                 .recommendationsReceived(List.of(new Recommendation())).build())
                         .skillOffers(List.of(new SkillOffer()))
                         .build();
+        recommendationsDto = List.of(recommendationDto);
 
+    }
+
+    @Test
+    void createTest() {
         doNothing().when(recommendationValidator).validateRecommendationDto(recommendationDto);
         when(recommendationMapper.toEntity(recommendationDto)).thenReturn(recommendation);
         when(recommendationMapper.toDto(any())).thenReturn(recommendationDto);
@@ -79,32 +94,6 @@ public class RecommendationServiceTest {
 
     @Test
     void updateTest() {
-        long authorId = 4L;
-        long receiverId = 2L;
-        String content = "some content";
-        List<SkillOfferDto> skillOfferDtoList = List.of(SkillOfferDto.builder()
-                .id(3L)
-                .skillId(4L).build());
-        RecommendationDto recommendationDto = RecommendationDto.builder()
-                .id(1L)
-                .receiverId(receiverId)
-                .authorId(authorId)
-                .content(content)
-                .skillOffers(skillOfferDtoList)
-                .build();
-        Recommendation recommendation =
-                Recommendation.builder()
-                        .id(1l)
-                        .createdAt(LocalDateTime.now())
-                        .content(content)
-                        .author(User.builder()
-                                .id(authorId).build())
-                        .receiver(User.builder()
-                                .id(receiverId)
-                                .recommendationsReceived(List.of(new Recommendation())).build())
-                        .skillOffers(List.of(new SkillOffer()))
-                        .build();
-
         when(recommendationRepository.existsById(recommendationDto.getId())).thenReturn(true);
         doNothing().when(recommendationValidator).validateRecommendationDto(recommendationDto);
         when(recommendationMapper.toEntity(recommendationDto)).thenReturn(recommendation);
@@ -116,14 +105,6 @@ public class RecommendationServiceTest {
 
     @Test
     void getAllUserRecommendations() {
-        long authorId = 1L;
-        long recommendationId = 2L;
-        List<RecommendationDto> recommendationsDto = List.of(
-                RecommendationDto.builder()
-                        .id(recommendationId)
-                        .authorId(authorId)
-                        .build());
-
         when(recommendationMapper.recommendationToRecommendationDto(any())).thenReturn(recommendationsDto);
         doNothing().when(recommendationValidator).checkRecommendationList(any(), anyLong());
         List<RecommendationDto> result = recommendationService.getAllUserRecommendations(authorId);
@@ -133,14 +114,6 @@ public class RecommendationServiceTest {
 
     @Test
     void getAllGivenRecommendations() {
-        long receiverId = 1L;
-        long recommendationId = 2L;
-        List<RecommendationDto> recommendationsDto = List.of(
-                RecommendationDto.builder()
-                        .id(recommendationId)
-                        .authorId(receiverId)
-                        .build());
-
         when(recommendationMapper.recommendationToRecommendationDto(any())).thenReturn(recommendationsDto);
         doNothing().when(recommendationValidator).checkRecommendationList(any(), anyLong());
         List<RecommendationDto> result = recommendationService.getAllGivenRecommendations(receiverId);

@@ -70,7 +70,7 @@ public class RecommendationService {
     public List<RecommendationDto> getAllUserRecommendations(long receiverId) {
         recommendationValidator.validateId(receiverId);
         List<Recommendation> allUserRecommendation = recommendationRepository.findAllByReceiverId(receiverId);
-        if (allUserRecommendation != null || !allUserRecommendation.isEmpty()) {
+        if (allUserRecommendation != null) {
             recommendationValidator.checkRecommendationList(allUserRecommendation, receiverId);
         } else {
             throw new NotFoundException("Recommendation not found");
@@ -82,7 +82,7 @@ public class RecommendationService {
     public List<RecommendationDto> getAllGivenRecommendations(long authorId) {
         recommendationValidator.validateId(authorId);
         List<Recommendation> allUserRecommendation = recommendationRepository.findAllByReceiverId(authorId);
-        if (allUserRecommendation != null || !allUserRecommendation.isEmpty()) {
+        if (allUserRecommendation != null) {
             recommendationValidator.checkRecommendationList(allUserRecommendation, authorId);
         } else {
             throw new NotFoundException("Recommendation not found");
@@ -109,7 +109,7 @@ public class RecommendationService {
     public void saveGuaranteeUserSkill(RecommendationDto recommendationDto) {
         Recommendation recommendation = recommendationMapper.toEntity(recommendationDto);
         List<Skill> userSkills = skillRepository.findAllByUserId(recommendation.getReceiver().getId());
-        if (recommendation.getSkillOffers() != null || !recommendation.getSkillOffers().isEmpty()) {
+        if (recommendation.getSkillOffers() != null && !recommendation.getSkillOffers().isEmpty()) {
             userSkills.stream()
                     .forEach(skill -> {
                         recommendationDto.getSkillOffers().stream()

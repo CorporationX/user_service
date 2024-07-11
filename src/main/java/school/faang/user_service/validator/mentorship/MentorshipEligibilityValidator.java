@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class MentorshipEligibilityValidator implements MentorshipValidator {
 
+    private static final int MENTORSHIP_COOLDOWN_PERIOD_IN_MONTHS = 3;
+
     private final MentorshipRequestRepository mentorshipRequestRepository;
 
     @Override
@@ -20,7 +22,7 @@ public class MentorshipEligibilityValidator implements MentorshipValidator {
         mentorshipRequestRepository.findLatestRequest(requestDto.getRequesterId(), requestDto.getReceiverId())
                 .map(MentorshipRequest::getCreatedAt)
                 .ifPresent(creationDate -> {
-                    if (creationDate.isAfter(LocalDateTime.now().minusMonths(3))) {
+                    if (creationDate.isAfter(LocalDateTime.now().minusMonths(MENTORSHIP_COOLDOWN_PERIOD_IN_MONTHS))) {
                         throw new IllegalStateException(ExceptionMessages.MENTORSHIP_FREQUENCY);
                     }
                 });

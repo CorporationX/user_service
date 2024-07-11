@@ -19,7 +19,6 @@ import school.faang.user_service.validator.mentorship.MentorshipValidator;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @Slf4j
@@ -91,13 +90,9 @@ public class MentorshipRequestServiceImpl implements MentorshipRequestService {
         } else {
             return mentorshipRequestFilters.stream()
                     .filter(filter -> filter.isApplicable(filters))
-                    .flatMap(filter -> applyFilter(requestsStream, filter, filters))
+                    .flatMap(filter -> filter.apply(requestsStream, filters))
                     .toList();
         }
-    }
-
-    private Stream<MentorshipRequest> applyFilter(Stream<MentorshipRequest> requestsStream, MentorshipRequestFilter filter, RequestFilterDto filters) {
-        return filter.apply(requestsStream, filters);
     }
 
     private MentorshipRequest findMentorshipRequest(long id) {

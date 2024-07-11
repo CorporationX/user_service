@@ -15,6 +15,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.validator.event.EventValidator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -27,24 +28,59 @@ public class EventService {
     private final EventValidator eventValidator;
     private final List<EventFilter> eventFilters;
 
+    // Создать событие
     public EventDto create(EventDto eventDto) {
-        List<Skill> skills = checkExistenceSkill(eventDto);
+        // Владелец события + проверка, что такой пользователь существует в базе
+        User owner = findByIdUser(eventDto.getOwnerId());
 
+        List<Skill> skills = skillRepository.findAllById(eventDto.getRelatedSkillIds());
+
+        // Проверка, что у пользователя имеются скилы для создания события
+        eventValidator.checkExistenceSkill(owner, skills);
+
+        // Заполнение недостающих полей entity
         Event eventEntity = eventMapper.toEntity(eventDto);
         eventEntity.setRelatedSkills(skills);
+        eventEntity.setOwner(owner);
+        eventEntity.setCreatedAt(LocalDateTime.now());
         return eventMapper.toDto(eventRepository.save(eventEntity));
     }
 
-    public EventDto getEvent(Long eventId) {
-        Event event = eventRepository.findById(eventId).orElseThrow(
-                () -> new DataValidationException("События с таким id не существует."));
+    // Обновить событие
+    public EventDto updateEvent(EventDto eventDto) {
+        Event event = eventRepository.findById(eventDto.getId())
+                .orElseThrow(() -> new DataValidationException("События с таким id не существует."));
+        List<Long> skillIds = event.getRelatedSkills().stream()
+                .map(Skill::getId).toList();
+        // Если умения события были изменены, то получаем новые умения для entity
+        if (!skillIds.containsAll(eventDto.getRelatedSkillIds())) {
+            User owner = findByIdUser(eventDto.getOwnerId());
+            List<Skill> skills = skillRepository.findAllById(eventDto.getRelatedSkillIds());
+            // Проверка, что у пользователя имеются скилы
+            eventValidator.checkExistenceSkill(owner, skills);
+            event.setRelatedSkills(skills);
+        }
 
-        return eventMapper.toDto(event);
+        Event eventEntity = eventMapper.toEntity(eventDto);
+        eventEntity.setRelatedSkills(event.getRelatedSkills());
+        // Владельца сменить нельзя. Сообщений об этом не вывожу.
+        eventEntity.setOwner(event.getOwner());
+        eventEntity.setUpdatedAt(LocalDateTime.now());
+        return eventMapper.toDto(eventRepository.save(eventEntity));
     }
 
+    // Получить событие
+    public EventDto getEvent(Long eventId) {
+        return eventRepository.findById(eventId)
+                .map(eventMapper::toDto)
+                .orElseThrow(() -> new DataValidationException("События с таким id не существует."));
+    }
+
+    // Фильтрация событий по шаблону
     public List<EventDto> getEventsByFilter(EventFilterDto filters) {
         List<Event> events = eventRepository.findAll();
 
+        // Список подключенных фильтров
         List<EventFilter> actualFilters = eventFilters.stream()
                 .filter(f -> f.isApplicable(filters))
                 .toList();
@@ -56,47 +92,33 @@ public class EventService {
                 .toList();
     }
 
+    // Удаление события
     public void deleteEvent(Long eventId) {
         eventRepository.deleteById(eventId);
     }
 
-
-    public EventDto updateEvent(EventDto eventDto) {
-        List<Skill> skills = checkExistenceSkill(eventDto);
-
-        Event eventEntity = eventMapper.toEntity(eventDto);
-        eventEntity.setRelatedSkills(skills);
-        return eventMapper.toDto(eventRepository.save(eventEntity));
-    }
-
-    private List<Skill> checkExistenceSkill(EventDto eventDto) {
-        User owner = userRepository.findById(eventDto.getOwnerId())
-                .orElseThrow(() -> new DataValidationException("Пользователя с таким id не существует."));
-        List<Skill> skills = skillRepository.findAllById(eventDto.getRelatedSkillIds());
-
-        if (!eventValidator.checkExistenceSkill(owner, skills)) {
-            throw new DataValidationException("У пользователя нет необходимых умений для создания события.");
-        }
-
-        return skills;
-    }
-
+    // Получение событий, что создал пользователь.
     public List<EventDto> getOwnedEvents(long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new DataValidationException("Пользователя с таким id не существует."));
+        User user = findByIdUser(userId);
 
         return user.getOwnedEvents().stream()
                 .map(eventMapper::toDto)
                 .toList();
     }
 
+    // Получение событий, где пользователь принимает участие
     public List<EventDto> getParticipatedEvents(long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new DataValidationException("Пользователя с таким id не существует."));
+        User user = findByIdUser(userId);
         List<Event> participatedEvents = eventRepository.findParticipatedEventsByUserId(user.getId());
 
         return participatedEvents.stream()
                 .map(eventMapper::toDto)
                 .toList();
+    }
+
+    // Получение владельца и проверка, что такой пользователь существует
+    private User findByIdUser(long ownerId) {
+        return userRepository.findById(ownerId)
+                .orElseThrow(() -> new DataValidationException("Пользователя с таким id не существует."));
     }
 }

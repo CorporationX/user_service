@@ -23,6 +23,7 @@ import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.event.EventRepository;
 import school.faang.user_service.validator.event.EventValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,7 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 
 @ExtendWith(MockitoExtension.class)
 public class EventServiceTest {
@@ -45,6 +45,7 @@ public class EventServiceTest {
     @Captor
     private ArgumentCaptor<Event> captorEvent;
 
+    // Пришлось использовать такой способ из-за фильтров
     @BeforeEach
     void setUp() {
         eventRepository = Mockito.mock(EventRepository.class);
@@ -68,78 +69,46 @@ public class EventServiceTest {
         checkOwnerId(eventDto, user, false);
 
         // ожидаем исключение
-        assertThrows(DataValidationException.class, () -> eventService.create(eventDto), "Пользователя с таким id не должно быть в БД");
-    }
-
-    private EventDto createEventDto() {
-        EventDto eventDto = new EventDto();
-        eventDto.setId(1L);
-        eventDto.setOwnerId(1L);
-        eventDto.setRelatedSkillIds(List.of(1L, 2L));
-        return eventDto;
-    }
-
-    private void checkOwnerId(EventDto eventDto, User user, boolean resultCheckOwnerId) {
-        Optional<User> optionalUser = Optional.of(user);
-
-        if (resultCheckOwnerId) {
-            when(userRepository.findById(eventDto.getOwnerId())).thenReturn(optionalUser);
-        } else {
-            when(userRepository.findById(eventDto.getOwnerId())).thenThrow(DataValidationException.class);
-        }
-    }
-
-    private User createUser(EventDto eventDto) {
-        Skill skillFirst = new Skill();
-        skillFirst.setId(eventDto.getRelatedSkillIds().get(0));
-        skillFirst.setTitle("skillFirst");
-        Skill skillSecond = new Skill();
-        skillSecond.setId(eventDto.getRelatedSkillIds().get(1));
-        skillSecond.setTitle("skillSecond");
-        List<Skill> skills = List.of(skillFirst, skillSecond);
-
-        User user = new User();
-        user.setId(eventDto.getOwnerId());
-        user.setSkills(skills);
-
-        return user;
+        assertThrows(DataValidationException.class,
+                () -> eventService.create(eventDto), "Пользователя с таким id не должно быть в БД");
     }
 
     @Test
     public void testCreateEventWithoutSkill() {
         EventDto eventDto = createEventDto();
-        User user = createUser(eventDto);
+        User owner = createUser(eventDto);
         // Пользователь с таким id в БД есть
-        checkOwnerId(eventDto, user, true);
+        checkOwnerId(eventDto, owner, true);
         // Проверка списка необходимых для мероприятия умений (Провалена)
-        checkExistSkill(eventDto, user, false);
+        List<Skill> skills = getSkillById(eventDto, owner);
+//            Не хочет работать, если метод ничего не возвращает.
+//            Об этом спрашивал. Как протестировать валидатор, который ничего не возвращает, но бросает исключения?
+        when(eventValidator.checkExistenceSkill(owner, skills)).thenThrow(DataValidationException.class);
 
         assertThrows(DataValidationException.class, () -> eventService.create(eventDto),
                 "У пользователя не было необходимых умений");
     }
 
-    private List<Skill> checkExistSkill(EventDto eventDto, User user, boolean resultCheckExistenceSkill) {
-        when(skillRepository.findAllById(eventDto.getRelatedSkillIds())).thenReturn(user.getSkills());
-        List<Skill> skills = skillRepository.findAllById(eventDto.getRelatedSkillIds());
-        when(eventValidator.checkExistenceSkill(user, skills)).thenReturn(resultCheckExistenceSkill);
-        return skills;
-    }
-
     @Test
     public void testCreateEventSuitableSkills() {
         EventDto eventDto = createEventDto();
-        User user = createUser(eventDto);
+        User owner = createUser(eventDto);
         // Пользователь с таким id в БД есть
-        checkOwnerId(eventDto, user, true);
-        // Проверка списка необходимых для мероприятия умений (Такие же, как у пользователя)
-        List<Skill> relatedSkills = checkExistSkill(eventDto, user, true);
+        checkOwnerId(eventDto, owner, true);
+        // Проверка списка необходимых для мероприятия умений (Такие же, как у пользователя) прошла успешно
+        List<Skill> skills = getSkillById(eventDto, owner);
         Event eventExp = eventMapper.toEntity(eventDto);
-        eventExp.setRelatedSkills(relatedSkills);
+        eventExp.setRelatedSkills(skills);
+        eventExp.setOwner(owner);
+        // В методе сервиса результат проверки не используется. Просто заглушка, чтобы проверять выброс исключений.
+        when(eventValidator.checkExistenceSkill(owner, skills)).thenReturn(true);
 
         eventService.create(eventDto);
 
+        // Проверка вызова финального метода на репозитории и отлов возвращаемой сущности.
         verify(eventRepository, times(1)).save(captorEvent.capture());
         Event eventActual = captorEvent.getValue();
+        eventExp.setCreatedAt(eventActual.getCreatedAt());
         assertEquals(eventExp, eventActual);
     }
 
@@ -190,23 +159,6 @@ public class EventServiceTest {
         assertEquals(eventsDtoExp, filteredEventsDto);
     }
 
-    private List<Event> prepareEventsForFiltering() {
-        Event eventFirst = new Event();
-        eventFirst.setTitle("title first");
-        eventFirst.setDescription("description first filter");
-        Event eventSecond = new Event();
-        eventSecond.setTitle("title second filter");
-        eventSecond.setDescription("description second");
-        Event eventThird = new Event();
-        eventThird.setTitle("title third filter");
-        eventThird.setDescription("description third filter");
-        Event eventFourth = new Event();
-        eventFourth.setTitle("title fourth filter");
-        eventFourth.setDescription("description fourth");
-
-        return List.of(eventFirst, eventSecond, eventThird, eventFourth);
-    }
-
     @Test
     public void testDeleteEvent() {
         Long id = 1L;
@@ -217,24 +169,24 @@ public class EventServiceTest {
     }
 
     @Test
-    public void testUpdateWithNotExistUserId() {
-        EventDto eventDto = createEventDto();
-        User user = createUser(eventDto);
-        // id пользователя в базе не нашли
-        checkOwnerId(eventDto, user, false);
-
-        // ожидаем исключение
-        assertThrows(DataValidationException.class, () -> eventService.updateEvent(eventDto), "Пользователя с таким id не должно быть в БД");
-    }
-
-    @Test
     public void testUpdateEventWithoutSkill() {
+        // Владелец, событие и список умений события, который хранятся в БД
         EventDto eventDto = createEventDto();
-        User user = createUser(eventDto);
-        // Пользователь с таким id в БД есть
-        checkOwnerId(eventDto, user, true);
+        User owner = createUser(eventDto);
+        List<Skill> skills = owner.getSkills();
+        Event event = eventMapper.toEntity(eventDto);
+        event.setOwner(owner);
+        event.setRelatedSkills(skills);
+        when(eventRepository.findById(eventDto.getId())).thenReturn(Optional.of(event));
+        checkOwnerId(eventDto, owner, true); // Пользователь с таким id в БД есть
+        // В дто пришёл изменённый список умений -> попадаем в блок if()
+        Long newSkillId = 3L;
+        eventDto.getRelatedSkillIds().add(newSkillId);
+        // Новый список умений для обновления entity
+        List<Skill> skillsForUpdate = prepareEvenDtoForUpdate(skills, newSkillId);
+        when(skillRepository.findAllById(eventDto.getRelatedSkillIds())).thenReturn(skillsForUpdate);
         // Проверка списка необходимых для мероприятия умений (провалена)
-        checkExistSkill(eventDto, user, false);
+        when(eventValidator.checkExistenceSkill(owner, skillsForUpdate)).thenThrow(DataValidationException.class);
 
         assertThrows(DataValidationException.class, () -> eventService.updateEvent(eventDto),
                 "У пользователя не было необходимых умений");
@@ -242,19 +194,36 @@ public class EventServiceTest {
 
     @Test
     public void testUpdateEventSuitableSkills() {
+        // Владелец, событие и список умений события, который хранятся в БД
         EventDto eventDto = createEventDto();
-        User user = createUser(eventDto);
-        // Пользователь с таким id в БД есть
-        checkOwnerId(eventDto, user, true);
-        // Проверка списка необходимых для мероприятия умений (Успешно)
-        List<Skill> relatedSkills = checkExistSkill(eventDto, user, true);
-        Event eventExp = eventMapper.toEntity(eventDto);
-        eventExp.setRelatedSkills(relatedSkills);
+        User owner = createUser(eventDto);
+        List<Skill> skills = new ArrayList<>(owner.getSkills());
+        Event event = eventMapper.toEntity(eventDto);
+        event.setOwner(owner);
+        event.setRelatedSkills(skills);
+        when(eventRepository.findById(eventDto.getId())).thenReturn(Optional.of(event));
+        checkOwnerId(eventDto, owner, true); // Пользователь с таким id в БД есть
+        // В дто пришёл изменённый список умений -> попадаем в блок if()
+        Long newSkillId = 3L;
+        eventDto.getRelatedSkillIds().add(newSkillId);
+        // Новый список умений для обновления entity
+        List<Skill> skillsForUpdate = prepareEvenDtoForUpdate(skills, newSkillId);
+        when(skillRepository.findAllById(eventDto.getRelatedSkillIds())).thenReturn(skillsForUpdate);
+        // Проверка списка необходимых для мероприятия умений (успешно)
+        when(eventValidator.checkExistenceSkill(owner, skillsForUpdate)).thenReturn(true);
+        // Поскольку БД вернёт мою переменную event, она претерпит изменения в методе и станет как actual.
+        // Создаю expectation
+        Event eventExp = new Event();
+        eventExp.setId(event.getId());
+        eventExp.setOwner(event.getOwner());
+        eventExp.setRelatedSkills(new ArrayList<>(skillsForUpdate));
+
 
         eventService.updateEvent(eventDto);
 
         verify(eventRepository, times(1)).save(captorEvent.capture());
         Event eventActual = captorEvent.getValue();
+        eventExp.setUpdatedAt(eventActual.getUpdatedAt());
         assertEquals(eventExp, eventActual);
     }
 
@@ -317,6 +286,73 @@ public class EventServiceTest {
         List<EventDto> actualEvents = eventService.getParticipatedEvents(userFirst.getId());
 
         assertEquals(expectationEvents, actualEvents);
+    }
+
+
+    private EventDto createEventDto() {
+        EventDto eventDto = new EventDto();
+        eventDto.setId(1L);
+        eventDto.setOwnerId(1L);
+        eventDto.setRelatedSkillIds(new ArrayList<>(List.of(1L, 2L)));
+        return eventDto;
+    }
+
+    private void checkOwnerId(EventDto eventDto, User user, boolean resultCheckOwnerId) {
+        Optional<User> optionalUser = Optional.of(user);
+
+        if (resultCheckOwnerId) {
+            when(userRepository.findById(eventDto.getOwnerId())).thenReturn(optionalUser);
+        } else {
+            when(userRepository.findById(eventDto.getOwnerId())).thenThrow(DataValidationException.class);
+        }
+    }
+
+    private User createUser(EventDto eventDto) {
+        Skill skillFirst = new Skill();
+        skillFirst.setId(eventDto.getRelatedSkillIds().get(0));
+        skillFirst.setTitle("skillFirst");
+        Skill skillSecond = new Skill();
+        skillSecond.setId(eventDto.getRelatedSkillIds().get(1));
+        skillSecond.setTitle("skillSecond");
+        List<Skill> skills = List.of(skillFirst, skillSecond);
+
+        User user = new User();
+        user.setId(eventDto.getOwnerId());
+        user.setSkills(skills);
+
+        return user;
+    }
+
+    private List<Event> prepareEventsForFiltering() {
+        Event eventFirst = new Event();
+        eventFirst.setTitle("title first");
+        eventFirst.setDescription("description first filter");
+        Event eventSecond = new Event();
+        eventSecond.setTitle("title second filter");
+        eventSecond.setDescription("description second");
+        Event eventThird = new Event();
+        eventThird.setTitle("title third filter");
+        eventThird.setDescription("description third filter");
+        Event eventFourth = new Event();
+        eventFourth.setTitle("title fourth filter");
+        eventFourth.setDescription("description fourth");
+
+        return List.of(eventFirst, eventSecond, eventThird, eventFourth);
+    }
+
+    private List<Skill> getSkillById(EventDto eventDto, User owner) {
+        when(skillRepository.findAllById(eventDto.getRelatedSkillIds())).thenReturn(owner.getSkills());
+        return skillRepository.findAllById(eventDto.getRelatedSkillIds());
+    }
+
+    private List<Skill> prepareEvenDtoForUpdate(List<Skill> skills, Long newSkillId) {
+        Skill newSkill = new Skill();
+        newSkill.setId(newSkillId);
+        newSkill.setTitle("thirdSkill");
+        List<Skill> skillsForUpdate = new ArrayList<>(skills);
+        skillsForUpdate.add(newSkill);
+
+        return skillsForUpdate;
     }
 
 }

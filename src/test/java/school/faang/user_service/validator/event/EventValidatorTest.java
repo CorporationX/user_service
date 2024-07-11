@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exeption.event.DataValidationException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EventValidatorTest {
@@ -24,7 +26,7 @@ public class EventValidatorTest {
     }
 
     @Test
-    public void testValidateId(){
+    public void testValidateId() {
         Long negativeId = -1L;
         Long validIdZero = 0L;
         Long validIdPositive = 1L;
@@ -72,7 +74,8 @@ public class EventValidatorTest {
         User user = new User();
         user.setSkills(mapSkills.get("userSkills"));
         List<Skill> skills = mapSkills.get("skills");
-        assertFalse(eventValidator.checkExistenceSkill(user, skills));
+
+        assertThrows(DataValidationException.class, () -> eventValidator.checkExistenceSkill(user, skills));
     }
 
     @Test
@@ -82,6 +85,7 @@ public class EventValidatorTest {
         User user = new User();
         user.setSkills(mapSkills.get("userSkills"));
         List<Skill> skills = mapSkills.get("skills");
+
         assertTrue(eventValidator.checkExistenceSkill(user, skills));
     }
 
@@ -102,12 +106,12 @@ public class EventValidatorTest {
         User user = new User();
         user.setSkills(mapSkills.get("userSkills"));
         List<Skill> skills = mapSkills.get("skills");
-        assertFalse(eventValidator.checkExistenceSkill(user, skills));
+
+        assertThrows(DataValidationException.class, () -> eventValidator.checkExistenceSkill(user, skills));
     }
 
     private Map<String, List<Skill>> getSkill(Option option) {
         List<Skill> userSkills = new ArrayList<>();
-        List<Skill> skills = new ArrayList<>();
         Skill skillFirst = new Skill();
         skillFirst.setId(1L);
         Skill skillSecond = new Skill();
@@ -117,7 +121,7 @@ public class EventValidatorTest {
         Skill skillFourth = new Skill();
         skillFourth.setId(4L);
 
-        skills.addAll(List.of(skillFirst, skillSecond, skillThird));
+        List<Skill> skills = new ArrayList<>(List.of(skillFirst, skillSecond, skillThird));
         switch (option) {
             case EXIST_ALL -> userSkills.addAll(List.of(skillFirst, skillSecond, skillThird));
             case EXIST_ENOUGH -> {

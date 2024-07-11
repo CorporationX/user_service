@@ -8,7 +8,5 @@ public interface EventFilter {
     boolean isApplicable(EventFilterDto filters);
 
     Stream<Event> apply(Stream<Event> eventStream, EventFilterDto filters);
-
-//    Event apply(Event event, EventFilterDto filters);
     boolean test(Event event, EventFilterDto filters);
 }

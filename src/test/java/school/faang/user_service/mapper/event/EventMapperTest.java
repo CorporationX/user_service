@@ -79,9 +79,7 @@ public class EventMapperTest {
         eventExp.setEndDate(eventDto.getEndDate());
         eventExp.setLocation(eventDto.getLocation());
         eventExp.setMaxAttendees(eventDto.getMaxAttendees());
-        User owner = new User();
-        owner.setId(eventDto.getOwnerId());
-        eventExp.setOwner(owner);
+        // owner, relatedSkills и даты создания/обновления заполняются в сервисе
 
         Event actual = mapper.toEntity(eventDto);
 

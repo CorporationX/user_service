@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import school.faang.user_service.dto.event.EventDto;
 import school.faang.user_service.entity.Skill;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.exeption.event.DataValidationException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,8 +30,12 @@ public class EventValidator {
         return userId != null;
     }
 
-    public boolean checkExistenceSkill(User user, List<Skill> skills) {
-        return user.getSkills().containsAll(skills);
+    public boolean checkExistenceSkill(User owner, List<Skill> skills) {
+        boolean result = owner.getSkills().containsAll(skills);
+        if (!result) {
+            throw new DataValidationException("У пользователя нет необходимых умений.");
+        }
+        return result;
     }
 
     public boolean validateId(Long id) {

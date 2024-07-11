@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 
 @Component
 public class ContactFilter implements UserFilter {
+
     @Override
     public boolean isApplicable(UserFilterDto userFilterDto) {
         return userFilterDto.getContactPattern() != null;

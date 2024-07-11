@@ -10,7 +10,6 @@ import java.util.stream.Stream;
 @Component
 public class NameFilter implements UserFilter {
 
-
     @Override
     public boolean isApplicable(UserFilterDto userFilterDto) {
         return userFilterDto.getNamePattern() != null;

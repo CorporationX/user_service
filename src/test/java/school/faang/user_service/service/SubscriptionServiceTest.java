@@ -64,7 +64,6 @@ class SubscriptionServiceTest {
         userStream = Stream.of(userFirst, userSecond);
         userFilter = List.of(nameFilter, cityFilter);
         subscriptionService = new SubscriptionService(subscriptionRepository, userMapper, userFilter);
-
     }
 
 
@@ -76,13 +75,13 @@ class SubscriptionServiceTest {
     void testFollowerUserWhenExistTrue() {
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(follower, followee)).thenReturn(true);
 
-        assertThrows(DataValidationException.class, () -> subscriptionService.followUser(follower, followee));
+        assertThrows(DataValidationException.class, () -> subscriptionService.follow(follower, followee));
     }
 
     @Test
     void testFollowerUserWhenExistFalse() {
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(follower, followee)).thenReturn(false);
-        subscriptionService.followUser(follower, followee);
+        subscriptionService.follow(follower, followee);
 
         verify(subscriptionRepository, atLeastOnce()).followUser(follower, followee);
     }
@@ -90,7 +89,7 @@ class SubscriptionServiceTest {
     @Test
     void testUnFollowerExistTrue() {
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(follower, followee)).thenReturn(true);
-        subscriptionService.unFollowUser(follower, followee);
+        subscriptionService.unfollow(follower, followee);
 
         verify(subscriptionRepository, atLeastOnce()).unfollowUser(follower, followee);
 
@@ -99,22 +98,22 @@ class SubscriptionServiceTest {
     @Test
     void testUnFollowerUserWhenExistFalse() {
         when(subscriptionRepository.existsByFollowerIdAndFolloweeId(follower, followee)).thenReturn(false);
-        assertThrows(DataValidationException.class, () -> subscriptionService.unFollowUser(follower, followee));
+        assertThrows(DataValidationException.class, () -> subscriptionService.unfollow(follower, followee));
     }
 
     @Test
     void testGetFollowersFindByFollowerId() {
         when(subscriptionRepository.findByFollowerId(follower)).thenReturn(userStream);
-        when(userMapper.toDTO(userFirst)).thenReturn(userDtoFirst);
-        when(userMapper.toDTO(userSecond)).thenReturn(userDtoSecond);
+        when(userMapper.toDto(userFirst)).thenReturn(userDtoFirst);
+        when(userMapper.toDto(userSecond)).thenReturn(userDtoSecond);
         when(userFilter.get(0).isApplicable(any())).thenReturn(true);
         when(userFilter.get(0).apply(any(), any())).thenReturn(Stream.of(userFirst, userSecond));
 
         subscriptionService.getFollowers(follower, filterDto);
 
         verify(subscriptionRepository, atLeastOnce()).findByFollowerId(follower);
-        verify(userMapper, atLeastOnce()).toDTO(userFirst);
-        verify(userMapper, atLeastOnce()).toDTO(userSecond);
+        verify(userMapper, atLeastOnce()).toDto(userFirst);
+        verify(userMapper, atLeastOnce()).toDto(userSecond);
         verify(userFilter.get(0), times(1)).isApplicable(any());
         verify(userFilter.get(0), times(1)).apply(any(), any());
 
@@ -124,16 +123,16 @@ class SubscriptionServiceTest {
     @Test
     void testGetFollowingFindByFolloweeId() {
         when(subscriptionRepository.findByFolloweeId(followee)).thenReturn(userStream);
-        when(userMapper.toDTO(userFirst)).thenReturn(userDtoFirst);
-        when(userMapper.toDTO(userSecond)).thenReturn(userDtoSecond);
+        when(userMapper.toDto(userFirst)).thenReturn(userDtoFirst);
+        when(userMapper.toDto(userSecond)).thenReturn(userDtoSecond);
         when(userFilter.get(1).isApplicable(any())).thenReturn(true);
         when(userFilter.get(1).apply(any(), any())).thenReturn(Stream.of(userFirst));
 
         subscriptionService.getFollowing(followee, filterDto);
 
         verify(subscriptionRepository, times(1)).findByFolloweeId(followee);
-        verify(userMapper, atLeastOnce()).toDTO(userFirst);
-        verify(userMapper, atLeastOnce()).toDTO(userSecond);
+        verify(userMapper, atLeastOnce()).toDto(userFirst);
+        verify(userMapper, atLeastOnce()).toDto(userSecond);
         verify(userFilter.get(1), times(1)).isApplicable(any());
         verify(userFilter.get(1), times(1)).apply(any(), any());
     }

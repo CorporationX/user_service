@@ -50,15 +50,6 @@ public class GetRecommendationRequestTest {
     @MockBean
     private RecommendationRequestRepository recommendationRequestRepository;
 
-    @MockBean
-    private SkillRequestRepository skillRequestRepository;
-
-    @MockBean
-    private CreateRequestDtoValidator createRequestValidator;
-
-    @Autowired
-    private RecommendationRequestMapper requestMapper;
-
     @Autowired
     private RecommendationRequestService recommendationRequestService;
 

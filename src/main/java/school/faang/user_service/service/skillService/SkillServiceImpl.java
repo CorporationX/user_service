@@ -12,9 +12,10 @@ import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.exception.skill.DataValidationException;
 import school.faang.user_service.mapper.SkillMapper;
 import school.faang.user_service.repository.SkillRepository;
-import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
+import school.faang.user_service.validation.skill.SkillValidator;
+import school.faang.user_service.validation.user.UserValidator;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,26 +23,26 @@ import java.util.Optional;
 @Service
 @AllArgsConstructor
 @Slf4j
-public class SkillServiceImpl implements SkillService, SkillValidation, UserValidation {
+public class SkillServiceImpl implements SkillService {
 
     private final int MIN_SKILL_OFFERS = 3;
     private final SkillRepository skillRepository;
     private final SkillOfferRepository skillOfferRepository;
     private final UserSkillGuaranteeRepository userSkillGuaranteeRepository;
-
-    private final UserRepository userRepository;
+    private final UserValidator userValidator;
+    private final SkillValidator skillValidation;
     private final SkillMapper skillMapper;
 
 
     @Override
     @Transactional
     public SkillDto create(SkillDto skill) {
-        if (!titleIsValid(skill.getTitle())) {
+        if (!skillValidation.titleIsValid(skill.getTitle())) {
             throw new DataValidationException("Skill title can't be empty");
         }
 
-        if (existByTitle(skill.getTitle())) {
-            throw new DataValidationException(String.format("Skill with title %s has already exist", skill.getId()));
+        if (skillValidation.existByTitle(skill.getTitle())) {
+            throw new DataValidationException(String.format("Skill with title %s has already exist", skill.getTitle()));
         }
 
         Skill savedSkill = skillRepository.save(skillMapper.toSkill(skill));
@@ -52,7 +53,11 @@ public class SkillServiceImpl implements SkillService, SkillValidation, UserVali
     @Transactional(readOnly = true)
     @Override
     public List<SkillDto> getUsersSkills(Long userId) {
-        if (!isUserExistsById(userId)) {
+        if (skillValidation.isNullableId(userId)) {
+            throw new IllegalArgumentException("Id can't be empty");
+        }
+
+        if (!userValidator.doesUserExistsById(userId)) {
             throw new DataValidationException(String.format("User with %s id doesn't exist", userId));
         }
 
@@ -67,7 +72,7 @@ public class SkillServiceImpl implements SkillService, SkillValidation, UserVali
             throw new IllegalArgumentException("Id can't be nullable");
         }
 
-        if (!isUserExistsById(userId)) {
+        if (!userValidator.doesUserExistsById(userId)) {
             throw new DataValidationException(String.format("User with %s id doesn't exist", userId));
         }
 
@@ -79,7 +84,7 @@ public class SkillServiceImpl implements SkillService, SkillValidation, UserVali
     @Transactional
     @Override
     public SkillDto acquireSkillFromOffers(long skillId, long userId) {
-        if (!isUserExistsById(userId)) {
+        if (!userValidator.doesUserExistsById(userId)) {
             throw new DataValidationException(String.format("User with %s id doesn't exist", userId));
         }
 
@@ -115,20 +120,5 @@ public class SkillServiceImpl implements SkillService, SkillValidation, UserVali
         } else {
             throw new DataValidationException("User doesn't have enough offers to acquire skill");
         }
-    }
-
-    @Override
-    public boolean titleIsValid(String title) {
-        return !title.isBlank();
-    }
-
-    @Override
-    public boolean existByTitle(String title) {
-        return skillRepository.existsByTitle(title);
-    }
-
-    @Override
-    public boolean isUserExistsById(long id) {
-        return userRepository.existsById(id);
     }
 }

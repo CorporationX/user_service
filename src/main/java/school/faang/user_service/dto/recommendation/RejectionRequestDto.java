@@ -6,8 +6,6 @@ import school.faang.user_service.entity.RequestStatus;
 
 @Data
 @AllArgsConstructor
-public class RejectionDto {
-    private Long id;
+public class RejectionRequestDto {
     private String reason;
-    private RequestStatus status;
 }

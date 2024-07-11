@@ -1,6 +1,6 @@
 package school.faang.user_service.controller;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -12,9 +12,9 @@ import school.faang.user_service.service.UserService;
 
 @RestController
 @RequestMapping("/user")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserController {
-    private UserService userService;
+    private final UserService userService;
 
     @PutMapping("/deactivate/{userId}")
     @ResponseStatus(HttpStatus.OK)

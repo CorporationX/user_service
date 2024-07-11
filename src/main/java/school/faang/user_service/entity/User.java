@@ -1,18 +1,36 @@
 package school.faang.user_service.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.AttributeOverrides;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import school.faang.user_service.entity.contact.Contact;
 import school.faang.user_service.entity.contact.ContactPreference;
 import school.faang.user_service.entity.event.Event;
+import school.faang.user_service.entity.event.Rating;
 import school.faang.user_service.entity.goal.Goal;
 import school.faang.user_service.entity.goal.GoalInvitation;
-import school.faang.user_service.entity.event.Rating;
 import school.faang.user_service.entity.premium.Premium;
 import school.faang.user_service.entity.recommendation.Recommendation;
 
@@ -77,7 +95,7 @@ public class User {
     @ManyToMany(mappedBy = "followers")
     private List<User> followees;
 
-    @OneToMany(mappedBy = "owner")
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Event> ownedEvents;
 
     @ManyToMany(mappedBy = "mentors")
@@ -89,22 +107,23 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "mentor_id"))
     private List<User> mentors;
 
-    @OneToMany(mappedBy = "receiver")
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MentorshipRequest> receivedMentorshipRequests;
 
-    @OneToMany(mappedBy = "requester")
+    @OneToMany(mappedBy = "requester", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MentorshipRequest> sentMentorshipRequests;
 
-    @OneToMany(mappedBy = "inviter")
+    @OneToMany(mappedBy = "inviter", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<GoalInvitation> sentGoalInvitations;
 
-    @OneToMany(mappedBy = "invited")
+    @OneToMany(mappedBy = "invited", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<GoalInvitation> receivedGoalInvitations;
 
-    @OneToMany(mappedBy = "mentor")
+    @OneToMany(mappedBy = "mentor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Goal> setGoals;
 
-    @ManyToMany(mappedBy = "users")
+    @ToString.Exclude
+    @ManyToMany(mappedBy = "users", cascade = CascadeType.ALL)
     private List<Goal> goals;
 
     @ManyToMany(mappedBy = "users")
@@ -118,16 +137,16 @@ public class User {
     )
     private List<Event> participatedEvents;
 
-    @OneToMany(mappedBy = "author")
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Recommendation> recommendationsGiven;
 
-    @OneToMany(mappedBy = "receiver")
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Recommendation> recommendationsReceived;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Contact> contacts;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Rating> ratings;
 
     @Embedded
@@ -137,9 +156,9 @@ public class User {
     })
     private UserProfilePic userProfilePic;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private ContactPreference contactPreference;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Premium premium;
 }

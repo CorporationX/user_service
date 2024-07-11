@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import school.faang.user_service.entity.Skill;
@@ -61,6 +62,7 @@ public class Goal {
     @OneToMany(mappedBy = "goal")
     private List<GoalInvitation> invitations;
 
+    @ToString.Exclude
     @ManyToMany
     @JoinTable(
             name = "user_goal",

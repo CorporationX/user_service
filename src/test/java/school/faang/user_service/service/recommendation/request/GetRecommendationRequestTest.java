@@ -54,7 +54,7 @@ public class GetRecommendationRequestTest {
     private RecommendationRequestService recommendationRequestService;
 
     @ParameterizedTest(name = "{0}")
-    @MethodSource("provideDataForGetRecommendationRequest")
+    @MethodSource("provideTestData")
     @DisplayName("Test GetRecommendationRequest")
     void testGetRecommendationRequest(String testName, GetRecommendationRequestTestParam param) {
         long id = param.requestedRecommendationID();
@@ -69,7 +69,7 @@ public class GetRecommendationRequestTest {
         }
     }
 
-    private static Stream<Arguments> provideDataForGetRecommendationRequest() {
+    private static Stream<Arguments> provideTestData() {
         RecommendationRequest recommendationRequest = new RecommendationRequest();
         recommendationRequest.setId(1L);
         recommendationRequest.setMessage("Test message");

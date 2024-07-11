@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.client.paymentService.PaymentServiceClient;
 import school.faang.user_service.client.paymentService.model.PaymentResponse;
 import school.faang.user_service.client.paymentService.model.PaymentStatus;
@@ -36,6 +37,7 @@ public class PremiumService {
     @Value("${payment-service.currency:USD}")
     private String currency;
 
+    @Transactional
     public PremiumDto buyPremium(long userId, PremiumPeriod period) {
         User user = findUserById(userId);
         boolean existPremium = premiumRepository.existsByUserId(userId);
@@ -43,9 +45,8 @@ public class PremiumService {
             throw new PremiumIllegalArgumentException(
                     "User with id: " + userId + " already has a premium subscription");
         }
-        sendPayment(userId, period);
-
         Premium premium = savePremium(user, period.getDays());
+        sendPayment(userId, period);
         return mapper.toPremiumDto(premium);
     }
 

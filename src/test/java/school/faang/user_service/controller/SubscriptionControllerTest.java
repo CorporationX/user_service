@@ -35,17 +35,17 @@ class SubscriptionControllerTest {
 
     @Test
     void testFollowUser() {
-        subscriptionController.followUser(followerId, followeeId);
+        subscriptionController.follow(followerId, followeeId);
         assertNotEquals(followerId, followeeId);
-        verify(subscriptionService, atLeastOnce()).followUser(followerId, followeeId);
+        verify(subscriptionService, atLeastOnce()).follow(followerId, followeeId);
     }
 
 
     @Test
     void testUnfollowUser() {
-        subscriptionController.unfollowUser(followerId, followeeId);
+        subscriptionController.unfollow(followerId, followeeId);
         assertNotEquals(followerId, followeeId);
-        verify(subscriptionService, atLeastOnce()).unFollowUser(followerId, followeeId);
+        verify(subscriptionService, atLeastOnce()).unfollow(followerId, followeeId);
     }
 
 

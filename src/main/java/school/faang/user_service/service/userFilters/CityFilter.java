@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 
 @Component
 public class CityFilter implements UserFilter {
+
     @Override
     public boolean isApplicable(UserFilterDto userFilterDto) {
         return userFilterDto.getCityPattern() != null;
@@ -16,6 +17,6 @@ public class CityFilter implements UserFilter {
 
     @Override
     public Stream<User> apply(Stream<User> userStream, UserFilterDto userFilterDto) {
-        return userStream.filter(filter -> filter.getCity().contains(userFilterDto.getCityPattern()));
+        return userStream.filter(filter -> filter.getCity().equals(userFilterDto.getCityPattern()));
     }
 }

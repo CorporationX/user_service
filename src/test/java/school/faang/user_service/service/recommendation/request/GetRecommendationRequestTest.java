@@ -1,15 +1,8 @@
-package school.faang.user_service.service.recommendation.request;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import org.junit.jupiter.api.DisplayName;
+package school.faang.user_service.service.recommendation.request;import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,10 +12,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.entity.recommendation.RecommendationRequest;
 import school.faang.user_service.entity.recommendation.SkillRequest;
-import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
-import school.faang.user_service.repository.recommendation.SkillRequestRepository;
-import school.faang.user_service.service.recommendation.request.validator.recommendation.requestvalidator.CreateRequestDtoValidator;
 
 import java.time.LocalDateTime;
 import java.util.List;

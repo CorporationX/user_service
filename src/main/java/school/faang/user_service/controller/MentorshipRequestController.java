@@ -1,5 +1,6 @@
 package school.faang.user_service.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
@@ -10,13 +11,14 @@ import school.faang.user_service.service.MentorshipRequestService;
 
 import java.util.List;
 
+@Validated
 @Controller
 @RequiredArgsConstructor
 public class MentorshipRequestController {
 
     private final MentorshipRequestService mentorshipRequestService;
 
-    public MentorshipRequestDto requestMentorship(@Validated MentorshipRequestDto mentorshipRequestDto) {
+    public MentorshipRequestDto requestMentorship(@Valid MentorshipRequestDto mentorshipRequestDto) {
         return mentorshipRequestService.requestMentorship(mentorshipRequestDto);
     }
 

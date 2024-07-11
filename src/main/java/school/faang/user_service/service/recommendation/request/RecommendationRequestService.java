@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RecommendationRequestFilterDto;
-import school.faang.user_service.dto.recommendation.RejectionDto;
+import school.faang.user_service.dto.recommendation.RejectionRequestDto;
 import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.exception.ExceptionMessage;
 import school.faang.user_service.exception.RejectRecommendationException;
@@ -71,9 +71,9 @@ public class RecommendationRequestService {
         return mRequestMapper.toDto(recommendationRequest);
     }
 
-    public RecommendationRequestDto rejectRequest(RejectionDto rejectionDto) {
+    public RecommendationRequestDto rejectRequest(long id, RejectionRequestDto rejectionDto) {
         var recommendation = mRecommendationReqRep.findById(
-                rejectionDto.getId()
+                id
         ).orElseThrow();
 
         RequestStatus status = recommendation.getStatus();

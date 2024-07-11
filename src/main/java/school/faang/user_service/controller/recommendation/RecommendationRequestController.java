@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import school.faang.user_service.dto.recommendation.RecommendationRequestDto;
 import school.faang.user_service.dto.recommendation.RecommendationRequestFilterDto;
-import school.faang.user_service.dto.recommendation.RejectionDto;
+import school.faang.user_service.dto.recommendation.RejectionRequestDto;
 import school.faang.user_service.service.recommendation.request.RecommendationRequestService;
 
 import java.util.List;
@@ -31,8 +31,8 @@ public class RecommendationRequestController {
         return mRecommendationRequestService.getRecommendationRequest(id);
     }
 
-    @PostMapping("/reject")
-    public RecommendationRequestDto rejectRequest(@RequestBody RejectionDto rejection) {
-        return mRecommendationRequestService.rejectRequest(rejection);
+    @PutMapping("/{id}")
+    public RecommendationRequestDto rejectRequest(@PathVariable long id, @RequestBody RejectionRequestDto rejection) {
+        return mRecommendationRequestService.rejectRequest(id, rejection);
     }
 }

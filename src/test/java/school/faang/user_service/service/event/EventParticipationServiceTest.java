@@ -8,48 +8,47 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.entity.User;
+import school.faang.user_service.mapper.UserMapper;
 import school.faang.user_service.repository.event.EventParticipationRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 public class EventParticipationServiceTest {
     @Mock
     private EventParticipationRepository eventParticipationRepository;
+    @Mock
+    private UserMapper userMapper;
     @InjectMocks
     private EventParticipationService eventParticipationService;
+    private final long eventId = 0L;
+    private final long userId = 0L;
+    private final long wrongUserId = 1L;
+
 
     @Test
     public void testRegisterExistingUser() {
-        long eventId = 0L;
-        long userId = 0L;
         prepareUserList(eventId, userId);
         Assert.assertThrows(RuntimeException.class, () -> eventParticipationService.registerParticipant(eventId, userId));
     }
 
     @Test
     public void testRegister() {
-        long eventId = 0L;
-        long userId = 0L;
-        prepareUserList(eventId, 1L);
+        prepareUserList(eventId, wrongUserId);
         eventParticipationService.registerParticipant(eventId, userId);
         Mockito.verify(eventParticipationRepository).register(eventId, userId);
     }
 
     @Test
     public void testUnregisterNotExistingUser() {
-        long eventId = 0L;
-        long userId = 0L;
-        prepareUserList(eventId, 1L);
+        prepareUserList(eventId, wrongUserId);
         Assert.assertThrows(RuntimeException.class, () -> eventParticipationService.unregisterParticipant(eventId, userId));
     }
 
     @Test
     public void testUnregister() {
-        long eventId = 0L;
-        long userId = 0L;
         prepareUserList(eventId, userId);
         eventParticipationService.unregisterParticipant(eventId, userId);
         Mockito.verify(eventParticipationRepository).unregister(eventId, userId);
@@ -57,14 +56,21 @@ public class EventParticipationServiceTest {
 
     @Test
     public void testGetParticipant() {
-        long eventId = 0L;
-        Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(eventId)).thenReturn(new ArrayList<>());
-        Assertions.assertEquals(eventParticipationService.getParticipant(eventId), new ArrayList<>());
+        User user = createUser(userId);
+        UserDto userdto = toDto(user);
+
+        Mockito.when(userMapper.toDto(user)).thenReturn(userdto);
+        prepareUserList(eventId, userId);
+
+        List<UserDto> expected = List.of(userdto);
+        List<UserDto> result = eventParticipationService.getParticipant(eventId);
+
+        Assertions.assertEquals(result, expected);
+        Mockito.verify(eventParticipationRepository).findAllParticipantsByEventId(eventId);
     }
 
     @Test
     public void testGetParticipantsCount() {
-        long eventId = 0L;
         int result = 11;
         Mockito.when(eventParticipationRepository.countParticipants(eventId)).thenReturn(result);
         Assertions.assertEquals(eventParticipationService.getParticipantsCount(eventId), result);
@@ -72,8 +78,23 @@ public class EventParticipationServiceTest {
 
 
     private void prepareUserList(long eventId, long userId) {
-        User user = new User();
-        user.setId(userId);
+        User user = createUser(userId);
         Mockito.when(eventParticipationRepository.findAllParticipantsByEventId(eventId)).thenReturn(List.of(user));
+    }
+
+    private User createUser(long id) {
+        return User.builder()
+                .id(id)
+                .email("email")
+                .username("userName")
+                .build();
+    }
+
+    private UserDto toDto(User user) {
+        UserDto userDto = new UserDto();
+        userDto.setId(user.getId());
+        userDto.setUsername(user.getUsername());
+        userDto.setEmail(user.getEmail());
+        return userDto;
     }
 }

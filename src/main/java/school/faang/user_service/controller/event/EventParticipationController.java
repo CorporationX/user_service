@@ -2,7 +2,7 @@ package school.faang.user_service.controller.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.entity.User;
+import school.faang.user_service.dto.UserDto;
 import school.faang.user_service.service.event.EventParticipationService;
 
 import java.util.List;
@@ -20,7 +20,7 @@ public class EventParticipationController {
         eventParticipationService.unregisterParticipant(eventId, userId);
     }
 
-    public List<User> getParticipant(long eventId) {
+    public List<UserDto> getParticipant(long eventId) {
         return eventParticipationService.getParticipant(eventId);
     }
 

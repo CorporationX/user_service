@@ -15,6 +15,8 @@ public interface RecommendationRequestMapper {
     @Mapping(target = "requesterId", source = "requester.id")
     @Mapping(target = "receiverId", source = "receiver.id")
     @Mapping(target = "skillIds", source = "skills", qualifiedByName = "mapSkills")
+    @Mapping(target = "createAt", source = "createdAt")
+    @Mapping(target = "updatedAt", source = "updatedAt")
     RecommendationRequestDto toDto(RecommendationRequest recommendationRequest);
 
     @Named("mapSkills")
@@ -25,8 +27,9 @@ public interface RecommendationRequestMapper {
     @Mapping(target = "requester", source = "requesterId", qualifiedByName = "mapRequesterId")
     @Mapping(target = "receiver", source = "receiverId", qualifiedByName = "mapReceiverId")
     @Mapping(target = "skills", source = "skillIds", qualifiedByName = "mapSkillIds")
+    @Mapping(target = "createdAt", source = "createAt")
+    @Mapping(target = "updatedAt", source = "updatedAt")
     RecommendationRequest toEntity(RecommendationRequestDto recommendationRequestDto);
-
 
     @Named("mapRequesterId")
     default User mapRequesterId(Long requesterId) {

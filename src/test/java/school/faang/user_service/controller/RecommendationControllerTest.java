@@ -1,5 +1,6 @@
 package school.faang.user_service.controller;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -7,8 +8,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import school.faang.user_service.dto.recomendation.RecommendationDto;
 import school.faang.user_service.dto.recomendation.SkillOfferDto;
+import school.faang.user_service.entity.User;
+import school.faang.user_service.entity.recommendation.Recommendation;
+import school.faang.user_service.entity.recommendation.SkillOffer;
 import school.faang.user_service.service.RecommendationService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,19 +30,32 @@ public class RecommendationControllerTest {
     @Mock
     private RecommendationService service;
 
+    private long authorId;
+    private long receiverId;
+    private List<SkillOfferDto> skillOfferDtoList;
+    private RecommendationDto recommendationDto;
+    private List<RecommendationDto> recommendationDtos;
 
-    @Test
-    void giveRecommendationTest() {
-        List<SkillOfferDto> skillOfferDtoList = List.of(SkillOfferDto.builder()
+    @BeforeEach
+    void init() {
+        authorId = 3L;
+        receiverId = 12L;
+        skillOfferDtoList = List.of(SkillOfferDto.builder()
                 .id(2L)
                 .skillId(1L).build());
-        RecommendationDto recommendationDto = RecommendationDto.builder()
+        recommendationDto = RecommendationDto.builder()
                 .id(1L)
-                .authorId(3L)
-                .receiverId(12L)
+                .authorId(authorId)
+                .receiverId(receiverId)
                 .skillOffers(skillOfferDtoList)
                 .build();
 
+        recommendationDtos = List.of(recommendationDto);
+    }
+
+
+    @Test
+    void giveRecommendationTest() {
         when(service.create(recommendationDto)).thenReturn(recommendationDto);
         RecommendationDto result = controller.giveRecommendation(recommendationDto);
         verify(service).create(recommendationDto);
@@ -47,37 +65,15 @@ public class RecommendationControllerTest {
 
     @Test
     void updateRecommendationTest() {
-        List<SkillOfferDto> skillOfferDtoList = List.of(SkillOfferDto.builder()
-                .id(2L)
-                .skillId(1L).build());
-        RecommendationDto updateRecommendationDto = RecommendationDto.builder()
-                .id(2L)
-                .authorId(3L)
-                .receiverId(14L)
-                .skillOffers(skillOfferDtoList)
-                .build();
-
-        when(service.update(updateRecommendationDto)).thenReturn(updateRecommendationDto);
-        RecommendationDto result = controller.updateRecommendation(updateRecommendationDto);
-        verify(service).update(updateRecommendationDto);
+        when(service.update(recommendationDto)).thenReturn(recommendationDto);
+        RecommendationDto result = controller.updateRecommendation(recommendationDto);
+        verify(service).update(recommendationDto);
         assertNotNull(result);
-        assertEquals(updateRecommendationDto, result);
+        assertEquals(recommendationDto, result);
     }
 
     @Test
     void getAllUserRecommendationTest() {
-        long receiverId = 1L;
-        List<SkillOfferDto> skillOfferDtoList = List.of(SkillOfferDto.builder()
-                .id(2L)
-                .skillId(1L).build());
-        List<RecommendationDto> recommendationDtos = List.of(
-                RecommendationDto.builder()
-                        .id(1L)
-                        .authorId(3L)
-                        .receiverId(receiverId)
-                        .skillOffers(skillOfferDtoList)
-                        .build());
-
         when(service.getAllUserRecommendations(receiverId)).thenReturn(recommendationDtos);
         List<RecommendationDto> result = controller.getAllUserRecommendations(receiverId);
         verify(service).getAllUserRecommendations(receiverId);
@@ -87,18 +83,6 @@ public class RecommendationControllerTest {
 
     @Test
     void getAllGivenRecommendationsTest() {
-        long authorId = 1L;
-        List<SkillOfferDto> skillOfferDtoList = List.of(SkillOfferDto.builder()
-                .id(2L)
-                .skillId(1L).build());
-        List<RecommendationDto> recommendationDtos = List.of(
-                RecommendationDto.builder()
-                        .id(1L)
-                        .authorId(authorId)
-                        .receiverId(14L)
-                        .skillOffers(skillOfferDtoList)
-                        .build());
-
         when(service.getAllUserRecommendations(authorId)).thenReturn(recommendationDtos);
         List<RecommendationDto> result = controller.getAllUserRecommendations(authorId);
         verify(service).getAllUserRecommendations(authorId);

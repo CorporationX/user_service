@@ -11,11 +11,11 @@ public class MentorshipRequesterFilter implements MentorshipRequestFilter {
 
     @Override
     public boolean isApplicable(RequestFilterDto filters) {
-        return filters.getRequesterPattern() != null;
+        return filters.getRequesterId() != null;
     }
 
     @Override
     public Stream<MentorshipRequest> apply(Stream<MentorshipRequest> requests, RequestFilterDto filters) {
-        return requests.filter(req -> req.getRequester().getId() == filters.getRequesterPattern());
+        return requests.filter(req -> req.getRequester().getId() == filters.getRequesterId());
     }
 }

@@ -24,7 +24,7 @@ class MentorshipRequesterFilterTest {
     @Test
     void testIsApplicable_should_return_true_with_requester_pattern() {
         var requestFilterDto = new RequestFilterDto();
-        requestFilterDto.setRequesterPattern(1L);
+        requestFilterDto.setRequesterId(1L);
         assertTrue(mentorshipRequesterFilter.isApplicable(requestFilterDto));
     }
 
@@ -48,7 +48,7 @@ class MentorshipRequesterFilterTest {
         req3.setRequester(user2);
         Stream<MentorshipRequest> requests = Stream.of(req1, req2, req3);
         var requestFilterDto = new RequestFilterDto();
-        requestFilterDto.setRequesterPattern(2L);
+        requestFilterDto.setRequesterId(2L);
 
         List<MentorshipRequest> filteredRequests = mentorshipRequesterFilter
                 .apply(requests, requestFilterDto)

@@ -82,7 +82,7 @@ class GoalServiceTest {
     }
 
     @Test
-    void createGoal_Success() {
+    void createGoalSuccessTest() {
         GoalDto goalDto = createGoalDto("New Goal", "Goal Description", 1L, Arrays.asList(1L, 2L));
         Goal savedGoal = new Goal();
         savedGoal.setId(2L);
@@ -99,7 +99,7 @@ class GoalServiceTest {
     }
 
     @Test
-    void createGoal_ThrowsException_WhenTitleIsNull() {
+    void createGoalThrowsExceptionWhenTitleIsNullTest() {
         GoalDto goalDto = new GoalDto();
 
         doThrow(new IllegalArgumentException("Goal must have a title"))
@@ -113,7 +113,7 @@ class GoalServiceTest {
     }
 
     @Test
-    void createGoal_ThrowsException_WhenTooManyActiveGoals() {
+    void createGoalThrowsExceptionWhenTooManyActiveGoalsTest() {
         GoalDto goalDto = new GoalDto();
         goalDto.setTitle("New Goal");
 
@@ -128,7 +128,7 @@ class GoalServiceTest {
     }
 
     @Test
-    void createGoal_ThrowsException_WhenSkillsDoNotExist() {
+    void createGoalThrowsExceptionWhenSkillsDoNotExistTest() {
         GoalDto goalDto = new GoalDto();
         goalDto.setTitle("New Goal");
         goalDto.setSkillIds(Collections.singletonList(1L));
@@ -152,7 +152,7 @@ class GoalServiceTest {
     }
 
     @Test
-    void updateGoal_Success() {
+    void updateGoalSuccessTest() {
         Goal goal = createGoal(1L, "Old Title", "Old Description", GoalStatus.ACTIVE,
                 Arrays.asList(createSkill(1L), createSkill(2L)));
         GoalDto goalDto = createGoalDto("New Title", "New Description", null, Arrays.asList(1L, 2L));
@@ -175,7 +175,7 @@ class GoalServiceTest {
     }
 
     @Test
-    void updateGoal_ThrowsException_WhenGoalNotFound() {
+    void updateGoalThrowsExceptionWhenGoalNotFoundTest() {
         GoalDto goalDto = new GoalDto();
         goalDto.setTitle("New Title");
 
@@ -190,7 +190,7 @@ class GoalServiceTest {
     }
 
     @Test
-    void updateGoal_ThrowsException_WhenGoalIsCompleted() {
+    void updateGoalThrowsExceptionWhenGoalIsCompletedTest() {
         Goal goal = createGoal(1L, null, null, GoalStatus.COMPLETED, null);
         GoalDto goalDto = new GoalDto();
         goalDto.setTitle("New Title");
@@ -206,7 +206,7 @@ class GoalServiceTest {
     }
 
     @Test
-    void updateGoal_ThrowsException_WhenTitleIsNull() {
+    void updateGoalThrowsExceptionWhenTitleIsNullTest() {
         Goal goal = createGoal(1L, null, null, GoalStatus.ACTIVE, null);
         GoalDto goalDto = new GoalDto();
 
@@ -221,7 +221,7 @@ class GoalServiceTest {
     }
 
     @Test
-    void updateGoal_ThrowsException_WhenSkillsDoNotExist() {
+    void updateGoalThrowsExceptionWhenSkillsDoNotExistTest() {
         Goal goal = createGoal(1L, null, null, GoalStatus.ACTIVE, Collections.singletonList(createSkill(1L)));
         GoalDto goalDto = new GoalDto();
         goalDto.setTitle("New Title");
@@ -238,7 +238,7 @@ class GoalServiceTest {
     }
 
     @Test
-    void updateGoal_CompletedStatus_AssignsSkillsToUsers() {
+    void updateGoalCompletedStatusAssignsSkillsToUsersTest() {
         Goal goal = createGoal(1L, null, null, GoalStatus.ACTIVE, Arrays.asList(createSkill(1L), createSkill(2L)));
         GoalDto goalDto = createGoalDto("New Title", null, null, Arrays.asList(1L, 2L));
         goalDto.setStatus("completed");
@@ -266,7 +266,7 @@ class GoalServiceTest {
     }
 
     @Test
-    void deleteGoal_Success() {
+    void deleteGoalSuccessTest() {
         long goalId = 1L;
         Goal goal = createGoal(goalId, null, null, null, null);
 

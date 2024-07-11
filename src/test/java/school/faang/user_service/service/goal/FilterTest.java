@@ -84,7 +84,7 @@ public class FilterTest {
     }
 
     @Test
-    void findSubtasksByGoalId_FilterByStatus() {
+    void findSubtasksByGoalIdFilterByStatusTest() {
         long goalId = 1L;
         GoalFilterDto filter = new GoalFilterDto();
         filter.setStatus(GoalStatus.ACTIVE);
@@ -106,10 +106,29 @@ public class FilterTest {
     }
 
     @Test
-    void findSubtasksByGoalId_FilterByTitle() {
+    void findSubtasksByGoalIdFilterByTitleTest() {
         long goalId = 1L;
         GoalFilterDto filter = new GoalFilterDto();
         filter.setTitle("Another");
+
+        Goal goal1 = createGoal(1L, "Test Goal", "Description", GoalStatus.ACTIVE);
+        Goal goal2 = createGoal(2L, "Another Goal", "Description", GoalStatus.COMPLETED);
+        Stream<Goal> stream = Stream.of(goal1, goal2);
+
+        when(goalRepository.findByParent(goalId)).thenReturn(stream);
+        when(goalFilter.isApplicable(filter)).thenReturn(false);
+        when(goalFilter.apply(stream, filter)).thenReturn(Stream.of());
+
+        List<GoalDto> result = goalService.findSubtasksByGoalId(goalId, filter);
+
+        assertEquals(0, result.size());
+    }
+
+    @Test
+    void findSubtasksByGoalIdFilterByNullTest() {
+        long goalId = 1L;
+        GoalFilterDto filter = new GoalFilterDto();
+        filter.setTitle(null);
 
         Goal goal1 = createGoal(1L, "Test Goal", "Description", GoalStatus.ACTIVE);
         Goal goal2 = createGoal(2L, "Another Goal", "Description", GoalStatus.COMPLETED);
@@ -131,7 +150,7 @@ public class FilterTest {
     }
 
     @Test
-    public void getGoalsByUser_WithFilterByStatus() {
+    public void getGoalsByUserWithFilterByStatusTest() {
         long userId = 1L;
         GoalFilterDto filter = new GoalFilterDto();
         filter.setStatus(GoalStatus.ACTIVE);
@@ -159,7 +178,7 @@ public class FilterTest {
     }
 
     @Test
-    public void getGoalsByUser_WithFilterByTitle() {
+    public void getGoalsByUserWithFilterByTitleTest() {
         long userId = 1L;
         GoalFilterDto filter = new GoalFilterDto();
         filter.setTitle("Another");
@@ -180,6 +199,26 @@ public class FilterTest {
         assertEquals(goalDto1.getId(), result.get(0).getId());
         assertEquals(goalDto1.getTitle(), result.get(0).getTitle());
         assertEquals(goalDto1.getStatus(), result.get(0).getStatus());
+
+        verify(goalRepository, times(1)).findGoalsByUserId(userId);
+    }
+
+    @Test
+    public void getGoalsByUserWithFilterByNullTest() {
+        long userId = 1L;
+        GoalFilterDto filter = new GoalFilterDto();
+        filter.setTitle(null);
+
+        List<Goal> goals = createGoals();
+        Stream<Goal> stream = goals.stream();
+
+        when(goalRepository.findGoalsByUserId(userId)).thenReturn(stream);
+        when(goalFilter.isApplicable(filter)).thenReturn(false);
+        when(goalFilter.apply(stream, filter)).thenReturn(Stream.of());
+
+        List<GoalDto> result = goalService.getGoalsByUser(userId, filter);
+
+        assertEquals(0, result.size());
 
         verify(goalRepository, times(1)).findGoalsByUserId(userId);
     }

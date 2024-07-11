@@ -23,6 +23,7 @@ public class GoalService {
     private final GoalValidator goalValidator;
     private final GoalMapper goalMapper;
     private final List<GoalFilter> goalFilters;
+
     @Autowired
     public GoalService(GoalRepository goalRepository, SkillService skillService, GoalValidator goalValidator, GoalMapper goalMapper, List<GoalFilter> goalFilters) {
         this.goalRepository = goalRepository;
@@ -31,6 +32,7 @@ public class GoalService {
         this.goalMapper = goalMapper;
         this.goalFilters = goalFilters;
     }
+
     @Transactional
     public GoalDto createGoal(Long userId, GoalDto goalDto) {
         goalValidator.createGoalValidator(userId, goalDto);
@@ -40,6 +42,7 @@ public class GoalService {
         goalDto.getSkillIds().forEach(skillId -> goalRepository.addSkillToGoal(saveGoal.getId(), skillId));
         return goalMapper.toDto(saveGoal);
     }
+
     @Transactional
     public GoalDto updateGoal(Long goalId, GoalDto goalDto) {
         goalValidator.updateGoalValidator(goalId, goalDto);
@@ -52,12 +55,12 @@ public class GoalService {
         goalDto.getSkillIds().forEach(skillId -> goalRepository.addSkillToGoal(savedGoal.getId(), skillId));
 
         if (goalDto.getStatus().equals("completed")) {
-            List<User> users = goalRepository.findUsersByGoalId(goalId);
-            users.forEach(user -> goalDto.getSkillIds().forEach(skillId -> skillService.assignSkillToUser(skillId, user.getId())));
+            goalRepository.findUsersByGoalId(goalId).forEach(user -> goalDto.getSkillIds().forEach(skillId -> skillService.assignSkillToUser(skillId, user.getId())));
         }
 
         return goalMapper.toDto(savedGoal);
     }
+
     @Transactional
     public void deleteGoal(long goalId) {
         goalValidator.deleteGoalValidator(goalId);

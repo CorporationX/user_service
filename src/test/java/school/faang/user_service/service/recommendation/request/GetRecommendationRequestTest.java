@@ -115,7 +115,7 @@ public class GetRecommendationRequestTest {
                                 recommendationRequestDto)
                 ),
                 Arguments.of(
-                        "Test with invalid RecommendationRequest ID",
+                        "Test requesting  for a non-existent recommendation request",
                         new GetRecommendationRequestTestParam(
                                 -1,
                                 Optional.empty(),

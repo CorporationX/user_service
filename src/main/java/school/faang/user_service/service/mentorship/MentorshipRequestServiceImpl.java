@@ -25,7 +25,7 @@ import java.util.stream.StreamSupport;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DefaultMentorshipRequestService implements MentorshipRequestService {
+public class MentorshipRequestServiceImpl implements MentorshipRequestService {
 
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final MentorshipRequestMapper mapper;

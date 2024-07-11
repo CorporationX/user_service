@@ -47,7 +47,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class DefaultMentorshipRequestServiceTest {
+class MentorshipRequestServiceImplTest {
 
     @Mock
     private MentorshipRequestRepository mentorshipRequestRepository;
@@ -65,7 +65,7 @@ class DefaultMentorshipRequestServiceTest {
     private ArgumentCaptor<MentorshipRequestDto> dtoCaptor;
 
     @InjectMocks
-    private DefaultMentorshipRequestService sut;
+    private MentorshipRequestServiceImpl sut;
 
     @BeforeEach
     void setUp() {

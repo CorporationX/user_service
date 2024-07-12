@@ -1,6 +1,7 @@
 package school.faang.user_service.service;
 
 
+import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,6 +14,7 @@ import school.faang.user_service.controller.SkillController;
 import school.faang.user_service.dto.skill.SkillCandidateDto;
 import school.faang.user_service.dto.skill.SkillDto;
 
+import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.mapper.SkillMapperImpl;
 
 import java.util.ArrayList;
@@ -58,7 +60,29 @@ public class SkillControllerTest {
         Assertions.assertEquals(singleSkillCandidateDtoList, skillController.getOfferedSkills(1L));
     }
 
-    @Test void testAcquireSkillFromOffers() {
-
+    @Test
+    void testAcquireLearnedSkillFromOffers() {
+        Mockito.when(skillService.acquireSkillFromOffers(1L, 1L)).thenThrow(new DataValidationException("the skill is already learned"));
+        Exception exception = Assert.assertThrows(DataValidationException.class, () -> skillController.acquireSkillFromOffers(1L, 1L));
+        String expectedMessage = "the skill is already learned";
+        String actualMessage = exception.getMessage();
+        Assertions.assertEquals(expectedMessage, actualMessage);
     }
+
+    @Test
+    void testAcquireSkillFromNotEnoughOffers() {
+        Mockito.when(skillService.acquireSkillFromOffers(1L, 1L)).thenThrow(new DataValidationException("not enough offers to acquire the skill..."));
+        Exception exception = Assert.assertThrows(DataValidationException.class, () -> skillController.acquireSkillFromOffers(1L, 1L));
+        String expectedMessage = "not enough offers to acquire the skill...";
+        String actualMessage = exception.getMessage();
+        Assertions.assertEquals(expectedMessage, actualMessage);
+    }
+
+    @Test
+    void testAcquireSkillFromOffers() {
+        Mockito.when(skillService.acquireSkillFromOffers(1L, 1L)).thenReturn(skillDto);
+        skillController.acquireSkillFromOffers(1L, 1L);
+        Mockito.verify(skillService).acquireSkillFromOffers(1L, 1L);
+    }
+
 }

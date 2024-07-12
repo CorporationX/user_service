@@ -2,7 +2,6 @@ package school.faang.user_service.controller.recommendation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import school.faang.user_service.exception.DataValidationException;
 import school.faang.user_service.service.RecommendationRequestService;
 
 import java.util.List;
@@ -31,7 +30,7 @@ public class RecommendationRequestController {
 
     private void validateRequestNotEmpty(RecommendationRequestDto recommendationRequest) {
         if (recommendationRequest.getMessage().isEmpty()) {
-            throw new DataValidationException("Recommendation message is empty");
+            throw new RuntimeException("Recommendation request message is empty");
         }
     }
 }

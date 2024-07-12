@@ -28,8 +28,11 @@ public class SkillValidatorTest {
 
     @Test
     public void testSkillNameIsNull() {
-        Assert.assertThrows(NullPointerException.class,
+        Exception exception = Assert.assertThrows(NullPointerException.class,
                 () -> skillValidator.validateSkill(new SkillDto(1L, null)));
+        String actualMessage = exception.getMessage();
+        String expectedMessage = "skill name is null";
+        Assert.assertEquals(expectedMessage, actualMessage);
     }
 
     @Test

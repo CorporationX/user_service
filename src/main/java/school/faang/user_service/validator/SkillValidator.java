@@ -17,7 +17,7 @@ public class SkillValidator {
 
     public void validateSkill(SkillDto skill) {
         if (skill.getTitle() == null) throw new NullPointerException("skill name is null");
-        if (skill.getTitle().isEmpty() || skill.getTitle().isBlank())
+        if (skill.getTitle().isBlank())
             throw new DataValidationException("skill name is either blank or empty");
         else if (skillRepository.existsByTitle(skill.getTitle()))
             throw new DataValidationException("skill already exists");

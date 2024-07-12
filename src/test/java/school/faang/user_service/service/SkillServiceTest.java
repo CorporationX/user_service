@@ -55,18 +55,18 @@ public class SkillServiceTest {
     @InjectMocks
     private SkillService skillService;
 
+    private final SkillDto skillDto = new SkillDto(1L, "title");
+
     @Test
     public void testCreate() {
-        SkillDto skill = new SkillDto(1L, "title");
-        skillService.create(skill);
-        Mockito.verify(skillRepository, Mockito.times(1)).save(skillMapper.toEntity(skill));
+        skillService.create(skillDto);
+        Mockito.verify(skillRepository, Mockito.times(1)).save(skillMapper.toEntity(skillDto));
     }
 
     @Test
     public void testGetUserSkills() {
-        SkillDto skill = new SkillDto(1L, "title");
-        skillService.getUserSkills(skill.getId());
-        Mockito.verify(skillRepository, Mockito.times(1)).findAllByUserId(skill.getId());
+        skillService.getUserSkills(skillDto.getId());
+        Mockito.verify(skillRepository, Mockito.times(1)).findAllByUserId(skillDto.getId());
     }
 
     @Test

@@ -22,23 +22,23 @@ public interface RecommendationRequestMapper {
 
     @Mapping(source = "requester.id", target = "requesterId")
     @Mapping(source = "receiver.id", target = "recieverId")
-    @Mapping(source = "skills", target = "skills", qualifiedByName = "toDto")
-    RecommendationRequestDto toDto(RecommendationRequest recommendationRequest);
+    @Mapping(source = "skills", target = "skills", qualifiedByName = "toDtoList")
+    RecommendationRequestDto toDtoList(RecommendationRequest recommendationRequest);
 
     @Mapping(source = "requesterId", target = "requester.id")
     @Mapping(source = "recieverId", target = "receiver.id")
-    @Mapping(source = "skills", target = "skills", qualifiedByName = "toEntity")
-    RecommendationRequest toEntity(RecommendationRequestDto recommendationRequestDto);
+    @Mapping(source = "skills", target = "skills", qualifiedByName = "toEntityList")
+    RecommendationRequest toEntityList(RecommendationRequestDto recommendationRequestDto);
 
-    @Named("toDto")
-    default List<SkillRequestDto> toDto(List<SkillRequest> skillRequests) {
+    @Named("toDtoList")
+    default List<SkillRequestDto> toDtoList(List<SkillRequest> skillRequests) {
         return skillRequests.stream()
                 .map(skillRequest -> Mappers.getMapper(SkillRequestMapper.class).toDto(skillRequest))
                 .toList();
     }
 
-    @Named("toEntity")
-    default List<SkillRequest> toEntity(List<SkillRequestDto> skillRequestsDto) {
+    @Named("toEntityList")
+    default List<SkillRequest> toEntityList(List<SkillRequestDto> skillRequestsDto) {
         return skillRequestsDto.stream()
                 .map(skillRequestDto -> Mappers.getMapper(SkillRequestMapper.class).toEntity(skillRequestDto))
                 .toList();

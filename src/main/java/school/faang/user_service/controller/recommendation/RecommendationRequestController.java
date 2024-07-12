@@ -23,22 +23,22 @@ import java.util.List;
 @Validated
 public class RecommendationRequestController {
     private static final String REQUEST = "/request";
-    private static final String ALL_REQUESTS_FILTER = "/requests-filter";
+    private static final String ALL_REQUESTS_FILTER = "/requests";
     private final RecommendationRequestService requestService;
 
     @GetMapping(REQUEST)
-    public ResponseEntity<RecommendationRequestDto> getRecommendationRequest(long id) {
-        return ResponseEntity.ok(requestService.getRequest(id));
+    public RecommendationRequestDto getRecommendationRequest(Long id) {
+        return ResponseEntity.ok(requestService.getRequest(id)).getBody();
     }
 
     @GetMapping(ALL_REQUESTS_FILTER)
-    public ResponseEntity<List<RecommendationRequestDto>> getRecommendationRequests(RequestFilterDto filter) {
-        return ResponseEntity.ok(requestService.getRequests(filter));
+    public List<RecommendationRequestDto> getRecommendationRequests(RequestFilterDto filter) {
+        return ResponseEntity.ok(requestService.getRequests(filter)).getBody();
     }
 
     @PostMapping(REQUEST)
-    public ResponseEntity<RecommendationRequestDto> rejectRequest(@RequestParam @Positive long recommendationRequestId,
+    public RecommendationRequestDto rejectRequest(@RequestParam @Positive long recommendationRequestId,
                                                                   @RequestParam @NotBlank @NotNull String reasonReject) {
-        return ResponseEntity.ok(requestService.rejectRequest(recommendationRequestId, reasonReject));
+        return ResponseEntity.ok(requestService.rejectRequest(recommendationRequestId, reasonReject)).getBody();
     }
 }

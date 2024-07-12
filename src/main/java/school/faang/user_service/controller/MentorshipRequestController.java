@@ -12,21 +12,24 @@ import school.faang.user_service.dto.MentorshipRequestDto;
 import school.faang.user_service.dto.RejectionDto;
 import school.faang.user_service.dto.RequestFilterDto;
 import school.faang.user_service.service.MentorshipRequestService;
+import school.faang.user_service.validator.MentorshipRequestValidator;
 
 import java.util.List;
 
 @Controller
 public class MentorshipRequestController {
     MentorshipRequestService mentorshipRequestService;
+    MentorshipRequestValidator mentorshipRequestValidator;
 
     @Autowired
-    public MentorshipRequestController(MentorshipRequestService mentorshipRequestService) {
+    public MentorshipRequestController(MentorshipRequestService mentorshipRequestService, MentorshipRequestValidator mentorshipRequestValidator) {
         this.mentorshipRequestService = mentorshipRequestService;
+        this.mentorshipRequestValidator = mentorshipRequestValidator;
     }
 
     @PostMapping
     public ResponseEntity<String> requestMentorship(@RequestBody MentorshipRequestDto mentorshipRequestDto) {
-        if (mentorshipRequestDto.getDescription() == null || mentorshipRequestDto.getDescription().isEmpty()) {
+        if (mentorshipRequestValidator.validateRequestMentorshipDescription(mentorshipRequestDto)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Description is required");
         }
 

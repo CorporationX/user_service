@@ -22,6 +22,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+import school.faang.user_service.validator.MentorshipRequestValidator;
 
 import java.util.Collections;
 import java.util.List;
@@ -40,6 +41,10 @@ public class MentorshipRequestServiceTest {
     @Mock
     private MentorshipRequestMapper mentorshipRequestMapper;
 
+    @Mock
+    private MentorshipRequestValidator mentorshipRequestValidator;
+
+
     MentorshipRequest mentorshipRequest;
     MentorshipRequestDto requestDto;
 
@@ -50,7 +55,6 @@ public class MentorshipRequestServiceTest {
     @BeforeEach
     public void setUp() {
         mentorshipRequest = new MentorshipRequest();
-
         requestDto = new MentorshipRequestDto();
         requestDto.setRequesterId(1L);
         requestDto.setReceiverId(2L);
@@ -60,8 +64,7 @@ public class MentorshipRequestServiceTest {
 
     @Test
     public void testRequestMentorship_Success() throws Exception {
-        when(userRepository.existsById(1L)).thenReturn(true);
-        when(userRepository.existsById(2L)).thenReturn(true);
+
 
         when(mentorshipRequestRepository.create(requestDto.getRequesterId(), requestDto.getReceiverId(), requestDto.getDescription())).thenReturn(new MentorshipRequest());
         mentorshipRequestService.requestMentorship(requestDto);
@@ -69,16 +72,17 @@ public class MentorshipRequestServiceTest {
     }
 
     @Test
-    public void testRequestMentorship_UserNotFound() {
-        when(userRepository.existsById(1L)).thenReturn(false);
+    public void testRequestMentorship_UserNotFound() throws Exception {
 
+        doThrow(new Exception("Пользователь не найден")).when(mentorshipRequestValidator).validateRequestMentorship(any(MentorshipRequestDto.class));
         assertThrows(Exception.class, () -> mentorshipRequestService.requestMentorship(requestDto));
 
         verify(mentorshipRequestRepository, never()).save(any(MentorshipRequest.class));
     }
 
     @Test
-    public void testRequestMentorship_SelfRequest() {
+    public void testRequestMentorship_SelfRequest() throws Exception {
+        doThrow(new Exception("Нельзя назначить себя ментором!")).when(mentorshipRequestValidator).validateRequestMentorship(any(MentorshipRequestDto.class));
         assertThrows(Exception.class, () -> mentorshipRequestService.requestMentorship(requestDto));
 
         verify(mentorshipRequestRepository, never()).save(any(MentorshipRequest.class));
@@ -117,6 +121,8 @@ public class MentorshipRequestServiceTest {
     public void testAcceptRequest_AlreadyAccepted() {
         mentorshipRequest.setStatus(RequestStatus.ACCEPTED);
         when(mentorshipRequestRepository.findById(1L)).thenReturn(Optional.of(mentorshipRequest));
+
+        doThrow(new RuntimeException("Запрос не найден")).when(mentorshipRequestValidator).validateAcceptRequest(any(Optional.class));
 
         assertThrows(RuntimeException.class,
                 () -> mentorshipRequestService.acceptRequest(1L), "Запрос не найден");
@@ -157,6 +163,8 @@ public class MentorshipRequestServiceTest {
         mentorshipRequest.setStatus(RequestStatus.REJECTED);
 
         when(mentorshipRequestRepository.findById(1L)).thenReturn(Optional.of(mentorshipRequest));
+
+        doThrow(new RuntimeException("Запрос уже отклонен")).when(mentorshipRequestValidator).validateRejectRequest(any(Optional.class));
 
         assertThrows(RuntimeException.class,
                 () -> mentorshipRequestService.rejectRequest(1L, rejectionDto), "Запрос уже отклонен");

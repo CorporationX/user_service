@@ -10,6 +10,7 @@ import school.faang.user_service.entity.RequestStatus;
 import school.faang.user_service.mapper.MentorshipRequestMapper;
 import school.faang.user_service.repository.UserRepository;
 import school.faang.user_service.repository.mentorship.MentorshipRequestRepository;
+import school.faang.user_service.validator.MentorshipRequestValidator;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,26 +23,24 @@ public class MentorshipRequestService {
     private final MentorshipRequestRepository mentorshipRequestRepository;
     private final UserRepository userRepository;
     private final MentorshipRequestMapper mentorshipRequestMapper;
+    private final MentorshipRequestValidator mentorshipRequestValidator;
 
 
     @Autowired
-    public MentorshipRequestService(MentorshipRequestRepository mentorshipRequestRepository, UserRepository userRepository, MentorshipRequestMapper mentorshipRequestMapper) {
+    public MentorshipRequestService(MentorshipRequestRepository mentorshipRequestRepository, UserRepository userRepository,
+                                    MentorshipRequestMapper mentorshipRequestMapper, MentorshipRequestValidator mentorshipRequestValidator) {
+
         this.mentorshipRequestRepository = mentorshipRequestRepository;
         this.userRepository = userRepository;
         this.mentorshipRequestMapper = mentorshipRequestMapper;
+        this.mentorshipRequestValidator = mentorshipRequestValidator;
     }
 
     public void requestMentorship(MentorshipRequestDto mentorshipRequestDto) throws Exception {
         Long requesterId = mentorshipRequestDto.getRequesterId();
         Long receiverId = mentorshipRequestDto.getReceiverId();
 
-        if (requesterId.equals(receiverId)) {
-            throw new Exception("Нельзя назначить себя ментором!");
-        }
-
-        if (!userRepository.existsById(requesterId) || !userRepository.existsById(receiverId)) {
-            throw new Exception("Пользователь не найден");
-        }
+        mentorshipRequestValidator.validateRequestMentorship(mentorshipRequestDto);
 
         mentorshipRequestRepository.findLatestRequest(requesterId, receiverId).ifPresent((n) -> {
             if (LocalDateTime.now().getMonthValue() - n.getUpdatedAt().getMonthValue() < 3) {
@@ -56,8 +55,7 @@ public class MentorshipRequestService {
     }
 
     public List<MentorshipRequestDto> getRequests(RequestFilterDto filterDto) {
-        Iterable<MentorshipRequest> iterable = mentorshipRequestRepository.findAll();
-        List<MentorshipRequest> requests = StreamSupport.stream(iterable.spliterator(), false)
+        List<MentorshipRequest> requests = StreamSupport.stream(mentorshipRequestRepository.findAll().spliterator(), false)
                 .toList();
 
         return requests.stream()
@@ -71,17 +69,8 @@ public class MentorshipRequestService {
 
     public void acceptRequest(long id) {
         Optional<MentorshipRequest> requestOptional = mentorshipRequestRepository.findById(id);
-
-        if (requestOptional.isEmpty()) {
-            throw new RuntimeException("Запрос не найден");
-        }
-
+        mentorshipRequestValidator.validateAcceptRequest(requestOptional);
         MentorshipRequest request = requestOptional.get();
-
-        if (request.getStatus() == RequestStatus.ACCEPTED) {
-            throw new RuntimeException("Запрос уже получен");
-        }
-
         request.setStatus(RequestStatus.ACCEPTED);
         mentorshipRequestRepository.save(request);
     }
@@ -89,16 +78,8 @@ public class MentorshipRequestService {
     public void rejectRequest(long id, RejectionDto rejection) {
         Optional<MentorshipRequest> requestOptional = mentorshipRequestRepository.findById(id);
 
-        if (requestOptional.isEmpty()) {
-            throw new RuntimeException("Запрос не найден");
-        }
-
+        mentorshipRequestValidator.validateRejectRequest(requestOptional);
         MentorshipRequest request = requestOptional.get();
-
-        if (request.getStatus() == RequestStatus.REJECTED) {
-            throw new RuntimeException("Запрос уже отклонен");
-        }
-
         request.setStatus(RequestStatus.REJECTED);
         request.setRejectionReason(rejection.getReason());
         mentorshipRequestRepository.save(request);

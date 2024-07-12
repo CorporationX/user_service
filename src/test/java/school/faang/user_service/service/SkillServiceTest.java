@@ -23,12 +23,14 @@ import school.faang.user_service.mapper.SkillMapperImpl;
 import school.faang.user_service.repository.SkillRepository;
 import school.faang.user_service.repository.UserSkillGuaranteeRepository;
 import school.faang.user_service.repository.recommendation.SkillOfferRepository;
+import school.faang.user_service.validator.SkillValidator;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.spy;
 
@@ -36,6 +38,9 @@ import static org.mockito.Mockito.spy;
 public class SkillServiceTest {
     @Mock
     private SkillRepository skillRepository;
+
+    @Mock
+    private SkillValidator skillValidator;
 
     @Spy
     private SkillMapperImpl skillMapper;
@@ -59,8 +64,12 @@ public class SkillServiceTest {
 
     @Test
     public void testCreate() {
-        skillService.create(skillDto);
+        Skill skill = skillMapper.toEntity(skillDto);
+        Mockito.doNothing().when(skillValidator).validateSkill(skillDto);
+        Mockito.when(skillRepository.save(skillMapper.toEntity(skillDto))).thenReturn(skill);
+        SkillDto actualDto = skillService.create(skillDto);
         Mockito.verify(skillRepository, Mockito.times(1)).save(skillMapper.toEntity(skillDto));
+        Assertions.assertEquals(skillDto, actualDto);
     }
 
     @Test
@@ -77,9 +86,13 @@ public class SkillServiceTest {
         firstSkill.setId(1L);
         List<Skill> listOfOneSkill = new ArrayList<>();
         listOfOneSkill.add(firstSkill);
+        List<SkillCandidateDto> expectedSkill = new ArrayList<>();
+        SkillCandidateDto firstSkillCandidateDto = new SkillCandidateDto(skillMapper.toDto(firstSkill), 1);
+        expectedSkill.add(firstSkillCandidateDto);
         Mockito.when(skillRepository.findSkillsOfferedToUser(userId)).thenReturn(listOfOneSkill);
-        skillService.getOfferedSkills(userId);
+        List<SkillCandidateDto> actualSkill = skillService.getOfferedSkills(userId);
         Mockito.verify(skillRepository, Mockito.times(1)).findSkillsOfferedToUser(userId);
+        Assertions.assertEquals(expectedSkill, actualSkill);
     }
 
     @Test
@@ -95,7 +108,7 @@ public class SkillServiceTest {
         skill.setId(1L);
         Optional<Skill> someSkill = Optional.of(skill);
         Mockito.when(skillRepository.findById(1L)).thenReturn(someSkill);
-        Assert.assertEquals(skillMapper.toDto(skill), skillService.getSkillById(1L));
+        assertEquals(skillMapper.toDto(skill), skillService.getSkillById(1L));
     }
 
     @Test

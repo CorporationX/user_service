@@ -1,6 +1,7 @@
 package school.faang.user_service.controller.recommendation;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -47,7 +48,8 @@ class RecommendationRequestControllerTest {
     }
 
     @Test
-    void testRequestRecommendation() {
+    @DisplayName("Testing that requestRecommendation calls all of his methods and do return")
+    public void testRequestRecommendation() {
         when(recommendationRequestService.create(any())).thenReturn(responseDto);
 
         RecommendationRequestDto result = recommendationRequestController.requestRecommendation(requestDto);
@@ -57,7 +59,8 @@ class RecommendationRequestControllerTest {
     }
 
     @Test
-    void testGetRecommendationRequests() {
+    @DisplayName("Testing that getRecommendationRequests calls all of his methods and do return")
+    public void testGetRecommendationRequests() {
         when(recommendationRequestService.getRequests(any())).thenReturn(recommendtionRequestDtoList);
 
         List<RecommendationRequestDto> result = recommendationRequestController.getRecommendationRequests(filter);
@@ -67,7 +70,8 @@ class RecommendationRequestControllerTest {
     }
 
     @Test
-    void testGetRecommendationRequest() {
+    @DisplayName("Testing that getRecommendationRequest calls all of his methods and do return")
+    public void testGetRecommendationRequest() {
         when(recommendationRequestService.getRequest(id)).thenReturn(requestDto);
 
         RecommendationRequestDto result = recommendationRequestController.getRecommendationRequest(id);
@@ -77,7 +81,8 @@ class RecommendationRequestControllerTest {
     }
 
     @Test
-    void testRejectRequest() {
+    @DisplayName("Testing that rejectRequest calls all of his methods and do return")
+    public void testRejectRequest() {
         when(recommendationRequestService.rejectRequest(id, any())).thenReturn(responseDto);
 
         RecommendationRequestDto result = recommendationRequestController.rejectRequest(id, rejection);

@@ -1,4 +1,4 @@
-package school.faang.user_service.service.recommendation;
+package school.faang.user_service.validator.recommendation;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,9 +14,9 @@ import java.util.Optional;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.when;
 
-public class RecommendationRequestRepositoryValidatorTest {
+public class RecommendationRequestIdValidatorTest {
     @InjectMocks
-    private RecommendationRequestRepositoryValidator recommendationRequestRepositoryValidator;
+    private RecommendationRequestIdValidator recommendationRequestIdValidator;
 
     @Mock
     private RecommendationRequestRepository recommendationRequestRepository;
@@ -35,6 +35,6 @@ public class RecommendationRequestRepositoryValidatorTest {
     public void testValidateId() {
         when(recommendationRequestRepository.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(NoSuchElementException.class, () -> recommendationRequestRepositoryValidator.validateId(id));
+        assertThrows(NoSuchElementException.class, () -> recommendationRequestIdValidator.validateId(id));
     }
 }

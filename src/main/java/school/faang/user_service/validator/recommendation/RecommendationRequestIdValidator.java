@@ -1,4 +1,4 @@
-package school.faang.user_service.service.recommendation;
+package school.faang.user_service.validator.recommendation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -8,7 +8,7 @@ import java.util.NoSuchElementException;
 
 @RequiredArgsConstructor
 @Component
-public class RecommendationRequestRepositoryValidator {
+public class RecommendationRequestIdValidator {
     private final RecommendationRequestRepository recommendationRequestRepository;
 
     public void validateId(Long id) {

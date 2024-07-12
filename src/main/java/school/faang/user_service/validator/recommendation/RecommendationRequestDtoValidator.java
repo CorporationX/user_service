@@ -1,4 +1,4 @@
-package school.faang.user_service.service.recommendation;
+package school.faang.user_service.validator.recommendation;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;

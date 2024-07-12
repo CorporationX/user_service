@@ -14,6 +14,7 @@ import school.faang.user_service.entity.recommendation.SkillRequest;
 import school.faang.user_service.mapper.recommendation.RecommendationRequestMapper;
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
+import school.faang.user_service.validator.recommendation.RecommendationRequestDtoValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,7 +82,10 @@ class RecommendationRequestServiceTest {
         skillRequest.setId(id);
         recommendationRequestDto.setSkills(List.of(skillRequest));
 
-        doNothing().when(recommendationRequestDtoValidator).validateAll(any());
+        doNothing().when(recommendationRequestDtoValidator).validateMessage(any());
+        doNothing().when(recommendationRequestDtoValidator).validateRequestedSkills(any());
+        doNothing().when(recommendationRequestDtoValidator).validateRequestTimeDifference(any(), any(), any());
+        doNothing().when(recommendationRequestDtoValidator).validateRequesterAndReceiverIds(any(), any());
 
         when(recommendationRequestMapper.toEntity(any(), any())).thenReturn(new RecommendationRequest());
         when(recommendationRequestRepository.create(any(), any(), any())).thenReturn(id);

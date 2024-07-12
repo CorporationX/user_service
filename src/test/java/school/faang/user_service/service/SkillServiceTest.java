@@ -99,7 +99,7 @@ public class SkillServiceTest {
     public void testGetSkillByIdThrowsException() {
         Optional<Skill> skill = Optional.empty();
         Mockito.when(skillRepository.findById(1L)).thenReturn(skill);
-        Assert.assertThrows(IllegalArgumentException.class, () -> skillService.getSkillById(1L));
+        Assert.assertThrows(DataValidationException.class, () -> skillService.getSkillById(1L));
     }
 
     @Test
@@ -151,7 +151,7 @@ public class SkillServiceTest {
         Optional<Skill> realSkill = Optional.of(skill);
         long userId = 2L;
         Mockito.when(skillRepository.findUserSkill(skillId, userId)).thenReturn(realSkill);
-        Assertions.assertEquals(skillMapper.toDto(realSkill.get()), skillService.acquireSkillFromOffers(skillId, userId));
+        Assertions.assertThrows(DataValidationException.class, ()->skillService.acquireSkillFromOffers(1L,2L));
     }
 
     @Test

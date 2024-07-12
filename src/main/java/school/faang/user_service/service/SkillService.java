@@ -73,9 +73,8 @@ public class SkillService {
     }
 
     public SkillDto getSkillById(long skillId) {
-        Optional<Skill> skill = skillRepository.findById(skillId);
-        if (skill.isEmpty()) throw new IllegalArgumentException("could not find any skill by this id");
-        else return skillMapper.toDto(skill.get());
+        Skill skill = skillRepository.findById(skillId).orElseThrow(() -> new DataValidationException("the skill is not found"));
+        return skillMapper.toDto(skill);
     }
 
 }

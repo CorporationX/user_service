@@ -28,7 +28,7 @@ class RecommendationRequestControllerTest {
 
     private Long id;
     private RecommendationRequestDto requestDto;
-    private RecommendationRequestDto responseDto = new RecommendationRequestDto();
+    private RecommendationRequestDto responseDto;
     private RequestFilterDto filter;
     private List<RecommendationRequestDto> recommendtionRequestDtoList;
     private RejectionDto rejection = new RejectionDto();
@@ -83,7 +83,7 @@ class RecommendationRequestControllerTest {
     @Test
     @DisplayName("Testing that rejectRequest calls all of his methods and do return")
     public void testRejectRequest() {
-        when(recommendationRequestService.rejectRequest(id, any())).thenReturn(responseDto);
+        when(recommendationRequestService.rejectRequest(id, rejection)).thenReturn(responseDto);
 
         RecommendationRequestDto result = recommendationRequestController.rejectRequest(id, rejection);
 

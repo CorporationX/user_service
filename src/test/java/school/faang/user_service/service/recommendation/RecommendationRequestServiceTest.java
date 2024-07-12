@@ -15,6 +15,8 @@ import school.faang.user_service.mapper.recommendation.RecommendationRequestMapp
 import school.faang.user_service.repository.recommendation.RecommendationRequestRepository;
 import school.faang.user_service.repository.recommendation.SkillRequestRepository;
 import school.faang.user_service.validator.recommendation.RecommendationRequestDtoValidator;
+import school.faang.user_service.validator.recommendation.RecommendationRequestIdValidator;
+import school.faang.user_service.validator.recommendation.RecommendationRequestIdValidatorTest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +52,9 @@ class RecommendationRequestServiceTest {
     @Mock
     public List<RequestFilter> requestFilters;
 
+    @Mock
+    public RecommendationRequestIdValidator recommendationRequestIdValidator;
+
     private Long id;
     private RequestFilterDto requestFilterDto;
     private List<RequestFilter> requestFilterList;
@@ -58,7 +63,6 @@ class RecommendationRequestServiceTest {
     private RecommendationRequest recommendationRequest;
     private RecommendationRequestDto recommendationRequestDto;
     private SkillRequest skillRequest;
-
 
     @BeforeEach
     public void setUp() {
@@ -113,6 +117,7 @@ class RecommendationRequestServiceTest {
     @Test
     @DisplayName("Test that getRequest method throws NoSuchElementException when there is no recommendation requests with given id in database")
     public void testGetRequestNoSuchElement() {
+        doNothing().when(recommendationRequestIdValidator).validateId(id);
         when(recommendationRequestRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThrows(NoSuchElementException.class, () -> recommendationRequestService.getRequest(id));
@@ -121,6 +126,7 @@ class RecommendationRequestServiceTest {
     @Test
     @DisplayName("Test that rejectRequest method throws NoSuchElementException when there is no recommendation requests with given id in database")
     public void testRejectRequestNoSuchElement() {
+        doNothing().when(recommendationRequestIdValidator).validateId(id);
         when(recommendationRequestRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThrows(NoSuchElementException.class, () -> recommendationRequestService.rejectRequest(id, rejectionDto));
